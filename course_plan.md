@@ -45,4 +45,10 @@ Half of the total points are required to pass the course. The grades are then sc
 
 (I know this can be turned into a formula easily.)
 
+## Workload
 
+Given the course has 5 ECTS, that gives 135 hours of work. That means 15 hours of effort per week so the course is demanding time-wise. I've done a rough calculation of the hour distribution below (average case):
+
+* Lectures - 9 * 2 = 18h
+* Course learning diary - 9 * 2 = 18h
+* Projects and reflection - 33 * 3 = 99h
