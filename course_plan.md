@@ -6,7 +6,7 @@ The course contains nine lectures and three projects: construct, reconstruct, an
 2. Composition
 3. Architecture
 4. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, start of the next portion - reconstruct
-5. Contracts
+5. Benchmarking
 6. Evolving architecture
 7. Scaling - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of scaling is considered
 8. Observability
@@ -28,10 +28,9 @@ During the course, the students are expected to maintain a learning diary that s
 
 The grading for the course is formative and it is derived based on the following factors:
 
-1. Completion of the course projects within groups - up to 10 points are available per project (total: 30)
-2. Participation to the lectures (either live or remote) - 3 points are gained per participation (total: 27)
-3. Completion of the learning diary. There are specific targets to hit for each lecture and points are gained per each - up to 3 points per entry (total: 27) 
-4. Self- and peer-assessment for project stages - up to ten points per entry (total: 30)
+1. Completion of the course projects within groups - up to 30 points are available per project (total: 90), 10 projects from each project needed
+2. Participation to the lectures (either live or remote) and learning diaries - 3 points are gained per participation (total: 27)
+3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36)
 
 There's slight bias towards project work in the point system so you cannot complete the course by participation alone.
 
@@ -44,6 +43,8 @@ Half of the total points are required to pass the course. The grades are then sc
 * 90% - 5
 
 (I know this can be turned into a formula easily.)
+
++ Individual tweaks to grades based on peer feedback
 
 ## Workload
 
