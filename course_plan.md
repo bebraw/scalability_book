@@ -30,7 +30,7 @@ The grading for the course is formative and it is derived based on the following
 
 1. Completion of the course projects within groups - up to 30 points are available per project (total: 90), 10 projects from each project needed
 2. Participation to the lectures (either live or remote) and learning diaries - 3 points are gained per participation (total: 27)
-3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36)
+3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36). TODO: this needs a rubric so it's fair and clear to the students!
 
 There's slight bias towards project work in the point system so you cannot complete the course by participation alone.
 
