@@ -53,3 +53,8 @@ Given the course has 5 ECTS, that gives 135 hours of work. That means 15 hours o
 * Lectures - 9 * 2 = 18h
 * Course learning diary - 9 * 2 = 18h
 * Projects and reflection - 33 * 3 = 99h
+
+## Topics to consider
+
+* Privacy - how to avoid getting scraped and hit by bots
+* Scaling development - how to deal with code developed by AI
