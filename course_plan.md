@@ -3,7 +3,7 @@
 The course contains nine lectures and three projects: construct, reconstruct, and deconstruct. The projects are aligned with the lectures. I have sketched out the initial timeline per week/lecture below:
 
 1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability
-2. Composition
+2. Scalable development - developing applications so that they remain understandable, testable, changeable, and maintainable as code, teams, dependencies, and tooling evolve. Composition is discussed as one way to manage this complexity.
 3. Architecture
 4. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, start of the next portion - reconstruct
 5. Benchmarking
@@ -14,7 +14,11 @@ The course contains nine lectures and three projects: construct, reconstruct, an
 
 ## Projects
 
-The three projects are called construct, reconstruct, and deconstruct. The idea is to show the students how scalability is about the ability to re-engineer existing projects and finally how to analyze them. I have outlined the details for each project below.
+The three projects are called construct, reconstruct, and deconstruct. The idea is to show the students that scalability is also about the ability to re-engineer existing projects and finally analyze them. In short:
+
+* Construct - build a working baseline.
+* Reconstruct - change it under new constraints.
+* Deconstruct - measure, explain, and critique the result.
 
 The projects are described in detail behind the `specifications` folder and each has its own technical targets. 
 
@@ -28,9 +32,9 @@ During the course, the students are expected to maintain a learning diary that s
 
 The grading for the course is formative and it is derived based on the following factors:
 
-1. Completion of the course projects within groups - up to 30 points are available per project (total: 90), 10 projects from each project needed
+1. Completion of the course projects within groups - up to 30 points are available per project (total: 90), 10 points from each project needed
 2. Participation to the lectures (either live or remote) and learning diaries - 3 points are gained per participation (total: 27)
-3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36). TODO: this needs a rubric so it's fair and clear to the students!
+3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36). These need a clear rubric so the criteria are fair and understandable to the students.
 
 There's slight bias towards project work in the point system so you cannot complete the course by participation alone.
 
@@ -57,4 +61,4 @@ Given the course has 5 ECTS, that gives 135 hours of work. That means 15 hours o
 ## Topics to consider
 
 * Privacy - how to avoid getting scraped and hit by bots
-* Scaling development - how to deal with code developed by AI
+* AI-assisted development - how to review, constrain, and maintain code developed with AI assistance
