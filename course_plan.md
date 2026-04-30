@@ -62,3 +62,4 @@ Given the course has 5 ECTS, that gives 135 hours of work. That means 15 hours o
 
 * Privacy - how to avoid getting scraped and hit by bots
 * AI-assisted development - how to review, constrain, and maintain code developed with AI assistance
+* Expanded API contract design - how to define APIs and keep them compatible, decouple APIs from clients, and account for Conway's Law in API design
