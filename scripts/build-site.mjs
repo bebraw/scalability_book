@@ -261,19 +261,21 @@ function renderLayout({
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="/">Scalable Web</a>
-    <nav aria-label="Primary">
-      <a href="/">Contents</a>
-      <a href="https://fitech101.aalto.fi/en/courses/designing-and-building-scalable-web-applications" target="_blank" rel="noreferrer">Course</a>
-    </nav>
-    <label class="theme-picker">
-      <span>Theme</span>
-      <select data-theme-picker>
-        ${config.themes.map((theme) => `<option value="${theme.id}">${escapeHtml(theme.label)}</option>`).join("")}
-      </select>
-    </label>
-    <button class="edit-toggle" type="button" data-editor-toggle hidden>
-      Edit
-    </button>
+    <div class="header-actions">
+      <nav aria-label="Primary">
+        <a href="/">Contents</a>
+        <a href="https://fitech101.aalto.fi/en/courses/designing-and-building-scalable-web-applications" target="_blank" rel="noreferrer">Course</a>
+      </nav>
+      <label class="theme-picker">
+        <span>Theme</span>
+        <select data-theme-picker>
+          ${config.themes.map((theme) => `<option value="${theme.id}">${escapeHtml(theme.label)}</option>`).join("")}
+        </select>
+      </label>
+      <button class="edit-toggle" type="button" data-editor-toggle hidden>
+        Edit
+      </button>
+    </div>
   </header>
   ${children}
   <footer class="site-footer">
@@ -427,7 +429,7 @@ a:hover { color: var(--accent); }
   border-bottom: 1px solid var(--border);
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   padding: .85rem clamp(1rem, 3vw, 2.5rem);
   position: sticky;
   top: 0;
@@ -437,6 +439,13 @@ a:hover { color: var(--accent); }
   color: var(--text);
   font-weight: 800;
   text-decoration: none;
+}
+.header-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
 }
 .site-header nav {
   display: flex;
@@ -789,6 +798,7 @@ a:hover { color: var(--accent); }
 @media (max-width: 48rem) {
   body { font-size: 16px; }
   .site-header { grid-template-columns: 1fr; position: static; }
+  .header-actions { justify-content: flex-start; }
   .site-header nav { flex-wrap: wrap; }
   .hero { grid-template-columns: 1fr; }
   .book-sidebar ol { columns: 1; }
