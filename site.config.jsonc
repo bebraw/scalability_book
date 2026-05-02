@@ -4,6 +4,10 @@
   "description": "Course book for Designing and Building Scalable Web Applications at Aalto University.",
   "course": "Designing and Building Scalable Web Applications",
   "audience": "MSc-level students",
+  "author": {
+    "name": "Juho Vepsäläinen",
+    "url": "https://survivejs.com/",
+  },
 
   // Only chapters listed here are published. Leave work-in-progress chapters out
   // until they are ready for the public site.

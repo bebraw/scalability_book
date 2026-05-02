@@ -115,13 +115,15 @@ function renderMarkdown(source, chapter) {
     const text = marked.Parser.parseInline(tokens);
     const slug = slugify(raw);
     const sectionNumber = getSectionNumber(depth, chapter, sectionCounters);
+    const displayText = stripHeadingNumber(text);
+    const plainText = stripHeadingNumber(decodeHtmlEntities(stripHtml(text)));
     const headingText = sectionNumber
-      ? `${sectionNumber} ${stripHtml(text)}`
-      : stripHtml(text);
+      ? `${sectionNumber} ${plainText}`
+      : plainText;
 
     tableOfContents.push({ slug, level: depth, text: headingText });
 
-    return `<h${depth} id="${slug}">${sectionNumber ? `<span class="section-number">${sectionNumber}</span> ` : ""}${text}<a class="heading-anchor" href="#${slug}" aria-label="Link to ${escapeAttribute(stripHtml(text))}">#</a></h${depth}>`;
+    return `<h${depth} id="${slug}">${sectionNumber ? `<span class="section-number">${sectionNumber}</span> ` : ""}${displayText}<a class="heading-anchor" href="#${slug}" aria-label="Link to ${escapeAttribute(plainText)}">#</a></h${depth}>`;
   };
 
   renderer.code = ({ text, lang }) => {
@@ -274,6 +276,12 @@ function renderLayout({
     </button>
   </header>
   ${children}
+  <footer class="site-footer">
+    <p>
+      ${escapeHtml(config.title)} by
+      <a href="${escapeAttribute(config.author.url)}" rel="author">${escapeHtml(config.author.name)}</a>.
+    </p>
+  </footer>
 </body>
 </html>`;
 }
@@ -463,6 +471,16 @@ a:hover { color: var(--accent); }
 .edit-toggle:hover {
   background: var(--accent);
   border-color: var(--accent);
+}
+.site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  margin-top: 4rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  text-align: center;
+}
+.site-footer p {
+  margin: 0;
 }
 .hero {
   display: grid;
@@ -928,6 +946,19 @@ function getSectionNumber(depth, chapter, counters) {
 
 function stripHtml(value) {
   return value.replace(/<[^>]*>/g, "");
+}
+
+function stripHeadingNumber(value) {
+  return value.replace(/^\d+(?:\.\d+)+\s+/, "");
+}
+
+function decodeHtmlEntities(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'");
 }
 
 function escapeHtml(value) {
