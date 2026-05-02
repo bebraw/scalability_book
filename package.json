@@ -1,0 +1,27 @@
+{
+  "name": "elements-of-scalable-web-applications",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "start": "gustwind --serve --input ./build --port 3000",
+    "serve": "gustwind --serve --input ./build --port 3000",
+    "validate": "node --check scripts/build-site.mjs && gustwind --validate --input ./build"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "0.5.19",
+    "gustwind": "0.109.0",
+    "highlight.js": "11.11.1",
+    "marked": "18.0.2",
+    "vite": "8.0.10"
+  },
+  "devDependencies": {
+    "prettier": "3.8.3"
+  }
+}

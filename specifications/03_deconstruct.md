@@ -18,15 +18,15 @@ This project emphasizes **analysis, interpretation, and explanation**.
 
 You will work with an existing system. This may be:
 
-* Your own implementation from a previous project
-* Another team’s implementation
-* A provided reference implementation or description
+- Your own implementation from a previous project
+- Another team’s implementation
+- A provided reference implementation or description
 
 You should assume the system:
 
-* Solves a real problem
-* Was built under constraints
-* Contains intentional and unintentional trade-offs
+- Solves a real problem
+- Was built under constraints
+- Contains intentional and unintentional trade-offs
 
 ---
 
@@ -36,25 +36,25 @@ You MUST analyze the system from multiple perspectives.
 
 ### 3.1 Problem and Context
 
-* What problem does the system aim to solve?
-* Who are the intended users?
-* What assumptions does the system make about its environment?
+- What problem does the system aim to solve?
+- Who are the intended users?
+- What assumptions does the system make about its environment?
 
 ---
 
 ### 3.2 Functional Behavior
 
-* What kinds of events does the system track?
-* How are events created, stored, and viewed?
-* What functionality is central, and what is secondary?
+- What kinds of events does the system track?
+- How are events created, stored, and viewed?
+- What functionality is central, and what is secondary?
 
 ---
 
 ### 3.3 Structure and Architecture
 
-* Identify the main components of the system
-* Describe how these components interact
-* Explain where data is stored and how it flows
+- Identify the main components of the system
+- Describe how these components interact
+- Explain where data is stored and how it flows
 
 Diagrams are strongly encouraged.
 
@@ -64,11 +64,11 @@ Diagrams are strongly encouraged.
 
 You MUST identify and explain:
 
-* Key design decisions
-* Constraints that influenced those decisions (time, scope, skills, tools)
-* Assumptions that are baked into the system
+- Key design decisions
+- Constraints that influenced those decisions (time, scope, skills, tools)
+- Assumptions that are baked into the system
 
-Focus on *why* choices were made, not whether you agree with them.
+Focus on _why_ choices were made, not whether you agree with them.
 
 ---
 
@@ -76,10 +76,10 @@ Focus on *why* choices were made, not whether you agree with them.
 
 You MUST discuss how the system relates to the following qualities:
 
-* Scalability
-* Reliability
-* Maintainability
-* Simplicity
+- Scalability
+- Reliability
+- Maintainability
+- Simplicity
 
 Not all qualities need to be strong; trade-offs are expected.
 
@@ -89,9 +89,9 @@ Not all qualities need to be strong; trade-offs are expected.
 
 You SHOULD identify:
 
-* Potential failure modes
-* Bottlenecks or fragile parts of the system
-* Situations where the system might behave poorly
+- Potential failure modes
+- Bottlenecks or fragile parts of the system
+- Situations where the system might behave poorly
 
 This is an analysis exercise, not a criticism exercise.
 
@@ -101,8 +101,8 @@ This is an analysis exercise, not a criticism exercise.
 
 You MAY include a short reflection on:
 
-* What surprised you about the system
-* What you would do differently if starting from scratch
+- What surprised you about the system
+- What you would do differently if starting from scratch
 
 Do not turn this into a redesign.
 
@@ -112,9 +112,9 @@ Do not turn this into a redesign.
 
 Your submission SHALL include:
 
-* A written analysis (4–6 pages or equivalent)
-* At least one architecture or data-flow diagram
-* Clear explanations in your own words
+- A written analysis (4–6 pages or equivalent)
+- At least one architecture or data-flow diagram
+- Clear explanations in your own words
 
 No code changes are required.
 
@@ -124,10 +124,10 @@ No code changes are required.
 
 Your work will be evaluated based on:
 
-* Depth of understanding
-* Accuracy of interpretation
-* Ability to explain trade-offs
-* Clarity and structure of communication
+- Depth of understanding
+- Accuracy of interpretation
+- Ability to explain trade-offs
+- Clarity and structure of communication
 
 Originality is less important than insight.
 
@@ -137,9 +137,9 @@ Originality is less important than insight.
 
 Good deconstruction answers questions like:
 
-* Why does this exist?
-* What constraints shaped it?
-* What problems does it solve well?
-* What problems does it avoid solving?
+- Why does this exist?
+- What constraints shaped it?
+- What problems does it solve well?
+- What problems does it avoid solving?
 
 The goal is to learn how real systems are understood, not how ideal systems are imagined.

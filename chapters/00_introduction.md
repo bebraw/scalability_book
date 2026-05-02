@@ -1,32 +1,18 @@
 # Elements of Scalable Web Applications
 
-In this brief book, I discuss the elements behind scalable web applications.
-The book contains three projects (construct, reconstruct, and deconstruct) for you to complete that each illustrate a facet of scalability.
-By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale.
-It is not only infrastructure that we have to consider but also the way we build applications.
-Therefore, scalability is not only a technical concern but also a social one.
-It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
+In this brief book, I discuss the elements behind scalable web applications. The book contains three projects (construct, reconstruct, and deconstruct) for you to complete that each illustrate a facet of scalability. By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale. It is not only infrastructure that we have to consider but also the way we build applications. Therefore, scalability is not only a technical concern but also a social one. It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
 
 ## Why should you read this book
 
-By its nature, the book is more on the academic side and I have included references in each chapter for further study.
-I have tried to keep each chapter to the point, and the additional resources provide a fuller view of each topic.
-Together, the book and the projects give the concepts a concrete shape and deepen your understanding.
+By its nature, the book is more on the academic side and I have included references in each chapter for further study. I have tried to keep each chapter to the point, and the additional resources provide a fuller view of each topic. Together, the book and the projects give the concepts a concrete shape and deepen your understanding.
 
-I wrote this book to capture my understanding of how to develop scalable web applications.
-Although the book is oriented toward the web, several principles discussed here apply more broadly.
-Even if you are not a web practitioner, you can likely still gain something from reading it.
+I wrote this book to capture my understanding of how to develop scalable web applications. Although the book is oriented toward the web, several principles discussed here apply more broadly. Even if you are not a web practitioner, you can likely still gain something from reading it.
 
-In the age of AI-driven development, understanding the concepts behind scalability is perhaps more important than ever.
-For this reason, I focus more on concepts than on specific technical details, which tend to change over time.
-Through this book and the surrounding course, you will also learn how to use AI technologies critically so they support development while preserving attention to design quality, maintainability, and system constraints.
+In the age of AI-driven development, understanding the concepts behind scalability is perhaps more important than ever. For this reason, I focus more on concepts than on specific technical details, which tend to change over time. Through this book and the surrounding course, you will also learn how to use AI technologies critically so they support development while preserving attention to design quality, maintainability, and system constraints.
 
 ## Structure of the book
 
-The course book is built around the three course projects: construct, reconstruct, and deconstruct.
-Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result.
-The purpose of this book is to support you as you complete these projects.
-With this goal in mind, I have structured the book as follows:
+The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows:
 
 1. What is scalability? -- How do we define scalability in the first place?
 2. How to develop scalable web applications? -- How can we keep applications understandable, testable, changeable, and maintainable as code, teams, dependencies, and tooling evolve? How can composition help us manage this complexity?

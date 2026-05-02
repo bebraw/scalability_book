@@ -16,11 +16,11 @@ The course contains nine lectures and three projects: construct, reconstruct, an
 
 The three projects are called construct, reconstruct, and deconstruct. The idea is to show the students that scalability is also about the ability to re-engineer existing projects and finally analyze them. In short:
 
-* Construct - build a working baseline.
-* Reconstruct - change it under new constraints.
-* Deconstruct - measure, explain, and critique the result.
+- Construct - build a working baseline.
+- Reconstruct - change it under new constraints.
+- Deconstruct - measure, explain, and critique the result.
 
-The projects are described in detail behind the `specifications` folder and each has its own technical targets. 
+The projects are described in detail behind the `specifications` folder and each has its own technical targets.
 
 The students are expected to perform self- and peer-assessment after each phase of the project so feedback may be shared with the project group and the students can reflect on their groupworking.
 
@@ -40,26 +40,26 @@ There's slight bias towards project work in the point system so you cannot compl
 
 Half of the total points are required to pass the course. The grades are then scaled so that 90% of points results in a 5 and the rest of the grades fall between 50% and 90% as follows:
 
-* 50% - 1
-* 60% - 2
-* 70% - 3
-* 80% - 4
-* 90% - 5
+- 50% - 1
+- 60% - 2
+- 70% - 3
+- 80% - 4
+- 90% - 5
 
 (I know this can be turned into a formula easily.)
 
-+ Individual tweaks to grades based on peer feedback
+- Individual tweaks to grades based on peer feedback
 
 ## Workload
 
 Given the course has 5 ECTS, that gives 135 hours of work. That means 15 hours of effort per week so the course is demanding time-wise. I've done a rough calculation of the hour distribution below (average case):
 
-* Lectures - 9 * 2 = 18h
-* Course learning diary - 9 * 2 = 18h
-* Projects and reflection - 33 * 3 = 99h
+- Lectures - 9 \* 2 = 18h
+- Course learning diary - 9 \* 2 = 18h
+- Projects and reflection - 33 \* 3 = 99h
 
 ## Topics to consider
 
-* Privacy - how to avoid getting scraped and hit by bots
-* AI-assisted development - how to review, constrain, and maintain code developed with AI assistance
-* Expanded API contract design - how to define APIs and keep them compatible, decouple APIs from clients, and account for Conway's Law in API design
+- Privacy - how to avoid getting scraped and hit by bots
+- AI-assisted development - how to review, constrain, and maintain code developed with AI assistance
+- Expanded API contract design - how to define APIs and keep them compatible, decouple APIs from clients, and account for Conway's Law in API design

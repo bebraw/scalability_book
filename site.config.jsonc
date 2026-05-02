@@ -1,0 +1,46 @@
+{
+  "domain": "scalableweb.dev",
+  "title": "Elements of Scalable Web Applications",
+  "description": "Course book for Designing and Building Scalable Web Applications at Aalto University.",
+  "course": "Designing and Building Scalable Web Applications",
+  "audience": "MSc-level students",
+
+  // Only chapters listed here are published. Leave work-in-progress chapters out
+  // until they are ready for the public site.
+  "chapters": [
+    "chapters/00_introduction.md",
+    /*"chapters/01_what_is_scalability.md",
+    "chapters/02_scalable_development.md",
+    "chapters/03_architecture.md",
+    "chapters/04_reality.md",
+    "chapters/05_benchmarking.md",
+    "chapters/06_evolving_architecture.md",
+    "chapters/07_scaling.md",
+    "chapters/08_observability.md",
+    "chapters/09_hindsight.md"*/
+  ],
+
+  // Theme choices shown in the site header.
+  "themes": [
+    {
+      "id": "light",
+      "label": "Light",
+    },
+    {
+      "id": "dark",
+      "label": "Dark",
+    },
+    {
+      "id": "sepia",
+      "label": "Sepia",
+    },
+    {
+      "id": "contrast",
+      "label": "High contrast",
+    },
+    {
+      "id": "calm",
+      "label": "Calm",
+    },
+  ],
+}
