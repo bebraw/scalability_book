@@ -12,7 +12,7 @@ npm run build
 npm start
 ```
 
-`npm start` serves the site locally at `http://127.0.0.1:3000` with an Edit button on chapter pages. In this mode, all Markdown files under `chapters/` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally. The editor writes changes back to the Markdown chapter files and rebuilds the local static output after saving.
+`npm start` serves the site locally at `http://127.0.0.1:3000` with an Edit button on chapter pages. In this mode, all Markdown files under `chapters/` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally. The editor writes changes back to the Markdown chapter files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
 
 For a read-only static preview, use:
 

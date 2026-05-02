@@ -1,4 +1,11 @@
-import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
 import highlight from "highlight.js/lib/core";
@@ -71,7 +78,8 @@ for (let index = 0; index < chapters.length; index++) {
       title: `${chapter.title} - ${config.title}`,
       description: config.description,
       currentUrl: chapter.url,
-      scripts: ["/editor.js"],
+      stylesheets: ["/vendor/easymde/easymde.min.css"],
+      scripts: ["/vendor/easymde/easymde.min.js", "/editor.js"],
       children: renderChapter({ chapter, rendered, previous, next }),
     }),
   );
@@ -90,6 +98,7 @@ await writePage(
 await writeFile(path.join(buildDir, "styles.css"), styles(), "utf8");
 await writeFile(path.join(buildDir, "theme.js"), themeScript(), "utf8");
 await writeFile(path.join(buildDir, "editor.js"), editorScript(), "utf8");
+await copyEditorAssets();
 
 async function writePage(relativePath, content) {
   const outputPath = path.join(buildDir, relativePath);
@@ -104,6 +113,20 @@ async function getAllChapterFiles() {
     .filter((entry) => entry.endsWith(".md"))
     .sort((a, b) => a.localeCompare(b, "en"))
     .map((entry) => `chapters/${entry}`);
+}
+
+async function copyEditorAssets() {
+  const vendorDir = path.join(buildDir, "vendor", "easymde");
+
+  await mkdir(vendorDir, { recursive: true });
+  await copyFile(
+    path.join(root, "node_modules", "easymde", "dist", "easymde.min.css"),
+    path.join(vendorDir, "easymde.min.css"),
+  );
+  await copyFile(
+    path.join(root, "node_modules", "easymde", "dist", "easymde.min.js"),
+    path.join(vendorDir, "easymde.min.js"),
+  );
 }
 
 function renderMarkdown(source, chapter) {
@@ -236,6 +259,7 @@ function renderLayout({
   title,
   description,
   currentUrl,
+  stylesheets = [],
   scripts = [],
   children,
 }) {
@@ -254,6 +278,7 @@ function renderLayout({
   <meta property="og:url" content="${canonicalUrl}">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/styles.css">
+  ${stylesheets.map((stylesheet) => `<link rel="stylesheet" href="${stylesheet}">`).join("\n  ")}
   <script src="/theme.js" defer></script>
   ${scripts.map((script) => `<script src="${script}" defer></script>`).join("\n  ")}
 </head>
@@ -679,6 +704,43 @@ a:hover { color: var(--accent); }
   resize: vertical;
   width: 100%;
 }
+.editor-panel .EasyMDEContainer {
+  color: var(--text);
+}
+.editor-panel .EasyMDEContainer .CodeMirror {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+  font: .95rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.editor-panel .EasyMDEContainer .CodeMirror-cursor {
+  border-left-color: var(--text);
+}
+.editor-panel .EasyMDEContainer .CodeMirror-selected {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.editor-panel .editor-toolbar {
+  background: var(--panel);
+  border-color: var(--border);
+  border-radius: .35rem .35rem 0 0;
+}
+.editor-panel .editor-toolbar button {
+  color: var(--text) !important;
+}
+.editor-panel .editor-toolbar button:hover,
+.editor-panel .editor-toolbar button.active {
+  background: var(--bg);
+  border-color: var(--border);
+}
+.editor-panel .editor-toolbar i.separator {
+  border-left-color: var(--border);
+  border-right-color: transparent;
+}
+.editor-panel .editor-preview,
+.editor-panel .editor-preview-side {
+  background: var(--panel);
+  color: var(--text);
+}
 .editor-actions {
   align-items: center;
   display: flex;
@@ -842,6 +904,7 @@ if (editor && toggle) {
   const cancel = editor.querySelector("[data-editor-cancel]");
   const status = editor.querySelector("[data-editor-status]");
   const slug = editor.dataset.chapterSlug;
+  let markdownEditor;
   let originalSource = "";
 
   fetch("/api/editor/status")
@@ -862,7 +925,7 @@ if (editor && toggle) {
       await loadSource();
       editor.hidden = false;
       toggle.textContent = "Hide editor";
-      textarea.focus();
+      getEditor().codemirror.focus();
       return;
     }
 
@@ -871,7 +934,7 @@ if (editor && toggle) {
   });
 
   cancel.addEventListener("click", () => {
-    textarea.value = originalSource;
+    setEditorValue(originalSource);
     editor.hidden = true;
     toggle.textContent = "Edit";
     setStatus("Changes discarded.");
@@ -885,7 +948,7 @@ if (editor && toggle) {
       const response = await fetch(\`/api/chapters/\${slug}\`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: textarea.value }),
+        body: JSON.stringify({ content: getEditorValue() }),
       });
 
       if (!response.ok) {
@@ -893,7 +956,7 @@ if (editor && toggle) {
         throw new Error(error.message || "Save failed");
       }
 
-      originalSource = textarea.value;
+      originalSource = getEditorValue();
       setStatus("Saved. Reloading...");
       location.reload();
     } catch (error) {
@@ -916,8 +979,63 @@ if (editor && toggle) {
 
     const data = await response.json();
     originalSource = data.content;
-    textarea.value = data.content;
+    setEditorValue(data.content);
     setStatus(\`Editing \${data.file}\`);
+  }
+
+  function getEditor() {
+    if (!markdownEditor && window.EasyMDE) {
+      markdownEditor = new EasyMDE({
+        element: textarea,
+        autofocus: false,
+        autosave: {
+          enabled: true,
+          uniqueId: \`chapter-\${slug}\`,
+          delay: 1000,
+        },
+        minHeight: "32rem",
+        nativeSpellcheck: true,
+        previewClass: ["editor-preview", "prose"],
+        renderingConfig: {
+          codeSyntaxHighlighting: true,
+        },
+        sideBySideFullscreen: false,
+        status: false,
+        toolbar: [
+          "bold",
+          "italic",
+          "heading",
+          "|",
+          "quote",
+          "unordered-list",
+          "ordered-list",
+          "|",
+          "link",
+          "code",
+          "table",
+          "|",
+          "preview",
+          "side-by-side",
+          "fullscreen",
+          "|",
+          "guide",
+        ],
+      });
+    }
+
+    return markdownEditor;
+  }
+
+  function getEditorValue() {
+    return markdownEditor ? markdownEditor.value() : textarea.value;
+  }
+
+  function setEditorValue(value) {
+    textarea.value = value;
+
+    if (window.EasyMDE) {
+      getEditor().value(value);
+    }
   }
 
   function setStatus(message) {
