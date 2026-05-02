@@ -9,6 +9,7 @@ import {
 import path from "node:path";
 import { marked } from "marked";
 import highlight from "highlight.js/lib/core";
+import { htmlispToHTMLSync } from "gustwind/htmlisp";
 import bash from "highlight.js/lib/languages/bash";
 import javascript from "highlight.js/lib/languages/javascript";
 import json from "highlight.js/lib/languages/json";
@@ -179,56 +180,63 @@ function renderMarkdown(source, chapter) {
 function renderHome() {
   const firstChapter = chapters[0];
 
-  return `
+  return renderHtmlisp(
+    `
     <header class="hero">
       <div class="hero-copy">
         <p class="eyebrow">Aalto University course book</p>
-        <h1>${escapeHtml(config.title)}</h1>
-        <p>${escapeHtml(config.description)}</p>
-        <a class="primary-link" href="${firstChapter.url}">Start reading</a>
+        <h1 &children="(resolve title)"></h1>
+        <p &children="(resolve description)"></p>
+        <a class="primary-link" &href="(resolve firstChapterUrl)">Start reading</a>
       </div>
       <aside class="course-panel" aria-label="Course context">
         <dl>
-          <div><dt>Course</dt><dd>${escapeHtml(config.course)}</dd></div>
+          <div><dt>Course</dt><dd &children="(resolve course)"></dd></div>
         </dl>
       </aside>
     </header>
     <main class="home-main" id="content">
       <section aria-labelledby="contents-heading">
         <h2 id="contents-heading">Book contents</h2>
-        <ol class="chapter-grid">
-          ${chapters
-            .map(
-              (chapter) => `
-            <li>
-              <a href="${chapter.url}">
-                <span>Chapter ${chapter.number}</span>
-                <strong>${escapeHtml(chapter.title)}</strong>
-              </a>
-            </li>
-          `,
-            )
-            .join("")}
+        <ol class="chapter-grid" &foreach="(resolve chapters)">
+          <li>
+            <a &href="(resolve url)">
+              <span &children="(resolve label)"></span>
+              <strong &children="(resolve title)"></strong>
+            </a>
+          </li>
         </ol>
       </section>
     </main>
-  `;
+  `,
+    {
+      title: config.title,
+      description: config.description,
+      course: config.course,
+      firstChapterUrl: firstChapter.url,
+      chapters: chapters.map((chapter) => ({
+        ...chapter,
+        label: `Chapter ${chapter.number}`,
+      })),
+    },
+  );
 }
 
 function renderChapter({ chapter, rendered, previous, next }) {
-  return `
+  return renderHtmlisp(
+    `
     <div class="book-shell">
-      ${renderBookSidebar(chapter)}
+      <Raw &html="(resolve bookSidebar)"></Raw>
       <main class="chapter-main" id="content">
         <section
           class="editor-panel"
           data-editor
-          data-chapter-slug="${escapeAttribute(chapter.slug)}"
+          &data-chapter-slug="(resolve chapterSlug)"
           hidden
         >
           <div>
             <h2>Edit chapter Markdown</h2>
-            <p>Local editing mode writes directly to ${escapeHtml(chapter.file)}.</p>
+            <p>Local editing mode writes directly to <span &children="(resolve chapterFile)"></span>.</p>
           </div>
           <textarea
             data-editor-source
@@ -242,17 +250,28 @@ function renderChapter({ chapter, rendered, previous, next }) {
           </div>
         </section>
         <article class="prose">
-          <p class="chapter-kicker">Chapter ${chapter.number}</p>
-          ${rendered.content}
+          <p class="chapter-kicker" &children="(resolve chapterLabel)"></p>
+          <Raw &html="(resolve content)"></Raw>
         </article>
         <nav class="chapter-pagination" aria-label="Chapter navigation">
-          ${previous ? `<a href="${previous.url}" rel="prev"><span>Previous</span>${escapeHtml(previous.title)}</a>` : "<span></span>"}
-          ${next ? `<a href="${next.url}" rel="next"><span>Next</span>${escapeHtml(next.title)}</a>` : "<span></span>"}
+          <Raw &html="(resolve previousLink)"></Raw>
+          <Raw &html="(resolve nextLink)"></Raw>
         </nav>
       </main>
-      ${renderLocalToc(rendered.tableOfContents)}
+      <Raw &html="(resolve localToc)"></Raw>
     </div>
-  `;
+  `,
+    {
+      bookSidebar: renderBookSidebar(chapter),
+      chapterFile: chapter.file,
+      chapterLabel: `Chapter ${chapter.number}`,
+      chapterSlug: chapter.slug,
+      content: rendered.content,
+      localToc: renderLocalToc(rendered.tableOfContents),
+      nextLink: renderPaginationLink(next, "Next", "next"),
+      previousLink: renderPaginationLink(previous, "Previous", "prev"),
+    },
+  );
 }
 
 function renderLayout({
@@ -265,22 +284,23 @@ function renderLayout({
 }) {
   const canonicalUrl = `https://${config.domain}${currentUrl}`;
 
-  return `<!doctype html>
+  return renderHtmlisp(
+    `<!doctype html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(title)}</title>
-  <meta name="description" content="${escapeAttribute(description)}">
-  <link rel="canonical" href="${canonicalUrl}">
-  <meta property="og:title" content="${escapeAttribute(title)}">
-  <meta property="og:description" content="${escapeAttribute(description)}">
-  <meta property="og:url" content="${canonicalUrl}">
-  <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/styles.css">
-  ${stylesheets.map((stylesheet) => `<link rel="stylesheet" href="${stylesheet}">`).join("\n  ")}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title &children="(resolve title)"></title>
+  <meta name="description" &content="(resolve description)" />
+  <link rel="canonical" &href="(resolve canonicalUrl)" />
+  <meta property="og:title" &content="(resolve title)" />
+  <meta property="og:description" &content="(resolve description)" />
+  <meta property="og:url" &content="(resolve canonicalUrl)" />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="/styles.css" />
+  <Raw &html="(resolve stylesheetTags)"></Raw>
   <script src="/theme.js" defer></script>
-  ${scripts.map((script) => `<script src="${script}" defer></script>`).join("\n  ")}
+  <Raw &html="(resolve scriptTags)"></Raw>
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
@@ -293,8 +313,8 @@ function renderLayout({
       </nav>
       <label class="theme-picker">
         <span>Theme</span>
-        <select data-theme-picker>
-          ${config.themes.map((theme) => `<option value="${theme.id}">${escapeHtml(theme.label)}</option>`).join("")}
+        <select data-theme-picker &foreach="(resolve themes)">
+          <option &value="(resolve id)" &children="(resolve label)"></option>
         </select>
       </label>
       <button class="edit-toggle" type="button" data-editor-toggle hidden>
@@ -302,37 +322,58 @@ function renderLayout({
       </button>
     </div>
   </header>
-  ${children}
+  <Raw &html="(resolve children)"></Raw>
   <footer class="site-footer">
     <p>
-      ${escapeHtml(config.title)} by
-      <a href="${escapeAttribute(config.author.url)}" rel="author">${escapeHtml(config.author.name)}</a>.
+      <span &children="(resolve siteTitle)"></span> by
+      <a &href="(resolve authorUrl)" rel="author" &children="(resolve authorName)"></a>.
     </p>
   </footer>
 </body>
-</html>`;
+</html>`,
+    {
+      authorName: config.author.name,
+      authorUrl: config.author.url,
+      canonicalUrl,
+      children,
+      description,
+      scriptTags: scripts
+        .map((src) => `<script src="${escapeAttribute(src)}" defer></script>`)
+        .join("\n"),
+      siteTitle: config.title,
+      stylesheetTags: stylesheets
+        .map(
+          (href) => `<link rel="stylesheet" href="${escapeAttribute(href)}" />`,
+        )
+        .join("\n"),
+      themes: config.themes,
+      title,
+    },
+  );
 }
 
 function renderBookSidebar(currentChapter) {
-  return `
+  return renderHtmlisp(
+    `
     <aside class="book-sidebar" aria-label="Book contents">
       <p>Book contents</p>
-      <ol>
-        ${chapters
-          .map(
-            (chapter) => `
-          <li>
-            <a href="${chapter.url}" ${chapter.slug === currentChapter.slug ? 'aria-current="page"' : ""}>
-              <span>${chapter.number}</span>
-              ${escapeHtml(chapter.title)}
-            </a>
-          </li>
-        `,
-          )
-          .join("")}
+      <ol &foreach="(resolve chapters)">
+        <li>
+          <a &href="(resolve url)" &aria-current="(resolve ariaCurrent)">
+            <span &children="(resolve number)"></span>
+            <span &children="(resolve title)"></span>
+          </a>
+        </li>
       </ol>
     </aside>
-  `;
+  `,
+    {
+      chapters: chapters.map((chapter) => ({
+        ...chapter,
+        ariaCurrent: chapter.slug === currentChapter.slug ? "page" : null,
+      })),
+    },
+  );
 }
 
 function renderLocalToc(tableOfContents) {
@@ -340,22 +381,58 @@ function renderLocalToc(tableOfContents) {
     (item) => item.level > 1 && item.level < 4,
   );
 
-  return `
+  return renderHtmlisp(
+    `
     <aside class="local-toc" aria-label="On this page">
       <p>On this page</p>
-      <ol>
-        ${headings
-          .map(
-            (item) => `
-          <li class="toc-level-${item.level}">
-            <a href="#${item.slug}">${escapeHtml(item.text)}</a>
-          </li>
-        `,
-          )
-          .join("")}
+      <ol &foreach="(resolve headings)">
+        <li &class="(resolve className)">
+          <a &href="(resolve href)" &children="(resolve text)"></a>
+        </li>
       </ol>
     </aside>
-  `;
+  `,
+    {
+      headings: headings.map((item) => ({
+        ...item,
+        className: `toc-level-${item.level}`,
+        href: `#${item.slug}`,
+      })),
+    },
+  );
+}
+
+function renderPaginationLink(chapter, label, rel) {
+  if (!chapter) {
+    return "<span></span>";
+  }
+
+  return renderHtmlisp(
+    `<a &href="(resolve url)" &rel="(resolve rel)"><span &children="(resolve label)"></span><span &children="(resolve title)"></span></a>`,
+    {
+      label,
+      rel,
+      title: chapter.title,
+      url: chapter.url,
+    },
+  );
+}
+
+function renderHtmlisp(htmlInput, props = {}) {
+  return normalizeVoidTags(
+    htmlispToHTMLSync({
+      htmlInput,
+      components: {
+        Raw: ({ html }) => html || " ",
+      },
+      props,
+      renderOptions: { escapeByDefault: true },
+    }),
+  );
+}
+
+function normalizeVoidTags(html) {
+  return html.replaceAll("</meta>", "").replaceAll("</link>", "");
 }
 
 function styles() {
