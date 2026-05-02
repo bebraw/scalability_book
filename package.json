@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.mjs",
+    "dev": "node scripts/dev-site.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "start": "gustwind --serve --input ./build --port 3000",
+    "start": "node scripts/dev-site.mjs",
     "serve": "gustwind --serve --input ./build --port 3000",
-    "validate": "node --check scripts/build-site.mjs && gustwind --validate --input ./build"
+    "validate": "node --check scripts/build-site.mjs && node --check scripts/dev-site.mjs && gustwind --validate --input ./build"
   },
   "engines": {
     "node": ">=24"

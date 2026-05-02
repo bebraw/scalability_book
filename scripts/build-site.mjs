@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
 import highlight from "highlight.js/lib/core";
@@ -11,6 +11,7 @@ import yaml from "highlight.js/lib/languages/yaml";
 
 const root = process.cwd();
 const buildDir = path.join(root, "build");
+const includeAllChapters = process.argv.includes("--all-chapters");
 const config = parseJsonc(
   await readFile(path.join(root, "site.config.jsonc"), "utf8"),
 );
@@ -32,26 +33,31 @@ await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
 
 const chapters = await Promise.all(
-  config.chapters.map(async (file, index) => {
-    const source = await readFile(path.join(root, file), "utf8");
-    const fallbackTitle = titleFromFilename(file);
-    const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
-    const title = firstHeading || fallbackTitle;
-    const slug =
-      index === 0
-        ? "introduction"
-        : path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
+  (includeAllChapters ? await getAllChapterFiles() : config.chapters).map(
+    async (file, index) => {
+      const source = await readFile(path.join(root, file), "utf8");
+      const fallbackTitle = titleFromFilename(file);
+      const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
+      const title = firstHeading || fallbackTitle;
+      const slug =
+        index === 0
+          ? "introduction"
+          : path
+              .basename(file, ".md")
+              .replace(/^\d+_/, "")
+              .replaceAll("_", "-");
 
-    return {
-      file,
-      index,
-      number: index === 0 ? "0" : String(index),
-      slug,
-      url: `/chapters/${slug}/`,
-      title,
-      source,
-    };
-  }),
+      return {
+        file,
+        index,
+        number: index === 0 ? "0" : String(index),
+        slug,
+        url: `/chapters/${slug}/`,
+        title,
+        source,
+      };
+    },
+  ),
 );
 
 for (let index = 0; index < chapters.length; index++) {
@@ -65,6 +71,7 @@ for (let index = 0; index < chapters.length; index++) {
       title: `${chapter.title} - ${config.title}`,
       description: config.description,
       currentUrl: chapter.url,
+      scripts: ["/editor.js"],
       children: renderChapter({ chapter, rendered, previous, next }),
     }),
   );
@@ -82,11 +89,21 @@ await writePage(
 
 await writeFile(path.join(buildDir, "styles.css"), styles(), "utf8");
 await writeFile(path.join(buildDir, "theme.js"), themeScript(), "utf8");
+await writeFile(path.join(buildDir, "editor.js"), editorScript(), "utf8");
 
 async function writePage(relativePath, content) {
   const outputPath = path.join(buildDir, relativePath);
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, content, "utf8");
+}
+
+async function getAllChapterFiles() {
+  const entries = await readdir(path.join(root, "chapters"));
+
+  return entries
+    .filter((entry) => entry.endsWith(".md"))
+    .sort((a, b) => a.localeCompare(b, "en"))
+    .map((entry) => `chapters/${entry}`);
 }
 
 function renderMarkdown(source, chapter) {
@@ -178,6 +195,27 @@ function renderChapter({ chapter, rendered, previous, next }) {
     <div class="book-shell">
       ${renderBookSidebar(chapter)}
       <main class="chapter-main" id="content">
+        <section
+          class="editor-panel"
+          data-editor
+          data-chapter-slug="${escapeAttribute(chapter.slug)}"
+          hidden
+        >
+          <div>
+            <h2>Edit chapter Markdown</h2>
+            <p>Local editing mode writes directly to ${escapeHtml(chapter.file)}.</p>
+          </div>
+          <textarea
+            data-editor-source
+            spellcheck="true"
+            aria-label="Chapter Markdown source"
+          ></textarea>
+          <div class="editor-actions">
+            <button type="button" data-editor-save>Save chapter</button>
+            <button type="button" data-editor-cancel>Cancel</button>
+            <span data-editor-status role="status" aria-live="polite"></span>
+          </div>
+        </section>
         <article class="prose">
           <p class="chapter-kicker">Chapter ${chapter.number}</p>
           ${rendered.content}
@@ -192,7 +230,13 @@ function renderChapter({ chapter, rendered, previous, next }) {
   `;
 }
 
-function renderLayout({ title, description, currentUrl, children }) {
+function renderLayout({
+  title,
+  description,
+  currentUrl,
+  scripts = [],
+  children,
+}) {
   const canonicalUrl = `https://${config.domain}${currentUrl}`;
 
   return `<!doctype html>
@@ -209,6 +253,7 @@ function renderLayout({ title, description, currentUrl, children }) {
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/styles.css">
   <script src="/theme.js" defer></script>
+  ${scripts.map((script) => `<script src="${script}" defer></script>`).join("\n  ")}
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
@@ -224,6 +269,9 @@ function renderLayout({ title, description, currentUrl, children }) {
         ${config.themes.map((theme) => `<option value="${theme.id}">${escapeHtml(theme.label)}</option>`).join("")}
       </select>
     </label>
+    <button class="edit-toggle" type="button" data-editor-toggle hidden>
+      Edit
+    </button>
   </header>
   ${children}
 </body>
@@ -402,6 +450,20 @@ a:hover { color: var(--accent); }
   font: inherit;
   padding: .3rem .45rem;
 }
+.edit-toggle {
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  border-radius: .35rem;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: .35rem .7rem;
+}
+.edit-toggle:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
 .hero {
   display: grid;
   gap: 2rem;
@@ -554,6 +616,73 @@ a:hover { color: var(--accent); }
 .chapter-main {
   min-width: 0;
 }
+.editor-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: .35rem solid var(--accent);
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+.editor-panel[hidden] {
+  display: none;
+}
+.editor-panel h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.editor-panel p {
+  color: var(--muted);
+  font-size: .9rem;
+  margin: .25rem 0 0;
+}
+.editor-panel textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .35rem;
+  color: var(--text);
+  font: .95rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  min-height: 32rem;
+  padding: .8rem;
+  resize: vertical;
+  width: 100%;
+}
+.editor-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+.editor-actions button {
+  border: 1px solid var(--border);
+  border-radius: .35rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: .45rem .75rem;
+}
+.editor-actions button:first-child {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
+}
+.editor-actions button:first-child:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.editor-actions button:last-of-type {
+  background: var(--panel);
+  color: var(--text);
+}
+.editor-actions span {
+  color: var(--muted);
+  font-size: .9rem;
+}
 .prose {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -672,6 +801,100 @@ if (picker) {
     root.dataset.theme = picker.value;
     localStorage.setItem("theme", picker.value);
   });
+}`;
+}
+
+function editorScript() {
+  return `const editor = document.querySelector("[data-editor]");
+const toggle = document.querySelector("[data-editor-toggle]");
+
+if (editor && toggle) {
+  const textarea = editor.querySelector("[data-editor-source]");
+  const save = editor.querySelector("[data-editor-save]");
+  const cancel = editor.querySelector("[data-editor-cancel]");
+  const status = editor.querySelector("[data-editor-status]");
+  const slug = editor.dataset.chapterSlug;
+  let originalSource = "";
+
+  fetch("/api/editor/status")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Editor API unavailable");
+      }
+
+      return response.json();
+    })
+    .then(() => {
+      toggle.hidden = false;
+    })
+    .catch(() => {});
+
+  toggle.addEventListener("click", async () => {
+    if (editor.hidden) {
+      await loadSource();
+      editor.hidden = false;
+      toggle.textContent = "Hide editor";
+      textarea.focus();
+      return;
+    }
+
+    editor.hidden = true;
+    toggle.textContent = "Edit";
+  });
+
+  cancel.addEventListener("click", () => {
+    textarea.value = originalSource;
+    editor.hidden = true;
+    toggle.textContent = "Edit";
+    setStatus("Changes discarded.");
+  });
+
+  save.addEventListener("click", async () => {
+    setStatus("Saving...");
+    save.disabled = true;
+
+    try {
+      const response = await fetch(\`/api/chapters/\${slug}\`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: textarea.value }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || "Save failed");
+      }
+
+      originalSource = textarea.value;
+      setStatus("Saved. Reloading...");
+      location.reload();
+    } catch (error) {
+      setStatus(error.message);
+      save.disabled = false;
+    }
+  });
+
+  async function loadSource() {
+    if (originalSource) {
+      return;
+    }
+
+    setStatus("Loading Markdown...");
+    const response = await fetch(\`/api/chapters/\${slug}\`);
+
+    if (!response.ok) {
+      throw new Error("Unable to load chapter source");
+    }
+
+    const data = await response.json();
+    originalSource = data.content;
+    textarea.value = data.content;
+    setStatus(\`Editing \${data.file}\`);
+  }
+
+  function setStatus(message) {
+    status.textContent = message;
+  }
 }`;
 }
 
