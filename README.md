@@ -21,3 +21,15 @@ npm run serve
 ```
 
 The build emits a static site to `build/` for `scalableweb.dev`. The deployed site remains read-only because the editing API exists only in the local dev server.
+
+## Cloudflare Worker
+
+The site can be deployed through Wrangler as a Cloudflare Worker with static assets bound from `build/`:
+
+```bash
+npm run worker:build
+npm run worker:dev
+npm run deploy
+```
+
+`worker:build` generates the static site and a small asset manifest for the Worker. `deploy` publishes `worker/index.ts` using [wrangler.jsonc](wrangler.jsonc).

@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "scalableweb",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-05-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./build",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+  },
+  "routes": [
+    {
+      "pattern": "scalableweb.dev",
+      "custom_domain": true,
+    },
+  ],
+}

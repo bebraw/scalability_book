@@ -10,7 +10,11 @@
     "format:check": "prettier --check .",
     "start": "node scripts/dev-site.mjs",
     "serve": "gustwind --serve --input ./build --port 3000",
-    "validate": "node --check scripts/build-site.mjs && node --check scripts/dev-site.mjs && gustwind --validate --input ./build"
+    "worker:prepare": "node scripts/generate-worker-manifest.mjs",
+    "worker:build": "npm run build && npm run worker:prepare",
+    "worker:dev": "npm run worker:build && wrangler dev",
+    "deploy": "npm run worker:build && wrangler deploy",
+    "validate": "node --check scripts/build-site.mjs && node --check scripts/dev-site.mjs && node --check scripts/generate-worker-manifest.mjs && gustwind --validate --input ./build"
   },
   "engines": {
     "node": ">=24"
@@ -24,6 +28,7 @@
     "vite": "8.0.10"
   },
   "devDependencies": {
-    "prettier": "3.8.3"
+    "prettier": "3.8.3",
+    "wrangler": "4.86.0"
   }
 }
