@@ -1,0 +1,38 @@
+<div class="book-shell">
+  <Raw &html="(resolve bookSidebar)"></Raw>
+  <main class="chapter-main" id="content">
+    <section
+      class="editor-panel"
+      data-editor
+      &data-chapter-slug="(resolve chapterSlug)"
+      hidden
+    >
+      <div>
+        <h2>Edit chapter Markdown</h2>
+        <p>
+          Local editing mode writes directly to
+          <span &children="(resolve chapterFile)"></span>.
+        </p>
+      </div>
+      <textarea
+        data-editor-source
+        spellcheck="true"
+        aria-label="Chapter Markdown source"
+      ></textarea>
+      <div class="editor-actions">
+        <button type="button" data-editor-save>Save chapter</button>
+        <button type="button" data-editor-cancel>Cancel</button>
+        <span data-editor-status role="status" aria-live="polite"></span>
+      </div>
+    </section>
+    <article class="prose">
+      <p class="chapter-kicker" &children="(resolve chapterLabel)"></p>
+      <Raw &html="(resolve content)"></Raw>
+    </article>
+    <nav class="chapter-pagination" aria-label="Chapter navigation">
+      <Raw &html="(resolve previousLink)"></Raw>
+      <Raw &html="(resolve nextLink)"></Raw>
+    </nav>
+  </main>
+  <Raw &html="(resolve localToc)"></Raw>
+</div>

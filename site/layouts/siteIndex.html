@@ -1,0 +1,29 @@
+<header class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Aalto University course book</p>
+    <h1 &children="(resolve title)"></h1>
+    <p &children="(resolve description)"></p>
+    <a class="primary-link" &href="(resolve firstChapterUrl)">Start reading</a>
+  </div>
+  <aside class="course-panel" aria-label="Course context">
+    <dl>
+      <div>
+        <dt>Course</dt>
+        <dd &children="(resolve course)"></dd>
+      </div>
+    </dl>
+  </aside>
+</header>
+<main class="home-main" id="content">
+  <section aria-labelledby="contents-heading">
+    <h2 id="contents-heading">Book contents</h2>
+    <ol class="chapter-grid" &foreach="(resolve chapters)">
+      <li>
+        <a &href="(resolve url)">
+          <span &children="(resolve label)"></span>
+          <strong &children="(resolve title)"></strong>
+        </a>
+      </li>
+    </ol>
+  </section>
+</main>

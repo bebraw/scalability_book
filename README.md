@@ -6,6 +6,8 @@ This is the course book for the [Designing and Building Scalable Web Application
 
 The book website is configured through [site.config.jsonc](site.config.jsonc). Use the `chapters` list there to choose which Markdown chapters are published; omitted chapters are not generated, which keeps work-in-progress material out of the site. The file supports `//` and `/* ... */` comments.
 
+HTMLisp templates live under `site/`: page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
+
 ```bash
 npm install
 npm run build
