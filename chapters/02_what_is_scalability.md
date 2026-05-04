@@ -1,3 +1,5 @@
+# What is scalability?
+
 Course narrative & project arc Dimensions of scalability (users, data, teams, change) Scalability vs performance vs resilience Constraints as design inputs Why most systems fail after success
 
 ---
@@ -28,7 +30,7 @@ Before we dive into that story, this chapter sets the stage:
 
 ---
 
-## 1.1 The Course Narrative & Project Arc
+## 2.1 The Course Narrative & Project Arc
 
 Rather than present scalability as a catalog of patterns and technologies, we’ll follow a single system over time.
 
@@ -95,7 +97,7 @@ The aim is not to design the “perfect” architecture, but to learn how to:
 
 ---
 
-## 1.2 The Dimensions of Scalability
+## 2.2 The Dimensions of Scalability
 
 “Can it scale?” is one of the most overused and underexplained questions in software.
 
@@ -110,7 +112,7 @@ Scalability is multi-dimensional. Different dimensions stress different parts of
 
 You cannot treat “scaling” as a single problem when these four often push in different directions.
 
-### 1.2.1 Scaling Users
+### 2.2.1 Scaling Users
 
 User scalability is the most obvious and most visible dimension: the ability of the system to handle increased load from more clients, more requests, or more concurrent activity.
 
@@ -130,7 +132,7 @@ User scaling forces you to think about:
 
 But more users don’t just mean _more of the same_. They also change the distribution of behavior: edge cases become daily cases, rare bugs become common, and timing issues become deterministic.
 
-### 1.2.2 Scaling Data
+### 2.2.2 Scaling Data
 
 Data scalability is about both volume and variety:
 

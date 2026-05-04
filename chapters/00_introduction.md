@@ -14,8 +14,8 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows:
 
-1. What is scalability? -- How do we define scalability in the first place?
-2. How to develop scalable web applications? -- How can we keep applications understandable, testable, changeable, and maintainable as code, teams, dependencies, and tooling evolve? How can composition help us manage this complexity?
+1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
+2. What is scalability? -- How do we define scalability in the first place?
 3. What is the architecture of the web? -- How was the web built and what kind of constraints does that give to our designs? How do the constraints of the web shape API design?
 4. What happens when systems face reality? -- What kind of problems might we encounter as our systems face reality and real users? How can we scale beyond a single machine?
 5. How to benchmark web applications? -- Why is benchmarking important? How to benchmark effectively?

@@ -13,8 +13,8 @@
   // until they are ready for the public site.
   "chapters": [
     "chapters/00_introduction.md",
-    /*"chapters/01_what_is_scalability.md",
-    "chapters/02_scalable_development.md",
+    "chapters/01_scalable_development.md",
+    /*"chapters/02_what_is_scalability.md",
     "chapters/03_architecture.md",
     "chapters/04_reality.md",
     "chapters/05_benchmarking.md",

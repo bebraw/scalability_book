@@ -4,6 +4,10 @@ Scalable development is about keeping a web application possible to change as th
 
 This chapter focuses on development practices and structures that reduce the cost of change. Composition remains an important theme, but it is treated as one technique among others rather than as the whole topic.
 
+## Questions
+
+How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
+
 ## Themes
 
 - Codebase structure and module boundaries
