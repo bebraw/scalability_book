@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "scalableweb",
+  "name": "scalability-book",
   "main": "worker/index.ts",
   "compatibility_date": "2026-05-02",
   "compatibility_flags": ["nodejs_compat"],
