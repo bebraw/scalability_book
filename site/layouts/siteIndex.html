@@ -18,10 +18,11 @@
   <section aria-labelledby="contents-heading">
     <h2 id="contents-heading">Book contents</h2>
     <ol class="chapter-grid" &foreach="(resolve chapters)">
-      <li>
-        <a &href="(resolve url)">
+      <li &class="(resolve className)">
+        <a &href="(resolve url)" &aria-disabled="(resolve ariaDisabled)">
           <span &children="(resolve label)"></span>
           <strong &children="(resolve title)"></strong>
+          <em &children="(resolve status)"></em>
         </a>
       </li>
     </ol>

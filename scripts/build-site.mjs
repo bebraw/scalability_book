@@ -48,32 +48,28 @@ marked.setOptions({ gfm: true, breaks: false });
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
 
+const allChapterFiles = await getAllChapterFiles();
+const publishedChapterFiles = includeAllChapters
+  ? allChapterFiles
+  : config.chapters;
+const publishedChapterSet = new Set(publishedChapterFiles);
 const chapters = await Promise.all(
-  (includeAllChapters ? await getAllChapterFiles() : config.chapters).map(
-    async (file, index) => {
-      const source = await readFile(path.join(root, file), "utf8");
-      const fallbackTitle = titleFromFilename(file);
-      const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
-      const title = firstHeading || fallbackTitle;
-      const slug =
-        index === 0
-          ? "introduction"
-          : path
-              .basename(file, ".md")
-              .replace(/^\d+_/, "")
-              .replaceAll("_", "-");
+  publishedChapterFiles.map((file, index) => getChapter(file, index)),
+);
+const indexChapters = await Promise.all(
+  allChapterFiles.map(async (file, index) => {
+    const chapter = await getChapter(file, index);
+    const published = publishedChapterSet.has(file);
 
-      return {
-        file,
-        index,
-        number: index === 0 ? "0" : String(index),
-        slug,
-        url: `/chapters/${slug}/`,
-        title,
-        source,
-      };
-    },
-  ),
+    return {
+      ...chapter,
+      ariaDisabled: published ? null : "true",
+      className: published ? "is-published" : "is-unpublished",
+      published,
+      status: published ? "" : "Coming soon",
+      url: published ? chapter.url : null,
+    };
+  }),
 );
 
 for (let index = 0; index < chapters.length; index++) {
@@ -122,6 +118,27 @@ async function getAllChapterFiles() {
     .filter((entry) => entry.endsWith(".md"))
     .sort((a, b) => a.localeCompare(b, "en"))
     .map((entry) => `chapters/${entry}`);
+}
+
+async function getChapter(file, index) {
+  const source = await readFile(path.join(root, file), "utf8");
+  const fallbackTitle = titleFromFilename(file);
+  const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
+  const title = firstHeading || fallbackTitle;
+  const slug =
+    index === 0
+      ? "introduction"
+      : path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
+
+  return {
+    file,
+    index,
+    number: index === 0 ? "0" : String(index),
+    slug,
+    url: `/chapters/${slug}/`,
+    title,
+    source,
+  };
 }
 
 async function copyEditorAssets() {
@@ -204,7 +221,7 @@ function renderHome() {
     description: config.description,
     course: config.course,
     firstChapterUrl: firstChapter.url,
-    chapters: chapters.map((chapter) => ({
+    chapters: indexChapters.map((chapter) => ({
       ...chapter,
       label: `Chapter ${chapter.number}`,
     })),
@@ -549,6 +566,12 @@ a:hover { color: var(--accent); }
   padding: 1rem;
   text-decoration: none;
 }
+.chapter-grid .is-unpublished a {
+  border-left-color: var(--border);
+  color: var(--muted);
+  cursor: default;
+  opacity: .68;
+}
 .chapter-grid span {
   color: var(--muted);
   display: block;
@@ -561,6 +584,17 @@ a:hover { color: var(--accent); }
   display: block;
   font-size: 1.2rem;
   line-height: 1.3;
+}
+.chapter-grid em {
+  color: var(--muted);
+  display: block;
+  font-size: .85rem;
+  font-style: normal;
+  font-weight: 700;
+  margin-top: .85rem;
+}
+.chapter-grid em:empty {
+  display: none;
 }
 .book-shell {
   display: grid;
