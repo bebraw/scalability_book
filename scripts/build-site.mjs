@@ -308,15 +308,26 @@ function renderPaginationLink(chapter, label, rel) {
 }
 
 function renderHtmlisp(htmlInput, props = {}) {
-  return normalizeVoidTags(
-    htmlispToHTMLSync({
-      htmlInput,
-      components: {
-        Raw: ({ html }) => html || " ",
+  const rawBlocks = [];
+  const rendered = htmlispToHTMLSync({
+    htmlInput,
+    components: {
+      Raw: ({ html }) => {
+        const index = rawBlocks.push(html || " ") - 1;
+
+        return `HTMLISP_RAW_${index}`;
       },
-      props,
-      renderOptions: { escapeByDefault: true },
-    }),
+    },
+    props,
+    renderOptions: { escapeByDefault: true },
+  });
+
+  return normalizeVoidTags(
+    rawBlocks.reduce(
+      (html, rawBlock, index) =>
+        html.replaceAll(`HTMLISP_RAW_${index}`, rawBlock),
+      rendered,
+    ),
   );
 }
 
