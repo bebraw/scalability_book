@@ -2,6 +2,26 @@
   <Raw &html="(resolve bookSidebar)"></Raw>
   <main class="chapter-main" id="content">
     <section
+      class="comments-panel"
+      data-comments-panel
+      &data-chapter-slug="(resolve chapterSlug)"
+      hidden
+    >
+      <div class="comments-panel-header">
+        <div>
+          <h2>Feedback</h2>
+          <p data-comments-status role="status" aria-live="polite"></p>
+        </div>
+        <div class="comments-panel-actions">
+          <button type="button" data-comments-login hidden>
+            Sign in with GitHub
+          </button>
+          <button type="button" data-comments-logout hidden>Sign out</button>
+        </div>
+      </div>
+      <div data-comments-list></div>
+    </section>
+    <section
       class="editor-panel"
       data-editor
       &data-chapter-slug="(resolve chapterSlug)"

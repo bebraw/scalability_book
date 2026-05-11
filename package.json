@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.mjs",
+    "comments:pull": "node scripts/sync-comments.mjs pull",
+    "comments:push": "node scripts/sync-comments.mjs push",
+    "comments:sync": "node scripts/sync-comments.mjs sync",
     "dev": "node scripts/dev-site.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

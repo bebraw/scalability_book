@@ -24,6 +24,27 @@ npm run serve
 
 The build emits a static site to `build/` for `scalableweb.dev`. The deployed site remains read-only because the editing API exists only in the local dev server.
 
+## Feedback comments
+
+The deployed Worker supports paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured. Students sign in with GitHub, select a paragraph, and post comments. Admin users listed in `ADMIN_GITHUB_LOGINS` can resolve comments.
+
+Setup details are in [docs/feedback-setup.md](docs/feedback-setup.md).
+
+Local editing stores feedback data in `.local/comments.json`. To review production feedback locally, pull from Cloudflare KV first:
+
+```bash
+npm run comments:pull -- --namespace-id <comments-kv-namespace-id>
+npm start
+```
+
+After resolving comments locally, push the resolution state back to KV:
+
+```bash
+npm run comments:push -- --namespace-id <comments-kv-namespace-id>
+```
+
+`comments:push` only copies local `resolvedAt` and `resolvedBy` fields to matching remote comments. It does not overwrite comment bodies or delete comments. `comments:sync` runs push first, then pulls the latest KV state back into `.local/comments.json`.
+
 ## Cloudflare Worker
 
 The site can be deployed through Wrangler as a Cloudflare Worker with static assets bound from `build/`:

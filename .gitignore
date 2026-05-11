@@ -1,4 +1,5 @@
 node_modules/
 build/
 worker/generated/
+.local/
 .DS_Store

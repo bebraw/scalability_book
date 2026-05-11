@@ -12,6 +12,20 @@
     "binding": "ASSETS",
     "run_worker_first": true,
   },
+  // To enable public feedback, create a namespace with:
+  //   wrangler kv namespace create COMMENTS_KV
+  // Then add the binding:
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "COMMENTS_KV",
+  //     "id": "replace-with-comments-kv-namespace-id",
+  //   },
+  // ],
+  // Also configure these as Worker secrets/vars:
+  //   GITHUB_CLIENT_ID
+  //   GITHUB_CLIENT_SECRET
+  //   SESSION_SECRET
+  //   ADMIN_GITHUB_LOGINS (comma-separated GitHub usernames)
   "routes": [
     {
       "pattern": "scalableweb.dev",
