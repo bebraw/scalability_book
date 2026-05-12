@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -8,6 +8,9 @@ const root = process.cwd();
 const buildDir = path.join(root, "build");
 const dataDir = path.join(root, ".local");
 const commentsPath = path.join(dataDir, "comments.json");
+const config = parseJsonc(
+  await readFile(path.join(root, "site.config.jsonc"), "utf8"),
+);
 const host = "127.0.0.1";
 const port = Number(process.env.PORT || 3000);
 const contentTypes = new Map([
@@ -249,7 +252,7 @@ async function saveComments(comments) {
 }
 
 async function loadChapters() {
-  const chapterFiles = await getAllChapterFiles();
+  const chapterFiles = getAllConfiguredContentFiles(config);
 
   return chapterFiles.map((file, index) => {
     const absolutePath = path.resolve(root, file);
@@ -261,13 +264,7 @@ async function loadChapters() {
     return {
       file,
       absolutePath,
-      slug:
-        index === 0
-          ? "introduction"
-          : path
-              .basename(file, ".md")
-              .replace(/^\d+_/, "")
-              .replaceAll("_", "-"),
+      slug: getSlug(file, index),
     };
   });
 }
@@ -294,13 +291,95 @@ async function rebuildSite() {
   });
 }
 
-async function getAllChapterFiles() {
-  const entries = await readdir(path.join(root, "chapters"));
+function getAllConfiguredContentFiles(config) {
+  const files = [...(config.chapters || [])];
 
-  return entries
-    .filter((entry) => entry.endsWith(".md"))
-    .sort((a, b) => a.localeCompare(b, "en"))
-    .map((entry) => `chapters/${entry}`);
+  for (const part of config.parts || []) {
+    if (part.file) {
+      files.push(part.file);
+    }
+
+    files.push(...(part.chapters || []));
+  }
+
+  return [...new Set(files)];
+}
+
+function getSlug(file, index) {
+  const chapterNumber = path.basename(file).match(/^(\d+)_/)?.[1];
+
+  if (chapterNumber === "00" && index === 0) {
+    return "introduction";
+  }
+
+  return path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
+}
+
+function parseJsonc(source) {
+  return JSON.parse(stripTrailingCommas(stripJsonComments(source)));
+}
+
+function stripJsonComments(source) {
+  let output = "";
+  let inString = false;
+  let quote = "";
+  let escaped = false;
+
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index];
+    const next = source[index + 1];
+
+    if (inString) {
+      output += char;
+
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === quote) {
+        inString = false;
+      }
+
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = true;
+      quote = char;
+      output += char;
+      continue;
+    }
+
+    if (char === "/" && next === "/") {
+      while (index < source.length && source[index] !== "\n") {
+        index++;
+      }
+      output += "\n";
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      index += 2;
+
+      while (
+        index < source.length &&
+        !(source[index] === "*" && source[index + 1] === "/")
+      ) {
+        index++;
+      }
+
+      index++;
+      continue;
+    }
+
+    output += char;
+  }
+
+  return output;
+}
+
+function stripTrailingCommas(source) {
+  return source.replace(/,\s*([}\]])/g, "$1");
 }
 
 function isValidSlug(value) {

@@ -1,11 +1,4 @@
-import {
-  copyFile,
-  mkdir,
-  readFile,
-  readdir,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
 import highlight from "highlight.js/lib/core";
@@ -48,14 +41,28 @@ marked.setOptions({ gfm: true, breaks: false });
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
 
-const allChapterFiles = await getAllChapterFiles();
+const allChapterFiles = getAllConfiguredChapterFiles(config);
 const publishedChapterFiles = includeAllChapters
   ? allChapterFiles
   : config.chapters;
 const publishedChapterSet = new Set(publishedChapterFiles);
+const partMetadata = getPartMetadata(config.parts || []);
 const chapters = await Promise.all(
   publishedChapterFiles.map((file, index) => getChapter(file, index)),
 );
+const chapterByFile = new Map(
+  chapters.map((chapter) => [chapter.file, chapter]),
+);
+const partPages = await Promise.all(
+  partMetadata.parts
+    .filter((part) => part.file)
+    .map((part) => getPartPage(part)),
+);
+const bookPages = buildBookPages({
+  chapters,
+  partPages,
+  parts: partMetadata.parts,
+});
 const indexChapters = await Promise.all(
   allChapterFiles.map(async (file, index) => {
     const chapter = await getChapter(file, index);
@@ -68,24 +75,35 @@ const indexChapters = await Promise.all(
       published,
       status: published ? "" : "Coming soon",
       url: published ? chapter.url : null,
+      part: partMetadata.byChapter.get(file) || null,
     };
   }),
 );
+const indexPartPages = await Promise.all(
+  partMetadata.parts
+    .filter((part) => part.file)
+    .map(async (part) => ({
+      ...(await getPartPage(part)),
+      className: "is-published",
+      published: true,
+      status: "",
+    })),
+);
 
-for (let index = 0; index < chapters.length; index++) {
-  const chapter = chapters[index];
-  const rendered = renderMarkdown(chapter.source, chapter);
-  const previous = chapters[index - 1];
-  const next = chapters[index + 1];
+for (let index = 0; index < bookPages.length; index++) {
+  const page = bookPages[index];
+  const rendered = renderMarkdown(page.source, page);
+  const previous = bookPages[index - 1];
+  const next = bookPages[index + 1];
   await writePage(
-    `chapters/${chapter.slug}/index.html`,
+    `${page.collection}/${page.slug}/index.html`,
     renderLayout({
-      title: `${chapter.title} - ${config.title}`,
+      title: `${page.title} - ${config.title}`,
       description: config.description,
-      currentUrl: chapter.url,
+      currentUrl: page.url,
       stylesheets: ["/vendor/easymde/easymde.min.css"],
       scripts: ["/comments.js", "/vendor/easymde/easymde.min.js", "/editor.js"],
-      children: renderChapter({ chapter, rendered, previous, next }),
+      children: renderBookPage({ page, rendered, previous, next }),
     }),
   );
 }
@@ -104,6 +122,7 @@ await writeFile(path.join(buildDir, "styles.css"), styles(), "utf8");
 await writeFile(path.join(buildDir, "theme.js"), themeScript(), "utf8");
 await writeFile(path.join(buildDir, "editor.js"), editorScript(), "utf8");
 await writeFile(path.join(buildDir, "comments.js"), commentsScript(), "utf8");
+await copyStaticAssets();
 await copyEditorAssets();
 
 async function writePage(relativePath, content) {
@@ -112,13 +131,14 @@ async function writePage(relativePath, content) {
   await writeFile(outputPath, content, "utf8");
 }
 
-async function getAllChapterFiles() {
-  const entries = await readdir(path.join(root, "chapters"));
+function getAllConfiguredChapterFiles(config) {
+  const files = [...(config.chapters || [])];
 
-  return entries
-    .filter((entry) => entry.endsWith(".md"))
-    .sort((a, b) => a.localeCompare(b, "en"))
-    .map((entry) => `chapters/${entry}`);
+  for (const part of config.parts || []) {
+    files.push(...(part.chapters || []));
+  }
+
+  return [...new Set(files)];
 }
 
 async function getChapter(file, index) {
@@ -126,19 +146,98 @@ async function getChapter(file, index) {
   const fallbackTitle = titleFromFilename(file);
   const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
   const title = firstHeading || fallbackTitle;
+  const chapterNumber = chapterNumberFromFilename(file);
   const slug =
-    index === 0
+    chapterNumber === "0" || index === 0
       ? "introduction"
       : path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
 
   return {
     file,
     index,
-    number: index === 0 ? "0" : String(index),
+    collection: "chapters",
+    kind: "chapter",
+    label: chapterNumber === "0" ? "Introduction" : `Chapter ${chapterNumber}`,
+    number: chapterNumber,
     slug,
     url: `/chapters/${slug}/`,
     title,
     source,
+  };
+}
+
+async function getPartPage(part) {
+  const source = await readFile(path.join(root, part.file), "utf8");
+  const fallbackTitle = part.title || titleFromFilename(part.file);
+  const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
+  const title = firstHeading || fallbackTitle;
+  const slug = path
+    .basename(part.file, ".md")
+    .replace(/^\d+_/, "")
+    .replaceAll("_", "-");
+
+  return {
+    file: part.file,
+    collection: "parts",
+    kind: "part",
+    label: `Part ${part.number}`,
+    number: part.number,
+    slug,
+    title,
+    source,
+    url: `/parts/${slug}/`,
+  };
+}
+
+function buildBookPages({ chapters, partPages, parts }) {
+  const pages = chapters.filter((chapter) => chapter.number === "0");
+  const partPageByFile = new Map(partPages.map((page) => [page.file, page]));
+
+  for (const part of parts) {
+    const partPage = part.file ? partPageByFile.get(part.file) : null;
+
+    if (partPage) {
+      pages.push(partPage);
+    }
+
+    for (const chapterFile of part.chapters) {
+      const chapter = chapterByFile.get(chapterFile);
+
+      if (chapter) {
+        pages.push(chapter);
+      }
+    }
+  }
+
+  for (const chapter of chapters) {
+    if (!pages.includes(chapter)) {
+      pages.push(chapter);
+    }
+  }
+
+  return pages;
+}
+
+function getPartMetadata(parts) {
+  const byChapter = new Map();
+
+  return {
+    byChapter,
+    parts: parts.map((part) => {
+      const normalized = {
+        number: part.number || "",
+        title: part.title || "",
+        description: part.description || "",
+        file: part.file || "",
+        chapters: Array.isArray(part.chapters) ? part.chapters : [],
+      };
+
+      for (const chapter of normalized.chapters) {
+        byChapter.set(chapter, normalized);
+      }
+
+      return normalized;
+    }),
   };
 }
 
@@ -153,6 +252,16 @@ async function copyEditorAssets() {
   await copyFile(
     path.join(root, "node_modules", "easymde", "dist", "easymde.min.js"),
     path.join(vendorDir, "easymde.min.js"),
+  );
+}
+
+async function copyStaticAssets() {
+  const assetsDir = path.join(buildDir, "assets");
+
+  await mkdir(assetsDir, { recursive: true });
+  await copyFile(
+    path.join(root, "site", "assets", "book-cover.svg"),
+    path.join(assetsDir, "book-cover.svg"),
   );
 }
 
@@ -229,23 +338,22 @@ function renderHome() {
   const firstChapter = chapters[0];
 
   return renderHtmlisp(templates.siteIndex, {
+    bookContents: renderHomeContents(),
+    coverAlt: "Cover of Elements of Scalable Web Applications",
+    coverImageUrl: "/assets/book-cover.svg",
     title: config.title,
     description: config.description,
     course: config.course,
     firstChapterUrl: firstChapter.url,
-    chapters: indexChapters.map((chapter) => ({
-      ...chapter,
-      label: `Chapter ${chapter.number}`,
-    })),
   });
 }
 
-function renderChapter({ chapter, rendered, previous, next }) {
+function renderBookPage({ page, rendered, previous, next }) {
   return renderHtmlisp(templates.bookPage, {
-    bookSidebar: renderBookSidebar(chapter),
-    chapterFile: chapter.file,
-    chapterLabel: `Chapter ${chapter.number}`,
-    chapterSlug: chapter.slug,
+    bookSidebar: renderBookSidebar(page),
+    chapterFile: page.file,
+    chapterLabel: page.label,
+    chapterSlug: page.slug,
     content: rendered.content,
     localToc: renderLocalToc(rendered.tableOfContents),
     nextLink: renderPaginationLink(next, "Next", "next"),
@@ -285,11 +393,144 @@ function renderLayout({
 
 function renderBookSidebar(currentChapter) {
   return renderHtmlisp(templates.bookContentsSidebar, {
-    chapters: chapters.map((chapter) => ({
-      ...chapter,
-      ariaCurrent: chapter.slug === currentChapter.slug ? "page" : null,
-    })),
+    bookContents: renderSidebarContents(currentChapter),
   });
+}
+
+function renderHomeContents() {
+  return renderChapterParts({
+    chapters: indexChapters,
+    currentChapter: null,
+    mode: "home",
+  });
+}
+
+function renderSidebarContents(currentChapter) {
+  return renderChapterParts({
+    chapters: indexChapters,
+    currentChapter,
+    mode: "sidebar",
+  });
+}
+
+function renderChapterParts({ chapters, currentChapter, mode }) {
+  const chapterByFile = new Map(
+    chapters.map((chapter) => [chapter.file, chapter]),
+  );
+  const partPageByFile = new Map(
+    indexPartPages.map((partPage) => [partPage.file, partPage]),
+  );
+  const assignedFiles = new Set();
+  const parts = partMetadata.parts.map((part) => {
+    const partPage = part.file ? partPageByFile.get(part.file) : null;
+    const partChapters = part.chapters
+      .map((file) => chapterByFile.get(file))
+      .filter(Boolean);
+
+    for (const chapter of partChapters) {
+      assignedFiles.add(chapter.file);
+    }
+
+    return {
+      ...part,
+      partPage,
+      chapters: partChapters,
+    };
+  });
+  const unassignedChapters = chapters.filter(
+    (chapter) => !assignedFiles.has(chapter.file),
+  );
+
+  if (unassignedChapters.length > 0) {
+    parts.unshift({
+      number: "",
+      title: "Front matter",
+      description: "",
+      chapters: unassignedChapters,
+    });
+  }
+
+  return parts
+    .filter((part) => part.chapters.length > 0)
+    .map((part) =>
+      mode === "home"
+        ? renderHomePart(part)
+        : renderSidebarPart(part, currentChapter),
+    )
+    .join("\n");
+}
+
+function renderHomePart(part) {
+  const heading = part.number
+    ? `Part ${part.number}: ${part.title}`
+    : part.title;
+  const headingContent = part.partPage
+    ? `<a href="${escapeAttribute(part.partPage.url)}">${escapeHtml(heading)}</a>`
+    : escapeHtml(heading);
+
+  return `<section class="book-part" aria-labelledby="${slugify(heading)}-heading">
+  <div class="book-part-header">
+    <h3 id="${slugify(heading)}-heading">${headingContent}</h3>
+  </div>
+  <ol class="chapter-grid">
+    ${part.chapters.map(renderHomeChapter).join("\n    ")}
+  </ol>
+</section>`;
+}
+
+function renderHomeChapter(chapter) {
+  const label =
+    chapter.label ||
+    (chapter.number === "0" ? "Introduction" : `Chapter ${chapter.number}`);
+  const status = chapter.status ? `<em>${escapeHtml(chapter.status)}</em>` : "";
+  const inner = `<span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(chapter.title)}</strong>
+      ${status}`;
+
+  if (!chapter.published) {
+    return `<li class="${escapeAttribute(chapter.className)}"><span class="chapter-card" aria-disabled="true">
+      ${inner}
+    </span></li>`;
+  }
+
+  return `<li class="${escapeAttribute(chapter.className)}"><a href="${escapeAttribute(chapter.url)}">
+      ${inner}
+    </a></li>`;
+}
+
+function renderSidebarPart(part, currentChapter) {
+  const heading = part.number
+    ? `Part ${part.number}: ${part.title}`
+    : part.title;
+  const entries = part.partPage
+    ? [part.partPage, ...part.chapters]
+    : part.chapters;
+
+  return `<section class="book-sidebar-part">
+  <h2>${escapeHtml(heading)}</h2>
+  ${part.description ? `<p>${escapeHtml(part.description)}</p>` : ""}
+  <ol>
+    ${entries.map((chapter) => renderSidebarChapter(chapter, currentChapter)).join("\n    ")}
+  </ol>
+</section>`;
+}
+
+function renderSidebarChapter(chapter, currentChapter) {
+  const ariaCurrent =
+    chapter.slug === currentChapter.slug ? ' aria-current="page"' : "";
+  const number =
+    chapter.kind === "part"
+      ? chapter.label
+      : chapter.number === "0"
+        ? "Intro"
+        : chapter.number;
+  const inner = `<span>${escapeHtml(number)}</span><span>${escapeHtml(chapter.title)}</span>`;
+
+  if (!chapter.published) {
+    return `<li><span class="book-sidebar-disabled" aria-disabled="true">${inner}</span></li>`;
+  }
+
+  return `<li><a href="${escapeAttribute(chapter.url)}"${ariaCurrent}>${inner}</a></li>`;
 }
 
 function renderLocalToc(tableOfContents) {
@@ -506,9 +747,10 @@ a:hover { color: var(--accent); }
   margin: 0;
 }
 .hero {
+  align-items: start;
   display: grid;
   gap: 2rem;
-  grid-template-columns: minmax(0, 1fr) 22rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
   margin: 0 auto;
   max-width: 72rem;
   padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 3vw, 2.5rem);
@@ -547,8 +789,20 @@ a:hover { color: var(--accent); }
   text-decoration: none;
 }
 .primary-link:hover { color: var(--panel); background: var(--accent); }
+.cover-panel {
+  display: grid;
+  gap: 1rem;
+}
+.cover-panel img {
+  aspect-ratio: 3 / 4;
+  background: #ffffff;
+  border-radius: .5rem;
+  box-shadow: var(--shadow);
+  display: block;
+  height: auto;
+  width: 100%;
+}
 .course-panel {
-  align-self: end;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: .5rem;
@@ -570,6 +824,29 @@ a:hover { color: var(--accent); }
   font-size: 2rem;
   line-height: 1.15;
 }
+.book-part {
+  margin-top: 2rem;
+}
+.book-part-header {
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .7rem;
+}
+.book-part-header h3 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.book-part-header a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: .08em;
+  text-underline-offset: .16em;
+}
+.book-part-header a:hover {
+  color: var(--accent-strong);
+}
 .chapter-grid {
   display: grid;
   gap: .85rem;
@@ -578,7 +855,8 @@ a:hover { color: var(--accent); }
   margin: 1.5rem 0 0;
   padding: 0;
 }
-.chapter-grid a {
+.chapter-grid a,
+.chapter-grid .chapter-card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-left: .35rem solid var(--accent);
@@ -589,7 +867,7 @@ a:hover { color: var(--accent); }
   padding: 1rem;
   text-decoration: none;
 }
-.chapter-grid .is-unpublished a {
+.chapter-grid .is-unpublished .chapter-card {
   border-left-color: var(--border);
   color: var(--muted);
   cursor: default;
@@ -641,7 +919,23 @@ a:hover { color: var(--accent); }
   margin: 0;
   padding: 0;
 }
-.book-sidebar a {
+.book-sidebar-part + .book-sidebar-part {
+  margin-top: 1.2rem;
+}
+.book-sidebar h2 {
+  color: var(--text);
+  font-size: .9rem;
+  line-height: 1.25;
+  margin: 0 0 .2rem;
+}
+.book-sidebar-part > p {
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.35;
+  margin: 0 0 .5rem;
+}
+.book-sidebar a,
+.book-sidebar-disabled {
   align-items: baseline;
   border-radius: .35rem;
   color: var(--text);
@@ -652,12 +946,17 @@ a:hover { color: var(--accent); }
   padding: .45rem .55rem;
   text-decoration: none;
 }
+.book-sidebar-disabled {
+  color: var(--muted);
+  opacity: .68;
+}
 .book-sidebar a[aria-current="page"] {
   background: var(--panel);
   box-shadow: inset 3px 0 0 var(--accent);
   font-weight: 800;
 }
-.book-sidebar span {
+.book-sidebar a span,
+.book-sidebar-disabled span {
   color: var(--muted);
   font-size: .8rem;
   font-weight: 800;
@@ -1462,6 +1761,12 @@ function titleFromFilename(file) {
     .replace(/^\d+_/, "")
     .replaceAll("_", " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function chapterNumberFromFilename(file) {
+  const match = path.basename(file).match(/^(\d+)_/);
+
+  return match ? String(Number(match[1])) : "";
 }
 
 function getSectionNumber(depth, chapter, counters) {

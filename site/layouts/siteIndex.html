@@ -5,26 +5,21 @@
     <p &children="(resolve description)"></p>
     <a class="primary-link" &href="(resolve firstChapterUrl)">Start reading</a>
   </div>
-  <aside class="course-panel" aria-label="Course context">
-    <dl>
-      <div>
-        <dt>Course</dt>
-        <dd &children="(resolve course)"></dd>
-      </div>
-    </dl>
+  <aside class="cover-panel" aria-label="Book cover and course context">
+    <img &src="(resolve coverImageUrl)" &alt="(resolve coverAlt)" />
+    <div class="course-panel">
+      <dl>
+        <div>
+          <dt>Course</dt>
+          <dd &children="(resolve course)"></dd>
+        </div>
+      </dl>
+    </div>
   </aside>
 </header>
 <main class="home-main" id="content">
   <section aria-labelledby="contents-heading">
     <h2 id="contents-heading">Book contents</h2>
-    <ol class="chapter-grid" &foreach="(resolve chapters)">
-      <li &class="(resolve className)">
-        <a &href="(resolve url)" &aria-disabled="(resolve ariaDisabled)">
-          <span &children="(resolve label)"></span>
-          <strong &children="(resolve title)"></strong>
-          <em &children="(resolve status)"></em>
-        </a>
-      </li>
-    </ol>
+    <Raw &html="(resolve bookContents)"></Raw>
   </section>
 </main>

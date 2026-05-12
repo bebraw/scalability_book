@@ -12,16 +12,54 @@
   // Only chapters listed here are published. Leave work-in-progress chapters out
   // until they are ready for the public site.
   "chapters": [
-    "chapters/00_introduction.md",
-    "chapters/01_scalable_development.md",
-    /*"chapters/02_what_is_scalability.md",
-    "chapters/03_architecture.md",
-    "chapters/04_reality.md",
-    "chapters/05_benchmarking.md",
-    "chapters/06_evolving_architecture.md",
-    "chapters/07_scaling.md",
-    "chapters/08_observability.md",
-    "chapters/09_hindsight.md"*/
+    "book/00_introduction.md",
+    "book/01_copiloting/01_scalable_development.md",
+    /*"book/01_copiloting/02_what_is_scalability.md",
+    "book/01_copiloting/03_architecture.md",
+    "book/02_agents/04_reality.md",
+    "book/02_agents/05_benchmarking.md",
+    "book/02_agents/06_evolving_architecture.md",
+    "book/03_agent_orchestration/07_scaling.md",
+    "book/03_agent_orchestration/08_observability.md",
+    "book/03_agent_orchestration/09_hindsight.md"*/
+  ],
+
+  // The course runs in three three-week parts. Each part maps to three book
+  // chapters and constrains the AI assistance mode allowed during that phase.
+  "parts": [
+    {
+      "number": "I",
+      "title": "Copiloting",
+      "description": "Only copilot-based assistance is allowed.",
+      "file": "book/01_copiloting/00_copiloting.md",
+      "chapters": [
+        "book/01_copiloting/01_scalable_development.md",
+        "book/01_copiloting/02_what_is_scalability.md",
+        "book/01_copiloting/03_architecture.md",
+      ],
+    },
+    {
+      "number": "II",
+      "title": "Agents",
+      "description": "Only a single agent is allowed.",
+      "file": "book/02_agents/00_agents.md",
+      "chapters": [
+        "book/02_agents/04_reality.md",
+        "book/02_agents/05_benchmarking.md",
+        "book/02_agents/06_evolving_architecture.md",
+      ],
+    },
+    {
+      "number": "III",
+      "title": "Agent orchestration",
+      "description": "Agent orchestration is allowed.",
+      "file": "book/03_agent_orchestration/00_agent_orchestration.md",
+      "chapters": [
+        "book/03_agent_orchestration/07_scaling.md",
+        "book/03_agent_orchestration/08_observability.md",
+        "book/03_agent_orchestration/09_hindsight.md",
+      ],
+    },
   ],
 
   // Theme choices shown in the site header.

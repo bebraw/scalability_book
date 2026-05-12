@@ -4,7 +4,7 @@ This is the course book for the [Designing and Building Scalable Web Application
 
 ## Website
 
-The book website is configured through [site.config.jsonc](site.config.jsonc). Use the `chapters` list there to choose which Markdown chapters are published; omitted chapters are not generated, which keeps work-in-progress material out of the site. The file supports `//` and `/* ... */` comments.
+The book website is configured through [site.config.jsonc](site.config.jsonc). Use the `chapters` list there to choose which Markdown chapters are published; omitted chapters are not generated, which keeps work-in-progress material out of the site. Use the `parts` list to group the nine course chapters into the three course sections, point at each part's Markdown intro file, and describe each section's allowed AI assistance mode. Markdown source files live under `book/`, with each part intro next to its related chapters. The file supports `//` and `/* ... */` comments.
 
 HTMLisp templates live under `site/`: page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
 
@@ -14,7 +14,7 @@ npm run build
 npm start
 ```
 
-`npm start` serves the site locally at `http://127.0.0.1:3000` with an Edit button on chapter pages. In this mode, all Markdown files under `chapters/` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally. The editor writes changes back to the Markdown chapter files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
+`npm start` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages. In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally. The editor writes changes back to the Markdown source files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
 
 For a read-only static preview, use:
 

@@ -1,11 +1,4 @@
 <aside class="book-sidebar" aria-label="Book contents">
   <p>Book contents</p>
-  <ol &foreach="(resolve chapters)">
-    <li>
-      <a &href="(resolve url)" &aria-current="(resolve ariaCurrent)">
-        <span &children="(resolve number)"></span>
-        <span &children="(resolve title)"></span>
-      </a>
-    </li>
-  </ol>
+  <Raw &html="(resolve bookContents)"></Raw>
 </aside>
