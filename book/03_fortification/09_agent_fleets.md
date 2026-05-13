@@ -2,6 +2,8 @@
 
 TODO
 
+---
+
 ## Notes for further development
 
 - Start from the idea that a fleet is useful only when work can be decomposed and recombined. Parallel agents can increase throughput, but they also increase coordination cost.

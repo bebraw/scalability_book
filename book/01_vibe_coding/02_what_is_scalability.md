@@ -28,8 +28,6 @@ Before we dive into that story, this chapter sets the stage:
 - Why most systems fail _after_ they become successful
 - How we’ll use a project arc to turn abstract principles into concrete engineering decisions
 
----
-
 ## 2.1 The Course Narrative & Project Arc
 
 Rather than present scalability as a catalog of patterns and technologies, we’ll follow a single system over time.
@@ -94,8 +92,6 @@ The aim is not to design the “perfect” architecture, but to learn how to:
 - Use constraints to focus design
 - Reduce the cost of change over time
 - Grow a system in a way that stays understandable and operable
-
----
 
 ## 2.2 The Dimensions of Scalability
 

@@ -277,6 +277,8 @@ async function loadTemplates(templatePaths) {
 }
 
 function renderMarkdown(source, chapter) {
+  source = getPublicMarkdownSource(source);
+
   const tableOfContents = [];
   const sectionCounters = [];
   const paragraphCounts = new Map();
@@ -332,6 +334,16 @@ function renderMarkdown(source, chapter) {
     content: marked(source, { renderer }),
     tableOfContents,
   };
+}
+
+function getPublicMarkdownSource(source) {
+  const marker = "\n---\n";
+  const markerIndex = source.lastIndexOf(marker);
+
+  // Content after the final standalone marker is author-only notes.
+  return markerIndex === -1
+    ? source
+    : `${source.slice(0, markerIndex).trimEnd()}\n`;
 }
 
 function renderHome() {

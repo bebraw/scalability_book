@@ -2,6 +2,8 @@
 
 TODO
 
+---
+
 ## Notes for further development
 
 - Explain that an agent-ready project is not a project with more AI sprinkled on top. It is a project where intent, constraints, and feedback are explicit enough that agents can operate without relying on hidden context.
