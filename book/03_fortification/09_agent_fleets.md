@@ -4,6 +4,10 @@ An agent fleet is a coordinated set of agents or agent roles working on parts of
 
 The central claim could be: more agents do not automatically mean more progress. Agent fleets work only when roles, boundaries, artifacts, and review loops are explicit.
 
+> **Optional: Sustainability angle**
+>
+> Parallel agents multiply compute use. A fleet is easier to justify when decomposition improves quality, reduces rework, or saves substantial human time. More agents are not automatically better if coordination overhead consumes the benefit.
+
 ## Chapter purpose
 
 - Explain when agent fleets are useful and when they are unnecessary.

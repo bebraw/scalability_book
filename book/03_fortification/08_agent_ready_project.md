@@ -4,6 +4,10 @@ An agent-ready project is a project where intent, constraints, and feedback are 
 
 The central claim could be: agentic development scales only when the project itself teaches agents how to work inside it.
 
+> **Optional: Sustainability angle**
+>
+> Agent-ready projects can reduce wasted agent work. Clear setup, fast tests, stable commands, useful errors, and scoped tasks prevent repeated failed attempts and make each model call more likely to produce reviewable value.
+
 ## Chapter purpose
 
 - Define what "agent-ready" means in practical project terms.

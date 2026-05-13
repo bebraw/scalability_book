@@ -97,6 +97,7 @@ You MUST describe trade-offs you are making, such as:
 - Simplicity vs scalability
 - Consistency vs availability
 - Real-time results vs batch processing
+- Resource efficiency vs convenience, speed, or operational safety
 
 There are no universally correct answers.
 

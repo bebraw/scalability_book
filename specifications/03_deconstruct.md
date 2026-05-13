@@ -82,6 +82,7 @@ You MUST discuss how the system relates to the following qualities:
 - Reliability
 - Maintainability
 - Simplicity
+- Resource efficiency
 
 Not all qualities need to be strong; trade-offs are expected.
 

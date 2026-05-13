@@ -2,6 +2,10 @@
 
 In this brief book, I discuss the elements behind scalable web applications. The book contains three projects (construct, reconstruct, and deconstruct) for you to complete that each illustrate a facet of scalability. By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale. It is not only infrastructure that we have to consider but also the way we build applications. Therefore, scalability is not only a technical concern but also a social one. It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
 
+> **Optional: Sustainability angle**
+>
+> Scalability also has an environmental dimension. More traffic, more data, more retries, more logs, and more infrastructure all consume resources. Throughout the book, you can ask whether a design scales efficiently, not only whether it scales at all.
+
 ## Why should you read this book
 
 By its nature, the book is more on the academic side and I have included references in each chapter for further study. I have tried to keep each chapter to the point, and the additional resources provide a fuller view of each topic. Together, the book and the projects give the concepts a concrete shape and deepen your understanding.

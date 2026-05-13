@@ -22,6 +22,10 @@ Possible subsections:
 - **More stakeholders**: reporting, compliance, support, product analytics, operational ownership.
 - **More change**: schema evolution, API compatibility, migrations, dependency upgrades.
 
+> **Optional: Sustainability angle**
+>
+> Production reality often reveals waste that local development hides: retries, bots, polling dashboards, failed jobs, duplicated events, abandoned data, and oversized logs. Systems that can back off, deduplicate, expire data, and shed load are often both more reliable and less wasteful.
+
 ## The event tracking system under pressure
 
 Scenario ideas:

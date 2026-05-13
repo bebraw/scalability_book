@@ -73,6 +73,11 @@ You may implement **any number** of the following. These are optional and meant 
 - Export events as a file (e.g. CSV or JSON)
 - Simple data import
 
+### 3.6 Sustainability Reflection
+
+- Identify one resource-related aspect of your design
+- Examples include storage growth, unnecessary polling, query efficiency, logging volume, client bundle size, or infrastructure assumptions
+
 ---
 
 ## 4. Non-Goals

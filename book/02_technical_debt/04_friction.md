@@ -23,6 +23,10 @@ Possible subsections:
 - **Operational friction**: logs, errors, configuration, and deployment behavior are unclear.
 - **Coordination friction**: people duplicate work or break each other's assumptions.
 
+> **Optional: Sustainability angle**
+>
+> Friction creates repeated work. Slow setup, flaky tests, confusing documentation, and unclear code make humans and agents rerun commands, regenerate changes, and spend more compute to reach the same result. Developer experience has an indirect resource cost.
+
 ## Friction in the event tracking project
 
 Examples to develop:

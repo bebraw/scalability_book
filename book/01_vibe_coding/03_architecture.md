@@ -58,6 +58,10 @@ Potential subsections:
 - **Security boundaries**: why every client input must be treated as untrusted.
 - **Compatibility**: why deployed clients and existing API consumers cannot be updated instantly.
 
+> **Optional: Sustainability angle**
+>
+> Architecture determines resource flow. Chatty APIs, unnecessary round trips, oversized payloads, heavy client bundles, and aggressive polling all turn design choices into recurring resource use. Good web architecture reduces waste by making useful work explicit and avoiding repeated work where possible.
+
 ## API design as architecture
 
 Ideas to develop:

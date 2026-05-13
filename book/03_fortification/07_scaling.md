@@ -42,6 +42,10 @@ Potential subsections:
 - **Bulkheads and isolation**: prevent one failure or tenant from spreading.
 - **Feature flags and staged rollout**: reduce deployment risk.
 
+> **Optional: Sustainability angle**
+>
+> Scaling techniques have resource profiles. Caches, queues, replicas, CDNs, shards, and multi-region deployments can improve user experience, but each adds infrastructure and operational cost. Ask which pressure justifies the extra resource use.
+
 ## Scaling the event pipeline
 
 For the project, the most natural scaling story is the event path:
@@ -85,6 +89,10 @@ Important trade-offs to make explicit:
 - Shared infrastructure vs tenant isolation.
 - Fast feature delivery vs strict contracts.
 - Automation vs human control.
+
+> **Optional: Sustainability angle**
+>
+> Sustainability is also a trade-off. Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
 
 ## Exercise ideas
 

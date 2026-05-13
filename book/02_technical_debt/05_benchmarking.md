@@ -22,6 +22,10 @@ Ideas to develop:
 - Distinguish cold start, warm cache, and sustained load behavior.
 - Explain why synthetic benchmarks are useful but limited.
 
+> **Optional: Sustainability angle**
+>
+> A useful benchmark can report resource use per unit of value, not only speed. For example, compare CPU time per recorded event, database queries per request, bytes transferred per dashboard load, or storage growth per day.
+
 Possible event tracking benchmarks:
 
 - Record 1,000 domain events.
@@ -45,6 +49,10 @@ Important distinction:
 - Monitoring tells you whether known conditions are healthy.
 - Observability helps you investigate unknown conditions.
 
+> **Optional: Sustainability angle**
+>
+> Observability is not free. Logs, metrics, traces, dashboards, and retained telemetry consume storage and processing. The goal is enough evidence to operate and improve the system, not unlimited data collection.
+
 ## What to measure in the project
 
 Prompts:
@@ -61,6 +69,10 @@ Prompts:
 Benchmarking can also support sustainability work. A scalable system is not only one that can handle more load; it should also avoid wasting computation, memory, storage, bandwidth, and energy. Green computing gives students a broader reason to care about efficiency: inefficient software can increase infrastructure cost and environmental impact at the same time.
 
 This section should stay concrete. Students do not need to calculate exact carbon emissions to learn useful lessons. It is enough to connect system behavior to resource consumption and ask whether the same user value can be delivered with less waste.
+
+> **Optional: Sustainability angle**
+>
+> Carbon estimates can be useful, but they are often harder to verify than direct resource measurements. Start with what you can observe: work done, data transferred, storage retained, and infrastructure kept running.
 
 Ideas to develop:
 
