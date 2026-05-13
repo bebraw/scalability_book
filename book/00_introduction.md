@@ -29,5 +29,5 @@ The course book is built around the three course projects: construct, reconstruc
 **Fortification:**
 
 7. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
-8. How to evolve web applications? -- How to evolve API contracts over time? How to consider evolvability in our designs?
-9. Why are architectural decisions easier to make in hindsight? -- What have we learned? Why do architectural constraints become apparent only in hindsight? What kind of additional constraints (ethical, sustainability) might we have to consider?
+8. How to build an agent-ready project? -- How do tests, documentation, interfaces, conventions, and task boundaries make a project safer for agentic development?
+9. How to coordinate agent fleets? -- How can we decompose work across agents, review their output, contain risk, and preserve architectural intent?

@@ -20,8 +20,8 @@
     "book/02_technical_debt/05_benchmarking.md",
     "book/02_technical_debt/06_reality.md",
     "book/03_fortification/07_scaling.md",
-    "book/03_fortification/08_evolving.md",
-    "book/03_fortification/09_hindsight.md"*/
+    "book/03_fortification/08_agent_ready_project.md",
+    "book/03_fortification/09_agent_fleets.md"*/
   ],
 
   // The course runs in three three-week parts. Each part maps to three book
@@ -56,8 +56,8 @@
       "file": "book/03_fortification/00_fortification.md",
       "chapters": [
         "book/03_fortification/07_scaling.md",
-        "book/03_fortification/08_evolving.md",
-        "book/03_fortification/09_hindsight.md",
+        "book/03_fortification/08_agent_ready_project.md",
+        "book/03_fortification/09_agent_fleets.md",
       ],
     },
   ],
