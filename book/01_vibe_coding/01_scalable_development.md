@@ -30,11 +30,13 @@ The final part of the loop, validation, is perhaps the most important one since 
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such. When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude. Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI. Most importantly you have to be able to judge what the tools emit and where to take your project. A big chunk of this comes with experience, but to avoid some of the pain and speed up your personal development, it is a good idea to pick up at least some basic ideas so you don't have to go through the trouble and find the lessons on your own. That is the main reason why we write a big project in three stages in this book, and I'll describe the first part of the project next. While people complete the project in groups during the course related to the book, you can also complete the project alone and cut the scope for example. Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely.
 
-## Book project - Event management platform
+## Book project - Event-oriented application
 
-The running project of the book is an event tracking application. The exact theme is intentionally open: a group might track activity in a conference, classroom, shop, game, device network, support workflow, or another domain where events matter. In the first project phase, Construct, students build the smallest useful version of the system: users can record events, store them, and inspect them later. The point is not to design a perfect platform immediately. The point is to create a concrete baseline that can later be stressed, redesigned, and analyzed.
+The running project of the book is an event-oriented application. The exact theme is intentionally open: a group might track activity in a conference, classroom, shop, game, device network, support workflow, or another domain where events matter. In the first project phase, Construct, students build the smallest useful version of the system: users can record events, store them, and inspect them later. The point is not to design a perfect platform immediately. The point is to create a concrete baseline that can later be stressed, redesigned, and analyzed.
 
 The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
+
+Keeping the theme open is intentional. If every group builds the same application, the later Deconstruct phase becomes too familiar and students can rely on assumptions instead of careful reading. When groups choose different domains, students have to analyze systems that encode unfamiliar workflows, terminology, and trade-offs. That makes the exercise closer to real software work, where you often inherit systems whose domain model was shaped by another team.
 
 This first version is also where agentic development becomes concrete. Students should document how they used AI assistance, what constraints they gave it, how they reviewed the result, and what they had to fix manually. The project should produce both software and evidence of engineering judgment.
 
@@ -43,6 +45,7 @@ Development ideas:
 - Keep the domain small enough that the whole system can be understood by one group.
 - Prefer a working vertical slice over many disconnected features.
 - Make assumptions explicit in the README, especially around the chosen domain, users, event types, storage, and failure handling.
+- Choose a domain specific enough that another group has something meaningful to deconstruct later.
 - Use AI tools for generation, explanation, testing, and review, but require students to justify the final design themselves.
 - Preserve early design decisions because later chapters will revisit them under pressure.
 

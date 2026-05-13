@@ -22,6 +22,8 @@ You will work with an existing system. This may be:
 - Another team’s implementation
 - A provided reference implementation or description
 
+Working with another team's system is encouraged when possible. One reason the earlier projects allow different application themes is that unfamiliar domains make deconstruction more useful. You have to infer the system's purpose, concepts, constraints, and trade-offs from the implementation and documentation rather than relying on your own memory of why choices were made.
+
 You should assume the system:
 
 - Solves a real problem
