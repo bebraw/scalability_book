@@ -4,6 +4,8 @@ Fortification is about making both the application and the development process r
 
 In this part, scalability has two meanings. The first is the traditional scalability of the web application itself. The second is the scalability of the development system around the application. As students begin to use agentic tools more actively, the project has to become legible enough that agents can work inside it without constantly breaking assumptions that only existed in a human developer's head.
 
+---
+
 ## Notes for further development
 
 - Frame the part as the transition from single-agent assistance to coordinated agentic development. The central claim could be: agentic development scales only when the project has boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel machine work.
