@@ -1,9 +1,5 @@
 # What is scalability?
 
-Course narrative & project arc Dimensions of scalability (users, data, teams, change) Scalability vs performance vs resilience Constraints as design inputs Why most systems fail after success
-
----
-
 You might be familiar with the saying "works on my machine". Often web applications are developed in the context of a local computer, or these days even on a service directly on top of a cloud platform, meaning your view on the application is limited. As systems become more complex, they also become easier to break. That is where the concept of scalability comes in. But what is scalability exactly?
 
 ## Dimensions of scalability
@@ -32,7 +28,7 @@ Before we dive into that story, this chapter sets the stage:
 
 Rather than present scalability as a catalog of patterns and technologies, we’ll follow a single system over time.
 
-Imagine we’re building a product: a multi-tenant SaaS application that lets companies run experiments on their own products—feature flags, A/B tests, and rollout strategies.
+Imagine we're building a product: an event tracking application that records meaningful activity in a chosen domain. One group might track a conference, another might track a classroom workflow, a shop, a game, a sensor network, or a support process. At first, the application may only track a few event types for a small number of users. Later, the same idea has to support many domain instances, many users, high event volume, unreliable networks, and delayed processing.
 
 At the beginning, it’s just:
 
@@ -133,3 +129,94 @@ But more users don’t just mean _more of the same_. They also change the distri
 Data scalability is about both volume and variety:
 
 - How much data can we store?
+- How quickly can we write incoming events?
+- How efficiently can we query old events?
+- How long do we keep data, and in what form?
+- How do schemas evolve when event types change?
+
+In the project, data growth begins quietly. A small version might create only a few thousand events. A larger platform can produce millions of records across user actions, device readings, workflow transitions, status changes, and analytics. At that point, the system has to distinguish between the write path, the read path, and the analytical path.
+
+Development ideas:
+
+- Explain append-only event storage as a natural fit for tracking systems.
+- Contrast normalized relational models with event logs and derived read models.
+- Discuss retention, aggregation, deletion, and privacy.
+- Use the project to ask: which data must be exact, which can be summarized, and which can be delayed?
+
+### 2.2.3 Scaling Teams
+
+Team scalability is about the ability of multiple people or groups to work on the system without constantly blocking or breaking each other.
+
+Typical stress signals:
+
+- Small changes require knowledge of the whole codebase.
+- Ownership is unclear.
+- Different groups make incompatible assumptions about shared data.
+- Pull requests become large because boundaries are weak.
+- New contributors need too much hidden context before they can work safely.
+
+Team scaling forces you to think about modules, ownership, documentation, testing, and contracts. In the project, a small team can move quickly with informal coordination, but later phases should expose the cost of implicit knowledge. If the event model, API, or storage assumptions are unclear, reconstruction becomes harder.
+
+Development ideas:
+
+- Connect team scalability to Conway's Law.
+- Show how API contracts and module boundaries reduce coordination cost.
+- Treat documentation as an operational part of the system, not an afterthought.
+- Relate agentic development to team scalability: agents also need explicit context and boundaries.
+
+### 2.2.4 Scaling Change
+
+Change scalability is the ability to keep evolving the system as requirements, tools, regulations, traffic patterns, and organizational needs shift.
+
+Typical stress signals:
+
+- The system works, but nobody wants to touch it.
+- New features require risky rewrites.
+- Dependencies cannot be upgraded.
+- Tests are slow, flaky, or absent.
+- Old design decisions are no longer documented.
+
+Change scaling is central to this book because the project itself changes shape. Construct asks for a simple working application. Reconstruct changes the assumptions. Deconstruct asks students to explain what happened and why. A scalable system is not only one that handles more load. It is one that can survive being changed by people who did not make the original decisions.
+
+Development ideas:
+
+- Discuss technical debt as reduced change capacity.
+- Explain why "easy to rewrite" is often an illusion.
+- Introduce migration thinking: compatibility, staged rollout, data backfills, and rollback.
+- Connect to later chapters on friction, observability, and fortification.
+
+## Scalability, performance, and resilience
+
+These terms often appear together, but they are not the same.
+
+- Performance asks how fast or efficient the system is under given conditions.
+- Scalability asks how the system behaves as some dimension grows.
+- Resilience asks how the system behaves when parts fail.
+
+A system can be fast but not scalable if it performs well only at one size. It can be scalable but fragile if a single dependency failure takes it down. It can be resilient but expensive if it survives failure by overprovisioning everything. The engineering task is to understand which property matters most under the current constraints.
+
+Development ideas:
+
+- Use simple graphs: latency vs load, throughput vs workers, recovery time vs failure.
+- Include examples where optimizing one property harms another.
+- Tie this back to the Reconstruct project: students should name which dimension they are optimizing and what they are sacrificing.
+
+## Constraints as design inputs
+
+Constraints are not merely obstacles. They define the shape of a reasonable design. Time, money, team skill, legal requirements, cloud limits, latency, geography, and existing code all narrow the design space.
+
+For the event tracking project, useful constraints include:
+
+- A limited project duration.
+- A small student team.
+- Unknown future event volume.
+- A domain where delayed correctness may be acceptable.
+- Privacy expectations around user or entity behavior.
+
+The goal is not to remove constraints but to use them honestly. A design that ignores constraints is usually not ambitious; it is vague.
+
+## Notes for further development
+
+- The chapter currently mixes draft prose and outline notes. Decide whether to keep the numbered `2.x` structure or align headings with the other chapters.
+- Add a small diagram showing the four scalability dimensions around the event tracking project.
+- Add a short closing section that previews Technical Debt: once the first project works, the next question is what hidden costs it has accumulated.

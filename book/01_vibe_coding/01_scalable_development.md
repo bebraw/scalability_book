@@ -32,7 +32,19 @@ While agents can allow you to develop entire web applications fast, they also re
 
 ## Book project - Event management platform
 
-TODO
+The running project of the book is an event tracking application. The exact theme is intentionally open: a group might track activity in a conference, classroom, shop, game, device network, support workflow, or another domain where events matter. In the first project phase, Construct, students build the smallest useful version of the system: users can record events, store them, and inspect them later. The point is not to design a perfect platform immediately. The point is to create a concrete baseline that can later be stressed, redesigned, and analyzed.
+
+The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
+
+This first version is also where agentic development becomes concrete. Students should document how they used AI assistance, what constraints they gave it, how they reviewed the result, and what they had to fix manually. The project should produce both software and evidence of engineering judgment.
+
+Development ideas:
+
+- Keep the domain small enough that the whole system can be understood by one group.
+- Prefer a working vertical slice over many disconnected features.
+- Make assumptions explicit in the README, especially around the chosen domain, users, event types, storage, and failure handling.
+- Use AI tools for generation, explanation, testing, and review, but require students to justify the final design themselves.
+- Preserve early design decisions because later chapters will revisit them under pressure.
 
 ## Themes
 

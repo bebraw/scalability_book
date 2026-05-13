@@ -1,6 +1,36 @@
 # How to coordinate agent fleets?
 
-TODO
+An agent fleet is a coordinated set of agents or agent roles working on parts of a larger task. Fleets can increase throughput when work decomposes cleanly, but they also introduce coordination cost. The student remains responsible for task design, integration, review, and final judgment.
+
+The central claim could be: more agents do not automatically mean more progress. Agent fleets work only when roles, boundaries, artifacts, and review loops are explicit.
+
+## Chapter purpose
+
+- Explain when agent fleets are useful and when they are unnecessary.
+- Teach role design for small development workflows.
+- Show how to decompose and recombine work safely.
+- Connect development-time fleets to production agent systems.
+
+## Working outline
+
+1. Why fleets are tempting
+   - Parallel exploration, faster implementation, specialized review, and repeatable workflows.
+2. Why fleets are risky
+   - Conflicting edits, duplicated work, shallow understanding, context loss, and integration burden.
+3. Minimal fleet roles
+   - `scout`, `planner`, `implementer`, and `reviewer`.
+4. Workflow patterns
+   - Scout then plan.
+   - Implement then review.
+   - Parallel scouts for independent subsystems.
+5. Integration discipline
+   - The human integrates findings, resolves conflicts, runs tests, and preserves architectural intent.
+6. Tooling examples
+   - Pi for local orchestration.
+   - Acolyte for controlled runtime execution.
+   - Mastra for production agent infrastructure.
+7. Course project application
+   - Students use a small fleet for one bounded improvement and submit evidence of the workflow.
 
 ---
 

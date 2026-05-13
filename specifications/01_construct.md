@@ -1,12 +1,12 @@
-# Conference Event Tracking Application
+# Event Tracking Application
 
 ## 1. Goal of the Assignment
 
-Your task is to design and implement a **simple event tracking application** for a conference.
+Your task is to design and implement a **simple event tracking application** for a domain of your choice.
 
-The system should record things that happen during a conference and allow those events to be viewed in a basic way. The focus of this assignment is **software design, clarity, and trade-offs**, not feature completeness.
+The system should record things that happen in the chosen domain and allow those events to be viewed in a basic way. The focus of this assignment is **software design, clarity, and trade-offs**, not feature completeness.
 
-This specification is intentionally minimal. You are expected to make reasonable assumptions and document them.
+This specification is intentionally minimal. You are expected to choose a theme, make reasonable assumptions, and document them. The theme could be a conference, classroom, shop, game, sensor network, task workflow, or another setting where meaningful events occur.
 
 ---
 
@@ -18,7 +18,7 @@ You MUST implement the following features.
 
 - The system SHALL allow events to be recorded.
 - Each event SHALL have:
-  - A type or name (e.g. "check-in", "session-start")
+  - A type or name (e.g. "check-in", "item-purchased", "task-completed", "sensor-reading")
   - A timestamp
 
 - Events MAY include additional data.
@@ -33,12 +33,12 @@ You MUST implement the following features.
 - Users SHALL be able to see a list of recorded events.
 - Events SHOULD be sortable or filterable by at least one criterion (e.g. time or type).
 
-### 2.4 Basic Conference Context
+### 2.4 Basic Domain Context
 
-- Events SHOULD relate to a conference context, such as:
-  - Attendees
-  - Sessions or talks
-  - Rooms or locations
+- Events SHOULD relate to the chosen domain context, such as:
+  - Users, actors, devices, or other entities
+  - Places, groups, sessions, tasks, or resources
+  - Categories or states that make the events meaningful
 
 You may model this context in any way you see fit.
 
@@ -51,16 +51,16 @@ You may implement **any number** of the following. These are optional and meant 
 ### 3.1 Aggregation and Summaries
 
 - Counts of events by type
-- Attendance numbers per session
+- Counts or summaries grouped by a domain-specific field
 
 ### 3.2 Roles and Access
 
-- Different user roles (e.g. organizer, staff)
+- Different user roles (e.g. administrator, operator, viewer)
 - Restricted access to certain views or actions
 
 ### 3.3 Simple Dashboard
 
-- Visual overview of conference activity
+- Visual overview of activity in the chosen domain
 - Charts, tables, or summaries
 
 ### 3.4 Event Validation
@@ -96,6 +96,7 @@ You MAY choose:
 - Frameworks and libraries
 - Architecture (monolith, client–server, etc.)
 - Storage solution
+- Application theme or domain
 
 You SHOULD be able to explain **why** you made these choices.
 
