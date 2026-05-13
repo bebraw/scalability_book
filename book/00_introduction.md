@@ -12,9 +12,9 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 ## Structure of the book
 
-The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows in three parts with a specific theme: Vibing, Technical Debt, and Forging.
+The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows in three parts with a specific theme: Vibe Coding, Technical Debt, and Forging.
 
-**Vibing:**
+**Vibe Coding:**
 
 1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
 2. What is scalability? -- How do we define scalability in the first place?

@@ -13,9 +13,9 @@
   // until they are ready for the public site.
   "chapters": [
     "book/00_introduction.md",
-    "book/01_vibing/01_scalable_development.md",
-    /*"book/01_vibing/02_what_is_scalability.md",
-    "book/01_vibing/03_architecture.md",
+    "book/01_vibe_coding/01_scalable_development.md",
+    /*"book/01_vibe_coding/02_what_is_scalability.md",
+    "book/01_vibe_coding/03_architecture.md",
     "book/02_technical_debt/04_friction.md",
     "book/02_technical_debt/05_benchmarking.md",
     "book/02_technical_debt/06_reality.md",
@@ -29,13 +29,13 @@
   "parts": [
     {
       "number": "I",
-      "title": "Vibing",
+      "title": "Vibe Coding",
       "description": "Only copilot-based assistance is allowed.",
-      "file": "book/01_vibing/00_vibing.md",
+      "file": "book/01_vibe_coding/00_vibe_coding.md",
       "chapters": [
-        "book/01_vibing/01_scalable_development.md",
-        "book/01_vibing/02_what_is_scalability.md",
-        "book/01_vibing/03_architecture.md",
+        "book/01_vibe_coding/01_scalable_development.md",
+        "book/01_vibe_coding/02_what_is_scalability.md",
+        "book/01_vibe_coding/03_architecture.md",
       ],
     },
     {
