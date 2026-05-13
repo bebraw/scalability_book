@@ -16,11 +16,11 @@
     "book/01_vibing/01_scalable_development.md",
     /*"book/01_vibing/02_what_is_scalability.md",
     "book/01_vibing/03_architecture.md",
-    "book/02_technical_debt/04_benchmarking.md",
-    "book/02_technical_debt/05_reality.md",
-    "book/02_technical_debt/06_evolving_architecture.md",
+    "book/02_technical_debt/04_friction.md",
+    "book/02_technical_debt/05_benchmarking.md",
+    "book/02_technical_debt/06_reality.md",
     "book/03_forging/07_scaling.md",
-    "book/03_forging/08_observability.md",
+    "book/03_forging/08_evolving.md",
     "book/03_forging/09_hindsight.md"*/
   ],
 
@@ -44,9 +44,9 @@
       "description": "Only a single agent is allowed.",
       "file": "book/02_technical_debt/00_technical_debt.md",
       "chapters": [
-        "book/02_technical_debt/04_benchmarking.md",
-        "book/02_technical_debt/05_reality.md",
-        "book/02_technical_debt/06_evolving_architecture.md",
+        "book/02_technical_debt/04_friction.md",
+        "book/02_technical_debt/05_benchmarking.md",
+        "book/02_technical_debt/06_reality.md",
       ],
     },
     {
@@ -56,7 +56,7 @@
       "file": "book/03_forging/00_forging.md",
       "chapters": [
         "book/03_forging/07_scaling.md",
-        "book/03_forging/08_observability.md",
+        "book/03_forging/08_evolving.md",
         "book/03_forging/09_hindsight.md",
       ],
     },

@@ -5,11 +5,11 @@ The course contains nine lectures and three projects: construct, reconstruct, an
 1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability
 2. Scalable development - developing applications so that they remain understandable, testable, changeable, and maintainable as code, teams, dependencies, and tooling evolve. Composition is discussed as one way to manage this complexity.
 3. Architecture
-4. Benchmarking
-5. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, start of the next portion - reconstruct
-6. Evolving architecture
+4. Friction
+5. Benchmarking and observability
+6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, start of the next portion - reconstruct
 7. Scaling - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of scaling is considered
-8. Observability
+8. Evolving architecture
 9. Hindsight - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned
 
 ## Projects
