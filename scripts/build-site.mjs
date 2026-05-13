@@ -508,7 +508,6 @@ function renderSidebarPart(part, currentChapter) {
 
   return `<section class="book-sidebar-part">
   <h2>${escapeHtml(heading)}</h2>
-  ${part.description ? `<p>${escapeHtml(part.description)}</p>` : ""}
   <ol>
     ${entries.map((chapter) => renderSidebarChapter(chapter, currentChapter)).join("\n    ")}
   </ol>
@@ -524,7 +523,10 @@ function renderSidebarChapter(chapter, currentChapter) {
       : chapter.number === "0"
         ? "Intro"
         : chapter.number;
-  const inner = `<span>${escapeHtml(number)}</span><span>${escapeHtml(chapter.title)}</span>`;
+  const inner =
+    chapter.kind === "part"
+      ? `<span class="book-sidebar-part-link">${escapeHtml(`${number}: ${chapter.title}`)}</span>`
+      : `<span>${escapeHtml(number)}</span><span>${escapeHtml(chapter.title)}</span>`;
 
   if (!chapter.published) {
     return `<li><span class="book-sidebar-disabled" aria-disabled="true">${inner}</span></li>`;
@@ -879,7 +881,6 @@ a:hover { color: var(--accent); }
   font-size: .85rem;
   font-weight: 700;
   margin-bottom: .5rem;
-  text-transform: uppercase;
 }
 .chapter-grid strong {
   display: block;
@@ -960,6 +961,9 @@ a:hover { color: var(--accent); }
   color: var(--muted);
   font-size: .8rem;
   font-weight: 800;
+}
+.book-sidebar .book-sidebar-part-link {
+  grid-column: 1 / -1;
 }
 .local-toc a {
   color: var(--muted);
