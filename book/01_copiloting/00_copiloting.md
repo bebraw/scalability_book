@@ -1,3 +1,0 @@
-# Copiloting
-
-TODO
