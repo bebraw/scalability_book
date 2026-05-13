@@ -12,7 +12,7 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 ## Structure of the book
 
-The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows in three parts with a specific theme: Vibe Coding, Technical Debt, and Forging.
+The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows in three parts with a specific theme: Vibe Coding, Technical Debt, and Fortification.
 
 **Vibe Coding:**
 
@@ -26,7 +26,7 @@ The course book is built around the three course projects: construct, reconstruc
 5. How to benchmark and observe web applications? -- Why is benchmarking important? How to benchmark effectively? What is observability?
 6. What happens when systems face reality? -- What kind of problems might we encounter as our systems face reality and real users? How can we scale beyond a single machine?
 
-**Forging:**
+**Fortification:**
 
 7. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
 8. How to evolve web applications? -- How to evolve API contracts over time? How to consider evolvability in our designs?
