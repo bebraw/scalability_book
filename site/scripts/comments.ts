@@ -497,6 +497,9 @@ if (commentsRoot) {
     renderReplies(card, comment);
 
     if (auth.admin && viewMode === "admin" && !comment.publicNote) {
+      const actions = document.createElement("div");
+      actions.className = "comment-card-actions";
+
       if (comment.hiddenAt) {
         const hidden = document.createElement("em");
         hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
@@ -507,47 +510,65 @@ if (commentsRoot) {
       }
 
       if (!comment.hiddenAt) {
-        const reply = document.createElement("button");
-        reply.type = "button";
-        reply.textContent = "Reply";
-        reply.addEventListener("click", () => replyToComment(comment.id));
-        card.append(reply);
-
-        const feature = document.createElement("button");
-        feature.type = "button";
-        feature.textContent = comment.featuredAt ? "Unfeature" : "Feature";
-        feature.addEventListener("click", () =>
-          comment.featuredAt
-            ? unfeatureComment(comment.id)
-            : featureComment(comment),
+        actions.append(
+          renderActionButton("Reply", () => replyToComment(comment.id)),
         );
-        card.append(feature);
+
+        const menu = renderActionMenu();
+        menu.append(
+          renderActionButton(comment.featuredAt ? "Unfeature" : "Feature", () =>
+            comment.featuredAt
+              ? unfeatureComment(comment.id)
+              : featureComment(comment),
+          ),
+        );
 
         if (auth.local && comment.featuredAt) {
-          const promote = document.createElement("button");
-          promote.type = "button";
-          promote.textContent = "Promote";
-          promote.addEventListener("click", () =>
-            promoteClarification(comment),
+          menu.append(
+            renderActionButton("Promote", () => promoteClarification(comment)),
           );
-          card.append(promote);
         }
 
-        const hide = document.createElement("button");
-        hide.type = "button";
-        hide.textContent = "Hide";
-        hide.addEventListener("click", () => hideComment(comment.id));
-        card.append(hide);
+        menu.append(renderActionButton("Hide", () => hideComment(comment.id)));
+        menu.append(
+          renderActionButton("Resolve", () => resolveComment(comment.id)),
+        );
+        actions.append(menu);
+      } else {
+        actions.append(
+          renderActionButton("Resolve", () => resolveComment(comment.id)),
+        );
       }
 
-      const resolve = document.createElement("button");
-      resolve.type = "button";
-      resolve.textContent = "Resolve";
-      resolve.addEventListener("click", () => resolveComment(comment.id));
-      card.append(resolve);
+      card.append(actions);
     }
 
     return card;
+  }
+
+  function renderActionButton(
+    label: string,
+    action: () => void | Promise<void>,
+  ): HTMLButtonElement {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", () => {
+      void action();
+    });
+
+    return button;
+  }
+
+  function renderActionMenu(): HTMLDetailsElement {
+    const menu = document.createElement("details");
+    menu.className = "comment-action-menu";
+
+    const summary = document.createElement("summary");
+    summary.textContent = "More";
+    menu.append(summary);
+
+    return menu;
   }
 
   function renderParagraphContext(
