@@ -153,9 +153,6 @@
   display: flex;
   transform: translateX(0);
 }
-[data-comment-target].is-feedback-selected {
-  box-shadow: inset -2px 0 0 color-mix(in srgb, var(--accent) 62%, transparent);
-}
 [data-comment-target].is-feedback-source {
   background: color-mix(in srgb, var(--accent) 9%, transparent);
   border-radius: 0.25rem;
