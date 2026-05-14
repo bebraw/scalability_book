@@ -511,7 +511,7 @@ async function rebuildSite() {
   await new Promise((resolve, reject) => {
     const child = spawn(
       process.execPath,
-      ["scripts/build-site.ts", "--all-chapters"],
+      ["scripts/build-site.ts", "--all-chapters", "--editable"],
       {
         cwd: root,
         stdio: "inherit",

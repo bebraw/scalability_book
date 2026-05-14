@@ -14,6 +14,7 @@ const root = process.cwd();
 const buildDir = path.join(root, "build");
 const siteDir = path.join(root, "site");
 const includeAllChapters = process.argv.includes("--all-chapters");
+const includeEditor = process.argv.includes("--editable");
 const config = parseJsonc(
   await readFile(path.join(root, "site.config.jsonc"), "utf8"),
 );
@@ -97,8 +98,10 @@ for (let index = 0; index < bookPages.length; index++) {
       title: `${page.title} - ${config.title}`,
       description: config.description,
       currentUrl: page.url,
-      stylesheets: ["/vendor/easymde/easymde.min.css"],
-      scripts: ["/comments.js", "/vendor/easymde/easymde.min.js", "/editor.js"],
+      stylesheets: includeEditor ? ["/vendor/easymde/easymde.min.css"] : [],
+      scripts: includeEditor
+        ? ["/comments.js", "/vendor/easymde/easymde.min.js", "/editor.js"]
+        : ["/comments.js"],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
   );
@@ -116,10 +119,14 @@ await writePage(
 
 await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
-await compileSiteScript("scripts/editor.ts", "editor.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
+if (includeEditor) {
+  await compileSiteScript("scripts/editor.ts", "editor.js");
+}
 await copyStaticAssets();
-await copyEditorAssets();
+if (includeEditor) {
+  await copyEditorAssets();
+}
 
 async function writePage(relativePath, content) {
   const outputPath = path.join(buildDir, relativePath);
