@@ -192,6 +192,15 @@ a:hover {
   color: var(--text);
   padding: 0.28rem 0.55rem;
 }
+.feedback-controls select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.28rem 0.45rem;
+}
 .feedback-controls button:hover {
   color: var(--panel);
 }

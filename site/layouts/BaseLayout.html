@@ -40,6 +40,14 @@
         </button>
         <div class="feedback-controls" data-comments-controls hidden>
           <span data-comments-status role="status" aria-live="polite"></span>
+          <label data-comments-view-control hidden>
+            <span class="visually-hidden">Feedback view</span>
+            <select data-comments-view>
+              <option value="admin">Admin view</option>
+              <option value="student">Student view</option>
+              <option value="public">Public view</option>
+            </select>
+          </label>
           <button type="button" data-comments-login hidden>Sign in</button>
           <button type="button" data-comments-logout hidden>Sign out</button>
         </div>

@@ -104,6 +104,12 @@ Comments are stored under KV keys named `comments:<chapter-slug>`.
 
 Students can see their own comments after posting and any admin replies to those comments. They cannot see comments from other students. Admin users can see all comments and can feature curated reader notes for public display.
 
+Admins can use the feedback view selector in the navigation header to preview three modes:
+
+- `Admin view`: all comments and moderation controls
+- `Student view`: the comments visible to the logged-in account as a regular student
+- `Public view`: featured reader notes visible to anonymous readers
+
 ## 6. Local Review Flow
 
 Pull production comments into the local file:

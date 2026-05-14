@@ -7,11 +7,14 @@ if (commentsPanel) {
   const list = commentsPanel.querySelector("[data-comments-list]");
   const loginButton = document.querySelector("[data-comments-login]");
   const logoutButton = document.querySelector("[data-comments-logout]");
+  const viewControl = document.querySelector("[data-comments-view-control]");
+  const viewSelect = document.querySelector("[data-comments-view]");
   const commentButtons = Array.from(
     document.querySelectorAll("[data-comment-button]"),
   );
   let auth = { authenticated: false, admin: false };
   let comments = [];
+  let viewMode = localStorage.getItem("comments-view-mode") || "admin";
 
   initComments();
 
@@ -28,6 +31,7 @@ if (commentsPanel) {
         ? "true"
         : "false";
       updateAuthControls();
+      updateViewControl();
       await loadComments();
       wireParagraphButtons();
     } catch {
@@ -61,6 +65,32 @@ if (commentsPanel) {
     loginButton.hidden = auth.available === false || !auth.loginUrl;
     logoutButton.hidden = true;
   }
+
+  function updateViewControl() {
+    if (!viewControl || !viewSelect) {
+      return;
+    }
+
+    viewControl.hidden = !auth.admin;
+
+    if (!auth.admin) {
+      viewMode = "student";
+      return;
+    }
+
+    if (!["admin", "student", "public"].includes(viewMode)) {
+      viewMode = "admin";
+    }
+
+    viewSelect.value = viewMode;
+  }
+
+  viewSelect?.addEventListener("change", () => {
+    viewMode = viewSelect.value;
+    localStorage.setItem("comments-view-mode", viewMode);
+    renderCommentList();
+    updateParagraphBadges();
+  });
 
   loginButton.addEventListener("click", () => {
     if (auth.loginUrl) {
@@ -157,11 +187,7 @@ if (commentsPanel) {
   }
 
   function renderCommentList() {
-    const visibleComments = comments.filter(
-      (comment) =>
-        (!comment.resolvedAt || comment.featuredAt) &&
-        (!comment.hiddenAt || auth.admin),
-    );
+    const visibleComments = getVisibleComments();
     list.innerHTML = "";
     commentsPanel.hidden = visibleComments.length === 0;
 
@@ -210,7 +236,7 @@ if (commentsPanel) {
 
         renderReplies(card, comment);
 
-        if (auth.admin) {
+        if (auth.admin && viewMode === "admin" && !comment.publicNote) {
           if (comment.hiddenAt) {
             const hidden = document.createElement("em");
             hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
@@ -287,6 +313,56 @@ if (commentsPanel) {
     card.append(replyList);
   }
 
+  function getVisibleComments() {
+    if (auth.admin && viewMode === "admin") {
+      return comments.filter(
+        (comment) => !comment.resolvedAt || comment.featuredAt,
+      );
+    }
+
+    if (auth.admin && viewMode === "public") {
+      return publicNotesFromComments(comments);
+    }
+
+    const userLogin = auth.user?.login;
+
+    if (!userLogin) {
+      return publicNotesFromComments(comments);
+    }
+
+    const own = comments.filter(
+      (comment) =>
+        !comment.hiddenAt &&
+        comment.author?.login === userLogin &&
+        (!comment.resolvedAt || comment.featuredAt),
+    );
+    const ownIds = new Set(own.map((comment) => comment.id));
+
+    return [
+      ...own,
+      ...publicNotesFromComments(comments).filter(
+        (comment) => !ownIds.has(comment.sourceId),
+      ),
+    ];
+  }
+
+  function publicNotesFromComments(items) {
+    return items
+      .filter((comment) => comment.featuredAt && !comment.hiddenAt)
+      .map((comment) => ({
+        id: `featured-${comment.id}`,
+        sourceId: comment.id,
+        chapter: comment.chapter,
+        paragraphId: comment.paragraphId,
+        body: comment.featuredText,
+        author: { login: "Reader note", avatarUrl: null, url: null },
+        createdAt: comment.featuredAt,
+        featuredAt: comment.featuredAt,
+        publicNote: true,
+        replies: [],
+      }));
+  }
+
   async function resolveComment(id) {
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/resolve`, {
       method: "POST",
@@ -347,18 +423,16 @@ if (commentsPanel) {
   }
 
   function updateParagraphBadges() {
-    const counts = comments
-      .filter(
-        (comment) =>
-          (!comment.resolvedAt || comment.featuredAt) && !comment.hiddenAt,
-      )
-      .reduce((result, comment) => {
+    const counts = getVisibleComments().reduce((result, comment) => {
+      if (!comment.resolvedAt || comment.featuredAt) {
         result.set(
           comment.paragraphId,
           (result.get(comment.paragraphId) || 0) + 1,
         );
-        return result;
-      }, new Map());
+      }
+
+      return result;
+    }, new Map());
 
     for (const button of commentButtons) {
       const count = counts.get(button.dataset.commentButton) || 0;
