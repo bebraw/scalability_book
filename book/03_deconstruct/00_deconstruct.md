@@ -1,8 +1,8 @@
-# Fortification
+# Deconstruct
 
-Fortification is about making both the application and the development process resilient enough to scale. In the earlier parts, students have seen how quickly AI-assisted development can produce working software and how that speed can also create technical debt. They have also seen that a system that works locally may need to change when users, events, failures, teams, and operating constraints grow. This part shifts the emphasis from producing code quickly to building structures that make change safer: tests, observability, contracts, documentation, review practices, architectural boundaries, and explicit scaling trade-offs.
+Deconstruct is about explaining what the constructed and reconstructed system reveals. In the earlier parts, students have seen how quickly AI-assisted development can produce working software, how that speed can create technical debt, and how a system that works locally may need to change when users, events, failures, teams, and operating constraints grow. This part shifts the emphasis from making changes to analyzing evidence, trade-offs, boundaries, review practices, and scaling decisions.
 
-In this part, scalability has two meanings. The first is the traditional scalability of the web application itself. The second is the scalability of the development system around the application. As students begin to use agentic tools more actively, the project has to become legible enough that agents can work inside it without constantly breaking assumptions that only existed in a human developer's head.
+In this part, scalability has two meanings. The first is the traditional scalability of the web application itself. The second is the scalability of the development system around the application. As students use agentic tools more actively, they should be able to explain what the tools made easier, what they made riskier, and what project structures made the work legible enough to review.
 
 ---
 
@@ -11,7 +11,7 @@ In this part, scalability has two meanings. The first is the traditional scalabi
 - Frame the part as fortifying both the system and the development process. The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
 - Use [Pi](https://pi.dev/) as the concrete tool for this part. Pi is a minimal terminal coding harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
 - Present Pi as a teaching vehicle rather than as the point of the chapter. The lesson is not "use this specific tool", but "a serious agent workflow needs a harness, explicit context, scoped capabilities, and reviewable traces".
-- Connect Pi to the course progression: copilot-style assistance in the first part, a single agent in the second part, and orchestrated agents in Fortification.
+- Connect Pi to the course progression: copilot-style assistance in the first part, a single agent in the second part, and orchestrated agents in Deconstruct.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit. This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
 - Introduce a small agent fleet with roles such as `scout`, `planner`, `implementer`, and `reviewer`. Keep the first version deliberately small so students learn orchestration and integration instead of trying to automate everything.
 - Use Pi prompt templates for repeatable workflows. Good examples: investigate a subsystem, implement a bounded change, review a diff, summarize architectural risks, and prepare a pull request.

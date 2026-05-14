@@ -13,15 +13,15 @@
   // until they are ready for the public site.
   "chapters": [
     "book/00_introduction.md",
-    "book/01_vibe_coding/01_scalable_development.md",
-    /*"book/01_vibe_coding/02_what_is_scalability.md",
-    "book/01_vibe_coding/03_architecture.md",
-    "book/02_technical_debt/04_friction.md",
-    "book/02_technical_debt/05_benchmarking.md",
-    "book/02_technical_debt/06_reality.md",
-    "book/03_fortification/07_agent_fleets.md",
-    "book/03_fortification/08_scaling.md",
-    "book/03_fortification/09_recap.md"*/
+    "book/01_construct/01_scalable_development.md",
+    /*"book/01_construct/02_what_is_scalability.md",
+    "book/01_construct/03_architecture.md",
+    "book/02_reconstruct/04_friction.md",
+    "book/02_reconstruct/05_benchmarking.md",
+    "book/02_reconstruct/06_reality.md",
+    "book/03_deconstruct/07_agent_fleets.md",
+    "book/03_deconstruct/08_scaling.md",
+    "book/03_deconstruct/09_recap.md"*/
   ],
 
   // The course runs in three three-week parts. Each part maps to three book
@@ -29,35 +29,35 @@
   "parts": [
     {
       "number": "I",
-      "title": "Vibe Coding",
+      "title": "Construct",
       "description": "Only copilot-based assistance is allowed.",
-      "file": "book/01_vibe_coding/00_vibe_coding.md",
+      "file": "book/01_construct/00_construct.md",
       "chapters": [
-        "book/01_vibe_coding/01_scalable_development.md",
-        "book/01_vibe_coding/02_what_is_scalability.md",
-        "book/01_vibe_coding/03_architecture.md",
+        "book/01_construct/01_scalable_development.md",
+        "book/01_construct/02_what_is_scalability.md",
+        "book/01_construct/03_architecture.md",
       ],
     },
     {
       "number": "II",
-      "title": "Technical Debt",
+      "title": "Reconstruct",
       "description": "Only a single agent is allowed.",
-      "file": "book/02_technical_debt/00_technical_debt.md",
+      "file": "book/02_reconstruct/00_reconstruct.md",
       "chapters": [
-        "book/02_technical_debt/04_friction.md",
-        "book/02_technical_debt/05_benchmarking.md",
-        "book/02_technical_debt/06_reality.md",
+        "book/02_reconstruct/04_friction.md",
+        "book/02_reconstruct/05_benchmarking.md",
+        "book/02_reconstruct/06_reality.md",
       ],
     },
     {
       "number": "III",
-      "title": "Fortification",
+      "title": "Deconstruct",
       "description": "Agent orchestration is allowed.",
-      "file": "book/03_fortification/00_fortification.md",
+      "file": "book/03_deconstruct/00_deconstruct.md",
       "chapters": [
-        "book/03_fortification/07_agent_fleets.md",
-        "book/03_fortification/08_scaling.md",
-        "book/03_fortification/09_recap.md",
+        "book/03_deconstruct/07_agent_fleets.md",
+        "book/03_deconstruct/08_scaling.md",
+        "book/03_deconstruct/09_recap.md",
       ],
     },
   ],

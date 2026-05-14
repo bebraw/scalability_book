@@ -16,21 +16,21 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 ## Structure of the book
 
-The course book is built around the three course projects: construct, reconstruct, and deconstruct. Across these projects, you build a baseline, change it under new constraints, and finally measure and critique the result. The purpose of this book is to support you as you complete these projects. With this goal in mind, I have structured the book as follows in three parts with a specific theme: Vibe Coding, Technical Debt, and Fortification.
+The course book is built around the three course phases: construct, reconstruct, and deconstruct. Across these phases, you build a baseline, change it under new constraints, and then inspect the evidence and trade-offs around the result. The purpose of this book is to support you as you complete these phases. With this goal in mind, I have structured the book in three matching parts: Construct, Reconstruct, and Deconstruct.
 
-**Vibe Coding:**
+**Construct:**
 
 1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
 2. What is scalability? -- How do we define scalability in the first place?
 3. What is the architecture of the web? -- How was the web built and what kind of constraints does that give to our designs? How do the constraints of the web shape API design?
 
-**Technical Debt:**
+**Reconstruct:**
 
 4. What is friction in software engineering? -- What is friction and how to reduce it?
 5. How to benchmark and observe web applications? -- Why is benchmarking important? How to benchmark effectively? What is observability?
 6. What happens when systems face reality? -- What kind of problems might we encounter as our systems face reality and real users? How can we scale beyond a single machine?
 
-**Fortification:**
+**Deconstruct:**
 
 7. How to coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
 8. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?

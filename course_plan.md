@@ -23,13 +23,13 @@ I have sketched out the initial timeline per week/lecture below:
 2. What is scalability (LO1, LO3)
 3. Architecture (LO2, LO3, LO6)
 
-**Deconstruct**
+**Reconstruct**
 
 4. Friction (LO1, LO3, LO5)
 5. Benchmarking and observability (LO1, LO4, LO5, LO6)
 6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct (LO2, LO3, LO4, LO5, LO6)
 
-**Reconstruct**
+**Deconstruct**
 
 7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered (LO3, LO5, LO6)
 8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure (LO2, LO3, LO4, LO5, LO6)

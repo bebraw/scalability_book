@@ -1,8 +1,8 @@
-# Technical Debt
+# Reconstruct
 
 Technical debt is the cost of earlier choices that make later change harder. The metaphor is useful only if we remember that debt is not automatically bad. Sometimes taking a shortcut is rational because the team is learning, time is limited, or the future is uncertain. The problem begins when the debt is invisible, unpriced, or allowed to compound until the system can no longer change safely.
 
-In this part, the course moves from building a working baseline to understanding the pressure that baseline creates. The Construct project gives students a system that works under modest assumptions. Technical Debt asks what happens when those assumptions are no longer enough.
+In this part, the course moves from building a working baseline to reconstructing it under pressure. The Construct project gives students a system that works under modest assumptions. Reconstruct asks what hidden costs, measurements, failure modes, and changed assumptions appear once the system is examined more closely, then uses that evidence to prepare a redesign.
 
 ## Chapter purpose for the part
 

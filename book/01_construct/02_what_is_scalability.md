@@ -231,4 +231,4 @@ Students should create a scalability dimensions checklist for their project. The
 
 - The chapter currently mixes draft prose and outline notes. Decide whether to keep the numbered `2.x` structure or align headings with the other chapters.
 - Add a small diagram showing the four scalability dimensions around the event tracking project.
-- Add a short closing section that previews Technical Debt: once the first project works, the next question is what hidden costs it has accumulated.
+- Add a short closing section that previews Deconstruct: once the first project works, the next question is what hidden costs it has accumulated.
