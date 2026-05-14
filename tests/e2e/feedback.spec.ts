@@ -15,6 +15,7 @@ test.describe("paragraph feedback", () => {
       "Feedback: local-editor",
     );
     await expect(page.locator("[data-comments-view]")).toHaveValue("admin");
+    await expect(page.locator("[data-reflection-prompts]")).toBeVisible();
     await expect(page.locator(".comment-thread")).toHaveCount(0);
     await expect(page.locator("[data-stuck-button]")).toHaveCount(0);
     await expect(page.getByRole("button", { name: /stuck/i })).toHaveCount(0);
@@ -109,6 +110,29 @@ test.describe("paragraph feedback", () => {
     await target.click({ position: { x: 12, y: 12 } });
     await expect(target).not.toHaveClass(/is-feedback-selected/);
   });
+});
+
+test("hides reflection prompts for logged-out readers", async ({ page }) => {
+  await page.route("/api/auth/status", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        available: true,
+        authenticated: false,
+        admin: false,
+        user: null,
+        loginUrl: "/api/auth/login",
+      }),
+    });
+  });
+
+  await page.goto(chapterPath);
+
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-comments-ready",
+    "false",
+  );
+  await expect(page.locator("[data-reflection-prompts]")).toBeHidden();
 });
 
 async function waitForFeedback(page: Page) {

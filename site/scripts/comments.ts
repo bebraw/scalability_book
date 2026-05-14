@@ -95,6 +95,9 @@ if (commentsRoot) {
   const commentButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-comment-button]"),
   );
+  const reflectionPrompts = document.querySelector<HTMLElement>(
+    "[data-reflection-prompts]",
+  );
   const reflectionButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-reflection-button]"),
   );
@@ -110,6 +113,9 @@ if (commentsRoot) {
       auth = await fetchJson<FeedbackAuth>("/api/auth/status");
       if (commentsControls) {
         commentsControls.hidden = false;
+      }
+      if (reflectionPrompts) {
+        reflectionPrompts.hidden = !auth.authenticated;
       }
       document.documentElement.dataset.commentsReady = auth.authenticated
         ? "true"
@@ -127,6 +133,9 @@ if (commentsRoot) {
     } catch {
       if (commentsControls) {
         commentsControls.hidden = true;
+      }
+      if (reflectionPrompts) {
+        reflectionPrompts.hidden = true;
       }
     }
   }
