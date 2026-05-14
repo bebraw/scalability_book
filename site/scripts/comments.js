@@ -38,6 +38,7 @@ if (commentsPanel) {
   );
   let auth = { authenticated: false, admin: false };
   let comments = [];
+  let activeFeedbackParagraphId = null;
   let viewMode = localStorage.getItem("comments-view-mode") || "admin";
 
   initComments();
@@ -56,7 +57,9 @@ if (commentsPanel) {
         : "false";
       updateAuthControls();
       updateViewControl();
+      syncPreviewMode();
       await loadComments();
+      wireParagraphSelection();
       wireParagraphButtons();
       wireStuckButtons();
       wireReflectionButtons();
@@ -117,8 +120,12 @@ if (commentsPanel) {
   viewSelect?.addEventListener("change", () => {
     viewMode = viewSelect.value;
     localStorage.setItem("comments-view-mode", viewMode);
+    syncPreviewMode();
     renderCommentList();
     updateParagraphBadges();
+    if (activeFeedbackParagraphId) {
+      renderParagraphFeedbackPanel(activeFeedbackParagraphId);
+    }
   });
 
   loginButton.addEventListener("click", () => {
@@ -142,6 +149,15 @@ if (commentsPanel) {
     );
     renderCommentList();
     updateParagraphBadges();
+    if (activeFeedbackParagraphId) {
+      renderParagraphFeedbackPanel(activeFeedbackParagraphId);
+    }
+  }
+
+  function syncPreviewMode() {
+    document.documentElement.dataset.commentsPreview = auth.admin
+      ? viewMode
+      : "";
   }
 
   function wireParagraphButtons() {
@@ -162,6 +178,41 @@ if (commentsPanel) {
     }
   }
 
+  function wireParagraphSelection() {
+    for (const paragraph of document.querySelectorAll(
+      "[data-comment-target]",
+    )) {
+      paragraph.addEventListener("click", (event) => {
+        if (event.target.closest("a, button, input, label, select, textarea")) {
+          return;
+        }
+
+        if (window.getSelection()?.toString()) {
+          return;
+        }
+
+        selectParagraph(paragraph);
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        clearSelectedParagraph();
+      }
+    });
+  }
+
+  function selectParagraph(paragraph) {
+    clearSelectedParagraph();
+    paragraph.classList.add("is-feedback-selected");
+  }
+
+  function clearSelectedParagraph() {
+    document
+      .querySelector("[data-comment-target].is-feedback-selected")
+      ?.classList.remove("is-feedback-selected");
+  }
+
   function wireStuckButtons() {
     for (const button of stuckButtons) {
       button.addEventListener("click", async () => {
@@ -175,6 +226,12 @@ if (commentsPanel) {
           return;
         }
 
+        if (hasOwnActiveStuckMarker(paragraphId)) {
+          showParagraphFeedbackPanel(paragraphId);
+          setStatus("Already marked as stuck.");
+          return;
+        }
+
         button.disabled = true;
 
         try {
@@ -184,6 +241,7 @@ if (commentsPanel) {
             body: JSON.stringify({ chapter: chapterSlug, paragraphId }),
           });
           await loadComments();
+          showParagraphFeedbackPanel(paragraphId);
           setStatus("Marked as stuck.");
         } catch (error) {
           setStatus(error.message);
@@ -196,6 +254,7 @@ if (commentsPanel) {
 
   function openForm(paragraphId) {
     document.querySelector("[data-comment-form]")?.remove();
+    closeParagraphFeedbackPanel();
     const paragraph = document.querySelector(
       `[data-comment-target="${cssEscape(paragraphId)}"]`,
     );
@@ -252,6 +311,7 @@ if (commentsPanel) {
         });
         form.remove();
         await loadComments();
+        showParagraphFeedbackPanel(paragraphId);
         setStatus("Comment posted.");
       } catch (error) {
         setStatus(error.message);
@@ -265,8 +325,96 @@ if (commentsPanel) {
         form.remove();
       });
 
+    positionCommentForm(form, paragraph);
     paragraph.insertAdjacentElement("afterend", form);
     form.elements.body.focus();
+  }
+
+  function positionCommentForm(form, paragraph) {
+    const rect = paragraph.getBoundingClientRect();
+    const top = Math.max(84, Math.min(rect.top, window.innerHeight - 420));
+
+    form.style.setProperty("--comment-form-top", `${top}px`);
+  }
+
+  function showParagraphFeedbackPanel(paragraphId) {
+    activeFeedbackParagraphId = paragraphId;
+    document.querySelector("[data-comment-form]")?.remove();
+    renderParagraphFeedbackPanel(paragraphId);
+  }
+
+  function renderParagraphFeedbackPanel(paragraphId) {
+    closeParagraphFeedbackPanel(false);
+
+    const paragraph = document.querySelector(
+      `[data-comment-target="${cssEscape(paragraphId)}"]`,
+    );
+
+    if (!paragraph) {
+      activeFeedbackParagraphId = null;
+      return;
+    }
+
+    const relatedComments = getVisibleComments().filter(
+      (comment) => comment.paragraphId === paragraphId,
+    );
+    const panel = document.createElement("aside");
+    panel.className = "paragraph-feedback-panel";
+    panel.dataset.paragraphFeedbackPanel = paragraphId;
+
+    const header = document.createElement("div");
+    header.className = "paragraph-feedback-panel-header";
+    const title = document.createElement("h3");
+    title.textContent = "Related feedback";
+    const close = document.createElement("button");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close related feedback");
+    close.textContent = "Close";
+    close.addEventListener("click", () => closeParagraphFeedbackPanel());
+    header.append(title, close);
+    panel.append(header);
+
+    if (!relatedComments.length) {
+      const empty = document.createElement("p");
+      empty.textContent = "No visible feedback for this paragraph yet.";
+      panel.append(empty);
+    }
+
+    for (const comment of relatedComments) {
+      panel.append(renderCompactComment(comment));
+    }
+
+    positionCommentForm(panel, paragraph);
+    paragraph.insertAdjacentElement("afterend", panel);
+  }
+
+  function closeParagraphFeedbackPanel(resetActive = true) {
+    document.querySelector("[data-paragraph-feedback-panel]")?.remove();
+    if (resetActive) {
+      activeFeedbackParagraphId = null;
+    }
+  }
+
+  function renderCompactComment(comment) {
+    const card = document.createElement("article");
+    card.className = "comment-card paragraph-feedback-card";
+    card.classList.toggle("is-featured", Boolean(comment.publicNote));
+    card.innerHTML = `
+      <div class="comment-meta">
+        <strong></strong>
+        <span></span>
+      </div>
+      <p></p>
+    `;
+    card.querySelector("strong").textContent = displayAuthor(comment);
+    card.querySelector("span").textContent = new Date(
+      comment.createdAt,
+    ).toLocaleString();
+    card.querySelector("p").textContent = comment.body;
+    renderCategory(card, comment.category);
+    renderReplies(card, comment);
+
+    return card;
   }
 
   function renderCommentList() {
@@ -675,8 +823,29 @@ if (commentsPanel) {
     for (const button of stuckButtons) {
       const count = stuckCounts.get(button.dataset.stuckButton) || 0;
       button.classList.toggle("has-comments", count > 0);
+      button.classList.toggle(
+        "is-active",
+        hasOwnActiveStuckMarker(button.dataset.stuckButton),
+      );
       button.dataset.commentCount = count > 0 ? String(count) : "";
     }
+  }
+
+  function hasOwnActiveStuckMarker(paragraphId) {
+    const userLogin = auth.user?.login;
+
+    if (!userLogin) {
+      return false;
+    }
+
+    return comments.some(
+      (comment) =>
+        comment.type === "stuck" &&
+        !comment.resolvedAt &&
+        !comment.hiddenAt &&
+        comment.paragraphId === paragraphId &&
+        comment.author?.login === userLogin,
+    );
   }
 
   function groupByParagraph(items) {

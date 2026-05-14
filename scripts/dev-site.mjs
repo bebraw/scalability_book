@@ -208,6 +208,19 @@ async function handleStuckRequest(request, response) {
 
   const comments = await loadComments();
   const chapterComments = comments[body.chapter] || [];
+  const existing = chapterComments.find(
+    (comment) =>
+      comment.type === "stuck" &&
+      !comment.resolvedAt &&
+      !comment.hiddenAt &&
+      comment.paragraphId === body.paragraphId &&
+      comment.author?.login === "local-editor",
+  );
+
+  if (existing) {
+    return sendJson(response, existing);
+  }
+
   const marker = {
     id: crypto.randomUUID(),
     type: "stuck",

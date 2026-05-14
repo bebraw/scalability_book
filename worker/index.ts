@@ -378,6 +378,19 @@ async function handleStuckRequest(
   }
 
   const comments = await getChapterComments(env, body.chapter);
+  const existing = comments.find(
+    (comment) =>
+      comment.type === "stuck" &&
+      !comment.resolvedAt &&
+      !comment.hiddenAt &&
+      comment.paragraphId === body.paragraphId &&
+      comment.author?.login === user.login,
+  );
+
+  if (existing) {
+    return json(existing);
+  }
+
   const marker = {
     id: crypto.randomUUID(),
     type: "stuck",
