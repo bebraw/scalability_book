@@ -14,7 +14,11 @@ type KVNamespace<Key extends string = string> = {
     type: "json",
   ): Promise<ExpectedValue | null>;
   list(options?: { prefix?: string }): Promise<KVNamespaceListResult<Key>>;
-  put(key: Key, value: string): Promise<void>;
+  put(
+    key: Key,
+    value: string,
+    options?: { expirationTtl?: number },
+  ): Promise<void>;
 };
 
 type Env = {
@@ -47,6 +51,11 @@ const resolutionReasons = new Set([
   "not-actionable",
   "planned",
 ]);
+const feedbackRateLimitWindowSeconds = 10 * 60;
+const feedbackRateLimits = [
+  { scope: "login", max: 10 },
+  { scope: "ip", max: 30 },
+] as const;
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -306,6 +315,16 @@ async function handleCommentsRequest(
       );
     }
 
+    const rateLimitResponse = await enforceFeedbackRateLimit(
+      request,
+      env,
+      user,
+    );
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     const body = (await request.json().catch(() => ({}))) as {
       chapter?: string;
       paragraphId?: string;
@@ -383,6 +402,12 @@ async function handleStuckRequest(
       { message: "Sign in with GitHub to mark confusion" },
       { status: 401 },
     );
+  }
+
+  const rateLimitResponse = await enforceFeedbackRateLimit(request, env, user);
+
+  if (rateLimitResponse) {
+    return rateLimitResponse;
   }
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -743,6 +768,55 @@ async function putChapterComments(
   await env.COMMENTS_KV?.put(`comments:${chapter}`, JSON.stringify(comments));
 }
 
+async function enforceFeedbackRateLimit(
+  request: Request,
+  env: Env,
+  user: { login: string },
+) {
+  if (!env.COMMENTS_KV || isAdmin(user.login, env)) {
+    return null;
+  }
+
+  const window = Math.floor(
+    Date.now() / (feedbackRateLimitWindowSeconds * 1000),
+  );
+  const identifiers = {
+    login: user.login.toLowerCase(),
+    ip: getClientIp(request),
+  };
+
+  for (const limit of feedbackRateLimits) {
+    const identifier = identifiers[limit.scope];
+    const key = `rate:${window}:${limit.scope}:${identifier}`;
+    const current = Number.parseInt(
+      (await env.COMMENTS_KV.get(key)) || "0",
+      10,
+    );
+    const next = Number.isFinite(current) ? current + 1 : 1;
+
+    if (next > limit.max) {
+      return json(
+        {
+          message:
+            "Too many feedback submissions. Wait a few minutes before trying again.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(feedbackRateLimitWindowSeconds),
+          },
+        },
+      );
+    }
+
+    await env.COMMENTS_KV.put(key, String(next), {
+      expirationTtl: feedbackRateLimitWindowSeconds,
+    });
+  }
+
+  return null;
+}
+
 async function getSessionUser(request: Request, env: Env) {
   const session = getCookie(request, sessionCookie);
 
@@ -846,6 +920,15 @@ function getCookie(request: Request, name: string) {
   const match = cookies.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
 
   return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+function getClientIp(request: Request) {
+  const ip =
+    request.headers.get("CF-Connecting-IP") ||
+    request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ||
+    "unknown";
+
+  return encodeURIComponent(ip);
 }
 
 function buildCookie(
