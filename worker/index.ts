@@ -691,7 +691,34 @@ async function handleUnfeatureRequest(
 async function getChapterComments(env: Env, chapter: string) {
   const stored = await env.COMMENTS_KV?.get(`comments:${chapter}`, "json");
 
-  return Array.isArray(stored) ? stored : [];
+  return Array.isArray(stored) ? dedupeActiveStuckMarkers(stored) : [];
+}
+
+function dedupeActiveStuckMarkers(comments: any[]) {
+  const seen = new Set<string>();
+
+  return comments.filter((comment) => {
+    if (
+      comment.type !== "stuck" ||
+      comment.resolvedAt ||
+      comment.hiddenAt
+    ) {
+      return true;
+    }
+
+    const key = [
+      comment.chapter || "",
+      comment.paragraphId || "",
+      String(comment.author?.login || "unknown").toLowerCase(),
+    ].join(":");
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
 }
 
 async function mutateComment(
