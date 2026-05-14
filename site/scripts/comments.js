@@ -8,6 +8,7 @@ if (commentsPanel) {
     ["typo-language", "Typo or language"],
     ["disagreement", "Disagreement"],
     ["broken-link-code", "Broken link or code"],
+    ["stuck", "Stuck here"],
   ];
   const resolutionReasons = [
     ["fixed", "Fixed"],
@@ -22,10 +23,14 @@ if (commentsPanel) {
   const list = commentsPanel.querySelector("[data-comments-list]");
   const loginButton = document.querySelector("[data-comments-login]");
   const logoutButton = document.querySelector("[data-comments-logout]");
+  const exportButton = document.querySelector("[data-comments-export]");
   const viewControl = document.querySelector("[data-comments-view-control]");
   const viewSelect = document.querySelector("[data-comments-view]");
   const commentButtons = Array.from(
     document.querySelectorAll("[data-comment-button]"),
+  );
+  const stuckButtons = Array.from(
+    document.querySelectorAll("[data-stuck-button]"),
   );
   let auth = { authenticated: false, admin: false };
   let comments = [];
@@ -49,6 +54,7 @@ if (commentsPanel) {
       updateViewControl();
       await loadComments();
       wireParagraphButtons();
+      wireStuckButtons();
     } catch {
       commentsPanel.hidden = true;
       if (commentsControls) {
@@ -87,6 +93,9 @@ if (commentsPanel) {
     }
 
     viewControl.hidden = !auth.admin;
+    if (exportButton) {
+      exportButton.hidden = !auth.admin;
+    }
 
     if (!auth.admin) {
       viewMode = "student";
@@ -118,6 +127,10 @@ if (commentsPanel) {
     location.reload();
   });
 
+  exportButton?.addEventListener("click", () => {
+    downloadFeedbackSummary();
+  });
+
   async function loadComments() {
     comments = await fetchJson(
       `/api/comments?chapter=${encodeURIComponent(chapterSlug)}`,
@@ -140,6 +153,38 @@ if (commentsPanel) {
         }
 
         openForm(paragraphId);
+      });
+    }
+  }
+
+  function wireStuckButtons() {
+    for (const button of stuckButtons) {
+      button.addEventListener("click", async () => {
+        const paragraphId = button.dataset.stuckButton;
+
+        if (!auth.authenticated && !auth.admin) {
+          (commentsControls || commentsPanel).scrollIntoView({
+            block: "start",
+          });
+          setStatus("Sign in with GitHub before marking confusion.");
+          return;
+        }
+
+        button.disabled = true;
+
+        try {
+          await fetchJson("/api/stuck", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chapter: chapterSlug, paragraphId }),
+          });
+          await loadComments();
+          setStatus("Marked as stuck.");
+        } catch (error) {
+          setStatus(error.message);
+        } finally {
+          button.disabled = false;
+        }
       });
     }
   }
@@ -219,8 +264,11 @@ if (commentsPanel) {
     commentsPanel.hidden = visibleComments.length === 0;
 
     if (!visibleComments.length) {
+      renderAdminSummary();
       return;
     }
+
+    renderAdminSummary();
 
     const byParagraph = Map.groupBy
       ? Map.groupBy(visibleComments, (comment) => comment.paragraphId)
@@ -307,6 +355,45 @@ if (commentsPanel) {
 
       list.append(thread);
     }
+  }
+
+  function renderAdminSummary() {
+    if (!auth.admin || viewMode !== "admin") {
+      return;
+    }
+
+    commentsPanel.hidden = false;
+    const summary = document.createElement("section");
+    summary.className = "feedback-summary";
+    const unresolved = comments.filter((comment) => !comment.resolvedAt);
+    const stuck = unresolved.filter((comment) => comment.type === "stuck");
+    const categoryCounts = countBy(
+      unresolved,
+      (comment) => comment.category || "uncategorized",
+    );
+    const paragraphCounts = countBy(
+      unresolved,
+      (comment) => comment.paragraphId,
+    );
+    const hotParagraphs = [...paragraphCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    summary.innerHTML = `
+      <h3>Feedback summary</h3>
+      <p>${unresolved.length} unresolved item${unresolved.length === 1 ? "" : "s"} · ${stuck.length} stuck marker${stuck.length === 1 ? "" : "s"}</p>
+      <div class="feedback-summary-grid">
+        <div>
+          <strong>Categories</strong>
+          <ul>${[...categoryCounts.entries()].map(([category, count]) => `<li>${escapeHtml(labelFor(feedbackCategories, category) || category)}: ${count}</li>`).join("")}</ul>
+        </div>
+        <div>
+          <strong>Hot paragraphs</strong>
+          <ul>${hotParagraphs.map(([paragraphId, count]) => `<li><a href="#${paragraphId}">${escapeHtml(paragraphLabel(paragraphId))}</a>: ${count}</li>`).join("")}</ul>
+        </div>
+      </div>
+    `;
+    list.prepend(summary);
   }
 
   function renderReplies(card, comment) {
@@ -496,6 +583,23 @@ if (commentsPanel) {
           : "Comment on this paragraph",
       );
     }
+
+    const stuckCounts = getVisibleComments()
+      .filter((comment) => comment.type === "stuck" && !comment.resolvedAt)
+      .reduce((result, comment) => {
+        result.set(
+          comment.paragraphId,
+          (result.get(comment.paragraphId) || 0) + 1,
+        );
+
+        return result;
+      }, new Map());
+
+    for (const button of stuckButtons) {
+      const count = stuckCounts.get(button.dataset.stuckButton) || 0;
+      button.classList.toggle("has-comments", count > 0);
+      button.dataset.commentCount = count > 0 ? String(count) : "";
+    }
   }
 
   function groupByParagraph(items) {
@@ -512,6 +616,59 @@ if (commentsPanel) {
 
   function labelFor(options, value) {
     return options.find(([option]) => option === value)?.[1] || "";
+  }
+
+  function countBy(items, getKey) {
+    return items.reduce((result, item) => {
+      const key = getKey(item);
+      result.set(key, (result.get(key) || 0) + 1);
+      return result;
+    }, new Map());
+  }
+
+  function downloadFeedbackSummary() {
+    const lines = [
+      `# Feedback summary for ${chapterSlug}`,
+      "",
+      `Generated: ${new Date().toISOString()}`,
+      "",
+    ];
+
+    for (const comment of comments) {
+      lines.push(`## ${paragraphLabel(comment.paragraphId)}`);
+      lines.push(`- Type: ${comment.type || "comment"}`);
+      lines.push(
+        `- Category: ${labelFor(feedbackCategories, comment.category) || comment.category || "Uncategorized"}`,
+      );
+      lines.push(`- Author: ${comment.author?.login || "Unknown"}`);
+      lines.push(`- Created: ${comment.createdAt}`);
+      lines.push(
+        `- Status: ${
+          comment.resolvedAt
+            ? `resolved (${comment.resolutionReason || "no reason"})`
+            : "unresolved"
+        }`,
+      );
+      lines.push("");
+      lines.push(comment.body || "");
+      lines.push("");
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${chapterSlug}-feedback-summary.md`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   async function fetchJson(url, options) {

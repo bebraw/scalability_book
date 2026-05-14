@@ -20,6 +20,7 @@ const feedbackCategories = new Set([
   "typo-language",
   "disagreement",
   "broken-link-code",
+  "stuck",
 ]);
 const resolutionReasons = new Set([
   "fixed",
@@ -46,6 +47,10 @@ export default {
 
     if (url.pathname === "/api/comments") {
       return handleCommentsRequest(request, env, url);
+    }
+
+    if (url.pathname === "/api/stuck") {
+      return handleStuckRequest(request, env);
     }
 
     const resolveMatch = url.pathname.match(
@@ -334,6 +339,66 @@ async function handleCommentsRequest(
   }
 
   return methodNotAllowed("GET, POST");
+}
+
+async function handleStuckRequest(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return methodNotAllowed("POST");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user) {
+    return json(
+      { message: "Sign in with GitHub to mark confusion" },
+      { status: 401 },
+    );
+  }
+
+  const body = (await request.json().catch(() => ({}))) as {
+    chapter?: string;
+    paragraphId?: string;
+  };
+
+  if (!isValidSlug(body.chapter) || !isValidParagraphId(body.paragraphId)) {
+    return json({ message: "Invalid feedback target" }, { status: 400 });
+  }
+
+  const comments = await getChapterComments(env, body.chapter);
+  const marker = {
+    id: crypto.randomUUID(),
+    type: "stuck",
+    chapter: body.chapter,
+    paragraphId: body.paragraphId,
+    category: "stuck",
+    body: "I'm stuck here.",
+    author: user,
+    createdAt: new Date().toISOString(),
+    resolvedAt: null,
+    resolvedBy: null,
+    resolutionReason: null,
+    hiddenAt: null,
+    hiddenBy: null,
+    featuredAt: null,
+    featuredBy: null,
+    featuredText: null,
+    replies: [],
+  };
+
+  comments.push(marker);
+  await putChapterComments(env, body.chapter, comments);
+
+  return json(marker, { status: 201 });
 }
 
 async function handleResolveRequest(

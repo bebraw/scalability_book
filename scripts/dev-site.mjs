@@ -27,6 +27,7 @@ const feedbackCategories = new Set([
   "typo-language",
   "disagreement",
   "broken-link-code",
+  "stuck",
 ]);
 const resolutionReasons = new Set([
   "fixed",
@@ -64,6 +65,10 @@ createServer(async (request, response) => {
 
     if (url.pathname === "/api/comments") {
       return handleCommentsRequest(request, response, url);
+    }
+
+    if (url.pathname === "/api/stuck") {
+      return handleStuckRequest(request, response);
     }
 
     const resolveMatch = url.pathname.match(
@@ -185,6 +190,47 @@ async function handleCommentsRequest(request, response, url) {
 
   response.writeHead(405, { Allow: "GET, POST" });
   return response.end("Method not allowed");
+}
+
+async function handleStuckRequest(request, response) {
+  if (request.method !== "POST") {
+    response.writeHead(405, { Allow: "POST" });
+    return response.end("Method not allowed");
+  }
+
+  const body = await readJsonBody(request);
+
+  if (!isValidSlug(body.chapter) || !isValidParagraphId(body.paragraphId)) {
+    return sendJson(response, { message: "Invalid feedback target" }, 400);
+  }
+
+  const comments = await loadComments();
+  const chapterComments = comments[body.chapter] || [];
+  const marker = {
+    id: crypto.randomUUID(),
+    type: "stuck",
+    chapter: body.chapter,
+    paragraphId: body.paragraphId,
+    category: "stuck",
+    body: "I'm stuck here.",
+    author: { login: "local-editor", avatarUrl: null, url: null },
+    createdAt: new Date().toISOString(),
+    resolvedAt: null,
+    resolvedBy: null,
+    resolutionReason: null,
+    hiddenAt: null,
+    hiddenBy: null,
+    featuredAt: null,
+    featuredBy: null,
+    featuredText: null,
+    replies: [],
+  };
+
+  chapterComments.push(marker);
+  comments[body.chapter] = chapterComments;
+  await saveComments(comments);
+
+  return sendJson(response, marker, 201);
 }
 
 async function handleResolveRequest(request, response, encodedId) {

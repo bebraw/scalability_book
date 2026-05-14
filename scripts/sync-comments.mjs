@@ -59,6 +59,7 @@ async function pushModerationState() {
       }
 
       const fields = [
+        "type",
         "resolvedAt",
         "resolvedBy",
         "resolutionReason",

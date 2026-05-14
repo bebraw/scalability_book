@@ -98,7 +98,7 @@ Students use the deployed site:
 1. Open a chapter.
 2. Select `Sign in` in the navigation header feedback controls.
 3. Use the comment control next to a paragraph.
-4. Choose a feedback category and post feedback.
+4. Choose a feedback category and post feedback. Students can also use the `?` control to mark that they are stuck at a paragraph without writing a full comment.
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 
@@ -109,6 +109,8 @@ Admins can use the feedback view selector in the navigation header to preview th
 - `Admin view`: all comments and moderation controls
 - `Student view`: the comments visible to the logged-in account as a regular student
 - `Public view`: featured reader notes visible to anonymous readers
+
+In `Admin view`, the page also shows a feedback summary with category counts, stuck marker counts, and the paragraphs with the most unresolved feedback. The `Export` button downloads a Markdown summary for the current chapter.
 
 ## 6. Local Review Flow
 
