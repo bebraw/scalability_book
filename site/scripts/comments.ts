@@ -267,9 +267,22 @@ if (commentsPanel) {
           return;
         }
 
-        selectParagraph(paragraph);
+        toggleParagraphSelection(paragraph);
       });
     }
+
+    document.addEventListener("click", (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          "[data-comment-target], [data-paragraph-feedback-panel], [data-comment-form]",
+        )
+      ) {
+        return;
+      }
+
+      clearSelectedParagraph();
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
@@ -278,7 +291,12 @@ if (commentsPanel) {
     });
   }
 
-  function selectParagraph(paragraph: Element): void {
+  function toggleParagraphSelection(paragraph: Element): void {
+    if (paragraph.classList.contains("is-feedback-selected")) {
+      clearSelectedParagraph();
+      return;
+    }
+
     clearSelectedParagraph();
     paragraph.classList.add("is-feedback-selected");
   }
