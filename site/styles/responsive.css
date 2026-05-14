@@ -1,15 +1,11 @@
 /* Responsive and motion preferences */
 @media (max-width: 76rem) {
-  .site-header {
-    grid-template-columns: 1fr;
-  }
   .header-actions {
-    justify-content: flex-start;
+    column-gap: 0.9rem;
   }
   .feedback-controls {
-    border-left: 0;
-    flex-basis: 100%;
-    padding-left: 0;
+    gap: 0.55rem;
+    padding-left: 0.8rem;
   }
   .book-shell {
     grid-template-columns: minmax(0, 1fr);
@@ -50,6 +46,11 @@
   }
   .site-header nav {
     flex-wrap: wrap;
+  }
+  .feedback-controls {
+    border-left: 0;
+    flex-basis: 100%;
+    padding-left: 0;
   }
   .hero {
     grid-template-columns: 1fr;
