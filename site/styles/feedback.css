@@ -83,19 +83,12 @@
   margin: 0.35rem 0 0;
 }
 [data-comment-target] {
+  padding-inline-end: 3rem;
   position: relative;
-}
-[data-comment-target]::after {
-  content: "";
-  inset-block: 0;
-  inset-inline-end: -4.5rem;
-  pointer-events: none;
-  position: absolute;
-  width: 4.5rem;
 }
 .paragraph-feedback-actions {
   display: none;
-  inset-inline-end: -4rem;
+  inset-inline-end: 0.25rem;
   position: absolute;
   top: 0.1rem;
   transform: translateX(0.2rem);
@@ -191,7 +184,7 @@
 }
 @media (max-width: 48rem) {
   [data-comment-target] {
-    padding-inline-end: 4rem;
+    padding-inline-end: 3rem;
   }
   .paragraph-feedback-actions {
     inset-inline-end: 0;
