@@ -9,6 +9,7 @@
     "comments:push": "node scripts/sync-comments.ts push",
     "comments:sync": "node scripts/sync-comments.ts sync",
     "dev": "node scripts/dev-site.ts",
+    "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "start": "node scripts/dev-site.ts",
@@ -32,6 +33,7 @@
     "vite": "8.0.10"
   },
   "devDependencies": {
+    "@playwright/test": "1.60.0",
     "@types/node": "25.7.0",
     "prettier": "3.8.3",
     "typescript": "6.0.3",

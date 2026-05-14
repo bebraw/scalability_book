@@ -7,7 +7,7 @@ import { spawn } from "node:child_process";
 
 const root = process.cwd();
 const buildDir = path.join(root, "build");
-const dataDir = path.join(root, ".local");
+const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const commentsPath = path.join(dataDir, "comments.json");
 const config = parseJsonc(
   await readFile(path.join(root, "site.config.jsonc"), "utf8"),
@@ -41,6 +41,9 @@ const resolutionReasons = new Set([
 
 let chapters = await loadChapters();
 await rebuildSite();
+if (process.env.RESET_LOCAL_COMMENTS === "1" && process.env.LOCAL_DATA_DIR) {
+  await saveComments({});
+}
 
 createServer(async (request, response) => {
   try {
