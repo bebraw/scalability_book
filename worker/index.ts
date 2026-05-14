@@ -13,6 +13,21 @@ const immutableAssetPattern =
   /\.(?:css|js|mjs|png|jpg|jpeg|gif|svg|webp|avif|ico|woff2?)$/i;
 const sessionCookie = "scalableweb_session";
 const oauthStateCookie = "scalableweb_oauth_state";
+const feedbackCategories = new Set([
+  "unclear-concept",
+  "missing-example",
+  "too-fast",
+  "typo-language",
+  "disagreement",
+  "broken-link-code",
+]);
+const resolutionReasons = new Set([
+  "fixed",
+  "answered",
+  "duplicate",
+  "not-actionable",
+  "planned",
+]);
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -271,10 +286,15 @@ async function handleCommentsRequest(
     const body = (await request.json().catch(() => ({}))) as {
       chapter?: string;
       paragraphId?: string;
+      category?: string;
       body?: string;
     };
 
-    if (!isValidSlug(body.chapter) || !isValidParagraphId(body.paragraphId)) {
+    if (
+      !isValidSlug(body.chapter) ||
+      !isValidParagraphId(body.paragraphId) ||
+      !isValidFeedbackCategory(body.category)
+    ) {
       return json({ message: "Invalid comment target" }, { status: 400 });
     }
 
@@ -292,11 +312,13 @@ async function handleCommentsRequest(
       id: crypto.randomUUID(),
       chapter: body.chapter,
       paragraphId: body.paragraphId,
+      category: body.category,
       body: text,
       author: user,
       createdAt: new Date().toISOString(),
       resolvedAt: null,
       resolvedBy: null,
+      resolutionReason: null,
       hiddenAt: null,
       hiddenBy: null,
       featuredAt: null,
@@ -340,6 +362,12 @@ async function handleResolveRequest(
   }
 
   const id = decodeURIComponent(encodedId);
+  const body = (await request.json().catch(() => ({}))) as { reason?: string };
+
+  if (!isValidResolutionReason(body.reason)) {
+    return json({ message: "Invalid resolution reason" }, { status: 400 });
+  }
+
   const chapterKeys = await env.COMMENTS_KV.list({ prefix: "comments:" });
 
   for (const key of chapterKeys.keys) {
@@ -353,6 +381,7 @@ async function handleResolveRequest(
 
     comment.resolvedAt = new Date().toISOString();
     comment.resolvedBy = user.login;
+    comment.resolutionReason = body.reason;
     await putChapterComments(env, chapter, comments);
 
     return json(comment);
@@ -701,6 +730,14 @@ function isValidSlug(value: unknown): value is string {
 
 function isValidParagraphId(value: unknown): value is string {
   return typeof value === "string" && /^p-[a-z0-9-]+$/.test(value);
+}
+
+function isValidFeedbackCategory(value: unknown): value is string {
+  return typeof value === "string" && feedbackCategories.has(value);
+}
+
+function isValidResolutionReason(value: unknown): value is string {
+  return typeof value === "string" && resolutionReasons.has(value);
 }
 
 function getCookie(request: Request, name: string) {

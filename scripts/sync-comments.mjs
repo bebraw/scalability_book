@@ -61,6 +61,8 @@ async function pushModerationState() {
       const fields = [
         "resolvedAt",
         "resolvedBy",
+        "resolutionReason",
+        "category",
         "hiddenAt",
         "hiddenBy",
         "featuredAt",

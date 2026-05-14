@@ -1,6 +1,21 @@
 const commentsPanel = document.querySelector("[data-comments-panel]");
 
 if (commentsPanel) {
+  const feedbackCategories = [
+    ["unclear-concept", "Unclear concept"],
+    ["missing-example", "Missing example"],
+    ["too-fast", "Too fast"],
+    ["typo-language", "Typo or language"],
+    ["disagreement", "Disagreement"],
+    ["broken-link-code", "Broken link or code"],
+  ];
+  const resolutionReasons = [
+    ["fixed", "Fixed"],
+    ["answered", "Answered"],
+    ["duplicate", "Duplicate"],
+    ["not-actionable", "Not actionable"],
+    ["planned", "Planned"],
+  ];
   const commentsControls = document.querySelector("[data-comments-controls]");
   const chapterSlug = commentsPanel.dataset.chapterSlug;
   const status = document.querySelector("[data-comments-status]");
@@ -143,6 +158,12 @@ if (commentsPanel) {
     form.className = "paragraph-comment-form";
     form.dataset.commentForm = paragraphId;
     form.innerHTML = `
+      <label>
+        <span>Category</span>
+        <select name="category" required>
+          ${feedbackCategories.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
+        </select>
+      </label>
       <textarea name="body" required maxlength="4000" aria-label="Comment text"></textarea>
       <div>
         <button type="submit">Post comment</button>
@@ -153,6 +174,7 @@ if (commentsPanel) {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const textarea = form.elements.body;
+      const category = form.elements.category.value;
       const body = textarea.value.trim();
 
       if (!body) {
@@ -165,7 +187,12 @@ if (commentsPanel) {
         await fetchJson("/api/comments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chapter: chapterSlug, paragraphId, body }),
+          body: JSON.stringify({
+            chapter: chapterSlug,
+            paragraphId,
+            category,
+            body,
+          }),
         });
         form.remove();
         await loadComments();
@@ -227,6 +254,7 @@ if (commentsPanel) {
           comment.createdAt,
         ).toLocaleString();
         card.querySelector("p").textContent = comment.body;
+        renderCategory(card, comment.category);
 
         if (comment.publicNote) {
           const featured = document.createElement("em");
@@ -313,6 +341,18 @@ if (commentsPanel) {
     card.append(replyList);
   }
 
+  function renderCategory(card, category) {
+    const label = labelFor(feedbackCategories, category);
+
+    if (!label) {
+      return;
+    }
+
+    const tag = document.createElement("em");
+    tag.textContent = label;
+    card.querySelector(".comment-meta").append(tag);
+  }
+
   function getVisibleComments() {
     if (auth.admin && viewMode === "admin") {
       return comments.filter(
@@ -364,8 +404,19 @@ if (commentsPanel) {
   }
 
   async function resolveComment(id) {
+    const reason = window.prompt(
+      `Resolution reason: ${resolutionReasons.map(([, label]) => label).join(", ")}`,
+      "fixed",
+    );
+
+    if (!reason?.trim()) {
+      return;
+    }
+
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/resolve`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
     });
     await loadComments();
     setStatus("Comment resolved.");
@@ -457,6 +508,10 @@ if (commentsPanel) {
     }
 
     return grouped;
+  }
+
+  function labelFor(options, value) {
+    return options.find(([option]) => option === value)?.[1] || "";
   }
 
   async function fetchJson(url, options) {

@@ -20,6 +20,21 @@ const contentTypes = new Map([
   [".json", "application/json; charset=utf-8"],
   [".svg", "image/svg+xml"],
 ]);
+const feedbackCategories = new Set([
+  "unclear-concept",
+  "missing-example",
+  "too-fast",
+  "typo-language",
+  "disagreement",
+  "broken-link-code",
+]);
+const resolutionReasons = new Set([
+  "fixed",
+  "answered",
+  "duplicate",
+  "not-actionable",
+  "planned",
+]);
 
 let chapters = await loadChapters();
 await rebuildSite();
@@ -122,7 +137,11 @@ async function handleCommentsRequest(request, response, url) {
   if (request.method === "POST") {
     const body = await readJsonBody(request);
 
-    if (!isValidSlug(body.chapter) || !isValidParagraphId(body.paragraphId)) {
+    if (
+      !isValidSlug(body.chapter) ||
+      !isValidParagraphId(body.paragraphId) ||
+      !feedbackCategories.has(body.category)
+    ) {
       return sendJson(response, { message: "Invalid comment target" }, 400);
     }
 
@@ -142,11 +161,13 @@ async function handleCommentsRequest(request, response, url) {
       id: crypto.randomUUID(),
       chapter: body.chapter,
       paragraphId: body.paragraphId,
+      category: body.category,
       body: text,
       author: { login: "local-editor", avatarUrl: null, url: null },
       createdAt: new Date().toISOString(),
       resolvedAt: null,
       resolvedBy: null,
+      resolutionReason: null,
       hiddenAt: null,
       hiddenBy: null,
       featuredAt: null,
@@ -173,6 +194,12 @@ async function handleResolveRequest(request, response, encodedId) {
   }
 
   const id = decodeURIComponent(encodedId);
+  const body = await readJsonBody(request);
+
+  if (!resolutionReasons.has(body.reason)) {
+    return sendJson(response, { message: "Invalid resolution reason" }, 400);
+  }
+
   const comments = await loadComments();
 
   for (const chapterComments of Object.values(comments)) {
@@ -184,6 +211,7 @@ async function handleResolveRequest(request, response, encodedId) {
 
     comment.resolvedAt = new Date().toISOString();
     comment.resolvedBy = "local-editor";
+    comment.resolutionReason = body.reason;
     await saveComments(comments);
 
     return sendJson(response, comment);

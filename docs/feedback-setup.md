@@ -98,7 +98,7 @@ Students use the deployed site:
 1. Open a chapter.
 2. Select `Sign in` in the navigation header feedback controls.
 3. Use the comment control next to a paragraph.
-4. Post feedback.
+4. Choose a feedback category and post feedback.
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 
@@ -124,7 +124,7 @@ Start the local editable site:
 npm start
 ```
 
-In local mode, the site signs you in as `local-editor` and treats you as an admin. Reply, feature, resolve, or hide comments from the page feedback threads while editing chapters.
+In local mode, the site signs you in as `local-editor` and treats you as an admin. Reply, feature, resolve with a reason, or hide comments from the page feedback threads while editing chapters.
 
 Local feedback state is stored in:
 
