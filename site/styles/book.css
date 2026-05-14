@@ -1,0 +1,88 @@
+/* Book prose and chapter navigation */
+.prose {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+.prose h1 {
+  border-top: 0.35rem solid var(--accent);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  margin: 0 0 1.5rem;
+  padding-top: 1.2rem;
+}
+.prose h2 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+}
+.prose h3 {
+  font-size: 1.45rem;
+  margin-top: 2rem;
+}
+.prose p,
+.prose li {
+  max-width: 68ch;
+}
+.prose img {
+  max-width: 100%;
+}
+.prose blockquote {
+  border-left: 0.3rem solid var(--accent);
+  color: var(--muted);
+  margin-left: 0;
+  padding-left: 1rem;
+}
+.prose pre {
+  background: var(--code-bg);
+  border-radius: 0.35rem;
+  color: var(--code-text);
+  overflow: auto;
+  padding: 1rem;
+}
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+.heading-anchor {
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.55em;
+  margin-left: 0.35rem;
+  opacity: 0.65;
+  text-decoration: none;
+}
+.chapter-pagination {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+.chapter-pagination a {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  display: block;
+  line-height: 1.35;
+  padding: 0.8rem;
+  text-decoration: none;
+}
+.chapter-pagination a:last-child {
+  text-align: right;
+}
+.chapter-pagination span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}

@@ -1,0 +1,115 @@
+/* Local Markdown editor */
+.editor-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 0.35rem solid var(--accent);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+.editor-panel[hidden] {
+  display: none;
+}
+.editor-panel h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.editor-panel p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+.editor-panel textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  font:
+    0.95rem/1.55 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+  min-height: 32rem;
+  padding: 0.8rem;
+  resize: vertical;
+  width: 100%;
+}
+.editor-panel .EasyMDEContainer {
+  color: var(--text);
+}
+.editor-panel .EasyMDEContainer .CodeMirror {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+  font:
+    0.95rem/1.55 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+.editor-panel .EasyMDEContainer .CodeMirror-cursor {
+  border-left-color: var(--text);
+}
+.editor-panel .EasyMDEContainer .CodeMirror-selected {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.editor-panel .editor-toolbar {
+  background: var(--panel);
+  border-color: var(--border);
+  border-radius: 0.35rem 0.35rem 0 0;
+}
+.editor-panel .editor-toolbar button {
+  color: var(--text) !important;
+}
+.editor-panel .editor-toolbar button:hover,
+.editor-panel .editor-toolbar button.active {
+  background: var(--bg);
+  border-color: var(--border);
+}
+.editor-panel .editor-toolbar i.separator {
+  border-left-color: var(--border);
+  border-right-color: transparent;
+}
+.editor-panel .editor-preview,
+.editor-panel .editor-preview-side {
+  background: var(--panel);
+  color: var(--text);
+}
+.editor-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.editor-actions button {
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.45rem 0.75rem;
+}
+.editor-actions button:first-child {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
+}
+.editor-actions button:first-child:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.editor-actions button:last-of-type {
+  background: var(--panel);
+  color: var(--text);
+}
+.editor-actions span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}

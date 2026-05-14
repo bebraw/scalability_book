@@ -1,0 +1,373 @@
+/* Site layout, navigation, home page, and book chrome */
+.site-header {
+  align-items: center;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr auto;
+  padding: 0.85rem clamp(1rem, 3vw, 2.5rem);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.brand {
+  color: var(--text);
+  font-weight: 800;
+  text-decoration: none;
+}
+.header-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+  row-gap: 0.75rem;
+  justify-content: flex-end;
+}
+.site-header nav {
+  display: flex;
+  gap: 1.15rem;
+  font-size: 0.95rem;
+}
+.site-header nav a {
+  text-decoration: none;
+}
+.theme-picker {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+.theme-picker select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  font: inherit;
+  padding: 0.3rem 0.45rem;
+}
+.edit-toggle,
+.feedback-controls button {
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  border-radius: 0.35rem;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
+}
+.edit-toggle:hover,
+.feedback-controls button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.feedback-controls {
+  align-items: center;
+  border-left: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  margin-left: 0;
+  padding-left: 1rem;
+}
+.feedback-controls[hidden] {
+  display: none;
+}
+.feedback-controls span {
+  color: var(--muted);
+  font-size: 0.85rem;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feedback-controls button {
+  background: transparent;
+  color: var(--text);
+  padding: 0.28rem 0.55rem;
+}
+.feedback-controls select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.28rem 0.45rem;
+}
+.feedback-controls button:hover {
+  color: var(--panel);
+}
+.site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  margin-top: 4rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  text-align: center;
+}
+.site-footer p {
+  margin: 0;
+}
+.hero {
+  align-items: start;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 3vw, 2.5rem);
+}
+.hero-copy h1 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(2.6rem, 6vw, 5.25rem);
+  letter-spacing: 0;
+  line-height: 1;
+  margin: 0.25rem 0 1rem;
+  max-width: 11ch;
+}
+.hero-copy p:not(.eyebrow) {
+  color: var(--muted);
+  max-width: 42rem;
+}
+.eyebrow,
+.chapter-kicker,
+.book-sidebar > p,
+.local-toc > p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+}
+.primary-link {
+  background: var(--accent-strong);
+  border-radius: 0.35rem;
+  color: var(--panel);
+  display: inline-flex;
+  font-weight: 700;
+  margin-top: 1rem;
+  padding: 0.65rem 0.9rem;
+  text-decoration: none;
+}
+.primary-link:hover {
+  color: var(--panel);
+  background: var(--accent);
+}
+.cover-panel {
+  display: grid;
+  gap: 1rem;
+}
+.cover-panel img {
+  aspect-ratio: 3 / 4;
+  background: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  display: block;
+  height: auto;
+  width: 100%;
+}
+.course-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+.course-panel dl,
+.course-panel dd {
+  margin: 0;
+}
+.course-panel div + div {
+  border-top: 1px solid var(--border);
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+}
+.course-panel dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.course-panel dd {
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 0.2rem;
+}
+.home-main {
+  margin: 0 auto 4rem;
+  max-width: 72rem;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+}
+.home-main h2 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+.book-part {
+  margin-top: 2rem;
+}
+.book-part-header {
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.7rem;
+}
+.book-part-header h3 {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.book-part-header a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+.book-part-header a:hover {
+  color: var(--accent-strong);
+}
+.chapter-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(22rem, 100%), 22rem));
+  justify-content: start;
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+.chapter-grid a,
+.chapter-grid .chapter-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 0.35rem solid var(--accent);
+  border-radius: 0.35rem;
+  color: var(--text);
+  display: block;
+  min-height: 8rem;
+  padding: 1rem;
+  text-decoration: none;
+}
+.chapter-grid .is-unpublished .chapter-card {
+  border-left-color: var(--border);
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.68;
+}
+.chapter-grid span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.chapter-grid strong {
+  display: block;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+.chapter-grid em {
+  color: var(--muted);
+  display: block;
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 700;
+  margin-top: 0.85rem;
+}
+.chapter-grid em:empty {
+  display: none;
+}
+.book-shell {
+  display: grid;
+  gap: clamp(1rem, 3vw, 2rem);
+  grid-template-columns: 18rem minmax(0, 48rem) 15rem;
+  margin: 0 auto;
+  max-width: 88rem;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem) 5rem;
+}
+.book-sidebar,
+.local-toc {
+  align-self: start;
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
+  position: sticky;
+  top: 5rem;
+}
+.book-sidebar ol,
+.local-toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.book-sidebar-part + .book-sidebar-part {
+  margin-top: 1.2rem;
+}
+.book-sidebar h2 {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.2rem;
+}
+.book-sidebar h2 a {
+  color: inherit;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+.book-sidebar h2 a:hover {
+  color: var(--accent-strong);
+}
+.book-sidebar-part > p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin: 0 0 0.5rem;
+}
+.book-sidebar a,
+.book-sidebar-disabled {
+  align-items: baseline;
+  border-radius: 0.35rem;
+  color: var(--text);
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 1.6rem 1fr;
+  line-height: 1.3;
+  padding: 0.45rem 0.55rem;
+  text-decoration: none;
+}
+.book-sidebar-disabled {
+  color: var(--muted);
+  opacity: 0.68;
+}
+.book-sidebar a[aria-current="page"] {
+  background: var(--panel);
+  box-shadow: inset 3px 0 0 var(--accent);
+  font-weight: 700;
+}
+.book-sidebar a span,
+.book-sidebar-disabled span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.book-sidebar a[aria-current="page"] span:last-child {
+  font-weight: 700;
+}
+.book-sidebar .book-sidebar-part-link {
+  grid-column: 1 / -1;
+}
+.local-toc a {
+  color: var(--muted);
+  display: block;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  padding: 0.25rem 0;
+  text-decoration: none;
+}
+.local-toc .toc-level-3 {
+  padding-left: 0.8rem;
+}
+.chapter-main {
+  min-width: 0;
+}

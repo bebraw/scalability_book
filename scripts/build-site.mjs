@@ -113,7 +113,7 @@ await writePage(
   }),
 );
 
-await copySiteFile("styles.css");
+await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/editor.ts", "editor.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
@@ -126,14 +126,40 @@ async function writePage(relativePath, content) {
   await writeFile(outputPath, content, "utf8");
 }
 
-async function copySiteFile(
-  sourceRelativePath,
-  outputRelativePath = sourceRelativePath,
-) {
-  const outputPath = path.join(buildDir, outputRelativePath);
+async function compileSiteStylesheet(sourceRelativePath) {
+  const outputPath = path.join(buildDir, sourceRelativePath);
+  const sourcePath = path.join(siteDir, sourceRelativePath);
+  const source = await inlineCssImports(sourcePath);
 
   await mkdir(path.dirname(outputPath), { recursive: true });
-  await copyFile(path.join(siteDir, sourceRelativePath), outputPath);
+  await writeFile(outputPath, source, "utf8");
+}
+
+async function inlineCssImports(sourcePath, seen = new Set()) {
+  if (seen.has(sourcePath)) {
+    throw new Error(`Circular CSS import: ${sourcePath}`);
+  }
+
+  seen.add(sourcePath);
+
+  const source = await readFile(sourcePath, "utf8");
+  const lines = await Promise.all(
+    source.split("\n").map(async (line) => {
+      const match = line.match(/^@import\s+"(.+)"\s*;$/);
+
+      if (!match) {
+        return line;
+      }
+
+      const importPath = path.resolve(path.dirname(sourcePath), match[1]);
+
+      return inlineCssImports(importPath, seen);
+    }),
+  );
+
+  seen.delete(sourcePath);
+
+  return lines.join("\n");
 }
 
 async function compileSiteScript(sourceRelativePath, outputRelativePath) {
