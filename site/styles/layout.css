@@ -134,7 +134,7 @@
 }
 .eyebrow,
 .chapter-kicker,
-.book-sidebar > p,
+.book-sidebar summary,
 .local-toc > p {
   color: var(--muted);
   font-size: 0.78rem;
@@ -142,6 +142,13 @@
   letter-spacing: 0.08em;
   margin: 0 0 0.75rem;
   text-transform: uppercase;
+}
+.book-sidebar summary {
+  cursor: default;
+  list-style: none;
+}
+.book-sidebar summary::-webkit-details-marker {
+  display: none;
 }
 .primary-link {
   background: var(--accent-strong);

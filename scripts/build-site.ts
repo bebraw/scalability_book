@@ -100,8 +100,13 @@ for (let index = 0; index < bookPages.length; index++) {
       currentUrl: page.url,
       stylesheets: includeEditor ? ["/vendor/easymde/easymde.min.css"] : [],
       scripts: includeEditor
-        ? ["/comments.js", "/vendor/easymde/easymde.min.js", "/editor.js"]
-        : ["/comments.js"],
+        ? [
+            "/book-nav.js",
+            "/comments.js",
+            "/vendor/easymde/easymde.min.js",
+            "/editor.js",
+          ]
+        : ["/book-nav.js", "/comments.js"],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
   );
@@ -119,6 +124,7 @@ await writePage(
 
 await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
+await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
