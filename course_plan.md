@@ -1,13 +1,36 @@
 # Course plan
 
-The course contains nine lectures and three projects: construct, reconstruct, and deconstruct. The projects are aligned with the lectures. I have sketched out the initial timeline per week/lecture below:
+The course contains nine lectures and three projects: construct, reconstruct, and deconstruct. The projects are aligned with the lectures.
 
-1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability
-2. Scalable development - developing applications so that they remain understandable, testable, changeable, and maintainable as code, teams, dependencies, and tooling evolve. Composition is discussed as one way to manage this complexity.
+## Learning outcomes
+
+I've listed the learning outcomes of the course below as it's vital to cover these through the course content.
+
+1. Understands the multiple dimensions of scalability and understands factors that contribute to the scalability of web applications.
+2. Knows and applies architectural patterns and techniques for designing and building scalable web applications.
+3. Understands the impact of the wide range of design decisions in building scalable web applications.
+4. Knows scalability laws and reflects on them in the context of architectural decisions.
+5. Can evaluate the scalability of web applications at multiple abstraction levels.
+6. Has practical experience in designing, building, and deploying web applications that scale. 
+
+## Time plan
+
+I have sketched out the initial timeline per week/lecture below:
+
+**Construct**
+
+1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability, get Construct started
+2. What is scalability
 3. Architecture
+
+**Deconstruct**
+
 4. Friction
 5. Benchmarking and observability
 6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct
+
+**Reconstruct**
+
 7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered
 8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure
 9. Recap - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned
