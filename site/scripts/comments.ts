@@ -95,9 +95,6 @@ if (commentsRoot) {
   const commentButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-comment-button]"),
   );
-  const stuckButtons = Array.from(
-    document.querySelectorAll<HTMLButtonElement>("[data-stuck-button]"),
-  );
   const reflectionButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-reflection-button]"),
   );
@@ -126,7 +123,6 @@ if (commentsRoot) {
       await loadComments();
       wireParagraphSelection();
       wireParagraphButtons();
-      wireStuckButtons();
       wireReflectionButtons();
     } catch {
       if (commentsControls) {
@@ -296,49 +292,6 @@ if (commentsRoot) {
     document
       .querySelector("[data-comment-target].is-feedback-selected")
       ?.classList.remove("is-feedback-selected");
-  }
-
-  function wireStuckButtons() {
-    for (const button of stuckButtons) {
-      button.addEventListener("click", async () => {
-        const paragraphId = button.dataset.stuckButton;
-
-        if (!auth.authenticated && !auth.admin) {
-          (commentsControls || feedbackRoot).scrollIntoView({
-            block: "start",
-          });
-          setStatus("Sign in with GitHub before marking confusion.");
-          return;
-        }
-
-        if (!paragraphId) {
-          return;
-        }
-
-        if (hasOwnActiveStuckMarker(paragraphId)) {
-          showParagraphFeedbackPanel(paragraphId);
-          setStatus("Already marked as stuck.");
-          return;
-        }
-
-        button.disabled = true;
-
-        try {
-          await fetchJson("/api/stuck", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chapter: chapterSlug, paragraphId }),
-          });
-          await loadComments();
-          showParagraphFeedbackPanel(paragraphId);
-          setStatus("Marked as stuck.");
-        } catch (error) {
-          setStatus(errorMessage(error));
-        } finally {
-          button.disabled = false;
-        }
-      });
-    }
   }
 
   function openForm(paragraphId: string): void {
@@ -825,44 +778,6 @@ if (commentsRoot) {
       );
     }
 
-    const stuckCounts = getVisibleComments()
-      .filter((comment) => comment.type === "stuck" && !comment.resolvedAt)
-      .reduce<Map<string, number>>((result, comment) => {
-        result.set(
-          comment.paragraphId,
-          (result.get(comment.paragraphId) || 0) + 1,
-        );
-
-        return result;
-      }, new Map());
-
-    for (const button of stuckButtons) {
-      const paragraphId = button.dataset.stuckButton || "";
-      const count = stuckCounts.get(paragraphId) || 0;
-      button.classList.toggle("has-comments", count > 0);
-      button.classList.toggle(
-        "is-active",
-        hasOwnActiveStuckMarker(paragraphId),
-      );
-      button.dataset.commentCount = count > 0 ? String(count) : "";
-    }
-  }
-
-  function hasOwnActiveStuckMarker(paragraphId: string): boolean {
-    const userLogin = auth.user?.login;
-
-    if (!userLogin) {
-      return false;
-    }
-
-    return comments.some(
-      (comment) =>
-        comment.type === "stuck" &&
-        !comment.resolvedAt &&
-        !comment.hiddenAt &&
-        comment.paragraphId === paragraphId &&
-        comment.author?.login === userLogin,
-    );
   }
 
   function labelFor(options: FeedbackOption[], value: string | undefined) {

@@ -4,7 +4,7 @@ The GitHub login flow is suitable for student identity, but it is not a complete
 
 ## Phase 1: Rate Limit Authenticated Writes
 
-Add per-login and per-IP rate limits for `POST /api/comments` and `POST /api/stuck`.
+Add per-login and per-IP rate limits for `POST /api/comments` and any legacy feedback write endpoints.
 
 - Store counters in KV with keys such as `rate:<window>:login:<github-login>` and `rate:<window>:ip:<client-ip>`.
 - Use short windows for burst control, for example 10 comments per 10 minutes per login and 30 writes per 10 minutes per IP.
@@ -21,7 +21,7 @@ Acceptance criteria:
 
 Use Turnstile as a challenge only when the user submits feedback, not during normal reading.
 
-- Add a Turnstile widget to comment and stuck forms.
+- Add a Turnstile widget to comment forms.
 - Send the Turnstile token with each feedback POST.
 - Verify the token in the Worker before writing to KV.
 - Keep the feature configurable with `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` so local development can run without it.
@@ -38,7 +38,7 @@ For stricter course deployments, add an optional allowlist before accepting feed
 
 - Support a `FEEDBACK_GITHUB_LOGINS` Worker var containing comma-separated GitHub usernames.
 - If the var is empty, preserve the current behavior: any GitHub user may post.
-- If the var is set, allow only listed users and admins to post comments or stuck markers.
+- If the var is set, allow only listed users and admins to post comments.
 - Document how to update the allowlist before each course run.
 
 Acceptance criteria:

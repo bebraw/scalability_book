@@ -96,7 +96,7 @@ export function renderMarkdown(
     paragraphCounts.set(baseId, count);
     const paragraphId = count === 1 ? baseId : `${baseId}-${count}`;
 
-    return `<p id="${paragraphId}" data-comment-target="${paragraphId}">${html}<span class="paragraph-feedback-actions"><button class="paragraph-comment-button" type="button" data-comment-button="${paragraphId}" aria-label="Comment on this paragraph" title="Comment"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.5h14v9H9l-4 4v-13Z" /></svg><span class="visually-hidden">Comment on this paragraph</span></button><button class="paragraph-stuck-button" type="button" data-stuck-button="${paragraphId}" aria-label="Mark this paragraph as stuck" title="I'm stuck here">?</button></span></p>`;
+    return `<p id="${paragraphId}" data-comment-target="${paragraphId}">${html}<span class="paragraph-feedback-actions"><button class="paragraph-comment-button" type="button" data-comment-button="${paragraphId}" aria-label="Comment on this paragraph" title="Comment"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.5h14v9H9l-4 4v-13Z" /></svg><span class="visually-hidden">Comment on this paragraph</span></button></span></p>`;
   };
 
   return {
