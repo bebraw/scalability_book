@@ -32,6 +32,6 @@ The course book is built around the three course projects: construct, reconstruc
 
 **Fortification:**
 
-7. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
-8. How to build an agent-ready project? -- How do tests, documentation, interfaces, conventions, and task boundaries make a project safer for agentic development?
-9. How to coordinate agent fleets? -- How can we decompose work across agents, review their output, contain risk, and preserve architectural intent?
+7. How to coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
+8. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
+9. Recap -- What should we remember from the course after constructing, reconstructing, and deconstructing a scalable web application?

@@ -105,4 +105,4 @@ Important trade-offs to make explicit:
 
 - Add a table mapping pressure, technique, benefit, and cost.
 - Include a short warning against premature scaling.
-- Connect the end of the chapter to agent-ready projects: once architecture grows, the development process itself must become more explicit and reviewable.
+- Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
