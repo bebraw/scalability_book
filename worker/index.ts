@@ -21,6 +21,7 @@ const feedbackCategories = new Set([
   "disagreement",
   "broken-link-code",
   "stuck",
+  "reflection",
 ]);
 const resolutionReasons = new Set([
   "fixed",
@@ -292,6 +293,7 @@ async function handleCommentsRequest(
       chapter?: string;
       paragraphId?: string;
       category?: string;
+      anonymous?: boolean;
       body?: string;
     };
 
@@ -318,6 +320,7 @@ async function handleCommentsRequest(
       chapter: body.chapter,
       paragraphId: body.paragraphId,
       category: body.category,
+      anonymous: body.anonymous === true,
       body: text,
       author: user,
       createdAt: new Date().toISOString(),
@@ -794,7 +797,10 @@ function isValidSlug(value: unknown): value is string {
 }
 
 function isValidParagraphId(value: unknown): value is string {
-  return typeof value === "string" && /^p-[a-z0-9-]+$/.test(value);
+  return (
+    typeof value === "string" &&
+    (/^p-[a-z0-9-]+$/.test(value) || value === "p-chapter-reflection")
+  );
 }
 
 function isValidFeedbackCategory(value: unknown): value is string {

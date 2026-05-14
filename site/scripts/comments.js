@@ -9,6 +9,7 @@ if (commentsPanel) {
     ["disagreement", "Disagreement"],
     ["broken-link-code", "Broken link or code"],
     ["stuck", "Stuck here"],
+    ["reflection", "Reflection"],
   ];
   const resolutionReasons = [
     ["fixed", "Fixed"],
@@ -31,6 +32,9 @@ if (commentsPanel) {
   );
   const stuckButtons = Array.from(
     document.querySelectorAll("[data-stuck-button]"),
+  );
+  const reflectionButtons = Array.from(
+    document.querySelectorAll("[data-reflection-button]"),
   );
   let auth = { authenticated: false, admin: false };
   let comments = [];
@@ -55,6 +59,7 @@ if (commentsPanel) {
       await loadComments();
       wireParagraphButtons();
       wireStuckButtons();
+      wireReflectionButtons();
     } catch {
       commentsPanel.hidden = true;
       if (commentsControls) {
@@ -210,6 +215,10 @@ if (commentsPanel) {
         </select>
       </label>
       <textarea name="body" required maxlength="4000" aria-label="Comment text"></textarea>
+      <label class="inline-option">
+        <input type="checkbox" name="anonymous" />
+        <span>Show as anonymous to teacher</span>
+      </label>
       <div>
         <button type="submit">Post comment</button>
         <button type="button" data-comment-cancel>Cancel</button>
@@ -220,6 +229,7 @@ if (commentsPanel) {
       event.preventDefault();
       const textarea = form.elements.body;
       const category = form.elements.category.value;
+      const anonymous = form.elements.anonymous.checked;
       const body = textarea.value.trim();
 
       if (!body) {
@@ -236,6 +246,7 @@ if (commentsPanel) {
             chapter: chapterSlug,
             paragraphId,
             category,
+            anonymous,
             body,
           }),
         });
@@ -296,8 +307,7 @@ if (commentsPanel) {
           </div>
           <p></p>
         `;
-        card.querySelector("strong").textContent =
-          comment.author?.login || "GitHub user";
+        card.querySelector("strong").textContent = displayAuthor(comment);
         card.querySelector("span").textContent = new Date(
           comment.createdAt,
         ).toLocaleString();
@@ -354,6 +364,40 @@ if (commentsPanel) {
       }
 
       list.append(thread);
+    }
+  }
+
+  function wireReflectionButtons() {
+    for (const button of reflectionButtons) {
+      button.addEventListener("click", async () => {
+        if (!auth.authenticated && !auth.admin) {
+          (commentsControls || commentsPanel).scrollIntoView({
+            block: "start",
+          });
+          setStatus("Sign in with GitHub before adding a reflection.");
+          return;
+        }
+
+        const prompt = button.dataset.reflectionButton;
+        const body = window.prompt(prompt);
+
+        if (!body?.trim()) {
+          return;
+        }
+
+        await fetchJson("/api/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chapter: chapterSlug,
+            paragraphId: "p-chapter-reflection",
+            category: "reflection",
+            body,
+          }),
+        });
+        await loadComments();
+        setStatus("Reflection posted.");
+      });
     }
   }
 
@@ -683,7 +727,17 @@ if (commentsPanel) {
   }
 
   function paragraphLabel(paragraphId) {
+    if (paragraphId === "p-chapter-reflection") {
+      return "Chapter reflection";
+    }
+
     return `Paragraph ${commentButtons.findIndex((button) => button.dataset.commentButton === paragraphId) + 1}`;
+  }
+
+  function displayAuthor(comment) {
+    return comment.anonymous
+      ? "Anonymous student"
+      : comment.author?.login || "GitHub user";
   }
 
   function cssEscape(value) {

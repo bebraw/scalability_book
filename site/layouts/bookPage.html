@@ -38,6 +38,27 @@
       <p class="chapter-kicker" &children="(resolve chapterLabel)"></p>
       <Raw &html="(resolve content)"></Raw>
     </article>
+    <section class="reflection-prompts" data-reflection-prompts>
+      <h2>Reflection</h2>
+      <button
+        type="button"
+        data-reflection-button="What was the muddiest point in this chapter?"
+      >
+        Muddiest point
+      </button>
+      <button
+        type="button"
+        data-reflection-button="What example would make this chapter clearer?"
+      >
+        Missing example
+      </button>
+      <button
+        type="button"
+        data-reflection-button="What design trade-off do you understand better after reading this chapter?"
+      >
+        Trade-off learned
+      </button>
+    </section>
     <nav class="chapter-pagination" aria-label="Chapter navigation">
       <Raw &html="(resolve previousLink)"></Raw>
       <Raw &html="(resolve nextLink)"></Raw>

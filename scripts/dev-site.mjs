@@ -28,6 +28,7 @@ const feedbackCategories = new Set([
   "disagreement",
   "broken-link-code",
   "stuck",
+  "reflection",
 ]);
 const resolutionReasons = new Set([
   "fixed",
@@ -167,6 +168,7 @@ async function handleCommentsRequest(request, response, url) {
       chapter: body.chapter,
       paragraphId: body.paragraphId,
       category: body.category,
+      anonymous: body.anonymous === true,
       body: text,
       author: { login: "local-editor", avatarUrl: null, url: null },
       createdAt: new Date().toISOString(),
@@ -609,7 +611,10 @@ function isValidSlug(value) {
 }
 
 function isValidParagraphId(value) {
-  return typeof value === "string" && /^p-[a-z0-9-]+$/.test(value);
+  return (
+    typeof value === "string" &&
+    (/^p-[a-z0-9-]+$/.test(value) || value === "p-chapter-reflection")
+  );
 }
 
 function sendJson(response, data, status = 200) {
