@@ -156,6 +156,26 @@
 [data-comment-target].is-feedback-selected {
   box-shadow: inset -2px 0 0 color-mix(in srgb, var(--accent) 62%, transparent);
 }
+[data-comment-target].is-feedback-source {
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border-radius: 0.25rem;
+  box-shadow:
+    inset 3px 0 0 var(--accent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent);
+  margin-inline: -0.4rem;
+  padding-block: 0.18rem;
+  padding-inline-start: 0.4rem;
+}
+[data-comment-target].is-feedback-source::before {
+  background: var(--accent);
+  block-size: 1rem;
+  border-radius: 999px;
+  content: "";
+  inline-size: 2px;
+  inset-block-end: -1rem;
+  inset-inline-start: 0.85rem;
+  position: absolute;
+}
 [data-comments-preview="public"] .paragraph-feedback-actions {
   display: none;
 }

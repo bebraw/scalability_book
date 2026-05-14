@@ -292,6 +292,19 @@ if (commentsRoot) {
     document
       .querySelector("[data-comment-target].is-feedback-selected")
       ?.classList.remove("is-feedback-selected");
+    clearFeedbackSource();
+  }
+
+  function clearFeedbackSource() {
+    document
+      .querySelector("[data-comment-target].is-feedback-source")
+      ?.classList.remove("is-feedback-source");
+  }
+
+  function markFeedbackSource(paragraph: Element) {
+    clearFeedbackSource();
+    paragraph.classList.add("is-feedback-source");
+    paragraph.classList.add("is-feedback-selected");
   }
 
   function openForm(paragraphId: string): void {
@@ -370,9 +383,11 @@ if (commentsRoot) {
       "comment cancel button",
     ).addEventListener("click", () => {
       form.remove();
+      clearFeedbackSource();
     });
 
     positionCommentForm(form, paragraph);
+    markFeedbackSource(paragraph);
     paragraph.insertAdjacentElement("afterend", form);
     form.elements.body.focus();
   }
@@ -432,11 +447,13 @@ if (commentsRoot) {
     }
 
     positionCommentForm(panel, paragraph);
+    markFeedbackSource(paragraph);
     paragraph.insertAdjacentElement("afterend", panel);
   }
 
   function closeParagraphFeedbackPanel(resetActive = true) {
     document.querySelector("[data-paragraph-feedback-panel]")?.remove();
+    clearFeedbackSource();
     if (resetActive) {
       activeFeedbackParagraphId = null;
     }
