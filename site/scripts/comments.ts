@@ -46,12 +46,10 @@ type CommentForm = HTMLFormElement & {
   };
 };
 
-const commentsPanel = document.querySelector<HTMLElement>(
-  "[data-comments-panel]",
-);
+const commentsRoot = document.querySelector<HTMLElement>("[data-comments-root]");
 
-if (commentsPanel) {
-  const panelRoot = commentsPanel;
+if (commentsRoot) {
+  const feedbackRoot = commentsRoot;
   const feedbackCategories: FeedbackOption[] = [
     ["unclear-concept", "Unclear concept"],
     ["missing-example", "Missing example"],
@@ -72,14 +70,10 @@ if (commentsPanel) {
   const commentsControls = document.querySelector<HTMLElement>(
     "[data-comments-controls]",
   );
-  const chapterSlug = commentsPanel.dataset.chapterSlug || "";
+  const chapterSlug = feedbackRoot.dataset.chapterSlug || "";
   const status = requireElement(
     document.querySelector<HTMLElement>("[data-comments-status]"),
     "comments status",
-  );
-  const list = requireElement(
-    commentsPanel.querySelector<HTMLElement>("[data-comments-list]"),
-    "comments list",
   );
   const loginButton = requireElement(
     document.querySelector<HTMLButtonElement>("[data-comments-login]"),
@@ -135,7 +129,6 @@ if (commentsPanel) {
       wireStuckButtons();
       wireReflectionButtons();
     } catch {
-      panelRoot.hidden = true;
       if (commentsControls) {
         commentsControls.hidden = true;
       }
@@ -192,7 +185,6 @@ if (commentsPanel) {
     viewMode = viewSelect.value;
     localStorage.setItem("comments-view-mode", viewMode);
     syncPreviewMode();
-    renderCommentList();
     updateParagraphBadges();
     if (activeFeedbackParagraphId) {
       renderParagraphFeedbackPanel(activeFeedbackParagraphId);
@@ -218,7 +210,6 @@ if (commentsPanel) {
     comments = await fetchJson<FeedbackComment[]>(
       `/api/comments?chapter=${encodeURIComponent(chapterSlug)}`,
     );
-    renderCommentList();
     updateParagraphBadges();
     if (activeFeedbackParagraphId) {
       renderParagraphFeedbackPanel(activeFeedbackParagraphId);
@@ -237,7 +228,7 @@ if (commentsPanel) {
         const paragraphId = button.dataset.commentButton;
 
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || panelRoot).scrollIntoView({
+          (commentsControls || feedbackRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before commenting.");
@@ -313,7 +304,7 @@ if (commentsPanel) {
         const paragraphId = button.dataset.stuckButton;
 
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || panelRoot).scrollIntoView({
+          (commentsControls || feedbackRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before marking confusion.");
@@ -518,129 +509,65 @@ if (commentsPanel) {
     renderCategory(card, comment.category);
     renderReplies(card, comment);
 
-    return card;
-  }
-
-  function renderCommentList() {
-    const visibleComments = getVisibleComments();
-    list.innerHTML = "";
-    panelRoot.hidden = visibleComments.length === 0;
-
-    if (!visibleComments.length) {
-      renderAdminSummary();
-      return;
-    }
-
-    renderAdminSummary();
-
-    const byParagraph = groupByParagraph(visibleComments);
-
-    for (const [paragraphId, threadComments] of byParagraph) {
-      const thread = document.createElement("section");
-      thread.className = "comment-thread";
-      const anchor = document.createElement("a");
-      anchor.href = `#${paragraphId}`;
-      anchor.textContent = paragraphLabel(paragraphId);
-      const title = document.createElement("h3");
-      title.append(anchor);
-      thread.append(title);
-
-      for (const comment of threadComments) {
-        const card = document.createElement("article");
-        card.className = "comment-card";
-        card.classList.toggle("is-hidden", Boolean(comment.hiddenAt));
-        card.classList.toggle("is-featured", Boolean(comment.publicNote));
-        card.innerHTML = `
-          <div class="comment-meta">
-            <strong></strong>
-            <span></span>
-          </div>
-          <p></p>
-        `;
+    if (auth.admin && viewMode === "admin" && !comment.publicNote) {
+      if (comment.hiddenAt) {
+        const hidden = document.createElement("em");
+        hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
         requireElement(
-          card.querySelector("strong"),
-          "comment author",
-        ).textContent = displayAuthor(comment);
-        requireElement(card.querySelector("span"), "comment date").textContent =
-          new Date(comment.createdAt).toLocaleString();
-        requireElement(card.querySelector("p"), "comment body").textContent =
-          comment.body;
-        renderCategory(card, comment.category);
-
-        if (comment.publicNote) {
-          const featured = document.createElement("em");
-          featured.textContent = "Featured";
-          requireElement(
-            card.querySelector<HTMLElement>(".comment-meta"),
-            "comment meta",
-          ).append(featured);
-        }
-
-        renderReplies(card, comment);
-
-        if (auth.admin && viewMode === "admin" && !comment.publicNote) {
-          if (comment.hiddenAt) {
-            const hidden = document.createElement("em");
-            hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
-            requireElement(
-              card.querySelector<HTMLElement>(".comment-meta"),
-              "comment meta",
-            ).append(hidden);
-          }
-
-          if (!comment.hiddenAt) {
-            const reply = document.createElement("button");
-            reply.type = "button";
-            reply.textContent = "Reply";
-            reply.addEventListener("click", () => replyToComment(comment.id));
-            card.append(reply);
-
-            const feature = document.createElement("button");
-            feature.type = "button";
-            feature.textContent = comment.featuredAt ? "Unfeature" : "Feature";
-            feature.addEventListener("click", () =>
-              comment.featuredAt
-                ? unfeatureComment(comment.id)
-                : featureComment(comment),
-            );
-            card.append(feature);
-
-            if (auth.local && comment.featuredAt) {
-              const promote = document.createElement("button");
-              promote.type = "button";
-              promote.textContent = "Promote";
-              promote.addEventListener("click", () =>
-                promoteClarification(comment),
-              );
-              card.append(promote);
-            }
-
-            const hide = document.createElement("button");
-            hide.type = "button";
-            hide.textContent = "Hide";
-            hide.addEventListener("click", () => hideComment(comment.id));
-            card.append(hide);
-          }
-
-          const resolve = document.createElement("button");
-          resolve.type = "button";
-          resolve.textContent = "Resolve";
-          resolve.addEventListener("click", () => resolveComment(comment.id));
-          card.append(resolve);
-        }
-
-        thread.append(card);
+          card.querySelector<HTMLElement>(".comment-meta"),
+          "comment meta",
+        ).append(hidden);
       }
 
-      list.append(thread);
+      if (!comment.hiddenAt) {
+        const reply = document.createElement("button");
+        reply.type = "button";
+        reply.textContent = "Reply";
+        reply.addEventListener("click", () => replyToComment(comment.id));
+        card.append(reply);
+
+        const feature = document.createElement("button");
+        feature.type = "button";
+        feature.textContent = comment.featuredAt ? "Unfeature" : "Feature";
+        feature.addEventListener("click", () =>
+          comment.featuredAt
+            ? unfeatureComment(comment.id)
+            : featureComment(comment),
+        );
+        card.append(feature);
+
+        if (auth.local && comment.featuredAt) {
+          const promote = document.createElement("button");
+          promote.type = "button";
+          promote.textContent = "Promote";
+          promote.addEventListener("click", () =>
+            promoteClarification(comment),
+          );
+          card.append(promote);
+        }
+
+        const hide = document.createElement("button");
+        hide.type = "button";
+        hide.textContent = "Hide";
+        hide.addEventListener("click", () => hideComment(comment.id));
+        card.append(hide);
+      }
+
+      const resolve = document.createElement("button");
+      resolve.type = "button";
+      resolve.textContent = "Resolve";
+      resolve.addEventListener("click", () => resolveComment(comment.id));
+      card.append(resolve);
     }
+
+    return card;
   }
 
   function wireReflectionButtons() {
     for (const button of reflectionButtons) {
       button.addEventListener("click", async () => {
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || panelRoot).scrollIntoView({
+          (commentsControls || feedbackRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before adding a reflection.");
@@ -668,45 +595,6 @@ if (commentsPanel) {
         setStatus("Reflection posted.");
       });
     }
-  }
-
-  function renderAdminSummary() {
-    if (!auth.admin || viewMode !== "admin") {
-      return;
-    }
-
-    panelRoot.hidden = false;
-    const summary = document.createElement("section");
-    summary.className = "feedback-summary";
-    const unresolved = comments.filter((comment) => !comment.resolvedAt);
-    const stuck = unresolved.filter((comment) => comment.type === "stuck");
-    const categoryCounts = countBy(
-      unresolved,
-      (comment) => comment.category || "uncategorized",
-    );
-    const paragraphCounts = countBy(
-      unresolved,
-      (comment) => comment.paragraphId,
-    );
-    const hotParagraphs = [...paragraphCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    summary.innerHTML = `
-      <h3>Feedback summary</h3>
-      <p>${unresolved.length} unresolved item${unresolved.length === 1 ? "" : "s"} · ${stuck.length} stuck marker${stuck.length === 1 ? "" : "s"}</p>
-      <div class="feedback-summary-grid">
-        <div>
-          <strong>Categories</strong>
-          <ul>${[...categoryCounts.entries()].map(([category, count]) => `<li>${escapeHtml(labelFor(feedbackCategories, category) || category)}: ${count}</li>`).join("")}</ul>
-        </div>
-        <div>
-          <strong>Hot paragraphs</strong>
-          <ul>${hotParagraphs.map(([paragraphId, count]) => `<li><a href="#${paragraphId}">${escapeHtml(paragraphLabel(paragraphId))}</a>: ${count}</li>`).join("")}</ul>
-        </div>
-      </div>
-    `;
-    list.prepend(summary);
   }
 
   function renderReplies(card: HTMLElement, comment: FeedbackComment): void {
@@ -977,33 +865,8 @@ if (commentsPanel) {
     );
   }
 
-  function groupByParagraph(
-    items: FeedbackComment[],
-  ): Map<string, FeedbackComment[]> {
-    const grouped = new Map<string, FeedbackComment[]>();
-
-    for (const item of items) {
-      const group = grouped.get(item.paragraphId) || [];
-      group.push(item);
-      grouped.set(item.paragraphId, group);
-    }
-
-    return grouped;
-  }
-
   function labelFor(options: FeedbackOption[], value: string | undefined) {
     return options.find(([option]) => option === value)?.[1] || "";
-  }
-
-  function countBy<T>(
-    items: T[],
-    getKey: (item: T) => string,
-  ): Map<string, number> {
-    return items.reduce<Map<string, number>>((result, item) => {
-      const key = getKey(item);
-      result.set(key, (result.get(key) || 0) + 1);
-      return result;
-    }, new Map());
   }
 
   function downloadFeedbackSummary() {
@@ -1053,14 +916,6 @@ if (commentsPanel) {
     }
 
     return `${source.slice(0, markerIndex).trimEnd()}${block}${source.slice(markerIndex)}`;
-  }
-
-  function escapeHtml(value: unknown): string {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
   }
 
   async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {

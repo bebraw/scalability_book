@@ -1,15 +1,11 @@
 <div class="book-shell">
   <Raw &html="(resolve bookSidebar)"></Raw>
-  <main class="chapter-main" id="content">
-    <section
-      class="comments-panel"
-      data-comments-panel
-      &data-chapter-slug="(resolve chapterSlug)"
-      hidden
-    >
-      <h2>Feedback</h2>
-      <div data-comments-list></div>
-    </section>
+  <main
+    class="chapter-main"
+    id="content"
+    data-comments-root
+    &data-chapter-slug="(resolve chapterSlug)"
+  >
     <section
       class="editor-panel"
       data-editor
