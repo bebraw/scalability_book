@@ -289,16 +289,21 @@ if (commentsRoot) {
   }
 
   function clearSelectedParagraph() {
-    document
-      .querySelector("[data-comment-target].is-feedback-selected")
-      ?.classList.remove("is-feedback-selected");
+    for (const paragraph of document.querySelectorAll(
+      "[data-comment-target].is-feedback-selected",
+    )) {
+      paragraph.classList.remove("is-feedback-selected");
+    }
+
     clearFeedbackSource();
   }
 
   function clearFeedbackSource() {
-    document
-      .querySelector("[data-comment-target].is-feedback-source")
-      ?.classList.remove("is-feedback-source");
+    for (const paragraph of document.querySelectorAll(
+      "[data-comment-target].is-feedback-source",
+    )) {
+      paragraph.classList.remove("is-feedback-source");
+    }
   }
 
   function markFeedbackSource(paragraph: Element) {
