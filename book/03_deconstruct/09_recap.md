@@ -4,7 +4,7 @@ By the end of the course, you have constructed a working system, reconstructed i
 
 The central claim could be: scalability is the ability to keep a system useful while the conditions around it change. That includes technical capacity, but it also includes architecture, feedback loops, team coordination, and the way AI-assisted development is governed.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > A scalable system should not only survive growth. It should use resources deliberately. The final reflection should ask whether the project handles more work efficiently or merely pushes more computation, storage, bandwidth, and human attention into the problem.
 

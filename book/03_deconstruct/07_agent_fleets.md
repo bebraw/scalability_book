@@ -4,7 +4,7 @@ An agent fleet is a coordinated set of agents or agent roles working on parts of
 
 The central claim could be: more agents do not automatically mean more progress. Agentic development scales only when the project teaches agents how to work inside it and when roles, boundaries, artifacts, and review loops are explicit.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > Parallel agents multiply compute use. A fleet is easier to justify when decomposition improves quality, reduces rework, or saves substantial human time. Clear setup, fast tests, stable commands, useful errors, and scoped tasks reduce wasted attempts and make each model call more likely to produce reviewable value.
 

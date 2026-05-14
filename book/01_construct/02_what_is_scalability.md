@@ -104,7 +104,7 @@ Scalability is multi-dimensional. Different dimensions stress different parts of
 
 You cannot treat “scaling” as a single problem when these four often push in different directions.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > Scaling a system usually scales resource consumption too. A design that handles 10x traffic by using 20x infrastructure may be technically scalable, but it is inefficient. Resource-aware scalability asks how much useful work the system delivers per unit of computation, storage, bandwidth, and operational cost.
 
@@ -199,7 +199,7 @@ These terms often appear together, but they are not the same.
 
 A system can be fast but not scalable if it performs well only at one size. It can be scalable but fragile if a single dependency failure takes it down. It can be resilient but expensive if it survives failure by overprovisioning everything. The engineering task is to understand which property matters most under the current constraints.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > Faster is not automatically more sustainable. A fast endpoint can still waste resources if it performs unnecessary queries, transfers oversized payloads, or runs continuously when no user value is produced. Efficiency needs its own evidence.
 

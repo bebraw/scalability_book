@@ -15,7 +15,7 @@ In this part, the course moves from building a working baseline to reconstructin
 
 Technical debt is reduced optionality. A system with high debt may still run, pass tests, and satisfy users today, but it gives the team fewer good choices tomorrow.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > Inefficient design can become sustainability debt. Unbounded logs, poor retention policies, N+1 queries, heavy dependencies, and wasteful background jobs may not break the system immediately, but they compound infrastructure cost and resource use over time.
 

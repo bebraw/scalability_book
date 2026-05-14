@@ -20,7 +20,7 @@ In short, agentic development has changed web development by shifting the abstra
 
 As mentioned, giving into the vibes and prompting your application can be seductive in sense that it allows you to achieve visible results fast. For a simple project that is easy to specify, sometimes even a single prompt can be enough to produce something usable even with the current tools. For example, the layout of the [AI meets SDLC](https://www.sdlcai.org/) was produced as one-shot using a carefully crafted prompt that provided the model enough context and constraints. Both context and constraints are at the core of using these tools. Commonly constraints are also called guardrails, and for a good reason. A big part of agentic engineering and working with AI systems in general is exactly about figuring out boundaries for the systems and constraining how it can work.
 
-> **Optional: Sustainability angle**
+> **Sustainability angle**
 >
 > Sustainable agentic development has two meanings here. It means keeping the project maintainable for humans, but it also means avoiding wasteful tool use. Focused prompts, smaller context, reusable instructions, and strong validation loops reduce repeated generation and unnecessary compute.
 
