@@ -223,6 +223,10 @@ For the event tracking project, useful constraints include:
 
 The goal is not to remove constraints but to use them honestly. A design that ignores constraints is usually not ambitious; it is vague.
 
+## Project artifact
+
+Students should create a scalability dimensions checklist for their project. The checklist should name which dimensions matter now, which dimensions are intentionally out of scope, and what evidence would show that a dimension is becoming important.
+
 ## Notes for further development
 
 - The chapter currently mixes draft prose and outline notes. Decide whether to keep the numbered `2.x` structure or align headings with the other chapters.

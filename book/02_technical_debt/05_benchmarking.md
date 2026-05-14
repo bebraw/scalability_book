@@ -122,6 +122,10 @@ Ideas to develop:
 - Students add one efficiency observation, such as resource use per event, database queries per request, bundle size, storage growth, or repeated background work.
 - Students propose one sustainability-oriented improvement and explain the trade-off it introduces.
 
+## Project artifact
+
+Students should create a measurement and observability plan. It should define one workload, one load level, the metrics collected, the result, what the result does not prove, and which signal would warn them first that the system is under pressure.
+
 ## Notes for further development
 
 - Add a small tool-neutral example using `curl`, a simple script, or a common load testing tool.

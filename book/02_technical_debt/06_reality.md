@@ -57,6 +57,23 @@ Ideas to develop:
 - Make delayed correctness explicit.
 - Design error states and recovery paths, not only successful paths.
 
+## Scaling bridge for Reconstruct
+
+Before students begin Reconstruct, they need a compact vocabulary for responding to pressure. This chapter should introduce the ideas lightly, while the later scaling chapter develops them in more detail.
+
+Useful bridge concepts:
+
+- **Write path and read path**: recording events and viewing summaries may need different designs.
+- **Raw events and derived views**: store what happened before computing summaries that can be rebuilt.
+- **Queues and background work**: absorb bursts when immediate processing is not required.
+- **Idempotency and deduplication**: make retries safe when clients or networks fail.
+- **Partitioning by domain boundary**: separate tenants, projects, groups, locations, or other units of scale.
+- **Backpressure and rate limiting**: protect the system when demand exceeds capacity.
+- **Graceful degradation**: decide what can be delayed, approximated, or temporarily disabled.
+- **Operational signals**: define which metric would show overload first.
+
+The goal is not for students to apply every technique. The goal is for them to enter Reconstruct with enough vocabulary to explain why one pressure deserves one response and not another.
+
 ## Reconstruct as a change in assumptions
 
 Reconstruct should not be framed as "make the app bigger" in a vague sense. It is a disciplined response to changed assumptions:
@@ -75,6 +92,10 @@ Students should explain which assumptions they are changing and which they are k
 - Ask students to write the top five assumptions in their Construct project and mark which assumptions fail under the Reconstruct brief.
 - Have students draw a "pressure map" showing which component is stressed by which new requirement.
 - Ask an agent to propose failure scenarios, then have students rank them by likelihood and impact.
+
+## Project artifact
+
+Students should produce a changed-assumptions list and a pressure map. The map should connect each new Reconstruct assumption to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
 
 ## Notes for further development
 

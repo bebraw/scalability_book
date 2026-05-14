@@ -34,6 +34,8 @@ The final part of the loop, validation, is perhaps the most important one since 
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such. When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude. Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI. Most importantly you have to be able to judge what the tools emit and where to take your project. A big chunk of this comes with experience, but to avoid some of the pain and speed up your personal development, it is a good idea to pick up at least some basic ideas so you don't have to go through the trouble and find the lessons on your own. That is the main reason why we write a big project in three stages in this book, and I'll describe the first part of the project next. While people complete the project in groups during the course related to the book, you can also complete the project alone and cut the scope for example. Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely.
 
+---
+
 ## Book project - Event-oriented application
 
 The running project of the book is an event-oriented application. The exact theme is intentionally open: a group might track activity in a conference, classroom, shop, game, device network, support workflow, or another domain where events matter. In the first project phase, Construct, students build the smallest useful version of the system: users can record events, store them, and inspect them later. The point is not to design a perfect platform immediately. The point is to create a concrete baseline that can later be stressed, redesigned, and analyzed.
@@ -73,3 +75,7 @@ After this chapter, students should be able to:
 - Use composition to manage complexity without hiding important system behavior.
 - Evaluate AI-assisted code as maintainable software rather than as a one-time output.
 - Connect development practices to the later project phases: construct, reconstruct, and deconstruct.
+
+## Project artifact
+
+Students should start a project README that records the chosen domain, core event types, setup command, development assumptions, AI assistance used, and the constraints they want future contributors or agents to respect.

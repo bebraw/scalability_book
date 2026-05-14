@@ -35,3 +35,17 @@ The course book is built around the three course projects: construct, reconstruc
 7. How to coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
 8. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
 9. Recap -- What should we remember from the course after constructing, reconstructing, and deconstructing a scalable web application?
+
+## Project artifacts
+
+Each chapter should help you produce or revise one concrete project artifact. By the end of the course, these artifacts should form a small engineering portfolio around your event tracking system:
+
+- Chapter 1: README, assumptions, and development process notes.
+- Chapter 2: scalability dimensions checklist.
+- Chapter 3: architecture and data-flow diagrams.
+- Chapter 4: friction audit.
+- Chapter 5: measurement and observability plan.
+- Chapter 6: changed-assumptions and pressure map for Reconstruct.
+- Chapter 7: agent instructions, task boundaries, and review workflow.
+- Chapter 8: scaling trade-off table and revised event pipeline.
+- Chapter 9: final evidence-based reflection.

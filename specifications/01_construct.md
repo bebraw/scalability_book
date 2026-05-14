@@ -117,6 +117,8 @@ Your submission SHALL include:
   - Your data model
   - Your main design decisions
   - Which optional features you implemented
+- A simple architecture or data-flow diagram showing how events are recorded, stored, and viewed
+- A short note on one source of friction or uncertainty you expect to revisit later
 
 ---
 

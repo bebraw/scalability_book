@@ -90,6 +90,10 @@ Prompts:
 - What API or internal interface is most likely to survive into the next project phase?
 - Which part of the design would be hardest to change later?
 
+## Project artifact
+
+Students should add one architecture diagram and one data-flow diagram to the project. The diagrams should show how an event moves from user action to storage and later viewing, including the boundaries where validation, authorization, and failure can occur.
+
 ## Notes for further development
 
 - Add one diagram showing a request path for recording an event.

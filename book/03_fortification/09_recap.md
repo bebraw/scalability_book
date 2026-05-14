@@ -126,6 +126,10 @@ Useful structure:
 5. Name the trade-offs and remaining risks.
 6. Explain what the project taught you about scalability.
 
+## Project artifact
+
+Students should submit a final reflection package. It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, scaling trade-off table, and a short explanation of what changed in their understanding.
+
 ## Questions to carry forward
 
 - What kind of growth is this system actually prepared for?

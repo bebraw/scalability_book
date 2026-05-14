@@ -7,9 +7,9 @@ The course contains nine lectures and three projects: construct, reconstruct, an
 3. Architecture
 4. Friction
 5. Benchmarking and observability
-6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, start of the next portion - reconstruct
+6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct
 7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered
-8. Scaling - students consider scaling techniques, trade-offs, and the evolution of their architecture under new pressure
+8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure
 9. Recap - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned
 
 ## Projects

@@ -60,6 +60,10 @@ Possible techniques:
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Use an AI agent to inspect the project for friction, then require students to verify or reject its findings.
 
+## Project artifact
+
+Students should produce a friction audit. It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before Reconstruct.
+
 ## Notes for further development
 
 - Add a friction checklist that students can reuse before Reconstruct.

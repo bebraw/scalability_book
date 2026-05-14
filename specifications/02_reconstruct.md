@@ -109,7 +109,9 @@ Your submission SHALL include:
 
 - A short design document (5–10 pages or equivalent)
 - Architecture and data-flow diagrams
+- A changed-assumptions list and pressure map
 - A written explanation of scalability decisions
+- A scaling trade-off table that names benefits, costs, new failure modes, and operational signals
 - Optional: supporting code or prototypes
 
 ---

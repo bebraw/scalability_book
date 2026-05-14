@@ -1,6 +1,6 @@
 # Fortification
 
-Fortification is about making both the application and the development process resilient enough to scale. In the earlier parts, students have seen how quickly AI-assisted development can produce working software and how that speed can also create technical debt. This part shifts the emphasis from producing code quickly to building structures that make change safer: tests, observability, contracts, documentation, review practices, and architectural boundaries.
+Fortification is about making both the application and the development process resilient enough to scale. In the earlier parts, students have seen how quickly AI-assisted development can produce working software and how that speed can also create technical debt. They have also seen that a system that works locally may need to change when users, events, failures, teams, and operating constraints grow. This part shifts the emphasis from producing code quickly to building structures that make change safer: tests, observability, contracts, documentation, review practices, architectural boundaries, and explicit scaling trade-offs.
 
 In this part, scalability has two meanings. The first is the traditional scalability of the web application itself. The second is the scalability of the development system around the application. As students begin to use agentic tools more actively, the project has to become legible enough that agents can work inside it without constantly breaking assumptions that only existed in a human developer's head.
 
@@ -8,7 +8,7 @@ In this part, scalability has two meanings. The first is the traditional scalabi
 
 ## Notes for further development
 
-- Frame the part as the transition from single-agent assistance to coordinated agentic development. The central claim could be: agentic development scales only when the project has boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel machine work.
+- Frame the part as fortifying both the system and the development process. The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
 - Use [Pi](https://pi.dev/) as the concrete tool for this part. Pi is a minimal terminal coding harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
 - Present Pi as a teaching vehicle rather than as the point of the chapter. The lesson is not "use this specific tool", but "a serious agent workflow needs a harness, explicit context, scoped capabilities, and reviewable traces".
 - Connect Pi to the course progression: copilot-style assistance in the first part, a single agent in the second part, and orchestrated agents in Fortification.
@@ -55,3 +55,7 @@ Suggested deliverables:
 - One change implemented through the workflow.
 - Evidence of review, such as test output, a diff review, or an exported session.
 - A short reflection on what the agents handled well, what they misunderstood, and what project structures made the work easier or harder.
+
+## Project artifact
+
+The part should leave students with three connected artifacts: an agent workflow that is bounded and reviewable, a scaling trade-off table tied to their Reconstruct design, and a final reflection that uses evidence from the whole project arc.

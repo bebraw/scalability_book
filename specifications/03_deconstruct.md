@@ -100,12 +100,13 @@ This is an analysis exercise, not a criticism exercise.
 
 ---
 
-## 7. Optional Reflection
+## 7. Final Reflection
 
-You MAY include a short reflection on:
+You SHALL include a short reflection on:
 
 - What surprised you about the system
 - What you would do differently if starting from scratch
+- What evidence from the three project phases changed your understanding of scalability
 
 Do not turn this into a redesign.
 
@@ -118,6 +119,7 @@ Your submission SHALL include:
 - A written analysis (4–6 pages or equivalent)
 - At least one architecture or data-flow diagram
 - Clear explanations in your own words
+- A short final reflection connecting evidence from Construct, Reconstruct, and Deconstruct
 
 No code changes are required.
 

@@ -43,9 +43,8 @@ The central claim could be: more agents do not automatically mean more progress.
 8. Integration discipline
    - The human integrates findings, resolves conflicts, runs tests, and preserves architectural intent.
 9. Tooling examples
-   - Pi for local orchestration.
-   - Acolyte for controlled runtime execution.
-   - Mastra for production agent infrastructure.
+   - Use Pi, Acolyte, and Mastra only after the principles are clear.
+   - Present tools as examples of boundaries, traces, workflows, and reviewable execution.
 10. Course project application
    - Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
 
@@ -91,3 +90,11 @@ The central claim could be: more agents do not automatically mean more progress.
   - Observability: transcript, logs, traces, metrics, review artifacts.
   - Primary setting: development-time assistance, controlled agent runtime, production application.
 - Possible assignment: students add project instructions, create a repeatable setup/test command, improve one weak feedback loop, run a small fleet on one bounded project change, preserve the transcript or summary, and evaluate whether the workflow improved quality, speed, or understanding.
+
+## Project artifact
+
+Students should produce agent project instructions and one bounded fleet workflow. The artifact should include role definitions, allowed files or modules, expected outputs, validation commands, review criteria, and a short trace showing where human judgment was required.
+
+## Common mistake
+
+The common mistake is to treat a fleet as a way to avoid thinking. The useful version is the opposite: decomposition, constraints, evidence, and integration become more explicit because more work can happen in parallel.
