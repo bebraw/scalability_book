@@ -305,6 +305,10 @@ async function copyStaticAssets() {
 
   await mkdir(assetsDir, { recursive: true });
   await copyFile(
+    path.join(siteDir, "favicon.svg"),
+    path.join(buildDir, "favicon.svg"),
+  );
+  await copyFile(
     path.join(siteDir, "assets", "book-cover.svg"),
     path.join(assetsDir, "book-cover.svg"),
   );
