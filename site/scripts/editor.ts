@@ -1,14 +1,33 @@
-const editor = document.querySelector("[data-editor]");
-const toggle = document.querySelector("[data-editor-toggle]");
+type EasyMDEEditor = {
+  codemirror: { focus: () => void };
+  value: (value?: string) => string;
+};
+
+declare const EasyMDE:
+  | (new (options: Record<string, unknown>) => EasyMDEEditor)
+  | undefined;
+
+const editor = document.querySelector<HTMLElement>("[data-editor]");
+const toggle = document.querySelector<HTMLButtonElement>(
+  "[data-editor-toggle]",
+);
 
 if (editor && toggle) {
-  const textarea = editor.querySelector("[data-editor-source]");
-  const save = editor.querySelector("[data-editor-save]");
-  const cancel = editor.querySelector("[data-editor-cancel]");
-  const status = editor.querySelector("[data-editor-status]");
+  const textarea = editor.querySelector<HTMLTextAreaElement>(
+    "[data-editor-source]",
+  );
+  const save = editor.querySelector<HTMLButtonElement>("[data-editor-save]");
+  const cancel = editor.querySelector<HTMLButtonElement>(
+    "[data-editor-cancel]",
+  );
+  const status = editor.querySelector<HTMLElement>("[data-editor-status]");
   const slug = editor.dataset.chapterSlug;
-  let markdownEditor;
+  let markdownEditor: EasyMDEEditor | undefined;
   let originalSource = "";
+
+  if (!textarea || !save || !cancel || !status || !slug) {
+    throw new Error("Editor controls are missing");
+  }
 
   fetch("/api/editor/status")
     .then((response) => {
@@ -63,12 +82,12 @@ if (editor && toggle) {
       setStatus("Saved. Reloading...");
       location.reload();
     } catch (error) {
-      setStatus(error.message);
+      setStatus(error instanceof Error ? error.message : "Save failed");
       save.disabled = false;
     }
   });
 
-  async function loadSource() {
+  async function loadSource(): Promise<void> {
     if (originalSource) {
       return;
     }
@@ -80,14 +99,14 @@ if (editor && toggle) {
       throw new Error("Unable to load chapter source");
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { content: string; file: string };
     originalSource = data.content;
     setEditorValue(data.content);
     setStatus(`Editing ${data.file}`);
   }
 
-  function getEditor() {
-    if (!markdownEditor && window.EasyMDE) {
+  function getEditor(): EasyMDEEditor {
+    if (!markdownEditor && typeof EasyMDE !== "undefined") {
       markdownEditor = new EasyMDE({
         element: textarea,
         autofocus: false,
@@ -126,22 +145,26 @@ if (editor && toggle) {
       });
     }
 
+    if (!markdownEditor) {
+      throw new Error("Markdown editor is unavailable");
+    }
+
     return markdownEditor;
   }
 
-  function getEditorValue() {
+  function getEditorValue(): string {
     return markdownEditor ? markdownEditor.value() : textarea.value;
   }
 
-  function setEditorValue(value) {
+  function setEditorValue(value: string): void {
     textarea.value = value;
 
-    if (window.EasyMDE) {
+    if (typeof EasyMDE !== "undefined") {
       getEditor().value(value);
     }
   }
 
-  function setStatus(message) {
+  function setStatus(message: string): void {
     status.textContent = message;
   }
 }

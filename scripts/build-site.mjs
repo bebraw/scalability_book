@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { transformWithOxc } from "vite";
 import { renderMarkdown } from "./lib/markdown.mjs";
 import { createSiteRenderer } from "./lib/site-renderer.mjs";
 import {
@@ -113,9 +114,9 @@ await writePage(
 );
 
 await copySiteFile("styles.css");
-await copySiteFile("scripts/theme.js", "theme.js");
-await copySiteFile("scripts/editor.js", "editor.js");
-await copySiteFile("scripts/comments.js", "comments.js");
+await compileSiteScript("scripts/theme.ts", "theme.js");
+await compileSiteScript("scripts/editor.ts", "editor.js");
+await compileSiteScript("scripts/comments.ts", "comments.js");
 await copyStaticAssets();
 await copyEditorAssets();
 
@@ -133,6 +134,19 @@ async function copySiteFile(
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await copyFile(path.join(siteDir, sourceRelativePath), outputPath);
+}
+
+async function compileSiteScript(sourceRelativePath, outputRelativePath) {
+  const sourcePath = path.join(siteDir, sourceRelativePath);
+  const outputPath = path.join(buildDir, outputRelativePath);
+  const source = await readFile(sourcePath, "utf8");
+  const result = await transformWithOxc(source, sourcePath, {
+    lang: "ts",
+    target: "es2022",
+  });
+
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, result.code, "utf8");
 }
 
 function getAllConfiguredChapterFiles(config) {

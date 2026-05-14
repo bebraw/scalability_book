@@ -1,7 +1,49 @@
-const commentsPanel = document.querySelector("[data-comments-panel]");
+type FeedbackOption = readonly [string, string];
+type FeedbackAuthor = {
+  login?: string;
+  avatarUrl?: string | null;
+  url?: string | null;
+};
+type FeedbackReply = {
+  author?: FeedbackAuthor;
+  body: string;
+  createdAt: string;
+};
+type FeedbackComment = {
+  id: string;
+  sourceId?: string;
+  chapter: string;
+  paragraphId: string;
+  type?: string;
+  category?: string;
+  body: string;
+  author?: FeedbackAuthor;
+  anonymous?: boolean;
+  createdAt: string;
+  hiddenAt?: string;
+  hiddenBy?: string;
+  resolvedAt?: string;
+  resolutionReason?: string;
+  featuredAt?: string;
+  featuredText?: string;
+  publicNote?: boolean;
+  replies?: FeedbackReply[];
+};
+type FeedbackAuth = {
+  available?: boolean;
+  authenticated: boolean;
+  admin: boolean;
+  local?: boolean;
+  loginUrl?: string | null;
+  user?: FeedbackAuthor;
+};
+
+const commentsPanel = document.querySelector<HTMLElement>(
+  "[data-comments-panel]",
+);
 
 if (commentsPanel) {
-  const feedbackCategories = [
+  const feedbackCategories: FeedbackOption[] = [
     ["unclear-concept", "Unclear concept"],
     ["missing-example", "Missing example"],
     ["too-fast", "Too fast"],
@@ -11,34 +53,54 @@ if (commentsPanel) {
     ["stuck", "Stuck here"],
     ["reflection", "Reflection"],
   ];
-  const resolutionReasons = [
+  const resolutionReasons: FeedbackOption[] = [
     ["fixed", "Fixed"],
     ["answered", "Answered"],
     ["duplicate", "Duplicate"],
     ["not-actionable", "Not actionable"],
     ["planned", "Planned"],
   ];
-  const commentsControls = document.querySelector("[data-comments-controls]");
-  const chapterSlug = commentsPanel.dataset.chapterSlug;
-  const status = document.querySelector("[data-comments-status]");
-  const list = commentsPanel.querySelector("[data-comments-list]");
-  const loginButton = document.querySelector("[data-comments-login]");
-  const logoutButton = document.querySelector("[data-comments-logout]");
-  const exportButton = document.querySelector("[data-comments-export]");
-  const viewControl = document.querySelector("[data-comments-view-control]");
-  const viewSelect = document.querySelector("[data-comments-view]");
+  const commentsControls = document.querySelector<HTMLElement>(
+    "[data-comments-controls]",
+  );
+  const chapterSlug = commentsPanel.dataset.chapterSlug || "";
+  const status = requireElement(
+    document.querySelector<HTMLElement>("[data-comments-status]"),
+    "comments status",
+  );
+  const list = requireElement(
+    commentsPanel.querySelector<HTMLElement>("[data-comments-list]"),
+    "comments list",
+  );
+  const loginButton = requireElement(
+    document.querySelector<HTMLButtonElement>("[data-comments-login]"),
+    "login button",
+  );
+  const logoutButton = requireElement(
+    document.querySelector<HTMLButtonElement>("[data-comments-logout]"),
+    "logout button",
+  );
+  const exportButton = document.querySelector<HTMLButtonElement>(
+    "[data-comments-export]",
+  );
+  const viewControl = document.querySelector<HTMLElement>(
+    "[data-comments-view-control]",
+  );
+  const viewSelect = document.querySelector<HTMLSelectElement>(
+    "[data-comments-view]",
+  );
   const commentButtons = Array.from(
-    document.querySelectorAll("[data-comment-button]"),
+    document.querySelectorAll<HTMLButtonElement>("[data-comment-button]"),
   );
   const stuckButtons = Array.from(
-    document.querySelectorAll("[data-stuck-button]"),
+    document.querySelectorAll<HTMLButtonElement>("[data-stuck-button]"),
   );
   const reflectionButtons = Array.from(
-    document.querySelectorAll("[data-reflection-button]"),
+    document.querySelectorAll<HTMLButtonElement>("[data-reflection-button]"),
   );
-  let auth = { authenticated: false, admin: false };
-  let comments = [];
-  let activeFeedbackParagraphId = null;
+  let auth: FeedbackAuth = { authenticated: false, admin: false };
+  let comments: FeedbackComment[] = [];
+  let activeFeedbackParagraphId: string | null = null;
   let viewMode = localStorage.getItem("comments-view-mode") || "admin";
 
   initComments();
@@ -938,6 +1000,17 @@ if (commentsPanel) {
     }
 
     return data;
+  }
+
+  function requireElement<T extends HTMLElement>(
+    element: T | null,
+    name: string,
+  ): T {
+    if (!element) {
+      throw new Error(`Missing ${name}`);
+    }
+
+    return element;
   }
 
   function paragraphLabel(paragraphId) {

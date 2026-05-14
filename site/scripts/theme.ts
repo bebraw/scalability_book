@@ -1,5 +1,5 @@
 const root = document.documentElement;
-const picker = document.querySelector("[data-theme-picker]");
+const picker = document.querySelector<HTMLSelectElement>("[data-theme-picker]");
 const storedTheme = localStorage.getItem("theme");
 const fallbackTheme = matchMedia("(prefers-color-scheme: dark)").matches
   ? "dark"
