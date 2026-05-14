@@ -18,6 +18,8 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 The course book is built around the three course phases: construct, reconstruct, and deconstruct. Across these phases, you build a baseline, change it under new constraints, and then inspect the evidence and trade-offs around the result. The purpose of this book is to support you as you complete these phases. With this goal in mind, I have structured the book in three matching parts: Construct, Reconstruct, and Deconstruct.
 
+The running project is intentionally framed as an event-oriented application rather than as one fixed product. Most groups should keep the first version modest: record events, store them, and view them. Stronger groups may choose a more ambitious domain as long as the event core remains clear. For example, a constrained visual agentic workflow platform can be treated as an event tracking system where workflow runs, node executions, tool calls, retries, and failures are the events. The course does not require everyone to build such a platform because the visual editor and agent runtime details can easily overtake the scalability lessons.
+
 **Construct:**
 
 1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?

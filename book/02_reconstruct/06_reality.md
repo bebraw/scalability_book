@@ -36,6 +36,7 @@ Scenario ideas:
 - A customer asks to delete personal or sensitive data after the activity has ended.
 - Multiple tenants or domain instances run at the same time and one large instance should not slow down another.
 - An older client version submits malformed events.
+- In a workflow-platform domain, many workflow runs start at once, long-running nodes block synchronous execution, tool calls fail or rate-limit, and users need traceable run history rather than immediate success.
 
 Each scenario can be used to ask:
 

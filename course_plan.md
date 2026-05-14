@@ -58,6 +58,8 @@ The three projects are called construct, reconstruct, and deconstruct. The idea 
 
 The projects are described in detail behind the `specifications` folder and each has its own technical targets.
 
+The default project theme is a modest event tracking application, but groups may choose an ambitious event-oriented domain if they keep the required core small. One useful advanced option is a constrained visual agentic workflow platform where workflow definitions, runs, node executions, tool calls, retries, and failures are modeled as events. This should remain a domain choice within the event-tracking brief rather than a new mandatory course project, since weaker groups could otherwise spend too much time on visual editor details instead of scalability, reconstruction, and deconstruction.
+
 Each project phase should include evidence that the application or design has been run in a realistic environment: a local deployment command, hosted URL, container, deployment notes, benchmark run, logs, screenshots from a running instance, or another operational artifact appropriate to the phase.
 
 The students are expected to perform self- and peer-assessment after each phase of the project so feedback may be shared with the project group and the students can reflect on their groupworking.

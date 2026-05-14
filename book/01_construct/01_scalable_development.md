@@ -50,6 +50,8 @@ The running project of the book is an event-oriented application. The exact them
 
 The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
 
+One advanced version of the same assignment is a small visual agentic workflow platform. In that domain, the application might let users define a simple workflow and then record events such as `workflow-created`, `run-started`, `node-completed`, `tool-failed`, and `retry-scheduled`. This can be a strong choice because it connects event tracking, web architecture, agentic systems, and observability. It should still be constrained carefully: a few node types, a simple execution model, and clear run history are enough. Building a polished visual programming product is not the goal of Construct.
+
 Keeping the theme open is intentional. If every group builds the same application, the later Deconstruct phase becomes too familiar and students can rely on assumptions instead of careful reading. When groups choose different domains, students have to analyze systems that encode unfamiliar workflows, terminology, and trade-offs. That makes the exercise closer to real software work, where you often inherit systems whose domain model was shaped by another team.
 
 This first version is also where agentic development becomes concrete. Students should document how they used AI assistance, what constraints they gave it, how they reviewed the result, and what they had to fix manually. The project should produce both software and evidence of engineering judgment.
@@ -60,6 +62,7 @@ Development ideas:
 - Prefer a working vertical slice over many disconnected features.
 - Make assumptions explicit in the README, especially around the chosen domain, users, event types, storage, and failure handling.
 - Choose a domain specific enough that another group has something meaningful to deconstruct later.
+- If you choose a workflow or agentic platform domain, treat it first as an event tracking problem and postpone advanced editor, orchestration, and runtime features unless the core is already stable.
 - Use AI tools for generation, explanation, testing, and review, but require students to justify the final design themselves.
 - Preserve early design decisions because later chapters will revisit them under pressure.
 

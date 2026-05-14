@@ -85,6 +85,7 @@ Examples include:
 - A message queue or buffer
 - A partitioned or append-only storage model
 - A read-optimized query path
+- For a workflow-platform domain: asynchronous run execution, retry handling, rate-limit handling, or traceable run history
 
 Partial implementations are acceptable if well explained.
 

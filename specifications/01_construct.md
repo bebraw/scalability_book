@@ -8,6 +8,8 @@ The system should record things that happen in the chosen domain and allow those
 
 This specification is intentionally minimal. You are expected to choose a theme, make reasonable assumptions, and document them. The theme could be a conference, classroom, shop, game, sensor network, task workflow, or another setting where meaningful events occur.
 
+An advanced group may choose a constrained visual agentic workflow platform as its event domain. In that case, the tracked events could include workflow creation, run starts, node completions, tool calls, retries, and failures. Keep this choice small: the assignment is still about event tracking, not about building a full visual programming product.
+
 ---
 
 ## 2. Core Requirements (Mandatory)
@@ -88,6 +90,7 @@ You are NOT expected to:
 - Implement real-time updates
 - Build a production-ready system
 - Support complex analytics
+- Build a polished drag-and-drop workflow editor or production agent runtime
 
 Simple and well-explained solutions are preferred over complex ones.
 

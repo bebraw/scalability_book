@@ -49,6 +49,7 @@ You MUST analyze the system from multiple perspectives.
 - What kinds of events does the system track?
 - How are events created, stored, and viewed?
 - What functionality is central, and what is secondary?
+- If the system is a workflow or agentic platform, how are workflow definitions, run events, tool calls, retries, failures, and traces represented?
 
 ---
 
