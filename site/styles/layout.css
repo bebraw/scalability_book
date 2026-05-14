@@ -53,9 +53,11 @@
   border-radius: 0.35rem;
   color: var(--panel);
   cursor: pointer;
-  font: inherit;
+  font:
+    800 0.82rem/1.15 system-ui,
+    sans-serif;
   font-weight: 700;
-  padding: 0.35rem 0.7rem;
+  padding: 0.36rem 0.65rem;
 }
 .edit-toggle:hover,
 .feedback-controls button:hover {
@@ -84,7 +86,8 @@
 .feedback-controls button {
   background: transparent;
   color: var(--text);
-  padding: 0.28rem 0.55rem;
+  min-block-size: 2rem;
+  padding: 0.3rem 0.62rem;
 }
 .feedback-controls select {
   background: var(--panel);
