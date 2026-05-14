@@ -1,11 +1,16 @@
 import { htmlispToHTMLSync } from "gustwind/htmlisp";
 
-export function renderHtmlisp(htmlInput, props = {}) {
-  const rawBlocks = [];
+type HtmlispProps = Record<string, unknown>;
+
+export function renderHtmlisp(
+  htmlInput: string,
+  props: HtmlispProps = {},
+): string {
+  const rawBlocks: string[] = [];
   const rendered = htmlispToHTMLSync({
     htmlInput,
     components: {
-      Raw: ({ html }) => {
+      Raw: ({ html }: { html?: string }) => {
         const index = rawBlocks.push(html || " ") - 1;
 
         return `HTMLISP_RAW_${index}`;
@@ -24,6 +29,6 @@ export function renderHtmlisp(htmlInput, props = {}) {
   );
 }
 
-function normalizeVoidTags(html) {
+function normalizeVoidTags(html: string): string {
   return html.replaceAll("</meta>", "").replaceAll("</link>", "");
 }

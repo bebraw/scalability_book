@@ -1,5 +1,78 @@
-import { renderHtmlisp } from "./htmlisp.mjs";
-import { escapeAttribute, escapeHtml, slugify } from "./text.mjs";
+import { renderHtmlisp } from "./htmlisp.ts";
+import { escapeAttribute, escapeHtml, slugify } from "./text.ts";
+import type { RenderedMarkdown, TableOfContentsItem } from "./markdown.ts";
+
+type SiteConfig = {
+  author: { name: string; url: string };
+  course: unknown;
+  description: string;
+  domain: string;
+  themes: unknown;
+  title: string;
+};
+export type BookPage = {
+  ariaDisabled?: string | null;
+  className?: string;
+  collection: string;
+  file: string;
+  index?: number;
+  kind: string;
+  label: string;
+  number: string;
+  part?: PartMetadata | null;
+  published?: boolean;
+  slug: string;
+  source: string;
+  status?: string;
+  title: string;
+  url: string | null;
+};
+export type PartMetadata = {
+  number: string;
+  title: string;
+  description: string;
+  file: string;
+  chapters: string[];
+  partPage?: BookPage | null;
+};
+type PartMetadataCollection = {
+  byChapter: Map<string, PartMetadata>;
+  parts: PartMetadata[];
+};
+type Templates = {
+  baseLayout: string;
+  bookContentsSidebar: string;
+  bookPage: string;
+  localTableOfContents: string;
+  paginationLink: string;
+  siteIndex: string;
+};
+type RenderPart = Omit<PartMetadata, "chapters" | "partPage"> & {
+  chapters: BookPage[];
+  partPage?: BookPage | null;
+};
+type CreateSiteRendererOptions = {
+  chapters: BookPage[];
+  config: SiteConfig;
+  indexChapters: BookPage[];
+  indexPartPages: BookPage[];
+  partMetadata: PartMetadataCollection;
+  templates: Templates;
+};
+type RenderBookPageOptions = {
+  page: BookPage;
+  rendered: RenderedMarkdown;
+  previous?: BookPage;
+  next?: BookPage;
+};
+type RenderLayoutOptions = {
+  title: string;
+  description: string;
+  currentUrl: string | null;
+  stylesheets?: string[];
+  scripts?: string[];
+  children: string;
+};
 
 export function createSiteRenderer({
   chapters,
@@ -8,15 +81,18 @@ export function createSiteRenderer({
   indexPartPages,
   partMetadata,
   templates,
-}) {
+}: CreateSiteRendererOptions) {
   return {
     renderBookPage,
     renderHome,
     renderLayout,
   };
 
-  function renderHome() {
+  function renderHome(): string {
     const firstChapter = chapters[0];
+    if (!firstChapter?.url) {
+      throw new Error("At least one chapter is required");
+    }
 
     return renderHtmlisp(templates.siteIndex, {
       bookContents: renderHomeContents(),
@@ -29,7 +105,12 @@ export function createSiteRenderer({
     });
   }
 
-  function renderBookPage({ page, rendered, previous, next }) {
+  function renderBookPage({
+    page,
+    rendered,
+    previous,
+    next,
+  }: RenderBookPageOptions): string {
     return renderHtmlisp(templates.bookPage, {
       bookSidebar: renderBookSidebar(page),
       chapterFile: page.file,
@@ -49,7 +130,7 @@ export function createSiteRenderer({
     stylesheets = [],
     scripts = [],
     children,
-  }) {
+  }: RenderLayoutOptions): string {
     const canonicalUrl = `https://${config.domain}${currentUrl}`;
 
     return renderHtmlisp(templates.baseLayout, {
@@ -72,13 +153,13 @@ export function createSiteRenderer({
     });
   }
 
-  function renderBookSidebar(currentChapter) {
+  function renderBookSidebar(currentChapter: BookPage): string {
     return renderHtmlisp(templates.bookContentsSidebar, {
       bookContents: renderSidebarContents(currentChapter),
     });
   }
 
-  function renderHomeContents() {
+  function renderHomeContents(): string {
     return renderChapterParts({
       chapters: indexChapters,
       currentChapter: null,
@@ -86,7 +167,7 @@ export function createSiteRenderer({
     });
   }
 
-  function renderSidebarContents(currentChapter) {
+  function renderSidebarContents(currentChapter: BookPage): string {
     return renderChapterParts({
       chapters: indexChapters,
       currentChapter,
@@ -94,7 +175,15 @@ export function createSiteRenderer({
     });
   }
 
-  function renderChapterParts({ chapters, currentChapter, mode }) {
+  function renderChapterParts({
+    chapters,
+    currentChapter,
+    mode,
+  }: {
+    chapters: BookPage[];
+    currentChapter: BookPage | null;
+    mode: "home" | "sidebar";
+  }): string {
     const chapterByFile = new Map(
       chapters.map((chapter) => [chapter.file, chapter]),
     );
@@ -102,11 +191,11 @@ export function createSiteRenderer({
       indexPartPages.map((partPage) => [partPage.file, partPage]),
     );
     const assignedFiles = new Set();
-    const parts = partMetadata.parts.map((part) => {
-      const partPage = part.file ? partPageByFile.get(part.file) : null;
+    const parts: RenderPart[] = partMetadata.parts.map((part) => {
+      const partPage = part.file ? partPageByFile.get(part.file) || null : null;
       const partChapters = part.chapters
         .map((file) => chapterByFile.get(file))
-        .filter(Boolean);
+        .filter((chapter): chapter is BookPage => Boolean(chapter));
 
       for (const chapter of partChapters) {
         assignedFiles.add(chapter.file);
@@ -127,6 +216,8 @@ export function createSiteRenderer({
         number: "",
         title: "Front matter",
         description: "",
+        file: "",
+        partPage: null,
         chapters: unassignedChapters,
       });
     }
@@ -141,7 +232,7 @@ export function createSiteRenderer({
       .join("\n");
   }
 
-  function renderHomePart(part) {
+  function renderHomePart(part: RenderPart): string {
     const heading = part.number
       ? `Part ${part.number}: ${part.title}`
       : part.title;
@@ -159,7 +250,7 @@ export function createSiteRenderer({
 </section>`;
   }
 
-  function renderHomeChapter(chapter) {
+  function renderHomeChapter(chapter: BookPage): string {
     const label =
       chapter.label ||
       (chapter.number === "0" ? "Introduction" : `Chapter ${chapter.number}`);
@@ -171,23 +262,26 @@ export function createSiteRenderer({
       ${status}`;
 
     if (!chapter.published) {
-      return `<li class="${escapeAttribute(chapter.className)}"><span class="chapter-card" aria-disabled="true">
+      return `<li class="${escapeAttribute(chapter.className || "")}"><span class="chapter-card" aria-disabled="true">
       ${inner}
     </span></li>`;
     }
 
-    return `<li class="${escapeAttribute(chapter.className)}"><a href="${escapeAttribute(chapter.url)}">
+    return `<li class="${escapeAttribute(chapter.className || "")}"><a href="${escapeAttribute(chapter.url || "")}">
       ${inner}
     </a></li>`;
   }
 
-  function renderSidebarPart(part, currentChapter) {
+  function renderSidebarPart(
+    part: RenderPart,
+    currentChapter: BookPage | null,
+  ): string {
     const heading = part.number
       ? `Part ${part.number}: ${part.title}`
       : part.title;
     const headingContent = part.partPage
       ? `<a href="${escapeAttribute(part.partPage.url)}"${
-          part.partPage.slug === currentChapter.slug
+          part.partPage.slug === currentChapter?.slug
             ? ' aria-current="page"'
             : ""
         }>${escapeHtml(heading)}</a>`
@@ -201,9 +295,12 @@ export function createSiteRenderer({
 </section>`;
   }
 
-  function renderSidebarChapter(chapter, currentChapter) {
+  function renderSidebarChapter(
+    chapter: BookPage,
+    currentChapter: BookPage | null,
+  ): string {
     const ariaCurrent =
-      chapter.slug === currentChapter.slug ? ' aria-current="page"' : "";
+      chapter.slug === currentChapter?.slug ? ' aria-current="page"' : "";
     const number =
       chapter.kind === "part"
         ? chapter.label
@@ -219,10 +316,10 @@ export function createSiteRenderer({
       return `<li><span class="book-sidebar-disabled" aria-disabled="true">${inner}</span></li>`;
     }
 
-    return `<li><a href="${escapeAttribute(chapter.url)}"${ariaCurrent}>${inner}</a></li>`;
+    return `<li><a href="${escapeAttribute(chapter.url || "")}"${ariaCurrent}>${inner}</a></li>`;
   }
 
-  function renderLocalToc(tableOfContents) {
+  function renderLocalToc(tableOfContents: TableOfContentsItem[]): string {
     const headings = tableOfContents.filter(
       (item) => item.level > 1 && item.level < 4,
     );
@@ -236,7 +333,11 @@ export function createSiteRenderer({
     });
   }
 
-  function renderPaginationLink(chapter, label, rel) {
+  function renderPaginationLink(
+    chapter: BookPage | undefined,
+    label: string,
+    rel: string,
+  ): string {
     if (!chapter) {
       return "<span></span>";
     }
@@ -245,7 +346,7 @@ export function createSiteRenderer({
       label,
       rel,
       title: chapter.title,
-      url: chapter.url,
+      url: chapter.url || "",
     });
   }
 }

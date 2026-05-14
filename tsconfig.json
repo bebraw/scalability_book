@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
     "lib": ["ES2022", "DOM"],
     "strict": true,
     "skipLibCheck": true,
@@ -13,5 +14,5 @@
     "noImplicitOverride": true,
     "types": ["node"]
   },
-  "include": ["site/scripts/**/*.ts", "worker/**/*.ts"]
+  "include": ["scripts/**/*.ts", "site/scripts/**/*.ts", "worker/**/*.ts"]
 }

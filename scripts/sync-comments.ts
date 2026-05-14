@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import path from "node:path";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createReadStream } from "node:fs";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -510,7 +511,7 @@ async function rebuildSite() {
   await new Promise((resolve, reject) => {
     const child = spawn(
       process.execPath,
-      ["scripts/build-site.mjs", "--all-chapters"],
+      ["scripts/build-site.ts", "--all-chapters"],
       {
         cwd: root,
         stdio: "inherit",

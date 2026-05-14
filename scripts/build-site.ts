@@ -1,13 +1,14 @@
+// @ts-nocheck
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { transformWithOxc } from "vite";
-import { renderMarkdown } from "./lib/markdown.mjs";
-import { createSiteRenderer } from "./lib/site-renderer.mjs";
+import { renderMarkdown } from "./lib/markdown.ts";
+import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
   chapterNumberFromFilename,
   parseJsonc,
   titleFromFilename,
-} from "./lib/text.mjs";
+} from "./lib/text.ts";
 
 const root = process.cwd();
 const buildDir = path.join(root, "build");

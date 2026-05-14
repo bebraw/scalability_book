@@ -14,7 +14,20 @@ import {
   stableParagraphId,
   stripHeadingNumber,
   stripHtml,
-} from "./text.mjs";
+} from "./text.ts";
+
+export type RenderedMarkdown = {
+  content: string;
+  tableOfContents: TableOfContentsItem[];
+};
+export type TableOfContentsItem = {
+  slug: string;
+  level: number;
+  text: string;
+};
+export type MarkdownChapter = {
+  number: string;
+};
 
 highlight.registerLanguage("bash", bash);
 highlight.registerLanguage("html", xml);
@@ -29,12 +42,15 @@ highlight.registerLanguage("yml", yaml);
 
 marked.setOptions({ gfm: true, breaks: false });
 
-export function renderMarkdown(source, chapter) {
+export function renderMarkdown(
+  source: string,
+  chapter: MarkdownChapter,
+): RenderedMarkdown {
   source = getPublicMarkdownSource(source);
 
-  const tableOfContents = [];
-  const sectionCounters = [];
-  const paragraphCounts = new Map();
+  const tableOfContents: TableOfContentsItem[] = [];
+  const sectionCounters: number[] = [];
+  const paragraphCounts = new Map<string, number>();
   const renderer = new marked.Renderer();
 
   renderer.heading = ({ tokens, depth, raw }) => {
@@ -84,12 +100,12 @@ export function renderMarkdown(source, chapter) {
   };
 
   return {
-    content: marked(source, { renderer }),
+    content: marked(source, { renderer }) as string,
     tableOfContents,
   };
 }
 
-function getPublicMarkdownSource(source) {
+function getPublicMarkdownSource(source: string): string {
   const marker = "\n---\n";
   const markerIndex = source.lastIndexOf(marker);
 
@@ -99,7 +115,11 @@ function getPublicMarkdownSource(source) {
     : `${source.slice(0, markerIndex).trimEnd()}\n`;
 }
 
-function getSectionNumber(depth, chapter, counters) {
+function getSectionNumber(
+  depth: number,
+  chapter: MarkdownChapter,
+  counters: number[],
+): string {
   if (depth < 2) {
     return "";
   }

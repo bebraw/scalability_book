@@ -1,6 +1,6 @@
 import path from "node:path";
 
-export function slugify(value) {
+export function slugify(value: string): string {
   return value
     .toLowerCase()
     .replace(/`/g, "")
@@ -8,7 +8,7 @@ export function slugify(value) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function stableParagraphId(value) {
+export function stableParagraphId(value: string): string {
   const text = stripHtml(value).toLowerCase().replace(/\s+/g, " ").trim();
   const readable =
     slugify(text).split("-").slice(0, 8).join("-") || "paragraph";
@@ -16,7 +16,7 @@ export function stableParagraphId(value) {
   return `p-${readable}-${hashString(text)}`;
 }
 
-function hashString(value) {
+function hashString(value: string): string {
   let hash = 0x811c9dc5;
 
   for (let index = 0; index < value.length; index++) {
@@ -27,7 +27,7 @@ function hashString(value) {
   return (hash >>> 0).toString(36);
 }
 
-export function titleFromFilename(file) {
+export function titleFromFilename(file: string): string {
   return path
     .basename(file, ".md")
     .replace(/^\d+_/, "")
@@ -35,21 +35,21 @@ export function titleFromFilename(file) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export function chapterNumberFromFilename(file) {
+export function chapterNumberFromFilename(file: string): string {
   const match = path.basename(file).match(/^(\d+)_/);
 
   return match ? String(Number(match[1])) : "";
 }
 
-export function stripHtml(value) {
+export function stripHtml(value: string): string {
   return value.replace(/<[^>]*>/g, "");
 }
 
-export function stripHeadingNumber(value) {
+export function stripHeadingNumber(value: string): string {
   return value.replace(/^\d+(?:\.\d+)+\s+/, "");
 }
 
-export function decodeHtmlEntities(value) {
+export function decodeHtmlEntities(value: string): string {
   return value
     .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
@@ -58,7 +58,7 @@ export function decodeHtmlEntities(value) {
     .replaceAll("&#39;", "'");
 }
 
-export function escapeHtml(value) {
+export function escapeHtml(value: unknown): string {
   return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -66,15 +66,15 @@ export function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
-export function escapeAttribute(value) {
+export function escapeAttribute(value: unknown): string {
   return escapeHtml(value).replaceAll("'", "&#39;");
 }
 
-export function parseJsonc(source) {
+export function parseJsonc(source: string): unknown {
   return JSON.parse(stripTrailingCommas(stripJsonComments(source)));
 }
 
-function stripJsonComments(source) {
+function stripJsonComments(source: string): string {
   let output = "";
   let inString = false;
   let quote = "";
@@ -132,7 +132,7 @@ function stripJsonComments(source) {
   return output;
 }
 
-function stripTrailingCommas(source) {
+function stripTrailingCommas(source: string): string {
   let output = "";
   let inString = false;
   let quote = "";
