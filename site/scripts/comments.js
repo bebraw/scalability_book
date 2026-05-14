@@ -346,6 +346,16 @@ if (commentsPanel) {
             );
             card.append(feature);
 
+            if (auth.local && comment.featuredAt) {
+              const promote = document.createElement("button");
+              promote.type = "button";
+              promote.textContent = "Promote";
+              promote.addEventListener("click", () =>
+                promoteClarification(comment),
+              );
+              card.append(promote);
+            }
+
             const hide = document.createElement("button");
             hide.type = "button";
             hide.textContent = "Hide";
@@ -604,6 +614,29 @@ if (commentsPanel) {
     setStatus("Comment unfeatured.");
   }
 
+  async function promoteClarification(comment) {
+    const text = window.prompt(
+      "Clarification text to append to the chapter Markdown",
+      comment.featuredText || comment.body,
+    );
+
+    if (!text?.trim()) {
+      return;
+    }
+
+    const chapter = await fetchJson(
+      `/api/chapters/${encodeURIComponent(chapterSlug)}`,
+    );
+    await fetchJson(`/api/chapters/${encodeURIComponent(chapterSlug)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: appendClarification(chapter.content, text),
+      }),
+    });
+    setStatus("Clarification appended to Markdown.");
+  }
+
   function updateParagraphBadges() {
     const counts = getVisibleComments().reduce((result, comment) => {
       if (!comment.resolvedAt || comment.featuredAt) {
@@ -705,6 +738,18 @@ if (commentsPanel) {
     link.download = `${chapterSlug}-feedback-summary.md`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  function appendClarification(source, text) {
+    const block = `\n\n> **Clarification:** ${text.trim().replace(/\n+/g, "\n> ")}\n`;
+    const marker = "\n---\n";
+    const markerIndex = source.lastIndexOf(marker);
+
+    if (markerIndex === -1) {
+      return `${source.trimEnd()}${block}\n`;
+    }
+
+    return `${source.slice(0, markerIndex).trimEnd()}${block}${source.slice(markerIndex)}`;
   }
 
   function escapeHtml(value) {

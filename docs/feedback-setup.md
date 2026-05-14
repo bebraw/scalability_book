@@ -114,6 +114,8 @@ Admins can use the feedback view selector in the navigation header to preview th
 
 In `Admin view`, the page also shows a feedback summary with category counts, stuck marker counts, and the paragraphs with the most unresolved feedback. The `Export` button downloads a Markdown summary for the current chapter.
 
+In local editing mode, admins can promote a featured note into the chapter Markdown as a clarification block. Promotion appends the clarification to the chapter source and uses the local editor API, so it is not available on the deployed read-only site.
+
 ## 6. Local Review Flow
 
 Pull production comments into the local file:
