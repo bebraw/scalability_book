@@ -231,7 +231,13 @@ if (commentsRoot) {
           return;
         }
 
-        if (paragraphId) {
+        if (!paragraphId) {
+          return;
+        }
+
+        if (hasVisibleComments(paragraphId)) {
+          showParagraphFeedbackPanel(paragraphId);
+        } else {
           openForm(paragraphId);
         }
       });
@@ -433,12 +439,16 @@ if (commentsRoot) {
     header.className = "paragraph-feedback-panel-header";
     const title = document.createElement("h3");
     title.textContent = "Related feedback";
+    const add = document.createElement("button");
+    add.type = "button";
+    add.textContent = "Add comment";
+    add.addEventListener("click", () => openForm(paragraphId));
     const close = document.createElement("button");
     close.type = "button";
     close.setAttribute("aria-label", "Close related feedback");
     close.textContent = "Close";
     close.addEventListener("click", () => closeParagraphFeedbackPanel());
-    header.append(title, close);
+    header.append(title, add, close);
     panel.append(header);
 
     if (!relatedComments.length) {
@@ -800,6 +810,14 @@ if (commentsRoot) {
       );
     }
 
+  }
+
+  function hasVisibleComments(paragraphId: string): boolean {
+    return getVisibleComments().some(
+      (comment) =>
+        comment.paragraphId === paragraphId &&
+        (!comment.resolvedAt || comment.featuredAt),
+    );
   }
 
   function labelFor(options: FeedbackOption[], value: string | undefined) {
