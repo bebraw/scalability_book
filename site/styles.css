@@ -85,6 +85,15 @@ a {
 a:hover {
   color: var(--accent);
 }
+.visually-hidden {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
 .skip-link {
   position: absolute;
   left: 1rem;
@@ -143,7 +152,8 @@ a:hover {
   font: inherit;
   padding: 0.3rem 0.45rem;
 }
-.edit-toggle {
+.edit-toggle,
+.feedback-controls button {
   background: var(--accent-strong);
   border: 1px solid var(--accent-strong);
   border-radius: 0.35rem;
@@ -153,9 +163,37 @@ a:hover {
   font-weight: 700;
   padding: 0.35rem 0.7rem;
 }
-.edit-toggle:hover {
+.edit-toggle:hover,
+.feedback-controls button:hover {
   background: var(--accent);
   border-color: var(--accent);
+}
+.feedback-controls {
+  align-items: center;
+  border-left: 1px solid var(--border);
+  display: flex;
+  gap: 0.5rem;
+  margin-left: -0.25rem;
+  padding-left: 0.75rem;
+}
+.feedback-controls[hidden] {
+  display: none;
+}
+.feedback-controls span {
+  color: var(--muted);
+  font-size: 0.85rem;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feedback-controls button {
+  background: transparent;
+  color: var(--text);
+  padding: 0.28rem 0.55rem;
+}
+.feedback-controls button:hover {
+  color: var(--panel);
 }
 .site-footer {
   border-top: 1px solid var(--border);
@@ -546,13 +584,11 @@ a:hover {
 .comments-panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-left: 0.35rem solid var(--accent);
   border-radius: 0.5rem;
-  box-shadow: var(--shadow);
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 0.85rem;
 }
 .comments-panel[hidden] {
   display: none;
@@ -564,10 +600,14 @@ a:hover {
   justify-content: space-between;
 }
 .comments-panel h2 {
-  font-family: Georgia, Cambria, "Times New Roman", serif;
-  font-size: 1.35rem;
+  color: var(--muted);
+  font:
+    800 0.78rem/1.3 system-ui,
+    sans-serif;
+  letter-spacing: 0.08em;
   line-height: 1.2;
   margin: 0;
+  text-transform: uppercase;
 }
 .comments-panel p {
   color: var(--muted);
@@ -621,6 +661,9 @@ a:hover {
   border-radius: 0.35rem;
   padding: 0.75rem;
 }
+.comment-card.is-hidden {
+  opacity: 0.68;
+}
 .comment-card + .comment-card {
   margin-top: 0.5rem;
 }
@@ -637,30 +680,88 @@ a:hover {
   gap: 0.35rem;
   font-size: 0.82rem;
 }
+.comment-meta em {
+  color: var(--accent-strong);
+  font-style: normal;
+  font-weight: 800;
+}
+[data-comment-target] {
+  position: relative;
+}
 .paragraph-comment-button {
-  background: transparent;
-  border: 1px solid var(--border);
+  align-items: center;
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
+  border: 1px solid transparent;
   border-radius: 999px;
   color: var(--muted);
   cursor: pointer;
   display: none;
-  font:
-    700 0.75rem/1 system-ui,
-    sans-serif;
-  margin-left: 0.5rem;
-  padding: 0.25rem 0.45rem;
-  vertical-align: middle;
+  block-size: 1.55rem;
+  inline-size: 1.55rem;
+  inset-inline-end: -2.25rem;
+  justify-content: center;
+  opacity: 0.16;
+  padding: 0;
+  position: absolute;
+  top: 0.1rem;
+  transform: translateX(0.2rem);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 [data-comments-ready="true"] .paragraph-comment-button,
 [data-comments-admin="true"] .paragraph-comment-button,
-[data-comment-target]:hover .paragraph-comment-button,
 .paragraph-comment-button.has-comments {
   display: inline-flex;
+}
+.paragraph-comment-button svg {
+  block-size: 0.95rem;
+  fill: none;
+  inline-size: 0.95rem;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+[data-comment-target]:hover .paragraph-comment-button,
+.paragraph-comment-button:focus-visible,
+.paragraph-comment-button.has-comments {
+  border-color: var(--border);
+  opacity: 1;
+  transform: translateX(0);
 }
 .paragraph-comment-button.has-comments {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   border-color: var(--accent);
   color: var(--accent-strong);
+}
+.paragraph-comment-button.has-comments::after {
+  align-items: center;
+  background: var(--accent);
+  border-radius: 999px;
+  color: var(--panel);
+  content: attr(data-comment-count);
+  display: flex;
+  font:
+    800 0.62rem/1 system-ui,
+    sans-serif;
+  inset-block-start: -0.42rem;
+  inset-inline-end: -0.42rem;
+  justify-content: center;
+  min-block-size: 0.9rem;
+  min-inline-size: 0.9rem;
+  padding: 0 0.16rem;
+  position: absolute;
+}
+@media (max-width: 48rem) {
+  [data-comment-target] {
+    padding-inline-end: 2rem;
+  }
+  .paragraph-comment-button {
+    inset-inline-end: 0;
+  }
 }
 .paragraph-comment-form {
   background: var(--bg);

@@ -41,6 +41,12 @@ export default {
       return handleResolveRequest(request, env, resolveMatch[1]);
     }
 
+    const hideMatch = url.pathname.match(/^\/api\/comments\/([^/]+)\/hide$/);
+
+    if (hideMatch) {
+      return handleHideRequest(request, env, hideMatch[1]);
+    }
+
     const response = await env.ASSETS.fetch(request);
     const headers = new Headers(response.headers);
 
@@ -77,6 +83,7 @@ async function handleAuthRequest(
       available,
       authenticated: Boolean(user),
       admin: Boolean(user && isAdmin(user.login, env)),
+      local: false,
       user,
       loginUrl: available ? "/api/auth/github/start" : null,
     });
@@ -208,6 +215,7 @@ async function handleCommentsRequest(
   }
 
   if (request.method === "GET") {
+    const user = await getSessionUser(request, env);
     const chapter = url.searchParams.get("chapter");
 
     if (!isValidSlug(chapter)) {
@@ -217,7 +225,13 @@ async function handleCommentsRequest(
       );
     }
 
-    return json(await getChapterComments(env, chapter));
+    return json(
+      visibleCommentsForUser(
+        await getChapterComments(env, chapter),
+        user,
+        Boolean(user && isAdmin(user.login, env)),
+      ),
+    );
   }
 
   if (request.method === "POST") {
@@ -259,6 +273,8 @@ async function handleCommentsRequest(
       createdAt: new Date().toISOString(),
       resolvedAt: null,
       resolvedBy: null,
+      hiddenAt: null,
+      hiddenBy: null,
     };
 
     comments.push(comment);
@@ -317,10 +333,75 @@ async function handleResolveRequest(
   return json({ message: "Unknown comment" }, { status: 404 });
 }
 
+async function handleHideRequest(
+  request: Request,
+  env: Env,
+  encodedId: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return methodNotAllowed("POST");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user || !isAdmin(user.login, env)) {
+    return json(
+      { message: "Only the book owner can hide comments" },
+      { status: 403 },
+    );
+  }
+
+  const id = decodeURIComponent(encodedId);
+  const chapterKeys = await env.COMMENTS_KV.list({ prefix: "comments:" });
+
+  for (const key of chapterKeys.keys) {
+    const chapter = key.name.replace(/^comments:/, "");
+    const comments = await getChapterComments(env, chapter);
+    const comment = comments.find((item) => item.id === id);
+
+    if (!comment) {
+      continue;
+    }
+
+    comment.hiddenAt = new Date().toISOString();
+    comment.hiddenBy = user.login;
+    await putChapterComments(env, chapter, comments);
+
+    return json(comment);
+  }
+
+  return json({ message: "Unknown comment" }, { status: 404 });
+}
+
 async function getChapterComments(env: Env, chapter: string) {
   const stored = await env.COMMENTS_KV?.get(`comments:${chapter}`, "json");
 
   return Array.isArray(stored) ? stored : [];
+}
+
+function visibleCommentsForUser(
+  comments: any[],
+  user: { login: string } | null,
+  admin: boolean,
+) {
+  if (admin) {
+    return comments;
+  }
+
+  if (!user) {
+    return [];
+  }
+
+  return comments.filter(
+    (comment) => !comment.hiddenAt && comment.author?.login === user.login,
+  );
 }
 
 async function putChapterComments(

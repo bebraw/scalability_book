@@ -24,9 +24,9 @@ if (!["pull", "push", "sync"].includes(command)) {
 if (command === "pull") {
   await pullComments();
 } else if (command === "push") {
-  await pushResolutions();
+  await pushModerationState();
 } else {
-  await pushResolutions();
+  await pushModerationState();
   await pullComments();
 }
 
@@ -39,7 +39,7 @@ async function pullComments() {
   );
 }
 
-async function pushResolutions() {
+async function pushModerationState() {
   const local = await loadLocalComments();
   const remote = await readRemoteComments();
   let updated = 0;
@@ -54,14 +54,19 @@ async function pushResolutions() {
     for (const remoteComment of remoteComments) {
       const localComment = localById.get(remoteComment.id);
 
-      if (!localComment?.resolvedAt || remoteComment.resolvedAt) {
-        continue;
+      if (localComment?.resolvedAt && !remoteComment.resolvedAt) {
+        remoteComment.resolvedAt = localComment.resolvedAt;
+        remoteComment.resolvedBy = localComment.resolvedBy || "local-editor";
+        chapterChanged = true;
+        updated++;
       }
 
-      remoteComment.resolvedAt = localComment.resolvedAt;
-      remoteComment.resolvedBy = localComment.resolvedBy || "local-editor";
-      chapterChanged = true;
-      updated++;
+      if (localComment?.hiddenAt && !remoteComment.hiddenAt) {
+        remoteComment.hiddenAt = localComment.hiddenAt;
+        remoteComment.hiddenBy = localComment.hiddenBy || "local-editor";
+        chapterChanged = true;
+        updated++;
+      }
     }
 
     if (chapterChanged) {
@@ -70,7 +75,7 @@ async function pushResolutions() {
   }
 
   console.log(
-    `Pushed ${updated} resolved comment${updated === 1 ? "" : "s"} to KV.`,
+    `Pushed ${updated} moderation update${updated === 1 ? "" : "s"} to KV.`,
   );
 }
 

@@ -1,11 +1,12 @@
 const commentsPanel = document.querySelector("[data-comments-panel]");
 
 if (commentsPanel) {
+  const commentsControls = document.querySelector("[data-comments-controls]");
   const chapterSlug = commentsPanel.dataset.chapterSlug;
-  const status = commentsPanel.querySelector("[data-comments-status]");
+  const status = document.querySelector("[data-comments-status]");
   const list = commentsPanel.querySelector("[data-comments-list]");
-  const loginButton = commentsPanel.querySelector("[data-comments-login]");
-  const logoutButton = commentsPanel.querySelector("[data-comments-logout]");
+  const loginButton = document.querySelector("[data-comments-login]");
+  const logoutButton = document.querySelector("[data-comments-logout]");
   const commentButtons = Array.from(
     document.querySelectorAll("[data-comment-button]"),
   );
@@ -17,7 +18,9 @@ if (commentsPanel) {
   async function initComments() {
     try {
       auth = await fetchJson("/api/auth/status");
-      commentsPanel.hidden = false;
+      if (commentsControls) {
+        commentsControls.hidden = false;
+      }
       document.documentElement.dataset.commentsReady = auth.authenticated
         ? "true"
         : "false";
@@ -29,26 +32,31 @@ if (commentsPanel) {
       wireParagraphButtons();
     } catch {
       commentsPanel.hidden = true;
+      if (commentsControls) {
+        commentsControls.hidden = true;
+      }
     }
   }
 
   function updateAuthControls() {
     if (auth.authenticated) {
       const name = auth.user?.login || "GitHub";
-      setStatus(
-        auth.admin
+      setStatus(`Feedback: ${name}`);
+      status.title = auth.admin
+        ? auth.local
           ? `Signed in as ${name}. Local resolution mode is available.`
-          : `Signed in as ${name}. Select a paragraph to comment.`,
-      );
+          : `Signed in as ${name}. Resolution controls are available.`
+        : `Signed in as ${name}. Select a paragraph to comment.`;
       loginButton.hidden = true;
       logoutButton.hidden = false;
       return;
     }
 
+    status.title = "";
     setStatus(
       auth.available === false
         ? "Feedback login is not configured yet."
-        : "Sign in to comment on a paragraph.",
+        : "Feedback",
     );
     loginButton.hidden = auth.available === false || !auth.loginUrl;
     logoutButton.hidden = true;
@@ -79,7 +87,9 @@ if (commentsPanel) {
         const paragraphId = button.dataset.commentButton;
 
         if (!auth.authenticated && !auth.admin) {
-          commentsPanel.scrollIntoView({ block: "start" });
+          (commentsControls || commentsPanel).scrollIntoView({
+            block: "start",
+          });
           setStatus("Sign in with GitHub before commenting.");
           return;
         }
@@ -147,8 +157,11 @@ if (commentsPanel) {
   }
 
   function renderCommentList() {
-    const visibleComments = comments.filter((comment) => !comment.resolvedAt);
+    const visibleComments = comments.filter(
+      (comment) => !comment.resolvedAt && (!comment.hiddenAt || auth.admin),
+    );
     list.innerHTML = "";
+    commentsPanel.hidden = visibleComments.length === 0;
 
     if (!visibleComments.length) {
       return;
@@ -171,6 +184,7 @@ if (commentsPanel) {
       for (const comment of threadComments) {
         const card = document.createElement("article");
         card.className = "comment-card";
+        card.classList.toggle("is-hidden", Boolean(comment.hiddenAt));
         card.innerHTML = `
           <div class="comment-meta">
             <strong></strong>
@@ -186,6 +200,20 @@ if (commentsPanel) {
         card.querySelector("p").textContent = comment.body;
 
         if (auth.admin) {
+          if (comment.hiddenAt) {
+            const hidden = document.createElement("em");
+            hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
+            card.querySelector(".comment-meta").append(hidden);
+          }
+
+          if (!comment.hiddenAt) {
+            const hide = document.createElement("button");
+            hide.type = "button";
+            hide.textContent = "Hide";
+            hide.addEventListener("click", () => hideComment(comment.id));
+            card.append(hide);
+          }
+
           const resolve = document.createElement("button");
           resolve.type = "button";
           resolve.textContent = "Resolve";
@@ -208,9 +236,17 @@ if (commentsPanel) {
     setStatus("Comment resolved.");
   }
 
+  async function hideComment(id) {
+    await fetchJson(`/api/comments/${encodeURIComponent(id)}/hide`, {
+      method: "POST",
+    });
+    await loadComments();
+    setStatus("Comment hidden.");
+  }
+
   function updateParagraphBadges() {
     const counts = comments
-      .filter((comment) => !comment.resolvedAt)
+      .filter((comment) => !comment.resolvedAt && !comment.hiddenAt)
       .reduce((result, comment) => {
         result.set(
           comment.paragraphId,
@@ -222,7 +258,13 @@ if (commentsPanel) {
     for (const button of commentButtons) {
       const count = counts.get(button.dataset.commentButton) || 0;
       button.classList.toggle("has-comments", count > 0);
-      button.textContent = count > 0 ? `Comment (${count})` : "Comment";
+      button.dataset.commentCount = count > 0 ? String(count) : "";
+      button.setAttribute(
+        "aria-label",
+        count > 0
+          ? `Comment on this paragraph. ${count} unresolved ${count === 1 ? "comment" : "comments"}.`
+          : "Comment on this paragraph",
+      );
     }
   }
 

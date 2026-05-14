@@ -80,7 +80,7 @@ export function renderMarkdown(source, chapter) {
     paragraphCounts.set(baseId, count);
     const paragraphId = count === 1 ? baseId : `${baseId}-${count}`;
 
-    return `<p id="${paragraphId}" data-comment-target="${paragraphId}">${html}<button class="paragraph-comment-button" type="button" data-comment-button="${paragraphId}" aria-label="Comment on this paragraph">Comment</button></p>`;
+    return `<p id="${paragraphId}" data-comment-target="${paragraphId}">${html}<button class="paragraph-comment-button" type="button" data-comment-button="${paragraphId}" aria-label="Comment on this paragraph" title="Comment"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.5h14v9H9l-4 4v-13Z" /></svg><span class="visually-hidden">Comment on this paragraph</span></button></p>`;
   };
 
   return {

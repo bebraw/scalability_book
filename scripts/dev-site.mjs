@@ -37,6 +37,7 @@ createServer(async (request, response) => {
         available: true,
         authenticated: true,
         admin: true,
+        local: true,
         user: { login: "local-editor", avatarUrl: null, url: null },
         loginUrl: null,
       });
@@ -56,6 +57,12 @@ createServer(async (request, response) => {
 
     if (resolveMatch) {
       return handleResolveRequest(request, response, resolveMatch[1]);
+    }
+
+    const hideMatch = url.pathname.match(/^\/api\/comments\/([^/]+)\/hide$/);
+
+    if (hideMatch) {
+      return handleHideRequest(request, response, hideMatch[1]);
     }
 
     if (url.pathname.startsWith("/api/chapters/")) {
@@ -116,6 +123,8 @@ async function handleCommentsRequest(request, response, url) {
       createdAt: new Date().toISOString(),
       resolvedAt: null,
       resolvedBy: null,
+      hiddenAt: null,
+      hiddenBy: null,
     };
 
     chapterComments.push(comment);
@@ -147,6 +156,32 @@ async function handleResolveRequest(request, response, encodedId) {
 
     comment.resolvedAt = new Date().toISOString();
     comment.resolvedBy = "local-editor";
+    await saveComments(comments);
+
+    return sendJson(response, comment);
+  }
+
+  return sendJson(response, { message: "Unknown comment" }, 404);
+}
+
+async function handleHideRequest(request, response, encodedId) {
+  if (request.method !== "POST") {
+    response.writeHead(405, { Allow: "POST" });
+    return response.end("Method not allowed");
+  }
+
+  const id = decodeURIComponent(encodedId);
+  const comments = await loadComments();
+
+  for (const chapterComments of Object.values(comments)) {
+    const comment = chapterComments.find((item) => item.id === id);
+
+    if (!comment) {
+      continue;
+    }
+
+    comment.hiddenAt = new Date().toISOString();
+    comment.hiddenBy = "local-editor";
     await saveComments(comments);
 
     return sendJson(response, comment);

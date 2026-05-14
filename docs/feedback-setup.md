@@ -96,11 +96,13 @@ If `available` is `false`, the OAuth values or `SESSION_SECRET` are missing.
 Students use the deployed site:
 
 1. Open a chapter.
-2. Select `Sign in with GitHub` in the feedback panel.
-3. Select `Comment` next to a paragraph.
+2. Select `Sign in` in the navigation header feedback controls.
+3. Use the comment control next to a paragraph.
 4. Post feedback.
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
+
+Students can see their own comments after posting. They cannot see comments from other students. Admin users can see all comments.
 
 ## 6. Local Review Flow
 
@@ -116,7 +118,7 @@ Start the local editable site:
 npm start
 ```
 
-In local mode, the site signs you in as `local-editor` and treats you as an admin. Resolve comments in the feedback panel while editing chapters.
+In local mode, the site signs you in as `local-editor` and treats you as an admin. Resolve or hide comments from the page feedback threads while editing chapters.
 
 Local feedback state is stored in:
 
@@ -126,17 +128,17 @@ Local feedback state is stored in:
 
 This file is ignored by git.
 
-## 7. Push Resolutions Back To KV
+## 7. Push Moderation State Back To KV
 
-After resolving comments locally, push resolution state back to Cloudflare KV:
+After resolving or hiding comments locally, push moderation state back to Cloudflare KV:
 
 ```bash
 npm run comments:push -- --namespace-id <comments-kv-namespace-id>
 ```
 
-This command only copies local `resolvedAt` and `resolvedBy` values to matching remote comments. It does not overwrite comment bodies and does not delete remote comments.
+This command only copies local `resolvedAt`, `resolvedBy`, `hiddenAt`, and `hiddenBy` values to matching remote comments. It does not overwrite comment bodies and does not delete remote comments.
 
-To push local resolutions and then refresh `.local/comments.json` from KV:
+To push local moderation state and then refresh `.local/comments.json` from KV:
 
 ```bash
 npm run comments:sync -- --namespace-id <comments-kv-namespace-id>
@@ -150,7 +152,7 @@ export COMMENTS_KV_NAMESPACE_ID=<comments-kv-namespace-id>
 
 ## 8. Troubleshooting
 
-If the feedback panel says login is not configured, check `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `SESSION_SECRET`.
+If the feedback controls say login is not configured, check `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `SESSION_SECRET`.
 
 If comments do not load in production, check that `COMMENTS_KV` is bound in `wrangler.jsonc` and redeploy.
 
