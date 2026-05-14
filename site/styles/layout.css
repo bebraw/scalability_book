@@ -308,6 +308,9 @@
   font-weight: 700;
   line-height: 1.25;
   margin: 0 0 0.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .book-sidebar h2 a {
   color: inherit;
