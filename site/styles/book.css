@@ -16,7 +16,8 @@
 }
 .prose h1 {
   border-top: 0.35rem solid var(--accent);
-  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-weight: 500;
   margin: 0 0 1.5rem;
   padding-top: 1.2rem;
 }
