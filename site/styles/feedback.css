@@ -108,7 +108,7 @@
   block-size: 1.55rem;
   inline-size: 1.55rem;
   justify-content: center;
-  opacity: 0.16;
+  opacity: 0;
   padding: 0;
   transition:
     background 140ms ease,
