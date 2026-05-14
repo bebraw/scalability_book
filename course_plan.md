@@ -19,21 +19,34 @@ I have sketched out the initial timeline per week/lecture below:
 
 **Construct**
 
-1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability, get Construct started
-2. What is scalability
-3. Architecture
+1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability, get Construct started (LO1, LO3, LO6)
+2. What is scalability (LO1, LO3)
+3. Architecture (LO2, LO3, LO6)
 
 **Deconstruct**
 
-4. Friction
-5. Benchmarking and observability
-6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct
+4. Friction (LO1, LO3, LO5)
+5. Benchmarking and observability (LO1, LO4, LO5, LO6)
+6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct (LO2, LO3, LO4, LO5, LO6)
 
 **Reconstruct**
 
-7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered
-8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure
-9. Recap - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned
+7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered (LO3, LO5, LO6)
+8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure (LO2, LO3, LO4, LO5, LO6)
+9. Recap - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned (LO1, LO2, LO3, LO4, LO5, LO6)
+
+## Learning outcome alignment
+
+The current book and project structure covers the learning outcomes well overall: the early chapters establish scalability as a multi-dimensional concern, the middle chapters make students evaluate evidence and friction in their own systems, and the later chapters require redesign, trade-off analysis, and reflection. LO4 fits most naturally as a sequence: introduce scalability laws during benchmarking and observability, use them informally when discussing reality and overload, and apply them explicitly during the scaling lecture. The scaling lecture should require students to apply at least one law or formal scalability model to an architectural decision.
+
+| Learning outcome | Primary time plan references | Book/project evidence | Validation note |
+| --- | --- | --- | --- |
+| LO1. Understands the multiple dimensions of scalability and factors that contribute to web application scalability. | Lectures 1, 2, 4, 5, 9 | `What is scalability?`, `Friction`, `Benchmarking and observability`, recap; Construct begins with a simple event tracking system. | Covered strongly through users, data, teams, change, performance, resilience, friction, and resource efficiency. |
+| LO2. Knows and applies architectural patterns and techniques for designing and building scalable web applications. | Lectures 3, 6, 8, 9 | `Architecture`, `Reality`, `Scaling`; Reconstruct architecture proposal, event flow, pressure map, and scaling trade-off table. | Covered strongly if Reconstruct requires students to justify chosen techniques rather than only list them. |
+| LO3. Understands the impact of the wide range of design decisions in building scalable web applications. | Lectures 1, 2, 3, 4, 6, 7, 8, 9 | Architecture and data-flow diagrams, friction audit, changed-assumptions list, agent workflow discussion, final reflection. | Covered strongly through repeated reflection on how early choices affect later change, operation, and coordination. |
+| LO4. Knows scalability laws and reflects on them in the context of architectural decisions. | Lectures 5, 6, 8, 9 | Benchmarking introduces latency, throughput, percentiles, queue depth, and resource use; Reality applies the laws to overload and bottlenecks; Scaling should add laws such as Amdahl's Law, Little's Law, and the Universal Scalability Law. | Covered if Lecture 5 introduces the laws through measured behavior and Lecture 8 includes an explicit exercise where students use one law to explain a scaling limit or trade-off. |
+| LO5. Can evaluate the scalability of web applications at multiple abstraction levels. | Lectures 4, 5, 6, 7, 8, 9 | Friction audit, measurement and observability plan, pressure map, scaling trade-off table, Deconstruct analysis of scalability, reliability, maintainability, simplicity, and resource efficiency. | Covered strongly across code, architecture, operations, collaboration, and system qualities. |
+| LO6. Has practical experience in designing, building, and deploying web applications that scale. | Lectures 1, 3, 5, 6, 8, 9 | Construct working application, architecture and deployment decisions, benchmark or observability evidence, Reconstruct redesign or prototype, Deconstruct final analysis and reflection. | Covered through project work if each phase includes lightweight operational evidence, such as a reproducible local run command, hosted URL, container, deployment notes, benchmark run, logs, or screenshots from a running instance. |
 
 ## Projects
 
@@ -44,6 +57,8 @@ The three projects are called construct, reconstruct, and deconstruct. The idea 
 - Deconstruct - measure, explain, and critique the result.
 
 The projects are described in detail behind the `specifications` folder and each has its own technical targets.
+
+Each project phase should include evidence that the application or design has been run in a realistic environment: a local deployment command, hosted URL, container, deployment notes, benchmark run, logs, screenshots from a running instance, or another operational artifact appropriate to the phase.
 
 The students are expected to perform self- and peer-assessment after each phase of the project so feedback may be shared with the project group and the students can reflect on their groupworking.
 
