@@ -349,6 +349,7 @@ if (commentsRoot) {
         <button type="button" data-comment-cancel>Cancel</button>
       </div>
     `;
+    form.prepend(renderParagraphContext(paragraph, paragraphId));
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -450,6 +451,7 @@ if (commentsRoot) {
     close.addEventListener("click", () => closeParagraphFeedbackPanel());
     header.append(title, add, close);
     panel.append(header);
+    panel.append(renderParagraphContext(paragraph, paragraphId));
 
     if (!relatedComments.length) {
       const empty = document.createElement("p");
@@ -546,6 +548,32 @@ if (commentsRoot) {
     }
 
     return card;
+  }
+
+  function renderParagraphContext(
+    paragraph: HTMLElement,
+    paragraphId: string,
+  ): HTMLElement {
+    const context = document.createElement("div");
+    context.className = "paragraph-feedback-context";
+
+    const label = document.createElement("strong");
+    label.textContent = paragraphLabel(paragraphId);
+
+    const excerpt = document.createElement("p");
+    excerpt.textContent = paragraphExcerpt(paragraph);
+
+    context.append(label, excerpt);
+
+    return context;
+  }
+
+  function paragraphExcerpt(paragraph: HTMLElement): string {
+    const clone = paragraph.cloneNode(true) as HTMLElement;
+    clone.querySelector(".paragraph-feedback-actions")?.remove();
+    const text = clone.textContent?.replace(/\s+/g, " ").trim() || "";
+
+    return text.length > 180 ? `${text.slice(0, 177).trimEnd()}...` : text;
   }
 
   function wireReflectionButtons() {

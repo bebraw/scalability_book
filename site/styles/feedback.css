@@ -249,6 +249,28 @@
   font-size: 0.9rem;
   margin: 0;
 }
+.paragraph-feedback-context {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border-left: 2px solid var(--accent);
+  border-radius: 0.25rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.45rem 0.6rem;
+}
+.paragraph-feedback-context strong {
+  color: var(--accent-strong);
+  font:
+    800 0.72rem/1.2 system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.paragraph-feedback-context p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin: 0;
+}
 .paragraph-feedback-panel button {
   background: var(--panel);
   color: var(--text);
