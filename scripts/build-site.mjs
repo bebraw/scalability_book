@@ -514,14 +514,16 @@ function renderSidebarPart(part, currentChapter) {
   const heading = part.number
     ? `Part ${part.number}: ${part.title}`
     : part.title;
-  const entries = part.partPage
-    ? [part.partPage, ...part.chapters]
-    : part.chapters;
+  const headingContent = part.partPage
+    ? `<a href="${escapeAttribute(part.partPage.url)}"${
+        part.partPage.slug === currentChapter.slug ? ' aria-current="page"' : ""
+      }>${escapeHtml(heading)}</a>`
+    : escapeHtml(heading);
 
   return `<section class="book-sidebar-part">
-  <h2>${escapeHtml(heading)}</h2>
+  <h2>${headingContent}</h2>
   <ol>
-    ${entries.map((chapter) => renderSidebarChapter(chapter, currentChapter)).join("\n    ")}
+    ${part.chapters.map((chapter) => renderSidebarChapter(chapter, currentChapter)).join("\n    ")}
   </ol>
 </section>`;
 }
@@ -938,8 +940,18 @@ a:hover { color: var(--accent); }
 .book-sidebar h2 {
   color: var(--text);
   font-size: .9rem;
+  font-weight: 700;
   line-height: 1.25;
   margin: 0 0 .2rem;
+}
+.book-sidebar h2 a {
+  color: inherit;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: .08em;
+  text-underline-offset: .16em;
+}
+.book-sidebar h2 a:hover {
+  color: var(--accent-strong);
 }
 .book-sidebar-part > p {
   color: var(--muted);
@@ -966,13 +978,16 @@ a:hover { color: var(--accent); }
 .book-sidebar a[aria-current="page"] {
   background: var(--panel);
   box-shadow: inset 3px 0 0 var(--accent);
-  font-weight: 800;
+  font-weight: 700;
 }
 .book-sidebar a span,
 .book-sidebar-disabled span {
   color: var(--muted);
   font-size: .8rem;
-  font-weight: 800;
+  font-weight: 600;
+}
+.book-sidebar a[aria-current="page"] span:last-child {
+  font-weight: 700;
 }
 .book-sidebar .book-sidebar-part-link {
   grid-column: 1 / -1;
