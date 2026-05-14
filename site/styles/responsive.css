@@ -42,15 +42,48 @@
     position: static;
   }
   .header-actions {
-    justify-content: flex-start;
+    align-items: start;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    justify-content: stretch;
+    width: 100%;
   }
   .site-header nav {
+    grid-column: 1 / -1;
     flex-wrap: wrap;
+  }
+  .theme-picker {
+    min-width: 0;
+  }
+  .theme-picker select {
+    min-width: 0;
+    width: 100%;
+  }
+  .edit-toggle {
+    justify-self: start;
+    white-space: nowrap;
   }
   .feedback-controls {
     border-left: 0;
-    flex-basis: 100%;
+    display: grid;
+    flex-basis: auto;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    width: 100%;
     padding-left: 0;
+  }
+  .feedback-controls span {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .feedback-controls label {
+    min-width: 0;
+  }
+  .feedback-controls select {
+    width: 100%;
+  }
+  .feedback-controls button {
+    white-space: nowrap;
   }
   .hero {
     grid-template-columns: 1fr;
