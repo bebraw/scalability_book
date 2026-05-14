@@ -17,7 +17,8 @@
     "worker:build": "npm run build && npm run worker:prepare",
     "worker:dev": "npm run worker:build && wrangler dev",
     "deploy": "npm run worker:build && wrangler deploy",
-    "validate": "node --check scripts/build-site.mjs && node --check scripts/dev-site.mjs && node --check scripts/generate-worker-manifest.mjs && gustwind --validate --input ./build"
+    "validate": "npm run types:check && node --check scripts/build-site.mjs && node --check scripts/dev-site.mjs && node --check scripts/generate-worker-manifest.mjs && gustwind --validate --input ./build",
+    "types:check": "tsc --noEmit"
   },
   "engines": {
     "node": ">=24"
@@ -31,7 +32,9 @@
     "vite": "8.0.10"
   },
   "devDependencies": {
+    "@types/node": "25.7.0",
     "prettier": "3.8.3",
+    "typescript": "6.0.3",
     "wrangler": "4.86.0"
   }
 }

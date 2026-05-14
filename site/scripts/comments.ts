@@ -37,12 +37,21 @@ type FeedbackAuth = {
   loginUrl?: string | null;
   user?: FeedbackAuthor;
 };
+type ChapterSource = { content: string; file: string };
+type CommentForm = HTMLFormElement & {
+  elements: HTMLFormControlsCollection & {
+    anonymous: HTMLInputElement;
+    body: HTMLTextAreaElement;
+    category: HTMLSelectElement;
+  };
+};
 
 const commentsPanel = document.querySelector<HTMLElement>(
   "[data-comments-panel]",
 );
 
 if (commentsPanel) {
+  const panelRoot = commentsPanel;
   const feedbackCategories: FeedbackOption[] = [
     ["unclear-concept", "Unclear concept"],
     ["missing-example", "Missing example"],
@@ -107,7 +116,7 @@ if (commentsPanel) {
 
   async function initComments() {
     try {
-      auth = await fetchJson("/api/auth/status");
+      auth = await fetchJson<FeedbackAuth>("/api/auth/status");
       if (commentsControls) {
         commentsControls.hidden = false;
       }
@@ -126,7 +135,7 @@ if (commentsPanel) {
       wireStuckButtons();
       wireReflectionButtons();
     } catch {
-      commentsPanel.hidden = true;
+      panelRoot.hidden = true;
       if (commentsControls) {
         commentsControls.hidden = true;
       }
@@ -206,7 +215,7 @@ if (commentsPanel) {
   });
 
   async function loadComments() {
-    comments = await fetchJson(
+    comments = await fetchJson<FeedbackComment[]>(
       `/api/comments?chapter=${encodeURIComponent(chapterSlug)}`,
     );
     renderCommentList();
@@ -228,14 +237,16 @@ if (commentsPanel) {
         const paragraphId = button.dataset.commentButton;
 
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || commentsPanel).scrollIntoView({
+          (commentsControls || panelRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before commenting.");
           return;
         }
 
-        openForm(paragraphId);
+        if (paragraphId) {
+          openForm(paragraphId);
+        }
       });
     }
   }
@@ -245,7 +256,10 @@ if (commentsPanel) {
       "[data-comment-target]",
     )) {
       paragraph.addEventListener("click", (event) => {
-        if (event.target.closest("a, button, input, label, select, textarea")) {
+        if (
+          event.target instanceof Element &&
+          event.target.closest("a, button, input, label, select, textarea")
+        ) {
           return;
         }
 
@@ -264,7 +278,7 @@ if (commentsPanel) {
     });
   }
 
-  function selectParagraph(paragraph) {
+  function selectParagraph(paragraph: Element): void {
     clearSelectedParagraph();
     paragraph.classList.add("is-feedback-selected");
   }
@@ -281,10 +295,14 @@ if (commentsPanel) {
         const paragraphId = button.dataset.stuckButton;
 
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || commentsPanel).scrollIntoView({
+          (commentsControls || panelRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before marking confusion.");
+          return;
+        }
+
+        if (!paragraphId) {
           return;
         }
 
@@ -306,7 +324,7 @@ if (commentsPanel) {
           showParagraphFeedbackPanel(paragraphId);
           setStatus("Marked as stuck.");
         } catch (error) {
-          setStatus(error.message);
+          setStatus(errorMessage(error));
         } finally {
           button.disabled = false;
         }
@@ -314,10 +332,10 @@ if (commentsPanel) {
     }
   }
 
-  function openForm(paragraphId) {
+  function openForm(paragraphId: string): void {
     document.querySelector("[data-comment-form]")?.remove();
     closeParagraphFeedbackPanel();
-    const paragraph = document.querySelector(
+    const paragraph = document.querySelector<HTMLElement>(
       `[data-comment-target="${cssEscape(paragraphId)}"]`,
     );
 
@@ -325,7 +343,7 @@ if (commentsPanel) {
       return;
     }
 
-    const form = document.createElement("form");
+    const form = document.createElement("form") as CommentForm;
     form.className = "paragraph-comment-form";
     form.dataset.commentForm = paragraphId;
     form.innerHTML = `
@@ -357,7 +375,11 @@ if (commentsPanel) {
         return;
       }
 
-      form.querySelector("button").disabled = true;
+      const submit = requireElement(
+        form.querySelector<HTMLButtonElement>("button"),
+        "comment submit button",
+      );
+      submit.disabled = true;
 
       try {
         await fetchJson("/api/comments", {
@@ -376,39 +398,40 @@ if (commentsPanel) {
         showParagraphFeedbackPanel(paragraphId);
         setStatus("Comment posted.");
       } catch (error) {
-        setStatus(error.message);
-        form.querySelector("button").disabled = false;
+        setStatus(errorMessage(error));
+        submit.disabled = false;
       }
     });
 
-    form
-      .querySelector("[data-comment-cancel]")
-      .addEventListener("click", () => {
-        form.remove();
-      });
+    requireElement(
+      form.querySelector<HTMLButtonElement>("[data-comment-cancel]"),
+      "comment cancel button",
+    ).addEventListener("click", () => {
+      form.remove();
+    });
 
     positionCommentForm(form, paragraph);
     paragraph.insertAdjacentElement("afterend", form);
     form.elements.body.focus();
   }
 
-  function positionCommentForm(form, paragraph) {
+  function positionCommentForm(form: HTMLElement, paragraph: Element): void {
     const rect = paragraph.getBoundingClientRect();
     const top = Math.max(84, Math.min(rect.top, window.innerHeight - 420));
 
     form.style.setProperty("--comment-form-top", `${top}px`);
   }
 
-  function showParagraphFeedbackPanel(paragraphId) {
+  function showParagraphFeedbackPanel(paragraphId: string): void {
     activeFeedbackParagraphId = paragraphId;
     document.querySelector("[data-comment-form]")?.remove();
     renderParagraphFeedbackPanel(paragraphId);
   }
 
-  function renderParagraphFeedbackPanel(paragraphId) {
+  function renderParagraphFeedbackPanel(paragraphId: string): void {
     closeParagraphFeedbackPanel(false);
 
-    const paragraph = document.querySelector(
+    const paragraph = document.querySelector<HTMLElement>(
       `[data-comment-target="${cssEscape(paragraphId)}"]`,
     );
 
@@ -457,7 +480,7 @@ if (commentsPanel) {
     }
   }
 
-  function renderCompactComment(comment) {
+  function renderCompactComment(comment: FeedbackComment): HTMLElement {
     const card = document.createElement("article");
     card.className = "comment-card paragraph-feedback-card";
     card.classList.toggle("is-featured", Boolean(comment.publicNote));
@@ -468,11 +491,12 @@ if (commentsPanel) {
       </div>
       <p></p>
     `;
-    card.querySelector("strong").textContent = displayAuthor(comment);
-    card.querySelector("span").textContent = new Date(
-      comment.createdAt,
-    ).toLocaleString();
-    card.querySelector("p").textContent = comment.body;
+    requireElement(card.querySelector("strong"), "comment author").textContent =
+      displayAuthor(comment);
+    requireElement(card.querySelector("span"), "comment date").textContent =
+      new Date(comment.createdAt).toLocaleString();
+    requireElement(card.querySelector("p"), "comment body").textContent =
+      comment.body;
     renderCategory(card, comment.category);
     renderReplies(card, comment);
 
@@ -482,7 +506,7 @@ if (commentsPanel) {
   function renderCommentList() {
     const visibleComments = getVisibleComments();
     list.innerHTML = "";
-    commentsPanel.hidden = visibleComments.length === 0;
+    panelRoot.hidden = visibleComments.length === 0;
 
     if (!visibleComments.length) {
       renderAdminSummary();
@@ -491,9 +515,7 @@ if (commentsPanel) {
 
     renderAdminSummary();
 
-    const byParagraph = Map.groupBy
-      ? Map.groupBy(visibleComments, (comment) => comment.paragraphId)
-      : groupByParagraph(visibleComments);
+    const byParagraph = groupByParagraph(visibleComments);
 
     for (const [paragraphId, threadComments] of byParagraph) {
       const thread = document.createElement("section");
@@ -517,17 +539,23 @@ if (commentsPanel) {
           </div>
           <p></p>
         `;
-        card.querySelector("strong").textContent = displayAuthor(comment);
-        card.querySelector("span").textContent = new Date(
-          comment.createdAt,
-        ).toLocaleString();
-        card.querySelector("p").textContent = comment.body;
+        requireElement(
+          card.querySelector("strong"),
+          "comment author",
+        ).textContent = displayAuthor(comment);
+        requireElement(card.querySelector("span"), "comment date").textContent =
+          new Date(comment.createdAt).toLocaleString();
+        requireElement(card.querySelector("p"), "comment body").textContent =
+          comment.body;
         renderCategory(card, comment.category);
 
         if (comment.publicNote) {
           const featured = document.createElement("em");
           featured.textContent = "Featured";
-          card.querySelector(".comment-meta").append(featured);
+          requireElement(
+            card.querySelector<HTMLElement>(".comment-meta"),
+            "comment meta",
+          ).append(featured);
         }
 
         renderReplies(card, comment);
@@ -536,7 +564,10 @@ if (commentsPanel) {
           if (comment.hiddenAt) {
             const hidden = document.createElement("em");
             hidden.textContent = `Hidden by ${comment.hiddenBy || "admin"}`;
-            card.querySelector(".comment-meta").append(hidden);
+            requireElement(
+              card.querySelector<HTMLElement>(".comment-meta"),
+              "comment meta",
+            ).append(hidden);
           }
 
           if (!comment.hiddenAt) {
@@ -591,14 +622,14 @@ if (commentsPanel) {
     for (const button of reflectionButtons) {
       button.addEventListener("click", async () => {
         if (!auth.authenticated && !auth.admin) {
-          (commentsControls || commentsPanel).scrollIntoView({
+          (commentsControls || panelRoot).scrollIntoView({
             block: "start",
           });
           setStatus("Sign in with GitHub before adding a reflection.");
           return;
         }
 
-        const prompt = button.dataset.reflectionButton;
+        const prompt = button.dataset.reflectionButton || "";
         const body = window.prompt(prompt);
 
         if (!body?.trim()) {
@@ -626,7 +657,7 @@ if (commentsPanel) {
       return;
     }
 
-    commentsPanel.hidden = false;
+    panelRoot.hidden = false;
     const summary = document.createElement("section");
     summary.className = "feedback-summary";
     const unresolved = comments.filter((comment) => !comment.resolvedAt);
@@ -660,7 +691,7 @@ if (commentsPanel) {
     list.prepend(summary);
   }
 
-  function renderReplies(card, comment) {
+  function renderReplies(card: HTMLElement, comment: FeedbackComment): void {
     const replies = Array.isArray(comment.replies) ? comment.replies : [];
 
     if (!replies.length) {
@@ -680,19 +711,22 @@ if (commentsPanel) {
         </div>
         <p></p>
       `;
-      item.querySelector("strong").textContent =
+      requireElement(item.querySelector("strong"), "reply author").textContent =
         reply.author?.login || "Book author";
-      item.querySelector("span").textContent = new Date(
-        reply.createdAt,
-      ).toLocaleString();
-      item.querySelector("p").textContent = reply.body;
+      requireElement(item.querySelector("span"), "reply date").textContent =
+        new Date(reply.createdAt).toLocaleString();
+      requireElement(item.querySelector("p"), "reply body").textContent =
+        reply.body;
       replyList.append(item);
     }
 
     card.append(replyList);
   }
 
-  function renderCategory(card, category) {
+  function renderCategory(
+    card: HTMLElement,
+    category: string | undefined,
+  ): void {
     const label = labelFor(feedbackCategories, category);
 
     if (!label) {
@@ -701,10 +735,13 @@ if (commentsPanel) {
 
     const tag = document.createElement("em");
     tag.textContent = label;
-    card.querySelector(".comment-meta").append(tag);
+    requireElement(
+      card.querySelector<HTMLElement>(".comment-meta"),
+      "comment meta",
+    ).append(tag);
   }
 
-  function getVisibleComments() {
+  function getVisibleComments(): FeedbackComment[] {
     if (auth.admin && viewMode === "admin") {
       return comments.filter(
         (comment) => !comment.resolvedAt || comment.featuredAt,
@@ -732,29 +769,37 @@ if (commentsPanel) {
     return [
       ...own,
       ...publicNotesFromComments(comments).filter(
-        (comment) => !ownIds.has(comment.sourceId),
+        (comment) => !comment.sourceId || !ownIds.has(comment.sourceId),
       ),
     ];
   }
 
-  function publicNotesFromComments(items) {
-    return items
-      .filter((comment) => comment.featuredAt && !comment.hiddenAt)
-      .map((comment) => ({
+  function publicNotesFromComments(
+    items: FeedbackComment[],
+  ): FeedbackComment[] {
+    return items.filter(hasPublicNote).map(
+      (comment): FeedbackComment => ({
         id: `featured-${comment.id}`,
         sourceId: comment.id,
         chapter: comment.chapter,
         paragraphId: comment.paragraphId,
-        body: comment.featuredText,
+        body: comment.featuredText || comment.body,
         author: { login: "Reader note", avatarUrl: null, url: null },
         createdAt: comment.featuredAt,
         featuredAt: comment.featuredAt,
         publicNote: true,
         replies: [],
-      }));
+      }),
+    );
   }
 
-  async function resolveComment(id) {
+  function hasPublicNote(
+    comment: FeedbackComment,
+  ): comment is FeedbackComment & { featuredAt: string } {
+    return Boolean(comment.featuredAt) && !comment.hiddenAt;
+  }
+
+  async function resolveComment(id: string): Promise<void> {
     const reason = window.prompt(
       `Resolution reason: ${resolutionReasons.map(([, label]) => label).join(", ")}`,
       "fixed",
@@ -773,7 +818,7 @@ if (commentsPanel) {
     setStatus("Comment resolved.");
   }
 
-  async function hideComment(id) {
+  async function hideComment(id: string): Promise<void> {
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/hide`, {
       method: "POST",
     });
@@ -781,7 +826,7 @@ if (commentsPanel) {
     setStatus("Comment hidden.");
   }
 
-  async function replyToComment(id) {
+  async function replyToComment(id: string): Promise<void> {
     const body = window.prompt("Reply to this comment");
 
     if (!body?.trim()) {
@@ -797,7 +842,7 @@ if (commentsPanel) {
     setStatus("Reply posted.");
   }
 
-  async function featureComment(comment) {
+  async function featureComment(comment: FeedbackComment): Promise<void> {
     const featuredText = window.prompt(
       "Public note to show to readers",
       comment.featuredText || comment.body,
@@ -816,7 +861,7 @@ if (commentsPanel) {
     setStatus("Comment featured.");
   }
 
-  async function unfeatureComment(id) {
+  async function unfeatureComment(id: string): Promise<void> {
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/unfeature`, {
       method: "POST",
     });
@@ -824,7 +869,7 @@ if (commentsPanel) {
     setStatus("Comment unfeatured.");
   }
 
-  async function promoteClarification(comment) {
+  async function promoteClarification(comment: FeedbackComment): Promise<void> {
     const text = window.prompt(
       "Clarification text to append to the chapter Markdown",
       comment.featuredText || comment.body,
@@ -834,7 +879,7 @@ if (commentsPanel) {
       return;
     }
 
-    const chapter = await fetchJson(
+    const chapter = await fetchJson<ChapterSource>(
       `/api/chapters/${encodeURIComponent(chapterSlug)}`,
     );
     await fetchJson(`/api/chapters/${encodeURIComponent(chapterSlug)}`, {
@@ -847,20 +892,23 @@ if (commentsPanel) {
     setStatus("Clarification appended to Markdown.");
   }
 
-  function updateParagraphBadges() {
-    const counts = getVisibleComments().reduce((result, comment) => {
-      if (!comment.resolvedAt || comment.featuredAt) {
-        result.set(
-          comment.paragraphId,
-          (result.get(comment.paragraphId) || 0) + 1,
-        );
-      }
+  function updateParagraphBadges(): void {
+    const counts = getVisibleComments().reduce<Map<string, number>>(
+      (result, comment) => {
+        if (!comment.resolvedAt || comment.featuredAt) {
+          result.set(
+            comment.paragraphId,
+            (result.get(comment.paragraphId) || 0) + 1,
+          );
+        }
 
-      return result;
-    }, new Map());
+        return result;
+      },
+      new Map(),
+    );
 
     for (const button of commentButtons) {
-      const count = counts.get(button.dataset.commentButton) || 0;
+      const count = counts.get(button.dataset.commentButton || "") || 0;
       button.classList.toggle("has-comments", count > 0);
       button.dataset.commentCount = count > 0 ? String(count) : "";
       button.setAttribute(
@@ -873,7 +921,7 @@ if (commentsPanel) {
 
     const stuckCounts = getVisibleComments()
       .filter((comment) => comment.type === "stuck" && !comment.resolvedAt)
-      .reduce((result, comment) => {
+      .reduce<Map<string, number>>((result, comment) => {
         result.set(
           comment.paragraphId,
           (result.get(comment.paragraphId) || 0) + 1,
@@ -883,17 +931,18 @@ if (commentsPanel) {
       }, new Map());
 
     for (const button of stuckButtons) {
-      const count = stuckCounts.get(button.dataset.stuckButton) || 0;
+      const paragraphId = button.dataset.stuckButton || "";
+      const count = stuckCounts.get(paragraphId) || 0;
       button.classList.toggle("has-comments", count > 0);
       button.classList.toggle(
         "is-active",
-        hasOwnActiveStuckMarker(button.dataset.stuckButton),
+        hasOwnActiveStuckMarker(paragraphId),
       );
       button.dataset.commentCount = count > 0 ? String(count) : "";
     }
   }
 
-  function hasOwnActiveStuckMarker(paragraphId) {
+  function hasOwnActiveStuckMarker(paragraphId: string): boolean {
     const userLogin = auth.user?.login;
 
     if (!userLogin) {
@@ -910,8 +959,10 @@ if (commentsPanel) {
     );
   }
 
-  function groupByParagraph(items) {
-    const grouped = new Map();
+  function groupByParagraph(
+    items: FeedbackComment[],
+  ): Map<string, FeedbackComment[]> {
+    const grouped = new Map<string, FeedbackComment[]>();
 
     for (const item of items) {
       const group = grouped.get(item.paragraphId) || [];
@@ -922,12 +973,15 @@ if (commentsPanel) {
     return grouped;
   }
 
-  function labelFor(options, value) {
+  function labelFor(options: FeedbackOption[], value: string | undefined) {
     return options.find(([option]) => option === value)?.[1] || "";
   }
 
-  function countBy(items, getKey) {
-    return items.reduce((result, item) => {
+  function countBy<T>(
+    items: T[],
+    getKey: (item: T) => string,
+  ): Map<string, number> {
+    return items.reduce<Map<string, number>>((result, item) => {
       const key = getKey(item);
       result.set(key, (result.get(key) || 0) + 1);
       return result;
@@ -971,7 +1025,7 @@ if (commentsPanel) {
     URL.revokeObjectURL(url);
   }
 
-  function appendClarification(source, text) {
+  function appendClarification(source: string, text: string): string {
     const block = `\n\n> **Clarification:** ${text.trim().replace(/\n+/g, "\n> ")}\n`;
     const marker = "\n---\n";
     const markerIndex = source.lastIndexOf(marker);
@@ -983,7 +1037,7 @@ if (commentsPanel) {
     return `${source.slice(0, markerIndex).trimEnd()}${block}${source.slice(markerIndex)}`;
   }
 
-  function escapeHtml(value) {
+  function escapeHtml(value: unknown): string {
     return String(value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -991,15 +1045,17 @@ if (commentsPanel) {
       .replace(/"/g, "&quot;");
   }
 
-  async function fetchJson(url, options) {
+  async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await fetch(url, options);
-    const data = await response.json().catch(() => ({}));
+    const data = (await response.json().catch(() => ({}))) as {
+      message?: string;
+    };
 
     if (!response.ok) {
       throw new Error(data.message || "Request failed");
     }
 
-    return data;
+    return data as T;
   }
 
   function requireElement<T extends HTMLElement>(
@@ -1013,7 +1069,7 @@ if (commentsPanel) {
     return element;
   }
 
-  function paragraphLabel(paragraphId) {
+  function paragraphLabel(paragraphId: string): string {
     if (paragraphId === "p-chapter-reflection") {
       return "Chapter reflection";
     }
@@ -1021,17 +1077,23 @@ if (commentsPanel) {
     return `Paragraph ${commentButtons.findIndex((button) => button.dataset.commentButton === paragraphId) + 1}`;
   }
 
-  function displayAuthor(comment) {
+  function displayAuthor(comment: FeedbackComment): string {
     return comment.anonymous
       ? "Anonymous student"
       : comment.author?.login || "GitHub user";
   }
 
-  function cssEscape(value) {
-    return window.CSS?.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
+  function cssEscape(value: string): string {
+    return "CSS" in window && typeof CSS.escape === "function"
+      ? CSS.escape(value)
+      : value.replace(/"/g, '\\"');
   }
 
-  function setStatus(message) {
+  function setStatus(message: string): void {
     status.textContent = message;
+  }
+
+  function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : "Request failed";
   }
 }

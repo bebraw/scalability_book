@@ -28,6 +28,8 @@ if (editor && toggle) {
   if (!textarea || !save || !cancel || !status || !slug) {
     throw new Error("Editor controls are missing");
   }
+  const sourceTextarea = textarea;
+  const statusElement = status;
 
   fetch("/api/editor/status")
     .then((response) => {
@@ -108,7 +110,7 @@ if (editor && toggle) {
   function getEditor(): EasyMDEEditor {
     if (!markdownEditor && typeof EasyMDE !== "undefined") {
       markdownEditor = new EasyMDE({
-        element: textarea,
+        element: sourceTextarea,
         autofocus: false,
         autosave: {
           enabled: true,
@@ -153,11 +155,11 @@ if (editor && toggle) {
   }
 
   function getEditorValue(): string {
-    return markdownEditor ? markdownEditor.value() : textarea.value;
+    return markdownEditor ? markdownEditor.value() : sourceTextarea.value;
   }
 
   function setEditorValue(value: string): void {
-    textarea.value = value;
+    sourceTextarea.value = value;
 
     if (typeof EasyMDE !== "undefined") {
       getEditor().value(value);
@@ -165,6 +167,6 @@ if (editor && toggle) {
   }
 
   function setStatus(message: string): void {
-    status.textContent = message;
+    statusElement.textContent = message;
   }
 }

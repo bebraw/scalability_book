@@ -1,5 +1,22 @@
 import { assetManifest } from "./generated/asset-manifest";
 
+type Fetcher = {
+  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+};
+type KVNamespaceListKey<Key extends string = string> = { name: Key };
+type KVNamespaceListResult<Key extends string = string> = {
+  keys: KVNamespaceListKey<Key>[];
+};
+type KVNamespace<Key extends string = string> = {
+  get(key: Key): Promise<string | null>;
+  get<ExpectedValue = unknown>(
+    key: Key,
+    type: "json",
+  ): Promise<ExpectedValue | null>;
+  list(options?: { prefix?: string }): Promise<KVNamespaceListResult<Key>>;
+  put(key: Key, value: string): Promise<void>;
+};
+
 type Env = {
   ASSETS: Fetcher;
   COMMENTS_KV?: KVNamespace;
@@ -59,13 +76,13 @@ export default {
     );
 
     if (resolveMatch) {
-      return handleResolveRequest(request, env, resolveMatch[1]);
+      return handleResolveRequest(request, env, resolveMatch[1] || "");
     }
 
     const hideMatch = url.pathname.match(/^\/api\/comments\/([^/]+)\/hide$/);
 
     if (hideMatch) {
-      return handleHideRequest(request, env, hideMatch[1]);
+      return handleHideRequest(request, env, hideMatch[1] || "");
     }
 
     const replyMatch = url.pathname.match(
@@ -73,7 +90,7 @@ export default {
     );
 
     if (replyMatch) {
-      return handleReplyRequest(request, env, replyMatch[1]);
+      return handleReplyRequest(request, env, replyMatch[1] || "");
     }
 
     const featureMatch = url.pathname.match(
@@ -81,7 +98,7 @@ export default {
     );
 
     if (featureMatch) {
-      return handleFeatureRequest(request, env, featureMatch[1]);
+      return handleFeatureRequest(request, env, featureMatch[1] || "");
     }
 
     const unfeatureMatch = url.pathname.match(
@@ -89,7 +106,7 @@ export default {
     );
 
     if (unfeatureMatch) {
-      return handleUnfeatureRequest(request, env, unfeatureMatch[1]);
+      return handleUnfeatureRequest(request, env, unfeatureMatch[1] || "");
     }
 
     const response = await env.ASSETS.fetch(request);
@@ -828,7 +845,7 @@ function getCookie(request: Request, name: string) {
   const cookies = request.headers.get("Cookie") || "";
   const match = cookies.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
 
-  return match ? decodeURIComponent(match[1]) : null;
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
 function buildCookie(
