@@ -47,6 +47,30 @@ export default {
       return handleHideRequest(request, env, hideMatch[1]);
     }
 
+    const replyMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/replies$/,
+    );
+
+    if (replyMatch) {
+      return handleReplyRequest(request, env, replyMatch[1]);
+    }
+
+    const featureMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/feature$/,
+    );
+
+    if (featureMatch) {
+      return handleFeatureRequest(request, env, featureMatch[1]);
+    }
+
+    const unfeatureMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/unfeature$/,
+    );
+
+    if (unfeatureMatch) {
+      return handleUnfeatureRequest(request, env, unfeatureMatch[1]);
+    }
+
     const response = await env.ASSETS.fetch(request);
     const headers = new Headers(response.headers);
 
@@ -275,6 +299,10 @@ async function handleCommentsRequest(
       resolvedBy: null,
       hiddenAt: null,
       hiddenBy: null,
+      featuredAt: null,
+      featuredBy: null,
+      featuredText: null,
+      replies: [],
     };
 
     comments.push(comment);
@@ -380,10 +408,164 @@ async function handleHideRequest(
   return json({ message: "Unknown comment" }, { status: 404 });
 }
 
+async function handleReplyRequest(
+  request: Request,
+  env: Env,
+  encodedId: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return methodNotAllowed("POST");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user || !isAdmin(user.login, env)) {
+    return json(
+      { message: "Only the book owner can reply to comments" },
+      { status: 403 },
+    );
+  }
+
+  const body = (await request.json().catch(() => ({}))) as { body?: string };
+  const text = body.body?.trim();
+
+  if (!text || text.length > 4000) {
+    return json(
+      { message: "Reply must be 1-4000 characters" },
+      { status: 400 },
+    );
+  }
+
+  const updated = await mutateComment(env, encodedId, (comment) => {
+    comment.replies = Array.isArray(comment.replies) ? comment.replies : [];
+    comment.replies.push({
+      id: crypto.randomUUID(),
+      body: text,
+      author: user,
+      createdAt: new Date().toISOString(),
+    });
+  });
+
+  return updated || json({ message: "Unknown comment" }, { status: 404 });
+}
+
+async function handleFeatureRequest(
+  request: Request,
+  env: Env,
+  encodedId: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return methodNotAllowed("POST");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user || !isAdmin(user.login, env)) {
+    return json(
+      { message: "Only the book owner can feature comments" },
+      { status: 403 },
+    );
+  }
+
+  const body = (await request.json().catch(() => ({}))) as {
+    featuredText?: string;
+  };
+  const text = body.featuredText?.trim();
+
+  if (!text || text.length > 4000) {
+    return json(
+      { message: "Featured note must be 1-4000 characters" },
+      { status: 400 },
+    );
+  }
+
+  const updated = await mutateComment(env, encodedId, (comment) => {
+    comment.featuredAt = new Date().toISOString();
+    comment.featuredBy = user.login;
+    comment.featuredText = text;
+  });
+
+  return updated || json({ message: "Unknown comment" }, { status: 404 });
+}
+
+async function handleUnfeatureRequest(
+  request: Request,
+  env: Env,
+  encodedId: string,
+): Promise<Response> {
+  if (request.method !== "POST") {
+    return methodNotAllowed("POST");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user || !isAdmin(user.login, env)) {
+    return json(
+      { message: "Only the book owner can unfeature comments" },
+      { status: 403 },
+    );
+  }
+
+  const updated = await mutateComment(env, encodedId, (comment) => {
+    comment.featuredAt = null;
+    comment.featuredBy = null;
+    comment.featuredText = null;
+  });
+
+  return updated || json({ message: "Unknown comment" }, { status: 404 });
+}
+
 async function getChapterComments(env: Env, chapter: string) {
   const stored = await env.COMMENTS_KV?.get(`comments:${chapter}`, "json");
 
   return Array.isArray(stored) ? stored : [];
+}
+
+async function mutateComment(
+  env: Env,
+  encodedId: string,
+  update: (comment: any) => void,
+) {
+  const id = decodeURIComponent(encodedId);
+  const chapterKeys = await env.COMMENTS_KV?.list({ prefix: "comments:" });
+
+  for (const key of chapterKeys?.keys || []) {
+    const chapter = key.name.replace(/^comments:/, "");
+    const comments = await getChapterComments(env, chapter);
+    const comment = comments.find((item) => item.id === id);
+
+    if (!comment) {
+      continue;
+    }
+
+    update(comment);
+    await putChapterComments(env, chapter, comments);
+
+    return json(comment);
+  }
+
+  return null;
 }
 
 function visibleCommentsForUser(
@@ -395,13 +577,35 @@ function visibleCommentsForUser(
     return comments;
   }
 
+  const featured = comments
+    .filter((comment) => comment.featuredAt && !comment.hiddenAt)
+    .map((comment) => ({
+      id: `featured-${comment.id}`,
+      sourceId: comment.id,
+      chapter: comment.chapter,
+      paragraphId: comment.paragraphId,
+      body: comment.featuredText,
+      author: { login: "Reader note", avatarUrl: null, url: null },
+      createdAt: comment.featuredAt,
+      featuredAt: comment.featuredAt,
+      publicNote: true,
+      replies: [],
+    }));
+
   if (!user) {
-    return [];
+    return featured;
   }
 
-  return comments.filter(
+  const own = comments.filter(
     (comment) => !comment.hiddenAt && comment.author?.login === user.login,
   );
+
+  const ownIds = new Set(own.map((comment) => comment.id));
+
+  return [
+    ...own,
+    ...featured.filter((comment) => !ownIds.has(comment.sourceId)),
+  ];
 }
 
 async function putChapterComments(

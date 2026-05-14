@@ -102,7 +102,7 @@ Students use the deployed site:
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 
-Students can see their own comments after posting. They cannot see comments from other students. Admin users can see all comments.
+Students can see their own comments after posting and any admin replies to those comments. They cannot see comments from other students. Admin users can see all comments and can feature curated reader notes for public display.
 
 ## 6. Local Review Flow
 
@@ -118,7 +118,7 @@ Start the local editable site:
 npm start
 ```
 
-In local mode, the site signs you in as `local-editor` and treats you as an admin. Resolve or hide comments from the page feedback threads while editing chapters.
+In local mode, the site signs you in as `local-editor` and treats you as an admin. Reply, feature, resolve, or hide comments from the page feedback threads while editing chapters.
 
 Local feedback state is stored in:
 
@@ -130,13 +130,13 @@ This file is ignored by git.
 
 ## 7. Push Moderation State Back To KV
 
-After resolving or hiding comments locally, push moderation state back to Cloudflare KV:
+After replying, featuring, resolving, or hiding comments locally, push moderation state back to Cloudflare KV:
 
 ```bash
 npm run comments:push -- --namespace-id <comments-kv-namespace-id>
 ```
 
-This command only copies local `resolvedAt`, `resolvedBy`, `hiddenAt`, and `hiddenBy` values to matching remote comments. It does not overwrite comment bodies and does not delete remote comments.
+This command only copies local moderation fields and admin replies to matching remote comments. It does not overwrite comment bodies and does not delete remote comments.
 
 To push local moderation state and then refresh `.local/comments.json` from KV:
 

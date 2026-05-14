@@ -158,7 +158,9 @@ if (commentsPanel) {
 
   function renderCommentList() {
     const visibleComments = comments.filter(
-      (comment) => !comment.resolvedAt && (!comment.hiddenAt || auth.admin),
+      (comment) =>
+        (!comment.resolvedAt || comment.featuredAt) &&
+        (!comment.hiddenAt || auth.admin),
     );
     list.innerHTML = "";
     commentsPanel.hidden = visibleComments.length === 0;
@@ -185,6 +187,7 @@ if (commentsPanel) {
         const card = document.createElement("article");
         card.className = "comment-card";
         card.classList.toggle("is-hidden", Boolean(comment.hiddenAt));
+        card.classList.toggle("is-featured", Boolean(comment.publicNote));
         card.innerHTML = `
           <div class="comment-meta">
             <strong></strong>
@@ -199,6 +202,14 @@ if (commentsPanel) {
         ).toLocaleString();
         card.querySelector("p").textContent = comment.body;
 
+        if (comment.publicNote) {
+          const featured = document.createElement("em");
+          featured.textContent = "Featured";
+          card.querySelector(".comment-meta").append(featured);
+        }
+
+        renderReplies(card, comment);
+
         if (auth.admin) {
           if (comment.hiddenAt) {
             const hidden = document.createElement("em");
@@ -207,6 +218,22 @@ if (commentsPanel) {
           }
 
           if (!comment.hiddenAt) {
+            const reply = document.createElement("button");
+            reply.type = "button";
+            reply.textContent = "Reply";
+            reply.addEventListener("click", () => replyToComment(comment.id));
+            card.append(reply);
+
+            const feature = document.createElement("button");
+            feature.type = "button";
+            feature.textContent = comment.featuredAt ? "Unfeature" : "Feature";
+            feature.addEventListener("click", () =>
+              comment.featuredAt
+                ? unfeatureComment(comment.id)
+                : featureComment(comment),
+            );
+            card.append(feature);
+
             const hide = document.createElement("button");
             hide.type = "button";
             hide.textContent = "Hide";
@@ -228,6 +255,38 @@ if (commentsPanel) {
     }
   }
 
+  function renderReplies(card, comment) {
+    const replies = Array.isArray(comment.replies) ? comment.replies : [];
+
+    if (!replies.length) {
+      return;
+    }
+
+    const replyList = document.createElement("div");
+    replyList.className = "comment-replies";
+
+    for (const reply of replies) {
+      const item = document.createElement("article");
+      item.className = "comment-reply";
+      item.innerHTML = `
+        <div class="comment-meta">
+          <strong></strong>
+          <span></span>
+        </div>
+        <p></p>
+      `;
+      item.querySelector("strong").textContent =
+        reply.author?.login || "Book author";
+      item.querySelector("span").textContent = new Date(
+        reply.createdAt,
+      ).toLocaleString();
+      item.querySelector("p").textContent = reply.body;
+      replyList.append(item);
+    }
+
+    card.append(replyList);
+  }
+
   async function resolveComment(id) {
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/resolve`, {
       method: "POST",
@@ -244,9 +303,55 @@ if (commentsPanel) {
     setStatus("Comment hidden.");
   }
 
+  async function replyToComment(id) {
+    const body = window.prompt("Reply to this comment");
+
+    if (!body?.trim()) {
+      return;
+    }
+
+    await fetchJson(`/api/comments/${encodeURIComponent(id)}/replies`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body }),
+    });
+    await loadComments();
+    setStatus("Reply posted.");
+  }
+
+  async function featureComment(comment) {
+    const featuredText = window.prompt(
+      "Public note to show to readers",
+      comment.featuredText || comment.body,
+    );
+
+    if (!featuredText?.trim()) {
+      return;
+    }
+
+    await fetchJson(`/api/comments/${encodeURIComponent(comment.id)}/feature`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ featuredText }),
+    });
+    await loadComments();
+    setStatus("Comment featured.");
+  }
+
+  async function unfeatureComment(id) {
+    await fetchJson(`/api/comments/${encodeURIComponent(id)}/unfeature`, {
+      method: "POST",
+    });
+    await loadComments();
+    setStatus("Comment unfeatured.");
+  }
+
   function updateParagraphBadges() {
     const counts = comments
-      .filter((comment) => !comment.resolvedAt && !comment.hiddenAt)
+      .filter(
+        (comment) =>
+          (!comment.resolvedAt || comment.featuredAt) && !comment.hiddenAt,
+      )
       .reduce((result, comment) => {
         result.set(
           comment.paragraphId,

@@ -54,16 +54,30 @@ async function pushModerationState() {
     for (const remoteComment of remoteComments) {
       const localComment = localById.get(remoteComment.id);
 
-      if (localComment?.resolvedAt && !remoteComment.resolvedAt) {
-        remoteComment.resolvedAt = localComment.resolvedAt;
-        remoteComment.resolvedBy = localComment.resolvedBy || "local-editor";
-        chapterChanged = true;
-        updated++;
+      if (!localComment) {
+        continue;
       }
 
-      if (localComment?.hiddenAt && !remoteComment.hiddenAt) {
-        remoteComment.hiddenAt = localComment.hiddenAt;
-        remoteComment.hiddenBy = localComment.hiddenBy || "local-editor";
+      const fields = [
+        "resolvedAt",
+        "resolvedBy",
+        "hiddenAt",
+        "hiddenBy",
+        "featuredAt",
+        "featuredBy",
+        "featuredText",
+        "replies",
+      ];
+
+      for (const field of fields) {
+        if (
+          JSON.stringify(remoteComment[field] ?? null) ===
+          JSON.stringify(localComment[field] ?? null)
+        ) {
+          continue;
+        }
+
+        remoteComment[field] = localComment[field] ?? null;
         chapterChanged = true;
         updated++;
       }

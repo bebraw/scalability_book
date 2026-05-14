@@ -664,6 +664,10 @@ a:hover {
 .comment-card.is-hidden {
   opacity: 0.68;
 }
+.comment-card.is-featured {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
 .comment-card + .comment-card {
   margin-top: 0.5rem;
 }
@@ -684,6 +688,22 @@ a:hover {
   color: var(--accent-strong);
   font-style: normal;
   font-weight: 800;
+}
+.comment-replies {
+  border-left: 2px solid var(--border);
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  padding-left: 0.75rem;
+}
+.comment-reply {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.65rem;
+}
+.comment-reply p {
+  margin: 0.35rem 0 0;
 }
 [data-comment-target] {
   position: relative;

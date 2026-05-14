@@ -65,6 +65,30 @@ createServer(async (request, response) => {
       return handleHideRequest(request, response, hideMatch[1]);
     }
 
+    const replyMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/replies$/,
+    );
+
+    if (replyMatch) {
+      return handleReplyRequest(request, response, replyMatch[1]);
+    }
+
+    const featureMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/feature$/,
+    );
+
+    if (featureMatch) {
+      return handleFeatureRequest(request, response, featureMatch[1]);
+    }
+
+    const unfeatureMatch = url.pathname.match(
+      /^\/api\/comments\/([^/]+)\/unfeature$/,
+    );
+
+    if (unfeatureMatch) {
+      return handleUnfeatureRequest(request, response, unfeatureMatch[1]);
+    }
+
     if (url.pathname.startsWith("/api/chapters/")) {
       return handleChapterRequest(request, response, url);
     }
@@ -125,6 +149,10 @@ async function handleCommentsRequest(request, response, url) {
       resolvedBy: null,
       hiddenAt: null,
       hiddenBy: null,
+      featuredAt: null,
+      featuredBy: null,
+      featuredText: null,
+      replies: [],
     };
 
     chapterComments.push(comment);
@@ -182,6 +210,91 @@ async function handleHideRequest(request, response, encodedId) {
 
     comment.hiddenAt = new Date().toISOString();
     comment.hiddenBy = "local-editor";
+    await saveComments(comments);
+
+    return sendJson(response, comment);
+  }
+
+  return sendJson(response, { message: "Unknown comment" }, 404);
+}
+
+async function handleReplyRequest(request, response, encodedId) {
+  if (request.method !== "POST") {
+    response.writeHead(405, { Allow: "POST" });
+    return response.end("Method not allowed");
+  }
+
+  const body = await readJsonBody(request);
+  const text = body.body?.trim();
+
+  if (!text || text.length > 4000) {
+    return sendJson(
+      response,
+      { message: "Reply must be 1-4000 characters" },
+      400,
+    );
+  }
+
+  return mutateComment(response, encodedId, (comment) => {
+    comment.replies = Array.isArray(comment.replies) ? comment.replies : [];
+    comment.replies.push({
+      id: crypto.randomUUID(),
+      body: text,
+      author: { login: "local-editor", avatarUrl: null, url: null },
+      createdAt: new Date().toISOString(),
+    });
+  });
+}
+
+async function handleFeatureRequest(request, response, encodedId) {
+  if (request.method !== "POST") {
+    response.writeHead(405, { Allow: "POST" });
+    return response.end("Method not allowed");
+  }
+
+  const body = await readJsonBody(request);
+  const text = body.featuredText?.trim();
+
+  if (!text || text.length > 4000) {
+    return sendJson(
+      response,
+      { message: "Featured note must be 1-4000 characters" },
+      400,
+    );
+  }
+
+  return mutateComment(response, encodedId, (comment) => {
+    comment.featuredAt = new Date().toISOString();
+    comment.featuredBy = "local-editor";
+    comment.featuredText = text;
+  });
+}
+
+async function handleUnfeatureRequest(request, response, encodedId) {
+  if (request.method !== "POST") {
+    response.writeHead(405, { Allow: "POST" });
+    return response.end("Method not allowed");
+  }
+
+  return mutateComment(response, encodedId, (comment) => {
+    comment.featuredAt = null;
+    comment.featuredBy = null;
+    comment.featuredText = null;
+  });
+}
+
+async function mutateComment(response, encodedId, update) {
+  const id = decodeURIComponent(encodedId);
+  const comments = await loadComments();
+
+  for (const chapterComments of Object.values(comments)) {
+    const comment = chapterComments.find((item) => item.id === id);
+
+    if (!comment) {
+      continue;
+    }
+
+    update(comment);
     await saveComments(comments);
 
     return sendJson(response, comment);

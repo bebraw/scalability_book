@@ -32,7 +32,7 @@ The build emits a static site to `build/` for `scalableweb.dev`. The deployed si
 
 ## Feedback Review
 
-The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured. Students sign in with GitHub, use the paragraph comment control, and post comments. Students see only their own comments. Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, resolve comments, and hide comments that should not be shown back to students.
+The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured. Students sign in with GitHub, use the paragraph comment control, and post comments. Students see only their own comments and admin replies to those comments. Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, reply to comments, resolve comments, hide comments that should not be shown back to students, and feature curated reader notes publicly.
 
 Local editing stores feedback data in `.local/comments.json`. To review production feedback locally, pull from Cloudflare KV first:
 
@@ -41,13 +41,13 @@ npm run comments:pull -- --namespace-id <comments-kv-namespace-id>
 npm start
 ```
 
-After resolving or hiding comments locally, push the moderation state back to KV:
+After replying, featuring, resolving, or hiding comments locally, push the moderation state back to KV:
 
 ```bash
 npm run comments:push -- --namespace-id <comments-kv-namespace-id>
 ```
 
-`comments:push` only copies local `resolvedAt`, `resolvedBy`, `hiddenAt`, and `hiddenBy` fields to matching remote comments. It does not overwrite comment bodies or delete comments. `comments:sync` runs push first, then pulls the latest KV state back into `.local/comments.json`.
+`comments:push` only copies local moderation fields and admin replies to matching remote comments. It does not overwrite comment bodies or delete comments. `comments:sync` runs push first, then pulls the latest KV state back into `.local/comments.json`.
 
 Feedback setup details are in [feedback-setup.md](feedback-setup.md).
 
