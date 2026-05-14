@@ -104,7 +104,7 @@ Comments are stored under KV keys named `comments:<chapter-slug>`.
 
 Students can see their own comments after posting and any admin replies to those comments. They cannot see comments from other students. Students may choose to show an individual comment as anonymous in the teacher-facing UI; the underlying GitHub identity remains stored in KV for abuse handling. Admin users can see all comments and can feature curated reader notes for public display.
 
-Each chapter also has reflection prompts for the muddiest point, missing examples, and learned trade-offs. These are stored as chapter-level feedback.
+Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs. These are stored as chapter-level feedback.
 
 Admins can use the feedback view selector in the navigation header to preview three modes:
 
