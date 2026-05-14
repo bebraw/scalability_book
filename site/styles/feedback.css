@@ -89,6 +89,7 @@
   content: "";
   inset-block: 0;
   inset-inline-end: -4.5rem;
+  pointer-events: none;
   position: absolute;
   width: 4.5rem;
 }
@@ -101,6 +102,7 @@
   transition:
     opacity 140ms ease,
     transform 140ms ease;
+  z-index: 1;
 }
 .paragraph-comment-button {
   align-items: center;
