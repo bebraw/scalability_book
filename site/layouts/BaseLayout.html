@@ -30,22 +30,34 @@
             <option &value="(resolve id)" &children="(resolve label)"></option>
           </select>
         </label>
-        <button class="edit-toggle" type="button" data-editor-toggle hidden>
-          Edit
+        <button
+          class="tools-toggle"
+          type="button"
+          data-tools-toggle
+          aria-controls="site-tools-panel"
+          aria-expanded="false"
+          hidden
+        >
+          Tools
         </button>
-        <div class="feedback-controls" data-comments-controls hidden>
-          <span data-comments-status role="status" aria-live="polite"></span>
-          <label data-comments-view-control hidden>
-            <span class="visually-hidden">Feedback view</span>
-            <select data-comments-view>
-              <option value="admin">Admin view</option>
-              <option value="student">Student view</option>
-              <option value="public">Public view</option>
-            </select>
-          </label>
-          <button type="button" data-comments-export hidden>Export</button>
-          <button type="button" data-comments-login hidden>Sign in</button>
-          <button type="button" data-comments-logout hidden>Sign out</button>
+        <div class="site-tools-panel" id="site-tools-panel" data-tools-panel>
+          <button class="edit-toggle" type="button" data-editor-toggle hidden>
+            Edit
+          </button>
+          <div class="feedback-controls" data-comments-controls hidden>
+            <span data-comments-status role="status" aria-live="polite"></span>
+            <label data-comments-view-control hidden>
+              <span class="visually-hidden">Feedback view</span>
+              <select data-comments-view>
+                <option value="admin">Admin view</option>
+                <option value="student">Student view</option>
+                <option value="public">Public view</option>
+              </select>
+            </label>
+            <button type="button" data-comments-export hidden>Export</button>
+            <button type="button" data-comments-login hidden>Sign in</button>
+            <button type="button" data-comments-logout hidden>Sign out</button>
+          </div>
         </div>
       </div>
     </header>
