@@ -10,35 +10,53 @@
   .book-shell {
     grid-template-columns: minmax(0, 1fr);
   }
+  .book-sidebar {
+    order: 1;
+  }
+  .local-toc {
+    order: 2;
+  }
+  .chapter-main {
+    order: 3;
+  }
   .book-sidebar,
   .local-toc {
     max-height: none;
     position: static;
   }
-  .book-sidebar {
+  .book-sidebar,
+  .local-toc {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     padding: 1rem;
   }
-  .book-sidebar summary {
+  .book-sidebar summary,
+  .local-toc summary {
     align-items: center;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     margin-bottom: 0;
   }
-  .book-sidebar summary::after {
+  .book-sidebar summary::after,
+  .local-toc summary::after {
     color: var(--accent);
     content: "+";
     font-size: 1rem;
     line-height: 1;
   }
-  .book-sidebar details[open] summary {
+  .book-sidebar details[open] summary,
+  .local-toc details[open] summary {
     margin-bottom: 0.75rem;
   }
-  .book-sidebar details[open] summary::after {
+  .book-sidebar details[open] summary::after,
+  .local-toc details[open] summary::after {
     content: "-";
+  }
+  .local-toc ol {
+    display: grid;
+    gap: 0.2rem;
   }
   .book-sidebar-part ol {
     display: grid;
@@ -47,9 +65,6 @@
   }
   .book-sidebar h2 {
     margin-bottom: 0.55rem;
-  }
-  .local-toc {
-    display: none;
   }
 }
 @media (max-width: 48rem) {

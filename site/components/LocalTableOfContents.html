@@ -1,8 +1,10 @@
 <aside class="local-toc" aria-label="On this page">
-  <p>On this page</p>
-  <ol &foreach="(resolve headings)">
-    <li &class="(resolve className)">
-      <a &href="(resolve href)" &children="(resolve text)"></a>
-    </li>
-  </ol>
+  <details open>
+    <summary>On this page</summary>
+    <ol &foreach="(resolve headings)">
+      <li &class="(resolve className)">
+        <a &href="(resolve href)" &children="(resolve text)"></a>
+      </li>
+    </ol>
+  </details>
 </aside>

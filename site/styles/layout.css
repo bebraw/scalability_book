@@ -140,7 +140,7 @@
 .eyebrow,
 .chapter-kicker,
 .book-sidebar summary,
-.local-toc > p {
+.local-toc summary {
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 700;
@@ -148,11 +148,13 @@
   margin: 0 0 0.75rem;
   text-transform: uppercase;
 }
-.book-sidebar summary {
+.book-sidebar summary,
+.local-toc summary {
   cursor: default;
   list-style: none;
 }
-.book-sidebar summary::-webkit-details-marker {
+.book-sidebar summary::-webkit-details-marker,
+.local-toc summary::-webkit-details-marker {
   display: none;
 }
 .primary-link {
