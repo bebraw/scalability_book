@@ -1,10 +1,6 @@
 /* Book prose and chapter navigation */
 .prose {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow);
-  padding: clamp(1.25rem, 4vw, 3rem);
+  padding: clamp(1rem, 3vw, 3.5rem) clamp(0.25rem, 2vw, 1.5rem);
 }
 .prose h1,
 .prose h2,
@@ -16,11 +12,11 @@
   position: relative;
 }
 .prose h1 {
-  border-top: 0.35rem solid var(--accent);
-  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  font-size: clamp(2.35rem, 4.8vw, 4rem);
   font-weight: 500;
-  margin: 0 0 1.5rem;
-  padding-top: 1.2rem;
+  line-height: 1.04;
+  margin: 0 0 2.4rem;
+  max-width: 14ch;
 }
 .prose h2 {
   font-size: 2rem;
@@ -32,7 +28,20 @@
 }
 .prose p,
 .prose li {
-  max-width: 68ch;
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 0.55vw + 0.95rem, 1.22rem);
+  line-height: 1.72;
+  max-width: 66ch;
+}
+.prose p {
+  margin: 0 0 1.35em;
+}
+.prose .chapter-kicker {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  max-width: none;
+  margin: 0 0 1rem;
 }
 .prose img {
   max-width: 100%;

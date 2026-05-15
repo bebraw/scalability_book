@@ -299,10 +299,10 @@
 .book-shell {
   display: grid;
   gap: clamp(1rem, 3vw, 2rem);
-  grid-template-columns: 18rem minmax(0, 48rem) 15rem;
+  grid-template-columns: 18rem minmax(0, 52rem) 15rem;
   margin: 0 auto;
-  max-width: 88rem;
-  padding: 2rem clamp(1rem, 3vw, 2.5rem) 5rem;
+  max-width: 92rem;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem;
 }
 .book-sidebar,
 .local-toc {
