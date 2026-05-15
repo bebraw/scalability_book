@@ -14,8 +14,9 @@
   display: none;
 }
 .editor-panel h2 {
-  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 1.35rem;
+  font-weight: 500;
   line-height: 1.2;
   margin: 0;
 }
@@ -29,12 +30,7 @@
   border: 1px solid var(--border);
   border-radius: 0.35rem;
   color: var(--text);
-  font:
-    0.95rem/1.55 ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Consolas,
-    monospace;
+  font: 0.95rem/1.55 var(--font-mono);
   min-height: 32rem;
   padding: 0.8rem;
   resize: vertical;
@@ -47,12 +43,7 @@
   background: var(--bg);
   border-color: var(--border);
   color: var(--text);
-  font:
-    0.95rem/1.55 ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Consolas,
-    monospace;
+  font: 0.95rem/1.55 var(--font-mono);
 }
 .editor-panel .EasyMDEContainer .CodeMirror-cursor {
   border-left-color: var(--text);
