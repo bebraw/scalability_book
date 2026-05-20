@@ -4,19 +4,15 @@ You might be familiar with the saying "works on my machine". Often web applicati
 
 ## Dimensions of scalability
 
-There are multiple ways to look at scalability. Consider for example what happens when a web-based product of a startup becomes popular and gains more users than the company might have ever imagined to be possible. It is in this case that normally the performance boundaries of a service are discovered as most likely the quality of the service will begin to degrade in one way or another. When people think about scalability, performance is perhaps the first aspect that comes to their mind but it is not the only aspect.
+There are multiple ways to look at scalability. Consider for example what happens when a web-based product of a startup becomes popular and gains more users than the company might have ever imagined being possible. It is in this case that normally the performance boundaries of a service are discovered as most likely the quality of the service will begin to degrade in one way or another. When people think about scalability, performance is perhaps the first aspect that comes to their mind, but it is not the only aspect.
 
-Another way to look at it is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise but it might be difficult to scale them otherwise due to technical or social concerns.
+Another way to look at it is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
 
-Most software dies not because it was bad, but because it was successful.
+Becoming too successful can kill a software product. That is essentially what dealing with scale is about, although it is important to keep in mind that premature scaling can also work against you. Now with agentic development tools, generating prototypes and learning about your market is faster than ever. Ideally you would be able to both iterate towards software business that works while being able to do it in a scalable manner. It is not only about technical scalability, but also about how you scale your development efforts. How can you retain your momentum as your product and company grow?
 
-It gets more users than expected, more data than imagined, more teams than planned, and more change than it was ever designed to tolerate. The result is familiar: outages, frantic hotfixes, late-night incident calls, slowing delivery, growing complexity, and mounting fear of touching “that part of the system.”
+While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
 
-This book is about designing and evolving systems _so that success doesn’t kill them_.
-
-We’ll approach this through a narrative: a single product that starts small, finds traction, then grows into a large-scale, long-lived system. Along the way we’ll make choices, hit limits, refactor, and sometimes regret what we did three chapters earlier.
-
-Before we dive into that story, this chapter sets the stage:
+---
 
 - What it means for a system to “scale”
 - How scalability differs from performance and resilience
