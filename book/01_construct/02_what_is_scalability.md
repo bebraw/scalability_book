@@ -14,6 +14,8 @@ While we might have the best of plans, typically the reality doesn't follow our 
 
 ---
 
+TODO: Have students vote on possible dimensions of scalability somehow
+
 - What it means for a system to “scale”
 - How scalability differs from performance and resilience
 - Why constraints are not obstacles, but design inputs
