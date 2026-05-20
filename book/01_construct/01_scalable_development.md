@@ -48,13 +48,17 @@ While agents can allow you to develop entire web applications fast, they also re
 
 Most importantly you have to be able to judge what the tools emit and where to take your project. A big chunk of this comes with experience, but to avoid some of the pain and speed up your personal development, it is a good idea to pick up at least some basic ideas so you don't have to go through the trouble and find the lessons on your own. That is the main reason why we write a big project in three stages in this book, and I'll describe the first part of the project next.
 
-While people complete the project in groups during the course related to the book, you can also complete the project alone and cut the scope for example. Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely. Therefore, I encourage developing small prototypes beyond this book as now prototyping is cheap, and you'll learn a lot in the process.
-
----
+While the course project has been designed to be completed in groups, you can also complete the project alone and cut the scope for example. Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely. Therefore, I encourage developing small prototypes beyond this book as now prototyping is cheap, and you'll learn a lot in the process.
 
 ## Book project - Event-oriented application
 
-The running project of the book is an event-oriented application. The exact theme is intentionally open: a group might track activity in a conference, classroom, shop, game, device network, support workflow, or another domain where events matter. In the first project phase, Construct, students build the smallest useful version of the system: users can record events, store them, and inspect them later. The point is not to design a perfect platform immediately. The point is to create a concrete baseline that can later be stressed, redesigned, and analyzed.
+During this book, you'll develop an event-oriented application. The exact nature of the events hasn't been fixed so you'll have to find a domain where events are available to track. The events can be either physical, i.e., local music events, technical conferences, or virtual. A good advanced choice would be to implement an agent based workflow application. The key point is that you have some specific data to track, and you have to set up a data model for the purpose. The point is not to end up with a perfect design immediately, but rather to come up with a concrete baseline that can be stressed, redesigned, and analyzed as detail is added to the service.
+
+For the first version, it is important that it contains a data model, basic functionality to manipulate it, transitions between different states of the application, and key workflows around all this. The way you implement this in terms of technical stack and software architecture is open. The key point is that you can justify and explain your initial choices to other people.
+
+To give a more concrete example, consider we are implementing a small visual agentic workflow platform. The idea is that the application allows users to define simple workflows that then get executed while triggering events the system records for logging purposes. To implement this kind of application, you would have to learn somewhat about the domain and get into specifics. Scoping-wise you might want to make it specific first and suitable for only certain tasks.
+
+---
 
 The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
 
