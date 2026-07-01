@@ -152,9 +152,6 @@ function initializeWorkflowDemo(root: HTMLElement) {
   const modeSelect = root.querySelector<HTMLSelectElement>(
     "[data-workflow-demo-mode]",
   );
-  const modeTitle = root.querySelector<HTMLElement>(
-    "[data-workflow-demo-mode-title]",
-  );
   const modeCopy = root.querySelector<HTMLElement>(
     "[data-workflow-demo-mode-copy]",
   );
@@ -199,7 +196,6 @@ function initializeWorkflowDemo(root: HTMLElement) {
   if (
     !form ||
     !modeSelect ||
-    !modeTitle ||
     !modeCopy ||
     !loop ||
     !evidence ||
@@ -226,7 +222,6 @@ function initializeWorkflowDemo(root: HTMLElement) {
     const signalScores = getSignalScores(signals);
     const result = calculateWorkflow(mode, signalScores);
 
-    modeTitle.textContent = mode.title;
     modeCopy.textContent = mode.copy;
     loop.innerHTML = buildWorkflowLoop(mode);
     outputs.forEach((output) => {
