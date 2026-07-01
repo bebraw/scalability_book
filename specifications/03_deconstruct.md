@@ -149,3 +149,10 @@ Good deconstruction answers questions like:
 - What problems does it avoid solving?
 
 The goal is to learn how real systems are understood, not how ideal systems are imagined.
+
+---
+
+## Instructor Notes
+
+- If the course uses the model-capability progression, this phase can require a weak department-hosted model. Treat this as part of the analysis rather than as a punishment: students should explain what their accumulated harness enabled, what the weak model misunderstood, and how human review corrected or contained the mistakes.
+- A useful final prompt is: "Which practices from Construct and Reconstruct still worked when model capability dropped, and which practices were only effective with a strong model?"

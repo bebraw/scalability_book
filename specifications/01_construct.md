@@ -143,3 +143,10 @@ There is no single correct solution.
 If you are unsure, choose the simplest possible solution that meets the requirements.
 
 A small, well-finished system is better than a large, incomplete one.
+
+---
+
+## Instructor Notes
+
+- If the course uses the model-capability progression, this is the phase where groups may use the strongest approved foundation model. Require them to leave behind evidence that will help later weaker models and other students: setup instructions, a short AI-use note, project conventions, basic tests, and examples of valid events.
+- The assessment should avoid rewarding only model-amplified output volume. Reward the quality of the baseline and the clarity of the harness students create around it.

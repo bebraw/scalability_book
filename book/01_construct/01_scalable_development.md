@@ -42,6 +42,10 @@ The final part of the loop, validation, is perhaps the most important one since 
 
 For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird. A big part of working with agents is getting better at figuring out how to set up effective validation rules since this can define whether your project stays on rails or not. If you don't take care, you can end up with a lot of working code that has not been structured well and in turn will be slow and expensive for agents to maintain and develop further. Technical debt can accrue faster with these tools than you can possibly imagine.
 
+> **Writing note**
+>
+> This loop can support the three-project AI arc. In Construct, students can use a strong model to generate quickly while building the constraint and validation artifacts. In Reconstruct, a weaker mini model can expose whether those artifacts are good enough. In Deconstruct, a weak department-hosted model can make the harness itself the object of analysis: what context, examples, tests, prompts, and review loops allowed useful work despite lower model capability?
+
 ## From slop to top
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such. When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude. Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.

@@ -58,6 +58,20 @@ The three projects are called construct, reconstruct, and deconstruct. The idea 
 
 The projects are described in detail behind the `specifications` folder and each has its own technical targets.
 
+## AI model capability arc
+
+Writing note: consider making the model progression an explicit pedagogical device across the three projects. The first phase can allow a strong foundation model so students experience the upside of agentic development and can build ambition quickly. The second phase can require a weaker "mini" model so the cost of vague requirements, missing tests, weak project instructions, and unclear architecture becomes visible. The third phase can require a weak department-hosted model so students have to rely on the harness, examples, evaluation cases, prompts, documentation, and review practices they developed earlier.
+
+The framing should not be "the good model is taken away" but "model capability is one changing condition the development system must absorb". This connects directly to scalability: the project is not only about scaling users, events, and infrastructure, but also about scaling development practice when tooling quality, cost, latency, privacy requirements, or availability changes.
+
+Possible phase mapping:
+
+- Construct: use a powerful model for fast prototyping, but require durable artifacts such as a README, setup command, project instructions, prompt log or usage note, tests, and validation checks.
+- Reconstruct: use a weaker mini model and ask students to identify which parts of their process stopped working. The expected lesson is that a harness with clear tasks, smaller contexts, runnable checks, and good examples matters more as model capability drops.
+- Deconstruct: use the department-hosted weak model and treat the result as evidence. Students should explain what their development system made possible, where the weak model failed, and which earlier practices transferred.
+
+This arc could also help grading: evaluate not only the final software or analysis, but whether the group improved its ability to constrain, generate, validate, and review AI-assisted work under less favorable model conditions.
+
 The default project theme is a modest event tracking application, but groups may choose an ambitious event-oriented domain if they keep the required core small. One useful advanced option is a constrained visual agentic workflow platform where workflow definitions, runs, node executions, tool calls, retries, and failures are modeled as events. This should remain a domain choice within the event-tracking brief rather than a new mandatory course project, since weaker groups could otherwise spend too much time on visual editor details instead of scalability, reconstruction, and deconstruction.
 
 Each project phase should include evidence that the application or design has been run in a realistic environment: a local deployment command, hosted URL, container, deployment notes, benchmark run, logs, screenshots from a running instance, or another operational artifact appropriate to the phase.

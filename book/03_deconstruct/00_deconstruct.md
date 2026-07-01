@@ -12,12 +12,14 @@ In this part, scalability has two meanings. The first is the traditional scalabi
 - Use [Pi](https://pi.dev/) as the concrete tool for this part. Pi is a minimal terminal coding harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
 - Present Pi as a teaching vehicle rather than as the point of the chapter. The lesson is not "use this specific tool", but "a serious agent workflow needs a harness, explicit context, scoped capabilities, and reviewable traces".
 - Connect Pi to the course progression: copilot-style assistance in the first part, a single agent in the second part, and orchestrated agents in Deconstruct.
+- Consider revising the progression if the course adopts a deliberate model-capability arc: powerful foundation model in Construct, weaker mini model in Reconstruct, and weak department-hosted model in Deconstruct. The point would be to show that a serious agent workflow should survive changes in model quality, cost, availability, and deployment constraints.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit. This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
 - Introduce a small agent fleet with roles such as `scout`, `planner`, `implementer`, and `reviewer`. Keep the first version deliberately small so students learn orchestration and integration instead of trying to automate everything.
 - Use Pi prompt templates for repeatable workflows. Good examples: investigate a subsystem, implement a bounded change, review a diff, summarize architectural risks, and prepare a pull request.
 - Use Pi's session history or export features as evidence. Students should submit a short trace or reflection showing how the fleet worked, where it failed, and how they intervened.
 - Discuss containment explicitly: limited tools, read-only exploration, small write scopes, branch isolation, test gates, and human review. The point is to teach students that an agent fleet is a socio-technical system, not merely concurrent prompting.
 - Add a comparison note: agent fleets make sense only when work can be decomposed. Some tasks are better handled by one careful agent or by the student directly.
+- Use the weak department-hosted model as an analysis tool rather than only a restriction. Ask students to identify what the model could still do well, where it failed, and which project structures made its work more reviewable.
 
 ## Tool examples to develop
 

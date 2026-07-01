@@ -140,3 +140,10 @@ Think in terms of **pressure**:
 - What can be duplicated?
 
 The goal is not to predict the future perfectly, but to design systems that fail gracefully.
+
+---
+
+## Instructor Notes
+
+- If the course uses the model-capability progression, this phase can require a weaker mini model. The assignment can then ask groups to report what changed in their workflow compared to Construct: what became harder, which missing artifacts mattered, and which tests, prompts, examples, or project instructions helped.
+- This should reinforce the Reconstruct theme: development practice has scalability limits too. A project that only worked because a strong model inferred unstated context has not yet developed a scalable development process.

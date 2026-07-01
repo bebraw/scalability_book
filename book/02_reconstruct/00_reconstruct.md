@@ -26,6 +26,7 @@ Development ideas:
 - Distinguish debt from defects. A bug is wrong behavior. Debt is a design or process choice that makes future work harder.
 - Distinguish deliberate debt from accidental debt.
 - Show how AI-assisted development can produce debt quickly because it lowers the cost of generating code but does not automatically lower the cost of understanding it.
+- Consider making Reconstruct the "reduced capability" phase of the AI-assisted development arc. If students have to use a weaker mini model here, the writing can ask them to notice which shortcuts from Construct now hurt: unclear tasks, oversized context, missing tests, weak examples, undocumented architecture, or no repeatable review process.
 
 ## Part outline
 
@@ -44,3 +45,4 @@ Development ideas:
 - Add a short story from a student project: a simple design that worked until a new requirement made it awkward.
 - Include a table of "shortcut now" vs "future cost".
 - Keep the tone balanced. The point is not to shame shortcuts, but to make trade-offs visible.
+- Add a short reflection prompt for the model transition: "What did the strong model hide from you in Construct, and what did the weaker model force you to make explicit in Reconstruct?"
