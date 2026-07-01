@@ -37,10 +37,10 @@ const frictionWeights: Record<FrictionKey, number> = {
 };
 
 const frictionMinutePenalty: Record<FrictionKey, number> = {
-  setup: 1,
-  comprehension: 2,
-  change: 2.5,
-  testing: 1.5,
+  setup: 0.25,
+  comprehension: 0.75,
+  change: 1,
+  testing: 0.75,
 };
 
 const frictionLabels: Record<FrictionKey, string> = {
@@ -95,37 +95,37 @@ const scenarios: Record<string, Scenario> = {
         phase: "Setup",
         task: "Start the app with representative seed events.",
         friction: "setup",
-        baseMinutes: 8,
+        baseMinutes: 2,
       },
       {
         phase: "Locate",
         task: "Find where event fields are defined and validated.",
         friction: "comprehension",
-        baseMinutes: 10,
+        baseMinutes: 3,
       },
       {
         phase: "Edit",
         task: "Update the form, API, storage shape, and summary view.",
         friction: "change",
-        baseMinutes: 16,
+        baseMinutes: 7,
       },
       {
         phase: "Verify",
         task: "Prove missing required data is rejected.",
         friction: "testing",
-        baseMinutes: 10,
+        baseMinutes: 4,
       },
       {
         phase: "Review",
         task: "Explain why UI and backend rules now match.",
         friction: "comprehension",
-        baseMinutes: 8,
+        baseMinutes: 3,
       },
       {
         phase: "Fix loop",
         task: "Revisit a missed path if review or testing finds drift.",
         friction: "testing",
-        baseMinutes: 8,
+        baseMinutes: 3,
       },
     ],
   },
@@ -138,31 +138,31 @@ const scenarios: Record<string, Scenario> = {
         phase: "Setup",
         task: "Find the runtime, install dependencies, and configure env vars.",
         friction: "setup",
-        baseMinutes: 12,
+        baseMinutes: 2,
       },
       {
         phase: "Seed",
         task: "Create believable events instead of testing an empty app.",
         friction: "setup",
-        baseMinutes: 10,
+        baseMinutes: 1,
       },
       {
         phase: "Locate",
         task: "Find the screen and workflow the author expects you to inspect.",
         friction: "comprehension",
-        baseMinutes: 8,
+        baseMinutes: 1,
       },
       {
         phase: "Verify",
         task: "Decide whether behavior is broken or only missing data.",
         friction: "testing",
-        baseMinutes: 10,
+        baseMinutes: 2,
       },
       {
         phase: "Review",
         task: "Write feedback that separates setup problems from code problems.",
-        friction: "change",
-        baseMinutes: 8,
+        friction: "comprehension",
+        baseMinutes: 1,
       },
     ],
   },
@@ -175,31 +175,31 @@ const scenarios: Record<string, Scenario> = {
         phase: "Locate",
         task: "Understand how events are stored, loaded, and summarized.",
         friction: "comprehension",
-        baseMinutes: 14,
+        baseMinutes: 5,
       },
       {
         phase: "Edit",
         task: "Add filtering without duplicating query logic in multiple places.",
         friction: "change",
-        baseMinutes: 18,
+        baseMinutes: 8,
       },
       {
         phase: "Verify",
         task: "Check empty, small, and noisy datasets.",
         friction: "testing",
-        baseMinutes: 12,
+        baseMinutes: 5,
       },
       {
         phase: "Review",
         task: "Show that the filter and summary share the same assumptions.",
         friction: "comprehension",
-        baseMinutes: 8,
+        baseMinutes: 3,
       },
       {
         phase: "Fix loop",
         task: "Repair performance or data-shape surprises found during review.",
         friction: "change",
-        baseMinutes: 10,
+        baseMinutes: 4,
       },
     ],
   },
@@ -212,31 +212,31 @@ const scenarios: Record<string, Scenario> = {
         phase: "Locate",
         task: "Find where invalid event names entered the system.",
         friction: "comprehension",
-        baseMinutes: 12,
+        baseMinutes: 5,
       },
       {
         phase: "Trace",
         task: "Decide whether UI, API, seed data, or import code created it.",
         friction: "comprehension",
-        baseMinutes: 14,
+        baseMinutes: 6,
       },
       {
         phase: "Edit",
         task: "Guard future writes and decide what to do with existing data.",
         friction: "change",
-        baseMinutes: 16,
+        baseMinutes: 7,
       },
       {
         phase: "Verify",
         task: "Add evidence that the bug cannot silently return.",
         friction: "testing",
-        baseMinutes: 12,
+        baseMinutes: 5,
       },
       {
         phase: "Review",
         task: "Explain the migration or cleanup risk.",
         friction: "change",
-        baseMinutes: 8,
+        baseMinutes: 4,
       },
     ],
   },
@@ -289,10 +289,10 @@ const improvements: Record<string, Improvement> = {
     effects: { comprehension: 1, change: 2 },
   },
 };
-const fallbackImprovement: Improvement = improvements["setup-script"] ?? {
-  title: "One-command setup with seed data",
-  copy: "Everyone starts from the same runnable project and known data.",
-  effects: { setup: 2, testing: 1 },
+const fallbackImprovement: Improvement = improvements["schema-validation"] ?? {
+  title: "Shared schema validation at boundaries",
+  copy: "The UI and backend reject the same invalid event shapes.",
+  effects: { comprehension: 1, change: 1, testing: 1 },
 };
 
 for (const root of document.querySelectorAll<HTMLElement>(
@@ -315,9 +315,6 @@ function initializeFrictionDemo(root: HTMLElement) {
   const scoreInputs = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-friction-demo-score]"),
   );
-  const outputs = Array.from(
-    root.querySelectorAll<HTMLOutputElement>("[data-friction-demo-output]"),
-  );
   const metrics = Array.from(
     root.querySelectorAll<HTMLElement>("[data-friction-demo-metric]"),
   );
@@ -329,9 +326,6 @@ function initializeFrictionDemo(root: HTMLElement) {
   const verdict = root.querySelector<HTMLElement>(
     "[data-friction-demo-verdict]",
   );
-  const scenarioTitle = root.querySelector<HTMLElement>(
-    "[data-friction-demo-scenario-title]",
-  );
   const scenarioCopy = root.querySelector<HTMLElement>(
     "[data-friction-demo-scenario-copy]",
   );
@@ -340,9 +334,6 @@ function initializeFrictionDemo(root: HTMLElement) {
   );
   const improvementCopy = root.querySelector<HTMLElement>(
     "[data-friction-demo-improvement-copy]",
-  );
-  const agentTitle = root.querySelector<HTMLElement>(
-    "[data-friction-demo-agent-title]",
   );
   const agentCopy = root.querySelector<HTMLElement>(
     "[data-friction-demo-agent-copy]",
@@ -356,18 +347,6 @@ function initializeFrictionDemo(root: HTMLElement) {
   const copy = root.querySelector<HTMLButtonElement>(
     "[data-friction-demo-copy]",
   );
-  const steps = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-friction-demo-step]"),
-  );
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("[data-friction-demo-tab]"),
-  );
-  const previous = root.querySelector<HTMLButtonElement>(
-    "[data-friction-demo-prev]",
-  );
-  const next = root.querySelector<HTMLButtonElement>(
-    "[data-friction-demo-next]",
-  );
 
   if (
     !form ||
@@ -378,28 +357,17 @@ function initializeFrictionDemo(root: HTMLElement) {
     !files ||
     !bars ||
     !verdict ||
-    !scenarioTitle ||
     !scenarioCopy ||
     !improvementTitle ||
     !improvementCopy ||
-    !agentTitle ||
     !agentCopy ||
     !interpretation ||
     !artifact ||
-    !copy ||
-    !previous ||
-    !next ||
-    steps.length === 0 ||
-    tabs.length !== steps.length
+    !copy
   ) {
     return;
   }
 
-  let currentStep = 0;
-  const showStep = (step: number, focusStep = false) => {
-    currentStep = Math.max(0, Math.min(step, steps.length - 1));
-    updateFrictionStage(steps, tabs, previous, next, currentStep, focusStep);
-  };
   const render = () => {
     const scenario = scenarios[scenarioSelect.value] ?? fallbackScenario;
     const improvement =
@@ -408,24 +376,14 @@ function initializeFrictionDemo(root: HTMLElement) {
     const scores = getScores(scoreInputs);
     const result = calculateFriction(scenario, scores, improvement, assistance);
 
-    scenarioTitle.textContent = scenario.title;
     scenarioCopy.textContent = scenario.copy;
     files.innerHTML = scenario.files
       .map((file) => `<li>${escapeFrictionHtml(file)}</li>`)
       .join("");
     improvementTitle.textContent = improvement.title;
     improvementCopy.textContent = improvement.copy;
-    agentTitle.textContent = assistance.title;
     agentCopy.textContent = assistance.copy;
     process.innerHTML = buildProcess(scenario, scores, assistance);
-    outputs.forEach((output) => {
-      const key = output.dataset.frictionDemoOutput as FrictionKey | undefined;
-
-      if (key) {
-        output.value = String(scores[key]);
-        output.textContent = String(scores[key]);
-      }
-    });
     updateFrictionMetrics(metrics, result);
     bars.innerHTML = buildBars(scores);
     verdict.textContent = `${result.before} min change path`;
@@ -439,22 +397,13 @@ function initializeFrictionDemo(root: HTMLElement) {
       improvement,
       assistance,
     );
-    updateFrictionStage(steps, tabs, previous, next, currentStep, false);
   };
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep < steps.length - 1) {
-      showStep(currentStep + 1, true);
-    }
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
-  previous.addEventListener("click", () => showStep(currentStep - 1, true));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => showStep(index, true));
-  });
   copy.addEventListener("click", async () => {
     artifact.select();
 
@@ -470,7 +419,6 @@ function initializeFrictionDemo(root: HTMLElement) {
   });
 
   render();
-  showStep(0);
 }
 
 function getScores(inputs: HTMLInputElement[]) {
@@ -576,10 +524,22 @@ function updateFrictionMetrics(
 function buildBars(scores: Record<FrictionKey, number>) {
   return (Object.keys(scores) as FrictionKey[])
     .map((key) => {
+      const value = scores[key];
+      const percent = Math.round((value / 5) * 100);
+
       return `<div class="friction-demo-bar-row">
         <span>${frictionLabels[key]}</span>
-        <meter min="0" max="5" value="${scores[key]}"></meter>
-        <strong>${scores[key]}</strong>
+        <span
+          class="friction-demo-bar-track"
+          role="meter"
+          aria-label="${frictionLabels[key]} score"
+          aria-valuemin="0"
+          aria-valuemax="5"
+          aria-valuenow="${value}"
+        >
+          <span style="--friction-demo-bar-value: ${percent}%"></span>
+        </span>
+        <strong>${value}</strong>
       </div>`;
     })
     .join("");
@@ -673,48 +633,6 @@ function getAssistanceMode(value: string) {
   }
 
   return fallbackAssistanceMode;
-}
-
-function updateFrictionStage(
-  steps: HTMLElement[],
-  tabs: HTMLButtonElement[],
-  previous: HTMLButtonElement,
-  next: HTMLButtonElement,
-  currentStep: number,
-  focusStep: boolean,
-) {
-  const finalStep = steps.length - 1;
-
-  steps.forEach((step, index) => {
-    const active = index === currentStep;
-
-    step.hidden = !active;
-    step.classList.toggle("is-active", active);
-    step.setAttribute("aria-hidden", String(!active));
-  });
-  tabs.forEach((tab, index) => {
-    const active = index === currentStep;
-
-    if (active) {
-      tab.setAttribute("aria-current", "step");
-    } else {
-      tab.removeAttribute("aria-current");
-    }
-
-    tab.classList.toggle("is-active", active);
-    tab.classList.toggle("is-complete", index < currentStep);
-  });
-  previous.disabled = currentStep === 0;
-  next.textContent = currentStep === finalStep ? "Done" : "Next";
-  next.disabled = currentStep === finalStep;
-
-  if (focusStep) {
-    requestAnimationFrame(() => {
-      steps[currentStep]
-        ?.querySelector<HTMLElement>("select, textarea, input, button")
-        ?.focus({ preventScroll: true });
-    });
-  }
 }
 
 function escapeFrictionHtml(value: string) {

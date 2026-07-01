@@ -16,34 +16,12 @@
     </div>
   </div>
 
-  <ol class="scaling-demo-progress" aria-label="Friction demo steps">
-    <li>
-      <button type="button" data-friction-demo-tab="0" aria-current="step">
-        <span>1</span>
-        Change
-      </button>
-    </li>
-    <li>
-      <button type="button" data-friction-demo-tab="1">
-        <span>2</span>
-        Audit
-      </button>
-    </li>
-    <li>
-      <button type="button" data-friction-demo-tab="2">
-        <span>3</span>
-        Improve
-      </button>
-    </li>
-  </ol>
-
-  <form class="scaling-demo-form" data-friction-demo-form>
-    <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
-      data-friction-demo-step="0"
-      aria-labelledby="friction-change-title"
-    >
-      <div class="scaling-demo-panel">
+  <form class="friction-demo-grid" data-friction-demo-form>
+    <div class="friction-demo-column">
+      <section
+        class="scaling-demo-panel"
+        aria-labelledby="friction-change-title"
+      >
         <h4 id="friction-change-title">Change request</h4>
         <label>
           <span>Scenario</span>
@@ -63,9 +41,6 @@
           </select>
         </label>
         <div class="friction-demo-scenario">
-          <strong data-friction-demo-scenario-title>
-            Add a required event property
-          </strong>
           <p data-friction-demo-scenario-copy>
             A new event type needs one required field in the UI, API, storage,
             and summary view.
@@ -86,28 +61,39 @@
           </select>
         </label>
         <div class="friction-demo-agent-note">
-          <strong data-friction-demo-agent-title>Human only</strong>
           <p data-friction-demo-agent-copy>
             The team does the search, edit, test, and review work manually.
           </p>
         </div>
-      </div>
-      <div class="scaling-demo-panel">
-        <h4>Change process</h4>
-        <div class="friction-demo-process" data-friction-demo-process></div>
-      </div>
-    </section>
+        <details class="friction-demo-estimate-basis">
+          <summary>Estimate basis</summary>
+          <p>
+            The agent multipliers are bounded by published developer
+            productivity studies: a constrained Copilot task was 55.8% faster,
+            while a 2025 open-source field experiment found experienced
+            developers 19% slower with AI tools on mature projects.
+          </p>
+          <ul>
+            <li>
+              <a href="https://arxiv.org/abs/2302.06590">Peng et al. 2023</a>
+            </li>
+            <li>
+              <a href="https://arxiv.org/abs/2507.09089">Becker et al. 2025</a>
+            </li>
+            <li>
+              <a href="https://arxiv.org/abs/2303.08733">Zhang et al. 2023</a>
+            </li>
+          </ul>
+        </details>
+      </section>
 
-    <section
-      class="scaling-demo-step friction-demo-audit-step"
-      data-friction-demo-step="1"
-      aria-labelledby="friction-audit-title"
-      hidden
-    >
-      <div class="scaling-demo-panel">
-        <h4 id="friction-audit-title">Score the path</h4>
-        <label>
-          <span>Setup friction</span>
+      <section
+        class="scaling-demo-panel"
+        aria-labelledby="friction-audit-title"
+      >
+        <h4 id="friction-audit-title">What slows this down?</h4>
+        <label class="friction-demo-scale">
+          <span>Startup work</span>
           <input
             type="range"
             min="0"
@@ -115,10 +101,10 @@
             value="3"
             data-friction-demo-score="setup"
           />
-          <output data-friction-demo-output="setup">3</output>
+          <small>one command -> manual setup</small>
         </label>
-        <label>
-          <span>Comprehension friction</span>
+        <label class="friction-demo-scale">
+          <span>Finding the code path</span>
           <input
             type="range"
             min="0"
@@ -126,10 +112,10 @@
             value="4"
             data-friction-demo-score="comprehension"
           />
-          <output data-friction-demo-output="comprehension">4</output>
+          <small>obvious file -> scattered rules</small>
         </label>
-        <label>
-          <span>Change friction</span>
+        <label class="friction-demo-scale">
+          <span>Places to change</span>
           <input
             type="range"
             min="0"
@@ -137,10 +123,10 @@
             value="4"
             data-friction-demo-score="change"
           />
-          <output data-friction-demo-output="change">4</output>
+          <small>one module -> many synchronized edits</small>
         </label>
-        <label>
-          <span>Testing friction</span>
+        <label class="friction-demo-scale">
+          <span>Proof work</span>
           <input
             type="range"
             min="0"
@@ -148,10 +134,18 @@
             value="3"
             data-friction-demo-score="testing"
           />
-          <output data-friction-demo-output="testing">3</output>
+          <small>focused test -> manual click path</small>
         </label>
-      </div>
-      <div class="scaling-demo-panel">
+      </section>
+    </div>
+
+    <section class="scaling-demo-panel friction-demo-process-panel">
+      <h4>Change process</h4>
+      <div class="friction-demo-process" data-friction-demo-process></div>
+    </section>
+
+    <div class="friction-demo-column">
+      <section class="scaling-demo-panel">
         <h4>Audit result</h4>
         <dl class="scaling-demo-metrics">
           <div>
@@ -172,24 +166,20 @@
           </div>
         </dl>
         <div class="friction-demo-bars" data-friction-demo-bars></div>
-      </div>
-    </section>
+      </section>
 
-    <section
-      class="scaling-demo-step scaling-demo-pressure-step"
-      data-friction-demo-step="2"
-      aria-labelledby="friction-improve-title"
-      hidden
-    >
-      <div class="scaling-demo-panel">
+      <section
+        class="scaling-demo-panel"
+        aria-labelledby="friction-improve-title"
+      >
         <h4 id="friction-improve-title">Choose one feedback loop</h4>
         <label>
           <span>Improvement</span>
           <select data-friction-demo-improvement>
-            <option value="setup-script" selected>
+            <option value="setup-script">
               One-command setup with seed data
             </option>
-            <option value="schema-validation">
+            <option value="schema-validation" selected>
               Shared schema validation at boundaries
             </option>
             <option value="focused-tests">
@@ -208,8 +198,7 @@
             Everyone starts from the same runnable project and known data.
           </p>
         </div>
-      </div>
-      <div class="scaling-demo-panel">
+
         <h4>Impact</h4>
         <dl class="scaling-demo-metrics">
           <div>
@@ -240,12 +229,7 @@
             spellcheck="false"
           ></textarea>
         </details>
-      </div>
-    </section>
-
-    <div class="scaling-demo-actions">
-      <button type="button" data-friction-demo-prev>Previous</button>
-      <button type="submit" data-friction-demo-next>Next</button>
+      </section>
     </div>
   </form>
 </section>

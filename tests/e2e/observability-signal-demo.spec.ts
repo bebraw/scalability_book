@@ -20,9 +20,6 @@ test.describe("observability signal demo", () => {
     await expect(
       demo.locator("[data-observability-demo-results]"),
     ).toContainText("Request traces");
-    await expect(
-      demo.locator("[data-observability-demo-recommendation]"),
-    ).toContainText("Database inspection");
 
     await demo
       .locator("[data-observability-demo-signal][value='errors']")
@@ -47,10 +44,10 @@ test.describe("observability signal demo", () => {
       demo.locator("[data-observability-demo-question]"),
     ).toContainText("never accepted");
     await expect(
-      demo.locator("[data-observability-demo-recommendation]"),
-    ).toContainText("Structured logs");
+      demo.locator("[data-observability-demo-results]"),
+    ).toContainText("Metrics over time");
     await expect(
-      demo.locator("[data-observability-demo-recommendation]"),
+      demo.locator("[data-observability-demo-results]"),
     ).toContainText("Request traces");
   });
 });

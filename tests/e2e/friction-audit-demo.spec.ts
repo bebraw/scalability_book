@@ -12,8 +12,9 @@ test.describe("friction audit demo", () => {
     const demo = page.locator("[data-friction-demo]");
 
     await expect(demo.locator("[data-friction-demo-verdict]")).toContainText(
-      "179 min",
+      "37 min",
     );
+    await expect(demo.locator(".friction-demo-grid")).toBeVisible();
     await expect(demo.locator("[data-friction-demo-process]")).toContainText(
       "Find where event fields are defined",
     );
@@ -27,31 +28,34 @@ test.describe("friction audit demo", () => {
       .locator("[data-friction-demo-assistance]")
       .selectOption("weak-agent");
     await expect(demo.locator("[data-friction-demo-verdict]")).toContainText(
-      "122 min",
+      "37 min",
     );
     await expect(
       demo.locator("[data-friction-demo-metric='agentRisk']"),
     ).toContainText("High");
     await demo.locator("[data-friction-demo-assistance]").selectOption("human");
     await expect(demo.locator("[data-friction-demo-verdict]")).toContainText(
-      "179 min",
+      "37 min",
     );
 
-    await demo.locator("[data-friction-demo-next]").click();
-    await expect(demo.locator("[data-friction-demo-step='1']")).toBeVisible();
     await expect(
       demo.locator("[data-friction-demo-metric='largest']"),
     ).toContainText("Change");
+    await expect(
+      demo.locator("[data-friction-demo-metric='after']").first(),
+    ).toContainText("34 min");
+    await expect(
+      demo.locator("[data-friction-demo-metric='saved']").first(),
+    ).toContainText("3 min");
+    await expect(
+      demo.locator(".friction-demo-bar-track").first(),
+    ).toHaveAttribute("role", "meter");
+
     await demo.locator("[data-friction-demo-score='testing']").fill("5");
     await expect(
-      demo.locator("[data-friction-demo-output='testing']"),
-    ).toContainText("5");
-    await expect(
       demo.locator("[data-friction-demo-metric='before']").first(),
-    ).toContainText("195 min");
+    ).toContainText("41 min");
 
-    await demo.locator("[data-friction-demo-next]").click();
-    await expect(demo.locator("[data-friction-demo-step='2']")).toBeVisible();
     await demo
       .locator("[data-friction-demo-improvement]")
       .selectOption("focused-tests");
@@ -60,19 +64,16 @@ test.describe("friction audit demo", () => {
     ).toContainText("Focused tests");
     await expect(
       demo.locator("[data-friction-demo-metric='saved']").first(),
-    ).toContainText("28 min");
+    ).toContainText("5 min");
     await expect(
       demo.locator("[data-friction-demo-interpretation]"),
     ).toContainText("likely to loop");
 
-    await demo.locator("[data-friction-demo-next]").click();
-    await expect(demo.locator("[data-friction-demo-step='3']")).toBeVisible();
     await expect(demo.locator("[data-friction-demo-artifact]")).toHaveValue(
       /Chosen improvement: Focused tests/,
     );
     await expect(demo.locator("[data-friction-demo-artifact]")).toHaveValue(
       /Assistance mode: Human only/,
     );
-    await expect(demo.locator("[data-friction-demo-next]")).toBeDisabled();
   });
 });

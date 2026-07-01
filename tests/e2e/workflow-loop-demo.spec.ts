@@ -10,7 +10,7 @@ test.describe("workflow loop demo", () => {
     const demo = page.locator("[data-workflow-demo]");
 
     await expect(demo.locator("[data-workflow-demo-verdict]")).toContainText(
-      "3 loops",
+      "2 loops",
     );
     await expect(demo.locator("[data-workflow-demo-loop]")).toContainText(
       "Human",
@@ -18,8 +18,8 @@ test.describe("workflow loop demo", () => {
     await demo
       .locator("[data-workflow-demo-mode]")
       .selectOption("agent-harnessed");
-    await expect(demo.locator("[data-workflow-demo-mode-title]")).toContainText(
-      "Agent works with clear harness",
+    await expect(demo.locator("[data-workflow-demo-mode-copy]")).toContainText(
+      "Instructions",
     );
     await expect(demo.locator("[data-workflow-demo-loop]")).toContainText(
       "Harness",
@@ -43,8 +43,6 @@ test.describe("workflow loop demo", () => {
       demo.locator("[data-workflow-demo-interpretation]"),
     ).toContainText("review intent");
 
-    await demo.locator("[data-workflow-demo-next]").click();
-    await expect(demo.locator("[data-workflow-demo-step='2']")).toBeVisible();
     await expect(demo.locator("[data-workflow-demo-artifact]")).toHaveValue(
       /Concrete feedback improvements/,
     );

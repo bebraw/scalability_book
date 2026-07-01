@@ -13,10 +13,7 @@ test.describe("request trace demo", () => {
 
     await expect(
       demo.locator("[data-request-trace-demo-verdict]"),
-    ).toContainText("5 boundaries");
-    await expect(
-      demo.locator("[data-request-trace-demo-step='0']"),
-    ).toBeVisible();
+    ).toContainText("5 steps");
     await expect(demo.locator(".request-trace-scene")).toContainText(
       "Student taps",
     );
@@ -34,23 +31,16 @@ test.describe("request trace demo", () => {
       .locator("[data-request-trace-demo-condition][value='queue']")
       .setChecked(true);
 
-    await demo.locator("[data-request-trace-demo-next]").click();
-    await expect(
-      demo.locator("[data-request-trace-demo-step='1']"),
-    ).toBeVisible();
     await expect(demo.locator("[data-request-trace-demo-path]")).toContainText(
       "Browser",
     );
     await expect(demo.locator("[data-request-trace-demo-flow]")).toContainText(
       "Queue",
     );
-    await demo.locator("[data-request-trace-demo-boundary]").selectOption("3");
+    await demo.locator("[data-request-trace-demo-boundary-button='3']").click();
     await expect(demo.locator("[data-request-trace-demo-path]")).toContainText(
       "Storage must distinguish",
     );
-    await expect(
-      demo.locator("[data-request-trace-demo-metric='boundaries']"),
-    ).toContainText("6");
     await expect(
       demo.locator("[data-request-trace-demo-metric='risk']"),
     ).toContainText("high");
@@ -58,10 +48,6 @@ test.describe("request trace demo", () => {
       demo.locator("[data-request-trace-demo-interpretation]"),
     ).toContainText("database timeout");
 
-    await demo.locator("[data-request-trace-demo-next]").click();
-    await expect(
-      demo.locator("[data-request-trace-demo-step='2']"),
-    ).toBeVisible();
     await expect(
       demo.locator("[data-request-trace-demo-artifact]"),
     ).toHaveValue(/Architecture boundary brief/);
@@ -71,6 +57,5 @@ test.describe("request trace demo", () => {
     await expect(
       demo.locator("[data-request-trace-demo-artifact]"),
     ).toHaveValue(/Each boundary needs an owner/);
-    await expect(demo.locator("[data-request-trace-demo-next]")).toBeDisabled();
   });
 });
