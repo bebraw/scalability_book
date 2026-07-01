@@ -163,7 +163,7 @@ function initializeDimensionsDemo(root: HTMLElement) {
     }
 
     previousGeometry = nextGeometry;
-    updateDimensionMetrics(metrics, primary);
+    updateDimensionMetrics(metrics, selected.length === 0 ? null : primary);
     verdict.textContent = buildDimensionsVerdict(selected, primary);
     interpretation.textContent = buildDimensionsInterpretation(
       selected,
@@ -401,17 +401,26 @@ function getRadarLabel(key: DimensionKey) {
   return key === "cost" ? "Cost" : dimensions[key].label;
 }
 
-function updateDimensionMetrics(nodes: HTMLElement[], primary: DimensionKey) {
-  const dimension = dimensions[primary];
-
+function updateDimensionMetrics(
+  nodes: HTMLElement[],
+  primary: DimensionKey | null,
+) {
   nodes.forEach((node) => {
     const key = node.dataset.dimensionsDemoMetric;
 
-    if (key === "primary") {
+    if (!primary) {
+      node.textContent = "-";
+    } else if (key === "primary") {
+      const dimension = dimensions[primary];
+
       node.textContent = dimension.label;
     } else if (key === "component") {
+      const dimension = dimensions[primary];
+
       node.textContent = dimension.component;
     } else if (key === "signal") {
+      const dimension = dimensions[primary];
+
       node.textContent = dimension.signal;
     }
   });
