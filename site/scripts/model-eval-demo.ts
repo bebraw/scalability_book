@@ -231,26 +231,20 @@ function initializeEvalDemo(root: HTMLElement) {
       return;
     }
 
-    const output = root.querySelector<HTMLTextAreaElement>(
-      `[data-model-output="${model}"]`,
+    fillModelSample(root, task, modelConfig);
+    updateScores(root, task, results, verdict, conclusion);
+  });
+  root.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      "[data-model-eval-sample-all]",
     );
 
-    if (output) {
-      output.value = task.outputs[model];
+    if (!button) {
+      return;
     }
 
-    for (const [key, value] of Object.entries(
-      modelConfig.sampleScores[task.id],
-    ) as [RubricKey, number][]) {
-      const input = root.querySelector<HTMLInputElement>(
-        `[data-model="${model}"][data-rubric="${key}"]`,
-      );
-
-      if (input) {
-        input.value = String(value);
-      }
-    }
-
+    const task = tasks[taskSelect.value as EvalTaskId] ?? tasks.bottleneck;
+    models.forEach((model) => fillModelSample(root, task, model));
     updateScores(root, task, results, verdict, conclusion);
   });
   root.addEventListener("change", () => {
@@ -260,6 +254,32 @@ function initializeEvalDemo(root: HTMLElement) {
 
   render();
   showStep(0);
+}
+
+function fillModelSample(
+  root: HTMLElement,
+  task: EvalTask,
+  model: ModelAttempt,
+) {
+  const output = root.querySelector<HTMLTextAreaElement>(
+    `[data-model-output="${model.id}"]`,
+  );
+
+  if (output) {
+    output.value = task.outputs[model.id];
+  }
+
+  for (const [key, value] of Object.entries(
+    model.sampleScores[task.id],
+  ) as [RubricKey, number][]) {
+    const input = root.querySelector<HTMLInputElement>(
+      `[data-model="${model.id}"][data-rubric="${key}"]`,
+    );
+
+    if (input) {
+      input.value = String(value);
+    }
+  }
 }
 
 function renderModelCard(model: ModelAttempt, task: EvalTask) {

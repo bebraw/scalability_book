@@ -2981,6 +2981,12 @@
   border-color: var(--success);
   color: var(--success);
 }
+.model-eval-sample-all {
+  background: color-mix(in srgb, var(--success) 16%, var(--bg));
+  border-color: color-mix(in srgb, var(--success) 42%, var(--border));
+  color: var(--text);
+  justify-self: start;
+}
 .model-eval-card pre {
   background: var(--bg);
   border: 1px solid var(--border);
