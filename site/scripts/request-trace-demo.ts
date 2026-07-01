@@ -440,8 +440,8 @@ function buildRequestTraceRuleList(rules: string[]) {
   const details =
     secondaryCount > 0
       ? `<details class="request-trace-rules-detail">
-          <summary>Show all</summary>
-          <ol class="request-trace-rules">${rules
+          <summary>Show remaining</summary>
+          <ol class="request-trace-rules">${secondaryRules
             .map((rule) => `<li>${escapeRequestTraceHtml(rule)}</li>`)
             .join("")}</ol>
         </details>`

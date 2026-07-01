@@ -1897,7 +1897,7 @@
   display: grid;
   gap: 0.38rem;
   list-style: none;
-  margin: 0.5rem 0 0;
+  margin: 0.4rem 0 0;
   padding: 0;
 }
 .prose .request-trace-rules li {
