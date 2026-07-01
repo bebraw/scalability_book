@@ -46,7 +46,16 @@ The central claim could be: more agents do not automatically mean more progress.
    - Use Pi, Acolyte, and Mastra only after the principles are clear.
    - Present tools as examples of boundaries, traces, workflows, and reviewable execution.
 10. Course project application
-   - Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
+
+- Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
+
+## Delegation lab
+
+A useful live demonstration should make the coordination cost visible. The point is not to show that four agents are better than one. The point is to let students try a task, choose roles, see the review burden, and produce a delegation brief that can be used in their own project.
+
+{{ import "site/includes/agent-fleet-demo.html" }}
+
+The demonstration should be used as a rehearsal before students run real agents. If the task is vague, the project is not ready, or the chosen roles produce overlapping work, the best outcome is to reduce the fleet. A small, reviewable delegation is usually better than parallel activity that the student cannot integrate.
 
 ---
 

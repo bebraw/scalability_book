@@ -1,0 +1,314 @@
+<section
+  class="agent-fleet-demo"
+  data-agent-fleet
+  aria-labelledby="agent-fleet-heading"
+>
+  <div class="agent-fleet-header">
+    <div>
+      <p class="agent-fleet-kicker">Deconstruct delegation lab</p>
+      <h3 id="agent-fleet-heading">Plan a small agent fleet</h3>
+    </div>
+    <div class="agent-fleet-summary" aria-live="polite">
+      <span data-agent-fleet-verdict>Choose a task</span>
+      <small data-agent-fleet-caveat
+        >The student remains responsible for integration and review.</small
+      >
+    </div>
+  </div>
+
+  <ol class="agent-fleet-progress" aria-label="Agent fleet demo steps">
+    <li>
+      <button type="button" data-agent-fleet-tab="0" aria-current="step">
+        <span>1</span>
+        Task
+      </button>
+    </li>
+    <li>
+      <button type="button" data-agent-fleet-tab="1">
+        <span>2</span>
+        Roles
+      </button>
+    </li>
+    <li>
+      <button type="button" data-agent-fleet-tab="2">
+        <span>3</span>
+        Models
+      </button>
+    </li>
+    <li>
+      <button type="button" data-agent-fleet-tab="3">
+        <span>4</span>
+        Review
+      </button>
+    </li>
+    <li>
+      <button type="button" data-agent-fleet-tab="4">
+        <span>5</span>
+        Brief
+      </button>
+    </li>
+  </ol>
+
+  <form class="agent-fleet-form" data-agent-fleet-form>
+    <section
+      class="agent-fleet-step agent-fleet-task-step is-active"
+      data-agent-fleet-step="0"
+      aria-labelledby="agent-fleet-task-title"
+    >
+      <h4 id="agent-fleet-task-title">Task shape</h4>
+      <label>
+        <span>Project readiness</span>
+        <select data-agent-fleet-readiness>
+          <option value="high">Instructions, tests, and setup are clear</option>
+          <option value="medium">Some guidance exists, but gaps remain</option>
+          <option value="low">The project depends on hidden context</option>
+        </select>
+      </label>
+      <label>
+        <span>Improvement</span>
+        <select data-agent-fleet-task>
+          <option value="bottleneck">Investigate a scaling bottleneck</option>
+          <option value="tests">Add regression tests for one workflow</option>
+          <option value="refactor">Refactor one bounded module</option>
+        </select>
+      </label>
+      <label>
+        <span>Change size</span>
+        <input type="range" min="1" max="5" value="2" data-agent-fleet-size />
+        <output data-agent-fleet-size-output>2</output>
+      </label>
+      <div class="agent-fleet-context-grid">
+        <label>
+          <span>Repository or module</span>
+          <input
+            type="text"
+            value="event-tracker API"
+            data-agent-fleet-project-field="module"
+          />
+        </label>
+        <label>
+          <span>Validation command</span>
+          <input
+            type="text"
+            value="npm test -- events"
+            data-agent-fleet-project-field="validation"
+          />
+        </label>
+        <label>
+          <span>Allowed files or directories</span>
+          <textarea rows="2" data-agent-fleet-project-field="allowedFiles">
+src/routes/events.ts
+src/db/events.ts
+tests/events.test.ts</textarea
+          >
+        </label>
+        <label>
+          <span>Branch or working area</span>
+          <input
+            type="text"
+            value="agent-fleet/latest-events-bottleneck"
+            data-agent-fleet-project-field="branch"
+          />
+        </label>
+        <label class="agent-fleet-wide-field">
+          <span>Concrete project context</span>
+          <textarea rows="4" data-agent-fleet-project-field="context">
+The app records project events and shows the latest 50 events per project. GET /events runs SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The migration has indexes on project_id and event_type, but not created_at.</textarea
+          >
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="agent-fleet-step agent-fleet-roles-step"
+      data-agent-fleet-step="1"
+      aria-labelledby="agent-fleet-roles-title"
+      hidden
+    >
+      <h4 id="agent-fleet-roles-title">Fleet roles</h4>
+      <div class="agent-fleet-role-options">
+        <label>
+          <input type="checkbox" value="scout" data-agent-fleet-role checked />
+          <span>Scout</span>
+          <small>Read-only reconnaissance</small>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="planner"
+            data-agent-fleet-role
+            checked
+          />
+          <span>Planner</span>
+          <small>Plan, risks, and boundaries</small>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="implementer"
+            data-agent-fleet-role
+            checked
+          />
+          <span>Implementer</span>
+          <small>One bounded code change</small>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="reviewer"
+            data-agent-fleet-role
+            checked
+          />
+          <span>Reviewer</span>
+          <small>Diff, tests, and regressions</small>
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="agent-fleet-step agent-fleet-models-step"
+      data-agent-fleet-step="2"
+      aria-labelledby="agent-fleet-models-title"
+      hidden
+    >
+      <div>
+        <h4 id="agent-fleet-models-title">Model assignment</h4>
+        <p>
+          Match model strength to role difficulty. Direct cost is only one part
+          of the decision; review and rework can dominate the workflow.
+        </p>
+      </div>
+      <div class="agent-fleet-model-options">
+        <label data-agent-fleet-model-row="scout">
+          <span>Scout model</span>
+          <select data-agent-fleet-model="scout">
+            <option value="small">Small: cheap reconnaissance</option>
+            <option value="balanced" selected>Balanced: normal default</option>
+            <option value="strong">Strong: careful analysis</option>
+          </select>
+        </label>
+        <label data-agent-fleet-model-row="planner">
+          <span>Planner model</span>
+          <select data-agent-fleet-model="planner">
+            <option value="small">Small: cheap planning</option>
+            <option value="balanced" selected>Balanced: normal default</option>
+            <option value="strong">Strong: safer decomposition</option>
+          </select>
+        </label>
+        <label data-agent-fleet-model-row="implementer">
+          <span>Implementer model</span>
+          <select data-agent-fleet-model="implementer">
+            <option value="small">Small: cheap edits</option>
+            <option value="balanced" selected>Balanced: normal default</option>
+            <option value="strong">Strong: lower rework risk</option>
+          </select>
+        </label>
+        <label data-agent-fleet-model-row="reviewer">
+          <span>Reviewer model</span>
+          <select data-agent-fleet-model="reviewer">
+            <option value="small">Small: checklist review</option>
+            <option value="balanced" selected>Balanced: normal default</option>
+            <option value="strong">Strong: better risk finding</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="agent-fleet-step agent-fleet-review-step"
+      data-agent-fleet-step="3"
+      aria-labelledby="agent-fleet-plan-title"
+      hidden
+    >
+      <div>
+        <h4 id="agent-fleet-plan-title">Recommended workflow</h4>
+        <ol data-agent-fleet-steps></ol>
+      </div>
+      <div>
+        <h4>Review load</h4>
+        <dl class="agent-fleet-metrics">
+          <div>
+            <dt>Coordination</dt>
+            <dd data-agent-fleet-coordination>0</dd>
+          </div>
+          <div>
+            <dt>Integration risk</dt>
+            <dd data-agent-fleet-risk>Low</dd>
+          </div>
+          <div>
+            <dt>Best pattern</dt>
+            <dd data-agent-fleet-pattern>Single agent</dd>
+          </div>
+          <div>
+            <dt>Model cost</dt>
+            <dd data-agent-fleet-model-cost>0.00 EUR</dd>
+          </div>
+          <div>
+            <dt>Model latency</dt>
+            <dd data-agent-fleet-model-latency>0 min</dd>
+          </div>
+          <div>
+            <dt>Review time</dt>
+            <dd data-agent-fleet-review-time>0 min</dd>
+          </div>
+          <div>
+            <dt>Rework risk</dt>
+            <dd data-agent-fleet-rework>Low</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="agent-fleet-impact">
+        <h4>Model selection impact</h4>
+        <p data-agent-fleet-model-impact>
+          Choose roles and models to compare direct model cost with review
+          burden.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="agent-fleet-step agent-fleet-brief-step"
+      data-agent-fleet-step="4"
+      aria-labelledby="agent-fleet-brief-title"
+      hidden
+    >
+      <div class="agent-fleet-brief-header">
+        <h4 id="agent-fleet-brief-title">Run packet</h4>
+        <button type="button" data-agent-fleet-copy>Copy packet</button>
+      </div>
+      <div
+        class="agent-fleet-packet-tabs"
+        role="tablist"
+        aria-label="Run packet sections"
+      >
+        <button type="button" data-agent-fleet-packet-tab="brief">
+          Overview
+        </button>
+        <button type="button" data-agent-fleet-packet-tab="scout">Scout</button>
+        <button type="button" data-agent-fleet-packet-tab="planner">
+          Planner
+        </button>
+        <button type="button" data-agent-fleet-packet-tab="implementer">
+          Implementer
+        </button>
+        <button type="button" data-agent-fleet-packet-tab="reviewer">
+          Reviewer
+        </button>
+        <button type="button" data-agent-fleet-packet-tab="submission">
+          Submission
+        </button>
+      </div>
+      <textarea
+        data-agent-fleet-brief
+        data-agent-fleet-packet
+        rows="14"
+        readonly
+      ></textarea>
+    </section>
+
+    <div class="agent-fleet-actions">
+      <button type="button" data-agent-fleet-prev>Previous</button>
+      <button type="submit" data-agent-fleet-next>Next</button>
+    </div>
+  </form>
+</section>

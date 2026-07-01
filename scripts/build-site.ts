@@ -105,6 +105,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/comments.js",
             "/project-fit-checker.js",
             "/model-eval-demo.js",
+            "/agent-fleet-demo.js",
             "/vendor/easymde/easymde.min.js",
             "/editor.js",
           ]
@@ -113,6 +114,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/comments.js",
             "/project-fit-checker.js",
             "/model-eval-demo.js",
+            "/agent-fleet-demo.js",
           ],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
@@ -138,6 +140,7 @@ await compileSiteScript(
   "project-fit-checker.js",
 );
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
+await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
 }

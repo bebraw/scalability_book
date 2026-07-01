@@ -558,6 +558,370 @@
   line-height: 1.35;
   margin-top: 0.35rem;
 }
+.agent-fleet-demo {
+  --agent-fleet-active-bg: var(--accent-strong);
+  --agent-fleet-active-text: var(--panel);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--panel) 92%, var(--accent) 8%),
+      var(--panel)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 2.35rem,
+      color-mix(in srgb, var(--border) 45%, transparent) 2.4rem
+    );
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  box-shadow: 0 1.5rem 3.5rem color-mix(in srgb, var(--text) 12%, transparent);
+  inline-size: min(100%, 58rem);
+  margin: 2rem 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+[data-theme="dark"] .agent-fleet-demo,
+[data-theme="contrast"] .agent-fleet-demo {
+  --agent-fleet-active-bg: var(--accent-strong);
+  --agent-fleet-active-text: var(--panel);
+}
+.agent-fleet-demo,
+.agent-fleet-demo * {
+  font-family: var(--font-ui);
+}
+.agent-fleet-header {
+  align-items: start;
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  padding-block-end: 1rem;
+}
+.prose .agent-fleet-kicker {
+  color: var(--accent-strong);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  margin: 0 0 0.35rem;
+  max-width: none;
+  text-transform: uppercase;
+}
+.prose .agent-fleet-demo h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.45rem, 1.3vw + 1rem, 2.05rem);
+  line-height: 1.12;
+  margin: 0;
+  max-width: 16ch;
+}
+.agent-fleet-summary,
+.agent-fleet-step {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+}
+.agent-fleet-summary {
+  padding: 0.8rem;
+}
+.agent-fleet-summary span {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 850;
+  line-height: 1.1;
+}
+.agent-fleet-summary small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+}
+.agent-fleet-progress {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.agent-fleet-progress li {
+  line-height: 1.2;
+  max-width: none;
+}
+.agent-fleet-progress button {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--muted);
+  display: grid;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 0.35rem;
+  justify-items: start;
+  line-height: 1.2;
+  min-height: 3.65rem;
+  padding: 0.55rem;
+  text-align: left;
+  width: 100%;
+}
+.agent-fleet-progress button span {
+  align-items: center;
+  background: color-mix(in srgb, var(--border) 55%, transparent);
+  border-radius: 999px;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 900;
+  height: 1.35rem;
+  justify-content: center;
+  width: 1.35rem;
+}
+.agent-fleet-progress button.is-active {
+  background: var(--agent-fleet-active-bg);
+  border-color: var(--accent-strong);
+  color: var(--agent-fleet-active-text);
+}
+.agent-fleet-progress button.is-active span {
+  background: var(--agent-fleet-active-text);
+  color: var(--agent-fleet-active-bg);
+}
+.agent-fleet-progress button.is-complete:not(.is-active) span {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  color: var(--text);
+}
+.agent-fleet-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.agent-fleet-step {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 1rem;
+}
+.agent-fleet-step[hidden] {
+  display: none;
+}
+.agent-fleet-task-step {
+  grid-template-columns: minmax(0, 1fr);
+}
+.agent-fleet-review-step {
+  grid-template-columns: minmax(0, 1.2fr) minmax(14rem, 0.8fr);
+}
+.agent-fleet-models-step {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+.prose .agent-fleet-demo h4 {
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
+.agent-fleet-step label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+.agent-fleet-step label > span,
+.agent-fleet-brief-header h4 {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.agent-fleet-models-step p,
+.agent-fleet-impact p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  margin: 0;
+}
+.agent-fleet-context-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.agent-fleet-wide-field {
+  grid-column: 1 / -1;
+}
+.agent-fleet-demo select,
+.agent-fleet-demo input[type="text"],
+.agent-fleet-demo textarea {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.35;
+  min-width: 0;
+  padding: 0.62rem 0.7rem;
+  width: 100%;
+}
+.agent-fleet-demo input[type="range"] {
+  inline-size: 100%;
+}
+.agent-fleet-demo input[type="checkbox"] {
+  accent-color: var(--accent-strong);
+}
+.agent-fleet-demo output {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+.agent-fleet-role-options {
+  display: grid;
+  gap: 0.5rem;
+}
+.agent-fleet-model-options {
+  display: grid;
+  gap: 0.55rem;
+}
+.agent-fleet-model-options label {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  padding: 0.65rem;
+}
+.agent-fleet-model-options label.is-disabled {
+  opacity: 0.48;
+}
+.agent-fleet-role-options label {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0 0.55rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.58rem 0.65rem;
+}
+.agent-fleet-role-options input {
+  margin-top: 0.2rem;
+}
+.agent-fleet-role-options span {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+.agent-fleet-role-options small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  grid-column: 2;
+  line-height: 1.3;
+}
+.agent-fleet-review-step ol {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.agent-fleet-review-step li {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  max-width: none;
+}
+.agent-fleet-metrics {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+.agent-fleet-metrics div {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  padding: 0.6rem 0.7rem;
+}
+.agent-fleet-metrics dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.agent-fleet-metrics dd {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 850;
+  margin: 0.15rem 0 0;
+}
+.agent-fleet-impact {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  grid-column: 1 / -1;
+  padding: 0.75rem;
+}
+.agent-fleet-actions {
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+  padding-block-start: 1rem;
+}
+.agent-fleet-brief-header {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+.agent-fleet-packet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.agent-fleet-form .agent-fleet-packet-tabs button {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--text);
+  min-height: 2.2rem;
+  padding: 0.42rem 0.65rem;
+}
+.agent-fleet-form .agent-fleet-packet-tabs button.is-active {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
+}
+.agent-fleet-form .agent-fleet-packet-tabs button[disabled] {
+  opacity: 0.42;
+}
+.agent-fleet-form button {
+  align-items: center;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  border-radius: 0.3rem;
+  color: var(--panel);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.5rem 0.75rem;
+}
+.agent-fleet-actions button[type="button"] {
+  background: var(--bg);
+  color: var(--text);
+}
+.agent-fleet-demo button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.agent-fleet-demo textarea {
+  min-height: 18rem;
+  resize: vertical;
+}
+.agent-fleet-demo select:focus,
+.agent-fleet-demo textarea:focus,
+.agent-fleet-demo button:focus-visible,
+.agent-fleet-demo input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
 .model-eval-progress {
   display: grid;
   gap: 0.45rem;
