@@ -47,11 +47,6 @@ test.describe("friction audit demo", () => {
     await expect(
       demo.locator("[data-friction-demo-metric='saved']").first(),
     ).toContainText("3 min");
-    await expect(demo.locator(".demo-track").first()).toHaveAttribute(
-      "role",
-      "meter",
-    );
-
     await demo.locator("[data-friction-demo-score='testing']").fill("5");
     await expect(
       demo.locator("[data-friction-demo-metric='before']").first(),
@@ -61,8 +56,8 @@ test.describe("friction audit demo", () => {
       .locator("[data-friction-demo-improvement]")
       .selectOption("focused-tests");
     await expect(
-      demo.locator("[data-friction-demo-improvement-title]"),
-    ).toContainText("Focused tests");
+      demo.locator("[data-friction-demo-improvement-copy]"),
+    ).toContainText("risky path");
     await expect(
       demo.locator("[data-friction-demo-metric='saved']").first(),
     ).toContainText("5 min");

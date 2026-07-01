@@ -322,15 +322,11 @@ function initializeFrictionDemo(root: HTMLElement) {
     "[data-friction-demo-process]",
   );
   const files = root.querySelector<HTMLElement>("[data-friction-demo-files]");
-  const bars = root.querySelector<HTMLElement>("[data-friction-demo-bars]");
   const verdict = root.querySelector<HTMLElement>(
     "[data-friction-demo-verdict]",
   );
   const scenarioCopy = root.querySelector<HTMLElement>(
     "[data-friction-demo-scenario-copy]",
-  );
-  const improvementTitle = root.querySelector<HTMLElement>(
-    "[data-friction-demo-improvement-title]",
   );
   const improvementCopy = root.querySelector<HTMLElement>(
     "[data-friction-demo-improvement-copy]",
@@ -355,10 +351,8 @@ function initializeFrictionDemo(root: HTMLElement) {
     !assistanceSelect ||
     !process ||
     !files ||
-    !bars ||
     !verdict ||
     !scenarioCopy ||
-    !improvementTitle ||
     !improvementCopy ||
     !agentCopy ||
     !interpretation ||
@@ -380,12 +374,10 @@ function initializeFrictionDemo(root: HTMLElement) {
     files.innerHTML = scenario.files
       .map((file) => `<li>${escapeFrictionHtml(file)}</li>`)
       .join("");
-    improvementTitle.textContent = improvement.title;
     improvementCopy.textContent = improvement.copy;
     agentCopy.textContent = assistance.copy;
     process.innerHTML = buildProcess(scenario, scores, assistance);
     updateFrictionMetrics(metrics, result);
-    bars.innerHTML = buildBars(scores);
     verdict.textContent = `${result.before} min change path`;
     interpretation.textContent = buildFrictionInterpretation(
       result,
@@ -519,30 +511,6 @@ function updateFrictionMetrics(
       node.textContent = frictionLabels[result.largest];
     }
   });
-}
-
-function buildBars(scores: Record<FrictionKey, number>) {
-  return (Object.keys(scores) as FrictionKey[])
-    .map((key) => {
-      const value = scores[key];
-      const percent = Math.round((value / 5) * 100);
-
-      return `<div class="demo-track-row">
-        <span>${frictionLabels[key]}</span>
-        <span
-          class="demo-track"
-          role="meter"
-          aria-label="${frictionLabels[key]} score"
-          aria-valuemin="0"
-          aria-valuemax="5"
-          aria-valuenow="${value}"
-        >
-          <span style="--demo-track-value: ${percent}%"></span>
-        </span>
-        <strong>${value}</strong>
-      </div>`;
-    })
-    .join("");
 }
 
 function buildProcess(
