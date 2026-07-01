@@ -16,7 +16,7 @@ test.describe("scalability dimensions demo", () => {
     await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
       "2 pressures",
     );
-    await expect(demo.locator(".dimensions-demo-scenario")).toContainText(
+    await expect(demo.locator(".demo-card").first()).toContainText(
       "event-oriented app",
     );
     await expect(

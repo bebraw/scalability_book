@@ -47,9 +47,10 @@ test.describe("friction audit demo", () => {
     await expect(
       demo.locator("[data-friction-demo-metric='saved']").first(),
     ).toContainText("3 min");
-    await expect(
-      demo.locator(".friction-demo-bar-track").first(),
-    ).toHaveAttribute("role", "meter");
+    await expect(demo.locator(".demo-track").first()).toHaveAttribute(
+      "role",
+      "meter",
+    );
 
     await demo.locator("[data-friction-demo-score='testing']").fill("5");
     await expect(

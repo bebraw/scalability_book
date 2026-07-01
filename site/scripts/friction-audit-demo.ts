@@ -527,17 +527,17 @@ function buildBars(scores: Record<FrictionKey, number>) {
       const value = scores[key];
       const percent = Math.round((value / 5) * 100);
 
-      return `<div class="friction-demo-bar-row">
+      return `<div class="demo-track-row">
         <span>${frictionLabels[key]}</span>
         <span
-          class="friction-demo-bar-track"
+          class="demo-track"
           role="meter"
           aria-label="${frictionLabels[key]} score"
           aria-valuemin="0"
           aria-valuemax="5"
           aria-valuenow="${value}"
         >
-          <span style="--friction-demo-bar-value: ${percent}%"></span>
+          <span style="--demo-track-value: ${percent}%"></span>
         </span>
         <strong>${value}</strong>
       </div>`;
