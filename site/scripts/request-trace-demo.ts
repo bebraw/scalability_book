@@ -11,14 +11,14 @@ type RequestTraceNode = {
   boundary: string;
   responsibility: string;
   risk: string;
-  contract: string;
+  rule: string;
 };
 
 type RequestTraceCondition = {
   label: string;
   impact: string;
   risk: string;
-  contract: string;
+  rule: string;
 };
 
 const baseTraceNodes: RequestTraceNode[] = [
@@ -27,7 +27,7 @@ const baseTraceNodes: RequestTraceNode[] = [
     boundary: "user device",
     responsibility: "Collect intent and send the event request.",
     risk: "The client can be stale, offline, interrupted, or untrusted.",
-    contract: "Request payload and user-visible error behavior",
+    rule: "Send type, entityId, occurredAt, and a client request id.",
   },
   {
     label: "Network",
@@ -35,7 +35,7 @@ const baseTraceNodes: RequestTraceNode[] = [
     responsibility:
       "Carry the request and response across unreliable distance.",
     risk: "The client may not know whether the server received the request.",
-    contract: "Timeout and retry policy",
+    rule: "Retry timeouts with the same idempotency key.",
   },
   {
     label: "API handler",
@@ -43,21 +43,21 @@ const baseTraceNodes: RequestTraceNode[] = [
     responsibility:
       "Authenticate, validate, and decide whether the event is acceptable.",
     risk: "Client assumptions can drift from server rules.",
-    contract: "POST /events schema and validation errors",
+    rule: "Reject missing fields with a 400 response that names the field.",
   },
   {
     label: "Database",
     boundary: "durability",
     responsibility: "Persist the raw event before derived views depend on it.",
     risk: "A slow or failed write can make success ambiguous.",
-    contract: "Write success, idempotency, and transaction boundary",
+    rule: "Store each idempotency key once and return the existing event on repeat.",
   },
   {
     label: "Response",
     boundary: "client feedback",
     responsibility: "Tell the client what happened without exposing internals.",
     risk: "A vague response makes retry and user feedback unsafe.",
-    contract: "Success, duplicate, validation, and retryable error shape",
+    rule: "Return accepted, duplicate, validation_failed, or retry_later.",
   },
 ];
 
@@ -70,38 +70,38 @@ const conditionDetails: Record<
     impact:
       "The API boundary owns correctness instead of trusting the browser.",
     risk: "Validation failures must be explicit enough for clients and agents to fix.",
-    contract: "Schema, required fields, and validation error format",
+    rule: "Reject invalid events before writing and return field-level errors.",
   },
   "client-retry": {
     label: "Wi-Fi drops after submit",
     impact: "The network boundary can replay the same intent.",
     risk: "The server may process an event even when the client sees a timeout.",
-    contract: "Retry policy and idempotency key",
+    rule: "Require an idempotency key so retries do not create new events.",
   },
   duplicate: {
     label: "Student taps twice",
     impact: "Storage must distinguish a new fact from a repeated request.",
     risk: "Counts and summaries become wrong if duplicates are accepted as new events.",
-    contract: "Duplicate detection and duplicate response semantics",
+    rule: "Treat the same room, type, time, and request id as one event.",
   },
   "db-timeout": {
     label: "Save takes too long",
     impact: "The API cannot always know whether persistence succeeded.",
     risk: "A timeout can create uncertain state between server, database, and client.",
-    contract: "Retryable error, reconciliation, and write observability",
+    rule: "Return retry_later and log whether the write eventually succeeded.",
   },
   queue: {
     label: "Summary updates later",
     impact:
       "The request can finish before summaries and analytics are updated.",
     risk: "Users may see accepted events before derived views catch up.",
-    contract: "Accepted vs processed status and freshness signal",
+    rule: "Return accepted immediately and expose processed status separately.",
   },
   cache: {
     label: "Dashboard may show old count",
     impact: "Reads become faster but may not reflect the latest write.",
     risk: "The dashboard can disagree with the raw event store.",
-    contract: "Cache freshness, invalidation, and stale-data label",
+    rule: "Show the dashboard freshness time and invalidate after accepted writes.",
   },
 };
 
@@ -242,19 +242,19 @@ function analyzeRequestTrace(
       : severeConditions === 1 || selected.includes("client-retry")
         ? "medium"
         : "low";
-  const contract = selected.includes("duplicate")
-    ? conditionDetails.duplicate.contract
+  const rule = selected.includes("duplicate")
+    ? conditionDetails.duplicate.rule
     : selected.includes("client-retry")
-      ? conditionDetails["client-retry"].contract
+      ? conditionDetails["client-retry"].rule
       : selected.includes("server-validation")
-        ? conditionDetails["server-validation"].contract
-        : (baseTraceNodes[2]?.contract ?? "POST /events contract");
+        ? conditionDetails["server-validation"].rule
+        : (baseTraceNodes[2]?.rule ?? "Validate POST /events before writing.");
 
   return {
     boundaries: nodes.length,
     path: formatRequestTracePath(nodes),
     riskLevel,
-    contract,
+    rule,
   };
 }
 
@@ -268,7 +268,7 @@ function getRequestTraceNodes(selected: RequestTraceConditionKey[]) {
       responsibility:
         "Move analytics and summaries out of the synchronous write path.",
       risk: conditionDetails.queue.risk,
-      contract: conditionDetails.queue.contract,
+      rule: conditionDetails.queue.rule,
     });
   }
 
@@ -279,7 +279,7 @@ function getRequestTraceNodes(selected: RequestTraceConditionKey[]) {
       responsibility:
         "Serve repeated dashboard reads without hitting storage every time.",
       risk: conditionDetails.cache.risk,
-      contract: conditionDetails.cache.contract,
+      rule: conditionDetails.cache.rule,
     });
   }
 
@@ -329,8 +329,8 @@ function buildRequestTracePath(
           <dd>${escapeRequestTraceHtml(node.risk)}</dd>
         </div>
         <div>
-          <dt>Contract</dt>
-          <dd>${escapeRequestTraceHtml(node.contract)}</dd>
+          <dt>Rule</dt>
+          <dd>${escapeRequestTraceHtml(node.rule)}</dd>
         </div>
       </dl>
       ${notes}
@@ -396,8 +396,8 @@ function updateRequestTraceMetrics(
       node.textContent = result.path;
     } else if (key === "risk") {
       node.textContent = result.riskLevel;
-    } else if (key === "contract") {
-      node.textContent = result.contract;
+    } else if (key === "rule") {
+      node.textContent = result.rule;
     }
   });
 }
@@ -411,10 +411,10 @@ function buildRequestTraceInterpretation(
   }
 
   if (selected.includes("duplicate") || selected.includes("client-retry")) {
-    return "Retries make the same user intent cross the API boundary more than once. Idempotency becomes part of the contract.";
+    return "Retries make the same user intent cross the API boundary more than once. The concrete rule is to reuse one idempotency key for that intent.";
   }
 
-  return `The request path is ${result.path}. It crosses ${result.boundaries} ownership and failure boundaries. Write down the contract before later clients depend on accidental behavior.`;
+  return `The request path is ${result.path}. It crosses ${result.boundaries} ownership and failure boundaries. Turn the most fragile boundary into an implementable rule before clients depend on accidental behavior.`;
 }
 
 function buildRequestTraceArtifact(
@@ -430,11 +430,11 @@ function buildRequestTraceArtifact(
     `Request path: ${result.path}`,
     `Boundary count: ${result.boundaries}`,
     `Highest risk: ${result.riskLevel}`,
-    `Contract to write down: ${result.contract}`,
+    `Rule to implement: ${result.rule}`,
     "",
     "Trace:",
     ...nodes.map(
-      (node) => `- ${node.label}: ${node.boundary} boundary; ${node.contract}`,
+      (node) => `- ${node.label}: ${node.boundary} boundary; ${node.rule}`,
     ),
     "",
     "Selected conditions:",
@@ -442,12 +442,12 @@ function buildRequestTraceArtifact(
       ? selected.map((key) => {
           const condition = conditionDetails[key];
 
-          return `- ${condition.label}: ${condition.contract}`;
+          return `- ${condition.label}: ${condition.rule}`;
         })
       : ["- none"]),
     "",
     "Architecture rule:",
-    "A web request is not a local function call. Each boundary needs an owner, failure story, and written contract.",
+    "A web request is not a local function call. Each boundary needs an owner, failure story, and implementable rule.",
   ].join("\n");
 }
 
