@@ -4,7 +4,6 @@ type AssistanceKey = "human" | "weak-agent" | "harnessed-agent";
 type Scenario = {
   title: string;
   copy: string;
-  baseMinutes: number;
   files: string[];
   process: ProcessStep[];
 };
@@ -35,6 +34,13 @@ const frictionWeights: Record<FrictionKey, number> = {
   comprehension: 11,
   change: 12,
   testing: 10,
+};
+
+const frictionMinutePenalty: Record<FrictionKey, number> = {
+  setup: 1,
+  comprehension: 2,
+  change: 2.5,
+  testing: 1.5,
 };
 
 const frictionLabels: Record<FrictionKey, string> = {
@@ -79,7 +85,6 @@ const scenarios: Record<string, Scenario> = {
   "required-field": {
     title: "Add a required event property",
     copy: "A new event type needs one required field in the UI, API, storage, and summary view.",
-    baseMinutes: 35,
     files: ["Event form", "API validation", "Storage shape", "Summary view"],
     process: [
       {
@@ -123,7 +128,6 @@ const scenarios: Record<string, Scenario> = {
   "reviewer-setup": {
     title: "Run the project as a reviewer",
     copy: "A teammate has to install, seed, and inspect the project before giving useful feedback.",
-    baseMinutes: 25,
     files: ["README", "Env file", "Seed data", "Main workflow"],
     process: [
       {
@@ -161,7 +165,6 @@ const scenarios: Record<string, Scenario> = {
   "filter-summary": {
     title: "Add a filterable event summary",
     copy: "A dashboard needs a filter by event type and a count grouped by day.",
-    baseMinutes: 45,
     files: ["Event loader", "Filter UI", "Summary query", "Empty states"],
     process: [
       {
@@ -199,7 +202,6 @@ const scenarios: Record<string, Scenario> = {
   "production-bug": {
     title: "Explain a production data bug",
     copy: "Some events appear under two names because event types are free-form strings.",
-    baseMinutes: 40,
     files: ["Write path", "Import code", "Existing data", "Regression test"],
     process: [
       {
@@ -238,7 +240,6 @@ const scenarios: Record<string, Scenario> = {
 const fallbackScenario: Scenario = scenarios["required-field"] ?? {
   title: "Change request",
   copy: "Score a small change path to see where repeated work appears.",
-  baseMinutes: 35,
   files: ["Relevant module", "Tests", "Review notes"],
   process: [
     {
@@ -539,13 +540,9 @@ function estimateMinutes(
   scores: Record<FrictionKey, number>,
   assistance: AssistanceMode,
 ) {
-  const frictionMinutes = scenario.process.reduce(
+  return scenario.process.reduce(
     (total, step) => total + processStepMinutes(step, scores, assistance),
     0,
-  );
-
-  return Math.round(
-    scenario.baseMinutes * assistance.speed.change + frictionMinutes,
   );
 }
 
@@ -612,7 +609,8 @@ function processStepMinutes(
   assistance: AssistanceMode,
 ) {
   return Math.round(
-    (step.baseMinutes + scores[step.friction] * 4) *
+    (step.baseMinutes +
+      scores[step.friction] * frictionMinutePenalty[step.friction]) *
       assistance.speed[step.friction],
   );
 }
@@ -621,7 +619,7 @@ function buildFrictionInterpretation(
   result: ReturnType<typeof calculateFriction>,
   improvement: Improvement,
 ) {
-  if (result.saved >= 35) {
+  if (result.saved >= 18) {
     return `${improvement.title} removes a meaningful amount of repeated work. This is a good first Reconstruct improvement.`;
   }
 
