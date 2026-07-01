@@ -7,21 +7,21 @@
     <div>
       <p class="reflection-package-demo-kicker">Final reflection package</p>
       <h3 id="reflection-package-demo-heading">
-        Assemble evidence before writing claims
+        Build a reflection from course artifacts
       </h3>
     </div>
     <div class="reflection-package-demo-summary" aria-live="polite">
       <span data-reflection-package-verdict>Pick project evidence</span>
       <small
-        >A strong reflection connects claims about scalability to artifacts from
-        the course.</small
+        >A strong reflection names the artifact, the claim it supports, and the
+        limitation it does not prove.</small
       >
     </div>
   </div>
 
   <form class="reflection-package-grid" data-reflection-package-form>
     <div class="reflection-package-panel">
-      <h4>Evidence available</h4>
+      <h4>Artifacts in your folder</h4>
       <div class="reflection-package-evidence">
         <label>
           <input
@@ -30,7 +30,12 @@
             data-reflection-package-evidence
             checked
           />
-          <span>Architecture decision or request trace</span>
+          <span>
+            <strong>Request trace screenshot or ADR</strong>
+            <small
+              >Example: POST /events boundary trace with owner notes.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -39,7 +44,12 @@
             data-reflection-package-evidence
             checked
           />
-          <span>Changed assumption or pressure map</span>
+          <span>
+            <strong>Changed assumption brief</strong>
+            <small
+              >Example: offline retries made duplicate events visible.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -48,7 +58,13 @@
             data-reflection-package-evidence
             checked
           />
-          <span>Friction audit</span>
+          <span>
+            <strong>Friction audit result</strong>
+            <small
+              >Example: one required event field touched UI, API, and summary
+              code.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -57,7 +73,13 @@
             data-reflection-package-evidence
             checked
           />
-          <span>Benchmark or observability result</span>
+          <span>
+            <strong>Measurement screenshot or table</strong>
+            <small
+              >Example: trace showed database time, not rendering, dominated
+              p95.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -65,7 +87,13 @@
             value="workflow"
             data-reflection-package-evidence
           />
-          <span>Human-agent workflow evidence</span>
+          <span>
+            <strong>Human-agent workflow trace</strong>
+            <small
+              >Example: scout found files, implementer changed them, reviewer
+              caught a missing path.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -74,7 +102,13 @@
             data-reflection-package-evidence
             checked
           />
-          <span>Scaling trade-off table</span>
+          <span>
+            <strong>Scaling trade-off table</strong>
+            <small
+              >Example: queue ingestion helped writes but created freshness
+              lag.</small
+            >
+          </span>
         </label>
         <label>
           <input
@@ -82,20 +116,26 @@
             value="risk"
             data-reflection-package-evidence
           />
-          <span>Remaining risk or next measurement</span>
+          <span>
+            <strong>Remaining risk note</strong>
+            <small
+              >Example: next failure is queue backlog; measure event age before
+              adding workers.</small
+            >
+          </span>
         </label>
       </div>
     </div>
 
     <div class="reflection-package-panel reflection-package-gaps">
-      <h4>Missing evidence</h4>
+      <h4>What to add before writing</h4>
       <ul data-reflection-package-missing></ul>
     </div>
 
     <div class="reflection-package-panel reflection-package-outline">
       <div class="reflection-package-outline-header">
-        <h4>Reflection outline</h4>
-        <button type="button" data-reflection-package-copy>Copy outline</button>
+        <h4>Draft package</h4>
+        <button type="button" data-reflection-package-copy>Copy package</button>
       </div>
       <textarea
         data-reflection-package-outline

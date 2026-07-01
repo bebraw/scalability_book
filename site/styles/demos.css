@@ -2917,10 +2917,19 @@
   margin-top: 0.18rem;
 }
 .reflection-package-evidence span {
+  display: grid;
+  gap: 0.2rem;
+}
+.reflection-package-evidence strong {
   color: var(--text);
   font-size: 0.82rem;
   font-weight: 800;
   line-height: 1.25;
+}
+.reflection-package-evidence small {
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.32;
 }
 .reflection-package-gaps ul {
   display: grid;

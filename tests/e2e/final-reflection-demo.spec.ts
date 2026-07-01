@@ -14,9 +14,12 @@ test.describe("final reflection package demo", () => {
     ).toContainText("5 of 7 evidence pieces ready");
     await expect(
       demo.locator("[data-reflection-package-missing]"),
-    ).toContainText("Human-agent workflow evidence");
+    ).toContainText("Human-agent workflow trace");
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /Scaling decision and trade-off/,
+      /Artifact to attach or cite:\nScaling planner trade-off table/,
+    );
+    await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
+      /Write this paragraph:/,
     );
 
     await demo
@@ -33,7 +36,7 @@ test.describe("final reflection package demo", () => {
       demo.locator("[data-reflection-package-missing]"),
     ).toContainText("All core evidence categories");
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /How work was delegated and reviewed/,
+      /Prompt, agent output, review note, or correction loop/,
     );
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
       /No core evidence gaps/,
