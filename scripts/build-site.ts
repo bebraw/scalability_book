@@ -6,7 +6,9 @@ import { renderMarkdown } from "./lib/markdown.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
   chapterNumberFromFilename,
+  escapeAttribute,
   parseJsonc,
+  slugify,
   titleFromFilename,
 } from "./lib/text.ts";
 
@@ -285,15 +287,17 @@ function hasDemoInclude(source) {
 
 function getDemoGallerySource() {
   const sections = demoScriptIncludes
-    .map(
-      ({ title, chapter, include }) => `<section class="demo-gallery-item">
+    .map(({ title, chapter, include }) => {
+      const id = `demo-${slugify(title)}`;
+
+      return `<section class="demo-gallery-item" id="${escapeAttribute(id)}">
 <div class="demo-gallery-item-header">
 <p>${chapter}</p>
-<span>${title}</span>
+<a href="#${escapeAttribute(id)}">${title}</a>
 </div>
 {{ import "${include}" }}
-</section>`,
-    )
+</section>`;
+    })
     .join("\n\n");
 
   return `# Demo showcase
