@@ -26,6 +26,58 @@ const templates = await loadTemplates({
   paginationLink: "components/PaginationLink.html",
   siteIndex: "layouts/siteIndex.html",
 });
+const commonBookScripts = ["/book-nav.js", "/toc-highlight.js", "/comments.js"];
+const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
+const demoScriptIncludes = [
+  {
+    include: "site/includes/project-fit-checker.html",
+    script: "/project-fit-checker.js",
+  },
+  {
+    include: "site/includes/scalability-dimensions-demo.html",
+    script: "/scalability-dimensions-demo.js",
+  },
+  {
+    include: "site/includes/request-trace-demo.html",
+    script: "/request-trace-demo.js",
+  },
+  {
+    include: "site/includes/model-eval-demo.html",
+    script: "/model-eval-demo.js",
+  },
+  {
+    include: "site/includes/observability-signal-demo.html",
+    script: "/observability-signal-demo.js",
+  },
+  {
+    include: "site/includes/workflow-loop-demo.html",
+    script: "/workflow-loop-demo.js",
+  },
+  {
+    include: "site/includes/friction-audit-demo.html",
+    script: "/friction-audit-demo.js",
+  },
+  {
+    include: "site/includes/pressure-map-demo.html",
+    script: "/pressure-map-demo.js",
+  },
+  {
+    include: "site/includes/agent-fleet-demo.html",
+    script: "/agent-fleet-demo.js",
+  },
+  {
+    include: "site/includes/scaling-pressure-demo.html",
+    script: "/scaling-pressure-demo.js",
+  },
+  {
+    include: "site/includes/latency-budget-demo.html",
+    script: "/latency-budget-demo.js",
+  },
+  {
+    include: "site/includes/final-reflection-demo.html",
+    script: "/final-reflection-demo.js",
+  },
+];
 
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
@@ -92,6 +144,11 @@ for (let index = 0; index < bookPages.length; index++) {
   const rendered = renderMarkdown(page.source, page);
   const previous = bookPages[index - 1];
   const next = bookPages[index + 1];
+  const pageScripts = [
+    ...commonBookScripts,
+    ...getDemoScriptsForSource(page.source),
+    ...(includeEditor ? editorScripts : []),
+  ];
   await writePage(
     `${page.collection}/${page.slug}/index.html`,
     renderer.renderLayout({
@@ -99,43 +156,7 @@ for (let index = 0; index < bookPages.length; index++) {
       description: config.description,
       currentUrl: page.url,
       stylesheets: includeEditor ? ["/vendor/easymde/easymde.min.css"] : [],
-      scripts: includeEditor
-        ? [
-            "/book-nav.js",
-            "/toc-highlight.js",
-            "/comments.js",
-            "/project-fit-checker.js",
-            "/scalability-dimensions-demo.js",
-            "/request-trace-demo.js",
-            "/model-eval-demo.js",
-            "/observability-signal-demo.js",
-            "/workflow-loop-demo.js",
-            "/friction-audit-demo.js",
-            "/pressure-map-demo.js",
-            "/agent-fleet-demo.js",
-            "/scaling-pressure-demo.js",
-            "/latency-budget-demo.js",
-            "/final-reflection-demo.js",
-            "/vendor/easymde/easymde.min.js",
-            "/editor.js",
-          ]
-        : [
-            "/book-nav.js",
-            "/toc-highlight.js",
-            "/comments.js",
-            "/project-fit-checker.js",
-            "/scalability-dimensions-demo.js",
-            "/request-trace-demo.js",
-            "/model-eval-demo.js",
-            "/observability-signal-demo.js",
-            "/workflow-loop-demo.js",
-            "/friction-audit-demo.js",
-            "/pressure-map-demo.js",
-            "/agent-fleet-demo.js",
-            "/scaling-pressure-demo.js",
-            "/latency-budget-demo.js",
-            "/final-reflection-demo.js",
-          ],
+      scripts: pageScripts,
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
   );
@@ -207,6 +228,12 @@ async function writePage(relativePath, content) {
   const outputPath = path.join(buildDir, relativePath);
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, content, "utf8");
+}
+
+function getDemoScriptsForSource(source) {
+  return demoScriptIncludes
+    .filter(({ include }) => source.includes(include))
+    .map(({ script }) => script);
 }
 
 async function compileSiteStylesheet(sourceRelativePath) {
