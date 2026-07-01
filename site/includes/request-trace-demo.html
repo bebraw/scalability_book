@@ -16,33 +16,8 @@
     </div>
   </div>
 
-  <ol class="scaling-demo-progress" aria-label="Request trace demo steps">
-    <li>
-      <button type="button" data-request-trace-demo-tab="0" aria-current="step">
-        <span>1</span>
-        Request
-      </button>
-    </li>
-    <li>
-      <button type="button" data-request-trace-demo-tab="1">
-        <span>2</span>
-        Trace
-      </button>
-    </li>
-    <li>
-      <button type="button" data-request-trace-demo-tab="2">
-        <span>3</span>
-        Boundary brief
-      </button>
-    </li>
-  </ol>
-
-  <form class="scaling-demo-form" data-request-trace-demo-form>
-    <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
-      data-request-trace-demo-step="0"
-      aria-labelledby="request-trace-request-title"
-    >
+  <form class="request-trace-layout" data-request-trace-demo-form>
+    <div class="request-trace-setup">
       <div class="scaling-demo-panel">
         <h4 id="request-trace-request-title">User action</h4>
         <div class="request-trace-payload">
@@ -128,22 +103,18 @@
           </label>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section
-      class="scaling-demo-step request-trace-path-step"
-      data-request-trace-demo-step="1"
-      aria-labelledby="request-trace-path-title"
-      hidden
-    >
-      <div class="scaling-demo-panel request-trace-flow-panel">
-        <h4 id="request-trace-path-title">Boundary trace</h4>
-        <div
-          class="request-trace-flow"
-          data-request-trace-demo-flow
-          aria-label="Visual request flow"
-        ></div>
-      </div>
+    <div class="scaling-demo-panel request-trace-flow-panel">
+      <h4 id="request-trace-path-title">Request path</h4>
+      <div
+        class="request-trace-flow"
+        data-request-trace-demo-flow
+        aria-label="Visual request flow"
+      ></div>
+    </div>
+
+    <div class="request-trace-analysis">
       <div class="scaling-demo-panel request-trace-detail-panel">
         <h4>Inspect boundary</h4>
         <ol class="request-trace-path" data-request-trace-demo-path></ol>
@@ -168,25 +139,21 @@
           A local function call becomes a distributed workflow once the browser,
           server, network, and storage can disagree.
         </p>
+        <details class="request-trace-brief">
+          <summary>Trace brief</summary>
+          <div class="scaling-demo-artifact-header">
+            <h4>Boundary brief</h4>
+            <button type="button" data-request-trace-demo-copy>
+              Copy brief
+            </button>
+          </div>
+          <textarea
+            data-request-trace-demo-artifact
+            readonly
+            spellcheck="false"
+          ></textarea>
+        </details>
       </div>
-    </section>
-
-    <section
-      class="scaling-demo-step scaling-demo-artifact-step"
-      data-request-trace-demo-step="2"
-      aria-labelledby="request-trace-brief-title"
-      hidden
-    >
-      <div class="scaling-demo-artifact-header">
-        <h4 id="request-trace-brief-title">Boundary brief</h4>
-        <button type="button" data-request-trace-demo-copy>Copy brief</button>
-      </div>
-      <textarea data-request-trace-demo-artifact spellcheck="false"></textarea>
-    </section>
-
-    <div class="scaling-demo-actions">
-      <button type="button" data-request-trace-demo-prev>Previous</button>
-      <button type="submit" data-request-trace-demo-next>Next</button>
     </div>
   </form>
 </section>

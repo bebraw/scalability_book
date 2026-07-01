@@ -141,18 +141,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
   const copy = root.querySelector<HTMLButtonElement>(
     "[data-request-trace-demo-copy]",
   );
-  const steps = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-request-trace-demo-step]"),
-  );
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("[data-request-trace-demo-tab]"),
-  );
-  const previous = root.querySelector<HTMLButtonElement>(
-    "[data-request-trace-demo-prev]",
-  );
-  const next = root.querySelector<HTMLButtonElement>(
-    "[data-request-trace-demo-next]",
-  );
 
   if (
     !form ||
@@ -161,28 +149,12 @@ function initializeRequestTraceDemo(root: HTMLElement) {
     !verdict ||
     !interpretation ||
     !artifact ||
-    !copy ||
-    !previous ||
-    !next ||
-    steps.length === 0 ||
-    tabs.length !== steps.length
+    !copy
   ) {
     return;
   }
 
-  let currentStep = 0;
   let selectedBoundaryIndex = 0;
-  const showStep = (step: number, focusStep = false) => {
-    currentStep = Math.max(0, Math.min(step, steps.length - 1));
-    updateRequestTraceStage(
-      steps,
-      tabs,
-      previous,
-      next,
-      currentStep,
-      focusStep,
-    );
-  };
   const render = () => {
     const selected = getSelectedConditions(toggles);
     const nodes = getRequestTraceNodes(selected);
@@ -206,22 +178,13 @@ function initializeRequestTraceDemo(root: HTMLElement) {
       result,
     );
     artifact.value = buildRequestTraceArtifact(selected, result);
-    updateRequestTraceStage(steps, tabs, previous, next, currentStep, false);
   };
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep < steps.length - 1) {
-      showStep(currentStep + 1, true);
-    }
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
-  previous.addEventListener("click", () => showStep(currentStep - 1, true));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => showStep(index, true));
-  });
   flow.addEventListener("click", (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
       "[data-request-trace-demo-boundary-button]",
@@ -251,7 +214,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
   });
 
   render();
-  showStep(0);
 }
 
 function getSelectedConditions(inputs: HTMLInputElement[]) {
@@ -491,48 +453,6 @@ function buildRequestTraceArtifact(
 
 function formatRequestTracePath(nodes: RequestTraceNode[]) {
   return nodes.map((node) => node.label).join(" -> ");
-}
-
-function updateRequestTraceStage(
-  steps: HTMLElement[],
-  tabs: HTMLButtonElement[],
-  previous: HTMLButtonElement,
-  next: HTMLButtonElement,
-  currentStep: number,
-  focusStep: boolean,
-) {
-  const finalStep = steps.length - 1;
-
-  steps.forEach((step, index) => {
-    const active = index === currentStep;
-
-    step.hidden = !active;
-    step.classList.toggle("is-active", active);
-    step.setAttribute("aria-hidden", String(!active));
-  });
-  tabs.forEach((tab, index) => {
-    const active = index === currentStep;
-
-    if (active) {
-      tab.setAttribute("aria-current", "step");
-    } else {
-      tab.removeAttribute("aria-current");
-    }
-
-    tab.classList.toggle("is-active", active);
-    tab.classList.toggle("is-complete", index < currentStep);
-  });
-  previous.disabled = currentStep === 0;
-  next.textContent = currentStep === finalStep ? "Done" : "Next";
-  next.disabled = currentStep === finalStep;
-
-  if (focusStep) {
-    requestAnimationFrame(() => {
-      steps[currentStep]
-        ?.querySelector<HTMLElement>("input, textarea, button")
-        ?.focus({ preventScroll: true });
-    });
-  }
 }
 
 function escapeRequestTraceHtml(value: string) {
