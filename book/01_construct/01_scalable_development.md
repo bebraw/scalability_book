@@ -78,9 +78,26 @@ Development ideas:
 - Prefer a working vertical slice over many disconnected features.
 - Make assumptions explicit in the README, especially around the chosen domain, users, event types, storage, and failure handling.
 - Choose a domain specific enough that another group has something meaningful to deconstruct later.
+- Require enough domain richness that the project can later be stressed along multiple dimensions: higher event volume, multiple users or groups, historical queries, retries or duplicate submissions, privacy or retention concerns, and future feature changes.
 - If you choose a workflow or agentic platform domain, treat it first as an event tracking problem and postpone advanced editor, orchestration, and runtime features unless the core is already stable.
 - Use AI tools for generation, explanation, testing, and review, but require students to justify the final design themselves.
 - Preserve early design decisions because later chapters will revisit them under pressure.
+
+> **Writing note**
+>
+> Consider framing the project as "bounded choice" rather than fully open-ended. The domain can be open, but approval could require a common minimum shape: multiple event types, at least one domain entity besides the event itself, one workflow or state transition, one actor or role, and a plausible path to scaling pressure. This would reduce the risk that groups choose domains that are too small, too static, or too artificial to make Reconstruct and Deconstruct meaningful.
+
+Possible project approval questions:
+
+- What are the main event types?
+- What domain entity do the events describe or affect?
+- What state transition or workflow does the system represent?
+- What happens if event volume grows by 100x?
+- What happens if there are many independent tenants, groups, projects, or locations?
+- What query, aggregation, or history view becomes expensive first?
+- What failure mode creates retries, duplicates, missing events, or delayed processing?
+- What privacy, retention, or resource-efficiency concern appears as data accumulates?
+- What part of the system would become hard to change later?
 
 ## Themes
 
