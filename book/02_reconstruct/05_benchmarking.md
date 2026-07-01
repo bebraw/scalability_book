@@ -90,6 +90,14 @@ Important distinction:
 - Monitoring tells you whether known conditions are healthy.
 - Observability helps you investigate unknown conditions.
 
+### Observability signal picker
+
+The demonstration below asks students to choose evidence for a concrete operational symptom. The useful signal depends on the question: the right first signal for stale summaries is not always the right first signal for missing events or a slow dashboard.
+
+{{ import "site/includes/observability-signal-demo.html" }}
+
+Use the result as a starting point for an observability plan. A good plan names the symptom, the first signal to inspect, and what that signal can or cannot prove.
+
 > **Sustainability angle**
 >
 > Observability is not free. Logs, metrics, traces, dashboards, and retained telemetry consume storage and processing. The goal is enough evidence to operate and improve the system, not unlimited data collection.

@@ -1,0 +1,99 @@
+<section
+  class="observability-demo"
+  data-observability-demo
+  aria-labelledby="observability-demo-heading"
+>
+  <div class="observability-demo-header">
+    <div>
+      <p class="observability-demo-kicker">Observability signal picker</p>
+      <h3 id="observability-demo-heading">Choose evidence for one symptom</h3>
+    </div>
+    <div class="observability-demo-summary" aria-live="polite">
+      <span data-observability-demo-verdict>Pick a symptom</span>
+      <small
+        >The goal is not to collect everything. Choose signals that answer the
+        operational question.</small
+      >
+    </div>
+  </div>
+
+  <form class="observability-demo-grid" data-observability-demo-form>
+    <div class="observability-demo-panel">
+      <label for="observability-demo-symptom">Incident symptom</label>
+      <select id="observability-demo-symptom" data-observability-demo-symptom>
+        <option value="stale">Event summaries are stale</option>
+        <option value="missing">Users report missing events</option>
+        <option value="slow">Dashboard loads slowly during arrival peak</option>
+      </select>
+      <p data-observability-demo-question>
+        Which signals would let you explain why summaries are behind?
+      </p>
+    </div>
+
+    <div class="observability-demo-panel">
+      <h4>Candidate signals</h4>
+      <div class="observability-demo-signals">
+        <label>
+          <input type="checkbox" value="logs" data-observability-demo-signal />
+          <span>Structured logs</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="metrics"
+            data-observability-demo-signal
+            checked
+          />
+          <span>Metrics over time</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="traces"
+            data-observability-demo-signal
+            checked
+          />
+          <span>Request traces</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="errors"
+            data-observability-demo-signal
+          />
+          <span>User-visible errors</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="benchmark"
+            data-observability-demo-signal
+          />
+          <span>Benchmark data</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="database"
+            data-observability-demo-signal
+          />
+          <span>Database inspection</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="observability-demo-panel observability-demo-output">
+      <div>
+        <h4>What the selected signals answer</h4>
+        <div
+          class="observability-demo-results"
+          data-observability-demo-results
+        ></div>
+      </div>
+      <div class="observability-demo-recommendation">
+        <h4>Start here</h4>
+        <ol data-observability-demo-recommendation></ol>
+      </div>
+    </div>
+  </form>
+</section>

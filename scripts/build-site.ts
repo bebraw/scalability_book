@@ -108,6 +108,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/scalability-dimensions-demo.js",
             "/request-trace-demo.js",
             "/model-eval-demo.js",
+            "/observability-signal-demo.js",
             "/workflow-loop-demo.js",
             "/friction-audit-demo.js",
             "/pressure-map-demo.js",
@@ -125,6 +126,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/scalability-dimensions-demo.js",
             "/request-trace-demo.js",
             "/model-eval-demo.js",
+            "/observability-signal-demo.js",
             "/workflow-loop-demo.js",
             "/friction-audit-demo.js",
             "/pressure-map-demo.js",
@@ -165,6 +167,10 @@ await compileSiteScript(
   "request-trace-demo.js",
 );
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
+await compileSiteScript(
+  "scripts/observability-signal-demo.ts",
+  "observability-signal-demo.js",
+);
 await compileSiteScript(
   "scripts/workflow-loop-demo.ts",
   "workflow-loop-demo.js",

@@ -558,6 +558,78 @@
   line-height: 1.35;
   margin-top: 0.35rem;
 }
+.observability-demo {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--panel) 90%, #0f766e 10%),
+      var(--panel)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2.2rem,
+      color-mix(in srgb, var(--border) 45%, transparent) 2.25rem
+    );
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  box-shadow: 0 1.5rem 3.5rem color-mix(in srgb, var(--text) 12%, transparent);
+  inline-size: min(100%, 58rem);
+  margin: 2rem 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+.observability-demo,
+.observability-demo * {
+  font-family: var(--font-ui);
+}
+.observability-demo-header {
+  align-items: start;
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  padding-block-end: 1rem;
+}
+.prose .observability-demo-kicker {
+  color: #0f766e;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  margin: 0 0 0.35rem;
+  max-width: none;
+  text-transform: uppercase;
+}
+.prose .observability-demo h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.45rem, 1.3vw + 1rem, 2.05rem);
+  line-height: 1.12;
+  margin: 0;
+  max-width: 20ch;
+}
+.observability-demo-summary,
+.observability-demo-panel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+}
+.observability-demo-summary {
+  padding: 0.8rem;
+}
+.observability-demo-summary span {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 850;
+  line-height: 1.1;
+}
+.observability-demo-summary small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+}
 .agent-fleet-demo {
   --agent-fleet-active-bg: var(--accent-strong);
   --agent-fleet-active-text: var(--panel);
@@ -2403,6 +2475,146 @@
 }
 .model-eval-prompt-panel textarea {
   min-height: 14rem;
+}
+.observability-demo-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(13rem, 0.8fr) minmax(16rem, 1fr);
+  margin-top: 1rem;
+}
+.observability-demo-panel {
+  align-content: start;
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.8rem;
+}
+.observability-demo label,
+.observability-demo h4 {
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 850;
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
+.observability-demo select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  inline-size: 100%;
+  line-height: 1.4;
+  min-height: 2.65rem;
+  padding: 0.58rem 0.7rem;
+}
+.prose .observability-demo-panel p,
+.prose .observability-demo-result p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0;
+  max-width: none;
+}
+.observability-demo-signals,
+.observability-demo-results,
+.observability-demo-recommendation ol {
+  display: grid;
+  gap: 0.5rem;
+}
+.observability-demo-signals label {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0 0.55rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.58rem 0.65rem;
+  text-transform: none;
+}
+.observability-demo-signals input {
+  margin-top: 0.18rem;
+}
+.observability-demo-signals span {
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.observability-demo-output {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.85fr);
+}
+.observability-demo-result {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-inline-start: 0.25rem solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.58rem 0.65rem;
+}
+.observability-demo-result.is-answers {
+  border-inline-start-color: #0f766e;
+}
+.observability-demo-result.is-supports {
+  border-inline-start-color: #b45309;
+}
+.observability-demo-result.is-noisy {
+  border-inline-start-color: #991b1b;
+}
+.observability-demo-result div {
+  align-items: baseline;
+  display: flex;
+  gap: 0.45rem;
+  justify-content: space-between;
+}
+.observability-demo-result strong {
+  color: var(--text);
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+.observability-demo-result span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.observability-demo-recommendation ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.observability-demo-recommendation li {
+  background: color-mix(in srgb, #0f766e 7%, var(--panel));
+  border: 1px solid color-mix(in srgb, #0f766e 32%, var(--border));
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.58rem 0.65rem;
+}
+.observability-demo-recommendation strong {
+  color: var(--text);
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+.observability-demo-recommendation span,
+.observability-demo-recommendation small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+.observability-demo-empty {
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: 0.3rem;
+  padding: 0.8rem;
 }
 .model-eval-note {
   background: var(--bg);
