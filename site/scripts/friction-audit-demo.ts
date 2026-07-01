@@ -50,6 +50,10 @@ const frictionLabels: Record<FrictionKey, string> = {
   testing: "Testing",
 };
 
+// Basis: docs/friction-audit-estimate-basis.md. The agent multipliers are
+// bounded by published studies that show both constrained-task speedups and
+// mature-codebase slowdowns, so this is a calibrated teaching model rather
+// than a productivity forecast.
 const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
   human: {
     title: "Human only",
@@ -61,14 +65,14 @@ const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
   "weak-agent": {
     title: "Agent with weak project context",
     copy: "The agent drafts edits faster, but missing setup, unclear boundaries, and weak tests create review and rework.",
-    speed: { setup: 0.95, comprehension: 0.85, change: 0.65, testing: 0.9 },
+    speed: { setup: 1.05, comprehension: 1.05, change: 0.8, testing: 1.05 },
     reworkMultiplier: 1.35,
     risk: "High",
   },
   "harnessed-agent": {
     title: "Agent with good instructions and tests",
     copy: "Clear project instructions, seed data, and focused tests let the agent move faster with fewer correction loops.",
-    speed: { setup: 0.75, comprehension: 0.7, change: 0.55, testing: 0.65 },
+    speed: { setup: 0.85, comprehension: 0.8, change: 0.65, testing: 0.75 },
     reworkMultiplier: 0.7,
     risk: "Low",
   },
