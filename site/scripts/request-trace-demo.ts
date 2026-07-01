@@ -185,8 +185,8 @@ function initializeRequestTraceDemo(root: HTMLElement) {
   };
   const render = () => {
     const selected = getSelectedConditions(toggles);
-    const result = analyzeRequestTrace(selected);
     const nodes = getRequestTraceNodes(selected);
+    const result = analyzeRequestTrace(selected, nodes);
     selectedBoundaryIndex = Math.min(selectedBoundaryIndex, nodes.length - 1);
 
     flow.innerHTML = buildRequestTraceFlow(
@@ -200,7 +200,7 @@ function initializeRequestTraceDemo(root: HTMLElement) {
       selectedBoundaryIndex,
     );
     updateRequestTraceMetrics(metrics, result);
-    verdict.textContent = `${result.boundaries} boundaries, ${result.riskLevel} risk`;
+    verdict.textContent = `${result.boundaries}-step request path, ${result.riskLevel} risk`;
     interpretation.textContent = buildRequestTraceInterpretation(
       selected,
       result,
@@ -267,9 +267,10 @@ function isRequestTraceConditionKey(
   return value in conditionDetails;
 }
 
-function analyzeRequestTrace(selected: RequestTraceConditionKey[]) {
-  const optionalBoundaries =
-    Number(selected.includes("queue")) + Number(selected.includes("cache"));
+function analyzeRequestTrace(
+  selected: RequestTraceConditionKey[],
+  nodes: RequestTraceNode[],
+) {
   const severeConditions = ["duplicate", "db-timeout"].filter((key) =>
     selected.includes(key as RequestTraceConditionKey),
   ).length;
@@ -288,7 +289,8 @@ function analyzeRequestTrace(selected: RequestTraceConditionKey[]) {
         : (baseTraceNodes[2]?.contract ?? "POST /events contract");
 
   return {
-    boundaries: baseTraceNodes.length + optionalBoundaries,
+    boundaries: nodes.length,
+    path: formatRequestTracePath(nodes),
     riskLevel,
     contract,
   };
@@ -428,8 +430,8 @@ function updateRequestTraceMetrics(
   nodes.forEach((node) => {
     const key = node.dataset.requestTraceDemoMetric;
 
-    if (key === "boundaries") {
-      node.textContent = String(result.boundaries);
+    if (key === "path") {
+      node.textContent = result.path;
     } else if (key === "risk") {
       node.textContent = result.riskLevel;
     } else if (key === "contract") {
@@ -450,7 +452,7 @@ function buildRequestTraceInterpretation(
     return "Retries make the same user intent cross the API boundary more than once. Idempotency becomes part of the contract.";
   }
 
-  return `The request crosses ${result.boundaries} boundaries. Write down the contract before later clients depend on accidental behavior.`;
+  return `The request path is ${result.path}. It crosses ${result.boundaries} ownership and failure boundaries. Write down the contract before later clients depend on accidental behavior.`;
 }
 
 function buildRequestTraceArtifact(
@@ -463,7 +465,8 @@ function buildRequestTraceArtifact(
     "Architecture boundary brief",
     "",
     "Request: POST /events",
-    `Boundaries crossed: ${result.boundaries}`,
+    `Request path: ${result.path}`,
+    `Boundary count: ${result.boundaries}`,
     `Highest risk: ${result.riskLevel}`,
     `Contract to write down: ${result.contract}`,
     "",
@@ -484,6 +487,10 @@ function buildRequestTraceArtifact(
     "Architecture rule:",
     "A web request is not a local function call. Each boundary needs an owner, failure story, and written contract.",
   ].join("\n");
+}
+
+function formatRequestTracePath(nodes: RequestTraceNode[]) {
+  return nodes.map((node) => node.label).join(" -> ");
 }
 
 function updateRequestTraceStage(

@@ -1818,6 +1818,11 @@
 .request-trace-flow-panel {
   grid-column: 1 / -1;
 }
+.request-trace-demo [data-request-trace-demo-metric="path"] {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 .request-trace-path {
   list-style: none;
   margin: 0;
