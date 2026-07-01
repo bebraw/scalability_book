@@ -48,6 +48,9 @@
   outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
   outline-offset: 0.25rem;
 }
+.prose input[type="checkbox"] {
+  accent-color: var(--accent-strong);
+}
 .project-fit {
   --project-fit-active-bg: var(--accent-strong);
   --project-fit-active-text: var(--panel);
