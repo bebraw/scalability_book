@@ -200,6 +200,9 @@ function initializeObservabilityDemo(root: HTMLElement) {
   const recommendation = root.querySelector<HTMLElement>(
     "[data-observability-demo-recommendation]",
   );
+  const recommendationPanel = root.querySelector<HTMLElement>(
+    "[data-observability-demo-recommendation-panel]",
+  );
 
   if (
     !form ||
@@ -207,7 +210,8 @@ function initializeObservabilityDemo(root: HTMLElement) {
     !verdict ||
     !question ||
     !results ||
-    !recommendation
+    !recommendation ||
+    !recommendationPanel
   ) {
     return;
   }
@@ -240,9 +244,13 @@ function initializeObservabilityDemo(root: HTMLElement) {
               renderSignalResult(signalKey, rating, reason),
             )
             .join("");
-    recommendation.innerHTML = symptom.recommendation
-      .map((signalKey) => renderRecommendedSignal(signalKey, symptom))
-      .join("");
+    recommendationPanel.hidden = selected.length === 0;
+    recommendation.innerHTML =
+      selected.length === 0
+        ? ""
+        : symptom.recommendation
+            .map((signalKey) => renderRecommendedSignal(signalKey, symptom))
+            .join("");
   };
 
   form.addEventListener("submit", (event) => event.preventDefault());
