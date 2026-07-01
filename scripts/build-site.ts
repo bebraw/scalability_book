@@ -102,6 +102,7 @@ for (let index = 0; index < bookPages.length; index++) {
       scripts: includeEditor
         ? [
             "/book-nav.js",
+            "/toc-highlight.js",
             "/comments.js",
             "/project-fit-checker.js",
             "/scalability-dimensions-demo.js",
@@ -118,6 +119,7 @@ for (let index = 0; index < bookPages.length; index++) {
           ]
         : [
             "/book-nav.js",
+            "/toc-highlight.js",
             "/comments.js",
             "/project-fit-checker.js",
             "/scalability-dimensions-demo.js",
@@ -148,6 +150,7 @@ await writePage(
 await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
+await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
 await compileSiteScript(
   "scripts/project-fit-checker.ts",

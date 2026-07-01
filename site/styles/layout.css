@@ -385,10 +385,35 @@
   font-size: 0.88rem;
   line-height: 1.35;
   padding: 0.25rem 0;
+  position: relative;
   text-decoration: none;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+.local-toc a::before {
+  background: transparent;
+  border-radius: 999px;
+  content: "";
+  inset: 0 auto 0 -0.55rem;
+  position: absolute;
+  width: 2px;
+}
+.local-toc a:hover,
+.local-toc a:focus-visible {
+  color: var(--text);
+}
+.local-toc a[aria-current="location"],
+.local-toc a.is-current {
+  color: var(--text);
+  font-weight: 650;
+}
+.local-toc a[aria-current="location"]::before,
+.local-toc a.is-current::before {
+  background: var(--accent);
 }
 .local-toc .toc-level-3 {
-  padding-left: 0.8rem;
+  padding-left: 1.35rem;
 }
 .chapter-main {
   min-width: 0;
