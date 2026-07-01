@@ -1,0 +1,108 @@
+<section
+  class="reflection-package-demo"
+  data-reflection-package-demo
+  aria-labelledby="reflection-package-demo-heading"
+>
+  <div class="reflection-package-demo-header">
+    <div>
+      <p class="reflection-package-demo-kicker">Final reflection package</p>
+      <h3 id="reflection-package-demo-heading">
+        Assemble evidence before writing claims
+      </h3>
+    </div>
+    <div class="reflection-package-demo-summary" aria-live="polite">
+      <span data-reflection-package-verdict>Pick project evidence</span>
+      <small
+        >A strong reflection connects claims about scalability to artifacts from
+        the course.</small
+      >
+    </div>
+  </div>
+
+  <form class="reflection-package-grid" data-reflection-package-form>
+    <div class="reflection-package-panel">
+      <h4>Evidence available</h4>
+      <div class="reflection-package-evidence">
+        <label>
+          <input
+            type="checkbox"
+            value="architecture"
+            data-reflection-package-evidence
+            checked
+          />
+          <span>Architecture decision or request trace</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="assumption"
+            data-reflection-package-evidence
+            checked
+          />
+          <span>Changed assumption or pressure map</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="friction"
+            data-reflection-package-evidence
+            checked
+          />
+          <span>Friction audit</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="measurement"
+            data-reflection-package-evidence
+            checked
+          />
+          <span>Benchmark or observability result</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="workflow"
+            data-reflection-package-evidence
+          />
+          <span>Human-agent workflow evidence</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="scaling"
+            data-reflection-package-evidence
+            checked
+          />
+          <span>Scaling trade-off table</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="risk"
+            data-reflection-package-evidence
+          />
+          <span>Remaining risk or next measurement</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="reflection-package-panel reflection-package-gaps">
+      <h4>Missing evidence</h4>
+      <ul data-reflection-package-missing></ul>
+    </div>
+
+    <div class="reflection-package-panel reflection-package-outline">
+      <div class="reflection-package-outline-header">
+        <h4>Reflection outline</h4>
+        <button type="button" data-reflection-package-copy>Copy outline</button>
+      </div>
+      <textarea
+        data-reflection-package-outline
+        rows="18"
+        readonly
+        spellcheck="false"
+      ></textarea>
+    </div>
+  </form>
+</section>

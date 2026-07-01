@@ -177,6 +177,9 @@
   .observability-demo-header,
   .observability-demo-grid,
   .observability-demo-output,
+  .reflection-package-demo-header,
+  .reflection-package-grid,
+  .reflection-package-evidence,
   .agent-fleet-header,
   .agent-fleet-form,
   .agent-fleet-step,
@@ -213,6 +216,9 @@
   .model-eval-checks,
   .model-eval-results,
   .model-eval-actions {
+    grid-column: 1;
+  }
+  .reflection-package-outline {
     grid-column: 1;
   }
   .agent-fleet-review-step,

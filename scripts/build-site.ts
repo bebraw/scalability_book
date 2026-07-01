@@ -115,6 +115,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
             "/latency-budget-demo.js",
+            "/final-reflection-demo.js",
             "/vendor/easymde/easymde.min.js",
             "/editor.js",
           ]
@@ -133,6 +134,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
             "/latency-budget-demo.js",
+            "/final-reflection-demo.js",
           ],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
@@ -188,6 +190,10 @@ await compileSiteScript(
 await compileSiteScript(
   "scripts/latency-budget-demo.ts",
   "latency-budget-demo.js",
+);
+await compileSiteScript(
+  "scripts/final-reflection-demo.ts",
+  "final-reflection-demo.js",
 );
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
