@@ -1,0 +1,196 @@
+<section
+  class="scaling-demo request-trace-demo"
+  data-request-trace-demo
+  aria-labelledby="request-trace-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Architecture boundary trace</p>
+      <h3 id="request-trace-demo-heading">Trace one event request</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-request-trace-demo-verdict>Trace POST /events</span>
+      <small>
+        Architecture becomes concrete when a request crosses boundaries.
+      </small>
+    </div>
+  </div>
+
+  <ol class="scaling-demo-progress" aria-label="Request trace demo steps">
+    <li>
+      <button type="button" data-request-trace-demo-tab="0" aria-current="step">
+        <span>1</span>
+        Request
+      </button>
+    </li>
+    <li>
+      <button type="button" data-request-trace-demo-tab="1">
+        <span>2</span>
+        Trace
+      </button>
+    </li>
+    <li>
+      <button type="button" data-request-trace-demo-tab="2">
+        <span>3</span>
+        Boundary brief
+      </button>
+    </li>
+  </ol>
+
+  <form class="scaling-demo-form" data-request-trace-demo-form>
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      data-request-trace-demo-step="0"
+      aria-labelledby="request-trace-request-title"
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="request-trace-request-title">User action</h4>
+        <div class="request-trace-payload">
+          <div class="request-trace-scene">
+            <div class="request-trace-phone" aria-hidden="true">
+              <div>
+                <span>Room A</span>
+                <strong>Check in</strong>
+                <small>09:15</small>
+              </div>
+            </div>
+            <div class="request-trace-scene-copy">
+              <strong>Student taps "Check in"</strong>
+              <p>
+                The browser turns that tap into a `session.checked_in` event for
+                Room A.
+              </p>
+            </div>
+          </div>
+          <div class="request-trace-wire">
+            <span>Browser sends</span>
+            <code>POST /events</code>
+          </div>
+          <div class="request-trace-fields">
+            <span>type: session.checked_in</span>
+            <span>entity: room-a</span>
+            <span>time: 09:15</span>
+          </div>
+        </div>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>What happens around the request?</h4>
+        <div class="request-trace-toggles">
+          <label>
+            <input
+              type="checkbox"
+              value="server-validation"
+              data-request-trace-demo-condition
+              checked
+            />
+            <span>Server checks required fields</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="client-retry"
+              data-request-trace-demo-condition
+              checked
+            />
+            <span>Wi-Fi drops after submit</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="duplicate"
+              data-request-trace-demo-condition
+            />
+            <span>Student taps twice</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="db-timeout"
+              data-request-trace-demo-condition
+            />
+            <span>Save takes too long</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="queue"
+              data-request-trace-demo-condition
+            />
+            <span>Summary updates later</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="cache"
+              data-request-trace-demo-condition
+            />
+            <span>Dashboard may show old count</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step request-trace-path-step"
+      data-request-trace-demo-step="1"
+      aria-labelledby="request-trace-path-title"
+      hidden
+    >
+      <div class="scaling-demo-panel request-trace-flow-panel">
+        <h4 id="request-trace-path-title">Boundary trace</h4>
+        <div
+          class="request-trace-flow"
+          data-request-trace-demo-flow
+          aria-label="Visual request flow"
+        ></div>
+      </div>
+      <div class="scaling-demo-panel request-trace-detail-panel">
+        <h4>Inspect boundary</h4>
+        <label>
+          <span>Boundary</span>
+          <select data-request-trace-demo-boundary></select>
+        </label>
+        <ol class="request-trace-path" data-request-trace-demo-path></ol>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Architecture pressure</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Boundaries crossed</dt>
+            <dd data-request-trace-demo-metric="boundaries">0</dd>
+          </div>
+          <div>
+            <dt>Highest risk</dt>
+            <dd data-request-trace-demo-metric="risk">-</dd>
+          </div>
+          <div>
+            <dt>Contract to write down</dt>
+            <dd data-request-trace-demo-metric="contract">-</dd>
+          </div>
+        </dl>
+        <p class="friction-demo-note" data-request-trace-demo-interpretation>
+          A local function call becomes a distributed workflow once the browser,
+          server, network, and storage can disagree.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-artifact-step"
+      data-request-trace-demo-step="2"
+      aria-labelledby="request-trace-brief-title"
+      hidden
+    >
+      <div class="scaling-demo-artifact-header">
+        <h4 id="request-trace-brief-title">Boundary brief</h4>
+        <button type="button" data-request-trace-demo-copy>Copy brief</button>
+      </div>
+      <textarea data-request-trace-demo-artifact spellcheck="false"></textarea>
+    </section>
+
+    <div class="scaling-demo-actions">
+      <button type="button" data-request-trace-demo-prev>Previous</button>
+      <button type="submit" data-request-trace-demo-next>Next</button>
+    </div>
+  </form>
+</section>

@@ -46,6 +46,14 @@ Outline:
 
 Development idea: use the same event recording action and trace it through each layer.
 
+### Request boundary lab
+
+The demonstration below traces one `POST /events` request through the browser, network, API, storage, and response path. The goal is to make boundaries visible: each one has an owner, a failure mode, and a contract that future clients, humans, and agents may depend on.
+
+{{ import "site/includes/request-trace-demo.html" }}
+
+Use this before drawing the architecture diagram. If the request path is unclear, the diagram is likely to hide the most important architectural decisions.
+
 ## Constraints of the web
 
 Potential subsections:
