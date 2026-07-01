@@ -12,15 +12,13 @@ Becoming too successful can kill a software product. That is essentially what de
 
 While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
 
----
+### Scalability dimensions lab
 
-TODO: Have students vote on possible dimensions of scalability somehow
+The demonstration below treats scalability as a choice of pressure rather than a vague quality. Select the growth pressures that matter for an event-oriented project and compare how they stress users, data, teams, change, and cost.
 
-- What it means for a system to “scale”
-- How scalability differs from performance and resilience
-- Why constraints are not obstacles, but design inputs
-- Why most systems fail _after_ they become successful
-- How we’ll use a project arc to turn abstract principles into concrete engineering decisions
+{{ import "site/includes/scalability-dimensions-demo.html" }}
+
+Use the radar before choosing techniques. A system can scale one dimension while becoming worse in another.
 
 ## 2.1 The Course Narrative & Project Arc
 

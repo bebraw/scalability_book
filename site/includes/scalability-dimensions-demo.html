@@ -1,0 +1,103 @@
+<section
+  class="scaling-demo dimensions-demo"
+  data-dimensions-demo
+  aria-labelledby="dimensions-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Scalability dimensions lab</p>
+      <h3 id="dimensions-demo-heading">Choose what must scale first</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-dimensions-demo-verdict>Pick project pressures</span>
+      <small
+        >Scalability is not one axis. Different growth pressures stress
+        different parts of the system.</small
+      >
+    </div>
+  </div>
+
+  <form class="dimensions-demo-grid" data-dimensions-demo-form>
+    <div class="scaling-demo-panel dimensions-demo-controls">
+      <h4 id="dimensions-demo-pressure-title">Event tracker scenario</h4>
+      <div class="dimensions-demo-scenario">
+        <strong>Construct project</strong>
+        <p>
+          A small event-oriented app records check-ins, status changes, sensor
+          readings, or workflow events. Choose the pressures that would matter
+          if the project succeeded.
+        </p>
+      </div>
+
+      <h4>Growth pressures</h4>
+      <div class="dimensions-demo-pressures">
+        <label>
+          <input
+            type="checkbox"
+            value="traffic"
+            data-dimensions-demo-pressure
+            checked
+          />
+          <span>Many people submit events at the same time</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="history"
+            data-dimensions-demo-pressure
+            checked
+          />
+          <span>Event history grows for months</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="contributors"
+            data-dimensions-demo-pressure
+          />
+          <span>Several teams or agents change the codebase</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="requirements"
+            data-dimensions-demo-pressure
+          />
+          <span>Event types and rules change every week</span>
+        </label>
+        <label>
+          <input type="checkbox" value="budget" data-dimensions-demo-pressure />
+          <span>Infrastructure cost and energy use must stay bounded</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="scaling-demo-panel dimensions-demo-output">
+      <div>
+        <h4 id="dimensions-demo-radar-title">Dimension radar</h4>
+        <div class="dimensions-demo-radar" data-dimensions-demo-radar></div>
+      </div>
+
+      <div class="dimensions-demo-tradeoff">
+        <h4>Primary trade-off</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Strongest dimension</dt>
+            <dd data-dimensions-demo-metric="primary">-</dd>
+          </div>
+          <div>
+            <dt>Stressed part</dt>
+            <dd data-dimensions-demo-metric="component">-</dd>
+          </div>
+          <div>
+            <dt>Watch for</dt>
+            <dd data-dimensions-demo-metric="signal">-</dd>
+          </div>
+        </dl>
+        <p class="friction-demo-note" data-dimensions-demo-interpretation>
+          Choose pressures to see which scalability dimension matters first.
+        </p>
+      </div>
+    </div>
+  </form>
+</section>

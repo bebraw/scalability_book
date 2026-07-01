@@ -1094,6 +1094,7 @@
 .workflow-demo .scaling-demo-panel,
 .pressure-map-demo .scaling-demo-panel,
 .request-trace-demo .scaling-demo-panel,
+.dimensions-demo .scaling-demo-panel,
 .friction-demo .scaling-demo-panel {
   align-content: start;
 }
@@ -1174,6 +1175,7 @@
   border-block-start: 1px solid var(--border);
   padding-block-start: 0.45rem;
 }
+.dimensions-demo-scenario,
 .friction-demo-scenario,
 .friction-demo-agent-note {
   background: color-mix(in srgb, var(--accent) 8%, var(--panel));
@@ -1183,12 +1185,14 @@
   gap: 0.25rem;
   padding: 0.65rem 0.7rem;
 }
+.dimensions-demo-scenario strong,
 .friction-demo-scenario strong,
 .friction-demo-agent-note strong {
   color: var(--text);
   font-size: 0.95rem;
   line-height: 1.2;
 }
+.prose .dimensions-demo-scenario p,
 .prose .friction-demo-scenario p,
 .prose .friction-demo-agent-note p,
 .prose .friction-demo-note {
@@ -1198,6 +1202,149 @@
   line-height: 1.4;
   margin: 0;
   max-width: none;
+}
+.dimensions-demo-grid {
+  align-items: start;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.2fr);
+}
+.dimensions-demo-controls,
+.dimensions-demo-output,
+.dimensions-demo-tradeoff,
+.dimensions-demo-pressures,
+.dimensions-demo-radar {
+  display: grid;
+  gap: 0.65rem;
+}
+.dimensions-demo-output {
+  grid-template-columns: 1fr;
+}
+.dimensions-demo-pressures label {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0 0.55rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.58rem 0.65rem;
+}
+.dimensions-demo-pressures input {
+  margin-top: 0.18rem;
+}
+.dimensions-demo-pressures span {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.dimensions-demo-radar-chart {
+  background:
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent) 9%, transparent) 0 34%,
+      transparent 35%
+    ),
+    var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0.6rem;
+}
+.dimensions-demo-radar-chart svg {
+  aspect-ratio: 1;
+  display: block;
+  inline-size: 100%;
+  min-block-size: 13.5rem;
+}
+.dimensions-demo-radar-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 20%, var(--border));
+  stroke-width: 1;
+}
+.dimensions-demo-radar-axis {
+  stroke: color-mix(in srgb, var(--accent) 24%, var(--border));
+  stroke-width: 1;
+}
+.dimensions-demo-radar-point {
+  fill: var(--panel);
+  stroke: color-mix(in srgb, var(--accent) 45%, var(--border));
+  stroke-width: 1.2;
+}
+.dimensions-demo-radar-shape {
+  fill: color-mix(in srgb, var(--accent) 32%, transparent);
+  stroke: var(--accent-strong);
+  stroke-linejoin: round;
+  stroke-width: 2.8;
+}
+.dimensions-demo-radar-score-point {
+  fill: var(--accent-strong);
+  stroke: var(--panel);
+  stroke-width: 1.6;
+}
+.dimensions-demo-radar-label {
+  fill: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 850;
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-linejoin: round;
+  stroke-width: 4px;
+  text-anchor: middle;
+  text-transform: uppercase;
+}
+.dimensions-demo-radar-chart figcaption {
+  display: grid;
+  gap: 0.45rem;
+}
+.dimensions-demo-radar-chart figcaption > span {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.dimensions-demo-radar-chart ol {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dimensions-demo-radar-chart li {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 0.28rem;
+  display: flex;
+  gap: 0.35rem;
+  justify-content: space-between;
+  min-inline-size: 0;
+  padding: 0.35rem 0.45rem;
+}
+.dimensions-demo-radar-chart li strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+.dimensions-demo-radar-chart li span {
+  color: var(--accent-strong);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+@media (width <= 62rem) {
+  .dimensions-demo-grid,
+  .dimensions-demo-output {
+    grid-template-columns: 1fr;
+  }
 }
 .friction-demo-files {
   display: grid;
