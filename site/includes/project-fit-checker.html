@@ -1,0 +1,404 @@
+<section
+  class="project-fit"
+  data-project-fit
+  aria-labelledby="project-fit-heading"
+>
+  <div class="project-fit-header">
+    <div>
+      <p class="project-fit-kicker">Construct project worksheet</p>
+      <h3 id="project-fit-heading">
+        Check whether your event idea can scale later
+      </h3>
+    </div>
+    <div class="project-fit-score" aria-live="polite">
+      <span data-project-fit-score>0/11</span>
+      <small data-project-fit-verdict
+        >Start with the domain shape, then test scaling pressure.</small
+      >
+    </div>
+  </div>
+
+  <ol class="project-fit-progress" aria-label="Project fit checker steps">
+    <li>
+      <button type="button" data-project-fit-tab="0" aria-current="step">
+        <span>1</span>
+        Idea
+      </button>
+    </li>
+    <li>
+      <button type="button" data-project-fit-tab="1">
+        <span>2</span>
+        Events
+      </button>
+    </li>
+    <li>
+      <button type="button" data-project-fit-tab="2">
+        <span>3</span>
+        Scaling
+      </button>
+    </li>
+    <li>
+      <button type="button" data-project-fit-tab="3">
+        <span>4</span>
+        Risk
+      </button>
+    </li>
+    <li>
+      <button type="button" data-project-fit-tab="4">
+        <span>5</span>
+        Brief
+      </button>
+    </li>
+  </ol>
+
+  <form class="project-fit-form" data-project-fit-form>
+    <fieldset class="project-fit-step is-active" data-project-fit-step="0">
+      <legend>Idea</legend>
+      <p>
+        Start with the domain language. A good idea has actors and objects that
+        another group can understand later.
+      </p>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-domain">Domain idea</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for domain idea"
+            aria-describedby="project-fit-domain-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-domain-help" role="tooltip">
+            Pick a domain where meaningful things happen over time. Avoid a
+            generic database exercise; the domain should have vocabulary another
+            group can learn and analyze.
+          </span>
+        </div>
+        <input
+          id="project-fit-domain"
+          name="domain"
+          type="text"
+          placeholder="Conference sessions, support tickets, workflow runs..."
+        />
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-actors">Actors or roles</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for actors or roles"
+            aria-describedby="project-fit-actors-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-actors-help" role="tooltip">
+            Name who creates events, views them, or depends on them. Distinct
+            roles make authorization, workflow, and later team ownership easier
+            to discuss.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-actors"
+          name="actors"
+          rows="2"
+          placeholder="Organizer, attendee, operator, viewer..."
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-entities">Domain entities</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for domain entities"
+            aria-describedby="project-fit-entities-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-entities-help" role="tooltip">
+            Events should affect something: a ticket, session, device, order,
+            workflow, node, or similar object. This gives the data model more
+            structure than an event log alone.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-entities"
+          name="entities"
+          rows="2"
+          placeholder="Session, ticket, device, workflow, node, order..."
+        ></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset class="project-fit-step" data-project-fit-step="1" hidden>
+      <legend>Events</legend>
+      <p>
+        Define what changes in the system and how users will inspect that
+        history.
+      </p>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-events">Event types</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for event types"
+            aria-describedby="project-fit-events-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-events-help" role="tooltip">
+            Use concrete past-tense names. Three or more event types usually
+            reveal whether the system has enough behavior for filtering,
+            summaries, failures, and scaling pressure.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-events"
+          name="events"
+          rows="3"
+          placeholder="check-in, status-changed, run-started, node-completed..."
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-workflow">Workflow or state transition</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for workflow or state transition"
+            aria-describedby="project-fit-workflow-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-workflow-help" role="tooltip">
+            Describe how the domain changes over time. A state transition gives
+            students something to validate, observe, benchmark, and later
+            redesign.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-workflow"
+          name="workflow"
+          rows="3"
+          placeholder="A ticket moves from open to assigned to resolved..."
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-views">Views, queries, or summaries</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for views, queries, or summaries"
+            aria-describedby="project-fit-views-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-views-help" role="tooltip">
+            Name how users read the event data. Views and summaries create
+            realistic pressure around indexes, pagination, aggregation,
+            freshness, and data retention.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-views"
+          name="views"
+          rows="2"
+          placeholder="Latest events, events by type, run history, daily summary..."
+        ></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset class="project-fit-step" data-project-fit-step="2" hidden>
+      <legend>Scaling pressure</legend>
+      <p>Give the later Reconstruct phase something concrete to redesign.</p>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-volume">100x event volume</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for 100x event volume"
+            aria-describedby="project-fit-volume-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-volume-help" role="tooltip">
+            Imagine the system becomes successful or receives a burst of
+            automated events. Identify what grows first: writes, storage,
+            dashboards, imports, logs, or review workload.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-volume"
+          name="volume"
+          rows="2"
+          placeholder="What starts to hurt if events grow sharply?"
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-tenants">Many groups or tenants</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for many groups or tenants"
+            aria-describedby="project-fit-tenants-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-tenants-help" role="tooltip">
+            Scaling is more interesting when the same system serves many teams,
+            locations, customers, classes, or projects with boundaries between
+            their data.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-tenants"
+          name="tenants"
+          rows="2"
+          placeholder="What changes when many teams, locations, courses, or customers use it?"
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-expensive-query"
+            >Expensive history query</label
+          >
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for expensive history query"
+            aria-describedby="project-fit-expensive-query-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-expensive-query-help" role="tooltip">
+            Pick a query that sounds useful but may become costly: long date
+            ranges, cross-tenant summaries, filtering by multiple fields, or
+            rebuilding a timeline.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-expensive-query"
+          name="expensiveQuery"
+          rows="2"
+          placeholder="Which filter, aggregation, or dashboard becomes slow first?"
+        ></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset class="project-fit-step" data-project-fit-step="3" hidden>
+      <legend>Risk and change</legend>
+      <p>
+        Name the operational and future-change pressures that make the system
+        worth analyzing.
+      </p>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-failure">Failure story</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for failure story"
+            aria-describedby="project-fit-failure-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-failure-help" role="tooltip">
+            Choose a failure that affects event correctness: duplicate
+            submissions, offline clients, retries, late delivery, partial
+            writes, or inconsistent external systems.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-failure"
+          name="failure"
+          rows="2"
+          placeholder="Retries, duplicate submissions, delayed events, offline clients..."
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-privacy">
+            Privacy, retention, or resource concern
+          </label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for privacy, retention, or resource concern"
+            aria-describedby="project-fit-privacy-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-privacy-help" role="tooltip">
+            Event data often describes behavior. Decide what should not be
+            logged, how long raw events should survive, and what storage or
+            compute could be wasted.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-privacy"
+          name="privacy"
+          rows="2"
+          placeholder="What data accumulates, leaks context, or wastes resources?"
+        ></textarea>
+      </div>
+      <div class="project-fit-field">
+        <div class="project-fit-label-row">
+          <label for="project-fit-change">Future change pressure</label>
+          <button
+            type="button"
+            class="project-fit-help"
+            aria-label="Help for future change pressure"
+            aria-describedby="project-fit-change-help"
+          >
+            ?
+          </button>
+          <span id="project-fit-change-help" role="tooltip">
+            Name a likely requirement change. Good candidates involve new event
+            types, revised states, different permissions, integrations, or
+            changes to historical data interpretation.
+          </span>
+        </div>
+        <textarea
+          id="project-fit-change"
+          name="change"
+          rows="2"
+          placeholder="What feature or rule change would be expensive later?"
+        ></textarea>
+      </div>
+    </fieldset>
+
+    <section class="project-fit-step" data-project-fit-step="4" hidden>
+      <h4>Brief</h4>
+      <p>
+        Review the score and warnings. The generated brief is deliberately plain
+        Markdown so it can move into the project README.
+      </p>
+      <div class="project-fit-results">
+        <section aria-labelledby="project-fit-checks-heading">
+          <h4 id="project-fit-checks-heading">Fit checks</h4>
+          <ul data-project-fit-checks></ul>
+        </section>
+        <section aria-labelledby="project-fit-warnings-heading">
+          <h4 id="project-fit-warnings-heading">Scope warnings</h4>
+          <ul data-project-fit-warnings></ul>
+        </section>
+        <label class="project-fit-brief">
+          <span>Generated project brief</span>
+          <textarea data-project-fit-output rows="16" readonly></textarea>
+        </label>
+      </div>
+    </section>
+
+    <div class="project-fit-actions">
+      <button type="button" data-project-fit-prev>Back</button>
+      <button type="submit" data-project-fit-next>Next</button>
+      <button type="button" data-project-fit-copy>Copy brief</button>
+    </div>
+  </form>
+</section>

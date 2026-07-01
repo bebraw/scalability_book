@@ -103,10 +103,11 @@ for (let index = 0; index < bookPages.length; index++) {
         ? [
             "/book-nav.js",
             "/comments.js",
+            "/project-fit-checker.js",
             "/vendor/easymde/easymde.min.js",
             "/editor.js",
           ]
-        : ["/book-nav.js", "/comments.js"],
+        : ["/book-nav.js", "/comments.js", "/project-fit-checker.js"],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
   );
@@ -126,6 +127,10 @@ await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
+await compileSiteScript(
+  "scripts/project-fit-checker.ts",
+  "project-fit-checker.js",
+);
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
 }

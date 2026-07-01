@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { marked } from "marked";
 import highlight from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
@@ -47,6 +49,7 @@ export function renderMarkdown(
   chapter: MarkdownChapter,
 ): RenderedMarkdown {
   source = getPublicMarkdownSource(source);
+  source = resolveMarkdownImports(source);
 
   const tableOfContents: TableOfContentsItem[] = [];
   const sectionCounters: number[] = [];
@@ -113,6 +116,30 @@ function getPublicMarkdownSource(source: string): string {
   return markerIndex === -1
     ? source
     : `${source.slice(0, markerIndex).trimEnd()}\n`;
+}
+
+function resolveMarkdownImports(source: string): string {
+  return source.replace(
+    /^\{\{\s*import\s+"([^"]+)"\s*\}\}$/gm,
+    (_match, importPath: string) => readMarkdownImport(importPath),
+  );
+}
+
+function readMarkdownImport(importPath: string): string {
+  if (path.isAbsolute(importPath) || !importPath.endsWith(".html")) {
+    throw new Error(`Invalid Markdown import path: ${importPath}`);
+  }
+
+  const root = process.cwd();
+  const resolvedPath = path.resolve(root, importPath);
+
+  if (!resolvedPath.startsWith(`${root}${path.sep}`)) {
+    throw new Error(`Markdown import escapes project root: ${importPath}`);
+  }
+
+  return readFileSync(resolvedPath, "utf8")
+    .trim()
+    .replace(/\n[ \t]*\n/g, "\n");
 }
 
 function getSectionNumber(

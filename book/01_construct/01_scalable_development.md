@@ -62,6 +62,12 @@ For the first version, it is important that it contains a data model, basic func
 
 To give a more concrete example, consider we are implementing a small visual agentic workflow platform. The idea is that the application allows users to define simple workflows that then get executed while triggering events the system records for logging purposes. To implement this kind of application, you would have to learn somewhat about the domain and get into specifics. Scoping-wise you might want to make it specific first and suitable for only certain tasks.
 
+## Project fit checker
+
+Use this checker to test whether your project idea is rich enough for the three project phases. A good Construct project should be small enough to build, but not so thin that Reconstruct and Deconstruct become artificial.
+
+{{ import "site/includes/project-fit-checker.html" }}
+
 ---
 
 The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
