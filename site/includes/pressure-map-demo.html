@@ -1,0 +1,177 @@
+<section
+  class="scaling-demo pressure-map-demo"
+  data-pressure-map-demo
+  aria-labelledby="pressure-map-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Reality pressure map</p>
+      <h3 id="pressure-map-demo-heading">
+        Map changed assumptions to failures
+      </h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-pressure-map-demo-verdict>Choose changed assumptions</span>
+      <small>
+        A pressure map connects new reality to the component that will feel it
+        first.
+      </small>
+    </div>
+  </div>
+
+  <ol class="scaling-demo-progress" aria-label="Pressure map demo steps">
+    <li>
+      <button type="button" data-pressure-map-demo-tab="0" aria-current="step">
+        <span>1</span>
+        Assumptions
+      </button>
+    </li>
+    <li>
+      <button type="button" data-pressure-map-demo-tab="1">
+        <span>2</span>
+        Pressure map
+      </button>
+    </li>
+    <li>
+      <button type="button" data-pressure-map-demo-tab="2">
+        <span>3</span>
+        Response
+      </button>
+    </li>
+  </ol>
+
+  <form class="scaling-demo-form" data-pressure-map-demo-form>
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      data-pressure-map-demo-step="0"
+      aria-labelledby="pressure-map-assumptions-title"
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="pressure-map-assumptions-title">Construct baseline</h4>
+        <div class="pressure-map-baseline">
+          <article>
+            <span>Users</span>
+            <strong>One small group</strong>
+            <p>People submit events while the app is online and calm.</p>
+          </article>
+          <article>
+            <span>Data</span>
+            <strong>Few event types</strong>
+            <p>The dashboard can query the same database used for writes.</p>
+          </article>
+          <article>
+            <span>Operations</span>
+            <strong>Manual diagnosis</strong>
+            <p>Logs and local testing are enough to explain most problems.</p>
+          </article>
+        </div>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Changed assumptions</h4>
+        <div class="pressure-map-toggles">
+          <label>
+            <input
+              type="checkbox"
+              value="burst"
+              data-pressure-map-demo-assumption
+              checked
+            />
+            <span>Burst traffic during a 20-minute peak</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="offline"
+              data-pressure-map-demo-assumption
+              checked
+            />
+            <span>Offline clients retry the same event</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="tenants"
+              data-pressure-map-demo-assumption
+            />
+            <span>Multiple tenants share the same system</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="old-client"
+              data-pressure-map-demo-assumption
+            />
+            <span>Old clients submit malformed events</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="deletion"
+              data-pressure-map-demo-assumption
+            />
+            <span>A customer requests data deletion</span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="slow-summary"
+              data-pressure-map-demo-assumption
+            />
+            <span>Users need summaries before data settles</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step pressure-map-map-step"
+      data-pressure-map-demo-step="1"
+      aria-labelledby="pressure-map-map-title"
+      hidden
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="pressure-map-map-title">Pressure map</h4>
+        <div class="pressure-map-board" data-pressure-map-demo-board></div>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>First signal</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Assumptions changed</dt>
+            <dd data-pressure-map-demo-metric="count">0</dd>
+          </div>
+          <div>
+            <dt>Primary pressure</dt>
+            <dd data-pressure-map-demo-metric="pressure">-</dd>
+          </div>
+          <div>
+            <dt>Most stressed part</dt>
+            <dd data-pressure-map-demo-metric="component">-</dd>
+          </div>
+        </dl>
+        <p class="friction-demo-note" data-pressure-map-demo-interpretation>
+          Pick at least one changed assumption to reveal the first likely
+          failure.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-artifact-step"
+      data-pressure-map-demo-step="2"
+      aria-labelledby="pressure-map-response-title"
+      hidden
+    >
+      <div class="scaling-demo-artifact-header">
+        <h4 id="pressure-map-response-title">Reconstruct pressure brief</h4>
+        <button type="button" data-pressure-map-demo-copy>Copy brief</button>
+      </div>
+      <textarea data-pressure-map-demo-artifact spellcheck="false"></textarea>
+    </section>
+
+    <div class="scaling-demo-actions">
+      <button type="button" data-pressure-map-demo-prev>Previous</button>
+      <button type="submit" data-pressure-map-demo-next>Next</button>
+    </div>
+  </form>
+</section>

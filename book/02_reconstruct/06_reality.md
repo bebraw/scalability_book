@@ -46,6 +46,14 @@ Each scenario can be used to ask:
 - What does the operator see?
 - What design choice from Construct caused or softened the problem?
 
+### Pressure map lab
+
+The demonstration below turns changed assumptions into a pressure map. The goal is to connect a new reality to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and a response that fits the pressure.
+
+{{ import "site/includes/pressure-map-demo.html" }}
+
+Use this before choosing scaling techniques. If the pressure is unclear, the response is likely to be fashionable rather than useful.
+
 ## Designing from failure
 
 Ideas to develop:
