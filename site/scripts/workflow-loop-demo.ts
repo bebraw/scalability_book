@@ -4,6 +4,7 @@ type WorkflowSignalKey = "setup" | "context" | "tests";
 type WorkflowMode = {
   title: string;
   copy: string;
+  defaultSignals: Record<WorkflowSignalKey, number>;
   actors: Array<{
     label: string;
     role: string;
@@ -17,6 +18,7 @@ const workflowModes: Record<WorkflowModeKey, WorkflowMode> = {
   solo: {
     title: "Human implements manually",
     copy: "The human reads, edits, tests, and prepares the review package.",
+    defaultSignals: { setup: 3, context: 3, tests: 2 },
     actors: [
       {
         label: "Human",
@@ -40,6 +42,7 @@ const workflowModes: Record<WorkflowModeKey, WorkflowMode> = {
   "agent-weak": {
     title: "Agent drafts with weak project context",
     copy: "The agent writes faster, but unclear setup and weak tests push more work into human review.",
+    defaultSignals: { setup: 1, context: 1, tests: 1 },
     actors: [
       {
         label: "Human",
@@ -68,6 +71,7 @@ const workflowModes: Record<WorkflowModeKey, WorkflowMode> = {
   "agent-harnessed": {
     title: "Agent works with clear harness and tests",
     copy: "Instructions, seed data, and focused tests let the agent use local feedback before review.",
+    defaultSignals: { setup: 4, context: 4, tests: 4 },
     actors: [
       {
         label: "Human",
@@ -212,6 +216,7 @@ function initializeWorkflowDemo(root: HTMLElement) {
   }
 
   let currentStep = 0;
+  let previousMode = modeSelect.value;
   const showStep = (step: number, focusStep = false) => {
     currentStep = Math.max(0, Math.min(step, steps.length - 1));
     updateWorkflowStage(steps, tabs, previous, next, currentStep, focusStep);
@@ -249,6 +254,14 @@ function initializeWorkflowDemo(root: HTMLElement) {
       showStep(currentStep + 1, true);
     }
   });
+  modeSelect.addEventListener("change", () => {
+    const mode = getWorkflowMode(modeSelect.value);
+
+    if (modeSelect.value !== previousMode) {
+      applyWorkflowSignalDefaults(signals, mode);
+      previousMode = modeSelect.value;
+    }
+  });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
   previous.addEventListener("click", () => showStep(currentStep - 1, true));
@@ -269,8 +282,24 @@ function initializeWorkflowDemo(root: HTMLElement) {
     }
   });
 
+  applyWorkflowSignalDefaults(signals, getWorkflowMode(modeSelect.value));
   render();
   showStep(0);
+}
+
+function applyWorkflowSignalDefaults(
+  inputs: HTMLInputElement[],
+  mode: WorkflowMode,
+) {
+  inputs.forEach((input) => {
+    const key = input.dataset.workflowDemoSignal as
+      | WorkflowSignalKey
+      | undefined;
+
+    if (key) {
+      input.value = String(mode.defaultSignals[key]);
+    }
+  });
 }
 
 function getWorkflowMode(value: string): WorkflowMode {
