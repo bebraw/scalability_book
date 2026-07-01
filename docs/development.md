@@ -14,6 +14,7 @@ Install dependencies, build the site, and start the local editable server:
 
 ```bash
 npm install
+npm run playwright:install
 npm run build
 npm start
 ```
@@ -29,6 +30,12 @@ npm run serve
 ```
 
 The build emits a static site to `build/` for `scalableweb.dev`. The deployed site remains read-only because the editing API exists only in the local dev server.
+
+Run browser-level checks with:
+
+```bash
+npm run e2e
+```
 
 ## Feedback Review
 

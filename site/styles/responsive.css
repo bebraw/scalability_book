@@ -170,6 +170,37 @@
   .project-fit-results {
     grid-template-columns: 1fr;
   }
+  .model-eval-header,
+  .model-eval-step,
+  .model-eval-cards,
+  .model-eval-results {
+    grid-template-columns: 1fr;
+  }
+  .model-eval-progress {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-block-end: 0.2rem;
+  }
+  .model-eval-progress button {
+    min-width: 0;
+  }
+  .model-eval-task-preview,
+  .model-eval-task-step .model-eval-field,
+  .model-eval-prompt-step .model-eval-prompt-panel,
+  .model-eval-rubric-panel,
+  .model-eval-cards,
+  .model-eval-score-step .model-eval-step-copy,
+  .model-eval-compare-step .model-eval-note,
+  .model-eval-checks,
+  .model-eval-results,
+  .model-eval-actions {
+    grid-column: 1;
+  }
+  .model-eval-slider {
+    grid-template-columns: 1fr;
+  }
+  .model-eval-slider output {
+    text-align: left;
+  }
   .project-fit-progress {
     grid-template-columns: repeat(5, minmax(5rem, 1fr));
     overflow-x: auto;

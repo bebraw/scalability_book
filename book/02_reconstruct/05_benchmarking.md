@@ -67,6 +67,14 @@ Development ideas:
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
 - Discuss how a model can score well on a generic benchmark but still fail in a local codebase with missing context, unclear instructions, or weak tests.
 
+### Small eval demonstration
+
+A simple classroom demonstration can be interactive. The point is to show that an eval is a controlled comparison, not a magic score. Students can change the task, inspect the shared prompt and context, score two model attempts, and notice how the conclusion changes when quality, latency, and cost are considered together.
+
+{{ import "site/includes/model-eval-demo.html" }}
+
+This is not enough data to declare a universal winner. It is enough to support a local decision such as: "For open-ended diagnosis, the stronger model saved review time. For checklist-style benchmark plans, the smaller model may be acceptable if a human verifies the result." To make the exercise more engineering-like, add deterministic checks: did the answer name a real file, include all required headings, or produce valid JSON? To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
+
 ## Observability basics
 
 Potential subsections:

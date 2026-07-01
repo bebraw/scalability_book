@@ -1,0 +1,164 @@
+<section
+  class="model-eval-demo"
+  data-model-eval
+  aria-labelledby="model-eval-heading"
+>
+  <div class="model-eval-header">
+    <div>
+      <p class="model-eval-kicker">Reconstruct eval lab</p>
+      <h3 id="model-eval-heading">
+        Compare two model attempts on the same task
+      </h3>
+    </div>
+    <div class="model-eval-summary" aria-live="polite">
+      <span data-model-eval-verdict>Score the attempts</span>
+      <small data-model-eval-caveat
+        >The result is local to this task set, not a universal model
+        ranking.</small
+      >
+    </div>
+  </div>
+
+  <ol class="model-eval-progress" aria-label="Model eval demo steps">
+    <li>
+      <button type="button" data-model-eval-tab="0" aria-current="step">
+        <span>1</span>
+        Task
+      </button>
+    </li>
+    <li>
+      <button type="button" data-model-eval-tab="1">
+        <span>2</span>
+        Prompt
+      </button>
+    </li>
+    <li>
+      <button type="button" data-model-eval-tab="2">
+        <span>3</span>
+        Score
+      </button>
+    </li>
+    <li>
+      <button type="button" data-model-eval-tab="3">
+        <span>4</span>
+        Compare
+      </button>
+    </li>
+  </ol>
+
+  <form class="model-eval-form" data-model-eval-form>
+    <section
+      class="model-eval-step model-eval-task-step is-active"
+      data-model-eval-step="0"
+    >
+      <div class="model-eval-field">
+        <label for="model-eval-task">Eval task</label>
+        <p>
+          Start with one task from the work students actually do in Reconstruct.
+          The eval is only meaningful if the task represents real project work.
+        </p>
+        <select id="model-eval-task" name="task" data-model-eval-task>
+          <option value="bottleneck">Find one likely scaling bottleneck</option>
+          <option value="benchmark">Produce a benchmark plan</option>
+          <option value="data-model">Explain the event data model</option>
+        </select>
+      </div>
+      <div class="model-eval-task-preview">
+        <h4>Input context</h4>
+        <p data-model-eval-context></p>
+      </div>
+    </section>
+
+    <section
+      class="model-eval-step model-eval-prompt-step"
+      data-model-eval-step="1"
+      hidden
+    >
+      <div class="model-eval-prompt-panel">
+        <label for="model-eval-prompt">Prompt shape</label>
+        <p>
+          Both models receive the same context, task, and required output shape.
+        </p>
+        <textarea
+          id="model-eval-prompt"
+          rows="8"
+          data-model-eval-prompt
+        ></textarea>
+      </div>
+      <div class="model-eval-rubric-panel">
+        <h4>Rubric</h4>
+        <p>Use the same rubric for both pasted outputs.</p>
+        <ul data-model-eval-rubric></ul>
+      </div>
+    </section>
+
+    <section
+      class="model-eval-step model-eval-score-step"
+      data-model-eval-step="2"
+      hidden
+    >
+      <div class="model-eval-step-copy">
+        <h4>Paste and score attempts</h4>
+        <p>
+          Run the shared prompt with two models, paste each output, then score
+          against the rubric. Use samples only when demonstrating the workflow.
+        </p>
+      </div>
+      <div class="model-eval-cards" data-model-eval-cards></div>
+    </section>
+
+    <section
+      class="model-eval-step model-eval-compare-step"
+      data-model-eval-step="3"
+      hidden
+    >
+      <div class="model-eval-checks">
+        <h4>Compare the local result</h4>
+        <p>
+          Add deterministic checks where possible, then report a narrow claim
+          about this task set.
+        </p>
+        <label>
+          <input type="checkbox" data-model-eval-check="headings" checked />
+          Required headings are present
+        </label>
+        <label>
+          <input type="checkbox" data-model-eval-check="file" checked />
+          Answer names a concrete file, query, or endpoint
+        </label>
+        <label>
+          <input type="checkbox" data-model-eval-check="measurement" checked />
+          Answer proposes a confirming measurement
+        </label>
+      </div>
+      <div class="model-eval-note">
+        <h4>Local conclusion</h4>
+        <p data-model-eval-conclusion>
+          Score both attempts to see what this tiny eval can and cannot claim.
+        </p>
+      </div>
+      <div class="model-eval-results">
+        <div>
+          <h4>Comparison</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Quality</th>
+                <th>Checks</th>
+                <th>Latency</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody data-model-eval-results></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="model-eval-actions">
+      <button type="button" data-model-eval-prev>Previous</button>
+      <button type="submit" data-model-eval-next>Next</button>
+    </div>
+  </form>
+</section>

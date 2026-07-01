@@ -104,10 +104,16 @@ for (let index = 0; index < bookPages.length; index++) {
             "/book-nav.js",
             "/comments.js",
             "/project-fit-checker.js",
+            "/model-eval-demo.js",
             "/vendor/easymde/easymde.min.js",
             "/editor.js",
           ]
-        : ["/book-nav.js", "/comments.js", "/project-fit-checker.js"],
+        : [
+            "/book-nav.js",
+            "/comments.js",
+            "/project-fit-checker.js",
+            "/model-eval-demo.js",
+          ],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
   );
@@ -131,6 +137,7 @@ await compileSiteScript(
   "scripts/project-fit-checker.ts",
   "project-fit-checker.js",
 );
+await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
 }

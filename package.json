@@ -12,6 +12,7 @@
     "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "playwright:install": "playwright install chromium",
     "start": "node scripts/dev-site.ts",
     "serve": "gustwind --serve --input ./build --port 3000",
     "worker:prepare": "node scripts/generate-worker-manifest.ts",
