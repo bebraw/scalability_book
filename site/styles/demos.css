@@ -2687,29 +2687,11 @@
 .observability-demo-signals input {
   margin-top: 0.18rem;
 }
-.observability-demo-signal-label {
-  align-items: center;
+.observability-demo-signals span {
   color: var(--text);
-  display: flex;
-  flex-wrap: wrap;
   font-size: 0.84rem;
   font-weight: 800;
-  gap: 0.35rem 0.45rem;
   line-height: 1.25;
-}
-.observability-demo-signal-label small {
-  background: color-mix(in srgb, var(--success) 14%, var(--bg));
-  border: 1px solid color-mix(in srgb, var(--success) 36%, var(--border));
-  border-radius: 999px;
-  color: var(--success);
-  font-size: 0.58rem;
-  font-weight: 900;
-  line-height: 1;
-  padding: 0.18rem 0.32rem;
-  text-transform: uppercase;
-}
-.observability-demo-signal-label small[hidden] {
-  display: none;
 }
 .observability-demo-output {
   grid-column: 1 / -1;

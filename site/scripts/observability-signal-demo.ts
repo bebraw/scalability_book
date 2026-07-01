@@ -188,9 +188,6 @@ function initializeObservabilityDemo(root: HTMLElement) {
   const signalInputs = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-observability-demo-signal]"),
   );
-  const signalTags = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-observability-demo-signal-tag]"),
-  );
   const verdict = root.querySelector<HTMLElement>(
     "[data-observability-demo-verdict]",
   );
@@ -219,7 +216,6 @@ function initializeObservabilityDemo(root: HTMLElement) {
     const symptom =
       symptoms[symptomSelect.value as SymptomKey] ?? symptoms.stale;
     const selected = getSelectedSignals(signalInputs);
-    updateRecommendedSignalTags(signalTags, symptom);
     const selectedRatings = selected.map((signalKey) => ({
       signalKey,
       ...symptom.ratings[signalKey],
@@ -252,18 +248,6 @@ function initializeObservabilityDemo(root: HTMLElement) {
   form.addEventListener("submit", (event) => event.preventDefault());
   form.addEventListener("change", render);
   render();
-}
-
-function updateRecommendedSignalTags(tags: HTMLElement[], symptom: Symptom) {
-  tags.forEach((tag) => {
-    const signalKey = tag.dataset.observabilityDemoSignalTag;
-    const recommended = symptom.recommendation.includes(
-      signalKey as SignalKey,
-    );
-
-    tag.textContent = recommended ? "Start here" : "";
-    tag.toggleAttribute("hidden", !recommended);
-  });
 }
 
 function getSelectedSignals(inputs: HTMLInputElement[]) {
