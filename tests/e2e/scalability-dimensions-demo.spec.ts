@@ -19,9 +19,9 @@ test.describe("scalability dimensions demo", () => {
     await expect(demo.locator(".dimensions-demo-scenario")).toContainText(
       "event-oriented app",
     );
-    await expect(demo.locator("[data-dimensions-demo-radar]")).toContainText(
-      "Score out of 6",
-    );
+    await expect(
+      demo.locator("[data-dimensions-demo-radar] svg"),
+    ).toBeVisible();
 
     await demo
       .locator("[data-dimensions-demo-pressure][value='traffic']")
@@ -55,5 +55,48 @@ test.describe("scalability dimensions demo", () => {
     await expect(demo.locator("[data-dimensions-demo-artifact]")).toHaveCount(
       0,
     );
+  });
+
+  test("keeps the layout stable when the budget pressure wraps", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-dimensions-demo]");
+    const getFormOffset = () =>
+      demo.evaluate((node) => {
+        const form = node.querySelector("[data-dimensions-demo-form]");
+
+        if (!form) {
+          return null;
+        }
+
+        return (
+          form.getBoundingClientRect().top - node.getBoundingClientRect().top
+        );
+      });
+
+    const before = await getFormOffset();
+
+    for (const value of [
+      "traffic",
+      "history",
+      "contributors",
+      "requirements",
+    ]) {
+      await demo
+        .locator(`[data-dimensions-demo-pressure][value='${value}']`)
+        .setChecked(false);
+    }
+
+    await demo
+      .locator("[data-dimensions-demo-pressure][value='budget']")
+      .setChecked(true);
+
+    await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
+      "1 pressure point to Cost and energy",
+    );
+
+    const after = await getFormOffset();
+
+    expect(after).toBe(before);
   });
 });

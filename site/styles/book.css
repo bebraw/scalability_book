@@ -995,6 +995,9 @@
   font-weight: 850;
   line-height: 1.1;
 }
+.dimensions-demo .scaling-demo-summary span {
+  min-block-size: 2.75rem;
+}
 .scaling-demo-summary small {
   color: var(--muted);
   display: block;
@@ -1241,13 +1244,7 @@
   line-height: 1.25;
 }
 .dimensions-demo-radar-chart {
-  background:
-    radial-gradient(
-      circle at center,
-      color-mix(in srgb, var(--accent) 9%, transparent) 0 34%,
-      transparent 35%
-    ),
-    var(--panel);
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 0.35rem;
   display: grid;
@@ -1257,6 +1254,11 @@
 }
 .dimensions-demo-radar-chart svg {
   aspect-ratio: 1;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--accent) 9%, transparent) 0 34%,
+    transparent 35%
+  );
   display: block;
   inline-size: 100%;
   min-block-size: 13.5rem;
@@ -1297,48 +1299,6 @@
   stroke-width: 4px;
   text-anchor: middle;
   text-transform: uppercase;
-}
-.dimensions-demo-radar-chart figcaption {
-  display: grid;
-  gap: 0.45rem;
-}
-.dimensions-demo-radar-chart figcaption > span {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.dimensions-demo-radar-chart ol {
-  display: grid;
-  gap: 0.35rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.dimensions-demo-radar-chart li {
-  align-items: center;
-  background: color-mix(in srgb, var(--accent) 7%, var(--bg));
-  border: 1px solid var(--border);
-  border-radius: 0.28rem;
-  display: flex;
-  gap: 0.35rem;
-  justify-content: space-between;
-  min-inline-size: 0;
-  padding: 0.35rem 0.45rem;
-}
-.dimensions-demo-radar-chart li strong {
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 0.72rem;
-  line-height: 1.1;
-}
-.dimensions-demo-radar-chart li span {
-  color: var(--accent-strong);
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 850;
 }
 @media (width <= 62rem) {
   .dimensions-demo-grid,

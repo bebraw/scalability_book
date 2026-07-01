@@ -153,7 +153,6 @@ function initializeDimensionsDemo(root: HTMLElement) {
     if (!radar.querySelector("[data-dimensions-demo-radar-chart]")) {
       radar.innerHTML = buildDimensionRadar(scores, nextGeometry);
     } else {
-      updateRadarScoreChips(radar, scores, nextGeometry.maxScore);
       updateRadarVertexTitles(radar, scores);
       animateRadarGeometry(
         radar,
@@ -275,7 +274,6 @@ function buildDimensionRadar(
         </circle>`;
     })
     .join("");
-  const scoreChips = buildRadarScoreChips(scores);
 
   return `<figure class="dimensions-demo-radar-chart" data-dimensions-demo-radar-chart>
     <svg viewBox="0 0 240 240" role="img" aria-labelledby="dimensions-radar-title dimensions-radar-desc" focusable="false">
@@ -288,32 +286,7 @@ function buildDimensionRadar(
       <polygon class="dimensions-demo-radar-shape" data-dimensions-demo-radar-shape points="${scorePoints}" />
       ${selectedPoints}
     </svg>
-    <figcaption>
-      <span data-dimensions-demo-radar-max>Score out of ${geometry.maxScore}</span>
-      <ol data-dimensions-demo-radar-scores>${scoreChips}</ol>
-    </figcaption>
   </figure>`;
-}
-
-function updateRadarScoreChips(
-  radar: HTMLElement,
-  scores: Record<DimensionKey, number>,
-  maxScore: number,
-) {
-  const max = radar.querySelector<HTMLElement>(
-    "[data-dimensions-demo-radar-max]",
-  );
-  const chips = radar.querySelector<HTMLElement>(
-    "[data-dimensions-demo-radar-scores]",
-  );
-
-  if (max) {
-    max.textContent = `Score out of ${maxScore}`;
-  }
-
-  if (chips) {
-    chips.innerHTML = buildRadarScoreChips(scores);
-  }
 }
 
 function updateRadarVertexTitles(
@@ -330,20 +303,6 @@ function updateRadarVertexTitles(
       title.textContent = `${dimensions[key].label}: ${scores[key]} pressure point${scores[key] === 1 ? "" : "s"}`;
     }
   });
-}
-
-function buildRadarScoreChips(scores: Record<DimensionKey, number>) {
-  return dimensionOrder
-    .map((key) => {
-      const dimension = dimensions[key];
-      const score = scores[key];
-
-      return `<li>
-        <strong>${escapeDimensionsHtml(dimension.label)}</strong>
-        <span>${score}</span>
-      </li>`;
-    })
-    .join("");
 }
 
 function animateRadarGeometry(
