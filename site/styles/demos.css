@@ -1093,6 +1093,10 @@
   gap: 0.8rem;
   min-width: 0;
 }
+.scaling-pressure-output-column .scaling-demo-tradeoff-step {
+  align-content: start;
+  grid-template-columns: minmax(0, 1fr);
+}
 .scaling-demo-step {
   display: grid;
   gap: 0.8rem;
@@ -2499,6 +2503,12 @@
   min-width: 0;
   overflow-wrap: anywhere;
   text-align: end;
+}
+.scaling-pressure-output-column .demo-metrics-compact div {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.scaling-pressure-output-column .demo-metrics-compact dd {
+  white-space: nowrap;
 }
 .scaling-demo-impact {
   background: var(--panel);
