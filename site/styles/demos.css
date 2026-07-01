@@ -1429,6 +1429,9 @@
   display: grid;
   gap: 0.5rem;
 }
+.workflow-demo .scaling-demo-progress {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .workflow-demo-signals,
 .workflow-demo-evidence {
   display: grid;
@@ -1495,6 +1498,24 @@
   color: var(--text);
   padding: 0.35rem 0.4rem;
   text-transform: none;
+}
+.workflow-demo-package {
+  display: grid;
+  gap: 0.65rem;
+}
+.workflow-demo-package summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+.workflow-demo-package[open] summary {
+  margin-bottom: 0.65rem;
+}
+.workflow-demo-package textarea {
+  min-height: 12rem;
 }
 .workflow-demo-node {
   align-items: start;
