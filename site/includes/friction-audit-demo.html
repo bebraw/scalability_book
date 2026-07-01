@@ -1,0 +1,258 @@
+<section
+  class="scaling-demo friction-demo"
+  data-friction-demo
+  aria-labelledby="friction-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Friction audit lab</p>
+      <h3 id="friction-demo-heading">Find the slow part of a small change</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-friction-demo-verdict>Score the change path</span>
+      <small
+        >Friction compounds when setup, tests, review, and context fail.</small
+      >
+    </div>
+  </div>
+
+  <ol class="scaling-demo-progress" aria-label="Friction demo steps">
+    <li>
+      <button type="button" data-friction-demo-tab="0" aria-current="step">
+        <span>1</span>
+        Change
+      </button>
+    </li>
+    <li>
+      <button type="button" data-friction-demo-tab="1">
+        <span>2</span>
+        Audit
+      </button>
+    </li>
+    <li>
+      <button type="button" data-friction-demo-tab="2">
+        <span>3</span>
+        Improve
+      </button>
+    </li>
+    <li>
+      <button type="button" data-friction-demo-tab="3">
+        <span>4</span>
+        Artifact
+      </button>
+    </li>
+  </ol>
+
+  <form class="scaling-demo-form" data-friction-demo-form>
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      data-friction-demo-step="0"
+      aria-labelledby="friction-change-title"
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="friction-change-title">Change request</h4>
+        <label>
+          <span>Scenario</span>
+          <select data-friction-demo-scenario>
+            <option value="required-field" selected>
+              Add a required event property
+            </option>
+            <option value="reviewer-setup">
+              Run the project as a reviewer
+            </option>
+            <option value="filter-summary">
+              Add a filterable event summary
+            </option>
+            <option value="production-bug">
+              Explain a production data bug
+            </option>
+          </select>
+        </label>
+        <div class="friction-demo-scenario">
+          <strong data-friction-demo-scenario-title>
+            Add a required event property
+          </strong>
+          <p data-friction-demo-scenario-copy>
+            A new event type needs one required field in the UI, API, storage,
+            and summary view.
+          </p>
+        </div>
+        <div class="friction-demo-files">
+          <span>Likely touch points</span>
+          <ul data-friction-demo-files></ul>
+        </div>
+        <label>
+          <span>Assistance mode</span>
+          <select data-friction-demo-assistance>
+            <option value="human" selected>Human only</option>
+            <option value="weak-agent">Agent with weak project context</option>
+            <option value="harnessed-agent">
+              Agent with good instructions and tests
+            </option>
+          </select>
+        </label>
+        <div class="friction-demo-agent-note">
+          <strong data-friction-demo-agent-title>Human only</strong>
+          <p data-friction-demo-agent-copy>
+            The team does the search, edit, test, and review work manually.
+          </p>
+        </div>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Change process</h4>
+        <div class="friction-demo-process" data-friction-demo-process></div>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step friction-demo-audit-step"
+      data-friction-demo-step="1"
+      aria-labelledby="friction-audit-title"
+      hidden
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="friction-audit-title">Score the path</h4>
+        <label>
+          <span>Setup friction</span>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value="3"
+            data-friction-demo-score="setup"
+          />
+          <output data-friction-demo-output="setup">3</output>
+        </label>
+        <label>
+          <span>Comprehension friction</span>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value="4"
+            data-friction-demo-score="comprehension"
+          />
+          <output data-friction-demo-output="comprehension">4</output>
+        </label>
+        <label>
+          <span>Change friction</span>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value="4"
+            data-friction-demo-score="change"
+          />
+          <output data-friction-demo-output="change">4</output>
+        </label>
+        <label>
+          <span>Testing friction</span>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value="3"
+            data-friction-demo-score="testing"
+          />
+          <output data-friction-demo-output="testing">3</output>
+        </label>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Audit result</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Estimated change cost</dt>
+            <dd data-friction-demo-metric="before">0 min</dd>
+          </div>
+          <div>
+            <dt>Likely rework loops</dt>
+            <dd data-friction-demo-metric="loops">0</dd>
+          </div>
+          <div>
+            <dt>Agent rework risk</dt>
+            <dd data-friction-demo-metric="agentRisk">-</dd>
+          </div>
+          <div>
+            <dt>Largest source</dt>
+            <dd data-friction-demo-metric="largest">-</dd>
+          </div>
+        </dl>
+        <div class="friction-demo-bars" data-friction-demo-bars></div>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step"
+      data-friction-demo-step="2"
+      aria-labelledby="friction-improve-title"
+      hidden
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="friction-improve-title">Choose one feedback loop</h4>
+        <label>
+          <span>Improvement</span>
+          <select data-friction-demo-improvement>
+            <option value="setup-script" selected>
+              One-command setup with seed data
+            </option>
+            <option value="schema-validation">
+              Shared schema validation at boundaries
+            </option>
+            <option value="focused-tests">
+              Focused tests for the important behavior
+            </option>
+            <option value="small-review">
+              Smaller change boundary and review checklist
+            </option>
+          </select>
+        </label>
+        <div class="friction-demo-scenario">
+          <strong data-friction-demo-improvement-title>
+            One-command setup with seed data
+          </strong>
+          <p data-friction-demo-improvement-copy>
+            Everyone starts from the same runnable project and known data.
+          </p>
+        </div>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Impact</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Before</dt>
+            <dd data-friction-demo-metric="before">0 min</dd>
+          </div>
+          <div>
+            <dt>After</dt>
+            <dd data-friction-demo-metric="after">0 min</dd>
+          </div>
+          <div>
+            <dt>Time saved</dt>
+            <dd data-friction-demo-metric="saved">0 min</dd>
+          </div>
+        </dl>
+        <p class="friction-demo-note" data-friction-demo-interpretation>
+          Pick a feedback loop to see what repeated work it removes.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-artifact-step"
+      data-friction-demo-step="3"
+      aria-labelledby="friction-artifact-title"
+      hidden
+    >
+      <div class="scaling-demo-artifact-header">
+        <h4 id="friction-artifact-title">Friction audit artifact</h4>
+        <button type="button" data-friction-demo-copy>Copy audit</button>
+      </div>
+      <textarea data-friction-demo-artifact spellcheck="false"></textarea>
+    </section>
+
+    <div class="scaling-demo-actions">
+      <button type="button" data-friction-demo-prev>Previous</button>
+      <button type="submit" data-friction-demo-next>Next</button>
+    </div>
+  </form>
+</section>

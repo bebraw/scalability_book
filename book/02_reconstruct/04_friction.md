@@ -40,6 +40,14 @@ Examples to develop:
 - AI-generated code works but follows several inconsistent patterns.
 - The chosen theme is not documented clearly enough, so later readers cannot tell which domain assumptions are intentional.
 
+### Friction audit lab
+
+The demonstration below treats friction as repeated work in a small change path. The goal is not to calculate exact minutes. The goal is to make students name where the resistance appears and choose one feedback loop to improve before adding more features.
+
+{{ import "site/includes/friction-audit-demo.html" }}
+
+After using the demo, students should apply the same structure to their own Construct project: choose a likely change, score the path, name the largest source of friction, and choose one concrete improvement.
+
 ## Reducing friction
 
 Possible techniques:

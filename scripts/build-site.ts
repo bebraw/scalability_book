@@ -105,6 +105,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/comments.js",
             "/project-fit-checker.js",
             "/model-eval-demo.js",
+            "/friction-audit-demo.js",
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
             "/latency-budget-demo.js",
@@ -116,6 +117,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/comments.js",
             "/project-fit-checker.js",
             "/model-eval-demo.js",
+            "/friction-audit-demo.js",
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
             "/latency-budget-demo.js",
@@ -144,6 +146,10 @@ await compileSiteScript(
   "project-fit-checker.js",
 );
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
+await compileSiteScript(
+  "scripts/friction-audit-demo.ts",
+  "friction-audit-demo.js",
+);
 await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
 await compileSiteScript(
   "scripts/scaling-pressure-demo.ts",
