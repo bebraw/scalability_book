@@ -100,3 +100,5 @@ Students should add one architecture diagram and one data-flow diagram to the pr
 - Add one diagram showing data flow from event creation to viewing.
 - Include a short warning against framework-first architecture: frameworks are useful, but they do not remove distributed-system constraints.
 - Consider adding references on REST, HTTP semantics, idempotency, and web application architecture.
+- Obsidian candidate: `Clippings/_Processed/Emerging trends in software architecture from the practitioner’s perspective A five-year review.md` could provide a practitioner-facing reference for why cloud native, Kubernetes, serverless, containers, DevOps, AI, and observability keep appearing in architecture discussions. It may work best as context, not as a technology checklist students should copy.
+- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could be used later in the chapter or previewed here as an example of architecture shaped by retries, task queues, timers, state recovery, and long-running workflows.

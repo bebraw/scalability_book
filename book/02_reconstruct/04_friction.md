@@ -69,3 +69,5 @@ Students should produce a friction audit. It should name the largest sources of 
 - Add a friction checklist that students can reuse before Reconstruct.
 - Connect this chapter to the peer assessment process: friction is often felt by teammates first.
 - Consider including a small before/after example where a tangled event handler is split into clearer validation, storage, and presentation pieces.
+- Obsidian candidate: `Clippings/_Processed/Harness engineering for coding agent users.md` could strengthen the chapter's feedback-loop framing. The feedforward/feedback distinction maps well to setup instructions, tests, linters, architecture notes, and review prompts as friction reducers.
+- Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support a short section on review friction. The useful angle is not "skip review", but "move repeatable review comments into tools, tests, formatters, conventions, and smaller module boundaries".

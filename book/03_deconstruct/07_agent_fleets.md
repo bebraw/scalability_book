@@ -90,6 +90,10 @@ The central claim could be: more agents do not automatically mean more progress.
   - Observability: transcript, logs, traces, metrics, review artifacts.
   - Primary setting: development-time assistance, controlled agent runtime, production application.
 - Possible assignment: students add project instructions, create a repeatable setup/test command, improve one weak feedback loop, run a small fleet on one bounded project change, preserve the transcript or summary, and evaluate whether the workflow improved quality, speed, or understanding.
+- Obsidian candidate: `Clippings/_Processed/The Orchestration Tax.md` is a strong fit for the core warning that agent throughput is limited by human review throughput. It can support language around Amdahl's Law, backpressure, batching reviews, and scaling fleet size to review capacity rather than to tool availability.
+- Obsidian candidate: `Clippings/_Processed/Harness engineering for coding agent users.md` is a strong fit for agent readiness. It gives vocabulary for feedforward guides, feedback sensors, computational checks, inferential checks, maintainability harnesses, architecture fitness harnesses, and behavior harnesses.
+- Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` can provide a research-backed caution that LLMs can improve analyzability, testing, repair, and comprehension while also introducing brittleness, hallucinated outputs, unstable behavior, and new technical debt.
+- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` can help connect development-time fleets to production agent systems: long-running agent workflows need retries, durable state, task queues, visibility, and recovery semantics.
 
 ## Project artifact
 

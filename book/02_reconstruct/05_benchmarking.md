@@ -132,3 +132,5 @@ Students should create a measurement and observability plan. It should define on
 - Include a table of metrics and what each metric can reveal.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.
+- Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes. Adapt the idea from page speed to event tracking: latency, freshness, failed submissions, or dashboard load time should be connected to the value the system claims to provide.
+- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support examples where observability must cover long-running or retrying work, not only request/response latency.

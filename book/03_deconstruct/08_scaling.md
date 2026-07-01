@@ -110,3 +110,5 @@ Students should revise their Reconstruct design into a scaling trade-off table. 
 - Add a table mapping pressure, technique, benefit, and cost.
 - Include a short warning against premature scaling.
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
+- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support concrete scaling trade-offs around queues, retries, timers, durable state, and workflow visibility. Use it to ask what new operational responsibilities appear when asynchronous processing is introduced.
+- Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support a "measure what matters" reminder: scaling work should name the user or operational outcome it improves, not only the infrastructure metric it moves.
