@@ -107,6 +107,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/model-eval-demo.js",
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
+            "/latency-budget-demo.js",
             "/vendor/easymde/easymde.min.js",
             "/editor.js",
           ]
@@ -117,6 +118,7 @@ for (let index = 0; index < bookPages.length; index++) {
             "/model-eval-demo.js",
             "/agent-fleet-demo.js",
             "/scaling-pressure-demo.js",
+            "/latency-budget-demo.js",
           ],
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
@@ -146,6 +148,10 @@ await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
 await compileSiteScript(
   "scripts/scaling-pressure-demo.ts",
   "scaling-pressure-demo.js",
+);
+await compileSiteScript(
+  "scripts/latency-budget-demo.ts",
+  "latency-budget-demo.js",
 );
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
@@ -345,6 +351,10 @@ async function copyStaticAssets() {
   await copyFile(
     path.join(siteDir, "assets", "book-cover.svg"),
     path.join(assetsDir, "book-cover.svg"),
+  );
+  await copyFile(
+    path.join(siteDir, "assets", "blank-map-world.svg"),
+    path.join(assetsDir, "blank-map-world.svg"),
   );
 }
 

@@ -1,0 +1,320 @@
+<section
+  class="scaling-demo latency-demo"
+  data-latency-demo
+  aria-labelledby="latency-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Latency budget lab</p>
+      <h3 id="latency-demo-heading">Count distance and database waits</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-latency-demo-verdict>Build the request path</span>
+      <small
+        >The numbers are approximate, but the accumulation pattern is
+        real.</small
+      >
+    </div>
+  </div>
+
+  <ol class="scaling-demo-progress" aria-label="Latency demo steps">
+    <li>
+      <button type="button" data-latency-demo-tab="0" aria-current="step">
+        <span>1</span>
+        Distance
+      </button>
+    </li>
+    <li>
+      <button type="button" data-latency-demo-tab="1">
+        <span>2</span>
+        Database
+      </button>
+    </li>
+    <li>
+      <button type="button" data-latency-demo-tab="2">
+        <span>3</span>
+        Budget
+      </button>
+    </li>
+  </ol>
+
+  <form class="scaling-demo-form" data-latency-demo-form>
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      data-latency-demo-step="0"
+      aria-labelledby="latency-distance-title"
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="latency-distance-title">Request topology</h4>
+        <label>
+          <span>User to application</span>
+          <select data-latency-demo-distance="userApp">
+            <option value="25">Same city or campus, 25 km</option>
+            <option value="500" selected>Same region, 500 km</option>
+            <option value="1500">Same continent, 1,500 km</option>
+            <option value="7000">Intercontinental, 7,000 km</option>
+          </select>
+        </label>
+        <label>
+          <span>Database placement</span>
+          <select data-latency-demo-distance="appDb">
+            <option value="1" selected>Edge read replica near app, 1 km</option>
+            <option value="25">Same metro primary, 25 km</option>
+            <option value="500">Regional managed database, 500 km</option>
+            <option value="1500">Home-region primary, 1,500 km</option>
+          </select>
+        </label>
+        <div class="latency-demo-db-choice">
+          <span data-latency-demo-db-placement>Edge read replica</span>
+          <p data-latency-demo-db-impact>
+            Reads stay close to the application, but writes may still coordinate
+            with a primary database.
+          </p>
+        </div>
+        <label>
+          <span>Network overhead multiplier</span>
+          <input
+            type="range"
+            min="1"
+            max="2"
+            step="0.1"
+            value="1.4"
+            data-latency-demo-overhead
+          />
+          <output data-latency-demo-overhead-output>1.4x</output>
+        </label>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Physical floor</h4>
+        <div
+          class="latency-demo-map"
+          role="img"
+          aria-label="Schematic map of user, application, and database latency"
+        >
+          <svg viewBox="0 0 640 260" focusable="false" aria-hidden="true">
+            <image
+              class="latency-demo-world-map"
+              href="/assets/blank-map-world.svg"
+              x="0"
+              y="-32"
+              width="640"
+              height="325"
+              preserveAspectRatio="none"
+            />
+            <path
+              class="latency-demo-route latency-demo-route-user-app"
+              data-latency-demo-route="userApp"
+              d="M340 78 C356 50 374 50 390 82"
+            />
+            <path
+              class="latency-demo-route latency-demo-route-app-db"
+              data-latency-demo-route="appDb"
+              d="M390 82 C397 78 402 83 407 91"
+            />
+            <g
+              class="latency-demo-node latency-demo-node-user"
+              data-latency-demo-node="user"
+              transform="translate(340 78)"
+            >
+              <circle r="15" />
+              <text y="34">User</text>
+            </g>
+            <g
+              class="latency-demo-node latency-demo-node-app"
+              data-latency-demo-node="app"
+              transform="translate(390 82)"
+            >
+              <circle r="15" />
+              <text y="34">App</text>
+            </g>
+            <g
+              class="latency-demo-node latency-demo-node-db"
+              data-latency-demo-node="db"
+              transform="translate(407 91)"
+            >
+              <circle r="15" />
+              <text y="34">DB</text>
+            </g>
+          </svg>
+          <div class="latency-demo-map-label latency-demo-map-label-user">
+            <span>User to app</span>
+            <strong data-latency-demo-map="userDistance">500 km</strong>
+            <small data-latency-demo-map="userLatency">5.0 ms RTT floor</small>
+          </div>
+          <div class="latency-demo-map-label latency-demo-map-label-db">
+            <span>App to DB</span>
+            <strong data-latency-demo-map="dbDistance">1 km</strong>
+            <small data-latency-demo-map="dbLatency">0.0 ms RTT floor</small>
+          </div>
+        </div>
+        <p class="latency-demo-source">
+          Map derived from
+          <a href="https://commons.wikimedia.org/wiki/File:BlankMap-World.svg"
+            >BlankMap-World.svg</a
+          >
+          by Canuckguy and contributors, public domain, via Wikimedia Commons.
+        </p>
+        <p class="latency-demo-note">
+          In fiber, light travels at roughly 200,000 km/s. That is about 200 km
+          per millisecond one way, before routing, queues, TLS, server work, or
+          database execution.
+        </p>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>User RTT floor</dt>
+            <dd data-latency-demo-metric="userFloor">0 ms</dd>
+          </div>
+          <div>
+            <dt>App-DB RTT floor</dt>
+            <dd data-latency-demo-metric="dbFloor">0 ms</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step"
+      data-latency-demo-step="1"
+      aria-labelledby="latency-database-title"
+      hidden
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="latency-database-title">Database access pattern</h4>
+        <label>
+          <span>Server hardware profile</span>
+          <select data-latency-demo-hardware>
+            <option value="shared">Shared or small instance</option>
+            <option value="production" selected>
+              Typical production instance
+            </option>
+            <option value="tuned">Tuned database and warm cache</option>
+            <option value="contended">CPU or disk contention</option>
+            <option value="custom">Custom manual values</option>
+          </select>
+        </label>
+        <div class="latency-demo-hardware-choice">
+          <span data-latency-demo-hardware-name>
+            Typical production instance
+          </span>
+          <p data-latency-demo-hardware-impact>
+            Ordinary compute and database performance: hardware matters, but
+            round trips can still dominate.
+          </p>
+        </div>
+        <label>
+          <span>Sequential database round trips</span>
+          <input
+            type="range"
+            min="1"
+            max="12"
+            value="6"
+            data-latency-demo-db-roundtrips
+          />
+          <output data-latency-demo-db-roundtrips-output>6</output>
+        </label>
+        <label>
+          <span>Average database execution per query</span>
+          <input
+            type="range"
+            min="1"
+            max="40"
+            value="8"
+            data-latency-demo-db-exec
+          />
+          <output data-latency-demo-db-exec-output>8 ms</output>
+        </label>
+        <label>
+          <span>Application work before response</span>
+          <input
+            type="range"
+            min="1"
+            max="80"
+            value="20"
+            data-latency-demo-app-work
+          />
+          <output data-latency-demo-app-work-output>20 ms</output>
+        </label>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Compare access shapes</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Sequential DB wait</dt>
+            <dd data-latency-demo-metric="sequentialDb">0 ms</dd>
+          </div>
+          <div>
+            <dt>If batched into 2 trips</dt>
+            <dd data-latency-demo-metric="batchedDb">0 ms</dd>
+          </div>
+          <div>
+            <dt>Round-trip penalty</dt>
+            <dd data-latency-demo-metric="roundtripPenalty">0 ms</dd>
+          </div>
+          <div>
+            <dt>Network per DB trip</dt>
+            <dd data-latency-demo-metric="dbTripNetwork">0 ms</dd>
+          </div>
+          <div>
+            <dt>Server execution</dt>
+            <dd data-latency-demo-metric="serverExecution">0 ms</dd>
+          </div>
+        </dl>
+        <div class="latency-demo-db-impact">
+          <h4 data-latency-demo-db-placement>Edge read replica</h4>
+          <p data-latency-demo-db-impact>
+            Reads stay close to the application, but writes may still coordinate
+            with a primary database.
+          </p>
+          <small data-latency-demo-db-caveat>
+            Edge placement helps read-heavy paths most. It does not remove
+            consistency, replication, or write-routing trade-offs.
+          </small>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-tradeoff-step"
+      data-latency-demo-step="2"
+      aria-labelledby="latency-budget-title"
+      hidden
+    >
+      <div>
+        <h4 id="latency-budget-title">Latency budget</h4>
+        <ol data-latency-demo-breakdown></ol>
+      </div>
+      <div>
+        <h4>Totals</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Estimated response</dt>
+            <dd data-latency-demo-metric="total">0 ms</dd>
+          </div>
+          <div>
+            <dt>Physical network floor</dt>
+            <dd data-latency-demo-metric="physical">0 ms</dd>
+          </div>
+          <div>
+            <dt>Avoidable DB wait</dt>
+            <dd data-latency-demo-metric="avoidable">0 ms</dd>
+          </div>
+          <div>
+            <dt>100-request page cost</dt>
+            <dd data-latency-demo-metric="hundred">0 s</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="scaling-demo-impact">
+        <h4>Interpretation</h4>
+        <p data-latency-demo-interpretation>
+          Adjust distance and database access to see what dominates.
+        </p>
+      </div>
+    </section>
+
+    <div class="scaling-demo-actions">
+      <button type="button" data-latency-demo-prev>Previous</button>
+      <button type="submit" data-latency-demo-next>Next</button>
+    </div>
+  </form>
+</section>

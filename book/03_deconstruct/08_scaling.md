@@ -86,6 +86,14 @@ Ideas to develop:
 
 In some project themes, geography may matter very little. In others, a platform serving users or devices in different regions may need to consider latency, data residency, or regional failure. This is a good place to teach restraint: not every project needs multi-region architecture.
 
+### Latency budget lab
+
+The demonstration below treats latency as a budget. Some of the budget is bounded by physics: a signal cannot cross distance instantly, and real networks add routing and protocol overhead. Some of the budget is architectural: every sequential database round trip adds another wait.
+
+{{ import "site/includes/latency-budget-demo.html" }}
+
+The point is not to memorize exact numbers. Real latency depends on providers, routing, congestion, TLS, database load, and query plans. The useful lesson is the shape of the problem: distance creates a lower bound, and repeated sequential database access multiplies that bound.
+
 ## Trade-offs
 
 Important trade-offs to make explicit:
