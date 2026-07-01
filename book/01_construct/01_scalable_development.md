@@ -46,6 +46,27 @@ For slideotter, one of the smartest decisions I did was to define layout rules f
 >
 > This loop can support the three-project AI arc. In Construct, students can use a strong model to generate quickly while building the constraint and validation artifacts. In Reconstruct, a weaker mini model can expose whether those artifacts are good enough. In Deconstruct, a weak department-hosted model can make the harness itself the object of analysis: what context, examples, tests, prompts, and review loops allowed useful work despite lower model capability?
 
+## The project harness
+
+When using agents, the application code is only one part of the project. The other part is the harness around the code: the files, commands, rules, and examples that help humans and agents understand what is expected. A good harness reduces the amount of hidden context a contributor needs before they can make a useful change.
+
+It is this harness that keeps your project maintainable, and you will end up evolving throughout your project while sharing good practices with other projects. One purpose of this book is to make you aware of those practices since I had to spend a lot of time myself to discover many of them and not all are obvious. As you work on your project, it is a good idea to push anything repetitive to your harness.
+
+For example, my [`vibe-template`](https://github.com/bebraw/vibe-template) project separates the starter application from the harness around it. The Cloudflare Worker and TypeScript setup are specific implementation choices, but the reusable lesson is more general: the repository contains agent instructions, architecture rules, feature specs, decision records, setup notes, and validation commands. Those artifacts make it easier to start quickly without letting the codebase become a pile of undocumented accidents. This project comes with a ready-made process for me to pull my practices to other projects so it may be worth studying as an example.
+
+For this course, a minimal harness for your project should include:
+
+- `README.md` explaining the domain, users, event types, setup command, and local development workflow.
+- `AGENTS.md` or an equivalent agent instruction file describing how AI tools should work in the repository, including what they must not change without approval.
+- `ARCHITECTURE.md` or an architecture note recording cross-cutting rules, major components, storage choices, and assumptions that should survive individual feature changes.
+- `specs/{feature}/spec.md` for the main event workflow, including expected behavior, API or UI contracts, regression guardrails, and verification steps.
+- `docs/adrs/` or a simpler decision log for choices that will matter later, such as the initial stack, database, deployment target, authentication model, or event storage approach.
+- A small set of stable commands for running, testing, formatting, type checking, or otherwise validating the project.
+- Example environment files, such as `.env.example`, when configuration or secrets are needed locally.
+- A short AI-use log noting what AI assistance was used, what was reviewed manually, and what had to be corrected.
+
+You can have an agent to generate a lot of that and refine as needed. Note that local CI, mutation testing, browser automation, performance budgets, pre-push hooks, and reusable capability kits are valuable, but they are optional upgrades for groups that have a reason to add them. The baseline is simpler: can another student or agent clone the project, understand the intended shape, run the checks, and make a small change without guessing?
+
 ## From slop to top
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such. When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude. Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.
@@ -128,4 +149,4 @@ After this chapter, students should be able to:
 
 ## Project artifact
 
-Students should start a project README that records the chosen domain, core event types, setup command, development assumptions, AI assistance used, and the constraints they want future contributors or agents to respect.
+Students should create a first version of the project harness. It should include a README, setup command, one agent instruction file, one architecture note, one feature spec for the core event workflow, one decision record for the initial stack or storage choice, one fast validation command, and a short AI-use log. The harness can be lightweight, but it should be concrete enough that another group can run, inspect, and later deconstruct the project.

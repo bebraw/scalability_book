@@ -81,6 +81,17 @@ Possible exercise:
 
 Students should make a conscious architecture choice for the first project, even if the choice is simple.
 
+Architecture should not live only in diagrams or in the memory of the original authors. In an AI-assisted project, architectural intent also has to be written in places that future contributors and agents will actually read. Otherwise, the next generated change can accidentally redefine the system by changing behavior without changing the explanation.
+
+The Construct project should therefore treat a small set of project memory files as architectural artifacts:
+
+- `ARCHITECTURE.md` records global rules and cross-cutting constraints, such as the chosen application shape, storage model, validation boundaries, deployment assumptions, and rules future changes should preserve.
+- `specs/{feature}/spec.md` records feature-level contracts, workflows, regression guardrails, and verification steps. For the event tracking project, the first spec should usually describe how an event is created, validated, stored, and viewed.
+- `docs/adrs/` or a simple decision log records durable decisions and trade-offs. Students do not need an ADR for every small change, but they should record decisions that future groups would otherwise have to rediscover.
+- `AGENTS.md` records how AI tools should operate in the repository. It can name required commands, review expectations, files that must not be overwritten, and when the agent should ask before changing the project shape.
+
+This documentation is not separate from architecture. It is part of how the architecture remains understandable after the first implementation is done. If the code, diagram, spec, and decision log disagree, the project has an architectural problem even if the application still runs.
+
 Prompts:
 
 - What are the main components of your system?
@@ -89,10 +100,12 @@ Prompts:
 - What does the frontend assume about the backend?
 - What API or internal interface is most likely to survive into the next project phase?
 - Which part of the design would be hardest to change later?
+- Which architectural decisions have been written down so another group can understand them?
+- Which agent instructions protect the architecture from accidental drift?
 
 ## Project artifact
 
-Students should add one architecture diagram and one data-flow diagram to the project. The diagrams should show how an event moves from user action to storage and later viewing, including the boundaries where validation, authorization, and failure can occur.
+Students should add one architecture diagram and one data-flow diagram to the project. The diagrams should show how an event moves from user action to storage and later viewing, including the boundaries where validation, authorization, and failure can occur. They should also add or update `ARCHITECTURE.md`, one feature spec, and one decision record so the diagrams are backed by written constraints.
 
 ## Notes for further development
 
