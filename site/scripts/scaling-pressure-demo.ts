@@ -202,18 +202,6 @@ function initializeScalingDemo(root: HTMLElement) {
   const metricNodes = Array.from(
     root.querySelectorAll<HTMLElement>("[data-scaling-demo-metric]"),
   );
-  const steps = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-scaling-demo-step]"),
-  );
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("[data-scaling-demo-tab]"),
-  );
-  const previous = root.querySelector<HTMLButtonElement>(
-    "[data-scaling-demo-prev]",
-  );
-  const next = root.querySelector<HTMLButtonElement>(
-    "[data-scaling-demo-next]",
-  );
 
   if (
     !form ||
@@ -224,28 +212,11 @@ function initializeScalingDemo(root: HTMLElement) {
     !verdict ||
     !interpretation ||
     !artifact ||
-    !copy ||
-    !previous ||
-    !next ||
-    steps.length === 0 ||
-    tabs.length !== steps.length
+    !copy
   ) {
     return;
   }
 
-  let currentStep = 0;
-  const showStep = (step: number, focusStep = false) => {
-    currentStep = Math.max(0, Math.min(step, steps.length - 1));
-    updateScalingStage(
-      root,
-      steps,
-      tabs,
-      previous,
-      next,
-      currentStep,
-      focusStep,
-    );
-  };
   const render = () => {
     const pressures = getScalingPressures(pressureInputs);
     const selected = getSelectedScalingTechniques(techniques);
@@ -285,7 +256,6 @@ function initializeScalingDemo(root: HTMLElement) {
       selected,
       result,
     });
-    updateScalingStage(root, steps, tabs, previous, next, currentStep, false);
   };
 
   scenario.addEventListener("change", () => {
@@ -307,17 +277,9 @@ function initializeScalingDemo(root: HTMLElement) {
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep < steps.length - 1) {
-      showStep(currentStep + 1, true);
-    }
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
-  previous.addEventListener("click", () => showStep(currentStep - 1, true));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => showStep(index, true));
-  });
   copy.addEventListener("click", async () => {
     artifact.select();
 
@@ -335,7 +297,6 @@ function initializeScalingDemo(root: HTMLElement) {
   const initialScenario = scalingScenarios[scenario.value as ScalingScenarioId];
   context.value = initialScenario.context;
   render();
-  showStep(0);
 }
 
 function getScalingPressures(inputs: HTMLInputElement[]) {
@@ -610,50 +571,6 @@ function getScalingRiskLabel(score: number) {
   }
 
   return "Low";
-}
-
-function updateScalingStage(
-  root: HTMLElement,
-  steps: HTMLElement[],
-  tabs: HTMLButtonElement[],
-  previous: HTMLButtonElement,
-  next: HTMLButtonElement,
-  currentStep: number,
-  focusStep: boolean,
-) {
-  const finalStep = steps.length - 1;
-
-  root.dataset.scalingDemoCurrentStep = String(currentStep);
-  steps.forEach((step, index) => {
-    const active = index === currentStep;
-
-    step.hidden = !active;
-    step.classList.toggle("is-active", active);
-    step.setAttribute("aria-hidden", String(!active));
-  });
-  tabs.forEach((tab, index) => {
-    const active = index === currentStep;
-
-    if (active) {
-      tab.setAttribute("aria-current", "step");
-    } else {
-      tab.removeAttribute("aria-current");
-    }
-
-    tab.classList.toggle("is-active", active);
-    tab.classList.toggle("is-complete", index < currentStep);
-  });
-  previous.disabled = currentStep === 0;
-  next.textContent = currentStep === finalStep ? "Done" : "Next";
-  next.disabled = currentStep === finalStep;
-
-  if (focusStep) {
-    requestAnimationFrame(() => {
-      steps[currentStep]
-        ?.querySelector<HTMLElement>("select, textarea, input, button")
-        ?.focus({ preventScroll: true });
-    });
-  }
 }
 
 function escapeScalingHtml(value: string) {

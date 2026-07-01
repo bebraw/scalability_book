@@ -17,39 +17,8 @@
     </div>
   </div>
 
-  <ol class="scaling-demo-progress" aria-label="Scaling demo steps">
-    <li>
-      <button type="button" data-scaling-demo-tab="0" aria-current="step">
-        <span>1</span>
-        Pressure
-      </button>
-    </li>
-    <li>
-      <button type="button" data-scaling-demo-tab="1">
-        <span>2</span>
-        Moves
-      </button>
-    </li>
-    <li>
-      <button type="button" data-scaling-demo-tab="2">
-        <span>3</span>
-        Trade-offs
-      </button>
-    </li>
-    <li>
-      <button type="button" data-scaling-demo-tab="3">
-        <span>4</span>
-        Artifact
-      </button>
-    </li>
-  </ol>
-
-  <form class="scaling-demo-form" data-scaling-demo-form>
-    <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
-      data-scaling-demo-step="0"
-      aria-labelledby="scaling-demo-pressure-title"
-    >
+  <form class="scaling-demo-form scaling-pressure-grid" data-scaling-demo-form>
+    <div class="scaling-pressure-column">
       <div class="scaling-demo-panel">
         <h4 id="scaling-demo-pressure-title">Event tracker pressure</h4>
         <label>
@@ -65,6 +34,7 @@
           <textarea rows="5" data-scaling-demo-context></textarea>
         </label>
       </div>
+
       <div class="scaling-demo-panel">
         <h4>Pressure levels</h4>
         <label>
@@ -112,14 +82,9 @@
           <output data-scaling-demo-output="tenants">2</output>
         </label>
       </div>
-    </section>
+    </div>
 
-    <section
-      class="scaling-demo-step scaling-demo-moves-step"
-      data-scaling-demo-step="1"
-      aria-labelledby="scaling-demo-moves-title"
-      hidden
-    >
+    <div class="scaling-pressure-column">
       <div class="scaling-demo-panel">
         <h4 id="scaling-demo-moves-title">Candidate moves</h4>
         <div class="scaling-demo-techniques">
@@ -184,6 +149,7 @@
           </label>
         </div>
       </div>
+
       <div class="scaling-demo-panel scaling-demo-guidance">
         <h4>Selection rule</h4>
         <p>
@@ -192,21 +158,13 @@
         </p>
         <ul data-scaling-demo-recommendations></ul>
       </div>
-    </section>
+    </div>
 
-    <section
-      class="scaling-demo-step scaling-demo-tradeoff-step"
-      data-scaling-demo-step="2"
-      aria-labelledby="scaling-demo-tradeoff-title"
-      hidden
-    >
-      <div>
+    <div class="scaling-pressure-column scaling-pressure-output-column">
+      <section class="scaling-demo-panel scaling-demo-tradeoff-step">
         <h4 id="scaling-demo-tradeoff-title">Resulting design</h4>
         <ol data-scaling-demo-pipeline></ol>
-      </div>
-      <div>
-        <h4>Pressure scorecard</h4>
-        <dl class="scaling-demo-metrics">
+        <dl class="scaling-demo-metrics demo-metrics-compact">
           <div>
             <dt>Write relief</dt>
             <dd data-scaling-demo-metric="writes">0/10</dd>
@@ -228,31 +186,19 @@
             <dd data-scaling-demo-metric="cost">Low</dd>
           </div>
         </dl>
-      </div>
-      <div class="scaling-demo-impact">
-        <h4>Interpretation</h4>
         <p data-scaling-demo-interpretation>
           Select techniques to see the trade-off.
         </p>
-      </div>
-    </section>
+      </section>
 
-    <section
-      class="scaling-demo-step scaling-demo-artifact-step"
-      data-scaling-demo-step="3"
-      aria-labelledby="scaling-demo-artifact-title"
-      hidden
-    >
-      <div class="scaling-demo-artifact-header">
-        <h4 id="scaling-demo-artifact-title">Scaling trade-off table</h4>
-        <button type="button" data-scaling-demo-copy>Copy artifact</button>
-      </div>
-      <textarea data-scaling-demo-artifact rows="16" readonly></textarea>
-    </section>
-
-    <div class="scaling-demo-actions">
-      <button type="button" data-scaling-demo-prev>Previous</button>
-      <button type="submit" data-scaling-demo-next>Next</button>
+      <details class="scaling-demo-panel scaling-demo-artifact-step">
+        <summary>Trade-off table</summary>
+        <div class="scaling-demo-artifact-header">
+          <h4 id="scaling-demo-artifact-title">Copyable scaling artifact</h4>
+          <button type="button" data-scaling-demo-copy>Copy artifact</button>
+        </div>
+        <textarea data-scaling-demo-artifact rows="12" readonly></textarea>
+      </details>
     </div>
   </form>
 </section>

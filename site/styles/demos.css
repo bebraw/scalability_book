@@ -1084,6 +1084,15 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+.scaling-pressure-grid {
+  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+.scaling-pressure-column {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
 .scaling-demo-step {
   display: grid;
   gap: 0.8rem;
@@ -2330,7 +2339,7 @@
   line-height: 1.3;
 }
 .scaling-demo-guidance p,
-.scaling-demo-impact p,
+.scaling-demo-tradeoff-step p,
 .prose .latency-demo-note {
   color: var(--muted);
   font-family: var(--font-ui);
@@ -2499,13 +2508,23 @@
   padding: 0.75rem;
 }
 .scaling-demo-artifact-step textarea {
-  min-height: 22rem;
+  min-height: 14rem;
 }
 .scaling-demo-artifact-header {
   align-items: center;
   display: flex;
   gap: 0.75rem;
   justify-content: space-between;
+}
+.scaling-demo-artifact-step summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+.scaling-demo-artifact-step[open] summary {
+  margin-bottom: 0.35rem;
 }
 .scaling-demo-actions {
   border-block-start: 1px solid var(--border);

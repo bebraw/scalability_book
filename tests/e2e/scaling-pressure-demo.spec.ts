@@ -12,13 +12,11 @@ test.describe("scaling pressure demo", () => {
     await expect(demo.locator("[data-scaling-demo-verdict]")).toContainText(
       "3 moves",
     );
-    await expect(demo.locator("[data-scaling-demo-step='0']")).toBeVisible();
+    await expect(demo.locator(".scaling-pressure-grid")).toBeVisible();
     await expect(demo.locator("[data-scaling-demo-context]")).toHaveValue(
       /20,000 check-in events/,
     );
 
-    await demo.locator("[data-scaling-demo-next]").click();
-    await expect(demo.locator("[data-scaling-demo-step='1']")).toBeVisible();
     await demo
       .locator("[data-scaling-demo-technique][value='cache']")
       .setChecked(true);
@@ -26,8 +24,6 @@ test.describe("scaling pressure demo", () => {
       demo.locator("[data-scaling-demo-recommendations]"),
     ).toContainText("Write pressure is high");
 
-    await demo.locator("[data-scaling-demo-next]").click();
-    await expect(demo.locator("[data-scaling-demo-step='2']")).toBeVisible();
     await expect(demo.locator("[data-scaling-demo-pipeline]")).toContainText(
       "short-lived cache",
     );
@@ -38,8 +34,7 @@ test.describe("scaling pressure demo", () => {
       demo.locator("[data-scaling-demo-interpretation]"),
     ).toContainText("freshness budget");
 
-    await demo.locator("[data-scaling-demo-next]").click();
-    await expect(demo.locator("[data-scaling-demo-step='3']")).toBeVisible();
+    await demo.locator(".scaling-demo-artifact-step summary").click();
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
       /Scaling Trade-off Table/,
     );
@@ -49,8 +44,8 @@ test.describe("scaling pressure demo", () => {
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
       /Cache dashboard reads/,
     );
-    await expect(demo.locator("[data-scaling-demo-next]")).toBeDisabled();
     await expectElementsInsideDemo(demo, [".scaling-demo-artifact-step"]);
+    await expect(demo.locator("[data-scaling-demo-step]")).toHaveCount(0);
   });
 
   test("updates pressure and recommendations for a different scenario", async ({
@@ -66,7 +61,6 @@ test.describe("scaling pressure demo", () => {
       demo.locator("[data-scaling-demo-output='tenants']"),
     ).toContainText("5");
 
-    await demo.locator("[data-scaling-demo-tab='1']").click();
     await expect(
       demo.locator("[data-scaling-demo-recommendations]"),
     ).toContainText("Tenant pressure is high");
@@ -74,7 +68,6 @@ test.describe("scaling pressure demo", () => {
       .locator("[data-scaling-demo-technique][value='partition']")
       .setChecked(true);
 
-    await demo.locator("[data-scaling-demo-tab='2']").click();
     await expect(demo.locator("[data-scaling-demo-pipeline]")).toContainText(
       "project partition",
     );
