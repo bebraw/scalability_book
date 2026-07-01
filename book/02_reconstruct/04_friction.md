@@ -40,6 +40,14 @@ Examples to develop:
 - AI-generated code works but follows several inconsistent patterns.
 - The chosen theme is not documented clearly enough, so later readers cannot tell which domain assumptions are intentional.
 
+### Workflow loop lab
+
+The demonstration below puts the work into a visible loop: human framing, implementation, tool feedback, review, and correction. It separates agent speed from workflow quality, because an agent can produce more output while still pushing uncertainty into human review.
+
+{{ import "site/includes/workflow-loop-demo.html" }}
+
+Use this first to make the human-in-the-loop process explicit. Then use the friction audit to ask which part of that process is creating repeated work.
+
 ### Friction audit lab
 
 The demonstration below treats friction as repeated work in a small change path. The goal is not to calculate exact minutes. The goal is to make students name where the resistance appears and choose one feedback loop to improve before adding more features.

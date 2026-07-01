@@ -1077,6 +1077,7 @@
 .latency-demo .scaling-demo-pressure-step {
   align-items: start;
 }
+.workflow-demo .scaling-demo-pressure-step,
 .friction-demo .scaling-demo-pressure-step {
   align-items: start;
 }
@@ -1088,6 +1089,7 @@
 .latency-demo .scaling-demo-panel {
   align-content: start;
 }
+.workflow-demo .scaling-demo-panel,
 .friction-demo .scaling-demo-panel {
   align-content: start;
 }
@@ -1223,6 +1225,128 @@
   line-height: 1.2;
   max-width: none;
   padding: 0.35rem 0.55rem;
+}
+.workflow-demo-loop {
+  display: grid;
+  gap: 0.5rem;
+}
+.workflow-demo-signals,
+.workflow-demo-evidence {
+  display: grid;
+  gap: 0.5rem;
+}
+.workflow-demo-signal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  padding: 0.58rem 0.65rem;
+}
+.workflow-demo-signal small {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+.workflow-demo-range {
+  align-items: center;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 0.1rem;
+}
+.workflow-demo-evidence {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.workflow-demo-evidence li {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.58rem 0.65rem;
+}
+.workflow-demo-evidence span,
+.workflow-demo-evidence small {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.workflow-demo-evidence strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+.prose .workflow-demo-evidence p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: none;
+}
+.workflow-demo-evidence small {
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border-radius: 0.25rem;
+  color: var(--text);
+  padding: 0.35rem 0.4rem;
+  text-transform: none;
+}
+.workflow-demo-node {
+  align-items: start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  display: grid;
+  gap: 0.25rem 0.6rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.55rem 0.65rem;
+}
+.workflow-demo-node > span {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg));
+  border-radius: 999px;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 900;
+  height: 1.45rem;
+  justify-content: center;
+  width: 1.45rem;
+}
+.workflow-demo-node strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+.prose .workflow-demo-node p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin: 0.1rem 0 0;
+  max-width: none;
+}
+.workflow-demo-node small {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 800;
+  grid-column: 2;
+  justify-self: start;
+  line-height: 1.1;
+  margin-top: 0.1rem;
+  padding: 0.22rem 0.42rem;
+  text-transform: uppercase;
 }
 .friction-demo-process,
 .friction-demo-bars {
