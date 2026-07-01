@@ -61,14 +61,14 @@ const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
   "weak-agent": {
     title: "Agent with weak project context",
     copy: "The agent drafts edits faster, but missing setup, unclear boundaries, and weak tests create review and rework.",
-    speed: { setup: 0.9, comprehension: 0.75, change: 0.45, testing: 0.85 },
+    speed: { setup: 0.95, comprehension: 0.85, change: 0.65, testing: 0.9 },
     reworkMultiplier: 1.35,
     risk: "High",
   },
   "harnessed-agent": {
     title: "Agent with good instructions and tests",
     copy: "Clear project instructions, seed data, and focused tests let the agent move faster with fewer correction loops.",
-    speed: { setup: 0.55, comprehension: 0.5, change: 0.35, testing: 0.45 },
+    speed: { setup: 0.75, comprehension: 0.7, change: 0.55, testing: 0.65 },
     reworkMultiplier: 0.7,
     risk: "Low",
   },
