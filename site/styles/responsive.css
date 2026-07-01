@@ -170,6 +170,12 @@
   .project-fit-results {
     grid-template-columns: 1fr;
   }
+  .demo-gallery-item {
+    grid-template-columns: 1fr;
+  }
+  .demo-gallery-item-header {
+    position: static;
+  }
   .model-eval-header,
   .model-eval-step,
   .model-eval-cards,

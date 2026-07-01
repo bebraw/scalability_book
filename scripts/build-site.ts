@@ -30,50 +30,74 @@ const commonBookScripts = ["/book-nav.js", "/toc-highlight.js", "/comments.js"];
 const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
 const demoScriptIncludes = [
   {
+    title: "Project fit checker",
+    chapter: "Scalable development",
     include: "site/includes/project-fit-checker.html",
     script: "/project-fit-checker.js",
   },
   {
+    title: "Scalability dimensions lab",
+    chapter: "What is scalability?",
     include: "site/includes/scalability-dimensions-demo.html",
     script: "/scalability-dimensions-demo.js",
   },
   {
+    title: "Boundary trace",
+    chapter: "Architecture",
     include: "site/includes/request-trace-demo.html",
     script: "/request-trace-demo.js",
   },
   {
+    title: "Model evaluation lab",
+    chapter: "Benchmarking",
     include: "site/includes/model-eval-demo.html",
     script: "/model-eval-demo.js",
   },
   {
+    title: "Observability signal picker",
+    chapter: "Benchmarking",
     include: "site/includes/observability-signal-demo.html",
     script: "/observability-signal-demo.js",
   },
   {
+    title: "Workflow loop",
+    chapter: "Friction",
     include: "site/includes/workflow-loop-demo.html",
     script: "/workflow-loop-demo.js",
   },
   {
+    title: "Friction audit",
+    chapter: "Friction",
     include: "site/includes/friction-audit-demo.html",
     script: "/friction-audit-demo.js",
   },
   {
+    title: "Changed assumptions map",
+    chapter: "Reality",
     include: "site/includes/pressure-map-demo.html",
     script: "/pressure-map-demo.js",
   },
   {
+    title: "Agent fleet delegation",
+    chapter: "Agent fleets",
     include: "site/includes/agent-fleet-demo.html",
     script: "/agent-fleet-demo.js",
   },
   {
+    title: "Scaling pressure planner",
+    chapter: "Scaling",
     include: "site/includes/scaling-pressure-demo.html",
     script: "/scaling-pressure-demo.js",
   },
   {
+    title: "Latency budget map",
+    chapter: "Scaling",
     include: "site/includes/latency-budget-demo.html",
     script: "/latency-budget-demo.js",
   },
   {
+    title: "Final reflection package",
+    chapter: "Recap",
     include: "site/includes/final-reflection-demo.html",
     script: "/final-reflection-demo.js",
   },
@@ -172,6 +196,18 @@ await writePage(
   }),
 );
 
+const demoGallery = renderMarkdown(getDemoGallerySource(), { number: "" });
+await writePage(
+  "demos/index.html",
+  renderer.renderLayout({
+    title: `Demo showcase - ${config.title}`,
+    description: "A single page for previewing and debugging course demos.",
+    currentUrl: "/demos/",
+    scripts: demoScriptIncludes.map(({ script }) => script),
+    children: renderDemoGalleryPage(demoGallery.content),
+  }),
+);
+
 await compileSiteStylesheet("styles.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
@@ -234,6 +270,37 @@ function getDemoScriptsForSource(source) {
   return demoScriptIncludes
     .filter(({ include }) => source.includes(include))
     .map(({ script }) => script);
+}
+
+function getDemoGallerySource() {
+  const sections = demoScriptIncludes
+    .map(
+      ({ title, chapter, include }) => `<section class="demo-gallery-item">
+<div class="demo-gallery-item-header">
+<p>${chapter}</p>
+<h2>${title}</h2>
+</div>
+{{ import "${include}" }}
+</section>`,
+    )
+    .join("\n\n");
+
+  return `# Demo showcase
+
+<div class="demo-gallery-lede">
+<p>Every interactive course demo is collected here for quick review, regression checks, and classroom walkthroughs.</p>
+</div>
+
+${sections}
+`;
+}
+
+function renderDemoGalleryPage(content) {
+  return `<main class="demo-gallery-page" id="content">
+<article class="prose demo-gallery-prose">
+${content}
+</article>
+</main>`;
 }
 
 async function compileSiteStylesheet(sourceRelativePath) {
