@@ -289,7 +289,7 @@ function getDemoGallerySource() {
       ({ title, chapter, include }) => `<section class="demo-gallery-item">
 <div class="demo-gallery-item-header">
 <p>${chapter}</p>
-<h2>${title}</h2>
+<span>${title}</span>
 </div>
 {{ import "${include}" }}
 </section>`,

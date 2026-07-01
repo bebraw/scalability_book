@@ -404,8 +404,8 @@
   color: var(--accent-strong);
 }
 .project-fit-results li.is-missing span {
-  background: color-mix(in srgb, #b45309 18%, transparent);
-  color: #92400e;
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
 }
 .project-fit-results li strong {
   display: block;
@@ -437,7 +437,7 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(in srgb, var(--panel) 88%, #0f766e 12%),
+      color-mix(in srgb, var(--panel) 88%, var(--success) 12%),
       var(--panel)
     ),
     repeating-linear-gradient(
@@ -466,7 +466,7 @@
   padding-block-end: 1rem;
 }
 .prose .model-eval-kicker {
-  color: #0f766e;
+  color: var(--success);
   font-family: var(--font-ui);
   font-size: 0.78rem;
   font-weight: 800;
@@ -506,7 +506,7 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(in srgb, var(--panel) 90%, #0f766e 10%),
+      color-mix(in srgb, var(--panel) 90%, var(--success) 10%),
       var(--panel)
     ),
     repeating-linear-gradient(
@@ -535,7 +535,7 @@
   padding-block-end: 1rem;
 }
 .prose .observability-demo-kicker {
-  color: #0f766e;
+  color: var(--success);
   font-family: var(--font-ui);
   font-size: 0.78rem;
   font-weight: 800;
@@ -1720,7 +1720,7 @@
   align-self: center;
   background: var(--accent-strong);
   border-radius: 0.35rem;
-  color: #10231f;
+  color: var(--panel);
   font-family: var(--font-ui);
   font-size: 0.9rem;
   font-weight: 900;
@@ -1867,7 +1867,7 @@
 }
 .request-trace-flow-node.is-selected span {
   background: var(--accent-strong);
-  color: #10231f;
+  color: var(--panel);
 }
 .request-trace-flow-node.is-selected small,
 .request-trace-flow-node.is-selected strong {
@@ -2311,7 +2311,7 @@
 }
 .request-trace-demo .request-trace-flow-node.is-selected span {
   background: var(--accent-strong);
-  color: #10231f;
+  color: var(--panel);
 }
 .request-trace-demo .request-trace-flow-node.is-selected small,
 .request-trace-demo .request-trace-flow-node.is-selected strong {
@@ -2373,17 +2373,17 @@
   width: 1.35rem;
 }
 .model-eval-progress button.is-active {
-  background: #0f766e;
-  border-color: #0f766e;
-  color: white;
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--panel);
 }
 .model-eval-progress button.is-active span {
-  background: white;
-  color: #0f766e;
+  background: var(--panel);
+  color: var(--success);
 }
 .model-eval-progress button.is-complete:not(.is-active) span {
-  background: color-mix(in srgb, #0f766e 20%, var(--bg));
-  color: #0f766e;
+  background: color-mix(in srgb, var(--success) 20%, var(--bg));
+  color: var(--success);
 }
 .model-eval-form {
   display: grid;
@@ -2575,13 +2575,13 @@
   padding: 0.58rem 0.65rem;
 }
 .observability-demo-result.is-answers {
-  border-inline-start-color: #0f766e;
+  border-inline-start-color: var(--success);
 }
 .observability-demo-result.is-supports {
-  border-inline-start-color: #b45309;
+  border-inline-start-color: var(--warning);
 }
 .observability-demo-result.is-noisy {
-  border-inline-start-color: #991b1b;
+  border-inline-start-color: var(--danger);
 }
 .observability-demo-result div {
   align-items: baseline;
@@ -2608,8 +2608,8 @@
   padding: 0;
 }
 .observability-demo-recommendation li {
-  background: color-mix(in srgb, #0f766e 7%, var(--panel));
-  border: 1px solid color-mix(in srgb, #0f766e 32%, var(--border));
+  background: color-mix(in srgb, var(--success) 7%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--success) 32%, var(--border));
   border-radius: 0.3rem;
   display: grid;
   gap: 0.25rem;
@@ -2691,7 +2691,7 @@
 .reflection-package-gaps li {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-inline-start: 0.25rem solid #b45309;
+  border-inline-start: 0.25rem solid var(--warning);
   border-radius: 0.3rem;
   display: grid;
   gap: 0.25rem;
@@ -2810,7 +2810,7 @@
   margin: 0;
 }
 .model-eval-card header span {
-  color: #0f766e;
+  color: var(--success);
   font-size: 0.78rem;
   font-weight: 850;
   min-width: 0;
@@ -2846,8 +2846,8 @@
   padding: 0.45rem 0.7rem;
 }
 .model-eval-sample:hover {
-  border-color: #0f766e;
-  color: #0f766e;
+  border-color: var(--success);
+  color: var(--success);
 }
 .model-eval-card pre {
   background: var(--bg);
@@ -2888,10 +2888,10 @@
 .model-eval-help {
   align-items: center;
   aspect-ratio: 1;
-  background: color-mix(in srgb, #0f766e 14%, var(--bg));
-  border: 1px solid color-mix(in srgb, #0f766e 45%, var(--border));
+  background: color-mix(in srgb, var(--success) 14%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--success) 45%, var(--border));
   border-radius: 999px;
-  color: #0f766e;
+  color: var(--success);
   cursor: help;
   display: inline-flex;
   flex: 0 0 auto;
@@ -3025,9 +3025,9 @@
   padding: 0.55rem 0.85rem;
 }
 .model-eval-actions button:last-child {
-  background: #0f766e;
-  border-color: #0f766e;
-  color: white;
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--panel);
 }
 .model-eval-actions button:disabled {
   cursor: not-allowed;
