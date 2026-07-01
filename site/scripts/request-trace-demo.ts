@@ -126,9 +126,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
   const flow = root.querySelector<HTMLElement>(
     "[data-request-trace-demo-flow]",
   );
-  const boundarySelect = root.querySelector<HTMLSelectElement>(
-    "[data-request-trace-demo-boundary]",
-  );
   const metrics = Array.from(
     root.querySelectorAll<HTMLElement>("[data-request-trace-demo-metric]"),
   );
@@ -161,7 +158,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
     !form ||
     !path ||
     !flow ||
-    !boundarySelect ||
     !verdict ||
     !interpretation ||
     !artifact ||
@@ -193,11 +189,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
     const nodes = getRequestTraceNodes(selected);
     selectedBoundaryIndex = Math.min(selectedBoundaryIndex, nodes.length - 1);
 
-    updateRequestTraceBoundaryOptions(
-      boundarySelect,
-      nodes,
-      selectedBoundaryIndex,
-    );
     flow.innerHTML = buildRequestTraceFlow(
       nodes,
       selected,
@@ -225,27 +216,11 @@ function initializeRequestTraceDemo(root: HTMLElement) {
       showStep(currentStep + 1, true);
     }
   });
-  form.addEventListener("input", (event) => {
-    if (event.target === boundarySelect) {
-      return;
-    }
-
-    render();
-  });
-  form.addEventListener("change", (event) => {
-    if (event.target === boundarySelect) {
-      return;
-    }
-
-    render();
-  });
+  form.addEventListener("input", render);
+  form.addEventListener("change", render);
   previous.addEventListener("click", () => showStep(currentStep - 1, true));
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => showStep(index, true));
-  });
-  boundarySelect.addEventListener("change", () => {
-    selectedBoundaryIndex = Number(boundarySelect.value);
-    render();
   });
   flow.addEventListener("click", (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
@@ -277,19 +252,6 @@ function initializeRequestTraceDemo(root: HTMLElement) {
 
   render();
   showStep(0);
-}
-
-function updateRequestTraceBoundaryOptions(
-  select: HTMLSelectElement,
-  nodes: RequestTraceNode[],
-  selectedIndex: number,
-) {
-  select.innerHTML = nodes
-    .map(
-      (node, index) =>
-        `<option value="${index}"${index === selectedIndex ? " selected" : ""}>${escapeRequestTraceHtml(node.label)}</option>`,
-    )
-    .join("");
 }
 
 function getSelectedConditions(inputs: HTMLInputElement[]) {
@@ -495,6 +457,8 @@ function buildRequestTraceArtifact(
   selected: RequestTraceConditionKey[],
   result: ReturnType<typeof analyzeRequestTrace>,
 ) {
+  const nodes = getRequestTraceNodes(selected);
+
   return [
     "Architecture boundary brief",
     "",
@@ -504,7 +468,7 @@ function buildRequestTraceArtifact(
     `Contract to write down: ${result.contract}`,
     "",
     "Trace:",
-    ...baseTraceNodes.map(
+    ...nodes.map(
       (node) => `- ${node.label}: ${node.boundary} boundary; ${node.contract}`,
     ),
     "",
