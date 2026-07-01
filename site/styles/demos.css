@@ -2668,8 +2668,7 @@
   max-width: none;
 }
 .observability-demo-signals,
-.observability-demo-results,
-.observability-demo-recommendation ol {
+.observability-demo-results {
   display: grid;
   gap: 0.5rem;
 }
@@ -2695,7 +2694,6 @@
 }
 .observability-demo-output {
   grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.85fr);
 }
 .observability-demo-result {
   background: var(--panel);
@@ -2733,30 +2731,6 @@
   letter-spacing: 0.04em;
   line-height: 1.2;
   text-transform: uppercase;
-}
-.observability-demo-recommendation ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.observability-demo-recommendation li {
-  background: color-mix(in srgb, var(--success) 7%, var(--panel));
-  border: 1px solid color-mix(in srgb, var(--success) 32%, var(--border));
-  border-radius: 0.3rem;
-  display: grid;
-  gap: 0.25rem;
-  padding: 0.58rem 0.65rem;
-}
-.observability-demo-recommendation strong {
-  color: var(--text);
-  font-size: 0.84rem;
-  line-height: 1.2;
-}
-.observability-demo-recommendation span,
-.observability-demo-recommendation small {
-  color: var(--muted);
-  font-size: 0.76rem;
-  line-height: 1.35;
 }
 .observability-demo-empty {
   background: var(--panel);

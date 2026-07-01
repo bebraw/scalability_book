@@ -11,7 +11,6 @@ type SignalRating = "answers" | "supports" | "noisy";
 type Symptom = {
   label: string;
   question: string;
-  recommendation: SignalKey[];
   ratings: Record<SignalKey, { rating: SignalRating; reason: string }>;
 };
 
@@ -54,7 +53,6 @@ const symptoms: Record<SymptomKey, Symptom> = {
   stale: {
     label: "Event summaries are stale",
     question: "Which signals would let you explain why summaries are behind?",
-    recommendation: ["metrics", "logs", "database"],
     ratings: {
       metrics: {
         rating: "answers",
@@ -92,7 +90,6 @@ const symptoms: Record<SymptomKey, Symptom> = {
     label: "Users report missing events",
     question:
       "Which signals tell whether events were never accepted, dropped later, or hidden in reads?",
-    recommendation: ["logs", "database", "traces"],
     ratings: {
       logs: {
         rating: "answers",
@@ -130,7 +127,6 @@ const symptoms: Record<SymptomKey, Symptom> = {
     label: "Dashboard loads slowly during arrival peak",
     question:
       "Which signals reveal whether the delay is network, API, database, or rendering work?",
-    recommendation: ["traces", "metrics", "benchmark"],
     ratings: {
       traces: {
         rating: "answers",
@@ -197,21 +193,13 @@ function initializeObservabilityDemo(root: HTMLElement) {
   const results = root.querySelector<HTMLElement>(
     "[data-observability-demo-results]",
   );
-  const recommendation = root.querySelector<HTMLElement>(
-    "[data-observability-demo-recommendation]",
-  );
-  const recommendationPanel = root.querySelector<HTMLElement>(
-    "[data-observability-demo-recommendation-panel]",
-  );
 
   if (
     !form ||
     !symptomSelect ||
     !verdict ||
     !question ||
-    !results ||
-    !recommendation ||
-    !recommendationPanel
+    !results
   ) {
     return;
   }
@@ -243,13 +231,6 @@ function initializeObservabilityDemo(root: HTMLElement) {
             .map(({ signalKey, rating, reason }) =>
               renderSignalResult(signalKey, rating, reason),
             )
-            .join("");
-    recommendationPanel.hidden = selected.length === 0;
-    recommendation.innerHTML =
-      selected.length === 0
-        ? ""
-        : symptom.recommendation
-            .map((signalKey) => renderRecommendedSignal(signalKey, symptom))
             .join("");
   };
 
@@ -283,17 +264,6 @@ function renderSignalResult(
     </div>
     <p>${escapeObservabilityHtml(reason)}</p>
   </article>`;
-}
-
-function renderRecommendedSignal(signalKey: SignalKey, symptom: Symptom) {
-  const signal = signals[signalKey];
-  const rating = symptom.ratings[signalKey];
-
-  return `<li>
-    <strong>${escapeObservabilityHtml(signal.label)}</strong>
-    <span>${escapeObservabilityHtml(signal.description)}</span>
-    <small>${escapeObservabilityHtml(rating.reason)}</small>
-  </li>`;
 }
 
 function escapeObservabilityHtml(value: string) {
