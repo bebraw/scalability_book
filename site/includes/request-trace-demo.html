@@ -114,45 +114,48 @@
       ></div>
     </div>
 
-    <div class="request-trace-analysis">
-      <div class="scaling-demo-panel request-trace-detail-panel">
-        <h4>Inspect boundary</h4>
-        <ol class="request-trace-path" data-request-trace-demo-path></ol>
-      </div>
-      <div class="scaling-demo-panel">
-        <h4>Architecture pressure</h4>
-        <dl class="scaling-demo-metrics">
-          <div>
-            <dt>Request path</dt>
-            <dd data-request-trace-demo-metric="path">-</dd>
-          </div>
-          <div>
-            <dt>Highest risk</dt>
-            <dd data-request-trace-demo-metric="risk">-</dd>
-          </div>
-          <div>
-            <dt>Rules to implement</dt>
-            <dd data-request-trace-demo-metric="rules">-</dd>
-          </div>
-        </dl>
-        <p class="friction-demo-note" data-request-trace-demo-interpretation>
-          A local function call becomes a distributed workflow once the browser,
-          server, network, and storage can disagree.
-        </p>
-        <details class="request-trace-brief">
-          <summary>Trace brief</summary>
-          <div class="scaling-demo-artifact-header">
-            <h4>Boundary brief</h4>
-            <button type="button" data-request-trace-demo-copy>
-              Copy brief
-            </button>
-          </div>
-          <textarea
-            data-request-trace-demo-artifact
-            readonly
-            spellcheck="false"
-          ></textarea>
-        </details>
+    <div class="scaling-demo-panel request-trace-analysis">
+      <h4>Trace analysis</h4>
+      <div class="request-trace-analysis-grid">
+        <div class="request-trace-detail-panel">
+          <p class="request-trace-section-label">Inspect boundary</p>
+          <ol class="request-trace-path" data-request-trace-demo-path></ol>
+        </div>
+        <div class="request-trace-pressure-panel">
+          <p class="request-trace-section-label">Architecture pressure</p>
+          <dl class="scaling-demo-metrics">
+            <div>
+              <dt>Request path</dt>
+              <dd data-request-trace-demo-metric="path">-</dd>
+            </div>
+            <div>
+              <dt>Highest risk</dt>
+              <dd data-request-trace-demo-metric="risk">-</dd>
+            </div>
+            <div>
+              <dt>Rules to implement</dt>
+              <dd data-request-trace-demo-metric="rules">-</dd>
+            </div>
+          </dl>
+          <p class="friction-demo-note" data-request-trace-demo-interpretation>
+            A local function call becomes a distributed workflow once the
+            browser, server, network, and storage can disagree.
+          </p>
+          <details class="request-trace-brief">
+            <summary>Trace brief</summary>
+            <div class="scaling-demo-artifact-header">
+              <h4>Boundary brief</h4>
+              <button type="button" data-request-trace-demo-copy>
+                Copy brief
+              </button>
+            </div>
+            <textarea
+              data-request-trace-demo-artifact
+              readonly
+              spellcheck="false"
+            ></textarea>
+          </details>
+        </div>
       </div>
     </div>
   </form>

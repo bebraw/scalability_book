@@ -1816,11 +1816,38 @@
   gap: 1rem;
   margin-top: 1rem;
 }
-.request-trace-setup,
-.request-trace-analysis {
+.request-trace-setup {
   display: grid;
   gap: 1rem;
   grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.75fr);
+}
+.request-trace-analysis-grid {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.9fr);
+}
+.request-trace-detail-panel,
+.request-trace-pressure-panel {
+  display: grid;
+  gap: 0.65rem;
+}
+.prose .request-trace-section-label {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  margin: 0;
+  max-width: none;
+  text-transform: uppercase;
+}
+.request-trace-analysis .scaling-demo-metrics {
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, 0.5fr);
+}
+.request-trace-analysis .scaling-demo-metrics div:nth-child(3) {
+  grid-column: 1 / -1;
 }
 .request-trace-flow-panel {
   grid-column: 1 / -1;
@@ -3170,7 +3197,8 @@
   .scaling-demo-header,
   .scaling-demo-form,
   .request-trace-setup,
-  .request-trace-analysis,
+  .request-trace-analysis-grid,
+  .request-trace-analysis .scaling-demo-metrics,
   .scaling-demo-step,
   .scaling-demo-pressure-step,
   .scaling-demo-moves-step,
