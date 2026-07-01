@@ -107,6 +107,55 @@
   font-weight: 700;
   text-transform: uppercase;
 }
+.prose input[type="range"] {
+  --range-track: color-mix(in srgb, var(--border) 75%, var(--panel));
+  --range-fill: var(--accent);
+  --range-thumb: var(--accent-strong);
+  accent-color: var(--range-thumb);
+  appearance: none;
+  background: transparent;
+  block-size: 1.35rem;
+  inline-size: 100%;
+}
+.prose input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--range-track);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  block-size: 0.5rem;
+}
+.prose input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--range-thumb);
+  border: 2px solid var(--panel);
+  border-radius: 999px;
+  block-size: 1.25rem;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--range-thumb) 55%, var(--border));
+  inline-size: 1.25rem;
+  margin-block-start: -0.45rem;
+}
+.prose input[type="range"]::-moz-range-track {
+  background: var(--range-track);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  block-size: 0.5rem;
+}
+.prose input[type="range"]::-moz-range-progress {
+  background: var(--range-fill);
+  border-radius: 999px;
+  block-size: 0.5rem;
+}
+.prose input[type="range"]::-moz-range-thumb {
+  background: var(--range-thumb);
+  border: 2px solid var(--panel);
+  border-radius: 999px;
+  block-size: 1.25rem;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--range-thumb) 55%, var(--border));
+  inline-size: 1.25rem;
+}
+.prose input[type="range"]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 0.25rem;
+}
 .project-fit {
   --project-fit-active-bg: var(--accent-strong);
   --project-fit-active-text: var(--panel);
@@ -3000,7 +3049,7 @@
   visibility: visible;
 }
 .model-eval-slider input {
-  accent-color: #0f766e;
+  accent-color: var(--accent-strong);
   inline-size: 100%;
 }
 .model-eval-slider output {
