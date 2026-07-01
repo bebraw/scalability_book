@@ -1,0 +1,258 @@
+<section
+  class="scaling-demo"
+  data-scaling-demo
+  aria-labelledby="scaling-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Deconstruct scaling lab</p>
+      <h3 id="scaling-demo-heading">Choose scaling moves for one pressure</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-scaling-demo-verdict>Describe the pressure</span>
+      <small data-scaling-demo-caveat
+        >A scaling choice is only defensible when the pressure, cost, and signal
+        are explicit.</small
+      >
+    </div>
+  </div>
+
+  <ol class="scaling-demo-progress" aria-label="Scaling demo steps">
+    <li>
+      <button type="button" data-scaling-demo-tab="0" aria-current="step">
+        <span>1</span>
+        Pressure
+      </button>
+    </li>
+    <li>
+      <button type="button" data-scaling-demo-tab="1">
+        <span>2</span>
+        Moves
+      </button>
+    </li>
+    <li>
+      <button type="button" data-scaling-demo-tab="2">
+        <span>3</span>
+        Trade-offs
+      </button>
+    </li>
+    <li>
+      <button type="button" data-scaling-demo-tab="3">
+        <span>4</span>
+        Artifact
+      </button>
+    </li>
+  </ol>
+
+  <form class="scaling-demo-form" data-scaling-demo-form>
+    <section
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      data-scaling-demo-step="0"
+      aria-labelledby="scaling-demo-pressure-title"
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="scaling-demo-pressure-title">Event tracker pressure</h4>
+        <label>
+          <span>Scenario</span>
+          <select data-scaling-demo-scenario>
+            <option value="arrival">Conference arrival spike</option>
+            <option value="dashboard">Slow operator dashboard</option>
+            <option value="tenants">Noisy tenant isolation</option>
+          </select>
+        </label>
+        <label>
+          <span>Concrete context</span>
+          <textarea rows="5" data-scaling-demo-context></textarea>
+        </label>
+      </div>
+      <div class="scaling-demo-panel">
+        <h4>Pressure levels</h4>
+        <label>
+          <span>Write burst</span>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value="4"
+            data-scaling-demo-pressure="writes"
+          />
+          <output data-scaling-demo-output="writes">4</output>
+        </label>
+        <label>
+          <span>Read load</span>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value="3"
+            data-scaling-demo-pressure="reads"
+          />
+          <output data-scaling-demo-output="reads">3</output>
+        </label>
+        <label>
+          <span>Freshness requirement</span>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value="4"
+            data-scaling-demo-pressure="freshness"
+          />
+          <output data-scaling-demo-output="freshness">4</output>
+        </label>
+        <label>
+          <span>Tenant count</span>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value="2"
+            data-scaling-demo-pressure="tenants"
+          />
+          <output data-scaling-demo-output="tenants">2</output>
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-moves-step"
+      data-scaling-demo-step="1"
+      aria-labelledby="scaling-demo-moves-title"
+      hidden
+    >
+      <div class="scaling-demo-panel">
+        <h4 id="scaling-demo-moves-title">Candidate moves</h4>
+        <div class="scaling-demo-techniques">
+          <label>
+            <input
+              type="checkbox"
+              value="index"
+              data-scaling-demo-technique
+              checked
+            />
+            <span>Composite index</span>
+            <small>Speed up latest-events reads by project and time.</small>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="queue"
+              data-scaling-demo-technique
+              checked
+            />
+            <span>Queue ingestion</span>
+            <small
+              >Accept writes quickly and process expensive work later.</small
+            >
+          </label>
+          <label>
+            <input type="checkbox" value="cache" data-scaling-demo-technique />
+            <span>Cache dashboard reads</span>
+            <small
+              >Reduce repeated latest-events work with freshness cost.</small
+            >
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="replica"
+              data-scaling-demo-technique
+            />
+            <span>Read replica</span>
+            <small>Move dashboard reads away from the write database.</small>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="partition"
+              data-scaling-demo-technique
+            />
+            <span>Partition by project</span>
+            <small
+              >Limit one large tenant or project from dominating storage.</small
+            >
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              value="backpressure"
+              data-scaling-demo-technique
+              checked
+            />
+            <span>Rate limit and backpressure</span>
+            <small>Protect the system when clients submit too fast.</small>
+          </label>
+        </div>
+      </div>
+      <div class="scaling-demo-panel scaling-demo-guidance">
+        <h4>Selection rule</h4>
+        <p>
+          Choose the smallest set that addresses the named pressure. Every extra
+          move must pay for itself with a benefit, signal, and failure story.
+        </p>
+        <ul data-scaling-demo-recommendations></ul>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-tradeoff-step"
+      data-scaling-demo-step="2"
+      aria-labelledby="scaling-demo-tradeoff-title"
+      hidden
+    >
+      <div>
+        <h4 id="scaling-demo-tradeoff-title">Resulting design</h4>
+        <ol data-scaling-demo-pipeline></ol>
+      </div>
+      <div>
+        <h4>Pressure scorecard</h4>
+        <dl class="scaling-demo-metrics">
+          <div>
+            <dt>Write relief</dt>
+            <dd data-scaling-demo-metric="writes">0/10</dd>
+          </div>
+          <div>
+            <dt>Read relief</dt>
+            <dd data-scaling-demo-metric="reads">0/10</dd>
+          </div>
+          <div>
+            <dt>Freshness risk</dt>
+            <dd data-scaling-demo-metric="freshness">Low</dd>
+          </div>
+          <div>
+            <dt>Operational complexity</dt>
+            <dd data-scaling-demo-metric="complexity">Low</dd>
+          </div>
+          <div>
+            <dt>Resource cost</dt>
+            <dd data-scaling-demo-metric="cost">Low</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="scaling-demo-impact">
+        <h4>Interpretation</h4>
+        <p data-scaling-demo-interpretation>
+          Select techniques to see the trade-off.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="scaling-demo-step scaling-demo-artifact-step"
+      data-scaling-demo-step="3"
+      aria-labelledby="scaling-demo-artifact-title"
+      hidden
+    >
+      <div class="scaling-demo-artifact-header">
+        <h4 id="scaling-demo-artifact-title">Scaling trade-off table</h4>
+        <button type="button" data-scaling-demo-copy>Copy artifact</button>
+      </div>
+      <textarea data-scaling-demo-artifact rows="16" readonly></textarea>
+    </section>
+
+    <div class="scaling-demo-actions">
+      <button type="button" data-scaling-demo-prev>Previous</button>
+      <button type="submit" data-scaling-demo-next>Next</button>
+    </div>
+  </form>
+</section>

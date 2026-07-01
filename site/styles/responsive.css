@@ -179,17 +179,25 @@
   .agent-fleet-step,
   .agent-fleet-context-grid,
   .agent-fleet-models-step,
-  .agent-fleet-review-step {
+  .agent-fleet-review-step,
+  .scaling-demo-header,
+  .scaling-demo-form,
+  .scaling-demo-step,
+  .scaling-demo-pressure-step,
+  .scaling-demo-moves-step,
+  .scaling-demo-tradeoff-step {
     grid-template-columns: 1fr;
   }
   .model-eval-progress,
-  .agent-fleet-progress {
+  .agent-fleet-progress,
+  .scaling-demo-progress {
     grid-template-columns: repeat(4, minmax(5rem, 1fr));
     overflow-x: auto;
     padding-block-end: 0.2rem;
   }
   .model-eval-progress button,
-  .agent-fleet-progress button {
+  .agent-fleet-progress button,
+  .scaling-demo-progress button {
     min-width: 0;
   }
   .model-eval-task-preview,
@@ -206,7 +214,10 @@
   }
   .agent-fleet-review-step,
   .agent-fleet-brief-step,
-  .agent-fleet-actions {
+  .agent-fleet-actions,
+  .scaling-demo-tradeoff-step,
+  .scaling-demo-artifact-step,
+  .scaling-demo-actions {
     grid-column: 1;
   }
   .model-eval-slider {

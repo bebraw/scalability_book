@@ -25,6 +25,14 @@ Before choosing a technique, ask what problem is being solved:
 
 Development idea: reuse the event tracking system and map each pressure to a possible response, regardless of whether the chosen theme is a conference, shop, workflow, game, or something else.
 
+### Scaling pressure lab
+
+The demonstration below starts from a concrete event-tracking pressure: event writes spike, dashboard reads get slower, and the latest-events query has to stay useful without pretending the system needs every scaling technique at once.
+
+{{ import "site/includes/scaling-pressure-demo.html" }}
+
+The important part is the exported trade-off table. Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
+
 ## Common scaling techniques
 
 Potential subsections:
