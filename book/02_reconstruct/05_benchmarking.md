@@ -34,6 +34,39 @@ Possible event tracking benchmarks:
 - Import a batch of historical events.
 - Simulate duplicate submissions from retrying clients.
 
+## Model evals as benchmarks
+
+If students use different AI models during the project, they should treat model choice as something that can be measured rather than guessed. A model eval is a benchmark for an AI-assisted workflow: given the same task, context, constraints, and expected evidence, how well does each model perform?
+
+The goal is not to rank models universally. A useful course eval should be local to the work students actually do. For example, students might compare models on tasks such as:
+
+- Explaining the event tracking data model from the codebase.
+- Finding one likely scaling bottleneck.
+- Proposing a benchmark plan from a short project README.
+- Writing or repairing a small test.
+- Summarizing an incident trace or log excerpt.
+- Reviewing a scaling trade-off table for missing failure modes.
+
+Each eval should define:
+
+- The input context given to the model.
+- The expected output or rubric.
+- The scoring method, such as exact checks, human pass/fail review, rubric scoring, or an LLM judge that has been checked against human labels.
+- The cost and latency of each attempt.
+- The limits of the result, including sample size and whether the tested tasks represent the real project work.
+
+> **Sustainability angle**
+>
+> Model evals should include cost and resource awareness. A stronger model may reduce rework, but it may also cost more, run slower, or consume more compute. A weaker model may be acceptable if the task is well-scoped, the feedback loop is strong, and the human review burden stays reasonable.
+
+Development ideas:
+
+- Compare two models on the same five project-specific prompts and require students to inspect the failures, not only the score.
+- Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
+- Use human review for quality judgments that require understanding of the project.
+- Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
+- Discuss how a model can score well on a generic benchmark but still fail in a local codebase with missing context, unclear instructions, or weak tests.
+
 ## Observability basics
 
 Potential subsections:
@@ -118,19 +151,29 @@ Ideas to develop:
 - Students add one benchmark or load script for their Construct project.
 - Students add basic structured logging around event creation and querying.
 - Students run one measurement, document the result, and explain what the result does and does not prove.
+- Students run a small model eval comparing two approved models on the same project-specific task set, then explain one failure pattern and one limitation of the eval.
 - Students use the measurement to identify one likely reconstruction pressure.
 - Students add one efficiency observation, such as resource use per event, database queries per request, bundle size, storage growth, or repeated background work.
 - Students propose one sustainability-oriented improvement and explain the trade-off it introduces.
 
 ## Project artifact
 
-Students should create a measurement and observability plan. It should define one workload, one load level, the metrics collected, the result, what the result does not prove, and which signal would warn them first that the system is under pressure.
+Students should create a measurement, model eval, and observability plan. It should define one workload, one load level, the metrics collected, one small model-evaluation task set if AI assistance is used, the result, what the result does not prove, and which signal would warn them first that the system is under pressure.
 
 ## Notes for further development
 
 - Add a small tool-neutral example using `curl`, a simple script, or a common load testing tool.
 - Include a table of metrics and what each metric can reveal.
+- Add a small tool-neutral model eval example. A simple version could be a CSV with columns for `model`, `task`, `input`, `score`, `cost`, `latency`, and `review_note`.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.
 - Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes. Adapt the idea from page speed to event tracking: latency, freshness, failed submissions, or dashboard load time should be connected to the value the system claims to provide.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support examples where observability must cover long-running or retrying work, not only request/response latency.
+- Obsidian candidate: `Clippings/_Processed/Statistics for LLM Evals.md` is directly relevant for warning students against eyeballing average scores. It can support a short treatment of sample size, confidence intervals, and careful model comparisons.
+- Obsidian candidate: `Clippings/_Processed/Building eval systems that improve your AI product.md` can support the error-analysis-first framing: start by looking at actual failures, then design evaluators around those failure modes rather than generic scores.
+- Obsidian candidate: `Clippings/_Processed/hamelsmuevals-skills Skills for AI Evals to compliment the course AI Evals For Engineers & PMs.md` can provide a checklist of eval design concerns: eval audits, error analysis, synthetic data, judge prompts, evaluator validation, RAG evaluation, and review interfaces.
+- Obsidian candidate: `Clippings/_Processed/harbor evaluate agents in sandboxed environments.md` could be useful if the course later evaluates agentic tasks in isolated environments.
+- External candidate: OpenAI Evals (`https://github.com/openai/evals`) is useful as a framework and registry reference for evaluating LLMs and LLM systems.
+- External candidate: Inspect AI (`https://github.com/UKGovernmentBEIS/inspect_ai`) is useful as a model-evaluation framework reference, especially if the chapter needs a more formal eval harness example.
+- External candidate: LangSmith evaluation concepts (`https://docs.langchain.com/langsmith/evaluation-concepts`) gives accessible vocabulary for datasets, examples, experiments, evaluator scores, and traces.
+- External candidate: Statistics for LLM Evals (`https://statsforevals.com/`) can support statistical interpretation of eval results and model comparisons.
