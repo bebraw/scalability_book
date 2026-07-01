@@ -105,6 +105,15 @@ const conditionDetails: Record<
   },
 };
 
+const rulePriority: RequestTraceConditionKey[] = [
+  "duplicate",
+  "db-timeout",
+  "client-retry",
+  "server-validation",
+  "queue",
+  "cache",
+];
+
 for (const root of document.querySelectorAll<HTMLElement>(
   "[data-request-trace-demo]",
 )) {
@@ -244,7 +253,9 @@ function analyzeRequestTrace(
         : "low";
   const rules =
     selected.length > 0
-      ? selected.map((key) => conditionDetails[key].rule)
+      ? rulePriority
+          .filter((key) => selected.includes(key))
+          .map((key) => conditionDetails[key].rule)
       : [baseTraceNodes[2]?.rule ?? "Validate POST /events before writing."];
 
   return {
@@ -415,9 +426,31 @@ function buildRequestTraceInterpretation(
 }
 
 function buildRequestTraceRuleList(rules: string[]) {
-  return `<ul class="request-trace-rules">${rules
-    .map((rule) => `<li>${escapeRequestTraceHtml(rule)}</li>`)
-    .join("")}</ul>`;
+  const [primaryRule, ...secondaryRules] = rules;
+
+  if (!primaryRule) {
+    return "";
+  }
+
+  const secondaryCount = secondaryRules.length;
+  const summary =
+    secondaryCount > 0
+      ? `<span>${secondaryCount} more ${secondaryCount === 1 ? "rule" : "rules"}</span>`
+      : "";
+  const details =
+    secondaryCount > 0
+      ? `<details class="request-trace-rules-detail">
+          <summary>Show all</summary>
+          <ol class="request-trace-rules">${rules
+            .map((rule) => `<li>${escapeRequestTraceHtml(rule)}</li>`)
+            .join("")}</ol>
+        </details>`
+      : "";
+
+  return `<div class="request-trace-rule-primary">
+    <strong>${escapeRequestTraceHtml(primaryRule)}</strong>
+    ${summary}
+  </div>${details}`;
 }
 
 function buildRequestTraceArtifact(
