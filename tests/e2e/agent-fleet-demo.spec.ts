@@ -12,19 +12,14 @@ test.describe("agent fleet demo", () => {
     await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
       "4 roles, medium risk",
     );
-    await expect(demo.locator("[data-agent-fleet-step='0']")).toBeVisible();
-
-    await demo.locator("[data-agent-fleet-next]").click();
-    await expect(demo.locator("[data-agent-fleet-step='1']")).toBeVisible();
-
-    await demo.locator("[data-agent-fleet-next]").click();
-    await expect(demo.locator("[data-agent-fleet-step='2']")).toBeVisible();
+    await expect(demo.locator(".agent-fleet-grid")).toBeVisible();
+    await expect(demo.locator("[data-agent-fleet-steps]")).toContainText(
+      "Scout returns compressed findings",
+    );
     await demo
       .locator("[data-agent-fleet-model='implementer']")
       .selectOption("small");
 
-    await demo.locator("[data-agent-fleet-next]").click();
-    await expect(demo.locator("[data-agent-fleet-step='3']")).toBeVisible();
     await expect(demo.locator("[data-agent-fleet-coordination]")).toContainText(
       "6/10",
     );
@@ -45,8 +40,7 @@ test.describe("agent fleet demo", () => {
       "Implementer uses a small model",
     );
 
-    await demo.locator("[data-agent-fleet-next]").click();
-    await expect(demo.locator("[data-agent-fleet-step='4']")).toBeVisible();
+    await demo.locator(".agent-fleet-brief-step summary").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /Identify one likely bottleneck/,
     );
@@ -83,8 +77,8 @@ test.describe("agent fleet demo", () => {
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /What the fleet missed/,
     );
-    await expect(demo.locator("[data-agent-fleet-next]")).toBeDisabled();
     await expectElementsInsideDemo(demo, [".agent-fleet-brief-step"]);
+    await expect(demo.locator("[data-agent-fleet-step]")).toHaveCount(0);
   });
 
   test("shows when the project should be hardened before delegation", async ({
@@ -92,9 +86,8 @@ test.describe("agent fleet demo", () => {
   }) => {
     const demo = page.locator("[data-agent-fleet]");
 
+    await demo.locator("[data-agent-fleet-task]").selectOption("refactor");
     await demo.locator("[data-agent-fleet-readiness]").selectOption("low");
-    await demo.locator("[data-agent-fleet-size]").fill("5");
-    await demo.locator("[data-agent-fleet-tab='1']").click();
     await demo
       .locator("[data-agent-fleet-role][value='implementer']")
       .setChecked(false);
@@ -102,13 +95,12 @@ test.describe("agent fleet demo", () => {
       .locator("[data-agent-fleet-role][value='reviewer']")
       .setChecked(false);
 
-    await demo.locator("[data-agent-fleet-tab='3']").click();
     await expect(demo.locator("[data-agent-fleet-risk]")).toContainText("High");
     await expect(demo.locator("[data-agent-fleet-pattern]")).toContainText(
       "Harden first",
     );
 
-    await demo.locator("[data-agent-fleet-tab='4']").click();
+    await demo.locator(".agent-fleet-brief-step summary").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /Project readiness:\nlow/,
     );

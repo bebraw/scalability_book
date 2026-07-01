@@ -10,6 +10,8 @@ type TaskConfig = {
   evidence: string;
   nonGoal: string;
   validation: string;
+  changeSize: number;
+  projectContext: ProjectContext;
 };
 
 type ProjectContext = {
@@ -44,6 +46,16 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
     nonGoal: "Do not redesign the system or apply speculative optimizations.",
     validation:
       "A benchmark, query plan, trace, or log signal that can confirm or reject the bottleneck.",
+    changeSize: 2,
+    projectContext: {
+      module: "event-tracker API",
+      validation: "npm test -- events",
+      allowedFiles:
+        "src/routes/events.ts\nsrc/db/events.ts\ntests/events.test.ts",
+      branch: "agent-fleet/latest-events-bottleneck",
+      context:
+        "The app records project events and shows the latest 50 events per project. GET /events runs SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The migration has indexes on project_id and event_type, but not created_at.",
+    },
   },
   tests: {
     label: "Add regression tests for one workflow",
@@ -53,6 +65,16 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
     nonGoal: "Do not rewrite the application structure while adding tests.",
     validation:
       "The new test fails for the broken behavior and passes after the fix.",
+    changeSize: 2,
+    projectContext: {
+      module: "event creation workflow",
+      validation: "npm test -- create-event",
+      allowedFiles:
+        "src/routes/events.ts\nsrc/validation/events.ts\ntests/create-event.test.ts",
+      branch: "agent-fleet/event-creation-regression",
+      context:
+        "The browser submits POST /events with type, entityId, and occurredAt. Recent bug reports say malformed events can reach storage when client-side validation is bypassed.",
+    },
   },
   refactor: {
     label: "Refactor one bounded module",
@@ -63,6 +85,16 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
     nonGoal: "Do not change database schema, routes, or public API contracts.",
     validation:
       "Existing tests pass and one characterization test protects the refactor.",
+    changeSize: 3,
+    projectContext: {
+      module: "event storage module",
+      validation: "npm test -- event-storage",
+      allowedFiles:
+        "src/db/events.ts\nsrc/db/event-queries.ts\ntests/event-storage.test.ts",
+      branch: "agent-fleet/event-storage-boundary",
+      context:
+        "Event storage mixes query construction, result mapping, and pagination defaults in one module. The API contract must stay stable while the storage boundary becomes easier to review.",
+    },
   },
 };
 
@@ -125,15 +157,6 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     "[data-agent-fleet-readiness]",
   );
   const task = root.querySelector<HTMLSelectElement>("[data-agent-fleet-task]");
-  const size = root.querySelector<HTMLInputElement>("[data-agent-fleet-size]");
-  const sizeOutput = root.querySelector<HTMLOutputElement>(
-    "[data-agent-fleet-size-output]",
-  );
-  const projectFields = Array.from(
-    root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
-      "[data-agent-fleet-project-field]",
-    ),
-  );
   const roles = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-agent-fleet-role]"),
   );
@@ -172,23 +195,11 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     root.querySelectorAll<HTMLButtonElement>("[data-agent-fleet-packet-tab]"),
   );
   const copy = root.querySelector<HTMLButtonElement>("[data-agent-fleet-copy]");
-  const steps = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-agent-fleet-step]"),
-  );
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("[data-agent-fleet-tab]"),
-  );
-  const previous = root.querySelector<HTMLButtonElement>(
-    "[data-agent-fleet-prev]",
-  );
-  const next = root.querySelector<HTMLButtonElement>("[data-agent-fleet-next]");
 
   if (
     !form ||
     !readiness ||
     !task ||
-    !size ||
-    !sizeOutput ||
     !verdict ||
     !workflowSteps ||
     !coordination ||
@@ -201,37 +212,20 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     !modelImpact ||
     !brief ||
     packetTabs.length === 0 ||
-    !copy ||
-    !previous ||
-    !next ||
-    steps.length === 0 ||
-    tabs.length !== steps.length
+    !copy
   ) {
     return;
   }
 
-  let currentStep = 0;
   let currentPacket: PacketId = "brief";
-  const showStep = (step: number, focusStep = false) => {
-    currentStep = Math.max(0, Math.min(step, steps.length - 1));
-    updateAgentFleetStage(
-      root,
-      steps,
-      tabs,
-      previous,
-      next,
-      currentStep,
-      focusStep,
-    );
-  };
   const render = () => {
     const selectedTask =
       taskConfigs[task.value as TaskId] ?? taskConfigs.bottleneck;
     const selectedReadiness = readiness.value as ReadinessId;
     const selectedRoles = getSelectedRoles(roles);
     const selectedModels = getSelectedModels(modelSelects);
-    const projectContext = getProjectContext(projectFields);
-    const changeSize = Number(size.value);
+    const projectContext = selectedTask.projectContext;
+    const changeSize = selectedTask.changeSize;
     const score = getCoordinationScore(
       selectedReadiness,
       selectedRoles.length,
@@ -261,8 +255,6 @@ function initializeAgentFleetDemo(root: HTMLElement) {
       modelResult,
     });
 
-    sizeOutput.value = String(changeSize);
-    sizeOutput.textContent = String(changeSize);
     updateModelRows(selectedRoles, modelRows, modelSelects);
     coordination.textContent = `${score}/10`;
     risk.textContent = riskLabel;
@@ -282,30 +274,13 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     currentPacket = getAvailablePacket(currentPacket, selectedRoles);
     updatePacketTabs(packetTabs, currentPacket, selectedRoles);
     brief.value = packets[currentPacket];
-    updateAgentFleetStage(
-      root,
-      steps,
-      tabs,
-      previous,
-      next,
-      currentStep,
-      false,
-    );
   };
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep < steps.length - 1) {
-      showStep(currentStep + 1, true);
-    }
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
-  previous.addEventListener("click", () => showStep(currentStep - 1, true));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => showStep(index, true));
-  });
   packetTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       const packet = tab.dataset.agentFleetPacketTab as PacketId | undefined;
@@ -334,7 +309,6 @@ function initializeAgentFleetDemo(root: HTMLElement) {
   });
 
   render();
-  showStep(0);
 }
 
 function getSelectedRoles(roleInputs: HTMLInputElement[]) {
@@ -357,40 +331,6 @@ function getSelectedModels(modelInputs: HTMLSelectElement[]) {
     },
     {} as Record<RoleId, AgentModelId>,
   );
-}
-
-function getProjectContext(
-  fields: Array<HTMLInputElement | HTMLTextAreaElement>,
-) {
-  const values = fields.reduce(
-    (context, field) => {
-      const key = field.dataset.agentFleetProjectField as
-        | keyof ProjectContext
-        | undefined;
-
-      if (key) {
-        context[key] = field.value.trim();
-      }
-
-      return context;
-    },
-    {
-      module: "",
-      validation: "",
-      allowedFiles: "",
-      branch: "",
-      context: "",
-    } as ProjectContext,
-  );
-
-  return {
-    module: values.module || "project module",
-    validation: values.validation || "npm test",
-    allowedFiles:
-      values.allowedFiles || "Define the allowed files before running.",
-    branch: values.branch || "agent-fleet-task",
-    context: values.context || "Add concrete project context before running.",
-  };
 }
 
 function updateModelRows(
@@ -945,48 +885,4 @@ function capitalizeRole(role: RoleId | null) {
   }
 
   return role.charAt(0).toUpperCase() + role.slice(1);
-}
-
-function updateAgentFleetStage(
-  root: HTMLElement,
-  steps: HTMLElement[],
-  tabs: HTMLButtonElement[],
-  previous: HTMLButtonElement,
-  next: HTMLButtonElement,
-  currentStep: number,
-  focusStep: boolean,
-) {
-  const finalStep = steps.length - 1;
-
-  root.dataset.agentFleetCurrentStep = String(currentStep);
-  steps.forEach((step, index) => {
-    const active = index === currentStep;
-
-    step.hidden = !active;
-    step.classList.toggle("is-active", active);
-    step.setAttribute("aria-hidden", String(!active));
-  });
-  tabs.forEach((tab, index) => {
-    const active = index === currentStep;
-
-    if (active) {
-      tab.setAttribute("aria-current", "step");
-    } else {
-      tab.removeAttribute("aria-current");
-    }
-
-    tab.classList.toggle("is-active", active);
-    tab.classList.toggle("is-complete", index < currentStep);
-  });
-  previous.disabled = currentStep === 0;
-  next.textContent = currentStep === finalStep ? "Done" : "Next";
-  next.disabled = currentStep === finalStep;
-
-  if (focusStep) {
-    requestAnimationFrame(() => {
-      steps[currentStep]
-        ?.querySelector<HTMLElement>("select, textarea, input, button")
-        ?.focus({ preventScroll: true });
-    });
-  }
 }
