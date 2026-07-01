@@ -27,6 +27,7 @@ const templates = await loadTemplates({
   siteIndex: "layouts/siteIndex.html",
 });
 const commonBookScripts = ["/book-nav.js", "/toc-highlight.js", "/comments.js"];
+const demoStylesheet = "/styles/demos.css";
 const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
 const demoScriptIncludes = [
   {
@@ -173,13 +174,17 @@ for (let index = 0; index < bookPages.length; index++) {
     ...getDemoScriptsForSource(page.source),
     ...(includeEditor ? editorScripts : []),
   ];
+  const pageStylesheets = [
+    ...(hasDemoInclude(page.source) ? [demoStylesheet] : []),
+    ...(includeEditor ? ["/vendor/easymde/easymde.min.css"] : []),
+  ];
   await writePage(
     `${page.collection}/${page.slug}/index.html`,
     renderer.renderLayout({
       title: `${page.title} - ${config.title}`,
       description: config.description,
       currentUrl: page.url,
-      stylesheets: includeEditor ? ["/vendor/easymde/easymde.min.css"] : [],
+      stylesheets: pageStylesheets,
       scripts: pageScripts,
       children: renderer.renderBookPage({ page, rendered, previous, next }),
     }),
@@ -203,12 +208,14 @@ await writePage(
     title: `Demo showcase - ${config.title}`,
     description: "A single page for previewing and debugging course demos.",
     currentUrl: "/demos/",
+    stylesheets: [demoStylesheet],
     scripts: demoScriptIncludes.map(({ script }) => script),
     children: renderDemoGalleryPage(demoGallery.content),
   }),
 );
 
 await compileSiteStylesheet("styles.css");
+await compileSiteStylesheet("styles/demos.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
@@ -270,6 +277,10 @@ function getDemoScriptsForSource(source) {
   return demoScriptIncludes
     .filter(({ include }) => source.includes(include))
     .map(({ script }) => script);
+}
+
+function hasDemoInclude(source) {
+  return demoScriptIncludes.some(({ include }) => source.includes(include));
 }
 
 function getDemoGallerySource() {
