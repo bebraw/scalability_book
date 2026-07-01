@@ -242,19 +242,16 @@ function analyzeRequestTrace(
       : severeConditions === 1 || selected.includes("client-retry")
         ? "medium"
         : "low";
-  const rule = selected.includes("duplicate")
-    ? conditionDetails.duplicate.rule
-    : selected.includes("client-retry")
-      ? conditionDetails["client-retry"].rule
-      : selected.includes("server-validation")
-        ? conditionDetails["server-validation"].rule
-        : (baseTraceNodes[2]?.rule ?? "Validate POST /events before writing.");
+  const rules =
+    selected.length > 0
+      ? selected.map((key) => conditionDetails[key].rule)
+      : [baseTraceNodes[2]?.rule ?? "Validate POST /events before writing."];
 
   return {
     boundaries: nodes.length,
     path: formatRequestTracePath(nodes),
     riskLevel,
-    rule,
+    rules,
   };
 }
 
@@ -396,8 +393,8 @@ function updateRequestTraceMetrics(
       node.textContent = result.path;
     } else if (key === "risk") {
       node.textContent = result.riskLevel;
-    } else if (key === "rule") {
-      node.textContent = result.rule;
+    } else if (key === "rules") {
+      node.innerHTML = buildRequestTraceRuleList(result.rules);
     }
   });
 }
@@ -417,6 +414,12 @@ function buildRequestTraceInterpretation(
   return `The request path is ${result.path}. It crosses ${result.boundaries} ownership and failure boundaries. Turn the most fragile boundary into an implementable rule before clients depend on accidental behavior.`;
 }
 
+function buildRequestTraceRuleList(rules: string[]) {
+  return `<ul class="request-trace-rules">${rules
+    .map((rule) => `<li>${escapeRequestTraceHtml(rule)}</li>`)
+    .join("")}</ul>`;
+}
+
 function buildRequestTraceArtifact(
   selected: RequestTraceConditionKey[],
   result: ReturnType<typeof analyzeRequestTrace>,
@@ -430,7 +433,8 @@ function buildRequestTraceArtifact(
     `Request path: ${result.path}`,
     `Boundary count: ${result.boundaries}`,
     `Highest risk: ${result.riskLevel}`,
-    `Rule to implement: ${result.rule}`,
+    "Rules to implement:",
+    ...result.rules.map((rule) => `- ${rule}`),
     "",
     "Trace:",
     ...nodes.map(

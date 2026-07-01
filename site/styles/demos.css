@@ -1830,6 +1830,25 @@
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
+.request-trace-demo [data-request-trace-demo-metric="rules"] {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+.request-trace-rules {
+  display: grid;
+  gap: 0.28rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.request-trace-rules li {
+  max-width: none;
+}
+.request-trace-rules li::before {
+  color: var(--accent-strong);
+  content: "-> ";
+  font-weight: 900;
+}
 .request-trace-brief {
   display: grid;
   gap: 0.7rem;
