@@ -35,12 +35,6 @@
         Improve
       </button>
     </li>
-    <li>
-      <button type="button" data-friction-demo-tab="3">
-        <span>4</span>
-        Artifact
-      </button>
-    </li>
   </ol>
 
   <form class="scaling-demo-form" data-friction-demo-form>
@@ -234,20 +228,19 @@
         <p class="friction-demo-note" data-friction-demo-interpretation>
           Pick a feedback loop to see what repeated work it removes.
         </p>
+        <details class="friction-demo-package">
+          <summary>Friction audit artifact</summary>
+          <div class="scaling-demo-artifact-header">
+            <h4>Friction audit artifact</h4>
+            <button type="button" data-friction-demo-copy>Copy audit</button>
+          </div>
+          <textarea
+            data-friction-demo-artifact
+            readonly
+            spellcheck="false"
+          ></textarea>
+        </details>
       </div>
-    </section>
-
-    <section
-      class="scaling-demo-step scaling-demo-artifact-step"
-      data-friction-demo-step="3"
-      aria-labelledby="friction-artifact-title"
-      hidden
-    >
-      <div class="scaling-demo-artifact-header">
-        <h4 id="friction-artifact-title">Friction audit artifact</h4>
-        <button type="button" data-friction-demo-copy>Copy audit</button>
-      </div>
-      <textarea data-friction-demo-artifact spellcheck="false"></textarea>
     </section>
 
     <div class="scaling-demo-actions">
