@@ -14,9 +14,10 @@ test.describe("pressure map demo", () => {
     await expect(
       demo.locator("[data-pressure-map-demo-verdict]"),
     ).toContainText("2 assumptions");
-    await expect(
-      demo.locator("[data-pressure-map-demo-step='0']"),
-    ).toBeVisible();
+    await expect(demo.locator(".pressure-map-grid")).toBeVisible();
+    await expect(demo.locator("[data-pressure-map-demo-board]")).toContainText(
+      "Event ingestion API",
+    );
 
     await demo
       .locator("[data-pressure-map-demo-assumption][value='tenants']")
@@ -25,10 +26,6 @@ test.describe("pressure map demo", () => {
       .locator("[data-pressure-map-demo-assumption][value='slow-summary']")
       .setChecked(true);
 
-    await demo.locator("[data-pressure-map-demo-next]").click();
-    await expect(
-      demo.locator("[data-pressure-map-demo-step='1']"),
-    ).toBeVisible();
     await expect(demo.locator("[data-pressure-map-demo-board]")).toContainText(
       "Event ingestion API",
     );
@@ -45,10 +42,6 @@ test.describe("pressure map demo", () => {
       demo.locator("[data-pressure-map-demo-interpretation]"),
     ).toContainText("Watch first for");
 
-    await demo.locator("[data-pressure-map-demo-next]").click();
-    await expect(
-      demo.locator("[data-pressure-map-demo-step='2']"),
-    ).toBeVisible();
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
       /Reconstruct pressure brief/,
     );
@@ -58,6 +51,6 @@ test.describe("pressure map demo", () => {
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
       /Do not add scaling techniques/,
     );
-    await expect(demo.locator("[data-pressure-map-demo-next]")).toBeDisabled();
+    await expect(demo.locator("[data-pressure-map-demo-step]")).toHaveCount(0);
   });
 });

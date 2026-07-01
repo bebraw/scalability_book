@@ -19,33 +19,8 @@
     </div>
   </div>
 
-  <ol class="scaling-demo-progress" aria-label="Pressure map demo steps">
-    <li>
-      <button type="button" data-pressure-map-demo-tab="0" aria-current="step">
-        <span>1</span>
-        Assumptions
-      </button>
-    </li>
-    <li>
-      <button type="button" data-pressure-map-demo-tab="1">
-        <span>2</span>
-        Pressure map
-      </button>
-    </li>
-    <li>
-      <button type="button" data-pressure-map-demo-tab="2">
-        <span>3</span>
-        Response
-      </button>
-    </li>
-  </ol>
-
-  <form class="scaling-demo-form" data-pressure-map-demo-form>
-    <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
-      data-pressure-map-demo-step="0"
-      aria-labelledby="pressure-map-assumptions-title"
-    >
+  <form class="pressure-map-grid" data-pressure-map-demo-form>
+    <div class="pressure-map-column">
       <div class="scaling-demo-panel">
         <h4 id="pressure-map-assumptions-title">Construct baseline</h4>
         <div class="pressure-map-baseline">
@@ -121,21 +96,17 @@
           </label>
         </div>
       </div>
+    </div>
+
+    <section class="scaling-demo-panel pressure-map-board-panel">
+      <h4 id="pressure-map-map-title">Pressure map</h4>
+      <div class="pressure-map-board" data-pressure-map-demo-board></div>
     </section>
 
-    <section
-      class="scaling-demo-step pressure-map-map-step"
-      data-pressure-map-demo-step="1"
-      aria-labelledby="pressure-map-map-title"
-      hidden
-    >
-      <div class="scaling-demo-panel">
-        <h4 id="pressure-map-map-title">Pressure map</h4>
-        <div class="pressure-map-board" data-pressure-map-demo-board></div>
-      </div>
-      <div class="scaling-demo-panel">
+    <div class="pressure-map-column">
+      <section class="scaling-demo-panel">
         <h4>First signal</h4>
-        <dl class="scaling-demo-metrics">
+        <dl class="scaling-demo-metrics demo-metrics-compact">
           <div>
             <dt>Assumptions changed</dt>
             <dd data-pressure-map-demo-metric="count">0</dd>
@@ -153,25 +124,21 @@
           Pick at least one changed assumption to reveal the first likely
           failure.
         </p>
-      </div>
-    </section>
 
-    <section
-      class="scaling-demo-step scaling-demo-artifact-step"
-      data-pressure-map-demo-step="2"
-      aria-labelledby="pressure-map-response-title"
-      hidden
-    >
-      <div class="scaling-demo-artifact-header">
-        <h4 id="pressure-map-response-title">Reconstruct pressure brief</h4>
-        <button type="button" data-pressure-map-demo-copy>Copy brief</button>
-      </div>
-      <textarea data-pressure-map-demo-artifact spellcheck="false"></textarea>
-    </section>
-
-    <div class="scaling-demo-actions">
-      <button type="button" data-pressure-map-demo-prev>Previous</button>
-      <button type="submit" data-pressure-map-demo-next>Next</button>
+        <details class="pressure-map-brief">
+          <summary>Pressure brief</summary>
+          <div class="scaling-demo-artifact-header">
+            <h4 id="pressure-map-response-title">Reconstruct pressure brief</h4>
+            <button type="button" data-pressure-map-demo-copy>
+              Copy brief
+            </button>
+          </div>
+          <textarea
+            data-pressure-map-demo-artifact
+            spellcheck="false"
+          ></textarea>
+        </details>
+      </section>
     </div>
   </form>
 </section>

@@ -110,39 +110,11 @@ function initializePressureMapDemo(root: HTMLElement) {
   const copy = root.querySelector<HTMLButtonElement>(
     "[data-pressure-map-demo-copy]",
   );
-  const steps = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-pressure-map-demo-step]"),
-  );
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>("[data-pressure-map-demo-tab]"),
-  );
-  const previous = root.querySelector<HTMLButtonElement>(
-    "[data-pressure-map-demo-prev]",
-  );
-  const next = root.querySelector<HTMLButtonElement>(
-    "[data-pressure-map-demo-next]",
-  );
 
-  if (
-    !form ||
-    !board ||
-    !verdict ||
-    !interpretation ||
-    !artifact ||
-    !copy ||
-    !previous ||
-    !next ||
-    steps.length === 0 ||
-    tabs.length !== steps.length
-  ) {
+  if (!form || !board || !verdict || !interpretation || !artifact || !copy) {
     return;
   }
 
-  let currentStep = 0;
-  const showStep = (step: number, focusStep = false) => {
-    currentStep = Math.max(0, Math.min(step, steps.length - 1));
-    updatePressureMapStage(steps, tabs, previous, next, currentStep, focusStep);
-  };
   const render = () => {
     const selected = getSelectedAssumptions(toggles);
     const result = analyzePressureMap(selected);
@@ -155,22 +127,13 @@ function initializePressureMapDemo(root: HTMLElement) {
       result,
     );
     artifact.value = buildPressureMapArtifact(selected, result);
-    updatePressureMapStage(steps, tabs, previous, next, currentStep, false);
   };
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep < steps.length - 1) {
-      showStep(currentStep + 1, true);
-    }
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
-  previous.addEventListener("click", () => showStep(currentStep - 1, true));
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => showStep(index, true));
-  });
   copy.addEventListener("click", async () => {
     artifact.select();
 
@@ -186,7 +149,6 @@ function initializePressureMapDemo(root: HTMLElement) {
   });
 
   render();
-  showStep(0);
 }
 
 function getSelectedAssumptions(inputs: HTMLInputElement[]) {
@@ -365,48 +327,6 @@ function buildPressureMapArtifact(
     "Reconstruct rule:",
     "Choose the response that matches the first stressed component and the first observable signal. Do not add scaling techniques before the pressure is named.",
   ].join("\n");
-}
-
-function updatePressureMapStage(
-  steps: HTMLElement[],
-  tabs: HTMLButtonElement[],
-  previous: HTMLButtonElement,
-  next: HTMLButtonElement,
-  currentStep: number,
-  focusStep: boolean,
-) {
-  const finalStep = steps.length - 1;
-
-  steps.forEach((step, index) => {
-    const active = index === currentStep;
-
-    step.hidden = !active;
-    step.classList.toggle("is-active", active);
-    step.setAttribute("aria-hidden", String(!active));
-  });
-  tabs.forEach((tab, index) => {
-    const active = index === currentStep;
-
-    if (active) {
-      tab.setAttribute("aria-current", "step");
-    } else {
-      tab.removeAttribute("aria-current");
-    }
-
-    tab.classList.toggle("is-active", active);
-    tab.classList.toggle("is-complete", index < currentStep);
-  });
-  previous.disabled = currentStep === 0;
-  next.textContent = currentStep === finalStep ? "Done" : "Next";
-  next.disabled = currentStep === finalStep;
-
-  if (focusStep) {
-    requestAnimationFrame(() => {
-      steps[currentStep]
-        ?.querySelector<HTMLElement>("input, textarea, button")
-        ?.focus({ preventScroll: true });
-    });
-  }
 }
 
 function escapePressureMapHtml(value: string) {
