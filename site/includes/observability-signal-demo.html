@@ -35,7 +35,10 @@
       <div class="observability-demo-signals">
         <label>
           <input type="checkbox" value="logs" data-observability-demo-signal />
-          <span>Structured logs</span>
+          <span class="observability-demo-signal-label">
+            <span>Structured logs</span>
+            <small data-observability-demo-signal-tag="logs"></small>
+          </span>
         </label>
         <label>
           <input
@@ -44,7 +47,10 @@
             data-observability-demo-signal
             checked
           />
-          <span>Metrics over time</span>
+          <span class="observability-demo-signal-label">
+            <span>Metrics over time</span>
+            <small data-observability-demo-signal-tag="metrics"></small>
+          </span>
         </label>
         <label>
           <input
@@ -53,7 +59,10 @@
             data-observability-demo-signal
             checked
           />
-          <span>Request traces</span>
+          <span class="observability-demo-signal-label">
+            <span>Request traces</span>
+            <small data-observability-demo-signal-tag="traces"></small>
+          </span>
         </label>
         <label>
           <input
@@ -61,7 +70,10 @@
             value="errors"
             data-observability-demo-signal
           />
-          <span>User-visible errors</span>
+          <span class="observability-demo-signal-label">
+            <span>User-visible errors</span>
+            <small data-observability-demo-signal-tag="errors"></small>
+          </span>
         </label>
         <label>
           <input
@@ -69,7 +81,10 @@
             value="benchmark"
             data-observability-demo-signal
           />
-          <span>Benchmark data</span>
+          <span class="observability-demo-signal-label">
+            <span>Benchmark data</span>
+            <small data-observability-demo-signal-tag="benchmark"></small>
+          </span>
         </label>
         <label>
           <input
@@ -77,7 +92,10 @@
             value="database"
             data-observability-demo-signal
           />
-          <span>Database inspection</span>
+          <span class="observability-demo-signal-label">
+            <span>Database inspection</span>
+            <small data-observability-demo-signal-tag="database"></small>
+          </span>
         </label>
       </div>
     </div>
