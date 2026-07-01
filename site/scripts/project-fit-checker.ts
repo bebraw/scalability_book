@@ -504,21 +504,13 @@ function getWarnings(
     );
   }
 
-  if (
-    !/\b(retry|retries|duplicate|duplicates|delay|delays|fail|failure|offline|network|missing|late)\b/.test(
-      allText,
-    )
-  ) {
+  if (!hasText(values.failure)) {
     warnings.push(
       "Add a failure story so Reconstruct has something concrete to redesign.",
     );
   }
 
-  if (
-    !/\b(tenant|tenants|group|groups|team|teams|location|locations|project|projects|organization|organizations|course|courses|customer|customers)\b/.test(
-      allText,
-    )
-  ) {
+  if (!hasText(values.tenants)) {
     warnings.push(
       "Add a many-instance story so scaling is not only about one local dataset.",
     );
