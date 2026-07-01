@@ -172,7 +172,7 @@ function initializeRequestTraceDemo(root: HTMLElement) {
       selectedBoundaryIndex,
     );
     updateRequestTraceMetrics(metrics, result);
-    verdict.textContent = `${result.boundaries}-step request path, ${result.riskLevel} risk`;
+    verdict.textContent = `${result.boundaries} steps / ${result.riskLevel} risk`;
     interpretation.textContent = buildRequestTraceInterpretation(
       selected,
       result,
