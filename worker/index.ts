@@ -698,11 +698,7 @@ function dedupeActiveStuckMarkers(comments: any[]) {
   const seen = new Set<string>();
 
   return comments.filter((comment) => {
-    if (
-      comment.type !== "stuck" ||
-      comment.resolvedAt ||
-      comment.hiddenAt
-    ) {
+    if (comment.type !== "stuck" || comment.resolvedAt || comment.hiddenAt) {
       return true;
     }
 

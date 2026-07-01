@@ -49,7 +49,10 @@ if (toolsPanel && toolsToggle) {
 
   const observer = new MutationObserver(updateToolsAvailability);
   for (const control of toolControls) {
-    observer.observe(control, { attributes: true, attributeFilter: ["hidden"] });
+    observer.observe(control, {
+      attributes: true,
+      attributeFilter: ["hidden"],
+    });
   }
 
   updateToolsAvailability();

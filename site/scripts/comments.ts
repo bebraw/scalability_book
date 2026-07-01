@@ -46,7 +46,9 @@ type CommentForm = HTMLFormElement & {
   };
 };
 
-const commentsRoot = document.querySelector<HTMLElement>("[data-comments-root]");
+const commentsRoot = document.querySelector<HTMLElement>(
+  "[data-comments-root]",
+);
 
 if (commentsRoot) {
   const feedbackRoot = commentsRoot;
@@ -525,10 +527,12 @@ if (commentsRoot) {
 
         const menu = renderActionMenu();
         menu.append(
-          renderActionButton(comment.featuredAt ? "Unfeature" : "Feature", () =>
-            comment.featuredAt
-              ? unfeatureComment(comment.id)
-              : featureComment(comment),
+          renderActionButton(
+            comment.featuredAt ? "Unfeature" : "Feature",
+            () =>
+              comment.featuredAt
+                ? unfeatureComment(comment.id)
+                : featureComment(comment),
           ),
         );
 
@@ -867,7 +871,6 @@ if (commentsRoot) {
           : "Comment on this paragraph",
       );
     }
-
   }
 
   function hasVisibleComments(paragraphId: string): boolean {
