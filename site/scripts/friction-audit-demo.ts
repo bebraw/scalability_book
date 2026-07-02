@@ -396,6 +396,16 @@ function initializeFrictionDemo(root: HTMLElement) {
   });
   form.addEventListener("input", render);
   form.addEventListener("change", render);
+  [scenarioSelect, improvementSelect, assistanceSelect, ...scoreInputs].forEach(
+    (control) => {
+      control.addEventListener("input", render);
+      control.addEventListener("change", render);
+    },
+  );
+  scoreInputs.forEach((input) => {
+    input.addEventListener("pointerup", render);
+    input.addEventListener("touchend", render);
+  });
   copy.addEventListener("click", async () => {
     artifact.select();
 

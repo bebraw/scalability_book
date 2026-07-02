@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { existsSync } from "node:fs";
+import { devices, expect, test, webkit } from "@playwright/test";
 
 test.describe("friction audit demo", () => {
   test.beforeEach(async ({ page }) => {
@@ -71,5 +72,41 @@ test.describe("friction audit demo", () => {
     await expect(demo.locator("[data-friction-demo-artifact]")).toHaveValue(
       /Assistance mode: Human only/,
     );
+  });
+
+  test("updates score calculations in mobile WebKit", async ({ baseURL }) => {
+    const webkitPath = webkit.executablePath();
+
+    test.skip(!existsSync(webkitPath), "Playwright WebKit is not installed");
+
+    const browser = await webkit.launch();
+    const page = await browser.newPage({ ...devices["iPhone 13"] });
+
+    try {
+      await page.goto(`${baseURL}/chapters/friction/#friction-audit-lab`);
+      const demo = page.locator("[data-friction-demo]");
+      await expect(demo).toBeVisible();
+
+      const slider = demo.locator("[data-friction-demo-score='testing']");
+      await slider.scrollIntoViewIfNeeded();
+
+      const before = demo
+        .locator("[data-friction-demo-metric='before']")
+        .first();
+      await expect(before).toContainText("37 min");
+
+      const box = await slider.boundingBox();
+      expect(box).not.toBeNull();
+
+      if (!box) {
+        return;
+      }
+
+      await page.touchscreen.tap(box.x + box.width - 4, box.y + box.height / 2);
+      await expect(slider).toHaveValue("5");
+      await expect(before).toContainText("41 min");
+    } finally {
+      await browser.close();
+    }
   });
 });
