@@ -77,7 +77,7 @@ const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
     risk: "Low",
   },
 };
-const fallbackAssistanceMode: AssistanceMode = assistanceModes.human ?? {
+const fallbackAssistanceMode: AssistanceMode = assistanceModes.human || {
   title: "Human only",
   copy: "The team does the search, edit, test, and review work manually.",
   speed: { setup: 1, comprehension: 1, change: 1, testing: 1 },
@@ -241,7 +241,7 @@ const scenarios: Record<string, Scenario> = {
     ],
   },
 };
-const fallbackScenario: Scenario = scenarios["required-field"] ?? {
+const fallbackScenario: Scenario = scenarios["required-field"] || {
   title: "Change request",
   copy: "Score a small change path to see where repeated work appears.",
   files: ["Relevant module", "Tests", "Review notes"],
@@ -289,7 +289,7 @@ const improvements: Record<string, Improvement> = {
     effects: { comprehension: 1, change: 2 },
   },
 };
-const fallbackImprovement: Improvement = improvements["schema-validation"] ?? {
+const fallbackImprovement: Improvement = improvements["schema-validation"] || {
   title: "Shared schema validation at boundaries",
   copy: "The UI and backend reject the same invalid event shapes.",
   effects: { comprehension: 1, change: 1, testing: 1 },
@@ -363,9 +363,9 @@ function initializeFrictionDemo(root: HTMLElement) {
   }
 
   const render = () => {
-    const scenario = scenarios[scenarioSelect.value] ?? fallbackScenario;
+    const scenario = scenarios[scenarioSelect.value] || fallbackScenario;
     const improvement =
-      improvements[improvementSelect.value] ?? fallbackImprovement;
+      improvements[improvementSelect.value] || fallbackImprovement;
     const assistance = getAssistanceMode(assistanceSelect.value);
     const scores = getScores(scoreInputs);
     const result = calculateFriction(scenario, scores, improvement, assistance);
@@ -607,7 +607,7 @@ function getAssistanceMode(value: string) {
     value === "weak-agent" ||
     value === "harnessed-agent"
   ) {
-    return assistanceModes[value] ?? fallbackAssistanceMode;
+    return assistanceModes[value] || fallbackAssistanceMode;
   }
 
   return fallbackAssistanceMode;

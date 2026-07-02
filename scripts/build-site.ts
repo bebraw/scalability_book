@@ -360,7 +360,8 @@ async function compileSiteScript(sourceRelativePath, outputRelativePath) {
   const source = await readFile(sourcePath, "utf8");
   const result = await transformWithOxc(source, sourcePath, {
     lang: "ts",
-    target: "es2022",
+    // Keep this aligned with package.json browserslist Safari/iOS Safari support.
+    target: "es2019",
   });
 
   await mkdir(path.dirname(outputPath), { recursive: true });
