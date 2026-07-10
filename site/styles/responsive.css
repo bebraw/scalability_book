@@ -8,6 +8,7 @@
     padding-left: 0.8rem;
   }
   .book-shell {
+    --book-demo-inline-extension: 0rem;
     grid-template-areas:
       "navigation"
       "chapter";

@@ -300,6 +300,7 @@
   display: none;
 }
 .book-shell {
+  --book-demo-inline-extension: calc(18rem + clamp(1rem, 3vw, 2rem));
   display: grid;
   gap: clamp(1rem, 3vw, 2rem);
   grid-template-areas: "navigation chapter balance";
@@ -513,6 +514,7 @@
     display: none;
   }
   .book-shell[data-navigation-collapsed="true"] {
+    --book-demo-inline-extension: 0rem;
     grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
     max-width: 112rem;
   }

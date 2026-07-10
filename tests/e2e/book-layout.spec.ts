@@ -28,6 +28,7 @@ test.describe("book reading layout", () => {
     await expect(pageView).toBeHidden();
     const defaultMainWidth = await elementWidth(main);
     const defaultDemoWidth = await elementWidth(demo);
+    expect(await rightEdgeExtension(demo, main)).toBeGreaterThan(180);
 
     await pageTab.click();
     await expect(pageTab).toHaveAttribute("aria-selected", "true");
@@ -90,7 +91,7 @@ test.describe("book reading layout", () => {
       .toBeGreaterThan(defaultMainWidth + 180);
     await expect
       .poll(() => elementWidth(demo))
-      .toBeGreaterThan(defaultDemoWidth + 180);
+      .toBeGreaterThan(defaultDemoWidth + 160);
 
     await page.reload();
     await expect(navigationPanel).not.toHaveAttribute("open", "");
@@ -145,5 +146,20 @@ async function horizontalCenterDelta(
 
   return Math.abs(
     containerBox.x + containerBox.width / 2 - (childBox.x + childBox.width / 2),
+  );
+}
+
+async function rightEdgeExtension(
+  element: import("@playwright/test").Locator,
+  container: import("@playwright/test").Locator,
+) {
+  const elementBox = await element.boundingBox();
+  const containerBox = await container.boundingBox();
+  if (!elementBox || !containerBox) {
+    throw new Error("Expected visible elements with bounding boxes");
+  }
+
+  return (
+    elementBox.x + elementBox.width - (containerBox.x + containerBox.width)
   );
 }
