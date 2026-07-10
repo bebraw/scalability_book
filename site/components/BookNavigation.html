@@ -1,0 +1,66 @@
+<aside
+  class="book-navigation"
+  id="book-navigation"
+  aria-label="Book navigation"
+>
+  <details data-book-navigation open>
+    <summary>
+      <span class="book-panel-label">Navigation</span>
+      <svg class="book-panel-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="4" width="17" height="16" rx="1.5" />
+        <path d="M8.5 4v16M5.8 8h.01M5.8 12h.01M5.8 16h.01" />
+      </svg>
+    </summary>
+    <div
+      class="book-navigation-tabs"
+      role="tablist"
+      aria-label="Navigation view"
+    >
+      <button
+        type="button"
+        id="book-navigation-tab"
+        role="tab"
+        aria-selected="true"
+        aria-controls="book-contents-panel"
+        data-book-navigation-tab="book"
+      >
+        Book
+      </button>
+      <button
+        type="button"
+        id="page-navigation-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="page-outline-panel"
+        data-book-navigation-tab="page"
+      >
+        Page
+      </button>
+    </div>
+    <section
+      class="book-navigation-panel book-sidebar"
+      id="book-contents-panel"
+      role="tabpanel"
+      aria-labelledby="book-navigation-tab"
+      data-book-navigation-panel="book"
+    >
+      <h2 class="book-navigation-mobile-heading">Book contents</h2>
+      <Raw &html="(resolve bookContents)"></Raw>
+    </section>
+    <section
+      class="book-navigation-panel local-toc"
+      id="page-outline-panel"
+      role="tabpanel"
+      aria-labelledby="page-navigation-tab"
+      data-book-navigation-panel="page"
+      hidden
+    >
+      <h2 class="book-navigation-mobile-heading">On this page</h2>
+      <ol &foreach="(resolve headings)">
+        <li &class="(resolve className)">
+          <a &href="(resolve href)" &children="(resolve text)"></a>
+        </li>
+      </ol>
+    </section>
+  </details>
+</aside>

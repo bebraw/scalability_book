@@ -5,6 +5,7 @@ test.describe("local table of contents highlight", () => {
     await page.goto("/chapters/what-is-scalability/");
 
     const toc = page.locator(".local-toc");
+    await page.locator("[data-book-navigation-tab='page']").click();
     await expect(toc).toBeVisible();
 
     await page

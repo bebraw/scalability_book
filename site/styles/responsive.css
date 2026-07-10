@@ -9,54 +9,63 @@
   }
   .book-shell {
     grid-template-areas:
-      "contents"
-      "outline"
+      "navigation"
       "chapter";
     grid-template-columns: minmax(0, 1fr);
   }
-  .book-sidebar {
+  .book-shell::after {
+    display: none;
+  }
+  .book-navigation {
     order: 1;
   }
-  .local-toc {
+  .chapter-main {
     order: 2;
   }
-  .chapter-main {
-    order: 3;
-  }
-  .book-sidebar,
-  .local-toc {
+  .book-navigation {
     max-height: none;
     position: static;
   }
-  .book-sidebar,
-  .local-toc {
+  .book-navigation {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     padding: 1rem;
   }
-  .book-sidebar summary,
-  .local-toc summary {
+  .book-navigation summary {
     align-items: center;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     margin-bottom: 0;
   }
-  .book-sidebar summary::after,
-  .local-toc summary::after {
+  .book-navigation summary::after {
     color: var(--accent);
     content: "+";
     font-size: 1rem;
     line-height: 1;
   }
-  .book-sidebar details[open] summary,
-  .local-toc details[open] summary {
+  .book-navigation details[open] summary {
     margin-bottom: 0.75rem;
   }
-  .book-sidebar details[open] summary::after,
-  .local-toc details[open] summary::after {
+  .book-navigation details[open] summary::after {
     content: "-";
+  }
+  .book-navigation-tabs {
+    display: none;
+  }
+  .book-navigation-mobile-heading {
+    color: var(--muted);
+    display: block;
+    font: 750 0.72rem/1.2 var(--font-ui);
+    letter-spacing: 0.08em;
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+  }
+  .book-navigation-panel + .book-navigation-panel {
+    border-top: 1px solid var(--border);
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
   }
   .local-toc ol {
     display: grid;

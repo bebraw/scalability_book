@@ -139,8 +139,7 @@
 }
 .eyebrow,
 .chapter-kicker,
-.book-sidebar summary,
-.local-toc summary {
+.book-navigation summary {
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 700;
@@ -148,16 +147,17 @@
   margin: 0 0 0.75rem;
   text-transform: uppercase;
 }
-.book-sidebar summary,
-.local-toc summary {
+.book-navigation summary {
   cursor: default;
   list-style: none;
 }
-.book-sidebar summary::-webkit-details-marker,
-.local-toc summary::-webkit-details-marker {
+.book-navigation summary::-webkit-details-marker {
   display: none;
 }
 .book-panel-icon {
+  display: none;
+}
+.book-navigation-mobile-heading {
   display: none;
 }
 .primary-link {
@@ -302,25 +302,47 @@
 .book-shell {
   display: grid;
   gap: clamp(1rem, 3vw, 2rem);
-  grid-template-areas: "contents chapter outline";
-  grid-template-columns: 18rem minmax(0, 1fr) 15rem;
+  grid-template-areas: "navigation chapter balance";
+  grid-template-columns: 18rem minmax(0, 1fr) 0;
   margin: 0 auto;
   max-width: 92rem;
   padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem;
 }
-.book-sidebar,
-.local-toc {
+.book-shell::after {
+  content: "";
+  grid-area: balance;
+}
+.book-navigation {
   align-self: start;
+  grid-area: navigation;
   max-height: calc(100vh - 6rem);
   overflow: auto;
   position: sticky;
   top: 5rem;
 }
-.book-sidebar {
-  grid-area: contents;
+.book-navigation-tabs {
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+  padding: 0.2rem;
 }
-.local-toc {
-  grid-area: outline;
+.book-navigation-tabs button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font: 750 0.72rem/1.2 var(--font-ui);
+  padding: 0.5rem 0.65rem;
+}
+.book-navigation-tabs button[aria-selected="true"] {
+  background: var(--accent-strong);
+  color: var(--panel);
+}
+.book-navigation-tabs button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  outline-offset: 2px;
 }
 .book-sidebar ol,
 .local-toc ol {
@@ -435,49 +457,39 @@
       grid-template-columns 260ms cubic-bezier(0.22, 1, 0.36, 1),
       max-width 260ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .book-sidebar,
-  .local-toc {
+  .book-navigation {
     overflow-x: clip;
   }
-  .book-sidebar details::details-content,
-  .local-toc details::details-content {
+  .book-navigation details::details-content {
     opacity: 0;
     transition:
       content-visibility 180ms allow-discrete,
       opacity 140ms ease;
   }
-  .book-sidebar details[open]::details-content,
-  .local-toc details[open]::details-content {
+  .book-navigation details[open]::details-content {
     opacity: 1;
     transition-delay: 80ms;
   }
-  .book-sidebar summary,
-  .local-toc summary {
+  .book-navigation summary {
     align-items: center;
     cursor: pointer;
     display: flex;
     gap: 0.5rem;
     justify-content: space-between;
   }
-  .book-sidebar summary::after,
-  .local-toc summary::after {
+  .book-navigation summary::after {
     color: var(--accent-strong);
     content: "←";
     font: 700 0.9rem/1 var(--font-mono);
   }
-  .local-toc summary::after {
-    content: "→";
-  }
-  .book-sidebar details:not([open]) summary,
-  .local-toc details:not([open]) summary {
+  .book-navigation details:not([open]) summary {
     justify-content: center;
     height: calc(100vh - 6rem);
     margin: 0;
     min-height: 12rem;
     padding: 0;
   }
-  .book-sidebar details:not([open]) .book-panel-label,
-  .local-toc details:not([open]) .book-panel-label {
+  .book-navigation details:not([open]) .book-panel-label {
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
     height: 1px;
@@ -486,8 +498,7 @@
     white-space: nowrap;
     width: 1px;
   }
-  .book-sidebar details:not([open]) .book-panel-icon,
-  .local-toc details:not([open]) .book-panel-icon {
+  .book-navigation details:not([open]) .book-panel-icon {
     color: var(--accent-strong);
     display: block;
     fill: none;
@@ -498,32 +509,22 @@
     stroke-width: 1.7;
     width: 1.25rem;
   }
-  .book-sidebar details:not([open]) summary::after,
-  .local-toc details:not([open]) summary::after {
+  .book-navigation details:not([open]) summary::after {
     display: none;
   }
-  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="false"] {
-    grid-template-columns: 2.5rem minmax(0, 1fr) 15rem;
-  }
-  .book-shell[data-book-contents-collapsed="false"][data-local-toc-collapsed="true"] {
-    grid-template-columns: 18rem minmax(0, 1fr) 2.5rem;
-  }
-  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"] {
+  .book-shell[data-navigation-collapsed="true"] {
     grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
     max-width: 112rem;
   }
-  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
-    .prose {
+  .book-shell[data-navigation-collapsed="true"] .prose {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 66ch) minmax(0, 1fr);
   }
-  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
-    .prose
-    > * {
+  .book-shell[data-navigation-collapsed="true"] .prose > * {
     grid-column: 2;
     min-width: 0;
   }
-  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
+  .book-shell[data-navigation-collapsed="true"]
     .prose
     > :is(
       .project-fit,

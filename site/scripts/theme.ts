@@ -4,10 +4,6 @@ const toolsPanel = document.querySelector<HTMLElement>("[data-tools-panel]");
 const toolsToggle = document.querySelector<HTMLButtonElement>(
   "[data-tools-toggle]",
 );
-const localTocDetails = Array.from(
-  document.querySelectorAll<HTMLDetailsElement>(".local-toc details"),
-);
-const compactToc = matchMedia("(max-width: 76rem)");
 const storedTheme = localStorage.getItem("theme");
 const fallbackTheme = matchMedia("(prefers-color-scheme: dark)").matches
   ? "dark"
@@ -56,15 +52,4 @@ if (toolsPanel && toolsToggle) {
   }
 
   updateToolsAvailability();
-}
-
-if (localTocDetails.length > 0) {
-  const syncLocalTocState = () => {
-    for (const details of localTocDetails) {
-      details.open = !compactToc.matches;
-    }
-  };
-
-  compactToc.addEventListener("change", syncLocalTocState);
-  syncLocalTocState();
 }

@@ -22,9 +22,8 @@ const config = parseJsonc(
 );
 const templates = await loadTemplates({
   baseLayout: "layouts/BaseLayout.html",
-  bookContentsSidebar: "components/BookContentsSidebar.html",
+  bookNavigation: "components/BookNavigation.html",
   bookPage: "layouts/bookPage.html",
-  localTableOfContents: "components/LocalTableOfContents.html",
   paginationLink: "components/PaginationLink.html",
   siteIndex: "layouts/siteIndex.html",
 });

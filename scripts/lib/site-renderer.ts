@@ -41,9 +41,8 @@ type PartMetadataCollection = {
 };
 type Templates = {
   baseLayout: string;
-  bookContentsSidebar: string;
+  bookNavigation: string;
   bookPage: string;
-  localTableOfContents: string;
   paginationLink: string;
   siteIndex: string;
 };
@@ -112,12 +111,11 @@ export function createSiteRenderer({
     next,
   }: RenderBookPageOptions): string {
     return renderHtmlisp(templates.bookPage, {
-      bookSidebar: renderBookSidebar(page),
+      bookNavigation: renderBookNavigation(page, rendered.tableOfContents),
       chapterFile: page.file,
       chapterLabel: page.label,
       chapterSlug: page.slug,
       content: rendered.content,
-      localToc: renderLocalToc(rendered.tableOfContents),
       nextLink: renderPaginationLink(next, "Next", "next"),
       previousLink: renderPaginationLink(previous, "Previous", "prev"),
     });
@@ -153,9 +151,21 @@ export function createSiteRenderer({
     });
   }
 
-  function renderBookSidebar(currentChapter: BookPage): string {
-    return renderHtmlisp(templates.bookContentsSidebar, {
+  function renderBookNavigation(
+    currentChapter: BookPage,
+    tableOfContents: TableOfContentsItem[],
+  ): string {
+    const headings = tableOfContents.filter(
+      (item) => item.level > 1 && item.level < 4,
+    );
+
+    return renderHtmlisp(templates.bookNavigation, {
       bookContents: renderSidebarContents(currentChapter),
+      headings: headings.map((item) => ({
+        ...item,
+        className: `toc-level-${item.level}`,
+        href: `#${item.slug}`,
+      })),
     });
   }
 
@@ -317,20 +327,6 @@ export function createSiteRenderer({
     }
 
     return `<li><a href="${escapeAttribute(chapter.url || "")}"${ariaCurrent}>${inner}</a></li>`;
-  }
-
-  function renderLocalToc(tableOfContents: TableOfContentsItem[]): string {
-    const headings = tableOfContents.filter(
-      (item) => item.level > 1 && item.level < 4,
-    );
-
-    return renderHtmlisp(templates.localTableOfContents, {
-      headings: headings.map((item) => ({
-        ...item,
-        className: `toc-level-${item.level}`,
-        href: `#${item.slug}`,
-      })),
-    });
   }
 
   function renderPaginationLink(
