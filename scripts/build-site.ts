@@ -30,6 +30,7 @@ const templates = await loadTemplates({
 const commonBookScripts = ["/book-nav.js", "/toc-highlight.js", "/comments.js"];
 const demoStylesheet = "/styles/demos.css";
 const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
+const developmentScripts = includeEditor ? ["/dev-reload.js"] : [];
 const demoScriptIncludes = [
   {
     title: "Project fit checker",
@@ -180,6 +181,7 @@ for (let index = 0; index < bookPages.length; index++) {
     ...commonBookScripts,
     ...getDemoScriptsForSource(page.source),
     ...(includeEditor ? editorScripts : []),
+    ...developmentScripts,
   ];
   const pageStylesheets = [
     ...(hasDemoInclude(page.source) ? [demoStylesheet] : []),
@@ -204,6 +206,7 @@ await writePage(
     title: config.title,
     description: config.description,
     currentUrl: "/",
+    scripts: developmentScripts,
     children: renderer.renderHome(),
   }),
 );
@@ -216,7 +219,10 @@ await writePage(
     description: "A single page for previewing and debugging course demos.",
     currentUrl: "/demos/",
     stylesheets: [demoStylesheet],
-    scripts: demoScriptIncludes.map(({ script }) => script),
+    scripts: [
+      ...demoScriptIncludes.map(({ script }) => script),
+      ...developmentScripts,
+    ],
     children: renderDemoGalleryPage(demoGallery.content),
   }),
 );
@@ -277,6 +283,7 @@ await compileSiteScript(
 );
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
+  await compileSiteScript("scripts/dev-reload.ts", "dev-reload.js");
 }
 await copyStaticAssets();
 if (includeEditor) {

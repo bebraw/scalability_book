@@ -15,6 +15,8 @@ let activeBuild = null;
 let buildQueued = false;
 let buildRevision = 0;
 let rebuildTimer = null;
+const devUpdateClients = new Set();
+const pendingSourceChanges = new Set();
 const host = "127.0.0.1";
 const port = Number(process.env.PORT || 3000);
 const contentTypes = new Map([
@@ -54,6 +56,10 @@ const server = createServer(async (request, response) => {
 
     if (url.pathname === "/api/editor/status") {
       return sendJson(response, { editable: true, buildRevision });
+    }
+
+    if (url.pathname === "/api/dev/events") {
+      return handleDevEvents(request, response);
     }
 
     if (url.pathname === "/api/auth/status") {
@@ -132,6 +138,22 @@ server.listen(port, host, () => {
   console.log(`Serving editable book site at http://${host}:${port}`);
 });
 startSourceWatchers();
+
+function handleDevEvents(request, response) {
+  response.writeHead(200, {
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "Content-Type": "text/event-stream; charset=utf-8",
+  });
+  response.write(
+    `retry: 1000\nevent: ready\ndata: ${JSON.stringify({ revision: buildRevision })}\n\n`,
+  );
+  devUpdateClients.add(response);
+
+  request.on("close", () => {
+    devUpdateClients.delete(response);
+  });
+}
 
 async function handleCommentsRequest(request, response, url) {
   if (request.method === "GET") {
@@ -609,17 +631,35 @@ function startSourceWatchers() {
 }
 
 function scheduleSourceRebuild(filename) {
+  pendingSourceChanges.add(filename?.toString() || "");
   clearTimeout(rebuildTimer);
   rebuildTimer = setTimeout(async () => {
+    const sourceChanges = [...pendingSourceChanges];
+    pendingSourceChanges.clear();
+
     try {
       config = await loadSiteConfig();
       chapters = await loadChapters();
       await rebuildSite();
+      broadcastDevUpdate(
+        sourceChanges.length > 0 &&
+          sourceChanges.every((changedPath) => changedPath.endsWith(".css"))
+          ? "css"
+          : "reload",
+      );
       console.log(`Rebuilt after ${filename || "a source change"}`);
     } catch (error) {
       console.error("Source rebuild failed", error);
     }
   }, 75);
+}
+
+function broadcastDevUpdate(event) {
+  const message = `event: ${event}\ndata: ${JSON.stringify({ revision: buildRevision })}\n\n`;
+
+  for (const client of devUpdateClients) {
+    client.write(message);
+  }
 }
 
 async function loadSiteConfig() {

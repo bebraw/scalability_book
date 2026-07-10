@@ -23,7 +23,7 @@ npm run dev
 
 Development output is kept in `.dev-build/`, separate from the production `build/` directory. You can therefore build or preview the published site without removing draft chapter routes from a running development server.
 
-The development server watches `book/`, `site/`, the site build helpers, and `site.config.jsonc`. Saving Markdown, CSS, templates, or browser scripts rebuilds `.dev-build/`, so refreshing the browser picks up the latest source without restarting the server.
+The development server watches `book/`, `site/`, the site build helpers, and `site.config.jsonc`. Saving CSS hot-swaps the generated stylesheets without losing page state. Markdown, template, configuration, and browser-script changes rebuild `.dev-build/` and automatically reload the page after the atomic output swap.
 
 The editor writes changes back to the Markdown source files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
 
