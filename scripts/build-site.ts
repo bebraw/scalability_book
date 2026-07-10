@@ -13,7 +13,7 @@ import {
 } from "./lib/text.ts";
 
 const root = process.cwd();
-const buildDir = path.join(root, "build");
+const buildDir = path.resolve(root, process.env.BUILD_DIR || "build");
 const siteDir = path.join(root, "site");
 const includeAllChapters = process.argv.includes("--all-chapters");
 const includeEditor = process.argv.includes("--editable");

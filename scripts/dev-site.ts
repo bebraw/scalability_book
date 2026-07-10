@@ -6,7 +6,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 const root = process.cwd();
-const buildDir = path.join(root, "build");
+const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const commentsPath = path.join(dataDir, "comments.json");
 const config = parseJsonc(
@@ -517,6 +517,7 @@ async function rebuildSite() {
       ["scripts/build-site.ts", "--all-chapters", "--editable"],
       {
         cwd: root,
+        env: { ...process.env, BUILD_DIR: buildDir },
         stdio: "inherit",
       },
     );

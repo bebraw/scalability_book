@@ -21,6 +21,8 @@ npm run dev
 
 `npm run dev` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages. In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally.
 
+Development output is kept in `.dev-build/`, separate from the production `build/` directory. You can therefore build or preview the published site without removing draft chapter routes from a running development server.
+
 The editor writes changes back to the Markdown source files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
 
 For a read-only static preview, use:
@@ -29,7 +31,7 @@ For a read-only static preview, use:
 npm run serve
 ```
 
-The build emits a static site to `build/` for `scalableweb.dev`. The deployed site remains read-only because the editing API exists only in the local dev server.
+The production build emits a static site to `build/` for `scalableweb.dev`. The deployed site remains read-only because the editing API exists only in the local dev server.
 
 Run browser-level checks with:
 
