@@ -1,117 +1,55 @@
-const bookContents = document.querySelector<HTMLDetailsElement>(
-  "[data-book-contents]",
+const bookShell = document.querySelector<HTMLElement>(".book-shell");
+const contentsPanel = document.querySelector<HTMLDetailsElement>(
+  '[data-book-layout-panel="contents"]',
+);
+const outlinePanel = document.querySelector<HTMLDetailsElement>(
+  '[data-book-layout-panel="outline"]',
 );
 
-if (bookContents) {
-  const details = bookContents;
-  const compactNav = window.matchMedia("(max-width: 48rem)");
-  let userToggledCompactNav = false;
+if (bookShell && contentsPanel && outlinePanel) {
+  const shell = bookShell;
+  const contents = contentsPanel;
+  const outline = outlinePanel;
+  const wideLayout = window.matchMedia("(min-width: 76.0625rem)");
+  const compactBookNav = window.matchMedia("(max-width: 48rem)");
+  let syncing = false;
 
-  function syncBookContents(): void {
-    if (compactNav.matches) {
-      if (!userToggledCompactNav) {
-        details.open = false;
-      }
-      return;
+  contents.addEventListener("toggle", syncFromPanels);
+  outline.addEventListener("toggle", syncFromPanels);
+  wideLayout.addEventListener("change", applyLayoutPreferences);
+  compactBookNav.addEventListener("change", applyLayoutPreferences);
+  applyLayoutPreferences();
+
+  function applyLayoutPreferences(): void {
+    syncing = true;
+
+    if (wideLayout.matches) {
+      contents.open = !readPreference("book-layout-contents-collapsed");
+      outline.open = !readPreference("book-layout-outline-collapsed");
+    } else {
+      contents.open = !compactBookNav.matches;
+      outline.open = true;
     }
 
-    userToggledCompactNav = false;
-    details.open = true;
+    syncing = false;
+    renderLayout();
   }
 
-  details.addEventListener("toggle", () => {
-    if (compactNav.matches) {
-      userToggledCompactNav = true;
+  function syncFromPanels(): void {
+    if (!syncing && wideLayout.matches) {
+      writePreference("book-layout-contents-collapsed", !contents.open);
+      writePreference("book-layout-outline-collapsed", !outline.open);
     }
-  });
 
-  compactNav.addEventListener("change", syncBookContents);
-  syncBookContents();
-}
-
-const bookShell = document.querySelector<HTMLElement>(".book-shell");
-const layoutControls = document.querySelector<HTMLElement>(
-  "[data-book-layout-controls]",
-);
-
-if (bookShell && layoutControls) {
-  const shell = bookShell;
-  const controls = layoutControls;
-  const contentsButton = requiredButton("contents");
-  const outlineButton = requiredButton("outline");
-  const focusButton = requiredButton("focus");
-  const focusLabel = layoutControls.querySelector<HTMLElement>(
-    "[data-book-layout-focus-label]",
-  );
-  const hasDemo = Boolean(
-    shell.querySelector(
-      ":is(.project-fit, .model-eval-demo, .observability-demo, .reflection-package-demo, .agent-fleet-demo, .scaling-demo, .orchestration-lab)",
-    ),
-  );
-  let contentsCollapsed = readPreference("book-layout-contents-collapsed");
-  let outlineCollapsed = readPreference("book-layout-outline-collapsed");
-  let demoFocus = false;
-
-  focusButton.hidden = !hasDemo;
-
-  contentsButton.addEventListener("click", () => {
-    contentsCollapsed = !contentsCollapsed;
-    writePreference("book-layout-contents-collapsed", contentsCollapsed);
     renderLayout();
-  });
-
-  outlineButton.addEventListener("click", () => {
-    outlineCollapsed = !outlineCollapsed;
-    writePreference("book-layout-outline-collapsed", outlineCollapsed);
-    renderLayout();
-  });
-
-  focusButton.addEventListener("click", () => {
-    demoFocus = !demoFocus;
-    renderLayout();
-  });
-
-  renderLayout();
-
-  function requiredButton(name: string): HTMLButtonElement {
-    const button = controls.querySelector<HTMLButtonElement>(
-      `[data-book-layout-toggle="${name}"]`,
-    );
-    if (!button) {
-      throw new Error(`Missing book layout control: ${name}`);
-    }
-    return button;
   }
 
   function renderLayout(): void {
-    shell.dataset.bookContentsCollapsed = String(contentsCollapsed);
-    shell.dataset.localTocCollapsed = String(outlineCollapsed);
-    shell.dataset.demoFocus = String(demoFocus);
-
-    const contentsHidden = demoFocus || contentsCollapsed;
-    const outlineHidden = demoFocus || outlineCollapsed;
-    contentsButton.setAttribute("aria-pressed", String(contentsHidden));
-    contentsButton.setAttribute(
-      "aria-label",
-      contentsHidden ? "Show book contents" : "Hide book contents",
-    );
-    outlineButton.setAttribute("aria-pressed", String(outlineHidden));
-    outlineButton.setAttribute(
-      "aria-label",
-      outlineHidden ? "Show page outline" : "Hide page outline",
-    );
-    contentsButton.disabled = demoFocus;
-    outlineButton.disabled = demoFocus;
-    focusButton.setAttribute("aria-pressed", String(demoFocus));
-    focusButton.setAttribute(
-      "aria-label",
-      demoFocus ? "Exit demo focus" : "Enter demo focus",
-    );
-    if (focusLabel) {
-      focusLabel.textContent = demoFocus ? "Exit demo focus" : "Focus demos";
-    }
+    shell.dataset.bookContentsCollapsed = String(!contents.open);
+    shell.dataset.localTocCollapsed = String(!outline.open);
 
     window.requestAnimationFrame(() => {
+      shell.dataset.layoutReady = "true";
       window.dispatchEvent(new Event("resize"));
     });
   }
