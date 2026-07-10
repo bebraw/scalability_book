@@ -3815,6 +3815,163 @@
   margin-block: 0.25rem;
   max-width: 70ch;
 }
+
+/* Shared systems-lab treatment for demos in chapters and the showcase. */
+:is(
+  .project-fit,
+  .model-eval-demo,
+  .observability-demo,
+  .reflection-package-demo,
+  .agent-fleet-demo,
+  .scaling-demo,
+  .orchestration-lab
+) {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--panel);
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-sizing: border-box;
+  box-shadow: var(--shadow);
+  inline-size: 100%;
+  max-inline-size: none;
+  max-width: none;
+  position: relative;
+}
+:is(
+  .project-fit,
+  .model-eval-demo,
+  .observability-demo,
+  .reflection-package-demo,
+  .agent-fleet-demo,
+  .scaling-demo,
+  .orchestration-lab
+)::before {
+  background: var(--accent-strong);
+  block-size: 0.2rem;
+  content: "";
+  inline-size: 4rem;
+  inset-block-start: -1px;
+  inset-inline-start: -1px;
+  position: absolute;
+  z-index: 2;
+}
+.prose
+  :is(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo,
+    .orchestration-lab
+  )
+  :where([class$="-kicker"]) {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+.prose
+  :is(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo,
+    .orchestration-lab
+  )
+  :where(
+    [class$="-panel"],
+    [class$="-summary"],
+    [class$="-score"],
+    .demo-card,
+    .project-fit-option,
+    .model-eval-card
+  ) {
+  border-radius: 0;
+  box-shadow: none;
+}
+.prose
+  :is(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo,
+    .orchestration-lab
+  )
+  :where(button, select, textarea, input:not([type="range"])) {
+  border-radius: 0;
+}
+.prose
+  :is(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo,
+    .orchestration-lab
+  )
+  :where(button, summary) {
+  text-underline-offset: 0.16em;
+}
+
+/* The catalogue supplies its own outer frame and numbered navigation rail. */
+.demo-gallery-item
+  > :where(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo,
+    .orchestration-lab
+  ) {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  inline-size: 100%;
+  margin: 0;
+  max-inline-size: none;
+  max-width: none;
+}
+.demo-gallery-item
+  > :where(
+    .project-fit,
+    .model-eval-demo,
+    .observability-demo,
+    .reflection-package-demo,
+    .agent-fleet-demo,
+    .scaling-demo
+  ):not(.orchestration-lab) {
+  background: transparent;
+}
+.demo-gallery-item
+  > section
+  > :where(
+    .project-fit-header,
+    .model-eval-header,
+    .observability-demo-header,
+    .reflection-package-demo-header,
+    .agent-fleet-header,
+    .scaling-demo-header,
+    .orchestration-lab-header
+  ) {
+  border-block-end-color: var(--border);
+}
 @keyframes orchestration-pulse {
   to {
     opacity: 0.35;
@@ -3842,7 +3999,25 @@
     grid-template-columns: 1fr;
   }
   .demo-gallery-item-header {
+    align-items: center;
+    border-block-end: 1px solid var(--border);
+    border-inline-end: 0;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 0;
     position: static;
+  }
+  .demo-gallery-index {
+    font-size: 1.5rem;
+  }
+  .demo-gallery-status {
+    align-self: center;
+  }
+  .demo-gallery-lede {
+    grid-template-columns: 1fr;
+  }
+  .demo-gallery-stats {
+    border-block-start: 1px solid var(--border);
+    border-inline-start: 0;
   }
   .model-eval-header,
   .model-eval-step,

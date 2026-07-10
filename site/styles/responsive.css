@@ -8,7 +8,14 @@
     padding-left: 0.8rem;
   }
   .book-shell {
+    grid-template-areas:
+      "contents"
+      "outline"
+      "chapter";
     grid-template-columns: minmax(0, 1fr);
+  }
+  .book-layout-controls {
+    display: none;
   }
   .book-sidebar {
     order: 1;

@@ -302,13 +302,18 @@ function hasDemoInclude(source) {
 
 function getDemoGallerySource() {
   const sections = demoScriptIncludes
-    .map(({ title, chapter, include }) => {
+    .map(({ title, chapter, include }, index) => {
       const id = `demo-${slugify(title)}`;
+      const displayIndex = String(index + 1).padStart(2, "0");
 
       return `<section class="demo-gallery-item" id="${escapeAttribute(id)}">
 <div class="demo-gallery-item-header">
+<span class="demo-gallery-index" aria-hidden="true">${displayIndex}</span>
+<div>
 <p>${chapter}</p>
 <a href="#${escapeAttribute(id)}">${title}</a>
+</div>
+<span class="demo-gallery-status"><i aria-hidden="true"></i> Ready</span>
 </div>
 {{ import "${include}" }}
 </section>`;
@@ -319,6 +324,11 @@ function getDemoGallerySource() {
 
 <div class="demo-gallery-lede">
 <p>Every interactive course demo is collected here for quick review, regression checks, and classroom walkthroughs.</p>
+<dl class="demo-gallery-stats">
+<div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
+<div><dt>Runtime</dt><dd>Browser</dd></div>
+<div><dt>Mode</dt><dd>Hands-on</dd></div>
+</dl>
 </div>
 
 ${sections}
