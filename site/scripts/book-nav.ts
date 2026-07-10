@@ -10,6 +10,8 @@ if (bookShell && contentsPanel && outlinePanel) {
   const shell = bookShell;
   const contents = contentsPanel;
   const outline = outlinePanel;
+  const contentsSummary = requiredSummary(contents);
+  const outlineSummary = requiredSummary(outline);
   const wideLayout = window.matchMedia("(min-width: 76.0625rem)");
   const compactBookNav = window.matchMedia("(max-width: 48rem)");
   let syncing = false;
@@ -47,11 +49,31 @@ if (bookShell && contentsPanel && outlinePanel) {
   function renderLayout(): void {
     shell.dataset.bookContentsCollapsed = String(!contents.open);
     shell.dataset.localTocCollapsed = String(!outline.open);
+    updateSummary(contentsSummary, contents.open, "book contents");
+    updateSummary(outlineSummary, outline.open, "page outline");
 
     window.requestAnimationFrame(() => {
       shell.dataset.layoutReady = "true";
       window.dispatchEvent(new Event("resize"));
     });
+  }
+
+  function requiredSummary(panel: HTMLDetailsElement): HTMLElement {
+    const summary = panel.querySelector<HTMLElement>("summary");
+    if (!summary) {
+      throw new Error("Book layout panel is missing its summary");
+    }
+    return summary;
+  }
+
+  function updateSummary(
+    summary: HTMLElement,
+    open: boolean,
+    label: string,
+  ): void {
+    const action = open ? "Hide" : "Show";
+    summary.setAttribute("aria-label", `${action} ${label}`);
+    summary.title = `${action} ${label}`;
   }
 }
 

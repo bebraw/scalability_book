@@ -4,7 +4,13 @@
   aria-label="Book contents"
 >
   <details data-book-contents data-book-layout-panel="contents" open>
-    <summary>Book contents</summary>
+    <summary>
+      <span class="book-panel-label">Book contents</span>
+      <svg class="book-panel-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3.5 5.5a8.5 8.5 0 0 1 8.5 1.8v11a8.5 8.5 0 0 0-8.5-1.8z" />
+        <path d="M20.5 5.5A8.5 8.5 0 0 0 12 7.3v11a8.5 8.5 0 0 1 8.5-1.8z" />
+      </svg>
+    </summary>
     <Raw &html="(resolve bookContents)"></Raw>
   </details>
 </aside>

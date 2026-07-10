@@ -9,6 +9,9 @@ test.describe("book reading layout", () => {
     const shell = page.locator(".book-shell");
     const main = page.locator(".chapter-main");
     const demo = page.locator("[data-scaling-demo]");
+    const bodyParagraph = page
+      .locator(".prose > p:not(.chapter-kicker)")
+      .first();
     const contents = page.locator("#book-contents-sidebar");
     const outline = page.locator("#local-toc-sidebar");
     const contentsPanel = contents.locator("details");
@@ -28,6 +31,29 @@ test.describe("book reading layout", () => {
     await expect(outlinePanel).not.toHaveAttribute("open", "");
     await expect(contentsToggle).toBeVisible();
     await expect(outlineToggle).toBeVisible();
+    await expect(contentsToggle).toHaveAttribute(
+      "aria-label",
+      "Show book contents",
+    );
+    await expect(outlineToggle).toHaveAttribute(
+      "aria-label",
+      "Show page outline",
+    );
+    await expect(contents.locator(".book-panel-icon")).toBeVisible();
+    await expect(outline.locator(".book-panel-icon")).toBeVisible();
+    await expect
+      .poll(() =>
+        centerDelta(contentsToggle, contents.locator(".book-panel-icon")),
+      )
+      .toBeLessThan(2);
+    await expect
+      .poll(() =>
+        centerDelta(outlineToggle, outline.locator(".book-panel-icon")),
+      )
+      .toBeLessThan(2);
+    await expect
+      .poll(() => horizontalCenterDelta(main, bodyParagraph))
+      .toBeLessThan(2);
     await expect
       .poll(() => elementWidth(main))
       .toBeGreaterThan(defaultMainWidth + 300);
@@ -65,4 +91,41 @@ async function elementWidth(locator: import("@playwright/test").Locator) {
     throw new Error("Expected a visible element with a bounding box");
   }
   return box.width;
+}
+
+async function centerDelta(
+  container: import("@playwright/test").Locator,
+  child: import("@playwright/test").Locator,
+) {
+  const containerBox = await container.boundingBox();
+  const childBox = await child.boundingBox();
+  if (!containerBox || !childBox) {
+    throw new Error("Expected visible elements with bounding boxes");
+  }
+
+  const horizontal = Math.abs(
+    containerBox.x + containerBox.width / 2 - (childBox.x + childBox.width / 2),
+  );
+  const vertical = Math.abs(
+    containerBox.y +
+      containerBox.height / 2 -
+      (childBox.y + childBox.height / 2),
+  );
+
+  return Math.max(horizontal, vertical);
+}
+
+async function horizontalCenterDelta(
+  container: import("@playwright/test").Locator,
+  child: import("@playwright/test").Locator,
+) {
+  const containerBox = await container.boundingBox();
+  const childBox = await child.boundingBox();
+  if (!containerBox || !childBox) {
+    throw new Error("Expected visible elements with bounding boxes");
+  }
+
+  return Math.abs(
+    containerBox.x + containerBox.width / 2 - (childBox.x + childBox.width / 2),
+  );
 }

@@ -157,6 +157,9 @@
 .local-toc summary::-webkit-details-marker {
   display: none;
 }
+.book-panel-icon {
+  display: none;
+}
 .primary-link {
   background: var(--accent-strong);
   border-radius: 0.35rem;
@@ -468,15 +471,36 @@
   .book-sidebar details:not([open]) summary,
   .local-toc details:not([open]) summary {
     justify-content: center;
+    height: calc(100vh - 6rem);
     margin: 0;
-    min-height: 10rem;
-    padding-block: 0.8rem;
-    text-align: center;
-    writing-mode: vertical-rl;
+    min-height: 12rem;
+    padding: 0;
+  }
+  .book-sidebar details:not([open]) .book-panel-label,
+  .local-toc details:not([open]) .book-panel-label {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+  .book-sidebar details:not([open]) .book-panel-icon,
+  .local-toc details:not([open]) .book-panel-icon {
+    color: var(--accent-strong);
+    display: block;
+    fill: none;
+    height: 1.25rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+    width: 1.25rem;
   }
   .book-sidebar details:not([open]) summary::after,
   .local-toc details:not([open]) summary::after {
-    content: "+";
+    display: none;
   }
   .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="false"] {
     grid-template-columns: 2.5rem minmax(0, 1fr) 15rem;
@@ -487,6 +511,30 @@
   .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"] {
     grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
     max-width: 112rem;
+  }
+  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
+    .prose {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 66ch) minmax(0, 1fr);
+  }
+  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
+    .prose
+    > * {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .book-shell[data-book-contents-collapsed="true"][data-local-toc-collapsed="true"]
+    .prose
+    > :is(
+      .project-fit,
+      .model-eval-demo,
+      .observability-demo,
+      .reflection-package-demo,
+      .agent-fleet-demo,
+      .scaling-demo,
+      .orchestration-lab
+    ) {
+    grid-column: 1 / -1;
   }
 }
 .demo-gallery-page {
