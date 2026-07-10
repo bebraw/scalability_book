@@ -54,6 +54,18 @@ Potential subsections:
 >
 > Scaling techniques have resource profiles. Caches, queues, replicas, CDNs, shards, and multi-region deployments can improve user experience, but each adds infrastructure and operational cost. Ask which pressure justifies the extra resource use.
 
+### Orchestration as a control loop
+
+Horizontal scaling is not merely the instruction to "run more servers". An orchestrator repeatedly compares a declared desired state with the state it observes and takes action to close the gap. A Deployment can declare a replica count and a pod template; controllers create and remove pods until that state is reached. A Service then gives clients a stable route while the individual pods behind it change.
+
+The lab below runs [Webernetes](https://github.com/ngrok/webernetes), a partial browser-based port of Kubernetes intended for interactive teaching. Change the desired replica count, send requests through a service, terminate a pod, and perform a rolling update. Watch for the distinction between the operator's instruction, the temporary mismatch, and the controller action that restores the declared state.
+
+{{ import "site/includes/orchestration-demo.html" }}
+
+This is a mechanism demonstration, not a capacity benchmark or a production Kubernetes environment. The browser runs compatible control logic and a simulated network, but it does not execute real container images or model persistent volumes, resource limits, autoscaling, and the full production networking stack. The useful question is therefore not "how many requests did this cluster handle?" but "which component noticed the mismatch, what action did it take, and which scaling problem remains unsolved?"
+
+Replica orchestration cannot make every component horizontally scalable. If each application instance depends on one saturated database, holds incompatible local state, or performs the same expensive downstream work, adding pods may simply move or amplify the bottleneck. The pressure still has to justify the technique.
+
 ## Scaling the event pipeline
 
 For the project, the most natural scaling story is the event path:

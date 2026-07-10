@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { transformWithOxc } from "vite";
+import { build as viteBuild, transformWithOxc } from "vite";
 import { renderMarkdown } from "./lib/markdown.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
@@ -91,6 +91,12 @@ const demoScriptIncludes = [
     chapter: "Scaling",
     include: "site/includes/scaling-pressure-demo.html",
     script: "/scaling-pressure-demo.js",
+  },
+  {
+    title: "Orchestration control loop",
+    chapter: "Scaling",
+    include: "site/includes/orchestration-demo.html",
+    script: "/orchestration-demo-loader.js",
   },
   {
     title: "Latency budget map",
@@ -253,6 +259,15 @@ await compileSiteScript(
   "scripts/scaling-pressure-demo.ts",
   "scaling-pressure-demo.js",
 );
+await compileSiteBundle(
+  "scripts/orchestration-demo.ts",
+  "vendor/orchestration-demo.js",
+  "OrchestrationDemo",
+);
+await compileSiteScript(
+  "scripts/orchestration-demo-loader.ts",
+  "orchestration-demo-loader.js",
+);
 await compileSiteScript(
   "scripts/latency-budget-demo.ts",
   "latency-budget-demo.js",
@@ -366,6 +381,30 @@ async function compileSiteScript(sourceRelativePath, outputRelativePath) {
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, result.code, "utf8");
+}
+
+async function compileSiteBundle(
+  sourceRelativePath,
+  outputRelativePath,
+  globalName,
+) {
+  await viteBuild({
+    configFile: false,
+    logLevel: "warn",
+    build: {
+      // Webernetes models 64-bit Kubernetes values with BigInt.
+      target: "es2020",
+      outDir: buildDir,
+      emptyOutDir: false,
+      sourcemap: false,
+      lib: {
+        entry: path.join(siteDir, sourceRelativePath),
+        formats: ["iife"],
+        name: globalName,
+        fileName: () => outputRelativePath,
+      },
+    },
+  });
 }
 
 function getAllConfiguredChapterFiles(config) {

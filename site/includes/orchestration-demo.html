@@ -1,0 +1,149 @@
+<section
+  class="orchestration-lab"
+  data-orchestration-lab
+  aria-labelledby="orchestration-lab-heading"
+>
+  <header class="orchestration-lab-header">
+    <div>
+      <p class="orchestration-lab-kicker">Browser cluster lab · Webernetes</p>
+      <h3 id="orchestration-lab-heading">Watch the control loop close</h3>
+    </div>
+    <div class="orchestration-lab-status" aria-live="polite">
+      <span class="orchestration-status-light" aria-hidden="true"></span>
+      <div>
+        <strong data-orchestration-status>Starting simulated cluster…</strong>
+        <small data-orchestration-status-detail
+          >Controllers are assembling a three-node teaching environment.</small
+        >
+      </div>
+    </div>
+  </header>
+
+  <div class="orchestration-boundary" role="note">
+    <strong>Simulation boundary</strong>
+    <span
+      >This runs Kubernetes-compatible control logic in your browser. It does
+      not run Docker images or measure production capacity.</span
+    >
+  </div>
+
+  <div class="orchestration-console">
+    <aside class="orchestration-controls" aria-label="Cluster controls">
+      <div class="orchestration-metrics">
+        <div>
+          <span>Desired</span>
+          <strong data-orchestration-metric="desired">3</strong>
+        </div>
+        <div>
+          <span>Running</span>
+          <strong data-orchestration-metric="running">0</strong>
+        </div>
+        <div>
+          <span>Release</span>
+          <strong data-orchestration-metric="release">v1</strong>
+        </div>
+        <div>
+          <span>Served</span>
+          <strong data-orchestration-metric="served">0</strong>
+        </div>
+      </div>
+
+      <div class="orchestration-control-block">
+        <label for="orchestration-replicas">
+          <span>Desired replicas</span>
+          <output data-orchestration-replica-output>3</output>
+        </label>
+        <input
+          id="orchestration-replicas"
+          type="range"
+          min="1"
+          max="6"
+          value="3"
+          data-orchestration-replicas
+          disabled
+        />
+        <button type="button" data-orchestration-apply disabled>
+          Apply desired state
+        </button>
+      </div>
+
+      <div class="orchestration-actions">
+        <button type="button" data-orchestration-burst disabled>
+          <span aria-hidden="true">↗</span>
+          Send 6-request burst
+        </button>
+        <button type="button" data-orchestration-terminate disabled>
+          <span aria-hidden="true">×</span>
+          Terminate one pod
+        </button>
+        <button type="button" data-orchestration-rollout disabled>
+          <span aria-hidden="true">↻</span>
+          Roll out release v2
+        </button>
+      </div>
+    </aside>
+
+    <div class="orchestration-stage">
+      <div class="orchestration-service">
+        <span class="orchestration-service-pulse" aria-hidden="true"></span>
+        <div>
+          <small>NodePort service · :31000</small>
+          <strong>event-api</strong>
+        </div>
+        <span>round robin</span>
+      </div>
+
+      <div class="orchestration-route" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div class="orchestration-nodes" data-orchestration-nodes>
+        <article class="orchestration-node" data-orchestration-node="node-1">
+          <header><span>01</span><strong>node-1</strong></header>
+          <ul data-orchestration-node-pods="node-1"></ul>
+        </article>
+        <article class="orchestration-node" data-orchestration-node="node-2">
+          <header><span>02</span><strong>node-2</strong></header>
+          <ul data-orchestration-node-pods="node-2"></ul>
+        </article>
+        <article class="orchestration-node" data-orchestration-node="node-3">
+          <header><span>03</span><strong>node-3</strong></header>
+          <ul data-orchestration-node-pods="node-3"></ul>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="orchestration-observer">
+    <div class="orchestration-observer-heading">
+      <div>
+        <span>Controller feed</span>
+        <small>Newest event first</small>
+      </div>
+      <strong data-orchestration-controller-state>Reconciling</strong>
+    </div>
+    <ol data-orchestration-log aria-live="polite"></ol>
+  </div>
+
+  <details class="orchestration-debrief">
+    <summary>Debrief the mechanism and its limits</summary>
+    <div>
+      <p>
+        Name the desired state, the observed state, and the controller action
+        after each experiment. Then ask what remains outside this model.
+      </p>
+      <ul>
+        <li>
+          Replicas add service instances; they do not remove database limits.
+        </li>
+        <li>
+          Replacement demonstrates recovery, not uninterrupted availability.
+        </li>
+        <li>
+          This simulator omits real images, resource limits, persistent volumes,
+          and production networking.
+        </li>
+      </ul>
+    </div>
+  </details>
+</section>
