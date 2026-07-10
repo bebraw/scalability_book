@@ -39,8 +39,39 @@ test.describe("book reading layout", () => {
     await expect(pageTab).toHaveAttribute("aria-selected", "true");
     await expect(pageView).toBeVisible();
 
-    await navigationToggle.click();
+    const bodyGeometryDuringFold = await navigationToggle.evaluate(
+      async (toggle) => {
+        const paragraph = document.querySelector<HTMLElement>(
+          ".prose > p:not(.chapter-kicker)",
+        );
+        if (!paragraph) {
+          throw new Error("Missing body paragraph");
+        }
+
+        const centers: number[] = [];
+        const widths: number[] = [];
+        const startedAt = performance.now();
+        toggle.click();
+
+        while (performance.now() - startedAt < 340) {
+          await new Promise(requestAnimationFrame);
+          const box = paragraph.getBoundingClientRect();
+          centers.push(box.left + box.width / 2);
+          widths.push(box.width);
+        }
+
+        return { centers, widths };
+      },
+    );
     await expect(navigationPanel).not.toHaveAttribute("open", "");
+    expect(
+      Math.max(...bodyGeometryDuringFold.centers) -
+        Math.min(...bodyGeometryDuringFold.centers),
+    ).toBeLessThan(2);
+    expect(
+      Math.max(...bodyGeometryDuringFold.widths) -
+        Math.min(...bodyGeometryDuringFold.widths),
+    ).toBeLessThan(2);
     await expect(navigationToggle).toHaveAttribute(
       "aria-label",
       "Show navigation",
