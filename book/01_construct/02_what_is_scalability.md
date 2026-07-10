@@ -108,6 +108,8 @@ You cannot treat “scaling” as a single problem when these four often push in
 
 User scalability is the most obvious and most visible dimension: the ability of the system to handle increased load from more clients, more requests, or more concurrent activity.
 
+The pressure may also appear inside the browser. More users often lead to larger and more dynamic views, and interactions can become slower as changes invalidate styles across a growing DOM even when the server remains fast. The benchmarking chapter returns to this as a client-side measurement problem.
+
 Typical stress signals:
 
 - API latency grows as request volume rises

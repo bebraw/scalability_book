@@ -34,6 +34,22 @@ Possible event tracking benchmarks:
 - Import a batch of historical events.
 - Simulate duplicate submissions from retrying clients.
 
+### Measure browser rendering work
+
+Web application performance is not limited to API and database latency. An interaction can receive a fast response and still feel slow because the browser has too much work to do before it can draw the next frame. Adding or removing DOM elements, changing attributes or classes, and running animations can trigger style recalculation and sometimes layout. The cost depends on the complexity of the applicable CSS rules and, often more importantly, how many elements the change invalidates.
+
+This is a useful example of why optimization should begin with evidence. Chrome DevTools can show `Recalculate Style` events in a Performance recording, including how many elements were affected. Selector Stats can then help identify selectors that required many matching attempts or consumed disproportionate time. A complex-looking selector is not automatically the real bottleneck, and replacing it without measuring may have little visible effect.
+
+A small project exercise can use the event list as the workload:
+
+1. Populate the view with an increasing number of events.
+2. Record an interaction such as filtering, expanding an event, or changing the theme.
+3. Inspect the rendering work and the number of elements whose styles were recalculated.
+4. Narrow the affected DOM scope or simplify an expensive selector, then record the same interaction again.
+5. Report what changed and what the measurement does not prove.
+
+The purpose is not to teach students to avoid expressive CSS. It is to show that client-side cost can grow with the size and structure of the rendered page, and that the relevant unit of work may be affected elements rather than requests. See [Reduce the scope and complexity of style calculations](https://web.dev/articles/reduce-the-scope-and-complexity-of-style-calculations) for a practical walkthrough.
+
 ## Model evals as benchmarks
 
 If students use different AI models during the project, they should treat model choice as something that can be measured rather than guessed. A model eval is a benchmark for an AI-assisted workflow: given the same task, context, constraints, and expected evidence, how well does each model perform?
