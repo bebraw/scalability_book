@@ -3,7 +3,7 @@
 This site has two feedback modes:
 
 - Production feedback runs in the Cloudflare Worker. Students sign in with GitHub and comments are stored in Cloudflare KV.
-- Local feedback runs in `npm start`. It stores comments in `.local/comments.json` so you can review and resolve comments while editing chapters locally.
+- Local feedback runs in `npm run dev`. It stores comments in `.local/comments.json` so you can review and resolve comments while editing chapters locally.
 
 Resolved local comments are synced back to Cloudflare KV with an explicit command. Local editing does not silently write to production.
 
@@ -127,7 +127,7 @@ npm run comments:pull -- --namespace-id <comments-kv-namespace-id>
 Start the local editable site:
 
 ```bash
-npm start
+npm run dev
 ```
 
 In local mode, the site signs you in as `local-editor` and treats you as an admin. Reply, feature, resolve with a reason, or hide comments from the page feedback threads while editing chapters.

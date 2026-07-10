@@ -16,10 +16,10 @@ Install dependencies, build the site, and start the local editable server:
 npm install
 npm run playwright:install
 npm run build
-npm start
+npm run dev
 ```
 
-`npm start` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages. In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally.
+`npm run dev` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages. In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally.
 
 The editor writes changes back to the Markdown source files and rebuilds the local static output after saving. The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.
 
@@ -45,7 +45,7 @@ Local editing stores feedback data in `.local/comments.json`. To review producti
 
 ```bash
 npm run comments:pull -- --namespace-id <comments-kv-namespace-id>
-npm start
+npm run dev
 ```
 
 After replying, featuring, resolving, or hiding comments locally, push the moderation state back to KV:
@@ -64,8 +64,8 @@ The site can be deployed through Wrangler as a Cloudflare Worker with static ass
 
 ```bash
 npm run worker:build
-npm run worker:dev
+npm run preview:worker
 npm run deploy
 ```
 
-`worker:build` generates the static site and a small asset manifest for the Worker. `deploy` publishes [worker/index.ts](../worker/index.ts) using [wrangler.jsonc](../wrangler.jsonc).
+`worker:build` generates the static site and a small asset manifest for the Worker. `preview:worker` runs that production-style Worker locally through Wrangler; unlike `dev`, it does not provide the local Markdown editor. `deploy` publishes [worker/index.ts](../worker/index.ts) using [wrangler.jsonc](../wrangler.jsonc).

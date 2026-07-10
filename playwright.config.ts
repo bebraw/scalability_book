@@ -21,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `PORT=${port} LOCAL_DATA_DIR=${localDataDir} RESET_LOCAL_COMMENTS=1 npm start`,
+    command: `PORT=${port} LOCAL_DATA_DIR=${localDataDir} RESET_LOCAL_COMMENTS=1 npm run dev`,
     url: `http://127.0.0.1:${port}/chapters/introduction/`,
     reuseExistingServer: false,
     timeout: 120_000,

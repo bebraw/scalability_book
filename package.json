@@ -14,11 +14,10 @@
     "format:check": "prettier --check .",
     "qa:demos": "playwright test tests/e2e/*demo.spec.ts",
     "playwright:install": "playwright install chromium",
-    "start": "node scripts/dev-site.ts",
     "serve": "gustwind --serve --input ./build --port 3000",
     "worker:prepare": "node scripts/generate-worker-manifest.ts",
     "worker:build": "npm run build && npm run worker:prepare",
-    "worker:dev": "npm run worker:build && wrangler dev",
+    "preview:worker": "npm run worker:build && wrangler dev",
     "deploy": "npm run worker:build && wrangler deploy",
     "validate": "npm run types:check && gustwind --validate --input ./build",
     "types:check": "tsc --noEmit"
