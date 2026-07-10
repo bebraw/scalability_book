@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { createReadStream } from "node:fs";
-import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { createReadStream, renameSync, watch } from "node:fs";
+import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -9,9 +9,12 @@ const root = process.cwd();
 const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const commentsPath = path.join(dataDir, "comments.json");
-const config = parseJsonc(
-  await readFile(path.join(root, "site.config.jsonc"), "utf8"),
-);
+const configPath = path.join(root, "site.config.jsonc");
+let config = await loadSiteConfig();
+let activeBuild = null;
+let buildQueued = false;
+let buildRevision = 0;
+let rebuildTimer = null;
 const host = "127.0.0.1";
 const port = Number(process.env.PORT || 3000);
 const contentTypes = new Map([
@@ -45,12 +48,12 @@ if (process.env.RESET_LOCAL_COMMENTS === "1" && process.env.LOCAL_DATA_DIR) {
   await saveComments({});
 }
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || "/", `http://${host}:${port}`);
 
     if (url.pathname === "/api/editor/status") {
-      return sendJson(response, { editable: true });
+      return sendJson(response, { editable: true, buildRevision });
     }
 
     if (url.pathname === "/api/auth/status") {
@@ -123,9 +126,12 @@ createServer(async (request, response) => {
     console.error(error);
     return sendJson(response, { message: "Internal server error" }, 500);
   }
-}).listen(port, host, () => {
+});
+
+server.listen(port, host, () => {
   console.log(`Serving editable book site at http://${host}:${port}`);
 });
+startSourceWatchers();
 
 async function handleCommentsRequest(request, response, url) {
   if (request.method === "GET") {
@@ -510,14 +516,38 @@ async function loadChapters() {
   });
 }
 
-async function rebuildSite() {
+function rebuildSite() {
+  buildQueued = true;
+
+  if (!activeBuild) {
+    activeBuild = drainBuildQueue();
+  }
+
+  return activeBuild;
+}
+
+async function drainBuildQueue() {
+  try {
+    while (buildQueued) {
+      buildQueued = false;
+      await runBuild();
+    }
+  } finally {
+    activeBuild = null;
+  }
+}
+
+async function runBuild() {
+  const nextBuildDir = `${buildDir}.next`;
+  const previousBuildDir = `${buildDir}.previous`;
+
   await new Promise((resolve, reject) => {
     const child = spawn(
       process.execPath,
       ["scripts/build-site.ts", "--all-chapters", "--editable"],
       {
         cwd: root,
-        env: { ...process.env, BUILD_DIR: buildDir },
+        env: { ...process.env, BUILD_DIR: nextBuildDir },
         stdio: "inherit",
       },
     );
@@ -531,6 +561,69 @@ async function rebuildSite() {
       reject(new Error(`Build failed with exit code ${code}`));
     });
   });
+
+  await rm(previousBuildDir, { recursive: true, force: true });
+  let movedPreviousBuild = false;
+
+  try {
+    renameSync(buildDir, previousBuildDir);
+    movedPreviousBuild = true;
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+
+  try {
+    renameSync(nextBuildDir, buildDir);
+  } catch (error) {
+    if (movedPreviousBuild) {
+      renameSync(previousBuildDir, buildDir);
+    }
+    throw error;
+  }
+
+  await rm(previousBuildDir, { recursive: true, force: true });
+  buildRevision++;
+}
+
+function startSourceWatchers() {
+  const sources = [
+    { target: path.join(root, "book"), recursive: true },
+    { target: path.join(root, "site"), recursive: true },
+    { target: path.join(root, "scripts", "lib"), recursive: true },
+    { target: path.join(root, "scripts", "build-site.ts"), recursive: false },
+    { target: configPath, recursive: false },
+  ];
+
+  for (const source of sources) {
+    const sourceWatcher = watch(
+      source.target,
+      { recursive: source.recursive },
+      (_eventType, filename) => scheduleSourceRebuild(filename),
+    );
+    sourceWatcher.on("error", (error) => {
+      console.error(`Source watcher failed for ${source.target}`, error);
+    });
+  }
+}
+
+function scheduleSourceRebuild(filename) {
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(async () => {
+    try {
+      config = await loadSiteConfig();
+      chapters = await loadChapters();
+      await rebuildSite();
+      console.log(`Rebuilt after ${filename || "a source change"}`);
+    } catch (error) {
+      console.error("Source rebuild failed", error);
+    }
+  }, 75);
+}
+
+async function loadSiteConfig() {
+  return parseJsonc(await readFile(configPath, "utf8"));
 }
 
 function getAllConfiguredContentFiles(config) {
