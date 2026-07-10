@@ -14,9 +14,7 @@ test.describe("request trace demo", () => {
     await expect(
       demo.locator("[data-request-trace-demo-verdict]"),
     ).toContainText("5 steps");
-    await expect(demo.locator(".request-trace-scene")).toContainText(
-      "Student taps",
-    );
+    await expect(demo.locator(".request-trace-scene")).toContainText("You tap");
     await expect(demo.locator(".request-trace-wire")).toContainText(
       "POST /events",
     );

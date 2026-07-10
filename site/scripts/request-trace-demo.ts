@@ -79,7 +79,7 @@ const conditionDetails: Record<
     rule: "Require an idempotency key so retries do not create new events.",
   },
   duplicate: {
-    label: "Student taps twice",
+    label: "You tap twice",
     impact: "Storage must distinguish a new fact from a repeated request.",
     risk: "Counts and summaries become wrong if duplicates are accepted as new events.",
     rule: "Treat the same room, type, time, and request id as one event.",

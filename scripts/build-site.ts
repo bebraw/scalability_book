@@ -323,11 +323,11 @@ function getDemoGallerySource() {
   return `# Demo showcase
 
 <div class="demo-gallery-lede">
-<p>Every interactive course demo is collected here for quick review, regression checks, and classroom walkthroughs.</p>
+<p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface.</p>
 <dl class="demo-gallery-stats">
 <div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
 <div><dt>Runtime</dt><dd>Browser</dd></div>
-<div><dt>Mode</dt><dd>Hands-on</dd></div>
+<div><dt>Mode</dt><dd>Self-guided</dd></div>
 </dl>
 </div>
 

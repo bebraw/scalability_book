@@ -43,7 +43,7 @@ const tasks: Record<EvalTaskId, EvalTask> = {
     id: "benchmark",
     label: "Produce a benchmark plan",
     context:
-      "Project: a student event tracker for conference check-ins. Users submit check-in events, organizers view the latest arrivals, and admins filter events by session. The Reconstruct assumption is 20,000 events during a 30-minute arrival peak.",
+      "Project: a conference check-in event tracker. Users submit check-in events, organizers view the latest arrivals, and admins filter events by session. The Reconstruct assumption is 20,000 events during a 30-minute arrival peak.",
     prompt:
       "You are helping with the Reconstruct phase of a course project.\nUse only the context below.\n\nTask: Propose one benchmark plan.\n\nRequired output:\n- Workload:\n- Load level:\n- Metrics:\n- What the result does not prove:",
     rubric: [
@@ -269,9 +269,10 @@ function fillModelSample(
     output.value = task.outputs[model.id];
   }
 
-  for (const [key, value] of Object.entries(
-    model.sampleScores[task.id],
-  ) as [RubricKey, number][]) {
+  for (const [key, value] of Object.entries(model.sampleScores[task.id]) as [
+    RubricKey,
+    number,
+  ][]) {
     const input = root.querySelector<HTMLInputElement>(
       `[data-model="${model.id}"][data-rubric="${key}"]`,
     );

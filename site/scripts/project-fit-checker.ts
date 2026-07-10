@@ -316,7 +316,7 @@ function updateProjectFit(
     {
       label: "A query, view, or summary",
       pass: viewCount >= 1,
-      hint: "Students need something to benchmark and later redesign.",
+      hint: "You need something you can benchmark and later redesign.",
     },
     {
       label: "A plausible 100x volume story",

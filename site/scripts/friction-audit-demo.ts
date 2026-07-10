@@ -57,7 +57,7 @@ const frictionLabels: Record<FrictionKey, string> = {
 const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
   human: {
     title: "Human only",
-    copy: "The team does the search, edit, test, and review work manually.",
+    copy: "In this mode, you do the search, edit, test, and review work manually.",
     speed: { setup: 1, comprehension: 1, change: 1, testing: 1 },
     reworkMultiplier: 1,
     risk: "Medium",
@@ -79,7 +79,7 @@ const assistanceModes: Record<AssistanceKey, AssistanceMode> = {
 };
 const fallbackAssistanceMode: AssistanceMode = assistanceModes.human || {
   title: "Human only",
-  copy: "The team does the search, edit, test, and review work manually.",
+  copy: "In this mode, you do the search, edit, test, and review work manually.",
   speed: { setup: 1, comprehension: 1, change: 1, testing: 1 },
   reworkMultiplier: 1,
   risk: "Medium",

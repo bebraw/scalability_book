@@ -483,7 +483,7 @@ function buildScalingInterpretation(
   }
 
   if (result.complexity >= 8) {
-    return "This design addresses pressure, but it adds enough operational complexity that students must name ownership, dashboards, and failure recovery.";
+    return "This design addresses pressure, but it adds enough operational complexity that you still need to name ownership, dashboards, and failure recovery.";
   }
 
   if (pressures.freshness >= 4 && result.freshnessRisk >= 4) {

@@ -9,14 +9,23 @@ test.describe("demo showcase", () => {
     const gallery = page.locator(".demo-gallery-page");
     const items = gallery.locator(".demo-gallery-item");
     await expect(gallery.locator("h1")).toContainText("Demo showcase");
+    await expect(gallery.locator(".demo-gallery-lede")).toContainText(
+      "Work through one module at a time",
+    );
     await expect(items).toHaveCount(13);
     await expect(gallery.locator(".demo-gallery-stats")).toContainText("13");
+    await expect(gallery.locator(".demo-gallery-stats")).toContainText(
+      "Self-guided",
+    );
     await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
     await expect(items.last().locator(".demo-gallery-index")).toHaveText("13");
     await expect(gallery.locator(".demo-gallery-status")).toHaveCount(13);
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });
+    expect(await gallery.innerText()).not.toMatch(
+      /\b(students?|classroom|lecturer|instructor)\b/i,
+    );
 
     const lightSurface = await gallery.evaluate(
       (element) => getComputedStyle(element).backgroundImage,
