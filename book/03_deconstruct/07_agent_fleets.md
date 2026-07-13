@@ -69,6 +69,8 @@ A useful live demonstration should make the coordination cost visible. The point
 
 The demonstration should be used as a rehearsal before students run real agents. If the task is vague, the project is not ready, or the chosen roles produce overlapping work, the best outcome is to reduce the fleet. A small, reviewable delegation is usually better than parallel activity that the student cannot integrate.
 
+The fleet should be evaluated as a workflow, not as a collection of impressive transcripts. Reuse the model-eval pattern from the benchmarking chapter: define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time. For a fleet, the execution trace is also evidence. It can reveal duplicated exploration, unnecessary handoffs, invalid tool calls, or an implementer working beyond its boundary even when the final answer looks acceptable. A single-agent and fleet run on the same bounded task can support a local decision about whether delegation paid for its coordination cost.
+
 ---
 
 ## Notes for further development
@@ -118,7 +120,7 @@ The demonstration should be used as a rehearsal before students run real agents.
 
 ## Project artifact
 
-Students should produce agent project instructions and one bounded fleet workflow. The artifact should include role definitions, allowed files or modules, expected outputs, validation commands, review criteria, and a short trace showing where human judgment was required.
+Students should produce agent project instructions and one bounded fleet workflow. The artifact should include role definitions, allowed files or modules, expected outputs, validation commands, review criteria, one deterministic workflow probe, and a short trace showing where human judgment was required.
 
 ## Common mistake
 

@@ -85,6 +85,23 @@ Development ideas:
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
 - Discuss how a model can score well on a generic benchmark but still fail in a local codebase with missing context, unclear instructions, or weak tests.
 
+### Make failures diagnosable
+
+An aggregate score can show that a workflow became better or worse, but it does not explain the failure. A useful eval should let a student move from "the score fell" to a concrete diagnosis: which input failed, which required property was missing, and whether the problem came from the model, prompt, context, tool use, or evaluator.
+
+Build that diagnostic path from the cheapest reliable checks upward:
+
+1. Choose a small dataset of representative project tasks and preserve the exact input context for each one.
+2. Add deterministic probes for properties that code can check, such as valid JSON, required headings, named files, test results, or allowed tool calls.
+3. Use human review for judgments that require project understanding.
+4. Add an LLM judge only for genuinely fuzzy properties, give it a specific rubric and the relevant answer key, and record its explanation alongside its score.
+5. Test the judge itself. Swap the order of compared answers, repeat selected cases, and compare its labels with a small set of human labels before relying on it at scale.
+6. Inspect failing rows instead of reporting only the average. Preserve important real failures as regression cases that can be rerun after a prompt, model, tool, or harness change.
+
+LLM judges can favor an answer because of its position, length, or similarity to the judge's own style rather than because it is correct. These are properties of the measurement instrument, so changing to a more capable judge does not remove the need for calibration. The paper [Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685) documents several of these biases and mitigation strategies.
+
+[Your Evals Are Lying To You](https://github.com/TejasQ/basically-agent-evals) provides a compact TypeScript companion for this progression. Its useful core for this course is the path from a dataset and checker to judge-bias experiments, deterministic probes, failing-row inspection, and a CI gate. The repository also includes RAG and diagnostic-console examples, but those are optional extensions rather than required parts of the scalability project.
+
 A practitioner benchmark of [frontier and local models on structured voice-note analysis](https://tej.as/blog/note-app-ai-benchmark-apple-intelligence-sucks) illustrates both the value and limits of this approach. Models were compared on the actual summaries, action items, and questions needed by the application, and a less prestigious model outperformed several frontier models on that task. Since the comparison used a small task set and one pass per model, it should not be generalized into a universal ranking. Its defensible lesson is that product-specific output quality, latency, and cost have to be measured together.
 
 ### Small eval demonstration
@@ -94,6 +111,18 @@ A simple classroom demonstration can be interactive. The point is to show that a
 {{ import "site/includes/model-eval-demo.html" }}
 
 This is not enough data to declare a universal winner. It is enough to support a local decision such as: "For open-ended diagnosis, the stronger model saved review time. For checklist-style benchmark plans, the smaller model may be acceptable if a human verifies the result." To make the exercise more engineering-like, add deterministic checks: did the answer name a real file, include all required headings, or produce valid JSON? To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
+
+### Short eval lab
+
+Use the demonstration above or a small script to evaluate three to five outputs from one real project task. The lab should take about 20–30 minutes:
+
+1. Define the task, shared context, expected evidence, and one narrow rubric.
+2. Write at least one deterministic probe before adding any fuzzy scoring.
+3. Score two attempts, then inspect the lowest-scoring row and name the property that failed.
+4. If an LLM judge is available, reverse the order of the attempts and run the judgment again. A changed verdict is evidence about the judge, not the attempts.
+5. Save the failure as a regression fixture and write one local conclusion that the evidence supports.
+
+A defensible conclusion is specific: "the smaller model omitted confirming measurements in three of five benchmark plans." A claim such as "the larger model is better" exceeds the evidence. If the class uses the companion repository, its offline mock mode is sufficient for demonstrating the judge traps; no API key or RAG system is needed.
 
 ## Observability basics
 
@@ -194,7 +223,7 @@ Ideas to develop:
 
 ## Project artifact
 
-Students should create a measurement, model eval, and observability plan. It should define one workload, one load level, the metrics collected, one small model-evaluation task set if AI assistance is used, the result, what the result does not prove, and which signal would warn them first that the system is under pressure.
+Students should create a measurement, model eval, and observability plan. It should define one workload, one load level, the metrics collected, one small model-evaluation task set if AI assistance is used, at least one deterministic probe, the result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure.
 
 ## Notes for further development
 
