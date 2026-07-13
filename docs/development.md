@@ -8,6 +8,18 @@ The book website is configured through [site.config.jsonc](../site.config.jsonc)
 
 Markdown source files live under [book/](../book/), with each part intro next to its related chapters. HTMLisp templates live under [site/](../site/): page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
 
+To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
+
+```md
+::: comment
+
+## A section still under consideration
+
+This content remains in the source but is omitted from the rendered page and table of contents. :::
+```
+
+The opening and closing markers must be on their own lines. An unclosed comment block causes the build to fail with its starting line number. Markers inside fenced code blocks are rendered as examples rather than interpreted.
+
 ## Local Development
 
 Install dependencies, build the site, and start the local editable server:

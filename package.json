@@ -15,6 +15,7 @@
     "qa:demos": "playwright test tests/e2e/*demo.spec.ts",
     "playwright:install": "playwright install chromium",
     "serve": "gustwind --serve --input ./build --port 3000",
+    "test:unit": "node --test tests/*.test.ts",
     "worker:prepare": "node scripts/generate-worker-manifest.ts",
     "worker:build": "npm run build && npm run worker:prepare",
     "preview:worker": "npm run worker:build && wrangler dev",

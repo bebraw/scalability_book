@@ -48,6 +48,7 @@ export function renderMarkdown(
   source: string,
   chapter: MarkdownChapter,
 ): RenderedMarkdown {
+  source = stripMarkdownCommentBlocks(source);
   source = getPublicMarkdownSource(source);
   source = resolveMarkdownImports(source);
 
@@ -106,6 +107,59 @@ export function renderMarkdown(
     content: marked(source, { renderer }) as string,
     tableOfContents,
   };
+}
+
+function stripMarkdownCommentBlocks(source: string): string {
+  const lines = source.split("\n");
+  const publicLines: string[] = [];
+  let commentStartLine: number | undefined;
+  let fence: { marker: string; length: number } | undefined;
+
+  for (const [index, line] of lines.entries()) {
+    if (commentStartLine !== undefined) {
+      if (/^\s*:::\s*$/.test(line)) {
+        commentStartLine = undefined;
+        publicLines.push("");
+      }
+      continue;
+    }
+
+    const fenceMarker = line.match(/^\s{0,3}(`{3,}|~{3,})/)?.[1];
+
+    if (fence) {
+      publicLines.push(line);
+
+      if (
+        fenceMarker &&
+        fenceMarker.charAt(0) === fence.marker &&
+        fenceMarker.length >= fence.length
+      ) {
+        fence = undefined;
+      }
+      continue;
+    }
+
+    if (fenceMarker) {
+      fence = { marker: fenceMarker.charAt(0), length: fenceMarker.length };
+      publicLines.push(line);
+      continue;
+    }
+
+    if (/^\s*:::\s*comment\s*$/.test(line)) {
+      commentStartLine = index + 1;
+      continue;
+    }
+
+    publicLines.push(line);
+  }
+
+  if (commentStartLine !== undefined) {
+    throw new Error(
+      `Unclosed Markdown comment block starting at line ${commentStartLine}`,
+    );
+  }
+
+  return publicLines.join("\n");
 }
 
 function getPublicMarkdownSource(source: string): string {
