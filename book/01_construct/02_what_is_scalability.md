@@ -1,14 +1,28 @@
 # What is scalability?
 
-You might be familiar with the saying "works on my machine". Often web applications are developed in the context of a local computer, or these days even on a service directly on top of a cloud platform, meaning your view on the application is limited. As systems become more complex, they also become easier to break. That is where the concept of scalability comes in. But what is scalability exactly?
+You might be familiar with the saying "works on my machine". There's a good reason for the saying since often web applications are developed in isolation at the developer's own machine or occasionally on top of a cloud platform meaning your view on the application is limited. Given the web has many different kinds of consumers, having only your own view can easily lead to a constrained perspective. The idea of heterogenous web is at the core of scalability and discussion around it. If you ask web developers about scalability, you will likely come with different types of answers. The purpose of this chapter is to make you think about different aspects around the topic to form your own idea of the topic.
 
 ## Dimensions of scalability
 
-There are multiple ways to look at scalability. Consider for example what happens when a web-based product of a startup becomes popular and gains more users than the company might have ever imagined being possible. It is in this case that normally the performance boundaries of a service are discovered as most likely the quality of the service will begin to degrade in one way or another. When people think about scalability, performance is perhaps the first aspect that comes to their mind, but it is not the only aspect.
+Scalability can be considered from multiple viewpoints ranging from development to how your web applications performs under load in practice. I will cover several of these angles next to give you some food for thought. The list won't be exhaustive as the idea is to get you thinking about the topic.
+
+### Technical scalability
+
+Consider what happens when your product gets discovered by an aggregator like Hacker News and makes it to the top. You can only imagine the amount of traffic you have to be able to deal with at once. While this is generally a good thing in terms of business, it is also a scaling concern. How do you deal with a sudden spike of traffic? Since an event like this is so short, it is difficult to react to it in time. You will have to plan for spikes in time to make sure you can deal with success as otherwise your serves might be hugged to death, momentarily at least.
+
+### Scalability of the development process
+
+While performance and related boundaries are important, there are also more subtle aspects related to development. Now that agentic development has supercharged the way we can develop, it means we can hit limitations of our development practices far faster. In other words, development efforts have an aspect of scalability to them. Good development practices keep our agents on track while helping us to avoid technical debt or at least maintain it.
+
+### Scalability in business context
 
 Another way to look at it is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
 
+### Premature scaling
+
 Becoming too successful can kill a software product. That is essentially what dealing with scale is about, although it is important to keep in mind that premature scaling can also work against you. Now with agentic development tools, generating prototypes and learning about your market is faster than ever. Ideally you would be able to both iterate towards software business that works while being able to do it in a scalable manner. It is not only about technical scalability, but also about how you scale your development efforts. How can you retain your momentum as your product and company grow?
+
+### Planning is good, reality has its own ideas
 
 While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
 
