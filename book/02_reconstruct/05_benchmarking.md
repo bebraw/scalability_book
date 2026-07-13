@@ -63,6 +63,8 @@ The goal is not to rank models universally. A useful course eval should be local
 - Summarizing an incident trace or log excerpt.
 - Reviewing a scaling trade-off table for missing failure modes.
 
+Model capability and tool reliability are also separate variables. In [Better Models: Worse Tools](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/), Armin Ronacher documents newer models completing the reasoning for an edit correctly while emitting arguments that violated a nested tool schema. The failures depended on the conversation history, client behavior, schema shape, and whether strict tool invocation was enabled. A model eval should therefore exercise the real harness and tools rather than test only a model's prose in isolation.
+
 Each eval should define:
 
 - The input context given to the model.
@@ -82,6 +84,8 @@ Development ideas:
 - Use human review for quality judgments that require understanding of the project.
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
 - Discuss how a model can score well on a generic benchmark but still fail in a local codebase with missing context, unclear instructions, or weak tests.
+
+A practitioner benchmark of [frontier and local models on structured voice-note analysis](https://tej.as/blog/note-app-ai-benchmark-apple-intelligence-sucks) illustrates both the value and limits of this approach. Models were compared on the actual summaries, action items, and questions needed by the application, and a less prestigious model outperformed several frontier models on that task. Since the comparison used a small task set and one pass per model, it should not be generalized into a universal ranking. Its defensible lesson is that product-specific output quality, latency, and cost have to be measured together.
 
 ### Small eval demonstration
 

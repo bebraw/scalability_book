@@ -27,6 +27,8 @@ Possible subsections:
 >
 > Friction creates repeated work. Slow setup, flaky tests, confusing documentation, and unclear code make humans and agents rerun commands, regenerate changes, and spend more compute to reach the same result. Developer experience has an indirect resource cost.
 
+This cost can be measured even when the final behavior is unchanged. Trivedi and Schmitt's controlled study, [Does Code Cleanliness Affect Coding Agents?](https://arxiv.org/abs/2605.20049), compared matched clean and deliberately degraded repositories across 660 agent trials. Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often. The result does not show that every clean-code rule improves every task, but it supports a narrower and useful claim: maintainability affects the operational footprint of agentic development, not only human preference.
+
 ## Friction in the event tracking project
 
 Examples to develop:

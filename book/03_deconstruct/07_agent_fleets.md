@@ -49,6 +49,18 @@ The central claim could be: more agents do not automatically mean more progress.
 
 - Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
 
+## Fleet throughput and cost
+
+An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step. A provocative industry formulation in [We are now factory engineers, not product engineers](https://www.warp.dev/blog/we-are-now-factory-engineers-not-product-engineers) defines factory efficiency roughly as shipped product divided by inference cost plus human time. The exact formula is too simple to stand as a general metric: shipped features are not automatically valuable, and quality, risk, maintenance, and environmental costs can be displaced beyond the measurement window. It is nevertheless a useful prompt. Students should count review, correction, integration, failed runs, and monitoring instead of treating generated code as completed work.
+
+This view also explains why additional agents can reduce rather than increase effective throughput. Parallel generation creates a queue for human judgment, integration, and verification. Fleet size should follow the system's review capacity and the independence of the available tasks. If two agents need the same files, hidden assumptions, or reviewer at the same time, their apparent parallelism may only move waiting and conflict downstream.
+
+## Trust boundaries
+
+An agent's role should define not only its task but also which information it can read and which actions it can take. Simon Willison's [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) names a particularly dangerous combination: access to private data, exposure to untrusted content, and a way to communicate externally. Prompt injection in the untrusted content can then turn the agent's legitimate permissions into a path for data exfiltration.
+
+The safest design is to break the combination where possible. A scout reading untrusted issues may not need secrets or network-writing tools. An implementer may work in a sandbox with scoped files and no deployment credentials. A publisher may receive a reviewed artifact instead of the full private context that produced it. Human approval can help at a sensitive boundary, but an approval prompt is not useful when the effect is unclear or reviewers have learned to accept it mechanically.
+
 ## Delegation lab
 
 A useful live demonstration should make the coordination cost visible. The point is not to show that four agents are better than one. The point is to let students try a task, choose roles, see the review burden, and produce a delegation brief that can be used in their own project.
