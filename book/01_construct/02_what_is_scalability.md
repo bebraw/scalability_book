@@ -22,9 +22,11 @@ Another way to look at it is to consider an established, even decades old servic
 
 Becoming too successful can kill a software product. That is essentially what dealing with scale is about, although it is important to keep in mind that premature scaling can also work against you. Now with agentic development tools, generating prototypes and learning about your market is faster than ever. Ideally you would be able to both iterate towards software business that works while being able to do it in a scalable manner. It is not only about technical scalability, but also about how you scale your development efforts. How can you retain your momentum as your product and company grow?
 
+::: comment
+
 ### Planning is good, reality has its own ideas
 
-While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
+While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all. :::
 
 ### Scalability dimensions lab
 
