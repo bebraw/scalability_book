@@ -4,15 +4,29 @@ You might be familiar with the saying "works on my machine". There's a good reas
 
 ## Dimensions of scalability
 
-Scalability can be considered from multiple viewpoints ranging from development to how your web applications performs under load in practice. I will cover several of these angles next to give you some food for thought. The list won't be exhaustive as the idea is to get you thinking about the topic.
-
-### Technical scalability
-
-Consider what happens when your product gets discovered by an aggregator like Hacker News and makes it to the top. You can only imagine the amount of traffic you have to be able to deal with at once. While this is generally a good thing in terms of business, it is also a scaling concern. How do you deal with a sudden spike of traffic? Since an event like this is so short, it is difficult to react to it in time. You will have to plan for spikes in time to make sure you can deal with success as otherwise your serves might be hugged to death, momentarily at least.
+Scalability can be considered from multiple viewpoints ranging from development to how your web applications performs under load in practice. I will cover several of these angles next to give you some food for thought. The list won't be exhaustive as the idea is to get you thinking about the topic. I will cover the following five aspects of scalability I consider essential: development process, architecture, infrastructure, and data. I am sure there are different ways to frame this and you will develop your own ideas but it is a good starting point for discussion at least.
 
 ### Scalability of the development process
 
-While performance and related boundaries are important, there are also more subtle aspects related to development. Now that agentic development has supercharged the way we can develop, it means we can hit limitations of our development practices far faster. In other words, development efforts have an aspect of scalability to them. Good development practices keep our agents on track while helping us to avoid technical debt or at least maintain it.
+The way I see it, no matter what kind fo web application you are developing, you always have to consider the scalability of your development process. With the introduction of large language models, this aspect has shifted largely now that building is cheap. That does not however mean that maintenance is any cheaper than before and you will have to learn to use models responsibly to avoid problems later on. Simply put, it is now easier than ever to accumulate massive amounts of technical debt. Arriving into these kind of situations might have required years or even decades of work before.
+
+As you know, not all debt is meant to be paid, or paid ever. Therefore understanding the context is valuable. Technical debt may be acceptable for throwaway spikes, for example, where you want to see if a specific direction might make sense. If the direction does make sense, you can still go and re-engineer your solution to capture the technical characteristics you prefer. Consider for example adding a new view to your application. The idea might be to first see if the proposed user interface would make sense to use while working with mock data before wiring in a data model. The same approach can be used for evaluating technical approaches against each other while having specific metrics in mind and we will cover this idea later on in the book.
+
+### Scalability of architecture
+
+As a concept architecture is nebulous since it captures the way we shape things and how they relate to each other. In software, architecture is visible for example in the concepts of cohesion and modularity. The way we structure our software has impact on its scalability as it can either constrain or enable scalability related factors. For example tight coupling between services may make it complicated to deploy them to a loosely coupled deployment target. Coupling touches the concepts of boundaries and contracts as those are at the core of software architecture. Understanding responsibilities of different entities is one of the key tasks of a software architect after all. On top of this, a software architect has to consider how to evolve this all since often systems are not fixed and change over time. That is yet another factor that can have impact on the scalability of a system.
+
+### Scalability of infrastructure
+
+Consider what happens when your product gets discovered by an aggregator like Hacker News and makes it to the top. You can only imagine the amount of traffic you have to be able to deal with at once and it may be far more than you have prepared for. While this is generally a good thing in terms of business, it is also a scaling concern especially in terms of infrastructure since too much traffic can literally crash your site. How do you architect for a sudden spike of traffic like this? Since an event, such as a Hacker News traffic surge, is so short, it is difficult to react to it in time so you will have to prepare upfront. You will have to plan for spikes in time to make sure you can deal with success as otherwise your serves might be hugged to death, momentarily at least.
+
+For infrastructure, the challenge is two-fold as typically you think about in terms of horizontal and vertical scalability. These mean either scaling a single node within infrastructure so that it is stronger, hence vertical or scaling up, or adding more nodes to the system as a form of horizontal scalability or scaling out. (TODO: Add citations for these for more info). It is a good question who is responsible for this portion of scalability since over time companies have moved from their own hosting towards cloud computing and beyond. These days it is possible to pay for function invocations bought from edge hosting providers meaning the economics behind infrastructure have changed considerably over the past few decades as computation has become abstracted and you might not be even aware as a developer where and how your code is running exactly.
+
+### Scalability of data
+
+While a considerable chunk of work has to do with computation and processing, underneath all this you typically have some type of data unless your application is ephemeral by its nature and does not store any permanent records. If you need records, then you will need to store your data somewhere somehow and this is typically the point where you either need a filesystem or a database or both. Data comes with its own sets of problems since you have to consider where it is stored and how. You may also want to backup your data so it does not get lost. To make things worse, you may have to consider how it is read and written while dealing with concurrent usage that may lead to conflicts. As you can see, the topic can get complex fast and this complexity depends largely on your use cases.
+
+TODO: touch CAP and ACID
 
 ### Scalability in business context
 
