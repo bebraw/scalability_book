@@ -32,23 +32,27 @@ TODO: touch CAP and ACID
 
 Another way to look at it is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
 
+::: comment
+
 ### Premature scaling
 
 Becoming too successful can kill a software product. That is essentially what dealing with scale is about, although it is important to keep in mind that premature scaling can also work against you. Now with agentic development tools, generating prototypes and learning about your market is faster than ever. Ideally you would be able to both iterate towards software business that works while being able to do it in a scalable manner. It is not only about technical scalability, but also about how you scale your development efforts. How can you retain your momentum as your product and company grow?
 
-::: comment
-
 ### Planning is good, reality has its own ideas
 
-While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all. :::
+While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
 
-### Scalability dimensions lab
+:::
+
+## Scalability dimensions lab
 
 The demonstration below treats scalability as a choice of pressure rather than a vague quality. Select the growth pressures that matter for an event-oriented project and compare how they stress users, data, teams, change, and cost.
 
 {{ import "site/includes/scalability-dimensions-demo.html" }}
 
 Use the radar before choosing techniques. A system can scale one dimension while becoming worse in another.
+
+::: comment
 
 ## 2.1 The Course Narrative & Project Arc
 
@@ -262,3 +266,5 @@ Students should create a scalability dimensions checklist for their project. The
 - Add a short closing section that previews Deconstruct: once the first project works, the next question is what hidden costs it has accumulated.
 - Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` could support the "change" dimension. It frames LLM-assisted development as both a maintainability aid and a source of new technical debt, which fits the claim that development practice also has scalability limits.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support the "teams" and "change" dimensions. Use it carefully as an opinionated practitioner piece about coordination latency, review bottlenecks, modularity, and quality systems rather than as a formal source.
+
+:::
