@@ -1406,12 +1406,12 @@
 .dimensions-demo-radar-label {
   fill: var(--text);
   font-family: var(--font-ui);
-  font-size: 0.62rem;
+  font-size: 0.44rem;
   font-weight: 850;
   paint-order: stroke;
   stroke: var(--panel);
   stroke-linejoin: round;
-  stroke-width: 4px;
+  stroke-width: 3px;
   text-anchor: middle;
   text-transform: uppercase;
 }
