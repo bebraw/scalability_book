@@ -8,7 +8,7 @@ Scalability can be considered from multiple viewpoints ranging from development 
 
 ### Scalability of the development process
 
-The way I see it, no matter what kind fo web application you are developing, you always have to consider the scalability of your development process. With the introduction of large language models, this aspect has shifted largely now that building is cheap. That does not however mean that maintenance is any cheaper than before and you will have to learn to use models responsibly to avoid problems later on. Simply put, it is now easier than ever to accumulate massive amounts of technical debt. Arriving into these kind of situations might have required years or even decades of work before.
+The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process. With the introduction of large language models, this aspect has shifted largely now that building is cheap. That does not however mean that maintenance is any cheaper than before and you will have to learn to use models responsibly to avoid problems later on. Simply put, it is now easier than ever to accumulate massive amounts of technical debt. Arriving into these kind of situations might have required years or even decades of work before.
 
 As you know, not all debt is meant to be paid, or paid ever. Therefore understanding the context is valuable. Technical debt may be acceptable for throwaway spikes, for example, where you want to see if a specific direction might make sense. If the direction does make sense, you can still go and re-engineer your solution to capture the technical characteristics you prefer. Consider for example adding a new view to your application. The idea might be to first see if the proposed user interface would make sense to use while working with mock data before wiring in a data model. The same approach can be used for evaluating technical approaches against each other while having specific metrics in mind and we will cover this idea later on in the book.
 
@@ -30,7 +30,7 @@ TODO: touch CAP and ACID
 
 ### Scalability in business context
 
-Another way to look at it is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
+Another way to look at scalability is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features. Here the challenge is to make changes without breaking anything that used to work as that could be expensive. Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed. On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least. These examples illustrate inertia within older systems and affect their technical scalability. These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
 
 ::: comment
 
@@ -44,13 +44,19 @@ While we might have the best of plans, typically the reality doesn't follow our 
 
 :::
 
-## Scalability dimensions lab
+### Scalability is multi-dimensional
 
-The demonstration below treats scalability as a choice of pressure rather than a vague quality. Select the growth pressures that matter for an event-oriented project and compare how they stress users, data, teams, change, and cost.
+As you can see, scalability is a multi-dimensional concept going beyond technical concerns. As a topic, it is open to interpretation and often different aspects of scalability are interrelated. They can also be conflicting which means that likely you cannot optimize each are at the same time but you may have to compromise. That is an important part of the engineering challenge and also the impetus behind this book as I want you to develop your own thinking around scalability.
+
+I set up a simple demonstration to showcase the multi-dimensionality of scalability to show how different growth pressures affect different dimensions related to a project. Different pressures lead to different kinds of pressures to consider. The example highlights how projects can differ depending on their pressures within the same domain.
 
 {{ import "site/includes/scalability-dimensions-demo.html" }}
 
 Use the radar before choosing techniques. A system can scale one dimension while becoming worse in another.
+
+## What scalability is not?
+
+
 
 ::: comment
 
