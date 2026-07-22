@@ -56,7 +56,9 @@ Use the radar before choosing techniques. A system can scale one dimension while
 
 ## What scalability is not?
 
+## Summary
 
+TODO: Summary goes here
 
 ::: comment
 
