@@ -1362,6 +1362,8 @@
   border-radius: 0.35rem;
   display: grid;
   gap: 0.65rem;
+  inline-size: min(100%, 34rem);
+  justify-self: center;
   margin: 0;
   padding: 0.6rem;
 }
