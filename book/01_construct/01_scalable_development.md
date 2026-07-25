@@ -50,7 +50,7 @@ Not every part of an agentic system should be generative. David Khourshid's talk
 
 > **Writing note**
 >
-> This loop can support the three-project AI arc. In Construct, students can use a strong model to generate quickly while building the constraint and validation artifacts. In Reconstruct, a weaker mini model can expose whether those artifacts are good enough. In Deconstruct, a weak department-hosted model can make the harness itself the object of analysis: what context, examples, tests, prompts, and review loops allowed useful work despite lower model capability?
+> Reframe this loop around the new comparison. Construct applies it with a locally hosted single agent, Reconstruct repeats the same required behavior with a foundation-model single agent, and Deconstruct applies it through a fleet. Emphasize what can be held constant across runs: the brief, acceptance checks, evidence template, and reporting units. The fleet phase adds delegation and integration to the loop rather than representing a third kind of model.
 
 ## The project harness
 
@@ -158,3 +158,12 @@ After this chapter, students should be able to:
 ## Project artifact
 
 Students should create a first version of the project harness. It should include a README, setup command, one agent instruction file, one architecture note, one feature spec for the core event workflow, one decision record for the initial stack or storage choice, one fast validation command, and a short AI-use log. The harness can be lightweight, but it should be concrete enough that another group can run, inspect, and later deconstruct the project.
+
+## Notes for further development
+
+- Replace passages that say another group will later reconstruct or deconstruct this codebase. Another group will audit it briefly, while the owning group will later produce fresh implementations from the common brief.
+- Add a short distinction between transferable knowledge and transferable code. Good specifications, tests, examples, and validation practices should improve across phases without allowing the later implementation to become a fork of the first.
+- Make the evidence log part of the constrain-generate-validate loop. Students should record task framing, relevant model/tool configuration, validation outcome, human correction, and approximate cost or latency without submitting an unreadable raw transcript.
+- Explain that local models are affected by hardware, serving configuration, context limits, and quantization. Ask for contextual reporting rather than simplistic local-versus-cloud rankings.
+- Keep the harness discussion, but distinguish a common course harness from implementation-specific project memory. Decide in the shared specification which harness files are supplied, which students author, and which may be carried into later builds.
+- Revise the project-fit checker once the common brief is fixed; open-ended domain selection currently conflicts with a controlled cross-build comparison.

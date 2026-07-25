@@ -76,6 +76,14 @@ The fleet should be evaluated as a workflow, not as a collection of impressive t
 ## Notes for further development
 
 - Start from the idea that an agent-ready project is not a project with more AI sprinkled on top. It is a project where intent, constraints, and feedback are explicit enough that agents can operate without relying on hidden context.
+- Introduce the phase as implementation C of the common brief. Say explicitly that a fleet is an orchestration topology using one or more declared models, not a model category.
+- Make the primary comparison a foundation-model single agent versus a fleet using the same base model when possible. Hold the brief, acceptance tests, and evidence schema constant.
+- Require students to justify why their selected tasks are decomposable. A valid fleet plan should identify independent or sequential units, interfaces between them, integration ownership, and a stopping condition.
+- Add a “single-agent counterfactual” to the fleet report: which work did not benefit from delegation and what evidence suggests one agent or one human would have been preferable?
+- Require fleet-specific measurements: duplicated exploration, number of handoffs, merge or integration failures, idle time, reviewer backlog, total model usage, active human integration time, and defects escaping individual agents.
+- Use Amdahl's Law and backpressure to explain why fleet throughput is bounded by sequential work and human review capacity. Connect this directly to the book's formal scalability laws.
+- Keep role names illustrative rather than mandatory. Grade the clarity of boundaries, permissions, outputs, and review—not whether students used `scout`, `planner`, `implementer`, and `reviewer` literally.
+- Define what evidence from fleet execution is submitted. Prefer a compact task graph, selected trace, validation results, intervention log, and summary metrics over an uncurated transcript dump.
 - Cover the practical foundations: fast tests, clear setup instructions, meaningful error messages, small modules, documented architecture, stable APIs, realistic seed data, and observable runtime behavior.
 - Introduce project instructions through `AGENTS.md` or an equivalent mechanism. Suggested contents: project purpose, commands, coding conventions, testing expectations, architectural boundaries, forbidden operations, and review checklist.
 - Show how Pi can load project-level instructions and reusable skills. Keep the example concrete: ask Pi to inspect the project, identify missing instructions, and propose an `AGENTS.md` draft.
@@ -112,7 +120,7 @@ The fleet should be evaluated as a workflow, not as a collection of impressive t
   - Control mechanism: instructions, tools, policies, tests, evals, permissions.
   - Observability: transcript, logs, traces, metrics, review artifacts.
   - Primary setting: development-time assistance, controlled agent runtime, production application.
-- Possible assignment: students add project instructions, create a repeatable setup/test command, improve one weak feedback loop, run a small fleet on one bounded project change, preserve the transcript or summary, and evaluate whether the workflow improved quality, speed, or understanding.
+- Replace the bounded-change assignment with a bounded fleet build of implementation C. The common brief should still be divided into reviewable tasks; students then evaluate whether delegation improved quality, speed, or understanding relative to implementation B.
 - Obsidian candidate: `Clippings/_Processed/The Orchestration Tax.md` is a strong fit for the core warning that agent throughput is limited by human review throughput. It can support language around Amdahl's Law, backpressure, batching reviews, and scaling fleet size to review capacity rather than to tool availability.
 - Obsidian candidate: `Clippings/_Processed/Harness engineering for coding agent users.md` is a strong fit for agent readiness. It gives vocabulary for feedforward guides, feedback sensors, computational checks, inferential checks, maintainability harnesses, architecture fitness harnesses, and behavior harnesses.
 - Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` can provide a research-backed caution that LLMs can improve analyzability, testing, repair, and comprehension while also introducing brittleness, hallucinated outputs, unstable behavior, and new technical debt.
@@ -120,7 +128,7 @@ The fleet should be evaluated as a workflow, not as a collection of impressive t
 
 ## Project artifact
 
-Students should produce agent project instructions and one bounded fleet workflow. The artifact should include role definitions, allowed files or modules, expected outputs, validation commands, review criteria, one deterministic workflow probe, and a short trace showing where human judgment was required.
+Students should produce implementation C and its bounded fleet workflow. The artifact should include the declared base model, task graph, role definitions, allowed files or modules, expected outputs, integration ownership, validation commands, review criteria, one deterministic workflow probe, comparable workflow measurements, and a short trace showing where human judgment was required.
 
 ## Common mistake
 

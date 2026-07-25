@@ -230,6 +230,13 @@ Students should create a measurement, model eval, and observability plan. It sho
 - Add a small tool-neutral example using `curl`, a simple script, or a common load testing tool.
 - Include a table of metrics and what each metric can reveal.
 - Add a small tool-neutral model eval example. A simple version could be a CSV with columns for `model`, `task`, `input`, `score`, `cost`, `latency`, and `review_note`.
+- Make this chapter the methodological center of the three-build comparison. State explicitly that the course is performing a local evaluation of complete development workflows, not establishing a universal model leaderboard.
+- Define two linked benchmark layers: the same runtime workload for each web application and the same reporting schema for each AI-assisted development workflow.
+- Expand the workflow schema to include active human time, failed attempts, interventions, acceptance-test pass rate, defects found in review, setup friction, and approximate resource use. Raw token or speed figures alone are insufficient.
+- Explain the two transitions separately: Construct to Reconstruct primarily compares model setups; Reconstruct to Deconstruct primarily compares orchestration. Require the fleet's base model and configuration to be declared.
+- Add practice effects, optional feature scope, hardware differences, and selective reporting to the measurement-traps section.
+- Require the evidence template to be completed after every phase, not reconstructed from memory in the final week.
+- Keep the sample sizes and claims modest. The final wording should favor “in our tasks and environment” over universal claims about local models, foundation models, or fleets.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.
 - Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes. Adapt the idea from page speed to event tracking: latency, freshness, failed submissions, or dashboard load time should be connected to the value the system claims to provide.

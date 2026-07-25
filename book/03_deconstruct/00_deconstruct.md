@@ -11,15 +11,17 @@ In this part, scalability has two meanings. The first is the traditional scalabi
 - Frame the part as fortifying both the system and the development process. The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
 - Use [Pi](https://pi.dev/) as the concrete tool for this part. Pi is a minimal terminal coding harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
 - Present Pi as a teaching vehicle rather than as the point of the chapter. The lesson is not "use this specific tool", but "a serious agent workflow needs a harness, explicit context, scoped capabilities, and reviewable traces".
-- Connect Pi to the course progression: copilot-style assistance in the first part, a single agent in the second part, and orchestrated agents in Deconstruct.
-- Consider revising the progression if the course adopts a deliberate model-capability arc: powerful foundation model in Construct, weaker mini model in Reconstruct, and weak department-hosted model in Deconstruct. The point would be to show that a serious agent workflow should survive changes in model quality, cost, availability, and deployment constraints.
+- Connect Pi to the revised course progression: locally hosted single agent in Construct, foundation-model single agent in Reconstruct, and an explicitly designed fleet in Deconstruct.
+- State the fleet's base model and keep it equal to the Reconstruct foundation model when practical. The comparison should change orchestration deliberately instead of changing model capability and orchestration at once.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit. This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
 - Introduce a small agent fleet with roles such as `scout`, `planner`, `implementer`, and `reviewer`. Keep the first version deliberately small so students learn orchestration and integration instead of trying to automate everything.
 - Use Pi prompt templates for repeatable workflows. Good examples: investigate a subsystem, implement a bounded change, review a diff, summarize architectural risks, and prepare a pull request.
 - Use Pi's session history or export features as evidence. Students should submit a short trace or reflection showing how the fleet worked, where it failed, and how they intervened.
 - Discuss containment explicitly: limited tools, read-only exploration, small write scopes, branch isolation, test gates, and human review. The point is to teach students that an agent fleet is a socio-technical system, not merely concurrent prompting.
 - Add a comparison note: agent fleets make sense only when work can be decomposed. Some tasks are better handled by one careful agent or by the student directly.
-- Use the weak department-hosted model as an analysis tool rather than only a restriction. Ask students to identify what the model could still do well, where it failed, and which project structures made its work more reviewable.
+- Frame the third implementation as a fresh build from the common brief. The fleet may receive the permitted shared specification, tests, examples, and evidence template, but should not begin by copying either earlier implementation.
+- Make cross-build analysis a first-class output: what differed in architecture, completeness, defects, elapsed time, active human time, resource use, and review burden, and which explanations are supported by evidence?
+- Preserve the bounded cross-team audit after the fleet build. Its coordination-friction findings should be comparable with the earlier audits.
 
 ## Tool examples to develop
 
@@ -61,3 +63,5 @@ Suggested deliverables:
 ## Project artifact
 
 The part should leave students with three connected artifacts: an agent workflow that is bounded and reviewable, a scaling trade-off table tied to their Reconstruct design, and a final reflection that uses evidence from the whole project arc.
+
+Revise this artifact after the common specification is written. It should culminate in implementation C, a fleet trace and coordination analysis, a three-way implementation comparison, and an evidence-based scalability analysis rather than a change made to the Reconstruct repository.

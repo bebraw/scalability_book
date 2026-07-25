@@ -51,3 +51,13 @@ Each chapter should help you produce or revise one concrete project artifact. By
 - Chapter 7: agent instructions, task boundaries, and review workflow.
 - Chapter 8: scaling trade-off table and revised event pipeline.
 - Chapter 9: final evidence-based reflection.
+
+## Notes for further development
+
+- Rewrite the opening project description around three independent implementations of one common brief rather than one implementation that is successively changed. Introduce the sequence compactly: local single agent, foundation-model single agent, then agent fleet.
+- Explain early that the application requirements stay substantially fixed while the development system changes. This is what makes comparison possible.
+- Preserve the traditional scalability thread explicitly. The three-build comparison is a way to study development scalability, but every implementation still has to be discussed in terms of users, data, traffic, failure, architecture, operations, and resource use.
+- Replace “the running project” with language that distinguishes the shared problem and acceptance suite from the three separate implementations.
+- Preview the bounded cross-team audit as the place where unfamiliar readers test setup, documentation, hidden assumptions, and change friction. Do not promise a full handover-and-return cycle.
+- Revise the artifact list after the common specification is settled. Some artifacts should be produced for every build in a comparable evidence package; others should culminate in the final cross-build analysis.
+- Use [`docs/three-build-project-direction.md`](../docs/three-build-project-direction.md) as the source of truth during this rewrite.

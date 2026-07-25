@@ -4,7 +4,13 @@ Construct is about building the first working version of the course project. The
 
 This part also introduces AI-assisted development as a practical force in modern web work. Fast development can be useful for prototypes, but it can also create hidden cost if the result is hard to understand, test, deploy, or modify. Alongside the project work, we consider what scalability means and how the architecture of the web shapes scalable application design.
 
+---
+
 ## Notes for further development
 
-- Consider making Construct the "abundance" phase of the AI-assisted development arc. Students may use a powerful foundation model here, but the writing should emphasize that early speed has to leave behind reusable structure: project instructions, setup commands, tests, examples, validation checks, and a short record of how AI assistance was used.
-- The key teaching move is to let students feel what strong models make easy while making the harness visible before it becomes necessary. Later phases can then show that the same artifacts are not bureaucracy; they are what lets weaker models and new contributors produce useful work.
+- Replace the old “abundance” framing. Construct is now the locally hosted, single-agent build and establishes the behavioral and measurement baseline for the later comparisons.
+- Introduce the common specification and acceptance suite here. Students should understand that they are constructing implementation A, not starting a codebase that will simply become implementations B and C.
+- Keep the scope deliberately small so local-model limitations generate useful evidence rather than preventing groups from finishing.
+- Explain which artifacts may transfer to later builds. Requirements, acceptance tests, examples, evidence templates, and lessons should transfer; application code should remain separate unless the final specification says otherwise.
+- Ask students to record local hardware, model, quantization or serving configuration where relevant, latency, interventions, failed attempts, and active human time. Without that context, comparisons of local-model performance will be misleading.
+- Add the first bounded cross-team audit after the build. Its output should be a short external friction report, not ownership of the codebase.

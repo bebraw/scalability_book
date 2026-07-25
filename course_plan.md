@@ -50,27 +50,29 @@ The current book and project structure covers the learning outcomes well overall
 
 ## Projects
 
-The three projects are called construct, reconstruct, and deconstruct. The idea is to show the students that scalability is also about the ability to re-engineer existing projects and finally analyze them. In short:
+The three projects are called construct, reconstruct, and deconstruct. The next revision should frame them as three independent implementations of one common, bounded application brief. The required behavior and acceptance checks stay stable while the AI-assisted development setup changes. In short:
 
-- Construct - build a working baseline.
-- Reconstruct - change it under new constraints.
-- Deconstruct - measure, explain, and critique the result.
+- Construct - build a working baseline with a locally hosted model and a single-agent workflow.
+- Reconstruct - build the same required behavior afresh with a foundation model and compare the process and result.
+- Deconstruct - build it again with an agent fleet, then measure, explain, and critique all three implementations and workflows.
 
-The projects are described in detail behind the `specifications` folder and each has its own technical targets.
+The full handover-and-return cycle is no longer the main mechanism. A bounded cross-team audit should preserve the unfamiliar-system lesson: another group runs the project from its documentation, applies the common checks, identifies a hidden assumption, and attempts or estimates one small standardized change.
 
-## AI model capability arc
+The current files in `specifications` still describe the earlier cumulative project arc and need to be replaced by one common specification plus phase-specific constraints. The rationale, comparison design, risks, and evidence requirements are recorded in [`docs/three-build-project-direction.md`](docs/three-build-project-direction.md).
 
-Writing note: consider making the model progression an explicit pedagogical device across the three projects. The first phase can allow a strong foundation model so students experience the upside of agentic development and can build ambition quickly. The second phase can require a weaker "mini" model so the cost of vague requirements, missing tests, weak project instructions, and unclear architecture becomes visible. The third phase can require a weak department-hosted model so students have to rely on the harness, examples, evaluation cases, prompts, documentation, and review practices they developed earlier.
+## AI development-system comparison
 
-The framing should not be "the good model is taken away" but "model capability is one changing condition the development system must absorb". This connects directly to scalability: the project is not only about scaling users, events, and infrastructure, but also about scaling development practice when tooling quality, cost, latency, privacy requirements, or availability changes.
+The earlier proposal used a declining-capability arc: strong foundation model, weaker mini model, then weak department-hosted model. Replace that with a progression from a local single agent to a foundation-model single agent and finally to a declared agent fleet.
+
+The comparison has two main transitions. Construct to Reconstruct changes model capability while keeping the single-agent workflow broadly comparable. Reconstruct to Deconstruct changes orchestration while keeping the fleet's base model declared and, preferably, equal to the Reconstruct model. This avoids treating a fleet as if it were a model category.
 
 Possible phase mapping:
 
-- Construct: use a powerful model for fast prototyping, but require durable artifacts such as a README, setup command, project instructions, prompt log or usage note, tests, and validation checks.
-- Reconstruct: use a weaker mini model and ask students to identify which parts of their process stopped working. The expected lesson is that a harness with clear tasks, smaller contexts, runnable checks, and good examples matters more as model capability drops.
-- Deconstruct: use the department-hosted weak model and treat the result as evidence. Students should explain what their development system made possible, where the weak model failed, and which earlier practices transferred.
+- Construct: use a supported locally hosted model and a single-agent workflow to create the smallest compliant implementation and the first evidence package.
+- Reconstruct: start from the same specification, not the Construct code, and use a foundation model through a single-agent workflow. Compare capability, speed, defects, architecture, review effort, and resource use.
+- Deconstruct: build a third implementation through bounded fleet roles and explicit integration. Compare the fleet with the foundation-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
 
-This arc could also help grading: evaluate not only the final software or analysis, but whether the group improved its ability to constrain, generate, validate, and review AI-assisted work under less favorable model conditions.
+This arc can help grading: evaluate the common required behavior, scalability reasoning, quality of evidence, and the group's ability to constrain, generate, validate, integrate, and review AI-assisted work. Do not reward generated output volume.
 
 The default project theme is a modest event tracking application, but groups may choose an ambitious event-oriented domain if they keep the required core small. One useful advanced option is a constrained visual agentic workflow platform where workflow definitions, runs, node executions, tool calls, retries, and failures are modeled as events. This should remain a domain choice within the event-tracking brief rather than a new mandatory course project, since weaker groups could otherwise spend too much time on visual editor details instead of scalability, reconstruction, and deconstruction.
 

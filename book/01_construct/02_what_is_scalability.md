@@ -271,7 +271,11 @@ Students should create a scalability dimensions checklist for their project. The
 
 - The chapter currently mixes draft prose and outline notes. Decide whether to keep the numbered `2.x` structure or align headings with the other chapters.
 - Add a small diagram showing the four scalability dimensions around the event tracking project.
-- Add a short closing section that previews Deconstruct: once the first project works, the next question is what hidden costs it has accumulated.
+- Replace the preview of cumulative reconstruction with a comparison question: once one implementation works, what evidence lets us compare it fairly with a fresh implementation produced through another development system?
+- Use the chapter's multiple dimensions to prevent the AI comparison from swallowing the course. Require every build to address the same runtime pressures as well as development throughput, cost, review, and coordination.
+- Add a compact table separating application scalability from development-system scalability. Candidate development dimensions include model latency, human review capacity, context size, task decomposability, integration cost, and inference/resource cost.
+- Connect constraints to the local-model phase: hardware, privacy, availability, context, and latency are legitimate design inputs, not merely disadvantages to be overcome.
+- Define a small set of scalability claims that every implementation must support with the same evidence. These should later become fields in the common specification and rubric.
 - Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` could support the "change" dimension. It frames LLM-assisted development as both a maintainability aid and a source of new technical debt, which fits the claim that development practice also has scalability limits.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support the "teams" and "change" dimensions. Use it carefully as an opinionated practitioner piece about coordination latency, review bottlenecks, modularity, and quality systems rather than as a formal source.
 

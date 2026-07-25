@@ -19,11 +19,11 @@ The central claim could be: scalability is the ability to keep a system useful w
 
 The three projects give the course its shape:
 
-1. **Construct**: build a baseline system and make the main path work.
-2. **Reconstruct**: change the system after the first design has met reality.
-3. **Deconstruct**: measure, explain, critique, and learn from the result.
+1. **Construct**: build a baseline system with a locally hosted single agent.
+2. **Reconstruct**: build the same required behavior afresh with a foundation-model single agent.
+3. **Deconstruct**: build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
 
-The most important lesson is that the first working version is not the final design. It is a hypothesis. It says: this is what we currently believe the system needs to do, how the parts should fit together, and where the risks are acceptable. Reconstruct and Deconstruct test that hypothesis.
+The first working version is not the final design. It is one implementation produced by one development system. The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human. Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
 
 ## Scalable development
 
@@ -115,16 +115,18 @@ Reflection prompts:
 
 ## Final reflection
 
-A strong final reflection should use evidence from the project rather than general claims. It should connect decisions to consequences: what you built, what changed, what you measured, what broke, what improved, and what you would do next.
+A strong final reflection should use evidence from the three implementations rather than general claims. It should connect development setup and architectural decisions to consequences: what each workflow produced, what changed, what was measured, what broke, what improved, and what the group would choose next.
 
 Useful structure:
 
-1. Describe the original design from Construct.
-2. Explain the pressure or changed assumption that motivated Reconstruct.
-3. Show the most important technical or architectural change.
-4. Present evidence from tests, benchmarks, observations, or user feedback.
-5. Name the trade-offs and remaining risks.
-6. Explain what the project taught you about scalability.
+1. Describe the common brief, fixed acceptance core, and comparison limits.
+2. Compare the local-model and foundation-model single-agent workflows.
+3. Compare the foundation-model single agent with the agent fleet.
+4. Compare the three architectures and their responses to the same scalability pressures.
+5. Present evidence from tests, benchmarks, audits, traces, interventions, and resource or time measurements.
+6. Separate observed differences from possible causes, including practice effects and scope differences.
+7. Name the trade-offs, remaining risks, and development setup the group would choose next.
+8. Explain what the project taught the group about application and development-system scalability.
 
 ### Final reflection package builder
 
@@ -145,3 +147,12 @@ Students should submit a final reflection package. It should include the stronge
 - What would you simplify before adding more infrastructure?
 - What would you make explicit before adding more agents?
 - What would you measure before making the next scaling decision?
+
+## Notes for further development
+
+- Revise every reflection prompt that assumes one evolving codebase. The final chapter should consistently speak about implementations A, B, and C or use equally clear names.
+- Add a compact comparison matrix covering required behavior, architecture, runtime evidence, defects, human intervention, active time, model cost or usage, setup/change friction, and coordination overhead.
+- Require causal humility. Students should name practice effects, hardware, optional scope, tool differences, and reporting gaps before attributing outcomes to a model or fleet.
+- Preserve the strongest original theme: scalability is multidimensional. The conclusion should not collapse into “which AI setup won?”
+- Include the three cross-team friction reports as external evidence. Ask where author perception and auditor experience disagreed.
+- End with a decision rather than a ranking: under what constraints would the group choose a local model, a foundation-model single agent, or a fleet for a future project?
