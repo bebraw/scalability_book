@@ -71,6 +71,8 @@ The demonstration should be used as a rehearsal before students run real agents.
 
 The fleet should be evaluated as a workflow, not as a collection of impressive transcripts. Reuse the model-eval pattern from the benchmarking chapter: define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time. For a fleet, the execution trace is also evidence. It can reveal duplicated exploration, unnecessary handoffs, invalid tool calls, or an implementer working beyond its boundary even when the final answer looks acceptable. A single-agent and fleet run on the same bounded task can support a local decision about whether delegation paid for its coordination cost.
 
+In the course project, this trace becomes application data. The fleet run maps to a workspace, delegated tasks map to work items, agents and humans map to actors, and execution details map to activity events. By loading a transformed trace into implementation C, students turn the application into a debugging and observability tool for the workflow that produced it. The goal is not to build a universal agent platform. It is to use event history, filters, summaries, and selected relationships to find coordination failures that the final code alone does not reveal.
+
 ---
 
 ## Notes for further development
@@ -84,6 +86,9 @@ The fleet should be evaluated as a workflow, not as a collection of impressive t
 - Use Amdahl's Law and backpressure to explain why fleet throughput is bounded by sequential work and human review capacity. Connect this directly to the book's formal scalability laws.
 - Keep role names illustrative rather than mandatory. Grade the clarity of boundaries, permissions, outputs, and review—not whether students used `scout`, `planner`, `implementer`, and `reviewer` literally.
 - Define what evidence from fleet execution is submitted. Prefer a compact task graph, selected trace, validation results, intervention log, and summary metrics over an uncurated transcript dump.
+- Add a small trace-transformation example that maps a real fleet export to the common project model. Include failure, retry, review, and human-intervention events when the source tool exposes them.
+- Show the distinction between state and history: a task may currently be complete even though its trace contains failed attempts, repeated work, rejected reviews, or expensive handoffs.
+- Ask students to use their debugging view to answer two concrete questions about their own fleet rather than merely demonstrating that trace import works.
 - Cover the practical foundations: fast tests, clear setup instructions, meaningful error messages, small modules, documented architecture, stable APIs, realistic seed data, and observable runtime behavior.
 - Introduce project instructions through `AGENTS.md` or an equivalent mechanism. Suggested contents: project purpose, commands, coding conventions, testing expectations, architectural boundaries, forbidden operations, and review checklist.
 - Show how Pi can load project-level instructions and reusable skills. Keep the example concrete: ask Pi to inspect the project, identify missing instructions, and propose an `AGENTS.md` draft.
@@ -128,7 +133,7 @@ The fleet should be evaluated as a workflow, not as a collection of impressive t
 
 ## Project artifact
 
-Students should produce implementation C and its bounded fleet workflow. The artifact should include the declared base model, task graph, role definitions, allowed files or modules, expected outputs, integration ownership, validation commands, review criteria, one deterministic workflow probe, comparable workflow measurements, and a short trace showing where human judgment was required.
+Students should produce implementation C and its bounded fleet workflow. The artifact should include the declared base model, task graph, role definitions, allowed files or modules, expected outputs, integration ownership, validation commands, review criteria, one deterministic workflow probe, comparable workflow measurements, a transformed trace loaded into implementation C, and debugging findings showing where coordination failed or human judgment was required.
 
 ## Common mistake
 

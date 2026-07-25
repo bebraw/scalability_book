@@ -1,152 +1,110 @@
-# Event Tracking Application
+# Construct Project
 
-## 1. Goal of the Assignment
+## Implementation A: Local Single Agent
 
-Your task is to design and implement a **simple event tracking application** for a domain of your choice.
-
-The system should record things that happen in the chosen domain and allow those events to be viewed in a basic way. The focus of this assignment is **software design, clarity, and trade-offs**, not feature completeness.
-
-This specification is intentionally minimal. You are expected to choose a theme, make reasonable assumptions, and document them. The theme could be a conference, classroom, shop, game, sensor network, task workflow, or another setting where meaningful events occur.
-
-An advanced group may choose a constrained visual agentic workflow platform as its event domain. In that case, the tracked events could include workflow creation, run starts, node completions, tool calls, retries, and failures. Keep this choice small: the assignment is still about event tracking, not about building a full visual programming product.
+The [common project specification](00_common_project.md) applies to this phase.
 
 ---
 
-## 2. Core Requirements (Mandatory)
+## 1. Purpose
 
-You MUST implement the following features.
+Construct establishes the first implementation and the comparison baseline.
 
-### 2.1 Event Recording
+Build the Work Activity Tracker using a locally hosted model through a single-agent workflow. The goal is not to demonstrate that local models are inherently weak or strong. The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
 
-- The system SHALL allow events to be recorded.
-- Each event SHALL have:
-  - A type or name (e.g. "check-in", "item-purchased", "task-completed", "sensor-reading")
-  - A timestamp
-
-- Events MAY include additional data.
-
-### 2.2 Event Storage
-
-- Recorded events SHALL be stored so they can be viewed later.
-- The storage mechanism is up to you.
-
-### 2.3 Event Viewing
-
-- Users SHALL be able to see a list of recorded events.
-- Events SHOULD be sortable or filterable by at least one criterion (e.g. time or type).
-
-### 2.4 Basic Domain Context
-
-- Events SHOULD relate to the chosen domain context, such as:
-  - Users, actors, devices, or other entities
-  - Places, groups, sessions, tasks, or resources
-  - Categories or states that make the events meaningful
-
-You may model this context in any way you see fit.
+Keep the implementation deliberately modest. A complete common core with clear evidence is more valuable than a large unfinished application.
 
 ---
 
-## 3. Optional Features (Choose 1–3)
+## 2. Development-System Constraint
 
-You may implement **any number** of the following. These are optional and meant to encourage exploration, not extra workload.
+You must use:
 
-### 3.1 Aggregation and Summaries
+- the approved locally hosted model or departmental local-model service;
+- one coding-agent process at a time;
+- the model, context, and tool configuration documented in your evidence package.
 
-- Counts of events by type
-- Counts or summaries grouped by a domain-specific field
+You may:
 
-### 3.2 Roles and Access
+- discuss, plan, write, test, and review work as a group;
+- use ordinary deterministic development tools;
+- restart the agent or begin a new session when needed;
+- use non-generative documentation and search tools allowed by the course.
 
-- Different user roles (e.g. administrator, operator, viewer)
-- Restricted access to certain views or actions
+You may not:
 
-### 3.3 Simple Dashboard
+- use a foundation model to generate, repair, review, or explain application code;
+- delegate work to subagents or run coding agents in parallel;
+- copy a prior implementation of the course application.
 
-- Visual overview of activity in the chosen domain
-- Charts, tables, or summaries
-
-### 3.4 Event Validation
-
-- Prevent clearly invalid events
-- Basic schema or required fields
-
-### 3.5 Import / Export
-
-- Export events as a file (e.g. CSV or JSON)
-- Simple data import
-
-### 3.6 Sustainability Reflection
-
-- Identify one resource-related aspect of your design
-- Examples include storage growth, unnecessary polling, query efficiency, logging volume, client bundle size, or infrastructure assumptions
+If the local model cannot complete a task, the group may implement or correct it manually. Record consequential human intervention instead of hiding it.
 
 ---
 
-## 4. Non-Goals
+## 3. Required Work
 
-You are NOT expected to:
+### 3.1 Implement the common core
 
-- Handle large-scale traffic
-- Implement real-time updates
-- Build a production-ready system
-- Support complex analytics
-- Build a polished drag-and-drop workflow editor or production agent runtime
+Complete the required domain model, behavior, harness, and acceptance scenarios from the common specification.
 
-Simple and well-explained solutions are preferred over complex ones.
+### 3.2 Establish the evidence baseline
 
----
+Produce the common evidence package while the work is happening. Do not attempt to reconstruct model usage, failed attempts, or human intervention at the end.
 
-## 5. Technical Freedom
+### 3.3 Record the stack hypothesis
 
-You MAY choose:
+In the stack decision record, explain:
 
-- Programming language
-- Frameworks and libraries
-- Architecture (monolith, client–server, etc.)
-- Storage solution
-- Application theme or domain
+- why the chosen stack is suitable for this application;
+- what the group wants to learn by using it;
+- what setup, deployment, scalability, or maintainability risks it creates;
+- how well the local model appears to understand the stack.
 
-You SHOULD be able to explain **why** you made these choices.
+### 3.4 Analyze initial scalability
+
+Apply the shared scalability scenarios to implementation A. You are not expected to add distributed infrastructure. Identify the likely first bottleneck, one operational signal, one plausible response, and its trade-off.
 
 ---
 
-## 6. Deliverables
+## 4. Deliverables
 
-Your submission SHALL include:
+Submit:
 
-- The working application
-- A short README describing:
-  - Your assumptions
-  - Your data model
-  - Your main design decisions
-  - Which optional features you implemented
-- A simple architecture or data-flow diagram showing how events are recorded, stored, and viewed
-- A short note on one source of friction or uncertainty you expect to revisit later
+- implementation A in its own repository or implementation directory;
+- the complete common evidence package;
+- acceptance-scenario and automated-test results;
+- architecture and data-flow diagram;
+- stack decision record;
+- scalability pressure map;
+- short local-model workflow reflection;
+- the cross-team audit report and a short response from the authors.
 
----
+The workflow reflection should answer:
 
-## 7. Evaluation Criteria
-
-Your work will be evaluated based on:
-
-- Correctness of the core requirements
-- Simplicity and clarity of the design
-- Quality of explanations and documentation
-- Appropriate scope for a 3‑week project
-
-There is no single correct solution.
+- What did the local model handle well?
+- Where did it require smaller tasks, more context, correction, or manual work?
+- Which limitation came from the model, which from the harness, and which from the project itself?
+- What evidence supports those interpretations?
 
 ---
 
-## 8. Advice
+## 5. Evaluation Emphasis
 
-If you are unsure, choose the simplest possible solution that meets the requirements.
+This phase emphasizes:
 
-A small, well-finished system is better than a large, incomplete one.
+- completion of the common behavioral core;
+- a reproducible project harness;
+- appropriate scope and technical clarity;
+- honest baseline evidence;
+- the ability to distinguish local-model behavior from hardware, tooling, and project conditions.
+
+Raw generation speed and feature count are not goals.
 
 ---
 
 ## Instructor Notes
 
-- If the course uses the model-capability progression, this is the phase where groups may use the strongest approved foundation model. Require them to leave behind evidence that will help later weaker models and other students: setup instructions, a short AI-use note, project conventions, basic tests, and examples of valid events.
-- The assessment should avoid rewarding only model-amplified output volume. Reward the quality of the baseline and the clarity of the harness students create around it.
+- Define the approved local-model environment before the project begins. If groups use different hardware or model variants, provide a reporting template and avoid direct latency rankings.
+- Decide which non-generative internet and documentation tools are allowed. Students should not have to guess whether looking up framework documentation violates the model constraint.
+- Make manual work explicitly legitimate. Otherwise students may conceal interventions and make the comparison less useful.
+- Check stack proposals early enough to catch unsupported local-model context limits, unavailable compilers, unsuitable deployment targets, or licensing problems.

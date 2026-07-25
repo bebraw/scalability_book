@@ -22,6 +22,8 @@ In this part, scalability has two meanings. The first is the traditional scalabi
 - Frame the third implementation as a fresh build from the common brief. The fleet may receive the permitted shared specification, tests, examples, and evidence template, but should not begin by copying either earlier implementation.
 - Make cross-build analysis a first-class output: what differed in architecture, completeness, defects, elapsed time, active human time, resource use, and review burden, and which explanations are supported by evidence?
 - Preserve the bounded cross-team audit after the fleet build. Its coordination-friction findings should be comparable with the earlier audits.
+- Make the project converge on a self-observation loop: students transform the fleet run into activity data and load it into implementation C. The application becomes a trace-based agent workflow debugger that can expose delegation, task state, failures, retries, handoffs, validation, and human intervention.
+- Keep the required integration deliberately small. A portable transformed trace and repeatable import are enough; live streaming, universal tool adapters, and a polished node graph should remain optional.
 
 ## Tool examples to develop
 
@@ -64,4 +66,4 @@ Suggested deliverables:
 
 The part should leave students with three connected artifacts: an agent workflow that is bounded and reviewable, a scaling trade-off table tied to their Reconstruct design, and a final reflection that uses evidence from the whole project arc.
 
-Revise this artifact after the common specification is written. It should culminate in implementation C, a fleet trace and coordination analysis, a three-way implementation comparison, and an evidence-based scalability analysis rather than a change made to the Reconstruct repository.
+The artifact should culminate in implementation C, a transformed fleet trace loaded into the application, debugging findings about the workflow that produced it, a fleet coordination analysis, a three-way implementation comparison, and an evidence-based scalability analysis.

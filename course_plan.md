@@ -54,11 +54,11 @@ The three projects are called construct, reconstruct, and deconstruct. The next 
 
 - Construct - build a working baseline with a locally hosted model and a single-agent workflow.
 - Reconstruct - build the same required behavior afresh with a foundation model and compare the process and result.
-- Deconstruct - build it again with an agent fleet, then measure, explain, and critique all three implementations and workflows.
+- Deconstruct - build it again with an agent fleet, load the fleet's execution trace into the resulting application as debugging data, then measure, explain, and critique all three implementations and workflows.
 
 The full handover-and-return cycle is no longer the main mechanism. A bounded cross-team audit should preserve the unfamiliar-system lesson: another group runs the project from its documentation, applies the common checks, identifies a hidden assumption, and attempts or estimates one small standardized change.
 
-The current files in `specifications` still describe the earlier cumulative project arc and need to be replaced by one common specification plus phase-specific constraints. The rationale, comparison design, risks, and evidence requirements are recorded in [`docs/three-build-project-direction.md`](docs/three-build-project-direction.md).
+The first specification draft now consists of a [common application contract](specifications/00_common_project.md) and separate [Construct](specifications/01_construct.md), [Reconstruct](specifications/02_reconstruct.md), and [Deconstruct](specifications/03_deconstruct.md) overlays. The rationale, comparison design, risks, and evidence requirements are recorded in [`docs/three-build-project-direction.md`](docs/three-build-project-direction.md).
 
 ## AI development-system comparison
 
@@ -70,7 +70,7 @@ Possible phase mapping:
 
 - Construct: use a supported locally hosted model and a single-agent workflow to create the smallest compliant implementation and the first evidence package.
 - Reconstruct: start from the same specification, not the Construct code, and use a foundation model through a single-agent workflow. Compare capability, speed, defects, architecture, review effort, and resource use.
-- Deconstruct: build a third implementation through bounded fleet roles and explicit integration. Compare the fleet with the foundation-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
+- Deconstruct: build a third implementation through bounded fleet roles and explicit integration. Transform the fleet trace into application data so the result becomes a debugging and observability tool for its own development workflow. Compare the fleet with the foundation-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
 
 This arc can help grading: evaluate the common required behavior, scalability reasoning, quality of evidence, and the group's ability to constrain, generate, validate, integrate, and review AI-assisted work. Do not reward generated output volume.
 

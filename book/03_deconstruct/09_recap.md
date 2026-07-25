@@ -101,6 +101,7 @@ Reflection prompts:
 - Which task was suitable for an agent fleet, and which task needed one careful contributor?
 - How did you divide work into roles, files, outputs, and acceptance criteria?
 - What evidence did you use before trusting agent output?
+- What did the fleet debugging view reveal about failures, retries, handoffs, review, or human intervention that the finished code did not show?
 
 ## Scaling techniques and trade-offs
 
@@ -123,7 +124,7 @@ Useful structure:
 2. Compare the local-model and foundation-model single-agent workflows.
 3. Compare the foundation-model single agent with the agent fleet.
 4. Compare the three architectures and their responses to the same scalability pressures.
-5. Present evidence from tests, benchmarks, audits, traces, interventions, and resource or time measurements.
+5. Present evidence from tests, benchmarks, audits, the fleet debugging view, traces, interventions, and resource or time measurements.
 6. Separate observed differences from possible causes, including practice effects and scope differences.
 7. Name the trade-offs, remaining risks, and development setup the group would choose next.
 8. Explain what the project taught the group about application and development-system scalability.

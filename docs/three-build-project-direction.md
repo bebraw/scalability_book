@@ -2,7 +2,7 @@
 
 ## Status
 
-This note records the intended direction for the next revision of the course projects. It supersedes the earlier idea that groups would primarily extend, hand over, and later receive back one implementation. The group-facing specifications have not yet been rewritten; that is the next design task.
+This note records the intended direction for the course projects. It supersedes the earlier idea that groups would primarily extend, hand over, and later receive back one implementation. A first group-facing draft now lives in [`specifications/00_common_project.md`](../specifications/00_common_project.md) with phase overlays in the same folder.
 
 ## Direction
 
@@ -88,17 +88,29 @@ The names can remain, but their meanings shift:
 
 - **Construct** establishes the common problem, the first implementation, and the measurement baseline.
 - **Reconstruct** means constructing the same required behavior again with a different development system, then comparing the resulting design and process rather than modifying the original codebase.
-- **Deconstruct** combines a fleet-based implementation with analysis across all three builds. Students explain what model capability and orchestration changed, what remained a human responsibility, and how the three systems would scale.
+- **Deconstruct** combines a fleet-based implementation with analysis across all three builds. Students transform the fleet's execution trace into the workspaces, tasks, actors, states, and events understood by implementation C. The application therefore becomes a trace-based debugging and observability tool for the workflow that produced it. Students explain what model capability and orchestration changed, what remained a human responsibility, and how the three systems would scale.
 
 Runtime scalability must remain a first-class learning target. The AI comparison is the course's experimental spine, not a replacement for architecture, load, failure, data growth, observability, and scalability laws.
 
-## Next design task
+## Specification follow-up
 
-Create one common group-facing specification with:
+The first specification draft now includes:
 
 - a fixed core application brief and acceptance suite;
 - phase-specific AI and orchestration constraints;
 - a transfer policy between implementations;
 - a common evidence template;
 - the bounded cross-team audit;
-- phase rubrics that separate software quality, scalability reasoning, process evidence, and reflection.
+- common evaluation principles.
+
+The next iteration should settle:
+
+- whether the Work Activity Tracker domain is the right balance between comparability and student choice;
+- exact model and agent environments;
+- the stack proposal and approval process;
+- the shared runtime workload and fixture data;
+- a small portable fleet-trace example or transformation template;
+- three equivalent audit change probes;
+- phase rubrics and grading weights;
+- expected project and audit time;
+- the submission structure used by the learning platform.
