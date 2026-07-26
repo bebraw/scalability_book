@@ -21,19 +21,19 @@ I have sketched out the initial timeline per week/lecture below:
 
 1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability, get Construct started (LO1, LO3, LO6)
 2. What is scalability (LO1, LO3)
-3. Architecture (LO2, LO3, LO6)
+3. Benchmarking and observability - define the shared runtime workload and development-workflow evidence, complete Construct after this lecture (LO1, LO4, LO5, LO6)
 
 **Reconstruct**
 
-4. Friction (LO1, LO3, LO5)
-5. Benchmarking and observability (LO1, LO4, LO5, LO6)
-6. Reality - 1. portion (construct) of the groupwork is complete and the students discuss their implementations, discussion about reality, a compact scaling bridge, start of the next portion - reconstruct (LO2, LO3, LO4, LO5, LO6)
+4. Architecture - students discuss their Construct implementations in public, use them as architecture cases, and start Reconstruct; most architecture content can be assigned as reading (LO2, LO3, LO6)
+5. Friction (LO1, LO3, LO5)
+6. Reality - discuss changed assumptions and a compact scaling bridge, then complete Reconstruct after this lecture (LO2, LO3, LO4, LO5, LO6)
 
 **Deconstruct**
 
-7. Agent fleets - 2. portion (reconstruct) of the groupwork is complete and the students discuss their implementations, the topic of agent coordination is considered (LO3, LO5, LO6)
+7. Agent fleets - students discuss their Reconstruct implementations in public, consider agent coordination, and start Deconstruct (LO3, LO5, LO6)
 8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure (LO2, LO3, LO4, LO5, LO6)
-9. Recap - 3. portion (deconstruct) of the groupwork is complete and the students discuss their implementations, recap the whole course content and reflect on what was learned (LO1, LO2, LO3, LO4, LO5, LO6)
+9. Recap - students discuss their Deconstruct implementations in public, briefly recap the course, and reflect on what was learned (LO1, LO2, LO3, LO4, LO5, LO6)
 
 ## Learning outcome alignment
 
@@ -41,12 +41,12 @@ The current book and project structure covers the learning outcomes well overall
 
 | Learning outcome | Primary time plan references | Book/project evidence | Validation note |
 | --- | --- | --- | --- |
-| LO1. Understands the multiple dimensions of scalability and factors that contribute to web application scalability. | Lectures 1, 2, 4, 5, 9 | `What is scalability?`, `Friction`, `Benchmarking and observability`, recap; Construct begins with a simple event tracking system. | Covered strongly through users, data, teams, change, performance, resilience, friction, and resource efficiency. |
-| LO2. Knows and applies architectural patterns and techniques for designing and building scalable web applications. | Lectures 3, 6, 8, 9 | `Architecture`, `Reality`, `Scaling`; Reconstruct architecture proposal, event flow, pressure map, and scaling trade-off table. | Covered strongly if Reconstruct requires students to justify chosen techniques rather than only list them. |
-| LO3. Understands the impact of the wide range of design decisions in building scalable web applications. | Lectures 1, 2, 3, 4, 6, 7, 8, 9 | Architecture and data-flow diagrams, friction audit, changed-assumptions list, agent workflow discussion, final reflection. | Covered strongly through repeated reflection on how early choices affect later change, operation, and coordination. |
-| LO4. Knows scalability laws and reflects on them in the context of architectural decisions. | Lectures 5, 6, 8, 9 | Benchmarking introduces latency, throughput, percentiles, queue depth, and resource use; Reality applies the laws to overload and bottlenecks; Scaling should add laws such as Amdahl's Law, Little's Law, and the Universal Scalability Law. | Covered if Lecture 5 introduces the laws through measured behavior and Lecture 8 includes an explicit exercise where students use one law to explain a scaling limit or trade-off. |
-| LO5. Can evaluate the scalability of web applications at multiple abstraction levels. | Lectures 4, 5, 6, 7, 8, 9 | Friction audit, measurement and observability plan, pressure map, scaling trade-off table, Deconstruct analysis of scalability, reliability, maintainability, simplicity, and resource efficiency. | Covered strongly across code, architecture, operations, collaboration, and system qualities. |
-| LO6. Has practical experience in designing, building, and deploying web applications that scale. | Lectures 1, 3, 5, 6, 8, 9 | Construct working application, architecture and deployment decisions, benchmark or observability evidence, Reconstruct redesign or prototype, Deconstruct final analysis and reflection. | Covered through project work if each phase includes lightweight operational evidence, such as a reproducible local run command, hosted URL, container, deployment notes, benchmark run, logs, or screenshots from a running instance. |
+| LO1. Understands the multiple dimensions of scalability and factors that contribute to web application scalability. | Lectures 1, 2, 3, 5, 9 | `What is scalability?`, `Benchmarking and observability`, `Friction`, recap; Construct begins with a simple event tracking system. | Covered strongly through users, data, teams, change, performance, resilience, friction, and resource efficiency. |
+| LO2. Knows and applies architectural patterns and techniques for designing and building scalable web applications. | Lectures 4, 6, 8, 9 | `Architecture`, `Reality`, `Scaling`; architecture and event-flow comparisons, pressure maps, and scaling trade-off tables. | Covered strongly if students use the architecture reading to interpret Construct and justify implementation B rather than only list techniques. |
+| LO3. Understands the impact of the wide range of design decisions in building scalable web applications. | Lectures 1, 2, 4, 5, 6, 7, 8, 9 | Architecture and data-flow diagrams, friction audit, changed-assumptions list, agent workflow discussion, final reflection. | Covered strongly through repeated reflection on how early choices affect later change, operation, and coordination. |
+| LO4. Knows scalability laws and reflects on them in the context of architectural decisions. | Lectures 3, 6, 8, 9 | Benchmarking introduces latency, throughput, percentiles, queue depth, and resource use; Reality applies the laws to overload and bottlenecks; Scaling should add laws such as Amdahl's Law, Little's Law, and the Universal Scalability Law. | Covered if Lecture 3 introduces the laws through measured behavior and Lecture 8 includes an explicit exercise where students use one law to explain a scaling limit or trade-off. |
+| LO5. Can evaluate the scalability of web applications at multiple abstraction levels. | Lectures 3, 5, 6, 7, 8, 9 | Measurement and observability plan, friction audit, pressure map, scaling trade-off table, Deconstruct analysis of scalability, reliability, maintainability, simplicity, and resource efficiency. | Covered strongly across code, architecture, operations, collaboration, and system qualities. |
+| LO6. Has practical experience in designing, building, and deploying web applications that scale. | Lectures 1, 3, 4, 6, 8, 9 | Three working implementations, architecture and deployment decisions, benchmark and observability evidence, and final comparative analysis. | Covered through project work if every phase includes a reproducible run path and the shared benchmark evidence. |
 
 ## Projects
 

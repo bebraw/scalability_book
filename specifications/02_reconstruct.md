@@ -14,6 +14,8 @@ The purpose is to compare implementation B with the local-model baseline. A more
 
 This is a new implementation, not a refactor of implementation A.
 
+Complete and submit implementation B before lecture 7. The public discussion during lecture 7 will compare the Reconstruct results before the course introduces the fleet workflow for implementation C.
+
 ---
 
 ## 2. Starting Conditions

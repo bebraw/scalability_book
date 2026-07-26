@@ -7,8 +7,9 @@ In this part, the course moves from building a working baseline to reconstructin
 ## Chapter purpose for the part
 
 - Give students a vocabulary for the hidden costs of software decisions.
+- Use the public Construct discussion and architecture reading to make design differences visible before implementation B.
 - Connect technical debt to development friction, not only messy code.
-- Show why benchmarking and observability are tools for discovering reality.
+- Reuse the benchmarking and observability protocol established during Construct.
 - Prepare students for the Reconstruct project, where the same required behavior is implemented afresh with a foundation model and compared with the local-model baseline.
 
 ## Core claim
@@ -30,12 +31,12 @@ Development ideas:
 
 ## Part outline
 
-1. Friction
+1. Architecture
+   - Compare the different architectures produced from the common specification.
+   - Use mostly reading and the public Construct discussion to develop architectural vocabulary for implementation B.
+2. Friction
    - How debt is felt in daily development.
    - Where work slows down: setup, comprehension, tests, review, deployment, debugging.
-2. Benchmarking and observability
-   - How to measure the system instead of relying on guesses.
-   - How load, latency, errors, logs, metrics, and traces reveal hidden assumptions.
 3. Reality
    - What happens when a system leaves the controlled environment of the first project.
    - How users, data, failures, concurrency, and operational constraints expose weak design.
@@ -49,4 +50,5 @@ Development ideas:
 - Add a clean-start rule and transfer-policy reminder. The foundation-model implementation should receive the common brief and permitted shared artifacts, but not silently inherit the local implementation.
 - Introduce practice effects as a limitation: students now understand the domain better, so they must not attribute every improvement to the foundation model.
 - Replace the old reflection prompt with: “What changed because the model changed, what changed because your team learned, and what evidence lets you distinguish the two?”
+- Keep the architecture chapter suitable for independent reading. Use lecture time primarily for the Construct presentations, comparison of concrete designs, and the Reconstruct launch.
 - Ensure Reconstruct still introduces new runtime pressure analytically or through a common benchmark even if the functional brief remains fixed.

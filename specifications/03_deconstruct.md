@@ -12,6 +12,8 @@ Deconstruct creates a third fresh implementation of the Work Activity Tracker th
 
 A fleet is an orchestration strategy, not a model category. The central question is whether decomposition, specialization, and parallelism improve the result enough to justify coordination, duplicated work, integration, review, and resource cost.
 
+Complete and submit implementation C before lecture 9. The public discussion and brief recap during lecture 9 use the fleet debugging views and final comparisons as evidence.
+
 ---
 
 ## 2. Starting Conditions

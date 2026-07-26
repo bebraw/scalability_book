@@ -24,12 +24,12 @@ The running project is intentionally framed as an event-oriented application rat
 
 1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
 2. What is scalability? -- How do we define scalability in the first place?
-3. What is the architecture of the web? -- How was the web built and what kind of constraints does that give to our designs? How do the constraints of the web shape API design?
+3. How to benchmark and observe web applications? -- How do we define the shared workload and evidence needed to compare all three implementations?
 
 **Reconstruct:**
 
-4. What is friction in software engineering? -- What is friction and how to reduce it?
-5. How to benchmark and observe web applications? -- Why is benchmarking important? How to benchmark effectively? What is observability?
+4. What is the architecture of the web? -- How was the web built and what kind of constraints does that give to our designs? What can the Construct implementations teach us about architecture before Reconstruct?
+5. What is friction in software engineering? -- What is friction and how to reduce it?
 6. What happens when systems face reality? -- What kind of problems might we encounter as our systems face reality and real users? How can we scale beyond a single machine?
 
 **Deconstruct:**
@@ -44,9 +44,9 @@ Each chapter should help you produce or revise one concrete project artifact. By
 
 - Chapter 1: README, assumptions, and development process notes.
 - Chapter 2: scalability dimensions checklist.
-- Chapter 3: architecture and data-flow diagrams.
-- Chapter 4: friction audit.
-- Chapter 5: measurement and observability plan.
+- Chapter 3: shared measurement protocol and Construct baseline.
+- Chapter 4: architecture reading, Construct architecture analysis, and an implementation B architecture hypothesis.
+- Chapter 5: friction audit.
 - Chapter 6: changed-assumptions and pressure map for Reconstruct.
 - Chapter 7: agent instructions, task boundaries, and review workflow.
 - Chapter 8: scaling trade-off table and revised event pipeline.

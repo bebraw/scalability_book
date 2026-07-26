@@ -12,6 +12,8 @@ Construct establishes the first implementation and the comparison baseline.
 
 Build the Work Activity Tracker using a locally hosted model through a single-agent workflow. The goal is not to demonstrate that local models are inherently weak or strong. The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
 
+Complete and submit implementation A before lecture 4. The public discussion during lecture 4 will use the submitted applications, benchmark results, and architecture diagrams as concrete cases.
+
 Keep the implementation deliberately modest. A complete common core with clear evidence is more valuable than a large unfinished application.
 
 ---

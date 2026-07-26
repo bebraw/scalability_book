@@ -9,7 +9,8 @@ The central claim could be: you cannot reason responsibly about scalability with
 - Explain why "it works" is not the same as "it works under pressure".
 - Introduce basic benchmarking concepts for web applications.
 - Introduce observability as the ability to understand system behavior from emitted signals.
-- Prepare students to discuss their Construct project before beginning Reconstruct.
+- Define the shared runtime workload and development-workflow evidence before Construct is submitted.
+- Establish a protocol students can repeat without redesigning the measurement after each project.
 
 ## Benchmarking basics
 
@@ -79,7 +80,8 @@ Each eval should define:
 
 Development ideas:
 
-- Compare two models on the same five project-specific prompts and require students to inspect the failures, not only the score.
+- Define a small set of project-specific tasks during Construct and record the local-model baseline. Rerun the same tasks with the foundation-model and fleet workflows when those phases become available.
+- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the foundation model.
 - Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
 - Use human review for quality judgments that require understanding of the project.
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
@@ -213,17 +215,17 @@ Ideas to develop:
 
 ## Exercise ideas
 
-- Students add one benchmark or load script for their Construct project.
+- Students add one benchmark or load script for their Construct project and preserve it for equivalent runs against implementations B and C.
 - Students add basic structured logging around event creation and querying.
 - Students run one measurement, document the result, and explain what the result does and does not prove.
-- Students run a small model eval comparing two approved models on the same project-specific task set, then explain one failure pattern and one limitation of the eval.
+- Students define a small model-eval task set, run the permitted local-model baseline, and preserve the inputs for equivalent runs after Reconstruct and Deconstruct.
 - Students use the measurement to identify one likely reconstruction pressure.
 - Students add one efficiency observation, such as resource use per event, database queries per request, bundle size, storage growth, or repeated background work.
 - Students propose one sustainability-oriented improvement and explain the trade-off it introduces.
 
 ## Project artifact
 
-Students should create a measurement, model eval, and observability plan. It should define one workload, one load level, the metrics collected, one small model-evaluation task set if AI assistance is used, at least one deterministic probe, the result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure.
+Students should create the shared measurement protocol and the Construct baseline. It should define one repeatable runtime workload, one load level, the metrics collected, the common development-workflow evidence, one small model-evaluation task set if appropriate, at least one deterministic probe, the first result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure. The same protocol should be rerun after Reconstruct and Deconstruct.
 
 ## Notes for further development
 
@@ -236,6 +238,7 @@ Students should create a measurement, model eval, and observability plan. It sho
 - Explain the two transitions separately: Construct to Reconstruct primarily compares model setups; Reconstruct to Deconstruct primarily compares orchestration. Require the fleet's base model and configuration to be declared.
 - Add practice effects, optional feature scope, hardware differences, and selective reporting to the measurement-traps section.
 - Require the evidence template to be completed after every phase, not reconstructed from memory in the final week.
+- Make the Construct public discussion use benchmark evidence. Groups should arrive at lecture 4 able to show at least one result and explain its limits.
 - Keep the sample sizes and claims modest. The final wording should favor “in our tasks and environment” over universal claims about local models, foundation models, or fleets.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.

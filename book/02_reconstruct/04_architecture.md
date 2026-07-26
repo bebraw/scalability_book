@@ -10,7 +10,8 @@ The central claim could be: web architecture is not neutral plumbing. It gives u
 - Show how browser, server, network, and database boundaries shape application design.
 - Introduce API contracts as long-lived interfaces between independently changing parts.
 - Connect web architecture to the event tracking project without requiring one fixed application theme.
-- Prepare students for later discussions about friction, benchmarking, observability, and scaling.
+- Use the completed Construct implementations as concrete architecture cases.
+- Prepare students to make and explain architectural choices in implementation B.
 
 ## Why web architecture matters
 
@@ -85,13 +86,13 @@ Possible exercise:
 - Design a minimal `POST /events` endpoint and a minimal `GET /events` endpoint.
 - Then ask what changes when the app must handle retrying clients, offline devices, many tenants or domain instances, or analytical summaries.
 
-## Architecture and the Construct project
+## Learning from the Construct architectures
 
-Students should make a conscious architecture choice for the first project, even if the choice is simple.
+Students have already made architecture choices in Construct, even if they did not yet have a complete vocabulary for them. The public project discussion should make those choices visible: different groups received the same behavioral specification but chose different stacks, boundaries, storage models, and request paths.
 
 Architecture should not live only in diagrams or in the memory of the original authors. In an AI-assisted project, architectural intent also has to be written in places that future contributors and agents will actually read. Otherwise, the next generated change can accidentally redefine the system by changing behavior without changing the explanation.
 
-The Construct project should therefore treat a small set of project memory files as architectural artifacts:
+Each implementation should therefore treat a small set of project memory files as architectural artifacts:
 
 - `ARCHITECTURE.md` records global rules and cross-cutting constraints, such as the chosen application shape, storage model, validation boundaries, deployment assumptions, and rules future changes should preserve.
 - `specs/{feature}/spec.md` records feature-level contracts, workflows, regression guardrails, and verification steps. For the event tracking project, the first spec should usually describe how an event is created, validated, stored, and viewed.
@@ -106,14 +107,14 @@ Prompts:
 - Where does validation happen?
 - Where is event data stored?
 - What does the frontend assume about the backend?
-- What API or internal interface is most likely to survive into the next project phase?
+- Which behavior is fixed by the common specification, and which boundary was an implementation choice?
 - Which part of the design would be hardest to change later?
 - Which architectural decisions have been written down so another group can understand them?
 - Which agent instructions protect the architecture from accidental drift?
 
 ## Project artifact
 
-Students should add one architecture diagram and one data-flow diagram to the project. The diagrams should show how an event moves from user action to storage and later viewing, including the boundaries where validation, authorization, and failure can occur. They should also add or update `ARCHITECTURE.md`, one feature spec, and one decision record so the diagrams are backed by written constraints.
+Students should review the architecture and data-flow diagrams submitted with implementation A, identify one consequential architectural choice, and write an architecture hypothesis for implementation B. The hypothesis should state what the group intends to preserve or change and why. Implementation B should still include its own diagrams and decision record, but the chapter is primarily reading and analysis rather than a second large deliverable.
 
 ## Notes for further development
 
@@ -126,5 +127,6 @@ Students should add one architecture diagram and one data-flow diagram to the pr
 - Keep API behavior and core data semantics stable in the common acceptance suite while allowing internal architecture to differ. This creates a meaningful comparison without forcing identical implementations.
 - Replace questions about which interface survives into the “next phase” with questions about which interface should remain invariant across independent builds and why.
 - Use the cross-team audit to test whether diagrams, decisions, and running behavior agree. The audit should report disagreement rather than inherit responsibility for repairing it.
+- Keep the chapter suitable for reading before lecture 4. In class, prefer comparing submitted Construct diagrams and request paths over repeating the full chapter as a lecture.
 - Obsidian candidate: `Clippings/_Processed/Emerging trends in software architecture from the practitioner’s perspective A five-year review.md` could provide a practitioner-facing reference for why cloud native, Kubernetes, serverless, containers, DevOps, AI, and observability keep appearing in architecture discussions. It may work best as context, not as a technology checklist students should copy.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could be used later in the chapter or previewed here as an example of architecture shaped by retries, task queues, timers, state recovery, and long-running workflows.
