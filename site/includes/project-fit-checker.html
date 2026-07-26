@@ -1,395 +1,466 @@
 <section
-  class="project-fit"
+  class="project-fit project-fit--discovery"
   data-project-fit
   aria-labelledby="project-fit-heading"
 >
   <div class="project-fit-header">
     <div>
-      <p class="project-fit-kicker">Construct project worksheet</p>
+      <p class="project-fit-kicker">Implementation discovery lab</p>
       <h3 id="project-fit-heading">
-        Check whether your event idea can scale later
+        Find a direction worth building three times
       </h3>
+      <p class="project-fit-intro">
+        The behavior is shared. Your interpretation, stack, architecture, and
+        experiment are yours to choose.
+      </p>
     </div>
     <div class="project-fit-score" aria-live="polite">
-      <span data-project-fit-score>0/11</span>
+      <span data-project-fit-score>0/4 anchors</span>
       <small data-project-fit-verdict
-        >Start with the domain shape, then test scaling pressure.</small
+        >Begin with the character of your implementation.</small
       >
+      <div class="project-fit-meter" aria-hidden="true">
+        <i></i><i></i><i></i><i></i>
+      </div>
     </div>
   </div>
 
-  <ol class="project-fit-progress" aria-label="Project fit checker steps">
+  <ol class="project-fit-progress" aria-label="Implementation discovery steps">
     <li>
       <button type="button" data-project-fit-tab="0" aria-current="step">
-        <span>1</span>
-        Idea
+        <span>01</span>
+        Interpret
       </button>
     </li>
     <li>
       <button type="button" data-project-fit-tab="1">
-        <span>2</span>
-        Events
+        <span>02</span>
+        Stack
       </button>
     </li>
     <li>
       <button type="button" data-project-fit-tab="2">
-        <span>3</span>
-        Scaling
+        <span>03</span>
+        Shape
       </button>
     </li>
     <li>
       <button type="button" data-project-fit-tab="3">
-        <span>4</span>
-        Risk
+        <span>04</span>
+        Experiment
       </button>
     </li>
     <li>
       <button type="button" data-project-fit-tab="4">
-        <span>5</span>
-        Brief
+        <span>→</span>
+        Direction
       </button>
     </li>
   </ol>
 
   <form class="project-fit-form" data-project-fit-form>
     <fieldset class="project-fit-step is-active" data-project-fit-step="0">
-      <legend>Idea</legend>
+      <legend>Interpret the common brief</legend>
       <p>
-        Start with the domain language. A good idea has actors and objects that
-        another group can understand later.
+        Keep the required behavior, but decide what kind of product your version
+        feels like. There is no preferred interpretation.
       </p>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-domain">Domain idea</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for domain idea"
-            aria-describedby="project-fit-domain-help"
+
+      <div
+        class="project-fit-preset-panel"
+        aria-labelledby="project-fit-preset-heading"
+      >
+        <div>
+          <strong id="project-fit-preset-heading"
+            >Need a starting point?</strong
           >
-            ?
-          </button>
-          <span id="project-fit-domain-help" role="tooltip">
-            Pick a domain where meaningful things happen over time. Avoid a
-            generic database exercise; the domain should have vocabulary another
-            group can learn and analyze.
-          </span>
+          <small>Borrow a lens, then change anything you dislike.</small>
         </div>
-        <input
-          id="project-fit-domain"
-          name="domain"
-          type="text"
-          placeholder="Conference sessions, support tickets, workflow runs..."
-        />
+        <div class="project-fit-presets">
+          <button type="button" data-project-fit-preset="operations">
+            Operations desk
+          </button>
+          <button type="button" data-project-fit-preset="studio">
+            Creative studio
+          </button>
+          <button type="button" data-project-fit-preset="field">
+            Field notebook
+          </button>
+          <button type="button" data-project-fit-preset="agents">
+            Agent trace viewer
+          </button>
+        </div>
       </div>
+
+      <div class="project-fit-field-grid">
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-workspace">A workspace feels like…</label>
+            <button
+              type="button"
+              class="project-fit-help"
+              aria-label="Help for workspace interpretation"
+              aria-describedby="project-fit-workspace-help"
+            >
+              ?
+            </button>
+            <span id="project-fit-workspace-help" role="tooltip">
+              Keep the common workspace capability, but choose its meaning and
+              vocabulary: a project, room, run, campaign, class, site, or
+              something else.
+            </span>
+          </div>
+          <input
+            id="project-fit-workspace"
+            name="workspaceMeaning"
+            type="text"
+            placeholder="A project room for one team"
+          />
+        </div>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-item">A work item represents…</label>
+            <button
+              type="button"
+              class="project-fit-help"
+              aria-label="Help for work item interpretation"
+              aria-describedby="project-fit-item-help"
+            >
+              ?
+            </button>
+            <span id="project-fit-item-help" role="tooltip">
+              Map the required lifecycle to something concrete. It could be a
+              task, job, case, experiment, scene, agent assignment, or repair.
+            </span>
+          </div>
+          <input
+            id="project-fit-item"
+            name="itemMeaning"
+            type="text"
+            placeholder="A task moving from idea to finished work"
+          />
+        </div>
+      </div>
+
       <div class="project-fit-field">
         <div class="project-fit-label-row">
-          <label for="project-fit-actors">Actors or roles</label>
+          <label for="project-fit-experience"
+            >Who uses it, and what should feel effortless?</label
+          >
           <button
             type="button"
             class="project-fit-help"
-            aria-label="Help for actors or roles"
-            aria-describedby="project-fit-actors-help"
+            aria-label="Help for user experience"
+            aria-describedby="project-fit-experience-help"
           >
             ?
           </button>
-          <span id="project-fit-actors-help" role="tooltip">
-            Name who creates events, views them, or depends on them. Distinct
-            roles make authorization, workflow, and later team ownership easier
-            to discuss.
+          <span id="project-fit-experience-help" role="tooltip">
+            Choose one user and one moment to optimize. This gives the interface
+            a point of view without adding more required features.
           </span>
         </div>
         <textarea
-          id="project-fit-actors"
-          name="actors"
-          rows="2"
-          placeholder="Organizer, attendee, operator, viewer..."
-        ></textarea>
-      </div>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-entities">Domain entities</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for domain entities"
-            aria-describedby="project-fit-entities-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-entities-help" role="tooltip">
-            Events should affect something: a ticket, session, device, order,
-            workflow, node, or similar object. This gives the data model more
-            structure than an event log alone.
-          </span>
-        </div>
-        <textarea
-          id="project-fit-entities"
-          name="entities"
-          rows="2"
-          placeholder="Session, ticket, device, workflow, node, order..."
+          id="project-fit-experience"
+          name="experience"
+          rows="3"
+          placeholder="A coordinator should understand what changed and what needs attention in one glance."
         ></textarea>
       </div>
     </fieldset>
 
     <fieldset class="project-fit-step" data-project-fit-step="1" hidden>
-      <legend>Events</legend>
+      <legend>Choose the technical material</legend>
       <p>
-        Define what changes in the system and how users will inspect that
-        history.
+        Pick tools that support a learning question or a practical constraint.
+        Familiar and unusual stacks are equally valid.
       </p>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-events">Event types</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for event types"
-            aria-describedby="project-fit-events-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-events-help" role="tooltip">
-            Use concrete past-tense names. Three or more event types usually
-            reveal whether the system has enough behavior for filtering,
-            summaries, failures, and scaling pressure.
-          </span>
+
+      <div class="project-fit-preset-panel">
+        <div>
+          <strong>Explore a stack family</strong>
+          <small>These are prompts, not recommended answers.</small>
         </div>
-        <textarea
-          id="project-fit-events"
-          name="events"
-          rows="3"
-          placeholder="check-in, status-changed, run-started, node-completed..."
-        ></textarea>
+        <div class="project-fit-presets">
+          <button type="button" data-project-fit-stack="next">
+            Next.js + Postgres
+          </button>
+          <button type="button" data-project-fit-stack="elixir">
+            Elixir + LiveView
+          </button>
+          <button type="button" data-project-fit-stack="python">
+            Python + HTMX
+          </button>
+          <button type="button" data-project-fit-stack="minimal">
+            Minimal + embedded
+          </button>
+        </div>
       </div>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-workflow">Workflow or state transition</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for workflow or state transition"
-            aria-describedby="project-fit-workflow-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-workflow-help" role="tooltip">
-            Describe how the domain changes over time. A state transition gives
-            you something to validate, observe, benchmark, and later redesign.
-          </span>
+
+      <div class="project-fit-field-grid">
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-runtime">Language and framework</label>
+            <button
+              type="button"
+              class="project-fit-help"
+              aria-label="Help for language and framework"
+              aria-describedby="project-fit-runtime-help"
+            >
+              ?
+            </button>
+            <span id="project-fit-runtime-help" role="tooltip">
+              Name the primary runtime and web framework. Normally your group
+              keeps this family across all three builds so the AI workflow is
+              easier to compare.
+            </span>
+          </div>
+          <input
+            id="project-fit-runtime"
+            name="runtime"
+            type="text"
+            placeholder="Elixir and Phoenix"
+          />
         </div>
-        <textarea
-          id="project-fit-workflow"
-          name="workflow"
-          rows="3"
-          placeholder="A ticket moves from open to assigned to resolved..."
-        ></textarea>
-      </div>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-views">Views, queries, or summaries</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for views, queries, or summaries"
-            aria-describedby="project-fit-views-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-views-help" role="tooltip">
-            Name how users read the event data. Views and summaries create
-            realistic pressure around indexes, pagination, aggregation,
-            freshness, and data retention.
-          </span>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-rendering">Interaction approach</label>
+          </div>
+          <select id="project-fit-rendering" name="rendering">
+            <option value="">Choose or leave open</option>
+            <option value="Server-rendered pages and forms">
+              Server-rendered pages and forms
+            </option>
+            <option value="Rich browser client backed by an API">
+              Rich browser client backed by an API
+            </option>
+            <option value="Live server-driven interface">
+              Live server-driven interface
+            </option>
+            <option value="Static client with serverless functions">
+              Static client with serverless functions
+            </option>
+            <option value="Another approach to be documented">
+              Another approach
+            </option>
+          </select>
         </div>
-        <textarea
-          id="project-fit-views"
-          name="views"
-          rows="2"
-          placeholder="Latest events, events by type, run history, daily summary..."
-        ></textarea>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-storage">Persistence</label>
+          </div>
+          <input
+            id="project-fit-storage"
+            name="storage"
+            type="text"
+            placeholder="SQLite, Postgres, event log, document store…"
+          />
+        </div>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-curiosity">Why this stack?</label>
+          </div>
+          <textarea
+            id="project-fit-curiosity"
+            name="curiosity"
+            rows="3"
+            placeholder="We want to learn whether server-driven UI keeps the event flow easier to reason about."
+          ></textarea>
+        </div>
       </div>
     </fieldset>
 
     <fieldset class="project-fit-step" data-project-fit-step="2" hidden>
-      <legend>Scaling pressure</legend>
-      <p>Give the later Reconstruct phase something concrete to redesign.</p>
+      <legend>Give the system a shape</legend>
+      <p>
+        Decide where the important boundaries sit. The goal is an explainable
+        first hypothesis, not a final architecture.
+      </p>
+
+      <div class="project-fit-field-grid">
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-architecture">Starting shape</label>
+          </div>
+          <select id="project-fit-architecture" name="architecture">
+            <option value="">Choose or leave open</option>
+            <option value="A small modular monolith">
+              A small modular monolith
+            </option>
+            <option value="A separate browser client and web API">
+              A separate browser client and web API
+            </option>
+            <option value="An event-oriented core with derived views">
+              An event-oriented core with derived views
+            </option>
+            <option value="Serverless or edge functions around managed storage">
+              Serverless or edge functions
+            </option>
+            <option value="Another shape to be documented">
+              Another shape
+            </option>
+          </select>
+        </div>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-deployment"
+              >Supported run environment</label
+            >
+            <button
+              type="button"
+              class="project-fit-help"
+              aria-label="Help for supported run environment"
+              aria-describedby="project-fit-deployment-help"
+            >
+              ?
+            </button>
+            <span id="project-fit-deployment-help" role="tooltip">
+              Another group must be able to run the project. Name the supported
+              local, container, cloud, edge, or other path early.
+            </span>
+          </div>
+          <input
+            id="project-fit-deployment"
+            name="deployment"
+            type="text"
+            placeholder="Local Docker Compose plus a hosted demo"
+          />
+        </div>
+      </div>
+
       <div class="project-fit-field">
         <div class="project-fit-label-row">
-          <label for="project-fit-volume">100x event volume</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for 100x event volume"
-            aria-describedby="project-fit-volume-help"
+          <label for="project-fit-boundary"
+            >One boundary you want to keep visible</label
           >
-            ?
-          </button>
-          <span id="project-fit-volume-help" role="tooltip">
-            Imagine the system becomes successful or receives a burst of
-            automated events. Identify what grows first: writes, storage,
-            dashboards, imports, logs, or review workload.
-          </span>
         </div>
         <textarea
-          id="project-fit-volume"
-          name="volume"
-          rows="2"
-          placeholder="What starts to hurt if events grow sharply?"
+          id="project-fit-boundary"
+          name="boundary"
+          rows="3"
+          placeholder="State transitions and event creation should happen together behind one application boundary."
         ></textarea>
       </div>
+
       <div class="project-fit-field">
         <div class="project-fit-label-row">
-          <label for="project-fit-tenants">Many groups or tenants</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for many groups or tenants"
-            aria-describedby="project-fit-tenants-help"
+          <label for="project-fit-friction"
+            >Likely first source of friction</label
           >
-            ?
-          </button>
-          <span id="project-fit-tenants-help" role="tooltip">
-            Scaling is more interesting when the same system serves many teams,
-            locations, customers, classes, or projects with boundaries between
-            their data.
-          </span>
         </div>
         <textarea
-          id="project-fit-tenants"
-          name="tenants"
+          id="project-fit-friction"
+          name="friction"
           rows="2"
-          placeholder="What changes when many teams, locations, courses, or customers use it?"
-        ></textarea>
-      </div>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-expensive-query"
-            >Expensive history query</label
-          >
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for expensive history query"
-            aria-describedby="project-fit-expensive-query-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-expensive-query-help" role="tooltip">
-            Pick a query that sounds useful but may become costly: long date
-            ranges, cross-tenant summaries, filtering by multiple fields, or
-            rebuilding a timeline.
-          </span>
-        </div>
-        <textarea
-          id="project-fit-expensive-query"
-          name="expensiveQuery"
-          rows="2"
-          placeholder="Which filter, aggregation, or dashboard becomes slow first?"
+          placeholder="The local model may know little about this framework, and setup may surprise auditors."
         ></textarea>
       </div>
     </fieldset>
 
     <fieldset class="project-fit-step" data-project-fit-step="3" hidden>
-      <legend>Risk and change</legend>
+      <legend>Choose what you want to learn</legend>
       <p>
-        Name the operational and future-change pressures that make the system
-        worth analyzing.
+        A useful experiment is a question, not an extra pile of features. Keep
+        the common core small enough that you can examine the result.
       </p>
+
       <div class="project-fit-field">
         <div class="project-fit-label-row">
-          <label for="project-fit-failure">Failure story</label>
+          <label for="project-fit-question">Implementation question</label>
           <button
             type="button"
             class="project-fit-help"
-            aria-label="Help for failure story"
-            aria-describedby="project-fit-failure-help"
+            aria-label="Help for implementation question"
+            aria-describedby="project-fit-question-help"
           >
             ?
           </button>
-          <span id="project-fit-failure-help" role="tooltip">
-            Choose a failure that affects event correctness: duplicate
-            submissions, offline clients, retries, late delivery, partial
-            writes, or inconsistent external systems.
+          <span id="project-fit-question-help" role="tooltip">
+            Ask something the implementation can teach you: about the stack,
+            architecture, local model, developer experience, performance,
+            portability, or resource use.
           </span>
         </div>
         <textarea
-          id="project-fit-failure"
-          name="failure"
-          rows="2"
-          placeholder="Retries, duplicate submissions, delayed events, offline clients..."
+          id="project-fit-question"
+          name="question"
+          rows="3"
+          placeholder="Can this stack express the lifecycle and event history with fewer hidden boundaries than our usual tools?"
         ></textarea>
       </div>
-      <div class="project-fit-field">
-        <div class="project-fit-label-row">
-          <label for="project-fit-privacy">
-            Privacy, retention, or resource concern
-          </label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for privacy, retention, or resource concern"
-            aria-describedby="project-fit-privacy-help"
-          >
-            ?
-          </button>
-          <span id="project-fit-privacy-help" role="tooltip">
-            Event data often describes behavior. Decide what should not be
-            logged, how long raw events should survive, and what storage or
-            compute could be wasted.
-          </span>
+
+      <div class="project-fit-field-grid">
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-evidence">Evidence to collect</label>
+          </div>
+          <textarea
+            id="project-fit-evidence"
+            name="evidence"
+            rows="3"
+            placeholder="Shared runtime workload, setup time, failed agent attempts, and query count per activity view."
+          ></textarea>
         </div>
-        <textarea
-          id="project-fit-privacy"
-          name="privacy"
-          rows="2"
-          placeholder="What data accumulates, leaks context, or wastes resources?"
-        ></textarea>
+
+        <div class="project-fit-field">
+          <div class="project-fit-label-row">
+            <label for="project-fit-audit"
+              >Make it legible to another group</label
+            >
+          </div>
+          <textarea
+            id="project-fit-audit"
+            name="auditPlan"
+            rows="3"
+            placeholder="Pin tool versions, provide seed data, and document one command for setup and validation."
+          ></textarea>
+        </div>
       </div>
-      <div class="project-fit-field">
+
+      <div class="project-fit-field project-fit-field--optional">
         <div class="project-fit-label-row">
-          <label for="project-fit-change">Future change pressure</label>
-          <button
-            type="button"
-            class="project-fit-help"
-            aria-label="Help for future change pressure"
-            aria-describedby="project-fit-change-help"
+          <label for="project-fit-stretch"
+            >Optional stretch, if the core works</label
           >
-            ?
-          </button>
-          <span id="project-fit-change-help" role="tooltip">
-            Name a likely requirement change. Good candidates involve new event
-            types, revised states, different permissions, integrations, or
-            changes to historical data interpretation.
-          </span>
         </div>
-        <textarea
-          id="project-fit-change"
-          name="change"
-          rows="2"
-          placeholder="What feature or rule change would be expensive later?"
-        ></textarea>
+        <input
+          id="project-fit-stretch"
+          name="stretch"
+          type="text"
+          placeholder="A live event view, offline capture, unusual deployment…"
+        />
       </div>
     </fieldset>
 
     <section class="project-fit-step" data-project-fit-step="4" hidden>
-      <h4>Brief</h4>
-      <p>
-        Review the score and warnings. The generated brief is deliberately plain
-        Markdown so it can move into the project README.
-      </p>
+      <div class="project-fit-direction-heading">
+        <div>
+          <p class="project-fit-kicker">Your current hypothesis</p>
+          <h4>Implementation direction</h4>
+        </div>
+        <p>
+          This is a conversation starter, not a commitment. Revise it after
+          trying the local model and inspecting the first evidence.
+        </p>
+      </div>
+
       <div class="project-fit-results">
         <section aria-labelledby="project-fit-checks-heading">
-          <h4 id="project-fit-checks-heading">Fit checks</h4>
+          <h4 id="project-fit-checks-heading">Decision anchors</h4>
           <ul data-project-fit-checks></ul>
         </section>
         <section aria-labelledby="project-fit-warnings-heading">
-          <h4 id="project-fit-warnings-heading">Scope warnings</h4>
+          <h4 id="project-fit-warnings-heading">Questions to discuss</h4>
           <ul data-project-fit-warnings></ul>
         </section>
         <label class="project-fit-brief">
-          <span>Generated project brief</span>
-          <textarea data-project-fit-output rows="16" readonly></textarea>
+          <span>Generated implementation direction</span>
+          <textarea data-project-fit-output rows="18" readonly></textarea>
         </label>
       </div>
     </section>
@@ -397,7 +468,7 @@
     <div class="project-fit-actions">
       <button type="button" data-project-fit-prev>Back</button>
       <button type="submit" data-project-fit-next>Next</button>
-      <button type="button" data-project-fit-copy>Copy brief</button>
+      <button type="button" data-project-fit-copy>Copy direction</button>
     </div>
   </form>
 </section>

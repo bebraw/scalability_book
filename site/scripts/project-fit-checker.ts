@@ -1,31 +1,115 @@
 type FieldName =
-  | "domain"
-  | "actors"
-  | "entities"
-  | "events"
-  | "workflow"
-  | "views"
-  | "volume"
-  | "tenants"
-  | "expensiveQuery"
-  | "failure"
-  | "privacy"
-  | "change";
+  | "workspaceMeaning"
+  | "itemMeaning"
+  | "experience"
+  | "runtime"
+  | "rendering"
+  | "storage"
+  | "curiosity"
+  | "architecture"
+  | "deployment"
+  | "boundary"
+  | "friction"
+  | "question"
+  | "evidence"
+  | "auditPlan"
+  | "stretch";
+
+type ProjectFitField =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement;
 
 type ProjectFitElements = {
   root: HTMLElement;
   form: HTMLFormElement;
   score: HTMLElement;
   verdict: HTMLElement;
+  meter: HTMLElement[];
   checks: HTMLElement;
-  warnings: HTMLElement;
+  questions: HTMLElement;
   output: HTMLTextAreaElement;
   copy: HTMLButtonElement | null;
   next: HTMLButtonElement;
   previous: HTMLButtonElement;
   steps: HTMLElement[];
   tabs: HTMLButtonElement[];
-  fields: Record<FieldName, HTMLTextAreaElement | HTMLInputElement>;
+  fields: Record<FieldName, ProjectFitField>;
+};
+
+type DirectionValues = Record<FieldName, string>;
+
+const fieldNames: FieldName[] = [
+  "workspaceMeaning",
+  "itemMeaning",
+  "experience",
+  "runtime",
+  "rendering",
+  "storage",
+  "curiosity",
+  "architecture",
+  "deployment",
+  "boundary",
+  "friction",
+  "question",
+  "evidence",
+  "auditPlan",
+  "stretch",
+];
+
+const interpretationPresets: Record<
+  string,
+  Partial<Record<FieldName, string>>
+> = {
+  operations: {
+    workspaceMeaning: "An operations room for one service or team",
+    itemMeaning: "A case that moves from reported to active to resolved",
+    experience:
+      "An operator should see what changed, what failed, and what needs attention without opening every item.",
+  },
+  studio: {
+    workspaceMeaning: "A studio for one creative production",
+    itemMeaning: "A scene or asset moving from idea to active work to approved",
+    experience:
+      "A producer should understand progress and recent decisions without interrupting the people doing the work.",
+  },
+  field: {
+    workspaceMeaning: "A field site or research campaign",
+    itemMeaning:
+      "An observation or sample moving from planned to collected to processed",
+    experience:
+      "A researcher should record activity quickly and reconstruct what happened later, even when the environment is imperfect.",
+  },
+  agents: {
+    workspaceMeaning: "One agent fleet run",
+    itemMeaning:
+      "A delegated agent task moving from queued to active to complete",
+    experience:
+      "A reviewer should spot stalled work, retries, handoffs, and human intervention from the event history.",
+  },
+};
+
+const stackPresets: Record<string, Partial<Record<FieldName, string>>> = {
+  next: {
+    runtime: "TypeScript with Next.js",
+    rendering: "Rich browser client backed by an API",
+    storage: "Postgres",
+  },
+  elixir: {
+    runtime: "Elixir with Phoenix and LiveView",
+    rendering: "Live server-driven interface",
+    storage: "Postgres through Ecto",
+  },
+  python: {
+    runtime: "Python with FastAPI, templates, and HTMX",
+    rendering: "Server-rendered pages and forms",
+    storage: "SQLite for local work, with a documented migration path",
+  },
+  minimal: {
+    runtime: "A small web runtime with few dependencies",
+    rendering: "Server-rendered pages and forms",
+    storage: "An embedded persistent database",
+  },
 };
 
 const tools = document.querySelectorAll<HTMLElement>("[data-project-fit]");
@@ -45,6 +129,7 @@ for (const tool of tools) {
   };
 
   elements.form.addEventListener("input", update);
+  elements.form.addEventListener("change", update);
   elements.form.addEventListener("submit", (event) => {
     event.preventDefault();
     if (currentStep < elements.steps.length - 1) {
@@ -59,18 +144,75 @@ for (const tool of tools) {
     tab.addEventListener("click", () => showStep(index));
   });
   initializeHelpTooltips(elements.root);
+  initializePresetButtons(
+    elements,
+    "[data-project-fit-preset]",
+    "projectFitPreset",
+    interpretationPresets,
+    update,
+  );
+  initializePresetButtons(
+    elements,
+    "[data-project-fit-stack]",
+    "projectFitStack",
+    stackPresets,
+    update,
+  );
 
   const copyButton = elements.copy;
 
   copyButton?.addEventListener("click", async () => {
-    await navigator.clipboard?.writeText(elements.output.value);
-    copyButton.textContent = "Copied";
+    try {
+      await navigator.clipboard?.writeText(elements.output.value);
+      copyButton.textContent = "Copied";
+    } catch {
+      elements.output.select();
+      copyButton.textContent = "Selected";
+    }
+
     window.setTimeout(() => {
-      copyButton.textContent = "Copy brief";
+      copyButton.textContent = "Copy direction";
     }, 1400);
   });
 
   showStep(0);
+}
+
+function initializePresetButtons(
+  elements: ProjectFitElements,
+  selector: string,
+  datasetKey: "projectFitPreset" | "projectFitStack",
+  presets: Record<string, Partial<Record<FieldName, string>>>,
+  update: () => void,
+) {
+  for (const button of elements.root.querySelectorAll<HTMLButtonElement>(
+    selector,
+  )) {
+    button.addEventListener("click", () => {
+      const key = button.dataset[datasetKey];
+      const preset = key ? presets[key] : null;
+
+      if (!preset) {
+        return;
+      }
+
+      for (const [name, value] of Object.entries(preset)) {
+        const field = elements.fields[name as FieldName];
+
+        if (field && value) {
+          field.value = value;
+        }
+      }
+
+      button
+        .closest(".project-fit-presets")
+        ?.querySelectorAll("button")
+        .forEach((candidate) => {
+          candidate.classList.toggle("is-selected", candidate === button);
+        });
+      update();
+    });
+  }
 }
 
 function initializeHelpTooltips(root: HTMLElement) {
@@ -207,7 +349,7 @@ function getElements(root: HTMLElement): ProjectFitElements | null {
   const score = root.querySelector<HTMLElement>("[data-project-fit-score]");
   const verdict = root.querySelector<HTMLElement>("[data-project-fit-verdict]");
   const checks = root.querySelector<HTMLElement>("[data-project-fit-checks]");
-  const warnings = root.querySelector<HTMLElement>(
+  const questions = root.querySelector<HTMLElement>(
     "[data-project-fit-warnings]",
   );
   const output = root.querySelector<HTMLTextAreaElement>(
@@ -229,7 +371,7 @@ function getElements(root: HTMLElement): ProjectFitElements | null {
     !score ||
     !verdict ||
     !checks ||
-    !warnings ||
+    !questions ||
     !output ||
     !previous ||
     !next ||
@@ -240,26 +382,11 @@ function getElements(root: HTMLElement): ProjectFitElements | null {
   }
 
   const fields = Object.fromEntries(
-    [
-      "domain",
-      "actors",
-      "entities",
-      "events",
-      "workflow",
-      "views",
-      "volume",
-      "tenants",
-      "expensiveQuery",
-      "failure",
-      "privacy",
-      "change",
-    ].map((name) => [
+    fieldNames.map((name) => [
       name,
-      form.querySelector<HTMLInputElement | HTMLTextAreaElement>(
-        `[name="${name}"]`,
-      ),
+      form.querySelector<ProjectFitField>(`[name="${name}"]`),
     ]),
-  ) as Record<FieldName, HTMLTextAreaElement | HTMLInputElement | null>;
+  ) as Record<FieldName, ProjectFitField | null>;
 
   if (Object.values(fields).some((field) => !field)) {
     return null;
@@ -270,15 +397,18 @@ function getElements(root: HTMLElement): ProjectFitElements | null {
     form,
     score,
     verdict,
+    meter: Array.from(
+      root.querySelectorAll<HTMLElement>(".project-fit-meter i"),
+    ),
     checks,
-    warnings,
+    questions,
     output,
     copy: root.querySelector<HTMLButtonElement>("[data-project-fit-copy]"),
     next,
     previous,
     steps,
     tabs,
-    fields: fields as Record<FieldName, HTMLTextAreaElement | HTMLInputElement>,
+    fields: fields as Record<FieldName, ProjectFitField>,
   };
 }
 
@@ -288,77 +418,20 @@ function updateProjectFit(
   focusStep: boolean,
 ) {
   const values = getValues(elements.fields);
-  const eventCount = countListItems(values.events);
-  const entityCount = countListItems(values.entities);
-  const actorCount = countListItems(values.actors);
-  const viewCount = countListItems(values.views);
-  const checks = [
-    {
-      label: "At least three event types",
-      pass: eventCount >= 3,
-      hint: "Name concrete events such as run-started or item-purchased.",
-    },
-    {
-      label: "At least one domain entity",
-      pass: entityCount >= 1,
-      hint: "Events should describe or affect something besides themselves.",
-    },
-    {
-      label: "At least one actor or role",
-      pass: actorCount >= 1,
-      hint: "Name who creates, views, or depends on the events.",
-    },
-    {
-      label: "A workflow or state transition",
-      pass: hasText(values.workflow),
-      hint: "The system should have behavior that changes over time.",
-    },
-    {
-      label: "A query, view, or summary",
-      pass: viewCount >= 1,
-      hint: "You need something you can benchmark and later redesign.",
-    },
-    {
-      label: "A plausible 100x volume story",
-      pass: hasText(values.volume),
-      hint: "Explain what changes when event count grows sharply.",
-    },
-    {
-      label: "Many groups, tenants, or locations",
-      pass: hasText(values.tenants),
-      hint: "The domain should scale beyond one local instance.",
-    },
-    {
-      label: "An expensive historical query",
-      pass: hasText(values.expensiveQuery),
-      hint: "Identify the first query or aggregation likely to hurt.",
-    },
-    {
-      label: "Retries, duplicates, delays, or missing events",
-      pass: hasText(values.failure),
-      hint: "The later architecture needs a failure pressure to handle.",
-    },
-    {
-      label: "Privacy, retention, or resource concern",
-      pass: hasText(values.privacy),
-      hint: "Event data accumulates and may describe user behavior.",
-    },
-    {
-      label: "A future change pressure",
-      pass: hasText(values.change),
-      hint: "Name what would become hard to change later.",
-    },
-  ];
-  const score = checks.filter((check) => check.pass).length;
-  const warnings = getWarnings(values, { eventCount, entityCount, viewCount });
+  const anchors = getAnchors(values);
+  const completeCount = anchors.filter((anchor) => anchor.complete).length;
+  const questions = getQuestions(values);
 
-  elements.score.textContent = `${score}/${checks.length}`;
-  elements.verdict.textContent = getVerdict(score, checks.length, warnings);
-  elements.checks.innerHTML = checks.map(renderCheck).join("");
-  elements.warnings.innerHTML = warnings.length
-    ? warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")
-    : "<li>No major scope warnings yet.</li>";
-  elements.output.value = buildBrief(values, score, checks.length, warnings);
+  elements.score.textContent = `${completeCount}/${anchors.length} anchors`;
+  elements.verdict.textContent = getVerdict(completeCount);
+  elements.meter.forEach((segment, index) => {
+    segment.classList.toggle("is-active", index < completeCount);
+  });
+  elements.checks.innerHTML = anchors.map(renderAnchor).join("");
+  elements.questions.innerHTML = questions
+    .map((question) => `<li>${escapeHtml(question)}</li>`)
+    .join("");
+  elements.output.value = buildDirection(values, questions);
   updateStage(elements, currentStep, focusStep);
 }
 
@@ -391,7 +464,7 @@ function updateStage(
   });
   elements.previous.disabled = currentStep === 0;
   elements.next.textContent =
-    currentStep === finalStep ? "Select brief" : "Next";
+    currentStep === finalStep ? "Select direction" : "Next";
   if (elements.copy) {
     elements.copy.hidden = currentStep !== finalStep;
   }
@@ -399,202 +472,207 @@ function updateStage(
   if (focusStep) {
     const activeStep = elements.steps[currentStep];
 
-    if (!activeStep) {
-      return;
-    }
-
     requestAnimationFrame(() => {
-      const focusTarget =
-        activeStep.querySelector<HTMLElement>("input, textarea");
-
-      focusTarget?.focus({ preventScroll: true });
+      activeStep
+        ?.querySelector<HTMLElement>("input, textarea, select")
+        ?.focus({ preventScroll: true });
     });
   }
 }
 
 function isStepComplete(elements: ProjectFitElements, step: number) {
   const values = getValues(elements.fields);
+  const anchors = getAnchors(values);
 
-  switch (step) {
-    case 0:
-      return (
-        hasText(values.domain) &&
-        countListItems(values.actors) >= 1 &&
-        countListItems(values.entities) >= 1
-      );
-    case 1:
-      return (
-        countListItems(values.events) >= 3 &&
-        hasText(values.workflow) &&
-        countListItems(values.views) >= 1
-      );
-    case 2:
-      return (
-        hasText(values.volume) &&
-        hasText(values.tenants) &&
-        hasText(values.expensiveQuery)
-      );
-    case 3:
-      return (
-        hasText(values.failure) &&
-        hasText(values.privacy) &&
-        hasText(values.change)
-      );
-    case 4:
-      return true;
-    default:
-      return false;
+  if (step >= 0 && step < anchors.length) {
+    return anchors[step]?.complete ?? false;
   }
+
+  return step === elements.steps.length - 1;
 }
 
 function getValues(fields: ProjectFitElements["fields"]) {
   return Object.fromEntries(
     Object.entries(fields).map(([name, field]) => [name, field.value.trim()]),
-  ) as Record<FieldName, string>;
+  ) as DirectionValues;
 }
 
-function renderCheck(check: { label: string; pass: boolean; hint: string }) {
-  return `<li class="${check.pass ? "is-pass" : "is-missing"}">
-    <span aria-hidden="true">${check.pass ? "✓" : "!"}</span>
-    <strong>${escapeHtml(check.label)}</strong>
-    <small>${escapeHtml(check.hint)}</small>
+function getAnchors(values: DirectionValues) {
+  return [
+    {
+      label: "Interpretation",
+      complete:
+        hasText(values.workspaceMeaning) &&
+        hasText(values.itemMeaning) &&
+        hasText(values.experience),
+      detail: "Meaning, user, and experience",
+    },
+    {
+      label: "Technical material",
+      complete:
+        hasText(values.runtime) &&
+        hasText(values.storage) &&
+        hasText(values.curiosity),
+      detail: "Stack, persistence, and reason",
+    },
+    {
+      label: "System shape",
+      complete:
+        hasText(values.architecture) &&
+        hasText(values.deployment) &&
+        hasText(values.boundary),
+      detail: "Architecture, run path, and boundary",
+    },
+    {
+      label: "Learning experiment",
+      complete:
+        hasText(values.question) &&
+        hasText(values.evidence) &&
+        hasText(values.auditPlan),
+      detail: "Question, evidence, and legibility",
+    },
+  ];
+}
+
+function renderAnchor(anchor: {
+  label: string;
+  complete: boolean;
+  detail: string;
+}) {
+  return `<li class="${anchor.complete ? "is-pass" : "is-missing"}">
+    <span aria-hidden="true">${anchor.complete ? "✓" : "·"}</span>
+    <strong>${escapeHtml(anchor.label)}</strong>
+    <small>${escapeHtml(
+      anchor.complete
+        ? `${anchor.detail} recorded`
+        : `${anchor.detail} still open`,
+    )}</small>
   </li>`;
 }
 
-function getVerdict(total: number, possible: number, warnings: string[]) {
-  if (total >= possible - 1 && warnings.length === 0) {
-    return "Strong candidate for Construct, Reconstruct, and Deconstruct.";
+function getVerdict(completeCount: number) {
+  switch (completeCount) {
+    case 4:
+      return "A coherent direction is ready for discussion—not locked in.";
+    case 3:
+      return "The implementation has a shape. Resolve one more anchor.";
+    case 2:
+      return "A direction is emerging. Connect the choices to evidence.";
+    case 1:
+      return "One anchor is set. Let it inform the next decision.";
+    default:
+      return "Begin with the character of your implementation.";
   }
-
-  if (total >= Math.ceil(possible * 0.7)) {
-    return "Promising, but tighten the missing pressure points before building.";
-  }
-
-  return "Too thin or underspecified. Narrow the domain, then add richer events and scaling pressure.";
 }
 
-function getWarnings(
-  values: Record<FieldName, string>,
-  counts: { eventCount: number; entityCount: number; viewCount: number },
-) {
-  const warnings: string[] = [];
-  const allText = Object.values(values).join(" ").toLowerCase();
+function getQuestions(values: DirectionValues) {
+  const questions: string[] = [];
 
-  if (counts.eventCount < 3) {
-    warnings.push(
-      "The project may collapse into a CRUD app unless it has more event variety.",
+  if (!hasText(values.workspaceMeaning) || !hasText(values.itemMeaning)) {
+    questions.push(
+      "What vocabulary will make the shared workspace and work-item model feel concrete in your version?",
+    );
+  }
+  if (!hasText(values.experience)) {
+    questions.push(
+      "Which user and moment should the interface make unusually clear or easy?",
+    );
+  }
+  if (!hasText(values.runtime) || !hasText(values.storage)) {
+    questions.push(
+      "Which runtime and persistence choice gives the group a useful constraint or learning opportunity?",
+    );
+  }
+  if (!hasText(values.curiosity)) {
+    questions.push(
+      "Why is this stack interesting for the group beyond familiarity or novelty?",
+    );
+  }
+  if (!hasText(values.architecture) || !hasText(values.boundary)) {
+    questions.push(
+      "Where should state transitions, event creation, and derived views meet—or remain separate?",
+    );
+  }
+  if (!hasText(values.deployment)) {
+    questions.push(
+      "What is the one supported path another group will use to run this stack?",
+    );
+  }
+  if (!hasText(values.question) || !hasText(values.evidence)) {
+    questions.push(
+      "What can this implementation teach you, and what evidence could change your mind?",
+    );
+  }
+  if (!hasText(values.auditPlan)) {
+    questions.push(
+      "What seed data, pinned versions, and validation command will make an unfamiliar stack inspectable?",
+    );
+  }
+  if (hasText(values.stretch)) {
+    questions.push(
+      "What condition must the common core satisfy before the optional stretch begins?",
+    );
+  }
+  if (values.architecture.includes("event-oriented")) {
+    questions.push(
+      "What is the simplest read model that keeps the event-oriented experiment understandable?",
+    );
+  }
+  if (questions.length === 0) {
+    questions.push(
+      "Which choice would you reconsider first if the local model or cross-team audit struggles with this direction?",
     );
   }
 
-  if (counts.entityCount === 0) {
-    warnings.push(
-      "The model needs at least one domain object affected by events.",
-    );
-  }
-
-  if (counts.viewCount === 0) {
-    warnings.push(
-      "Without a view or query, benchmarking and observability become abstract.",
-    );
-  }
-
-  if (/\b(editor|drag|canvas|visual builder|polished ui)\b/.test(allText)) {
-    warnings.push(
-      "Watch for product/UI scope creep. Keep Construct focused on event tracking.",
-    );
-  }
-
-  if (!hasText(values.failure)) {
-    warnings.push(
-      "Add a failure story so Reconstruct has something concrete to redesign.",
-    );
-  }
-
-  if (!hasText(values.tenants)) {
-    warnings.push(
-      "Add a many-instance story so scaling is not only about one local dataset.",
-    );
-  }
-
-  return warnings;
+  return questions;
 }
 
-function buildBrief(
-  values: Record<FieldName, string>,
-  score: number,
-  possible: number,
-  warnings: string[],
-) {
-  return `# Project Brief
+function buildDirection(values: DirectionValues, questions: string[]) {
+  return `# Implementation Direction
 
-## Domain
+## Common contract
 
-${orPlaceholder(values.domain)}
+We will implement the shared Work Activity Tracker behavior and acceptance scenarios. The choices below describe our interpretation, not changes to the common requirements.
 
-## Actors or roles
+## Interpretation
 
-${asMarkdownList(values.actors)}
+- Workspace means: ${orPlaceholder(values.workspaceMeaning)}
+- Work item means: ${orPlaceholder(values.itemMeaning)}
+- Intended user experience: ${orPlaceholder(values.experience)}
 
-## Domain entities
+## Technical material
 
-${asMarkdownList(values.entities)}
+- Language and framework: ${orPlaceholder(values.runtime)}
+- Interaction approach: ${orPlaceholder(values.rendering)}
+- Persistence: ${orPlaceholder(values.storage)}
+- Reason for the stack: ${orPlaceholder(values.curiosity)}
 
-## Event types
+## System shape
 
-${asMarkdownList(values.events)}
+- Starting architecture: ${orPlaceholder(values.architecture)}
+- Supported run environment: ${orPlaceholder(values.deployment)}
+- Boundary to keep visible: ${orPlaceholder(values.boundary)}
+- Expected first friction: ${orPlaceholder(values.friction)}
 
-## Workflow or state transition
+## Learning experiment
 
-${orPlaceholder(values.workflow)}
+- Question: ${orPlaceholder(values.question)}
+- Evidence: ${orPlaceholder(values.evidence)}
+- Cross-team legibility plan: ${orPlaceholder(values.auditPlan)}
+- Optional stretch after the core: ${orPlaceholder(values.stretch)}
 
-## Views, queries, or summaries
+## Questions to discuss
 
-${asMarkdownList(values.views)}
-
-## Scaling pressures to revisit
-
-- 100x event volume: ${orPlaceholder(values.volume)}
-- Many tenants/groups/projects: ${orPlaceholder(values.tenants)}
-- Expensive query or history view: ${orPlaceholder(values.expensiveQuery)}
-- Failure, retries, duplicates, or delays: ${orPlaceholder(values.failure)}
-- Privacy, retention, or resource concern: ${orPlaceholder(values.privacy)}
-- Future change pressure: ${orPlaceholder(values.change)}
-
-## Fit check
-
-Score: ${score}/${possible}
-
-${warnings.length ? warnings.map((warning) => `- ${warning}`).join("\n") : "- No major scope warnings yet."}
+${questions.map((question) => `- ${question}`).join("\n")}
 `;
 }
 
-function asMarkdownList(value: string) {
-  const items = splitList(value);
-
-  if (items.length === 0) {
-    return "- TODO";
-  }
-
-  return items.map((item) => `- ${item}`).join("\n");
-}
-
-function countListItems(value: string) {
-  return splitList(value).length;
-}
-
-function splitList(value: string) {
-  return value
-    .split(/[\n,;]+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
 function hasText(value: string) {
-  return value.trim().length >= 8;
+  return value.trim().length >= 5;
 }
 
 function orPlaceholder(value: string) {
-  return value || "TODO";
+  return value || "Open decision";
 }
 
 function escapeHtml(value: string) {

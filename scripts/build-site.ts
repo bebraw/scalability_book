@@ -33,7 +33,7 @@ const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
 const developmentScripts = includeEditor ? ["/dev-reload.js"] : [];
 const demoScriptIncludes = [
   {
-    title: "Project fit checker",
+    title: "Implementation discovery lab",
     chapter: "Scalable development",
     include: "site/includes/project-fit-checker.html",
     script: "/project-fit-checker.js",

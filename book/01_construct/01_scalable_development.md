@@ -83,56 +83,37 @@ Most importantly you have to be able to judge what the tools emit and where to t
 
 While the course project has been designed to be completed in groups, you can also complete the project alone and cut the scope for example. Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely. Therefore, I encourage developing small prototypes beyond this book as now prototyping is cheap, and you'll learn a lot in the process.
 
-## Book project - Event-oriented application
+## Book project - Work Activity Tracker
 
-During this book, you'll develop an event-oriented application. The exact nature of the events hasn't been fixed so you'll have to find a domain where events are available to track. The events can be either physical, i.e., local music events, technical conferences, or virtual. A good advanced choice would be to implement an agent based workflow application. The key point is that you have some specific data to track, and you have to set up a data model for the purpose. The point is not to end up with a perfect design immediately, but rather to come up with a concrete baseline that can be stressed, redesigned, and analyzed as detail is added to the service.
+During this book, you will implement the same bounded web application three times. The common project specification in `specifications/00_common_project.md` defines workspaces, work items, a small lifecycle, activity events, filtering, summaries, validation, and persistence. These observable requirements stay substantially stable so the three results can be compared.
 
-For the first version, it is important that it contains a data model, basic functionality to manipulate it, transitions between different states of the application, and key workflows around all this. The way you implement this in terms of technical stack and software architecture is open. The key point is that you can justify and explain your initial choices to other people.
+The specification deliberately leaves many decisions open. Your group chooses how the domain feels, which terminology appears in the interface, the technical stack, rendering approach, storage, architecture, deployment path, and one implementation question worth investigating. Different groups should arrive at recognizably different applications without changing the common behavior.
 
-To give a more concrete example, consider we are implementing a small visual agentic workflow platform. The idea is that the application allows users to define simple workflows that then get executed while triggering events the system records for logging purposes. To implement this kind of application, you would have to learn somewhat about the domain and get into specifics. Scoping-wise you might want to make it specific first and suitable for only certain tasks.
+The point is not to predict the perfect design. It is to form an explicit implementation hypothesis, build it, collect evidence, and revise your understanding before the next fresh implementation.
 
-## Project fit checker
+## Implementation discovery lab
 
-Use this checker to test whether your project idea is rich enough for the three project phases. A good Construct project should be small enough to build, but not so thin that Reconstruct and Deconstruct become artificial.
+Use this lab to turn the shared specification into a direction your group wants to explore. It does not approve or reject an idea. Instead, it records four decision anchors and generates a short brief you can discuss, revise, and place in the project repository.
 
 {{ import "site/includes/project-fit-checker.html" }}
 
 ---
 
-The project should stay deliberately modest at first. A useful first version might track check-ins, status changes, purchases, task transitions, sensor readings, or interactions in a small workflow. The implementation can be a monolith, a simple client-server application, or another architecture the group can explain. The database and storage model are also open, as long as the group can justify the choice. What matters is that the group makes visible design decisions: what counts as an event, what data belongs to an event, how events are stored, and how users can view them.
+The implementation should remain deliberately modest. Interpretive freedom is not a request for more features. A small monolith, a server-rendered application, a rich client with an API, an event-oriented design, or an unusual language can all be appropriate when the group can explain the choice and provide a reliable path for another group to run it.
 
-One advanced version of the same assignment is a small visual agentic workflow platform. In that domain, the application might let users define a simple workflow and then record events such as `workflow-created`, `run-started`, `node-completed`, `tool-failed`, and `retry-scheduled`. This can be a strong choice because it connects event tracking, web architecture, agentic systems, and observability. It should still be constrained carefully: a few node types, a simple execution model, and clear run history are enough. Building a polished visual programming product is not the goal of Construct.
+The same primary stack will normally be used for all three implementations. This makes the changing AI development setup easier to study. The implementation can still change substantially because requirements, models, tools, prompts, architecture decisions, and accumulated understanding do not determine one inevitable result.
 
-Keeping the theme open is intentional. If every group builds the same application, the later Deconstruct phase becomes too familiar and students can rely on assumptions instead of careful reading. When groups choose different domains, students have to analyze systems that encode unfamiliar workflows, terminology, and trade-offs. That makes the exercise closer to real software work, where you often inherit systems whose domain model was shaped by another team.
+Construct is also where agentic development becomes concrete. Document what the local model was asked to do, what constraints and validation it received, what it misunderstood, and what the group corrected manually. The implementation direction is a starting hypothesis; the evidence package shows what actually happened.
 
-This first version is also where agentic development becomes concrete. Students should document how they used AI assistance, what constraints they gave it, how they reviewed the result, and what they had to fix manually. The project should produce both software and evidence of engineering judgment.
+Questions worth discussing before implementation:
 
-Development ideas:
-
-- Keep the domain small enough that the whole system can be understood by one group.
-- Prefer a working vertical slice over many disconnected features.
-- Make assumptions explicit in the README, especially around the chosen domain, users, event types, storage, and failure handling.
-- Choose a domain specific enough that another group has something meaningful to deconstruct later.
-- Require enough domain richness that the project can later be stressed along multiple dimensions: higher event volume, multiple users or groups, historical queries, retries or duplicate submissions, privacy or retention concerns, and future feature changes.
-- If you choose a workflow or agentic platform domain, treat it first as an event tracking problem and postpone advanced editor, orchestration, and runtime features unless the core is already stable.
-- Use AI tools for generation, explanation, testing, and review, but require students to justify the final design themselves.
-- Preserve early design decisions because later chapters will revisit them under pressure.
-
-> **Writing note**
->
-> Consider framing the project as "bounded choice" rather than fully open-ended. The domain can be open, but approval could require a common minimum shape: multiple event types, at least one domain entity besides the event itself, one workflow or state transition, one actor or role, and a plausible path to scaling pressure. This would reduce the risk that groups choose domains that are too small, too static, or too artificial to make Reconstruct and Deconstruct meaningful.
-
-Possible project approval questions:
-
-- What are the main event types?
-- What domain entity do the events describe or affect?
-- What state transition or workflow does the system represent?
-- What happens if event volume grows by 100x?
-- What happens if there are many independent tenants, groups, projects, or locations?
-- What query, aggregation, or history view becomes expensive first?
-- What failure mode creates retries, duplicates, missing events, or delayed processing?
-- What privacy, retention, or resource-efficiency concern appears as data accumulates?
-- What part of the system would become hard to change later?
+- What should a workspace and work item mean in the interface?
+- Which user moment should feel especially clear or effortless?
+- What does the chosen stack let the group learn or constrain?
+- Which architectural boundary should remain visible?
+- What evidence could challenge the group's initial assumption?
+- How will a student unfamiliar with the stack set up and inspect the project?
+- Which optional idea will wait until the common core works?
 
 ## Themes
 
@@ -166,4 +147,4 @@ Students should create a first version of the project harness. It should include
 - Make the evidence log part of the constrain-generate-validate loop. Students should record task framing, relevant model/tool configuration, validation outcome, human correction, and approximate cost or latency without submitting an unreadable raw transcript.
 - Explain that local models are affected by hardware, serving configuration, context limits, and quantization. Ask for contextual reporting rather than simplistic local-versus-cloud rankings.
 - Keep the harness discussion, but distinguish a common course harness from implementation-specific project memory. Decide in the shared specification which harness files are supplied, which students author, and which may be carried into later builds.
-- Revise the project-fit checker once the common brief is fixed; open-ended domain selection currently conflicts with a controlled cross-build comparison.
+- Keep the implementation discovery lab aligned with the shared specification as the project evolves. It should support reasoning and conversation rather than score whether a group has found the “right” idea.

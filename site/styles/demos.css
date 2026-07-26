@@ -435,6 +435,229 @@
 .project-fit-brief textarea {
   min-height: 18rem;
 }
+
+/* Implementation discovery lab: an engineering field notebook, not a gate. */
+.project-fit--discovery {
+  --project-fit-ink: var(--text);
+  --project-fit-paper: color-mix(in srgb, var(--panel) 96%, var(--accent) 4%);
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 2.35rem,
+      color-mix(in srgb, var(--warning) 34%, transparent) 2.35rem 2.42rem,
+      transparent 2.42rem
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 1.72rem,
+      color-mix(in srgb, var(--border) 46%, transparent) 1.72rem 1.77rem
+    ),
+    var(--project-fit-paper);
+  border-color: color-mix(in srgb, var(--text) 28%, var(--border));
+  box-shadow:
+    0.45rem 0.45rem 0 color-mix(in srgb, var(--accent) 18%, transparent),
+    0 1.5rem 3.5rem color-mix(in srgb, var(--text) 12%, transparent);
+  padding-inline-start: clamp(3.35rem, 7vw, 4.6rem);
+  position: relative;
+}
+.project-fit--discovery::before {
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  content: "DIRECTION / 01";
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 900;
+  inset-block-start: 1.1rem;
+  inset-inline-start: 0.65rem;
+  letter-spacing: 0.12em;
+  position: absolute;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+.project-fit--discovery .project-fit-header {
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+}
+.prose .project-fit--discovery h3 {
+  max-width: 25ch;
+}
+.prose .project-fit-intro {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0.65rem 0 0;
+  max-width: 55ch;
+}
+.project-fit--discovery .project-fit-score {
+  border-inline-start: 0.3rem solid var(--accent-strong);
+  position: relative;
+}
+.project-fit-meter {
+  display: grid;
+  gap: 0.28rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-block-start: 0.75rem;
+}
+.project-fit-meter i {
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+  block-size: 0.3rem;
+  display: block;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+.project-fit-meter i.is-active {
+  background: var(--accent-strong);
+  transform: translateY(-0.08rem);
+}
+.project-fit--discovery .project-fit-progress button {
+  background: var(--bg);
+  border-block-end-width: 0.2rem;
+  color: var(--muted);
+  position: relative;
+}
+.project-fit--discovery .project-fit-progress button.is-active {
+  background: var(--project-fit-active-bg);
+  color: var(--project-fit-active-text);
+}
+.project-fit--discovery .project-fit-progress button span {
+  border-radius: 0;
+  font-variant-numeric: tabular-nums;
+}
+.project-fit--discovery
+  .project-fit-progress
+  button.is-complete:not(.is-active) {
+  border-block-end-color: var(--accent-strong);
+}
+.project-fit--discovery .project-fit-step.is-active {
+  animation: project-fit-page-in 220ms ease-out both;
+}
+.project-fit-preset-panel {
+  align-items: center;
+  background: color-mix(in srgb, var(--bg) 82%, var(--accent) 18%);
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
+  border-inline-start: 0.3rem solid var(--accent-strong);
+  display: grid;
+  gap: 0.8rem 1rem;
+  grid-template-columns: minmax(10rem, 0.55fr) minmax(0, 1.45fr);
+  padding: 0.8rem;
+}
+.project-fit-preset-panel strong,
+.project-fit-preset-panel small {
+  display: block;
+  font-family: var(--font-ui);
+}
+.project-fit-preset-panel strong {
+  color: var(--text);
+  font-size: 0.82rem;
+}
+.project-fit-preset-panel small {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  margin-block-start: 0.2rem;
+}
+.project-fit-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+}
+.project-fit--discovery .project-fit-presets button {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+  font-size: 0.76rem;
+  min-height: 2rem;
+  padding: 0.36rem 0.55rem;
+}
+.project-fit--discovery .project-fit-presets button:hover,
+.project-fit--discovery .project-fit-presets button.is-selected {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--panel);
+  transform: translateY(-0.08rem);
+}
+.project-fit-field-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.project-fit--discovery .project-fit-field {
+  background: color-mix(in srgb, var(--panel) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  padding: 0.72rem;
+}
+.project-fit--discovery .project-fit-field:focus-within {
+  background: var(--panel);
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+  box-shadow: 0.22rem 0.22rem 0
+    color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.project-fit--discovery .project-fit-field--optional {
+  border-style: dashed;
+}
+.project-fit--discovery select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 1rem)
+      calc(50% - 0.12rem) / 0.38rem 0.38rem no-repeat,
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%)
+      calc(100% - 0.73rem) calc(50% - 0.12rem) / 0.38rem 0.38rem no-repeat,
+    var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  min-height: 2.7rem;
+  padding: 0.62rem 2rem 0.62rem 0.7rem;
+  width: 100%;
+}
+.project-fit--discovery select:focus {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+.project-fit-direction-heading {
+  align-items: end;
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 0.8fr) minmax(16rem, 1.2fr);
+  padding-block-end: 0.85rem;
+}
+.project-fit-direction-heading > p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 55ch;
+}
+.project-fit--discovery .project-fit-results li.is-missing span {
+  background: color-mix(in srgb, var(--border) 65%, transparent);
+  color: var(--muted);
+}
+.project-fit--discovery .project-fit-results [data-project-fit-warnings] li {
+  border-inline-start: 0.2rem solid var(--warning);
+}
+.project-fit--discovery .project-fit-brief textarea {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 1.35rem,
+      color-mix(in srgb, var(--border) 42%, transparent) 1.35rem 1.39rem
+    ),
+    var(--bg);
+  line-height: 1.39rem;
+  min-height: 24rem;
+}
+@keyframes project-fit-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.28rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .model-eval-demo {
   background:
     linear-gradient(
@@ -4011,6 +4234,14 @@
   .project-fit-results {
     grid-template-columns: 1fr;
   }
+  .project-fit--discovery {
+    padding-inline-start: 3.1rem;
+  }
+  .project-fit-preset-panel,
+  .project-fit-field-grid,
+  .project-fit-direction-heading {
+    grid-template-columns: 1fr;
+  }
   .demo-gallery-item {
     grid-template-columns: 1fr;
   }
@@ -4131,6 +4362,12 @@
 }
 
 @media (max-width: 34rem) {
+  .project-fit--discovery {
+    padding-inline: 2.65rem 0.8rem;
+  }
+  .project-fit--discovery::before {
+    inset-inline-start: 0.45rem;
+  }
   .orchestration-nodes {
     grid-template-columns: 1fr;
   }
@@ -4147,6 +4384,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .project-fit--discovery *,
+  .project-fit--discovery *::before,
+  .project-fit--discovery *::after,
   .orchestration-lab *,
   .orchestration-lab *::before,
   .orchestration-lab *::after {
