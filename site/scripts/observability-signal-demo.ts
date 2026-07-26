@@ -194,13 +194,7 @@ function initializeObservabilityDemo(root: HTMLElement) {
     "[data-observability-demo-results]",
   );
 
-  if (
-    !form ||
-    !symptomSelect ||
-    !verdict ||
-    !question ||
-    !results
-  ) {
+  if (!form || !symptomSelect || !verdict || !question || !results) {
     return;
   }
 
