@@ -1,0 +1,325 @@
+/* Course-project dossier */
+.project-shell {
+  --project-phase: var(--accent-strong);
+  align-items: start;
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  grid-template-columns: minmax(13rem, 16rem) minmax(0, 48rem) minmax(
+      12rem,
+      15rem
+    );
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 96rem;
+  padding: clamp(2rem, 4vw, 4rem) clamp(1rem, 3vw, 2.5rem) 5rem;
+}
+.project-shell[data-project-phase="construct"] {
+  --project-phase: #bd6c13;
+}
+.project-shell[data-project-phase="reconstruct"] {
+  --project-phase: #087d91;
+}
+.project-shell[data-project-phase="deconstruct"] {
+  --project-phase: #b44035;
+}
+.project-index,
+.project-page-tools {
+  position: sticky;
+  top: 5.5rem;
+}
+.project-index-heading {
+  border-bottom: 3px solid var(--project-phase);
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+.project-index-heading p,
+.project-page-tools p,
+.project-document-kicker,
+.project-source-link span {
+  color: var(--muted);
+  font: 800 0.68rem/1.2 var(--font-mono);
+  letter-spacing: 0.1em;
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+}
+.project-index-heading a {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.15;
+  text-decoration: none;
+}
+.project-index ol,
+.project-page-tools ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.project-index li + li {
+  border-top: 1px solid var(--border);
+}
+.project-index li a {
+  color: var(--text);
+  display: grid;
+  gap: 0.15rem 0.65rem;
+  grid-template-columns: 1.7rem minmax(0, 1fr);
+  padding: 0.85rem 0.65rem;
+  text-decoration: none;
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+.project-index li a:hover,
+.project-index li a[aria-current="page"] {
+  background: var(--panel);
+  box-shadow: inset 3px 0 0 var(--project-phase);
+}
+.project-index li span {
+  color: var(--project-phase);
+  font: 800 0.72rem/1.45 var(--font-mono);
+  grid-row: 1 / 3;
+}
+.project-index li strong {
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+.project-index li small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  grid-column: 2;
+  line-height: 1.35;
+}
+.project-main {
+  min-width: 0;
+}
+.project-document-header {
+  align-items: stretch;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--project-phase) 8%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--panel);
+  background-size: 1.5rem 100%;
+  border: 1px solid var(--border);
+  border-top: 0.3rem solid var(--project-phase);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: clamp(1.1rem, 2.5vw, 1.75rem);
+}
+.project-document-header > div:first-child {
+  align-content: center;
+}
+.project-document-kicker span {
+  color: var(--project-phase);
+}
+.project-document-header > div > strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+.project-document-header dl {
+  border-left: 1px solid var(--border);
+  display: grid;
+  margin: 0;
+  min-width: 12.5rem;
+  padding-left: 1.25rem;
+}
+.project-document-header dl > div + div {
+  border-top: 1px solid var(--border);
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+}
+.project-document-header dt {
+  color: var(--muted);
+  font: 800 0.62rem/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.project-document-header dd {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0;
+}
+.project-document-header dd i {
+  background: var(--project-phase);
+  border-radius: 100%;
+  display: inline-block;
+  height: 0.48rem;
+  margin-right: 0.3rem;
+  width: 0.48rem;
+}
+.project-document-summary {
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  font-style: italic;
+  margin: 0;
+  padding: 1rem 0.25rem;
+}
+.project-prose {
+  padding-inline: 0.25rem;
+}
+.project-prose h1 {
+  max-width: 16ch;
+}
+.project-prose h2 {
+  scroll-margin-top: 6rem;
+}
+.project-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+  max-width: 66ch;
+}
+.project-prose > h2:first-of-type {
+  color: var(--project-phase);
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+  margin-top: -1.4rem;
+}
+.project-page-tools {
+  display: grid;
+  gap: 1.5rem;
+}
+.project-source-link {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 0.22rem solid var(--project-phase);
+  color: var(--text);
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 750;
+  line-height: 1.35;
+  padding: 0.85rem 2.5rem 0.85rem 0.85rem;
+  position: relative;
+  text-decoration: none;
+}
+.project-source-link span,
+.project-source-link strong {
+  display: block;
+}
+.project-source-link span {
+  margin-bottom: 0.2rem;
+}
+.project-source-link strong {
+  font-size: 0.88rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.project-source-link b {
+  color: var(--project-phase);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  inset: 50% 0.75rem auto auto;
+  position: absolute;
+  transform: translateY(-50%);
+}
+.project-source-link:hover {
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+.project-page-tools .local-toc {
+  border-top: 1px solid var(--border);
+  max-height: calc(100vh - 13rem);
+  overflow: auto;
+  padding-top: 1rem;
+}
+.project-page-tools .local-toc a {
+  font-size: 0.75rem;
+}
+.project-pagination {
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+.project-pagination a {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  display: block;
+  padding: 0.8rem;
+  text-decoration: none;
+}
+.project-pagination a:last-child {
+  grid-column: 2;
+  text-align: right;
+}
+.project-pagination span {
+  color: var(--muted);
+  display: block;
+  font: 800 0.62rem/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@media (max-width: 76rem) {
+  .project-shell {
+    grid-template-columns: minmax(13rem, 16rem) minmax(0, 48rem);
+  }
+  .project-page-tools {
+    grid-column: 1;
+    grid-row: 2;
+    position: static;
+  }
+  .project-page-tools .local-toc {
+    display: none;
+  }
+}
+@media (max-width: 48rem) {
+  .project-shell {
+    display: block;
+    padding-top: 1.25rem;
+  }
+  .project-index {
+    margin-bottom: 1.5rem;
+    position: static;
+  }
+  .project-index ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .project-index li + li {
+    border-top: 0;
+  }
+  .project-index li a {
+    border-top: 1px solid var(--border);
+    height: 100%;
+  }
+  .project-document-header {
+    grid-template-columns: 1fr;
+  }
+  .project-document-header dl {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 0;
+    padding-top: 0.85rem;
+  }
+  .project-document-header dl > div + div {
+    border-left: 1px solid var(--border);
+    border-top: 0;
+    margin: 0 0 0 0.85rem;
+    padding: 0 0 0 0.85rem;
+  }
+  .project-page-tools {
+    margin-top: 1.25rem;
+  }
+}
+@media (max-width: 30rem) {
+  .project-index ol,
+  .project-pagination {
+    grid-template-columns: 1fr;
+  }
+  .project-pagination a:last-child {
+    grid-column: 1;
+    text-align: left;
+  }
+}

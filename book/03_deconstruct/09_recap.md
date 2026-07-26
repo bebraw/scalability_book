@@ -19,9 +19,9 @@ The central claim could be: scalability is the ability to keep a system useful w
 
 The three projects give the course its shape:
 
-1. **Construct**: build a baseline system with a locally hosted single agent.
-2. **Reconstruct**: build the same required behavior afresh with a foundation-model single agent.
-3. **Deconstruct**: build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
+1. **[Construct](/project/construct/)**: build a baseline system with a locally hosted single agent.
+2. **[Reconstruct](/project/reconstruct/)**: build the same required behavior afresh with a foundation-model single agent.
+3. **[Deconstruct](/project/deconstruct/)**: build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
 
 The first working version is not the final design. It is one implementation produced by one development system. The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human. Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
 

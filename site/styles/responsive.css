@@ -156,6 +156,10 @@
   .hero-copy h1 {
     font-size: 2.55rem;
   }
+  .project-callout {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
   .cover-panel {
     align-items: stretch;
     grid-template-columns: minmax(5.5rem, 7rem) minmax(0, 1fr);

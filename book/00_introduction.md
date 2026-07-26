@@ -18,7 +18,7 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 The course book is built around the three course phases: construct, reconstruct, and deconstruct. Across these phases, you build a baseline, change it under new constraints, and then inspect the evidence and trade-offs around the result. The purpose of this book is to support you as you complete these phases. With this goal in mind, I have structured the book in three matching parts: Construct, Reconstruct, and Deconstruct.
 
-The running project is intentionally framed as an event-oriented application rather than as one fixed product. Most groups should keep the first version modest: record events, store them, and view them. Stronger groups may choose a more ambitious domain as long as the event core remains clear. For example, a constrained visual agentic workflow platform can be treated as an event tracking system where workflow runs, node executions, tool calls, retries, and failures are the events. The course does not require everyone to build such a platform because the visual editor and agent runtime details can easily overtake the scalability lessons.
+The [course project specification](/project/) defines a bounded Work Activity Tracker that each group implements three times. The application behavior remains substantially stable while the development setup changes from a local single agent to a foundation-model single agent and then an agent fleet. The specification leaves the product interpretation, stack, architecture, storage, and interface open so groups can make and compare real engineering choices without losing the common behavioral core.
 
 **Construct:**
 

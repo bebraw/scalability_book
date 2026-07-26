@@ -1,0 +1,60 @@
+<div class="project-shell" &data-project-phase="(resolve phase)">
+  <aside class="project-index" aria-label="Project specifications">
+    <div class="project-index-heading">
+      <p>Course file</p>
+      <a href="/project/">Work Activity Tracker</a>
+    </div>
+    <ol>
+      <Raw &html="(resolve projectNavigation)"></Raw>
+    </ol>
+  </aside>
+
+  <main class="project-main" id="content">
+    <header class="project-document-header">
+      <div>
+        <p class="project-document-kicker">
+          Specification <span &children="(resolve projectSequence)"></span>
+        </p>
+        <strong &children="(resolve projectTitle)"></strong>
+      </div>
+      <dl>
+        <div>
+          <dt>Status</dt>
+          <dd><i aria-hidden="true"></i> Canonical brief</dd>
+        </div>
+        <div>
+          <dt>Application</dt>
+          <dd>Work Activity Tracker</dd>
+        </div>
+      </dl>
+    </header>
+
+    <p
+      class="project-document-summary"
+      &children="(resolve projectSummary)"
+    ></p>
+
+    <article class="prose project-prose">
+      <Raw &html="(resolve content)"></Raw>
+    </article>
+
+    <nav class="project-pagination" aria-label="Project brief navigation">
+      <Raw &html="(resolve previousLink)"></Raw>
+      <Raw &html="(resolve nextLink)"></Raw>
+    </nav>
+  </main>
+
+  <aside class="project-page-tools">
+    <a class="project-source-link" &href="(resolve downloadUrl)" download>
+      <span>Source file</span>
+      <strong>Download Markdown</strong>
+      <b aria-hidden="true">↓</b>
+    </a>
+    <nav class="local-toc" aria-label="On this page">
+      <p>In this brief</p>
+      <ol>
+        <Raw &html="(resolve projectToc)"></Raw>
+      </ol>
+    </nav>
+  </aside>
+</div>

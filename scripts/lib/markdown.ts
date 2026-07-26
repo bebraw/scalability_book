@@ -61,8 +61,11 @@ export function renderMarkdown(
     const text = marked.Parser.parseInline(tokens);
     const slug = slugify(raw);
     const sectionNumber = getSectionNumber(depth, chapter, sectionCounters);
-    const displayText = stripHeadingNumber(text);
-    const plainText = stripHeadingNumber(decodeHtmlEntities(stripHtml(text)));
+    const displayText = sectionNumber ? stripHeadingNumber(text) : text;
+    const rawPlainText = decodeHtmlEntities(stripHtml(text));
+    const plainText = sectionNumber
+      ? stripHeadingNumber(rawPlainText)
+      : rawPlainText;
     const headingText = sectionNumber
       ? `${sectionNumber} ${plainText}`
       : plainText;
@@ -162,7 +165,7 @@ function stripMarkdownCommentBlocks(source: string): string {
   return publicLines.join("\n");
 }
 
-function getPublicMarkdownSource(source: string): string {
+export function getPublicMarkdownSource(source: string): string {
   const marker = "\n---\n";
   const markerIndex = source.lastIndexOf(marker);
 
@@ -201,7 +204,7 @@ function getSectionNumber(
   chapter: MarkdownChapter,
   counters: number[],
 ): string {
-  if (depth < 2) {
+  if (depth < 2 || !chapter.number) {
     return "";
   }
 

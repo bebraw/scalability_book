@@ -225,6 +225,44 @@
   font-weight: 500;
   line-height: 1.15;
 }
+.project-callout {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 0.4rem solid var(--accent-strong);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(14rem, 0.9fr) minmax(18rem, 1.35fr) auto;
+  margin: 0 0 clamp(2.5rem, 6vw, 5rem);
+  padding: clamp(1.1rem, 2.5vw, 1.75rem);
+}
+.project-callout .eyebrow {
+  margin-bottom: 0.35rem;
+}
+.home-main .project-callout h2 {
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  margin: 0;
+}
+.project-callout > p {
+  color: var(--muted);
+  font-family: var(--font-serif);
+  line-height: 1.5;
+  margin: 0;
+}
+.project-callout > a {
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 750;
+  padding: 0.35rem 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.project-callout > a span {
+  color: var(--accent-strong);
+  margin-left: 0.35rem;
+}
 .book-part {
   margin-top: 2rem;
 }

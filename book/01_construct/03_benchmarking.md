@@ -155,6 +155,8 @@ Use the result as a starting point for an observability plan. A good plan names 
 
 ## What to measure in the project
 
+Use the [comparable evidence package in the common specification](/project/#9-comparable-evidence-package) as the stable reporting frame for all three implementations. The measurements below help turn that frame into an operational protocol rather than a collection of isolated numbers.
+
 Prompts:
 
 - How long does event recording take?

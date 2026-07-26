@@ -85,7 +85,7 @@ While the course project has been designed to be completed in groups, you can al
 
 ## Book project - Work Activity Tracker
 
-During this book, you will implement the same bounded web application three times. The common project specification in `specifications/00_common_project.md` defines workspaces, work items, a small lifecycle, activity events, filtering, summaries, validation, and persistence. These observable requirements stay substantially stable so the three results can be compared.
+During this book, you will implement the same bounded web application three times. The [common project specification](/project/) defines workspaces, work items, a small lifecycle, activity events, filtering, summaries, validation, and persistence. These observable requirements stay substantially stable so the three results can be compared.
 
 The specification deliberately leaves many decisions open. Your group chooses how the domain feels, which terminology appears in the interface, the technical stack, rendering approach, storage, architecture, deployment path, and one implementation question worth investigating. Different groups should arrive at recognizably different applications without changing the common behavior.
 
@@ -93,7 +93,7 @@ The point is not to predict the perfect design. It is to form an explicit implem
 
 ## Implementation discovery lab
 
-Use this lab to turn the shared specification into a direction your group wants to explore. It does not approve or reject an idea. Instead, it records four decision anchors and generates a short brief you can discuss, revise, and place in the project repository.
+Use this lab to turn the [shared specification](/project/) into a direction your group wants to explore. It does not approve or reject an idea. Instead, it records four decision anchors and generates a short brief you can discuss, revise, and place in the project repository.
 
 {{ import "site/includes/project-fit-checker.html" }}
 

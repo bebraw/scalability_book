@@ -2,11 +2,13 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { build as viteBuild, transformWithOxc } from "vite";
-import { renderMarkdown } from "./lib/markdown.ts";
+import { getPublicMarkdownSource, renderMarkdown } from "./lib/markdown.ts";
+import { renderHtmlisp } from "./lib/htmlisp.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
   chapterNumberFromFilename,
   escapeAttribute,
+  escapeHtml,
   parseJsonc,
   slugify,
   titleFromFilename,
@@ -25,12 +27,47 @@ const templates = await loadTemplates({
   bookNavigation: "components/BookNavigation.html",
   bookPage: "layouts/bookPage.html",
   paginationLink: "components/PaginationLink.html",
+  projectPage: "layouts/projectPage.html",
   siteIndex: "layouts/siteIndex.html",
 });
 const commonBookScripts = ["/book-nav.js", "/toc-highlight.js", "/comments.js"];
 const demoStylesheet = "/styles/demos.css";
 const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
 const developmentScripts = includeEditor ? ["/dev-reload.js"] : [];
+const projectSpecificationDefinitions = [
+  {
+    file: "specifications/00_common_project.md",
+    label: "Common contract",
+    phase: "common",
+    sequence: "00",
+    slug: "",
+    summary: "Behavior, technical freedom, evidence, and shared evaluation.",
+  },
+  {
+    file: "specifications/01_construct.md",
+    label: "Construct",
+    phase: "construct",
+    sequence: "01",
+    slug: "construct",
+    summary: "Implementation A · local model · single agent.",
+  },
+  {
+    file: "specifications/02_reconstruct.md",
+    label: "Reconstruct",
+    phase: "reconstruct",
+    sequence: "02",
+    slug: "reconstruct",
+    summary: "Implementation B · foundation model · single agent.",
+  },
+  {
+    file: "specifications/03_deconstruct.md",
+    label: "Deconstruct",
+    phase: "deconstruct",
+    sequence: "03",
+    slug: "deconstruct",
+    summary: "Implementation C · declared agent fleet.",
+  },
+];
 const demoScriptIncludes = [
   {
     title: "Implementation discovery lab",
@@ -171,6 +208,21 @@ const renderer = createSiteRenderer({
   partMetadata,
   templates,
 });
+const projectSpecifications = await Promise.all(
+  projectSpecificationDefinitions.map(async (definition) => {
+    const source = await readFile(path.join(root, definition.file), "utf8");
+    const title = source.match(/^#\s+(.+)$/m)?.[1]?.trim() || definition.label;
+    const url = definition.slug ? `/project/${definition.slug}/` : "/project/";
+
+    return {
+      ...definition,
+      downloadUrl: `/project/source/${definition.slug || "common-project"}.md`,
+      source,
+      title,
+      url,
+    };
+  }),
+);
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
@@ -211,6 +263,36 @@ await writePage(
   }),
 );
 
+for (let index = 0; index < projectSpecifications.length; index++) {
+  const specification = projectSpecifications[index];
+  const rendered = renderMarkdown(
+    rewriteProjectSpecificationLinks(specification.source),
+    { number: "" },
+  );
+  const previous = projectSpecifications[index - 1];
+  const next = projectSpecifications[index + 1];
+
+  await writePage(
+    specification.slug
+      ? `project/${specification.slug}/index.html`
+      : "project/index.html",
+    renderer.renderLayout({
+      title: `${specification.title} - ${config.title}`,
+      description: specification.summary,
+      currentUrl: specification.url,
+      stylesheets: ["/styles/project.css"],
+      scripts: ["/toc-highlight.js", ...developmentScripts],
+      children: renderProjectPage({
+        content: rendered.content,
+        next,
+        previous,
+        specification,
+        tableOfContents: rendered.tableOfContents,
+      }),
+    }),
+  );
+}
+
 const demoGallery = renderMarkdown(getDemoGallerySource(), { number: "" });
 await writePage(
   "demos/index.html",
@@ -229,6 +311,7 @@ await writePage(
 
 await compileSiteStylesheet("styles.css");
 await compileSiteStylesheet("styles/demos.css");
+await compileSiteStylesheet("styles/project.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
@@ -286,6 +369,7 @@ if (includeEditor) {
   await compileSiteScript("scripts/dev-reload.ts", "dev-reload.js");
 }
 await copyStaticAssets();
+await copyProjectSpecificationSources(projectSpecifications);
 if (includeEditor) {
   await copyEditorAssets();
 }
@@ -347,6 +431,76 @@ function renderDemoGalleryPage(content) {
 ${content}
 </article>
 </main>`;
+}
+
+function renderProjectPage({
+  content,
+  next,
+  previous,
+  specification,
+  tableOfContents,
+}) {
+  return renderHtmlisp(templates.projectPage, {
+    content,
+    downloadUrl: specification.downloadUrl,
+    nextLink: renderProjectPaginationLink(next, "Next brief"),
+    phase: specification.phase,
+    projectNavigation: renderProjectNavigation(specification),
+    projectSequence: specification.sequence,
+    projectSummary: specification.summary,
+    projectTitle: specification.label,
+    projectToc: renderProjectToc(tableOfContents),
+    previousLink: renderProjectPaginationLink(previous, "Previous brief"),
+  });
+}
+
+function renderProjectNavigation(current) {
+  return projectSpecifications
+    .map((specification) => {
+      const ariaCurrent =
+        specification.url === current.url ? ' aria-current="page"' : "";
+
+      return `<li><a href="${escapeAttribute(specification.url)}"${ariaCurrent}>
+  <span>${escapeHtml(specification.sequence)}</span>
+  <strong>${escapeHtml(specification.label)}</strong>
+  <small>${escapeHtml(specification.summary)}</small>
+</a></li>`;
+    })
+    .join("\n");
+}
+
+function renderProjectToc(tableOfContents) {
+  const headings = tableOfContents.filter(
+    (item) => item.level > 1 && item.level < 4,
+  );
+
+  return headings
+    .map(
+      (item) =>
+        `<li><a class="toc-level-${item.level}" href="#${escapeAttribute(item.slug)}">${escapeHtml(item.text)}</a></li>`,
+    )
+    .join("\n");
+}
+
+function renderProjectPaginationLink(specification, direction) {
+  if (!specification) {
+    return "";
+  }
+
+  return `<a href="${escapeAttribute(specification.url)}"><span>${escapeHtml(direction)}</span><strong>${escapeHtml(specification.label)}</strong></a>`;
+}
+
+function rewriteProjectSpecificationLinks(source) {
+  const urlByFilename = new Map(
+    projectSpecificationDefinitions.map((definition) => [
+      path.basename(definition.file),
+      definition.slug ? `/project/${definition.slug}/` : "/project/",
+    ]),
+  );
+
+  return source.replace(/\]\((\d{2}_[^)]+\.md)\)/g, (match, filename) =>
+    urlByFilename.has(filename) ? `](${urlByFilename.get(filename)})` : match,
+  );
 }
 
 async function compileSiteStylesheet(sourceRelativePath) {
@@ -562,6 +716,23 @@ async function copyStaticAssets() {
   await copyFile(
     path.join(siteDir, "assets", "blank-map-world.svg"),
     path.join(assetsDir, "blank-map-world.svg"),
+  );
+}
+
+async function copyProjectSpecificationSources(specifications) {
+  const sourceDir = path.join(buildDir, "project", "source");
+
+  await mkdir(sourceDir, { recursive: true });
+  await Promise.all(
+    specifications.map((specification) =>
+      writeFile(
+        path.join(sourceDir, `${specification.slug || "common-project"}.md`),
+        rewriteProjectSpecificationLinks(
+          getPublicMarkdownSource(specification.source),
+        ),
+        "utf8",
+      ),
+    ),
   );
 }
 

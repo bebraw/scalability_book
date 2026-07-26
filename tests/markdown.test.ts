@@ -2,6 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderMarkdown } from "../scripts/lib/markdown.ts";
 
+test("unnumbered documents preserve authored heading numbers", () => {
+  const rendered = renderMarkdown("# Brief\n\n## 1. Purpose\n\n### 1.1 Scope", {
+    number: "",
+  });
+
+  assert.match(rendered.content, />1\. Purpose</);
+  assert.match(rendered.content, />1\.1 Scope</);
+  assert.doesNotMatch(rendered.content, /class="section-number"/);
+  assert.deepEqual(
+    rendered.tableOfContents.map(({ text }) => text),
+    ["Brief", "1. Purpose", "1.1 Scope"],
+  );
+});
+
 test("Markdown comment blocks are omitted from content and the table of contents", () => {
   const rendered = renderMarkdown(
     `# Chapter
