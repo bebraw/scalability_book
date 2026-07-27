@@ -31,6 +31,7 @@
   font-family: var(--font-serif);
   font-size: clamp(1.05rem, 0.55vw + 0.95rem, 1.22rem);
   line-height: 1.72;
+  /* Keep body copy comfortably below WCAG's 80-character line ceiling. */
   max-width: 66ch;
 }
 .prose p {

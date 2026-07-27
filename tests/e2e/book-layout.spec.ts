@@ -1,6 +1,35 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("book reading layout", () => {
+  test("keeps body copy within a readable line length", async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 900 });
+    await page.goto("/chapters/scalable-development/");
+
+    const paragraph = page.locator(".prose > p:not(.chapter-kicker)").first();
+    await expect(paragraph).toBeVisible();
+
+    const { paragraphWidth, eightyCharactersWidth } = await paragraph.evaluate(
+      (element) => {
+        const ruler = document.createElement("span");
+        ruler.textContent = "0".repeat(80);
+        ruler.style.font = getComputedStyle(element).font;
+        ruler.style.position = "absolute";
+        ruler.style.visibility = "hidden";
+        ruler.style.whiteSpace = "nowrap";
+        document.body.append(ruler);
+
+        const widths = {
+          paragraphWidth: element.getBoundingClientRect().width,
+          eightyCharactersWidth: ruler.getBoundingClientRect().width,
+        };
+        ruler.remove();
+        return widths;
+      },
+    );
+
+    expect(paragraphWidth).toBeLessThan(eightyCharactersWidth);
+  });
+
   test("keeps chapter cards in each landing-page row the same height", async ({
     page,
   }) => {
