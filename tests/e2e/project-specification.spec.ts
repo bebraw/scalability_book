@@ -99,7 +99,7 @@ test.describe("project specification", () => {
   }) => {
     await page.goto("/chapters/scalable-development/");
     await expect(
-      page.getByRole("link", { name: "common project specification" }),
+      page.getByRole("link", { name: "the book project" }),
     ).toHaveAttribute("href", "/project/");
 
     await page.goto("/parts/challenge/");

@@ -2,7 +2,7 @@ import { expect, test, type Locator } from "@playwright/test";
 
 test.describe("model eval demo", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/benchmarking/#small-eval-demonstration");
+    await page.goto("/demos/#demo-model-evaluation-lab");
     await expect(page.locator("[data-model-eval]")).toBeVisible();
   });
 

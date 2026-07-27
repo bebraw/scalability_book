@@ -2,7 +2,11 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { build as viteBuild, transformWithOxc } from "vite";
-import { getPublicMarkdownSource, renderMarkdown } from "./lib/markdown.ts";
+import {
+  getPublicMarkdownSource,
+  renderMarkdown,
+  resolveTrustedHtmlImports,
+} from "./lib/markdown.ts";
 import { renderHtmlisp } from "./lib/htmlisp.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
@@ -293,7 +297,8 @@ for (let index = 0; index < projectSpecifications.length; index++) {
   );
 }
 
-const demoGallery = renderMarkdown(getDemoGallerySource(), { number: "" });
+const demoGalleryHeading = renderMarkdown("# Demo showcase", { number: "" });
+const demoGallery = `${demoGalleryHeading.content}\n${resolveTrustedHtmlImports(getDemoGalleryHtml())}`;
 await writePage(
   "demos/index.html",
   renderer.renderLayout({
@@ -305,7 +310,7 @@ await writePage(
       ...demoScriptIncludes.map(({ script }) => script),
       ...developmentScripts,
     ],
-    children: renderDemoGalleryPage(demoGallery.content),
+    children: renderDemoGalleryPage(demoGallery),
   }),
 );
 
@@ -390,7 +395,7 @@ function hasDemoInclude(source) {
   return demoScriptIncludes.some(({ include }) => source.includes(include));
 }
 
-function getDemoGallerySource() {
+function getDemoGalleryHtml() {
   const sections = demoScriptIncludes
     .map(({ title, chapter, include }, index) => {
       const id = `demo-${slugify(title)}`;
@@ -410,9 +415,7 @@ function getDemoGallerySource() {
     })
     .join("\n\n");
 
-  return `# Demo showcase
-
-<div class="demo-gallery-lede">
+  return `<div class="demo-gallery-lede">
 <p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface.</p>
 <dl class="demo-gallery-stats">
 <div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>

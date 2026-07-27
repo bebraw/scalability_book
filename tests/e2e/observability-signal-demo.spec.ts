@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("observability signal demo", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/benchmarking/#observability-signal-picker");
+    await page.goto("/demos/#demo-observability-signal-picker");
     await expect(page.locator("[data-observability-demo]")).toBeVisible();
   });
 

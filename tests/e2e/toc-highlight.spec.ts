@@ -9,15 +9,12 @@ test.describe("local table of contents highlight", () => {
     await expect(toc).toBeVisible();
 
     await page
-      .locator('[id="2-1-the-course-narrative-project-arc"]')
+      .locator('[id="summary"]')
       .evaluate((heading) => heading.scrollIntoView({ block: "start" }));
 
     const activeLink = toc.locator('a[aria-current="location"]');
 
-    await expect(activeLink).toContainText("The Course Narrative");
-    await expect(activeLink).toHaveAttribute(
-      "href",
-      "#2-1-the-course-narrative-project-arc",
-    );
+    await expect(activeLink).toContainText("Summary");
+    await expect(activeLink).toHaveAttribute("href", "#summary");
   });
 });
