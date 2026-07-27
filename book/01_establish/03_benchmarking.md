@@ -1,4 +1,4 @@
-# How do we measure and observe web applications?
+# How to measure and observe web applications?
 
 Benchmarking and observability are ways to replace assumptions with evidence.
 A system that feels simple during development may behave differently under load, with real data, slow networks, concurrent users, or partial failures.

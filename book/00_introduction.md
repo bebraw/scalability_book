@@ -32,36 +32,41 @@ I have tried to structure the book so that each chapter works on its own though 
 While researching the book, I came up with far more material than I could possibly include to it, so I have tried to include further references for you to study where relevant.
 I think the key thing is to adopt a scalability oriented mindset so you understand why the topic is important and where to look when you hit the issues, preferably before.
 
-## Structure of the book
+## How is the book structured
 
-The book follows three pedagogical moves: establish a baseline, challenge its assumptions, and compare the alternatives.
-Across three independent implementations of one shared web application, you will learn to recognize scaling pressure, collect comparable evidence, make architectural trade-offs, and determine when additional computational or organizational capacity creates value rather than merely more complexity.
+I structured the book around a single project that is implemented three times to establish a baseline, challenge its assumptions, and finally to compare the alternatives.
+In other words, expect three parts with three chapters each that take you to the topic.
+By implementing the three projects, you will gain appreciation of different ways of developing web applications.
+More specifically, we will touch local models, foundation models, and agent fleets where you have multiple actors working together.
+It is within this framing that you will learn to benchmark, architect, and scale your web applications.
 
-The subject of the book is scalable web applications.
-The three AI-assisted development setups are the experimental lens through which we study them.
-Application behavior remains substantially stable while the development setup changes, allowing the class to compare both application architectures and the systems used to produce them.
+The course project has been documented through [a shared specification](/project/) built around a work activity tracker with some ambiguity so that you can make it yours.
+While the application behavior remains stable across the different implementations, the way you implement will change as mentioned, and you will have technical choices to make in terms of product interpretation, stack, architecture, storage, and interfaces.
+This means you can compare the impact of different engineering choices against the same behavioral core.
 
-The [course project specification](/project/) defines a bounded Work Activity Tracker that each group implements three times.
-The application behavior remains substantially stable while the development setup changes from a local single agent to a foundation-model single agent and then an agent fleet.
-The specification leaves the product interpretation, stack, architecture, storage, and interface open so groups can make and compare real engineering choices without losing the common behavioral core.
+I call the three parts of the book Establish, Challenge, and Compare.
+Each of these parts responds to specific scalability related questions and I have covered what to expect briefly below.
 
 **Establish:**
 
-1. What is scalability? -- What has to remain useful as users, data, traffic, teams, and change grow?
-2. How can development remain scalable? -- How do we constrain, generate, validate, and maintain software produced with AI assistance?
-3. How do we measure and observe web applications? -- How do we define the shared workload and evidence needed to compare all three implementations?
+1. What is scalability? -- In this chapter I consider aspects related to scalability in the context of web development.
+2. How to develop in a scalable way? -- Given the shape of development is changing, I consider the implications of artificial intelligence (AI) and agents in this chapter.
+3. How to measure and observe web applications? -- While AI speeds up development of artefacts, this also highlights the importance of measuring and observing our applications.
+   That is why I will show you how to measure and observe your web applications in this chapter.
 
 **Challenge:**
 
-4. How does web architecture shape scalability? -- Which boundaries and constraints shaped implementation A, and what architectural hypothesis should guide implementation B?
-5. Where does development friction come from? -- Where does the cost of understanding, changing, testing, reviewing, and operating a system accumulate?
-6. What happens when assumptions meet reality? -- Which assumptions fail under real users, data, concurrency, failures, costs, and constraints?
+4. How does web architecture shape scalability? -- Architecture and scalability go hand in hand, and in this chapter I'll consider the implications of this connection.
+5. Where does development friction come from? -- As web applications become more complex, they become more difficult to develop and in this chapter we consider sources of friction and what to do about it.
+6. What happens when assumptions meet reality? -- In this chapter we consider which assumptions fail under real users, data, concurrency, failures, costs, and constraints.
 
 **Compare:**
 
-7. How do we coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
+7. How to coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
 8. How should systems respond to scaling pressure? -- How do all three implementations respond to the same pressures, and what would a justified target architecture retain or change?
-9. What can the three implementations teach us? -- What conclusions does the evidence support, and which application architecture and development workflow would we choose under stated constraints?
+9. What can the three implementations teach us? -- What conclusions do the evidence support, and which application architecture and development workflow would we choose under stated constraints?
+
+---
 
 ## Project artifacts
 

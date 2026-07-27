@@ -1,4 +1,4 @@
-# How can development remain scalable?
+# How to develop in a scalable way?
 
 As systems evolve, they tend to become more difficult to develop as the existing requirements and code may work against you.
 This problem has been amplified with the introduction of so-called agentic coding, where computer agents leveraging large language models (LLMs) essentially do the coding work for us.
