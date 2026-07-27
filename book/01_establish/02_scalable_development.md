@@ -159,7 +159,7 @@ While the course project has been designed to be completed in groups, you can al
 Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely.
 Therefore, I encourage developing small prototypes beyond this book as now prototyping is cheap, and you'll learn a lot in the process.
 
----
+::: comment
 
 The implementation should remain deliberately modest.
 Interpretive freedom is not a request for more features.
@@ -222,3 +222,5 @@ The harness can be lightweight, but it should be concrete enough that another gr
   Decide in the shared specification which harness files are supplied, which students author, and which may be carried into later builds.
 - Keep the implementation discovery lab aligned with the shared specification as the project evolves.
   It should support reasoning and conversation rather than score whether a group has found the “right” idea.
+
+:::
