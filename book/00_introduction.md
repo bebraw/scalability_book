@@ -12,19 +12,25 @@ You will pick up ideas behind technical scaling during this process.
 > More traffic, more data, more retries, more logs, and more infrastructure all consume resources.
 > Throughout the book, you can ask whether a design scales efficiently, not only whether it scales at all.
 
-## Why should you read this book
+## Why you should read this book
 
-By its nature, the book is more on the academic side and I have included references in each chapter for further study.
-I have tried to keep each chapter to the point, and the additional resources provide a fuller view of each topic.
-Together, the book and the projects give the concepts a concrete shape and deepen your understanding.
+This book captures my current understanding how to develop web applications in a scalable way and in the book I share my latest learnings about the topic.
+I finished my doctorate recently (2025) and I have been active in the scene for the past twenty years.
+Besides the doctorate, [I have completed plenty of research about the topic](https://survivejs.com/research/).
+If I had been writing this book last year (2025), it would have looked quite different.
+Now in 2026 the shape of web development has changed as agent driven development through large language models has become a thing.
+I believe this has changed the way we develop web applications for good (or worse).
+The days of writing our applications fully by hand are over.
 
-I wrote this book to capture my understanding of how to develop scalable web applications.
-Although the book is oriented toward the web, several principles discussed here apply more broadly.
-Even if you are not a web practitioner, you can likely still gain something from reading it.
+This shift in the scene meant I had to change my thinking about this book and understand what agentic web development is about.
+Besides learning to develop the agentic way myself, I ran a conference called [Future Frontend](https://futurefrontend.com/) related to the topic and both of these moves gave me greater appreciation of the topic.
+The important thing to note is that this book represents a snapshot of what I consider the current good practices, and you should always make up your own mind about scalability.
+I can only give you some directions where to look.
 
-In the age of AI-driven development, understanding the concepts behind scalability is perhaps more important than ever.
-For this reason, I focus more on concepts than on specific technical details, which tend to change over time.
-Through this book and the surrounding course, you will also learn how to use AI technologies critically so they support development while preserving attention to design quality, maintainability, and system constraints.
+If web development and scalability are close to your heart, then this might be a good book for you to read even if you skip the book projects.
+I have tried to structure the book so that each chapter works on its own though understandably there are some subtle references between the chapters.
+While researching the book, I came up with far more material than I could possibly include to it, so I have tried to include further references for you to study where relevant.
+I think the key thing is to adopt a scalability oriented mindset so you understand why the topic is important and where to look when you hit the issues, preferably before.
 
 ## Structure of the book
 
