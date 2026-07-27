@@ -8,9 +8,10 @@ Upstream: [bebraw/scholarmark](https://github.com/bebraw/scholarmark)
 
 Originally tested package: `scholarmark@0.1.0`
 
-Integrated package: `scholarmark@0.2.0`
+Integrated package: `scholarmark@0.3.0`
 
 The requested sanitized-HAST and rendered-heading APIs shipped in `0.2.0` and now power the book renderer.
+Version `0.3.0` adds postfix labels, table captions, local reference metadata, and host-provided cross-document reference targets.
 The remainder of this document preserves the original upstream request and its rationale for reference.
 
 ## Summary

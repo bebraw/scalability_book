@@ -121,6 +121,35 @@ Earlier work established the relationship :cite[little1961].
   assert.match(rendered.content, /target="_blank"/);
 });
 
+test("postfix labels attach after captioned tables", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+| Sample | Value |
+| ------ | ----: |
+| A      |    42 |
+::caption[Measurements collected during the trial.]
+::label[table:measurements]
+
+See :ref[table:measurements]{text="the measurements table"}.
+`,
+    { number: "2" },
+  );
+
+  assert.match(
+    rendered.content,
+    /<caption class="semantic-table-caption"[^>]*>Measurements collected during the trial\.<\/caption>/,
+  );
+  assert.match(
+    rendered.content,
+    /class="semantic-label" id="table:measurements"/,
+  );
+  assert.match(
+    rendered.content,
+    /href="#table:measurements"[^>]*>the measurements table<\/a>/,
+  );
+});
+
 test("unknown citation keys fail the build", () => {
   assert.throws(
     () =>

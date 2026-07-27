@@ -16,6 +16,10 @@ Scientific references live in [bibliography.bib](../bibliography.bib).
 Use `:cite[key]` for a parenthetical citation or `:citet[key]` when the authors form part of the sentence, and place `::bibliography[]` under a `## References` heading in each chapter that cites sources.
 The build fails when a citation key is missing from the bibliography.
 
+Scholarmark labels follow the block they identify.
+Use `::label[id]` after a heading, paragraph, table, or figure and refer to it with `:ref[id]`.
+For a GFM table, place `::caption[Caption text.]` immediately after the table and an optional label after the caption.
+
 To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
 
 ```md
