@@ -12,6 +12,7 @@ import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 import {
   headingNumbersByOffset,
+  parseBibliography,
   projectMarkdownComments,
   renderTreeSync,
   slugify,
@@ -104,6 +105,7 @@ export function renderMarkdown(
     prepared.imports,
     rendered.headings,
     Boolean(chapter.number),
+    bibliographySource,
   );
 
   return {
@@ -225,10 +227,12 @@ function decorateRenderedTree(
   imports: readonly MarkdownImport[],
   headings: readonly RenderedHeading[],
   numbered: boolean,
+  bibliographySource: string,
 ): TableOfContentsItem[] {
   const importsByToken = new Map(imports.map((item) => [item.token, item]));
   const headingById = new Map(headings.map((heading) => [heading.id, heading]));
   const paragraphCounts = new Map<string, number>();
+  linkCitationsToBibliography(tree, bibliographySource);
 
   decorateChildren(tree, source, importsByToken, paragraphCounts, numbered);
 
@@ -284,10 +288,6 @@ function decorateElement(
     decorateLink(element);
   }
 
-  if (element.tagName === "button" && hasClass(element, "semantic-citation")) {
-    decorateStaticCitation(element);
-  }
-
   if (element.tagName === "ol" && hasClass(element, "semantic-bibliography")) {
     linkBibliographyUrls(element);
   }
@@ -297,10 +297,60 @@ function decorateElement(
   }
 }
 
-function decorateStaticCitation(citation: HastElement): void {
-  citation.tagName = "span";
-  delete citation.properties.ariaLabel;
-  delete citation.properties.type;
+function linkCitationsToBibliography(
+  tree: HastRoot,
+  bibliographySource: string,
+): void {
+  const citedIds = new Set<string>();
+  const citations: HastElement[] = [];
+  let bibliography: HastElement | undefined;
+
+  walk(tree, (element) => {
+    if (hasClass(element, "semantic-citation")) {
+      citations.push(element);
+      const citationId = element.properties.dataCitation;
+      if (typeof citationId === "string") {
+        citedIds.add(citationId);
+      }
+    }
+    if (!bibliography && hasClass(element, "semantic-bibliography")) {
+      bibliography = element;
+    }
+  });
+
+  const targets = new Map<string, string>();
+  if (bibliography) {
+    const citationIds = [
+      ...parseBibliography(bibliographySource).keys(),
+    ].filter((id) => citedIds.has(id));
+    const entries = bibliography.children.filter(
+      (child): child is HastElement =>
+        child.type === "element" && child.tagName === "li",
+    );
+
+    for (const [index, citationId] of citationIds.entries()) {
+      const entry = entries[index];
+      if (!entry) {
+        break;
+      }
+      const target = `reference-${slugify(citationId)}`;
+      entry.properties.id = target;
+      targets.set(citationId, target);
+    }
+  }
+
+  for (const citation of citations) {
+    const citationId = citation.properties.dataCitation;
+    const target =
+      typeof citationId === "string" ? targets.get(citationId) : undefined;
+    citation.tagName = target ? "a" : "span";
+    delete citation.properties.type;
+    if (target) {
+      citation.properties.href = `#${target}`;
+    } else {
+      delete citation.properties.ariaLabel;
+    }
+  }
 }
 
 function linkBibliographyUrls(bibliography: HastElement): void {

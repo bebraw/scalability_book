@@ -70,7 +70,7 @@ test("unclosed Markdown comment blocks fail with the opening line", () => {
   );
 });
 
-test("citations use the shared bibliography and render as static text", () => {
+test("citations link to their shared bibliography entries", () => {
   const bibliography = `@article{little1961,
   author = {Little, John D. C.},
   title = {A Proof for the Queuing Formula},
@@ -92,7 +92,11 @@ As :citet[little1961] showed, the relationship is stable.
   assert.match(rendered.content, /class="semantic-citation"/);
   assert.match(rendered.content, /Little \(1961\)/);
   assert.match(rendered.content, /class="semantic-bibliography"/);
-  assert.doesNotMatch(rendered.content, /<button[^>]+semantic-citation/);
+  assert.match(
+    rendered.content,
+    /<a[^>]+class="semantic-citation"[^>]+href="#reference-little1961"/,
+  );
+  assert.match(rendered.content, /<li id="reference-little1961">/);
 });
 
 test("bibliography URLs remain clickable", () => {

@@ -57,7 +57,14 @@ test.describe("book reading layout", () => {
     await expect(page.locator(".semantic-bibliography")).toContainText(
       "Shift-Up",
     );
-    await expect(page.locator("button.semantic-citation")).toHaveCount(0);
+    await expect(citation).toHaveAttribute(
+      "href",
+      "#reference-lipsanen2026shiftup",
+    );
+
+    await citation.click();
+    await expect(page).toHaveURL(/#reference-lipsanen2026shiftup$/);
+    await expect(page.locator("#reference-lipsanen2026shiftup")).toBeVisible();
   });
 
   test("switches navigation views and expands demos when folded", async ({

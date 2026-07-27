@@ -66,6 +66,9 @@
 }
 .prose .semantic-citation {
   color: var(--accent-strong);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.14em;
   white-space: nowrap;
 }
 .prose .semantic-bibliography {
@@ -77,6 +80,11 @@
   font-size: 0.96em;
   margin-bottom: 0.8em;
   padding-inline-start: 0.35em;
+}
+.prose .semantic-bibliography li:target {
+  border-radius: 0.2rem;
+  outline: 2px solid var(--accent);
+  outline-offset: 0.3rem;
 }
 .heading-anchor {
   color: var(--muted);
