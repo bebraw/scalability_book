@@ -16,39 +16,55 @@ Since late-2022 with the introduction of ChatGPT, the way we program has begun t
 On top of this we have whole systems that can orchestrate how multiple agents develop a system even independently.
 Even then, the challenge becomes how to ensure the system is producing right outputs.
 
-In the context of this book, I'll focus primarily on agentic development at the level of a single agent since it is possible to take those ideas to scaling agents as you'll hit the same problems, but at a pronounced rate.
-The ideas behind effective agentic development are good development practices in general, and I'll provide a good list of those for you in this chapter.
+In the context of this book, we will first use a local model to implement [the book project](/project/) before trying the same with a foundation model and moving onto a fleet of agents to appreciate the differences and related challenges.
+The ideas behind effective agentic development are good development practices in general, and you should have a good idea of at least some of those after finishing reading this chapter.
+
+## Vibe coding vs. discipline
 
 Since agentic development allows you to produce vast amounts of code fast through prompting, this brings you to the same old practices encountered by developers for decades at an elevated rate.
 The term vibe coding coined by Andrej Karpathy in February 2025 captures well the dark side of this kind of development and for this reason it is occasionally used as a pejorative against development practices that focus on visual results while forgetting what is underneath.
-This doesn't mean vibe coding cannot be useful as a prototyping technique, but that it can be dangerous to forget to design your codebase so that it follows good practices and follow security practices to avoid leaking client data or causing unnecessary cost or reputation loss to the developer.
+This does not mean vibe coding cannot be useful as a prototyping technique, but that it can be dangerous to forget to design your codebase so that it follows good practices and follow security practices to avoid leaking client data or causing unnecessary cost or reputation loss to the developer.
 
 It turns out, to get most out of agentic development, you will need a certain amount of discipline.
 That is the main reason why it is important to understand technical details as in what should good architecture look like and how to develop software sustainably.
 In [Shift-Up: A Framework for Software Engineering Guardrails in AI-native Software Development - Initial Findings](https://arxiv.org/html/2604.20436v1), Lipsanen et al. consider this issue and propose structured development as an alternative to unstructured vibe coding.
 On top of structured development, the authors propose the Shift-Up approach that trades development speed for human control.
-Practices are still emerging, and I have no doubt we'll find better and worse ways to work machines.
+Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
 The question is what values we want to emphasize.
 
 In short, agentic development has changed web development by shifting the abstraction level.
 Instead of writing code, you massage the codebase into your preferred shape.
 The big question is, how to do this effectively.
-I'll consider this question next based on my own experience gained through the development of my own projects, especially [Slideotter](https://slideotter.com/), a large web application designed around slide authoring.
+I will consider this question next based on my own experience gained through the development of my own projects, especially [Slideotter](https://slideotter.com/), a large web application designed around slide authoring, and [kirjolab](https://github.com/bebraw/kirjolab), a scientific authoring tool.
+Both projects are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me.
+A single developer that can work with the machine can achieve far more than ever in the past.
 
 ## How to develop web applications using agents sustainably?
 
 As mentioned, giving into the vibes and prompting your application can be seductive in sense that it allows you to achieve visible results fast.
 For a simple project that is easy to specify, sometimes even a single prompt can be enough to produce something usable even with the current tools.
-For example, the layout of the [SDLCAI](https://www.sdlcai.org/) was produced as one-shot using a carefully crafted prompt that provided the model enough context and constraints.
+For example, the layout of the [SDLCAI](https://www.sdlcai.org/) was produced as one-shot using a carefully crafted prompt that provided the model enough context and constraints, but it took a surprising amount of time to implement a form to capture prospects safely as my agent was not well familiar with the problem.
+
 Both context and constraints are at the core of using these tools.
-Commonly constraints are also called guardrails, and for a good reason.
-A big part of agentic engineering and working with AI systems in general is exactly about figuring out boundaries for the systems and constraining how it can work.
+Commonly constraints are also called guardrails, and for a good reason as they protect the agent from going off the rails.
+In addition, I prefer to use quality gates that the agent has to run at predefined occasions, for example when completing work or when work is pushed to a remote repository.
+While tight guardrails and quality gates can improve quality in general, they also come with a cost in terms of time spent, so there may be engineering compromises to be made.
+When you are developing a web application the agentic way, you are not working only on the application but also the surrounding layer to support its efficient development and in practice it is that supporting layer that often defines how successful your development efforts are in terms of both quality and budget.
+
+Ironically a considerable part of working with agents is about figuring out how to work with agents especially when you are starting out.
+For this reason, I encourage you to perform experiments and maintain some kind of project template you improve over time.
+Mine is called [vibe-template](https://github.com/bebraw/vibe-template), and it might have some patterns you could find useful for yours though I have no doubt you may have different opinions on some things.
+I have found it interesting that with agentic development, techniques such as mutation testing (see [Stryker](https://stryker-mutator.io/)) and static analysis (see [Fallow](https://github.com/fallow-rs/fallow)) have become increasingly usable.
+I use static analysis to decrease the cognitive complexity of my codebases while mutation testing is useful in improving the code coverage of my tests while improving their quality and avoiding unnecessary tests.
+Manually these tools would require a huge amount of effort but when an agent is doing the work, the situation is vastly different, and I consider these kinds of tools good examples of guardrails.
 
 > **Sustainability angle**
 >
 > Sustainable agentic development has two meanings here.
 > It means keeping the project maintainable for humans, but it also means avoiding wasteful tool use.
 > Focused prompts, smaller context, reusable instructions, and strong validation loops reduce repeated generation and unnecessary compute.
+
+## Constrain, generate, validate
 
 Roughly put, when you develop with agents you follow a loop where you first constrain, then generate, and finally validate the results before starting again.
 The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
@@ -98,16 +114,17 @@ Instead, those accepted shortcuts became examples for the agent to copy into the
 A shortcut therefore has two costs: humans may have to repair it later, and agents may treat it as evidence of the project's preferred style.
 Validation should ask not only whether the current change works, but also whether it leaves behind a pattern worth repeating.
 
-Not every part of an agentic system should be generative.
-David Khourshid's talk [Beyond the Prompt: "Goodbye slop; welcome determinism"](https://www.youtube.com/watch?v=uMvTAF280so) argues for explicit models, state machines, and deterministic core logic around generative components.
-This gives validation a clearer target: let the model handle work that benefits from interpretation, but express business rules, state transitions, permissions, and invariants in forms that tests and tools can check repeatedly.
+## The job is to convert non-determinism into determinism
 
-> **Writing note**
->
-> Reframe this loop around the new comparison.
-> Implementation A applies it with a locally hosted single agent, implementation B repeats the same required behavior with a foundation-model single agent, and implementation C applies it through a fleet.
-> Emphasize what can be held constant across runs: the brief, acceptance checks, evidence template, and reporting units.
-> The fleet adds delegation and integration to the loop rather than representing a third kind of model.
+Simply put, the new job of a developer is to convert something that is non-deterministic into deterministic.
+This observation is at the core of how LLMs work since they rely on statistical inference meaning if you prompt them twice, likely the result will be in some way different.
+For this reason, it is a good idea to figure out how to reduce the chance that this interpretation process goes wrong.
+A part of this has to do with our technical choices and in his talk, David Khourshid ([Beyond the Prompt: "Goodbye slop; welcome determinism"](https://www.youtube.com/watch?v=uMvTAF280so)) argues using explicit models, state machines, and deterministic core logic around generative components.
+This gives validation a clearer target: let the model handle work that benefits from interpretation, but express business rules, state transitions, permissions, and invariants in forms that tests and tools can check repeatedly.
+When you codify your domain knowledge as models, they are easy to verify and more difficult for models to break.
+
+Regardless of your generation approach, it is these kinds of technical choices that will maintain the quality of your implementation and I recommend trying out different kinds of modeling techniques you might be able to find to see if they make a qualitative difference in implementation compared to pure vibe coding.
+This becomes interesting particularly in the agent fleet case as you will have multiple different types of agents evaluating your code from different directions.
 
 ## The project harness
 
@@ -119,7 +136,7 @@ It is this harness that keeps your project maintainable, and you will end up evo
 One purpose of this book is to make you aware of those practices since I had to spend a lot of time myself to discover many of them and not all are obvious.
 As you work on your project, it is a good idea to push anything repetitive to your harness.
 
-For example, my [`vibe-template`](https://github.com/bebraw/vibe-template) project separates the starter application from the harness around it.
+For example, my [vibe-template](https://github.com/bebraw/vibe-template) project separates the starter application from the harness around it.
 The Cloudflare Worker and TypeScript setup are specific implementation choices, but the reusable lesson is more general: the repository contains agent instructions, architecture rules, feature specs, decision records, setup notes, and validation commands.
 Those artifacts make it easier to start quickly without letting the codebase become a pile of undocumented accidents.
 This project comes with a ready-made process for me to pull my practices to other projects so it may be worth studying as an example.
@@ -139,25 +156,27 @@ You can have an agent to generate a lot of that and refine as needed.
 Note that local CI, mutation testing, browser automation, performance budgets, pre-push hooks, and reusable capability kits are valuable, but they are optional upgrades for groups that have a reason to add them.
 The baseline is simpler: can another student or agent clone the project, understand the intended shape, run the checks, and make a small change without guessing?
 
-## From slop to top
+## How to avoid slop?
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such.
 When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude.
 Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.
 
 It is useful to distinguish disposable code from what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve).
-A one-off program can be valuable even when nobody will maintain it.
-Code that becomes part of a shared application has a different obligation: it should leave the team and future agents able to operate, understand, and improve it.
-Implementation A belongs to this second category because an unfamiliar group will audit it and its evidence will be compared with two later implementations.
-Getting the first version to run is therefore a milestone, not the finish line.
+A one-off program can be valuable even when nobody will maintain it and there slop may be acceptable.
+Once code becomes shared with other people, higher qualitative expectations likely come with it especially if and when the code will be maintained in the future by others.
 
-Most importantly you have to be able to judge what the tools emit and where to take your project.
-A big chunk of this comes with experience, but to avoid some of the pain and speed up your personal development, it is a good idea to pick up at least some basic ideas so you don't have to go through the trouble and find the lessons on your own.
-That is the main reason why we write a big project in three stages in this book, and I'll describe the first part of the project next.
+Since agentic development can be so fast, it is easy to gain speed blindness and end up in a situation where you have to refactor your code a lot to get it under control again.
+This is exactly what good development practices can help you to avoid as you can both go fast and with good quality if you know what you are doing.
+By completing the three book projects, you will likely develop an intuition of what works and what does not when working with different types of agents.
 
-While the course project has been designed to be completed in groups, you can also complete the project alone and cut the scope for example.
-Although you can learn a lot by reading, it is hard to beat learning by doing as then you can experience the problems related to this type of development concretely.
-Therefore, I encourage developing small prototypes beyond this book as now prototyping is cheap, and you'll learn a lot in the process.
+## Summary
+
+Agentic development has changed the way web applications are built.
+In short, you can move far faster now but this ability also comes with built-in risks.
+Therefore, it is essential that you pick up strong engineering practices and develop your intuition of working with agents since that is a skill of its own.
+At best, being able to work with the machine well can work as a force multiplier allowing you to implement ideas otherwise out of your reach.
+This also means having a different attitude towards development as the shift is moving you towards a managerial position and development lead now that you have a pair or even a team of tireless agents working for you.
 
 ::: comment
 
