@@ -16,7 +16,7 @@ You will pick up ideas behind technical scaling during this process.
 
 This book captures my current understanding how to develop web applications in a scalable way and in the book I share my latest learnings about the topic.
 I finished my doctorate recently (2025) and I have been active in the scene for the past twenty years.
-Besides the doctorate, [I have completed plenty of research about the topic](https://survivejs.com/research/).
+Besides the doctorate, [I have completed plenty of research related to the topic](https://survivejs.com/research/).
 If I had been writing this book last year (2025), it would have looked quite different.
 Now in 2026 the shape of web development has changed as agent driven development through large language models has become a thing.
 I believe this has changed the way we develop web applications for good (or worse).
