@@ -1,6 +1,23 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("book reading layout", () => {
+  test("keeps chapter cards in each landing-page row the same height", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const firstPartCards = page
+      .locator(".book-part:has(.chapter-grid > li:nth-child(3))")
+      .first()
+      .locator(".chapter-grid > li > a, .chapter-grid > li > .chapter-card");
+    await expect(firstPartCards).toHaveCount(3);
+
+    const heights = await firstPartCards.evaluateAll((cards) =>
+      cards.map((card) => card.getBoundingClientRect().height),
+    );
+    expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(1);
+  });
+
   test("switches navigation views and expands demos when folded", async ({
     page,
   }) => {

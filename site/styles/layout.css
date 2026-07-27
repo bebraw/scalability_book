@@ -303,6 +303,7 @@
   border-radius: 0.35rem;
   color: var(--text);
   display: block;
+  height: 100%;
   min-height: 8rem;
   padding: 1rem;
   text-decoration: none;
