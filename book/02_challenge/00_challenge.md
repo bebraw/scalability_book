@@ -1,8 +1,10 @@
-# Reconstruct
+# Challenge
 
 Technical debt is the cost of earlier choices that make later change harder. The metaphor is useful only if we remember that debt is not automatically bad. Sometimes taking a shortcut is rational because the team is learning, time is limited, or the future is uncertain. The problem begins when the debt is invisible, unpriced, or allowed to compound until the system can no longer change safely.
 
-In this part, the course moves from building a working baseline to reconstructing it under pressure. The Construct project gives students a system that works under modest assumptions. The [Reconstruct project brief](/project/reconstruct/) asks students to implement the same behavior afresh with a foundation-model single agent, examine what changes, and compare the result with the local-model baseline.
+In this part, the course challenges the baseline from three directions: architecture makes its hidden boundaries visible, friction exposes the cost of changing it, and production pressure reveals which assumptions no longer hold. The [Reconstruct project brief](/project/reconstruct/) asks students to implement the same behavior afresh with a foundation-model single agent and compare implementation B with the local-model baseline.
+
+Students reconstruct their understanding, not the earlier codebase. Requirements and acceptance checks remain stable while the implementation and development setup provide a new architectural hypothesis.
 
 ## Chapter purpose for the part
 

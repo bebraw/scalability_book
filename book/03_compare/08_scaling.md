@@ -1,13 +1,13 @@
-# How to scale web applications?
+# How should systems respond to scaling pressure?
 
-Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change. By this point in the course, students have built a small system, inspected its friction, measured parts of it, seen how reality changes the assumptions, and used a compact scaling vocabulary during Reconstruct. This chapter should synthesize and deepen the main technical scaling techniques without turning into a catalog of cloud products.
+Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change. By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions. This chapter applies the same pressures to all three architectures before synthesizing a justified target design. It develops technical scaling techniques without turning them into a catalog of cloud products.
 
 The central claim could be: scaling is not one move. It is a sequence of trade-offs made in response to specific pressure.
 
 ## Chapter purpose
 
 - Give students a practical vocabulary for scaling web applications.
-- Connect scaling techniques to the Reconstruct project.
+- Compare how implementations A, B, and C respond to the same scaling pressures.
 - Show that scaling choices have costs in complexity, consistency, operations, and development speed.
 - Prepare the transition from application scaling to development-process fortification.
 
@@ -124,14 +124,14 @@ Important trade-offs to make explicit:
 
 ## Exercise ideas
 
-- Students choose two scaling techniques for their Reconstruct design and explain why they did not choose three others.
-- Students draw the event pipeline before and after reconstruction.
+- Students choose two scaling techniques for a justified target design and explain why they did not choose three others.
+- Students draw the event pipeline for all three implementations and for the proposed target design.
 - Students identify the first metric that would reveal overload.
 - Students explain one failure mode introduced by their own scaling design.
 
 ## Project artifact
 
-Students should revise their Reconstruct design into a scaling trade-off table. Each row should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
+Students should produce a three-way scaling comparison and one justified target design. The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed. Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
 
 ## Notes for further development
 

@@ -1,4 +1,4 @@
-# What is the architecture of the web?
+# How does web architecture shape scalability?
 
 This chapter should connect the course project to the web as an architectural environment. Students often experience web development as a collection of frameworks, libraries, and deployment platforms, but scalable web applications are shaped by older and deeper constraints: clients and servers, requests and responses, networks, latency, caches, URLs, protocols, browsers, APIs, and failure.
 

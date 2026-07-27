@@ -1,4 +1,4 @@
-# What is friction in software engineering?
+# Where does development friction come from?
 
 Friction is the resistance a team feels when trying to understand, change, test, review, deploy, or operate a system. It is the everyday experience of technical debt. A system with high friction may still be useful, but each change requires more effort than it should.
 

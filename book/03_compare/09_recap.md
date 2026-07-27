@@ -1,4 +1,4 @@
-# What have we learned?
+# What can the three implementations teach us?
 
 By the end of the course, you have constructed a working system, reconstructed it under new pressure, and deconstructed the result. The point of this sequence is not only to practice implementation. It is to see how web applications change when more people, data, traffic, features, dependencies, tools, and assumptions enter the system.
 

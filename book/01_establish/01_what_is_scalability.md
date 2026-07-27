@@ -220,7 +220,7 @@ Typical stress signals:
 - Tests are slow, flaky, or absent.
 - Old design decisions are no longer documented.
 
-Change scaling is central to this book because the project itself changes shape. Construct asks for a simple working application. Reconstruct changes the assumptions. Deconstruct asks students to explain what happened and why. A scalable system is not only one that handles more load. It is one that can survive being changed by people who did not make the original decisions.
+Change scaling is central to this book because three development systems address the same required behavior independently. Construct establishes a baseline, Reconstruct supplies a second architectural hypothesis, and Deconstruct adds a fleet-produced implementation before students compare the evidence. A scalable system is not only one that handles more load. It is one that can survive being changed by people who did not make the original decisions.
 
 Development ideas:
 

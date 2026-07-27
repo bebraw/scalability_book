@@ -1,4 +1,4 @@
-# How to coordinate agent fleets?
+# How do we coordinate agent fleets?
 
 An agent fleet is a coordinated set of agents or agent roles working on parts of a larger task. Fleets can increase throughput when work decomposes cleanly, but they also introduce coordination cost. They work only when the project itself is legible enough that agents can operate without depending on hidden human context.
 

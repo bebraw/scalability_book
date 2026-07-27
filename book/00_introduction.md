@@ -16,48 +16,48 @@ In the age of AI-driven development, understanding the concepts behind scalabili
 
 ## Structure of the book
 
-The course book is built around the three course phases: construct, reconstruct, and deconstruct. Across these phases, you build a baseline, change it under new constraints, and then inspect the evidence and trade-offs around the result. The purpose of this book is to support you as you complete these phases. With this goal in mind, I have structured the book in three matching parts: Construct, Reconstruct, and Deconstruct.
+The book follows three pedagogical moves: establish a baseline, challenge its assumptions, and compare the alternatives. Across three independent implementations of one shared web application, you will learn to recognize scaling pressure, collect comparable evidence, make architectural trade-offs, and determine when additional computational or organizational capacity creates value rather than merely more complexity.
+
+The subject of the book is scalable web applications. The three AI-assisted development setups are the experimental lens through which we study them. Application behavior remains substantially stable while the development setup changes, allowing the class to compare both application architectures and the systems used to produce them.
 
 The [course project specification](/project/) defines a bounded Work Activity Tracker that each group implements three times. The application behavior remains substantially stable while the development setup changes from a local single agent to a foundation-model single agent and then an agent fleet. The specification leaves the product interpretation, stack, architecture, storage, and interface open so groups can make and compare real engineering choices without losing the common behavioral core.
 
-**Construct:**
+**Establish:**
 
-1. How to develop in a scalable manner? -- How do the latest improvements to development techniques affect the way we develop? How can we get set with our development efforts the right way?
-2. What is scalability? -- How do we define scalability in the first place?
-3. How to benchmark and observe web applications? -- How do we define the shared workload and evidence needed to compare all three implementations?
+1. What is scalability? -- What has to remain useful as users, data, traffic, teams, and change grow?
+2. How can development remain scalable? -- How do we constrain, generate, validate, and maintain software produced with AI assistance?
+3. How do we measure and observe web applications? -- How do we define the shared workload and evidence needed to compare all three implementations?
 
-**Reconstruct:**
+**Challenge:**
 
-4. What is the architecture of the web? -- How was the web built and what kind of constraints does that give to our designs? What can the Construct implementations teach us about architecture before Reconstruct?
-5. What is friction in software engineering? -- What is friction and how to reduce it?
-6. What happens when systems face reality? -- What kind of problems might we encounter as our systems face reality and real users? How can we scale beyond a single machine?
+4. How does web architecture shape scalability? -- Which boundaries and constraints shaped implementation A, and what architectural hypothesis should guide implementation B?
+5. Where does development friction come from? -- Where does the cost of understanding, changing, testing, reviewing, and operating a system accumulate?
+6. What happens when assumptions meet reality? -- Which assumptions fail under real users, data, concurrency, failures, costs, and constraints?
 
-**Deconstruct:**
+**Compare:**
 
-7. How to coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
-8. How to scale web applications? -- What to consider when scaling our web applications? What kind of scaling techniques exist at a technical level? How does latency caused by physical constraints affect our designs?
-9. Recap -- What should we remember from the course after constructing, reconstructing, and deconstructing a scalable web application?
+7. How do we coordinate agent fleets? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
+8. How should systems respond to scaling pressure? -- How do all three implementations respond to the same pressures, and what would a justified target architecture retain or change?
+9. What can the three implementations teach us? -- What conclusions does the evidence support, and which application architecture and development workflow would we choose under stated constraints?
 
 ## Project artifacts
 
 Each chapter should help you produce or revise one concrete project artifact. By the end of the course, these artifacts should form a small engineering portfolio around your event tracking system:
 
-- Chapter 1: README, assumptions, and development process notes.
-- Chapter 2: scalability dimensions checklist.
+- Chapter 1: scalability dimensions checklist.
+- Chapter 2: README, assumptions, and development process notes.
 - Chapter 3: shared measurement protocol and Construct baseline.
 - Chapter 4: architecture reading, Construct architecture analysis, and an implementation B architecture hypothesis.
 - Chapter 5: friction audit.
 - Chapter 6: changed-assumptions and pressure map for Reconstruct.
 - Chapter 7: agent instructions, task boundaries, and review workflow.
-- Chapter 8: scaling trade-off table and revised event pipeline.
+- Chapter 8: three-way scaling comparison, target design, and scaling trade-off table.
 - Chapter 9: final evidence-based reflection.
 
 ## Notes for further development
 
-- Rewrite the opening project description around three independent implementations of one common brief rather than one implementation that is successively changed. Introduce the sequence compactly: local single agent, foundation-model single agent, then agent fleet.
-- Explain early that the application requirements stay substantially fixed while the development system changes. This is what makes comparison possible.
 - Preserve the traditional scalability thread explicitly. The three-build comparison is a way to study development scalability, but every implementation still has to be discussed in terms of users, data, traffic, failure, architecture, operations, and resource use.
 - Replace “the running project” with language that distinguishes the shared problem and acceptance suite from the three separate implementations.
 - Preview the bounded cross-team audit as the place where unfamiliar readers test setup, documentation, hidden assumptions, and change friction. Do not promise a full handover-and-return cycle.
-- Revise the artifact list after the common specification is settled. Some artifacts should be produced for every build in a comparable evidence package; others should culminate in the final cross-build analysis.
+- Revisit the artifact list after the common specification is settled. Some artifacts should be produced for every build in a comparable evidence package; others should culminate in the final cross-build analysis.
 - Use [`docs/three-build-project-direction.md`](../docs/three-build-project-direction.md) as the source of truth during this rewrite.

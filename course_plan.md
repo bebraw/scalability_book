@@ -17,23 +17,23 @@ I've listed the learning outcomes of the course below as it's vital to cover the
 
 I have sketched out the initial timeline per week/lecture below:
 
-**Construct**
+**Establish**
 
-1. Introduction to the course - course fundamentals (grading, groupwork etc.), group formation, what is scalability, get Construct started (LO1, LO3, LO6)
-2. What is scalability (LO1, LO3)
+1. What is scalability - course fundamentals (grading, groupwork etc.), group formation, define the central question, and get Construct started (LO1, LO3, LO6)
+2. Scalable development - establish the constrain, generate, validate loop and the project harness for implementation A (LO1, LO3, LO6)
 3. Benchmarking and observability - define the shared runtime workload and development-workflow evidence, complete Construct after this lecture (LO1, LO4, LO5, LO6)
 
-**Reconstruct**
+**Challenge**
 
 4. Architecture - students discuss their Construct implementations in public, use them as architecture cases, and start Reconstruct; most architecture content can be assigned as reading (LO2, LO3, LO6)
 5. Friction (LO1, LO3, LO5)
 6. Reality - discuss changed assumptions and a compact scaling bridge, then complete Reconstruct after this lecture (LO2, LO3, LO4, LO5, LO6)
 
-**Deconstruct**
+**Compare**
 
 7. Agent fleets - students discuss their Reconstruct implementations in public, consider agent coordination, and start Deconstruct (LO3, LO5, LO6)
-8. Scaling - students synthesize scaling techniques, trade-offs, and the evolution of their architecture under new pressure (LO2, LO3, LO4, LO5, LO6)
-9. Recap - students discuss their Deconstruct implementations in public, briefly recap the course, and reflect on what was learned (LO1, LO2, LO3, LO4, LO5, LO6)
+8. Scaling - students apply the same pressures to all three implementations, synthesize a justified target design, and explain its trade-offs (LO2, LO3, LO4, LO5, LO6)
+9. Comparison - students discuss their Deconstruct implementations in public, compare the evidence, and decide what architecture and development workflow they would choose under stated constraints (LO1, LO2, LO3, LO4, LO5, LO6)
 
 ## Learning outcome alignment
 
@@ -50,7 +50,7 @@ The current book and project structure covers the learning outcomes well overall
 
 ## Projects
 
-The three projects are called construct, reconstruct, and deconstruct. The next revision should frame them as three independent implementations of one common, bounded application brief. The required behavior and acceptance checks stay stable while the AI-assisted development setup changes. In short:
+The book parts are Establish, Challenge, and Compare. Within them, the three projects retain the operational labels Construct, Reconstruct, and Deconstruct. They are three independent implementations of one common, bounded application brief. The required behavior and acceptance checks stay stable while the AI-assisted development setup changes. In short:
 
 - Construct - build a working baseline with a locally hosted model and a single-agent workflow.
 - Reconstruct - build the same required behavior afresh with a foundation model and compare the process and result.

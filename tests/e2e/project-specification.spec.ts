@@ -102,12 +102,12 @@ test.describe("project specification", () => {
       page.getByRole("link", { name: "common project specification" }),
     ).toHaveAttribute("href", "/project/");
 
-    await page.goto("/parts/reconstruct/");
+    await page.goto("/parts/challenge/");
     await expect(
       page.getByRole("link", { name: "Reconstruct project brief" }),
     ).toHaveAttribute("href", "/project/reconstruct/");
 
-    await page.goto("/parts/deconstruct/");
+    await page.goto("/parts/compare/");
     await expect(
       page.getByRole("link", { name: "Deconstruct project brief" }),
     ).toHaveAttribute("href", "/project/deconstruct/");

@@ -1,6 +1,6 @@
-# What happens when systems face reality?
+# What happens when assumptions meet reality?
 
-Reality is what happens when the assumptions of the first implementation meet real users, real data, real failures, real costs, and real constraints. The Construct project intentionally starts small, but the Reconstruct project changes the environment. This chapter should help students understand why a design that was reasonable earlier can become insufficient later.
+Reality is what happens when implementation assumptions meet real users, real data, real failures, real costs, and real constraints. The common functional scope remains stable across the three builds, but shared pressure scenarios reveal where each design would become insufficient. This chapter helps students challenge implementation A while they form and evaluate the architectural hypothesis behind implementation B.
 
 The central claim could be: systems rarely fail because one textbook pattern was missing. They fail because their original assumptions no longer match their operating environment.
 
@@ -66,9 +66,9 @@ Ideas to develop:
 - Make delayed correctness explicit.
 - Design error states and recovery paths, not only successful paths.
 
-## Scaling bridge for Reconstruct
+## Scaling bridge for the comparison
 
-Before students begin Reconstruct, they need a compact vocabulary for responding to pressure. This chapter should introduce the ideas lightly, while the later scaling chapter develops them in more detail.
+Before students complete Reconstruct, they need a compact vocabulary for responding to pressure. This chapter introduces the ideas lightly; the later scaling chapter applies them consistently across all three implementations.
 
 Useful bridge concepts:
 
@@ -83,9 +83,9 @@ Useful bridge concepts:
 
 The goal is not for students to apply every technique. The goal is for them to enter Reconstruct with enough vocabulary to explain why one pressure deserves one response and not another.
 
-## Reconstruct as a change in assumptions
+## Challenging assumptions without changing the core
 
-Reconstruct should not be framed as "make the app bigger" in a vague sense. It is a disciplined response to changed assumptions:
+Reconstruct should not be framed as "make the app bigger" or as an extension of implementation A. The following shared pressure scenarios challenge both implementations without changing the common acceptance core:
 
 - many concurrent tenants, projects, groups, locations, or other domain instances,
 - tens or hundreds of thousands of users,
@@ -104,7 +104,7 @@ Students should explain which assumptions they are changing and which they are k
 
 ## Project artifact
 
-Students should produce a changed-assumptions list and a pressure map. The map should connect each new Reconstruct assumption to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
+Students should produce a challenged-assumptions list and a pressure map. The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
 
 ## Notes for further development
 

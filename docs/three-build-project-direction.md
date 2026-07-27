@@ -4,6 +4,8 @@
 
 This note records the intended direction for the course projects. It supersedes the earlier idea that groups would primarily extend, hand over, and later receive back one implementation. A first group-facing draft now lives in [`specifications/00_common_project.md`](../specifications/00_common_project.md) with phase overlays in the same folder.
 
+The book organizes this learning journey as **Establish**, **Challenge**, and **Compare**. The project overlays retain the operational names **Construct**, **Reconstruct**, and **Deconstruct** so the pedagogical movement is distinct from the three development setups.
+
 ## Direction
 
 Each group should implement the same bounded application brief three times. The core requirements and acceptance checks should remain stable enough that the results can be compared. What changes between phases is the AI-assisted development setup:

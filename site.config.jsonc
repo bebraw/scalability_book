@@ -13,15 +13,15 @@
   // until they are ready for the public site.
   "chapters": [
     "book/00_introduction.md",
-    "book/01_construct/01_scalable_development.md",
-    /*"book/01_construct/02_what_is_scalability.md",
-    "book/01_construct/03_benchmarking.md",
-    "book/02_reconstruct/04_architecture.md",
-    "book/02_reconstruct/05_friction.md",
-    "book/02_reconstruct/06_reality.md",
-    "book/03_deconstruct/07_agent_fleets.md",
-    "book/03_deconstruct/08_scaling.md",
-    "book/03_deconstruct/09_recap.md"*/
+    "book/01_establish/01_what_is_scalability.md",
+    /*"book/01_establish/02_scalable_development.md",
+    "book/01_establish/03_benchmarking.md",
+    "book/02_challenge/04_architecture.md",
+    "book/02_challenge/05_friction.md",
+    "book/02_challenge/06_reality.md",
+    "book/03_compare/07_agent_fleets.md",
+    "book/03_compare/08_scaling.md",
+    "book/03_compare/09_recap.md"*/
   ],
 
   // The course runs in three three-week parts. Each part maps to three book
@@ -29,35 +29,35 @@
   "parts": [
     {
       "number": "I",
-      "title": "Construct",
-      "description": "Use a locally hosted model through a single-agent workflow.",
-      "file": "book/01_construct/00_construct.md",
+      "title": "Establish",
+      "description": "Define scalability, build implementation A, and establish a shared evidence baseline.",
+      "file": "book/01_establish/00_establish.md",
       "chapters": [
-        "book/01_construct/01_scalable_development.md",
-        "book/01_construct/02_what_is_scalability.md",
-        "book/01_construct/03_benchmarking.md",
+        "book/01_establish/01_what_is_scalability.md",
+        "book/01_establish/02_scalable_development.md",
+        "book/01_establish/03_benchmarking.md",
       ],
     },
     {
       "number": "II",
-      "title": "Reconstruct",
-      "description": "Use a foundation model through a single-agent workflow.",
-      "file": "book/02_reconstruct/00_reconstruct.md",
+      "title": "Challenge",
+      "description": "Challenge the baseline through architecture, friction, production pressure, and implementation B.",
+      "file": "book/02_challenge/00_challenge.md",
       "chapters": [
-        "book/02_reconstruct/04_architecture.md",
-        "book/02_reconstruct/05_friction.md",
-        "book/02_reconstruct/06_reality.md",
+        "book/02_challenge/04_architecture.md",
+        "book/02_challenge/05_friction.md",
+        "book/02_challenge/06_reality.md",
       ],
     },
     {
       "number": "III",
-      "title": "Deconstruct",
-      "description": "Build through a declared agent fleet and analyze its trace.",
-      "file": "book/03_deconstruct/00_deconstruct.md",
+      "title": "Compare",
+      "description": "Build implementation C through a declared agent fleet, compare all three systems, and form an engineering judgment.",
+      "file": "book/03_compare/00_compare.md",
       "chapters": [
-        "book/03_deconstruct/07_agent_fleets.md",
-        "book/03_deconstruct/08_scaling.md",
-        "book/03_deconstruct/09_recap.md",
+        "book/03_compare/07_agent_fleets.md",
+        "book/03_compare/08_scaling.md",
+        "book/03_compare/09_recap.md",
       ],
     },
   ],
