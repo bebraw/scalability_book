@@ -1,28 +1,29 @@
 # Establish
 
-Establish defines the question the rest of the book will investigate: what does it mean for a web application—and the process used to develop it—to scale?
-The part introduces scalability as a multi-dimensional idea, gives students a disciplined AI-assisted development workflow, and establishes the evidence needed for later comparison.
+In this part of the book, we establish the idea of scalability and developing web applications in scale.
+Besides developing your first book project, you will start to think about different aspects related to scalability to form your own view of the topic.
+These learnings will come in handy in the latter parts of the book as you will rebuild your project twice but in a different way.
 
-The [Establish project brief](/project/establish/) defines implementation A and its locally hosted, single-agent constraint.
-The goal is not to create the final architecture immediately, but to produce a concrete behavioral, architectural, and measurement baseline that can later be challenged and compared.
+## Book project - Work Activity Tracker
 
-Across the part, students first define scalability, then build a first answer, and finally replace impressions with measurements.
-Fast development can be useful for prototypes, but it can also create hidden cost if the result is hard to understand, test, deploy, or modify.
+The [Establish project specification](/project/establish/) shows what you should implement during this part of the book.
+Essentially you will be implementing the book project using a single, locally hosted agent.
+As a result, you should end up with a baseline for comparison and the architecture of the application does not have to be final as you will refine it during the other two iterations as you understand the topic better.
+The key thing is to get used to agent driven development using a small model first.
 
----
+The specification leaves many decisions open deliberately, and you can customize the domain to your liking while choosing your own technical stack, rendering approach, storage, architecture, deployment path, and one specific implementation question worth investigating.
+There is no single right way to implement the project, but likely there are better and worse ways as we might learn after completing all three iterations.
 
-## Notes for further development
+Note that while you cannot transfer the implementation to the following parts of the book, you can take requirements, acceptance tests, examples, evidence templates, and any lessons you gained to them.
+In this sense, each project is a greenfield one when it comes to the implementation.
 
-- Replace the old “abundance” framing.
-  Implementation A is the locally hosted, single-agent build and establishes the behavioral and measurement baseline for the later comparisons.
-- Introduce the common specification and acceptance suite here.
-  Students should understand that they are constructing implementation A, not starting a codebase that will simply become implementations B and C.
-- Keep the scope deliberately small so local-model limitations generate useful evidence rather than preventing groups from finishing.
-- Explain which artifacts may transfer to later builds.
-  Requirements, acceptance tests, examples, evidence templates, and lessons should transfer; application code should remain separate unless the final specification says otherwise.
-- Ask students to record local hardware, model, quantization or serving configuration where relevant, latency, interventions, failed attempts, and active human time.
-  Without that context, comparisons of local-model performance will be misleading.
-- Make the benchmarking chapter operational before the implementation A deadline.
-  Every group should finish the project with the first runtime measurement and the first complete development-workflow evidence package.
-- Add the first bounded cross-team audit after the build.
-  Its output should be a short external friction report, not ownership of the codebase.
+## Implementation discovery lab
+
+Use this lab to turn the [shared specification](/project/) into a direction to explore.
+As a result, it gives you a document that you can improve further.
+
+{{ import "site/includes/project-fit-checker.html" }}
+
+## What is covered in this part of the book
+
+In this part of the book, we will first define what is scalability before focusing on scalable development, and benchmarking to generate a measured baseline to compare against as you proceed with the book projects.
