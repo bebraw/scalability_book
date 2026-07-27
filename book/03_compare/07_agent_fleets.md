@@ -70,7 +70,7 @@ If two agents need the same files, hidden assumptions, or reviewer at the same t
 
 ### Amdahl's Law and the sequential bottleneck
 
-Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel.
+Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
 If `p` is the parallelizable share of the work and `N` agents execute that share, the idealized speedup is:
 
 `S(N) = 1 / ((1 - p) + p / N)`
@@ -117,6 +117,10 @@ The fleet run maps to a workspace, delegated tasks map to work items, agents and
 By loading a transformed trace into implementation C, students turn the application into a debugging and observability tool for the workflow that produced it.
 The goal is not to build a universal agent platform.
 It is to use event history, filters, summaries, and selected relationships to find coordination failures that the final code alone does not reveal.
+
+## References
+
+::bibliography[]
 
 ---
 

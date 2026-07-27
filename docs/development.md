@@ -12,6 +12,10 @@ The file supports `//` and `/* ... */` comments.
 Markdown source files live under [book/](../book/), with each part intro next to its related chapters.
 HTMLisp templates live under [site/](../site/): page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
 
+Scientific references live in [bibliography.bib](../bibliography.bib).
+Use `:cite[key]` for a parenthetical citation or `:citet[key]` when the authors form part of the sentence, and place `::bibliography[]` under a `## References` heading in each chapter that cites sources.
+The build fails when a citation key is missing from the bibliography.
+
 To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
 
 ```md
@@ -43,7 +47,7 @@ In this mode, all Markdown files referenced by `parts` are shown regardless of t
 Development output is kept in `.dev-build/`, separate from the production `build/` directory.
 You can therefore build or preview the published site without removing draft chapter routes from a running development server.
 
-The development server watches `book/`, `site/`, the site build helpers, and `site.config.jsonc`.
+The development server watches `book/`, `site/`, the site build helpers, `bibliography.bib`, and `site.config.jsonc`.
 Saving CSS hot-swaps the generated stylesheets without losing page state.
 Markdown, template, configuration, and browser-script changes rebuild `.dev-build/` and automatically reload the page after the atomic output swap.
 

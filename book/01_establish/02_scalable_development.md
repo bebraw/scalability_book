@@ -27,7 +27,7 @@ This does not mean vibe coding cannot be useful as a prototyping technique, but 
 
 It turns out, to get most out of agentic development, you will need a certain amount of discipline.
 That is the main reason why it is important to understand technical details as in what should good architecture look like and how to develop software sustainably.
-In [Shift-Up: A Framework for Software Engineering Guardrails in AI-native Software Development - Initial Findings](https://arxiv.org/html/2604.20436v1), Lipsanen et al. consider this issue and propose structured development as an alternative to unstructured vibe coding.
+:citet[lipsanen2026shiftup] consider this issue and propose structured development as an alternative to unstructured vibe coding.
 On top of structured development, the authors propose the Shift-Up approach that trades development speed for human control.
 Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
 The question is what values we want to emphasize.
@@ -177,6 +177,10 @@ In short, you can move far faster now but this ability also comes with built-in 
 Therefore, it is essential that you pick up strong engineering practices and develop your intuition of working with agents since that is a skill of its own.
 At best, being able to work with the machine well can work as a force multiplier allowing you to implement ideas otherwise out of your reach.
 This also means having a different attitude towards development as the shift is moving you towards a managerial position and development lead now that you have a pair or even a team of tireless agents working for you.
+
+## References
+
+::bibliography[]
 
 ::: comment
 

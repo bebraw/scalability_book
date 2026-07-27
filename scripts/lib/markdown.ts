@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { Cite } from "@citation-js/core";
+import "@citation-js/plugin-csl";
 import { fromHtml } from "hast-util-from-html";
 import highlight from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
@@ -16,6 +18,7 @@ import {
   toHtml,
   type Diagnostic,
   type RenderedHeading,
+  type SyncCitationFormatter,
 } from "scholarmark";
 import type {
   Element as HastElement,
@@ -50,9 +53,39 @@ highlight.registerLanguage("xml", xml);
 highlight.registerLanguage("yaml", yaml);
 highlight.registerLanguage("yml", yaml);
 
+const cslOptions = {
+  format: "text",
+  lang: "en-US",
+  template: "apa",
+};
+const citationFormatter: SyncCitationFormatter = {
+  formatCitation(entry, { mode }) {
+    const cite = new Cite([entry.data]);
+    if (mode === "full") {
+      return cite.format("bibliography", cslOptions).trim();
+    }
+    if (mode === "textual") {
+      const author = cite.format("citation", {
+        ...cslOptions,
+        entry: [{ id: entry.id, "author-only": true }],
+      });
+      const date = cite.format("citation", {
+        ...cslOptions,
+        entry: [{ id: entry.id, "suppress-author": true }],
+      });
+      return `${author} ${date}`;
+    }
+    return withoutParentheses(cite.format("citation", cslOptions));
+  },
+  formatBibliography(entry) {
+    return new Cite([entry.data]).format("bibliography", cslOptions).trim();
+  },
+};
+
 export function renderMarkdown(
   source: string,
   chapter: MarkdownChapter,
+  bibliographySource = "",
 ): RenderedMarkdown {
   source = getPublicMarkdownSource(source);
   const prepared = prepareMarkdownImports(source);
@@ -60,7 +93,8 @@ export function renderMarkdown(
     headingNumbersByOffset(prepared.source),
     chapter.number,
   );
-  const rendered = renderTreeSync(prepared.source, "", "apa", {
+  const rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
+    citationFormatter,
     headingNumbers,
   });
   throwOnMarkdownErrors(prepared.source, rendered.diagnostics);
@@ -76,6 +110,12 @@ export function renderMarkdown(
     content: toHtml(rendered.tree),
     tableOfContents,
   };
+}
+
+function withoutParentheses(value: string): string {
+  return value.startsWith("(") && value.endsWith(")")
+    ? value.slice(1, -1)
+    : value;
 }
 
 export function getPublicMarkdownSource(source: string): string {
@@ -244,8 +284,52 @@ function decorateElement(
     decorateLink(element);
   }
 
+  if (element.tagName === "button" && hasClass(element, "semantic-citation")) {
+    decorateStaticCitation(element);
+  }
+
+  if (element.tagName === "ol" && hasClass(element, "semantic-bibliography")) {
+    linkBibliographyUrls(element);
+  }
+
   if (element.tagName === "code" && isElement(parent, "pre")) {
     decorateCode(element);
+  }
+}
+
+function decorateStaticCitation(citation: HastElement): void {
+  citation.tagName = "span";
+  delete citation.properties.ariaLabel;
+  delete citation.properties.type;
+}
+
+function linkBibliographyUrls(bibliography: HastElement): void {
+  for (const entry of bibliography.children) {
+    if (entry.type !== "element" || entry.tagName !== "li") {
+      continue;
+    }
+
+    const text = entry.children[0];
+    if (!text || text.type !== "text") {
+      continue;
+    }
+
+    const match = text.value.match(/^(.*?)(https:\/\/\S+)$/);
+    const prefix = match?.[1];
+    const url = match?.[2];
+    if (prefix === undefined || url === undefined) {
+      continue;
+    }
+
+    entry.children = [
+      { type: "text", value: prefix },
+      {
+        type: "element",
+        tagName: "a",
+        properties: { href: url },
+        children: [{ type: "text", value: url }],
+      },
+    ];
   }
 }
 

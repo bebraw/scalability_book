@@ -47,6 +47,19 @@ test.describe("book reading layout", () => {
     expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(1);
   });
 
+  test("renders scientific citations and the chapter bibliography", async ({
+    page,
+  }) => {
+    await page.goto("/chapters/scalable-development/");
+
+    const citation = page.locator(".semantic-citation").first();
+    await expect(citation).toContainText("Lipsanen et al.");
+    await expect(page.locator(".semantic-bibliography")).toContainText(
+      "Shift-Up",
+    );
+    await expect(page.locator("button.semantic-citation")).toHaveCount(0);
+  });
+
   test("switches navigation views and expands demos when folded", async ({
     page,
   }) => {

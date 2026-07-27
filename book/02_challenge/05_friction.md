@@ -33,7 +33,7 @@ Possible subsections:
 > Developer experience has an indirect resource cost.
 
 This cost can be measured even when the final behavior is unchanged.
-Trivedi and Schmitt's controlled study, [Does Code Cleanliness Affect Coding Agents?](https://arxiv.org/abs/2605.20049), compared matched clean and deliberately degraded repositories across 660 agent trials.
+:citet[trivedi2026cleanliness] compared matched clean and deliberately degraded repositories across 660 agent trials.
 Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often.
 The result does not show that every clean-code rule improves every task, but it supports a narrower and useful claim: maintainability affects the operational footprint of agentic development, not only human preference.
 
@@ -94,6 +94,10 @@ Possible techniques:
 
 Students should produce a friction audit.
 It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before building implementation B.
+
+## References
+
+::bibliography[]
 
 ## Notes for further development
 

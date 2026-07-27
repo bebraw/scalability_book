@@ -1,19 +1,24 @@
 # Scholarmark integration report
 
-Status: upstream change request
+Status: implemented upstream and integrated by the consumer
 
 Consumer: [bebraw/scalability_book](https://github.com/bebraw/scalability_book)
 
 Upstream: [bebraw/scholarmark](https://github.com/bebraw/scholarmark)
 
-Tested package: `scholarmark@0.1.0`
+Originally tested package: `scholarmark@0.1.0`
+
+Integrated package: `scholarmark@0.2.0`
+
+The requested sanitized-HAST and rendered-heading APIs shipped in `0.2.0` and now power the book renderer.
+The remainder of this document preserves the original upstream request and its rationale for reference.
 
 ## Summary
 
 Scholarmark is a strong fit for the book's long-term Markdown pipeline.
 It already covers the shared portable comment syntax and adds structured citations, cross-references, bibliography placement, heading numbering, GFM, diagnostics, and sanitized output.
 
-A direct replacement of the book's current `marked` renderer is not yet practical because the book adds trusted host behavior after Markdown parsing.
+At the time of the request, a direct replacement of the book's `marked` renderer was not practical because the book adds trusted host behavior after Markdown parsing.
 That behavior includes interactive teaching demos, paragraph feedback controls, heading anchors, syntax highlighting, external-link attributes, and sidebar table-of-contents data.
 
 The smallest general-purpose upstream change is to expose the sanitized HAST before it is stringified.
@@ -44,7 +49,7 @@ It performs the following work:
 - Adds `target="_blank" rel="noreferrer"` to external links.
 
 The content currently contains 13 trusted HTML demo imports across nine Markdown files.
-There is not yet a BibTeX bibliography or authored Scholarmark citation syntax, so citations can be adopted after renderer parity is established.
+Scientific sources now live in a shared BibTeX bibliography and chapters use Scholarmark's structured citation and bibliography syntax.
 
 ## Compatibility findings
 
@@ -185,20 +190,20 @@ Field semantics:
 - Heading markup, inline code, and character entities produce a plain-text title suitable for navigation.
 - Async and sync results contain identical heading metadata.
 
-## Consumer migration after upstream support
+## Implemented consumer migration
 
-Once both APIs are available, the book can migrate behind its existing `renderMarkdown()` interface:
+The book migrated behind its existing `renderMarkdown()` interface as follows:
 
 1. Preserve the author-only-note preprocessing step.
 2. Replace trusted HTML imports with unique inert placeholders before Scholarmark parsing.
-3. Call `renderHastSync()` with chapter-prefixed `headingNumbers`.
+3. Call `renderTreeSync()` with chapter-prefixed `headingNumbers` and the shared bibliography.
 4. Fail the production build when Scholarmark returns an error diagnostic and report the source filename and line.
 5. Traverse the returned sanitized HAST to replace only known import placeholders with parsed repository-local HTML.
 6. Add stable paragraph IDs and feedback controls using the existing source-position annotations.
 7. Add heading anchors, external-link attributes, and Highlight.js token markup.
 8. Stringify the host-extended tree.
 9. Adapt `RenderedHeading[]` to the existing sidebar table-of-contents type.
-10. Add a bibliography file and migrate research links to Scholarmark citations in separate content changes.
+10. Add a bibliography file and migrate research links to Scholarmark citations.
 
 This sequence keeps all current site behavior while making Scholarmark the single parser and semantic validator.
 
@@ -231,4 +236,4 @@ The work can be reviewed as two independent changes:
 1. **Expose sanitized HAST rendering APIs.** Refactor HTML rendering to build on the new shared result while preserving current output and security tests.
 2. **Return rendered heading metadata.** Collect metadata during the existing heading transform and add it to all render results.
 
-The book integration should begin only after both changes are released, avoiding a temporary HTML reparsing adapter or a second heading implementation.
+The book integration began after both changes were released, avoiding a temporary HTML reparsing adapter or a second heading implementation.

@@ -23,6 +23,10 @@ const buildDir = path.resolve(root, process.env.BUILD_DIR || "build");
 const siteDir = path.join(root, "site");
 const includeAllChapters = process.argv.includes("--all-chapters");
 const includeEditor = process.argv.includes("--editable");
+const bibliographySource = await readFile(
+  path.join(root, "bibliography.bib"),
+  "utf8",
+);
 const config = parseJsonc(
   await readFile(path.join(root, "site.config.jsonc"), "utf8"),
 );
@@ -230,7 +234,7 @@ const projectSpecifications = await Promise.all(
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
-  const rendered = renderMarkdown(page.source, page);
+  const rendered = renderMarkdown(page.source, page, bibliographySource);
   const previous = bookPages[index - 1];
   const next = bookPages[index + 1];
   const pageScripts = [
@@ -272,6 +276,7 @@ for (let index = 0; index < projectSpecifications.length; index++) {
   const rendered = renderMarkdown(
     rewriteProjectSpecificationLinks(specification.source),
     { number: "" },
+    bibliographySource,
   );
   const previous = projectSpecifications[index - 1];
   const next = projectSpecifications[index + 1];
@@ -297,7 +302,11 @@ for (let index = 0; index < projectSpecifications.length; index++) {
   );
 }
 
-const demoGalleryHeading = renderMarkdown("# Demo showcase", { number: "" });
+const demoGalleryHeading = renderMarkdown(
+  "# Demo showcase",
+  { number: "" },
+  bibliographySource,
+);
 const demoGallery = `${demoGalleryHeading.content}\n${resolveTrustedHtmlImports(getDemoGalleryHtml())}`;
 await writePage(
   "demos/index.html",

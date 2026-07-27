@@ -44,11 +44,11 @@ Students should be able to explain why a chosen technique fits the pressure, wha
 A scaling technique should respond to an identified limit.
 Formal models help students state that limit precisely enough to challenge their own intuition:
 
-- **Little's Law** connects arrival rate, time in the system, and average work in progress.
+- **Little's Law** connects arrival rate, time in the system, and average work in progress :citep[little1961proof].
   It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
-- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential.
+- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential :citep[amdahl1967validity].
   It applies to request paths, batch processing, deployments, and agent workflows.
-- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs.
+- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs :citep[gunther2008scalability].
   It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
 
 The project does not require every model.
@@ -176,6 +176,10 @@ Students should produce a three-way scaling comparison and one justified target 
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
 It should include one formal model applied to an application decision and one applied to the development workflow.
 Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
+
+## References
+
+::bibliography[]
 
 ## Notes for further development
 

@@ -32,6 +32,8 @@
     "ios_saf >= 13"
   ],
   "dependencies": {
+    "@citation-js/core": "0.8.2",
+    "@citation-js/plugin-csl": "0.8.2",
     "@ngrok/webernetes": "0.1.5",
     "@tailwindcss/typography": "0.5.19",
     "easymde": "2.20.0",

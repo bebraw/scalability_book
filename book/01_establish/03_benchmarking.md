@@ -32,7 +32,11 @@ It is for this reason learning chaos engineering can be useful since it tests ex
 > **Sustainability angle**
 >
 > It turns out measuring the energy consumption of web applications is difficult.
-> You can learn more about the topic from the article [Challenges Related to Approximating the Energy Consumption of a Website](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=11115034).
+> You can learn more about the topic from the article _Challenges Related to Approximating the Energy Consumption of a Website_ :citep[kalliola2025energy].
+
+## References
+
+::bibliography[]
 
 ::: comment
 
@@ -47,7 +51,7 @@ Possible event tracking benchmarks:
 ### From measurements to Little's Law
 
 Measurements become more useful when they can be connected through a model.
-Little's Law states that, for a stable system over a suitable observation period, the average number of items in the system equals their average arrival rate multiplied by their average time in the system:
+Little's Law states that, for a stable system over a suitable observation period, the average number of items in the system equals their average arrival rate multiplied by their average time in the system :citep[little1961proof]:
 
 `L = λW`
 
@@ -146,7 +150,7 @@ Build that diagnostic path from the cheapest reliable checks upward:
 
 LLM judges can favor an answer because of its position, length, or similarity to the judge's own style rather than because it is correct.
 These are properties of the measurement instrument, so changing to a more capable judge does not remove the need for calibration.
-The paper [Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685) documents several of these biases and mitigation strategies.
+The paper _Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena_ documents several of these biases and mitigation strategies :citep[zheng2023mtbench].
 
 [Your Evals Are Lying To You](https://github.com/TejasQ/basically-agent-evals) provides a compact TypeScript companion for this progression.
 Its useful core for this course is the path from a dataset and checker to judge-bias experiments, deterministic probes, failing-row inspection, and a CI gate.

@@ -64,6 +64,20 @@
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
+.prose .semantic-citation {
+  color: var(--accent-strong);
+  white-space: nowrap;
+}
+.prose .semantic-bibliography {
+  margin: 0 0 2rem;
+  max-width: 66ch;
+  padding-inline-start: 1.6em;
+}
+.prose .semantic-bibliography li {
+  font-size: 0.96em;
+  margin-bottom: 0.8em;
+  padding-inline-start: 0.35em;
+}
 .heading-anchor {
   color: var(--muted);
   font-family: var(--font-ui);

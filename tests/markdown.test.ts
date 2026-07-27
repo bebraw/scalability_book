@@ -69,3 +69,62 @@ test("unclosed Markdown comment blocks fail with the opening line", () => {
     /Unclosed Markdown comment block starting at line 3/,
   );
 });
+
+test("citations use the shared bibliography and render as static text", () => {
+  const bibliography = `@article{little1961,
+  author = {Little, John D. C.},
+  title = {A Proof for the Queuing Formula},
+  year = {1961}
+}`;
+  const rendered = renderMarkdown(
+    `# Chapter
+
+As :citet[little1961] showed, the relationship is stable.
+
+## References
+
+::bibliography[]
+`,
+    { number: "2" },
+    bibliography,
+  );
+
+  assert.match(rendered.content, /class="semantic-citation"/);
+  assert.match(rendered.content, /Little \(1961\)/);
+  assert.match(rendered.content, /class="semantic-bibliography"/);
+  assert.doesNotMatch(rendered.content, /<button[^>]+semantic-citation/);
+});
+
+test("bibliography URLs remain clickable", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+Earlier work established the relationship :cite[little1961].
+
+## References
+
+::bibliography[]
+`,
+    { number: "2" },
+    `@article{little1961,
+  author = {Little, John D. C.},
+  title = {A Proof for the Queuing Formula},
+  year = {1961},
+  url = {https://doi.org/10.1287/opre.9.3.383}
+}`,
+  );
+
+  assert.match(
+    rendered.content,
+    /href="https:\/\/doi\.org\/10\.1287\/opre\.9\.3\.383"/,
+  );
+  assert.match(rendered.content, /target="_blank"/);
+});
+
+test("unknown citation keys fail the build", () => {
+  assert.throws(
+    () =>
+      renderMarkdown("# Chapter\n\nMissing :cite[unknown].", { number: "2" }),
+    /Missing citation: unknown/,
+  );
+});
