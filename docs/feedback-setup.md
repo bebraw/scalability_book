@@ -2,10 +2,13 @@
 
 This site has two feedback modes:
 
-- Production feedback runs in the Cloudflare Worker. Students sign in with GitHub and comments are stored in Cloudflare KV.
-- Local feedback runs in `npm run dev`. It stores comments in `.local/comments.json` so you can review and resolve comments while editing chapters locally.
+- Production feedback runs in the Cloudflare Worker.
+  Students sign in with GitHub and comments are stored in Cloudflare KV.
+- Local feedback runs in `npm run dev`.
+  It stores comments in `.local/comments.json` so you can review and resolve comments while editing chapters locally.
 
-Resolved local comments are synced back to Cloudflare KV with an explicit command. Local editing does not silently write to production.
+Resolved local comments are synced back to Cloudflare KV with an explicit command.
+Local editing does not silently write to production.
 
 ## 1. Create GitHub OAuth App
 
@@ -20,7 +23,8 @@ After creation, keep these values:
 - Client ID
 - Client secret
 
-The Worker uses GitHub only for identity. It requests the `read:user` scope.
+The Worker uses GitHub only for identity.
+It requests the `read:user` scope.
 
 ## 2. Create Cloudflare KV Namespace
 
@@ -30,7 +34,8 @@ Create the KV namespace:
 npx wrangler kv namespace create COMMENTS_KV
 ```
 
-Wrangler prints an `id`. Add that binding to `wrangler.jsonc`:
+Wrangler prints an `id`.
+Add that binding to `wrangler.jsonc`:
 
 ```jsonc
 "kv_namespaces": [
@@ -41,7 +46,8 @@ Wrangler prints an `id`. Add that binding to `wrangler.jsonc`:
 ],
 ```
 
-Keep the namespace id as well. The local sync commands can use it directly.
+Keep the namespace id as well.
+The local sync commands can use it directly.
 
 ## 3. Configure Worker Secrets And Vars
 
@@ -58,7 +64,8 @@ Use these meanings:
 
 - `GITHUB_CLIENT_ID`: GitHub OAuth App client id.
 - `GITHUB_CLIENT_SECRET`: GitHub OAuth App client secret.
-- `SESSION_SECRET`: long random string used to sign login cookies. Generate one with `openssl rand -base64 32`.
+- `SESSION_SECRET`: long random string used to sign login cookies.
+  Generate one with `openssl rand -base64 32`.
 - `ADMIN_GITHUB_LOGINS`: comma-separated GitHub usernames that can resolve comments, for example `juhovepsalainen`.
 
 `ADMIN_GITHUB_LOGINS` can also be a plain Worker var, but keeping it as a secret is fine.
@@ -102,9 +109,13 @@ Students use the deployed site:
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 
-Students can see their own comments after posting and any admin replies to those comments. They cannot see comments from other students. Students may choose to show an individual comment as anonymous in the teacher-facing UI; the underlying GitHub identity remains stored in KV for abuse handling. Admin users can see all comments and can feature curated reader notes for public display.
+Students can see their own comments after posting and any admin replies to those comments.
+They cannot see comments from other students.
+Students may choose to show an individual comment as anonymous in the teacher-facing UI; the underlying GitHub identity remains stored in KV for abuse handling.
+Admin users can see all comments and can feature curated reader notes for public display.
 
-Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs. These are stored as chapter-level feedback.
+Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs.
+These are stored as chapter-level feedback.
 
 Admins can use the feedback view selector in the navigation header to preview three modes:
 
@@ -112,9 +123,11 @@ Admins can use the feedback view selector in the navigation header to preview th
 - `Student view`: the comments visible to the logged-in account as a regular student
 - `Public view`: featured reader notes visible to anonymous readers
 
-In `Admin view`, moderation controls are available in paragraph feedback threads. The `Export` button downloads a Markdown summary for the current chapter.
+In `Admin view`, moderation controls are available in paragraph feedback threads.
+The `Export` button downloads a Markdown summary for the current chapter.
 
-In local editing mode, admins can promote a featured note into the chapter Markdown as a clarification block. Promotion appends the clarification to the chapter source and uses the local editor API, so it is not available on the deployed read-only site.
+In local editing mode, admins can promote a featured note into the chapter Markdown as a clarification block.
+Promotion appends the clarification to the chapter source and uses the local editor API, so it is not available on the deployed read-only site.
 
 ## 6. Local Review Flow
 
@@ -130,7 +143,8 @@ Start the local editable site:
 npm run dev
 ```
 
-In local mode, the site signs you in as `local-editor` and treats you as an admin. Reply, feature, resolve with a reason, or hide comments from the page feedback threads while editing chapters.
+In local mode, the site signs you in as `local-editor` and treats you as an admin.
+Reply, feature, resolve with a reason, or hide comments from the page feedback threads while editing chapters.
 
 Local feedback state is stored in:
 
@@ -148,7 +162,8 @@ After replying, featuring, resolving, or hiding comments locally, push moderatio
 npm run comments:push -- --namespace-id <comments-kv-namespace-id>
 ```
 
-This command only copies local moderation fields and admin replies to matching remote comments. It does not overwrite comment bodies and does not delete remote comments.
+This command only copies local moderation fields and admin replies to matching remote comments.
+It does not overwrite comment bodies and does not delete remote comments.
 
 To push local moderation state and then refresh `.local/comments.json` from KV:
 

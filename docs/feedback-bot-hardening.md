@@ -1,6 +1,8 @@
 # Feedback Bot Hardening
 
-The GitHub login flow is suitable for student identity, but it is not a complete spam defense by itself. Any authenticated GitHub account can currently post feedback. Keep the OAuth flow as the identity layer and add abuse controls around the write endpoints.
+The GitHub login flow is suitable for student identity, but it is not a complete spam defense by itself.
+Any authenticated GitHub account can currently post feedback.
+Keep the OAuth flow as the identity layer and add abuse controls around the write endpoints.
 
 ## Phase 1: Rate Limit Authenticated Writes
 

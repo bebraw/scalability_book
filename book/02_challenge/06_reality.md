@@ -1,8 +1,11 @@
 # What happens when assumptions meet reality?
 
-Reality is what happens when implementation assumptions meet real users, real data, real failures, real costs, and real constraints. The common functional scope remains stable across the three builds, but shared pressure scenarios reveal where each design would become insufficient. This chapter helps students challenge implementation A while they form and evaluate the architectural hypothesis behind implementation B.
+Reality is what happens when implementation assumptions meet real users, real data, real failures, real costs, and real constraints.
+The common functional scope remains stable across the three builds, but shared pressure scenarios reveal where each design would become insufficient.
+This chapter helps students challenge implementation A while they form and evaluate the architectural hypothesis behind implementation B.
 
-The central claim could be: systems rarely fail because one textbook pattern was missing. They fail because their original assumptions no longer match their operating environment.
+The central claim could be: systems rarely fail because one textbook pattern was missing.
+They fail because their original assumptions no longer match their operating environment.
 
 ## Chapter purpose
 
@@ -24,7 +27,8 @@ Possible subsections:
 
 > **Sustainability angle**
 >
-> Production reality often reveals waste that local development hides: retries, bots, polling dashboards, failed jobs, duplicated events, abandoned data, and oversized logs. Systems that can back off, deduplicate, expire data, and shed load are often both more reliable and less wasteful.
+> Production reality often reveals waste that local development hides: retries, bots, polling dashboards, failed jobs, duplicated events, abandoned data, and oversized logs.
+> Systems that can back off, deduplicate, expire data, and shed load are often both more reliable and less wasteful.
 
 ## The event tracking system under pressure
 
@@ -48,11 +52,13 @@ Each scenario can be used to ask:
 
 ### Pressure map lab
 
-The demonstration below turns changed assumptions into a pressure map. The goal is to connect a new reality to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and a response that fits the pressure.
+The demonstration below turns changed assumptions into a pressure map.
+The goal is to connect a new reality to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and a response that fits the pressure.
 
 {{ import "site/includes/pressure-map-demo.html" }}
 
-Use this before choosing scaling techniques. If the pressure is unclear, the response is likely to be fashionable rather than useful.
+Use this before choosing scaling techniques.
+If the pressure is unclear, the response is likely to be fashionable rather than useful.
 
 ## Designing from failure
 
@@ -68,7 +74,8 @@ Ideas to develop:
 
 ## Scaling bridge for the comparison
 
-Before students complete implementation B, they need a compact vocabulary for responding to pressure. This chapter introduces the ideas lightly; the later scaling chapter applies them consistently across all three implementations.
+Before students complete implementation B, they need a compact vocabulary for responding to pressure.
+This chapter introduces the ideas lightly; the later scaling chapter applies them consistently across all three implementations.
 
 Useful bridge concepts:
 
@@ -81,11 +88,13 @@ Useful bridge concepts:
 - **Graceful degradation**: decide what can be delayed, approximated, or temporarily disabled.
 - **Operational signals**: define which metric would show overload first.
 
-The goal is not for students to apply every technique. The goal is for them to complete implementation B with enough vocabulary to explain why one pressure deserves one response and not another.
+The goal is not for students to apply every technique.
+The goal is for them to complete implementation B with enough vocabulary to explain why one pressure deserves one response and not another.
 
 ## Challenging assumptions without changing the core
 
-Implementation B should not be framed as "make the app bigger" or as an extension of implementation A. The following shared pressure scenarios challenge both implementations without changing the common acceptance core:
+Implementation B should not be framed as "make the app bigger" or as an extension of implementation A.
+The following shared pressure scenarios challenge both implementations without changing the common acceptance core:
 
 - many concurrent tenants, projects, groups, locations, or other domain instances,
 - tens or hundreds of thousands of users,
@@ -93,7 +102,8 @@ Implementation B should not be framed as "make the app bigger" or as an extensio
 - expected failures,
 - eventual correctness over immediate accuracy.
 
-Students should explain which assumptions they are changing and which they are keeping. A good reconstruction makes trade-offs visible instead of trying to solve every possible future problem.
+Students should explain which assumptions they are changing and which they are keeping.
+A good reconstruction makes trade-offs visible instead of trying to solve every possible future problem.
 
 ## Exercise ideas
 
@@ -104,15 +114,18 @@ Students should explain which assumptions they are changing and which they are k
 
 ## Project artifact
 
-Students should produce a challenged-assumptions list and a pressure map. The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
+Students should produce a challenged-assumptions list and a pressure map.
+The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
 
 ## Notes for further development
 
 - Add a concise incident narrative that can be reused in lecture.
 - Connect this chapter to benchmarking: measurement reveals some forms of reality before users do.
 - Connect this chapter to scaling: the next part should introduce specific techniques only after the pressure is clear.
-- Keep changed assumptions as a shared thought experiment or pressure test applied to all three implementations. Do not make them a license to change the common functional scope of implementation B.
-- Distinguish the immutable acceptance core from scalability scenarios. The implementation must satisfy the former; students use the latter to explain what would fail and how the architecture could respond.
+- Keep changed assumptions as a shared thought experiment or pressure test applied to all three implementations.
+  Do not make them a license to change the common functional scope of implementation B.
+- Distinguish the immutable acceptance core from scalability scenarios.
+  The implementation must satisfy the former; students use the latter to explain what would fail and how the architecture could respond.
 - Ask students to compare whether the local and foundation-model implementations exposed different failure assumptions, and whether those differences came from architecture, generated defaults, or team decisions.
 - Preserve identical pressure-map headings across phases so the final analysis can compare event volume, concurrency, storage growth, retries, partial failure, and eventual correctness directly.
 - Add one prompt about development reality: what happens when model access, latency, privacy requirements, cost, or human review capacity changes?

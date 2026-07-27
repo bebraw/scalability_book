@@ -1,12 +1,17 @@
 # What can the three implementations teach us?
 
-By the end of the course, you have established a baseline, challenged its assumptions through a second implementation, and compared both with a fleet-produced third implementation. The point of this sequence is not only to practice implementation. It is to see how web applications and their development systems respond when more people, data, traffic, features, dependencies, tools, and assumptions enter the picture.
+By the end of the course, you have established a baseline, challenged its assumptions through a second implementation, and compared both with a fleet-produced third implementation.
+The point of this sequence is not only to practice implementation.
+It is to see how web applications and their development systems respond when more people, data, traffic, features, dependencies, tools, and assumptions enter the picture.
 
-The central claim could be: scalability is the ability to keep a system useful while the conditions around it change. That includes technical capacity, but it also includes architecture, feedback loops, team coordination, and the way AI-assisted development is governed.
+The central claim could be: scalability is the ability to keep a system useful while the conditions around it change.
+That includes technical capacity, but it also includes architecture, feedback loops, team coordination, and the way AI-assisted development is governed.
 
 > **Sustainability angle**
 >
-> A scalable system should not only survive growth. It should use resources deliberately. The final reflection should ask whether the project handles more work efficiently or merely pushes more computation, storage, bandwidth, and human attention into the problem.
+> A scalable system should not only survive growth.
+> It should use resources deliberately.
+> The final reflection should ask whether the project handles more work efficiently or merely pushes more computation, storage, bandwidth, and human attention into the problem.
 
 ## Chapter purpose
 
@@ -23,11 +28,17 @@ The three projects give the course its shape:
 2. **[Challenge](/project/challenge/) — implementation B:** build the same required behavior afresh with a foundation-model single agent.
 3. **[Compare](/project/compare/) — implementation C:** build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
 
-The first working version is not the final design. It is one implementation produced by one development system. The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human. Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
+The first working version is not the final design.
+It is one implementation produced by one development system.
+The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human.
+Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
 
 ## Scalable development
 
-Scalable development begins before traffic grows. A project scales better when its structure, commands, tests, naming, documentation, and interfaces make change easier to understand. AI-assisted development makes this more visible because agents are sensitive to unclear context. If the project is hard for an agent to navigate, it is often hard for a new human contributor too.
+Scalable development begins before traffic grows.
+A project scales better when its structure, commands, tests, naming, documentation, and interfaces make change easier to understand.
+AI-assisted development makes this more visible because agents are sensitive to unclear context.
+If the project is hard for an agent to navigate, it is often hard for a new human contributor too.
 
 Reflection prompts:
 
@@ -38,7 +49,10 @@ Reflection prompts:
 
 ## Scalability as a multi-dimensional idea
 
-Scalability is not a synonym for performance. A system can scale users, data, teams, change, operations, and cost in different ways. It can also fail to scale in one dimension while doing well in another. A design that handles more requests but becomes impossible to modify is only partially scalable.
+Scalability is not a synonym for performance.
+A system can scale users, data, teams, change, operations, and cost in different ways.
+It can also fail to scale in one dimension while doing well in another.
+A design that handles more requests but becomes impossible to modify is only partially scalable.
 
 Reflection prompts:
 
@@ -49,7 +63,9 @@ Reflection prompts:
 
 ## Web architecture
 
-The web gives us useful constraints: clients and servers, requests and responses, URLs, HTTP methods, caches, APIs, databases, and asynchronous work. These are not just implementation details. They shape what can be evolved independently and what becomes coupled.
+The web gives us useful constraints: clients and servers, requests and responses, URLs, HTTP methods, caches, APIs, databases, and asynchronous work.
+These are not just implementation details.
+They shape what can be evolved independently and what becomes coupled.
 
 Reflection prompts:
 
@@ -60,7 +76,9 @@ Reflection prompts:
 
 ## Friction and technical debt
 
-Technical debt is not only messy code. It is anything that makes future work slower, riskier, or less understandable. Friction appears in setup, unclear ownership, slow tests, hidden assumptions, missing observability, brittle dependencies, and code that resists change.
+Technical debt is not only messy code.
+It is anything that makes future work slower, riskier, or less understandable.
+Friction appears in setup, unclear ownership, slow tests, hidden assumptions, missing observability, brittle dependencies, and code that resists change.
 
 Reflection prompts:
 
@@ -71,7 +89,10 @@ Reflection prompts:
 
 ## Measurement and observability
 
-Without measurement, scalability discussions become guesses. Benchmarking, logs, metrics, traces, and useful errors make system behavior visible. Good measurement does not mean measuring everything. It means choosing evidence that answers a specific question.
+Without measurement, scalability discussions become guesses.
+Benchmarking, logs, metrics, traces, and useful errors make system behavior visible.
+Good measurement does not mean measuring everything.
+It means choosing evidence that answers a specific question.
 
 Reflection prompts:
 
@@ -82,7 +103,9 @@ Reflection prompts:
 
 ## Reality and changing assumptions
 
-Systems meet reality when users behave unexpectedly, data grows, traffic spikes, dependencies fail, teams misunderstand each other, or old assumptions stop holding. The Challenge part makes this normal mismatch explicit and applies the same pressure scenarios to independent implementations. A scalable system is designed to adapt when assumptions change.
+Systems meet reality when users behave unexpectedly, data grows, traffic spikes, dependencies fail, teams misunderstand each other, or old assumptions stop holding.
+The Challenge part makes this normal mismatch explicit and applies the same pressure scenarios to independent implementations.
+A scalable system is designed to adapt when assumptions change.
 
 Reflection prompts:
 
@@ -93,7 +116,10 @@ Reflection prompts:
 
 ## Agent fleets and project readiness
 
-Agentic development scales only when work is bounded and reviewable. More agents do not automatically create more progress. They can also create duplicated work, conflicting edits, shallow reasoning, and integration burden. A project becomes safer for agents when intent, constraints, commands, tests, and review expectations are explicit.
+Agentic development scales only when work is bounded and reviewable.
+More agents do not automatically create more progress.
+They can also create duplicated work, conflicting edits, shallow reasoning, and integration burden.
+A project becomes safer for agents when intent, constraints, commands, tests, and review expectations are explicit.
 
 Reflection prompts:
 
@@ -105,7 +131,9 @@ Reflection prompts:
 
 ## Scaling techniques and trade-offs
 
-Scaling is a sequence of trade-offs made in response to pressure. Caching, queues, indexing, replicas, sharding, CDNs, rate limiting, background jobs, feature flags, and isolation all solve some problems while introducing others. The question is not "which technique is best?" but "which pressure justifies which cost?"
+Scaling is a sequence of trade-offs made in response to pressure.
+Caching, queues, indexing, replicas, sharding, CDNs, rate limiting, background jobs, feature flags, and isolation all solve some problems while introducing others.
+The question is not "which technique is best?" but "which pressure justifies which cost?"
 
 Reflection prompts:
 
@@ -116,7 +144,8 @@ Reflection prompts:
 
 ## Final reflection
 
-A strong final reflection should use evidence from the three implementations rather than general claims. It should connect development setup and architectural decisions to consequences: what each workflow produced, what changed, what was measured, what broke, what improved, and what the group would choose next.
+A strong final reflection should use evidence from the three implementations rather than general claims.
+It should connect development setup and architectural decisions to consequences: what each workflow produced, what changed, what was measured, what broke, what improved, and what the group would choose next.
 
 Useful structure:
 
@@ -131,13 +160,15 @@ Useful structure:
 
 ### Final reflection package builder
 
-The lightweight builder below helps assemble evidence from the course before writing the final reflection. Select the artifacts you have, then use the generated outline to see which claims are supported and which evidence is still missing.
+The lightweight builder below helps assemble evidence from the course before writing the final reflection.
+Select the artifacts you have, then use the generated outline to see which claims are supported and which evidence is still missing.
 
 {{ import "site/includes/final-reflection-demo.html" }}
 
 ## Project artifact
 
-Students should submit a final reflection package. It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, scaling trade-off table, and a short explanation of what changed in their understanding.
+Students should submit a final reflection package.
+It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, scaling trade-off table, and a short explanation of what changed in their understanding.
 
 ## Questions to carry forward
 
@@ -151,9 +182,13 @@ Students should submit a final reflection package. It should include the stronge
 
 ## Notes for further development
 
-- Revise every reflection prompt that assumes one evolving codebase. The final chapter should consistently speak about implementations A, B, and C or use equally clear names.
+- Revise every reflection prompt that assumes one evolving codebase.
+  The final chapter should consistently speak about implementations A, B, and C or use equally clear names.
 - Add a compact comparison matrix covering required behavior, architecture, runtime evidence, defects, human intervention, active time, model cost or usage, setup/change friction, and coordination overhead.
-- Require causal humility. Students should name practice effects, hardware, optional scope, tool differences, and reporting gaps before attributing outcomes to a model or fleet.
-- Preserve the strongest original theme: scalability is multidimensional. The conclusion should not collapse into “which AI setup won?”
-- Include the three cross-team friction reports as external evidence. Ask where author perception and auditor experience disagreed.
+- Require causal humility.
+  Students should name practice effects, hardware, optional scope, tool differences, and reporting gaps before attributing outcomes to a model or fleet.
+- Preserve the strongest original theme: scalability is multidimensional.
+  The conclusion should not collapse into “which AI setup won?”
+- Include the three cross-team friction reports as external evidence.
+  Ask where author perception and auditor experience disagreed.
 - End with a decision rather than a ranking: under what constraints would the group choose a local model, a foundation-model single agent, or a fleet for a future project?

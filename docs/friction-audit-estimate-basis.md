@@ -1,8 +1,10 @@
 # Friction audit estimate basis
 
-The friction audit demo is a teaching model, not a forecasting tool. Its goal is to make relative pressure visible: setup, comprehension, change, testing, review, and rework do not shrink equally when an agent helps.
+The friction audit demo is a teaching model, not a forecasting tool.
+Its goal is to make relative pressure visible: setup, comprehension, change, testing, review, and rework do not shrink equally when an agent helps.
 
-The default human-only numbers are small classroom-scale estimates for a focused change to the course event tracker. Each process step has a base time, then friction points add a small penalty:
+The default human-only numbers are small classroom-scale estimates for a focused change to the course event tracker.
+Each process step has a base time, then friction points add a small penalty:
 
 - Setup: 0.25 minutes per friction point.
 - Comprehension: 0.75 minutes per friction point.
@@ -21,7 +23,8 @@ The demo therefore uses conservative multipliers instead of treating agents as a
 - Agent with weak project context: setup, comprehension, and testing are 5% slower; editing is 20% faster; rework risk increases.
 - Agent with good instructions and tests: setup is 15% faster, comprehension is 20% faster, editing is 35% faster, and testing is 25% faster; rework risk decreases.
 
-These assumptions keep the weak-agent path close to human-only work instead of making it magically fast. They also keep the harnessed-agent path below the best-case Copilot benchmark because the demo includes locating code, verifying behavior, and explaining the change, not just writing an implementation.
+These assumptions keep the weak-agent path close to human-only work instead of making it magically fast.
+They also keep the harnessed-agent path below the best-case Copilot benchmark because the demo includes locating code, verifying behavior, and explaining the change, not just writing an implementation.
 
 Sources:
 

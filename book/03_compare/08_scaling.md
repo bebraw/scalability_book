@@ -1,8 +1,12 @@
 # How should systems respond to scaling pressure?
 
-Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change. By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions. This chapter applies the same pressures to all three architectures before synthesizing a justified target design. It develops technical scaling techniques without turning them into a catalog of cloud products.
+Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change.
+By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions.
+This chapter applies the same pressures to all three architectures before synthesizing a justified target design.
+It develops technical scaling techniques without turning them into a catalog of cloud products.
 
-The central claim could be: scaling is not one move. It is a sequence of trade-offs made in response to specific pressure.
+The central claim could be: scaling is not one move.
+It is a sequence of trade-offs made in response to specific pressure.
 
 ## Chapter purpose
 
@@ -32,17 +36,25 @@ The demonstration below starts from a concrete event-tracking pressure: event wr
 
 {{ import "site/includes/scaling-pressure-demo.html" }}
 
-The important part is the exported trade-off table. Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
+The important part is the exported trade-off table.
+Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
 
 ## Use a formal model before choosing a technique
 
-A scaling technique should respond to an identified limit. Formal models help students state that limit precisely enough to challenge their own intuition:
+A scaling technique should respond to an identified limit.
+Formal models help students state that limit precisely enough to challenge their own intuition:
 
-- **Little's Law** connects arrival rate, time in the system, and average work in progress. It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
-- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential. It applies to request paths, batch processing, deployments, and agent workflows.
-- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs. It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
+- **Little's Law** connects arrival rate, time in the system, and average work in progress.
+  It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
+- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential.
+  It applies to request paths, batch processing, deployments, and agent workflows.
+- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs.
+  It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
 
-The project does not require every model. Students must apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow. Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out. A formula added after the design decision is not evidence that the formula guided the decision.
+The project does not require every model.
+Students must apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.
+Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out.
+A formula added after the design decision is not evidence that the formula guided the decision.
 
 ## Common scaling techniques
 
@@ -63,19 +75,30 @@ Potential subsections:
 
 > **Sustainability angle**
 >
-> Scaling techniques have resource profiles. Caches, queues, replicas, CDNs, shards, and multi-region deployments can improve user experience, but each adds infrastructure and operational cost. Ask which pressure justifies the extra resource use.
+> Scaling techniques have resource profiles.
+> Caches, queues, replicas, CDNs, shards, and multi-region deployments can improve user experience, but each adds infrastructure and operational cost.
+> Ask which pressure justifies the extra resource use.
 
 ### Orchestration as a control loop
 
-Horizontal scaling is not merely the instruction to "run more servers". An orchestrator repeatedly compares a declared desired state with the state it observes and takes action to close the gap. A Deployment can declare a replica count and a pod template; controllers create and remove pods until that state is reached. A Service then gives clients a stable route while the individual pods behind it change.
+Horizontal scaling is not merely the instruction to "run more servers".
+An orchestrator repeatedly compares a declared desired state with the state it observes and takes action to close the gap.
+A Deployment can declare a replica count and a pod template; controllers create and remove pods until that state is reached.
+A Service then gives clients a stable route while the individual pods behind it change.
 
-The lab below runs [Webernetes](https://github.com/ngrok/webernetes), a partial browser-based port of Kubernetes intended for interactive teaching. Change the desired replica count, send requests through a service, terminate a pod, and perform a rolling update. Watch for the distinction between the operator's instruction, the temporary mismatch, and the controller action that restores the declared state.
+The lab below runs [Webernetes](https://github.com/ngrok/webernetes), a partial browser-based port of Kubernetes intended for interactive teaching.
+Change the desired replica count, send requests through a service, terminate a pod, and perform a rolling update.
+Watch for the distinction between the operator's instruction, the temporary mismatch, and the controller action that restores the declared state.
 
 {{ import "site/includes/orchestration-demo.html" }}
 
-This is a mechanism demonstration, not a capacity benchmark or a production Kubernetes environment. The browser runs compatible control logic and a simulated network, but it does not execute real container images or model persistent volumes, resource limits, autoscaling, and the full production networking stack. The useful question is therefore not "how many requests did this cluster handle?" but "which component noticed the mismatch, what action did it take, and which scaling problem remains unsolved?"
+This is a mechanism demonstration, not a capacity benchmark or a production Kubernetes environment.
+The browser runs compatible control logic and a simulated network, but it does not execute real container images or model persistent volumes, resource limits, autoscaling, and the full production networking stack.
+The useful question is therefore not "how many requests did this cluster handle?" but "which component noticed the mismatch, what action did it take, and which scaling problem remains unsolved?"
 
-Replica orchestration cannot make every component horizontally scalable. If each application instance depends on one saturated database, holds incompatible local state, or performs the same expensive downstream work, adding pods may simply move or amplify the bottleneck. The pressure still has to justify the technique.
+Replica orchestration cannot make every component horizontally scalable.
+If each application instance depends on one saturated database, holds incompatible local state, or performs the same expensive downstream work, adding pods may simply move or amplify the bottleneck.
+The pressure still has to justify the technique.
 
 ## Scaling the event pipeline
 
@@ -107,15 +130,21 @@ Ideas to develop:
 - Edge caching helps some workloads but not all writes.
 - Multi-region systems introduce consistency, routing, failover, and data residency problems.
 
-In some project themes, geography may matter very little. In others, a platform serving users or devices in different regions may need to consider latency, data residency, or regional failure. This is a good place to teach restraint: not every project needs multi-region architecture.
+In some project themes, geography may matter very little.
+In others, a platform serving users or devices in different regions may need to consider latency, data residency, or regional failure.
+This is a good place to teach restraint: not every project needs multi-region architecture.
 
 ### Latency budget lab
 
-The demonstration below treats latency as a budget. Some of the budget is bounded by physics: a signal cannot cross distance instantly, and real networks add routing and protocol overhead. Some of the budget is architectural: every sequential database round trip adds another wait.
+The demonstration below treats latency as a budget.
+Some of the budget is bounded by physics: a signal cannot cross distance instantly, and real networks add routing and protocol overhead.
+Some of the budget is architectural: every sequential database round trip adds another wait.
 
 {{ import "site/includes/latency-budget-demo.html" }}
 
-The point is not to memorize exact numbers. Real latency depends on providers, routing, congestion, TLS, database load, and query plans. The useful lesson is the shape of the problem: distance creates a lower bound, and repeated sequential database access multiplies that bound.
+The point is not to memorize exact numbers.
+Real latency depends on providers, routing, congestion, TLS, database load, and query plans.
+The useful lesson is the shape of the problem: distance creates a lower bound, and repeated sequential database access multiplies that bound.
 
 ## Trade-offs
 
@@ -131,7 +160,8 @@ Important trade-offs to make explicit:
 
 > **Sustainability angle**
 >
-> Sustainability is also a trade-off. Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
+> Sustainability is also a trade-off.
+> Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
 
 ## Exercise ideas
 
@@ -142,17 +172,24 @@ Important trade-offs to make explicit:
 
 ## Project artifact
 
-Students should produce a three-way scaling comparison and one justified target design. The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed. It should include one formal model applied to an application decision and one applied to the development workflow. Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
+Students should produce a three-way scaling comparison and one justified target design.
+The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
+It should include one formal model applied to an application decision and one applied to the development workflow.
+Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
 
 ## Notes for further development
 
 - Add a table mapping pressure, technique, benefit, and cost.
 - Include a short warning against premature scaling.
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
-- Apply the same pressure set to all three implementations before recommending changes. The chapter should compare how each architecture responds rather than assuming implementation B is the sole object of analysis.
+- Apply the same pressure set to all three implementations before recommending changes.
+  The chapter should compare how each architecture responds rather than assuming implementation B is the sole object of analysis.
 - Keep the formal-model requirement tied to observed or explicitly proposed limits rather than accepting decorative calculations added after the design.
-- Ask whether the fleet-generated implementation is architecturally more scalable or merely larger. Generated component count and infrastructure ambition are not evidence of scalability.
-- Revise the event-pipeline artifact into a three-way comparison plus one justified target design. Students may select or synthesize the best ideas, but should label what is observed in code versus what is proposed.
+- Ask whether the fleet-generated implementation is architecturally more scalable or merely larger.
+  Generated component count and infrastructure ambition are not evidence of scalability.
+- Revise the event-pipeline artifact into a three-way comparison plus one justified target design.
+  Students may select or synthesize the best ideas, but should label what is observed in code versus what is proposed.
 - Include development-system trade-offs alongside runtime ones: local privacy versus capability, foundation-model cost versus reduced rework, parallel throughput versus integration and review capacity.
-- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support concrete scaling trade-offs around queues, retries, timers, durable state, and workflow visibility. Use it to ask what new operational responsibilities appear when asynchronous processing is introduced.
+- Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support concrete scaling trade-offs around queues, retries, timers, durable state, and workflow visibility.
+  Use it to ask what new operational responsibilities appear when asynchronous processing is introduced.
 - Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support a "measure what matters" reminder: scaling work should name the user or operational outcome it improves, not only the infrastructure metric it moves.

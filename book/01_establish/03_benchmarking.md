@@ -1,6 +1,8 @@
 # How do we measure and observe web applications?
 
-Benchmarking and observability are ways to replace assumptions with evidence. A system that feels simple during development may behave differently under load, with real data, slow networks, concurrent users, or partial failures. Before students redesign for scale, they need some way to see what is actually happening.
+Benchmarking and observability are ways to replace assumptions with evidence.
+A system that feels simple during development may behave differently under load, with real data, slow networks, concurrent users, or partial failures.
+Before students redesign for scale, they need some way to see what is actually happening.
 
 The central claim could be: you cannot reason responsibly about scalability without measurement, but measurement itself has to be designed.
 
@@ -26,7 +28,8 @@ Ideas to develop:
 
 > **Sustainability angle**
 >
-> A useful benchmark can report resource use per unit of value, not only speed. For example, compare CPU time per recorded event, database queries per request, bytes transferred per dashboard load, or storage growth per day.
+> A useful benchmark can report resource use per unit of value, not only speed.
+> For example, compare CPU time per recorded event, database queries per request, bytes transferred per dashboard load, or storage growth per day.
 
 Possible event tracking benchmarks:
 
@@ -38,19 +41,30 @@ Possible event tracking benchmarks:
 
 ### From measurements to Little's Law
 
-Measurements become more useful when they can be connected through a model. Little's Law states that, for a stable system over a suitable observation period, the average number of items in the system equals their average arrival rate multiplied by their average time in the system:
+Measurements become more useful when they can be connected through a model.
+Little's Law states that, for a stable system over a suitable observation period, the average number of items in the system equals their average arrival rate multiplied by their average time in the system:
 
 `L = λW`
 
-For an event pipeline, `L` might be the average number of events being processed or waiting, `λ` the average arrival rate, and `W` the average time from arrival to completion. If 20 events arrive per second and each spends an average of half a second in the system, the average work in progress is 10 events. The relationship can also expose an inconsistent measurement: if the observed queue is much larger, the system may not be stable, the time window may be misleading, or important work may be missing from the measurement.
+For an event pipeline, `L` might be the average number of events being processed or waiting, `λ` the average arrival rate, and `W` the average time from arrival to completion.
+If 20 events arrive per second and each spends an average of half a second in the system, the average work in progress is 10 events.
+The relationship can also expose an inconsistent measurement: if the observed queue is much larger, the system may not be stable, the time window may be misleading, or important work may be missing from the measurement.
 
-Little's Law does not identify the cause of latency and does not promise that a system can sustain any chosen arrival rate. Students should record the measurement boundary and check whether arrivals and completions were approximately balanced before using it. In Lecture 6, the same relationship will be applied to a concrete application bottleneck; later, it can also describe review queues in an agent workflow.
+Little's Law does not identify the cause of latency and does not promise that a system can sustain any chosen arrival rate.
+Students should record the measurement boundary and check whether arrivals and completions were approximately balanced before using it.
+In Lecture 6, the same relationship will be applied to a concrete application bottleneck; later, it can also describe review queues in an agent workflow.
 
 ### Measure browser rendering work
 
-Web application performance is not limited to API and database latency. An interaction can receive a fast response and still feel slow because the browser has too much work to do before it can draw the next frame. Adding or removing DOM elements, changing attributes or classes, and running animations can trigger style recalculation and sometimes layout. The cost depends on the complexity of the applicable CSS rules and, often more importantly, how many elements the change invalidates.
+Web application performance is not limited to API and database latency.
+An interaction can receive a fast response and still feel slow because the browser has too much work to do before it can draw the next frame.
+Adding or removing DOM elements, changing attributes or classes, and running animations can trigger style recalculation and sometimes layout.
+The cost depends on the complexity of the applicable CSS rules and, often more importantly, how many elements the change invalidates.
 
-This is a useful example of why optimization should begin with evidence. Chrome DevTools can show `Recalculate Style` events in a Performance recording, including how many elements were affected. Selector Stats can then help identify selectors that required many matching attempts or consumed disproportionate time. A complex-looking selector is not automatically the real bottleneck, and replacing it without measuring may have little visible effect.
+This is a useful example of why optimization should begin with evidence.
+Chrome DevTools can show `Recalculate Style` events in a Performance recording, including how many elements were affected.
+Selector Stats can then help identify selectors that required many matching attempts or consumed disproportionate time.
+A complex-looking selector is not automatically the real bottleneck, and replacing it without measuring may have little visible effect.
 
 A small project exercise can use the event list as the workload:
 
@@ -60,13 +74,18 @@ A small project exercise can use the event list as the workload:
 4. Narrow the affected DOM scope or simplify an expensive selector, then record the same interaction again.
 5. Report what changed and what the measurement does not prove.
 
-The purpose is not to teach students to avoid expressive CSS. It is to show that client-side cost can grow with the size and structure of the rendered page, and that the relevant unit of work may be affected elements rather than requests. See [Reduce the scope and complexity of style calculations](https://web.dev/articles/reduce-the-scope-and-complexity-of-style-calculations) for a practical walkthrough.
+The purpose is not to teach students to avoid expressive CSS.
+It is to show that client-side cost can grow with the size and structure of the rendered page, and that the relevant unit of work may be affected elements rather than requests.
+See [Reduce the scope and complexity of style calculations](https://web.dev/articles/reduce-the-scope-and-complexity-of-style-calculations) for a practical walkthrough.
 
 ## Model evals as benchmarks
 
-If students use different AI models during the project, they should treat model choice as something that can be measured rather than guessed. A model eval is a benchmark for an AI-assisted workflow: given the same task, context, constraints, and expected evidence, how well does each model perform?
+If students use different AI models during the project, they should treat model choice as something that can be measured rather than guessed.
+A model eval is a benchmark for an AI-assisted workflow: given the same task, context, constraints, and expected evidence, how well does each model perform?
 
-The goal is not to rank models universally. A useful course eval should be local to the work students actually do. For example, students might compare models on tasks such as:
+The goal is not to rank models universally.
+A useful course eval should be local to the work students actually do.
+For example, students might compare models on tasks such as:
 
 - Explaining the event tracking data model from the codebase.
 - Finding one likely scaling bottleneck.
@@ -75,7 +94,10 @@ The goal is not to rank models universally. A useful course eval should be local
 - Summarizing an incident trace or log excerpt.
 - Reviewing a scaling trade-off table for missing failure modes.
 
-Model capability and tool reliability are also separate variables. In [Better Models: Worse Tools](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/), Armin Ronacher documents newer models completing the reasoning for an edit correctly while emitting arguments that violated a nested tool schema. The failures depended on the conversation history, client behavior, schema shape, and whether strict tool invocation was enabled. A model eval should therefore exercise the real harness and tools rather than test only a model's prose in isolation.
+Model capability and tool reliability are also separate variables.
+In [Better Models: Worse Tools](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/), Armin Ronacher documents newer models completing the reasoning for an edit correctly while emitting arguments that violated a nested tool schema.
+The failures depended on the conversation history, client behavior, schema shape, and whether strict tool invocation was enabled.
+A model eval should therefore exercise the real harness and tools rather than test only a model's prose in isolation.
 
 Each eval should define:
 
@@ -87,11 +109,14 @@ Each eval should define:
 
 > **Sustainability angle**
 >
-> Model evals should include cost and resource awareness. A stronger model may reduce rework, but it may also cost more, run slower, or consume more compute. A weaker model may be acceptable if the task is well-scoped, the feedback loop is strong, and the human review burden stays reasonable.
+> Model evals should include cost and resource awareness.
+> A stronger model may reduce rework, but it may also cost more, run slower, or consume more compute.
+> A weaker model may be acceptable if the task is well-scoped, the feedback loop is strong, and the human review burden stays reasonable.
 
 Development ideas:
 
-- Define a small set of project-specific tasks during implementation A and record the local-model baseline. Rerun the same tasks with the foundation-model and fleet workflows when implementations B and C become available.
+- Define a small set of project-specific tasks during implementation A and record the local-model baseline.
+  Rerun the same tasks with the foundation-model and fleet workflows when implementations B and C become available.
 - Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the foundation model.
 - Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
 - Use human review for quality judgments that require understanding of the project.
@@ -100,7 +125,8 @@ Development ideas:
 
 ### Make failures diagnosable
 
-An aggregate score can show that a workflow became better or worse, but it does not explain the failure. A useful eval should let a student move from "the score fell" to a concrete diagnosis: which input failed, which required property was missing, and whether the problem came from the model, prompt, context, tool use, or evaluator.
+An aggregate score can show that a workflow became better or worse, but it does not explain the failure.
+A useful eval should let a student move from "the score fell" to a concrete diagnosis: which input failed, which required property was missing, and whether the problem came from the model, prompt, context, tool use, or evaluator.
 
 Build that diagnostic path from the cheapest reliable checks upward:
 
@@ -108,34 +134,51 @@ Build that diagnostic path from the cheapest reliable checks upward:
 2. Add deterministic probes for properties that code can check, such as valid JSON, required headings, named files, test results, or allowed tool calls.
 3. Use human review for judgments that require project understanding.
 4. Add an LLM judge only for genuinely fuzzy properties, give it a specific rubric and the relevant answer key, and record its explanation alongside its score.
-5. Test the judge itself. Swap the order of compared answers, repeat selected cases, and compare its labels with a small set of human labels before relying on it at scale.
-6. Inspect failing rows instead of reporting only the average. Preserve important real failures as regression cases that can be rerun after a prompt, model, tool, or harness change.
+5. Test the judge itself.
+   Swap the order of compared answers, repeat selected cases, and compare its labels with a small set of human labels before relying on it at scale.
+6. Inspect failing rows instead of reporting only the average.
+   Preserve important real failures as regression cases that can be rerun after a prompt, model, tool, or harness change.
 
-LLM judges can favor an answer because of its position, length, or similarity to the judge's own style rather than because it is correct. These are properties of the measurement instrument, so changing to a more capable judge does not remove the need for calibration. The paper [Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685) documents several of these biases and mitigation strategies.
+LLM judges can favor an answer because of its position, length, or similarity to the judge's own style rather than because it is correct.
+These are properties of the measurement instrument, so changing to a more capable judge does not remove the need for calibration.
+The paper [Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685) documents several of these biases and mitigation strategies.
 
-[Your Evals Are Lying To You](https://github.com/TejasQ/basically-agent-evals) provides a compact TypeScript companion for this progression. Its useful core for this course is the path from a dataset and checker to judge-bias experiments, deterministic probes, failing-row inspection, and a CI gate. The repository also includes RAG and diagnostic-console examples, but those are optional extensions rather than required parts of the scalability project.
+[Your Evals Are Lying To You](https://github.com/TejasQ/basically-agent-evals) provides a compact TypeScript companion for this progression.
+Its useful core for this course is the path from a dataset and checker to judge-bias experiments, deterministic probes, failing-row inspection, and a CI gate.
+The repository also includes RAG and diagnostic-console examples, but those are optional extensions rather than required parts of the scalability project.
 
-A practitioner benchmark of [frontier and local models on structured voice-note analysis](https://tej.as/blog/note-app-ai-benchmark-apple-intelligence-sucks) illustrates both the value and limits of this approach. Models were compared on the actual summaries, action items, and questions needed by the application, and a less prestigious model outperformed several frontier models on that task. Since the comparison used a small task set and one pass per model, it should not be generalized into a universal ranking. Its defensible lesson is that product-specific output quality, latency, and cost have to be measured together.
+A practitioner benchmark of [frontier and local models on structured voice-note analysis](https://tej.as/blog/note-app-ai-benchmark-apple-intelligence-sucks) illustrates both the value and limits of this approach.
+Models were compared on the actual summaries, action items, and questions needed by the application, and a less prestigious model outperformed several frontier models on that task.
+Since the comparison used a small task set and one pass per model, it should not be generalized into a universal ranking.
+Its defensible lesson is that product-specific output quality, latency, and cost have to be measured together.
 
 ### Small eval demonstration
 
-A simple classroom demonstration can be interactive. The point is to show that an eval is a controlled comparison, not a magic score. Students can change the task, inspect the shared prompt and context, score two model attempts, and notice how the conclusion changes when quality, latency, and cost are considered together.
+A simple classroom demonstration can be interactive.
+The point is to show that an eval is a controlled comparison, not a magic score.
+Students can change the task, inspect the shared prompt and context, score two model attempts, and notice how the conclusion changes when quality, latency, and cost are considered together.
 
 {{ import "site/includes/model-eval-demo.html" }}
 
-This is not enough data to declare a universal winner. It is enough to support a local decision such as: "For open-ended diagnosis, the stronger model saved review time. For checklist-style benchmark plans, the smaller model may be acceptable if a human verifies the result." To make the exercise more engineering-like, add deterministic checks: did the answer name a real file, include all required headings, or produce valid JSON? To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
+This is not enough data to declare a universal winner.
+It is enough to support a local decision such as: "For open-ended diagnosis, the stronger model saved review time.
+For checklist-style benchmark plans, the smaller model may be acceptable if a human verifies the result." To make the exercise more engineering-like, add deterministic checks: did the answer name a real file, include all required headings, or produce valid JSON?
+To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
 
 ### Short eval lab
 
-Use the demonstration above or a small script to evaluate three to five outputs from one real project task. The lab should take about 20–30 minutes:
+Use the demonstration above or a small script to evaluate three to five outputs from one real project task.
+The lab should take about 20–30 minutes:
 
 1. Define the task, shared context, expected evidence, and one narrow rubric.
 2. Write at least one deterministic probe before adding any fuzzy scoring.
 3. Score two attempts, then inspect the lowest-scoring row and name the property that failed.
-4. If an LLM judge is available, reverse the order of the attempts and run the judgment again. A changed verdict is evidence about the judge, not the attempts.
+4. If an LLM judge is available, reverse the order of the attempts and run the judgment again.
+   A changed verdict is evidence about the judge, not the attempts.
 5. Save the failure as a regression fixture and write one local conclusion that the evidence supports.
 
-A defensible conclusion is specific: "the smaller model omitted confirming measurements in three of five benchmark plans." A claim such as "the larger model is better" exceeds the evidence. If the class uses the companion repository, its offline mock mode is sufficient for demonstrating the judge traps; no API key or RAG system is needed.
+A defensible conclusion is specific: "the smaller model omitted confirming measurements in three of five benchmark plans." A claim such as "the larger model is better" exceeds the evidence.
+If the class uses the companion repository, its offline mock mode is sufficient for demonstrating the judge traps; no API key or RAG system is needed.
 
 ## Observability basics
 
@@ -154,19 +197,24 @@ Important distinction:
 
 ### Observability signal picker
 
-The demonstration below asks students to choose evidence for a concrete operational symptom. The useful signal depends on the question: the right first signal for stale summaries is not always the right first signal for missing events or a slow dashboard.
+The demonstration below asks students to choose evidence for a concrete operational symptom.
+The useful signal depends on the question: the right first signal for stale summaries is not always the right first signal for missing events or a slow dashboard.
 
 {{ import "site/includes/observability-signal-demo.html" }}
 
-Use the result as a starting point for an observability plan. A good plan names the symptom, the first signal to inspect, and what that signal can or cannot prove.
+Use the result as a starting point for an observability plan.
+A good plan names the symptom, the first signal to inspect, and what that signal can or cannot prove.
 
 > **Sustainability angle**
 >
-> Observability is not free. Logs, metrics, traces, dashboards, and retained telemetry consume storage and processing. The goal is enough evidence to operate and improve the system, not unlimited data collection.
+> Observability is not free.
+> Logs, metrics, traces, dashboards, and retained telemetry consume storage and processing.
+> The goal is enough evidence to operate and improve the system, not unlimited data collection.
 
 ## What to measure in the project
 
-Use the [comparable evidence package in the common specification](/project/#9-comparable-evidence-package) as the stable reporting frame for all three implementations. The measurements below help turn that frame into an operational protocol rather than a collection of isolated numbers.
+Use the [comparable evidence package in the common specification](/project/#9-comparable-evidence-package) as the stable reporting frame for all three implementations.
+The measurements below help turn that frame into an operational protocol rather than a collection of isolated numbers.
 
 Prompts:
 
@@ -179,13 +227,18 @@ Prompts:
 
 ## Efficiency and green computing
 
-Benchmarking can also support sustainability work. A scalable system is not only one that can handle more load; it should also avoid wasting computation, memory, storage, bandwidth, and energy. Green computing gives students a broader reason to care about efficiency: inefficient software can increase infrastructure cost and environmental impact at the same time.
+Benchmarking can also support sustainability work.
+A scalable system is not only one that can handle more load; it should also avoid wasting computation, memory, storage, bandwidth, and energy.
+Green computing gives students a broader reason to care about efficiency: inefficient software can increase infrastructure cost and environmental impact at the same time.
 
-This section should stay concrete. Students do not need to calculate exact carbon emissions to learn useful lessons. It is enough to connect system behavior to resource consumption and ask whether the same user value can be delivered with less waste.
+This section should stay concrete.
+Students do not need to calculate exact carbon emissions to learn useful lessons.
+It is enough to connect system behavior to resource consumption and ask whether the same user value can be delivered with less waste.
 
 > **Sustainability angle**
 >
-> Carbon estimates can be useful, but they are often harder to verify than direct resource measurements. Start with what you can observe: work done, data transferred, storage retained, and infrastructure kept running.
+> Carbon estimates can be useful, but they are often harder to verify than direct resource measurements.
+> Start with what you can observe: work done, data transferred, storage retained, and infrastructure kept running.
 
 Ideas to develop:
 
@@ -223,7 +276,8 @@ Ideas to develop:
 - Running benchmarks from the same machine as the server without understanding the distortion.
 - Treating benchmark numbers as universal instead of environment-specific.
 - Adding logs that are too noisy, too vague, or unsafe for privacy.
-- Treating "faster" as automatically greener. A faster system can still waste resources if it does unnecessary work at high volume.
+- Treating "faster" as automatically greener.
+  A faster system can still waste resources if it does unnecessary work at high volume.
 - Optimizing for sustainability claims without measuring the underlying resource behavior.
 
 ## Exercise ideas
@@ -238,26 +292,36 @@ Ideas to develop:
 
 ## Project artifact
 
-Students should create the shared measurement protocol and the implementation A baseline. It should define one repeatable runtime workload, one load level, the metrics collected, the common development-workflow evidence, one small model-evaluation task set if appropriate, at least one deterministic probe, the first result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure. The same protocol should be rerun for implementations B and C.
+Students should create the shared measurement protocol and the implementation A baseline.
+It should define one repeatable runtime workload, one load level, the metrics collected, the common development-workflow evidence, one small model-evaluation task set if appropriate, at least one deterministic probe, the first result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure.
+The same protocol should be rerun for implementations B and C.
 
 ## Notes for further development
 
 - Add a small tool-neutral example using `curl`, a simple script, or a common load testing tool.
 - Include a table of metrics and what each metric can reveal.
-- Add a small tool-neutral model eval example. A simple version could be a CSV with columns for `model`, `task`, `input`, `score`, `cost`, `latency`, and `review_note`.
-- Make this chapter the methodological center of the three-build comparison. State explicitly that the course is performing a local evaluation of complete development workflows, not establishing a universal model leaderboard.
+- Add a small tool-neutral model eval example.
+  A simple version could be a CSV with columns for `model`, `task`, `input`, `score`, `cost`, `latency`, and `review_note`.
+- Make this chapter the methodological center of the three-build comparison.
+  State explicitly that the course is performing a local evaluation of complete development workflows, not establishing a universal model leaderboard.
 - Define two linked benchmark layers: the same runtime workload for each web application and the same reporting schema for each AI-assisted development workflow.
-- Expand the workflow schema to include active human time, failed attempts, interventions, acceptance-test pass rate, defects found in review, setup friction, and approximate resource use. Raw token or speed figures alone are insufficient.
-- Explain the two comparisons separately: A–B primarily compares model setups; B–C primarily compares orchestration. Require the fleet's base model and configuration to be declared.
+- Expand the workflow schema to include active human time, failed attempts, interventions, acceptance-test pass rate, defects found in review, setup friction, and approximate resource use.
+  Raw token or speed figures alone are insufficient.
+- Explain the two comparisons separately: A–B primarily compares model setups; B–C primarily compares orchestration.
+  Require the fleet's base model and configuration to be declared.
 - Add practice effects, optional feature scope, hardware differences, and selective reporting to the measurement-traps section.
 - Require the evidence template to be completed after every phase, not recreated from memory in the final week.
-- Make the implementation A public discussion use benchmark evidence. Groups should arrive at lecture 4 able to show at least one result and explain its limits.
-- Keep the sample sizes and claims modest. The final wording should favor “in our tasks and environment” over universal claims about local models, foundation models, or fleets.
+- Make the implementation A public discussion use benchmark evidence.
+  Groups should arrive at lecture 4 able to show at least one result and explain its limits.
+- Keep the sample sizes and claims modest.
+  The final wording should favor “in our tasks and environment” over universal claims about local models, foundation models, or fleets.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.
-- Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes. Adapt the idea from page speed to event tracking: latency, freshness, failed submissions, or dashboard load time should be connected to the value the system claims to provide.
+- Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes.
+  Adapt the idea from page speed to event tracking: latency, freshness, failed submissions, or dashboard load time should be connected to the value the system claims to provide.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support examples where observability must cover long-running or retrying work, not only request/response latency.
-- Obsidian candidate: `Clippings/_Processed/Statistics for LLM Evals.md` is directly relevant for warning students against eyeballing average scores. It can support a short treatment of sample size, confidence intervals, and careful model comparisons.
+- Obsidian candidate: `Clippings/_Processed/Statistics for LLM Evals.md` is directly relevant for warning students against eyeballing average scores.
+  It can support a short treatment of sample size, confidence intervals, and careful model comparisons.
 - Obsidian candidate: `Clippings/_Processed/Building eval systems that improve your AI product.md` can support the error-analysis-first framing: start by looking at actual failures, then design evaluators around those failure modes rather than generic scores.
 - Obsidian candidate: `Clippings/_Processed/hamelsmuevals-skills Skills for AI Evals to compliment the course AI Evals For Engineers & PMs.md` can provide a checklist of eval design concerns: eval audits, error analysis, synthetic data, judge prompts, evaluator validation, RAG evaluation, and review interfaces.
 - Obsidian candidate: `Clippings/_Processed/harbor evaluate agents in sandboxed environments.md` could be useful if the course later evaluates agentic tasks in isolated environments.

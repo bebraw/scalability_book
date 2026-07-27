@@ -9,4 +9,5 @@ The course uses one common application contract and three phase-specific develop
 
 Read the common specification together with the current phase specification.
 
-These files are a working draft. The shared runtime workload, audit change probes, fleet-trace transformation example, exact model environments, and grading weights still need to be finalized.
+These files are a working draft.
+The shared runtime workload, audit change probes, fleet-trace transformation example, exact model environments, and grading weights still need to be finalized.

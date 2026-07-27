@@ -2,15 +2,20 @@
 
 ## Work Activity Tracker
 
-This specification defines the application that your group will implement three times during the course. The required behavior remains substantially the same. The development setup changes:
+This specification defines the application that your group will implement three times during the course.
+The required behavior remains substantially the same.
+The development setup changes:
 
 1. **Establish:** locally hosted model and a single-agent workflow.
 2. **Challenge:** foundation model and a single-agent workflow.
 3. **Compare:** an agent fleet using a declared base model.
 
-Each phase produces a separate implementation. The purpose is not to find one universally best model, framework, or architecture. The purpose is to compare how different development systems approach the same bounded web application and to reason about the scalability of both the application and the development process.
+Each phase produces a separate implementation.
+The purpose is not to find one universally best model, framework, or architecture.
+The purpose is to compare how different development systems approach the same bounded web application and to reason about the scalability of both the application and the development process.
 
-The phase specifications define additional constraints and deliverables. This common specification applies to all three phases.
+The phase specifications define additional constraints and deliverables.
+This common specification applies to all three phases.
 
 ---
 
@@ -24,17 +29,23 @@ The application contains:
 - **Work items**, which belong to a workspace and move through a small lifecycle.
 - **Activity events**, which record what happened to a work item.
 
-The domain is intentionally familiar and compact. Your group may give the application a visual theme or adapt the terminology—for example, a workspace may be presented as a classroom, game, laboratory, production line, or agent workflow. The required capabilities must remain identifiable to an auditor, but the specification does not prescribe one ideal interpretation or design.
+The domain is intentionally familiar and compact.
+Your group may give the application a visual theme or adapt the terminology—for example, a workspace may be presented as a classroom, game, laboratory, production line, or agent workflow.
+The required capabilities must remain identifiable to an auditor, but the specification does not prescribe one ideal interpretation or design.
 
-This specification primarily describes observable behavior. When several interpretations satisfy the requirements, choose one, implement it consistently, and document any assumption that affects how the application is used or evaluated. You do not need to make the implementation unusual deliberately; differences are expected to emerge from ordinary design and development decisions.
+This specification primarily describes observable behavior.
+When several interpretations satisfy the requirements, choose one, implement it consistently, and document any assumption that affects how the application is used or evaluated.
+You do not need to make the implementation unusual deliberately; differences are expected to emerge from ordinary design and development decisions.
 
-In Compare, the same model will be applied to the development workflow itself: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events. The earlier implementations do not need agent-specific behavior.
+In Compare, the same model will be applied to the development workflow itself: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events.
+The earlier implementations do not need agent-specific behavior.
 
 ---
 
 ## 2. Required Domain Model
 
-Your implementation must represent the following concepts. Field names and internal representations may differ.
+Your implementation must represent the following concepts.
+Field names and internal representations may differ.
 
 ### 2.1 Workspace
 
@@ -74,7 +85,8 @@ The required event meanings are:
 - movement into the active stage, such as `work_started`;
 - movement into the finished stage, such as `work_completed`.
 
-Events may contain additional metadata. Names and representations may differ if their mapping to the required meanings is documented.
+Events may contain additional metadata.
+Names and representations may differ if their mapping to the required meanings is documented.
 
 ---
 
@@ -98,9 +110,12 @@ A user must be able to:
 - move a work item from the active stage to the finished stage;
 - see the current state of a work item.
 
-Creating a work item must record one creation event. Each successful state transition must record the corresponding activity event.
+Creating a work item must record one creation event.
+Each successful state transition must record the corresponding activity event.
 
-Unsupported transitions must be rejected. For example, an item cannot skip directly from the initial stage to the finished stage. A rejected transition must not change the item state or record a successful transition event.
+Unsupported transitions must be rejected.
+For example, an item cannot skip directly from the initial stage to the finished stage.
+A rejected transition must not change the item state or record a successful transition event.
 
 ### 3.3 Activity feed
 
@@ -111,7 +126,8 @@ A user must be able to:
 - filter events by workspace;
 - filter events by event type.
 
-The default ordering must be documented and deterministic. Newest-first ordering is recommended.
+The default ordering must be documented and deterministic.
+Newest-first ordering is recommended.
 
 ### 3.4 Summary
 
@@ -152,7 +168,8 @@ The specification does not prescribe:
 - module, service, or deployment boundaries;
 - behavior outside the required lifecycle and acceptance scenarios.
 
-Resolve these details in a coherent way. Record assumptions that another group would need in order to use, test, or understand the result.
+Resolve these details in a coherent way.
+Record assumptions that another group would need in order to use, test, or understand the result.
 
 ---
 
@@ -173,7 +190,8 @@ Another group and the instructors must be able to verify at least the following 
 11. Restart the application and confirm that the data remains available.
 12. Submit invalid input and confirm that the result is understandable and does not corrupt existing data.
 
-The course may provide automated checks for behavior that can be tested without prescribing a particular implementation. Passing an automated check does not replace human review.
+The course may provide automated checks for behavior that can be tested without prescribing a particular implementation.
+Passing an automated check does not replace human review.
 
 ---
 
@@ -189,11 +207,16 @@ You may choose:
 - local, containerized, cloud, edge, or other deployment;
 - testing, observability, and build tools.
 
-Next.js, Elixir, Python, and less common stacks are all valid choices. A familiar stack is not automatically safer, and an exotic stack is not automatically more innovative. Evaluation is based on what the choice enables, what it costs, how well the result satisfies the contract, and whether another group can understand and run it.
+Next.js, Elixir, Python, and less common stacks are all valid choices.
+A familiar stack is not automatically safer, and an exotic stack is not automatically more innovative.
+Evaluation is based on what the choice enables, what it costs, how well the result satisfies the contract, and whether another group can understand and run it.
 
-For the clearest within-group comparison, you should normally keep the same primary language and framework family across all three implementations. Different groups are encouraged to choose different stacks. A group may change its own stack between phases when it has a clear experimental reason and instructor approval, but the final analysis must then treat the stack change as a confounding factor.
+For the clearest within-group comparison, you should normally keep the same primary language and framework family across all three implementations.
+Different groups are encouraged to choose different stacks.
+A group may change its own stack between phases when it has a clear experimental reason and instructor approval, but the final analysis must then treat the stack change as a confounding factor.
 
-Experimentation is encouraged when it serves a question the group can explain. Examples include:
+Experimentation is encouraged when it serves a question the group can explain.
+Examples include:
 
 - comparing server rendering with a client-heavy approach;
 - using an actor model or functional language;
@@ -203,7 +226,8 @@ Experimentation is encouraged when it serves a question the group can explain. E
 - minimizing client JavaScript;
 - optimizing for local-first operation, privacy, portability, or resource efficiency.
 
-Your group owns the operational consequences of its choices. A stack that nobody outside the group can install, run, test, or inspect has not met the project requirements, even if the application worked on the authors' machine.
+Your group owns the operational consequences of its choices.
+A stack that nobody outside the group can install, run, test, or inspect has not met the project requirements, even if the application worked on the authors' machine.
 
 No particular stack receives extra credit merely for being fashionable, complex, or unusual.
 
@@ -225,15 +249,18 @@ Each implementation must provide:
 - an architecture or data-flow diagram;
 - a short decision record explaining the stack choice.
 
-Setup may use native tools, containers, a development environment definition, or another documented mechanism. Do not require an auditor to infer missing steps from knowledge held only by your team.
+Setup may use native tools, containers, a development environment definition, or another documented mechanism.
+Do not require an auditor to infer missing steps from knowledge held only by your team.
 
-The README must distinguish mandatory prerequisites from optional development conveniences. If the stack requires unusual system dependencies or hardware, document them near the beginning.
+The README must distinguish mandatory prerequisites from optional development conveniences.
+If the stack requires unusual system dependencies or hardware, document them near the beginning.
 
 ---
 
 ## 7. Scalability Analysis Shared by All Phases
 
-You do not have to build a production-scale distributed system. You must be able to reason about what your implementation would do under pressure.
+You do not have to build a production-scale distributed system.
+You must be able to reason about what your implementation would do under pressure.
 
 Apply these shared scenarios to every implementation:
 
@@ -278,7 +305,8 @@ You may not carry forward:
 - an earlier repository used as the starting point for the next phase;
 - prompts that contain substantial blocks of the earlier implementation.
 
-When uncertain, disclose the reuse in the evidence package. The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.
+When uncertain, disclose the reuse in the evidence package.
+The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.
 
 Third-party libraries, public starter templates, framework generators, and generic personal scaffolds are allowed if their use is documented and permitted by the course's normal rules.
 
@@ -305,7 +333,8 @@ Submit the same evidence categories after every phase:
 - failed or abandoned attempts worth noting;
 - important human interventions and corrections.
 
-Exact accounting is not expected when a tool does not expose it. State what could and could not be measured.
+Exact accounting is not expected when a tool does not expose it.
+State what could and could not be measured.
 
 ### 9.3 Product evidence
 
@@ -315,7 +344,10 @@ Exact accounting is not expected when a tool does not expose it. State what coul
 - known defects or incomplete requirements;
 - deployment URL, local run evidence, or another agreed operational artifact.
 
-Every implementation must have a reproducible operational path. By the final submission, the group must also select one of implementations A, B, or C, deploy it in an instructor-approved realistic environment outside the author's development process, and rerun the shared workload there. A hosted service or containerized environment is suitable; a purely hypothetical deployment plan is not. Record the environment, configuration, result, and limits of the comparison with local measurements.
+Every implementation must have a reproducible operational path.
+By the final submission, the group must also select one of implementations A, B, or C, deploy it in an instructor-approved realistic environment outside the author's development process, and rerun the shared workload there.
+A hosted service or containerized environment is suitable; a purely hypothetical deployment plan is not.
+Record the environment, configuration, result, and limits of the comparison with local measurements.
 
 ### 9.4 Engineering explanation
 
@@ -325,7 +357,8 @@ Every implementation must have a reproducible operational path. By the final sub
 - largest source of setup, comprehension, change, testing, review, and operational friction;
 - short reflection distinguishing observation from a possible explanation.
 
-Do not submit an uncurated raw agent transcript as the main evidence. Preserve enough task, prompt, trace, and review information to explain consequential decisions and failures.
+Do not submit an uncurated raw agent transcript as the main evidence.
+Preserve enough task, prompt, trace, and review information to explain consequential decisions and failures.
 
 ---
 
@@ -343,7 +376,9 @@ The auditing group will:
 6. attempt or estimate a small change probe supplied for that phase;
 7. return a concise friction report.
 
-The audit is not a full code review and does not transfer ownership. Auditors are not expected to become experts in the chosen stack. Difficulty caused by an unfamiliar technology is useful evidence, but the report should distinguish ordinary learning from missing documentation or accidental complexity.
+The audit is not a full code review and does not transfer ownership.
+Auditors are not expected to become experts in the chosen stack.
+Difficulty caused by an unfamiliar technology is useful evidence, but the report should distinguish ordinary learning from missing documentation or accidental complexity.
 
 The authors may correct factual misunderstandings in the report, but they should not erase evidence that the system was difficult to understand.
 
@@ -351,7 +386,8 @@ The authors may correct factual misunderstandings in the report, but they should
 
 ## 11. Optional Extensions
 
-Complete the common requirements before adding extensions. Suitable extensions include:
+Complete the common requirements before adding extensions.
+Suitable extensions include:
 
 - authentication and roles;
 - work-item assignment;
@@ -392,11 +428,17 @@ The phase specifications describe the emphasis and deliverables for each build.
 
 ## Instructor Notes
 
-- Keep the behavioral contract stable during the three phases. Clarifications and defect corrections are appropriate; feature expansion weakens the comparison.
-- Preserve genuine interpretive room. Clarify a requirement when groups cannot tell what observable capability is required, but avoid resolving design choices merely because implementations differ.
-- Publish any course-provided acceptance checks and measurement workload in a stack-neutral form. Prefer observable behavior over framework-specific APIs or file layouts.
-- Decide whether every group receives the same local model endpoint or whether local hardware is part of the exercise. If hardware varies, require it to be reported and avoid ranking groups by raw latency.
-- Provide equivalent, bounded change probes for the three audits. Do not reveal all probes at the start if prior knowledge would make later audits meaningless.
+- Keep the behavioral contract stable during the three phases.
+  Clarifications and defect corrections are appropriate; feature expansion weakens the comparison.
+- Preserve genuine interpretive room.
+  Clarify a requirement when groups cannot tell what observable capability is required, but avoid resolving design choices merely because implementations differ.
+- Publish any course-provided acceptance checks and measurement workload in a stack-neutral form.
+  Prefer observable behavior over framework-specific APIs or file layouts.
+- Decide whether every group receives the same local model endpoint or whether local hardware is part of the exercise.
+  If hardware varies, require it to be reported and avoid ranking groups by raw latency.
+- Provide equivalent, bounded change probes for the three audits.
+  Do not reveal all probes at the start if prior knowledge would make later audits meaningless.
 - Review proposed exotic stacks early for feasibility, licensing, security, and available deployment paths without steering everyone toward the same technologies.
-- Treat setup difficulty as evidence, not automatic failure. The group should lose credit when its supported path is incomplete or irreproducible, not merely because the auditor has never used the language.
+- Treat setup difficulty as evidence, not automatic failure.
+  The group should lose credit when its supported path is incomplete or irreproducible, not merely because the auditor has never used the language.
 - The exact rubric weights and shared runtime workload still need to be defined.

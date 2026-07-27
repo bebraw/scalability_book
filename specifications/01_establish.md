@@ -10,11 +10,14 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 Establish creates the first implementation and the comparison baseline.
 
-Build the Work Activity Tracker using a locally hosted model through a single-agent workflow. The goal is not to demonstrate that local models are inherently weak or strong. The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
+Build the Work Activity Tracker using a locally hosted model through a single-agent workflow.
+The goal is not to demonstrate that local models are inherently weak or strong.
+The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
 
 Complete and submit implementation A before lecture 4. The public discussion during lecture 4 will use the submitted applications, benchmark results, and architecture diagrams as concrete cases.
 
-Keep the implementation deliberately modest. A complete common core with clear evidence is more valuable than a large unfinished application.
+Keep the implementation deliberately modest.
+A complete common core with clear evidence is more valuable than a large unfinished application.
 
 ---
 
@@ -39,7 +42,8 @@ You may not:
 - delegate work to subagents or run coding agents in parallel;
 - copy a prior implementation of the course application.
 
-If the local model cannot complete a task, the group may implement or correct it manually. Record consequential human intervention instead of hiding it.
+If the local model cannot complete a task, the group may implement or correct it manually.
+Record consequential human intervention instead of hiding it.
 
 ---
 
@@ -51,7 +55,8 @@ Complete the required domain model, behavior, harness, and acceptance scenarios 
 
 ### 3.2 Establish the evidence baseline
 
-Produce the common evidence package while the work is happening. Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
+Produce the common evidence package while the work is happening.
+Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
 
 ### 3.3 Record the stack hypothesis
 
@@ -64,7 +69,9 @@ In the stack decision record, explain:
 
 ### 3.4 Analyze initial scalability
 
-Apply the shared scalability scenarios to implementation A. You are not expected to add distributed infrastructure. Identify the likely first bottleneck, one operational signal, one plausible response, and its trade-off.
+Apply the shared scalability scenarios to implementation A.
+You are not expected to add distributed infrastructure.
+Identify the likely first bottleneck, one operational signal, one plausible response, and its trade-off.
 
 ---
 
@@ -106,7 +113,10 @@ Raw generation speed and feature count are not goals.
 
 ## Instructor Notes
 
-- Define the approved local-model environment before the project begins. If groups use different hardware or model variants, provide a reporting template and avoid direct latency rankings.
-- Decide which non-generative internet and documentation tools are allowed. Students should not have to guess whether looking up framework documentation violates the model constraint.
-- Make manual work explicitly legitimate. Otherwise students may conceal interventions and make the comparison less useful.
+- Define the approved local-model environment before the project begins.
+  If groups use different hardware or model variants, provide a reporting template and avoid direct latency rankings.
+- Decide which non-generative internet and documentation tools are allowed.
+  Students should not have to guess whether looking up framework documentation violates the model constraint.
+- Make manual work explicitly legitimate.
+  Otherwise students may conceal interventions and make the comparison less useful.
 - Check stack proposals early enough to catch unsupported local-model context limits, unavailable compilers, unsuitable deployment targets, or licensing problems.
