@@ -1,6 +1,6 @@
 # Elements of Scalable Web Applications
 
-In this brief book, I discuss the elements behind scalable web applications. The book contains three projects—Establish, Challenge, and Compare—that produce implementations A, B, and C of the same bounded application. By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale. It is not only infrastructure that we have to consider but also the way we build applications. Therefore, scalability is not only a technical concern but also a social one. It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
+Building scalable web applications is not easy especially since there are multiple definitions for scalability. In this book, I will discuss scalability from both development and technical perspectives. The book has been split into three parts during which you will learn more about the topic and implement a project. The project will remain the same but the way you implement it will change to give perspective on development level scaling. You will pick up ideas behind technical scaling during this process.
 
 > **Sustainability angle**
 >
