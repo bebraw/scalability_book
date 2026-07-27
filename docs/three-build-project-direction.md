@@ -4,15 +4,15 @@
 
 This note records the intended direction for the course projects. It supersedes the earlier idea that groups would primarily extend, hand over, and later receive back one implementation. A first group-facing draft now lives in [`specifications/00_common_project.md`](../specifications/00_common_project.md) with phase overlays in the same folder.
 
-The book organizes this learning journey as **Establish**, **Challenge**, and **Compare**. The project overlays retain the operational names **Construct**, **Reconstruct**, and **Deconstruct** so the pedagogical movement is distinct from the three development setups.
+The book parts and project overlays use the same names: **Establish**, **Challenge**, and **Compare**.
 
 ## Direction
 
 Each group should implement the same bounded application brief three times. The core requirements and acceptance checks should remain stable enough that the results can be compared. What changes between phases is the AI-assisted development setup:
 
-1. **Construct: locally hosted model, single-agent workflow.** Build the smallest compliant baseline and make the limits of a less capable or less convenient model visible.
-2. **Reconstruct: foundation model, single-agent workflow.** Build a fresh implementation from the same brief and compare what greater model capability changes.
-3. **Deconstruct: agent fleet.** Build a third implementation through explicit roles, task boundaries, handoffs, integration, and review. Use a declared base model so orchestration is not confused with model capability.
+1. **Establish: locally hosted model, single-agent workflow.** Build the smallest compliant baseline and make the limits of a less capable or less convenient model visible.
+2. **Challenge: foundation model, single-agent workflow.** Build a fresh implementation from the same brief and compare what greater model capability changes.
+3. **Compare: agent fleet.** Build a third implementation through explicit roles, task boundaries, handoffs, integration, and review. Use a declared base model so orchestration is not confused with model capability.
 
 The implementations should be separate rather than cumulative. Students may reuse knowledge, requirements, tests, and deliberately shared harness artifacts, but should not simply fork the previous implementation. The point is to compare development systems against a common target.
 
@@ -39,9 +39,9 @@ Small extensions may remain open, but they must not replace the common core. Oth
 
 ## What should vary
 
-- **Construct:** the approved local model and its single-agent environment.
-- **Reconstruct:** the approved foundation model in a comparable single-agent environment.
-- **Deconstruct:** the orchestration design: roles, parallelism, handoffs, permissions, integration, and review. The base model must be recorded and should preferably match Reconstruct when the course wants to isolate orchestration effects.
+- **Establish:** the approved local model and its single-agent environment.
+- **Challenge:** the approved foundation model in a comparable single-agent environment.
+- **Compare:** the orchestration design: roles, parallelism, handoffs, permissions, integration, and review. The base model must be recorded and should preferably match Challenge when the course wants to isolate orchestration effects.
 
 Tool versions, prompts, context, retries, and model settings should be recorded. They are part of the treatment, not incidental details.
 
@@ -88,9 +88,9 @@ This keeps maintainability and communicability externally tested without making 
 
 The names can remain, but their meanings shift:
 
-- **Construct** establishes the common problem, the first implementation, and the measurement baseline.
-- **Reconstruct** means constructing the same required behavior again with a different development system, then comparing the resulting design and process rather than modifying the original codebase.
-- **Deconstruct** combines a fleet-based implementation with analysis across all three builds. Students transform the fleet's execution trace into the workspaces, tasks, actors, states, and events understood by implementation C. The application therefore becomes a trace-based debugging and observability tool for the workflow that produced it. Students explain what model capability and orchestration changed, what remained a human responsibility, and how the three systems would scale.
+- **Establish** defines the common problem, the first implementation, and the measurement baseline.
+- **Challenge** implements the same required behavior again with a different development system, then compares the resulting design and process rather than modifying the original codebase.
+- **Compare** combines a fleet-based implementation with analysis across all three builds. Students transform the fleet's execution trace into the workspaces, tasks, actors, states, and events understood by implementation C. The application therefore becomes a trace-based debugging and observability tool for the workflow that produced it. Students explain what model capability and orchestration changed, what remained a human responsibility, and how the three systems would scale.
 
 Runtime scalability must remain a first-class learning target. The AI comparison is the course's experimental spine, not a replacement for architecture, load, failure, data growth, observability, and scalability laws.
 

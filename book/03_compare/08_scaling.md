@@ -8,6 +8,7 @@ The central claim could be: scaling is not one move. It is a sequence of trade-o
 
 - Give students a practical vocabulary for scaling web applications.
 - Compare how implementations A, B, and C respond to the same scaling pressures.
+- Apply formal scalability models to application and development-workflow decisions.
 - Show that scaling choices have costs in complexity, consistency, operations, and development speed.
 - Prepare the transition from application scaling to development-process fortification.
 
@@ -32,6 +33,16 @@ The demonstration below starts from a concrete event-tracking pressure: event wr
 {{ import "site/includes/scaling-pressure-demo.html" }}
 
 The important part is the exported trade-off table. Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
+
+## Use a formal model before choosing a technique
+
+A scaling technique should respond to an identified limit. Formal models help students state that limit precisely enough to challenge their own intuition:
+
+- **Little's Law** connects arrival rate, time in the system, and average work in progress. It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
+- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential. It applies to request paths, batch processing, deployments, and agent workflows.
+- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs. It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
+
+The project does not require every model. Students must apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow. Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out. A formula added after the design decision is not evidence that the formula guided the decision.
 
 ## Common scaling techniques
 
@@ -131,15 +142,15 @@ Important trade-offs to make explicit:
 
 ## Project artifact
 
-Students should produce a three-way scaling comparison and one justified target design. The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed. Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
+Students should produce a three-way scaling comparison and one justified target design. The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed. It should include one formal model applied to an application decision and one applied to the development workflow. Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
 
 ## Notes for further development
 
 - Add a table mapping pressure, technique, benefit, and cost.
 - Include a short warning against premature scaling.
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
-- Apply the same pressure set to all three implementations before recommending changes. The chapter should compare how each architecture responds rather than assuming the Reconstruct design is the sole object of analysis.
-- Require at least one formal scalability law to be applied to the application and one to the development workflow. Amdahl's Law is a natural fit for fleet coordination; Little's Law can connect arrival rate, work in progress, latency, queues, or review backlog.
+- Apply the same pressure set to all three implementations before recommending changes. The chapter should compare how each architecture responds rather than assuming implementation B is the sole object of analysis.
+- Keep the formal-model requirement tied to observed or explicitly proposed limits rather than accepting decorative calculations added after the design.
 - Ask whether the fleet-generated implementation is architecturally more scalable or merely larger. Generated component count and infrastructure ambition are not evidence of scalability.
 - Revise the event-pipeline artifact into a three-way comparison plus one justified target design. Students may select or synthesize the best ideas, but should label what is observed in code versus what is proposed.
 - Include development-system trade-offs alongside runtime ones: local privacy versus capability, foundation-model cost versus reduced rework, parallel throughput versus integration and review capacity.

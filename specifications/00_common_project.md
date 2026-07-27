@@ -4,9 +4,9 @@
 
 This specification defines the application that your group will implement three times during the course. The required behavior remains substantially the same. The development setup changes:
 
-1. **Construct:** locally hosted model and a single-agent workflow.
-2. **Reconstruct:** foundation model and a single-agent workflow.
-3. **Deconstruct:** an agent fleet using a declared base model.
+1. **Establish:** locally hosted model and a single-agent workflow.
+2. **Challenge:** foundation model and a single-agent workflow.
+3. **Compare:** an agent fleet using a declared base model.
 
 Each phase produces a separate implementation. The purpose is not to find one universally best model, framework, or architecture. The purpose is to compare how different development systems approach the same bounded web application and to reason about the scalability of both the application and the development process.
 
@@ -28,7 +28,7 @@ The domain is intentionally familiar and compact. Your group may give the applic
 
 This specification primarily describes observable behavior. When several interpretations satisfy the requirements, choose one, implement it consistently, and document any assumption that affects how the application is used or evaluated. You do not need to make the implementation unusual deliberately; differences are expected to emerge from ordinary design and development decisions.
 
-In Deconstruct, the same model will be applied to the development workflow itself: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events. The earlier implementations do not need agent-specific behavior.
+In Compare, the same model will be applied to the development workflow itself: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events. The earlier implementations do not need agent-specific behavior.
 
 ---
 
@@ -314,6 +314,8 @@ Exact accounting is not expected when a tool does not expose it. State what coul
 - one runtime measurement using the shared course workload;
 - known defects or incomplete requirements;
 - deployment URL, local run evidence, or another agreed operational artifact.
+
+Every implementation must have a reproducible operational path. By the final submission, the group must also select one of implementations A, B, or C, deploy it in an instructor-approved realistic environment outside the author's development process, and rerun the shared workload there. A hosted service or containerized environment is suitable; a purely hypothetical deployment plan is not. Record the environment, configuration, result, and limits of the comparison with local measurements.
 
 ### 9.4 Engineering explanation
 

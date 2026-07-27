@@ -13,13 +13,13 @@
   max-width: 96rem;
   padding: clamp(2rem, 4vw, 4rem) clamp(1rem, 3vw, 2.5rem) 5rem;
 }
-.project-shell[data-project-phase="construct"] {
+.project-shell[data-project-phase="establish"] {
   --project-phase: #bd6c13;
 }
-.project-shell[data-project-phase="reconstruct"] {
+.project-shell[data-project-phase="challenge"] {
   --project-phase: #087d91;
 }
-.project-shell[data-project-phase="deconstruct"] {
+.project-shell[data-project-phase="compare"] {
   --project-phase: #b44035;
 }
 .project-index,

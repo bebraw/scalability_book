@@ -78,7 +78,7 @@ const interpretationPresets: Record<
     itemMeaning:
       "An observation or sample moving from planned to collected to processed",
     experience:
-      "A researcher should record activity quickly and reconstruct what happened later, even when the environment is imperfect.",
+      "A researcher should record activity quickly and determine what happened later, even when the environment is imperfect.",
   },
   agents: {
     workspaceMeaning: "One agent fleet run",

@@ -1,4 +1,4 @@
-# Deconstruct Project
+# Compare Project
 
 ## Implementation C: Agent Fleet and Final Analysis
 
@@ -8,7 +8,7 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 ## 1. Purpose
 
-Deconstruct creates a third fresh implementation of the Work Activity Tracker through an agent fleet and then analyzes all three implementations and development workflows.
+Compare creates a third fresh implementation of the Work Activity Tracker through an agent fleet and then analyzes all three implementations and development workflows.
 
 A fleet is an orchestration strategy, not a model category. The central question is whether decomposition, specialization, and parallelism improve the result enough to justify coordination, duplicated work, integration, review, and resource cost.
 
@@ -25,7 +25,7 @@ Use:
 - the same common specification and acceptance scenarios;
 - the transfer policy in the common specification;
 - a declared base model;
-- normally the same foundation model and primary stack used for Reconstruct.
+- normally the same foundation model and primary stack used for Challenge.
 
 Keeping the model and stack stable makes B–C primarily a comparison of orchestration. If the available fleet tooling requires another model or stack, document the difference and treat it as a limitation.
 
@@ -142,6 +142,12 @@ The final analysis must address:
 
 The final result should support a conditional engineering decision, not declare a universal winner.
 
+Apply at least one scalability law or formal model to an application-architecture decision. Name the variables and assumptions, show the calculation or reasoning, connect the result to runtime evidence or a stated pressure, and explain what the model does not capture. This application analysis is separate from the workflow model required in section 5.4.
+
+### 5.6 Validate one realistic deployment
+
+Select implementation A, B, or C based on the evidence collected so far. Deploy it in an instructor-approved realistic environment outside the author's development process and rerun the shared workload. Record the environment and configuration, operational steps, result, difference from the local run, first observed constraint, and what the run does not prove about larger scale.
+
 ---
 
 ## 6. Deliverables
@@ -158,6 +164,8 @@ Submit:
 - the documented transformed trace and a repeatable way to load it;
 - evidence from the fleet debugging view and at least two findings;
 - fleet coordination measurements and analysis;
+- one application-level formal-model analysis and one workflow-level formal-model analysis;
+- deployed workload evidence from one selected implementation;
 - the cross-team audit report and a short response from the authors;
 - a final A–B–C comparison.
 
@@ -204,7 +212,7 @@ Fleet size, transcript length, generated code volume, and architectural complexi
 
 ## Instructor Notes
 
-- Use the Reconstruct model as the fleet base model when tooling and access allow it.
+- Use the Challenge model as the fleet base model when tooling and access allow it.
 - Clarify whether sequential delegation counts. It can be pedagogically valid when the handoffs are explicit, although at least one parallel branch gives stronger evidence about integration and review pressure.
 - Set a practical upper bound on fleet size or total model budget if resource use could become excessive.
 - Require compact evidence. Raw multi-agent traces can become too large to review and may contain sensitive information.

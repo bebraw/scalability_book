@@ -47,7 +47,7 @@ const evidenceItems: Record<EvidenceKey, EvidenceItem> = {
   assumption: {
     label: "Changed assumption brief",
     artifact: "Reality pressure map or changed-assumption note",
-    section: "What changed after Construct",
+    section: "What changed after Establish",
     example:
       "Offline retries, deletion requests, burst traffic, or multiple tenants changed the system pressure.",
     claimPrompt:
@@ -57,7 +57,7 @@ const evidenceItems: Record<EvidenceKey, EvidenceItem> = {
     limitationPrompt:
       "What it does not prove: This does not prove the chosen fix is correct; it only identifies the pressure.",
     missing:
-      "Name the changed assumption; otherwise Reconstruct can sound like arbitrary refactoring.",
+      "Name the changed assumption; otherwise Challenge can sound like arbitrary refactoring.",
   },
   friction: {
     label: "Friction audit result",
@@ -250,7 +250,7 @@ Write this paragraph:
   return [
     "# Final reflection package draft",
     "",
-    "Thesis: Explain how the project changed when it moved from Construct to Reconstruct to Deconstruct. Every claim below should point to a named artifact.",
+    "Thesis: Explain how the project changed from Establish to Challenge to Compare. Every claim below should point to a named artifact.",
     "",
     ...selectedSections,
     "## Evidence gaps to address before submission",

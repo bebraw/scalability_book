@@ -50,7 +50,7 @@ Not every part of an agentic system should be generative. David Khourshid's talk
 
 > **Writing note**
 >
-> Reframe this loop around the new comparison. Construct applies it with a locally hosted single agent, Reconstruct repeats the same required behavior with a foundation-model single agent, and Deconstruct applies it through a fleet. Emphasize what can be held constant across runs: the brief, acceptance checks, evidence template, and reporting units. The fleet phase adds delegation and integration to the loop rather than representing a third kind of model.
+> Reframe this loop around the new comparison. Implementation A applies it with a locally hosted single agent, implementation B repeats the same required behavior with a foundation-model single agent, and implementation C applies it through a fleet. Emphasize what can be held constant across runs: the brief, acceptance checks, evidence template, and reporting units. The fleet adds delegation and integration to the loop rather than representing a third kind of model.
 
 ## The project harness
 
@@ -77,7 +77,7 @@ You can have an agent to generate a lot of that and refine as needed. Note that 
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such. When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude. Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.
 
-It is useful to distinguish disposable code from what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve). A one-off program can be valuable even when nobody will maintain it. Code that becomes part of a shared application has a different obligation: it should leave the team and future agents able to operate, understand, and improve it. The Construct project belongs to this second category because an unfamiliar group will audit it and its evidence will be compared with two later implementations. Getting the first version to run is therefore a milestone, not the finish line.
+It is useful to distinguish disposable code from what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve). A one-off program can be valuable even when nobody will maintain it. Code that becomes part of a shared application has a different obligation: it should leave the team and future agents able to operate, understand, and improve it. Implementation A belongs to this second category because an unfamiliar group will audit it and its evidence will be compared with two later implementations. Getting the first version to run is therefore a milestone, not the finish line.
 
 Most importantly you have to be able to judge what the tools emit and where to take your project. A big chunk of this comes with experience, but to avoid some of the pain and speed up your personal development, it is a good idea to pick up at least some basic ideas so you don't have to go through the trouble and find the lessons on your own. That is the main reason why we write a big project in three stages in this book, and I'll describe the first part of the project next.
 
@@ -103,7 +103,7 @@ The implementation should remain deliberately modest. Interpretive freedom is no
 
 The same primary stack will normally be used for all three implementations. This makes the changing AI development setup easier to study. The implementation can still change substantially because requirements, models, tools, prompts, architecture decisions, and accumulated understanding do not determine one inevitable result.
 
-Construct is also where agentic development becomes concrete. Document what the local model was asked to do, what constraints and validation it received, what it misunderstood, and what the group corrected manually. The implementation direction is a starting hypothesis; the evidence package shows what actually happened.
+Implementation A is also where agentic development becomes concrete. Document what the local model was asked to do, what constraints and validation it received, what it misunderstood, and what the group corrected manually. The implementation direction is a starting hypothesis; the evidence package shows what actually happened.
 
 Questions worth discussing before implementation:
 
@@ -134,15 +134,14 @@ After this chapter, students should be able to:
 - Identify codebase and workflow choices that make future changes easier or harder.
 - Use composition to manage complexity without hiding important system behavior.
 - Evaluate AI-assisted code as maintainable software rather than as a one-time output.
-- Connect development practices to the later project phases: construct, reconstruct, and deconstruct.
+- Connect development practices to implementations A, B, and C and the development setup used for each.
 
 ## Project artifact
 
-Students should create a first version of the project harness. It should include a README, setup command, one agent instruction file, one architecture note, one feature spec for the core event workflow, one decision record for the initial stack or storage choice, one fast validation command, and a short AI-use log. The harness can be lightweight, but it should be concrete enough that another group can run, inspect, and later deconstruct the project.
+Students should create a first version of the project harness. It should include a README, setup command, one agent instruction file, one architecture note, one feature spec for the core event workflow, one decision record for the initial stack or storage choice, one fast validation command, and a short AI-use log. The harness can be lightweight, but it should be concrete enough that another group can run and inspect the project and that the final comparison can explain its development workflow.
 
 ## Notes for further development
 
-- Replace passages that say another group will later reconstruct or deconstruct this codebase. Another group will audit it briefly, while the owning group will later produce fresh implementations from the common brief.
 - Add a short distinction between transferable knowledge and transferable code. Good specifications, tests, examples, and validation practices should improve across phases without allowing the later implementation to become a fork of the first.
 - Make the evidence log part of the constrain-generate-validate loop. Students should record task framing, relevant model/tool configuration, validation outcome, human correction, and approximate cost or latency without submitting an unreadable raw transcript.
 - Explain that local models are affected by hardware, serving configuration, context limits, and quantization. Ask for contextual reporting rather than simplistic local-versus-cloud rankings.

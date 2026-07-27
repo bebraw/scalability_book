@@ -10,7 +10,7 @@ The central claim could be: web architecture is not neutral plumbing. It gives u
 - Show how browser, server, network, and database boundaries shape application design.
 - Introduce API contracts as long-lived interfaces between independently changing parts.
 - Connect web architecture to the event tracking project without requiring one fixed application theme.
-- Use the completed Construct implementations as concrete architecture cases.
+- Use the completed implementation A systems as concrete architecture cases.
 - Prepare students to make and explain architectural choices in implementation B.
 
 ## Why web architecture matters
@@ -86,9 +86,9 @@ Possible exercise:
 - Design a minimal `POST /events` endpoint and a minimal `GET /events` endpoint.
 - Then ask what changes when the app must handle retrying clients, offline devices, many tenants or domain instances, or analytical summaries.
 
-## Learning from the Construct architectures
+## Learning from the implementation A architectures
 
-Students have already made architecture choices in Construct, even if they did not yet have a complete vocabulary for them. The public project discussion should make those choices visible: different groups received the same behavioral specification but chose different stacks, boundaries, storage models, and request paths.
+Students have already made architecture choices in implementation A, even if they did not yet have a complete vocabulary for them. The public project discussion should make those choices visible: different groups received the same behavioral specification but chose different stacks, boundaries, storage models, and request paths.
 
 Architecture should not live only in diagrams or in the memory of the original authors. In an AI-assisted project, architectural intent also has to be written in places that future contributors and agents will actually read. Otherwise, the next generated change can accidentally redefine the system by changing behavior without changing the explanation.
 
@@ -127,6 +127,6 @@ Students should review the architecture and data-flow diagrams submitted with im
 - Keep API behavior and core data semantics stable in the common acceptance suite while allowing internal architecture to differ. This creates a meaningful comparison without forcing identical implementations.
 - Replace questions about which interface survives into the “next phase” with questions about which interface should remain invariant across independent builds and why.
 - Use the cross-team audit to test whether diagrams, decisions, and running behavior agree. The audit should report disagreement rather than inherit responsibility for repairing it.
-- Keep the chapter suitable for reading before lecture 4. In class, prefer comparing submitted Construct diagrams and request paths over repeating the full chapter as a lecture.
+- Keep the chapter suitable for reading before lecture 4. In class, prefer comparing submitted implementation A diagrams and request paths over repeating the full chapter as a lecture.
 - Obsidian candidate: `Clippings/_Processed/Emerging trends in software architecture from the practitioner’s perspective A five-year review.md` could provide a practitioner-facing reference for why cloud native, Kubernetes, serverless, containers, DevOps, AI, and observability keep appearing in architecture discussions. It may work best as context, not as a technology checklist students should copy.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could be used later in the chapter or previewed here as an example of architecture shaped by retries, task queues, timers, state recovery, and long-running workflows.

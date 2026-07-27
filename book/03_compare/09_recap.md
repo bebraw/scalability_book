@@ -1,6 +1,6 @@
 # What can the three implementations teach us?
 
-By the end of the course, you have constructed a working system, reconstructed it under new pressure, and deconstructed the result. The point of this sequence is not only to practice implementation. It is to see how web applications change when more people, data, traffic, features, dependencies, tools, and assumptions enter the system.
+By the end of the course, you have established a baseline, challenged its assumptions through a second implementation, and compared both with a fleet-produced third implementation. The point of this sequence is not only to practice implementation. It is to see how web applications and their development systems respond when more people, data, traffic, features, dependencies, tools, and assumptions enter the picture.
 
 The central claim could be: scalability is the ability to keep a system useful while the conditions around it change. That includes technical capacity, but it also includes architecture, feedback loops, team coordination, and the way AI-assisted development is governed.
 
@@ -11,7 +11,7 @@ The central claim could be: scalability is the ability to keep a system useful w
 ## Chapter purpose
 
 - Reconnect the main ideas of the book.
-- Help students explain what changed between Construct, Reconstruct, and Deconstruct.
+- Help students explain what changed between implementations A, B, and C.
 - Turn the final project discussion into evidence-based reflection.
 - Show that scalability is technical, architectural, organizational, and agentic.
 
@@ -19,9 +19,9 @@ The central claim could be: scalability is the ability to keep a system useful w
 
 The three projects give the course its shape:
 
-1. **[Construct](/project/construct/)**: build a baseline system with a locally hosted single agent.
-2. **[Reconstruct](/project/reconstruct/)**: build the same required behavior afresh with a foundation-model single agent.
-3. **[Deconstruct](/project/deconstruct/)**: build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
+1. **[Establish](/project/establish/) — implementation A:** build a baseline system with a locally hosted single agent.
+2. **[Challenge](/project/challenge/) — implementation B:** build the same required behavior afresh with a foundation-model single agent.
+3. **[Compare](/project/compare/) — implementation C:** build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
 
 The first working version is not the final design. It is one implementation produced by one development system. The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human. Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
 
@@ -82,11 +82,11 @@ Reflection prompts:
 
 ## Reality and changing assumptions
 
-Systems meet reality when users behave unexpectedly, data grows, traffic spikes, dependencies fail, teams misunderstand each other, or old assumptions stop holding. The Reconstruct phase exists because this is normal. A scalable system is designed to adapt when assumptions change.
+Systems meet reality when users behave unexpectedly, data grows, traffic spikes, dependencies fail, teams misunderstand each other, or old assumptions stop holding. The Challenge part makes this normal mismatch explicit and applies the same pressure scenarios to independent implementations. A scalable system is designed to adapt when assumptions change.
 
 Reflection prompts:
 
-- Which assumption from Construct changed during Reconstruct?
+- Which assumptions differed between implementations A and B, and which shared pressures challenged both?
 - What failure mode did you discover only after building the first version?
 - How did your design respond to overload, bad input, retries, duplicates, or partial failure?
 - What would you redesign first if the project continued?

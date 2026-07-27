@@ -295,17 +295,17 @@ function buildPressureMapArtifact(
 ) {
   if (selected.length === 0) {
     return [
-      "Reconstruct pressure brief",
+      "Challenge pressure brief",
       "",
       "No changed assumptions selected.",
       "",
-      "Reconstruct rule:",
+      "Challenge rule:",
       "Name the changed assumption before choosing a scaling technique.",
     ].join("\n");
   }
 
   return [
-    "Reconstruct pressure brief",
+    "Challenge pressure brief",
     "",
     `Changed assumptions: ${selected.length}`,
     `Primary pressure: ${result.pressure}`,
@@ -324,7 +324,7 @@ function buildPressureMapArtifact(
       ];
     }),
     "",
-    "Reconstruct rule:",
+    "Challenge rule:",
     "Choose the response that matches the first stressed component and the first observable signal. Do not add scaling techniques before the pressure is named.",
   ].join("\n");
 }

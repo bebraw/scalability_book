@@ -15,6 +15,7 @@ The central claim could be: more agents do not automatically mean more progress.
 - Show how tests, documentation, conventions, setup, and architecture support agentic development.
 - Teach role design for small development workflows.
 - Show how to decompose and recombine work safely.
+- Apply Amdahl's Law to parallel agent work and sequential integration or review.
 - Connect agent readiness, development-time fleets, and production agent systems.
 
 ## Working outline
@@ -54,6 +55,16 @@ The central claim could be: more agents do not automatically mean more progress.
 An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step. A provocative industry formulation in [We are now factory engineers, not product engineers](https://www.warp.dev/blog/we-are-now-factory-engineers-not-product-engineers) defines factory efficiency roughly as shipped product divided by inference cost plus human time. The exact formula is too simple to stand as a general metric: shipped features are not automatically valuable, and quality, risk, maintenance, and environmental costs can be displaced beyond the measurement window. It is nevertheless a useful prompt. Students should count review, correction, integration, failed runs, and monitoring instead of treating generated code as completed work.
 
 This view also explains why additional agents can reduce rather than increase effective throughput. Parallel generation creates a queue for human judgment, integration, and verification. Fleet size should follow the system's review capacity and the independence of the available tasks. If two agents need the same files, hidden assumptions, or reviewer at the same time, their apparent parallelism may only move waiting and conflict downstream.
+
+### Amdahl's Law and the sequential bottleneck
+
+Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel. If `p` is the parallelizable share of the work and `N` agents execute that share, the idealized speedup is:
+
+`S(N) = 1 / ((1 - p) + p / N)`
+
+If half of a workflow is inherently sequential, unlimited agents cannot make the entire workflow more than twice as fast. In software development, framing the task, changing a shared interface, integrating overlapping edits, reviewing risk, and accepting the final result often remain sequential. Real fleets perform below the ideal bound because communication, duplicated exploration, conflicts, and waiting add overhead that the basic formula does not model.
+
+Students should estimate the parallel and sequential portions of one fleet workflow, calculate the ideal bound, and then compare it with observed elapsed time and human review effort. The difference is evidence about coordination cost, not proof that the law failed.
 
 ## Trust boundaries
 
@@ -115,7 +126,7 @@ In the course project, this trace becomes application data. The fleet run maps t
 - Discuss security and trust boundaries: project-local agents should be treated as executable project policy. Use them only in trusted repositories and review their prompts like code.
 - Use Acolyte as a comparison point for agent-ready tooling. Its documentation emphasizes explicit runtime concepts such as sessions, tasks, lifecycle phases, tool contracts, workspace behavior, tracing, and memory. Develop this as an example of how good agent tooling mirrors good software architecture: clear boundaries, typed interfaces, observable behavior, and recoverable failures.
 - Possible Acolyte angle: ask students to inspect what an agent runtime needs from a workspace before it can operate safely. This can lead into workspace detection, sandbox boundaries, permissions, test commands, lint commands, and traceable tool execution.
-- Use Mastra to broaden the chapter beyond coding agents. The key point is that an agent fleet can also be a runtime system inside an application, not only a set of development assistants. This connects Deconstruct back to scalable web applications: deployed agents need workflows, observability, evaluation, access control, memory, deployment strategy, and operational ownership.
+- Use Mastra to broaden the chapter beyond coding agents. The key point is that an agent fleet can also be a runtime system inside an application, not only a set of development assistants. This connects implementation C back to scalable web applications: deployed agents need workflows, observability, evaluation, access control, memory, deployment strategy, and operational ownership.
 - Possible Mastra exercise extension: after students coordinate a coding-agent fleet, ask them to sketch how a production agent workflow would be tested and observed. They do not need to build the full system, but they should identify inputs, outputs, tools, state, evals, traces, failure handling, and deployment boundaries.
 - Verify Acolyte-specific claims with the author. In particular, check how to describe its daemon architecture, task lifecycle, workspace sandboxing, SKILL.md support, memory model, and trace commands accurately.
 - Verify Mastra-specific claims with the authors. In particular, check the best current way to describe Mastra workflows, evals, observability, Studio, Server, Memory Gateway, and framework integration.

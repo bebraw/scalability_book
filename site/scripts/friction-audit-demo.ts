@@ -562,7 +562,7 @@ function buildFrictionInterpretation(
   improvement: Improvement,
 ) {
   if (result.saved >= 18) {
-    return `${improvement.title} removes a meaningful amount of repeated work. This is a good first Reconstruct improvement.`;
+    return `${improvement.title} removes a meaningful amount of repeated work. This is a good first Challenge improvement.`;
   }
 
   if (result.loops >= 4) {

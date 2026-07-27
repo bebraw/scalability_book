@@ -7,7 +7,7 @@ The central claim could be: scalability is not only about handling more users. A
 ## Chapter purpose
 
 - Define friction as the practical symptom of technical debt.
-- Help students notice friction in their own Construct projects.
+- Help students notice friction in their own implementation A systems.
 - Show how friction appears in code, tooling, documentation, tests, dependencies, and collaboration.
 - Connect friction to agentic development: agents amplify both good structure and bad structure.
 
@@ -56,7 +56,7 @@ The demonstration below treats friction as repeated work in a small change path.
 
 {{ import "site/includes/friction-audit-demo.html" }}
 
-After using the demo, students should apply the same structure to their own Construct project: choose a likely change, score the path, name the largest source of friction, and choose one concrete improvement.
+After using the demo, students should apply the same structure to implementation A: choose a likely change, score the path, name the largest source of friction, and choose one concrete improvement.
 
 ## Reducing friction
 
@@ -73,24 +73,24 @@ Possible techniques:
 
 ## Exercise ideas
 
-- Ask students to perform a friction audit of their Construct project.
+- Ask students to perform a friction audit of implementation A.
 - Have them identify the three most expensive changes they can imagine making.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Use an AI agent to inspect the project for friction, then require students to verify or reject its findings.
 
 ## Project artifact
 
-Students should produce a friction audit. It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before Reconstruct.
+Students should produce a friction audit. It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before building implementation B.
 
 ## Notes for further development
 
-- Add a friction checklist that students can reuse before Reconstruct.
+- Add a friction checklist that students can reuse before implementation B.
 - Connect this chapter to the peer assessment process: friction is often felt by teammates first.
 - Consider including a small before/after example where a tangled event handler is split into clearer validation, storage, and presentation pieces.
 - Turn the friction audit into a standardized instrument applied to every build. Keep the same setup, comprehension, change, testing, review, operational, and coordination categories so cross-build comparisons are meaningful.
 - Make the bounded cross-team audit the primary source of setup and comprehension evidence. Authors are poor judges of their own hidden context.
 - Define one small common change request that auditors can attempt or estimate against each implementation. The change must be narrow enough to fit the audit and stable enough to compare.
 - Separate generated-code friction from workflow friction. A clean final repository may still have required excessive retries, prompt repair, integration, or human review to produce.
-- In Deconstruct, add fleet-specific coordination friction without changing the base audit rubric. This makes the cost of handoffs and parallel work visible as an additional dimension.
+- For implementation C, add fleet-specific coordination friction without changing the base audit rubric. This makes the cost of handoffs and parallel work visible as an additional dimension.
 - Obsidian candidate: `Clippings/_Processed/Harness engineering for coding agent users.md` could strengthen the chapter's feedback-loop framing. The feedforward/feedback distinction maps well to setup instructions, tests, linters, architecture notes, and review prompts as friction reducers.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support a short section on review friction. The useful angle is not "skip review", but "move repeatable review comments into tools, tests, formatters, conventions, and smaller module boundaries".

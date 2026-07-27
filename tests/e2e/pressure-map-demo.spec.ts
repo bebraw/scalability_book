@@ -43,7 +43,7 @@ test.describe("pressure map demo", () => {
     ).toContainText("Watch first for");
 
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
-      /Reconstruct pressure brief/,
+      /Challenge pressure brief/,
     );
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
       /Partition by tenant boundary/,

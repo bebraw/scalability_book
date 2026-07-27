@@ -1,4 +1,4 @@
-# Construct Project
+# Establish Project
 
 ## Implementation A: Local Single Agent
 
@@ -8,7 +8,7 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 ## 1. Purpose
 
-Construct establishes the first implementation and the comparison baseline.
+Establish creates the first implementation and the comparison baseline.
 
 Build the Work Activity Tracker using a locally hosted model through a single-agent workflow. The goal is not to demonstrate that local models are inherently weak or strong. The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
 
@@ -51,7 +51,7 @@ Complete the required domain model, behavior, harness, and acceptance scenarios 
 
 ### 3.2 Establish the evidence baseline
 
-Produce the common evidence package while the work is happening. Do not attempt to reconstruct model usage, failed attempts, or human intervention at the end.
+Produce the common evidence package while the work is happening. Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
 
 ### 3.3 Record the stack hypothesis
 

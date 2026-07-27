@@ -26,7 +26,7 @@ const tasks: Record<EvalTaskId, EvalTask> = {
     context:
       "README: Users record workflow events and view the latest activity per project. Code excerpt: GET /events loads events with SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The migration defines indexes on project_id and event_type, but not created_at.",
     prompt:
-      "You are helping with the Reconstruct phase of a course project.\nUse only the context below. If something is missing, say what you cannot know.\n\nTask: Find one likely scaling bottleneck in the event tracking project.\n\nRequired output:\n- Bottleneck:\n- Evidence from the context:\n- Why it matters under higher load:\n- One measurement that would confirm or reject it:",
+      "You are helping with the Challenge phase of a course project.\nUse only the context below. If something is missing, say what you cannot know.\n\nTask: Find one likely scaling bottleneck in the event tracking project.\n\nRequired output:\n- Bottleneck:\n- Evidence from the context:\n- Why it matters under higher load:\n- One measurement that would confirm or reject it:",
     rubric: [
       "Grounded in the supplied context rather than generic advice.",
       "Names a concrete query, endpoint, file, or data flow.",
@@ -43,9 +43,9 @@ const tasks: Record<EvalTaskId, EvalTask> = {
     id: "benchmark",
     label: "Produce a benchmark plan",
     context:
-      "Project: a conference check-in event tracker. Users submit check-in events, organizers view the latest arrivals, and admins filter events by session. The Reconstruct assumption is 20,000 events during a 30-minute arrival peak.",
+      "Project: a conference check-in event tracker. Users submit check-in events, organizers view the latest arrivals, and admins filter events by session. The Challenge assumption is 20,000 events during a 30-minute arrival peak.",
     prompt:
-      "You are helping with the Reconstruct phase of a course project.\nUse only the context below.\n\nTask: Propose one benchmark plan.\n\nRequired output:\n- Workload:\n- Load level:\n- Metrics:\n- What the result does not prove:",
+      "You are helping with the Challenge phase of a course project.\nUse only the context below.\n\nTask: Propose one benchmark plan.\n\nRequired output:\n- Workload:\n- Load level:\n- Metrics:\n- What the result does not prove:",
     rubric: [
       "Defines a workload that matches the project workflow.",
       "States a concrete load level rather than 'many users'.",
@@ -64,7 +64,7 @@ const tasks: Record<EvalTaskId, EvalTask> = {
     context:
       "Schema excerpt: Project(id, name), User(id, email), Event(id, project_id, actor_id, event_type, payload_json, created_at). README: events describe actions inside one project. Some events are created by system jobs, so actor_id can be null.",
     prompt:
-      "You are helping with the Reconstruct phase of a course project.\nUse only the context below.\n\nTask: Explain the event data model.\n\nRequired output:\n- Main entities:\n- How events relate to them:\n- One unclear assumption:",
+      "You are helping with the Challenge phase of a course project.\nUse only the context below.\n\nTask: Explain the event data model.\n\nRequired output:\n- Main entities:\n- How events relate to them:\n- One unclear assumption:",
     rubric: [
       "Names the core entities and relationships.",
       "Accounts for nullable actor_id instead of inventing a user for every event.",

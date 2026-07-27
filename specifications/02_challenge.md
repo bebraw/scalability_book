@@ -1,4 +1,4 @@
-# Reconstruct Project
+# Challenge Project
 
 ## Implementation B: Foundation-Model Single Agent
 
@@ -8,13 +8,13 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 ## 1. Purpose
 
-Reconstruct creates a fresh implementation of the same Work Activity Tracker using a foundation model through a single-agent workflow.
+Challenge creates a fresh implementation of the same Work Activity Tracker using a foundation model through a single-agent workflow.
 
 The purpose is to compare implementation B with the local-model baseline. A more capable model may generate more code, infer more context, or recover from problems differently. It may also introduce unnecessary complexity, plausible-looking defects, greater cost, or more demanding review work.
 
 This is a new implementation, not a refactor of implementation A.
 
-Complete and submit implementation B before lecture 7. The public discussion during lecture 7 will compare the Reconstruct results before the course introduces the fleet workflow for implementation C.
+Complete and submit implementation B before lecture 7. The public discussion during lecture 7 will compare the Challenge results before the course introduces the fleet workflow for implementation C.
 
 ---
 
@@ -28,7 +28,7 @@ Use:
 - the transfer policy in the common specification;
 - the approved foundation model;
 - one coding-agent process at a time;
-- normally the same primary stack chosen for Construct.
+- normally the same primary stack chosen for Establish.
 
 Keeping the primary stack stable makes the comparison easier to interpret. A group may change it with instructor approval when the change supports a clear learning question. The final comparison must then treat the stack change as a confounding factor rather than attributing every difference to the model.
 
@@ -61,7 +61,7 @@ Complete a fresh implementation of the required domain model, behavior, harness,
 
 ### 4.2 Repeat the evidence collection
 
-Use the same evidence categories and measurement units as Construct. Preserve failed attempts and human corrections that help explain the result.
+Use the same evidence categories and measurement units as Establish. Preserve failed attempts and human corrections that help explain the result.
 
 ### 4.3 Compare the two single-agent workflows
 
@@ -76,7 +76,7 @@ Compare implementations A and B in terms of:
 - amount and type of human intervention;
 - optional scope completed.
 
-Do not present correlation as proof. The group has more domain knowledge during Reconstruct, and this practice effect is part of the comparison's limitations.
+Do not present correlation as proof. The group has more domain knowledge during Challenge, and this practice effect is part of the comparison's limitations.
 
 ### 4.4 Apply runtime pressure
 
@@ -130,4 +130,4 @@ A larger implementation B is not automatically a better implementation.
 - Choose the approved foundation model and agent environment before the phase begins.
 - Keep the single-agent boundary operationally clear. A tool that silently delegates to several agents may invalidate the intended comparison.
 - Require the same primary stack by default, but allow justified exceptions. Stack experimentation across groups is desirable; uncontrolled stack changes within one group's comparison are harder to interpret.
-- Consider supplying the same small runtime workload used in Construct so architectural comparisons include measured behavior.
+- Consider supplying the same small runtime workload used in Establish so architectural comparisons include measured behavior.

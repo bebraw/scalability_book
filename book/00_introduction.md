@@ -1,6 +1,6 @@
 # Elements of Scalable Web Applications
 
-In this brief book, I discuss the elements behind scalable web applications. The book contains three projects (construct, reconstruct, and deconstruct) for you to complete that each illustrate a facet of scalability. By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale. It is not only infrastructure that we have to consider but also the way we build applications. Therefore, scalability is not only a technical concern but also a social one. It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
+In this brief book, I discuss the elements behind scalable web applications. The book contains three projects—Establish, Challenge, and Compare—that produce implementations A, B, and C of the same bounded application. By completing this book, you should understand different ways to build web applications while appreciating the problems that emerge when these applications have to scale. It is not only infrastructure that we have to consider but also the way we build applications. Therefore, scalability is not only a technical concern but also a social one. It has to do with how teams develop and maintain applications while requirements, constraints, and operating conditions change.
 
 > **Sustainability angle**
 >
@@ -46,10 +46,10 @@ Each chapter should help you produce or revise one concrete project artifact. By
 
 - Chapter 1: scalability dimensions checklist.
 - Chapter 2: README, assumptions, and development process notes.
-- Chapter 3: shared measurement protocol and Construct baseline.
-- Chapter 4: architecture reading, Construct architecture analysis, and an implementation B architecture hypothesis.
+- Chapter 3: shared measurement protocol and implementation A baseline.
+- Chapter 4: architecture reading, implementation A analysis, and an implementation B architecture hypothesis.
 - Chapter 5: friction audit.
-- Chapter 6: changed-assumptions and pressure map for Reconstruct.
+- Chapter 6: challenged-assumptions and pressure maps for implementations A and B.
 - Chapter 7: agent instructions, task boundaries, and review workflow.
 - Chapter 8: three-way scaling comparison, target design, and scaling trade-off table.
 - Chapter 9: final evidence-based reflection.
@@ -57,7 +57,6 @@ Each chapter should help you produce or revise one concrete project artifact. By
 ## Notes for further development
 
 - Preserve the traditional scalability thread explicitly. The three-build comparison is a way to study development scalability, but every implementation still has to be discussed in terms of users, data, traffic, failure, architecture, operations, and resource use.
-- Replace “the running project” with language that distinguishes the shared problem and acceptance suite from the three separate implementations.
 - Preview the bounded cross-team audit as the place where unfamiliar readers test setup, documentation, hidden assumptions, and change friction. Do not promise a full handover-and-return cycle.
 - Revisit the artifact list after the common specification is settled. Some artifacts should be produced for every build in a comparable evidence package; others should culminate in the final cross-build analysis.
 - Use [`docs/three-build-project-direction.md`](../docs/three-build-project-direction.md) as the source of truth during this rewrite.

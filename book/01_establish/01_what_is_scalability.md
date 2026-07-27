@@ -40,7 +40,7 @@ Becoming too successful can kill a software product. That is essentially what de
 
 ### Planning is good, reality has its own ideas
 
-While we might have the best of plans, typically the reality doesn't follow our assumptions. That said, it's better to plan than not as that gives us insight on what to expect. Ideally we are then able to adjust our plans as we proceed and gain new information to help make more informed choices. In this chapter, we approach the topic through this viewpoint as we start from a single product that grows into a large system as you complete the portions of the project. We won't touch the business side within this book, though, and keep the scope within the technical realm and what you might encounter there. It is important that you form your own view of technical scalability after all.
+While we might have the best of plans, typically reality does not follow our assumptions. That said, it is better to plan than not, as planning gives us claims that evidence can challenge. In this book, three independent implementations address the same bounded application while shared pressure scenarios reveal where each design would become insufficient. We keep the scope primarily within the technical realm so you can form and defend your own view of technical scalability.
 
 :::
 
@@ -61,71 +61,6 @@ Use the radar before choosing techniques. A system can scale one dimension while
 TODO: Summary goes here
 
 ::: comment
-
-## 2.1 The Course Narrative & Project Arc
-
-Rather than present scalability as a catalog of patterns and technologies, we’ll follow a single system over time.
-
-Imagine we're building a product: an event tracking application that records meaningful activity in a chosen domain. One group might track a conference, another might track a classroom workflow, a shop, a game, a sensor network, or a support process. At first, the application may only track a few event types for a small number of users. Later, the same idea has to support many domain instances, many users, high event volume, unreliable networks, and delayed processing.
-
-At the beginning, it’s just:
-
-- A small backend API
-- A database
-- A simple web dashboard
-- A handful of users
-
-It works. It’s simple. It’s fine.
-
-Then success arrives:
-
-- Traffic grows from dozens to millions of requests per day
-- Customers demand stricter SLAs and compliance
-- Product and sales teams multiply
-- The data we store grows from megabytes to terabytes
-- The system must integrate with many other systems
-- Features must ship faster, not slower
-
-Our project arc will follow this journey through distinct phases:
-
-1. **Prototype and early traction**
-   - “Get something working.”
-   - Single service, single database, minimal infrastructure.
-   - Engineering priorities: speed of development and correctness.
-
-2. **First scaling pain**
-   - Traffic spikes, outages, slow queries, brittle deployments.
-   - “We just need to make it stop falling over.”
-   - Introduce basic observability, caching, and capacity planning.
-
-3. **Growing teams, growing complexity**
-   - New product lines, multiple teams contributing, conflicting priorities.
-   - Conway’s Law starts to show up in the architecture.
-   - Move from a single codebase mindset to modular boundaries.
-
-4. **System as a platform**
-   - Other teams and external partners now depend on our APIs and data.
-   - We need stable contracts, versioning, backward compatibility.
-   - The system becomes infrastructure, not just an app.
-
-5. **Operating at scale under constant change**
-   - Large volumes of traffic and data, constant experiments, frequent deploys.
-   - We must manage risk, blast radius, resilience, and cost.
-   - Architecture and organization choices become deeply intertwined.
-
-Each chapter will live inside this narrative:
-
-- We’ll introduce a _pressure_ (more users, data, teams, or change).
-- We’ll make or evaluate design choices under real constraints.
-- We’ll look at tradeoffs: when a pattern helps and when it hurts.
-- We’ll revisit earlier decisions with the clarity of hindsight.
-
-The aim is not to design the “perfect” architecture, but to learn how to:
-
-- Recognize scaling dimensions early
-- Use constraints to focus design
-- Reduce the cost of change over time
-- Grow a system in a way that stays understandable and operable
 
 ## 2.2 The Dimensions of Scalability
 
@@ -220,7 +155,7 @@ Typical stress signals:
 - Tests are slow, flaky, or absent.
 - Old design decisions are no longer documented.
 
-Change scaling is central to this book because three development systems address the same required behavior independently. Construct establishes a baseline, Reconstruct supplies a second architectural hypothesis, and Deconstruct adds a fleet-produced implementation before students compare the evidence. A scalable system is not only one that handles more load. It is one that can survive being changed by people who did not make the original decisions.
+Change scaling is central to this book because three development systems address the same required behavior independently. Implementation A establishes a baseline, implementation B supplies a second architectural hypothesis, and implementation C adds a fleet-produced result before students compare the evidence. A scalable system is not only one that handles more load. It is one that can survive being changed by people who did not make the original decisions.
 
 Development ideas:
 
@@ -247,7 +182,7 @@ Development ideas:
 
 - Use simple graphs: latency vs load, throughput vs workers, recovery time vs failure.
 - Include examples where optimizing one property harms another.
-- Tie this back to the Reconstruct project: students should name which dimension they are optimizing and what they are sacrificing.
+- Tie this back to implementation B: students should name which dimension they are optimizing and what they are sacrificing.
 
 ## Constraints as design inputs
 

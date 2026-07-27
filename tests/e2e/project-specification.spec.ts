@@ -21,8 +21,8 @@ test.describe("project specification", () => {
     ).toBeVisible();
     await expect(page.getByText("Canonical brief")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /Construct/ }).first(),
-    ).toHaveAttribute("href", "/project/construct/");
+      page.getByRole("link", { name: /Establish/ }).first(),
+    ).toHaveAttribute("href", "/project/establish/");
     await expect(
       page.getByRole("heading", { name: "Instructor Notes" }),
     ).toHaveCount(0);
@@ -32,28 +32,28 @@ test.describe("project specification", () => {
     page,
     request,
   }) => {
-    await page.goto("/project/reconstruct/");
+    await page.goto("/project/challenge/");
 
     await expect(
-      page.getByRole("heading", { name: "Reconstruct Project" }),
+      page.getByRole("heading", { name: "Challenge Project" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "common project specification" }),
     ).toHaveAttribute("href", "/project/");
     await expect(
       page.locator('.project-index a[aria-current="page"]'),
-    ).toContainText("Reconstruct");
+    ).toContainText("Challenge");
 
     const sourceLink = page.getByRole("link", { name: /Download Markdown/ });
     await expect(sourceLink).toHaveAttribute(
       "href",
-      "/project/source/reconstruct.md",
+      "/project/source/challenge.md",
     );
 
-    const sourceResponse = await request.get("/project/source/reconstruct.md");
+    const sourceResponse = await request.get("/project/source/challenge.md");
     expect(sourceResponse.status()).toBe(200);
     const source = await sourceResponse.text();
-    expect(source).toContain("# Reconstruct Project");
+    expect(source).toContain("# Challenge Project");
     expect(source).toContain("](\/project\/)");
     expect(source).not.toContain("## Instructor Notes");
   });
@@ -104,12 +104,12 @@ test.describe("project specification", () => {
 
     await page.goto("/parts/challenge/");
     await expect(
-      page.getByRole("link", { name: "Reconstruct project brief" }),
-    ).toHaveAttribute("href", "/project/reconstruct/");
+      page.getByRole("link", { name: "Challenge project brief" }),
+    ).toHaveAttribute("href", "/project/challenge/");
 
     await page.goto("/parts/compare/");
     await expect(
-      page.getByRole("link", { name: "Deconstruct project brief" }),
-    ).toHaveAttribute("href", "/project/deconstruct/");
+      page.getByRole("link", { name: "Compare project brief" }),
+    ).toHaveAttribute("href", "/project/compare/");
   });
 });

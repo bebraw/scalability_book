@@ -6,7 +6,7 @@ The central claim could be: systems rarely fail because one textbook pattern was
 
 ## Chapter purpose
 
-- Bridge Construct and Reconstruct.
+- Bridge the comparison from implementation A to implementation B.
 - Help students identify what breaks first when scale and uncertainty increase.
 - Introduce failure modes that appear outside local development.
 - Teach students to reason from pressure rather than from fashionable architecture patterns.
@@ -44,7 +44,7 @@ Each scenario can be used to ask:
 - What data can be lost, delayed, or duplicated?
 - What does the user see?
 - What does the operator see?
-- What design choice from Construct caused or softened the problem?
+- What design choice from implementation A caused or softened the problem?
 
 ### Pressure map lab
 
@@ -68,7 +68,7 @@ Ideas to develop:
 
 ## Scaling bridge for the comparison
 
-Before students complete Reconstruct, they need a compact vocabulary for responding to pressure. This chapter introduces the ideas lightly; the later scaling chapter applies them consistently across all three implementations.
+Before students complete implementation B, they need a compact vocabulary for responding to pressure. This chapter introduces the ideas lightly; the later scaling chapter applies them consistently across all three implementations.
 
 Useful bridge concepts:
 
@@ -81,11 +81,11 @@ Useful bridge concepts:
 - **Graceful degradation**: decide what can be delayed, approximated, or temporarily disabled.
 - **Operational signals**: define which metric would show overload first.
 
-The goal is not for students to apply every technique. The goal is for them to enter Reconstruct with enough vocabulary to explain why one pressure deserves one response and not another.
+The goal is not for students to apply every technique. The goal is for them to complete implementation B with enough vocabulary to explain why one pressure deserves one response and not another.
 
 ## Challenging assumptions without changing the core
 
-Reconstruct should not be framed as "make the app bigger" or as an extension of implementation A. The following shared pressure scenarios challenge both implementations without changing the common acceptance core:
+Implementation B should not be framed as "make the app bigger" or as an extension of implementation A. The following shared pressure scenarios challenge both implementations without changing the common acceptance core:
 
 - many concurrent tenants, projects, groups, locations, or other domain instances,
 - tens or hundreds of thousands of users,
@@ -98,7 +98,7 @@ Students should explain which assumptions they are changing and which they are k
 ## Exercise ideas
 
 - Run a postmortem for a fictional event tracking outage.
-- Ask students to write the top five assumptions in their Construct project and mark which assumptions fail under the Reconstruct brief.
+- Ask students to write the top five assumptions in implementation A and mark which are challenged by the shared pressure scenarios.
 - Have students draw a "pressure map" showing which component is stressed by which new requirement.
 - Ask an agent to propose failure scenarios, then have students rank them by likelihood and impact.
 
@@ -111,7 +111,7 @@ Students should produce a challenged-assumptions list and a pressure map. The ma
 - Add a concise incident narrative that can be reused in lecture.
 - Connect this chapter to benchmarking: measurement reveals some forms of reality before users do.
 - Connect this chapter to scaling: the next part should introduce specific techniques only after the pressure is clear.
-- Keep changed assumptions as a shared thought experiment or pressure test applied to all three implementations. Do not make them a license for the Reconstruct group to change the common functional scope.
+- Keep changed assumptions as a shared thought experiment or pressure test applied to all three implementations. Do not make them a license to change the common functional scope of implementation B.
 - Distinguish the immutable acceptance core from scalability scenarios. The implementation must satisfy the former; students use the latter to explain what would fail and how the architecture could respond.
 - Ask students to compare whether the local and foundation-model implementations exposed different failure assumptions, and whether those differences came from architecture, generated defaults, or team decisions.
 - Preserve identical pressure-map headings across phases so the final analysis can compare event volume, concurrency, storage growth, retries, partial failure, and eventual correctness directly.
