@@ -94,7 +94,3 @@ Possible techniques:
 
 Students should produce a friction audit.
 It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before building implementation B.
-
-## References
-
-::bibliography[]

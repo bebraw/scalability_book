@@ -109,6 +109,12 @@ const demoScriptIncludes = [
     script: "/web-architecture-lens.js",
   },
   {
+    title: "Client activation lens",
+    chapter: "Architecture",
+    include: "site/includes/client-activation-lens.html",
+    script: "/client-activation-lens.js",
+  },
+  {
     title: "Tail latency simulator",
     chapter: "Benchmarking",
     include: "site/includes/benchmark-simulation-demo.html",
@@ -384,6 +390,10 @@ await compileSiteScript(
 await compileSiteScript(
   "scripts/web-architecture-lens.ts",
   "web-architecture-lens.js",
+);
+await compileSiteScript(
+  "scripts/client-activation-lens.ts",
+  "client-activation-lens.js",
 );
 await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",

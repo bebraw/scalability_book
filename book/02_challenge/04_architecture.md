@@ -105,6 +105,47 @@ The ISR behavior in the lab is a simplified stale-while-revalidate model.
 Exact regeneration, invalidation, and consistency behavior depends on the framework and deployment platform.
 That platform-specific contract should be documented as part of the architecture.
 
+## Activation is another architectural decision
+
+Rendering and navigation do not explain how delivered HTML becomes interactive.
+A server-rendered page may already contain useful content while the browser still has to recover or load the behavior behind its controls.
+That activation work is another architectural decision with consequences for payload size, client processing, first-interaction latency, and application structure.
+
+Four approaches make the trade-off visible:
+
+| Approach              | Activation unit                         | Main benefit                                           | Main constraint                                                  |
+| --------------------- | --------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
+| Hydration             | The rendered component tree             | Familiar, general application model                    | Re-executes client code to recover state and listeners           |
+| Progressive hydration | Ordered portions of the same tree       | Prioritizes important interaction                      | The application is still eventually hydrated                     |
+| Islands architecture  | Explicit interactive regions            | Static HTML elsewhere; work can be deferred or avoided | Shared state, navigation, and communication across islands       |
+| Resumability          | Serialized state and handler boundaries | Continues without replaying the application            | Serializable state and framework compiler or runtime constraints |
+
+Islands architecture and resumability are not competing names for a complete application architecture.
+Islands partition a page into static and interactive regions and attach a loading strategy to each interactive region.
+Resumability changes how execution crosses the server-client boundary: component boundaries, application state, and listener references are serialized into the delivered HTML so the browser can continue without replaying the application :citep[vepsalainen2024resumability].
+A resumable framework can therefore create fine-grained islands automatically.
+
+The strongest fit for explicit islands is an application with meaningful static regions and a smaller amount of separable interactivity.
+Research on edge-powered islands found that work could be deferred or avoided, but also concluded that the benefit becomes harder to obtain as an application grows more dynamic and difficult to divide into independent portions :citep[vepsalainen2025islands].
+Inter-island state, navigation, and communication then become architectural costs rather than incidental implementation details.
+
+### Client activation lens
+
+The lab below holds the server-rendered event page constant and changes only how its behavior becomes available in the browser.
+Compare what happens before the first interaction, then run the same record-event action.
+The transfer values are illustrative teaching values, not framework benchmarks; a real comparison should record production bundles, client execution, and interaction latency on representative devices.
+
+{{ import "site/includes/client-activation-lens.html" }}
+
+The useful question is not which technique is universally fastest.
+Ask which code and state must cross the boundary, which work happens before the user asks for it, which latency moves to the first interaction, and what new constraints the chosen technique introduces.
+Resumability can avoid replay but requires serializable state and more specialized tooling.
+Islands can reduce initial JavaScript but become less attractive when every region needs shared client state.
+
+For the event tracking project, annotate the architecture diagram with interactive regions.
+For each region, record whether it is static, eagerly activated, activated when visible, or activated on interaction; identify its state owner and how it communicates with the rest of the page.
+The architecture hypothesis for implementation B should name one activation decision worth preserving or changing and the evidence that would validate it.
+
 ## API design as architecture
 
 Ideas to develop:

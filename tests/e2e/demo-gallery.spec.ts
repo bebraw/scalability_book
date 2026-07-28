@@ -12,16 +12,16 @@ test.describe("demo showcase", () => {
     await expect(gallery.locator(".demo-gallery-lede")).toContainText(
       "Work through one module at a time",
     );
-    await expect(items).toHaveCount(17);
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText("17");
+    await expect(items).toHaveCount(18);
+    await expect(gallery.locator(".demo-gallery-stats")).toContainText("18");
     await expect(gallery.locator(".demo-gallery-stats")).toContainText(
       "Self-guided",
     );
     await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
-    await expect(items.last().locator(".demo-gallery-index")).toHaveText("17");
-    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(17);
-    await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(17);
-    await expect(gallery.locator("[data-demo-permalink]")).toHaveCount(17);
+    await expect(items.last().locator(".demo-gallery-index")).toHaveText("18");
+    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(18);
+    await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(18);
+    await expect(gallery.locator("[data-demo-permalink]")).toHaveCount(18);
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });

@@ -121,7 +121,3 @@ The fleet run maps to a workspace, delegated tasks map to work items, agents and
 By loading a transformed trace into implementation C, students turn the application into a debugging and observability tool for the workflow that produced it.
 The goal is not to build a universal agent platform.
 It is to use event history, filters, summaries, and selected relationships to find coordination failures that the final code alone does not reveal.
-
-## References
-
-::bibliography[]

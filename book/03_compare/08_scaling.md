@@ -176,7 +176,3 @@ Students should produce a three-way scaling comparison and one justified target 
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
 It should include one formal model applied to an application decision and one applied to the development workflow.
 Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
-
-## References
-
-::bibliography[]

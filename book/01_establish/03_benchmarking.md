@@ -111,7 +111,3 @@ There's also a point to be made about variability (Herivcko et al.).
 
 Explanation should go here.
 Find also other related laws.
-
-## References
-
-::bibliography[]

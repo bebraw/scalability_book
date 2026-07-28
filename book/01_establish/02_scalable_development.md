@@ -202,7 +202,3 @@ In short, you can move far faster now but this ability also comes with built-in 
 Therefore, it is essential that you pick up strong engineering practices and develop your intuition of working with agents since that is a skill of its own.
 At best, being able to work with the machine well can work as a force multiplier allowing you to implement ideas otherwise out of your reach.
 This also means having a different attitude towards development as the shift is moving you towards a managerial position and development lead now that you have a pair or even a team of tireless agents working for you.
-
-## References
-
-::bibliography[]

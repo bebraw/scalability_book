@@ -70,7 +70,7 @@ test("unclosed Markdown comment blocks fail with the opening line", () => {
   );
 });
 
-test("citations link to their shared bibliography entries", () => {
+test("citations automatically link to a generated bibliography", () => {
   const bibliography = `@article{little1961,
   author = {Little, John D. C.},
   title = {A Proof for the Queuing Formula},
@@ -80,10 +80,6 @@ test("citations link to their shared bibliography entries", () => {
     `# Chapter
 
 As :citet[little1961] showed, the relationship is stable.
-
-## References
-
-::bibliography[]
 `,
     { number: "2" },
     bibliography,
@@ -97,6 +93,53 @@ As :citet[little1961] showed, the relationship is stable.
     /<a[^>]+class="semantic-citation"[^>]+href="#reference-little1961"/,
   );
   assert.match(rendered.content, /<li id="reference-little1961">/);
+  assert.deepEqual(
+    rendered.tableOfContents.map(({ text }) => text),
+    ["Chapter", "2.1 References"],
+  );
+});
+
+test("an explicit bibliography is not duplicated", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+Earlier work established the relationship :cite[little1961].
+
+## Sources
+
+::bibliography[]
+`,
+    { number: "2" },
+    `@article{little1961,
+  author = {Little, John D. C.},
+  title = {A Proof for the Queuing Formula},
+  year = {1961}
+}`,
+  );
+
+  assert.equal(
+    rendered.content.match(/class="semantic-bibliography"/g)?.length,
+    1,
+  );
+  assert.doesNotMatch(rendered.content, />References</);
+});
+
+test("citation syntax in a code fence does not generate a bibliography", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+\`\`\`md
+:cite[little1961]
+\`\`\`
+`,
+    { number: "2" },
+  );
+
+  assert.doesNotMatch(rendered.content, /semantic-bibliography/);
+  assert.deepEqual(
+    rendered.tableOfContents.map(({ text }) => text),
+    ["Chapter"],
+  );
 });
 
 test("bibliography URLs remain clickable", () => {

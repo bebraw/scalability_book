@@ -64,6 +64,15 @@
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
+@media (max-width: 42rem) {
+  .prose > table {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+}
 .prose .semantic-citation {
   color: var(--accent-strong);
   text-decoration-color: var(--accent);

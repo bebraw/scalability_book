@@ -89,15 +89,29 @@ export function renderMarkdown(
   bibliographySource = "",
 ): RenderedMarkdown {
   source = getPublicMarkdownSource(source);
-  const prepared = prepareMarkdownImports(source);
-  const headingNumbers = prefixHeadingNumbers(
+  let prepared = prepareMarkdownImports(source);
+  let headingNumbers = prefixHeadingNumbers(
     headingNumbersByOffset(prepared.source),
     chapter.number,
   );
-  const rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
+  let rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
     citationFormatter,
     headingNumbers,
   });
+
+  if (needsAutomaticBibliography(rendered.tree)) {
+    source = `${source.trimEnd()}\n\n## References\n\n::bibliography[]\n`;
+    prepared = prepareMarkdownImports(source);
+    headingNumbers = prefixHeadingNumbers(
+      headingNumbersByOffset(prepared.source),
+      chapter.number,
+    );
+    rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
+      citationFormatter,
+      headingNumbers,
+    });
+  }
+
   throwOnMarkdownErrors(prepared.source, rendered.diagnostics);
   const tableOfContents = decorateRenderedTree(
     rendered.tree,
@@ -112,6 +126,18 @@ export function renderMarkdown(
     content: toHtml(rendered.tree),
     tableOfContents,
   };
+}
+
+function needsAutomaticBibliography(tree: HastRoot): boolean {
+  let hasCitation = false;
+  let hasBibliography = false;
+
+  walk(tree, (element) => {
+    hasCitation ||= hasClass(element, "semantic-citation");
+    hasBibliography ||= hasClass(element, "semantic-bibliography");
+  });
+
+  return hasCitation && !hasBibliography;
 }
 
 function withoutParentheses(value: string): string {
