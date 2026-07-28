@@ -101,13 +101,135 @@ Explanation should go here.
 
 Demo should go here.
 
-## Playwright and Lighthouse
+## Measuring browser journeys with Playwright and Lighthouse
 
-Likely it would be a good idea to demonstrate the usefulness of Playwright and Lighthouse.
-The idea is to show how to measure user flows through those and I have a paper doing this.
-There's also a point to be made about variability (Herivcko et al.).
+Server latency does not describe the whole user experience.
+A browser still has to download resources, parse and execute JavaScript, calculate styles, lay out the page, paint it, and respond to input.
+Three related tools expose different parts of that work:
 
-## Little's law
+- The browser's [Performance APIs](https://developer.mozilla.org/en-US/docs/Web/API/Performance_API) can measure marks, durations, resources, and selected rendering events in the page itself.
+- [Playwright](https://playwright.dev/) drives a real browser through a repeatable user journey and checks whether the expected behavior occurred.
+- [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/) audits a page in a controlled lab setup and reports performance metrics and diagnostics.
 
-Explanation should go here.
-Find also other related laws.
+These tools are complementary rather than interchangeable.
+A Playwright test can prove that filtering the event list produces the expected rows, but its elapsed test time is not a Web Vital.
+A Lighthouse navigation can diagnose initial page load, but it does not prove that the application's business flow works.
+Lighthouse user flows can audit interactions, although they require browser automation outside the page; a normal web page cannot grant itself the required browser-control privileges.
+
+### Browser performance workbench
+
+The workbench below runs completely in the current page.
+It builds and filters an event list either as one uninterrupted task or in batches that yield to the browser.
+It measures from the start of the work until the next painted frame, repeats the same flow five times, and reports both total time and the longest JavaScript slice observed by its own instrumentation.
+
+{{ import "site/includes/browser-performance-workbench.html" }}
+
+Before each measurement, predict which strategy will finish sooner and which will leave the main thread available sooner.
+Run both strategies with the same number of events.
+Then increase the workload and check whether the conclusion remains the same.
+
+This is a real measurement, but it is deliberately narrow.
+The timer includes work performed by this demo on this browser and device; it is not a Lighthouse score, INP measurement, or claim about other users.
+The chunked strategy may take longer overall because it waits between batches while still improving responsiveness by avoiding one long uninterrupted task.
+This distinction between throughput and responsiveness is often more useful than asking which version is simply "faster."
+
+For client-side collection in a real application, the small [web-vitals](https://github.com/GoogleChrome/web-vitals) library implements LCP, INP, CLS, FCP, and TTFB using browser APIs and follows the same measurement rules used by Google's web-performance tools.
+Those measurements describe actual page visits.
+Lighthouse instead provides synthetic lab evidence under declared conditions.
+
+### Run a page audit on your own machine
+
+Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
+It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
+
+1. Choose one representative public route and state why it matters to a user.
+2. Select the mobile profile and run the same URL five times without changing the application.
+3. Record LCP, TBT, CLS, transferred bytes, and the overall performance score for every run.
+4. Report the median and the fastest-to-slowest range for each time-based metric.
+5. Select one Lighthouse diagnostic, make one change, deploy it, and repeat the five runs under the same conditions.
+6. State the narrow conclusion supported by the comparison and at least one factor it does not control.
+
+The PageSpeed Insights result can include Lighthouse lab data and, for sufficiently popular public pages, field data derived from real Chrome visits.
+Keep those sources separate: lab and field measurements use different populations and conditions.
+
+If the application is not public, open it in Chrome, select **Developer Tools → Lighthouse**, choose the mobile profile, and generate a report locally.
+Close unrelated applications where practical, do not run audits concurrently, and keep the browser version, profile, URL, application version, and machine consistent.
+
+Performance values vary even when the application has not changed because the browser, client hardware, resource contention, network, and server introduce noise.
+:citet[hericko2021representative] found that five consecutive Lighthouse runs aggregated with the median greatly reduced variability in their experiment.
+
+### Add a repeatable Playwright journey
+
+PageSpeed Insights is convenient for navigation audits, but it cannot exercise a private or multi-step project flow.
+Start with the standalone test below so the first Playwright exercise does not depend on a framework, development server, or route that may not exist.
+Save it as `performance-flow.spec.ts` in a project created with `npm init playwright@latest`:
+
+```ts
+import { expect, test } from "@playwright/test";
+
+test("filters recorded events", async ({ page }) => {
+  await page.setContent(`
+    <label>
+      Filter events
+      <input type="search" data-filter />
+    </label>
+    <ul aria-label="Events">
+      <li>event.created</li>
+      <li>storage.retry</li>
+      <li>event.observed</li>
+    </ul>
+    <script>
+      const filter = document.querySelector("[data-filter]");
+      const events = [...document.querySelectorAll("li")];
+
+      filter.addEventListener("input", () => {
+        const query = filter.value.toLowerCase();
+        for (const event of events) {
+          event.hidden = !event.textContent.toLowerCase().includes(query);
+        }
+      });
+    </script>
+  `);
+
+  await page.getByRole("searchbox", { name: "Filter events" }).fill("retry");
+  await expect(page.locator("li:visible")).toHaveText(["storage.retry"]);
+});
+```
+
+Run the journey visibly:
+
+```sh
+npx playwright test performance-flow.spec.ts --headed --trace on
+```
+
+Because `page.setContent()` creates the fixture inside the browser, this test works without `localhost` or network access.
+It teaches locators, interaction, assertions, and trace inspection, but it does not measure application loading or network behavior.
+After the standalone version passes, replace `page.setContent()` with the project's real route and adapt the accessible names while preserving the same user-visible contract.
+
+Inspect the Playwright trace to verify what was clicked, requested, and rendered.
+Use Lighthouse or PageSpeed Insights separately on a real local or deployed URL for performance metrics; the temporary page created by `page.setContent()` is not a Lighthouse audit target.
+Keeping the functional assertion and the performance evidence separate makes a failure easier to interpret: the flow can be correct but slow, or fast because it failed to do the intended work.
+
+Teams that need a repeatable CI gate can use the official `lighthouse` Node module or [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to collect several runs and assert a budget.
+Start with reporting rather than a strict pass/fail threshold, learn the normal variation of the runner, and only then set a budget with enough tolerance to detect a meaningful regression.
+
+## From measurements to Little's Law
+
+Measurements become more useful when they can be checked against a model.
+Little's Law states that, for a stable system over a suitable observation period, average work in progress (`L`) equals the average arrival rate (`λ`) multiplied by average time in the system (`W`) :citep[little1961proof]:
+
+`L = λW`
+
+For an event pipeline, `L` can be the average number of events waiting or being processed, `λ` the average arrival rate, and `W` the average time from arrival to completion.
+If 20 events arrive per second and each spends half a second in the system, the expected average work in progress is 10 events.
+
+### Queue balance lab
+
+Use the lab below to check whether three observed averages are mutually consistent.
+Change one value at a time and explain whether the mismatch suggests overload, incompatible measurement windows, or a missing boundary.
+
+{{ import "site/includes/little-law-demo.html" }}
+
+The law does not identify the cause of latency, prove that a queue is healthy, or promise that the system can sustain any chosen arrival rate.
+Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
+A large mismatch is a reason to inspect the measurement setup or system stability, not permission to force the numbers to fit.

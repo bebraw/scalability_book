@@ -74,6 +74,17 @@ Roughly put, when you develop with agents you follow a loop where you first cons
 The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
 Even in a personal context, it is worth considering the loop and how you are contributing towards its operation so let's consider each part in isolation.
 
+### Constraint feedback loop
+
+The demonstration below starts with an underspecified request to add CSV export to an event list.
+Generate a candidate, validate it against the constraints that were stated, and turn any failed checks into explicit constraints for the next round.
+Try completing the loop once with the default constraints and once after selecting every constraint before generation.
+
+{{ import "site/includes/constrain-generate-validate-demo.html" }}
+
+The generated candidate is deterministic teaching data rather than model output.
+The useful part is the shape of the loop: validation produces evidence, and failed evidence changes the next generation boundary instead of becoming a vague instruction to "try again."
+
 **Constraining**
 
 By constraining process I mean defining the constraints of your systems, or even an individual prompt.

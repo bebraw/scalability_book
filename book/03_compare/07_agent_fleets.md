@@ -86,6 +86,16 @@ Real fleets perform below the ideal bound because communication, duplicated expl
 Students should estimate the parallel and sequential portions of one fleet workflow, calculate the ideal bound, and then compare it with observed elapsed time and human review effort.
 The difference is evidence about coordination cost, not proof that the law failed.
 
+### Sequential work bound
+
+The lab below keeps the workflow at 100 units of work and changes only the parallelizable share and the number of agents.
+Predict the effect of the next agent before moving the control, then compare the ideal speedup with the infinite-agent ceiling.
+
+{{ import "site/includes/amdahl-law-demo.html" }}
+
+Apply the same calculation to one observed fleet task.
+Name what remained sequential—for example task framing, a shared contract change, integration, review, or acceptance—and keep coordination time outside the ideal bound visible rather than hiding it inside the parallel share.
+
 ## Trust boundaries
 
 An agent's role should define not only its task but also which information it can read and which actions it can take.

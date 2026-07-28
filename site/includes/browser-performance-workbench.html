@@ -1,0 +1,127 @@
+<section
+  id="demo-browser-performance-workbench"
+  data-demo-anchor
+  class="browser-performance-workbench"
+  data-browser-performance-workbench
+  aria-labelledby="browser-performance-workbench-heading"
+>
+  <div class="browser-performance-header">
+    <div>
+      <p class="browser-performance-kicker">Browser performance workbench</p>
+      <h3 id="browser-performance-workbench-heading">
+        Repeat one interaction before trusting it
+      </h3>
+    </div>
+    <div class="browser-performance-summary" aria-live="polite">
+      <span data-browser-performance-status>Ready for five local runs</span>
+      <small>
+        Measurements come from this browser and this device. No data leaves the
+        page.
+      </small>
+    </div>
+  </div>
+
+  <div class="browser-performance-grid">
+    <form
+      class="browser-performance-panel browser-performance-controls"
+      data-browser-performance-form
+    >
+      <div>
+        <p class="browser-performance-eyebrow">01 / Define the workload</p>
+        <h4>Event-list interaction</h4>
+      </div>
+
+      <label>
+        <span>Rendered events</span>
+        <select data-browser-performance-input="events">
+          <option value="250">250 events</option>
+          <option value="1000" selected>1,000 events</option>
+          <option value="2500">2,500 events</option>
+        </select>
+      </label>
+
+      <fieldset class="browser-performance-strategies">
+        <legend>Update strategy</legend>
+        <label>
+          <input
+            type="radio"
+            name="browser-performance-strategy"
+            value="single"
+            checked
+          />
+          <span>
+            <strong>One task</strong>
+            Build and filter the list without yielding.
+          </span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="browser-performance-strategy"
+            value="chunked"
+          />
+          <span>
+            <strong>Yield between batches</strong>
+            Share the main thread with rendering between groups.
+          </span>
+        </label>
+      </fieldset>
+
+      <button type="submit" data-browser-performance-run>
+        Run five trials
+      </button>
+
+      <p class="browser-performance-caveat">
+        Predict first: which strategy has the shorter total time, and which has
+        the shorter uninterrupted slice?
+      </p>
+    </form>
+
+    <section class="browser-performance-panel browser-performance-results">
+      <div class="browser-performance-results-heading">
+        <div>
+          <p class="browser-performance-eyebrow">02 / Inspect the runs</p>
+          <h4>Time until the next painted frame</h4>
+        </div>
+        <span class="browser-performance-local-badge">Local evidence</span>
+      </div>
+
+      <div
+        class="browser-performance-chart"
+        data-browser-performance-chart
+        role="img"
+        aria-label="No browser workload has been measured yet"
+      >
+        <p>Run the same interaction five times to reveal its distribution.</p>
+      </div>
+
+      <dl class="browser-performance-metrics">
+        <div>
+          <dt>Median total</dt>
+          <dd data-browser-performance-metric="median">—</dd>
+        </div>
+        <div>
+          <dt>Fastest</dt>
+          <dd data-browser-performance-metric="minimum">—</dd>
+        </div>
+        <div>
+          <dt>Slowest</dt>
+          <dd data-browser-performance-metric="maximum">—</dd>
+        </div>
+        <div>
+          <dt>Median longest slice</dt>
+          <dd data-browser-performance-metric="slice">—</dd>
+        </div>
+      </dl>
+
+      <p class="browser-performance-reading" data-browser-performance-reading>
+        One run is an observation. Repeated runs show whether that observation
+        was typical.
+      </p>
+    </section>
+  </div>
+
+  <div class="browser-performance-stage" aria-hidden="true">
+    <div data-browser-performance-surface></div>
+  </div>
+</section>

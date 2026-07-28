@@ -85,6 +85,12 @@ const demoScriptIncludes = [
     script: "/project-fit-checker.js",
   },
   {
+    title: "Constraint feedback loop",
+    chapter: "Scalable development",
+    include: "site/includes/constrain-generate-validate-demo.html",
+    script: "/constrain-generate-validate-demo.js",
+  },
+  {
     title: "Deterministic boundary lab",
     chapter: "Scalable development",
     include: "site/includes/statechart-boundary-demo.html",
@@ -133,6 +139,18 @@ const demoScriptIncludes = [
     script: "/benchmark-simulation-demo.js",
   },
   {
+    title: "Browser performance workbench",
+    chapter: "Benchmarking",
+    include: "site/includes/browser-performance-workbench.html",
+    script: "/browser-performance-workbench.js",
+  },
+  {
+    title: "Queue balance lab",
+    chapter: "Benchmarking",
+    include: "site/includes/little-law-demo.html",
+    script: "/scalability-laws.js",
+  },
+  {
     title: "Model evaluation lab",
     chapter: "Benchmarking",
     include: "site/includes/model-eval-demo.html",
@@ -175,10 +193,22 @@ const demoScriptIncludes = [
     script: "/agent-fleet-demo.js",
   },
   {
+    title: "Sequential work bound",
+    chapter: "Agent fleets",
+    include: "site/includes/amdahl-law-demo.html",
+    script: "/scalability-laws.js",
+  },
+  {
     title: "Scaling pressure planner",
     chapter: "Scaling",
     include: "site/includes/scaling-pressure-demo.html",
     script: "/scaling-pressure-demo.js",
+  },
+  {
+    title: "Contention curve lab",
+    chapter: "Scaling",
+    include: "site/includes/usl-demo.html",
+    script: "/scalability-laws.js",
   },
   {
     title: "Orchestration control loop",
@@ -367,7 +397,7 @@ await writePage(
     stylesheets: [demoStylesheet],
     scripts: [
       "/demo-anchors.js",
-      ...demoScriptIncludes.map(({ script }) => script),
+      ...new Set(demoScriptIncludes.map(({ script }) => script)),
       ...developmentScripts,
     ],
     children: renderDemoGalleryPage(demoGallery),
@@ -385,6 +415,10 @@ await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteScript(
   "scripts/project-fit-checker.ts",
   "project-fit-checker.js",
+);
+await compileSiteScript(
+  "scripts/constrain-generate-validate-demo.ts",
+  "constrain-generate-validate-demo.js",
 );
 await compileSiteBundle(
   "scripts/statechart-boundary-demo.ts",
@@ -413,6 +447,11 @@ await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",
   "benchmark-simulation-demo.js",
 );
+await compileSiteScript(
+  "scripts/browser-performance-workbench.ts",
+  "browser-performance-workbench.js",
+);
+await compileSiteScript("scripts/scalability-laws.ts", "scalability-laws.js");
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
 await compileSiteScript(
   "scripts/observability-signal-demo.ts",
@@ -467,9 +506,13 @@ async function writePage(relativePath, content) {
 }
 
 function getDemoScriptsForSource(source) {
-  return demoScriptIncludes
-    .filter(({ include }) => source.includes(include))
-    .map(({ script }) => script);
+  return [
+    ...new Set(
+      demoScriptIncludes
+        .filter(({ include }) => source.includes(include))
+        .map(({ script }) => script),
+    ),
+  ];
 }
 
 function hasDemoInclude(source) {

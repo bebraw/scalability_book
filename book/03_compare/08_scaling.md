@@ -56,6 +56,22 @@ Students must apply at least one suitable law or formal model to an application-
 Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out.
 A formula added after the design decision is not evidence that the formula guided the decision.
 
+### Contention curve lab
+
+Amdahl's Law models a fixed sequential share but does not describe the way shared resources and coordination can become more expensive as concurrency grows.
+The Universal Scalability Law models relative capacity as:
+
+`C(N) = N / (1 + α(N - 1) + βN(N - 1))`
+
+Here `α` represents contention or serialization cost and `β` represents coherency or coordination cost.
+The curve can rise, flatten, and eventually fall: adding workers may reduce total capacity when coordination grows faster than useful work.
+
+{{ import "site/includes/usl-demo.html" }}
+
+First set both costs to zero and inspect the ideal linear curve.
+Then add contention, add coherency cost, and find the first concurrency level after the modeled peak.
+The parameters should ultimately be fitted from measured throughput at several concurrency levels; arbitrary sliders illustrate the model's shape but do not predict a real deployment.
+
 ## Common scaling techniques
 
 Potential subsections:

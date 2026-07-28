@@ -1,0 +1,53 @@
+<section
+  id="demo-sequential-work-bound"
+  data-demo-anchor
+  class="law-demo law-demo-amdahl"
+  data-amdahl-law-demo
+  aria-labelledby="amdahl-law-demo-heading"
+>
+  <div class="law-demo-header">
+    <div>
+      <p class="law-demo-kicker">Amdahl’s Law · S(N) = 1 / ((1 − p) + p/N)</p>
+      <h3 id="amdahl-law-demo-heading">Find the work that more agents cannot remove</h3>
+    </div>
+    <div class="law-demo-verdict" data-amdahl-law-verdict aria-live="polite">
+      2.50× ideal speedup
+    </div>
+  </div>
+
+  <div class="law-demo-grid">
+    <form class="law-demo-controls" data-amdahl-law-form>
+      <p class="law-demo-step">01 / Describe the workflow</p>
+      <label>
+        <span>Parallelizable work, p</span>
+        <input type="range" min="50" max="95" value="80" data-amdahl-law-input="parallel" />
+        <output data-amdahl-law-output="parallel">80%</output>
+      </label>
+      <label>
+        <span>Agents, N</span>
+        <input type="range" min="1" max="32" value="4" data-amdahl-law-input="agents" />
+        <output data-amdahl-law-output="agents">4 agents</output>
+      </label>
+      <p class="law-demo-control-note">
+        The ideal bound excludes coordination, conflicts, retries, and review queues.
+      </p>
+    </form>
+
+    <div class="law-demo-workspace">
+      <div class="amdahl-timeline" aria-label="Relative workflow duration">
+        <div class="amdahl-baseline"><span>One agent</span><i></i><strong>100%</strong></div>
+        <div class="amdahl-parallel"><span data-amdahl-agents-label>4 agents</span><div class="amdahl-workbar"><i data-amdahl-sequential></i><b data-amdahl-parallel></b></div><strong data-amdahl-duration>40%</strong></div>
+        <div class="amdahl-legend"><span>Sequential</span><span>Parallel share after division</span></div>
+      </div>
+      <dl class="law-demo-metrics law-demo-metrics-four">
+        <div><dt>Ideal speedup</dt><dd data-amdahl-law-metric="speedup">2.50×</dd></div>
+        <div><dt>Relative time</dt><dd data-amdahl-law-metric="duration">40.0%</dd></div>
+        <div><dt>Efficiency</dt><dd data-amdahl-law-metric="efficiency">62.5%</dd></div>
+        <div><dt>Infinite-agent ceiling</dt><dd data-amdahl-law-metric="ceiling">5.00×</dd></div>
+      </dl>
+      <p class="law-demo-reading" data-amdahl-law-reading>
+        Four agents divide the parallel work, but the sequential 20% remains.
+      </p>
+    </div>
+  </div>
+</section>
