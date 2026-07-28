@@ -74,17 +74,6 @@ Roughly put, when you develop with agents you follow a loop where you first cons
 The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
 Even in a personal context, it is worth considering the loop and how you are contributing towards its operation so let's consider each part in isolation.
 
-### Constraint feedback loop
-
-The demonstration below starts with an underspecified request to add CSV export to an event list.
-Generate a candidate, validate it against the constraints that were stated, and turn any failed checks into explicit constraints for the next round.
-Try completing the loop once with the default constraints and once after selecting every constraint before generation.
-
-{{ import "site/includes/constrain-generate-validate-demo.html" }}
-
-The generated candidate is deterministic teaching data rather than model output.
-The useful part is the shape of the loop: validation produces evidence, and failed evidence changes the next generation boundary instead of becoming a vague instruction to "try again."
-
 **Constraining**
 
 By constraining process I mean defining the constraints of your systems, or even an individual prompt.
@@ -128,6 +117,17 @@ In [Write code like a human will maintain it](https://unstack.io/write-code-like
 Instead, those accepted shortcuts became examples for the agent to copy into the next change.
 A shortcut therefore has two costs: humans may have to repair it later, and agents may treat it as evidence of the project's preferred style.
 Validation should ask not only whether the current change works, but also whether it leaves behind a pattern worth repeating.
+
+### Constraint feedback loop
+
+The demonstration below starts with an underspecified request to add CSV export to an event list.
+Generate a candidate, validate it against the constraints that were stated, and turn any failed checks into explicit constraints for the next round.
+Try completing the loop once with the default constraints and once after selecting every constraint before generation.
+
+{{ import "site/includes/constrain-generate-validate-demo.html" }}
+
+The generated candidate is deterministic teaching data rather than model output.
+The useful part is the shape of the loop: validation produces evidence, and failed evidence changes the next generation boundary instead of becoming a vague instruction to "try again."
 
 ## The job is to convert non-determinism into determinism
 
