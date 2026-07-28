@@ -1,0 +1,196 @@
+<section
+  id="demo-api-contract-lens"
+  data-demo-anchor
+  class="scaling-demo api-contract-lens"
+  data-api-contract-lens
+  aria-labelledby="api-contract-lens-heading"
+>
+  <div class="scaling-demo-header api-contract-lens-header">
+    <div>
+      <p class="scaling-demo-kicker">Contract topology lab</p>
+      <h3 id="api-contract-lens-heading">
+        Where does the client learn what it can do?
+      </h3>
+    </div>
+    <div class="api-contract-lens-badge" aria-live="polite">
+      <span data-api-contract-style>Resource HTTP</span>
+      <small data-api-contract-boundary>address + representation</small>
+    </div>
+  </div>
+
+  <p class="api-contract-lens-intro">
+    Hold the domain intent constant. Move between contracts to see which facts
+    live in client code, which arrive from the server, and where change creates
+    coordination.
+  </p>
+
+  <form data-api-contract-form>
+    <fieldset class="api-contract-lens-picker">
+      <legend>Choose the interaction style</legend>
+      <div class="api-contract-lens-options">
+        <label>
+          <input
+            type="radio"
+            name="api-contract-style"
+            value="resource"
+            data-api-contract-option
+            checked
+          />
+          <span
+            ><strong>Resource HTTP</strong><small>Know the address</small></span
+          >
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="api-contract-style"
+            value="hypermedia"
+            data-api-contract-option
+          />
+          <span
+            ><strong>REST + HATEOAS</strong><small>Follow controls</small></span
+          >
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="api-contract-style"
+            value="graphql"
+            data-api-contract-option
+          />
+          <span><strong>GraphQL</strong><small>Select fields</small></span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="api-contract-style"
+            value="rpc"
+            data-api-contract-option
+          />
+          <span><strong>RPC</strong><small>Call a method</small></span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="api-contract-lens-intent">
+      <div>
+        <span>Fixed user intent</span>
+        <strong>Start work on item 42</strong>
+      </div>
+      <div>
+        <span>Required view</span>
+        <strong>state · title · workspace · next actions</strong>
+      </div>
+      <label class="api-contract-lens-change">
+        <input type="checkbox" data-api-contract-change />
+        <span>
+          <small>Change request</small>
+          <strong>Also show assignee name</strong>
+        </span>
+      </label>
+    </div>
+
+    <div class="api-contract-lens-stage">
+      <div class="api-contract-lens-wire">
+        <div class="api-contract-lens-panel-heading">
+          <span>Wire contract</span>
+          <strong data-api-contract-wire-label>HTTP exchange</strong>
+        </div>
+        <pre><code data-api-contract-code></code></pre>
+        <div
+          class="api-contract-lens-flow"
+          aria-label="Contract execution path"
+        >
+          <span data-api-contract-node="client"><b>01</b> Client</span>
+          <i aria-hidden="true"></i>
+          <span data-api-contract-node="contract"><b>02</b> Contract</span>
+          <i aria-hidden="true"></i>
+          <span data-api-contract-node="domain"><b>03</b> Domain</span>
+          <i aria-hidden="true"></i>
+          <span data-api-contract-node="result"><b>04</b> Result</span>
+        </div>
+        <ol
+          class="api-contract-lens-trace"
+          data-api-contract-trace
+          aria-label="Concrete execution trace"
+        ></ol>
+        <div class="api-contract-lens-runway">
+          <button type="button" data-api-contract-run>
+            <span data-api-contract-run-label>Run PATCH request</span>
+            <small>replay four steps</small>
+          </button>
+          <div class="api-contract-lens-receipt" data-api-contract-receipt>
+            <span>Observed result</span>
+            <strong data-api-contract-result>Not sent yet</strong>
+          </div>
+        </div>
+        <p
+          class="api-contract-lens-status"
+          data-api-contract-status
+          aria-live="polite"
+        >
+          Run the exchange to see what each boundary actually does.
+        </p>
+      </div>
+
+      <aside class="api-contract-lens-ledger" aria-label="Knowledge ledger">
+        <div class="api-contract-lens-panel-heading">
+          <span>Knowledge ledger</span>
+          <strong>before the request</strong>
+        </div>
+        <section>
+          <h4><span>C</span> Client carries</h4>
+          <ul data-api-contract-client></ul>
+        </section>
+        <section>
+          <h4><span>S</span> Server publishes</h4>
+          <ul data-api-contract-server></ul>
+        </section>
+        <div class="api-contract-lens-delta">
+          <small>Effect of requested field</small>
+          <strong data-api-contract-delta></strong>
+        </div>
+      </aside>
+    </div>
+
+    <dl class="api-contract-lens-facts">
+      <div>
+        <dt>Interaction shape</dt>
+        <dd data-api-contract-fact="shape"></dd>
+      </div>
+      <div>
+        <dt>Discovery</dt>
+        <dd data-api-contract-fact="discovery"></dd>
+      </div>
+      <div>
+        <dt>Cache unit</dt>
+        <dd data-api-contract-fact="cache"></dd>
+      </div>
+      <div>
+        <dt>Pressure lands on</dt>
+        <dd data-api-contract-fact="pressure"></dd>
+      </div>
+    </dl>
+
+    <div class="api-contract-lens-readout">
+      <div>
+        <p class="request-trace-section-label">Architectural reading</p>
+        <h4 data-api-contract-title>Coordinate around resources</h4>
+        <p data-api-contract-summary></p>
+      </div>
+      <div class="api-contract-lens-caution">
+        <span>Do not confuse</span>
+        <strong data-api-contract-caution-title
+          >HTTP-shaped with full REST</strong
+        >
+        <p data-api-contract-caution></p>
+      </div>
+    </div>
+
+    <p class="api-contract-lens-note">
+      This is a structural comparison, not a ranking. Authentication,
+      authorization, retries, observability, and versioning still apply in every
+      mode.
+    </p>
+  </form>
+</section>

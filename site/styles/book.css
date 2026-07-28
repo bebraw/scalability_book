@@ -90,6 +90,9 @@
   margin-bottom: 0.8em;
   padding-inline-start: 0.35em;
 }
+.prose .semantic-bibliography a {
+  overflow-wrap: anywhere;
+}
 .prose .semantic-bibliography li:target {
   border-radius: 0.2rem;
   outline: 2px solid var(--accent);

@@ -79,6 +79,42 @@ Potential subsections:
 > Chatty APIs, unnecessary round trips, oversized payloads, heavy client bundles, and aggressive polling all turn design choices into recurring resource use.
 > Good web architecture reduces waste by making useful work explicit and avoiding repeated work where possible.
 
+### Cache control is application policy
+
+An HTTP cache can avoid an origin request, reduce transferred bytes, and hide network latency, but only when reuse is correct for the response and its users.
+Browsers operate private caches, while content delivery networks and other intermediaries can operate shared caches.
+The response therefore needs to communicate who may store it, how long it remains fresh, how it can be validated, and whether stale reuse is acceptable.
+
+The [HTTP caching specification](https://httpwg.org/specs/rfc9111.html) defines the core directives and freshness model:
+
+- `public` permits storage by shared caches, while `private` limits a response to private caches.
+- `max-age` defines freshness relative to response generation; `s-maxage` can define a different freshness lifetime for shared caches.
+- `no-cache` still permits storage, but the stored response has to be validated before reuse.
+- `no-store` asks caches not to store the response at all.
+- `must-revalidate` prevents reuse of a stale response without successful validation.
+- `Vary` makes selected request headers part of response selection.
+  This can protect correctness, but every varying dimension can fragment the cache.
+
+Validators avoid retransmitting an unchanged body.
+An origin can attach an `ETag`; once the stored response needs validation, a cache sends that value through `If-None-Match`.
+A matching validator allows the origin to return `304 Not Modified` without the representation body, while a changed validator produces a new `200` response.
+
+The [`stale-while-revalidate`](https://httpwg.org/specs/rfc5861.html) extension moves latency again: a cache may immediately serve a stale response for a bounded period while validating it in the background.
+That can be appropriate for a public activity summary, but not for every response.
+Personalization, authorization, invalidation, and the cache key are correctness and security decisions rather than deployment details.
+
+### Cache decision lab
+
+The lab below follows a second request through browser cache, shared cache, and origin.
+Change the response profile, move time forward, and decide whether the origin representation changed.
+Then inspect whether the request is served fresh, served stale while validation happens, conditionally revalidated, or fetched in full.
+
+{{ import "site/includes/cache-control-lab.html" }}
+
+Cache behavior should be tested at the deployed boundary because application code is only one participant.
+A framework, reverse proxy, CDN, browser, or hosting platform may add, remove, or reinterpret cache metadata.
+Record the final response headers, cache status, `Age`, and origin traffic rather than assuming the source-code declaration is the complete policy.
+
 ## Rendering and interaction are separate decisions
 
 Architecture labels often collapse several decisions into one framework-shaped category.
@@ -148,18 +184,45 @@ The architecture hypothesis for implementation B should name one activation deci
 
 ## API design as architecture
 
-Ideas to develop:
+APIs are not merely endpoint collections.
+They distribute knowledge between clients and servers: which addresses exist, which operations are allowed, how data is selected, how errors are represented, and how either side can change without forcing the other to change at the same time.
+Versioning, idempotency, validation, pagination, filtering, and error shape all become parts of that contract.
 
-- APIs are not only technical endpoints; they are contracts between parts of the system.
-- Good APIs make common behavior easy and invalid behavior hard.
-- Versioning, idempotency, validation, pagination, filtering, and error shape matter.
-- An event ingestion API should handle duplicate submissions, delayed events, invalid timestamps, and unknown event types.
-- Query APIs may need different models than write APIs.
+### API interaction styles
 
-Possible exercise:
+Several styles can expose the same domain behavior while placing coupling in different locations:
 
-- Design a minimal `POST /events` endpoint and a minimal `GET /events` endpoint.
-- Then ask what changes when the app must handle retrying clients, offline devices, many tenants or domain instances, or analytical summaries.
+- **Resource-oriented HTTP** exposes identifiable resources through a uniform set of HTTP methods and status semantics.
+  Many APIs described as REST use this recognizable subset, but REST itself is a broader architectural style derived for distributed hypermedia systems :citep[fielding2000architectural].
+- **Hypermedia-driven REST** includes links or controls in representations so the response tells a client which transitions are currently available.
+  HATEOAS—hypermedia as the engine of application state—is therefore a REST constraint, not a separate peer to REST.
+- **GraphQL** exposes a typed schema and lets a client describe the response shape it needs through queries and mutations.
+  This can reduce endpoint-specific fetching logic, while moving pressure to schema governance, authorization, resolver behavior, and query-cost control.
+  The [GraphQL specification](https://spec.graphql.org/September2025/) defines the language, type system, validation, and execution model.
+- **RPC** exposes named operations with explicit request and response messages.
+  It maps naturally to commands and service capabilities, while coupling clients to method names and message contracts.
+  Systems such as [gRPC](https://grpc.io/docs/what-is-grpc/core-concepts/) can generate clients from a service definition and support unary and streaming methods.
+
+These styles are not mutually exclusive at the transport level.
+GraphQL and JSON-based RPC commonly travel over HTTP, and a resource-oriented API may expose a few operation-like endpoints.
+The architectural question is where clients learn what they can do and which part of the contract absorbs change.
+
+Event streams, queues, webhooks, and publish-subscribe APIs add a different decision: communication can become asynchronous.
+That can reduce temporal coupling, but delivery guarantees, ordering, replay, idempotency, and schema evolution then become explicit parts of the contract.
+
+### API contract lens
+
+The lab below holds one user intent constant: start work on item 42 and obtain its current state, title, workspace, and available next actions.
+Switch the interaction style to see what crosses the wire, what the client must know in advance, and where a request for one more related field creates pressure.
+
+{{ import "site/includes/api-contract-lens.html" }}
+
+No style wins every row.
+A stable public resource model, a workflow discovered through hypermedia, a frontend assembling related data, and an internal service command create different reasons to accept different forms of coupling.
+The comparison should begin with consumers, change patterns, network conditions, tooling, and ownership—not with a preferred acronym.
+
+For the project, design a minimal event-creation operation and event-query operation in one style.
+Then identify what changes when clients retry, devices go offline, a new workflow state appears, many tenants share the system, or the UI needs an additional related field.
 
 ### Executable HTTP contracts
 

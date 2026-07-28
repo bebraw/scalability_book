@@ -1,0 +1,180 @@
+<section
+  id="demo-cache-decision-lab"
+  data-demo-anchor
+  class="scaling-demo cache-control-lab"
+  data-cache-control-lab
+  aria-labelledby="cache-control-lab-heading"
+>
+  <div class="scaling-demo-header cache-control-lab-header">
+    <div>
+      <p class="scaling-demo-kicker">HTTP reuse control room</p>
+      <h3 id="cache-control-lab-heading">
+        Where does the next response come from?
+      </h3>
+    </div>
+    <div class="cache-control-lab-badge" aria-live="polite">
+      <span data-cache-outcome>Fresh cache hit</span>
+      <small data-cache-source>shared cache</small>
+    </div>
+  </div>
+
+  <p class="cache-control-lab-intro">
+    Every case begins after one successful response. Change its policy and age,
+    then trace the next request without changing the URL.
+  </p>
+
+  <form data-cache-control-form>
+    <fieldset class="cache-control-lab-profiles">
+      <legend>Choose the response profile</legend>
+      <div class="cache-control-lab-profile-options">
+        <label>
+          <input
+            type="radio"
+            name="cache-profile"
+            value="asset"
+            data-cache-profile
+            checked
+          />
+          <span
+            ><strong>Versioned asset</strong><small>immutable URL</small></span
+          >
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="cache-profile"
+            value="summary"
+            data-cache-profile
+          />
+          <span
+            ><strong>Public summary</strong><small>shared + SWR</small></span
+          >
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="cache-profile"
+            value="private"
+            data-cache-profile
+          />
+          <span
+            ><strong>Private dashboard</strong
+            ><small>validate reuse</small></span
+          >
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="cache-profile"
+            value="sensitive"
+            data-cache-profile
+          />
+          <span
+            ><strong>Sensitive response</strong
+            ><small>do not store</small></span
+          >
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="cache-control-lab-controls">
+      <label class="cache-control-lab-age">
+        <span>Time since response was stored</span>
+        <input type="range" min="0" max="100" value="25" data-cache-age />
+        <strong data-cache-age-label>100 days</strong>
+      </label>
+      <label class="cache-control-lab-origin-change">
+        <input type="checkbox" data-cache-origin-change />
+        <span
+          ><small>Origin state</small
+          ><strong>Representation changed</strong></span
+        >
+      </label>
+    </div>
+
+    <div class="cache-control-lab-stage">
+      <div class="cache-control-lab-response">
+        <div class="cache-control-lab-panel-heading">
+          <span>Stored response policy</span>
+          <strong data-cache-profile-label>Versioned asset</strong>
+        </div>
+        <pre><code data-cache-headers></code></pre>
+        <div class="cache-control-lab-clock">
+          <div>
+            <i data-cache-clock-fill></i>
+            <b data-cache-clock-marker></b>
+          </div>
+          <span>stored</span>
+          <span data-cache-fresh-label>fresh for 365 days</span>
+          <span data-cache-limit-label>timeline: 400 days</span>
+        </div>
+      </div>
+
+      <div class="cache-control-lab-route" aria-label="Cache request path">
+        <div class="cache-control-node" data-cache-node="browser">
+          <span>01</span><strong>Browser cache</strong
+          ><small data-cache-browser-state></small>
+        </div>
+        <i aria-hidden="true"></i>
+        <div class="cache-control-node" data-cache-node="shared">
+          <span>02</span><strong>Shared cache</strong
+          ><small data-cache-shared-state></small>
+        </div>
+        <i aria-hidden="true"></i>
+        <div class="cache-control-node" data-cache-node="origin">
+          <span>03</span><strong>Origin</strong
+          ><small data-cache-origin-state></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="cache-control-lab-decision">
+      <div class="cache-control-lab-panel-heading">
+        <span>Decision trace</span>
+        <strong data-cache-decision-code>cache → response</strong>
+      </div>
+      <ol data-cache-steps></ol>
+      <button type="button" data-cache-run>Request again</button>
+    </div>
+
+    <dl class="cache-control-lab-facts">
+      <div>
+        <dt>Response source</dt>
+        <dd data-cache-fact="source"></dd>
+      </div>
+      <div>
+        <dt>Browser waits?</dt>
+        <dd data-cache-fact="wait"></dd>
+      </div>
+      <div>
+        <dt>Origin body bytes</dt>
+        <dd data-cache-fact="bytes"></dd>
+      </div>
+      <div>
+        <dt>Representation used</dt>
+        <dd data-cache-fact="version"></dd>
+      </div>
+    </dl>
+
+    <div class="cache-control-lab-readout">
+      <div>
+        <p class="request-trace-section-label">Architectural reading</p>
+        <h4 data-cache-title>Reuse the fingerprinted response</h4>
+        <p data-cache-summary></p>
+      </div>
+      <div class="cache-control-lab-rule">
+        <span>Policy rule</span>
+        <strong data-cache-rule-title
+          >immutable means the URL carries the version</strong
+        >
+        <p data-cache-rule></p>
+      </div>
+    </div>
+
+    <p class="cache-control-lab-note">
+      The trace models compliant HTTP cache behavior at a teaching scale. Real
+      cache keys, platform overrides, authorization, request directives, and
+      invalidation rules must be verified in the deployed path.
+    </p>
+  </form>
+</section>

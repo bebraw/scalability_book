@@ -103,6 +103,12 @@ const demoScriptIncludes = [
     script: "/request-trace-demo.js",
   },
   {
+    title: "Cache decision lab",
+    chapter: "Architecture",
+    include: "site/includes/cache-control-lab.html",
+    script: "/cache-control-lab.js",
+  },
+  {
     title: "Web architecture lens",
     chapter: "Architecture",
     include: "site/includes/web-architecture-lens.html",
@@ -113,6 +119,12 @@ const demoScriptIncludes = [
     chapter: "Architecture",
     include: "site/includes/client-activation-lens.html",
     script: "/client-activation-lens.js",
+  },
+  {
+    title: "API contract lens",
+    chapter: "Architecture",
+    include: "site/includes/api-contract-lens.html",
+    script: "/api-contract-lens.js",
   },
   {
     title: "Tail latency simulator",
@@ -387,6 +399,7 @@ await compileSiteScript(
   "scripts/request-trace-demo.ts",
   "request-trace-demo.js",
 );
+await compileSiteScript("scripts/cache-control-lab.ts", "cache-control-lab.js");
 await compileSiteScript(
   "scripts/web-architecture-lens.ts",
   "web-architecture-lens.js",
@@ -395,6 +408,7 @@ await compileSiteScript(
   "scripts/client-activation-lens.ts",
   "client-activation-lens.js",
 );
+await compileSiteScript("scripts/api-contract-lens.ts", "api-contract-lens.js");
 await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",
   "benchmark-simulation-demo.js",
