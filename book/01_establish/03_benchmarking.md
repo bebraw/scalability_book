@@ -137,6 +137,24 @@ For client-side collection in a real application, the small [web-vitals](https:/
 Those measurements describe actual page visits.
 Lighthouse instead provides synthetic lab evidence under declared conditions.
 
+### From page metrics to product metrics
+
+Standard browser metrics deliberately use definitions that work across many kinds of pages.
+That makes them comparable, but the element selected for a metric such as LCP is not necessarily the part of the interface that a user came to see.
+An event tracker might care when its event list becomes visible; another application might care about a search-results region, product summary, or account overview.
+The measurement boundary should follow the question rather than whichever element happens to be largest.
+
+[Element Timing](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceElementTiming) can report when one annotated image or text element rendered.
+The experimental [Container Timing API](https://csswizardry.com/2026/07/meaasuring-component-performance-with-the-container-timing-api/) extends that idea to an author-defined DOM region and reports a sequence as new contentful areas inside it are painted.
+That sequence can reveal whether a component appeared together or accumulated through several delayed stages, moving the measurement boundary from a browser-selected element toward a user-recognizable product component.
+
+Container Timing does not declare that a component is complete, interactive, accurate, or ready to use.
+Those are product claims that may require application instrumentation or interaction measurements in addition to paint evidence.
+Because the API is experimental, its immediate value here is the design principle rather than the exact interface: choose a meaningful region, give the signal a stable name, state how an entry is selected from the sequence, sample collection deliberately, and record which browsers and users the dataset represents.
+
+For the course project, choose one user-recognizable region and define what useful evidence would mean for it.
+Then decide whether a page-level Web Vital, one Element Timing entry, a sequence of container paints, or an application milestone best supports that claim, and explain what the chosen signal cannot prove.
+
 ### Run a page audit on your own machine
 
 Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
