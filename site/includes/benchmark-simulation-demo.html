@@ -1,0 +1,158 @@
+<section
+  class="scaling-demo benchmark-simulation-demo"
+  data-benchmark-simulation-demo
+  aria-labelledby="benchmark-simulation-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Tail latency simulator</p>
+      <h3 id="benchmark-simulation-demo-heading">
+        An average can hide slow requests
+      </h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-benchmark-demo-verdict>Choose a claim before measuring</span>
+      <small>
+        A deterministic teaching model of 60 <code>POST /events</code>
+        requests. It does not contact a server.
+      </small>
+    </div>
+  </div>
+
+  <form class="benchmark-demo-grid" data-benchmark-demo-form>
+    <section class="scaling-demo-panel benchmark-demo-controls">
+      <div>
+        <p class="benchmark-demo-eyebrow">01 / Define the run</p>
+        <h4>Workload controls</h4>
+      </div>
+
+      <label>
+        <span>Concurrent clients</span>
+        <input
+          type="range"
+          min="1"
+          max="20"
+          value="4"
+          data-benchmark-demo-input="concurrency"
+        />
+        <output data-benchmark-demo-output="concurrency">4 clients</output>
+      </label>
+
+      <label>
+        <span>Requests taking the slow storage path</span>
+        <select data-benchmark-demo-input="slow-rate">
+          <option value="0">None</option>
+          <option value="5">5%</option>
+          <option value="10" selected>10%</option>
+          <option value="20">20%</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Latency objective for p95</span>
+        <input
+          type="range"
+          min="60"
+          max="300"
+          step="10"
+          value="120"
+          data-benchmark-demo-input="threshold"
+        />
+        <output data-benchmark-demo-output="threshold">120 ms</output>
+      </label>
+
+      <fieldset class="benchmark-demo-prediction">
+        <legend>Predict the result</legend>
+        <label>
+          <input
+            type="radio"
+            name="benchmark-prediction"
+            value="both-pass"
+            data-benchmark-demo-prediction
+            required
+          />
+          <span>Average and p95 pass</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="benchmark-prediction"
+            value="tail-fails"
+            data-benchmark-demo-prediction
+          />
+          <span>Average passes; p95 fails</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="benchmark-prediction"
+            value="both-fail"
+            data-benchmark-demo-prediction
+          />
+          <span>Average and p95 fail</span>
+        </label>
+      </fieldset>
+
+      <button class="benchmark-demo-run" type="submit" disabled>
+        Test prediction on 60 requests
+      </button>
+    </section>
+
+    <section class="scaling-demo-panel benchmark-demo-console">
+      <div class="benchmark-demo-console-heading">
+        <div>
+          <p class="benchmark-demo-eyebrow">02 / Read the distribution</p>
+          <h4>Completion time per request</h4>
+        </div>
+        <div class="benchmark-demo-legend" aria-label="Chart legend">
+          <span><i class="is-typical" aria-hidden="true"></i>Typical</span>
+          <span><i class="is-slow" aria-hidden="true"></i>Slow path</span>
+        </div>
+      </div>
+
+      <div class="benchmark-demo-chart-frame">
+        <div
+          class="benchmark-demo-chart"
+          data-benchmark-demo-chart
+          role="img"
+          aria-label="No simulated benchmark has been run yet"
+        >
+          <p>Make a prediction, then run the workload.</p>
+        </div>
+        <div class="benchmark-demo-axis" aria-hidden="true">
+          <span>0 ms</span>
+          <span data-benchmark-demo-axis-maximum>—</span>
+        </div>
+      </div>
+
+      <dl class="scaling-demo-metrics benchmark-demo-metrics">
+        <div>
+          <dt>Average</dt>
+          <dd data-benchmark-demo-metric="average">—</dd>
+        </div>
+        <div>
+          <dt>p50</dt>
+          <dd data-benchmark-demo-metric="p50">—</dd>
+        </div>
+        <div>
+          <dt>p95</dt>
+          <dd data-benchmark-demo-metric="p95">—</dd>
+        </div>
+        <div>
+          <dt>Slowest</dt>
+          <dd data-benchmark-demo-metric="maximum">—</dd>
+        </div>
+      </dl>
+
+      <p class="demo-note" data-benchmark-demo-interpretation>
+        A benchmark should test an explicit claim. Which measurement do you
+        expect to cross the objective?
+      </p>
+      <p
+        class="benchmark-demo-comparison"
+        data-benchmark-demo-comparison
+        hidden
+      ></p>
+    </section>
+  </form>
+</section>

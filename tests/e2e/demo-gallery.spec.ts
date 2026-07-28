@@ -12,14 +12,14 @@ test.describe("demo showcase", () => {
     await expect(gallery.locator(".demo-gallery-lede")).toContainText(
       "Work through one module at a time",
     );
-    await expect(items).toHaveCount(13);
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText("13");
+    await expect(items).toHaveCount(15);
+    await expect(gallery.locator(".demo-gallery-stats")).toContainText("15");
     await expect(gallery.locator(".demo-gallery-stats")).toContainText(
       "Self-guided",
     );
     await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
-    await expect(items.last().locator(".demo-gallery-index")).toHaveText("13");
-    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(13);
+    await expect(items.last().locator(".demo-gallery-index")).toHaveText("15");
+    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(15);
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });

@@ -4041,6 +4041,557 @@
   max-width: 70ch;
 }
 
+/* Benchmarking lab: a compact load-generator console and latency oscilloscope. */
+.benchmark-simulation-demo {
+  --benchmark-typical: var(--accent-strong);
+  --benchmark-slow: var(--warning);
+}
+.benchmark-demo-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(14rem, 0.72fr) minmax(0, 1.7fr);
+  margin-block-start: 1rem;
+}
+.benchmark-demo-controls {
+  align-content: start;
+}
+.prose .benchmark-demo-eyebrow {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  margin: 0 0 0.3rem;
+  max-width: none;
+  text-transform: uppercase;
+}
+.benchmark-demo-controls output {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.benchmark-demo-prediction {
+  border: 0;
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.75rem 0 0;
+}
+.benchmark-demo-prediction legend {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.2;
+  margin-block-end: 0.4rem;
+  padding: 0;
+}
+.benchmark-demo-prediction label {
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+.benchmark-demo-prediction input {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+.benchmark-demo-prediction span {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.25;
+  padding: 0.52rem 0.6rem 0.52rem 1.65rem;
+  position: relative;
+}
+.benchmark-demo-prediction span::before {
+  border: 1px solid var(--muted);
+  block-size: 0.58rem;
+  content: "";
+  inline-size: 0.58rem;
+  inset-block-start: 50%;
+  inset-inline-start: 0.58rem;
+  position: absolute;
+  transform: translateY(-50%);
+}
+.benchmark-demo-prediction input:checked + span {
+  background: color-mix(in srgb, var(--accent) 13%, var(--panel));
+  border-color: var(--accent-strong);
+  box-shadow: inset 0.2rem 0 var(--accent-strong);
+}
+.benchmark-demo-prediction input:checked + span::before {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  box-shadow: inset 0 0 0 0.12rem var(--panel);
+}
+.benchmark-demo-prediction input:focus-visible + span {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+.benchmark-demo-run {
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 850;
+  min-height: 2.65rem;
+  padding: 0.65rem 0.8rem;
+}
+.benchmark-demo-run:not([disabled]):hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.benchmark-demo-run[disabled] {
+  background: color-mix(in srgb, var(--border) 60%, var(--panel));
+  border-color: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.benchmark-demo-run:focus-visible,
+.otel-demo-span-row:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+.benchmark-demo-console {
+  align-content: start;
+  min-width: 0;
+}
+.benchmark-demo-console-heading,
+.otel-demo-trace-heading {
+  align-items: start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.benchmark-demo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.benchmark-demo-legend span {
+  align-items: center;
+  color: var(--muted);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  gap: 0.3rem;
+  text-transform: uppercase;
+}
+.benchmark-demo-legend i {
+  block-size: 0.55rem;
+  display: inline-block;
+  inline-size: 0.55rem;
+}
+.benchmark-demo-legend .is-typical {
+  background: var(--benchmark-typical);
+}
+.benchmark-demo-legend .is-slow {
+  background: var(--benchmark-slow);
+}
+.benchmark-demo-chart-frame {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--border) 52%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--panel);
+  background-size: 100% 25%;
+  border: 1px solid var(--border);
+  padding: 1rem 0.75rem 0.45rem;
+}
+.benchmark-demo-chart {
+  align-items: end;
+  block-size: 13rem;
+  display: flex;
+  gap: clamp(1px, 0.22vw, 3px);
+  overflow: hidden;
+  position: relative;
+}
+.benchmark-demo-chart.is-awaiting {
+  align-items: center;
+  display: grid;
+  justify-items: center;
+}
+.prose .benchmark-demo-chart.is-awaiting p {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 22ch;
+  text-align: center;
+  text-transform: uppercase;
+}
+.benchmark-demo-chart.is-stale > :not(.benchmark-demo-threshold) {
+  opacity: 0.3;
+}
+.benchmark-demo-chart.is-stale::after {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  content: "Previous run · settings changed";
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 850;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  padding: 0.45rem 0.55rem;
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.benchmark-demo-chart > i {
+  background: var(--benchmark-typical);
+  block-size: var(--benchmark-bar-height);
+  flex: 1 1 0;
+  min-inline-size: 1px;
+  opacity: 0.78;
+  position: relative;
+  transform-origin: bottom;
+}
+.benchmark-demo-chart > i.is-slow {
+  background: var(--benchmark-slow);
+  opacity: 1;
+}
+.benchmark-demo-chart > i span {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.benchmark-demo-chart.is-animated > i {
+  animation: benchmark-bar-rise 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--benchmark-bar-delay);
+}
+.benchmark-demo-threshold {
+  border-block-start: 2px dashed var(--warning);
+  bottom: var(--benchmark-threshold-position);
+  inline-size: 100%;
+  inset-inline-start: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+.benchmark-demo-threshold span {
+  background: var(--panel);
+  color: var(--warning);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-style: normal;
+  font-weight: 850;
+  inset-block-end: 0.2rem;
+  inset-inline-end: 0;
+  padding-inline: 0.2rem;
+  position: absolute;
+  text-transform: uppercase;
+}
+.benchmark-demo-axis {
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  justify-content: space-between;
+  margin-block-start: 0.35rem;
+}
+.benchmark-demo-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.benchmark-demo-metrics dd {
+  font-family: var(--font-mono);
+}
+.prose .benchmark-demo-comparison {
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-inline-start: 0.2rem solid var(--accent-strong);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  margin: 0;
+  max-width: none;
+  padding: 0.55rem 0.65rem;
+}
+.benchmark-demo-comparison[hidden] {
+  display: none;
+}
+
+/* OTel lab: a trace waterfall that feels like an instrument, not a dashboard mock. */
+.otel-trace-demo {
+  --otel-ok: var(--success);
+  --otel-unset: var(--accent-strong);
+  --otel-error: var(--warning);
+}
+.otel-demo-pipeline {
+  align-items: stretch;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(7, auto);
+  margin-block-start: 1rem;
+}
+.otel-demo-pipeline > span {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+}
+.otel-demo-pipeline b {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+.otel-demo-pipeline small {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+.otel-demo-pipeline > i {
+  align-self: center;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-weight: 900;
+}
+.prose .otel-demo-pipeline-note {
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+  border: 1px solid var(--border);
+  border-block-start: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: none;
+  padding: 0.55rem 0.65rem;
+}
+.otel-demo-controls {
+  align-items: end;
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg));
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  margin-block-start: 0.75rem;
+  padding: 0.75rem;
+}
+.otel-demo-controls label {
+  min-width: 0;
+}
+.otel-demo-workbench {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.65fr) minmax(15rem, 0.8fr);
+  margin-block-start: 1rem;
+}
+.otel-demo-trace-panel,
+.otel-demo-inspector {
+  align-content: start;
+  min-width: 0;
+}
+.otel-demo-trace-heading code {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+.prose .otel-demo-trace-instruction {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  line-height: 1.4;
+  margin: -0.25rem 0 0;
+  max-width: none;
+}
+.otel-demo-scale {
+  border-block-end: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  justify-content: space-between;
+  margin-inline-start: min(42%, 12rem);
+  padding-block: 0.55rem 0.28rem;
+}
+.otel-demo-timeline {
+  display: grid;
+  gap: 0.3rem;
+}
+.otel-demo-span-row {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 0.5rem;
+  grid-template-columns: minmax(8.5rem, 0.7fr) minmax(9rem, 1.4fr) 3.5rem;
+  min-height: 2.6rem;
+  padding: 0.3rem;
+  text-align: start;
+  width: 100%;
+}
+.otel-demo-span-row:hover,
+.otel-demo-span-row.is-selected {
+  background: color-mix(in srgb, var(--accent) 11%, var(--panel));
+}
+.otel-demo-span-row.is-selected {
+  box-shadow: inset 0.2rem 0 var(--accent-strong);
+}
+.otel-demo-span-label {
+  display: grid;
+  gap: 0.1rem;
+  padding-inline-start: calc(var(--otel-span-level) * 0.8rem);
+}
+.otel-demo-span-label b {
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.otel-demo-span-label small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.59rem;
+  text-transform: uppercase;
+}
+.otel-demo-span-track {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--border) 60%, transparent) 1px,
+      transparent 1px
+    ),
+    color-mix(in srgb, var(--border) 24%, transparent);
+  background-size: 25% 100%;
+  block-size: 0.85rem;
+  position: relative;
+}
+.otel-demo-span-track i {
+  background: var(--otel-unset);
+  block-size: 100%;
+  inline-size: var(--otel-span-width);
+  inset-inline-start: var(--otel-span-left);
+  position: absolute;
+}
+.otel-demo-span-track i.is-ok {
+  background: var(--otel-ok);
+}
+.otel-demo-span-track i.is-error {
+  background: var(--otel-error);
+}
+.otel-demo-span-row > strong {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-align: end;
+}
+.otel-demo-inspector {
+  border-block-start: 0.2rem solid var(--accent-strong);
+}
+.otel-demo-span-facts,
+.otel-demo-attributes {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+.otel-demo-span-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.otel-demo-span-facts div,
+.otel-demo-attributes div {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  min-width: 0;
+  padding: 0.45rem;
+}
+.otel-demo-span-facts dt,
+.otel-demo-attributes dt {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+.otel-demo-span-facts dd,
+.otel-demo-attributes dd {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  margin: 0.18rem 0 0;
+  overflow-wrap: anywhere;
+}
+.otel-demo-attributes div {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.75fr);
+}
+.otel-demo-attributes dd {
+  margin: 0;
+  text-align: end;
+}
+.otel-demo-record {
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.otel-demo-record summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 850;
+  padding: 0.6rem;
+  text-transform: uppercase;
+}
+.otel-demo-record[open] summary {
+  border-block-end: 1px solid var(--border);
+}
+.otel-demo-record pre {
+  background: color-mix(in srgb, var(--text) 94%, var(--panel));
+  border: 0;
+  border-radius: 0;
+  color: var(--panel);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  margin: 0;
+  max-block-size: 20rem;
+  overflow: auto;
+  padding: 0.7rem;
+}
+.otel-demo-record code {
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+}
+.prose .otel-demo-record p {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: none;
+  padding: 0.6rem;
+}
+
+@keyframes benchmark-bar-rise {
+  from {
+    opacity: 0;
+    transform: scaleY(0.05);
+  }
+}
+
 /* Shared systems-lab treatment for demos in chapters and the showcase. */
 :is(
   .project-fit,
@@ -4283,6 +4834,8 @@
   .agent-fleet-review-step,
   .scaling-demo-header,
   .scaling-demo-form,
+  .benchmark-demo-grid,
+  .otel-demo-workbench,
   .request-trace-setup,
   .request-trace-analysis-grid,
   .request-trace-analysis .scaling-demo-metrics,
@@ -4294,6 +4847,16 @@
   .orchestration-console,
   .orchestration-observer {
     grid-template-columns: 1fr;
+  }
+  .benchmark-demo-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .otel-demo-pipeline {
+    grid-template-columns: 1fr;
+  }
+  .otel-demo-pipeline > i {
+    justify-self: center;
+    transform: rotate(90deg);
   }
   .orchestration-controls,
   .orchestration-observer-heading {
@@ -4381,6 +4944,25 @@
     grid-template-columns: 1fr;
     gap: 0.2rem;
   }
+  .benchmark-demo-console-heading,
+  .otel-demo-trace-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .otel-demo-controls,
+  .otel-demo-span-row {
+    grid-template-columns: 1fr;
+  }
+  .otel-demo-span-row > strong,
+  .otel-demo-trace-heading code {
+    text-align: start;
+  }
+  .otel-demo-span-facts {
+    grid-template-columns: 1fr;
+  }
+  .otel-demo-scale {
+    margin-inline-start: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4394,5 +4976,9 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+  .benchmark-demo-chart > i {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
   }
 }

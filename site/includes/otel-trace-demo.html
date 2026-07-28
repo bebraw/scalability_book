@@ -1,0 +1,102 @@
+<section
+  class="scaling-demo otel-trace-demo"
+  data-otel-trace-demo
+  aria-labelledby="otel-trace-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">OpenTelemetry trace explorer</p>
+      <h3 id="otel-trace-demo-heading">Follow one request, span by span</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-otel-demo-verdict>Slow storage path found</span>
+      <small>
+        A client-only trace simulation. No telemetry is collected, exported, or
+        stored.
+      </small>
+    </div>
+  </div>
+
+  <div class="otel-demo-pipeline" aria-label="OpenTelemetry data path">
+    <span><b>Application</b><small>starts + ends spans</small></span>
+    <i aria-hidden="true">→</i>
+    <span><b>OTel SDK</b><small>batches span records</small></span>
+    <i aria-hidden="true">→</i>
+    <span><b>Collector</b><small>receives OTLP + routes</small></span>
+    <i aria-hidden="true">→</i>
+    <span><b>Backend</b><small>stores + explores</small></span>
+  </div>
+  <p class="otel-demo-pipeline-note">
+    The rows below are spans from one trace. Select a row to inspect the record
+    the SDK could include in a batched OTLP export.
+  </p>
+
+  <div class="otel-demo-controls">
+    <label>
+      <span>Captured request</span>
+      <select data-otel-demo-scenario>
+        <option value="healthy">Healthy event write</option>
+        <option value="slow" selected>Slow event write</option>
+        <option value="retry">Storage retry succeeds</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="otel-demo-workbench">
+    <section class="scaling-demo-panel otel-demo-trace-panel">
+      <div class="otel-demo-trace-heading">
+        <div>
+          <p class="benchmark-demo-eyebrow">Trace</p>
+          <h4 data-otel-demo-trace-name>POST /events · 286 ms</h4>
+        </div>
+        <code data-otel-demo-trace-id>4bf92f3577b34da6a3ce929d0e0e4736</code>
+      </div>
+      <p class="otel-demo-trace-instruction">
+        Select any span row to inspect its telemetry record.
+      </p>
+      <div class="otel-demo-scale" aria-hidden="true">
+        <span>0 ms</span><span data-otel-demo-scale-middle>143 ms</span
+        ><span data-otel-demo-scale-end>286 ms</span>
+      </div>
+      <div class="otel-demo-timeline" data-otel-demo-timeline></div>
+    </section>
+
+    <aside class="scaling-demo-panel otel-demo-inspector" aria-live="polite">
+      <div>
+        <p class="benchmark-demo-eyebrow">Selected span</p>
+        <h4 data-otel-demo-span-name>store event</h4>
+      </div>
+      <dl class="otel-demo-span-facts">
+        <div>
+          <dt>Duration</dt>
+          <dd data-otel-demo-span-duration>184 ms</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd data-otel-demo-span-status>Unset</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd data-otel-demo-span-source>Manual</dd>
+        </div>
+      </dl>
+      <div>
+        <h4>Attributes</h4>
+        <dl class="otel-demo-attributes" data-otel-demo-attributes></dl>
+      </div>
+      <details class="otel-demo-record">
+        <summary>Inspect conceptual span record</summary>
+        <pre><code data-otel-demo-span-record></code></pre>
+        <p>
+          This keeps the important structure visible. Literal OTLP/JSON adds
+          typed values and a more verbose envelope, and a real export may
+          contain several spans.
+        </p>
+      </details>
+      <p class="demo-note" data-otel-demo-span-note>
+        This child span explains most of the end-to-end latency. The trace
+        narrows the investigation; it does not prove the underlying cause.
+      </p>
+    </aside>
+  </div>
+</section>

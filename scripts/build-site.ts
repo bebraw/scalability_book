@@ -96,6 +96,12 @@ const demoScriptIncludes = [
     script: "/request-trace-demo.js",
   },
   {
+    title: "Tail latency simulator",
+    chapter: "Benchmarking",
+    include: "site/includes/benchmark-simulation-demo.html",
+    script: "/benchmark-simulation-demo.js",
+  },
+  {
     title: "Model evaluation lab",
     chapter: "Benchmarking",
     include: "site/includes/model-eval-demo.html",
@@ -106,6 +112,12 @@ const demoScriptIncludes = [
     chapter: "Benchmarking",
     include: "site/includes/observability-signal-demo.html",
     script: "/observability-signal-demo.js",
+  },
+  {
+    title: "OpenTelemetry trace explorer",
+    chapter: "Benchmarking",
+    include: "site/includes/otel-trace-demo.html",
+    script: "/otel-trace-demo.js",
   },
   {
     title: "Workflow loop",
@@ -342,11 +354,16 @@ await compileSiteScript(
   "scripts/request-trace-demo.ts",
   "request-trace-demo.js",
 );
+await compileSiteScript(
+  "scripts/benchmark-simulation-demo.ts",
+  "benchmark-simulation-demo.js",
+);
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
 await compileSiteScript(
   "scripts/observability-signal-demo.ts",
   "observability-signal-demo.js",
 );
+await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
 await compileSiteScript(
   "scripts/workflow-loop-demo.ts",
   "workflow-loop-demo.js",
