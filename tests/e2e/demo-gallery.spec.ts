@@ -12,14 +12,16 @@ test.describe("demo showcase", () => {
     await expect(gallery.locator(".demo-gallery-lede")).toContainText(
       "Work through one module at a time",
     );
-    await expect(items).toHaveCount(15);
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText("15");
+    await expect(items).toHaveCount(16);
+    await expect(gallery.locator(".demo-gallery-stats")).toContainText("16");
     await expect(gallery.locator(".demo-gallery-stats")).toContainText(
       "Self-guided",
     );
     await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
-    await expect(items.last().locator(".demo-gallery-index")).toHaveText("15");
-    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(15);
+    await expect(items.last().locator(".demo-gallery-index")).toHaveText("16");
+    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(16);
+    await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(16);
+    await expect(gallery.locator("[data-demo-permalink]")).toHaveCount(16);
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });
@@ -46,6 +48,30 @@ test.describe("demo showcase", () => {
       () => document.documentElement.scrollWidth - window.innerWidth,
     );
     expect(pageOverflow).toBeLessThanOrEqual(1);
+  });
+
+  test("links directly to a demo from the gallery and a chapter", async ({
+    page,
+  }) => {
+    const demoId = "demo-deterministic-boundary-lab";
+
+    await page.goto(`/demos/#${demoId}`);
+    const galleryDemo = page.locator(`#${demoId}`);
+    await expect(galleryDemo).toBeVisible();
+    await expect(galleryDemo).toHaveCSS("outline-style", "solid");
+    await expect(galleryDemo.locator("[data-demo-permalink]")).toHaveAttribute(
+      "href",
+      `#${demoId}`,
+    );
+
+    await page.goto(`/chapters/scalable-development/#${demoId}`);
+    const chapterDemo = page.locator(`#${demoId}`);
+    await expect(chapterDemo).toBeVisible();
+    await expect(chapterDemo.locator("[data-demo-permalink]")).toHaveAttribute(
+      "href",
+      `#${demoId}`,
+    );
+    await expect(page).toHaveURL(new RegExp(`#${demoId}$`));
   });
 
   test("uses the systems-lab treatment for demos embedded in chapters", async ({

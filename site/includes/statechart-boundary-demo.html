@@ -1,0 +1,121 @@
+<section
+  id="demo-deterministic-boundary-lab"
+  data-demo-anchor
+  class="scaling-demo statechart-demo statechart-workflow-demo"
+  data-statechart-demo
+  aria-labelledby="statechart-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Deterministic boundary lab</p>
+      <h3 id="statechart-demo-heading">Give the agent a map</h3>
+    </div>
+    <div class="scaling-demo-summary" aria-live="polite">
+      <span data-statechart-demo-verdict>Goal: ship a safe change</span>
+      <small data-statechart-demo-summary>
+        The agent can choose only events enabled by the statechart.
+      </small>
+    </div>
+  </div>
+
+  <form class="statechart-workflow-layout" data-statechart-demo-form>
+    <section
+      class="statechart-agent-console"
+      aria-labelledby="statechart-agent-heading"
+    >
+      <div class="statechart-demo-section-heading">
+        <span aria-hidden="true">01</span>
+        <div>
+          <h4 id="statechart-agent-heading">Agentic shell</h4>
+          <p>One goal can produce different valid routes through the model.</p>
+        </div>
+      </div>
+
+      <div class="statechart-agent-decision" aria-live="polite">
+        <div class="statechart-agent-decision-heading">
+          <div>
+            <span>Current state</span>
+            <code data-statechart-demo-agent-state>active.planning</code>
+            <button
+              class="statechart-agent-reset"
+              type="button"
+              data-statechart-demo-reset
+            >
+              <span aria-hidden="true">↺</span>
+              Reset run
+            </button>
+          </div>
+          <div>
+            <span>Available next events</span>
+            <div
+              class="statechart-agent-options"
+              data-statechart-demo-events-enabled
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="statechart-core" aria-labelledby="statechart-core-heading">
+      <div class="statechart-demo-section-heading">
+        <span aria-hidden="true">02</span>
+        <div>
+          <h4 id="statechart-core-heading">
+            Deterministic core <em>XState v5 + ELK</em>
+          </h4>
+          <p>
+            Hierarchy shares rules; parallel regions represent simultaneous
+            facts.
+          </p>
+        </div>
+      </div>
+
+      <div class="statechart-workflow-canvas" data-statechart-demo-chart>
+        <div data-statechart-elk-placeholder></div>
+      </div>
+
+      <div class="statechart-workflow-readout" aria-live="polite">
+        <div>
+          <span>Active configuration</span>
+          <code data-statechart-demo-configuration>active.planning</code>
+        </div>
+        <div>
+          <span>Why this matters</span>
+          <p data-statechart-demo-explanation>
+            The parent state exposes one shared cancellation rule.
+          </p>
+        </div>
+      </div>
+
+      <details class="statechart-demo-definition">
+        <summary>Inspect or export the executable model</summary>
+        <div class="statechart-demo-definition-actions">
+          <p>
+            Copy the XState machine and paste it into Stately Sketch to inspect
+            or simulate the generated diagram.
+          </p>
+          <div>
+            <button type="button" data-statechart-demo-copy>Copy model</button>
+            <a href="https://sketch.stately.ai" target="_blank" rel="noreferrer"
+              >Open Stately Sketch ↗</a
+            >
+          </div>
+        </div>
+        <pre
+          class="statechart-demo-model"
+          tabindex="0"
+          aria-label="XState change delivery machine"
+        ><code class="hljs language-typescript" data-statechart-demo-model></code></pre>
+      </details>
+
+      <div class="statechart-workflow-ledger">
+        <div>
+          <span>Observed events</span>
+        </div>
+        <ol data-statechart-demo-history>
+          <li class="is-empty">No events sent yet.</li>
+        </ol>
+      </div>
+    </section>
+  </form>
+</section>

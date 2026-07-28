@@ -116,12 +116,24 @@ Validation should ask not only whether the current change works, but also whethe
 
 ## The job is to convert non-determinism into determinism
 
-Simply put, the new job of a developer is to convert something that is non-deterministic into deterministic.
+Simply put, the new job of a developer is to turn non-deterministic input into deterministic behavior.
+That does not make the model itself deterministic; it surrounds interpretation with explicit boundaries that keep the application predictable.
 This observation is at the core of how LLMs work since they rely on statistical inference meaning if you prompt them twice, likely the result will be in some way different.
 For this reason, it is a good idea to figure out how to reduce the chance that this interpretation process goes wrong.
 A part of this has to do with our technical choices and in his talk, David Khourshid ([Beyond the Prompt: "Goodbye slop; welcome determinism"](https://www.youtube.com/watch?v=uMvTAF280so)) argues using explicit models, state machines, and deterministic core logic around generative components.
 This gives validation a clearer target: let the model handle work that benefits from interpretation, but express business rules, state transitions, permissions, and invariants in forms that tests and tools can check repeatedly.
 When you codify your domain knowledge as models, they are easy to verify and more difficult for models to break.
+
+Khourshid describes one way to combine these ideas as letting an LLM navigate a deterministic state machine: given a goal and the current state, the model chooses from the events the machine currently permits.
+The demonstration below applies that pattern to an agent delivering a code change.
+At each state, choose among only the events that the machine currently enables.
+The statechart expresses hierarchy, parallel verification, recovery, and completion while keeping the model away from events that are not currently legal.
+
+{{ import "site/includes/statechart-boundary-demo.html" }}
+
+Notice what the statechart provides beyond a linear checklist.
+One cancellation rule applies throughout the compound active state, tests and human review can progress independently, and either kind of failure can return the workflow to implementation.
+The model may choose a route, but the statechart defines the available routes.
 
 Regardless of your generation approach, it is these kinds of technical choices that will maintain the quality of your implementation and I recommend trying out different kinds of modeling techniques you might be able to find to see if they make a qualitative difference in implementation compared to pure vibe coding.
 This becomes interesting particularly in the agent fleet case as you will have multiple different types of agents evaluating your code from different directions.

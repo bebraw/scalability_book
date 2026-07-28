@@ -8,6 +8,7 @@ import {
   resolveTrustedHtmlImports,
 } from "./lib/markdown.ts";
 import { renderHtmlisp } from "./lib/htmlisp.ts";
+import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import {
   chapterNumberFromFilename,
@@ -82,6 +83,12 @@ const demoScriptIncludes = [
     chapter: "Scalable development",
     include: "site/includes/project-fit-checker.html",
     script: "/project-fit-checker.js",
+  },
+  {
+    title: "Deterministic boundary lab",
+    chapter: "Scalable development",
+    include: "site/includes/statechart-boundary-demo.html",
+    script: "/statechart-boundary-demo.js",
   },
   {
     title: "Scalability dimensions lab",
@@ -169,6 +176,9 @@ const demoScriptIncludes = [
   },
 ];
 
+await validateDemoAnchors();
+const statechartDiagramHtml = await renderStatechartDiagram();
+
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
 
@@ -247,10 +257,12 @@ const projectSpecifications = await Promise.all(
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
   const rendered = renderMarkdown(page.source, page, bibliographySource);
+  rendered.content = injectStatechartDiagram(rendered.content);
   const previous = bookPages[index - 1];
   const next = bookPages[index + 1];
   const pageScripts = [
     ...commonBookScripts,
+    ...(hasDemoInclude(page.source) ? ["/demo-anchors.js"] : []),
     ...getDemoScriptsForSource(page.source),
     ...(includeEditor ? editorScripts : []),
     ...developmentScripts,
@@ -319,7 +331,9 @@ const demoGalleryHeading = renderMarkdown(
   { number: "" },
   bibliographySource,
 );
-const demoGallery = `${demoGalleryHeading.content}\n${resolveTrustedHtmlImports(getDemoGalleryHtml())}`;
+const demoGallery = injectStatechartDiagram(
+  `${demoGalleryHeading.content}\n${resolveTrustedHtmlImports(getDemoGalleryHtml())}`,
+);
 await writePage(
   "demos/index.html",
   renderer.renderLayout({
@@ -328,6 +342,7 @@ await writePage(
     currentUrl: "/demos/",
     stylesheets: [demoStylesheet],
     scripts: [
+      "/demo-anchors.js",
       ...demoScriptIncludes.map(({ script }) => script),
       ...developmentScripts,
     ],
@@ -342,9 +357,15 @@ await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
+await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteScript(
   "scripts/project-fit-checker.ts",
   "project-fit-checker.js",
+);
+await compileSiteBundle(
+  "scripts/statechart-boundary-demo.ts",
+  "statechart-boundary-demo.js",
+  "StatechartBoundaryDemo",
 );
 await compileSiteScript(
   "scripts/scalability-dimensions-demo.ts",
@@ -421,18 +442,50 @@ function hasDemoInclude(source) {
   return demoScriptIncludes.some(({ include }) => source.includes(include));
 }
 
+function injectStatechartDiagram(source) {
+  return source.replace(
+    /<div\s+data-statechart-elk-placeholder(?:="")?\s*><\/div>/,
+    statechartDiagramHtml,
+  );
+}
+
+async function validateDemoAnchors() {
+  const anchorIds = new Set();
+
+  for (const { include, title } of demoScriptIncludes) {
+    const expectedId = `demo-${slugify(title)}`;
+    const source = await readFile(path.join(root, include), "utf8");
+    const openingSection = source.match(/<section\b[^>]*>/i)?.[0] || "";
+
+    if (
+      !openingSection.includes(`id="${expectedId}"`) ||
+      !/\bdata-demo-anchor(?:\s|>|=)/.test(openingSection)
+    ) {
+      throw new Error(
+        `${include} must give its root section data-demo-anchor and id="${expectedId}"`,
+      );
+    }
+
+    if (anchorIds.has(expectedId)) {
+      throw new Error(`Duplicate demo anchor: ${expectedId}`);
+    }
+    anchorIds.add(expectedId);
+  }
+}
+
 function getDemoGalleryHtml() {
   const sections = demoScriptIncludes
     .map(({ title, chapter, include }, index) => {
-      const id = `demo-${slugify(title)}`;
+      const demoId = `demo-${slugify(title)}`;
+      const galleryId = `${demoId}-gallery`;
       const displayIndex = String(index + 1).padStart(2, "0");
 
-      return `<section class="demo-gallery-item" id="${escapeAttribute(id)}">
+      return `<section class="demo-gallery-item" id="${escapeAttribute(galleryId)}">
 <div class="demo-gallery-item-header">
 <span class="demo-gallery-index" aria-hidden="true">${displayIndex}</span>
 <div>
 <p>${chapter}</p>
-<a href="#${escapeAttribute(id)}">${title}</a>
+<a href="#${escapeAttribute(demoId)}">${title}</a>
 </div>
 <span class="demo-gallery-status"><i aria-hidden="true"></i> Ready</span>
 </div>

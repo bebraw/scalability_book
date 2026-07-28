@@ -1,4 +1,38 @@
 /* Interactive demo components */
+[data-demo-anchor] {
+  scroll-margin-block-start: 5.5rem;
+}
+[data-demo-anchor]:target {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 0.35rem;
+}
+.demo-permalink {
+  align-items: center;
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%);
+  border: 1px solid color-mix(in srgb, var(--border) 75%, var(--accent));
+  border-radius: 0.2rem;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  inline-size: 1.4rem;
+  justify-content: center;
+  line-height: 1;
+  margin-inline-start: 0.55rem;
+  min-block-size: 1.4rem;
+  opacity: 0.62;
+  text-decoration: none;
+  vertical-align: 0.16em;
+}
+.demo-permalink:hover,
+.demo-permalink:focus-visible {
+  opacity: 1;
+}
+.demo-permalink:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  outline-offset: 0.18rem;
+}
 .prose input[type="range"] {
   --range-track: color-mix(in srgb, var(--border) 75%, var(--panel));
   --range-fill: var(--accent);
@@ -4762,6 +4796,934 @@
   ) {
   border-block-end-color: var(--border);
 }
+.statechart-demo {
+  --statechart-ink: color-mix(in srgb, var(--text) 88%, #142a32);
+  --statechart-line: color-mix(in srgb, var(--text) 22%, var(--border));
+  overflow: hidden;
+  position: relative;
+}
+.statechart-demo::after {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 0.42rem,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0.42rem 0.52rem
+  );
+  content: "";
+  height: 0.22rem;
+  inset: 0 0 auto;
+  position: absolute;
+}
+.statechart-demo-section-heading {
+  align-items: start;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.statechart-demo-section-heading > span {
+  align-items: center;
+  aspect-ratio: 1;
+  background: var(--statechart-ink);
+  border-radius: 999px;
+  color: var(--bg);
+  display: inline-flex;
+  font-size: 0.68rem;
+  font-weight: 900;
+  justify-content: center;
+  width: 1.75rem;
+}
+.prose .statechart-demo-section-heading h4 {
+  color: var(--text);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+.statechart-demo-section-heading h4 em {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border));
+  border-radius: 999px;
+  color: var(--accent-strong);
+  display: inline-block;
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.05em;
+  margin-inline-start: 0.28rem;
+  padding: 0.18rem 0.38rem;
+  vertical-align: 0.08rem;
+}
+.prose .statechart-demo-section-heading p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  margin: 0.22rem 0 0;
+  max-width: none;
+}
+.statechart-demo-definition {
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  overflow: hidden;
+}
+.statechart-demo-definition summary {
+  background: color-mix(in srgb, var(--text) 4%, var(--panel));
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  padding: 0.52rem 0.65rem;
+  text-transform: uppercase;
+}
+.statechart-demo button:focus-visible,
+.statechart-demo select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.statechart-workflow-layout {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.statechart-agent-console,
+.statechart-core {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: clamp(0.85rem, 2vw, 1.15rem);
+}
+.statechart-agent-console {
+  align-items: start;
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 28%
+    ),
+    color-mix(in srgb, var(--text) 3%, var(--bg));
+  grid-template-columns: minmax(11rem, 0.55fr) minmax(22rem, 2.45fr);
+}
+.statechart-agent-controls {
+  display: grid;
+  gap: 0.65rem;
+}
+.statechart-agent-controls label > span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-agent-proposal {
+  background: var(--statechart-ink);
+  border: 1px solid var(--statechart-ink);
+  border-radius: 0.35rem;
+  box-shadow: 0.38rem 0.38rem 0
+    color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--bg);
+  display: grid;
+  gap: 0.52rem;
+  padding: 0.72rem;
+}
+.statechart-agent-proposal > div {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+  justify-content: space-between;
+}
+.statechart-agent-proposal > div span,
+.statechart-agent-proposal > div i {
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-agent-proposal > div span {
+  color: color-mix(in srgb, var(--bg) 68%, transparent);
+}
+.statechart-agent-proposal > div i {
+  border: 1px solid color-mix(in srgb, var(--accent) 58%, transparent);
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--accent) 72%, white);
+  padding: 0.14rem 0.34rem;
+}
+.statechart-agent-proposal > strong {
+  color: var(--bg);
+  font-family: var(--font-serif);
+  font-size: 1.24rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.prose .statechart-agent-proposal > p {
+  color: color-mix(in srgb, var(--bg) 70%, transparent);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: none;
+  min-height: 2rem;
+}
+.statechart-agent-proposal > button,
+.statechart-enabled-events button,
+.statechart-agent-options button,
+.statechart-agent-reset,
+.statechart-workflow-ledger button,
+.statechart-demo-definition-actions button {
+  border: 1px solid var(--statechart-ink);
+  border-radius: 0.28rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1.2;
+  min-height: 2.2rem;
+  padding: 0.42rem 0.55rem;
+}
+.statechart-agent-proposal > button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--panel);
+}
+.statechart-agent-proposal > button[disabled] {
+  background: color-mix(in srgb, var(--bg) 15%, transparent);
+  border-color: transparent;
+  color: color-mix(in srgb, var(--bg) 54%, transparent);
+}
+.statechart-enabled-events {
+  display: grid;
+  gap: 0.6rem;
+}
+.statechart-enabled-events > div:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+.statechart-enabled-events > div:first-child span {
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.statechart-enabled-events > div:first-child small {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+.statechart-enabled-events > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.statechart-enabled-events button {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--text);
+  font-size: 0.62rem;
+  min-height: 1.9rem;
+  overflow-wrap: anywhere;
+  padding: 0.34rem 0.42rem;
+}
+.statechart-enabled-events button:last-child {
+  border-color: color-mix(in srgb, #c74c42 45%, var(--border));
+  color: color-mix(in srgb, #c74c42 78%, var(--text));
+}
+.statechart-no-events {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-style: italic;
+}
+.statechart-agent-decision {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.72rem;
+}
+.statechart-agent-decision-heading {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(9rem, 0.85fr) minmax(12rem, 1.15fr);
+}
+.statechart-agent-decision-heading > div {
+  align-content: start;
+  display: grid;
+  gap: 0.18rem;
+}
+.statechart-agent-decision-heading span {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-agent-decision-heading code {
+  background: transparent;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+.statechart-agent-reset {
+  align-items: center;
+  background: transparent;
+  border-color: color-mix(in srgb, var(--accent-strong) 48%, var(--border));
+  color: var(--text);
+  display: inline-flex;
+  gap: 0.32rem;
+  justify-self: start;
+  margin-top: 0.38rem;
+  min-height: 2.15rem;
+}
+.statechart-agent-reset:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  border-color: var(--accent-strong);
+}
+.statechart-agent-reset > span {
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.statechart-agent-decision-heading small {
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+.statechart-agent-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+.statechart-agent-options button {
+  align-content: center;
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+  display: grid;
+  gap: 0.12rem;
+  min-height: 2.55rem;
+  overflow-wrap: anywhere;
+  padding: 0.46rem 0.6rem;
+  text-align: start;
+}
+.statechart-agent-options button span {
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+.statechart-agent-options button[data-statechart-demo-event="CANCEL"] {
+  border-color: color-mix(in srgb, #c74c42 55%, var(--border));
+  color: color-mix(in srgb, #c74c42 78%, var(--text));
+}
+.statechart-core {
+  border-block-start: 0.3rem solid var(--statechart-ink);
+}
+.statechart-workflow-canvas {
+  display: grid;
+  gap: 0.75rem;
+}
+.statechart-workflow-active {
+  background: color-mix(in srgb, var(--text) 2%, var(--panel));
+  border: 1px solid var(--statechart-line);
+  border-radius: 0.45rem;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.65rem;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.statechart-workflow-active.is-current {
+  border-color: color-mix(in srgb, var(--accent-strong) 58%, var(--border));
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.statechart-workflow-parent-label {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+}
+.statechart-workflow-parent-label span {
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-workflow-parent-label small {
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+.statechart-workflow-mainline {
+  align-items: center;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns:
+    minmax(4.5rem, 0.75fr) minmax(3.3rem, 0.55fr) minmax(5.4rem, 0.85fr)
+    minmax(3rem, 0.5fr) minmax(14rem, 2.1fr) minmax(2.8rem, 0.45fr)
+    minmax(4.2rem, 0.7fr);
+}
+.statechart-workflow-state,
+.statechart-workflow-mini-state {
+  background: var(--bg);
+  border: 1px solid var(--statechart-line);
+  border-radius: 0.42rem;
+  color: var(--text);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+.statechart-workflow-state {
+  align-content: center;
+  display: grid;
+  justify-items: center;
+  min-height: 4.2rem;
+  padding: 0.48rem;
+  text-align: center;
+}
+.statechart-workflow-state small {
+  color: var(--muted);
+  font-size: 0.55rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-workflow-state strong {
+  color: var(--text);
+  font-size: 0.74rem;
+  line-height: 1.1;
+}
+.statechart-workflow-state.is-current,
+.statechart-workflow-mini-state.is-current {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 0.14rem color-mix(in srgb, var(--accent) 13%, transparent);
+  transform: translateY(-0.1rem);
+}
+.statechart-workflow-arrow {
+  align-items: center;
+  display: grid;
+  gap: 0.15rem;
+  justify-items: center;
+  min-width: 0;
+}
+.statechart-workflow-arrow span {
+  color: var(--muted);
+  font-size: 0.46rem;
+  font-weight: 850;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.statechart-workflow-arrow i {
+  background: var(--statechart-line);
+  display: block;
+  height: 1px;
+  position: relative;
+  width: 100%;
+}
+.statechart-workflow-arrow i::after {
+  border-block: 0.2rem solid transparent;
+  border-inline-start: 0.34rem solid var(--statechart-line);
+  content: "";
+  inset: 50% -0.06rem auto auto;
+  position: absolute;
+  transform: translateY(-50%);
+}
+.statechart-workflow-parallel {
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg));
+  border: 1px dashed var(--statechart-line);
+  border-radius: 0.42rem;
+  display: grid;
+  gap: 0.42rem;
+  padding: 0.48rem;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.statechart-workflow-parallel.is-current {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 0.14rem color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.statechart-workflow-region {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.28rem;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: minmax(4.8rem, 0.72fr) minmax(0, 1.28fr);
+  padding: 0.34rem;
+}
+.statechart-workflow-region > b {
+  color: var(--muted);
+  font-size: 0.55rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.statechart-workflow-region > div {
+  align-items: center;
+  display: flex;
+  gap: 0.2rem;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.statechart-workflow-region > div > i {
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-style: normal;
+}
+.statechart-workflow-mini-state {
+  display: inline-block;
+  font-size: 0.53rem;
+  font-weight: 800;
+  min-width: 0;
+  padding: 0.28rem 0.32rem;
+  text-align: center;
+}
+.statechart-workflow-return {
+  align-items: end;
+  display: grid;
+  gap: 0.18rem 0.5rem;
+  grid-column: 3 / 6;
+  grid-row: 2;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: -0.05rem 1.25rem 0 1.8rem;
+  position: relative;
+}
+.statechart-workflow-return > span {
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 800;
+  grid-column: 1 / -1;
+  justify-self: start;
+  text-transform: uppercase;
+}
+.statechart-workflow-return > span strong {
+  color: var(--text);
+  font-size: inherit;
+}
+.statechart-workflow-return > div {
+  align-items: center;
+  display: flex;
+  gap: 0.28rem;
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  z-index: 1;
+}
+.statechart-workflow-return code {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.5rem;
+  font-weight: 850;
+  padding: 0.18rem 0.3rem;
+}
+.statechart-workflow-return small {
+  color: var(--muted);
+  font-size: 0.48rem;
+  font-style: italic;
+}
+.statechart-workflow-return > i {
+  border-block-end: 1px solid var(--statechart-line);
+  border-inline-end: 1px solid var(--statechart-line);
+  display: block;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  height: 0.85rem;
+  position: relative;
+}
+.statechart-workflow-return > i::after {
+  border-block: 0.2rem solid transparent;
+  border-inline-end: 0.34rem solid var(--statechart-line);
+  content: "";
+  inset: auto auto -0.21rem -0.05rem;
+  position: absolute;
+}
+.statechart-workflow-outcomes {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.statechart-workflow-outcome-path {
+  align-items: center;
+  background: color-mix(in srgb, var(--text) 2%, var(--panel));
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: minmax(5.4rem, 0.8fr) minmax(3.2rem, 0.55fr) minmax(
+      5rem,
+      0.9fr
+    );
+  padding: 0.55rem;
+}
+.prose .statechart-workflow-outcome-path > p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 850;
+  grid-column: 1 / -1;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  margin: 0;
+  max-width: none;
+  text-transform: uppercase;
+}
+.statechart-workflow-outcome-source {
+  align-content: center;
+  border: 1px dashed var(--statechart-line);
+  border-radius: 0.3rem;
+  display: grid;
+  justify-items: center;
+  min-height: 3.4rem;
+  padding: 0.38rem;
+  text-align: center;
+}
+.statechart-workflow-outcome-source small {
+  color: var(--muted);
+  font-size: 0.52rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.statechart-workflow-outcome-source code {
+  background: transparent;
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 850;
+  padding: 0;
+}
+.statechart-workflow-outcome-path .statechart-workflow-state {
+  min-height: 3.4rem;
+}
+.statechart-workflow-readout {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1.2fr);
+}
+.statechart-workflow-readout > div {
+  background: color-mix(in srgb, var(--text) 3%, var(--panel));
+  border: 1px solid var(--border);
+  border-radius: 0.28rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.55rem 0.62rem;
+}
+.statechart-workflow-readout span,
+.statechart-workflow-ledger > div > span {
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statechart-workflow-readout code {
+  background: transparent;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+.prose .statechart-workflow-readout p {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: none;
+}
+.statechart-demo-definition-actions {
+  align-items: center;
+  background: var(--panel);
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.6rem;
+}
+.prose .statechart-demo-definition-actions p {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 46ch;
+}
+.statechart-demo-definition-actions > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.statechart-demo-definition-actions button,
+.statechart-demo-definition-actions a {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.28rem;
+  color: var(--text);
+  font-size: 0.66rem;
+  font-weight: 850;
+  min-height: 2rem;
+  padding: 0.4rem 0.5rem;
+  text-decoration: none;
+}
+.statechart-demo-model {
+  --statechart-code-comment: #a9b8b2;
+  --statechart-code-keyword: #7dd3fc;
+  --statechart-code-literal: #fda4af;
+  --statechart-code-property: #99f6e4;
+  --statechart-code-string: #fde68a;
+  --statechart-code-title: #c4b5fd;
+  background: var(--code-bg);
+  border: 0;
+  border-radius: 0;
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 0.3vw + 0.65rem, 0.8rem);
+  line-height: 1.55;
+  margin: 0;
+  max-height: 30rem;
+  min-height: 15rem;
+  overflow: auto;
+  padding: 0.7rem;
+  tab-size: 2;
+}
+.statechart-demo-model:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+.statechart-demo-model code {
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+}
+.statechart-demo-model .hljs-comment,
+.statechart-demo-model .hljs-quote {
+  color: var(--statechart-code-comment);
+}
+.statechart-demo-model .hljs-keyword,
+.statechart-demo-model .hljs-selector-tag {
+  color: var(--statechart-code-keyword);
+}
+.statechart-demo-model .hljs-literal,
+.statechart-demo-model .hljs-number {
+  color: var(--statechart-code-literal);
+}
+.statechart-demo-model .hljs-attr,
+.statechart-demo-model .hljs-property,
+.statechart-demo-model .hljs-variable {
+  color: var(--statechart-code-property);
+}
+.statechart-demo-model .hljs-string,
+.statechart-demo-model .hljs-template-tag,
+.statechart-demo-model .hljs-template-variable {
+  color: var(--statechart-code-string);
+}
+.statechart-demo-model .hljs-title,
+.statechart-demo-model .hljs-type {
+  color: var(--statechart-code-title);
+}
+[data-theme="contrast"] .statechart-demo-model {
+  --statechart-code-comment: #e6e6e6;
+  --statechart-code-keyword: #ffffff;
+  --statechart-code-literal: #ffffff;
+  --statechart-code-property: #ffffff;
+  --statechart-code-string: #ffffff;
+  --statechart-code-title: #ffffff;
+}
+.statechart-workflow-ledger {
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.55rem;
+  padding-block-start: 0.75rem;
+}
+.statechart-workflow-ledger > div {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+.statechart-workflow-ledger button {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--muted);
+  min-height: 1.9rem;
+}
+.statechart-workflow-ledger ol {
+  display: grid;
+  gap: 0.32rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.statechart-workflow-ledger li {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.24rem;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 0.75fr) minmax(0, 1.25fr);
+  line-height: 1.2;
+  max-width: none;
+  padding: 0.42rem 0.5rem;
+}
+.statechart-workflow-ledger li span,
+.statechart-workflow-ledger li small {
+  color: var(--muted);
+  font-size: 0.6rem;
+}
+.statechart-workflow-ledger li code {
+  color: var(--text);
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+.statechart-workflow-ledger li small {
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+.statechart-workflow-ledger li.is-empty {
+  color: var(--muted);
+  display: block;
+  font-size: 0.68rem;
+  font-style: italic;
+}
+
+/* ELK computes the geometry at build time; these rules own the visual language. */
+.statechart-workflow-canvas {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    color-mix(in srgb, var(--text) 1.5%, var(--panel));
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  display: block;
+  overflow-x: auto;
+  padding: 0.55rem;
+}
+.statechart-elk-diagram {
+  display: block;
+  height: auto;
+  min-width: 145rem;
+  width: 100%;
+}
+.statechart-elk-node > rect {
+  fill: var(--bg);
+  stroke: var(--statechart-line);
+  stroke-width: 1.5;
+  transition:
+    fill 180ms ease,
+    stroke 180ms ease,
+    stroke-width 180ms ease;
+}
+.statechart-elk-node.is-compound > rect,
+.statechart-elk-node.is-parallel > rect {
+  fill: color-mix(in srgb, var(--text) 2%, var(--panel));
+  stroke-dasharray: 5 4;
+}
+.statechart-elk-node.is-parallel > rect {
+  fill: color-mix(in srgb, var(--accent) 5%, var(--panel));
+}
+.statechart-elk-node.is-current > rect {
+  fill: color-mix(in srgb, var(--accent) 17%, var(--bg));
+  stroke: var(--accent-strong);
+  stroke-width: 3;
+}
+.statechart-elk-label,
+.statechart-elk-kind,
+.statechart-elk-initial,
+.statechart-elk-edge-label text {
+  font-family: var(--font-ui);
+  pointer-events: none;
+}
+.statechart-elk-label {
+  fill: var(--text);
+  font-size: 18px;
+  font-weight: 850;
+}
+.statechart-elk-node.is-compound > .statechart-elk-label,
+.statechart-elk-node.is-parallel > .statechart-elk-label {
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.statechart-elk-kind {
+  fill: var(--muted);
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.statechart-elk-initial {
+  fill: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.statechart-elk-final-mark {
+  fill: var(--statechart-ink);
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+.statechart-elk-edge path {
+  fill: none;
+  stroke: var(--statechart-line);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+.statechart-elk-edge.is-return path {
+  stroke: var(--accent-strong);
+  stroke-width: 2.4;
+}
+.statechart-elk-edge.is-cancel path {
+  stroke: color-mix(in srgb, #c74c42 76%, var(--text));
+  stroke-dasharray: 6 4;
+  stroke-width: 2;
+}
+.statechart-elk-diagram marker path {
+  fill: var(--statechart-line);
+}
+.statechart-elk-diagram marker.is-return path {
+  fill: var(--accent-strong);
+}
+.statechart-elk-diagram marker.is-cancel path {
+  fill: color-mix(in srgb, #c74c42 76%, var(--text));
+}
+.statechart-elk-edge-label rect {
+  fill: var(--panel);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.statechart-elk-edge-label text {
+  fill: var(--muted);
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+.statechart-elk-edge.is-return .statechart-elk-edge-label rect {
+  fill: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  stroke: var(--accent-strong);
+}
+.statechart-elk-edge.is-return .statechart-elk-edge-label text {
+  fill: var(--accent-strong);
+}
+.statechart-elk-edge.is-cancel .statechart-elk-edge-label text {
+  fill: color-mix(in srgb, #c74c42 76%, var(--text));
+}
+
 @keyframes orchestration-pulse {
   to {
     opacity: 0.35;
@@ -4846,6 +5808,76 @@
   .orchestration-lab-header,
   .orchestration-console,
   .orchestration-observer {
+    grid-template-columns: 1fr;
+  }
+  .statechart-agent-console {
+    grid-template-columns: 1fr;
+  }
+  .statechart-agent-controls {
+    grid-template-columns: 1fr;
+  }
+  .statechart-workflow-mainline {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .statechart-workflow-mainline > .statechart-workflow-state {
+    width: min(10rem, 100%);
+  }
+  .statechart-workflow-mainline > .statechart-workflow-arrow {
+    grid-template-rows: auto 1.15rem;
+    width: 5rem;
+  }
+  .statechart-workflow-mainline > .statechart-workflow-arrow i {
+    height: 1.15rem;
+    width: 1px;
+  }
+  .statechart-workflow-mainline > .statechart-workflow-arrow i::after {
+    border-block: 0.34rem 0;
+    border-inline: 0.2rem solid transparent;
+    border-top-color: var(--statechart-line);
+    inset: auto auto -0.05rem 50%;
+    transform: translateX(-50%);
+  }
+  .statechart-workflow-parallel {
+    width: 100%;
+  }
+  .statechart-workflow-return {
+    align-items: center;
+    background: color-mix(in srgb, var(--text) 3%, var(--panel));
+    border: 1px solid var(--border);
+    border-inline-start: 0.22rem solid var(--accent-strong);
+    border-radius: 0.3rem;
+    gap: 0.35rem;
+    grid-column: 1;
+    grid-row: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    margin: 0;
+    padding: 0.5rem;
+    width: 100%;
+  }
+  .statechart-workflow-return > span {
+    grid-column: 1 / -1;
+  }
+  .statechart-workflow-return > div {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .statechart-workflow-return > i {
+    border: 0;
+    grid-column: 1;
+    grid-row: 2;
+    height: auto;
+  }
+  .statechart-workflow-return > i::after {
+    border: 0;
+    color: var(--accent-strong);
+    content: "↖";
+    font-size: 1.05rem;
+    inset: auto;
+    position: static;
+  }
+  .statechart-workflow-readout {
     grid-template-columns: 1fr;
   }
   .benchmark-demo-metrics {
@@ -4960,6 +5992,25 @@
   .otel-demo-span-facts {
     grid-template-columns: 1fr;
   }
+  .statechart-agent-controls {
+    grid-template-columns: 1fr;
+  }
+  .statechart-agent-decision-heading {
+    grid-template-columns: 1fr;
+  }
+  .statechart-workflow-region {
+    grid-template-columns: 1fr;
+  }
+  .statechart-workflow-region > div {
+    justify-content: flex-start;
+  }
+  .statechart-workflow-outcomes {
+    grid-template-columns: 1fr;
+  }
+  .statechart-demo-definition-actions {
+    align-items: start;
+    flex-direction: column;
+  }
   .otel-demo-scale {
     margin-inline-start: 0;
   }
@@ -4980,5 +6031,11 @@
   .benchmark-demo-chart > i {
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;
+  }
+  .statechart-demo *,
+  .statechart-demo *::before,
+  .statechart-demo *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
