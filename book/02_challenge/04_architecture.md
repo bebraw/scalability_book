@@ -161,6 +161,40 @@ Possible exercise:
 - Design a minimal `POST /events` endpoint and a minimal `GET /events` endpoint.
 - Then ask what changes when the app must handle retrying clients, offline devices, many tenants or domain instances, or analytical summaries.
 
+### Executable HTTP contracts
+
+An API description becomes more durable when representative requests and expected responses are executable.
+[Hurl](https://hurl.dev/) expresses HTTP sessions in plain text and can assert status codes, headers, and response bodies without depending on the application's implementation language.
+For example, an HTTP-based event tracker could preserve one creation-and-read scenario as follows:
+
+```text
+POST http://localhost:3000/events
+Content-Type: application/json
+{
+  "type": "work.started",
+  "workItemId": "item-42"
+}
+
+HTTP 201
+[Captures]
+event_id: jsonpath "$.id"
+
+GET http://localhost:3000/events/{{event_id}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.type" == "work.started"
+jsonpath "$.workItemId" == "item-42"
+```
+
+This file is both an example of the interface and a deterministic integration test.
+It can be run locally or in continuous integration, and a failure points to the request or assertion that no longer matches the implementation.
+If implementations A, B, and C expose a compatible HTTP boundary, the same scenario can be run against each one by changing the base URL rather than rewriting the test in each implementation's language.
+
+Hurl does not replace browser testing: it checks the HTTP boundary, while a tool such as Playwright checks behavior through a browser, including rendering and interaction.
+Although Hurl can repeat requests and assert response duration, a small contract scenario is not evidence that the system will behave well under representative load.
+The common project specification does not require an HTTP API, so this technique is optional for implementations that expose one rather than a universal project requirement.
+
 ## Learning from the implementation A architectures
 
 Students have already made architecture choices in implementation A, even if they did not yet have a complete vocabulary for them.

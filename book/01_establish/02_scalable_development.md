@@ -170,6 +170,7 @@ For this course, a minimal harness for your project should include:
 - `specs/{feature}/spec.md` for the main event workflow, including expected behavior, API or UI contracts, regression guardrails, and verification steps.
 - `docs/adrs/` or a simpler decision log for choices that will matter later, such as the initial stack, database, deployment target, authentication model, or event storage approach.
 - A small set of stable commands for running, testing, formatting, type checking, or otherwise validating the project.
+  For an HTTP-based application, this may include plain-text [Hurl](https://hurl.dev/) scenarios that exercise important API requests independently of the implementation language.
 - Example environment files, such as `.env.example`, when configuration or secrets are needed locally.
 - A short AI-use log noting what AI assistance was used, what was reviewed manually, and what had to be corrected.
 
