@@ -6,6 +6,29 @@
   outline: 3px solid var(--accent-strong);
   outline-offset: 0.35rem;
 }
+[data-demo-anchor]
+  :where(
+    a[href],
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex="0"]
+  ):focus-visible {
+  box-shadow: 0 0 0 2px var(--panel);
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-demo-anchor] *,
+  [data-demo-anchor] *::before,
+  [data-demo-anchor] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 .demo-permalink {
   align-items: center;
   background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%);
@@ -585,7 +608,7 @@
   font-size: 0.82rem;
 }
 .project-fit-preset-panel small {
-  color: var(--muted);
+  color: var(--text);
   font-size: 0.75rem;
   line-height: 1.35;
   margin-block-start: 0.2rem;

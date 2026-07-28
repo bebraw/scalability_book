@@ -41,6 +41,19 @@ test.describe("agent fleet demo", () => {
     );
 
     await demo.locator(".agent-fleet-brief-step summary").click();
+    const overviewTab = demo.getByRole("tab", { name: "Overview" });
+    const scoutTab = demo.getByRole("tab", { name: "Scout" });
+    await expect(overviewTab).toHaveAttribute("aria-selected", "true");
+    await expect(overviewTab).toHaveAttribute("tabindex", "0");
+    await overviewTab.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(scoutTab).toBeFocused();
+    await expect(scoutTab).toHaveAttribute("aria-selected", "true");
+    await expect(overviewTab).toHaveAttribute("tabindex", "-1");
+    await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
+      /Role:\nScout/,
+    );
+    await overviewTab.click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /Identify one likely bottleneck/,
     );

@@ -194,31 +194,68 @@
           role="tablist"
           aria-label="Run packet sections"
         >
-          <button type="button" data-agent-fleet-packet-tab="brief">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="brief"
+          >
             Overview
           </button>
-          <button type="button" data-agent-fleet-packet-tab="scout">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="scout"
+          >
             Scout
           </button>
-          <button type="button" data-agent-fleet-packet-tab="planner">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="planner"
+          >
             Planner
           </button>
-          <button type="button" data-agent-fleet-packet-tab="implementer">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="implementer"
+          >
             Implementer
           </button>
-          <button type="button" data-agent-fleet-packet-tab="reviewer">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="reviewer"
+          >
             Reviewer
           </button>
-          <button type="button" data-agent-fleet-packet-tab="submission">
+          <button
+            type="button"
+            role="tab"
+            aria-controls="agent-fleet-packet-panel"
+            data-agent-fleet-packet-tab="submission"
+          >
             Submission
           </button>
         </div>
-        <textarea
-          data-agent-fleet-brief
-          data-agent-fleet-packet
-          rows="14"
-          readonly
-        ></textarea>
+        <div
+          id="agent-fleet-packet-panel"
+          role="tabpanel"
+          aria-label="Run packet content"
+        >
+          <textarea
+            data-agent-fleet-brief
+            data-agent-fleet-packet
+            aria-label="Selected run packet"
+            rows="14"
+            readonly
+          ></textarea>
+        </div>
       </details>
     </div>
   </form>

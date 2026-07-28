@@ -293,6 +293,35 @@ function initializeAgentFleetDemo(root: HTMLElement) {
       render();
       brief.focus({ preventScroll: true });
     });
+    tab.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+        return;
+      }
+
+      event.preventDefault();
+      const availableTabs = packetTabs.filter(
+        (candidate) => !candidate.disabled,
+      );
+      const currentIndex = availableTabs.indexOf(tab);
+      const nextIndex =
+        event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? availableTabs.length - 1
+            : (currentIndex +
+                (event.key === "ArrowRight" ? 1 : -1) +
+                availableTabs.length) %
+              availableTabs.length;
+      const nextTab = availableTabs[nextIndex];
+
+      if (!nextTab) {
+        return;
+      }
+
+      currentPacket = nextTab.dataset.agentFleetPacketTab as PacketId;
+      render();
+      nextTab.focus();
+    });
   });
   copy.addEventListener("click", async () => {
     brief.select();
@@ -772,6 +801,7 @@ function updatePacketTabs(
     const active = packet === currentPacket;
 
     tab.disabled = disabled;
+    tab.tabIndex = active ? 0 : -1;
     tab.classList.toggle("is-active", active);
 
     if (active) {
