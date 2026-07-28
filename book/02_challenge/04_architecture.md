@@ -79,6 +79,32 @@ Potential subsections:
 > Chatty APIs, unnecessary round trips, oversized payloads, heavy client bundles, and aggressive polling all turn design choices into recurring resource use.
 > Good web architecture reduces waste by making useful work explicit and avoiding repeated work where possible.
 
+## Rendering and interaction are separate decisions
+
+Architecture labels often collapse several decisions into one framework-shaped category.
+That makes comparisons harder than they need to be.
+Server-side rendering (SSR), incremental static regeneration (ISR), and client-side rendering (CSR) primarily describe **where and when the view is produced and refreshed**.
+Multi-page applications (MPAs), hypermedia-driven applications (HDAs), and single-page applications (SPAs) primarily describe **how the browser reaches later application states**.
+
+CSR is common in single-page applications because the browser can fetch data, render views, and handle later navigation without replacing the document.
+The terms are not synonyms: CSR is a rendering strategy, while SPA describes a broader navigation and state-management shape.
+
+These choices can be combined.
+An HDA can receive its initial document through SSR, while an MPA can serve pages from an incrementally regenerated cache.
+The useful comparison is therefore not “which acronym wins?” but what each decision does to freshness, server work, navigation, client responsibility, caching, and failure.
+
+### Web architecture lens
+
+Use the same event-recording interaction across nine combinations.
+First choose how the initial document is produced, then choose how the application presents the state after `POST /events`.
+Run the trace and watch which artifact crosses the network.
+
+{{ import "site/includes/web-architecture-lens.html" }}
+
+The ISR behavior in the lab is a simplified stale-while-revalidate model.
+Exact regeneration, invalidation, and consistency behavior depends on the framework and deployment platform.
+That platform-specific contract should be documented as part of the architecture.
+
 ## API design as architecture
 
 Ideas to develop:

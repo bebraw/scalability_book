@@ -103,6 +103,12 @@ const demoScriptIncludes = [
     script: "/request-trace-demo.js",
   },
   {
+    title: "Web architecture lens",
+    chapter: "Architecture",
+    include: "site/includes/web-architecture-lens.html",
+    script: "/web-architecture-lens.js",
+  },
+  {
     title: "Tail latency simulator",
     chapter: "Benchmarking",
     include: "site/includes/benchmark-simulation-demo.html",
@@ -374,6 +380,10 @@ await compileSiteScript(
 await compileSiteScript(
   "scripts/request-trace-demo.ts",
   "request-trace-demo.js",
+);
+await compileSiteScript(
+  "scripts/web-architecture-lens.ts",
+  "web-architecture-lens.js",
 );
 await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",

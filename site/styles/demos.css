@@ -6039,3 +6039,872 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Architecture lens: an editorial systems diagram for composing web choices. */
+.architecture-lens {
+  --architecture-primary: var(--accent-strong);
+  --architecture-flow: var(--accent);
+  --architecture-ink: var(--text);
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(50% - 0.5px),
+      color-mix(in srgb, var(--border) 65%, transparent) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--panel) 96%, var(--architecture-primary) 4%),
+      var(--panel)
+    );
+  overflow: hidden;
+  position: relative;
+}
+.architecture-lens:target {
+  outline: none;
+}
+.architecture-lens::before {
+  background: transparent;
+  block-size: auto;
+  color: color-mix(in srgb, var(--architecture-ink) 5%, transparent);
+  content: "HTML / HTTP / STATE";
+  font-family: var(--font-mono);
+  font-size: clamp(2rem, 7vw, 6rem);
+  font-weight: 900;
+  inset: 4.6rem auto auto -0.3rem;
+  inline-size: auto;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+  pointer-events: none;
+  position: absolute;
+  white-space: nowrap;
+  z-index: auto;
+}
+.architecture-lens > * {
+  position: relative;
+}
+.architecture-lens-header {
+  align-items: center;
+}
+.architecture-lens-equation {
+  align-items: center;
+  display: grid;
+  gap: 0.25rem 0.5rem;
+  grid-template-columns: auto auto auto;
+  justify-content: end;
+}
+.architecture-lens-equation span {
+  background: var(--architecture-ink);
+  color: var(--panel);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  min-width: 3.6rem;
+  padding: 0.45rem 0.55rem;
+  text-align: center;
+}
+.architecture-lens-equation span:last-of-type {
+  background: var(--architecture-primary);
+  color: var(--panel);
+}
+.architecture-lens-equation i {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 900;
+}
+.architecture-lens-equation small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  grid-column: 1 / -1;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+.architecture-lens-intro {
+  align-items: baseline;
+  border-block: 1px solid var(--border);
+  display: grid;
+  gap: 0.4rem 1rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-block: 1rem;
+  padding-block: 0.75rem;
+}
+.architecture-lens-intro strong {
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+.prose .architecture-lens-intro p {
+  color: var(--muted);
+  font-size: 0.86rem;
+  margin: 0;
+  max-width: 72ch;
+}
+.architecture-lens form {
+  display: grid;
+  gap: 1rem;
+}
+.architecture-lens-controls {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.architecture-lens fieldset {
+  border: 1px solid var(--border);
+  margin: 0;
+  min-width: 0;
+  padding: 0.75rem;
+}
+.architecture-lens legend {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  padding-inline: 0.35rem;
+  text-transform: uppercase;
+}
+.architecture-lens legend span {
+  color: var(--architecture-primary);
+  font-family: var(--font-mono);
+  margin-inline-end: 0.35rem;
+}
+.architecture-lens-options {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.architecture-lens-options label {
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+.architecture-lens-options input {
+  block-size: 100%;
+  cursor: pointer;
+  inline-size: 100%;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  z-index: 1;
+}
+.architecture-lens-options label > span {
+  background: color-mix(in srgb, var(--bg) 70%, var(--panel));
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.15rem;
+  min-height: 4.2rem;
+  padding: 0.65rem;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+.architecture-lens-options label:hover > span {
+  transform: translateY(-2px);
+}
+.architecture-lens-options input:checked + span {
+  background: color-mix(in srgb, var(--architecture-primary) 10%, var(--panel));
+  border-color: var(--architecture-primary);
+  box-shadow: inset 0.22rem 0 0 var(--architecture-primary);
+}
+.architecture-lens-options input:focus-visible + span {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+.architecture-lens-options strong {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+.architecture-lens-options small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+.architecture-lens-workbench {
+  align-items: stretch;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 1.45rem,
+      color-mix(in srgb, var(--border) 35%, transparent) 1.5rem
+    ),
+    color-mix(in srgb, var(--bg) 75%, var(--panel));
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(13rem, 0.72fr) minmax(0, 1.28fr);
+  padding: 1rem;
+}
+.architecture-lens-browser {
+  align-self: center;
+  background: var(--panel);
+  border: 1px solid var(--architecture-ink);
+  box-shadow: 0.45rem 0.45rem 0
+    color-mix(in srgb, var(--architecture-ink) 12%, transparent);
+  min-width: 0;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+.architecture-lens-browser.is-replacing {
+  animation: architecture-document-replace 520ms ease;
+}
+.architecture-lens-browser.is-swapping [data-architecture-lens-events] {
+  animation: architecture-fragment-swap 720ms ease;
+}
+.architecture-lens-browser.is-rendering [data-architecture-lens-events] {
+  animation: architecture-client-render 720ms ease;
+}
+.architecture-lens-browser-bar {
+  align-items: center;
+  background: var(--architecture-ink);
+  display: flex;
+  gap: 0.28rem;
+  min-height: 1.8rem;
+  padding: 0.4rem 0.5rem;
+}
+.architecture-lens-browser-bar i {
+  background: var(--panel);
+  border-radius: 999px;
+  block-size: 0.38rem;
+  inline-size: 0.38rem;
+  opacity: 0.68;
+}
+.architecture-lens-browser-bar code {
+  color: var(--panel);
+  font-size: 0.6rem;
+  margin-inline-start: 0.3rem;
+  opacity: 0.8;
+}
+.architecture-lens-document {
+  padding: 0.8rem;
+}
+.architecture-lens-document-head {
+  align-items: start;
+  border-block-end: 2px solid var(--architecture-ink);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding-block-end: 0.55rem;
+}
+.architecture-lens-document-head > div {
+  display: grid;
+}
+.architecture-lens-document-head small {
+  color: var(--muted);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+.architecture-lens-document-head strong {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+}
+.architecture-lens-document-head > span {
+  background: color-mix(in srgb, var(--architecture-flow) 12%, var(--panel));
+  border: 1px solid
+    color-mix(in srgb, var(--architecture-flow) 55%, var(--border));
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  padding: 0.22rem 0.3rem;
+}
+.architecture-lens-document ul {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0.55rem 0;
+  padding: 0;
+}
+.architecture-lens-document li {
+  border-block-end: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  max-width: none;
+  padding: 0.45rem 0;
+}
+.architecture-lens-document li span {
+  color: var(--muted);
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  width: 3.2rem;
+}
+.architecture-lens-draft {
+  background: color-mix(in srgb, var(--bg) 72%, var(--panel));
+  border: 1px dashed var(--border);
+  display: grid;
+  gap: 0.3rem;
+  margin-block: 0.65rem;
+  padding: 0.5rem;
+}
+.architecture-lens-draft > span {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+.architecture-lens-draft > span small {
+  color: var(--architecture-primary);
+  font-size: 0.48rem;
+}
+.architecture-lens-draft input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.68rem;
+  min-width: 0;
+  padding: 0.38rem 0.45rem;
+  width: 100%;
+}
+.architecture-lens-draft input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: 1px;
+}
+.architecture-lens-document button {
+  background: var(--architecture-primary);
+  border: 1px solid var(--architecture-primary);
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.5rem 0.6rem;
+  width: 100%;
+}
+.architecture-lens-document button span {
+  margin-inline-end: 0.25rem;
+}
+.architecture-lens-document button[disabled] {
+  cursor: wait;
+  opacity: 0.58;
+}
+.architecture-lens-browser-status {
+  background: color-mix(in srgb, var(--architecture-ink) 5%, var(--panel));
+  border-block-start: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  min-height: 2.9rem;
+  padding: 0.5rem 0.8rem;
+}
+.architecture-lens-receipt {
+  background: color-mix(in srgb, var(--bg) 70%, var(--panel));
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+.architecture-lens-receipt div {
+  border-block-end: 1px solid var(--border);
+  border-inline-end: 1px solid var(--border);
+  min-width: 0;
+  padding: 0.42rem 0.5rem;
+}
+.architecture-lens-receipt div:nth-child(even) {
+  border-inline-end: 0;
+}
+.architecture-lens-receipt dt {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.46rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.architecture-lens-receipt dd {
+  color: var(--text);
+  font-size: 0.62rem;
+  font-weight: 750;
+  line-height: 1.25;
+  margin: 0.12rem 0 0;
+  min-height: 1.55rem;
+  overflow-wrap: anywhere;
+}
+.architecture-lens-receipt .architecture-lens-transfer {
+  border-inline-end: 0;
+  grid-column: 1 / -1;
+  padding-block: 0.5rem 0.58rem;
+}
+.architecture-lens-transfer dd {
+  display: grid;
+  gap: 0.24rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 0;
+}
+.architecture-lens-transfer strong {
+  color: var(--text);
+  font-size: 0.62rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.architecture-lens-transfer small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.46rem;
+  grid-column: 1 / -1;
+  line-height: 1.2;
+}
+.architecture-lens-transfer-track {
+  align-self: center;
+  background: color-mix(in srgb, var(--border) 45%, transparent);
+  display: flex;
+  height: 0.42rem;
+  min-width: 0;
+  overflow: hidden;
+}
+.architecture-lens-transfer-track i {
+  background: var(--architecture-primary);
+  flex: 0 0 var(--transfer-warm, 36%);
+  min-width: 0.2rem;
+}
+.architecture-lens-transfer-track b {
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--architecture-flow) 75%, var(--panel)) 0 0.2rem,
+    color-mix(in srgb, var(--architecture-flow) 28%, var(--panel)) 0.2rem 0.4rem
+  );
+  flex: 0 0 var(--transfer-cold-extra, 0%);
+}
+.prose .architecture-lens-transfer-note {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.46rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: none;
+  padding: 0.45rem 0.5rem 0.55rem;
+}
+.architecture-lens-session {
+  background: color-mix(in srgb, var(--architecture-primary) 7%, var(--panel));
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.55rem 0.5rem 0.65rem;
+}
+.architecture-lens-session label {
+  align-items: center;
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: auto minmax(3rem, 1fr) auto;
+}
+.architecture-lens-session label > span,
+.architecture-lens-session output {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+.architecture-lens-session output {
+  color: var(--architecture-primary);
+  text-align: end;
+}
+.architecture-lens-session input {
+  accent-color: var(--architecture-primary);
+  min-width: 0;
+  width: 100%;
+}
+.prose .architecture-lens-session p {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: none;
+}
+.architecture-lens-trace {
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--architecture-primary) transparent;
+}
+.architecture-sequence {
+  --sequence-row: 2.25rem;
+  min-width: 29rem;
+  padding-inline-start: 2.4rem;
+  position: relative;
+}
+.architecture-sequence-axis {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  inset: 0 auto 0 0;
+  letter-spacing: 0.08em;
+  position: absolute;
+  text-transform: uppercase;
+  width: 1.6rem;
+}
+.architecture-sequence-axis i {
+  background: color-mix(
+    in srgb,
+    var(--architecture-primary) 55%,
+    var(--border)
+  );
+  flex: 1;
+  margin-block-start: 0.35rem;
+  position: relative;
+  width: 1px;
+}
+.architecture-sequence-axis i::after {
+  border-inline: 0.25rem solid transparent;
+  border-top: 0.4rem solid var(--architecture-primary);
+  content: "";
+  inset: auto auto -0.05rem 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+.architecture-sequence-participants,
+.architecture-sequence-lifelines {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.architecture-sequence-participants {
+  border-block-end: 1px solid var(--border);
+  min-height: 3.6rem;
+}
+.architecture-sequence-participant {
+  align-content: center;
+  background: color-mix(
+    in srgb,
+    var(--panel) 88%,
+    var(--architecture-primary) 12%
+  );
+  border-inline-end: 1px solid var(--border);
+  display: grid;
+  padding: 0.55rem 0.65rem;
+  text-align: center;
+}
+.architecture-sequence-participant:first-child {
+  border-inline-start: 1px solid var(--border);
+}
+.architecture-sequence-participant span {
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+.architecture-sequence-participant small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  line-height: 1.25;
+}
+.architecture-sequence-participant::after {
+  content: "";
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  line-height: 1.2;
+  min-block-size: 0.58rem;
+  text-transform: uppercase;
+}
+.architecture-sequence-participant.is-idle {
+  background: color-mix(in srgb, var(--bg) 85%, var(--panel));
+  opacity: 0.48;
+}
+.architecture-sequence-participant.is-idle::after {
+  color: var(--muted);
+  content: "bypassed";
+}
+.architecture-sequence-plot {
+  height: calc(var(--sequence-row) * 16.4);
+  position: relative;
+}
+.architecture-sequence-lifelines {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+.architecture-sequence-lifeline {
+  border-inline-start: 1px dashed
+    color-mix(in srgb, var(--muted) 52%, transparent);
+  justify-self: center;
+  width: 1px;
+}
+.architecture-sequence-lifeline.is-idle {
+  opacity: 0.28;
+}
+.architecture-sequence-phase {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 800;
+  gap: 0.4rem;
+  inset-inline: 0;
+  letter-spacing: 0.06em;
+  position: absolute;
+  text-transform: uppercase;
+}
+.architecture-sequence-phase::after {
+  background: color-mix(in srgb, var(--border) 72%, transparent);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+.architecture-sequence-phase span {
+  color: var(--architecture-primary);
+}
+.architecture-sequence-phase--load {
+  top: calc(var(--sequence-row) * 0.18);
+}
+.architecture-sequence-phase--action {
+  top: calc(var(--sequence-row) * 7.18);
+}
+.architecture-sequence-plot ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.architecture-sequence-message {
+  height: 2rem;
+  left: var(--message-left);
+  max-width: none;
+  position: absolute;
+  top: calc(var(--sequence-row) * var(--message-row));
+  transition:
+    filter 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+  width: var(--message-width);
+}
+.architecture-sequence-message > i {
+  border-block-start: 2px solid var(--architecture-primary);
+  inset: 0.82rem 0 auto;
+  position: absolute;
+}
+.architecture-sequence-message > i::after {
+  border-block: 0.25rem solid transparent;
+  content: "";
+  position: absolute;
+  top: -0.34rem;
+}
+.architecture-sequence-message.is-forward > i::after {
+  border-inline-start: 0.42rem solid var(--architecture-primary);
+  right: -0.05rem;
+}
+.architecture-sequence-message.is-reverse > i::after {
+  border-inline-end: 0.42rem solid var(--architecture-primary);
+  left: -0.05rem;
+}
+.architecture-sequence-message > span {
+  background: var(--panel);
+  display: grid;
+  gap: 0.02rem;
+  left: 50%;
+  max-width: none;
+  padding: 0.12rem 0.35rem;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  transform: translate(-50%, -48%);
+  width: max-content;
+  z-index: 1;
+}
+.architecture-sequence-message strong {
+  color: var(--text);
+  font-size: 0.62rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.architecture-sequence-message small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.architecture-sequence-message.is-background > i {
+  border-block-start-style: dashed;
+}
+.architecture-sequence-message.is-write > i {
+  border-block-start-color: var(--warning);
+}
+.architecture-sequence-message.is-write.is-forward > i::after {
+  border-inline-start-color: var(--warning);
+}
+.architecture-sequence-message.is-local {
+  width: 7%;
+}
+.architecture-sequence-message.is-local > i {
+  border: 2px solid var(--architecture-primary);
+  border-inline-start: 0;
+  height: 1.25rem;
+  inset: -0.1rem auto auto 0;
+  width: 100%;
+}
+.architecture-sequence-message.is-local > i::after {
+  border-block: 0.25rem solid transparent;
+  border-inline-end: 0.42rem solid var(--architecture-primary);
+  bottom: -0.3rem;
+  left: -0.05rem;
+  top: auto;
+}
+.architecture-sequence-message.is-local > span {
+  left: calc(100% + 0.45rem);
+  max-width: 8rem;
+  text-align: left;
+  top: 0.15rem;
+  transform: none;
+  width: max-content;
+}
+.architecture-sequence-message.is-active {
+  filter: drop-shadow(
+    0 0 0.28rem color-mix(in srgb, var(--architecture-flow) 55%, transparent)
+  );
+  transform: translateY(-0.08rem);
+}
+.architecture-sequence-message.is-active > i,
+.architecture-sequence-message.is-complete > i {
+  border-color: var(--architecture-flow);
+}
+.architecture-sequence-message.is-active.is-forward > i::after,
+.architecture-sequence-message.is-complete.is-forward > i::after {
+  border-inline-start-color: var(--architecture-flow);
+}
+.architecture-sequence-message.is-active.is-reverse > i::after,
+.architecture-sequence-message.is-complete.is-reverse > i::after,
+.architecture-sequence-message.is-active.is-local > i::after,
+.architecture-sequence-message.is-complete.is-local > i::after {
+  border-inline-end-color: var(--architecture-flow);
+}
+.architecture-sequence-message:not(.is-active, .is-complete) {
+  opacity: 0.78;
+}
+.architecture-lens-readout {
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.3fr);
+  min-block-size: 14.5rem;
+  padding: 0.9rem;
+}
+.prose .architecture-lens-readout h4 {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  margin: 0.15rem 0 0.4rem;
+  text-transform: none;
+}
+.prose .architecture-lens-readout p {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 54ch;
+}
+.architecture-lens-facts {
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+.architecture-lens-facts div {
+  background: color-mix(in srgb, var(--bg) 65%, var(--panel));
+  border-inline-start: 0.18rem solid var(--architecture-primary);
+  padding: 0.45rem 0.55rem;
+}
+.architecture-lens-facts dt {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.architecture-lens-facts dd {
+  color: var(--text);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  margin: 0.18rem 0 0;
+}
+.prose .architecture-lens-readout .architecture-lens-caution {
+  background: color-mix(in srgb, var(--warning) 9%, var(--panel));
+  border-inline-start: 0.22rem solid var(--warning);
+  color: var(--text);
+  font-size: 0.72rem;
+  grid-column: 1 / -1;
+  inline-size: 100%;
+  max-width: none;
+  padding: 0.5rem 0.65rem;
+}
+
+@keyframes architecture-document-replace {
+  45% {
+    opacity: 0.25;
+    transform: translateY(0.3rem);
+  }
+}
+@keyframes architecture-fragment-swap {
+  35% {
+    background: color-mix(in srgb, var(--architecture-flow) 24%, transparent);
+  }
+}
+@keyframes architecture-client-render {
+  35% {
+    background: color-mix(
+      in srgb,
+      var(--architecture-primary) 18%,
+      transparent
+    );
+    outline: 2px solid
+      color-mix(in srgb, var(--architecture-primary) 45%, transparent);
+    outline-offset: 0.15rem;
+  }
+}
+
+@media (max-width: 62rem) {
+  .architecture-lens-workbench {
+    grid-template-columns: minmax(11rem, 0.55fr) minmax(0, 1.45fr);
+  }
+}
+
+@media (max-width: 46rem) {
+  .architecture-lens {
+    inline-size: min(100%, calc(100vw - 3rem));
+    max-inline-size: calc(100vw - 3rem);
+    min-inline-size: 0;
+  }
+  .architecture-lens-header,
+  .architecture-lens-intro,
+  .architecture-lens-controls,
+  .architecture-lens-workbench,
+  .architecture-lens-readout {
+    grid-template-columns: 1fr;
+  }
+  .architecture-lens-equation {
+    justify-content: start;
+  }
+  .architecture-lens-equation small {
+    text-align: left;
+  }
+  .architecture-lens-browser {
+    width: min(100%, 20rem);
+  }
+}
+
+@media (max-width: 30rem) {
+  .architecture-lens-options,
+  .architecture-lens-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .architecture-lens *,
+  .architecture-lens *::before,
+  .architecture-lens *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

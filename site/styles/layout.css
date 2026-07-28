@@ -697,16 +697,6 @@
   padding: 0;
   position: relative;
 }
-.demo-gallery-item::before {
-  background: var(--accent-strong);
-  block-size: 0.2rem;
-  content: "";
-  inline-size: 4rem;
-  inset-block-start: -1px;
-  inset-inline-start: -1px;
-  position: absolute;
-  z-index: 2;
-}
 .demo-gallery-item-header {
   align-self: start;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
