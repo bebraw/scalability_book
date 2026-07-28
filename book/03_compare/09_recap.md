@@ -46,6 +46,7 @@ Reflection prompts:
 - Which part became harder to change, and why?
 - What instructions, conventions, or tests would have helped a new contributor?
 - Where did AI assistance speed up development, and where did it create review work?
+- Which skills or architectural knowledge could the group still demonstrate without AI assistance?
 
 ## Scalability as a multi-dimensional idea
 
@@ -100,6 +101,7 @@ Reflection prompts:
 - Which metric would warn you first that the system is overloaded?
 - What important behavior is still invisible?
 - Did your tests or benchmarks match realistic use?
+- Did a nominally successful agent stay within the reasonable intent and boundaries of its task?
 
 ## Reality and changing assumptions
 
@@ -128,6 +130,7 @@ Reflection prompts:
 - How did you divide work into roles, files, outputs, and acceptance criteria?
 - What evidence did you use before trusting agent output?
 - What did the fleet debugging view reveal about failures, retries, handoffs, review, or human intervention that the finished code did not show?
+- Did parallel work reduce accepted completion time, or only move work into integration and review?
 
 ## Scaling techniques and trade-offs
 

@@ -68,6 +68,10 @@ Parallel generation creates a queue for human judgment, integration, and verific
 Fleet size should follow the system's review capacity and the independence of the available tasks.
 If two agents need the same files, hidden assumptions, or reviewer at the same time, their apparent parallelism may only move waiting and conflict downstream.
 
+Coordination mechanisms can remove one bottleneck without removing the others.
+In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results ranging from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
+The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not the same as accepted work.
+
 ### Amdahl's Law and the sequential bottleneck
 
 Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].

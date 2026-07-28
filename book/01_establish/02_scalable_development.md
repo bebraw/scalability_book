@@ -32,6 +32,10 @@ On top of structured development, the authors propose the Shift-Up approach that
 Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
 The question is what values we want to emphasize.
 
+Adoption is also moving faster than measurement.
+An empirical study of software-engineering practice found broad use and perceived gains in cycle time and quality, but limited objective measurement and uneven investment in training and governance :citep[giray2025adoption].
+This makes disciplined project evidence more important than impressions of speed.
+
 In short, agentic development has changed web development by shifting the abstraction level.
 Instead of writing code, you massage the codebase into your preferred shape.
 The big question is, how to do this effectively.
@@ -144,6 +148,11 @@ When using agents, the application code is only one part of the project.
 The other part is the harness around the code: the files, commands, rules, and examples that help humans and agents understand what is expected.
 A good harness reduces the amount of hidden context a contributor needs before they can make a useful change.
 
+The harness must also make failures at system boundaries visible.
+An analysis of more than 3,800 reported bugs across three coding tools found that API, integration, or configuration errors accounted for 36.9% of root causes, while tool invocation and command execution were the most affected workflow stages :citep[zhang2026pitfalls].
+The sample is limited to public issue reports, but the result is a useful warning: model reasoning is only one possible failure source.
+Strict tool contracts, useful errors, reproducible commands, and observable execution belong to the project harness too.
+
 It is this harness that keeps your project maintainable, and you will end up evolving throughout your project while sharing good practices with other projects.
 One purpose of this book is to make you aware of those practices since I had to spend a lot of time myself to discover many of them and not all are obvious.
 As you work on your project, it is a good idea to push anything repetitive to your harness.
@@ -173,6 +182,10 @@ The baseline is simpler: can another student or agent clone the project, underst
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such.
 When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude.
 Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.
+
+Immediate output is not the only outcome worth protecting.
+Across three randomized experiments involving arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence; the decline was concentrated among participants who used AI for direct solutions, while hint-oriented users did not differ significantly from the control group :citep[liu2026assistance].
+These short tasks do not establish the long-term effect on professional programming, but they justify a practical course rule: use agents for hints, critique, and verification when the underlying skill must remain yours.
 
 It is useful to distinguish disposable code from what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve).
 A one-off program can be valuable even when nobody will maintain it and there slop may be acceptable.

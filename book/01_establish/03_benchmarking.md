@@ -41,6 +41,30 @@ It is possible that real usage will exercise portions of your system you did not
 Under these conditions, you may hit third-party limitations you might not expect or there might be something in your infrastructure that breaks under specific kind of loads.
 It is for this reason learning chaos engineering can be useful since it tests exactly what happens when a piece of infrastructure breaks since that is exactly what can happen in practice at the worst possible moment.
 
+## Evaluating agentic workflows
+
+The development workflow is also a system that can be benchmarked.
+For a bounded task, record whether the result passed its acceptance checks, how long it took, what it cost, how many retries occurred, and how much human review or correction it required.
+Generated lines of code and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
+This distinction matters in practice: organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
+
+Some outcomes can be checked deterministically through tests, schemas, or expected artifacts.
+Others require a rubric or human judgment.
+When a model acts as a judge, test whether answer order, verbosity, confidence, or the judge's own style changes its scores; LLM judges have documented position and self-enhancement biases :citep[zheng2023mtbench].
+Keep a small human-reviewed calibration set and report disagreement rather than treating the judge as ground truth.
+
+The demonstration below separates deterministic probes from a rubric score.
+Use it to inspect a failing task and decide whether the problem lies in the result, the rubric, or the evaluation setup.
+
+{{ import "site/includes/model-eval-demo.html" }}
+
+Literal task completion is not enough for an agent that can take actions.
+The proposed "Genie coefficient" asks how far an agent's behavior departs from a reasonable interpretation of the user's intent :citep[raghavan2026genie].
+It is a conceptual framework rather than a validated metric, but it suggests a useful evaluation split: score task success, permission compliance, unnecessary actions, side effects, and clarification quality separately.
+
+For the course project, evaluate one representative AI-assisted task twice: once for the correctness of the produced artifact and once for the quality of the workflow that produced it.
+Preserve the prompt or task brief, relevant context, model and tool versions, execution trace, checks, human corrections, and final acceptance decision.
+
 ## Observability and telemetry
 
 A benchmark can reveal that the request distribution changed, but it does not necessarily explain why one request was slow.
