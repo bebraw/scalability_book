@@ -25,6 +25,20 @@ Since agentic development allows you to produce vast amounts of code fast throug
 The term vibe coding coined by Andrej Karpathy in February 2025 captures well the dark side of this kind of development and for this reason it is occasionally used as a pejorative against development practices that focus on visual results while forgetting what is underneath.
 This does not mean vibe coding cannot be useful as a prototyping technique, but that it can be dangerous to forget to design your codebase so that it follows good practices and follow security practices to avoid leaking client data or causing unnecessary cost or reputation loss to the developer.
 
+:citet[foote1997mud] describe a Big Ball of Mud as a system whose organization is dictated more by expediency than design.
+Big Ball of Mud connects well with the idea of vibe coding since a system can evolve faster than understanding of its structure.
+As code is fast to generate, it is also fast to learn about your actual requirements that shape software architecture.
+This is particularly true for spikes and early prototypes.
+
+:::comment
+
+Fowler's rule of three, attributed to Don Roberts, recommends refactoring when a similar implementation appears for the third time :citep[fowler1999refactoring].
+The accumulated examples can reveal an abstraction that would have been speculative earlier.
+
+:::
+
+## Shifting-Up -- Trading development speed for human control
+
 It turns out, to get most out of agentic development, you will need a certain amount of discipline.
 That is the main reason why it is important to understand technical details as in what should good architecture look like and how to develop software sustainably.
 :citet[lipsanen2026shiftup] consider this issue and propose structured development as an alternative to unstructured vibe coding.
@@ -32,9 +46,13 @@ On top of structured development, the authors propose the Shift-Up approach that
 Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
 The question is what values we want to emphasize.
 
+::: comment
+
 Adoption is also moving faster than measurement.
-An empirical study of software-engineering practice found broad use and perceived gains in cycle time and quality, but limited objective measurement and uneven investment in training and governance :citep[giray2025adoption].
+:citet[giray2025adoption] found broad use and perceived gains in cycle time and quality, but limited objective measurement and uneven investment in training and governance.
 This makes disciplined project evidence more important than impressions of speed.
+
+:::
 
 In short, agentic development has changed web development by shifting the abstraction level.
 Instead of writing code, you massage the codebase into your preferred shape.

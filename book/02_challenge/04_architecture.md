@@ -33,6 +33,27 @@ Possible event tracking example:
 - Each boundary can fail or interpret data differently.
 - A scalable design makes these boundaries explicit.
 
+### Architecture is maintained, not declared
+
+A system does not avoid architectural decay merely because it began with a diagram or a recognizable framework.
+:citet[foote1997mud] identify throwaway code, piecemeal growth, and pressure to keep the system working as forces that gradually produce a Big Ball of Mud.
+Even a deliberate initial design can erode as requirements change and expedient repairs accumulate.
+
+Conscious architecture therefore does not mean designing the entire system in advance.
+It means repeatedly deciding which boundaries must remain visible, which shortcuts are temporary, and when working code needs to be reorganized before further growth makes change unsafe.
+Refactoring, tests, module contracts, and decision records are mechanisms for maintaining architectural intent while the system evolves.
+
+Christopher Alexander's pattern language offers a middle path between a complete upfront blueprint and unregulated growth.
+A shared set of patterns allows people to make local, piecemeal changes while preserving relationships that contribute to the coherence of the whole :citep[alexander1977pattern].
+In an agentic project, the harness can serve a similar role.
+Architecture notes, specifications, examples, tests, and decision records give humans and agents a project-specific language for making changes without rediscovering—or accidentally redefining—the system on every task.
+
+This distinction also clarifies cathedral and bazaar metaphor by :citet[raymond2001cathedral].
+The cathedral and bazaar describe how development and feedback are organized; a Big Ball of Mud describes the structure that results.
+Iterative, distributed development does not imply architectural disorder, just as centralized planning does not guarantee coherence.
+A bazaar can sustain strong architecture when contributions pass through stable boundaries, review, and continuous integration.
+Either development model can produce mud when local changes accumulate without structural stewardship.
+
 ## The basic shape of a web application
 
 Outline:
