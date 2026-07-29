@@ -107,6 +107,16 @@ The author reviewed the generated code and built integration tests that exercise
 When the browser implementation behaved differently, the mismatch became a concrete failure the developer and agent could investigate.
 This is stronger than asking a model whether its own output looks correct: the harness compares behavior against an independent reference implementation.
 
+> **A generated test is still generated output**
+>
+> In a contrasting workshop report, Samir Talwar describes an agent-generated application whose screenshot tests did not exercise the application, whose claimed passkey authentication accepted a username without authentication, and whose data disappeared after restart :citep[talwar2026llms].
+> Talwar interprets the experience as evidence that LLMs cannot program.
+> A narrower conclusion is more useful: specifications and generated tests do not constrain a system merely because they exist.
+>
+> The model provides capabilities that a development harness can invoke, but the harness must connect claims to independent evidence.
+> A screenshot check should launch the real application, authentication should be tested against observable security behavior, and persistence should survive a restart.
+> Tests produced by the same agent remain candidate artifacts until their relationship to the required behavior has been established.
+
 For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird.
 A big part of working with agents is getting better at figuring out how to set up effective validation rules since this can define whether your project stays on rails or not.
 If you don't take care, you can end up with a lot of working code that has not been structured well and in turn will be slow and expensive for agents to maintain and develop further.
