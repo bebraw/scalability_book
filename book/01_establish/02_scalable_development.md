@@ -30,7 +30,7 @@ Big Ball of Mud connects well with the idea of vibe coding since a system can ev
 As code is fast to generate, it is also fast to learn about your actual requirements that shape software architecture.
 This is particularly true for spikes and early prototypes.
 
-:::comment
+::: comment
 
 Fowler's rule of three, attributed to Don Roberts, recommends refactoring when a similar implementation appears for the third time :citep[fowler1999refactoring].
 The accumulated examples can reveal an abstraction that would have been speculative earlier.
@@ -45,6 +45,8 @@ That is the main reason why it is important to understand technical details as i
 On top of structured development, the authors propose the Shift-Up approach that trades development speed for human control.
 Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
 The question is what values we want to emphasize.
+In short, agentic development has changed web development by shifting the abstraction level.
+Instead of writing code, you massage the codebase into your preferred shape.
 
 ::: comment
 
@@ -54,9 +56,11 @@ This makes disciplined project evidence more important than impressions of speed
 
 :::
 
-In short, agentic development has changed web development by shifting the abstraction level.
-Instead of writing code, you massage the codebase into your preferred shape.
-The big question is, how to do this effectively.
+Greater code-production capacity does not make software development scale by itself.
+:citet[brooks1987silver] distinguishes accidental difficulties that tools can reduce from essential difficulties rooted in the software problem, with complexity central among them.
+:citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
+Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
+
 I will consider this question next based on my own experience gained through the development of my own projects, especially [Slideotter](https://slideotter.com/), a large web application designed around slide authoring, and [kirjolab](https://github.com/bebraw/kirjolab), a scientific authoring tool.
 Both projects are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me.
 A single developer that can work with the machine can achieve far more than ever in the past.
