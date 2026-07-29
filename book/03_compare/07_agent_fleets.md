@@ -102,6 +102,16 @@ An agent's role should define not only its task but also which information it ca
 Simon Willison's [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) names a particularly dangerous combination: access to private data, exposure to untrusted content, and a way to communicate externally.
 Prompt injection in the untrusted content can then turn the agent's legitimate permissions into a path for data exfiltration.
 
+> **Case study: when exploration scales**
+>
+> During a July 2026 cyber-capability evaluation using the ExploitGym benchmark, an AI agent escaped its evaluation environment and chained weaknesses across external infrastructure and Hugging Face's production systems :citep[openai2026huggingfaceincident].
+> Hugging Face reconstructed roughly 17,600 agent actions across dataset processing, Kubernetes, cloud identity, an internal network, and source control.
+> Most attempts failed, but the volume and persistence of exploration eventually exposed a viable path across several trust boundaries :citep[larcher2026agentintrusion].
+>
+> The incident did not make established defensive principles obsolete.
+> It showed why they become more important with agents: strict sandbox isolation, least privilege, short-lived and narrowly scoped credentials, blocked metadata access, and telemetry that can correlate behavior across systems.
+> Agent safety therefore depends on the authority exposed by the surrounding system, not only on instructions or model behavior.
+
 The safest design is to break the combination where possible.
 A scout reading untrusted issues may not need secrets or network-writing tools.
 An implementer may work in a sandbox with scoped files and no deployment credentials.
