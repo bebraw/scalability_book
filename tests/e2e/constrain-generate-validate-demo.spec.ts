@@ -8,7 +8,7 @@ test.describe("constrain, generate, validate demo", () => {
     await expect(page.locator("[data-cgv-demo]")).toBeVisible();
   });
 
-  test("turns failed validation into constraints for the next round", async ({
+  test("turns failed validation into an explicit revision for the next round", async ({
     page,
   }) => {
     const demo = page.locator("[data-cgv-demo]");
@@ -36,6 +36,20 @@ test.describe("constrain, generate, validate demo", () => {
     );
     await expect(demo.locator('[data-cgv-check="acceptance"]')).toContainText(
       "split into three fields",
+    );
+
+    await action.click();
+    await expect(demo.locator("[data-cgv-stage='revise']")).toHaveClass(
+      /is-current/,
+    );
+    await expect(demo.locator("[data-cgv-status]")).toContainText(
+      "revise project memory",
+    );
+    await expect(demo.locator("[data-cgv-candidate]")).toContainText(
+      "Project memory · proposed revision",
+    );
+    await expect(demo.locator("[data-cgv-candidate]")).toContainText(
+      "preserve fields containing commas or quotes",
     );
 
     await action.click();

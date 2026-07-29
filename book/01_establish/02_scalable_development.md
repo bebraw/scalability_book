@@ -90,11 +90,16 @@ Manually these tools would require a huge amount of effort but when an agent is 
 > It means keeping the project maintainable for humans, but it also means avoiding wasteful tool use.
 > Focused prompts, smaller context, reusable instructions, and strong validation loops reduce repeated generation and unnecessary compute.
 
-## Constrain, generate, validate
+## Constrain, generate, validate, revise
 
-Roughly put, when you develop with agents you follow a loop where you first constrain, then generate, and finally validate the results before starting again.
+Roughly put, when you develop with agents you follow a loop where you constrain, generate, validate, and revise before starting again.
 The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
 Even in a personal context, it is worth considering the loop and how you are contributing towards its operation so let's consider each part in isolation.
+
+Constraints at the start of a task are hypotheses, not necessarily complete knowledge.
+:citet[brooks1987silver] argues that rapid prototyping supports the iterative specification of requirements because important questions become visible only when people interact with a concrete system.
+:citet[naur1985theory] similarly describes programming as theory building rather than program-text production.
+Implementation can therefore be a way to learn what the specification should say, not only a way to execute it.
 
 **Constraining**
 
@@ -118,20 +123,28 @@ Many other solutions exist as well and they are worth researching.
 
 **Validation**
 
-The final part of the loop, validation, is perhaps the most important one since it's the part that defines the overall performance of your loop in sense that with good validation you can get decent results even from poor models as validation helps to keep them on track.
+Validation is perhaps the most important part of the loop since it defines the overall performance of your loop in sense that with good validation you can get decent results even from poor models as validation helps to keep them on track.
 Interestingly enough you can have your agents develop a big chunk, or even all, of validation logic for you.
 The idea is to give your agents tools to let them validate their work.
 The most obvious thing to do is to set up strict validation rules for your projects, but the idea scales beyond development.
 
-A useful example is the development of [Webernetes, a partial TypeScript port of Kubernetes that runs in the browser](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser).
-Most of its code was generated with language models, but generation was not treated as evidence of correctness.
+**Revision**
+
+Revision, the final part of the loop, is the part where you reflect and adjust based on your understanding.
+This is the part where you apply your enhanced learning to have a better starting point for the next loop.
+Essentially this is the part where learnings become codified for example as updated requirements, tests, architectural decisions, or project instructions.
+It is important to document your learnings as otherwise the implementation might drift apart from its specification and supporting material.
+
+## Case study -- Webernetes, Kubernetes in the browser
+
+[Webernetes](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser), a partial TypeScript port of Kubernetes that runs in the browser, is a useful example to study as most of its code was generated with language models, but generation was not treated as evidence of correctness.
 The author reviewed the generated code and built integration tests that exercised the same operations against Webernetes and a real k3s cluster.
 When the browser implementation behaved differently, the mismatch became a concrete failure the developer and agent could investigate.
 This is stronger than asking a model whether its own output looks correct: the harness compares behavior against an independent reference implementation.
 
 > **A generated test is still generated output**
 >
-> In a contrasting workshop report, Samir Talwar describes an agent-generated application whose screenshot tests did not exercise the application, whose claimed passkey authentication accepted a username without authentication, and whose data disappeared after restart :citep[talwar2026llms].
+> In a contrasting workshop report, :citet[talwar2026llms] describes an agent-generated application whose screenshot tests did not exercise the application, whose claimed passkey authentication accepted a username without authentication, and whose data disappeared after restart.
 > Talwar interprets the experience as evidence that LLMs cannot program.
 > A narrower conclusion is more useful: specifications and generated tests do not constrain a system merely because they exist.
 >
@@ -139,13 +152,17 @@ This is stronger than asking a model whether its own output looks correct: the h
 > A screenshot check should launch the real application, authentication should be tested against observable security behavior, and persistence should survive a restart.
 > Tests produced by the same agent remain candidate artifacts until their relationship to the required behavior has been established.
 
+## Slideotter -- The power of validation
+
 For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird.
 A big part of working with agents is getting better at figuring out how to set up effective validation rules since this can define whether your project stays on rails or not.
 If you don't take care, you can end up with a lot of working code that has not been structured well and in turn will be slow and expensive for agents to maintain and develop further.
 Technical debt can accrue faster with these tools than you can possibly imagine.
 
+## Agents learn patterns from your codebase
+
 The codebase itself is also part of the context an agent learns from during a task.
-In [Write code like a human will maintain it](https://unstack.io/write-code-like-a-human-will-maintain-it), the author describes allowing several duplicated authorization checks because an agent could maintain them later.
+:citet[robinson2026maintain] describes allowing several duplicated authorization checks because an agent could maintain them later.
 Instead, those accepted shortcuts became examples for the agent to copy into the next change.
 A shortcut therefore has two costs: humans may have to repair it later, and agents may treat it as evidence of the project's preferred style.
 Validation should ask not only whether the current change works, but also whether it leaves behind a pattern worth repeating.
@@ -153,13 +170,13 @@ Validation should ask not only whether the current change works, but also whethe
 ### Constraint feedback loop
 
 The demonstration below starts with an underspecified request to add CSV export to an event list.
-Generate a candidate, validate it against the constraints that were stated, and turn any failed checks into explicit constraints for the next round.
+Generate a candidate, validate it against the constraints that were stated, revise the project memory from failed checks, and then begin the next round.
 Try completing the loop once with the default constraints and once after selecting every constraint before generation.
 
 {{ import "site/includes/constrain-generate-validate-demo.html" }}
 
 The generated candidate is deterministic teaching data rather than model output.
-The useful part is the shape of the loop: validation produces evidence, and failed evidence changes the next generation boundary instead of becoming a vague instruction to "try again."
+The useful part is the shape of the loop: validation produces evidence, revision makes the learning explicit, and the revised memory changes the next generation boundary instead of becoming a vague instruction to "try again."
 
 ## The job is to convert non-determinism into determinism
 

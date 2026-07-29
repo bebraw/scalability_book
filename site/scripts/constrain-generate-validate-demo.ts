@@ -1,5 +1,10 @@
 type CgvConstraint = "platform" | "scope" | "acceptance";
-type CgvPhase = "constrain" | "generated" | "validated" | "complete";
+type CgvPhase =
+  | "constrain"
+  | "generated"
+  | "validated"
+  | "revising"
+  | "complete";
 
 type CgvCandidate = Record<CgvConstraint, boolean>;
 
@@ -48,16 +53,16 @@ function initializeCgvDemo(root: HTMLElement) {
     action.disabled = false;
     download.disabled = true;
     action.textContent =
-      round === 1 ? "Generate candidate" : "Generate revision";
+      round === 1 ? "Generate candidate" : "Generate revised candidate";
     status.textContent = `Round ${round} · constrain the change`;
     title.textContent = feedback
-      ? "Validation feedback became constraints"
+      ? "The explicit revision became constraints"
       : "No candidate generated";
     candidateView.innerHTML = feedback
-      ? `<p><strong>Boundary revised.</strong> The next candidate receives the checks that failed in the previous round.</p>`
+      ? `<p><strong>Project memory updated.</strong> The next candidate receives the requirements learned in the previous round.</p>`
       : "Choose the constraints the candidate should receive.";
     reading.textContent = feedback
-      ? "The loop is useful because the next attempt is narrower, not merely newer. Generate again with the revised boundary."
+      ? "The next attempt is informed by recorded learning, not merely by an instruction to try again. Generate with the revised boundary."
       : "Generation is not evidence. Generate a candidate, then run the checks.";
     cgvRenderChecks(root, null);
     cgvRenderStages(root, "constrain", round > 1);
@@ -94,11 +99,11 @@ function initializeCgvDemo(root: HTMLElement) {
       status.textContent = `Round ${round} · ${failures.length} check${failures.length === 1 ? "" : "s"} failed`;
       title.textContent = "Candidate rejected by the harness";
       reading.textContent = `${cgvFailureSummary(failures)} Feed those failures back as explicit constraints before generating again.`;
-      action.textContent = "Use failures as constraints";
+      action.textContent = "Revise project memory";
     }
   };
 
-  const applyValidation = () => {
+  const advanceAfterValidation = () => {
     if (!candidate) return;
     const failures = cgvConstraintKeys.filter((key) => !candidate![key]);
 
@@ -115,6 +120,20 @@ function initializeCgvDemo(root: HTMLElement) {
       return;
     }
 
+    phase = "revising";
+    status.textContent = `Round ${round} · revise project memory`;
+    title.textContent = "Evidence became an explicit revision";
+    candidateView.innerHTML = cgvRevisionMarkup(failures);
+    reading.textContent =
+      "Record what the failed checks taught before another candidate is generated. This keeps the specification and implementation from drifting apart.";
+    action.textContent = "Apply revision to next round";
+    cgvRenderStages(root, "revise", true);
+  };
+
+  const applyRevision = () => {
+    if (!candidate) return;
+    const failures = cgvConstraintKeys.filter((key) => !candidate![key]);
+
     for (const key of failures) {
       const input = root.querySelector<HTMLInputElement>(
         `[data-cgv-constraint][value="${key}"]`,
@@ -129,7 +148,8 @@ function initializeCgvDemo(root: HTMLElement) {
   action.addEventListener("click", () => {
     if (phase === "constrain") renderGenerated();
     else if (phase === "generated") renderValidated();
-    else if (phase === "validated") applyValidation();
+    else if (phase === "validated") advanceAfterValidation();
+    else if (phase === "revising") applyRevision();
   });
 
   form.addEventListener("change", () => {
@@ -198,6 +218,19 @@ API "office hours",Online`;
 </div>`;
 }
 
+function cgvRevisionMarkup(failures: CgvConstraint[]) {
+  const revisions: Record<CgvConstraint, string> = {
+    platform: "Architecture: export must run in the browser without Node APIs.",
+    scope: "Change boundary: edit only the export module and its test.",
+    acceptance: "Acceptance: preserve fields containing commas or quotes.",
+  };
+
+  return `<div class="cgv-revision">
+<span>Project memory · proposed revision</span>
+<ul>${failures.map((failure) => `<li>${revisions[failure]}</li>`).join("")}</ul>
+</div>`;
+}
+
 function cgvRenderChecks(root: HTMLElement, candidate: CgvCandidate | null) {
   const evidence: Record<
     CgvConstraint,
@@ -244,10 +277,10 @@ function cgvRenderChecks(root: HTMLElement, candidate: CgvCandidate | null) {
 
 function cgvRenderStages(
   root: HTMLElement,
-  current: "constrain" | "generate" | "validate",
+  current: "constrain" | "generate" | "validate" | "revise",
   looping: boolean,
 ) {
-  const order = ["constrain", "generate", "validate"];
+  const order = ["constrain", "generate", "validate", "revise"];
   const currentIndex = order.indexOf(current);
   for (const stage of root.querySelectorAll<HTMLElement>("[data-cgv-stage]")) {
     const index = order.indexOf(stage.dataset.cgvStage || "");

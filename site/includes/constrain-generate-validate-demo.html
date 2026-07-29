@@ -7,8 +7,8 @@
 >
   <div class="scaling-demo-header">
     <div>
-      <p class="scaling-demo-kicker">Constraint feedback loop</p>
-      <h3 id="cgv-demo-heading">Turn a failed check into a better boundary</h3>
+      <p class="scaling-demo-kicker">Constraint learning loop</p>
+      <h3 id="cgv-demo-heading">Turn evidence into project memory</h3>
     </div>
     <div class="scaling-demo-summary" aria-live="polite">
       <span data-cgv-status>Round 1 · constrain the change</span>
@@ -16,7 +16,10 @@
     </div>
   </div>
 
-  <ol class="cgv-loop-map" aria-label="Constrain, generate, validate loop">
+  <ol
+    class="cgv-loop-map"
+    aria-label="Constrain, generate, validate, revise loop"
+  >
     <li class="is-current" data-cgv-stage="constrain">
       <span>01</span><strong>Constrain</strong
       ><small>state what must remain true</small>
@@ -29,8 +32,12 @@
       <span>03</span><strong>Validate</strong
       ><small>compare evidence with intent</small>
     </li>
+    <li data-cgv-stage="revise">
+      <span>04</span><strong>Revise</strong
+      ><small>make the learning explicit</small>
+    </li>
     <li class="cgv-loop-return" aria-hidden="true">
-      ↩ failures revise constraints
+      ↩ revision constrains the next round
     </li>
   </ol>
 

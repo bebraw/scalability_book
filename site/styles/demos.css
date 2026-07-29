@@ -9706,7 +9706,7 @@
   }
 }
 
-/* Constrain → generate → validate */
+/* Constrain → generate → validate → revise */
 .cgv-demo {
   --cgv-active: var(--accent-strong);
   --cgv-pass: var(--success);
@@ -9718,7 +9718,7 @@
   border-block-end: 1px solid var(--border);
   display: grid;
   gap: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
   margin: 0;
   padding: 0;
@@ -9746,7 +9746,7 @@
   z-index: 1;
 }
 
-.cgv-loop-map > li:nth-child(3)::after {
+.cgv-loop-map > li:nth-child(4)::after {
   display: none;
 }
 
@@ -10056,6 +10056,22 @@
   list-style: none;
   margin: 0 0 0.6rem;
   padding: 0;
+}
+
+.cgv-revision > span {
+  color: color-mix(in srgb, var(--code-text) 58%, transparent);
+  display: block;
+  font-size: 0.44rem;
+  letter-spacing: 0.05em;
+  margin-block-end: 0.5rem;
+  text-transform: uppercase;
+}
+
+.cgv-revision ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding-inline-start: 1rem;
 }
 
 .cgv-artifact-grid li::before {
