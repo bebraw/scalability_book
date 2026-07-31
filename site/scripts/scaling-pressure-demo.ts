@@ -22,6 +22,7 @@ type ScalingTechnique = {
   failure: string;
   signal: string;
   simplerAlternative: string;
+  complexityMovesTo: string;
   effects: {
     writes: number;
     reads: number;
@@ -62,6 +63,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     signal: "Query plan, p95 GET /events latency, index size.",
     simplerAlternative:
       "Start with the missing index before adding replicas or caches.",
+    complexityMovesTo:
+      "Write amplification, index storage, and query-plan maintenance.",
     effects: {
       writes: -1,
       reads: 4,
@@ -80,6 +83,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     signal: "Queue depth, event age, retry count, processing error rate.",
     simplerAlternative:
       "Move only nonessential processing out of the request path first.",
+    complexityMovesTo:
+      "Backlog, retries, idempotency, worker operations, and summary lag.",
     effects: {
       writes: 5,
       reads: 0,
@@ -97,6 +102,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     signal: "Cache hit rate, stale age, database read rate.",
     simplerAlternative:
       "Use pagination and indexing before caching everything.",
+    complexityMovesTo:
+      "Invalidation, freshness budgets, cache keys, and stale-read behavior.",
     effects: {
       writes: 0,
       reads: 4,
@@ -113,6 +120,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     failure: "Dashboards can lag behind accepted writes.",
     signal: "Replica lag, read latency, primary CPU, replica errors.",
     simplerAlternative: "Measure whether indexes and caching are enough first.",
+    complexityMovesTo:
+      "Replication lag, read routing, failover, and replica operations.",
     effects: {
       writes: 1,
       reads: 5,
@@ -131,6 +140,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     signal:
       "Per-project storage, hot partition rate, cross-partition query count.",
     simplerAlternative: "Add per-tenant rate limits before sharding storage.",
+    complexityMovesTo:
+      "Routing, rebalancing, migrations, and cross-partition queries.",
     effects: {
       writes: 2,
       reads: 2,
@@ -148,6 +159,8 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     signal: "429 rate, rejected event count, retry-after usage, queue depth.",
     simplerAlternative:
       "Set clear limits before adding capacity for rare peaks.",
+    complexityMovesTo:
+      "Client retry discipline, fairness policy, and partial acceptance.",
     effects: {
       writes: 3,
       reads: 0,
@@ -193,6 +206,12 @@ function initializeScalingDemo(root: HTMLElement) {
   const interpretation = root.querySelector<HTMLElement>(
     "[data-scaling-demo-interpretation]",
   );
+  const waterbed = root.querySelector<HTMLElement>(
+    "[data-scaling-demo-waterbed]",
+  );
+  const waterbedSummary = root.querySelector<HTMLElement>(
+    "[data-scaling-demo-waterbed-summary]",
+  );
   const artifact = root.querySelector<HTMLTextAreaElement>(
     "[data-scaling-demo-artifact]",
   );
@@ -211,6 +230,8 @@ function initializeScalingDemo(root: HTMLElement) {
     !pipeline ||
     !verdict ||
     !interpretation ||
+    !waterbed ||
+    !waterbedSummary ||
     !artifact ||
     !copy
   ) {
@@ -238,6 +259,11 @@ function initializeScalingDemo(root: HTMLElement) {
     pipeline.innerHTML = buildScalingPipeline(selected)
       .map((item) => `<li>${escapeScalingHtml(item)}</li>`)
       .join("");
+    waterbed.innerHTML = buildScalingWaterbed(selected);
+    waterbedSummary.textContent =
+      selected.length === 0
+        ? "Choose a scaling move"
+        : `${selected.length} move${selected.length === 1 ? "" : "s"} relocate complexity`;
     updateScalingMetrics(metricNodes, result);
     verdict.textContent = `${selected.length} moves, ${getScalingRiskLabel(
       result.complexity,
@@ -452,6 +478,24 @@ function buildScalingPipeline(selected: ScalingTechniqueId[]) {
   return steps;
 }
 
+function buildScalingWaterbed(selected: ScalingTechniqueId[]) {
+  if (selected.length === 0) {
+    return `<p>No complexity displacement to inspect yet.</p>`;
+  }
+
+  return selected
+    .map((id) => {
+      const technique = scalingTechniques[id];
+
+      return `<article>
+        <strong>${escapeScalingHtml(technique.label)}</strong>
+        <span aria-hidden="true">→</span>
+        <p>${escapeScalingHtml(technique.complexityMovesTo)}</p>
+      </article>`;
+    })
+    .join("");
+}
+
 function updateScalingMetrics(
   nodes: HTMLElement[],
   result: ReturnType<typeof calculateScalingResult>,
@@ -519,10 +563,10 @@ function buildScalingArtifact({
       ? selected.map((id) => {
           const technique = scalingTechniques[id];
 
-          return `| ${technique.pressure} | ${technique.label} | ${technique.benefit} | ${technique.cost} | ${technique.failure} | ${technique.signal} | ${technique.simplerAlternative} |`;
+          return `| ${technique.pressure} | ${technique.label} | ${technique.benefit} | ${technique.cost} | ${technique.complexityMovesTo} | ${technique.failure} | ${technique.signal} | ${technique.simplerAlternative} |`;
         })
       : [
-          "| Pressure not selected | Measure first | Avoid premature complexity | Scaling decision deferred | Unknown bottleneck remains | Baseline latency, throughput, error rate | No infrastructure change yet |",
+          "| Pressure not selected | Measure first | Avoid premature complexity | Scaling decision deferred | No complexity displaced yet | Unknown bottleneck remains | Baseline latency, throughput, error rate | No infrastructure change yet |",
         ];
 
   return `# Scaling Trade-off Table
@@ -546,15 +590,16 @@ ${context}
 - Operational complexity: ${getScalingRiskLabel(result.complexity)}
 - Resource cost: ${getScalingRiskLabel(result.resourceCost)}
 
-| Pressure | Technique | Benefit | Cost | New failure mode | Signal to watch | Why simpler alternative was not enough |
-| --- | --- | --- | --- | --- | --- | --- |
+| Pressure | Technique | Benefit | Cost | Complexity moved to | New failure mode | Signal to watch | Why simpler alternative was not enough |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 ${rows.join("\n")}
 
 ## Human review questions
 - Which selected technique should be tried first?
 - What metric would falsify this design?
 - Which technique was deliberately not chosen?
-- What extra operational responsibility did the design introduce?`;
+- What extra operational responsibility did the design introduce?
+- What became simpler, and where did the displaced complexity reappear?`;
 }
 
 function clampScalingScore(value: number) {

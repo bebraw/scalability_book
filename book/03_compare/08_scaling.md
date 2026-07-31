@@ -210,6 +210,13 @@ Important trade-offs to make explicit:
 - Fast feature delivery vs strict contracts.
 - Automation vs human control.
 
+> **The waterbed effect**
+>
+> The waterbed theory of complexity uses a physical metaphor: pushing complexity down in one place may make it rise somewhere else rather than remove it from the system :citep[randal2003perl6].
+> In a scaling design, caching moves repeated computation into invalidation and freshness decisions; queues move request latency into backlog, retries, idempotency, and delayed correctness; and partitioning moves shared-resource pressure into routing, migration, and cross-partition queries.
+> This is not a formal law that every simplification must preserve a fixed quantity of complexity.
+> It is a review question that complements the distinction between essential and accidental difficulty :citep[brooks1987silver]: **what became simpler, and where did the displaced complexity reappear?**
+
 > **Sustainability angle**
 >
 > Sustainability is also a trade-off.
@@ -240,6 +247,7 @@ The goal is to balance work that prevents known failures with work that improves
 - Students identify the first metric that would reveal overload.
 - Students explain one failure mode introduced by their own scaling design.
 - Students name one plausible saturation boundary and demonstrate or describe a prepared recovery action that does not require inventing a new tool during the incident.
+- Students use the waterbed lens to identify where a selected scaling technique displaced complexity.
 
 ## Project artifact
 
@@ -247,3 +255,4 @@ Students should produce a three-way scaling comparison and one justified target 
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
 It should include one formal model applied to an application decision and one applied to the development workflow.
 Each row in the target design's trade-off table should name a pressure, the limit being approached, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, at least one prepared recovery action, and the reason a simpler alternative was not enough.
+It should also state where the technique displaced complexity, such as into clients, data freshness, background operations, routing, migration, or incident response.

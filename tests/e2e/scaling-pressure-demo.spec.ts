@@ -33,6 +33,15 @@ test.describe("scaling pressure demo", () => {
     await expect(
       demo.locator("[data-scaling-demo-interpretation]"),
     ).toContainText("freshness budget");
+    await expect(
+      demo.locator("[data-scaling-demo-waterbed-summary]"),
+    ).toContainText("4 moves relocate complexity");
+    await expect(demo.locator("[data-scaling-demo-waterbed]")).toContainText(
+      "Invalidation, freshness budgets",
+    );
+    await expect(demo.locator("[data-scaling-demo-waterbed]")).toContainText(
+      "Backlog, retries, idempotency",
+    );
 
     await demo.locator(".scaling-demo-artifact-step summary").click();
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
@@ -43,6 +52,12 @@ test.describe("scaling pressure demo", () => {
     );
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
       /Cache dashboard reads/,
+    );
+    await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
+      /Complexity moved to/,
+    );
+    await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
+      /where did the displaced complexity reappear/,
     );
     await expectElementsInsideDemo(demo, [".scaling-demo-artifact-step"]);
     await expect(demo.locator("[data-scaling-demo-step]")).toHaveCount(0);
