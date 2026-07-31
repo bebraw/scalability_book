@@ -61,7 +61,7 @@ Greater code-production capacity does not make software development scale by its
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
 Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
 
-I will consider this question next based on my own experience gained through the development of my own projects, especially [Slideotter](https://slideotter.com/), a large web application designed around slide authoring, and [kirjolab](https://github.com/bebraw/kirjolab), a scientific authoring tool.
+I will consider this question next based on my own experience gained through the development of my own projects, especially [Slideotter](https://slideotter.com/), a large web application designed around slide authoring, and [Kirjolab](/case-studies/kirjolab/), a scientific authoring tool whose rapid development and later refactoring are examined in a separate case study.
 Both projects are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me.
 A single developer that can work with the machine can achieve far more than ever in the past.
 

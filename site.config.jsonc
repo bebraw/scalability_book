@@ -24,6 +24,17 @@
     "book/03_compare/09_recap.md"*/
   ],
 
+  // Case studies support the chapters without interrupting their main argument.
+  // Each source is published below /case-studies/{slug}/.
+  "caseStudies": [
+    {
+      "file": "case-studies/kirjolab.md",
+      "slug": "kirjolab",
+      "repositoryUrl": "https://github.com/bebraw/kirjolab",
+      "summary": "How a strong development harness enabled exceptional delivery speed while architectural understanding struggled to keep up.",
+    },
+  ],
+
   // The course runs in three three-week parts. Each part maps to three book
   // chapters and constrains the AI assistance mode allowed during that phase.
   "parts": [

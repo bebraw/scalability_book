@@ -35,6 +35,8 @@ const templates = await loadTemplates({
   baseLayout: "layouts/BaseLayout.html",
   bookNavigation: "components/BookNavigation.html",
   bookPage: "layouts/bookPage.html",
+  caseStudyIndex: "layouts/caseStudyIndex.html",
+  caseStudyPage: "layouts/caseStudyPage.html",
   paginationLink: "components/PaginationLink.html",
   projectPage: "layouts/projectPage.html",
   siteIndex: "layouts/siteIndex.html",
@@ -313,6 +315,21 @@ const projectSpecifications = await Promise.all(
     };
   }),
 );
+const caseStudies = await Promise.all(
+  (config.caseStudies || []).map(async (definition) => {
+    const source = await readFile(path.join(root, definition.file), "utf8");
+    const title =
+      source.match(/^#\s+(.+)$/m)?.[1]?.trim() ||
+      titleFromFilename(definition.file);
+
+    return {
+      ...definition,
+      source,
+      title,
+      url: `/case-studies/${definition.slug}/`,
+    };
+  }),
+);
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
@@ -386,6 +403,39 @@ for (let index = 0; index < projectSpecifications.length; index++) {
   );
 }
 
+await writePage(
+  "case-studies/index.html",
+  renderer.renderLayout({
+    title: `Case studies - ${config.title}`,
+    description:
+      "Evidence-rich project histories about application and development-system scalability.",
+    currentUrl: "/case-studies/",
+    stylesheets: ["/styles/case-studies.css"],
+    scripts: developmentScripts,
+    children: renderCaseStudyIndex(caseStudies),
+  }),
+);
+
+for (const caseStudy of caseStudies) {
+  const rendered = renderMarkdown(
+    caseStudy.source,
+    { number: "" },
+    bibliographySource,
+  );
+
+  await writePage(
+    `case-studies/${caseStudy.slug}/index.html`,
+    renderer.renderLayout({
+      title: `${caseStudy.title} - ${config.title}`,
+      description: caseStudy.summary,
+      currentUrl: caseStudy.url,
+      stylesheets: ["/styles/case-studies.css"],
+      scripts: ["/toc-highlight.js", ...developmentScripts],
+      children: renderCaseStudyPage(caseStudy, rendered),
+    }),
+  );
+}
+
 const demoGalleryHeading = renderMarkdown(
   "# Demo showcase",
   { number: "" },
@@ -411,6 +461,7 @@ await writePage(
 );
 
 await compileSiteStylesheet("styles.css");
+await compileSiteStylesheet("styles/case-studies.css");
 await compileSiteStylesheet("styles/demos.css");
 await compileSiteStylesheet("styles/project.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
@@ -620,6 +671,30 @@ function renderProjectPage({
     projectTitle: specification.label,
     projectToc: renderProjectToc(tableOfContents),
     previousLink: renderProjectPaginationLink(previous, "Previous brief"),
+  });
+}
+
+function renderCaseStudyIndex(caseStudyEntries) {
+  const caseStudyCards = caseStudyEntries
+    .map(
+      (caseStudy) => `<li>
+  <a href="${escapeAttribute(caseStudy.url)}">
+    <span>Case study</span>
+    <strong>${escapeHtml(caseStudy.title)}</strong>
+    <small>${escapeHtml(caseStudy.summary)}</small>
+  </a>
+</li>`,
+    )
+    .join("\n");
+
+  return renderHtmlisp(templates.caseStudyIndex, { caseStudyCards });
+}
+
+function renderCaseStudyPage(caseStudy, rendered) {
+  return renderHtmlisp(templates.caseStudyPage, {
+    caseStudyToc: renderProjectToc(rendered.tableOfContents),
+    content: rendered.content,
+    repositoryUrl: caseStudy.repositoryUrl,
   });
 }
 
