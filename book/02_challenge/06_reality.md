@@ -50,10 +50,27 @@ Each scenario can be used to ask:
 - What does the operator see?
 - What design choice from implementation A caused or softened the problem?
 
+## From changed assumptions to saturation
+
+A system has a **competence envelope**: the range of conditions it can handle with its current resources, architecture, procedures, tools, and expertise.
+Ordinary disturbances move the system around inside that envelope.
+Saturation occurs when pressure reaches a binding limit and pushes the system to or beyond the boundary of what it can currently handle :citep[woods2018graceful].
+
+That limit is not necessarily a server running at 100 percent CPU.
+It may be physical, such as memory or network bandwidth; deliberately imposed, such as a bounded queue, connection pool, quota, or rate limit; or organizational, such as an on-call team unable to diagnose several interacting failures quickly enough.
+The relevant system is therefore sociotechnical: software, infrastructure, operators, deployment paths, and operational tools all affect where its boundary lies :citep[hochstein2026saturation].
+
+This framing turns a vague question such as "Will it scale?" into four more useful questions:
+
+1. Which limit is the pressure approaching?
+2. Which signal reveals that the remaining margin is shrinking?
+3. What failure or feedback loop begins at saturation?
+4. Which prepared recovery actions could return the system to a useful state?
+
 ### Pressure map lab
 
 The demonstration below turns changed assumptions into a pressure map.
-The goal is to connect a new reality to the part of the system it stresses, the likely failure mode, the first signal that would reveal the problem, and a response that fits the pressure.
+The goal is to connect a new reality to the part of the system it stresses, the limit being approached, the likely failure mode, the first signal that would reveal the problem, and the prepared recovery actions available to an operator.
 
 {{ import "site/includes/pressure-map-demo.html" }}
 
@@ -86,6 +103,7 @@ Useful bridge concepts:
 - **Partitioning by domain boundary**: separate tenants, projects, groups, locations, or other units of scale.
 - **Backpressure and rate limiting**: protect the system when demand exceeds capacity.
 - **Graceful degradation**: decide what can be delayed, approximated, or temporarily disabled.
+- **Operational optionality**: prepare safe ways to shed work, change a limit, disable a feature, scale a dependency, roll back, or fix forward.
 - **Operational signals**: define which metric would show overload first.
 
 The goal is not for students to apply every technique.
@@ -115,4 +133,4 @@ A good reconstruction makes trade-offs visible instead of trying to solve every 
 ## Project artifact
 
 Students should produce a challenged-assumptions list and a pressure map.
-The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the likely failure mode, the first signal that would reveal the problem, and one possible scaling response.
+The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the limit being approached, the likely failure mode, the first signal that would reveal the problem, one possible scaling response, and at least one prepared recovery action.

@@ -205,6 +205,12 @@ const demoScriptIncludes = [
     script: "/scaling-pressure-demo.js",
   },
   {
+    title: "Saturation boundary lab",
+    chapter: "Scaling",
+    include: "site/includes/saturation-boundary-demo.html",
+    script: "/saturation-boundary-demo.js",
+  },
+  {
     title: "Contention curve lab",
     chapter: "Scaling",
     include: "site/includes/usl-demo.html",
@@ -471,6 +477,10 @@ await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
 await compileSiteScript(
   "scripts/scaling-pressure-demo.ts",
   "scaling-pressure-demo.js",
+);
+await compileSiteScript(
+  "scripts/saturation-boundary-demo.ts",
+  "saturation-boundary-demo.js",
 );
 await compileSiteBundle(
   "scripts/orchestration-demo.ts",

@@ -2059,6 +2059,395 @@
     grid-row: auto;
   }
 }
+.saturation-boundary-demo {
+  --saturation-safe: color-mix(in srgb, #4d8b68 72%, var(--text));
+  --saturation-near: color-mix(in srgb, #c1841a 82%, var(--text));
+  --saturation-hot: color-mix(in srgb, #c64c3f 82%, var(--text));
+}
+.saturation-boundary-summary span::before {
+  background: var(--saturation-hot);
+  border-radius: 999px;
+  box-shadow: 0 0 0 0.3rem
+    color-mix(in srgb, var(--saturation-hot) 15%, transparent);
+  content: "";
+  display: inline-block;
+  height: 0.55rem;
+  margin-inline-end: 0.55rem;
+  vertical-align: 0.05rem;
+  width: 0.55rem;
+}
+.saturation-boundary-summary {
+  min-block-size: 5.85rem;
+}
+.saturation-boundary-summary span {
+  align-items: center;
+  block-size: 2.8rem;
+  display: flex;
+}
+.saturation-boundary-summary small {
+  block-size: 2.15rem;
+}
+.saturation-boundary-demo[data-saturation-state="healthy"]
+  .saturation-boundary-summary
+  span::before {
+  background: var(--saturation-safe);
+  box-shadow: 0 0 0 0.3rem
+    color-mix(in srgb, var(--saturation-safe) 15%, transparent);
+}
+.saturation-boundary-grid {
+  align-items: start;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: minmax(14rem, 0.72fr) minmax(0, 1.7fr);
+  margin-block-start: 1rem;
+}
+.saturation-boundary-controls,
+.saturation-boundary-workbench {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+.saturation-boundary-capacities {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 0.65rem,
+    color-mix(in srgb, var(--border) 25%, transparent) 0.65rem,
+    color-mix(in srgb, var(--border) 25%, transparent) 0.7rem
+  );
+}
+.saturation-boundary-range {
+  align-items: center;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: minmax(0, 1fr) 5rem;
+}
+.saturation-boundary-range output {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  padding: 0.28rem 0.4rem;
+  text-align: right;
+  white-space: nowrap;
+}
+.saturation-boundary-instrument {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--accent) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    color-mix(in srgb, var(--bg) 88%, var(--panel));
+  background-size: 1.25rem 1.25rem;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 0.22rem
+    color-mix(in srgb, var(--panel) 72%, transparent);
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1rem;
+}
+.saturation-boundary-demand {
+  align-items: end;
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 0.18rem 0.8rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-block-end: 0.7rem;
+}
+.saturation-boundary-demand span,
+.saturation-boundary-demand small {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.saturation-boundary-demand strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  grid-row: span 2;
+  line-height: 1;
+}
+.saturation-boundary-pipeline {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.saturation-boundary-stage {
+  --stage-color: var(--saturation-safe);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.68rem;
+  position: relative;
+}
+.saturation-boundary-stage:not(:last-child)::after {
+  border-block: 0.22rem solid transparent;
+  border-inline-start: 0.35rem solid var(--muted);
+  content: "";
+  inset-inline-end: -0.72rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.saturation-boundary-stage[data-state="near"] {
+  --stage-color: var(--saturation-near);
+}
+.saturation-boundary-stage[data-state="saturated"] {
+  --stage-color: var(--saturation-hot);
+}
+.saturation-boundary-stage[data-boundary="true"] {
+  border-color: var(--stage-color);
+  box-shadow:
+    inset 0 0 0 1px var(--stage-color),
+    0.28rem 0.28rem 0 color-mix(in srgb, var(--stage-color) 24%, transparent);
+}
+.saturation-boundary-stage-index {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+.saturation-boundary-stage strong {
+  color: var(--text);
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  line-height: 1.15;
+}
+.saturation-boundary-stage small {
+  color: var(--muted);
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  line-height: 1.25;
+  margin-block-start: 0.15rem;
+}
+.saturation-boundary-meter {
+  background: color-mix(in srgb, var(--border) 65%, var(--bg));
+  border: 1px solid var(--border);
+  height: 0.55rem;
+  overflow: hidden;
+}
+.saturation-boundary-meter i {
+  background: var(--stage-color);
+  display: block;
+  height: 100%;
+  transition: width 180ms ease-out;
+  width: var(--stage-pressure);
+}
+.saturation-boundary-stage b {
+  color: var(--stage-color);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.saturation-boundary-stage em {
+  background: var(--stage-color);
+  color: var(--panel);
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  margin: 0 -0.68rem -0.68rem;
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+.saturation-boundary-stage em[data-active="false"] {
+  visibility: hidden;
+}
+.saturation-boundary-readout {
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.2fr);
+  min-block-size: 13.2rem;
+}
+.saturation-boundary-metrics {
+  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
+  border-inline-end: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.saturation-boundary-metrics article {
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.7rem;
+}
+.saturation-boundary-metrics article:nth-child(odd) {
+  border-inline-end: 1px solid var(--border);
+}
+.saturation-boundary-metrics article:nth-last-child(-n + 2) {
+  border-block-end: 0;
+}
+.saturation-boundary-metrics span,
+.saturation-boundary-diagnosis dt {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.saturation-boundary-metrics strong {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.saturation-boundary-diagnosis {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem;
+}
+.prose .saturation-boundary-diagnosis > p {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  font-weight: 750;
+  line-height: 1.4;
+  margin: 0;
+  max-width: none;
+  min-block-size: 2.45rem;
+}
+.saturation-boundary-diagnosis dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+.saturation-boundary-diagnosis dl div {
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.2rem;
+  padding-block-start: 0.45rem;
+}
+.saturation-boundary-diagnosis dd {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  margin: 0;
+  min-block-size: 2.05rem;
+}
+.saturation-boundary-actions {
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.saturation-boundary-switch {
+  align-items: start;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.saturation-boundary-switch input {
+  margin-block-start: 0.18rem;
+}
+.saturation-boundary-switch > span {
+  color: var(--text);
+  display: grid;
+  gap: 0.12rem;
+}
+.saturation-boundary-switch strong {
+  font-size: 0.82rem;
+}
+.saturation-boundary-switch small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.saturation-boundary-actions button,
+.saturation-boundary-artifact button {
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: var(--panel);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 900;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.7rem;
+}
+.saturation-boundary-actions button:hover,
+.saturation-boundary-artifact button:hover {
+  filter: brightness(1.08);
+}
+.saturation-boundary-artifact summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+.saturation-boundary-artifact[open] summary {
+  margin-block-end: 0.7rem;
+}
+.saturation-boundary-artifact textarea {
+  min-height: 16rem;
+}
+.prose .saturation-boundary-caveat {
+  border-inline-start: 0.2rem solid var(--accent-strong);
+  margin-block-start: 0.8rem;
+  padding-inline-start: 0.65rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .saturation-boundary-meter i {
+    transition: none;
+  }
+}
+@media (width <= 72rem) {
+  .saturation-boundary-grid {
+    grid-template-columns: 1fr;
+  }
+  .saturation-boundary-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (width <= 54rem) {
+  .saturation-boundary-controls,
+  .saturation-boundary-pipeline,
+  .saturation-boundary-readout,
+  .saturation-boundary-actions {
+    grid-template-columns: 1fr;
+  }
+  .saturation-boundary-stage:not(:last-child)::after {
+    border-block-start: 0.35rem solid var(--muted);
+    border-inline: 0.22rem solid transparent;
+    bottom: -0.72rem;
+    inset-inline-end: auto;
+    left: 50%;
+    top: auto;
+    transform: translateX(-50%);
+  }
+  .saturation-boundary-metrics {
+    border-block-end: 1px solid var(--border);
+    border-inline-end: 0;
+  }
+  .saturation-boundary-actions button {
+    width: 100%;
+  }
+}
 .request-trace-payload {
   background: var(--panel);
   border: 1px solid var(--border);

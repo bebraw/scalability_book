@@ -39,6 +39,37 @@ The demonstration below starts from a concrete event-tracking pressure: event wr
 The important part is the exported trade-off table.
 Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
 
+## Name the saturation boundary
+
+Scaling pressure becomes operationally important when it approaches a limit.
+The competence-envelope model introduced in the Challenge part calls the boundary condition **saturation**: the system can no longer absorb the disturbance with its current capabilities :citep[woods2018graceful].
+Naming the saturated resource prevents "add more servers" from becoming the default response.
+
+Useful categories include:
+
+| Limit category       | Examples                                                                           | What approaching saturation may look like                                                       |
+| -------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Physical resources   | CPU, memory, disk space, storage I/O, network bandwidth                            | Growing wait time, swapping, failed allocations, full disks, or reduced throughput              |
+| Virtual resources    | Connection and thread pools, file descriptors, bounded queues, quotas, rate limits | Pool wait, rejected work, `429` responses, queue growth, or quota errors                        |
+| Dependency capacity  | Databases, identity providers, third-party APIs, provisioning systems              | Timeouts, blocked callers, correlated downstream errors, or delayed scaling                     |
+| Operational capacity | On-call attention, deployment speed, diagnostic access, coordination               | Slow decisions, unsafe workarounds, competing responders, or recovery blocked by normal process |
+
+Saturation also creates feedback loops.
+Retries can amplify load, synchronous fan-out can overload an internal service, and blocked threads can make a CPU-based autoscaler misread demand.
+A resource leak may separate the causal change from the eventual failure by hours or months.
+These dynamics explain why a locally sensible mechanism can worsen a system-wide incident and why the pressure map must identify both the first limit and what happens after it is reached :citep[hochstein2026saturation].
+
+### Saturation boundary lab
+
+The model below compares one effective event rate with four declared stage limits.
+Increase demand until a boundary becomes binding, expand that limit, and observe which constraint becomes visible next.
+Then enable backpressure and compare hidden backlog growth with explicit rejection.
+
+{{ import "site/includes/saturation-boundary-demo.html" }}
+
+Treat the rates as a reasoning aid rather than measured capacity.
+The lesson is structural: removing one bottleneck changes the system's limiting factor, while retries can consume headroom before useful demand changes.
+
 ## Use a formal model before choosing a technique
 
 A scaling technique should respond to an identified limit.
@@ -88,6 +119,7 @@ Potential subsections:
 - **Rate limiting and backpressure**: protect the system from overload.
 - **Bulkheads and isolation**: prevent one failure or tenant from spreading.
 - **Feature flags and staged rollout**: reduce deployment risk.
+- **Dynamic configuration and recovery controls**: change limits, shed optional work, disable features, scale a dependency, or redirect traffic without first building new tooling during an incident.
 
 > **Sustainability angle**
 >
@@ -115,6 +147,10 @@ The useful question is therefore not "how many requests did this cluster handle?
 Replica orchestration cannot make every component horizontally scalable.
 If each application instance depends on one saturated database, holds incompatible local state, or performs the same expensive downstream work, adding pods may simply move or amplify the bottleneck.
 The pressure still has to justify the technique.
+
+The same caution applies to autoscaling signals.
+A downstream dependency can slow requests until application threads block; if the scaling policy watches only CPU, lower utilization may incorrectly suggest that fewer instances are needed.
+The control loop should observe a signal that represents the actual pressure, respect downstream limits, and have a bounded response.
 
 ## Scaling the event pipeline
 
@@ -179,16 +215,35 @@ Important trade-offs to make explicit:
 > Sustainability is also a trade-off.
 > Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
 
+## Prepare to be surprised
+
+Design can expand the competence envelope, but finite systems always retain another boundary.
+Graceful degradation keeps selected functions useful when capacity is constrained.
+**Graceful extensibility** is a complementary idea: when an unanticipated condition exceeds the designed envelope, the sociotechnical system can adapt its capabilities and recover :citep[woods2018graceful].
+
+That ability requires optionality prepared before the incident:
+
+- dynamic configuration and feature flags that expose understood controls;
+- fast, practiced paths to restart, scale, shed work, roll back, or fix forward;
+- diagnostic access and telemetry that remain useful under pressure;
+- people who understand the system and have authority to act;
+- exercises that keep rarely used recovery paths discoverable and safe.
+
+More controls are not automatically better.
+An undocumented switch or unsafe manual path creates another failure mode.
+The goal is to balance work that prevents known failures with work that improves the ability to respond when the design encounters a surprise.
+
 ## Exercise ideas
 
 - Students choose two scaling techniques for a justified target design and explain why they did not choose three others.
 - Students draw the event pipeline for all three implementations and for the proposed target design.
 - Students identify the first metric that would reveal overload.
 - Students explain one failure mode introduced by their own scaling design.
+- Students name one plausible saturation boundary and demonstrate or describe a prepared recovery action that does not require inventing a new tool during the incident.
 
 ## Project artifact
 
 Students should produce a three-way scaling comparison and one justified target design.
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
 It should include one formal model applied to an application decision and one applied to the development workflow.
-Each row in the target design's trade-off table should name a pressure, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, and the reason a simpler alternative was not enough.
+Each row in the target design's trade-off table should name a pressure, the limit being approached, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, at least one prepared recovery action, and the reason a simpler alternative was not enough.

@@ -1,0 +1,234 @@
+<section
+  id="demo-saturation-boundary-lab"
+  data-demo-anchor
+  class="scaling-demo saturation-boundary-demo"
+  data-saturation-boundary-demo
+  aria-labelledby="saturation-boundary-demo-heading"
+>
+  <div class="scaling-demo-header">
+    <div>
+      <p class="scaling-demo-kicker">Capacity envelope</p>
+      <h3 id="saturation-boundary-demo-heading">
+        Find the first binding limit
+      </h3>
+    </div>
+    <div
+      class="scaling-demo-summary saturation-boundary-summary"
+      aria-live="polite"
+    >
+      <span data-saturation-boundary-verdict>Inspecting pipeline</span>
+      <small data-saturation-boundary-summary>
+        Compare effective demand with every stage.
+      </small>
+    </div>
+  </div>
+
+  <form
+    class="saturation-boundary-grid"
+    data-saturation-boundary-form
+    autocomplete="off"
+  >
+    <div class="saturation-boundary-controls">
+      <section class="scaling-demo-panel">
+        <h4>Disturbance</h4>
+        <label>
+          <span>Scenario</span>
+          <select data-saturation-boundary-scenario>
+            <option value="arrival">Arrival burst</option>
+            <option value="dependency">Slow dependency</option>
+            <option value="retry">Retry amplification</option>
+            <option value="baseline">Healthy baseline</option>
+          </select>
+        </label>
+        <label>
+          <span>Offered load</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="20"
+              max="240"
+              step="5"
+              value="140"
+              data-saturation-boundary-load
+            />
+            <output data-saturation-boundary-output="load">140 ev/s</output>
+          </div>
+        </label>
+        <label>
+          <span>Retry amplification</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="0"
+              max="80"
+              step="5"
+              value="5"
+              data-saturation-boundary-retries
+            />
+            <output data-saturation-boundary-output="retries">5%</output>
+          </div>
+        </label>
+      </section>
+
+      <section class="scaling-demo-panel saturation-boundary-capacities">
+        <h4>Declared stage capacity</h4>
+        <label>
+          <span>Ingestion API</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="40"
+              max="260"
+              step="10"
+              value="180"
+              data-saturation-boundary-capacity="ingestion"
+            />
+            <output data-saturation-boundary-capacity-output="ingestion"
+              >180</output
+            >
+          </div>
+        </label>
+        <label>
+          <span>Database pool</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="40"
+              max="260"
+              step="10"
+              value="110"
+              data-saturation-boundary-capacity="database"
+            />
+            <output data-saturation-boundary-capacity-output="database"
+              >110</output
+            >
+          </div>
+        </label>
+        <label>
+          <span>Event processors</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="40"
+              max="260"
+              step="10"
+              value="150"
+              data-saturation-boundary-capacity="processor"
+            />
+            <output data-saturation-boundary-capacity-output="processor"
+              >150</output
+            >
+          </div>
+        </label>
+        <label>
+          <span>Downstream quota</span>
+          <div class="saturation-boundary-range">
+            <input
+              type="range"
+              min="40"
+              max="260"
+              step="10"
+              value="130"
+              data-saturation-boundary-capacity="downstream"
+            />
+            <output data-saturation-boundary-capacity-output="downstream"
+              >130</output
+            >
+          </div>
+        </label>
+      </section>
+    </div>
+
+    <div class="saturation-boundary-workbench">
+      <section class="saturation-boundary-instrument" aria-live="polite">
+        <div class="saturation-boundary-demand">
+          <span>Effective demand</span>
+          <strong data-saturation-boundary-effective-load>147 ev/s</strong>
+          <small>offered load + retries</small>
+        </div>
+        <div
+          class="saturation-boundary-pipeline"
+          data-saturation-boundary-pipeline
+        ></div>
+      </section>
+
+      <section class="saturation-boundary-readout">
+        <div class="saturation-boundary-metrics">
+          <article>
+            <span>Boundary</span>
+            <strong data-saturation-boundary-metric="boundary">—</strong>
+          </article>
+          <article>
+            <span>Headroom</span>
+            <strong data-saturation-boundary-metric="headroom">—</strong>
+          </article>
+          <article>
+            <span>Hidden backlog</span>
+            <strong data-saturation-boundary-metric="backlog">—</strong>
+          </article>
+          <article>
+            <span>Rejected explicitly</span>
+            <strong data-saturation-boundary-metric="rejected">—</strong>
+          </article>
+        </div>
+        <div class="saturation-boundary-diagnosis">
+          <p data-saturation-boundary-diagnosis>
+            Adjust demand or capacity to expose a boundary.
+          </p>
+          <dl>
+            <div>
+              <dt>First useful signal</dt>
+              <dd data-saturation-boundary-signal>—</dd>
+            </div>
+            <div>
+              <dt>Prepared recovery</dt>
+              <dd data-saturation-boundary-recovery>—</dd>
+            </div>
+            <div>
+              <dt>Next closest boundary</dt>
+              <dd data-saturation-boundary-next>—</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="scaling-demo-panel saturation-boundary-actions">
+        <label class="saturation-boundary-switch">
+          <input type="checkbox" data-saturation-boundary-backpressure />
+          <span>
+            <strong>Enable ingress backpressure</strong>
+            <small
+              >Reject excess demand explicitly instead of accumulating hidden
+              work.</small
+            >
+          </span>
+        </label>
+        <button type="button" data-saturation-boundary-expand>
+          Expand current limit +40 ev/s
+        </button>
+      </section>
+
+      <details class="scaling-demo-panel saturation-boundary-artifact">
+        <summary>Boundary report</summary>
+        <div class="scaling-demo-artifact-header">
+          <h4>Copyable saturation analysis</h4>
+          <button type="button" data-saturation-boundary-copy>
+            Copy report
+          </button>
+        </div>
+        <textarea
+          data-saturation-boundary-artifact
+          aria-label="Generated saturation boundary report"
+          rows="12"
+          readonly
+        ></textarea>
+      </details>
+    </div>
+  </form>
+
+  <p class="demo-note saturation-boundary-caveat">
+    This is a teaching model, not a capacity benchmark. It compares one
+    effective demand rate with declared stage limits so the movement of a
+    bottleneck is visible.
+  </p>
+</section>

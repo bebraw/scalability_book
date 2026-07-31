@@ -276,8 +276,10 @@ Apply these shared scenarios to every implementation:
 For each implementation, identify:
 
 - what is likely to fail or slow down first;
+- the resource, quota, dependency, or operational limit being approached;
 - the first useful signal that would reveal the problem;
 - one plausible response;
+- at least one prepared recovery action available if the limit is reached;
 - the new cost or failure mode introduced by that response.
 
 The goal is justified reasoning, not adding distributed infrastructure without evidence.

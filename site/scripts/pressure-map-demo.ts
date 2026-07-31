@@ -10,9 +10,11 @@ type PressureAssumption = {
   label: string;
   pressure: string;
   component: string;
+  limit: string;
   failure: string;
   signal: string;
   response: string;
+  recovery: string;
 };
 
 const pressureAssumptions: Record<PressureAssumptionKey, PressureAssumption> = {
@@ -20,60 +22,79 @@ const pressureAssumptions: Record<PressureAssumptionKey, PressureAssumption> = {
     label: "Burst traffic during a 20-minute peak",
     pressure: "Write burst",
     component: "Event ingestion API",
+    limit: "Write throughput, database connections, or the ingestion queue.",
     failure: "Requests queue up, time out, or overload the write database.",
     signal: "p95 write latency rises before the dashboard visibly fails.",
     response:
       "Separate ingestion from processing, add backpressure, and measure write latency.",
+    recovery:
+      "Throttle ingress, shed optional work, or switch to a prepared asynchronous path.",
   },
   offline: {
     label: "Offline clients retry the same event",
     pressure: "Retry storm",
     component: "Validation and storage boundary",
+    limit: "Request budget and deduplication capacity at the write boundary.",
     failure:
       "Duplicate events inflate counts and make summaries untrustworthy.",
     signal:
       "Duplicate event IDs or repeated payload hashes increase after reconnects.",
     response: "Add idempotency keys and deduplicate before deriving summaries.",
+    recovery:
+      "Activate retry throttling and quarantine repeated events for controlled replay.",
   },
   tenants: {
     label: "Multiple tenants share the same system",
     pressure: "Isolation",
     component: "Storage and query model",
+    limit: "Shared database, connection-pool, or query capacity.",
     failure: "One large tenant slows down reads and writes for everyone else.",
     signal:
       "Latency and error rate correlate with one tenant or domain instance.",
     response:
       "Partition by tenant boundary and add per-tenant rate limits or quotas.",
+    recovery:
+      "Throttle the noisy tenant or route it to an isolated capacity pool.",
   },
   "old-client": {
     label: "Old clients submit malformed events",
     pressure: "Compatibility",
     component: "API contract",
+    limit: "Validation and operational capacity for incompatible payloads.",
     failure:
       "The server accepts ambiguous data or rejects valid older clients.",
     signal: "Validation errors cluster by client version and event schema.",
     response:
       "Version the event contract and keep server-side validation explicit.",
+    recovery:
+      "Quarantine incompatible payloads or re-enable a prepared compatibility path.",
   },
   deletion: {
     label: "A customer requests data deletion",
     pressure: "Governance",
     component: "Retention and derived data",
+    limit:
+      "Data-lineage and operational capacity to locate every derived copy.",
     failure:
       "Raw events are deleted but summaries, exports, or logs still reveal data.",
     signal: "Deletion audit cannot prove every derived copy was updated.",
     response:
       "Track data lineage, define retention rules, and rebuild derived views after deletion.",
+    recovery:
+      "Pause affected exports and run a verified deletion-and-rebuild procedure.",
   },
   "slow-summary": {
     label: "Users need summaries before data settles",
     pressure: "Freshness",
     component: "Read model",
+    limit: "Processor throughput and acceptable summary lag.",
     failure:
       "The dashboard shows stale or inconsistent totals during processing lag.",
     signal: "Summary lag grows while raw event ingestion still succeeds.",
     response:
       "Expose freshness, use derived views, and make delayed correctness visible.",
+    recovery:
+      "Serve the last known summary, pause expensive recomputation, or scale processors.",
   },
 };
 
@@ -232,12 +253,20 @@ function buildPressureMapBoard(selected: PressureAssumptionKey[]) {
               <dd>${escapePressureMapHtml(assumption.component)}</dd>
             </div>
             <div>
+              <dt>Limit approached</dt>
+              <dd>${escapePressureMapHtml(assumption.limit)}</dd>
+            </div>
+            <div>
               <dt>Likely failure</dt>
               <dd>${escapePressureMapHtml(assumption.failure)}</dd>
             </div>
             <div>
               <dt>First signal</dt>
               <dd>${escapePressureMapHtml(assumption.signal)}</dd>
+            </div>
+            <div>
+              <dt>Prepared recovery</dt>
+              <dd>${escapePressureMapHtml(assumption.recovery)}</dd>
             </div>
           </dl>
         </div>
@@ -318,9 +347,11 @@ function buildPressureMapArtifact(
       return [
         `- Assumption: ${assumption.label}`,
         `  Stressed part: ${assumption.component}`,
+        `  Limit approached: ${assumption.limit}`,
         `  Likely failure: ${assumption.failure}`,
         `  First signal: ${assumption.signal}`,
         `  Response: ${assumption.response}`,
+        `  Prepared recovery: ${assumption.recovery}`,
       ];
     }),
     "",

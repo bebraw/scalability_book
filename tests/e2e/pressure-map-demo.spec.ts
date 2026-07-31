@@ -35,6 +35,12 @@ test.describe("pressure map demo", () => {
     await expect(demo.locator("[data-pressure-map-demo-board]")).toContainText(
       "Summary lag grows",
     );
+    await expect(demo.locator("[data-pressure-map-demo-board]")).toContainText(
+      "Limit approached",
+    );
+    await expect(demo.locator("[data-pressure-map-demo-board]")).toContainText(
+      "Prepared recovery",
+    );
     await expect(
       demo.locator("[data-pressure-map-demo-metric='count']"),
     ).toContainText("4");
@@ -47,6 +53,12 @@ test.describe("pressure map demo", () => {
     );
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
       /Partition by tenant boundary/,
+    );
+    await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
+      /Limit approached: Shared database/,
+    );
+    await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
+      /Prepared recovery: Throttle the noisy tenant/,
     );
     await expect(demo.locator("[data-pressure-map-demo-artifact]")).toHaveValue(
       /Do not add scaling techniques/,
