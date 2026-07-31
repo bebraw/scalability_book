@@ -1,4 +1,4 @@
-# Slideotter -- Learning faster than the product converged
+# Slideotter – Learning faster than the product converged
 
 [Slideotter](https://github.com/bebraw/slideotter) is a local, structured workbench for creating and reviewing presentations with language models.
 I developed it with coding agents between April and June 2026, before beginning Kirjolab.
@@ -16,7 +16,7 @@ A mechanical extraction and a difficult product decision are not comparable unit
 
 | Evidence                                                      | Observation                                               |
 | ------------------------------------------------------------- | --------------------------------------------------------- |
-| Development interval reviewed                                 | 19 April--24 June 2026                                    |
+| Development interval reviewed                                 | 19 April–24 June 2026                                     |
 | Repository history                                            | 1,606 commits                                             |
 | Commits made by 15 May                                        | 1,444, about 90% of the history                           |
 | Structurally named commit subjects                            | 457, about 28% of the history                             |

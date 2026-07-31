@@ -37,7 +37,7 @@ The accumulated examples can reveal an abstraction that would have been speculat
 
 :::
 
-## Shifting-Up -- Trading development speed for human control
+## Shifting-Up – Trading development speed for human control
 
 It turns out, to get most out of agentic development, you will need a certain amount of discipline.
 That is the main reason why it is important to understand technical details as in what should good architecture look like and how to develop software sustainably.
@@ -140,7 +140,7 @@ This is the part where you apply your enhanced learning to have a better startin
 Essentially this is the part where learnings become codified for example as updated requirements, tests, architectural decisions, or project instructions.
 It is important to document your learnings as otherwise the implementation might drift apart from its specification and supporting material.
 
-## Case study -- Webernetes, Kubernetes in the browser
+## Case study – Webernetes, Kubernetes in the browser
 
 [Webernetes](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser), a partial TypeScript port of Kubernetes that runs in the browser, is a useful example to study as most of its code was generated with language models, but generation was not treated as evidence of correctness.
 The author reviewed the generated code and built integration tests that exercised the same operations against Webernetes and a real k3s cluster.
@@ -157,7 +157,7 @@ This is stronger than asking a model whether its own output looks correct: the h
 > A screenshot check should launch the real application, authentication should be tested against observable security behavior, and persistence should survive a restart.
 > Tests produced by the same agent remain candidate artifacts until their relationship to the required behavior has been established.
 
-## Slideotter -- The power of validation
+## Slideotter – The power of validation
 
 For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird.
 A big part of working with agents is getting better at figuring out how to set up effective validation rules since this can define whether your project stays on rails or not.

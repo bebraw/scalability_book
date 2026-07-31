@@ -1,4 +1,4 @@
-# Kirjolab -- When code production scaled faster than architecture
+# Kirjolab – When code production scaled faster than architecture
 
 [Kirjolab](https://github.com/bebraw/kirjolab) is a collaborative workspace for scientific writing.
 It connects portable Markdown manuscripts with references, PDF annotations, evidence, and reviewable local-model suggestions.
@@ -16,13 +16,13 @@ A small mechanical commit and a difficult design decision are not comparable uni
 
 | Evidence                                  | Observation                                                     |
 | ----------------------------------------- | --------------------------------------------------------------- |
-| Development interval reviewed             | 10--30 July 2026                                                |
+| Development interval reviewed             | 10–30 July 2026                                                 |
 | Repository history                        | 1,433 commits                                                   |
 | Commit subjects beginning with `refactor` | 818, about 57% of the history                                   |
 | TypeScript files                          | 14 in the initial template; 583 at the reviewed head            |
 | TypeScript test files                     | 5 in the initial template; 265 at the reviewed head             |
 | Build Week implementation range           | 332 commits, 439 files, 88,867 insertions, and 16,140 deletions |
-| Most concentrated restructuring interval  | 696 of 707 commits from 25--28 July were named as refactors     |
+| Most concentrated restructuring interval  | 696 of 707 commits from 25–28 July were named as refactors      |
 
 The project did not begin with an empty prompt.
 The initial commit came from a prepared development template with strict TypeScript, coverage checks, mutation testing, browser tests, affected-file checks, a pre-push gate, local CI, architecture decision records, feature specifications, and repository instructions for agents.
@@ -130,9 +130,9 @@ The history alone does not demonstrate product success or long-term maintainabil
 ## Refactoring was the revision phase
 
 The project history changes character after the initial delivery push.
-From 10--21 July there were 461 commits, mostly features, fixes, tests, and documentation.
+From 10–21 July there were 461 commits, mostly features, fixes, tests, and documentation.
 On 22 July, 51 of 108 commits were already refactors.
-From 25--28 July, 696 of 707 commits were named as refactors.
+From 25–28 July, 696 of 707 commits were named as refactors.
 
 The work was not one undifferentiated rewrite.
 It included:

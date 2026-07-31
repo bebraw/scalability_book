@@ -1,4 +1,4 @@
-# Thesis Journey Tracker -- Small scope made production success possible
+# Thesis Journey Tracker – Small scope made production success possible
 
 [Thesis Journey Tracker](https://github.com/bebraw/thesis-journey-tracker) is a private dashboard for a small thesis-supervision team.
 It tracks students, thesis phases, meetings, topics, notes, workload, and backups without trying to become a general student information system.
@@ -15,10 +15,10 @@ The production assessment above is based on my direct use of the deployed applic
 
 | Evidence                                     | Observation                                      |
 | -------------------------------------------- | ------------------------------------------------ |
-| Development interval reviewed                | 22 March--30 July 2026                           |
+| Development interval reviewed                | 22 March–30 July 2026                            |
 | Repository history                           | 282 commits                                      |
 | Commits made by 31 March                     | 175, about 62% of the history                    |
-| Focused security-hardening interval          | 29 commits on 13--14 July                        |
+| Focused security-hardening interval          | 29 commits on 13–14 July                         |
 | TypeScript files                             | 0 in the initial README-only commit; 160 at head |
 | TypeScript test or specification files       | 25                                               |
 | Application, test, and script lines reviewed | About 20,500                                     |

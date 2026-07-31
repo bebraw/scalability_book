@@ -28,10 +28,15 @@
 .case-study-grid {
   display: grid;
   gap: 1rem;
+  grid-auto-rows: 1fr;
   grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
   list-style: none;
   margin: clamp(2.5rem, 6vw, 5rem) 0 0;
   padding: 0;
+}
+
+.case-study-grid > li {
+  display: flex;
 }
 
 .case-study-grid a {
@@ -41,6 +46,7 @@
   border-radius: 0.35rem;
   color: var(--text);
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-height: 15rem;
   padding: clamp(1.25rem, 3vw, 2rem);
