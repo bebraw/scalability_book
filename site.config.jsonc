@@ -28,6 +28,18 @@
   // Each source is published below /case-studies/{slug}/.
   "caseStudies": [
     {
+      "file": "case-studies/slideotter.md",
+      "slug": "slideotter",
+      "repositoryUrl": "https://github.com/bebraw/slideotter",
+      "summary": "How a technically ambitious precursor generated durable lessons faster than it established a production path.",
+    },
+    {
+      "file": "case-studies/thesis-journey-tracker.md",
+      "slug": "thesis-journey-tracker",
+      "repositoryUrl": "https://github.com/bebraw/thesis-journey-tracker",
+      "summary": "How a narrow product boundary and simple runtime turned rapid agent-assisted development into a working production tool.",
+    },
+    {
       "file": "case-studies/kirjolab.md",
       "slug": "kirjolab",
       "repositoryUrl": "https://github.com/bebraw/kirjolab",
