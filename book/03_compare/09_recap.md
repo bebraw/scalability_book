@@ -98,6 +98,7 @@ It means choosing evidence that answers a specific question.
 Reflection prompts:
 
 - What did you measure, and what did the measurement actually prove?
+- Did any measure become a target that could improve without the intended outcome improving?
 - Which metric would warn you first that the system is overloaded?
 - What important behavior is still invisible?
 - Did your tests or benchmarks match realistic use?

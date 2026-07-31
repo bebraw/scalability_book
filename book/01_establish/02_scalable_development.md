@@ -85,6 +85,10 @@ I have found it interesting that with agentic development, techniques such as mu
 I use static analysis to decrease the cognitive complexity of my codebases while mutation testing is useful in improving the code coverage of my tests while improving their quality and avoiding unnecessary tests.
 Manually these tools would require a huge amount of effort but when an agent is doing the work, the situation is vastly different, and I consider these kinds of tools good examples of guardrails.
 
+These scores also expose the risk described by Goodhart's law: a measure used as a control target can lose its relationship with the outcome it was meant to represent :citep[goodhart1975monetary].
+An agent can raise coverage, mutation, or static-health scores mechanically without making the system safer or easier to change.
+Treat the score as diagnostic evidence, inspect how it changed, and pair it with behavioral and human review rather than making the number itself the goal.
+
 > **Sustainability angle**
 >
 > Sustainable agentic development has two meanings here.

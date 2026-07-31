@@ -41,6 +41,35 @@ It is possible that real usage will exercise portions of your system you did not
 Under these conditions, you may hit third-party limitations you might not expect or there might be something in your infrastructure that breaks under specific kind of loads.
 It is for this reason learning chaos engineering can be useful since it tests exactly what happens when a piece of infrastructure breaks since that is exactly what can happen in practice at the worst possible moment.
 
+## When a measure becomes a target
+
+[Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law) warns that a statistical relationship used for observation can break down when pressure is applied to it as a control target :citep[goodhart1975monetary].
+The familiar shorthand is that a measure tends to stop being a good measure when it becomes the target.
+This is especially relevant to software because dashboards and quality gates make measurable proxies easy to optimize.
+
+Consider a few examples:
+
+- Test coverage can reveal unexercised code, but a coverage target can reward assertions that execute lines without checking meaningful behavior.
+- A Lighthouse score can direct attention to performance problems, but optimizing only the score can remove valuable functionality or tune a page for the audit rather than its users.
+- Mean latency can improve while tail latency or error rate becomes worse.
+- Agent task pass rate can rise because tasks, judges, or outputs become tailored to the evaluation set rather than because the workflow handles new work better.
+- Commit count, generated lines, and closed tickets can all increase while review and maintenance costs grow elsewhere.
+
+Goodhart's law does not imply that targets or metrics are useless.
+It means that the measurement system changes once people or agents can adapt to it.
+A quality gate should therefore be treated as a partial model of the desired outcome, not as the outcome itself.
+
+For an important target, record four things:
+
+1. **Outcome:** What user or operational result is the metric intended to represent?
+2. **Proxy:** Why should the chosen measure move with that outcome under the current conditions?
+3. **Gaming path:** How could the number improve without the outcome improving?
+4. **Counterevidence:** Which second signal, failure review, or qualitative check would expose that divergence?
+
+Keep raw distributions and failed examples available instead of retaining only an aggregate score.
+Review the proxy when the workload, system, incentives, or development process changes.
+An effective metric is not permanently valid; it is a hypothesis that must survive contact with the behavior it influences.
+
 ## Evaluating agentic workflows
 
 The development workflow is also a system that can be benchmarked.
