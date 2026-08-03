@@ -55,6 +55,25 @@ Agentic development scales only when the project teaches agents how to work insi
 
 - Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
 
+## Give project memory a lifecycle
+
+Long-running and parallel work produces questions, hypotheses, plans, decisions, and behavioral evidence.
+Treating all of them as equally authoritative makes it difficult for both humans and agents to know which statements still govern the project.
+A useful project-memory lifecycle distinguishes four roles:
+
+1. **Explore:** keep unresolved questions, alternatives, and temporary findings in a working map or session artifact.
+2. **Decide:** record consequential choices and their trade-offs in a decision record.
+3. **Specify:** promote settled behavior and capability contracts into the relevant feature specification or architecture document.
+4. **Verify and supersede:** connect the contract to executable evidence, and explicitly replace durable records when the decision changes.
+
+A discovery map should not silently become the specification, and an agent transcript should not become the only place where a lasting constraint exists.
+The fleet plan should tell each role where its output belongs and who may promote temporary findings into durable project memory.
+This reduces the chance that parallel agents act on different generations of the same decision.
+
+Repeatable agent workflows can also be stored as small, named project skills rather than one continually growing instruction file.
+A review skill, debugging skill, or release skill can define its trigger, evidence, boundaries, and output contract.
+Keep only workflows the project actually uses, make explicit or destructive workflows opt-in, and preserve one obvious source of truth when the same instructions must be distributed to multiple tools.
+
 ## Fleet throughput and cost
 
 An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step.

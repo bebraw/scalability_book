@@ -52,6 +52,7 @@ Record consequential human intervention instead of hiding it.
 ### 3.1 Implement the common core
 
 Complete the required domain model, behavior, harness, and acceptance scenarios from the common specification.
+Before expanding optional scope, describe the first closed product loop and list the capabilities deliberately deferred until that loop produces evidence.
 
 ### 3.2 Establish the evidence baseline
 
@@ -83,6 +84,7 @@ Submit:
 - the complete common evidence package;
 - acceptance-scenario and automated-test results;
 - architecture and data-flow diagram;
+- a capability ownership card for the main event workflow;
 - stack decision record;
 - scalability pressure map;
 - short local-model workflow reflection;

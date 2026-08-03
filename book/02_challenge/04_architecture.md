@@ -302,6 +302,24 @@ This documentation is not separate from architecture.
 It is part of how the architecture remains understandable after the first implementation is done.
 If the code, diagram, spec, and decision log disagree, the project has an architectural problem even if the application still runs.
 
+### Make capability ownership reviewable
+
+A component diagram can show that two boxes exist without explaining which one owns a decision.
+As a project grows, each independently evolvable capability should therefore have a short ownership card in its feature specification:
+
+- **Source root:** where the capability's implementation primarily lives.
+- **Composition root:** where its parts are assembled and dependencies are supplied.
+- **State authority:** which component or store decides the current truth.
+- **Public contracts:** the interfaces other capabilities may rely on.
+- **Dependency direction:** which side is allowed to know about the other.
+- **Out of scope:** adjacent responsibilities that intentionally belong elsewhere.
+
+The card is a review aid rather than a demand for one directory per feature.
+Small projects may keep several capabilities in a few files while their responsibilities remain clear.
+Likewise, file size, fan-in, churn concentration, or a crowded directory can act as structural smoke alarms, but none proves that a split is correct.
+When such a signal fires, inspect whether several authorities or change reasons have accumulated together.
+Consolidate ownership, split responsibilities, or document a justified exception; do not divide a file merely to satisfy a number.
+
 Prompts:
 
 - What are the main components of your system?
@@ -312,9 +330,11 @@ Prompts:
 - Which part of the design would be hardest to change later?
 - Which architectural decisions have been written down so another group can understand them?
 - Which agent instructions protect the architecture from accidental drift?
+- Can you name the source root, composition root, state authority, public contracts, and dependency direction of the event workflow?
 
 ## Project artifact
 
 Students should review the architecture and data-flow diagrams submitted with implementation A, identify one consequential architectural choice, and write an architecture hypothesis for implementation B.
 The hypothesis should state what the group intends to preserve or change and why.
+Students should also complete an ownership card for the event workflow and identify one structural signal that would cause them to review that ownership again.
 Implementation B should still include its own diagrams and decision record, but the chapter is primarily reading and analysis rather than a second large deliverable.
