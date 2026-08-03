@@ -104,6 +104,7 @@ Submit:
 - the complete common evidence package;
 - acceptance-scenario and automated-test results;
 - architecture and data-flow diagram;
+- an updated capability ownership card for the main event workflow;
 - updated stack decision record;
 - scalability pressure map;
 - a concise A–B comparison;

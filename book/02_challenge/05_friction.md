@@ -83,14 +83,36 @@ Possible techniques:
 - Add useful error messages.
 - Keep generated code under the same review standard as human-written code.
 
+### Feedback economics
+
+Validation can itself become a source of friction.
+A ten-minute clean-install or browser suite may provide valuable release evidence while being a poor response to every saved file.
+Conversely, a fast test that never crosses the changed boundary can create confidence without useful coverage.
+
+For one representative change, map the project's feedback ladder:
+
+| Stage             | Evidence returned                                                             | Typical cost          | When it is required                                          |
+| ----------------- | ----------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------ |
+| Focused           | One behavior or local invariant                                               | Seconds               | During implementation                                        |
+| Affected          | Likely consequences of changed files                                          | Seconds to minutes    | Before sharing the change                                    |
+| Baseline          | Ordinary project readiness                                                    | Minutes               | Before accepting non-trivial work                            |
+| Boundary-specific | Browser, clean install, workflow, performance, security, or mutation evidence | Potentially expensive | When that boundary changed or release confidence is required |
+
+The exact commands depend on the project.
+The important property is that each stage has a named purpose.
+Measure both time-to-first-useful-failure and total readiness time.
+If a slow check repeatedly catches problems that no earlier stage sees, consider whether a cheaper focused signal can move that feedback forward without weakening the final gate.
+
 ## Exercise ideas
 
 - Ask students to perform a friction audit of implementation A.
 - Have them identify the three most expensive changes they can imagine making.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
+- Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
 - Use an AI agent to inspect the project for friction, then require students to verify or reject its findings.
 
 ## Project artifact
 
 Students should produce a friction audit.
 It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before building implementation B.
+The audit should include the project's validation ladder and identify one check that should move earlier, later, or become conditional.

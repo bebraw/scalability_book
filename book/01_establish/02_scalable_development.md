@@ -243,6 +243,52 @@ You can have an agent to generate a lot of that and refine as needed.
 Note that local CI, mutation testing, browser automation, performance budgets, pre-push hooks, and reusable capability kits are valuable, but they are optional upgrades for groups that have a reason to add them.
 The baseline is simpler: can another student or agent clone the project, understand the intended shape, run the checks, and make a small change without guessing?
 
+### Start by subtracting from the template
+
+A starter template is a distribution artifact, not the finished architecture of a product.
+It may contain examples, optional workflows, migration history, and integrations that are useful to some projects but irrelevant to the one being started.
+Keeping all of that material indefinitely increases navigation cost and gives agents more unrelated patterns to consider.
+Deleting it immediately can be just as harmful if the removal breaks the only working runtime path or discards the provenance needed to receive later improvements.
+
+A safer initialization pass begins by defining one **closed product loop**: the smallest end-to-end workflow that creates value and produces evidence worth learning from.
+List adjacent capabilities explicitly as deferred rather than allowing them to arrive by implication.
+Then classify inherited material into four groups:
+
+- **Keep** because it protects the current loop or its development harness.
+- **Replace later** because it is still the only working seam.
+- **Remove** because it is distribution-only material with no current owner.
+- **Decide** because removal would settle a product or architecture question that is still open.
+
+Review the exact removal set before editing the repository, especially when automation or an agent performs the pruning.
+If the project will continue to receive improvements from the template, record the template source and starting revision before deleting local migration history.
+This makes subtraction a reviewable design step rather than an improvised cleanup.
+
+### Let validation cost follow change risk
+
+The best validation loop is not the one that runs every available check after every edit.
+It is the one that returns the cheapest relevant evidence early and adds slower evidence when the change creates additional uncertainty.
+A project can organize checks into a small ladder:
+
+1. Run a focused test or static check while changing one behavior.
+2. Run affected-file checks before sharing the change.
+3. Run a stable baseline gate before treating ordinary work as ready.
+4. Add browser, clean-install, workflow-replay, performance, or mutation checks when the changed boundary makes their evidence relevant.
+
+Unknown impact should move the change toward broader validation rather than silently skipping expensive checks.
+Known documentation-only or non-runtime changes can use a smaller path.
+This model keeps feedback fast without treating validation as optional, and it makes the reason for each expensive check visible.
+
+### Reuse practices without cloning the whole harness
+
+Once a useful practice has emerged, copying the complete starter repository into an existing project is usually too coarse.
+Adoption and maintenance are different problems.
+A capability such as mutation testing can be packaged with its fit criteria, files, dependencies, integration instructions, and checks so another project can adopt only that capability.
+Later improvements need a smaller migration note or patch that preserves the target project's conventions instead of restoring the source template around it.
+
+The reusable unit is therefore not necessarily the template snapshot.
+It can be a bounded practice with provenance, an adoption path, and an update path.
+This keeps the harness evolvable without making every downstream project carry every experiment performed by its source template.
+
 ## How to avoid slop?
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such.
