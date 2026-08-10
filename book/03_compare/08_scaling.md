@@ -103,6 +103,24 @@ First set both costs to zero and inspect the ideal linear curve.
 Then add contention, add coherency cost, and find the first concurrency level after the modeled peak.
 The parameters should ultimately be fitted from measured throughput at several concurrency levels; arbitrary sliders illustrate the model's shape but do not predict a real deployment.
 
+> **Case study: limiting concurrency to protect throughput**
+>
+> [PlanetScale describes a Vitess and MySQL production incident](https://planetscale.com/blog/concurrency-vs-throughput-vitess-mysql) in which a long-running transaction, immediate application retries, and a transaction pool raised to about 10,000 allowed more than 10,000 requests to accumulate inside the storage engine.
+> Snapshot reads grew more expensive as the long transaction preserved an increasingly long version history; more requests exceeded their latency limit and retried.
+> Work in progress rose while completed query throughput fell.
+> Increasing the pool had silenced pool-full errors but weakened the boundary protecting the database.
+>
+> The team later reduced the pool to roughly 1,000 and changed full-pool behavior so requests could wait for a slot within a bounded timeout.
+> During a later burst on another shard, demand peaked around 25,000 slot requests per second while reported query throughput stayed near 60,000 per second and fewer than 200 statements executed inside MySQL at once.
+> If those figures describe the same stable boundary and observation window, Little's Law gives an upper estimate of `W < 200 / 60,000` seconds, or about 3.3 milliseconds.
+> The important separation is between clients seeking work, work admitted to the constrained resource, and useful work completed.
+>
+> A queue does not create capacity; it moves waiting to a boundary where it can be observed and limited.
+> This report changed pool size and waiting behavior together, the later burst did not reproduce the original incident, and no tail-latency distribution was reported.
+> It also uses the Universal Scalability Law as an explanatory lens rather than fitting its parameters from measurements.
+> Treat the numbers as evidence for this workload, not as a universal pool target.
+> The durable lesson is that admission control can raise throughput when in-flight requests slow one another down, provided waiting is bounded, overload remains visible, and the underlying long transaction and retry behavior are still addressed.
+
 ## Common scaling techniques
 
 Potential subsections:
