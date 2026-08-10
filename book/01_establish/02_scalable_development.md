@@ -289,6 +289,21 @@ The reusable unit is therefore not necessarily the template snapshot.
 It can be a bounded practice with provenance, an adoption path, and an update path.
 This keeps the harness evolvable without making every downstream project carry every experiment performed by its source template.
 
+> **Case study – importing a living capability**
+>
+> [Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started) packages current web-platform knowledge as installable instruction bundles, called skills, for coding agents.
+> Instead of assuming that a model already knows the latest HTML, CSS, accessibility, performance, and browser-compatibility practices, an agent searches the collection and retrieves only the guide relevant to its task.
+> A project can also state a [Baseline](https://web.dev/baseline) browser-support target in its agent instructions, turning compatibility from an accidental property of generated code into an explicit project constraint.
+>
+> This extends the idea of a project harness beyond files maintained inside one repository.
+> The guidance has provenance and an update path, while targeted retrieval avoids placing the whole reference library in every agent context.
+> For reproducible work, record which version or update policy governed a change.
+> Its recommendations still remain inputs rather than proof: the project is an [early preview](https://github.com/GoogleChrome/modern-web-guidance-src), its maintainers' priorities may not match the application's users, and generated behavior still needs to be checked in representative browsers and assistive technologies.
+>
+> The durable pattern is broader than this particular tool.
+> Keep fast-changing domain knowledge in a maintained capability, retrieve the smallest relevant part, declare the local constraints that govern its use, and connect its recommendations to independent validation.
+> This is safer than copying a changing reference into a permanent prompt or trusting the model's training data to remain current.
+
 ## How to avoid slop?
 
 While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such.

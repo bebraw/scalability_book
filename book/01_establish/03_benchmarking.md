@@ -87,6 +87,11 @@ Use it to inspect a failing task and decide whether the problem lies in the resu
 
 {{ import "site/includes/model-eval-demo.html" }}
 
+[Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started#how-is-accuracy-ensured) provides a concrete example of evaluating an imported agent capability.
+Its evaluation harness first checks browser assertions against both a reference implementation and a deliberately flawed implementation, then compares agent runs with and without the guidance.
+A project can reproduce the smaller experimental shape: hold the task, model, starting repository, and acceptance checks constant; change whether the capability is available; and compare correctness, retries, cost, and human correction.
+The resulting difference measures performance on that task and those checks, not whether the guidance makes every application better in production.
+
 Literal task completion is not enough for an agent that can take actions.
 The proposed "Genie coefficient" asks how far an agent's behavior departs from a reasonable interpretation of the user's intent :citep[raghavan2026genie].
 It is a conceptual framework rather than a validated metric, but it suggests a useful evaluation split: score task success, permission compliance, unnecessary actions, side effects, and clarification quality separately.
