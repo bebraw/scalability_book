@@ -190,6 +190,8 @@ Design questions:
 - Which views need real-time accuracy and which can lag?
 - How can raw events be replayed if aggregation logic changes?
 
+[NATS](https://nats.io/) makes one version of this trade-off concrete: Core NATS provides ephemeral publish-subscribe communication, while JetStream adds stored, replayable streams.
+
 ## Latency and geography
 
 Ideas to develop:
