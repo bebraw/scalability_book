@@ -175,10 +175,31 @@ Model choice should follow the work and local evidence.
 A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
 Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules; the benchmarking chapter shows how to test them against accepted outcomes.
 
-You should also consider what kind of context your provide to your model, how you provide it, and in which kind of context your agent is operating.
-As you work with models, you will hit concepts of context window and token consumption and both are worth optimizing since the models have limited capabilities and can suffer "memory loss" while working which in turn wastes resources and makes you wait longer.
-For this reason, people have developed tools, such as [rtk](https://github.com/rtk-ai/rtk), that allow you to optimize token consumption.
-Many other solutions exist as well and they are worth researching.
+Context is another generation decision: what the model receives, in what representation, and for how long.
+Long tool outputs and interaction histories consume context and can increase latency or cost, which has motivated command-aware filters such as [rtk](https://github.com/rtk-ai/rtk) and model-generated summaries.
+A shorter agent-facing view does not by itself establish a lower total bill or an unchanged task outcome.
+
+In a SWE-agent workshop study, observation masking and model-generated summaries reduced cost in most of five tested model configurations, but its paired analysis found that both significantly lowered solve rate in one reasoning-model configuration :citep[lindenbauer2025complexity].
+On controlled long-horizon tool-use benchmarks, ACON reduced peak input tokens while largely retaining task performance :citep[kang2026acon].
+Neither study validates RTK or every command filter; together they show that context reduction is a behavior change to test, not free efficiency.
+
+> **Compact the working view; preserve the raw record**
+>
+> Treat compressed output as a working view, not as the evidence record.
+> Keep raw output retrievable during the run.
+> For course evidence, retain only bounded qualification cases and consequential failures, with the original command or query, working directory, exit status, separate output streams, pagination or continuation metadata, and explicit omission markers under a stable handle.
+> A retained record is not proof that the upstream source returned everything.
+> Apply the underlying system's data-minimization, secret-handling, residency, access, and deletion rules; disable archival where those rules cannot be met.
+> Prefer native structured output as a comparison baseline.
+> Treat quiet mode as another reduction policy.
+> Make parsing or capture failures visible and preserve the producer's exit status independently; return uncompressed output only when its data classification and size permit it.
+> Treat retrieved output as untrusted text and escape control sequences rather than interpreting embedded instructions.
+>
+> Qualify a compression policy for each model and command class that matters, while recording the harness and policy versions.
+> Use a fixed attempted-task cohort and the same acceptance checks.
+> Report accepted outcomes over all attempted tasks and total end-to-end cost per accepted outcome, including compression calls, raw retrievals, retries, and failed attempts; report provider token categories separately.
+> If no task is accepted, report `0/N` and total cohort cost; cost per accepted outcome is undefined rather than zero.
+> A reduction in shell-output bytes is only a component metric.
 
 **Validation**
 
@@ -186,6 +207,16 @@ Validation is perhaps the most important part of the loop since it defines the o
 Interestingly enough you can have your agents develop a big chunk, or even all, of validation logic for you.
 The idea is to give your agents tools to let them validate their work.
 The most obvious thing to do is to set up strict validation rules for your projects, but the idea scales beyond development.
+
+**Tool-output preflight.**
+Use instructor-supplied or synthetic non-sensitive raw artifacts for one passing command and one deliberately tricky output: an exit-zero warning, a failing diagnostic, or an unusual line in a repetitive log.
+Production and secret-bearing output are outside this exercise.
+If the policy claims to handle pagination, add one paginated artifact.
+Record the command and tool version, reduction-policy version and configuration, and a content hash, then generate every view from the same raw artifact.
+Before generating the views, list the critical facts in each artifact, and require every compact fixture to mark at least one explicit omission.
+Verify that source status, separate output-stream provenance, critical facts, omission markers, the retrieval handle, and pagination metadata where applicable survive; report critical facts retained over critical facts present, false or materially misleading facts, and any policy-safe fallback.
+Passing this preflight can reject an obviously lossy or unsafe policy; it does not qualify agent effectiveness.
+Claims about cost or task effectiveness require paired end-to-end outcomes.
 
 **Revision**
 
