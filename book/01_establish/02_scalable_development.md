@@ -190,6 +190,23 @@ This is stronger than asking a model whether its own output looks correct: the h
 > A screenshot check should launch the real application, authentication should be tested against observable security behavior, and persistence should survive a restart.
 > Tests produced by the same agent remain candidate artifacts until their relationship to the required behavior has been established.
 
+> **A mutant can turn a concern into a testable contrast**
+>
+> Meta's Automated Compliance Hardener shows one way to strengthen a generated test without treating it as self-validating.
+> Starting from descriptions of earlier privacy faults, it generated concern-specific simulated faults that existing tests did not catch, then proposed tests required to build, pass consistently on the current program, and fail on the mutated version :citep[harman2025mutation].
+> Across 10,795 Android Kotlin classes, the pipeline produced 571 mutant-killing tests; 277 of them (49%) added no line coverage.
+> In two Messenger and WhatsApp review sessions, engineers accepted 140 of 191 tests reviewed for usefulness; among the 175 tests that also received a privacy-relevance rating, 63 were judged possibly or definitely relevant.
+>
+> The original-versus-mutant comparison makes one behavioral claim mechanically checkable.
+> It does not prove that the simulated fault is realistic, reveal a defect already present, or establish privacy compliance.
+> The mutant is not independent ground truth: one LLM agent generated it from the concern, and another generated the test to distinguish it.
+> Human review must still judge relevance, maintainability, and whether the concern itself is worth guarding.
+> The value lies not in maximizing a mutation score, but in connecting a named concern to a distinguishing test.
+>
+> **Try it:** Choose one consequential requirement or recorded defect in your tracker and introduce one small, reversible mutation that violates it.
+> Confirm that the existing tests miss the mutation, then add a test that passes on the restored implementation and fails when the mutation is reapplied.
+> Explain both what this comparison establishes and what it leaves unproven.
+
 ## Slideotter – The power of validation
 
 For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird.
