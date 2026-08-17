@@ -14,5 +14,10 @@
     "noImplicitOverride": true,
     "types": ["node"]
   },
-  "include": ["scripts/**/*.ts", "site/scripts/**/*.ts", "worker/**/*.ts"]
+  "include": [
+    "labs/**/*.ts",
+    "scripts/**/*.ts",
+    "site/scripts/**/*.ts",
+    "worker/**/*.ts"
+  ]
 }

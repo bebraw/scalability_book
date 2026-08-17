@@ -283,6 +283,10 @@ This is stronger than asking a model whether its own output looks correct: the h
 > **Try it:** Choose one consequential requirement or recorded defect in your tracker and introduce one small, reversible mutation that violates it.
 > Confirm that the existing tests miss the mutation, then add a test that passes on the restored implementation and fails when the mutation is reapplied.
 > Explain both what this comparison establishes and what it leaves unproven.
+>
+> For a fixed starting point, use the [concern-directed mutation fixture](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) in `labs/concern-directed-mutation`.
+> Its baseline and three mutants initially pass the same incomplete suite.
+> Choose the authorization, retry, or archived-state concern; add one public-behavior test; then preserve the baseline pass and the selected mutant's assertion failure as the evidence pair.
 
 ## Slideotter – The power of validation
 
