@@ -56,7 +56,28 @@ This makes disciplined project evidence more important than impressions of speed
 
 :::
 
+### When generation outruns comprehension
+
 Greater code-production capacity does not make software development scale by itself.
+Across three field experiments with 4,867 developers, access to an AI coding assistant increased completed tasks by about 26% in the pooled estimate, although the individual experiments were noisy and varied :citep[cui2026effects].
+This is evidence that tools can raise the production rate in some settings, not that every developer or project becomes faster.
+
+Comprehension was already a substantial part of development before generative AI.
+In a field study covering 78 professional developers, seven projects, and 3,148 working hours, :citet[xia2018comprehension] classified about 58% of observed time as program comprehension, compared with about 24% navigation and 5% editing.
+Their measure included activity across IDEs, browsers, and documents, and the projects came from two companies using Java and C#.
+The percentages are therefore not a universal reading-to-writing ratio, but they show why producing more text does not remove the work of understanding a system.
+Code and change understanding is also a central part of review, where it supports knowledge transfer and alternative solutions as well as defect detection :citep[bacchelli2013review].
+
+AI can therefore increase the arrival rate of candidate changes more readily than a team can increase its comprehension capacity.
+A generated diff is inventory, not completed work.
+The relevant throughput is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
+When candidate arrival exceeds that capacity, the backlog appears as large diffs, delayed review, shallow acceptance, rework, or technical debt.
+
+Here, "reading" is shorthand for building and testing a useful mental model, not manually inspecting every generated line.
+Types, tests, contracts, static analysis, small modules, architectural notes, and AI-assisted search or review can compress the work by directing attention and supplying evidence.
+They expand comprehension capacity only when they reduce uncertainty rather than create more assertions to inspect.
+A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both sides: generated comments sometimes contributed to later revisions, but reviewers still had to inspect them and accepted only a minority :citep[olewicki2026review].
+
 :citet[brooks1987silver] distinguishes accidental difficulties that tools can reduce from essential difficulties rooted in the software problem, with complexity central among them.
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
 Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
