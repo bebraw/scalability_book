@@ -99,6 +99,31 @@ It is a conceptual framework rather than a validated metric, but it suggests a u
 For the course project, evaluate one representative AI-assisted task twice: once for the correctness of the produced artifact and once for the quality of the workflow that produced it.
 Preserve the prompt or task brief, relevant context, model and tool versions, execution trace, checks, human corrections, and final acceptance decision.
 
+### Report uncertainty, not only point estimates
+
+An evaluation observes a finite set of tasks under declared conditions.
+A difference in average score or acceptance rate is therefore an estimate, not a stable ranking of two models or workflows.
+In a systematic review of 445 new or substantially modified LLM benchmark papers, only 16.0% used uncertainty estimates or statistical tests to compare results :citep[bean2025measuring].
+Earlier work on NLP evaluations likewise found that small test sets can lack the power to distinguish plausible improvements and that effects detected by underpowered studies can be exaggerated :citep[card2020littlepower].
+
+When possible, run both candidates on the same task IDs and predeclare how repeated calls become one task-level result.
+Repeated calls reveal variation within a task; they do not turn one task into many independent tasks.
+If many tasks are variants of one template, repository, or issue family, disclose that dependence and narrow the claim.
+
+Report the independent task count, task source, one predeclared primary outcome, and observed paired difference.
+If a course-provided or otherwise justified paired interval method fits the outcome, include the interval and name the method.
+Before inspecting results, define the signed difference and the practical boundary or bounds that would change the decision.
+Only an interval wholly on the required side of a boundary supports that local decision; overlap leaves it inconclusive, and statistical separation can still describe a difference too small to matter.
+An interval containing zero is not proof that the candidates are equal.
+Treat other metrics and unplanned slices as descriptive or exploratory unless their joint decision rule and multiple-comparison treatment were declared in advance.
+When no defensible interval is available, show the raw paired outcomes, label the comparison exploratory, and restrict the claim to those tasks.
+An interval still describes uncertainty conditional on the sample and scoring process; it cannot repair unrepresentative tasks, judge bias, contamination, or a changed harness.
+
+**Paired comparison check.**
+For one predeclared binary acceptance result per independent task, count tasks accepted by both candidates, only the first, only the second, or neither.
+Use an instructor-supplied interval or a justified paired method to interpret those counts against the predeclared decision boundary; do not compare two separate error bars.
+The single representative project task above remains a case comparison; use this check with a multi-task project cohort or instructor-provided data.
+
 ### From evaluation to routing
 
 A lower per-request price does not necessarily make a model cheaper for a task.
