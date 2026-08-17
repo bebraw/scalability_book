@@ -50,6 +50,18 @@ Examples to develop:
 - AI-generated code works but follows several inconsistent patterns.
 - The chosen theme is not documented clearly enough, so later readers cannot tell which domain assumptions are intentional.
 
+> **Identify the commitment point**
+>
+> Fast generation can make a change cheap to introduce without making it cheap to reverse.
+> In a repository study of ten open-source database applications, schema revisions often co-evolved with dependent application code, illustrating how a local data-model choice can acquire a wider change footprint :citep[qiu2013coevolution].
+> For this audit, treat the relevant **commitment point** as the first moment when an ordinary code revert no longer restores the prior state—for example, when persistent production data adopts a schema or an independently deployed consumer relies on a published contract.
+> Beyond that point, undoing the choice is a coordinated change rather than a deletion.
+>
+> A commitment is not automatically technical debt.
+> The audit asks whether its future coordination cost was visible and justified.
+> The Reality chapter returns to compatibility, migration, rollback, and fix-forward; here, make the difference between introduction and safe reversal visible.
+> [Florian Herrengt's practitioner essay](https://blog.florianherrengt.com/ai-removing-middle-class-software-engineering.html) dramatizes this asymmetry with database changes; its broader labor-market prediction is outside this claim.
+
 ### Workflow loop lab
 
 The demonstration below puts the work into a visible loop: human framing, implementation, tool feedback, review, and correction.
@@ -69,6 +81,7 @@ The goal is to make students name where the resistance appears and choose one fe
 {{ import "site/includes/friction-audit-demo.html" }}
 
 After using the demo, students should apply the same structure to implementation A: choose a likely change, score the path, name the largest source of friction, and choose one concrete improvement.
+For one implemented choice, compare introduction with safe reversal: mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
 
 ## Reducing friction
 
@@ -125,7 +138,8 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 - Have them identify the three most expensive changes they can imagine making.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
-- Time-box an agent review of one representative change. Record candidate, independently confirmed, duplicate, and rejected findings along with triage and repair time.
+- Time-box an agent review of one representative change.
+  Record candidate, independently confirmed, duplicate, and rejected findings along with triage and repair time.
 - Define a risk-based stopping rule for the review and identify whether one simplification could eliminate a defect class.
 
 ## Project artifact
