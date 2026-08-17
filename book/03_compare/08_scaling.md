@@ -220,6 +220,15 @@ The useful lesson is the shape of the problem: distance creates a lower bound, a
 
 ## Trade-offs
 
+> **Simplicity makes deficiencies visible**
+>
+> “I conclude that there are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies and the other way is to make it so complicated that there are no obvious deficiencies.
+> The first method is far more difficult.” :citep[hoare1981emperor]{locator="p. 81"}
+>
+> Hoare was writing about overambitious programming-language design, not distributed systems.
+> The contrast is about inspectability, not proof that a simple design is defect-free.
+> Applied to scaling, it becomes a review test: **what pressure justifies each added mechanism, what new failure mode does it introduce, and why is the simpler design insufficient?**
+
 Important trade-offs to make explicit:
 
 - Simplicity vs capacity.
