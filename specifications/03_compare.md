@@ -58,6 +58,7 @@ Before implementation, record:
 - each role or delegated responsibility;
 - allowed tools, files, or modules where relevant;
 - shared state that can survive between delegated runs, including who can write and later read it, how writes are attributed, how long it persists, and how it is cleared;
+- when session orchestration and resource access are separate, their policy ownership and precedence, bypass paths, and the authenticated identity, scoped delegated authority, and task, budget, policy, and trace identifiers passed across the boundary;
 - expected output and validation for each task;
 - dependencies and possible parallel work;
 - who or what owns integration;
@@ -115,6 +116,7 @@ Use the application to inspect the run and answer at least two debugging questio
 - Where did validation or review reject apparently completed work?
 - Where and why did a human intervene?
 - What became the bottleneck as concurrent work increased?
+- Can every physical model or tool attempt, including denied, failed, retried, and cancelled attempts, be linked to its delegated run, actor, policy result, and usage or cost provenance, and can that run be assigned an explicit outcome?
 
 Present the findings through the application's existing feed, filters, summaries, and any small additional view needed to make the evidence understandable.
 A real-time integration, generic adapter for every agent tool, polished graph editor, and interactive step debugger are not required.

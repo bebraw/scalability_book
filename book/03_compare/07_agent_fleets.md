@@ -74,6 +74,51 @@ Repeatable agent workflows can also be stored as small, named project skills rat
 A review skill, debugging skill, or release skill can define its trigger, evidence, boundaries, and output contract.
 Keep only workflows the project actually uses, make explicit or destructive workflows opt-in, and preserve one obvious source of truth when the same instructions must be distributed to multiple tools.
 
+## Separate task control from resource access
+
+Controls around a fleet operate at different scopes.
+The project harness introduced earlier is the versioned material inside a repository: specifications, commands, rules, and evidence.
+An agent harness controls a model-and-tool execution loop.
+A session or orchestration layer may coordinate several harnesses, while a resource-access layer may mediate selected model and tool requests.
+These responsibilities may be combined in one platform or split across several services.
+
+| Control boundary             | Primary unit                   | Typical responsibilities                                                                                                               |
+| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy        |
+| Model and tool access        | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
+
+Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
+Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
+These are examples, not evidence that every fleet needs two products or exactly two control planes.
+Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
+
+The durable distinction is between a decision and its enforcement point.
+NIST's zero-trust architecture distinguishes a policy engine that makes and logs an access decision, a policy administrator that executes it by configuring an enforcement point, and the enforcement point that enables, monitors, or terminates access; implementations may combine the engine and administrator :citep[rose2020zerotrust].
+This is a design analogy, not a claim of NIST conformance.
+For each consequential decision, name the policy authority, mandatory enforcement point, and conflict or outage rule; overlapping controls still need explicit precedence, and a mediator cannot protect a path that bypasses it.
+
+The contract between the scopes matters more than the number of components.
+Trace one operation through the chain:
+
+`originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
+
+Propagate only the necessary authenticated principal, audience-scoped delegated authority, and trusted task, trace, budget-reservation, and policy-decision identifiers.
+Each enforcement point must validate the authority and identifiers it relies on.
+Return the resource actually selected, routing or fallback decision, policy result, and observable latency, usage, and cost; for a model call, also record its provider, model, and version where available.
+Associate every physical attempt with one delegated run and that run's explicit outcome, such as accepted, rejected, failed, cancelled, or unresolved.
+Default telemetry to metadata: capture prompts, source, tool arguments or results, approval details, or principal data only when necessary, with redaction, access control, and deliberate retention, and never place credentials in trace context.
+A trace identifier connects evidence; it is not proof of identity or permission.
+Without this contract, the resource layer can see spend without knowing whether the work was accepted, while the orchestration layer can see intent without knowing which model or permission was actually used.
+
+For one delegated task, choose two consequential decisions: one about the session or task and one about a model, tool, credential, or other resource.
+For each, record the policy authority, mandatory enforcement point, trusted context or evidence, and conflict or outage rule.
+Then trace the task end to end and look for a direct-call bypass, lost actor identity, multiplied retry, conflicting caps or double-counted usage, and cancellation that does not reach in-flight work.
+Where practical, use a safe direct-call negative test and, where records are available, reconcile the mediator with the model provider or tool resource rather than inferring non-bypass from an incomplete trace.
+The audit is complete only when every denied, failed, retried, cancelled, or successful attempt has an identifier, policy result, and usage or cost provenance where measurable, and rolls up once to an explicit delegated-run outcome.
+When computing cost per accepted outcome, include spend from every attempt in the fixed cohort and use accepted delegated runs—not internal calls—as the denominator; label missing or estimated costs rather than treating them as zero.
+
+For the B–C comparison, keep any gateway pinned to the declared base model where possible; otherwise record the model actually used and treat substitution as a confounding factor.
+
 ## Fleet throughput and cost
 
 An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step.
