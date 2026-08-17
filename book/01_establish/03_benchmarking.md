@@ -124,11 +124,6 @@ That is a stronger lead than the end-to-end latency alone, but it still does not
 The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
 
-> **Sustainability angle**
->
-> It turns out measuring the energy consumption of web applications is difficult.
-> You can learn more about the topic from the article _Challenges Related to Approximating the Energy Consumption of a Website_ :citep[kalliola2025energy].
-
 ## Observability with OpenTelemetry (OTEL)
 
 Explanation should go here.
@@ -264,6 +259,27 @@ Keeping the functional assertion and the performance evidence separate makes a f
 
 Teams that need a repeatable CI gate can use the official `lighthouse` Node module or [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to collect several runs and assert a budget.
 Start with reporting rather than a strict pass/fail threshold, learn the normal variation of the runner, and only then set a budget with enough tolerance to detect a meaningful regression.
+
+### Test an energy-aware change
+
+Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
+
+:citet[barrocas2026ecoassist] provide one bounded example of a before-and-after energy study.
+On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 deliberately resource-heavy standalone webpages.
+The pages were selected for a size above 600 KB and at least ten DOM-affecting operations, so the sample does not represent arbitrary production applications.
+The benchmark compared each optimized page with its own unoptimized baseline, not with another optimizer.
+
+In a separate single-condition lab study, twenty early-career developers generated and optimized portfolio pages and reported low workload.
+The study did not compare productivity against a control, and five participants observed removed content or layout changes after optimization.
+The reported before-and-after page measurements do not include the optimizing model's full training and inference footprint; the paper estimates that overhead separately, and neither result is a whole-system carbon estimate.
+Treat the optimization as a candidate change that must preserve the intended product behavior, not as evidence that a lower energy number is automatically better.
+
+Reuse one representative Playwright journey and the repeated-measurement discipline above.
+Preserve the baseline, make one targeted AI-assisted frontend optimization, and run the same journey under the same declared conditions.
+Repeat it at least five times before and after when the chosen signal varies from run to run.
+Record direct energy if the platform exposes a defensible measure; otherwise label transferred bytes, JavaScript or asset size, CPU time, or long-task time as **resource proxies**, not energy or carbon.
+For deterministic measures such as built asset size, record one before-and-after value; for run-varying measures, report the median and range.
+Re-run the functional checks, inspect for visual or accessibility regressions, note any rejected suggestion or regression, and state what the comparison cannot establish.
 
 ## From measurements to Little's Law
 

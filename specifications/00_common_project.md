@@ -342,9 +342,12 @@ State what could and could not be measured.
 
 - acceptance-scenario results;
 - automated test results;
-- one runtime measurement using the shared course workload;
+- one runtime measurement based on repeated runs of the shared course workload, plus at least one declared resource-efficiency signal;
 - known defects or incomplete requirements;
 - deployment URL, local run evidence, or another agreed operational artifact.
+
+Use the same resource-efficiency signal and procedure across phases where practical.
+If direct energy measurement is unavailable, report an observable resource proxy and do not relabel it as energy or carbon.
 
 Every implementation must have a reproducible operational path.
 By the final submission, the group must also select one of implementations A, B, or C, deploy it in an instructor-approved realistic environment outside the author's development process, and rerun the shared workload there.
