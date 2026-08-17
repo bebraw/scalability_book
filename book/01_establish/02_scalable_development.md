@@ -106,6 +106,18 @@ Constraints at the start of a task are hypotheses, not necessarily complete know
 :citet[naur1985theory] similarly describes programming as theory building rather than program-text production.
 Implementation can therefore be a way to learn what the specification should say, not only a way to execute it.
 
+> **Delegate work without surrendering judgment**
+>
+> Cognitive offloading—using external action or aids to reduce a task's cognitive demand—is one reason tools can help people scale their work :citep[risko2016offloading].
+> :citet[shaw2026cognitive] use _cognitive surrender_ for a narrower proposed failure: adopting AI output with little scrutiny so its judgment replaces rather than supports the person's own.
+> Their preregistered experiments found that participants often followed deliberately faulty AI answers, but the term comes from a preprint using short reasoning tasks :citep[shaw2026cognitive]{locator="pp. 21–24, 47–48"}.
+> The experiments measured adoption, accuracy, and confidence; they did not directly show that deliberation stopped, establish long-term skill loss, or test professional programming.
+>
+> Use the phrase here as a workflow diagnostic, not as settled cognitive architecture.
+> Generation can be delegated, but constraints, validation, and revision should not all collapse into the same model's unsupported judgment.
+> Before accepting a consequential change, the team should be able to explain the intended behavior, name a plausible failure, connect acceptance to independent evidence, and correct or reject the result.
+> Deliberate friction can help: cognitive forcing functions reduced overreliance on incorrect AI advice, although participants found effective interventions less convenient :citep[bucinca2021trust].
+
 **Constraining**
 
 By constraining process I mean defining the constraints of your systems, or even an individual prompt.
