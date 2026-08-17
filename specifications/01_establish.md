@@ -25,7 +25,7 @@ A complete common core with clear evidence is more valuable than a large unfinis
 
 You must use:
 
-- the approved locally hosted model or departmental local-model service;
+- only the approved local-model endpoint or named departmental local-model service; every other inference route and automatic model fallback must be disabled or fail closed;
 - one coding-agent process at a time;
 - the model, context, and tool configuration documented in your evidence package.
 

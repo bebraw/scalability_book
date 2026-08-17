@@ -322,10 +322,10 @@ Submit the same evidence categories after every phase:
 
 - implementation identifier and commit;
 - language, framework, storage, and deployment approach;
-- model names and versions where available;
+- model artifact and serving configuration relevant to the result: name, resolved revision or digest when exposed, quantization where applicable, runtime version, allocated context where exposed, and actual inference route for reported evaluation attempts when observable; otherwise record the declared route and limitation;
 - agent tool and relevant configuration, including the source, resolved revision or content digest, and update policy of any imported skill, plugin, or instruction bundle that materially affected the workflow; when neither a revision nor a digest is exposed, record the retrieval date and observed update behavior;
 - orchestration configuration, if any;
-- local hardware or hosted environment details relevant to the result.
+- local hardware or hosted-environment details relevant to the result, including memory limits and accelerator residency or CPU/GPU offload where exposed, together with paths by which project data may leave that environment and any fallback policy.
 
 ### 9.2 Effort and execution
 

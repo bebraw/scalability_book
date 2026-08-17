@@ -175,7 +175,32 @@ Model choice should follow the work and local evidence.
 A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
 Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules; the benchmarking chapter shows how to test them against accepted outcomes.
 
-Context is another generation decision: what the model receives, in what representation, and for how long.
+> **"Local" describes a configuration**
+>
+> A model name or local endpoint is not a capability result.
+> Bind an accepted outcome to the served configuration: resolved model revision or digest and quantization, runtime version, allocated context, prompt and tool scaffold, and relevant hardware and accelerator residency or CPU/GPU offload where exposed.
+> When an approved service does not expose a field, mark it unavailable and name the evidence source or service operator rather than estimating it.
+> In a study of 9.7K test examples across long-input and long-form-output benchmarks, quantization effects varied by method, model, task, context length, and language :citep[mekala2025quantization].
+> The study used vLLM on datacenter GPUs and did not test coding agents, Ollama, or consumer-device deployments, so one quantized build should not inherit another build's score.
+>
+> Keep capability, hardware fit, and data location as separate claims.
+> Hardware constrains which configurations fit and their latency, throughput, and resource use; it does not establish task capability.
+> Running inference locally identifies where model computation occurs, not the data boundary of tools, telemetry, storage, or network calls.
+> A fallback can select a different model or configuration and change the capability, latency, cost, and data boundary.
+> Ollama, for example, exposes an installed model's [digest and quantization](https://docs.ollama.com/api/tags) and a running model's [allocated context and server-reported model VRAM bytes](https://docs.ollama.com/api/ps).
+> It can also forward cloud-model requests while callers continue using its local API, so `localhost` alone does not prove local execution ([cloud models](https://docs.ollama.com/cloud)).
+> Declare outbound paths and whether fallback is disabled or has a named trigger, provider, and model.
+> For each reported evaluation attempt, record the observed route and its evidence source when the runtime exposes them; otherwise label the route as declared rather than observed and list the unavailable fields.
+>
+> Qualify the approved configuration against a predeclared representative task and deterministic check from the existing project evidence.
+> Treat the result as evidence for that task and configuration, not a general ranking of local and hosted models.
+
+**Configuration qualification.**
+Assign a stable identifier to each served configuration represented in the reported evaluation and record, where exposed, its model revision or digest, quantization, runtime and allocated context, scaffold and tools, relevant hardware or memory boundary, accelerator residency or CPU/GPU offload, outbound paths, and fallback policy.
+For an opaque departmental service, use operator- or instructor-supplied metadata; otherwise mark unavailable fields and name the evidence source or operator.
+For each reported attempt, link the task and acceptance result to that configuration, then record the observed route and evidence source or mark the route as declared and state what the serving tool did not expose.
+
+Within that serving configuration, context selection is another generation decision: what the model receives, in what representation, and for how long.
 Long tool outputs and interaction histories consume context and can increase latency or cost, which has motivated command-aware filters such as [rtk](https://github.com/rtk-ai/rtk) and model-generated summaries.
 A shorter agent-facing view does not by itself establish a lower total bill or an unchanged task outcome.
 
