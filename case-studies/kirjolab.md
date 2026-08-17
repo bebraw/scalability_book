@@ -33,7 +33,7 @@ The first scholarly workspace slice followed about an hour later.
 
 ### The harness existed before the feature pressure
 
-The most consequential early decision was to treat the development environment as part of the product.
+The most consequential early decision was to treat the project harness as part of the product.
 Generated code had to pass deterministic checks rather than merely look plausible.
 The initial harness already checked formatting, types, coverage, browser behavior, security-sensitive browser boundaries, and mutation resistance.
 Later changes added more focused diagnostics and faster affected-file paths.
