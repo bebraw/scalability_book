@@ -78,6 +78,26 @@ Types, tests, contracts, static analysis, small modules, architectural notes, an
 They expand comprehension capacity only when they reduce uncertainty rather than create more assertions to inspect.
 A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both sides: generated comments sometimes contributed to later revisions, but reviewers still had to inspect them and accepted only a minority :citep[olewicki2026review].
 
+> **Separate effort from trust**
+>
+> Perceived effort can influence quality judgments when quality is difficult to assess :citep[kruger2004effort].
+> It is a heuristic, not correctness evidence: a quick change can be sound, a laborious change can be wrong, and neither hours nor transcript length shows that software meets its requirements.
+> Ask four different questions:
+>
+> - **Provenance:** Which exact revision or artifact is this, and which inputs, people, and tools produced or materially transformed it?
+> - **Endorsement:** Who stands behind which claim or decision on the final revision, including any reservations?
+> - **Accountability:** Who owns the consequences and must correct, maintain, or retire the result if it proves wrong or becomes outdated?
+> - **Evidence:** Which properties were checked on that revision, under what conditions, and what remains unverified?
+>
+> [_Sloptimists, Sloperators and Slopportunism_](https://atharvaraykar.com/sloptimists-sloperators-and-slopportunism/) makes the distinction concrete: Atharva Raykar describes the essay body as unedited model output, then says in his commentary that he does not fully endorse it.
+> Disclosed origin and human acceptance are different, and neither establishes quality.
+> Survey respondents have reported tracking and monitoring for later review or debugging as reasons for declaring AI-generated code, but the available study did not test whether declaration improves software quality :citep[kashif2026declaration].
+>
+> Provenance can make a process traceable; it does not make the artifact correct or transfer responsibility to the tool.
+> Use the AI-use log together with the submitted project evidence: record material assistance and corrections in the log, and bind checks and known limits to the submitted revision.
+> Responsibility remains with the accepting group.
+> Record effort for comparison and reflection, not as a quality score.
+
 :citet[brooks1987silver] distinguishes accidental difficulties that tools can reduce from essential difficulties rooted in the software problem, with complexity central among them.
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
 Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
@@ -289,7 +309,7 @@ For this course, a minimal harness for your project should include:
   For an HTTP-based application, this may include plain-text [Hurl](https://hurl.dev/) scenarios that exercise important API requests independently of the implementation language.
 - A versioned environment definition, or explicit prerequisites that state the required runtimes, package managers, system tools, local services, and supported platforms.
 - Example environment files, such as `.env.example`, when configuration or secrets are needed locally.
-- A short AI-use log noting what AI assistance was used, what was reviewed manually, and what had to be corrected.
+- A short AI-use log noting material AI assistance, what the group reviewed, and consequential corrections or reservations.
 
 You can have an agent to generate a lot of that and refine as needed.
 Note that local CI, mutation testing, browser automation, performance budgets, pre-push hooks, and reusable capability kits are valuable, but they are optional upgrades for groups that have a reason to add them.
