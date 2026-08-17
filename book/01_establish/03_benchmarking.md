@@ -99,6 +99,43 @@ It is a conceptual framework rather than a validated metric, but it suggests a u
 For the course project, evaluate one representative AI-assisted task twice: once for the correctness of the produced artifact and once for the quality of the workflow that produced it.
 Preserve the prompt or task brief, relevant context, model and tool versions, execution trace, checks, human corrections, and final acceptance decision.
 
+### From evaluation to routing
+
+A lower per-request price does not necessarily make a model cheaper for a task.
+An inexpensive attempt that fails may have to be repeated with a stronger model, while still consuming context, validation, and review time.
+Conversely, always selecting the strongest available model can waste capacity when a smaller model can reliably clear the same acceptance bar.
+The useful comparison is therefore cost per accepted outcome, not token price or first-attempt cost.
+
+Research distinguishes **routing**, which selects one model before it produces an answer, from **cascading**, which begins with one model and escalates when evidence indicates that its answer is insufficient.
+Both depend on an accurate quality estimate; :citet[dekoninck2025routing] identify estimator quality as a critical condition for improving the cost-performance trade-off.
+In their SWE-Bench experiment, the post-generation estimator could use the task's ground-truth test outcomes.
+The result therefore shows what a strong verifier can enable, not how well the approach works for tasks without one.
+Databricks presents routing as an emerging coding-agent cost-control technique and reports an internal benchmark result, but publishes too little about that router evaluation to predict savings in another codebase :citep[wendell2026codingcosts].
+This motivates a local experiment, not a promised saving.
+
+When access rules permit both models—or when instructor-provided outputs are available—choose an efficient and a stronger model within the same declared harness and assemble a small set of representative tasks.
+Keep near-duplicates and tasks from the same module in the same partition, using one partition to define the policy and reserving the other for held-out evaluation.
+
+Define two evidence layers before running the comparison.
+The **policy-visible gate** may use deployable signals such as public tests, builds, or static checks to decide whether a cascade should escalate.
+The **final adjudicator** uses held-out tests or blinded human review that the policy cannot see; only this layer decides whether the final outcome is accepted.
+A policy that stops after passing its visible gate but fails final adjudication is a false acceptance.
+
+On the first partition, define and freeze either a routing rule that uses only facts available before generation or a cheap-first cascade that uses the policy-visible gate after its first result.
+Freeze the task features, thresholds, prompts, model and harness versions, budgets, retry rules, and exclusion rules before inspecting the held-out results.
+Compare the policy with always using either model and, when the task set permits it, random selection at the same stronger-model call rate.
+The random baseline tests whether the policy selects useful cases rather than benefiting only from its mixture of models.
+
+Report accepted outcomes over all attempted tasks, stronger-model calls, end-to-end latency, human correction, and total cost per accepted outcome.
+Count timeouts, tool failures, missing patches, and budget exits as attempted failures.
+Include policy decisions, quality estimation, rejected attempts, fallbacks, repeated context, validation, review, and rework in the cost; report unpriced resources separately.
+If both model arms are run to reveal counterfactual mistakes, keep that one-time evaluation expense separate from each policy's simulated operating cost.
+That comparison can expose false acceptances and unnecessary escalations; without both arms, label the missing counterfactuals as unknown rather than inferring them from an average.
+
+The result supports a local decision only if the policy meets a predeclared quality and risk threshold while improving the chosen cost or latency measure.
+After using held-out results to change the policy, evaluate again on fresh tasks.
+High-risk work can bypass the router or retain mandatory review, and the policy should be recalibrated when models, prices, harnesses, or the task distribution change.
+
 ## Observability and telemetry
 
 A benchmark can reveal that the request distribution changed, but it does not necessarily explain why one request was slow.

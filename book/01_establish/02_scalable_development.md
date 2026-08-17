@@ -151,8 +151,9 @@ As you look at projects developed by agents, you'll notice standard files, such 
 
 The second part of the loop, generation, is where the agent is doing its work based on your prompt.
 Although it sounds trivial, it is an important part since it is easy to get this one wrong or end up with higher expenses than you would like.
-You should consider which model you use and why since so-called reasoning models are better for more complex tasks while smaller models can be useful for simple implementation level tasks.
-For this reason, people often use different models for planning and implementation.
+Model choice should follow the work and local evidence.
+A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
+Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules; the benchmarking chapter shows how to test them against accepted outcomes.
 
 You should also consider what kind of context your provide to your model, how you provide it, and in which kind of context your agent is operating.
 As you work with models, you will hit concepts of context window and token consumption and both are worth optimizing since the models have limited capabilities and can suffer "memory loss" while working which in turn wastes resources and makes you wait longer.
