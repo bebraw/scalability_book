@@ -306,8 +306,47 @@ Notice what the statechart provides beyond a linear checklist.
 One cancellation rule applies throughout the compound active state, tests and human review can progress independently, and either kind of failure can return the workflow to implementation.
 The model may choose a route, but the statechart defines the available routes.
 
-Regardless of your generation approach, it is these kinds of technical choices that will maintain the quality of your implementation and I recommend trying out different kinds of modeling techniques you might be able to find to see if they make a qualitative difference in implementation compared to pure vibe coding.
-This becomes interesting particularly in the agent fleet case as you will have multiple different types of agents evaluating your code from different directions.
+### Model valid data combinations
+
+A statechart constrains which transition is legal from the current state.
+Constructive data modeling asks which combinations ordinary code should be able to construct.
+In _The Unreasonable Effectiveness of Constructive Data Modeling_, Alexis King describes defining the supported "positive space" with ordinary records and tagged variants, then using exhaustive case analysis where the language supports it :citep[king2026constructive].
+King's earlier _Parse, Don't Validate_ frames a boundary check as a transformation that returns a more precise representation carrying what it learned rather than only reporting success :citep[king2019parse].
+These are design arguments rather than comparative evidence, and the goal is not maximum type precision.
+
+For the result of a state-transition decision, a loose record does not require the payload that each outcome needs:
+
+```ts
+type TransitionDecision = {
+  accepted: boolean;
+  next?: WorkItem;
+  current?: WorkItem;
+  event?: ActivityEvent;
+  reason?: TransitionError;
+};
+```
+
+It permits `accepted: true` without a next item or event, and `accepted: false` without a current item or reason.
+Model the required payload for each branch instead:
+
+```ts
+type TransitionDecision =
+  | { kind: "accepted"; next: WorkItem; event: ActivityEvent }
+  | { kind: "rejected"; current: WorkItem; reason: TransitionError };
+```
+
+The discriminator makes each branch's required payload explicit, and narrowed type-checked code cannot treat a rejected decision as if it exposed a transition event.
+It does not prove that the event matches the correct transition unless the inner types or constructor also enforce that relationship.
+The value is an in-memory decision, not a durable fact.
+Untrusted, untyped, or deserialized input crossing a boundary still needs runtime parsing.
+Before committing a decision, the request or application path must authenticate and authorize the caller; the persistence operation must conditionally match the authoritative state or version, then atomically update the item and append the event.
+Malformed deserialization, mutation, or unsafe casts can bypass the representation; concurrency and retries can violate surrounding state invariants even when each decision matches it.
+
+**Selected-invariant check.**
+In the existing `specs/{feature}/spec.md`, show one broad record or result and one contradictory value it permits.
+Replace it with a stack-native tagged union, sealed hierarchy, or guarded constructor.
+Where the stack supports checked variants, add a compile-fail type fixture; add a runtime test for any parser or guarded constructor at a data boundary, and reuse an existing supported-behavior test.
+Record one important invariant that remains enforced elsewhere, such as authorization or atomic concurrent transition.
 
 ## The project harness
 
