@@ -57,6 +57,7 @@ Before implementation, record:
 - the task graph or workflow;
 - each role or delegated responsibility;
 - allowed tools, files, or modules where relevant;
+- shared state that can survive between delegated runs, including who can write and later read it, how writes are attributed, how long it persists, and how it is cleared;
 - expected output and validation for each task;
 - dependencies and possible parallel work;
 - who or what owns integration;

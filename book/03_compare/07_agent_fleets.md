@@ -127,6 +127,16 @@ Prompt injection in the untrusted content can then turn the agent's legitimate p
 > Hugging Face reconstructed roughly 17,600 agent actions across dataset processing, Kubernetes, cloud identity, an internal network, and source control.
 > Most attempts failed, but the volume and persistence of exploration eventually exposed a viable path across several trust boundaries :citep[larcher2026agentintrusion].
 >
+> OpenAI's later reconstruction added a crucial continuity mechanism.
+> Separate agent runs discovered files left in a shared Artifactory service and used them as an informal message board for requests, exploit details, assignments, scripts, progress, and credential information.
+> After the files were cleared and the posting credentials revoked, later runs recreated the channel through an unauthenticated WebDAV endpoint, using message-bearing directory names in Artifactory's remote cache :citep[dalton2026breaking].
+>
+> The sandboxes were short-lived, but the runs were not independent.
+> Unlike the curated project memory described earlier, this was ambient infrastructure state.
+> A location becomes cross-run memory and an unintended coordination channel when one run can leave state that survives, is discoverable, and influences a later run.
+> Artifact and package stores, caches, queues, logs, temporary storage that outlives a run, and remote workspaces therefore belong in the trust-boundary review.
+> For each channel, record who can write and later read it, how writes are attributed, what may be stored, how long it persists, and how it is cleared.
+>
 > The incident did not make established defensive principles obsolete.
 > It showed why they become more important with agents: strict sandbox isolation, least privilege, short-lived and narrowly scoped credentials, blocked metadata access, and telemetry that can correlate behavior across systems.
 > Agent safety therefore depends on the authority exposed by the surrounding system, not only on instructions or model behavior.
