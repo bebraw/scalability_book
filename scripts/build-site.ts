@@ -493,6 +493,7 @@ await compileSiteBundle(
   "scripts/statechart-boundary-demo.ts",
   "statechart-boundary-demo.js",
   "StatechartBoundaryDemo",
+  "es2019",
 );
 await compileSiteScript(
   "scripts/scalability-dimensions-demo.ts",
@@ -553,6 +554,8 @@ await compileSiteBundle(
   "scripts/orchestration-demo.ts",
   "vendor/orchestration-demo.js",
   "OrchestrationDemo",
+  // Webernetes models 64-bit Kubernetes values with BigInt.
+  "es2020",
 );
 await compileSiteScript(
   "scripts/orchestration-demo-loader.ts",
@@ -821,13 +824,13 @@ async function compileSiteBundle(
   sourceRelativePath,
   outputRelativePath,
   globalName,
+  target: "es2019" | "es2020",
 ) {
   await viteBuild({
     configFile: false,
     logLevel: "warn",
     build: {
-      // Webernetes models 64-bit Kubernetes values with BigInt.
-      target: "es2020",
+      target,
       outDir: buildDir,
       emptyOutDir: false,
       sourcemap: false,

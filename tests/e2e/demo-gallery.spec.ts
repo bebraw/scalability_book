@@ -36,6 +36,58 @@ test.describe("demo showcase", () => {
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });
+
+    const alignedLabShells = [
+      {
+        root: "[data-fleet-trace]",
+        header: ".fleet-trace-header",
+        summary: ".fleet-trace-summary",
+      },
+      {
+        root: "[data-durable-retry]",
+        header: ".durable-retry-header",
+        summary: ".durable-retry-summary",
+      },
+    ];
+
+    for (const lab of alignedLabShells) {
+      const root = gallery.locator(lab.root);
+      await expect(root).toHaveCSS("border-top-width", "0px");
+      await expect(root).toHaveCSS("box-shadow", "none");
+      await expect(root).toHaveCSS("margin-top", "0px");
+      await expect(root).toHaveCSS("background-image", "none");
+      await expect(root.locator(lab.header)).toHaveCSS(
+        "background-image",
+        "none",
+      );
+      await expect(root.locator(lab.summary)).toHaveCSS(
+        "background-image",
+        "none",
+      );
+      await expect(root.locator(`${lab.summary} span`)).toHaveCSS(
+        "text-transform",
+        "none",
+      );
+    }
+
+    const expectSharedShellPalette = async () => {
+      const reference = await readShellPalette(
+        gallery.locator(".agent-fleet-header"),
+        gallery.locator(".agent-fleet-summary"),
+      );
+
+      for (const lab of alignedLabShells) {
+        expect(
+          await readShellPalette(
+            gallery.locator(lab.root).locator(lab.header),
+            gallery.locator(lab.root).locator(lab.summary),
+          ),
+        ).toEqual(reference);
+      }
+    };
+
+    await expectSharedShellPalette();
+
     expect(await gallery.innerText()).not.toMatch(
       /\b(students?|classroom|lecturer|instructor)\b/i,
     );
@@ -49,8 +101,22 @@ test.describe("demo showcase", () => {
       (element) => getComputedStyle(element).backgroundImage,
     );
     expect(darkSurface).not.toBe(lightSurface);
+    await expectSharedShellPalette();
 
     await page.setViewportSize({ width: 390, height: 844 });
+    for (const lab of alignedLabShells) {
+      await expect(gallery.locator(lab.root).locator(lab.header)).toHaveCSS(
+        "grid-template-columns",
+        /.+/,
+      );
+      const headerColumns = await gallery
+        .locator(lab.root)
+        .locator(lab.header)
+        .evaluate((element) =>
+          getComputedStyle(element).gridTemplateColumns.split(" "),
+        );
+      expect(headerColumns).toHaveLength(1);
+    }
     await expect(items.first().locator(".demo-gallery-item-header")).toHaveCSS(
       "position",
       "static",
@@ -113,3 +179,30 @@ test.describe("demo showcase", () => {
     expect(darkBackground).not.toBe(lightBackground);
   });
 });
+
+async function readShellPalette(
+  header: import("@playwright/test").Locator,
+  summary: import("@playwright/test").Locator,
+) {
+  const [headerPalette, summaryPalette] = await Promise.all([
+    header.evaluate((element) => {
+      const style = getComputedStyle(element);
+
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+      };
+    }),
+    summary.evaluate((element) => {
+      const style = getComputedStyle(element);
+
+      return {
+        backgroundColor: style.backgroundColor,
+        backgroundImage: style.backgroundImage,
+        color: style.color,
+      };
+    }),
+  ]);
+
+  return { header: headerPalette, summary: summaryPalette };
+}

@@ -286,7 +286,7 @@ function initializeDurableRetryLab(root: HTMLElement) {
           : phase === "recovered"
             ? "Delivered"
             : "Delivery unknown";
-    lastFact.textContent = history.at(-1)?.event ?? "None";
+    lastFact.textContent = history[history.length - 1]?.event ?? "None";
 
     historyBody.innerHTML = history.length
       ? history
@@ -412,7 +412,7 @@ function buildDurableRetryArtifact({
     `- Receiver effects: ${effectCount}`,
     `- Durable completions: ${durableCompletions}`,
     "",
-    `Last workflow fact: ${history.at(-1)?.event ?? "none"}`,
+    `Last workflow fact: ${history[history.length - 1]?.event ?? "none"}`,
     `Interpretation: ${interpretation}`,
   ].join("\n");
 }

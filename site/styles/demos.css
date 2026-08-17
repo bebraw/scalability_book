@@ -12307,3 +12307,127 @@
     grid-column: auto;
   }
 }
+
+/* Keep the trace-heavy labs inside the same visual shell as the catalogue. */
+:is(.durable-retry-lab, .fleet-trace-lab) {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--panel);
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow);
+  inline-size: 100%;
+  max-inline-size: none;
+  max-width: none;
+  position: relative;
+}
+
+.book-shell .prose > :is(.durable-retry-lab, .fleet-trace-lab) {
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:is(.durable-retry-lab, .fleet-trace-lab)::before {
+  background: var(--accent-strong);
+  block-size: 0.2rem;
+  content: "";
+  inline-size: 4rem;
+  inset-block-start: -1px;
+  inset-inline-start: -1px;
+  position: absolute;
+  z-index: 2;
+}
+
+:is(.durable-retry-header, .fleet-trace-header) {
+  align-items: start;
+  background: transparent;
+  border-block-end: 1px solid var(--border);
+  color: var(--text);
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+:is(.durable-retry-header, .fleet-trace-header) > div:first-child {
+  padding: 0;
+}
+
+.prose :is(.durable-retry-kicker, .fleet-trace-kicker) {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  margin: 0 0 0.35rem;
+}
+
+.prose :is(.durable-retry-header, .fleet-trace-header) h3 {
+  color: var(--text);
+  font-size: clamp(1.45rem, 1.3vw + 1rem, 2.05rem);
+  letter-spacing: 0;
+  line-height: 1.12;
+}
+
+:is(.durable-retry-summary, .fleet-trace-summary) {
+  align-content: start;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  gap: 0;
+  padding: 0.8rem;
+}
+
+:is(.durable-retry-summary, .fleet-trace-summary) span {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 1.25rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+:is(.durable-retry-summary, .fleet-trace-summary) small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+}
+
+[data-theme="dark"] :is(.durable-retry-summary, .fleet-trace-summary),
+[data-theme="contrast"] :is(.durable-retry-summary, .fleet-trace-summary) {
+  color: var(--text);
+}
+
+.demo-gallery-item > :where(.durable-retry-lab, .fleet-trace-lab) {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  inline-size: 100%;
+  margin: 0;
+  max-inline-size: none;
+  max-width: none;
+}
+
+@media (max-width: 56rem) {
+  :is(.durable-retry-header, .fleet-trace-header) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40rem) {
+  :is(.durable-retry-lab, .fleet-trace-lab) {
+    box-shadow: none;
+  }
+}
