@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectedDemoCount } from "./demo-fixtures.ts";
 
 test.describe("demo showcase", () => {
   test("presents every demo as one themed systems-lab catalogue", async ({
@@ -12,16 +13,26 @@ test.describe("demo showcase", () => {
     await expect(gallery.locator(".demo-gallery-lede")).toContainText(
       "Work through one module at a time",
     );
-    await expect(items).toHaveCount(26);
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText("26");
+    await expect(items).toHaveCount(expectedDemoCount);
+    await expect(gallery.locator(".demo-gallery-stats")).toContainText(
+      String(expectedDemoCount),
+    );
     await expect(gallery.locator(".demo-gallery-stats")).toContainText(
       "Self-guided",
     );
     await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
-    await expect(items.last().locator(".demo-gallery-index")).toHaveText("26");
-    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(26);
-    await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(26);
-    await expect(gallery.locator("[data-demo-permalink]")).toHaveCount(26);
+    await expect(items.last().locator(".demo-gallery-index")).toHaveText(
+      String(expectedDemoCount).padStart(2, "0"),
+    );
+    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(
+      expectedDemoCount,
+    );
+    await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(
+      expectedDemoCount,
+    );
+    await expect(gallery.locator("[data-demo-permalink]")).toHaveCount(
+      expectedDemoCount,
+    );
     await expect(
       gallery.locator("[data-orchestration-lab]:not([data-busy])"),
     ).toBeVisible({ timeout: 20_000 });

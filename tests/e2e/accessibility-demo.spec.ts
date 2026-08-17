@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { expectedDemoCount } from "./demo-fixtures.ts";
 
 const themes = ["light", "dark", "sepia", "contrast", "calm"];
 
@@ -11,7 +12,7 @@ test.describe("demo accessibility", () => {
     await page.goto("/demos/");
 
     const demos = page.locator("[data-demo-anchor]");
-    await expect(demos).toHaveCount(25);
+    await expect(demos).toHaveCount(expectedDemoCount);
 
     const demoIds = await demos.evaluateAll((elements) =>
       elements.map((element) => element.id),
@@ -119,7 +120,7 @@ test.describe("demo accessibility", () => {
       }
     }
 
-    expect(auditedDemos.size).toBe(25);
+    expect(auditedDemos.size).toBe(expectedDemoCount);
     expect(visitedControls.size).toBeGreaterThan(100);
     expect(controlsWithoutFocusIndicators).toEqual([]);
   });

@@ -2252,7 +2252,7 @@
   width: var(--stage-pressure);
 }
 .saturation-boundary-stage b {
-  color: var(--stage-color);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;

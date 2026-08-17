@@ -373,7 +373,7 @@ function buildSaturationPipeline(
           <strong>${escapeSaturationHtml(stage.label)}</strong>
           <small>${capacity} ev/s capacity</small>
         </div>
-        <div class="saturation-boundary-meter" aria-label="${utilizationPercent}% of declared capacity">
+        <div class="saturation-boundary-meter" role="img" aria-label="${utilizationPercent}% of declared capacity">
           <i></i>
         </div>
         <b>${utilizationPercent}%</b>
