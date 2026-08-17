@@ -89,6 +89,22 @@ Validation can itself become a source of friction.
 A ten-minute clean-install or browser suite may provide valuable release evidence while being a poor response to every saved file.
 Conversely, a fast test that never crosses the changed boundary can create confidence without useful coverage.
 
+> **When findings become inventory**
+>
+> :citet[lawson2026bugs] uses the provocative claim that teams can now choose how many bugs they want by asking agents to continue reviewing.
+> The operational choice is narrower: a team can choose how much defect-search and verification effort to fund, which known risks to accept, and when to stop.
+> It cannot count the unknown defects that remain.
+>
+> Cheap reports may shift rather than remove friction.
+> In a live study at Mozilla and Ubisoft, reviewers directly accepted 8.1% and 7.2% of generated comments, respectively, while another 14.6% and 20.5% were marked useful as review or development tips.
+> At Ubisoft, the median instrumented interval for evaluating generated comments was about 43 seconds per patch, an upper bound on active evaluation time.
+> The study measured adoption rather than defect-detection accuracy, but it shows that suggestions still consume attention :citep[olewicki2026review].
+>
+> Each finding still needs independent evidence such as a reproduction, a reachable path, or a violated invariant, followed by an impact judgment, a repair decision, and regression evidence.
+> A review loop without a stopping rule can create its own backlog, while repeated local patches can make the system harder to understand.
+> When several reports share a cause, ask whether a simpler boundary or invariant could eliminate the class before adding another exception.
+> Stop against an explicit risk threshold, not when the agent runs out of concerns.
+
 For one representative change, map the project's feedback ladder:
 
 | Stage             | Evidence returned                                                             | Typical cost          | When it is required                                          |
@@ -109,7 +125,8 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 - Have them identify the three most expensive changes they can imagine making.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
-- Use an AI agent to inspect the project for friction, then require students to verify or reject its findings.
+- Time-box an agent review of one representative change. Record candidate, independently confirmed, duplicate, and rejected findings along with triage and repair time.
+- Define a risk-based stopping rule for the review and identify whether one simplification could eliminate a defect class.
 
 ## Project artifact
 
