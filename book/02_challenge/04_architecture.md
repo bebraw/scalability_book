@@ -86,7 +86,6 @@ If the request path is unclear, the diagram is likely to hide the most important
 
 Potential subsections:
 
-- **Stateless requests**: why statelessness helps scaling, and where state still exists.
 - **Latency**: why physical distance and network hops matter.
 - **Partial failure**: why the client, server, database, and third-party services can disagree.
 - **Concurrency**: why two users can act at the same time and produce unexpected states.
@@ -99,6 +98,44 @@ Potential subsections:
 > Architecture determines resource flow.
 > Chatty APIs, unnecessary round trips, oversized payloads, heavy client bundles, and aggressive polling all turn design choices into recurring resource use.
 > Good web architecture reduces waste by making useful work explicit and avoiding repeated work where possible.
+
+### Stateless requests still depend on state
+
+Statelessness describes what a service needs to process one request, not whether the application remembers anything.
+The final `2026-07-28` revision of the Model Context Protocol (MCP) removes the initialization handshake and the Streamable HTTP `Mcp-Session-Id` header.
+Servers must not infer protocol context from earlier requests on the same connection; the core carries no protocol session across calls :citep[modelcontextprotocol2026spec].
+This is a versioned protocol example, not a requirement that the course project expose MCP or that older MCP traffic use the same design.
+
+| Continuity design           | What a later request carries             | Deployment obligation                                                                                     |
+| --------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Hidden protocol session     | A session identifier                     | Route to the instance that owns it, or share the protocol-session state                                   |
+| Explicit application handle | A resource handle such as `workspace_id` | Authorize the operation and resolve the referenced state from every eligible instance, or retain affinity |
+
+An explicit handle moves continuity rather than deleting it.
+An application may select state from the authenticated principal and ordinary request parameters; when workflow state cannot be derived from them, a service can mint a handle and require later calls to return it.
+The service still has to store or reconstruct the referenced state and define its owner, lifecycle, concurrency rules, expiry, and cleanup.
+A handle is an address, not authorization: authenticate the caller, then authorize that principal to perform the requested operation on the referenced tenant or workspace on every request.
+If the state remains available only on the instance that minted the handle, affinity has merely moved behind a new identifier.
+
+Retries add another state boundary.
+If a mutation commits but its response is lost, a retry may reach a different instance and apply the mutation again.
+Do not assume that a protocol request identifier makes a domain operation idempotent.
+Use an application-level command identifier or idempotency key, bind it to the caller, handle, operation, and relevant arguments, and store the mutation and reusable result atomically in the authoritative application state.
+
+**State placement audit.** Assume two interchangeable server instances, `A` and `B`, share one application store.
+Alice's validated token identifies principal `alice` in tenant `T1` with `events:write`; creating a workspace grants her access to it.
+Bob's token identifies principal `bob` in the same tenant with the same scope, but he has no access to Alice's workspace.
+The server derives these identities from the validated tokens, not from client metadata or a resource handle.
+
+1. Alice calls `create_workspace` and receives `W1`.
+2. Alice calls `record_event(W1, work_item_id=I42, command_id=C7, type=work_started)`; instance `A` commits the event, but the response stream breaks.
+3. The client retries on instance `B` with a new protocol request identifier and the same `C7`.
+4. Bob calls `record_event(W1, work_item_id=I42, command_id=C8, ...)`.
+5. The workspace is now `archived`, and the stated lifecycle makes archived workspaces read-only; Alice calls `record_event` again.
+
+For each request, record the authenticated principal and scope, authoritative state before the request, decision to apply, return, or reject, and the invariant or evidence supporting that decision.
+Design the flow so `C7` produces one event and its retry returns the original result, Bob cannot act merely by knowing `W1`, and the archived write returns a defined application error such as `workspace_archived` rather than silently recreating state.
+Finish by naming which information is carried by the client and which state remains authoritative on the server.
 
 ### Cache control is application policy
 
