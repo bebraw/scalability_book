@@ -240,6 +240,50 @@ For the event tracking project, annotate the architecture diagram with interacti
 For each region, record whether it is static, eagerly activated, activated when visible, or activated on interaction; identify its state owner and how it communicates with the rest of the page.
 The architecture hypothesis for implementation B should name one activation decision worth preserving or changing and the evidence that would validate it.
 
+## Runtime UI generation changes the control boundary
+
+The earlier sections ask where a view is produced and how it becomes interactive.
+A separate question is how much of its structure and behavior model output may choose at runtime.
+A component written by a coding agent during development is not runtime-generative UI in this sense: once reviewed and committed, it is ordinary application code at runtime.
+The boundary expands as runtime output moves from filling a host-selected component to selecting component composition or executable behavior.
+
+:citet[casas2026beyondcomponents] describes a practical spectrum from fixed components, through declarative descriptions rendered from an approved catalog, to generated executable code.
+Treat this as a design lens rather than a settled taxonomy:
+
+| Runtime model output                                      | Application must control                                             | Main trade-off                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Data for one approved component                           | Component implementation, behavior, and prop schema                  | Predictable behavior with little freedom over layout                       |
+| Declarative descriptor using approved components/actions  | Schema, renderer, design system, and action registry                  | Composition within a grammar, with validation and schema-evolution burden  |
+| Generated HTML, CSS, and JavaScript                        | Isolated execution boundary, mediated data/tool bridge, and limits   | Broadest expressiveness with the largest failure, review, and containment load |
+
+This axis can be combined with server-side or client-side rendering, hydration, islands, or resumability.
+It does not replace those choices.
+A declarative descriptor is still untrusted input: reject unknown components and actions, validate data bindings and accessible names, bound size and nesting, and authorize an action when it is invoked.
+Resolve action identifiers through trusted application code; naming an action in generated data does not grant authority to perform it.
+
+Executable generated UI expands the boundary further.
+It needs a separate-origin sandbox or equivalent isolated runtime without ambient credentials, a narrow bridge to host data and tools, explicit network, storage, navigation, and tool permissions, resource limits, observability, and a safe fallback.
+Running generated code in a browser does not by itself provide that boundary.
+
+A Google Research preprint provides bounded preference evidence for one complete generative-UI pipeline.
+After excluding eight of 100 sampled LMArena prompts, the study sent each pre-cached result to two raters.
+Across the pairwise comparisons, raters preferred the generated UI over the study's markdown condition in 82.8%.
+Contractor-built pages were preferred over the generated pages in 50.0% of comparisons, while the generated pages were preferred in 35.3% and the remainder was neutral.
+The pipeline combined Gemini with search and image tools, extensive instructions, and post-processing; generation often took one to two minutes and was excluded from the ratings.
+The study therefore measures preference in that setup, not task success, correctness, accessibility, security, maintainability, or production readiness :citep[leviathan2026generativeui].
+
+### Descriptor boundary audit
+
+Create one small event-summary data fixture and keep it unchanged.
+First define the prop schema and payload for one fixed summary component.
+Then define minimal prop schemas for an approved registry such as `metric`, `eventList`, and `button`, plus a small action allowlist, and express the same fixture as a declarative descriptor.
+Define where and how the system rejects an unknown component, raw HTML or script, an unregistered action, a control without an accessible name, and excessive nesting.
+For each rejection, state the enforcing layer, error, and test, and use the fixed read-only summary as the fallback.
+Finally, identify the additional containment and evidence that would be required before the application could execute model-generated code.
+
+The descriptor schema and action vocabulary are API contracts.
+The next section examines what follows once such contracts cross client and server boundaries.
+
 ## API design as architecture
 
 APIs are not merely endpoint collections.
