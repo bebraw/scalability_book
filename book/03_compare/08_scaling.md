@@ -192,6 +192,25 @@ Design questions:
 
 [NATS](https://nats.io/) makes one version of this trade-off concrete: Core NATS provides ephemeral publish-subscribe communication, while JetStream adds stored, replayable streams.
 
+### Durable execution preserves coordination progress
+
+A queue can preserve a pending work item, but an asynchronous multi-step operation that must survive process failure also needs durable coordination state.
+An explicit application state machine can store each transition and its current state in a database.
+A replay-based workflow engine instead persists scheduling decisions and task results, then reconstructs logical control state by replaying deterministic orchestration code against that history.
+In the replay-based design, calls to databases, APIs, models, and tools sit behind external-work boundaries; replay reuses results that reached workflow history rather than issuing those calls again :citep[burckhardt2021durablefunctions].
+
+Durable orchestration does not guarantee exactly-once external effects.
+Suppose the worker sends a subscriber webhook for event `E42`, the receiver accepts it, and the worker crashes before recording completion.
+A timeout and retry may send the webhook again.
+Temporal documents this boundary explicitly for Activities: an Activity may be retried and should therefore tolerate repeated execution, and a stable business idempotency key enforced by the called service is one way to make a non-idempotent effect safe to repeat :citep[temporal2026activitydefinition].
+The caller must reuse that key across attempts, and the called service must apply the effect and record the key atomically.
+If no component at the effect boundary can deduplicate, duplicate delivery remains possible; compensation or manual repair may be the honest recovery path.
+
+For the event project, the event store remains authoritative for domain events, while state-machine state or workflow history records coordination progress.
+Bound total retry time and resource cost, classify permanent errors, and expose terminal states.
+Cancellation is a request to stop: it may not preempt an in-flight external effect and does not by itself undo one that already completed.
+Every approach adds durable state and operational ownership; replay-based engines also require replay-compatible code evolution and management of history growth and retention.
+
 ## Latency and geography
 
 Ideas to develop:
@@ -285,3 +304,6 @@ The comparison should apply the same pressure set to implementations A, B, and C
 It should include one formal model applied to an application decision and one applied to the development workflow.
 Each row in the target design's trade-off table should name a pressure, the limit being approached, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, at least one prepared recovery action, and the reason a simpler alternative was not enough.
 It should also state where the technique displaced complexity, such as into clients, data freshness, background operations, routing, migration, or incident response.
+If the target design contains asynchronous multi-step work that can perform an external side effect, include one crash-after-side-effect audit.
+Record the last durable coordination fact, the external effect that may already have occurred, the timeout and retry rule, the retry-safety or deduplication mechanism and its owner, any stable key it uses, the terminal-state behavior, and the evidence available to an operator.
+If no component at the effect boundary can deduplicate, state that duplicate delivery remains possible.
