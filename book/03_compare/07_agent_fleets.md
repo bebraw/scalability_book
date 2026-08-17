@@ -119,6 +119,16 @@ When computing cost per accepted outcome, include spend from every attempt in th
 
 For the B–C comparison, keep any gateway pinned to the declared base model where possible; otherwise record the model actually used and treat substitution as a confounding factor.
 
+### Fleet trace debugger
+
+The forensic packet below separates orchestration outcomes, gateway decisions, and physical provider or resource records.
+Map every physical row to a delegated run or leave it unmatched, then reconcile the packet without counting the same attempt once per log source.
+
+{{ import "site/includes/fleet-trace-debugger.html" }}
+
+The packet is synthetic and deterministic.
+It rehearses evidence joins, accounting, bypass detection, and late-effect reasoning; it does not estimate the reliability or cost of a particular fleet platform.
+
 ## Fleet throughput and cost
 
 An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step.

@@ -189,6 +189,12 @@ const demoScriptIncludes = [
     script: "/pressure-map-demo.js",
   },
   {
+    title: "Fleet trace debugger",
+    chapter: "Agent fleets",
+    include: "site/includes/fleet-trace-debugger.html",
+    script: "/fleet-trace-debugger.js",
+  },
+  {
     title: "Agent fleet delegation",
     chapter: "Agent fleets",
     include: "site/includes/agent-fleet-demo.html",
@@ -530,6 +536,10 @@ await compileSiteScript(
   "friction-audit-demo.js",
 );
 await compileSiteScript("scripts/pressure-map-demo.ts", "pressure-map-demo.js");
+await compileSiteScript(
+  "scripts/fleet-trace-debugger.ts",
+  "fleet-trace-debugger.js",
+);
 await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
 await compileSiteScript(
   "scripts/scaling-pressure-demo.ts",

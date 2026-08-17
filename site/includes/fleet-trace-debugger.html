@@ -1,0 +1,261 @@
+<section
+  id="demo-fleet-trace-debugger"
+  data-demo-anchor
+  class="fleet-trace-lab"
+  data-fleet-trace
+  aria-labelledby="fleet-trace-heading"
+>
+  <header class="fleet-trace-header">
+    <div>
+      <p class="fleet-trace-kicker">Compare forensic lab</p>
+      <h3 id="fleet-trace-heading">Reconcile what the fleet actually used</h3>
+    </div>
+    <div class="fleet-trace-summary" aria-live="polite">
+      <span data-fleet-trace-verdict>0 of 5 ledger rows assigned</span>
+      <small data-fleet-trace-summary>
+        Intent, mediation, and physical use are separate evidence streams.
+      </small>
+    </div>
+  </header>
+
+  <form class="fleet-trace-form" data-fleet-trace-form>
+    <section
+      class="fleet-trace-packet"
+      aria-labelledby="fleet-trace-packet-heading"
+    >
+      <div class="fleet-trace-section-heading">
+        <span aria-hidden="true">01</span>
+        <div>
+          <h4 id="fleet-trace-packet-heading">Inspect the fixed packet</h4>
+          <p>
+            Compare orchestration intent with gateway decisions before touching
+            the physical ledger.
+          </p>
+        </div>
+        <div class="fleet-trace-packet-stamp">
+          <span>Packet</span>
+          <code>FLT-17A</code>
+          <small>Gateway export complete</small>
+        </div>
+      </div>
+
+      <div class="fleet-trace-run-strip" aria-label="Delegated run outcomes">
+        <article>
+          <span>R41</span>
+          <div>
+            <strong>Patch event filter</strong>
+            <small><code>tr-41</code> · outcome accepted</small>
+          </div>
+          <em class="is-accepted">Accepted</em>
+        </article>
+        <article>
+          <span>R42</span>
+          <div>
+            <strong>Publish audit notice</strong>
+            <small><code>tr-42</code> · outcome cancelled</small>
+          </div>
+          <em class="is-cancelled">Cancelled</em>
+        </article>
+      </div>
+
+      <div class="fleet-trace-source-grid">
+        <section
+          class="fleet-trace-source fleet-trace-orchestration"
+          aria-labelledby="fleet-trace-orchestration-heading"
+        >
+          <header>
+            <span>ORCH</span>
+            <div>
+              <h5 id="fleet-trace-orchestration-heading">Orchestration log</h5>
+              <small>Run intent and outcomes</small>
+            </div>
+          </header>
+          <div class="fleet-trace-table-wrap" tabindex="0">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Run</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Evidence</th>
+                </tr>
+              </thead>
+              <tbody data-fleet-trace-orchestration></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          class="fleet-trace-source fleet-trace-gateway"
+          aria-labelledby="fleet-trace-gateway-heading"
+        >
+          <header>
+            <span>GATE</span>
+            <div>
+              <h5 id="fleet-trace-gateway-heading">Gateway log</h5>
+              <small>Selected route and policy result · complete export</small>
+            </div>
+          </header>
+          <div class="fleet-trace-table-wrap" tabindex="0">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Request</th>
+                  <th scope="col">Run / trace</th>
+                  <th scope="col">Selected resource</th>
+                  <th scope="col">Policy</th>
+                </tr>
+              </thead>
+              <tbody data-fleet-trace-gateway></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section
+      class="fleet-trace-mapping"
+      aria-labelledby="fleet-trace-mapping-heading"
+    >
+      <div class="fleet-trace-section-heading">
+        <span aria-hidden="true">02</span>
+        <div>
+          <h4 id="fleet-trace-mapping-heading">Attribute every physical row</h4>
+          <p>
+            Map each provider or resource record to <code>R41</code>,
+            <code>R42</code>, or <code>unmatched</code>. Do not infer a run
+            where the linking evidence is absent.
+          </p>
+        </div>
+        <output data-fleet-trace-progress>0 / 5 mapped</output>
+      </div>
+
+      <div class="fleet-trace-physical-label">
+        <span>PHY</span>
+        <div>
+          <strong>Provider and resource ledger</strong>
+          <small>Authoritative provider spend and tool-effect records</small>
+        </div>
+      </div>
+
+      <div
+        class="fleet-trace-table-wrap fleet-trace-physical-wrap"
+        tabindex="0"
+      >
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Row</th>
+              <th scope="col">Time</th>
+              <th scope="col">Physical operation</th>
+              <th scope="col">Linking evidence</th>
+              <th scope="col">Result</th>
+              <th scope="col">Cost</th>
+              <th scope="col">Map to</th>
+              <th scope="col">Reconciliation</th>
+            </tr>
+          </thead>
+          <tbody data-fleet-trace-physical></tbody>
+        </table>
+      </div>
+
+      <div class="fleet-trace-actions">
+        <p data-fleet-trace-guidance>
+          Assign every row before reconciling the packet.
+        </p>
+        <div>
+          <button type="button" data-fleet-trace-reset>Reset mappings</button>
+          <button type="button" data-fleet-trace-reconcile disabled>
+            Reconcile packet
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="fleet-trace-results"
+      data-fleet-trace-results
+      aria-labelledby="fleet-trace-results-heading"
+      hidden
+    >
+      <div class="fleet-trace-section-heading">
+        <span aria-hidden="true">03</span>
+        <div>
+          <h4 id="fleet-trace-results-heading">Reconciled control record</h4>
+          <p>
+            Each physical row is counted once, including failed, cancelled, and
+            unmatched work.
+          </p>
+        </div>
+        <strong class="fleet-trace-seal">5 / 5 accounted</strong>
+      </div>
+
+      <dl class="fleet-trace-metrics" aria-label="Reconciled fleet metrics">
+        <div>
+          <dt>Physical rows</dt>
+          <dd data-fleet-trace-metric="rows">5</dd>
+        </div>
+        <div>
+          <dt>Accepted runs</dt>
+          <dd data-fleet-trace-metric="accepted">1</dd>
+        </div>
+        <div>
+          <dt>Fixed-cohort cost</dt>
+          <dd data-fleet-trace-metric="cost">0.00 EUR</dd>
+        </div>
+        <div>
+          <dt>Cost / accepted run</dt>
+          <dd data-fleet-trace-metric="cost-per-accepted">0.00 EUR</dd>
+        </div>
+      </dl>
+
+      <div class="fleet-trace-result-grid">
+        <section
+          class="fleet-trace-rollup"
+          aria-labelledby="fleet-trace-rollup-heading"
+        >
+          <h5 id="fleet-trace-rollup-heading">Run and route rollup</h5>
+          <div class="fleet-trace-table-wrap" tabindex="0">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Attribution</th>
+                  <th scope="col">Outcome</th>
+                  <th scope="col">Rows</th>
+                  <th scope="col">Selected route / policy</th>
+                  <th scope="col">Cost</th>
+                </tr>
+              </thead>
+              <tbody data-fleet-trace-rollup></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          class="fleet-trace-findings"
+          aria-labelledby="fleet-trace-findings-heading"
+        >
+          <h5 id="fleet-trace-findings-heading">Consequential findings</h5>
+          <ol data-fleet-trace-findings></ol>
+        </section>
+      </div>
+
+      <details class="fleet-trace-artifact">
+        <summary>Export the reconciliation record</summary>
+        <div>
+          <p>
+            The record preserves mappings, route and policy provenance, all
+            costs in the packet, and the denominator used for the result.
+          </p>
+          <button type="button" data-fleet-trace-copy>Copy record</button>
+          <textarea
+            rows="18"
+            readonly
+            aria-label="Fleet trace reconciliation record"
+            data-fleet-trace-artifact
+          ></textarea>
+        </div>
+      </details>
+    </section>
+  </form>
+</section>
