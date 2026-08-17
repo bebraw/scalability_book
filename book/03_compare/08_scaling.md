@@ -211,6 +211,16 @@ Bound total retry time and resource cost, classify permanent errors, and expose 
 Cancellation is a request to stop: it may not preempt an in-flight external effect and does not by itself undo one that already completed.
 Every approach adds durable state and operational ownership; replay-based engines also require replay-compatible code evolution and management of history growth and retention.
 
+### Durable effect retry lab
+
+The lab below stops a worker after a webhook receiver applies its effect but before the workflow records completion.
+Predict the outcome, inject the crash, then compare retry keys and receiver enforcement while keeping the logical command, physical attempts, outbound calls, effects, and durable completions separate.
+
+{{ import "site/includes/durable-retry-demo.html" }}
+
+The simulation holds the failure point constant.
+It demonstrates how one bounded retry contract behaves; it does not establish that every receiver, workflow engine, or external operation exposes the same enforcement boundary.
+
 ## Latency and geography
 
 Ideas to develop:

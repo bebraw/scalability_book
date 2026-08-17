@@ -225,6 +225,12 @@ const demoScriptIncludes = [
     script: "/orchestration-demo-loader.js",
   },
   {
+    title: "Durable effect retry lab",
+    chapter: "Scaling",
+    include: "site/includes/durable-retry-demo.html",
+    script: "/durable-retry-demo.js",
+  },
+  {
     title: "Latency budget map",
     chapter: "Scaling",
     include: "site/includes/latency-budget-demo.html",
@@ -541,6 +547,10 @@ await compileSiteBundle(
 await compileSiteScript(
   "scripts/orchestration-demo-loader.ts",
   "orchestration-demo-loader.js",
+);
+await compileSiteScript(
+  "scripts/durable-retry-demo.ts",
+  "durable-retry-demo.js",
 );
 await compileSiteScript(
   "scripts/latency-budget-demo.ts",

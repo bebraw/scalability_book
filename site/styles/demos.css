@@ -10794,3 +10794,752 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Durable retry failure-window lab */
+.durable-retry-lab {
+  --durable-retry-line: color-mix(in srgb, var(--border) 72%, var(--text) 28%);
+  --durable-retry-soft: color-mix(in srgb, var(--panel) 86%, var(--accent) 14%);
+  --durable-retry-fault: var(--danger);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--panel) 96%, var(--accent) 4%),
+      var(--panel) 68%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 2.45rem,
+      color-mix(in srgb, var(--border) 42%, transparent) 2.5rem
+    );
+  border: 1px solid var(--durable-retry-line);
+  box-shadow: 0.7rem 0.7rem 0 color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+  margin: 2rem 0;
+  max-width: 76rem;
+}
+
+.durable-retry-lab,
+.durable-retry-lab * {
+  box-sizing: border-box;
+  font-family: var(--font-ui);
+}
+
+.durable-retry-header {
+  align-items: stretch;
+  background: color-mix(in srgb, var(--text) 94%, var(--panel));
+  color: var(--panel);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 22rem);
+}
+
+.durable-retry-header > div:first-child {
+  padding: clamp(1rem, 2.5vw, 1.65rem);
+}
+
+.prose .durable-retry-kicker {
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.45rem;
+  max-width: none;
+  text-transform: uppercase;
+}
+
+.prose .durable-retry-header h3 {
+  color: inherit;
+  font-family: var(--font-serif);
+  font-size: clamp(1.55rem, 2vw + 0.8rem, 2.45rem);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin: 0;
+  max-width: 23ch;
+}
+
+.durable-retry-summary {
+  align-content: center;
+  background: var(--accent-strong);
+  border-inline-start: 1px solid
+    color-mix(in srgb, var(--panel) 32%, transparent);
+  color: color-mix(in srgb, var(--text) 92%, black);
+  display: grid;
+  gap: 0.38rem;
+  padding: 1rem 1.25rem;
+  color: var(--bg);
+}
+
+.durable-retry-summary span {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.durable-retry-summary small {
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.durable-retry-form {
+  display: grid;
+  gap: 1px;
+}
+
+.durable-retry-workbench {
+  background: var(--durable-retry-line);
+  display: grid;
+  gap: 1px;
+  grid-template-columns: minmax(18rem, 0.78fr) minmax(28rem, 1.22fr);
+}
+
+.durable-retry-panel {
+  background: color-mix(in srgb, var(--panel) 96%, var(--bg));
+  padding: clamp(1rem, 2vw, 1.4rem);
+}
+
+.durable-retry-section-heading,
+.durable-retry-ledger > header {
+  align-items: start;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 2rem minmax(0, 1fr);
+}
+
+.durable-retry-section-heading > span,
+.durable-retry-ledger > header > span {
+  align-items: center;
+  background: var(--text);
+  color: var(--panel);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 900;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.prose .durable-retry-section-heading h4,
+.prose .durable-retry-ledger h4,
+.prose .durable-retry-artifact h4 {
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  line-height: 1.18;
+  margin: 0;
+  max-width: none;
+}
+
+.prose .durable-retry-section-heading p,
+.prose .durable-retry-ledger header p,
+.prose .durable-retry-artifact p {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.42;
+  margin: 0.18rem 0 0;
+  max-width: none;
+}
+
+.durable-retry-control-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-start: 1.15rem;
+}
+
+.durable-retry-control-grid label {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.durable-retry-control-grid label > span,
+.durable-retry-prediction legend {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.durable-retry-control-grid select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--text) 50%)
+      calc(100% - 0.95rem) 50% / 0.35rem 0.35rem no-repeat,
+    linear-gradient(135deg, var(--text) 50%, transparent 50%)
+      calc(100% - 0.7rem) 50% / 0.35rem 0.35rem no-repeat,
+    var(--bg);
+  border: 1px solid var(--durable-retry-line);
+  border-radius: 0;
+  color: var(--text);
+  font-size: 0.78rem;
+  min-block-size: 2.65rem;
+  padding: 0.62rem 2rem 0.62rem 0.72rem;
+  width: 100%;
+}
+
+.durable-retry-control-grid select:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.durable-retry-prediction {
+  border: 0;
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1.1rem 0 0;
+  min-width: 0;
+  padding: 1rem 0 0;
+}
+
+.durable-retry-prediction legend {
+  margin-block-end: 0.55rem;
+  padding: 0;
+}
+
+.durable-retry-prediction label {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: auto 1fr;
+  min-block-size: 2.75rem;
+  padding: 0.55rem 0.65rem;
+}
+
+.durable-retry-prediction label:has(input:checked) {
+  background: var(--durable-retry-soft);
+  border-color: var(--accent-strong);
+  box-shadow: inset 0.22rem 0 var(--accent-strong);
+}
+
+.durable-retry-prediction input {
+  accent-color: var(--accent-strong);
+  height: 1rem;
+  margin: 0;
+  width: 1rem;
+}
+
+.durable-retry-prediction span {
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
+.durable-retry-actions {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr 1fr auto;
+  margin-block-start: 1rem;
+}
+
+.durable-retry-actions button,
+.durable-retry-artifact button {
+  align-items: center;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  border-radius: 0;
+  color: var(--panel);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 850;
+  gap: 0.48rem;
+  justify-content: center;
+  letter-spacing: 0.025em;
+  line-height: 1.2;
+  min-block-size: 2.75rem;
+  padding: 0.62rem 0.72rem;
+  text-transform: uppercase;
+}
+
+.durable-retry-actions button > span {
+  align-items: center;
+  border: 1px solid currentColor;
+  display: inline-flex;
+  height: 1.15rem;
+  justify-content: center;
+  width: 1.15rem;
+}
+
+.durable-retry-actions button:disabled {
+  background: color-mix(in srgb, var(--border) 65%, var(--panel));
+  border-color: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.durable-retry-actions .durable-retry-reset {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.durable-retry-rail {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+  margin: 1.15rem 0 0;
+  padding: 0;
+}
+
+.durable-retry-rail li {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-inline-start: -1px;
+  min-height: 6.5rem;
+  padding: 0.7rem;
+  position: relative;
+}
+
+.durable-retry-rail li:first-child {
+  margin-inline-start: 0;
+}
+
+.durable-retry-rail li > span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.durable-retry-rail li > div {
+  align-content: start;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.durable-retry-rail strong {
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.durable-retry-rail small {
+  color: var(--muted);
+  font-size: 0.64rem;
+  line-height: 1.35;
+}
+
+.durable-retry-rail li.is-complete {
+  background: color-mix(in srgb, var(--success) 9%, var(--panel));
+  border-color: color-mix(in srgb, var(--success) 58%, var(--border));
+  box-shadow: inset 0 -0.2rem var(--success);
+  z-index: 1;
+}
+
+.durable-retry-rail li.is-current {
+  border-color: var(--accent-strong);
+  box-shadow: inset 0 -0.24rem var(--accent-strong);
+  z-index: 2;
+}
+
+.durable-retry-rail li.is-failed,
+.durable-retry-rail .durable-retry-fault.is-current {
+  background: color-mix(in srgb, var(--danger) 10%, var(--panel));
+  border-color: var(--danger);
+  box-shadow: inset 0 -0.24rem var(--danger);
+}
+
+.durable-retry-rail li.is-muted {
+  opacity: 0.56;
+}
+
+.durable-retry-fault-note {
+  align-items: start;
+  background: color-mix(in srgb, var(--danger) 7%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--danger) 48%, var(--border));
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: minmax(8rem, auto) minmax(0, 1fr);
+  margin-block-start: 1rem;
+  padding: 0.75rem;
+}
+
+.durable-retry-fault-note > span {
+  color: var(--danger);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.prose .durable-retry-fault-note p {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: none;
+}
+
+.durable-retry-fault-note code,
+.durable-retry-ledger code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.08rem 0.22rem;
+}
+
+.durable-retry-metrics {
+  background: var(--durable-retry-line);
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 0;
+}
+
+.durable-retry-metrics > div {
+  background: var(--text);
+  color: var(--panel);
+  display: grid;
+  gap: 0.28rem;
+  min-height: 5.3rem;
+  padding: 0.78rem 0.9rem;
+}
+
+.durable-retry-metrics dt {
+  color: color-mix(in srgb, var(--panel) 72%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.durable-retry-metrics dd {
+  align-self: end;
+  font-family: var(--font-mono);
+  font-size: clamp(1.2rem, 1.4vw, 1.55rem);
+  font-weight: 900;
+  line-height: 1;
+  margin: 0;
+}
+
+.durable-retry-ledgers {
+  background: var(--durable-retry-line);
+  display: grid;
+  gap: 1px;
+  grid-template-columns: minmax(13rem, 0.74fr) minmax(19rem, 1fr) minmax(
+      22rem,
+      1.26fr
+    );
+}
+
+.durable-retry-ledger {
+  background: var(--panel);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.durable-retry-ledger > header > span {
+  background: var(--accent-strong);
+}
+
+.durable-retry-app-state > dl {
+  display: grid;
+  gap: 0;
+  margin: 1rem 0 0;
+}
+
+.durable-retry-app-state > dl > div {
+  border-block-start: 1px solid var(--border);
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.62rem 0;
+}
+
+.durable-retry-app-state dt {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.durable-retry-app-state dd {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.durable-retry-table-wrap {
+  margin-block-start: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.durable-retry-table-wrap:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 0.18rem;
+}
+
+.durable-retry-ledger table {
+  border-collapse: collapse;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  margin: 0;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+.durable-retry-history table {
+  min-width: 25rem;
+}
+
+.durable-retry-receiver table {
+  min-width: 34rem;
+}
+
+.durable-retry-ledger th,
+.durable-retry-ledger td {
+  border: 1px solid var(--border);
+  padding: 0.48rem 0.52rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.durable-retry-ledger th {
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.durable-retry-ledger td:first-child {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.durable-retry-ledger tr.is-empty td {
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.durable-retry-ledger .is-applied,
+.durable-retry-ledger .is-replayed {
+  border-inline-start: 0.18rem solid var(--warning);
+  display: inline-block;
+  padding-inline-start: 0.4rem;
+  white-space: nowrap;
+}
+
+.durable-retry-ledger .is-replayed {
+  border-inline-start-color: var(--success);
+  color: var(--success);
+}
+
+.durable-retry-result {
+  align-items: center;
+  background: var(--durable-retry-soft);
+  border-block: 1px solid var(--durable-retry-line);
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  padding: 1rem;
+}
+
+.durable-retry-result-mark {
+  align-items: center;
+  background: var(--text);
+  color: var(--panel);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 900;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.durable-retry-result > div:last-child {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.durable-retry-result [data-durable-retry-result-label] {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.prose .durable-retry-result p {
+  font-size: 0.76rem;
+  line-height: 1.48;
+  margin: 0;
+  max-width: 76ch;
+}
+
+.durable-retry-result.is-success {
+  background: color-mix(in srgb, var(--success) 10%, var(--panel));
+  border-color: var(--success);
+}
+
+.durable-retry-result.is-success .durable-retry-result-mark {
+  background: var(--success);
+}
+
+.durable-retry-result.is-warning {
+  background: color-mix(in srgb, var(--warning) 10%, var(--panel));
+  border-color: var(--warning);
+}
+
+.durable-retry-result.is-warning .durable-retry-result-mark {
+  background: var(--warning);
+}
+
+.durable-retry-result.is-failure {
+  background: color-mix(in srgb, var(--danger) 9%, var(--panel));
+  border-color: var(--danger);
+}
+
+.durable-retry-result.is-failure .durable-retry-result-mark {
+  background: var(--danger);
+}
+
+.durable-retry-artifact {
+  background: var(--panel);
+  border-block-end: 1px solid var(--durable-retry-line);
+}
+
+.durable-retry-artifact > summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  padding: 0.9rem 1rem;
+  text-transform: uppercase;
+}
+
+.durable-retry-artifact[open] > summary {
+  border-block-end: 1px solid var(--border);
+}
+
+.durable-retry-artifact-body {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 1rem;
+}
+
+.durable-retry-artifact button {
+  align-self: start;
+}
+
+.durable-retry-artifact textarea {
+  background: color-mix(in srgb, var(--text) 94%, var(--panel));
+  border: 1px solid var(--text);
+  border-radius: 0;
+  color: var(--panel);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  grid-column: 1 / -1;
+  line-height: 1.5;
+  min-height: 15rem;
+  padding: 0.85rem;
+  resize: vertical;
+  width: 100%;
+}
+
+@media (max-width: 68rem) {
+  .durable-retry-ledgers {
+    grid-template-columns: minmax(14rem, 0.7fr) minmax(24rem, 1.3fr);
+  }
+
+  .durable-retry-receiver {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 56rem) {
+  .durable-retry-workbench,
+  .durable-retry-header {
+    grid-template-columns: 1fr;
+  }
+
+  .durable-retry-summary {
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--panel) 32%, transparent);
+    border-inline-start: 0;
+  }
+
+  .durable-retry-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .durable-retry-metrics > div:nth-child(n + 4) {
+    min-height: 4.6rem;
+  }
+}
+
+@media (max-width: 44rem) {
+  .durable-retry-lab {
+    box-shadow: none;
+  }
+
+  .durable-retry-ledgers {
+    grid-template-columns: 1fr;
+  }
+
+  .durable-retry-receiver {
+    grid-column: auto;
+  }
+
+  .durable-retry-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .durable-retry-rail li {
+    margin-block-start: -1px;
+    margin-inline-start: 0;
+    min-height: auto;
+  }
+
+  .durable-retry-rail li:first-child {
+    margin-block-start: 0;
+  }
+
+  .durable-retry-actions,
+  .durable-retry-artifact-body {
+    grid-template-columns: 1fr;
+  }
+
+  .durable-retry-artifact textarea {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 31rem) {
+  .durable-retry-prediction,
+  .durable-retry-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .durable-retry-fault-note {
+    grid-template-columns: 1fr;
+  }
+}

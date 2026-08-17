@@ -1,0 +1,311 @@
+<section
+  id="demo-durable-effect-retry-lab"
+  data-demo-anchor
+  class="durable-retry-lab"
+  data-durable-retry
+  aria-labelledby="durable-retry-heading"
+>
+  <header class="durable-retry-header">
+    <div>
+      <p class="durable-retry-kicker">Scaling failure lab</p>
+      <h3 id="durable-retry-heading">Crash between effect and checkpoint</h3>
+    </div>
+    <div class="durable-retry-summary" aria-live="polite">
+      <span data-durable-retry-verdict>Predict the recovery outcome</span>
+      <small data-durable-retry-summary>
+        One command can produce more than one physical attempt.
+      </small>
+    </div>
+  </header>
+
+  <form class="durable-retry-form" data-durable-retry-form>
+    <div class="durable-retry-workbench">
+      <section
+        class="durable-retry-panel durable-retry-controls"
+        aria-labelledby="durable-retry-controls-heading"
+      >
+        <div class="durable-retry-section-heading">
+          <span aria-hidden="true">01</span>
+          <div>
+            <h4 id="durable-retry-controls-heading">Set the retry contract</h4>
+            <p>Choose the facts that survive the worker.</p>
+          </div>
+        </div>
+
+        <div class="durable-retry-control-grid">
+          <label>
+            <span>Retry after timeout</span>
+            <select data-durable-retry-policy>
+              <option value="retry" selected>Retry the activity</option>
+              <option value="stop">Stop after the timeout</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Key on retry</span>
+            <select data-durable-retry-key-mode>
+              <option value="stable" selected>Reuse the business key</option>
+              <option value="fresh">Generate a fresh attempt key</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Webhook receiver</span>
+            <select data-durable-retry-dedupe>
+              <option value="none" selected>No deduplication</option>
+              <option value="atomic">Atomic key + effect record</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="durable-retry-prediction">
+          <legend>After recovery, how many webhook effects exist?</legend>
+          <label>
+            <input
+              type="radio"
+              name="durable-retry-prediction"
+              value="1"
+              data-durable-retry-prediction
+            />
+            <span>One effect</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="durable-retry-prediction"
+              value="2"
+              data-durable-retry-prediction
+            />
+            <span>Two effects</span>
+          </label>
+        </fieldset>
+
+        <div class="durable-retry-actions">
+          <button type="button" data-durable-retry-crash>
+            <span>1</span>
+            Send, then crash
+          </button>
+          <button type="button" data-durable-retry-recover disabled>
+            <span>2</span>
+            Recover workflow
+          </button>
+          <button
+            type="button"
+            class="durable-retry-reset"
+            data-durable-retry-reset
+          >
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <section
+        class="durable-retry-panel durable-retry-sequence"
+        aria-labelledby="durable-retry-sequence-heading"
+      >
+        <div class="durable-retry-section-heading">
+          <span aria-hidden="true">02</span>
+          <div>
+            <h4 id="durable-retry-sequence-heading">
+              Follow the failure window
+            </h4>
+            <p>The fault sits outside the durable history boundary.</p>
+          </div>
+        </div>
+
+        <ol class="durable-retry-rail" aria-label="Delivery sequence">
+          <li data-durable-retry-stage="schedule">
+            <span>01</span>
+            <div>
+              <strong>Schedule</strong>
+              <small>History records attempt 1</small>
+            </div>
+          </li>
+          <li data-durable-retry-stage="send">
+            <span>02</span>
+            <div>
+              <strong>Send</strong>
+              <small>Worker calls the receiver</small>
+            </div>
+          </li>
+          <li data-durable-retry-stage="effect">
+            <span>03</span>
+            <div>
+              <strong>Apply</strong>
+              <small>Receiver commits the effect</small>
+            </div>
+          </li>
+          <li class="durable-retry-fault" data-durable-retry-stage="fault">
+            <span>!</span>
+            <div>
+              <strong>Crash seam</strong>
+              <small>Completion never reaches history</small>
+            </div>
+          </li>
+          <li data-durable-retry-stage="recover">
+            <span>04</span>
+            <div>
+              <strong>Recover</strong>
+              <small>Replay sees incomplete work</small>
+            </div>
+          </li>
+        </ol>
+
+        <div class="durable-retry-fault-note" data-durable-retry-fault-note>
+          <span>Failure injector armed</span>
+          <p>
+            The first worker will stop after the receiver replies and before
+            <code>ActivityCompleted</code> is stored.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <dl class="durable-retry-metrics" aria-label="Scenario totals">
+      <div>
+        <dt>Logical commands</dt>
+        <dd data-durable-retry-metric="commands">0</dd>
+      </div>
+      <div>
+        <dt>Activity attempts</dt>
+        <dd data-durable-retry-metric="attempts">0</dd>
+      </div>
+      <div>
+        <dt>Outbound calls</dt>
+        <dd data-durable-retry-metric="calls">0</dd>
+      </div>
+      <div>
+        <dt>Webhook effects</dt>
+        <dd data-durable-retry-metric="effects">0</dd>
+      </div>
+      <div>
+        <dt>Durable completions</dt>
+        <dd data-durable-retry-metric="completion">0</dd>
+      </div>
+    </dl>
+
+    <div class="durable-retry-ledgers">
+      <section
+        class="durable-retry-ledger durable-retry-app-state"
+        aria-labelledby="durable-retry-app-state-heading"
+      >
+        <header>
+          <span aria-hidden="true">A</span>
+          <div>
+            <h4 id="durable-retry-app-state-heading">
+              Authoritative application state
+            </h4>
+            <p>The domain fact and requested delivery.</p>
+          </div>
+        </header>
+        <dl>
+          <div>
+            <dt>Event</dt>
+            <dd><code>E42</code> · stored</dd>
+          </div>
+          <div>
+            <dt>Command</dt>
+            <dd><code>deliver:E42:subscriber-7</code></dd>
+          </div>
+          <div>
+            <dt>Delivery state</dt>
+            <dd data-durable-retry-app-status>Ready</dd>
+          </div>
+          <div>
+            <dt>Last durable fact</dt>
+            <dd data-durable-retry-last-fact>None</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        class="durable-retry-ledger durable-retry-history"
+        aria-labelledby="durable-retry-history-heading"
+      >
+        <header>
+          <span aria-hidden="true">H</span>
+          <div>
+            <h4 id="durable-retry-history-heading">Workflow history</h4>
+            <p>Only durable orchestration facts appear here.</p>
+          </div>
+        </header>
+        <div class="durable-retry-table-wrap" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Seq</th>
+                <th scope="col">History event</th>
+                <th scope="col">Replay knows</th>
+              </tr>
+            </thead>
+            <tbody data-durable-retry-history>
+              <tr class="is-empty">
+                <td colspan="3">Run the first attempt to create history.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        class="durable-retry-ledger durable-retry-receiver"
+        aria-labelledby="durable-retry-receiver-heading"
+      >
+        <header>
+          <span aria-hidden="true">R</span>
+          <div>
+            <h4 id="durable-retry-receiver-heading">Webhook receiver ledger</h4>
+            <p>Attempts and externally visible effects.</p>
+          </div>
+        </header>
+        <div class="durable-retry-table-wrap" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Try</th>
+                <th scope="col">Idempotency key</th>
+                <th scope="col">Receiver reply</th>
+                <th scope="col">Effect</th>
+              </tr>
+            </thead>
+            <tbody data-durable-retry-receiver-ledger>
+              <tr class="is-empty">
+                <td colspan="4">No webhook attempts yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="durable-retry-result" aria-live="polite">
+      <div class="durable-retry-result-mark" aria-hidden="true">?</div>
+      <div>
+        <span data-durable-retry-result-label>Awaiting experiment</span>
+        <p data-durable-retry-result>
+          Make a prediction, then stop the worker inside the failure window.
+        </p>
+      </div>
+    </section>
+
+    <details class="durable-retry-artifact">
+      <summary>Export the evidence record</summary>
+      <div class="durable-retry-artifact-body">
+        <div>
+          <h4>Failure-window record</h4>
+          <p>
+            Preserve the configuration and all four counts instead of reporting
+            only the final workflow status.
+          </p>
+        </div>
+        <button type="button" data-durable-retry-copy>Copy record</button>
+        <textarea
+          rows="13"
+          readonly
+          aria-label="Durable retry evidence record"
+          data-durable-retry-artifact
+        ></textarea>
+      </div>
+    </details>
+  </form>
+</section>
