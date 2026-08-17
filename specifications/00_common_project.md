@@ -323,7 +323,7 @@ Submit the same evidence categories after every phase:
 - implementation identifier and commit;
 - language, framework, storage, and deployment approach;
 - model names and versions where available;
-- agent tool and relevant configuration;
+- agent tool and relevant configuration, including the source, resolved revision or content digest, and update policy of any imported skill, plugin, or instruction bundle that materially affected the workflow; when neither a revision nor a digest is exposed, record the retrieval date and observed update behavior;
 - orchestration configuration, if any;
 - local hardware or hosted environment details relevant to the result.
 
