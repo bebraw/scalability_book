@@ -70,6 +70,15 @@ A discovery map should not silently become the specification, and an agent trans
 The fleet plan should tell each role where its output belongs and who may promote temporary findings into durable project memory.
 This reduces the chance that parallel agents act on different generations of the same decision.
 
+Retrieval should assemble candidate evidence, not create a second authority.
+Cerebras describes an internal knowledge base that keeps authoring in source-native systems, normalizes Slack, code, documents, and custom sources into a shared evidence schema, and constructs query context with scoped lexical and semantic retrieval, recency, rank fusion, reranking, and surrounding-context restoration.
+Its MCP interface exposes narrow retrieval primitives while leaving tool selection and synthesis to the client :citep[tai2026knowledge].
+This is a vendor-authored implementation case: the reported volume of more than 15,000 daily questions after three months indicates use, but the article provides neither controlled component ablations nor a complete answer-quality evaluation.
+
+For a fleet, return attributed evidence and keep governing records and acceptance checks outside synthesized answers.
+Preserve source identity, retrieval time, freshness, project scope, and permission context; surface conflicts; verify consequential claims; and promote only reviewed decisions into plans, specifications, or decision records.
+A fluent multi-source answer remains a derived view, not the authority it summarizes.
+
 Repeatable agent workflows can also be stored as small, named project skills rather than one continually growing instruction file.
 A review skill, debugging skill, or release skill can define its trigger, evidence, boundaries, and output contract.
 Keep only workflows the project actually uses, make explicit or destructive workflows opt-in, and preserve one obvious source of truth when the same instructions must be distributed to multiple tools.
