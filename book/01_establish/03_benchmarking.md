@@ -82,6 +82,13 @@ Others require a rubric or human judgment.
 When a model acts as a judge, test whether answer order, verbosity, confidence, or the judge's own style changes its scores; LLM judges have documented position and self-enhancement biases :citep[zheng2023mtbench].
 Keep a small human-reviewed calibration set and report disagreement rather than treating the judge as ground truth.
 
+:citet[falck2026training] offer a useful case in which evaluation becomes supervision.
+Their Replica setup trains a 27B agent on 242 figure-replication tasks using auto-generated per-task rubrics, three judge samples, and turn-level credit assignment, then scores it on 68 held-out AI-for-science tasks.
+The rubric judge was more repeatable than a generic judge in the paper's repeated-sampling analysis.
+In a blinded study of ten training tasks selected because the judges disagreed, its Kendall rank correlation with expert rankings was 0.19 rather than 0.15 for the generic judge; on disputed pairs, experts sided with the rubric judge 63% of the time, a difference that was not statistically significant (`p = 0.109`).
+Because the same judge design supplied training rewards and the headline evaluation, the task holdout did not make the scoring process independent.
+The evidence supports a bounded claim about a lower-noise training signal and improved scores under this judge, not that the judge is ground truth or that the system performs open-ended scientific innovation.
+
 The demonstration below separates deterministic probes from a rubric score.
 Use it to inspect a failing task and decide whether the problem lies in the result, the rubric, or the evaluation setup.
 
