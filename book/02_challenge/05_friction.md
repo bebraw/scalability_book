@@ -96,6 +96,16 @@ Possible techniques:
 - Add useful error messages.
 - Keep generated code under the same review standard as human-written code.
 
+### Agents can move friction rather than remove it
+
+Agent assistance can change which technology choices appear feasible.
+In a practitioner essay, :citet[ronacher2026fasthard] argues that agents reduce language-learning and rewrite friction enough to make performance-oriented languages and low-level systems work accessible to more developers, while also noting that prior knowledge improves the result.
+Treat this as a hypothesis about the capability of a human-agent pair, not evidence that the human has retained the same skill or that an unfamiliar stack is cheaper to own.
+
+Lower entry friction can move cost into comprehension, debugging, security review, operations, and succession.
+Before adopting an unfamiliar stack, use a bounded spike to compare it with a familiar baseline under the same behavioral tests and explicit performance and resource targets; require a team member to explain and modify the result; and record the toolchain and rollback path.
+Choose the stack only when the measured benefit survives those ownership costs.
+
 > **A reading diff routes attention**
 >
 > Large changes may repeat the same migration across call sites or include generated and mechanically forced edits.
