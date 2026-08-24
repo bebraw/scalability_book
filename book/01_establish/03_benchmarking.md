@@ -70,6 +70,18 @@ Keep raw distributions and failed examples available instead of retaining only a
 Review the proxy when the workload, system, incentives, or development process changes.
 An effective metric is not permanently valid; it is a hypothesis that must survive contact with the behavior it influences.
 
+### Goodhart pressure test
+
+The challenge below turns that four-part review into two decisions.
+First choose a proxy and predict how an optimizer will respond when the number becomes a target.
+Then inspect the displaced cost and revise the gate so that improving the proxy cannot compensate for losing the intended outcome.
+The scenarios use deterministic illustrative values to make the feedback loop visible; they are not empirical comparisons between tools or teams.
+
+{{ import "site/includes/goodhart-challenge-demo.html" }}
+
+Try at least two targets.
+Notice that monitoring the proxy is still useful after the repair, but it no longer decides success alone.
+
 ## Evaluating agentic workflows
 
 The development workflow is also a system that can be benchmarked.

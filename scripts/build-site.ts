@@ -141,6 +141,12 @@ const demoScriptIncludes = [
     script: "/benchmark-simulation-demo.js",
   },
   {
+    title: "Goodhart pressure test",
+    chapter: "Benchmarking",
+    include: "site/includes/goodhart-challenge-demo.html",
+    script: "/goodhart-challenge-demo.js",
+  },
+  {
     title: "Browser performance workbench",
     chapter: "Benchmarking",
     include: "site/includes/browser-performance-workbench.html",
@@ -516,6 +522,10 @@ await compileSiteScript("scripts/api-contract-lens.ts", "api-contract-lens.js");
 await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",
   "benchmark-simulation-demo.js",
+);
+await compileSiteScript(
+  "scripts/goodhart-challenge-demo.ts",
+  "goodhart-challenge-demo.js",
 );
 await compileSiteScript(
   "scripts/browser-performance-workbench.ts",

@@ -1,147 +1,290 @@
 <section
   id="demo-changed-assumptions-map"
   data-demo-anchor
-  class="scaling-demo pressure-map-demo"
+  class="scaling-demo pressure-map-demo pressure-incident-lab"
   data-pressure-map-demo
   aria-labelledby="pressure-map-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header pressure-incident-header">
     <div>
-      <p class="scaling-demo-kicker">Reality pressure map</p>
-      <h3 id="pressure-map-demo-heading">
-        Map changed assumptions to failures
-      </h3>
+      <p class="scaling-demo-kicker">Incident response challenge</p>
+      <h3 id="pressure-map-demo-heading">Keep the event pipeline useful</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
-      <span data-pressure-map-demo-verdict>Choose changed assumptions</span>
-      <small>
-        A pressure map connects new reality to the first binding limit and the
-        recovery options prepared for it.
+    <div
+      class="scaling-demo-summary pressure-incident-summary"
+      aria-live="polite"
+    >
+      <span data-pressure-map-demo-verdict
+        >Round 1 of 3 · Find the boundary</span
+      >
+      <small data-pressure-map-demo-summary>
+        The conference doors just opened. Commit to evidence before changing the
+        system.
       </small>
     </div>
   </div>
 
-  <form class="pressure-map-grid" data-pressure-map-demo-form>
-    <div class="pressure-map-column">
-      <div class="scaling-demo-panel">
-        <h4 id="pressure-map-assumptions-title">Establish baseline</h4>
-        <div class="pressure-map-baseline">
-          <article>
-            <span>Users</span>
-            <strong>One small group</strong>
-            <p>People submit events while the app is online and calm.</p>
+  <div class="pressure-incident-boundary" role="note">
+    <strong>Model boundary</strong>
+    <span>
+      This deterministic scenario teaches pressure, feedback, and trade-offs.
+      Its values are not measured capacity for a real deployment.
+    </span>
+  </div>
+
+  <ol class="pressure-incident-progress" aria-label="Incident progress">
+    <li data-pressure-map-demo-step="0">
+      <span>01</span>
+      <div><strong>Detect</strong><small>Find the first limit</small></div>
+    </li>
+    <li data-pressure-map-demo-step="1">
+      <span>02</span>
+      <div><strong>Contain</strong><small>Break the retry loop</small></div>
+    </li>
+    <li data-pressure-map-demo-step="2">
+      <span>03</span>
+      <div><strong>Recover</strong><small>Protect shared capacity</small></div>
+    </li>
+    <li data-pressure-map-demo-step="3">
+      <span>04</span>
+      <div><strong>Debrief</strong><small>Defend the trade-off</small></div>
+    </li>
+  </ol>
+
+  <form class="pressure-incident-form" data-pressure-map-demo-form>
+    <div class="pressure-incident-grid">
+      <section
+        class="scaling-demo-panel pressure-incident-console"
+        aria-labelledby="pressure-incident-console-title"
+      >
+        <header class="pressure-incident-section-heading">
+          <div>
+            <span>Live system</span>
+            <h4 id="pressure-incident-console-title">Conference check-in</h4>
+          </div>
+          <time data-pressure-map-demo-clock>09:02</time>
+        </header>
+
+        <div class="pressure-incident-mission">
+          <span>Mission</span>
+          <p>
+            Preserve trustworthy event recording and a useful dashboard while
+            demand, retries, and one large import test different boundaries.
+          </p>
+        </div>
+
+        <div
+          class="pressure-incident-pipeline"
+          aria-label="Event processing pipeline"
+        >
+          <article data-pressure-map-demo-stage="ingress">
+            <span aria-hidden="true">01</span>
+            <div><small>Ingress</small><strong>Event API</strong></div>
+            <em data-pressure-map-demo-stage-status="ingress">Accepting</em>
           </article>
-          <article>
-            <span>Data</span>
-            <strong>Few event types</strong>
-            <p>The dashboard can query the same database used for writes.</p>
+          <article data-pressure-map-demo-stage="store">
+            <span aria-hidden="true">02</span>
+            <div><small>Commit</small><strong>Event store</strong></div>
+            <em data-pressure-map-demo-stage-status="store">Pool waiting</em>
           </article>
-          <article>
-            <span>Operations</span>
-            <strong>Manual diagnosis</strong>
-            <p>Logs and local testing are enough to explain most problems.</p>
+          <article data-pressure-map-demo-stage="processor">
+            <span aria-hidden="true">03</span>
+            <div><small>Derive</small><strong>Processors</strong></div>
+            <em data-pressure-map-demo-stage-status="processor">Keeping up</em>
+          </article>
+          <article data-pressure-map-demo-stage="dashboard">
+            <span aria-hidden="true">04</span>
+            <div><small>Read</small><strong>Dashboard</strong></div>
+            <em data-pressure-map-demo-stage-status="dashboard">Current</em>
           </article>
         </div>
-      </div>
-      <div class="scaling-demo-panel">
-        <h4>Changed assumptions</h4>
-        <div class="pressure-map-toggles">
-          <label>
-            <input
-              type="checkbox"
-              value="burst"
-              data-pressure-map-demo-assumption
-              checked
-            />
-            <span>Burst traffic during a 20-minute peak</span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="offline"
-              data-pressure-map-demo-assumption
-              checked
-            />
-            <span>Offline clients retry the same event</span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="tenants"
-              data-pressure-map-demo-assumption
-            />
-            <span>Multiple tenants share the same system</span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="old-client"
-              data-pressure-map-demo-assumption
-            />
-            <span>Old clients submit malformed events</span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="deletion"
-              data-pressure-map-demo-assumption
-            />
-            <span>A customer requests data deletion</span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              value="slow-summary"
-              data-pressure-map-demo-assumption
-            />
-            <span>Users need summaries before data settles</span>
-          </label>
+
+        <div
+          class="pressure-incident-metrics"
+          role="group"
+          aria-label="Incident metrics"
+        >
+          <div data-pressure-map-demo-metric-state="latency">
+            <span>Write p95</span>
+            <strong data-pressure-map-demo-metric="latency">310 ms</strong>
+            <small>target ≤ 250 ms</small>
+          </div>
+          <div data-pressure-map-demo-metric-state="backlog">
+            <span>Oldest event</span>
+            <strong data-pressure-map-demo-metric="backlog">28 s</strong>
+            <small>target ≤ 60 s</small>
+          </div>
+          <div data-pressure-map-demo-metric-state="duplicates">
+            <span>Duplicate effects</span>
+            <strong data-pressure-map-demo-metric="duplicates">0</strong>
+            <small>target ≤ 2</small>
+          </div>
+          <div data-pressure-map-demo-metric-state="usefulness">
+            <span>Modeled usefulness</span>
+            <strong data-pressure-map-demo-metric="usefulness">100%</strong>
+            <small>target ≥ 75%</small>
+          </div>
+          <div data-pressure-map-demo-metric-state="rejected">
+            <span>Explicit rejection</span>
+            <strong data-pressure-map-demo-metric="rejected">0%</strong>
+            <small>budget ≤ 20%</small>
+          </div>
+          <div class="pressure-incident-budget-metric">
+            <span>Change budget</span>
+            <strong data-pressure-map-demo-metric="budget">6</strong>
+            <small>spend deliberately</small>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <section class="scaling-demo-panel pressure-map-board-panel">
-      <h4 id="pressure-map-map-title">Pressure map</h4>
-      <div class="pressure-map-board" data-pressure-map-demo-board></div>
-    </section>
+        <section
+          class="pressure-incident-log"
+          aria-labelledby="pressure-incident-log-title"
+        >
+          <header>
+            <h4 id="pressure-incident-log-title">Shift log</h4>
+            <small>Consequences persist into the next round</small>
+          </header>
+          <ol data-pressure-map-demo-log aria-live="polite">
+            <li>
+              <time>08:55</time>
+              <p>Baseline stable at 75 events per second.</p>
+            </li>
+            <li class="is-current">
+              <time>09:02</time>
+              <p>Arrival demand crosses the current capacity envelope.</p>
+            </li>
+          </ol>
+        </section>
+      </section>
 
-    <div class="pressure-map-column">
-      <section class="scaling-demo-panel">
-        <h4>First signal</h4>
-        <dl class="scaling-demo-metrics demo-metrics-compact">
+      <section
+        class="scaling-demo-panel pressure-incident-decision"
+        aria-labelledby="pressure-map-round-title"
+      >
+        <header class="pressure-incident-section-heading">
           <div>
-            <dt>Assumptions changed</dt>
-            <dd data-pressure-map-demo-metric="count">0</dd>
+            <span data-pressure-map-demo-round-label>Round 01 · Detect</span>
+            <h4
+              id="pressure-map-round-title"
+              data-pressure-map-demo-round-title
+            >
+              Writes slow while API CPU remains quiet
+            </h4>
           </div>
-          <div>
-            <dt>Primary pressure</dt>
-            <dd data-pressure-map-demo-metric="pressure">-</dd>
-          </div>
-          <div>
-            <dt>Most stressed part</dt>
-            <dd data-pressure-map-demo-metric="component">-</dd>
-          </div>
-        </dl>
-        <p class="demo-note" data-pressure-map-demo-interpretation>
-          Pick at least one changed assumption to reveal the first likely
-          failure.
+          <output
+            data-pressure-map-demo-budget
+            aria-label="Change budget remaining"
+            >6 units</output
+          >
+        </header>
+
+        <p class="pressure-incident-prompt" data-pressure-map-demo-prompt>
+          Which signal identifies the first binding limit, and what is the
+          smallest defensible response?
         </p>
 
-        <details class="pressure-map-brief">
-          <summary>Pressure brief</summary>
-          <div class="scaling-demo-artifact-header">
-            <h4 id="pressure-map-response-title">Challenge pressure brief</h4>
-            <button type="button" data-pressure-map-demo-copy>
-              Copy brief
-            </button>
-          </div>
-          <textarea
-            data-pressure-map-demo-artifact
-            aria-label="Generated challenge pressure brief"
-            spellcheck="false"
-          ></textarea>
-        </details>
+        <div class="pressure-incident-surface-signals">
+          <span>What everyone can see</span>
+          <ul data-pressure-map-demo-surface></ul>
+        </div>
+
+        <fieldset class="pressure-incident-options pressure-incident-probes">
+          <legend>Investigate one signal</legend>
+          <div data-pressure-map-demo-options="probe"></div>
+        </fieldset>
+
+        <div
+          class="pressure-incident-reading"
+          data-pressure-map-demo-probe-readout
+        >
+          <span>Probe not selected</span>
+          <p>Choose one signal to reveal its reading before you act.</p>
+        </div>
+
+        <fieldset class="pressure-incident-options pressure-incident-actions">
+          <legend>Commit one response</legend>
+          <div data-pressure-map-demo-options="action"></div>
+        </fieldset>
+
+        <p class="pressure-incident-cost-note" data-pressure-map-demo-cost-note>
+          The response and its displaced complexity will carry into the next
+          round.
+        </p>
+
+        <button
+          type="submit"
+          class="pressure-incident-commit"
+          data-pressure-map-demo-commit
+          disabled
+        >
+          Commit response and advance time
+        </button>
       </section>
     </div>
+
+    <section
+      class="pressure-incident-debrief"
+      data-pressure-map-demo-debrief
+      hidden
+    >
+      <header>
+        <div>
+          <span>Incident debrief</span>
+          <h4 data-pressure-map-demo-result-title tabindex="-1">
+            Pressure map ready
+          </h4>
+        </div>
+        <strong data-pressure-map-demo-result>—</strong>
+      </header>
+
+      <div
+        class="pressure-incident-constraint-grid"
+        data-pressure-map-demo-constraints
+      ></div>
+
+      <div class="pressure-incident-debrief-grid">
+        <section class="scaling-demo-panel pressure-map-board-panel">
+          <h4>Observed pressure map</h4>
+          <div class="pressure-map-board" data-pressure-map-demo-board></div>
+        </section>
+
+        <section class="scaling-demo-panel pressure-incident-reflection">
+          <h4>Defend the operating decision</h4>
+          <ol>
+            <li>Which signal revealed the first binding limit?</li>
+            <li>
+              Where did each response move complexity or user-visible cost?
+            </li>
+            <li>
+              Which result is modeled, and what would still need measurement?
+            </li>
+          </ol>
+
+          <details class="pressure-map-brief" open>
+            <summary>Incident pressure brief</summary>
+            <div class="scaling-demo-artifact-header">
+              <h4>Copyable project evidence</h4>
+              <button type="button" data-pressure-map-demo-copy>
+                Copy brief
+              </button>
+            </div>
+            <textarea
+              data-pressure-map-demo-artifact
+              aria-label="Generated incident pressure brief"
+              spellcheck="false"
+              readonly
+            ></textarea>
+          </details>
+
+          <button
+            type="button"
+            class="pressure-incident-restart"
+            data-pressure-map-demo-reset
+          >
+            Replay the incident
+          </button>
+        </section>
+      </div>
+    </section>
   </form>
 </section>

@@ -1,0 +1,305 @@
+<section
+  id="demo-goodhart-pressure-test"
+  data-demo-anchor
+  class="scaling-demo goodhart-demo"
+  data-goodhart-demo
+  aria-labelledby="goodhart-demo-heading"
+>
+  <div class="goodhart-header">
+    <div>
+      <p class="goodhart-kicker">Goodhart pressure test</p>
+      <h3 id="goodhart-demo-heading">Can your metric survive an optimizer?</h3>
+    </div>
+    <div class="goodhart-status" aria-live="polite" aria-atomic="true">
+      <span data-goodhart-status>Choose a proxy to put under pressure</span>
+      <small
+        >A deterministic two-round challenge. The values are illustrative, not
+        observed results.</small
+      >
+    </div>
+  </div>
+
+  <ol class="goodhart-progress" aria-label="Goodhart challenge progress">
+    <li class="is-active" data-goodhart-step="target">
+      <span>01</span>
+      Target
+    </li>
+    <li data-goodhart-step="pressure">
+      <span>02</span>
+      Pressure
+    </li>
+    <li data-goodhart-step="repair">
+      <span>03</span>
+      Repair
+    </li>
+  </ol>
+
+  <form class="goodhart-form" data-goodhart-form>
+    <div class="goodhart-round-one">
+      <section
+        class="goodhart-contract"
+        aria-labelledby="goodhart-target-title"
+      >
+        <div class="goodhart-section-heading">
+          <span aria-hidden="true">01</span>
+          <div>
+            <p>Write the target contract</p>
+            <h4 id="goodhart-target-title">Which proxy gets rewarded?</h4>
+          </div>
+        </div>
+
+        <fieldset class="goodhart-targets" data-goodhart-targets>
+          <legend>Choose one optimization target</legend>
+          <label>
+            <input type="radio" name="goodhart-target" value="coverage" />
+            <span class="goodhart-target-mark">COV</span>
+            <span>
+              <strong>Line coverage</strong>
+              <small>Proxy for regression resistance</small>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="goodhart-target" value="latency" />
+            <span class="goodhart-target-mark">P95</span>
+            <span>
+              <strong>Successful-request p95</strong>
+              <small>Proxy for a responsive endpoint</small>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="goodhart-target" value="agent-pass" />
+            <span class="goodhart-target-mark">EVAL</span>
+            <span>
+              <strong>Agent task pass rate</strong>
+              <small>Proxy for useful completed work</small>
+            </span>
+          </label>
+        </fieldset>
+
+        <div class="goodhart-contract-note" data-goodhart-contract-note>
+          <span>Intended outcome</span>
+          <p>
+            Choose a proxy to reveal the result it is supposed to represent.
+          </p>
+        </div>
+
+        <fieldset class="goodhart-predictions">
+          <legend>Predict what target pressure will do</legend>
+          <label>
+            <input type="radio" name="goodhart-prediction" value="aligned" />
+            <span>Proxy and intended outcome improve together</span>
+          </label>
+          <label>
+            <input type="radio" name="goodhart-prediction" value="diverges" />
+            <span>Proxy improves while the outcome degrades</span>
+          </label>
+          <label>
+            <input type="radio" name="goodhart-prediction" value="unchanged" />
+            <span>The target does not change behavior</span>
+          </label>
+        </fieldset>
+
+        <button
+          class="goodhart-primary-action"
+          type="button"
+          data-goodhart-apply
+          disabled
+        >
+          Apply target pressure
+        </button>
+      </section>
+
+      <section class="goodhart-board" aria-labelledby="goodhart-board-title">
+        <div class="goodhart-board-heading">
+          <div>
+            <p>Optimizer dashboard</p>
+            <h4 id="goodhart-board-title" data-goodhart-board-title>
+              Waiting for a target
+            </h4>
+          </div>
+          <span class="goodhart-board-stamp" data-goodhart-board-stamp
+            >UNPRESSURED</span
+          >
+        </div>
+
+        <div
+          class="goodhart-scorecard"
+          data-goodhart-scorecard
+          role="group"
+          aria-label="Choose a proxy to load its baseline measures"
+        >
+          <article data-goodhart-measure-card="0">
+            <span class="goodhart-measure-kind">Targeted proxy</span>
+            <h5 data-goodhart-measure-label="0">—</h5>
+            <p>
+              <span data-goodhart-measure-before="0">—</span>
+              <i aria-hidden="true">→</i>
+              <strong data-goodhart-measure-after="0">?</strong>
+            </p>
+          </article>
+          <article data-goodhart-measure-card="1">
+            <span class="goodhart-measure-kind">Intended outcome</span>
+            <h5 data-goodhart-measure-label="1">—</h5>
+            <p>
+              <span data-goodhart-measure-before="1">—</span>
+              <i aria-hidden="true">→</i>
+              <strong data-goodhart-measure-after="1">?</strong>
+            </p>
+          </article>
+          <article data-goodhart-measure-card="2">
+            <span class="goodhart-measure-kind">Counter-signal</span>
+            <h5 data-goodhart-measure-label="2">—</h5>
+            <p>
+              <span data-goodhart-measure-before="2">—</span>
+              <i aria-hidden="true">→</i>
+              <strong data-goodhart-measure-after="2">?</strong>
+            </p>
+          </article>
+          <article data-goodhart-measure-card="3">
+            <span class="goodhart-measure-kind">Displaced cost</span>
+            <h5 data-goodhart-measure-label="3">—</h5>
+            <p>
+              <span data-goodhart-measure-before="3">—</span>
+              <i aria-hidden="true">→</i>
+              <strong data-goodhart-measure-after="3">?</strong>
+            </p>
+          </article>
+        </div>
+
+        <div class="goodhart-trace" data-goodhart-trace>
+          <span>Optimizer trace</span>
+          <p>
+            No behavior to inspect yet. Select a proxy, predict the result, and
+            apply pressure.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <section
+      class="goodhart-repair"
+      data-goodhart-repair
+      aria-labelledby="goodhart-repair-title"
+      hidden
+    >
+      <div class="goodhart-section-heading">
+        <span aria-hidden="true">02</span>
+        <div>
+          <p>The number won. The outcome lost.</p>
+          <h4 id="goodhart-repair-title" tabindex="-1">
+            Close the gaming path
+          </h4>
+        </div>
+      </div>
+
+      <div class="goodhart-repair-grid">
+        <div class="goodhart-gaming-path">
+          <span>Observed optimizer response</span>
+          <p data-goodhart-gaming-path></p>
+        </div>
+
+        <fieldset class="goodhart-safeguards">
+          <legend>Choose a revised gate</legend>
+          <label data-goodhart-safeguard-card="paired">
+            <input type="radio" name="goodhart-safeguard" value="paired" />
+            <span>
+              <strong data-goodhart-safeguard-title="paired"
+                >Independent outcome gate</strong
+              >
+              <small data-goodhart-safeguard-detail="paired"
+                >Pair the proxy with evidence the optimizer cannot select or
+                exclude.</small
+              >
+            </span>
+          </label>
+          <label data-goodhart-safeguard-card="selective">
+            <input type="radio" name="goodhart-safeguard" value="selective" />
+            <span>
+              <strong data-goodhart-safeguard-title="selective"
+                >Selected-success audit</strong
+              >
+              <small data-goodhart-safeguard-detail="selective"
+                >Inspect successful cases chosen from the same measurement
+                system.</small
+              >
+            </span>
+          </label>
+          <label data-goodhart-safeguard-card="more-pressure">
+            <input
+              type="radio"
+              name="goodhart-safeguard"
+              value="more-pressure"
+            />
+            <span>
+              <strong data-goodhart-safeguard-title="more-pressure"
+                >More target pressure</strong
+              >
+              <small data-goodhart-safeguard-detail="more-pressure"
+                >Make the same proxy threshold harder to reach.</small
+              >
+            </span>
+          </label>
+        </fieldset>
+      </div>
+
+      <button
+        class="goodhart-primary-action goodhart-test-gate"
+        type="button"
+        data-goodhart-test
+        disabled
+      >
+        Test the revised gate
+      </button>
+    </section>
+
+    <section
+      class="goodhart-debrief"
+      data-goodhart-debrief
+      aria-labelledby="goodhart-debrief-title"
+      hidden
+    >
+      <div class="goodhart-debrief-heading">
+        <div>
+          <p>Challenge debrief</p>
+          <h4 id="goodhart-debrief-title" data-goodhart-debrief-title></h4>
+        </div>
+        <span data-goodhart-gate-result></span>
+      </div>
+
+      <dl class="goodhart-four-part">
+        <div>
+          <dt>Outcome</dt>
+          <dd data-goodhart-debrief-outcome></dd>
+        </div>
+        <div>
+          <dt>Proxy</dt>
+          <dd data-goodhart-debrief-proxy></dd>
+        </div>
+        <div>
+          <dt>Gaming path</dt>
+          <dd data-goodhart-debrief-gaming></dd>
+        </div>
+        <div>
+          <dt>Counterevidence</dt>
+          <dd data-goodhart-debrief-counterevidence></dd>
+        </div>
+      </dl>
+
+      <div class="goodhart-artifact">
+        <label for="goodhart-artifact-text">Measurement contract</label>
+        <textarea
+          id="goodhart-artifact-text"
+          rows="10"
+          readonly
+          data-goodhart-artifact
+        ></textarea>
+        <div>
+          <button type="button" data-goodhart-copy>Copy contract</button>
+          <button type="button" data-goodhart-reset>
+            Pressure-test another proxy
+          </button>
+        </div>
+      </div>
+    </section>
+  </form>
+</section>

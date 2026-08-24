@@ -69,12 +69,17 @@ This framing turns a vague question such as "Will it scale?" into four more usef
 
 ### Pressure map lab
 
-The demonstration below turns changed assumptions into a pressure map.
-The goal is to connect a new reality to the part of the system it stresses, the limit being approached, the likely failure mode, the first signal that would reveal the problem, and the prepared recovery actions available to an operator.
+The incident challenge below turns changed assumptions into a pressure map over three rounds.
+Investigate one signal and commit one response before time advances.
+The consequences persist: a response may protect one boundary while moving waiting, cost, correctness risk, or operational work somewhere else.
 
 {{ import "site/includes/pressure-map-demo.html" }}
 
-Use this before choosing scaling techniques.
+Try one path, inspect the debrief, and replay with a different response.
+Use the exported brief to connect the operating pressure to the stressed component, binding limit, likely failure, first signal, and prepared recovery.
+The values are deterministic teaching inputs rather than measured capacity, so the useful evidence is the causal explanation and not the final number.
+
+Use this challenge before choosing scaling techniques.
 If the pressure is unclear, the response is likely to be fashionable rather than useful.
 
 ## Designing from failure
