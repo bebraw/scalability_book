@@ -551,7 +551,8 @@ Choose `approve for the declared scope`, `approve with restrictions`, `reject pe
 
 ## How to avoid slop?
 
-While agents can allow you to develop entire web applications fast, they also require responsible usage as otherwise you might end up with what some people call derogatively as slop, something that was artificially generated and looks such.
+Agents can let you develop entire web applications quickly, but careless use can produce what people derogatorily call _slop_: generic, low-value, or insufficiently reviewed output.
+Treat recurring style patterns as editing prompts, not authorship evidence: [No AI Slop](https://github.com/petergyang/no-ai-slop/tree/d30eddb9e04562234f2070b5ee63ca4649d9a05e) tells its detection mode not to guess whether AI wrote the text, but offers no comparative evidence that its edits preserve the writer's voice.
 When used responsibly and with good taste, I argue that AI tools can help you to elevate your own skills by a magnitude.
 Therefore, your task is to become a strong engineer that understands both the domain and engineering since it is this combination that enables productivity with AI.
 
