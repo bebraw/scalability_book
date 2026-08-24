@@ -146,6 +146,19 @@ Coordination mechanisms can remove one bottleneck without removing the others.
 In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results ranging from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
 The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not the same as accepted work.
 
+### Repeated review is measurement, not proof
+Repeating an agent review can reveal variance, but agreement between runs is not independent validation.
+VulnBench repeated identical security-review tasks five times across ten small JavaScript and Express fixtures.
+Of 158 unique findings that matched its Snyk Code reference, 134 appeared in every repetition; among 161 unmatched findings, 80 appeared only once and 22 appeared in every repetition :citep[tal2026vulnbench].
+The recurrence difference is useful for triage, but reference overlap measures agreement with Snyk Code rather than ground-truth accuracy.
+Treat each model review as one sample.
+Deduplicate repeated findings, record recurrence separately from deterministic-reference overlap, and preserve rare findings for case-level adjudication rather than automatically discarding them.
+Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
+Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
+Repeated review also consumes the same scarce integration capacity that bounds the fleet.
+If students repeat an agent review, they should record the fixed code, prompt, harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
+More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
+
 ### Amdahl's Law and the sequential bottleneck
 
 Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
