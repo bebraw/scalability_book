@@ -563,6 +563,16 @@ It is useful to distinguish disposable code from what Cory Doctorow calls [accre
 A one-off program can be valuable even when nobody will maintain it and there slop may be acceptable.
 Once code becomes shared with other people, higher qualitative expectations likely come with it especially if and when the code will be maintained in the future by others.
 
+### Upstream work needs a human owner
+
+An issue or patch submitted upstream asks someone else to spend scarce attention on triage, comprehension, review, integration, and follow-up.
+:citet[gruhn2026meatproxy] describes a failure mode in which a person forwards model output and routes reviewer feedback back through the model without first understanding and validating the work.
+Writing the request in your own words is only a signal of engagement, not proof of correctness, but the submitting human should be able to restate the intent, explain the evidence and limits, answer feedback, and correct or withdraw the change.
+
+:citet[garbutt2026humanity] distinguishes agent-assisted human contributions from end-to-end agent submissions and argues that the latter can transfer effort to maintainers and weaken the relationships through which contributors become maintainers.
+His supporting data covers five selected projects, the projected annual changes simply double first-half totals, and the source cannot identify which pull requests were agent-generated; the observations illustrate a plausible cost-transfer mechanism rather than establish causal prevalence or community effects.
+Before allowing an agent to publish upstream, require explicit human authorization, follow the project's policy and templates, respect opt-outs and rate limits, disclose material assistance when requested, and measure accepted maintenance value rather than submission volume.
+
 Since agentic development can be so fast, it is easy to gain speed blindness and end up in a situation where you have to refactor your code a lot to get it under control again.
 This is exactly what good development practices can help you to avoid as you can both go fast and with good quality if you know what you are doing.
 By completing the three book projects, you will likely develop an intuition of what works and what does not when working with different types of agents.
