@@ -1,40 +1,49 @@
 # What is scalability?
 
-You might be familiar with the saying "works on my machine".
-There's a good reason for the saying since often web applications are developed in isolation at the developer's own machine or occasionally on top of a cloud platform meaning your view on the application is limited.
-Given the web has many different kinds of consumers, having only your own view can easily lead to a constrained perspective.
-The idea of a web full of different types of consumers is at the core of scalability and discussion around it.
-The purpose of this chapter is to make you think about different aspects around the topic to form your own idea of the topic.
+If you ask two developers, they will likely give you a different definition for what is scalability.
+Especially in the context of the web, scalability can be complex as a concept.
+Within this book, we consider the scalability of web applications in particular while many of the ideas considered apply to websites as well.
+This division to websites and applications is operational since websites are oriented around content and applications around functionality.
+It is common that both characteristics are found within a single site and in the context of this book we will use the terms liberally for this reason.
+
+When put to the larger context of scalability, the web has its own challenges related to its design and the way it is used.
+Especially during the past few years the web has started to undergo a major shift as both the way we develop for the web and how we consume it have begun to change.
+This change has to do with the introduction of Large Language Models (LLMs) and agents.
+The shift is a great challenge for developers as while development is cheap, developing in a scalable manner is not.
+The purpose of this chapter is to open your mind to especially scalability related challenges and start you to think about the topic as you will develop your own view on the topic by completing this book.
 
 ## Dimensions of scalability
 
-Scalability can be considered from multiple viewpoints ranging from development to how your web applications performs under load in practice.
+Scalability can be considered from multiple viewpoints ranging from development to how your web applications perform under load in practice.
 I will cover several of these angles next to give you some food for thought.
-The list won't be exhaustive as the idea is to get you thinking about the topic.
-I will cover the following five aspects of scalability I consider essential: development process, architecture, infrastructure, and data.
-I am sure there are different ways to frame this, and you will develop your own ideas, but it is a good starting point for discussion at least.
+The list won't be exhaustive as the idea is broad and there are likely other ways to decompose scalability.
+That said, I will consider these five aspects of scalability I consider essential: development process, architecture, infrastructure, and data.
 
 > **Sustainability angle**
 >
 > Scaling a system usually scales resource consumption too.
-> A design that handles 10x traffic by using 20x infrastructure may be technically scalable, but it is inefficient.
+> A design that handles 10x traffic by using 20x infrastructure may be technically scalable but inefficient.
 > Resource-aware scalability asks how much useful work the system delivers per unit of computation, storage, bandwidth, and operational cost.
+> In short, sustainability forms another angle that encompasses many of the other and within the context of this book we define the term through ecological lens, not other forms of sustainability.
 
 ### Scalability of the development process
 
-The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process.
-With the introduction of large language models, this aspect has shifted largely now that building is cheap.
-That does not however mean that maintenance is any cheaper than before, and you will have to learn to use models responsibly to avoid problems later on.
-Simply put, it is now easier than ever to accumulate massive amounts of technical debt.
-Arriving into these of situations might have required years or even decades of work before.
+The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process as eventually it may become a constraining factor as your application and ambitions grow.
+For a small throwaway application, development process might not matter much, but it may become a factor if you plan to develop the application further and for a longer period of time.
+These days development process also has to consider how developers and machines work together since LLMs have taken a chunk of work people would have been doing manually shifting responsibilities.
+This is why I believe web developers should understand how to work with models these days.
 
-As you know, not all debt is meant to be paid, or paid ever.
-Therefore, understanding the context is valuable.
-Technical debt may be acceptable for throwaway spikes, for example, where you want to see if a specific direction might make sense.
-If the direction does make sense, you can still go and re-engineer your solution to capture the technical characteristics you prefer.
-Consider for example adding a new view to your application.
-The idea might be to first see if the proposed user interface would make sense to use while working with mock data before wiring in a data model.
-The same approach can be used for evaluating technical approaches against each other while having specific metrics in mind, and we will cover this idea later on in the book.
+I consider the currently available models as power tools.
+While power tools can be fun to use, they can also cause a lot of damage if not used responsibly.
+In other words, it is now easier than ever to accumulate massive amounts of technical debt that may bite you later.
+Since development was so slow before the large scale introduction of models, it may have required years to reach similar situations before and even then there was much more human intervention in the process.
+Today developers may build even extremely complex applications without spending a lot of time on understanding code which may be dangerous since it erodes trust in what was done since it can be difficult to tell if what was done is correct or even smart.
+It is good to remember that LLMs are good at generating and for that reason what they produce may easily get out of hand as they cannot fully replace your understanding of the problem while they may be able to complement it.
+
+Technical debt may be acceptable and not even meant to be paid ever.
+For certain tasks, such as technical feasibility spikes or ideation, debt might not matter.
+Once you understand what you need to build, proper engineering can take place.
+Since building is cheap, you can use that to your benefit while experimenting to develop your understanding of the problem to come up with a better solution.
 
 ### Scalability of architecture
 
@@ -45,7 +54,9 @@ For example tight coupling between services may make it complicated to deploy th
 Coupling touches the concepts of boundaries and contracts as those are at the core of software architecture.
 Understanding responsibilities of different entities is one of the key tasks of a software architect after all.
 On top of this, a software architect has to consider how to evolve this all since often systems are not fixed and change over time.
-That is yet another factor that can have impact on the scalability of a system.
+It is good to remember that LLMs tend to copy patterns available in your codebase.
+Therefore, setting good example has even more value than before since building the right way can save you from a lot of uncertainty and refactoring.
+It can be argued that our current tools are not ideal for LLM driven development so it is worth thinking about what kind of primitives you want to use in your architecture to allow LLMs to make good decisions as they craft technical solutions for you.
 
 ### Scalability of infrastructure
 
@@ -69,8 +80,6 @@ Data comes with its own sets of problems since you have to consider where it is 
 You may also want to back up your data so it does not get lost.
 To make things worse, you may have to consider how it is read and written while dealing with concurrent usage that may lead to conflicts.
 As you can see, the topic can get complex fast, and this complexity depends largely on your use cases.
-
-TODO: touch CAP and ACID
 
 ### Scalability in business context
 
