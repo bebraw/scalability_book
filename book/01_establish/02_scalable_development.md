@@ -102,8 +102,9 @@ A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both 
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
 Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
 
-I will consider this question next based on my own experience gained through the development of my own projects.
-The case studies follow three different outcomes: [Slideotter](/case-studies/slideotter/) generated valuable architecture and validation lessons without yet finding a clear production path; [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) constrained a small supervision workflow and became a working production tool; and [Kirjolab](/case-studies/kirjolab/) reached broad scientific-authoring scope before requiring substantial consolidation.
+The dedicated case studies apply these ideas without interrupting the chapter's main argument.
+Three projects from my own work follow different outcomes: [Slideotter](/case-studies/slideotter/) generated valuable architecture and validation lessons without yet finding a clear production path; [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) constrained a small supervision workflow and became a working production tool; and [Kirjolab](/case-studies/kirjolab/) reached broad scientific-authoring scope before requiring substantial consolidation.
+Two external cases isolate specific development-system patterns: [Webernetes](/case-studies/webernetes/) compares an agent-assisted port with an independent reference implementation, while [Modern Web Guidance](/case-studies/modern-web-guidance/) treats fast-changing platform knowledge as a retrieved and evaluated dependency.
 Slideotter and Kirjolab are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me.
 A single developer that can work with the machine can achieve far more than ever in the past.
 
@@ -295,19 +296,8 @@ Verify that source status, separate output-stream provenance, critical facts, om
 Passing this preflight can reject an obviously lossy or unsafe policy; it does not qualify agent effectiveness.
 Claims about cost or task effectiveness require paired end-to-end outcomes.
 
-**Revision**
-
-Revision, the final part of the loop, is the part where you reflect and adjust based on your understanding.
-This is the part where you apply your enhanced learning to have a better starting point for the next loop.
-Essentially this is the part where learnings become codified for example as updated requirements, tests, architectural decisions, or project instructions.
-It is important to document your learnings as otherwise the implementation might drift apart from its specification and supporting material.
-
-## Case study – Webernetes, Kubernetes in the browser
-
-[Webernetes](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser), a partial TypeScript port of Kubernetes that runs in the browser, is a useful example to study as most of its code was generated with language models, but generation was not treated as evidence of correctness.
-The author reviewed the generated code and built integration tests that exercised the same operations against Webernetes and a real k3s cluster.
-When the browser implementation behaved differently, the mismatch became a concrete failure the developer and agent could investigate.
-This is stronger than asking a model whether its own output looks correct: the harness compares behavior against an independent reference implementation.
+Validation is stronger when it compares a candidate with an independent reference or inspects the artifact a user actually consumes.
+The [Webernetes case study](/case-studies/webernetes/) develops the first pattern through tests shared with a real k3s cluster; the [Slideotter case study](/case-studies/slideotter/) develops the second through geometry, browser, and rendered-output checks.
 
 > **A generated test is still generated output**
 >
@@ -340,12 +330,12 @@ This is stronger than asking a model whether its own output looks correct: the h
 > Its baseline and three mutants initially pass the same incomplete suite.
 > Choose the authorization, retry, or archived-state concern; add one public-behavior test; then preserve the baseline pass and the selected mutant's assertion failure as the evidence pair.
 
-## Slideotter – The power of validation
+**Revision**
 
-For slideotter, one of the smartest decisions I did was to define layout rules for my LLMs early on to enable generation of sensible visual layouts that don't overlap or look otherwise weird.
-A big part of working with agents is getting better at figuring out how to set up effective validation rules since this can define whether your project stays on rails or not.
-If you don't take care, you can end up with a lot of working code that has not been structured well and in turn will be slow and expensive for agents to maintain and develop further.
-Technical debt can accrue faster with these tools than you can possibly imagine.
+Revision, the final part of the loop, is the part where you reflect and adjust based on your understanding.
+This is the part where you apply your enhanced learning to have a better starting point for the next loop.
+Essentially this is the part where learnings become codified for example as updated requirements, tests, architectural decisions, or project instructions.
+It is important to document your learnings as otherwise the implementation might drift apart from its specification and supporting material.
 
 ## Agents learn patterns from your codebase
 
@@ -546,20 +536,8 @@ The reusable unit is therefore not necessarily the template snapshot.
 It can be a bounded practice with provenance, an adoption path, and an update path.
 This keeps the harness evolvable without making every downstream project carry every experiment performed by its source template.
 
-> **Case study – importing a living capability**
->
-> [Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started) packages current web-platform knowledge as installable instruction bundles, called skills, for coding agents.
-> Instead of assuming that a model already knows the latest HTML, CSS, accessibility, performance, and browser-compatibility practices, an agent searches the collection and retrieves only the guide relevant to its task.
-> A project can also state a [Baseline](https://web.dev/baseline) browser-support target in its agent instructions, turning compatibility from an accidental property of generated code into an explicit project constraint.
->
-> This extends the idea of a project harness beyond files maintained inside one repository.
-> The guidance has provenance and an update path, while targeted retrieval avoids placing the whole reference library in every agent context.
-> For reproducible work, record which version or update policy governed a change.
-> Its recommendations still remain inputs rather than proof: the project is an [early preview](https://github.com/GoogleChrome/modern-web-guidance-src), its maintainers' priorities may not match the application's users, and generated behavior still needs to be checked in representative browsers and assistive technologies.
->
-> The durable pattern is broader than this particular tool.
-> Keep fast-changing domain knowledge in a maintained capability, retrieve the smallest relevant part, declare the local constraints that govern its use, and connect its recommendations to independent validation.
-> This avoids freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
+[Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
+The broader lesson is to reuse a bounded practice with provenance rather than freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
 
 > **Treat imported skills as development dependencies**
 >

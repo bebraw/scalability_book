@@ -47,6 +47,10 @@ Slide software can typecheck while still producing unreadable slides.
 The project therefore validates geometry, text fit, media, visible-text quality, browser workflows, rendered baselines, and PDF output in addition to types and tests.
 Its [repository instructions](https://github.com/bebraw/slideotter/blob/main/AGENTS.md) require visual changes to be checked in the rendered artifact rather than inferred from source coordinates.
 
+Layout rules were established early so generated slides had explicit limits for overlap, clipping, margins, and text fit.
+Those rules narrowed the model's search space and turned several obvious visual defects into machine-checkable failures before review.
+They could not establish whether a slide communicated well, so rendered inspection and editorial judgment remained separate acceptance steps.
+
 That practice carried an important lesson into later projects: validation should inspect the thing the user consumes.
 For a presentation tool, the PDF is part of the behavior.
 

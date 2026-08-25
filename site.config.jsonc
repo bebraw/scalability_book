@@ -45,6 +45,18 @@
       "repositoryUrl": "https://github.com/bebraw/kirjolab",
       "summary": "How a strong development harness enabled exceptional delivery speed while architectural understanding struggled to keep up.",
     },
+    {
+      "file": "case-studies/webernetes.md",
+      "slug": "webernetes",
+      "repositoryUrl": "https://github.com/ngrok/webernetes",
+      "summary": "How an agent-assisted port used reviewable source mappings and shared tests against a real cluster to make selected compatibility claims observable.",
+    },
+    {
+      "file": "case-studies/modern-web-guidance.md",
+      "slug": "modern-web-guidance",
+      "repositoryUrl": "https://github.com/GoogleChrome/modern-web-guidance-src",
+      "summary": "How fast-changing web-platform knowledge can become a retrieved, versioned, and task-evaluated development dependency.",
+    },
   ],
 
   // The course runs in three three-week parts. Each part maps to three book
