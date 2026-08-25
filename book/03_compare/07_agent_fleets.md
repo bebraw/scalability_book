@@ -55,6 +55,57 @@ Agentic development scales only when the project teaches agents how to work insi
 
 - Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
 
+## Map decision responsibility before assigning roles
+
+The fleet roles above describe activities, but an activity role does not by itself allocate decision responsibility.
+A `planner` might only prepare alternatives, or it might silently settle architecture and scope through the plan it produces.
+A `reviewer` might provide another opinion, or it might act as the actual acceptance gate.
+The role name does not reveal the difference.
+
+The Human Agent Relationship framing introduced earlier treats the fleet as a development control system.
+Following the decision-path formulation of :citet[nissila2026decisionpath], trace a feature through:
+
+> **Need → Define → Design → Implement → Verify → Release → Observe → Adapt**
+
+Not every project needs a separate person or agent at every step, and adjacent steps may collapse in a small change.
+The useful unit is the consequential decision.
+For each one, distinguish the performer from the accountable owner and record how much authority is delegated.
+The function-specific automation model of :citet[parasuraman2000automation] is useful here: acquiring information, analyzing it, selecting an action, and implementing that action can receive different allocations even inside one named task.
+NIST similarly recommends defining and differentiating roles and responsibilities for human-AI configurations and oversight rather than assuming that the presence of a human establishes effective control :citep[tabassi2023airmf].
+
+| Decision                           | Performer and authority                                   | Acceptance evidence                                              | Escalation or recovery                                          | Accountable owner |
+| ---------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- | ----------------- |
+| Interpret an ambiguous requirement | Agent proposes interpretations; human selects or reframes | Examples, affected users, assumptions, and unresolved questions  | Escalate when alternatives change the required behavior         | Outcome owner     |
+| Change a shared interface          | Agent prepares an ADR and compatibility analysis          | Contract checks, affected consumers, migration and rollback plan | Escalate before breaking or externally visible change           | System owner      |
+| Implement a bounded change         | Agent executes within named files, tools, and budget      | Focused tests, baseline gate, diff, and known limits             | Stop on scope expansion, failed invariant, or unavailable check | Integrating human |
+| Release and observe                | Automation executes an approved reversible path           | Deployment identity, health signals, and rollback trigger        | Roll back or page the named responder on threshold breach       | Release owner     |
+
+This table is a design example, not a universal role model.
+Authority should vary with the decision's ambiguity, coupling, observability, reversibility, and consequence.
+The same agent can legitimately execute one bounded implementation decision while being limited to proposing an architectural or product decision.
+
+Coactive Design adds a practical test for whether the allocation can work.
+Each interdependence needs sufficient **observability** of relevant state, **predictability** of likely behavior, and **directability** through instructions, correction, stopping, or reallocation :citep[johnson2014coactive].
+A human approval box does not provide these properties automatically.
+If the approver receives an opaque artifact, cannot identify what will happen next, or cannot interrupt or recover the action, the relationship may be human-on-paper but agent-controlled in practice.
+
+### Decision-path exercise
+
+Before running the fleet, choose one consequential feature and create a small HAR decision map.
+Start from the eight-step path above, merge steps that genuinely share one decision, and record for at least four decisions:
+
+- the intended outcome and accountable human or group
+- the primary performer and the agent's authority: `propose`, `prepare`, or `execute`
+- the allowed context, files, tools, credentials, budget, and external effects
+- the evidence required for acceptance
+- an observable escalation condition and named responder
+- the stop, rollback, compensation, or supersession path
+
+Include at least one human-owned decision, one agent proposal, and one bounded agent execution.
+After the run, annotate where the observed path differed from the planned path.
+The map is the normative design; the execution trace is descriptive evidence.
+A mismatch may reveal hidden authority, missing escalation, ceremonial approval, or work that no one explicitly accepted.
+
 ## Give project memory a lifecycle
 
 Long-running and parallel work produces questions, hypotheses, plans, decisions, and behavioral evidence.
@@ -91,10 +142,10 @@ An agent harness controls a model-and-tool execution loop.
 A session or orchestration layer may coordinate several harnesses, while a resource-access layer may mediate selected model and tool requests.
 These responsibilities may be combined in one platform or split across several services.
 
-| Control boundary             | Primary unit                   | Typical responsibilities                                                                                                               |
-| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy        |
-| Model and tool access        | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
+| Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy          |
+| Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
 
 Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
 Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
@@ -107,6 +158,8 @@ This is a design analogy, not a claim of NIST conformance.
 For each consequential decision, name the policy authority, mandatory enforcement point, and conflict or outage rule; overlapping controls still need explicit precedence, and a mediator cannot protect a path that bypasses it.
 
 The contract between the scopes matters more than the number of components.
+The HAR decision map states which decisions and transfers should occur; these control scopes provide some of the places where that design can be enforced and observed.
+A responsibility recorded in a table without a mandatory enforcement point remains an intention.
 Trace one operation through the chain:
 
 `originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
@@ -156,6 +209,7 @@ In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and 
 The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not the same as accepted work.
 
 ### Repeated review is measurement, not proof
+
 Repeating an agent review can reveal variance, but agreement between runs is not independent validation.
 VulnBench repeated identical security-review tasks five times across ten small JavaScript and Express fixtures.
 Of 158 unique findings that matched its Snyk Code reference, 134 appeared in every repetition; among 161 unmatched findings, 80 appeared only once and 22 appeared in every repetition :citep[tal2026vulnbench].
@@ -235,6 +289,7 @@ The point is to let students try a task, choose roles, see the review burden, an
 The demonstration should be used as a rehearsal before students run real agents.
 If the task is vague, the project is not ready, or the chosen roles produce overlapping work, the best outcome is to reduce the fleet.
 A small, reviewable delegation is usually better than parallel activity that the student cannot integrate.
+Use the decision-path exercise with the delegation brief: role descriptions allocate activity, while the HAR map allocates authority, acceptance, escalation, and accountability.
 
 The fleet should be evaluated as a workflow, not as a collection of impressive transcripts.
 Reuse the model-eval pattern from the benchmarking chapter: define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time.

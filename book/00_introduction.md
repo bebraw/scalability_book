@@ -50,7 +50,7 @@ Each of these parts responds to specific scalability related questions and I hav
 **Establish:**
 
 1. What is scalability? -- In this chapter I consider aspects related to scalability in the context of web development.
-2. How to develop in a scalable way? -- Given the shape of development is changing, I consider the implications of artificial intelligence (AI) and agents in this chapter.
+2. How to develop in a scalable way? -- Given the shape of development is changing, I consider the implications of artificial intelligence (AI) and agents in this chapter, including how humans and agents divide authority, judgment, and responsibility.
 3. How to measure and observe web applications? -- While AI speeds up development of artefacts, this also highlights the importance of measuring and observing our applications.
    That is why I will show you how to measure and observe your web applications in this chapter.
 

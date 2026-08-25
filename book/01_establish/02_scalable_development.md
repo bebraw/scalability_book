@@ -136,6 +136,58 @@ Treat the score as diagnostic evidence, inspect how it changed, and pair it with
 > It means keeping the project maintainable for humans, but it also means avoiding wasteful tool use.
 > Focused prompts, smaller context, reusable instructions, and strong validation loops reduce repeated generation and unnecessary compute.
 
+## Human-agent relationship is a control design
+
+The phrase _Human Agent Relationship_ (HAR) can suggest an interpersonal question: should the agent be treated as a tool, assistant, colleague, or team member?
+Those metaphors may shape expectations, but they do not define how work is controlled.
+In this book, HAR is a practical name for the designed allocation of **intent, authority, execution, evidence, intervention, and accountability** across a human-agent development system.
+It is not presented as one standardized academic framework.
+
+The underlying questions have a longer research history.
+:citet[parasuraman2000automation] separate automation into information acquisition, information analysis, decision and action selection, and action implementation, with different levels of automation possible for each function.
+This matters because an agent need not have one global autonomy level: it may collect evidence, propose a choice, or implement an approved choice under different controls.
+:citet[horvitz1999mixedinitiative] frames mixed-initiative interaction around combining direct human control with automation while considering uncertainty, costs, and benefits.
+:citet[lee2004trust] argues that the design target is appropriate reliance rather than maximum trust.
+Together these traditions shift the question from “How autonomous is the agent?” to “Which function may it perform, under which conditions, and how should reliance change when the conditions change?”
+
+Research on joint human-agent activity adds a second distinction.
+An agent that performs its local task correctly can still be a poor participant in a coupled workflow.
+:citet[klein2004teamplayer] describe requirements for automation to become a team player, including common ground, mutual predictability, directability, and making status and intentions visible.
+Coactive Design develops this interdependence perspective through **observability, predictability, and directability**: participants need sufficient access to pertinent state, behavior they can reasonably anticipate, and ways to influence each other :citep[johnson2014coactive].
+The goal is not maximum visibility or control, but enough of each for the chosen interdependence.
+
+Human-AI interaction guidance reaches similar conclusions at the interface level.
+The guidelines validated by :citet[amershi2019guidelines] include making capabilities and likely errors clear, supporting invocation, dismissal and correction, scoping behavior under uncertainty, and explaining relevant actions.
+At the organizational level, the NIST AI Risk Management Framework calls for differentiated human-AI roles, explicit oversight responsibilities, accountability structures, ongoing monitoring, and mechanisms to disengage systems that behave inconsistently with their intended use :citep[tabassi2023airmf].
+
+Tapio Nissilä expresses these concerns as a software-delivery **decision path** rather than an organization chart :citep[nissila2026decisionpath]:
+
+> **Need → Define → Design → Implement → Verify → Release → Observe → Adapt**
+
+Titles tell us something about skill and organizational position.
+The decision path tells us where authority, evidence, intervention, and responsibility actually sit.
+For each consequential decision along the path, ask:
+
+- What outcome or constraint governs this decision, and which human or group owns its consequences?
+- Does a human, agent, or combination perform the work?
+- May the agent **propose**, **prepare**, or **execute** the decision?
+- Which context, tools, data, permissions, and budgets may it use?
+- What evidence is required before the result is accepted or allowed to affect another system?
+- Which observable condition causes escalation, and who must respond?
+- How can the action be stopped, contained, reversed, or superseded?
+
+An agent can receive operational authority, but invoking a tool does not transfer accountability to that tool.
+The accepting person or group still needs enough understanding, evidence, and control to stand behind the result.
+An approval step is therefore weak when the approver cannot see the relevant state, predict the likely effect, or direct recovery.
+
+Treat autonomy as a property of a particular decision in a particular context, not as a permanent property of an agent role.
+As a design heuristic, broader execution authority is easier to justify when work is bounded, observable, independently checkable, reversible, and low in blast radius.
+Ambiguous intent, novel or tightly coupled changes, weak evidence, irreversible commitments, and material external effects should narrow authority or move the decision to a human.
+This is a risk-routing heuristic rather than a universal formula; the benchmarking chapter shows how local evidence can test whether a chosen allocation actually improves accepted outcomes.
+
+The loop below is the local form of this larger relationship.
+The human and agent may occupy different positions in each phase, but the workflow still needs a visible owner, admissible actions, acceptance evidence, and a route for correction.
+
 ## Constrain, generate, validate, revise
 
 Roughly put, when you develop with agents you follow a loop where you constrain, generate, validate, and revise before starting again.

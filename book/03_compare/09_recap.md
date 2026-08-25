@@ -117,21 +117,32 @@ Reflection prompts:
 - How did your design respond to overload, bad input, retries, duplicates, or partial failure?
 - What would you redesign first if the project continued?
 
-## Agent fleets and project readiness
+## Agent fleets, project readiness, and human-agent relationship
 
 Agentic development scales only when work is bounded and reviewable.
 More agents do not automatically create more progress.
 They can also create duplicated work, conflicting edits, shallow reasoning, and integration burden.
 A project becomes safer for agents when intent, constraints, commands, tests, and review expectations are explicit.
 
+The three implementations are also three human-agent configurations.
+Implementation A and B change model capability while retaining a broadly single-agent workflow; implementation C changes the orchestration and coordination structure.
+Comparing only the finished applications would hide where humans framed intent, delegated authority, supplied context, accepted evidence, intervened, and remained responsible.
+Use the HAR decision path from the development and fleet chapters to compare one consequential feature from need through adaptation.
+The goal is not to identify the build with the most agent autonomy.
+It is to determine which allocation produced accepted outcomes with a review and recovery burden the group could actually sustain.
+
 Reflection prompts:
 
 - What made your project easier or harder for an agent to work on?
 - Which task was suitable for an agent fleet, and which task needed one careful contributor?
 - How did you divide work into roles, files, outputs, and acceptance criteria?
+- For one feature, who or what defined, designed, implemented, verified, released, observed, and adapted it?
+- At each consequential decision, could the agent propose, prepare, or execute, and what justified that authority?
 - What evidence did you use before trusting agent output?
+- Which approval represented informed acceptance, and which risked becoming ceremonial because the reviewer lacked context, time, or a recovery path?
 - What did the fleet debugging view reveal about failures, retries, handoffs, review, or human intervention that the finished code did not show?
 - Did parallel work reduce accepted completion time, or only move work into integration and review?
+- Where did the observed execution path diverge from the planned authority, escalation, or accountability map?
 
 ## Scaling techniques and trade-offs
 
@@ -157,10 +168,11 @@ Useful structure:
 2. Compare the local-model and foundation-model single-agent workflows.
 3. Compare the foundation-model single agent with the agent fleet.
 4. Compare the three architectures and their responses to the same scalability pressures.
-5. Present evidence from tests, benchmarks, audits, the fleet debugging view, traces, interventions, and resource or time measurements.
-6. Separate observed differences from possible causes, including practice effects and scope differences.
-7. Name the trade-offs, remaining risks, and development setup the group would choose next.
-8. Explain what the project taught the group about application and development-system scalability.
+5. Compare one feature's human-agent decision path across A, B, and C, including authority, evidence, escalation, recovery, and accountable ownership.
+6. Present evidence from tests, benchmarks, audits, the fleet debugging view, traces, interventions, and resource or time measurements.
+7. Separate observed differences from possible causes, including practice effects and scope differences.
+8. Name the trade-offs, remaining risks, and development setup the group would choose next.
+9. Explain what the project taught the group about application and development-system scalability.
 
 ### Final reflection package builder
 
@@ -172,7 +184,7 @@ Select the artifacts you have, then use the generated outline to see which claim
 ## Project artifact
 
 Students should submit a final reflection package.
-It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, scaling trade-off table, and a short explanation of what changed in their understanding.
+It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, one planned-versus-observed HAR decision map, scaling trade-off table, and a short explanation of what changed in their understanding.
 
 ## Questions to carry forward
 
