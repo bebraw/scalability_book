@@ -1,62 +1,68 @@
 # What is scalability?
 
-If you ask two developers, they will likely give you a different definition for what is scalability.
-Especially in the context of the web, scalability can be complex as a concept.
-Within this book, we consider the scalability of web applications in particular while many of the ideas considered apply to websites as well.
-This division to websites and applications is operational since websites are oriented around content and applications around functionality.
-It is common that both characteristics are found within a single site and in the context of this book we will use the terms liberally for this reason.
+If you ask two developers, they will likely give you different definitions of scalability.
+Scalability can be a complex concept, especially in the context of the web.
+In this book, we consider the scalability of web applications in particular, although many of the ideas also apply to content-focused websites.
+A single site commonly has both characteristics, so this book uses the terms liberally.
 
-When put to the larger context of scalability, the web has its own challenges related to its design and the way it is used.
-Especially during the past few years the web has started to undergo a major shift as both the way we develop for the web and how we consume it have begun to change.
-This change has to do with the introduction of Large Language Models (LLMs) and agents.
-The shift is a great challenge for developers as while development is cheap, developing in a scalable manner is not.
-The purpose of this chapter is to open your mind to especially scalability related challenges and start you to think about the topic as you will develop your own view on the topic by completing this book.
+Within the broader context of scalability, the web presents its own challenges because of how it is designed and used.
+Over the past few years, the web has begun to undergo a major shift in both how we develop for it and how we consume it.
+This change is driven in part by the introduction of Large Language Models (LLMs) and agents.
+The shift presents a major challenge for developers: while generating code is cheap, developing in a scalable manner is not.
+For me, scalability has both hard and soft aspects: a service must work technically, but keeping it maintainable also requires social infrastructure.
+Therefore, the purpose of this chapter is to introduce you to scalability-related challenges and get you thinking about the topic.
+As you work through the book, you will develop your own view of scalability.
 
 ## Dimensions of scalability
 
-Scalability can be considered from multiple viewpoints ranging from development to how your web applications perform under load in practice.
+Scalability can be considered from multiple viewpoints, ranging from the development process to how web applications perform under load in practice.
 I will cover several of these angles next to give you some food for thought.
-The list won't be exhaustive as the idea is broad and there are likely other ways to decompose scalability.
-That said, I will consider these four aspects of scalability I consider essential: development process, architecture, infrastructure, and data.
+The list is not exhaustive because the concept is broad, and there are likely other ways to decompose scalability.
+That said, I consider five aspects of scalability essential: development process, architecture, infrastructure, data, and business.
 
 > **Sustainability angle**
 >
-> Scaling a system usually scales resource consumption too.
-> A design that handles 10x traffic by using 20x infrastructure may be technically scalable but inefficient.
-> Resource-aware scalability asks how much useful work the system delivers per unit of computation, storage, bandwidth, and operational cost.
-> In short, sustainability forms another angle that encompasses many of the other and within the context of this book we define the term through ecological lens, not other forms of sustainability.
+> Scaling a system typically scales resource consumption too.
+> Although a system may scale to meet demand technically, doing so may be inefficient.
+> I consider ecological sustainability another valuable angle that cuts across the other dimensions.
+> Because of this, I have included short callouts throughout the book to offer these kinds of additional perspectives on the topic.
 
 ### Scalability of the development process
 
-The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process as eventually it may become a constraining factor as your application and ambitions grow.
-For a small throwaway application, development process might not matter much, but it may become a factor if you plan to develop the application further and for a longer period of time.
-These days development process also has to consider how developers and machines work together since LLMs have taken a chunk of work people would have been doing manually shifting responsibilities.
-This is why I believe web developers should understand how to work with models these days.
+The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process.
+Eventually, it may become a constraint as your application and ambitions grow.
+For a small throwaway application, the development process may not matter much, but it can become important if you plan to develop the application further or over a longer period of time.
+These days, the development process must also account for how developers and machines work together.
+LLMs have taken over some work that people previously performed manually, shifting responsibilities in the process.
+This is why I believe today's web developers should understand how to work with models.
 
-I consider the currently available models as power tools.
+I consider the currently available models to be power tools.
 While power tools can be fun to use, they can also cause a lot of damage if not used responsibly.
-In other words, it is now easier than ever to accumulate massive amounts of technical debt that may bite you later.
-Since development was so slow before the large scale introduction of models, it may have required years to reach similar situations before and even then there was much more human intervention in the process.
-Today developers may build even extremely complex applications without spending a lot of time on understanding code which may be dangerous since it erodes trust in what was done since it can be difficult to tell if what was done is correct or even smart.
-It is good to remember that LLMs are good at generating and for that reason what they produce may easily get out of hand as they cannot fully replace your understanding of the problem while they may be able to complement it.
+In other words, it is now easier than ever to accumulate massive amounts of technical debt that may cause problems later.
+Before the large-scale introduction of models, reaching similar situations might have required years, and even then the process involved far more human intervention.
+Today, developers can build extremely complex applications without spending much time understanding the code.
+This can be dangerous because it erodes trust in the result: it may be difficult to tell whether the code is correct or even appropriate.
+LLMs are good at generating code, but their output can easily get out of hand.
+They cannot replace your understanding of the problem, although they can complement it.
 
-Technical debt may be acceptable and not even meant to be paid ever.
+Technical debt may be acceptable and may never need to be repaid.
 For certain tasks, such as technical feasibility spikes or ideation, debt might not matter.
 Once you understand what you need to build, proper engineering can take place.
-Since building is cheap, you can use that to your benefit while experimenting to develop your understanding of the problem to come up with a better solution.
+Since generating code is cheap, you can use experimentation to deepen your understanding of the problem and arrive at a better solution.
 
 ### Scalability of architecture
 
-As a concept architecture is nebulous since it captures the way we shape things and how they relate to each other.
-In software, architecture is visible for example in the concepts of cohesion and modularity.
-The way we structure our software has impact on its scalability as it can either constrain or enable scalability related factors.
-For example tight coupling between services may make it complicated to deploy them to a loosely coupled deployment target.
-Coupling touches the concepts of boundaries and contracts as those are at the core of software architecture.
-Understanding responsibilities of different entities is one of the key tasks of a software architect after all.
-On top of this, a software architect has to consider how to evolve this all since often systems are not fixed and change over time.
-It is good to remember that LLMs tend to copy patterns available in your codebase.
-Therefore, setting good example has even more value than before since building the right way can save you from a lot of uncertainty and refactoring.
-It can be argued that our current tools are not ideal for LLM driven development so it is worth thinking about what kind of primitives you want to use in your architecture to allow LLMs to make good decisions as they craft technical solutions for you.
+As a concept, architecture is nebulous because it captures how we shape things and how they relate to one another.
+In software, architecture is visible in concepts such as cohesion and modularity.
+The way we structure our software has an impact on its scalability because it can either constrain or enable scalability-related factors.
+For example, tight coupling between services may make them difficult to deploy to a loosely coupled deployment target.
+Coupling relates to boundaries and contracts, which lie at the core of software architecture.
+Understanding the responsibilities of different entities is one of the key tasks of a software architect, after all.
+A software architect must also consider how the system will evolve because it is rarely fixed and will change over time.
+It is worth remembering that LLMs tend to copy patterns available in your codebase.
+Therefore, setting a good example has even more value than before because building the right way can save you from a lot of uncertainty and refactoring.
+Our current tools are arguably not ideal for LLM-driven development.
+It is therefore worth considering which architectural primitives will help LLMs make good decisions as they craft technical solutions for you.
 
 ### Scalability of infrastructure
 
@@ -81,7 +87,7 @@ You may also want to back up your data so it does not get lost.
 To make things worse, you may have to consider how it is read and written while dealing with concurrent usage that may lead to conflicts.
 As you can see, the topic can get complex fast, and this complexity depends largely on your use cases.
 
-### Scalability in business context
+### Scalability in business
 
 Another way to look at scalability is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features.
 Here the challenge is to make changes without breaking anything that used to work as that could be expensive.
