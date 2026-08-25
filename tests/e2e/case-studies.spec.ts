@@ -7,14 +7,11 @@ test.describe("case studies", () => {
     await page.goto("/chapters/scalable-development/");
 
     await expect(
+      page.getByRole("link", { name: "case studies" }),
+    ).toHaveAttribute("href", "/case-studies/");
+    await expect(
       page.getByRole("link", { name: "Slideotter" }).first(),
     ).toHaveAttribute("href", "/case-studies/slideotter/");
-    await expect(
-      page.getByRole("link", { name: "Thesis Journey Tracker" }).first(),
-    ).toHaveAttribute("href", "/case-studies/thesis-journey-tracker/");
-    await expect(
-      page.getByRole("link", { name: "Kirjolab" }).first(),
-    ).toHaveAttribute("href", "/case-studies/kirjolab/");
     await expect(
       page.getByRole("link", { name: "Webernetes" }).first(),
     ).toHaveAttribute("href", "/case-studies/webernetes/");

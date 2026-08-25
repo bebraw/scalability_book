@@ -52,7 +52,9 @@ test.describe("book reading layout", () => {
   }) => {
     await page.goto("/chapters/scalable-development/");
 
-    const citation = page.locator(".semantic-citation").first();
+    const citation = page.locator(
+      '.semantic-citation[data-citation="lipsanen2026shiftup"]',
+    );
     await expect(citation).toContainText("Lipsanen et al.");
     await expect(page.locator(".semantic-bibliography")).toContainText(
       "Shift-Up",

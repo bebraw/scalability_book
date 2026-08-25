@@ -161,6 +161,48 @@ Then introduce a database transaction and, for concurrent requests, compare read
 The simulation does not imply that every database implements an isolation level or durable commit in the same way.
 For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
 
+### Model valid data combinations
+
+A transaction constrains how a valid state change becomes durable.
+Constructive data modeling asks which combinations ordinary code should be able to construct before that boundary is reached.
+In _The Unreasonable Effectiveness of Constructive Data Modeling_, Alexis King describes defining the supported "positive space" with ordinary records and tagged variants, then using exhaustive case analysis where the language supports it :citep[king2026constructive].
+King's earlier _Parse, Don't Validate_ frames a boundary check as a transformation that returns a more precise representation carrying what it learned rather than only reporting success :citep[king2019parse].
+These are design arguments rather than comparative evidence, and the goal is not maximum type precision.
+
+For the result of a state-transition decision, a loose record does not require the payload that each outcome needs:
+
+```ts
+type TransitionDecision = {
+  accepted: boolean;
+  next?: WorkItem;
+  current?: WorkItem;
+  event?: ActivityEvent;
+  reason?: TransitionError;
+};
+```
+
+It permits `accepted: true` without a next item or event, and `accepted: false` without a current item or reason.
+Model the required payload for each branch instead:
+
+```ts
+type TransitionDecision =
+  | { kind: "accepted"; next: WorkItem; event: ActivityEvent }
+  | { kind: "rejected"; current: WorkItem; reason: TransitionError };
+```
+
+The discriminator makes each branch's required payload explicit, and narrowed type-checked code cannot treat a rejected decision as if it exposed a transition event.
+It does not prove that the event matches the correct transition unless the inner types or constructor also enforce that relationship.
+The value is an in-memory decision, not a durable fact.
+Untrusted, untyped, or deserialized input crossing a boundary still needs runtime parsing.
+Before committing a decision, the request path must authenticate and authorize the caller; the persistence operation must conditionally match the authoritative state or version, then atomically update the item and append the event.
+Malformed deserialization, mutation, or unsafe casts can bypass the representation, while concurrency and retries can violate surrounding invariants even when each individual value is valid.
+
+**Selected-invariant check.**
+In the existing `specs/{feature}/spec.md`, show one broad record or result and one contradictory value it permits.
+Replace it with a stack-native tagged union, sealed hierarchy, or guarded constructor.
+Where the stack supports checked variants, add a compile-fail type fixture; add a runtime test for any parser or guarded constructor at a data boundary, and reuse an existing supported-behavior test.
+Record one important invariant that remains enforced elsewhere, such as authorization or atomic concurrent transition.
+
 ### Cache control is application policy
 
 An HTTP cache can avoid an origin request, reduce transferred bytes, and hide network latency, but only when reuse is correct for the response and its users.

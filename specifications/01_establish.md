@@ -54,6 +54,17 @@ Record consequential human intervention instead of hiding it.
 Complete the required domain model, behavior, harness, and acceptance scenarios from the common specification.
 Before expanding optional scope, describe the first closed product loop and list the capabilities deliberately deferred until that loop produces evidence.
 
+If the implementation begins from a starter template, record the template source and starting revision before pruning it.
+Classify inherited material as:
+
+- **keep** because it protects the closed product loop or its development harness;
+- **replace later** because it is still the only working seam;
+- **remove** because it is distribution-only material with no current owner; or
+- **decide** because removal would settle a product or architecture question that remains open.
+
+Review the exact removal set before editing, especially when automation or an agent performs the pruning.
+The template is a distribution artifact, not the finished architecture of the product.
+
 ### 3.2 Establish the evidence baseline
 
 Produce the common evidence package while the work is happening.

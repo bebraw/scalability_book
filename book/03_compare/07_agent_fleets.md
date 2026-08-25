@@ -73,6 +73,10 @@ For each one, distinguish the performer from the accountable owner and record ho
 The function-specific automation model of :citet[parasuraman2000automation] is useful here: acquiring information, analyzing it, selecting an action, and implementing that action can receive different allocations even inside one named task.
 NIST similarly recommends defining and differentiating roles and responsibilities for human-AI configurations and oversight rather than assuming that the presence of a human establishes effective control :citep[tabassi2023airmf].
 
+This allocation problem has a longer research history.
+Mixed-initiative interaction combines direct human control with automation while considering uncertainty, costs, and benefits :citep[horvitz1999mixedinitiative], and the design target is appropriate reliance rather than maximum trust :citep[lee2004trust].
+Joint-activity research adds common ground, mutual predictability, and directability :citep[klein2004teamplayer], while human-AI interaction guidance emphasizes making capabilities and likely errors visible and supporting invocation, dismissal, and correction :citep[amershi2019guidelines].
+
 | Decision                           | Performer and authority                                   | Acceptance evidence                                              | Escalation or recovery                                          | Accountable owner |
 | ---------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- | ----------------- |
 | Interpret an ambiguous requirement | Agent proposes interpretations; human selects or reframes | Examples, affected users, assumptions, and unresolved questions  | Escalate when alternatives change the required behavior         | Outcome owner     |
@@ -252,6 +256,23 @@ An agent's role should define not only its task but also which information it ca
 Simon Willison's [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) names a particularly dangerous combination: access to private data, exposure to untrusted content, and a way to communicate externally.
 Prompt injection in the untrusted content can then turn the agent's legitimate permissions into a path for data exfiltration.
 
+### Imported capabilities are development dependencies
+
+A skill may arrive as prose, yet it can direct tool calls made with the agent's authority and may bundle code or configuration.
+A USENIX Security 2026 study crawled 98,380 skill entries from two community registries in January 2026.
+Static triage selected 4,287 candidates; sandboxed behavioral verification and independent judgments by two of the authors confirmed 157 malicious skills :citep[liu2026maliciousskills].
+
+Those 157 are a behaviorally confirmed lower bound in one snapshot, not an ecosystem prevalence estimate.
+The snapshot excluded private, unindexed, and official collections; one publisher identifier contributed 85 templated cases; and 60-second sandbox runs could miss dormant or environment-gated behavior.
+Official provenance, popularity, scanning, or a previous safe version can filter risk; none proves that an imported capability or update is safe in the current host.
+
+Treat adoption and updates as dependency changes.
+Record the source and resolved revision; inspect instructions, bundled files, installation hooks, downloads, and mutable remote inputs; identify missing or unreviewable content; and map requested access against the authority the host would actually grant over files, commands, networks, and credentials.
+Perform any dynamic verification only in a disposable sandbox approved for security testing, with the least authority needed and no production credentials.
+Connect output produced with the capability to independent project checks, and define who reviews updates and how the capability can be removed.
+
+The [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a non-executing fixture for practicing this review without loading an untrusted capability into an agent context.
+
 > **Case study: when exploration scales**
 >
 > During a July 2026 cyber-capability evaluation using the ExploitGym benchmark, an AI agent escaped its evaluation environment and chained weaknesses across external infrastructure and Hugging Face's production systems :citep[openai2026huggingfaceincident].
@@ -277,6 +298,16 @@ A scout reading untrusted issues may not need secrets or network-writing tools.
 An implementer may work in a sandbox with scoped files and no deployment credentials.
 A publisher may receive a reviewed artifact instead of the full private context that produced it.
 Human approval can help at a sensitive boundary, but an approval prompt is not useful when the effect is unclear or reviewers have learned to accept it mechanically.
+
+### Upstream work needs a human owner
+
+An issue or patch submitted upstream asks someone else to spend scarce attention on triage, comprehension, review, integration, and follow-up.
+:citet[gruhn2026meatproxy] describes a failure mode in which a person forwards model output and routes reviewer feedback back through the model without first understanding and validating the work.
+Writing the request in your own words is only a signal of engagement, not proof of correctness, but the submitting human should be able to restate the intent, explain the evidence and limits, answer feedback, and correct or withdraw the change.
+
+:citet[garbutt2026humanity] distinguishes agent-assisted human contributions from end-to-end agent submissions and argues that the latter can transfer effort to maintainers and weaken the relationships through which contributors become maintainers.
+His supporting data covers five selected projects, the projected annual changes simply double first-half totals, and the source cannot identify which pull requests were agent-generated; the observations illustrate a plausible cost-transfer mechanism rather than establish causal prevalence or community effects.
+Before allowing an agent to publish upstream, require explicit human authorization, follow the project's policy and templates, respect opt-outs and rate limits, disclose material assistance when requested, and measure accepted maintenance value rather than submission volume.
 
 ## Delegation lab
 

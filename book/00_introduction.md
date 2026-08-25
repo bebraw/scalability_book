@@ -44,6 +44,12 @@ The course project has been documented through [a shared specification](/project
 While the application behavior remains stable across the different implementations, the way you implement will change as mentioned, and you will have technical choices to make in terms of product interpretation, stack, architecture, storage, and interfaces.
 This means you can compare the impact of different engineering choices against the same behavioral core.
 
+> **Protect learning, not only output**
+>
+> Immediate task performance is not the only outcome worth protecting.
+> Across three randomized experiments involving short arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence; the decline was concentrated among participants who used AI for direct solutions, while hint-oriented users did not differ significantly from the control group :citep[liu2026assistance].
+> These tasks do not establish the long-term effect on professional programming, but they support a practical course rule: use agents for hints, critique, and verification when the underlying skill must remain yours.
+
 I call the three parts of the book Establish, Challenge, and Compare.
 Each of these parts responds to specific scalability related questions and I have covered what to expect briefly below.
 

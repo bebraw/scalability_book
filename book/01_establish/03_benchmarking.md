@@ -89,6 +89,25 @@ For a bounded task, record whether the result passed its acceptance checks, how 
 Generated lines of code and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
 This distinction matters in practice: organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
 
+### Separate effort from trust
+
+Perceived effort can influence quality judgments when quality is difficult to assess :citep[kruger2004effort].
+It is a heuristic, not correctness evidence: a quick change can be sound, a laborious change can be wrong, and neither hours nor transcript length shows that software meets its requirements.
+Ask four different questions:
+
+- **Provenance:** Which exact revision or artifact is this, and which inputs, people, and tools produced or materially transformed it?
+- **Endorsement:** Who stands behind which claim or decision on the final revision, including any reservations?
+- **Accountability:** Who owns the consequences and must correct, maintain, or retire the result if it proves wrong or becomes outdated?
+- **Evidence:** Which properties were checked on that revision, under what conditions, and what remains unverified?
+
+[_Sloptimists, Sloperators and Slopportunism_](https://atharvaraykar.com/sloptimists-sloperators-and-slopportunism/) makes the distinction concrete: Atharva Raykar describes the essay body as unedited model output, then says in his commentary that he does not fully endorse it.
+Disclosed origin and human acceptance are different, and neither establishes quality.
+Survey respondents have reported tracking and monitoring for later review or debugging as reasons for declaring AI-generated code, but the available study did not test whether declaration improves software quality :citep[kashif2026declaration].
+
+Use the AI-use log together with the submitted project evidence: record material assistance and corrections in the log, and bind checks and known limits to the submitted revision.
+Provenance can make a process traceable; it does not make the artifact correct or transfer responsibility to the tool.
+Record effort for comparison and reflection, not as a quality score.
+
 ### Anatomy of an agent evaluation
 
 A software test usually invokes known code with controlled inputs and checks the result.
@@ -125,6 +144,57 @@ Start with tasks already checked manually, consequential failures, and represent
 For each task, keep a reference solution or known passing run to show that the stated problem is solvable and the graders can accept at least one correct outcome.
 Everything required by a grader should be justified by the task brief or a declared invariant; an agent should not fail because the evaluator silently assumed a filepath, output format, or environmental resource.
 Balance positive and negative cases so optimizing one behavior does not produce its opposite failure elsewhere.
+
+### Qualify the served configuration
+
+A model name or local endpoint is not a capability result.
+Bind an accepted outcome to the configuration that served it: resolved model revision or digest and quantization, runtime version, allocated context, prompt and tool scaffold, and relevant hardware and accelerator residency or CPU/GPU offload where exposed.
+When an approved service does not expose a field, mark it unavailable and name the evidence source or service operator rather than estimating it.
+
+In a study of 9.7K test examples across long-input and long-form-output benchmarks, quantization effects varied by method, model, task, context length, and language :citep[mekala2025quantization].
+The study used vLLM on datacenter GPUs and did not test coding agents, Ollama, or consumer-device deployments, so one quantized build should not inherit another build's score.
+Hardware constrains which configurations fit and their latency, throughput, and resource use; it does not establish task capability.
+
+Keep capability, hardware fit, and data location as separate claims.
+Running inference locally identifies where model computation occurs, not the data boundary of tools, telemetry, storage, or network calls.
+A fallback can select a different model or configuration and change the capability, latency, cost, and data boundary.
+Ollama, for example, exposes an installed model's [digest and quantization](https://docs.ollama.com/api/tags) and a running model's [allocated context and server-reported model VRAM bytes](https://docs.ollama.com/api/ps).
+It can also forward cloud-model requests while callers continue using its local API, so `localhost` alone does not prove local execution ([cloud models](https://docs.ollama.com/cloud)).
+
+Assign a stable identifier to each served configuration in the evaluation.
+Record its exposed model, runtime, context, scaffold, tools, hardware boundary, outbound paths, and fallback policy, then link every attempt and acceptance result to that identifier.
+For an opaque departmental service, use operator- or instructor-supplied metadata; otherwise mark unavailable fields and name the evidence source.
+Qualify the configuration against a predeclared representative task and deterministic check, and treat the result as evidence for that task rather than a general ranking of local and hosted models.
+
+Context selection and output reduction are also configuration decisions.
+Long tool outputs and interaction histories consume context and can increase latency or cost, which has motivated command-aware filters such as [rtk](https://github.com/rtk-ai/rtk) and model-generated summaries.
+A shorter agent-facing view does not by itself establish a lower total bill or an unchanged task outcome.
+In a SWE-agent workshop study, observation masking and model-generated summaries reduced cost in most of five tested model configurations, but its paired analysis found that both significantly lowered solve rate in one reasoning-model configuration :citep[lindenbauer2025complexity].
+On controlled long-horizon tool-use benchmarks, ACON reduced peak input tokens while largely retaining task performance :citep[kang2026acon].
+Neither study validates every command filter; together they show that context reduction is a behavior change to test, not free efficiency.
+
+> **Compact the working view; preserve the raw record**
+>
+> Treat compressed output as a working view, not as the evidence record.
+> Keep raw output retrievable during the run and preserve the producer's exit status independently.
+> For bounded qualification cases and consequential failures, retain the original command or query, working directory, separate output streams, pagination or continuation metadata, and explicit omission markers under a stable handle.
+> Apply the underlying system's data-minimization, secret-handling, residency, access, and deletion rules; disable archival where those rules cannot be met.
+> Prefer native structured output as a comparison baseline, make capture failures visible, and treat retrieved output as untrusted text rather than embedded instructions.
+>
+> Qualify each important compression policy with the same task cohort and acceptance checks used for the uncompressed view.
+> Include compression calls, raw retrievals, retries, and failed attempts when reporting total cost per accepted outcome.
+> A reduction in shell-output bytes is only a component metric.
+
+**Tool-output preflight.**
+Use instructor-supplied or synthetic non-sensitive raw artifacts for one passing command and one deliberately tricky output: an exit-zero warning, a failing diagnostic, or an unusual line in a repetitive log.
+Production and secret-bearing output are outside this exercise.
+If the policy claims to handle pagination, add one paginated artifact.
+
+Before generating compact views, list the critical facts in each raw artifact and require every compact fixture to mark at least one explicit omission.
+Record the command and tool version, reduction-policy version, configuration, and content hash.
+Verify that source status, separate output-stream provenance, critical facts, omission markers, retrieval handle, and pagination metadata survive.
+Report critical facts retained over critical facts present, false or materially misleading facts, and any policy-safe fallback.
+Passing this preflight can reject an obviously lossy or unsafe policy; claims about cost or task effectiveness require paired end-to-end outcomes.
 
 ### The eval suite is also software
 
