@@ -89,6 +89,67 @@ For a bounded task, record whether the result passed its acceptance checks, how 
 Generated lines of code and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
 This distinction matters in practice: organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
 
+### Anatomy of an agent evaluation
+
+A software test usually invokes known code with controlled inputs and checks the result.
+An agent evaluation must also define the situation in which a model acts, because tool access, instructions, the starting repository, resource limits, and intermediate state can all change the result.
+The following vocabulary helps keep those layers separate :citep[grace2026demystifying]:
+
+- A **task** is one problem with declared inputs and success criteria.
+- A **trial** is one attempt at that task.
+  Repeated trials expose variation in the agent's behavior; they do not create new independent tasks.
+- The **outcome** is the state left at the end of a trial, such as a working patch, updated database, or generated artifact.
+- The **trace** or **transcript** records the path to that state, including outputs, tool calls, intermediate results, and relevant interventions.
+- A **grader** checks one aspect of the outcome or trace through code, a model-based rubric, or human judgment.
+- The **agent harness** runs the model-and-tool loop, while the **evaluation harness** provisions tasks and environments, invokes the agent harness, preserves evidence, applies graders, and aggregates results.
+- An **evaluation suite** groups tasks intended to measure a declared capability or behavior.
+
+These terms describe different measurement objects.
+A repository test is often one deterministic grader inside an agent evaluation rather than the entire evaluation.
+A public benchmark is a shared evaluation suite designed for comparison across systems, while a local product or project evaluation should represent the work and failure modes that matter in its own setting.
+An RL environment additionally exposes a reward signal for optimization or training.
+Treating these as synonyms hides differences in task selection, incentives, and supported claims.
+
+Prefer grading the outcome when several valid paths can solve the task.
+Use the trace to diagnose failures, account for cost and intervention, and check process requirements that genuinely matter, such as permission compliance or a mandatory approval.
+Rigidly requiring one anticipated sequence of tool calls can reject a valid solution, while accepting only the final statement can miss that the claimed change never occurred.
+
+### Capability and regression evals
+
+A **capability eval** asks whether the workflow can perform work that is currently difficult.
+Its initial pass rate may be low because it is intended to reveal a boundary and provide room for improvement.
+A **regression eval** asks whether the workflow still handles previously accepted work and should normally pass almost all trials :citep[grace2026demystifying].
+When a capability task becomes reliably solvable, preserve it as a regression task rather than discarding the evidence and starting over.
+
+Start with tasks already checked manually, consequential failures, and representative project changes.
+For each task, keep a reference solution or known passing run to show that the stated problem is solvable and the graders can accept at least one correct outcome.
+Everything required by a grader should be justified by the task brief or a declared invariant; an agent should not fail because the evaluator silently assumed a filepath, output format, or environmental resource.
+Balance positive and negative cases so optimizing one behavior does not produce its opposite failure elsewhere.
+
+### The eval suite is also software
+
+Terminal-Bench provides a concrete example of a versioned agent benchmark whose tasks combine instructions, container environments, resource limits, reference solutions, and executable tests.
+Terminal-Bench 2.1 changed 26 tasks from the earlier suite to repair bugs, adjust timeouts or resources, and improve robustness against reward hacking :citep[terminalbench2026v21].
+Its `fix-code-vulnerability` task, for example, pins a Bottle source revision and Python image, specifies CPU, memory, storage, and time limits, requires both a patch and a structured report, and checks the result with original and security-focused tests.
+
+The revisions make a methodological point more important than a leaderboard position: the measurement instrument can be wrong.
+Ambiguous instructions, incomplete graders, leaked state, shared caches, resource contention, and permissive reference matching can create failures or passes unrelated to the intended capability.
+Record the suite version and environment with every result, validate a reference solution, start trials from clean state, and read selected traces before trusting an aggregate score.
+When a task or grader changes materially, do not silently compare the new score with results from the previous instrument.
+
+For this course, inspecting one packaged benchmark task is more useful than running the entire public suite.
+Identify its claimed capability, starting state, visible instructions, hidden or external assumptions, graders, reference solution, resource boundary, and plausible gaming paths.
+Then state what a passing result would and would not establish.
+The exercise teaches benchmark anatomy without replacing the project's local tasks with a heterogeneous and potentially expensive leaderboard workload.
+
+> **Advanced option: derive candidate tasks from repository history**
+>
+> Repo2RLEnv can mine merged pull requests or commits, reconstruct repository states in Docker, and emit Harbor-compatible tasks whose primary runtime signal comes from the repository's own tests :citep[huggingface2026repo2rlenv].
+> Its runtime pipelines use the familiar fail-to-pass and pass-to-pass shape: tests associated with the change should begin failing and pass under the reference patch, while previously passing behavior should remain intact.
+> This can help an instructor or a mature project turn reviewed changes into candidate evaluation data, but it is not a course baseline and does not make every repository an informative RL environment.
+> History records changes that happened, not a representative sample of future work; tests can omit intended behavior; generated instructions can leak or distort the problem; and similarity to an oracle diff can penalize a different valid patch.
+> An executable reward is verifiable under its grader, not automatically complete ground truth.
+
 Some outcomes can be checked deterministically through tests, schemas, or expected artifacts.
 Others require a rubric or human judgment.
 When a model acts as a judge, test whether answer order, verbosity, confidence, or the judge's own style changes its scores; LLM judges have documented position and self-enhancement biases :citep[zheng2023mtbench].
@@ -128,6 +189,12 @@ Earlier work on NLP evaluations likewise found that small test sets can lack the
 When possible, run both candidates on the same task IDs and predeclare how repeated calls become one task-level result.
 Repeated calls reveal variation within a task; they do not turn one task into many independent tasks.
 If many tasks are variants of one template, repository, or issue family, disclose that dependence and narrow the claim.
+
+When a protocol permits `k` trials per task, name the reliability question before selecting a summary.
+**Pass@k** asks whether at least one of the `k` trials succeeds and is useful when several attempts are genuinely available and one accepted solution is enough.
+**Pass^k** asks whether all `k` trials succeed and is useful when users need the behavior to be dependable every time :citep[grace2026demystifying].
+More attempts make pass@k easier to satisfy and pass^k harder, so the same workflow can look increasingly capable by one measure and increasingly unreliable by the other.
+Predeclare `k`, budgets, stopping rules, and whether failed attempts remain in latency and cost totals; do not use pass@k to imply first-attempt reliability.
 
 Report the independent task count, task source, one predeclared primary outcome, and observed paired difference.
 If a course-provided or otherwise justified paired interval method fits the outcome, include the interval and name the method.

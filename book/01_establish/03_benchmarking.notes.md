@@ -291,7 +291,6 @@ The same protocol should be rerun for implementations B and C.
   It can support a short treatment of sample size, confidence intervals, and careful model comparisons.
 - Obsidian candidate: `Clippings/_Processed/Building eval systems that improve your AI product.md` can support the error-analysis-first framing: start by looking at actual failures, then design evaluators around those failure modes rather than generic scores.
 - Obsidian candidate: `Clippings/_Processed/hamelsmuevals-skills Skills for AI Evals to compliment the course AI Evals For Engineers & PMs.md` can provide a checklist of eval design concerns: eval audits, error analysis, synthetic data, judge prompts, evaluator validation, RAG evaluation, and review interfaces.
-- Obsidian candidate: `Clippings/_Processed/harbor evaluate agents in sandboxed environments.md` could be useful if the course later evaluates agentic tasks in isolated environments.
 - External candidate: OpenAI Evals (`https://github.com/openai/evals`) is useful as a framework and registry reference for evaluating LLMs and LLM systems.
 - External candidate: Inspect AI (`https://github.com/UKGovernmentBEIS/inspect_ai`) is useful as a model-evaluation framework reference, especially if the chapter needs a more formal eval harness example.
 - External candidate: LangSmith evaluation concepts (`https://docs.langchain.com/langsmith/evaluation-concepts`) gives accessible vocabulary for datasets, examples, experiments, evaluator scores, and traces.

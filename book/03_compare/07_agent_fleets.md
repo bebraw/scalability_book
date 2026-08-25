@@ -293,9 +293,11 @@ Use the decision-path exercise with the delegation brief: role descriptions allo
 
 The fleet should be evaluated as a workflow, not as a collection of impressive transcripts.
 Reuse the model-eval pattern from the benchmarking chapter: define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time.
+Treat one end-to-end fleet attempt as a trial and grade its accepted outcome at the delegated-run boundary; the fleet's internal agents, retries, and handoffs are parts of that trial rather than independent samples.
 For a fleet, the execution trace is also evidence.
 It can reveal duplicated exploration, unnecessary handoffs, invalid tool calls, or an implementer working beyond its boundary even when the final answer looks acceptable.
-A single-agent and fleet run on the same bounded task can support a local decision about whether delegation paid for its coordination cost.
+A single-agent and fleet run on the same bounded task can support a local case decision about whether delegation paid for its coordination cost.
+If the comparison makes a reliability claim, predeclare repeated trials and whether success means at least one accepted outcome or consistent acceptance across them; keep every failed attempt in the cost and latency accounting.
 
 In the course project, this trace becomes application data.
 The fleet run maps to a workspace, delegated tasks map to work items, agents and humans map to actors, and execution details map to activity events.
