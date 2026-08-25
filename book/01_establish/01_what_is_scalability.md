@@ -17,7 +17,7 @@ The purpose of this chapter is to open your mind to especially scalability relat
 Scalability can be considered from multiple viewpoints ranging from development to how your web applications perform under load in practice.
 I will cover several of these angles next to give you some food for thought.
 The list won't be exhaustive as the idea is broad and there are likely other ways to decompose scalability.
-That said, I will consider these five aspects of scalability I consider essential: development process, architecture, infrastructure, and data.
+That said, I will consider these four aspects of scalability I consider essential: development process, architecture, infrastructure, and data.
 
 > **Sustainability angle**
 >
