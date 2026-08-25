@@ -1297,7 +1297,8 @@
   line-height: 1.1;
 }
 .dimensions-demo .scaling-demo-summary span {
-  min-block-size: 2.75rem;
+  block-size: 4.125rem;
+  overflow-wrap: anywhere;
 }
 .scaling-demo-summary small {
   color: var(--muted);
@@ -1607,6 +1608,7 @@
 }
 .dimensions-demo-controls,
 .dimensions-demo-output,
+.dimensions-demo-radar-section,
 .dimensions-demo-tradeoff,
 .dimensions-demo-pressures,
 .dimensions-demo-radar {

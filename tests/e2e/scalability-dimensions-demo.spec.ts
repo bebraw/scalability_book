@@ -14,8 +14,14 @@ test.describe("scalability dimensions demo", () => {
     const demo = page.locator("[data-dimensions-demo]");
 
     await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
-      "2 pressures",
+      "2 pressures: Infrastructure + Data",
     );
+    await expect(
+      demo.locator("[data-dimensions-demo-metric='primary']"),
+    ).toContainText("Infrastructure and Data");
+    await expect(
+      demo.locator("[data-dimensions-demo-interpretation]"),
+    ).toContainText("share the highest relative pressure");
     await expect(demo.locator(".demo-card").first()).toContainText(
       "event-oriented app",
     );
@@ -37,16 +43,19 @@ test.describe("scalability dimensions demo", () => {
       .setChecked(true);
 
     await expect(demo.locator("[data-dimensions-demo-radar]")).toContainText(
-      "Change",
+      "Development",
+    );
+    await expect(demo.locator("[data-dimensions-demo-radar]")).toContainText(
+      "Architecture",
     );
     await expect(
       demo.locator("[data-dimensions-demo-metric='primary']"),
-    ).toContainText("Change");
+    ).toContainText("Development process");
     await expect(
       demo.locator("[data-dimensions-demo-interpretation]"),
-    ).toContainText("Fast iteration");
+    ).toContainText("has the highest relative pressure");
     await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
-      "2 pressures point to Change",
+      "2 pressures: Development",
     );
     await expect(
       demo.locator("[data-dimensions-demo-radar] svg"),
@@ -57,10 +66,58 @@ test.describe("scalability dimensions demo", () => {
     );
   });
 
-  test("keeps the layout stable when the budget pressure wraps", async ({
+  test("normalizes every dimension to its own maximum", async ({ page }) => {
+    const demo = page.locator("[data-dimensions-demo]");
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+
+    for (const input of await demo
+      .locator("[data-dimensions-demo-pressure]")
+      .all()) {
+      await input.setChecked(true);
+    }
+
+    const exposures = await demo
+      .locator("[data-dimensions-demo-radar-vertex] title")
+      .allTextContents();
+    const verticesReachOuterRing = await demo.evaluate((node) => {
+      const outer = Array.from(
+        node.querySelectorAll<SVGCircleElement>(".dimensions-demo-radar-point"),
+      );
+      const selected = Array.from(
+        node.querySelectorAll<SVGCircleElement>(
+          "[data-dimensions-demo-radar-vertex]",
+        ),
+      );
+
+      return selected.every(
+        (vertex, index) =>
+          vertex.getAttribute("cx") === outer[index]?.getAttribute("cx") &&
+          vertex.getAttribute("cy") === outer[index]?.getAttribute("cy"),
+      );
+    });
+
+    expect(exposures).toEqual([
+      "Development process: 100% of modeled pressure",
+      "Architecture: 100% of modeled pressure",
+      "Infrastructure: 100% of modeled pressure",
+      "Data: 100% of modeled pressure",
+      "Business: 100% of modeled pressure",
+    ]);
+    expect(verticesReachOuterRing).toBe(true);
+    await expect(
+      demo.locator("[data-dimensions-demo-metric='primary']"),
+    ).toContainText(
+      "Development process, Architecture, Infrastructure, Data, and Business",
+    );
+  });
+
+  test("keeps the layout stable across pressure combinations", async ({
     page,
   }) => {
     const demo = page.locator("[data-dimensions-demo]");
+    const pressureInputs = demo.locator("[data-dimensions-demo-pressure]");
+    const verdict = demo.locator("[data-dimensions-demo-verdict]");
     const getFormOffset = () =>
       demo.evaluate((node) => {
         const form = node.querySelector("[data-dimensions-demo-form]");
@@ -75,28 +132,24 @@ test.describe("scalability dimensions demo", () => {
       });
 
     const before = await getFormOffset();
+    const pressureCount = await pressureInputs.count();
 
-    for (const value of [
-      "traffic",
-      "history",
-      "contributors",
-      "requirements",
-    ]) {
-      await demo
-        .locator(`[data-dimensions-demo-pressure][value='${value}']`)
-        .setChecked(false);
+    for (let mask = 0; mask < 2 ** pressureCount; mask += 1) {
+      for (let index = 0; index < pressureCount; index += 1) {
+        await pressureInputs
+          .nth(index)
+          .setChecked(Boolean(mask & (1 << index)));
+      }
+
+      const after = await getFormOffset();
+      const verdictFits = await verdict.evaluate(
+        (node) => node.scrollHeight <= node.clientHeight,
+      );
+
+      expect(after, `pressure mask ${mask} moved the form`).toBe(before);
+      expect(verdictFits, `pressure mask ${mask} overflowed the verdict`).toBe(
+        true,
+      );
     }
-
-    await demo
-      .locator("[data-dimensions-demo-pressure][value='budget']")
-      .setChecked(true);
-
-    await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
-      "1 pressure point to Cost and energy",
-    );
-
-    const after = await getFormOffset();
-
-    expect(after).toBe(before);
   });
 });

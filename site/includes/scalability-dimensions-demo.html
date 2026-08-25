@@ -13,8 +13,8 @@
     <div class="scaling-demo-summary" aria-live="polite">
       <span data-dimensions-demo-verdict>Pick project pressures</span>
       <small
-        >Scalability is not one axis. Different growth pressures stress
-        different parts of the system.</small
+        >Each axis shows its share of the maximum pressure modeled by this
+        scenario.</small
       >
     </div>
   </div>
@@ -57,7 +57,7 @@
             value="contributors"
             data-dimensions-demo-pressure
           />
-          <span>Several teams or agents change the codebase</span>
+          <span>Several developers, teams, or agents change the codebase</span>
         </label>
         <label>
           <input
@@ -75,16 +75,16 @@
     </div>
 
     <div class="scaling-demo-panel dimensions-demo-output">
-      <div>
+      <div class="dimensions-demo-radar-section">
         <h4 id="dimensions-demo-radar-title">Dimension radar</h4>
         <div class="dimensions-demo-radar" data-dimensions-demo-radar></div>
       </div>
 
       <div class="dimensions-demo-tradeoff">
-        <h4>Primary trade-off</h4>
+        <h4>What the pressures affect</h4>
         <dl class="scaling-demo-metrics">
           <div>
-            <dt>Strongest dimension</dt>
+            <dt>Most affected</dt>
             <dd data-dimensions-demo-metric="primary">-</dd>
           </div>
           <div>

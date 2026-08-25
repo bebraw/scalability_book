@@ -5,6 +5,11 @@ Scalability can be a complex concept, especially in the context of the web.
 In this book, we consider the scalability of web applications in particular, although many of the ideas also apply to content-focused websites.
 A single site commonly has both characteristics, so this book uses the terms liberally.
 
+In this book, I use scalability to mean a system's ability to continue meeting its goals as the demands around it grow or change.
+These demands may be technical, developmental, or organizational.
+A system can therefore scale well in one respect while struggling in another.
+Performance describes how a system behaves under given conditions, whereas scalability describes how that behavior changes when the conditions change.
+
 Within the broader context of scalability, the web presents its own challenges because of how it is designed and used.
 Over the past few years, the web has begun to undergo a major shift in both how we develop for it and how we consume it.
 This change is driven in part by the introduction of Large Language Models (LLMs) and agents.
@@ -74,7 +79,7 @@ Since an event, such as a Hacker News traffic surge, is so short, it is difficul
 You will have to plan for spikes in time to make sure you can deal with success as otherwise your serves might be hugged to death, momentarily at least.
 
 For infrastructure, the challenge is two-fold as typically you think about in terms of horizontal and vertical scalability.
-These mean either scaling a single node within infrastructure so that it is stronger, hence vertical or scaling up, or adding more nodes to the system as a form of horizontal scalability or scaling out. (TODO: Add citations for these for more info).
+These mean either scaling a single node within infrastructure so that it is stronger, hence vertical or scaling up, or adding more nodes to the system as a form of horizontal scalability or scaling out.
 It is a good question who is responsible for this portion of scalability since over time companies have moved from their own hosting towards cloud computing and beyond.
 These days it is possible to pay for function invocations bought from edge hosting providers meaning the economics behind infrastructure have changed considerably over the past few decades as computation has become abstracted, and you might not be even aware as a developer where and how your code is running exactly.
 
@@ -103,13 +108,13 @@ As a topic, it is open to interpretation and often different aspects of scalabil
 They can also be conflicting which means that likely you cannot optimize each are at the same time, but you may have to compromise.
 That is an important part of the engineering challenge and also the impetus behind this book as I want you to develop your own thinking around scalability.
 
-I set up a simple demonstration to showcase the multidimensionality of scalability to show how different growth pressures affect different dimensions related to a project.
-Different pressures lead to different kinds of pressures to consider.
-The example highlights how projects can differ depending on their pressures within the same domain.
+The demonstration below applies growth pressures to the five dimensions introduced in this chapter.
+Select the pressures that matter for the event tracker and observe which dimensions receive the most strain.
+A single pressure can affect several dimensions, and some combinations may leave multiple dimensions equally exposed.
 
 {{ import "site/includes/scalability-dimensions-demo.html" }}
 
-Use the radar before choosing techniques.
+Use the radar to identify which dimensions require attention before choosing techniques.
 As you can see, a system can scale in one dimension while becoming worse in another.
 
 ## Summary

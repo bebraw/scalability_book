@@ -1,4 +1,9 @@
-type DimensionKey = "users" | "data" | "teams" | "change" | "cost";
+type DimensionKey =
+  | "development"
+  | "architecture"
+  | "infrastructure"
+  | "data"
+  | "business";
 type PressureKey =
   | "traffic"
   | "history"
@@ -8,6 +13,7 @@ type PressureKey =
 
 type Dimension = {
   label: string;
+  radarLabel: string;
   component: string;
   signal: string;
   tradeoff: string;
@@ -24,7 +30,6 @@ type RadarPoint = {
 };
 
 type RadarGeometry = {
-  maxScore: number;
   scorePoints: RadarPoint[];
 };
 
@@ -33,85 +38,125 @@ type RadarAnimationState = {
 };
 
 const dimensions: Record<DimensionKey, Dimension> = {
-  users: {
-    label: "Users",
-    component: "Request path and concurrency limits",
-    signal: "p95 latency, error rate, and queue depth during peaks",
-    tradeoff: "Capacity techniques can add cost and operational complexity.",
+  development: {
+    label: "Development process",
+    radarLabel: "Development",
+    component: "Project guidance, review capacity, testing, and ownership",
+    signal: "lead time, review delay, rework, and failed integrations",
+    tradeoff:
+      "More automation can increase output faster than people can understand and review it.",
+  },
+  architecture: {
+    label: "Architecture",
+    radarLabel: "Architecture",
+    component: "Boundaries, contracts, dependencies, and change surfaces",
+    signal: "change fan-out, coupled deployments, and migration effort",
+    tradeoff:
+      "Stronger boundaries reduce coupling but add contracts that must be maintained.",
+  },
+  infrastructure: {
+    label: "Infrastructure",
+    radarLabel: "Infrastructure",
+    component: "Request paths, compute capacity, and deployment limits",
+    signal:
+      "p95 latency, error rate, utilization, and queue depth during peaks",
+    tradeoff:
+      "Extra capacity can improve headroom while increasing cost and operational complexity.",
   },
   data: {
     label: "Data",
+    radarLabel: "Data",
     component: "Event storage, indexes, and derived views",
-    signal: "write latency, query time, storage growth, and retention cost",
-    tradeoff: "Keeping all data exact and queryable can become expensive.",
-  },
-  teams: {
-    label: "Teams",
-    component: "Module boundaries, ownership, and contracts",
     signal:
-      "pull request size, review delay, duplicated work, and merge conflicts",
+      "write latency, query time, storage growth, recovery time, and retention cost",
     tradeoff:
-      "More boundaries help coordination but require explicit contracts.",
+      "Keeping all history exact, available, and immediately queryable can become expensive.",
   },
-  change: {
-    label: "Change",
-    component: "Tests, schemas, migrations, and decision records",
-    signal: "time to change one event rule without breaking old behavior",
+  business: {
+    label: "Business",
+    radarLabel: "Business",
+    component: "Operating cost, support load, ownership, and time to value",
+    signal:
+      "cost per useful event, support burden, delivery time, and service value",
     tradeoff:
-      "Fast iteration needs guardrails, not only faster code generation.",
-  },
-  cost: {
-    label: "Cost and energy",
-    component: "Compute, storage, bandwidth, and repeated work",
-    signal: "useful events processed per unit of infrastructure",
-    tradeoff: "Overprovisioning may hide problems while wasting resources.",
+      "Technical headroom is not sustainable if its cost or coordination burden outgrows the product.",
   },
 };
 
 const pressures: Record<PressureKey, Pressure> = {
   traffic: {
     label: "Many people submit events at the same time",
-    weights: { users: 3, data: 1, teams: 0, change: 0, cost: 1 },
+    weights: {
+      development: 0,
+      architecture: 1,
+      infrastructure: 3,
+      data: 1,
+      business: 1,
+    },
   },
   history: {
     label: "Event history grows for months",
-    weights: { users: 0, data: 3, teams: 0, change: 1, cost: 2 },
+    weights: {
+      development: 0,
+      architecture: 1,
+      infrastructure: 1,
+      data: 3,
+      business: 1,
+    },
   },
   contributors: {
     label: "Several teams or agents change the codebase",
-    weights: { users: 0, data: 0, teams: 3, change: 2, cost: 0 },
+    weights: {
+      development: 3,
+      architecture: 2,
+      infrastructure: 0,
+      data: 0,
+      business: 1,
+    },
   },
   requirements: {
     label: "Event types and rules change every week",
-    weights: { users: 0, data: 1, teams: 1, change: 3, cost: 0 },
+    weights: {
+      development: 2,
+      architecture: 3,
+      infrastructure: 0,
+      data: 1,
+      business: 1,
+    },
   },
   budget: {
     label: "Infrastructure cost and energy use must stay bounded",
-    weights: { users: 1, data: 1, teams: 0, change: 0, cost: 3 },
+    weights: {
+      development: 1,
+      architecture: 1,
+      infrastructure: 2,
+      data: 1,
+      business: 3,
+    },
   },
 };
 
 const dimensionOrder: DimensionKey[] = [
-  "users",
+  "development",
+  "architecture",
+  "infrastructure",
   "data",
-  "teams",
-  "change",
-  "cost",
+  "business",
 ];
 
 const radarCenter = 120;
 const radarRadius = 72;
-const radarLabelRadius = 99;
+const radarLabelRadius = 92;
 const radarAnimationDuration = 360;
-const radarMaxScore = Math.max(
-  1,
-  ...dimensionOrder.map((dimensionKey) =>
+const dimensionMaximums = Object.fromEntries(
+  dimensionOrder.map((dimensionKey) => [
+    dimensionKey,
     Object.values(pressures).reduce(
       (total, pressure) => total + pressure.weights[dimensionKey],
       0,
     ),
-  ),
-);
+  ]),
+) as Record<DimensionKey, number>;
 
 for (const root of document.querySelectorAll<HTMLElement>(
   "[data-dimensions-demo]",
@@ -146,8 +191,9 @@ function initializeDimensionsDemo(root: HTMLElement) {
 
   const render = () => {
     const selected = getSelectedPressures(inputs);
-    const scores = calculateDimensionScores(selected);
-    const primary = getPrimaryDimension(scores);
+    const pressurePoints = calculateDimensionScores(selected);
+    const scores = normalizeDimensionScores(pressurePoints);
+    const primary = getPrimaryDimensions(scores);
     const nextGeometry = getRadarGeometry(scores);
 
     if (!radar.querySelector("[data-dimensions-demo-radar-chart]")) {
@@ -163,7 +209,7 @@ function initializeDimensionsDemo(root: HTMLElement) {
     }
 
     previousGeometry = nextGeometry;
-    updateDimensionMetrics(metrics, selected.length === 0 ? null : primary);
+    updateDimensionMetrics(metrics, selected.length === 0 ? [] : primary);
     verdict.textContent = buildDimensionsVerdict(selected, primary);
     interpretation.textContent = buildDimensionsInterpretation(
       selected,
@@ -206,21 +252,32 @@ function calculateDimensionScores(selected: PressureKey[]) {
   return scores;
 }
 
-function getPrimaryDimension(scores: Record<DimensionKey, number>) {
-  return dimensionOrder.reduce((best, current) =>
-    scores[current] > scores[best] ? current : best,
+function normalizeDimensionScores(scores: Record<DimensionKey, number>) {
+  return Object.fromEntries(
+    dimensionOrder.map((dimension) => [
+      dimension,
+      scores[dimension] / Math.max(1, dimensionMaximums[dimension]),
+    ]),
+  ) as Record<DimensionKey, number>;
+}
+
+function getPrimaryDimensions(scores: Record<DimensionKey, number>) {
+  const highestScore = Math.max(...Object.values(scores));
+
+  return dimensionOrder.filter(
+    (dimension) => scores[dimension] === highestScore,
   );
 }
 
 function getRadarGeometry(scores: Record<DimensionKey, number>): RadarGeometry {
   const scorePoints = dimensionOrder.map((key, index) => {
     const angle = getRadarAngle(index);
-    const scoreRadius = (scores[key] / radarMaxScore) * radarRadius;
+    const scoreRadius = scores[key] * radarRadius;
 
     return getRadarPoint(radarCenter, radarCenter, scoreRadius, angle);
   });
 
-  return { maxScore: radarMaxScore, scorePoints };
+  return { scorePoints };
 }
 
 function buildDimensionRadar(
@@ -267,10 +324,10 @@ function buildDimensionRadar(
     .join(" ");
   const selectedPoints = geometry.scorePoints
     .map((score, index) => {
-      const key = dimensionOrder[index] ?? "users";
+      const key = dimensionOrder[index] ?? "development";
 
       return `<circle class="dimensions-demo-radar-score-point" data-dimensions-demo-radar-vertex="${key}" cx="${score.x}" cy="${score.y}" r="3.8">
-          <title>${escapeDimensionsHtml(dimensions[key].label)}: ${scores[key]} pressure point${scores[key] === 1 ? "" : "s"}</title>
+          <title>${escapeDimensionsHtml(dimensions[key].label)}: ${formatDimensionExposure(scores[key])}</title>
         </circle>`;
     })
     .join("");
@@ -278,7 +335,7 @@ function buildDimensionRadar(
   return `<figure class="dimensions-demo-radar-chart" data-dimensions-demo-radar-chart>
     <svg viewBox="0 0 240 240" role="img" aria-labelledby="dimensions-radar-title dimensions-radar-desc" focusable="false">
       <title id="dimensions-radar-title">Scalability dimensions radar</title>
-      <desc id="dimensions-radar-desc">A five-axis radar chart comparing pressure points for users, data, teams, change, and cost.</desc>
+      <desc id="dimensions-radar-desc">A five-axis radar chart comparing each dimension's share of the maximum modeled pressure for the development process, architecture, infrastructure, data, and business.</desc>
       <g class="dimensions-demo-radar-grid">
         ${rings}
         ${axes}
@@ -300,7 +357,7 @@ function updateRadarVertexTitles(
     const title = vertex?.querySelector("title");
 
     if (title) {
-      title.textContent = `${dimensions[key].label}: ${scores[key]} pressure point${scores[key] === 1 ? "" : "s"}`;
+      title.textContent = `${dimensions[key].label}: ${formatDimensionExposure(scores[key])}`;
     }
   });
 }
@@ -398,54 +455,83 @@ function formatRadarPoint(point: { x: number; y: number }) {
 }
 
 function getRadarLabel(key: DimensionKey) {
-  return key === "cost" ? "Cost" : dimensions[key].label;
+  return dimensions[key].radarLabel;
 }
 
-function updateDimensionMetrics(
-  nodes: HTMLElement[],
-  primary: DimensionKey | null,
-) {
+function updateDimensionMetrics(nodes: HTMLElement[], primary: DimensionKey[]) {
   nodes.forEach((node) => {
     const key = node.dataset.dimensionsDemoMetric;
 
-    if (!primary) {
+    if (primary.length === 0) {
       node.textContent = "-";
     } else if (key === "primary") {
-      const dimension = dimensions[primary];
-
-      node.textContent = dimension.label;
+      node.textContent = formatDimensionList(primary);
     } else if (key === "component") {
-      const dimension = dimensions[primary];
-
-      node.textContent = dimension.component;
+      node.textContent = primary
+        .map((dimension) => dimensions[dimension].component)
+        .join("; ");
     } else if (key === "signal") {
-      const dimension = dimensions[primary];
-
-      node.textContent = dimension.signal;
+      node.textContent = primary
+        .map((dimension) => dimensions[dimension].signal)
+        .join("; ");
     }
   });
 }
 
 function buildDimensionsVerdict(
   selected: PressureKey[],
-  primary: DimensionKey,
+  primary: DimensionKey[],
 ) {
   if (selected.length === 0) {
     return "Pick project pressures";
   }
 
-  return `${selected.length} pressure${selected.length === 1 ? "" : "s"} point to ${dimensions[primary].label}`;
+  return `${selected.length} pressure${selected.length === 1 ? "" : "s"}: ${formatCompactDimensionList(primary)}`;
 }
 
 function buildDimensionsInterpretation(
   selected: PressureKey[],
-  primary: DimensionKey,
+  primary: DimensionKey[],
 ) {
   if (selected.length === 0) {
     return "Choose pressures that would matter if the event tracker succeeded.";
   }
 
-  return `${dimensions[primary].label} scalability matters first, but the trade-off is: ${dimensions[primary].tradeoff}`;
+  if (primary.length === 1) {
+    const dimension = dimensions[primary[0] ?? "development"];
+
+    return `${dimension.label} has the highest relative pressure. ${dimension.tradeoff}`;
+  }
+
+  return `${formatDimensionList(primary)} share the highest relative pressure, showing why scalability cannot be reduced to one axis. ${primary.map((dimension) => dimensions[dimension].tradeoff).join(" ")}`;
+}
+
+function formatDimensionList(keys: DimensionKey[]) {
+  const labels = keys.map((key) => dimensions[key].label);
+
+  if (labels.length < 2) {
+    return labels[0] ?? "";
+  }
+
+  if (labels.length === 2) {
+    return `${labels[0]} and ${labels[1]}`;
+  }
+
+  return `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}`;
+}
+
+function formatCompactDimensionList(keys: DimensionKey[]) {
+  const labels = keys.map((key) => dimensions[key].radarLabel);
+
+  if (labels.length < 2) {
+    return labels[0] ?? "";
+  }
+
+  return `${labels.slice(0, -1).join(", ")} + ${labels.at(-1)}`;
+}
+
+function formatDimensionExposure(score: number) {
+  return `${Math.round(score * 100)}% of modeled pressure`;
 }
 
 function escapeDimensionsHtml(value: string) {
