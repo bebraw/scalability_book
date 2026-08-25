@@ -1,22 +1,24 @@
 # How to develop in a scalable way?
 
 As systems evolve, they tend to become more difficult to develop as the existing requirements and code may work against you.
-This problem has been amplified with the introduction of so-called agentic coding, where computer agents leveraging large language models (LLMs) essentially do the coding work for us.
+This problem has been amplified with the introduction of so-called agentic coding, where computer agents leveraging Large Language Models (LLMs) essentially do the coding work for us.
 While the abstraction level has shifted, arguably this hasn't changed the fundamentals behind software engineering.
 We are still in a position where we have to figure out different types of requirements and map them to our applications.
+It is this gap between requirements and implementation where software engineering becomes difficult since transforming requirements into concrete code can typically be done in many different ways.
 
 In this chapter, I will bring you up to speed with agentic development while considering its impact on software engineering and web development in particular.
-Note that the space is moving fast at the moment, so some of the content may already be outdated by the time you read it so make sure to do your own research on top!
+Note that the space is moving fast at the moment, so some of the content may already be outdated by the time you read it so make sure to do your own research on top of reading this chapter!
+I recommend maintaining your own agentic development template and doing experiments actively since as you do it, you will learn to work better with the machine and becoming aware of its limitations though limitations tend to move over time and tend to be contextual and even model dependent.
 
 ## How are agents changing web development?
 
 For a long time, web applications were written manually using a suitable editor.
-Of course visual editors able to generate HTML has existed since the 90s, but for any serious development often code has had to be written unless a specific platform abstracting it out has been used.
-Since late-2022 with the introduction of ChatGPT, the way we program has begun to shift, first with so-called copilots that complete sections of code as you write it, and then with agents that can develop what you want based on prompting.
+Of course visual editors able to generate HTML have existed since the 90s, but for any serious development often code had to be written by hand unless a specific platform specific abstraction was available to at least reduce this type of work.
+Since late-2022 with the introduction of ChatGPT, the way we program begun to shift, first with so-called copilots that complete sections of code as you write it, and then with agents that can develop what you want based on prompting.
 On top of this we have whole systems that can orchestrate how multiple agents develop a system even independently.
-Even then, the challenge becomes how to ensure the system is producing right outputs.
+Regardless of the approach, the challenge is always how to ensure the system is producing right outputs.
 
-In the context of this book, we will first use a local model to implement [the book project](/project/) before trying the same with a foundation model and moving onto a fleet of agents to appreciate the differences and related challenges.
+In the context of this book, we will first use a local model to implement [the book project](/project/) before trying the same with a foundation model and moving onto a fleet of agents to appreciate the differences and related challenges as the used approach, or even a model, can make a difference.
 The ideas behind effective agentic development are good development practices in general, and you should have a good idea of at least some of those after finishing reading this chapter.
 
 ## Vibe coding vs. discipline
@@ -72,6 +74,8 @@ AI can therefore increase the arrival rate of candidate changes more readily tha
 A generated diff is inventory, not completed work.
 The relevant throughput is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
 When candidate arrival exceeds that capacity, the backlog appears as large diffs, delayed review, shallow acceptance, rework, or technical debt.
+Because of this problem, alternate ways for reviewing code have become available.
+For example, [codiff](https://github.com/nkzw-tech/codiff) implements a walkthrough mode besides a regular diff that allows developers walk through proposed changes in a guided manner so that context behind changes is visible.
 
 Here, "reading" is shorthand for building and testing a useful mental model, not manually inspecting every generated line.
 Types, tests, contracts, static analysis, small modules, architectural notes, and AI-assisted search or review can compress the work by directing attention and supplying evidence.
@@ -102,11 +106,11 @@ A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both 
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
 Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
 
-The dedicated case studies apply these ideas without interrupting the chapter's main argument.
-Three projects from my own work follow different outcomes: [Slideotter](/case-studies/slideotter/) generated valuable architecture and validation lessons without yet finding a clear production path; [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) constrained a small supervision workflow and became a working production tool; and [Kirjolab](/case-studies/kirjolab/) reached broad scientific-authoring scope before requiring substantial consolidation.
-Two external cases isolate specific development-system patterns: [Webernetes](/case-studies/webernetes/) compares an agent-assisted port with an independent reference implementation, while [Modern Web Guidance](/case-studies/modern-web-guidance/) treats fast-changing platform knowledge as a retrieved and evaluated dependency.
-Slideotter and Kirjolab are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me.
-A single developer that can work with the machine can achieve far more than ever in the past.
+You might encounter different challenges depending on a project.
+To give you concrete examples, consider these three projects of mine: [Slideotter](/case-studies/slideotter/) generated valuable architecture and validation lessons without yet finding a clear production path; [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) constrained a small supervision workflow and became a working production tool; and [Kirjolab](/case-studies/kirjolab/) reached broad scientific-authoring scope before requiring substantial consolidation that was eventually done to get the project back on track after it had attained too much technical debt.
+There are two external cases that isolate specific development-system patterns: [Webernetes](/case-studies/webernetes/) compares an agent-assisted port with an independent reference implementation, while [Modern Web Guidance](/case-studies/modern-web-guidance/) treats fast-changing platform knowledge as a retrieved and evaluated dependency.
+Slideotter and Kirjolab are so large by their scope I could never have completed them on my own so in that sense agentic development was a game changer for me as it allowed me to run with an idea.
+A single developer that can work with the machine can achieve far more than ever in the past and projects like these are a testament to that.
 
 ## How to develop web applications using agents sustainably?
 
