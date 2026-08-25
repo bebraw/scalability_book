@@ -1,0 +1,189 @@
+<section
+  id="demo-cap-partition-lab"
+  data-demo-anchor
+  class="cap-lab"
+  data-cap-lab
+  data-cap-phase="connected"
+  data-cap-result="ready"
+  aria-labelledby="cap-lab-heading"
+>
+  <header class="cap-lab-header">
+    <div>
+      <p class="cap-lab-kicker">Distributed data fault table</p>
+      <h3 id="cap-lab-heading">Decide what happens across a partition</h3>
+    </div>
+    <div class="cap-lab-summary" aria-live="polite">
+      <span data-cap-verdict>All regions can communicate</span>
+      <small data-cap-summary>
+        Cut the network before testing the write policy.
+      </small>
+    </div>
+  </header>
+
+  <p class="cap-lab-intro">
+    Helsinki becomes isolated from the Frankfurt–Dublin majority. Alice and Bob
+    then try to start the same work item from opposite sides of the split.
+  </p>
+
+  <form class="cap-lab-form" data-cap-form>
+    <div class="cap-lab-controls">
+      <label>
+        <span>Write policy during the split</span>
+        <select data-cap-policy>
+          <option value="quorum" selected>Require a majority quorum</option>
+          <option value="local">Accept writes in every region</option>
+        </select>
+      </label>
+      <div class="cap-lab-actions">
+        <button type="button" data-cap-partition>1 · Cut network</button>
+        <button type="button" data-cap-write disabled>
+          2 · Attempt both writes
+        </button>
+        <button type="button" data-cap-heal disabled>3 · Heal partition</button>
+        <button type="button" data-cap-reset>Reset</button>
+      </div>
+    </div>
+
+    <div class="cap-lab-topology" aria-label="Three-region replica topology">
+      <article data-cap-node="helsinki" data-node-state="connected">
+        <header>
+          <span>HEL</span>
+          <small data-cap-node-network="helsinki">connected</small>
+        </header>
+        <strong>Helsinki</strong>
+        <dl>
+          <div>
+            <dt>Item state</dt>
+            <dd data-cap-node-item="helsinki">initial</dd>
+          </div>
+          <div>
+            <dt>Visible event</dt>
+            <dd data-cap-node-event="helsinki">none</dd>
+          </div>
+          <div>
+            <dt>Client reply</dt>
+            <dd data-cap-node-reply="helsinki">waiting</dd>
+          </div>
+        </dl>
+      </article>
+
+      <div class="cap-lab-network" aria-hidden="true">
+        <span data-cap-network-label>healthy network</span>
+        <i></i>
+        <i></i>
+      </div>
+
+      <div class="cap-lab-majority">
+        <article data-cap-node="frankfurt" data-node-state="connected">
+          <header>
+            <span>FRA</span>
+            <small data-cap-node-network="frankfurt">connected</small>
+          </header>
+          <strong>Frankfurt</strong>
+          <dl>
+            <div>
+              <dt>Item state</dt>
+              <dd data-cap-node-item="frankfurt">initial</dd>
+            </div>
+            <div>
+              <dt>Visible event</dt>
+              <dd data-cap-node-event="frankfurt">none</dd>
+            </div>
+            <div>
+              <dt>Client reply</dt>
+              <dd data-cap-node-reply="frankfurt">waiting</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article data-cap-node="dublin" data-node-state="connected">
+          <header>
+            <span>DUB</span>
+            <small data-cap-node-network="dublin">connected</small>
+          </header>
+          <strong>Dublin</strong>
+          <dl>
+            <div>
+              <dt>Item state</dt>
+              <dd data-cap-node-item="dublin">initial</dd>
+            </div>
+            <div>
+              <dt>Visible event</dt>
+              <dd data-cap-node-event="dublin">none</dd>
+            </div>
+            <div>
+              <dt>Client reply</dt>
+              <dd data-cap-node-reply="dublin">replica</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </div>
+
+    <div class="cap-lab-evidence">
+      <section aria-labelledby="cap-log-heading">
+        <header>
+          <span aria-hidden="true">LOG</span>
+          <div>
+            <h4 id="cap-log-heading">Request and repair log</h4>
+            <p>Responses are facts too; reconciliation cannot un-send one.</p>
+          </div>
+        </header>
+        <ol data-cap-log>
+          <li>
+            <span>00</span>
+            <p>Replicas agree that <code>I42</code> is initial.</p>
+          </li>
+        </ol>
+      </section>
+
+      <dl class="cap-lab-counters" aria-label="Partition experiment totals">
+        <div>
+          <dt>Accepted writes</dt>
+          <dd data-cap-metric="accepted">0</dd>
+        </div>
+        <div>
+          <dt>Rejected writes</dt>
+          <dd data-cap-metric="rejected">0</dd>
+        </div>
+        <div>
+          <dt>Conflicts to repair</dt>
+          <dd data-cap-metric="conflicts">0</dd>
+        </div>
+      </dl>
+    </div>
+
+    <dl class="cap-lab-properties" aria-label="CAP property assessment">
+      <div data-cap-property="consistency" data-status="idle">
+        <dt><b>C</b> Atomic consistency</dt>
+        <dd>One current value</dd>
+      </div>
+      <div data-cap-property="availability" data-status="idle">
+        <dt><b>A</b> Availability</dt>
+        <dd>No partition yet</dd>
+      </div>
+      <div data-cap-property="partition" data-status="idle">
+        <dt><b>P</b> Partition condition</dt>
+        <dd>Network connected</dd>
+      </div>
+    </dl>
+
+    <section class="cap-lab-reading" aria-live="polite">
+      <div class="cap-lab-reading-mark" aria-hidden="true">↔</div>
+      <div>
+        <span>Architectural reading</span>
+        <h4 data-cap-reading>CAP has not constrained the request path yet</h4>
+        <p data-cap-explanation>
+          With communication intact, the replicas can coordinate before they
+          answer.
+        </p>
+      </div>
+    </section>
+  </form>
+
+  <p class="cap-lab-note">
+    The model holds workload, topology, and failure constant so the policy is
+    visible. Real systems define quorums, timeouts, leases, conflict resolution,
+    and consistency guarantees more precisely.
+  </p>
+</section>

@@ -13926,3 +13926,928 @@
     inline-size: 100%;
   }
 }
+
+/* ACID transaction lab */
+.acid-lab {
+  --acid-grid: color-mix(in srgb, var(--border) 46%, transparent);
+  --acid-ink: color-mix(in srgb, var(--text) 96%, var(--panel));
+  --acid-paper: color-mix(in srgb, var(--panel) 96%, var(--bg));
+  background:
+    linear-gradient(90deg, var(--acid-grid) 1px, transparent 1px) 0 0 / 1.5rem
+      1.5rem,
+    linear-gradient(var(--acid-grid) 1px, transparent 1px) 0 0 / 1.5rem 1.5rem,
+    var(--acid-paper);
+  border: 1px solid var(--border);
+  box-shadow: 0 1.5rem 3.5rem color-mix(in srgb, var(--text) 11%, transparent);
+  margin: 2rem 0;
+  max-width: 72rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.acid-lab,
+.acid-lab * {
+  box-sizing: border-box;
+  font-family: var(--font-ui);
+}
+
+.book-shell .prose > :is(.acid-lab, .cap-lab) {
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+  max-inline-size: none;
+  max-width: none;
+  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.acid-lab-header {
+  align-items: stretch;
+  background: var(--acid-ink);
+  color: var(--panel);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr);
+}
+
+.acid-lab-header > div:first-child {
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+}
+
+.prose .acid-lab-kicker,
+.prose .cap-lab-kicker {
+  color: var(--panel);
+  font: 850 0.68rem/1.2 var(--font-mono);
+  letter-spacing: 0.1em;
+  margin: 0 0 0.48rem;
+  max-width: none;
+  text-transform: uppercase;
+}
+
+.prose .acid-lab-header h3,
+.prose .cap-lab-header h3 {
+  color: inherit;
+  font-family: var(--font-serif);
+  font-size: clamp(1.45rem, 2vw + 0.8rem, 2.35rem);
+  line-height: 1.08;
+  margin: 0;
+  max-width: 22ch;
+}
+
+.acid-lab-summary {
+  align-content: center;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--warning) 9%, transparent) 0 0.45rem,
+      transparent 0.45rem 0.9rem
+    ),
+    color-mix(in srgb, var(--acid-ink) 88%, var(--warning));
+  border-inline-start: 1px solid
+    color-mix(in srgb, var(--panel) 22%, transparent);
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.acid-lab-summary span,
+.cap-lab-summary span {
+  font: 850 0.82rem/1.3 var(--font-mono);
+  letter-spacing: 0.03em;
+}
+
+.acid-lab-summary small,
+.cap-lab-summary small {
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.prose .acid-lab-intro,
+.prose .cap-lab-intro {
+  background: color-mix(in srgb, var(--bg) 76%, var(--panel));
+  border-block-end: 1px solid var(--border);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+  max-width: none;
+  padding: 0.9rem clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.acid-lab-form,
+.cap-lab-form {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.acid-lab-controls {
+  align-items: end;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns:
+    minmax(0, 1.2fr) minmax(0, 1.05fr) minmax(0, 0.9fr)
+    auto;
+}
+
+.acid-lab-controls label,
+.cap-lab-controls label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.acid-lab-controls label > span,
+.cap-lab-controls label > span {
+  color: var(--muted);
+  font: 800 0.64rem/1.2 var(--font-mono);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.acid-lab select,
+.cap-lab select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--text);
+  font: 750 0.78rem/1.2 var(--font-ui);
+  min-block-size: 2.65rem;
+  padding: 0.58rem 2rem 0.58rem 0.68rem;
+  width: 100%;
+}
+
+.acid-lab select:disabled,
+.cap-lab select:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.acid-lab-actions,
+.cap-lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.acid-lab button,
+.cap-lab button {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--text);
+  cursor: pointer;
+  font: 800 0.7rem/1.2 var(--font-mono);
+  min-block-size: 2.65rem;
+  padding: 0.62rem 0.78rem;
+}
+
+.acid-lab button[type="submit"] {
+  background: var(--acid-ink);
+  border-color: var(--acid-ink);
+  color: var(--panel);
+}
+
+.cap-lab button[data-cap-partition],
+.cap-lab button[data-cap-write],
+.cap-lab button[data-cap-heal] {
+  background: var(--cap-night);
+  border-color: var(--cap-night);
+  color: var(--panel);
+}
+
+.acid-lab button:hover,
+.cap-lab button:hover {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.acid-lab button:disabled,
+.cap-lab button:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.15);
+  opacity: 0.42;
+}
+
+.prose .acid-lab-control-note {
+  color: var(--muted);
+  font: 0.72rem/1.4 var(--font-mono);
+  margin: -0.35rem 0 0;
+  max-width: none;
+}
+
+.acid-lab-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.acid-lab-rail li {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.28rem;
+  margin-inline-start: -1px;
+  min-width: 0;
+  padding: 0.72rem;
+  position: relative;
+}
+
+.acid-lab-rail li::after {
+  background: var(--border);
+  content: "";
+  height: 2px;
+  left: 100%;
+  position: absolute;
+  top: 1.1rem;
+  width: 0.8rem;
+  z-index: 2;
+}
+
+.acid-lab-rail li:last-child::after {
+  display: none;
+}
+
+.acid-lab-rail li > span {
+  color: var(--muted);
+  font: 800 0.62rem/1 var(--font-mono);
+}
+
+.acid-lab-rail strong {
+  font-size: 0.78rem;
+}
+
+.acid-lab-rail small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.acid-lab-rail li[data-status="complete"] {
+  border-block-start: 0.22rem solid var(--success);
+}
+
+.acid-lab-rail li[data-status="failed"] {
+  border-block-start: 0.22rem solid var(--danger);
+}
+
+.acid-lab-rail li[data-status="rolled-back"] {
+  border-block-start: 0.22rem solid var(--warning);
+}
+
+.acid-lab-rail li[data-status="skipped"] {
+  opacity: 0.55;
+}
+
+.acid-lab-ledger {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.15fr) minmax(0, 1.1fr);
+}
+
+.acid-lab-record,
+.cap-lab-evidence > section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+
+.acid-lab-record > header,
+.cap-lab-evidence > section > header {
+  align-items: start;
+  border-block-end: 1px solid var(--border);
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.7rem;
+}
+
+.acid-lab-record > header > span,
+.cap-lab-evidence > section > header > span {
+  align-items: center;
+  background: var(--acid-ink);
+  color: var(--panel);
+  display: inline-flex;
+  flex: 0 0 1.65rem;
+  font: 900 0.68rem/1 var(--font-mono);
+  height: 1.65rem;
+  justify-content: center;
+}
+
+.prose .acid-lab-record h4,
+.prose .cap-lab-evidence h4 {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.prose .acid-lab-record header p,
+.prose .cap-lab-evidence header p {
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.35;
+  margin: 0.2rem 0 0;
+  max-width: none;
+}
+
+.acid-lab-record > dl {
+  margin: 0;
+  padding: 0.72rem;
+}
+
+.acid-lab-record > dl div {
+  border-block-end: 1px solid var(--border);
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: minmax(5rem, 0.75fr) minmax(0, 1.25fr);
+  padding: 0.48rem 0;
+}
+
+.acid-lab-record > dl div:last-child {
+  border: 0;
+}
+
+.acid-lab-record dt,
+.acid-lab-record dd {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.acid-lab-record dt {
+  color: var(--muted);
+}
+
+.acid-lab-record dd {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.acid-lab-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.acid-lab table {
+  border-collapse: collapse;
+  font-size: 0.68rem;
+  margin: 0;
+  min-width: 100%;
+}
+
+.acid-lab th,
+.acid-lab td {
+  border-block-end: 1px solid var(--border);
+  padding: 0.58rem 0.65rem;
+  text-align: left;
+}
+
+.acid-lab th {
+  color: var(--muted);
+  font: 800 0.6rem/1.2 var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.acid-lab tbody tr:last-child td {
+  border: 0;
+}
+
+.acid-lab .is-empty td {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.acid-lab-trace > ol,
+.cap-lab-evidence ol {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0.45rem 0.7rem 0.7rem;
+}
+
+.acid-lab-trace li,
+.cap-lab-evidence li {
+  border-inline-start: 2px solid var(--border);
+  display: grid;
+  gap: 0.22rem;
+  margin: 0;
+  padding: 0.42rem 0.55rem;
+}
+
+.acid-lab-trace li[data-status="pass"],
+.cap-lab-evidence li[data-status="pass"] {
+  border-color: var(--success);
+}
+
+.acid-lab-trace li[data-status="fail"],
+.cap-lab-evidence li[data-status="fail"] {
+  border-color: var(--danger);
+}
+
+.cap-lab-evidence li[data-status="warn"] {
+  border-color: var(--warning);
+}
+
+.acid-lab-trace li span {
+  font: 850 0.65rem/1.2 var(--font-mono);
+}
+
+.acid-lab-trace li small {
+  color: var(--muted);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.acid-lab-properties {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+}
+
+.acid-lab-properties > div,
+.cap-lab-properties > div {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  margin-inline-start: -1px;
+  padding: 0.72rem;
+}
+
+.acid-lab-properties dt,
+.cap-lab-properties dt {
+  align-items: center;
+  display: flex;
+  font: 800 0.69rem/1.25 var(--font-mono);
+  gap: 0.42rem;
+}
+
+.acid-lab-properties dt b,
+.cap-lab-properties dt b {
+  align-items: center;
+  background: var(--muted);
+  color: var(--panel);
+  display: inline-flex;
+  height: 1.4rem;
+  justify-content: center;
+  width: 1.4rem;
+}
+
+.acid-lab-properties dd,
+.cap-lab-properties dd {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  margin: 0.38rem 0 0;
+}
+
+.acid-lab-properties [data-status="pass"] dt b,
+.cap-lab-properties [data-status="pass"] dt b {
+  background: var(--success);
+}
+
+.acid-lab-properties [data-status="fail"] dt b,
+.cap-lab-properties [data-status="fail"] dt b {
+  background: var(--danger);
+}
+
+.cap-lab-properties [data-status="warn"] dt b {
+  background: var(--warning);
+  color: var(--text);
+}
+
+.acid-lab-invariant,
+.cap-lab-reading {
+  align-items: center;
+  background: color-mix(in srgb, var(--text) 96%, var(--panel));
+  color: var(--panel);
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.9rem;
+}
+
+.acid-lab-invariant-mark,
+.cap-lab-reading-mark {
+  align-items: center;
+  border: 2px solid currentColor;
+  display: flex;
+  font: 900 1.1rem/1 var(--font-mono);
+  height: 2.4rem;
+  justify-content: center;
+  width: 2.4rem;
+}
+
+.acid-lab[data-acid-result="protected"] .acid-lab-invariant-mark {
+  color: var(--success);
+}
+
+.acid-lab[data-acid-result="broken"] .acid-lab-invariant-mark {
+  color: var(--danger);
+}
+
+.acid-lab-invariant span,
+.cap-lab-reading span {
+  color: var(--panel);
+  font: 800 0.61rem/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.prose .acid-lab-invariant h4,
+.prose .cap-lab-reading h4 {
+  color: inherit;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  line-height: 1.3;
+  margin: 0.2rem 0 0;
+}
+
+.prose .acid-lab-invariant p,
+.prose .cap-lab-reading p {
+  color: color-mix(in srgb, currentColor 74%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  margin: 0.25rem 0 0;
+  max-width: 78ch;
+}
+
+.prose .acid-lab-note,
+.prose .cap-lab-note {
+  background: color-mix(in srgb, var(--warning) 7%, var(--panel));
+  border-block-start: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  margin: 0;
+  max-width: none;
+  padding: 0.75rem clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* CAP partition lab */
+.cap-lab {
+  --cap-grid: color-mix(in srgb, var(--accent) 11%, transparent);
+  --cap-night: color-mix(in srgb, var(--text) 95%, #071b24);
+  background:
+    radial-gradient(circle at 11% 13%, var(--cap-grid) 0 1px, transparent 1.5px)
+      0 0 / 1.2rem 1.2rem,
+    color-mix(in srgb, var(--panel) 97%, var(--accent));
+  border: 1px solid var(--border);
+  box-shadow: 0 1.5rem 3.5rem color-mix(in srgb, var(--text) 11%, transparent);
+  margin: 2rem 0;
+  max-width: 72rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.cap-lab,
+.cap-lab * {
+  box-sizing: border-box;
+  font-family: var(--font-ui);
+}
+
+.cap-lab-header {
+  align-items: stretch;
+  background: var(--cap-night);
+  color: var(--panel);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr);
+}
+
+.cap-lab-header > div:first-child {
+  padding: clamp(1rem, 2.5vw, 1.6rem);
+}
+
+.cap-lab-summary {
+  align-content: center;
+  background:
+    radial-gradient(
+      circle at 15% 35%,
+      color-mix(in srgb, var(--accent) 28%, transparent),
+      transparent 38%
+    ),
+    color-mix(in srgb, var(--cap-night) 86%, var(--accent));
+  border-inline-start: 1px solid
+    color-mix(in srgb, var(--panel) 22%, transparent);
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.cap-lab-controls {
+  align-items: end;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: minmax(14rem, 0.7fr) minmax(0, 1.3fr);
+}
+
+.cap-lab-actions {
+  justify-content: flex-end;
+}
+
+.cap-lab-topology {
+  align-items: stretch;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(12rem, 0.85fr) 5rem minmax(16rem, 1.35fr);
+}
+
+.cap-lab-topology article {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  min-width: 0;
+  padding: 0.78rem;
+  position: relative;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.cap-lab-topology article::after {
+  border: 1px solid transparent;
+  content: "";
+  inset: 0.28rem;
+  pointer-events: none;
+  position: absolute;
+}
+
+.cap-lab-topology article[data-node-state="isolated"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--danger) 13%, transparent);
+}
+
+.cap-lab-topology article[data-node-state="divergent"]::after {
+  border-color: var(--warning);
+}
+
+.cap-lab-topology article[data-node-state="converged"]::after {
+  border-color: var(--success);
+}
+
+.cap-lab-topology article > header {
+  align-items: center;
+  border-block-end: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  margin-block-end: 0.65rem;
+  padding-block-end: 0.55rem;
+}
+
+.cap-lab-topology article > header span {
+  background: var(--cap-night);
+  color: var(--panel);
+  font: 900 0.68rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  padding: 0.38rem 0.45rem;
+}
+
+.cap-lab-topology article > header small {
+  color: var(--muted);
+  font: 750 0.61rem/1.2 var(--font-mono);
+}
+
+.cap-lab-topology article > strong {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+}
+
+.cap-lab-topology article dl {
+  display: grid;
+  gap: 0.38rem;
+  margin: 0.7rem 0 0;
+}
+
+.cap-lab-topology article dl div {
+  align-items: baseline;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: minmax(4.4rem, 0.7fr) minmax(0, 1.3fr);
+}
+
+.cap-lab-topology article dt,
+.cap-lab-topology article dd {
+  font-size: 0.67rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cap-lab-topology article dt {
+  color: var(--muted);
+}
+
+.cap-lab-topology article dd {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.cap-lab-network {
+  align-content: center;
+  display: grid;
+  gap: 0.42rem;
+  justify-items: center;
+  min-width: 0;
+}
+
+.cap-lab-network span {
+  color: var(--muted);
+  font: 750 0.56rem/1.2 var(--font-mono);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cap-lab-network i {
+  background: var(--success);
+  display: block;
+  height: 2px;
+  position: relative;
+  width: 100%;
+}
+
+.cap-lab[data-cap-phase="partitioned"] .cap-lab-network i,
+.cap-lab[data-cap-phase="written"] .cap-lab-network i {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--danger) 0 0.35rem,
+    transparent 0.35rem 0.65rem
+  );
+  height: 3px;
+}
+
+.cap-lab-majority {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.cap-lab-evidence {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1.5fr) minmax(12rem, 0.5fr);
+}
+
+.cap-lab-evidence li {
+  align-items: baseline;
+  grid-template-columns: 2rem minmax(0, 1fr);
+}
+
+.cap-lab-evidence li > span {
+  color: var(--muted);
+  font: 850 0.61rem/1.2 var(--font-mono);
+}
+
+.prose .cap-lab-evidence li p {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  margin: 0;
+  max-width: none;
+}
+
+.cap-lab-counters {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.cap-lab-counters div {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  margin-block-start: -1px;
+  padding: 0.7rem;
+}
+
+.cap-lab-counters dt {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.cap-lab-counters dd {
+  font: 900 1.25rem/1 var(--font-mono);
+  margin: 0;
+}
+
+.cap-lab-properties {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.cap-lab-reading-mark {
+  color: var(--accent);
+}
+
+.cap-lab[data-cap-result="quorum"] .cap-lab-reading-mark {
+  color: var(--warning);
+}
+
+.cap-lab[data-cap-result="local"] .cap-lab-reading-mark,
+.cap-lab[data-cap-result="repaired"] .cap-lab-reading-mark {
+  color: var(--danger);
+}
+
+.demo-gallery-item > :where(.acid-lab, .cap-lab) {
+  box-shadow: none;
+  margin: 0;
+}
+
+@media (max-width: 62rem) {
+  .acid-lab-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .acid-lab-ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .acid-lab-trace {
+    grid-column: 1 / -1;
+  }
+
+  .cap-lab-controls,
+  .cap-lab-evidence {
+    grid-template-columns: 1fr;
+  }
+
+  .cap-lab-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 48rem) {
+  .acid-lab-header,
+  .cap-lab-header {
+    grid-template-columns: 1fr;
+  }
+
+  .acid-lab-summary,
+  .cap-lab-summary {
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--panel) 22%, transparent);
+    border-inline-start: 0;
+  }
+
+  .acid-lab-rail,
+  .acid-lab-properties,
+  .cap-lab-properties {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .acid-lab-rail li:nth-child(3)::after,
+  .acid-lab-rail li:nth-child(4)::after {
+    display: none;
+  }
+
+  .cap-lab-topology {
+    grid-template-columns: 1fr;
+  }
+
+  .cap-lab-network {
+    min-height: 3.5rem;
+  }
+
+  .cap-lab-network i {
+    height: 1.5rem;
+    width: 2px;
+  }
+
+  .cap-lab[data-cap-phase="partitioned"] .cap-lab-network i,
+  .cap-lab[data-cap-phase="written"] .cap-lab-network i {
+    background: repeating-linear-gradient(
+      180deg,
+      var(--danger) 0 0.35rem,
+      transparent 0.35rem 0.65rem
+    );
+    height: 1.5rem;
+    width: 3px;
+  }
+}
+
+@media (max-width: 34rem) {
+  .acid-lab,
+  .cap-lab {
+    box-shadow: none;
+  }
+
+  .acid-lab-controls,
+  .acid-lab-ledger,
+  .acid-lab-rail,
+  .acid-lab-properties,
+  .cap-lab-majority,
+  .cap-lab-properties {
+    grid-template-columns: 1fr;
+  }
+
+  .acid-lab-rail li::after {
+    display: none;
+  }
+
+  .acid-lab-actions,
+  .acid-lab-actions button,
+  .cap-lab-actions,
+  .cap-lab-actions button {
+    width: 100%;
+  }
+}

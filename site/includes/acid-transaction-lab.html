@@ -1,0 +1,196 @@
+<section
+  id="demo-acid-transaction-lab"
+  data-demo-anchor
+  class="acid-lab"
+  data-acid-lab
+  data-acid-result="ready"
+  aria-labelledby="acid-lab-heading"
+>
+  <header class="acid-lab-header">
+    <div>
+      <p class="acid-lab-kicker">Database invariant workbench</p>
+      <h3 id="acid-lab-heading">Keep state and history in one truth</h3>
+    </div>
+    <div class="acid-lab-summary" aria-live="polite">
+      <span data-acid-verdict>Choose a failure boundary</span>
+      <small data-acid-summary>
+        One lifecycle transition must produce exactly one activity event.
+      </small>
+    </div>
+  </header>
+
+  <p class="acid-lab-intro">
+    Run the same work-item operation with application-managed writes or a
+    database transaction. The ledger exposes which guarantee actually protects
+    the project contract.
+  </p>
+
+  <form class="acid-lab-form" data-acid-form>
+    <div class="acid-lab-controls">
+      <label>
+        <span>Disturbance</span>
+        <select data-acid-scenario>
+          <option value="failure" selected>Failure between two writes</option>
+          <option value="concurrent">Two concurrent start requests</option>
+          <option value="restart">Restart after success response</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Write boundary</span>
+        <select data-acid-mode>
+          <option value="application" selected>
+            Separate application writes
+          </option>
+          <option value="transaction">Database transaction</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Isolation</span>
+        <select data-acid-isolation>
+          <option value="read-committed" selected>Read committed</option>
+          <option value="serializable">Serializable</option>
+        </select>
+      </label>
+
+      <div class="acid-lab-actions">
+        <button type="submit" data-acid-run>Run disturbance</button>
+        <button type="button" data-acid-reset>Reset</button>
+      </div>
+    </div>
+
+    <p class="acid-lab-control-note" data-acid-control-note>
+      Isolation applies when concurrent work shares a transaction boundary.
+    </p>
+
+    <ol class="acid-lab-rail" aria-label="Transaction execution trace">
+      <li data-acid-stage="read">
+        <span>01</span>
+        <strong>Read</strong>
+        <small>Inspect the current lifecycle state</small>
+      </li>
+      <li data-acid-stage="state">
+        <span>02</span>
+        <strong>Change state</strong>
+        <small>Move the item through the lifecycle</small>
+      </li>
+      <li data-acid-stage="event">
+        <span>03</span>
+        <strong>Append event</strong>
+        <small>Record the matching domain fact</small>
+      </li>
+      <li data-acid-stage="commit">
+        <span>04</span>
+        <strong>Commit</strong>
+        <small>Make the accepted result durable</small>
+      </li>
+    </ol>
+
+    <div class="acid-lab-ledger">
+      <section class="acid-lab-record" aria-labelledby="acid-record-heading">
+        <header>
+          <span aria-hidden="true">W</span>
+          <div>
+            <h4 id="acid-record-heading">Work-item record</h4>
+            <p>The state returned by a fresh read.</p>
+          </div>
+        </header>
+        <dl>
+          <div>
+            <dt>Item</dt>
+            <dd><code>I42</code></dd>
+          </div>
+          <div>
+            <dt>Stored state</dt>
+            <dd data-acid-item-state>Initial</dd>
+          </div>
+          <div>
+            <dt>Client result</dt>
+            <dd data-acid-acknowledgement>Not run</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="acid-lab-record" aria-labelledby="acid-events-heading">
+        <header>
+          <span aria-hidden="true">E</span>
+          <div>
+            <h4 id="acid-events-heading">Activity-event ledger</h4>
+            <p>Successful transitions must appear exactly once.</p>
+          </div>
+        </header>
+        <div class="acid-lab-table-wrap" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Seq</th>
+                <th scope="col">Event</th>
+                <th scope="col">Actor</th>
+              </tr>
+            </thead>
+            <tbody data-acid-events>
+              <tr class="is-empty">
+                <td colspan="3">No activity events stored.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        class="acid-lab-record acid-lab-trace"
+        aria-labelledby="acid-trace-heading"
+      >
+        <header>
+          <span aria-hidden="true">T</span>
+          <div>
+            <h4 id="acid-trace-heading">Execution trace</h4>
+            <p>The moment where the guarantee holds or leaks.</p>
+          </div>
+        </header>
+        <ol data-acid-trace>
+          <li>
+            <span>Ready</span><small>Select a scenario and run it.</small>
+          </li>
+        </ol>
+      </section>
+    </div>
+
+    <dl class="acid-lab-properties" aria-label="ACID property assessment">
+      <div data-acid-property="atomicity" data-status="idle">
+        <dt><b>A</b> Atomicity</dt>
+        <dd>Not exercised</dd>
+      </div>
+      <div data-acid-property="consistency" data-status="idle">
+        <dt><b>C</b> Consistency</dt>
+        <dd>Not exercised</dd>
+      </div>
+      <div data-acid-property="isolation" data-status="idle">
+        <dt><b>I</b> Isolation</dt>
+        <dd>Not exercised</dd>
+      </div>
+      <div data-acid-property="durability" data-status="idle">
+        <dt><b>D</b> Durability</dt>
+        <dd>Not exercised</dd>
+      </div>
+    </dl>
+
+    <section class="acid-lab-invariant" aria-live="polite">
+      <div class="acid-lab-invariant-mark" aria-hidden="true">?</div>
+      <div>
+        <span>Contract check</span>
+        <h4 data-acid-invariant>Awaiting an operation</h4>
+        <p data-acid-explanation>
+          The lifecycle state and activity ledger have not changed.
+        </p>
+      </div>
+    </section>
+  </form>
+
+  <p class="acid-lab-note">
+    This is a deterministic transaction model, not a benchmark of a particular
+    database. Real isolation and durability depend on the database, transaction
+    boundaries, constraints, storage configuration, and failure model.
+  </p>
+</section>

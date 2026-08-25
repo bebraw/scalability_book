@@ -111,6 +111,12 @@ const demoScriptIncludes = [
     script: "/request-trace-demo.js",
   },
   {
+    title: "ACID transaction lab",
+    chapter: "Architecture",
+    include: "site/includes/acid-transaction-lab.html",
+    script: "/acid-transaction-lab.js",
+  },
+  {
     title: "Cache decision lab",
     chapter: "Architecture",
     include: "site/includes/cache-control-lab.html",
@@ -241,6 +247,12 @@ const demoScriptIncludes = [
     chapter: "Scaling",
     include: "site/includes/durable-retry-demo.html",
     script: "/durable-retry-demo.js",
+  },
+  {
+    title: "CAP partition lab",
+    chapter: "Scaling",
+    include: "site/includes/cap-partition-lab.html",
+    script: "/cap-partition-lab.js",
   },
   {
     title: "Latency budget map",
@@ -509,6 +521,10 @@ await compileSiteScript(
   "scripts/request-trace-demo.ts",
   "request-trace-demo.js",
 );
+await compileSiteScript(
+  "scripts/acid-transaction-lab.ts",
+  "acid-transaction-lab.js",
+);
 await compileSiteScript("scripts/cache-control-lab.ts", "cache-control-lab.js");
 await compileSiteScript(
   "scripts/web-architecture-lens.ts",
@@ -575,6 +591,7 @@ await compileSiteScript(
   "scripts/durable-retry-demo.ts",
   "durable-retry-demo.js",
 );
+await compileSiteScript("scripts/cap-partition-lab.ts", "cap-partition-lab.js");
 await compileSiteScript(
   "scripts/latency-budget-demo.ts",
   "latency-budget-demo.js",

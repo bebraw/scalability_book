@@ -231,6 +231,28 @@ Ideas to develop:
 - Edge caching helps some workloads but not all writes.
 - Multi-region systems introduce consistency, routing, failover, and data residency problems.
 
+### Partitions force an operational choice
+
+The CAP result is narrower than a general slogan about balancing consistency and availability.
+For a distributed read-write object in an asynchronous network, a network partition can prevent a design from guaranteeing both atomic consistency and an available response from every non-failing node :citep[gilbert2002brewer].
+Here **atomic consistency** means operations appear in one current order, while **availability** means every request to a non-failing node eventually receives a non-error response.
+The partition is the condition that makes those guarantees collide; it is not a feature that an application can disable after communication has already failed.
+
+A system that requires a majority quorum may preserve one history by rejecting or delaying a request that reaches an isolated minority.
+A system that accepts writes on both sides may keep responding, but the replicas can diverge and later need domain-specific reconciliation.
+Neither label chooses the right policy on its own.
+The decision depends on which operations may be stale, rejected, delayed, merged, compensated, or repaired without violating the domain.
+
+#### CAP partition lab
+
+Split one region from a two-region majority and apply the same two work-item transitions under both policies.
+Inspect the replies before healing the network: reconciliation can change stored state, but it cannot retract a success that a user already observed.
+
+{{ import "site/includes/cap-partition-lab.html" }}
+
+The lab models one write invariant and a fixed topology.
+Real systems need explicit definitions for reads as well as writes, failure detection and timeouts, quorum membership, leases, conflict resolution, and the consistency guarantee exposed to clients.
+
 In some project themes, geography may matter very little.
 In others, a platform serving users or devices in different regions may need to consider latency, data residency, or regional failure.
 This is a good place to teach restraint: not every project needs multi-region architecture.

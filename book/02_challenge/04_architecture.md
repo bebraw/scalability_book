@@ -137,6 +137,30 @@ For each request, record the authenticated principal and scope, authoritative st
 Design the flow so `C7` produces one event and its retry returns the original result, Bob cannot act merely by knowing `W1`, and the archived write returns a defined application error such as `workspace_archived` rather than silently recreating state.
 Finish by naming which information is carried by the client and which state remains authoritative on the server.
 
+### Transactions preserve invariants across failure and concurrency
+
+A database transaction groups operations into one unit with four commonly named properties: atomicity, consistency, isolation, and durability, or ACID :citep[haerder1983recovery].
+**Atomicity** means the operations commit together or not at all.
+**Consistency** means a committed transaction leaves the data within its declared invariants; the database cannot invent those application rules, so they still have to be expressed through constraints, guarded writes, or validated domain logic.
+**Isolation** describes how concurrent transactions are allowed to observe and affect one another.
+The exact guarantee depends on the selected isolation level rather than on the mere presence of a transaction.
+**Durability** means a successful commit survives the failures covered by the storage system's contract.
+
+The work-item lifecycle contains a useful transaction boundary.
+A successful transition changes the current state and records the corresponding activity event.
+If either write escapes alone, the activity feed and the work item disagree.
+The same invariant is threatened when two requests make a decision from the same old state or when the application returns success before persistence is durable.
+
+#### ACID transaction lab
+
+Choose one disturbance, predict where the invariant could leak, and run it first with application-managed writes.
+Then introduce a database transaction and, for concurrent requests, compare read committed with serializable execution.
+
+{{ import "site/includes/acid-transaction-lab.html" }}
+
+The simulation does not imply that every database implements an isolation level or durable commit in the same way.
+For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+
 ### Cache control is application policy
 
 An HTTP cache can avoid an origin request, reduce transferred bytes, and hide network latency, but only when reuse is correct for the response and its users.
@@ -250,11 +274,11 @@ The boundary expands as runtime output moves from filling a host-selected compon
 :citet[casas2026beyondcomponents] describes a practical spectrum from fixed components, through declarative descriptions rendered from an approved catalog, to generated executable code.
 Treat this as a design lens rather than a settled taxonomy:
 
-| Runtime model output                                      | Application must control                                             | Main trade-off                                                             |
-| --------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Data for one approved component                           | Component implementation, behavior, and prop schema                  | Predictable behavior with little freedom over layout                       |
-| Declarative descriptor using approved components/actions  | Schema, renderer, design system, and action registry                  | Composition within a grammar, with validation and schema-evolution burden  |
-| Generated HTML, CSS, and JavaScript                        | Isolated execution boundary, mediated data/tool bridge, and limits   | Broadest expressiveness with the largest failure, review, and containment load |
+| Runtime model output                                     | Application must control                                           | Main trade-off                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Data for one approved component                          | Component implementation, behavior, and prop schema                | Predictable behavior with little freedom over layout                           |
+| Declarative descriptor using approved components/actions | Schema, renderer, design system, and action registry               | Composition within a grammar, with validation and schema-evolution burden      |
+| Generated HTML, CSS, and JavaScript                      | Isolated execution boundary, mediated data/tool bridge, and limits | Broadest expressiveness with the largest failure, review, and containment load |
 
 This axis can be combined with server-side or client-side rendering, hydration, islands, or resumability.
 It does not replace those choices.
