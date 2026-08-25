@@ -32,7 +32,7 @@ That said, I consider five aspects of scalability essential: development process
 > I consider ecological sustainability another valuable angle that cuts across the other dimensions.
 > Because of this, I have included short callouts throughout the book to offer these kinds of additional perspectives on the topic.
 
-### Scalability of the development process
+## Scalability of the development process
 
 The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process.
 Eventually, it may become a constraint as your application and ambitions grow.
@@ -55,7 +55,7 @@ For certain tasks, such as technical feasibility spikes or ideation, debt might 
 Once you understand what you need to build, proper engineering can take place.
 Since generating code is cheap, you can use experimentation to deepen your understanding of the problem and arrive at a better solution.
 
-### Scalability of architecture
+## Scalability of architecture
 
 As a concept, architecture is nebulous because it captures how we shape things and how they relate to one another.
 In software, architecture is visible in concepts such as cohesion and modularity.
@@ -69,7 +69,7 @@ Therefore, setting a good example has even more value than before because buildi
 Our current tools are arguably not ideal for LLM-driven development.
 It is therefore worth considering which architectural primitives will help LLMs make good decisions as they craft technical solutions for you.
 
-### Scalability of infrastructure
+## Scalability of infrastructure
 
 Consider what happens when your product gets discovered by an aggregator like Hacker News and makes it to the top.
 You can only imagine the amount of traffic you have to be able to deal with at once, and it may be far more than you have prepared for.
@@ -83,7 +83,7 @@ These mean either scaling a single node within infrastructure so that it is stro
 It is a good question who is responsible for this portion of scalability since over time companies have moved from their own hosting towards cloud computing and beyond.
 These days it is possible to pay for function invocations bought from edge hosting providers meaning the economics behind infrastructure have changed considerably over the past few decades as computation has become abstracted, and you might not be even aware as a developer where and how your code is running exactly.
 
-### Scalability of data
+## Scalability of data
 
 While a considerable chunk of work has to do with computation and processing, underneath all this you typically have some type of data unless your application is ephemeral by its nature and does not store any permanent records.
 If you need records, then you will need to store your data somewhere somehow and this is typically the point where you either need a file system or a database or both.
@@ -92,7 +92,7 @@ You may also want to back up your data so it does not get lost.
 To make things worse, you may have to consider how it is read and written while dealing with concurrent usage that may lead to conflicts.
 As you can see, the topic can get complex fast, and this complexity depends largely on your use cases.
 
-### Scalability in business
+## Scalability in business
 
 Another way to look at scalability is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features.
 Here the challenge is to make changes without breaking anything that used to work as that could be expensive.
@@ -101,7 +101,7 @@ On top of that, the stack used by the system might be considered antiquated or n
 These examples illustrate inertia within older systems and affect their technical scalability.
 These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
 
-### Scalability is multidimensional
+## Scalability is multidimensional
 
 As you can see, scalability is a multidimensional concept going beyond technical concerns.
 As a topic, it is open to interpretation and often different aspects of scalability are interrelated.
