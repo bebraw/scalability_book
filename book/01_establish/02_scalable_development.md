@@ -22,7 +22,8 @@ An LLM by itself is not the whole agent.
 The model operates inside an agent harness that assembles observations, exposes tools, carries state between steps, invokes the model, and returns the effects of actions to the next step.
 A survey focused on software-engineering agents uses the closely related modules of perception, memory, and action, with the LLM as their cognitive core :citep[wang2025agentsse].
 
-`goal and current state → observe → decide → act → changed state → observe again`
+Within this system, the controller repeats an observe–decide–act loop as actions change the environment and create new observations.
+:ref[table:coding-agent-anatomy]{text="The table below"} maps the parts of that loop from a physical robot to a coding agent and shows which development choices tune each part.
 
 | Agent concept       | Robot                                      | Coding agent                                                                             | What to tune                                                                    |
 | ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -32,6 +33,8 @@ A survey focused on software-engineering agents uses the closely related modules
 | Controller / brain  | Control software that selects motor commands | LLM plus the harness loop that constructs context and interprets model outputs            | Model and runtime configuration, instructions, planning policy, and orchestration |
 | State / memory      | A map, state estimate, and recent readings | Context window, session history, task state, retrieved documents, and durable project memory | Selection, summarization, retention, freshness, and source-of-truth rules        |
 | Actuators / actions | Wheels, arms, speaker, or display           | File edits, shell commands, browser interaction, API calls, and messages                  | Tool design, permissions, approvals, validation, rollback, and rate limits       |
+::caption[Agent anatomy mapped from a physical robot to a coding agent.]
+::label[table:coding-agent-anatomy]
 
 The analogy is a design model, not a claim that a coding agent has a body, desires, or a human-like mind.
 Its observations can be incomplete, its internal model can be wrong, its tool calls can fail, and its stated goal can be an inadequate proxy for the outcome people actually want.
