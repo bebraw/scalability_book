@@ -37,6 +37,10 @@
 .prose p {
   margin: 0 0 1.35em;
 }
+.prose > ul,
+.prose > ol {
+  margin-block: 0 1.35em;
+}
 .prose .chapter-kicker {
   font-family: var(--font-ui);
   font-size: 0.78rem;

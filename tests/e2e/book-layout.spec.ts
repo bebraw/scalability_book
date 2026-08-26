@@ -30,6 +30,31 @@ test.describe("book reading layout", () => {
     expect(paragraphWidth).toBeLessThan(eightyCharactersWidth);
   });
 
+  test("keeps paragraph-to-list spacing in the prose rhythm", async ({
+    page,
+  }) => {
+    await page.goto("/chapters/benchmarking/");
+
+    const introduction = page
+      .locator(".prose > p")
+      .filter({ hasText: /^Consider a few examples:/ });
+    const precedingParagraph = introduction.locator(
+      "xpath=preceding-sibling::p[1]",
+    );
+    const followingList = introduction.locator(
+      "xpath=following-sibling::ul[1]",
+    );
+
+    await expect(introduction).toBeVisible();
+    await expect(precedingParagraph).toBeVisible();
+    await expect(followingList).toBeVisible();
+
+    const paragraphGap = await verticalGap(precedingParagraph, introduction);
+    const listGap = await verticalGap(introduction, followingList);
+
+    expect(Math.abs(listGap - paragraphGap)).toBeLessThan(1);
+  });
+
   test("keeps chapter cards in each landing-page row the same height", async ({
     page,
   }) => {
@@ -178,6 +203,20 @@ async function elementWidth(locator: import("@playwright/test").Locator) {
     throw new Error("Expected a visible element with a bounding box");
   }
   return box.width;
+}
+
+async function verticalGap(
+  first: import("@playwright/test").Locator,
+  second: import("@playwright/test").Locator,
+) {
+  const [firstBox, secondBox] = await Promise.all([
+    first.boundingBox(),
+    second.boundingBox(),
+  ]);
+  if (!firstBox || !secondBox) {
+    throw new Error("Expected visible elements with bounding boxes");
+  }
+  return secondBox.y - (firstBox.y + firstBox.height);
 }
 
 async function centerDelta(
