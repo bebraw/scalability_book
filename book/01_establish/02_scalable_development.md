@@ -25,14 +25,15 @@ A survey focused on software-engineering agents uses the closely related modules
 Within this system, the controller repeats an observe–decide–act loop as actions change the environment and create new observations.
 :ref[table:coding-agent-anatomy]{text="The table below"} maps the parts of that loop from a physical robot to a coding agent and shows which development choices tune each part.
 
-| Agent concept       | Robot                                      | Coding agent                                                                             | What to tune                                                                    |
-| ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Goal or preference  | Reach a destination while avoiding hazards | Requested outcome, acceptance criteria, constraints, budget, and stopping conditions     | Task specification, examples, graders, priorities, and escalation rules         |
-| Environment         | A room, road, or factory floor             | Repository, filesystem, terminal, browser, remote services, and collaborating people     | Sandbox, workspace setup, available services, and environmental determinism     |
-| Sensors / perception | Camera, microphone, or proximity sensor    | Prompt and instructions, file reads, search results, tool output, test failures, and images | Context selection, retrieval, observation format, provenance, and feedback quality |
-| Controller / brain  | Control software that selects motor commands | LLM plus the harness loop that constructs context and interprets model outputs            | Model and runtime configuration, instructions, planning policy, and orchestration |
-| State / memory      | A map, state estimate, and recent readings | Context window, session history, task state, retrieved documents, and durable project memory | Selection, summarization, retention, freshness, and source-of-truth rules        |
-| Actuators / actions | Wheels, arms, speaker, or display           | File edits, shell commands, browser interaction, API calls, and messages                  | Tool design, permissions, approvals, validation, rollback, and rate limits       |
+| Agent concept        | Robot                                        | Coding agent                                                                                 | What to tune                                                                       |
+| -------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Goal or preference   | Reach a destination while avoiding hazards   | Requested outcome, acceptance criteria, constraints, budget, and stopping conditions         | Task specification, examples, graders, priorities, and escalation rules            |
+| Environment          | A room, road, or factory floor               | Repository, filesystem, terminal, browser, remote services, and collaborating people         | Sandbox, workspace setup, available services, and environmental determinism        |
+| Sensors / perception | Camera, microphone, or proximity sensor      | Prompt and instructions, file reads, search results, tool output, test failures, and images  | Context selection, retrieval, observation format, provenance, and feedback quality |
+| Controller / brain   | Control software that selects motor commands | LLM plus the harness loop that constructs context and interprets model outputs               | Model and runtime configuration, instructions, planning policy, and orchestration  |
+| State / memory       | A map, state estimate, and recent readings   | Context window, session history, task state, retrieved documents, and durable project memory | Selection, summarization, retention, freshness, and source-of-truth rules          |
+| Actuators / actions  | Wheels, arms, speaker, or display            | File edits, shell commands, browser interaction, API calls, and messages                     | Tool design, permissions, approvals, validation, rollback, and rate limits         |
+
 ::caption[Agent anatomy mapped from a physical robot to a coding agent.]
 ::label[table:coding-agent-anatomy]
 
@@ -164,12 +165,24 @@ The human and agent may occupy different positions in each phase, but the workfl
 
 Roughly put, when you develop with agents you follow a loop where you constrain, generate, validate, and revise before starting again.
 The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
-Even in a personal context, it is worth considering the loop and how you are contributing towards its operation so let's consider each part in isolation.
+Even in a personal context, it is worth considering the loop and how you are contributing towards its operation.
 
 Constraints at the start of a task are hypotheses, not necessarily complete knowledge.
 :citet[brooks1987silver] argues that rapid prototyping supports the iterative specification of requirements because important questions become visible only when people interact with a concrete system.
 :citet[naur1985theory] similarly describes programming as theory building rather than program-text production.
 Implementation can therefore be a way to learn what the specification should say, not only a way to execute it.
+
+:ref[table:agent-development-loop]{text="The table below"} summarizes the question, work, and exit evidence at each stage before the sections that follow examine them in detail.
+
+| Stage     | Governing question                          | Main action                                                                  | Exit evidence                                           |
+| --------- | ------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Constrain | What outcome is wanted, and what may vary?  | State the goal, context, boundaries, budget, and stopping or escalation rule | A bounded task and explicit acceptance criteria         |
+| Generate  | Which candidate might satisfy those limits? | Let a chosen model and harness act with relevant context and tools           | A candidate artifact plus its trace, cost, and attempts |
+| Validate  | Does the candidate satisfy the real need?   | Apply independent checks and inspect the artifact a user will consume        | Acceptance evidence and known unverified properties     |
+| Revise    | What should change before the next attempt? | Correct the result and codify learning in durable project material           | An improved artifact and better starting constraints    |
+
+::caption[The constrain–generate–validate–revise loop and the evidence that advances each stage.]
+::label[table:agent-development-loop]
 
 > **Delegate work without surrendering judgment**
 >

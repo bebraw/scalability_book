@@ -179,21 +179,56 @@ test("postfix labels attach after captioned tables", () => {
 ::label[table:measurements]
 
 See :ref[table:measurements]{text="the measurements table"}.
+See also :ref[table:measurements].
 `,
     { number: "2" },
   );
 
   assert.match(
     rendered.content,
-    /<caption class="semantic-table-caption"[^>]*>Measurements collected during the trial\.<\/caption>/,
+    /<table(?=[^>]*class="semantic-table")(?=[^>]*id="table:measurements")[^>]*>/,
   );
   assert.match(
     rendered.content,
-    /class="semantic-label" id="table:measurements"/,
+    /<caption class="semantic-table-caption"[^>]*><span class="semantic-table-number">Table 2\.1\.<\/span> Measurements collected during the trial\. <a aria-label="Link to Table 2\.1" class="table-anchor" href="#table:measurements">#<\/a><\/caption>/,
   );
+  assert.doesNotMatch(rendered.content, /class="semantic-label"/);
   assert.match(
     rendered.content,
     /href="#table:measurements"[^>]*>the measurements table<\/a>/,
+  );
+  assert.match(
+    rendered.content,
+    /data-reference="table:measurements"[^>]*>Table 2\.1<\/a>/,
+  );
+});
+
+test("native figures use chapter-prefixed numbers and direct anchors", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+:::figure{kind="boxplot" version=1 x-label="Time (ms)" y-label="Method"}
+::box[Baseline]{min=12 q1=15 median=18 q3=21 max=27}
+::caption[Latency measured across five runs.]
+:::
+::label[fig:latency]
+
+See :ref[fig:latency].
+`,
+    { number: "2" },
+  );
+
+  assert.match(
+    rendered.content,
+    /<figure(?=[^>]*class="[^"]*semantic-figure[^"]*")(?=[^>]*id="fig:latency")[^>]*>/,
+  );
+  assert.match(
+    rendered.content,
+    /<figcaption class="semantic-figure-caption"><span class="semantic-figure-number">Figure 2\.1\.<\/span> Latency measured across five runs\. <a aria-label="Link to Figure 2\.1" class="figure-anchor" href="#fig:latency">#<\/a><\/figcaption>/,
+  );
+  assert.match(
+    rendered.content,
+    /data-reference="fig:latency"[^>]*>Figure 2\.1<\/a>/,
   );
 });
 

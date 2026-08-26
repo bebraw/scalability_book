@@ -34,6 +34,7 @@
   ],
   "dependencies": {
     "@citation-js/core": "0.8.2",
+    "@citation-js/plugin-bibtex": "0.8.2",
     "@citation-js/plugin-csl": "0.8.2",
     "@ngrok/webernetes": "0.1.5",
     "@tailwindcss/typography": "0.5.19",
@@ -42,7 +43,7 @@
     "gustwind": "0.109.0",
     "hast-util-from-html": "2.0.3",
     "highlight.js": "11.11.1",
-    "scholarmark": "0.3.0",
+    "scholarmark": "0.9.1",
     "vite": "8.0.10",
     "xstate": "5.32.5"
   },

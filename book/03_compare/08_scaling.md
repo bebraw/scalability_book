@@ -44,8 +44,7 @@ Students should be able to explain why a chosen technique fits the pressure, wha
 Scaling pressure becomes operationally important when it approaches a limit.
 The competence-envelope model introduced in the Challenge part calls the boundary condition **saturation**: the system can no longer absorb the disturbance with its current capabilities :citep[woods2018graceful].
 Naming the saturated resource prevents "add more servers" from becoming the default response.
-
-Useful categories include:
+:ref[table:saturation-limit-categories]{text="The table below"} groups common limits by the evidence that reveals their approach.
 
 | Limit category       | Examples                                                                           | What approaching saturation may look like                                                       |
 | -------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -53,6 +52,9 @@ Useful categories include:
 | Virtual resources    | Connection and thread pools, file descriptors, bounded queues, quotas, rate limits | Pool wait, rejected work, `429` responses, queue growth, or quota errors                        |
 | Dependency capacity  | Databases, identity providers, third-party APIs, provisioning systems              | Timeouts, blocked callers, correlated downstream errors, or delayed scaling                     |
 | Operational capacity | On-call attention, deployment speed, diagnostic access, coordination               | Slow decisions, unsafe workarounds, competing responders, or recovery blocked by normal process |
+
+::caption[Categories of saturation limits and their observable signals.]
+::label[table:saturation-limit-categories]
 
 Saturation also creates feedback loops.
 Retries can amplify load, synchronous fan-out can overload an internal service, and blocked threads can make a CPU-based autoscaler misread demand.
@@ -73,16 +75,18 @@ The lesson is structural: removing one bottleneck changes the system's limiting 
 ## Use a formal model before choosing a technique
 
 A scaling technique should respond to an identified limit.
-Formal models help students state that limit precisely enough to challenge their own intuition:
+Formal models help students state that limit precisely enough to challenge their own intuition.
+:ref[table:scalability-laws]{text="The table below"} states four useful laws explicitly and separates what each can support from what it cannot establish.
 
-- **Little's Law** connects arrival rate, time in the system, and average work in progress :citep[little1961proof].
-  It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
-- **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential :citep[amdahl1967validity].
-  It applies to request paths, batch processing, deployments, and agent workflows.
-- **Lusser's Law** multiplies the reliability of independent critical steps in a series system :citep[tait1995lusser].
-  It is useful for testing whether a long request, deployment, or agent workflow can meet an end-to-end correctness target.
-- **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs :citep[gunther2008scalability].
-  It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
+| Law                                                      | Exact relationship                                                                                                                | Main assumptions                                                                                 | Useful when                                                                                         | Cannot establish                                                            |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Little's Law :citep[little1961proof]                     | `L = λW`, where `L` is average work in progress, `λ` is average throughput or arrival rate, and `W` is average time in the system | Stable long-run averages, one consistent system boundary, and conserved work                     | Relating queue or review backlog, throughput, and elapsed time                                      | The cause of delay, tail latency, or stability from one snapshot            |
+| Amdahl's Law :citep[amdahl1967validity]                  | `S(N) = 1 / ((1 - p) + p/N)`, where `p` is the parallelizable fraction and `N` is the parallel capacity                           | Fixed workload and fractions, with no added parallel overhead in the bound                       | Bounding speedup for request paths, batch work, deployments, or agent workflows                     | Contention, coordination cost, load growth, or the actual parallel fraction |
+| Lusser's Law :citep[tait1995lusser]                      | `R_system = ∏ R_i` for independent components that must all succeed in a series system                                            | Every named step is critical and step failures are independent                                   | Checking whether a request, deployment, or agent workflow can meet an end-to-end reliability target | Correlated failures, recovery behavior, or omitted dependency paths         |
+| Universal Scalability Law :citep[gunther2008scalability] | `C(N) = N / (1 + α(N - 1) + βN(N - 1))`, where `α` models contention and `β` coordination or coherency cost                       | One workload and configuration, with parameters fitted to representative throughput measurements | Describing capacity that rises, flattens, and then falls as concurrency grows                       | The causal mechanism or safe extrapolation beyond the measured range        |
+
+::caption[Formal scalability models, their assumptions, and suitable application boundaries.]
+::label[table:scalability-laws]
 
 The project does not require every model.
 Students must apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.

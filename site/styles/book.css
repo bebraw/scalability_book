@@ -68,6 +68,79 @@
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
+.prose > .semantic-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: var(--font-ui);
+  font-size: clamp(0.82rem, 0.2vw + 0.78rem, 0.92rem);
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+  line-height: 1.48;
+  margin-block: 2rem 2.35rem;
+  scroll-margin-block-start: 6rem;
+}
+.prose > .semantic-table th,
+.prose > .semantic-table td {
+  border-block-end: 1px solid var(--border);
+  padding: 0.72rem 0.8rem;
+  text-align: start;
+  vertical-align: top;
+}
+.prose > .semantic-table th {
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.025em;
+  line-height: 1.35;
+}
+.prose > .semantic-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--panel) 45%, transparent);
+}
+.prose > .semantic-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+.prose > :is(.semantic-table, .semantic-figure):target {
+  border-radius: 0.2rem;
+  outline: 2px solid var(--accent);
+  outline-offset: 0.35rem;
+}
+.semantic-table-caption {
+  caption-side: top;
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.45;
+  max-width: 66ch;
+  padding-block: 0 0.72rem;
+  text-align: start;
+}
+.semantic-table-number,
+.semantic-figure-number {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 750;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+}
+.table-anchor,
+.figure-anchor {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.82em;
+  opacity: 0.45;
+  text-decoration: none;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease;
+}
+.table-anchor:hover,
+.table-anchor:focus-visible,
+.figure-anchor:hover,
+.figure-anchor:focus-visible {
+  color: var(--accent-strong);
+  opacity: 1;
+}
 @media (max-width: 42rem) {
   .prose > table {
     display: block;
@@ -75,6 +148,10 @@
     max-inline-size: 100%;
     overflow-x: auto;
     overscroll-behavior-inline: contain;
+  }
+  .prose > .semantic-table th,
+  .prose > .semantic-table td {
+    min-inline-size: 10rem;
   }
 }
 .prose .semantic-citation {

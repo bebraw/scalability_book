@@ -106,10 +106,15 @@ The final `2026-07-28` revision of the Model Context Protocol (MCP) removes the 
 Servers must not infer protocol context from earlier requests on the same connection; the core carries no protocol session across calls :citep[modelcontextprotocol2026spec].
 This is a versioned protocol example, not a requirement that the course project expose MCP or that older MCP traffic use the same design.
 
+:ref[table:continuity-designs]{text="The table below"} compares what a client carries forward and what the deployment must still provide.
+
 | Continuity design           | What a later request carries             | Deployment obligation                                                                                     |
 | --------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Hidden protocol session     | A session identifier                     | Route to the instance that owns it, or share the protocol-session state                                   |
 | Explicit application handle | A resource handle such as `workspace_id` | Authorize the operation and resolve the referenced state from every eligible instance, or retain affinity |
+
+::caption[Continuity designs and the deployment obligations they retain.]
+::label[table:continuity-designs]
 
 An explicit handle moves continuity rather than deleting it.
 An application may select state from the authenticated principal and ordinary request parameters; when workflow state cannot be derived from them, a service can mint a handle and require later calls to return it.
@@ -271,7 +276,7 @@ Rendering and navigation do not explain how delivered HTML becomes interactive.
 A server-rendered page may already contain useful content while the browser still has to recover or load the behavior behind its controls.
 That activation work is another architectural decision with consequences for payload size, client processing, first-interaction latency, and application structure.
 
-Four approaches make the trade-off visible:
+:ref[table:client-activation-approaches]{text="The table below"} makes the trade-offs among four activation approaches visible.
 
 | Approach              | Activation unit                         | Main benefit                                           | Main constraint                                                  |
 | --------------------- | --------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
@@ -279,6 +284,9 @@ Four approaches make the trade-off visible:
 | Progressive hydration | Ordered portions of the same tree       | Prioritizes important interaction                      | The application is still eventually hydrated                     |
 | Islands architecture  | Explicit interactive regions            | Static HTML elsewhere; work can be deferred or avoided | Shared state, navigation, and communication across islands       |
 | Resumability          | Serialized state and handler boundaries | Continues without replaying the application            | Serializable state and framework compiler or runtime constraints |
+
+::caption[Client activation approaches and their principal trade-offs.]
+::label[table:client-activation-approaches]
 
 Islands architecture and resumability are not competing names for a complete application architecture.
 Islands partition a page into static and interactive regions and attach a loading strategy to each interactive region.
@@ -314,13 +322,17 @@ A component written by a coding agent during development is not runtime-generati
 The boundary expands as runtime output moves from filling a host-selected component to selecting component composition or executable behavior.
 
 :citet[casas2026beyondcomponents] describes a practical spectrum from fixed components, through declarative descriptions rendered from an approved catalog, to generated executable code.
-Treat this as a design lens rather than a settled taxonomy:
+Treat this as a design lens rather than a settled taxonomy.
+:ref[table:runtime-ui-control-boundary]{text="The table below"} shows how the application's control obligation expands with the model's runtime freedom.
 
 | Runtime model output                                     | Application must control                                           | Main trade-off                                                                 |
 | -------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | Data for one approved component                          | Component implementation, behavior, and prop schema                | Predictable behavior with little freedom over layout                           |
 | Declarative descriptor using approved components/actions | Schema, renderer, design system, and action registry               | Composition within a grammar, with validation and schema-evolution burden      |
 | Generated HTML, CSS, and JavaScript                      | Isolated execution boundary, mediated data/tool bridge, and limits | Broadest expressiveness with the largest failure, review, and containment load |
+
+::caption[Runtime model-output boundaries and the application controls they require.]
+::label[table:runtime-ui-control-boundary]
 
 This axis can be combined with server-side or client-side rendering, hydration, islands, or resumability.
 It does not replace those choices.
@@ -358,7 +370,20 @@ Versioning, idempotency, validation, pagination, filtering, and error shape all 
 
 ### API interaction styles
 
-Several styles can expose the same domain behavior while placing coupling in different locations:
+Several styles can expose the same domain behavior while placing coupling in different locations.
+:ref[table:api-interaction-styles]{text="The table below"} summarizes where each style places advance knowledge, change pressure, and operational concern.
+
+| Style                  | What the client knows in advance                           | Where change pressure concentrates                         | Typical operational concern                         |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
+| Resource-oriented HTTP | Resource addresses, representations, methods, and statuses | Resource and representation compatibility                  | Caching, idempotency, pagination, and versioning    |
+| Hypermedia-driven REST | Entry points, media types, and stable relation semantics   | Relation semantics and completeness of advertised controls | Link validity, client interpretation, and adoption  |
+| GraphQL                | A typed schema and the fields needed for each operation    | Schema governance, field evolution, and deprecation        | Authorization, resolver behavior, and query cost    |
+| RPC                    | Named methods and request or response message contracts    | Method and message compatibility                           | Deadlines, retries, idempotency, and streaming flow |
+
+::caption[API interaction styles and where each places coupling and operational pressure.]
+::label[table:api-interaction-styles]
+
+The distinctions behind the summary matter:
 
 - **Resource-oriented HTTP** exposes identifiable resources through a uniform set of HTTP methods and status semantics.
   Many APIs described as REST use this recognizable subset, but REST itself is a broader architectural style derived for distributed hypermedia systems :citep[fielding2000architectural].

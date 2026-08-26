@@ -8,10 +8,11 @@ Upstream: [bebraw/scholarmark](https://github.com/bebraw/scholarmark)
 
 Originally tested package: `scholarmark@0.1.0`
 
-Integrated package: `scholarmark@0.3.0`
+Integrated package: `scholarmark@0.9.1`
 
 The requested sanitized-HAST and rendered-heading APIs shipped in `0.2.0` and now power the book renderer.
-Version `0.3.0` adds postfix labels, table captions, local reference metadata, and host-provided cross-document reference targets.
+The current integration uses postfix labels, native and independently numbered table or figure captions, captioned-block metadata, local reference metadata, host-provided cross-document reference targets, and the Citation.js bibliography-parser adapter from the `0.9.1` API.
+ScholarMark `0.9.1` also exposes a browser entry, injectable bibliography parsing, portable line comments, language-service metadata, and bounded native figures for consumers that need them.
 The remainder of this document preserves the original upstream request and its rationale for reference.
 
 ## Summary

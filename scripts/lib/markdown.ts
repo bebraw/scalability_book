@@ -11,16 +11,20 @@ import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 import {
+  figureNumbersByOffset,
   headingNumbersByOffset,
   parseBibliography,
   projectMarkdownComments,
   renderTreeSync,
   slugify,
+  tableNumbersByOffset,
   toHtml,
   type Diagnostic,
+  type RenderedCaptionedBlock,
   type RenderedHeading,
   type SyncCitationFormatter,
 } from "scholarmark";
+import { parseBibliography as parseCitationJsBibliography } from "scholarmark/citation-js";
 import type {
   Element as HastElement,
   ElementContent as HastElementContent,
@@ -94,9 +98,20 @@ export function renderMarkdown(
     headingNumbersByOffset(prepared.source),
     chapter.number,
   );
+  let tableNumbers = prefixBlockNumbers(
+    tableNumbersByOffset(prepared.source),
+    chapter.number,
+  );
+  let figureNumbers = prefixBlockNumbers(
+    figureNumbersByOffset(prepared.source),
+    chapter.number,
+  );
   let rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
     citationFormatter,
+    figureNumbers,
     headingNumbers,
+    parseBibliography: parseCitationJsBibliography,
+    tableNumbers,
   });
 
   if (needsAutomaticBibliography(rendered.tree)) {
@@ -106,9 +121,20 @@ export function renderMarkdown(
       headingNumbersByOffset(prepared.source),
       chapter.number,
     );
+    tableNumbers = prefixBlockNumbers(
+      tableNumbersByOffset(prepared.source),
+      chapter.number,
+    );
+    figureNumbers = prefixBlockNumbers(
+      figureNumbersByOffset(prepared.source),
+      chapter.number,
+    );
     rendered = renderTreeSync(prepared.source, bibliographySource, "apa", {
       citationFormatter,
+      figureNumbers,
       headingNumbers,
+      parseBibliography: parseCitationJsBibliography,
+      tableNumbers,
     });
   }
 
@@ -118,6 +144,7 @@ export function renderMarkdown(
     prepared.source,
     prepared.imports,
     rendered.headings,
+    rendered.captionedBlocks,
     Boolean(chapter.number),
     bibliographySource,
   );
@@ -227,6 +254,18 @@ function prefixHeadingNumbers(
   );
 }
 
+function prefixBlockNumbers(
+  blockNumbers: Readonly<Record<number, string>>,
+  chapterNumber: string,
+): Record<number, string> {
+  return Object.fromEntries(
+    Object.entries(blockNumbers).map(([offset, number]) => [
+      offset,
+      chapterNumber ? `${chapterNumber}.${number}` : number,
+    ]),
+  );
+}
+
 function throwOnMarkdownErrors(
   source: string,
   diagnostics: readonly Diagnostic[],
@@ -252,6 +291,7 @@ function decorateRenderedTree(
   source: string,
   imports: readonly MarkdownImport[],
   headings: readonly RenderedHeading[],
+  captionedBlocks: readonly RenderedCaptionedBlock[],
   numbered: boolean,
   bibliographySource: string,
 ): TableOfContentsItem[] {
@@ -259,10 +299,71 @@ function decorateRenderedTree(
   const headingById = new Map(headings.map((heading) => [heading.id, heading]));
   const paragraphCounts = new Map<string, number>();
   linkCitationsToBibliography(tree, bibliographySource);
+  decorateCaptionedBlockPermalinks(tree, captionedBlocks);
 
   decorateChildren(tree, source, importsByToken, paragraphCounts, numbered);
 
   return collectTableOfContents(tree, headingById);
+}
+
+function decorateCaptionedBlockPermalinks(
+  tree: HastRoot,
+  captionedBlocks: readonly RenderedCaptionedBlock[],
+): void {
+  const blocksById = new Map(
+    captionedBlocks.flatMap((block) => (block.id ? [[block.id, block]] : [])),
+  );
+
+  walk(tree, (element) => {
+    const kind =
+      element.tagName === "table"
+        ? "table"
+        : element.tagName === "figure"
+          ? "figure"
+          : undefined;
+    const id =
+      typeof element.properties.id === "string"
+        ? element.properties.id
+        : undefined;
+    const block = id ? blocksById.get(id) : undefined;
+    if (!kind || block?.kind !== kind) {
+      return;
+    }
+
+    addClass(element, `semantic-${kind}`);
+    const captionTag = kind === "table" ? "caption" : "figcaption";
+    const caption = element.children.find(
+      (child): child is HastElement =>
+        child.type === "element" && child.tagName === captionTag,
+    );
+    if (!caption) {
+      return;
+    }
+
+    const title = `${kind === "table" ? "Table" : "Figure"} ${block.number}`;
+    caption.children.push(
+      { type: "text", value: " " },
+      {
+        type: "element",
+        tagName: "a",
+        properties: {
+          ariaLabel: `Link to ${title}`,
+          className: [`${kind}-anchor`],
+          href: `#${id}`,
+        },
+        children: [{ type: "text", value: "#" }],
+      },
+    );
+  });
+}
+
+function addClass(element: HastElement, className: string): void {
+  const classes = Array.isArray(element.properties.className)
+    ? element.properties.className.map(String)
+    : [];
+  if (!classes.includes(className)) {
+    element.properties.className = [...classes, className];
+  }
 }
 
 function decorateChildren(
@@ -347,7 +448,10 @@ function linkCitationsToBibliography(
   const targets = new Map<string, string>();
   if (bibliography) {
     const citationIds = [
-      ...parseBibliography(bibliographySource).keys(),
+      ...parseBibliography(
+        bibliographySource,
+        parseCitationJsBibliography,
+      ).keys(),
     ].filter((id) => citedIds.has(id));
     const entries = bibliography.children.filter(
       (child): child is HastElement =>

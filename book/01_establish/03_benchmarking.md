@@ -94,12 +94,17 @@ This distinction matters in practice: organizations report broad AI adoption and
 
 Perceived effort can influence quality judgments when quality is difficult to assess :citep[kruger2004effort].
 It is a heuristic, not correctness evidence: a quick change can be sound, a laborious change can be wrong, and neither hours nor transcript length shows that software meets its requirements.
-Ask four different questions:
+:ref[table:trust-questions]{text="The table below"} separates four questions that should not be collapsed into one quality judgment.
 
-- **Provenance:** Which exact revision or artifact is this, and which inputs, people, and tools produced or materially transformed it?
-- **Endorsement:** Who stands behind which claim or decision on the final revision, including any reservations?
-- **Accountability:** Who owns the consequences and must correct, maintain, or retire the result if it proves wrong or becomes outdated?
-- **Evidence:** Which properties were checked on that revision, under what conditions, and what remains unverified?
+| Concept        | Question it answers                                                                                         | Record to preserve                                                | Does not prove                         |
+| -------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
+| Provenance     | Which exact revision or artifact is this, and which inputs, people, and tools produced or transformed it?   | Artifact identity, revision, material inputs, actors, and tools   | That the artifact is correct           |
+| Endorsement    | Who stands behind which claim or decision on the final revision, including any reservations?                | Named endorser, endorsed claim, scope, revision, and reservations | That every property was checked        |
+| Accountability | Who owns the consequences and must correct, maintain, or retire the result if it becomes wrong or outdated? | Accountable owner and correction or retirement obligation         | That the owner produced the artifact   |
+| Evidence       | Which properties were checked on that revision, under what conditions, and what remains unverified?         | Check, environment, result, revision, limits, and omissions       | Universal quality outside those checks |
+
+::caption[Questions that separate an artifact's origin, endorsement, accountability, and evidence.]
+::label[table:trust-questions]
 
 [_Sloptimists, Sloperators and Slopportunism_](https://atharvaraykar.com/sloptimists-sloperators-and-slopportunism/) makes the distinction concrete: Atharva Raykar describes the essay body as unedited model output, then says in his commentary that he does not fully endorse it.
 Disclosed origin and human acceptance are different, and neither establishes quality.
@@ -114,15 +119,21 @@ Record effort for comparison and reflection, not as a quality score.
 A software test usually invokes known code with controlled inputs and checks the result.
 An agent evaluation must also define the situation in which a model acts, because tool access, instructions, the starting repository, resource limits, and intermediate state can all change the result.
 The following vocabulary helps keep those layers separate :citep[grace2026demystifying]:
+:ref[table:agent-evaluation-vocabulary]{text="The table below"} locates each term within one evaluation.
 
-- A **task** is one problem with declared inputs and success criteria.
-- A **trial** is one attempt at that task.
-  Repeated trials expose variation in the agent's behavior; they do not create new independent tasks.
-- The **outcome** is the state left at the end of a trial, such as a working patch, updated database, or generated artifact.
-- The **trace** or **transcript** records the path to that state, including outputs, tool calls, intermediate results, and relevant interventions.
-- A **grader** checks one aspect of the outcome or trace through code, a model-based rubric, or human judgment.
-- The **agent harness** runs the model-and-tool loop, while the **evaluation harness** provisions tasks and environments, invokes the agent harness, preserves evidence, applies graders, and aggregates results.
-- An **evaluation suite** groups tasks intended to measure a declared capability or behavior.
+| Term                | Unit or scope                 | What it records or does                                                                                                   | Common confusion                                      |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Task                | One declared problem          | Defines inputs and success criteria                                                                                       | A repeated attempt is not a new independent task      |
+| Trial               | One attempt at one task       | Runs the task once so repeated trials can expose behavioral variation                                                     | Trial count is not task diversity                     |
+| Outcome             | End state of one trial        | Preserves the resulting patch, database state, generated artifact, or other effect                                        | The final claim is not necessarily the actual outcome |
+| Trace or transcript | Path through one trial        | Records outputs, tool calls, intermediate results, and relevant interventions                                             | A plausible trace does not prove a correct outcome    |
+| Grader              | One evaluated property        | Checks an aspect of the outcome or trace through code, a model-based rubric, or human judgment                            | One grader is not the whole evaluation                |
+| Agent harness       | Model-and-tool execution loop | Supplies context, tools, state, and control for one agent run                                                             | It need not provision or score the evaluation         |
+| Evaluation harness  | Evaluation infrastructure     | Provisions tasks and environments, invokes the agent harness, preserves evidence, applies graders, and aggregates results | It is distinct from the agent being evaluated         |
+| Evaluation suite    | A declared set of tasks       | Groups tasks intended to measure a capability or behavior                                                                 | A shared benchmark is one kind of suite               |
+
+::caption[Vocabulary for the nested objects and responsibilities in an agent evaluation.]
+::label[table:agent-evaluation-vocabulary]
 
 These terms describe different measurement objects.
 A repository test is often one deterministic grader inside an agent evaluation rather than the entire evaluation.

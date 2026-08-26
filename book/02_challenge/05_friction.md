@@ -176,7 +176,8 @@ Conversely, a fast test that never crosses the changed boundary can create confi
 > When several reports share a cause, ask whether a simpler boundary or invariant could eliminate the class before adding another exception.
 > Stop against an explicit risk threshold, not when the agent runs out of concerns.
 
-For one representative change, map the project's feedback ladder:
+For one representative change, map the project's feedback ladder.
+:ref[table:feedback-ladder]{text="The table below"} separates the evidence needed during implementation from the more expensive evidence needed at a changed boundary or release decision.
 
 | Stage             | Evidence returned                                                             | Typical cost          | When it is required                                          |
 | ----------------- | ----------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------ |
@@ -184,6 +185,9 @@ For one representative change, map the project's feedback ladder:
 | Affected          | Likely consequences of changed files                                          | Seconds to minutes    | Before sharing the change                                    |
 | Baseline          | Ordinary project readiness                                                    | Minutes               | Before accepting non-trivial work                            |
 | Boundary-specific | Browser, clean install, workflow, performance, security, or mutation evidence | Potentially expensive | When that boundary changed or release confidence is required |
+
+::caption[The project feedback ladder from focused checks to boundary-specific evidence.]
+::label[table:feedback-ladder]
 
 The exact commands depend on the project.
 The important property is that each stage has a named purpose.

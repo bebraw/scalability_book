@@ -79,12 +79,17 @@ This allocation problem has a longer research history.
 Mixed-initiative interaction combines direct human control with automation while considering uncertainty, costs, and benefits :citep[horvitz1999mixedinitiative], and the design target is appropriate reliance rather than maximum trust :citep[lee2004trust].
 Joint-activity research adds common ground, mutual predictability, and directability :citep[klein2004teamplayer], while human-AI interaction guidance emphasizes making capabilities and likely errors visible and supporting invocation, dismissal, and correction :citep[amershi2019guidelines].
 
+:ref[table:fleet-decision-responsibility]{text="The table below"} gives one concrete allocation of performance, authority, evidence, recovery, and accountability across a feature's decision path.
+
 | Decision                           | Performer and authority                                   | Acceptance evidence                                              | Escalation or recovery                                          | Accountable owner |
 | ---------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- | ----------------- |
 | Interpret an ambiguous requirement | Agent proposes interpretations; human selects or reframes | Examples, affected users, assumptions, and unresolved questions  | Escalate when alternatives change the required behavior         | Outcome owner     |
 | Change a shared interface          | Agent prepares an ADR and compatibility analysis          | Contract checks, affected consumers, migration and rollback plan | Escalate before breaking or externally visible change           | System owner      |
 | Implement a bounded change         | Agent executes within named files, tools, and budget      | Focused tests, baseline gate, diff, and known limits             | Stop on scope expansion, failed invariant, or unavailable check | Integrating human |
 | Release and observe                | Automation executes an approved reversible path           | Deployment identity, health signals, and rollback trigger        | Roll back or page the named responder on threshold breach       | Release owner     |
+
+::caption[Example allocation of authority, evidence, recovery, and accountability across development decisions.]
+::label[table:fleet-decision-responsibility]
 
 This table is a design example, not a universal role model.
 Authority should vary with the decision's ambiguity, coupling, observability, reversibility, and consequence.
@@ -148,10 +153,15 @@ An agent harness controls a model-and-tool execution loop.
 A session or orchestration layer may coordinate several harnesses, while a resource-access layer may mediate selected model and tool requests.
 These responsibilities may be combined in one platform or split across several services.
 
+:ref[table:fleet-control-boundaries]{text="The table below"} separates task-level orchestration from request-level resource access.
+
 | Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
 | ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy          |
 | Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
+
+::caption[Control boundaries for agent orchestration and model or tool access.]
+::label[table:fleet-control-boundaries]
 
 Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
 Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].

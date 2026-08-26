@@ -94,6 +94,48 @@ test.describe("book reading layout", () => {
     await expect(page.locator("#reference-lipsanen2026shiftup")).toBeVisible();
   });
 
+  test("numbers tables and links references to the table itself", async ({
+    page,
+  }) => {
+    await page.goto("/chapters/scaling/");
+
+    const table = page.locator('[id="table:scalability-laws"]');
+    const reference = page.locator(
+      'a.semantic-reference[href="#table:scalability-laws"]',
+    );
+
+    await expect(table.locator("caption")).toContainText(
+      "Table 8.2. Formal scalability models",
+    );
+    await reference.click();
+    await expect(page).toHaveURL(/#table:scalability-laws$/);
+    await expect(table).toHaveCSS("outline-style", "solid");
+  });
+
+  test("contains wide prose tables without widening the mobile page", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/chapters/benchmarking/");
+
+    const table = page.locator('[id="table:agent-evaluation-vocabulary"]');
+    await expect(table).toBeVisible();
+
+    const geometry = await table.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      overflowX: getComputedStyle(element).overflowX,
+      pageClientWidth: document.documentElement.clientWidth,
+      pageScrollWidth: document.documentElement.scrollWidth,
+      scrollWidth: element.scrollWidth,
+    }));
+
+    expect(geometry.overflowX).toBe("auto");
+    expect(geometry.scrollWidth).toBeGreaterThan(geometry.clientWidth);
+    expect(geometry.pageScrollWidth).toBeLessThanOrEqual(
+      geometry.pageClientWidth + 1,
+    );
+  });
+
   test("switches navigation views and expands demos when folded", async ({
     page,
   }) => {

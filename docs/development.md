@@ -16,9 +16,11 @@ Scientific references live in [bibliography.bib](../bibliography.bib).
 Use `:cite[key]` for a parenthetical citation or `:citet[key]` when the authors form part of the sentence, and place `::bibliography[]` under a `## References` heading in each chapter that cites sources.
 The build fails when a citation key is missing from the bibliography.
 
-Scholarmark labels follow the block they identify.
+ScholarMark labels follow the block they identify.
 Use `::label[id]` after a heading, paragraph, table, or figure and refer to it with `:ref[id]`.
-For a GFM table, place `::caption[Caption text.]` immediately after the table and an optional label after the caption.
+Every book table should place `::caption[Caption text.]` immediately after the GFM table and a unique `::label[table:descriptive-id]` after the caption.
+ScholarMark numbers captioned tables and figures within each chapter (for example, `Table 4.2`), attaches the postfix label directly to the semantic block, and supplies its default reference title; the site adds a caption permalink.
+Introduce the table with a semantic reference such as `:ref[table:descriptive-id]{text="The table below"}` so prose and anchors stay connected if content moves.
 
 To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
 

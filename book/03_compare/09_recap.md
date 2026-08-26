@@ -22,11 +22,17 @@ That includes technical capacity, but it also includes architecture, feedback lo
 
 ## The project arc
 
-The three projects give the course its shape:
+The three projects give the course its shape.
+:ref[table:project-arc]{text="The table below"} makes the controlled comparison explicit: required behavior is held as stable as practical while the development system changes.
 
-1. **[Establish](/project/establish/) — implementation A:** build a baseline system with a locally hosted single agent.
-2. **[Challenge](/project/challenge/) — implementation B:** build the same required behavior afresh with a foundation-model single agent.
-3. **[Compare](/project/compare/) — implementation C:** build it again with an agent fleet, then measure, explain, critique, and learn from all three results.
+| Build                                               | Agent setup                   | Held as stable as practical                           | Deliberately varied                                                        | Evidence goal                                                                |
+| --------------------------------------------------- | ----------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [Establish](/project/establish/) — implementation A | Locally hosted single agent   | Common functional scope and submission evidence       | Local model, runtime, and the team's first project harness                 | Establish a baseline and expose initial assumptions                          |
+| [Challenge](/project/challenge/) — implementation B | Foundation-model single agent | The same required behavior, built afresh              | Served model capability and the revised harness or architecture hypothesis | Identify which outcomes recur and which change under a different agent setup |
+| [Compare](/project/compare/) — implementation C     | Agent fleet                   | The same required behavior and evaluation obligations | Delegation, orchestration, authority allocation, and fleet controls        | Explain fleet effects and compare all three results with recorded evidence   |
+
+::caption[The three course implementations and the evidence each comparison contributes.]
+::label[table:project-arc]
 
 The first working version is not the final design.
 It is one implementation produced by one development system.

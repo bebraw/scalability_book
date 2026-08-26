@@ -16,14 +16,19 @@ They fail because their original assumptions no longer match their operating env
 
 ## Pressures that expose assumptions
 
-Possible subsections:
+:ref[table:scaling-pressures]{text="The table below"} turns six forms of growth into assumptions to challenge, signals to watch, and responses to prepare.
 
-- **More users**: concurrency, rate limits, authentication load, abusive clients, peak traffic.
-- **More events**: storage growth, slow queries, indexes, archiving, aggregation.
-- **More domain instances**: tenancy, isolation, configuration, permissions, noisy neighbors.
-- **More failures**: retries, duplicates, timeouts, network partitions, delayed processing.
-- **More stakeholders**: reporting, compliance, support, product analytics, operational ownership.
-- **More change**: schema evolution, API compatibility, migrations, dependency upgrades.
+| Pressure              | Assumption it exposes                                                | First signals                                                      | Prepared response                                                               |
+| --------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| More users            | Request handling and identity services absorb concurrent peaks       | Tail latency, `429` responses, authentication failures, abuse load | Load-test peaks; define admission control, rate limits, and degradation         |
+| More events           | Data can grow without changing query cost or retention needs         | Slow queries, storage growth, index maintenance, stale summaries   | Index measured access paths; define aggregation, archival, and retention        |
+| More domain instances | Shared capacity remains isolated, configurable, and fairly allocated | Noisy-neighbor latency, uneven queues, permission exceptions       | Enforce tenant boundaries, quotas, partitioning rules, and scoped configuration |
+| More failures         | A timed-out or retried operation does not create a new side effect   | Duplicates, retry storms, growing queues, delayed work             | Use idempotency, bounded backoff, failure isolation, and observable recovery    |
+| More stakeholders     | The original data, access model, and ownership satisfy later needs   | Manual exports, access exceptions, audit gaps, ownerless incidents | Name owners; define reporting, access-control, audit, and support contracts     |
+| More change           | Producers, consumers, schemas, and dependencies evolve together      | Version skew, failed migrations, repeated compatibility breakage   | Design compatible evolution, staged migration, verification, and rollback       |
+
+::caption[Scaling pressures that expose assumptions in the event-tracking system.]
+::label[table:scaling-pressures]
 
 > **Sustainability angle**
 >
