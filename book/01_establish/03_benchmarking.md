@@ -43,7 +43,8 @@ It is for this reason learning chaos engineering can be useful since it tests ex
 
 ## When a measure becomes a target
 
-[Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law) warns that a statistical relationship used for observation can break down when pressure is applied to it as a control target :citep[goodhart1975monetary].
+[Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law) states: "Any observed statistical regularity will tend to collapse once pressure is placed upon it for control purposes" :citep[goodhart1975monetary].
+In plain language, the relationship that made a metric informative can break down when that metric is used as a target.
 The familiar shorthand is that a measure tends to stop being a good measure when it becomes the target.
 This is especially relevant to software because dashboards and quality gates make measurable proxies easy to optimize.
 
