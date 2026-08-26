@@ -213,6 +213,12 @@ const demoScriptIncludes = [
     script: "/agent-fleet-demo.js",
   },
   {
+    title: "Reliability chain lab",
+    chapter: "Agent fleets",
+    include: "site/includes/lusser-law-demo.html",
+    script: "/scalability-laws.js",
+  },
+  {
     title: "Sequential work bound",
     chapter: "Agent fleets",
     include: "site/includes/amdahl-law-demo.html",

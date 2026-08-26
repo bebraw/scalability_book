@@ -15,6 +15,12 @@ for (const root of document.querySelectorAll<HTMLElement>(
   initializeAmdahlLaw(root);
 }
 
+for (const root of document.querySelectorAll<HTMLElement>(
+  "[data-lusser-law-demo]",
+)) {
+  initializeLusserLaw(root);
+}
+
 for (const root of document.querySelectorAll<HTMLElement>("[data-usl-demo]")) {
   initializeUsl(root);
 }
@@ -101,6 +107,268 @@ function renderQueue(
     const warning = Math.abs(gap) > tolerance && index >= observed - Math.abs(gap);
     return `<i${warning ? ' class="is-gap"' : ""}></i>`;
   }).join("");
+}
+
+function initializeLusserLaw(root: HTMLElement) {
+  const form = root.querySelector<HTMLFormElement>("[data-lusser-law-form]");
+  if (!form) return;
+
+  const update = () => {
+    const correctnessPercent = lawReadNumber(
+      root,
+      "[data-lusser-law-input='correctness']",
+      95,
+    );
+    const detectionPercent = lawReadNumber(
+      root,
+      "[data-lusser-law-input='detection']",
+      90,
+    );
+    const recoveryPercent = lawReadNumber(
+      root,
+      "[data-lusser-law-input='recovery']",
+      100,
+    );
+    const steps = lawReadNumber(root, "[data-lusser-law-input='steps']", 100);
+    const correctness = correctnessPercent / 100;
+    const detection = detectionPercent / 100;
+    const recovery = recoveryPercent / 100;
+    const recoveredStep = (1 - correctness) * detection * recovery;
+    const stoppedStep = (1 - correctness) * detection * (1 - recovery);
+    const wrongStep = (1 - correctness) * (1 - detection);
+    const stepReliability = correctness + recoveredStep;
+    const correctWorkflow = Math.pow(stepReliability, steps);
+    const terminalStep = stoppedStep + wrongStep;
+    const failedWorkflow = 1 - correctWorkflow;
+    const stoppedWorkflow =
+      terminalStep > Number.EPSILON
+        ? failedWorkflow * (stoppedStep / terminalStep)
+        : 0;
+    const wrongWorkflow = Math.max(0, 1 - correctWorkflow - stoppedWorkflow);
+    const target = 0.95;
+    const requiredStep = Math.pow(target, 1 / steps);
+    const requiredCoverage =
+      correctness < 1
+        ? Math.max(0, (requiredStep - correctness) / (1 - correctness))
+        : 0;
+    const verdict = root.querySelector<HTMLElement>(
+      "[data-lusser-law-verdict]",
+    );
+    const reading = root.querySelector<HTMLElement>(
+      "[data-lusser-law-reading]",
+    );
+
+    lawSetText(
+      root,
+      "[data-lusser-law-output='correctness']",
+      `${correctnessPercent.toFixed(1)}%`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-output='detection']",
+      `${detectionPercent.toFixed(0)}%`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-output='recovery']",
+      `${recoveryPercent.toFixed(0)}%`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-output='steps']",
+      `${steps} step${steps === 1 ? "" : "s"}`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-step-equation]",
+      `r = ${formatDecimal(correctness, 3)} + (${formatDecimal(1 - correctness, 3)} × ${formatDecimal(detection, 3)} × ${formatDecimal(recovery, 3)})`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-step-result]",
+      `= ${formatLawPercent(stepReliability, 3)}`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-workflow-equation]",
+      `R(${steps}) = ${formatDecimal(stepReliability, 5)}^${steps}`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-workflow-result]",
+      `= ${formatLawPercent(correctWorkflow)}`,
+    );
+    lawSetText(
+      root,
+      "[data-lusser-chart-value]",
+      formatLawPercent(correctWorkflow),
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-metric='step']",
+      formatLawPercent(stepReliability, 3),
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-metric='correct']",
+      formatLawPercent(correctWorkflow),
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-metric='stopped']",
+      formatLawPercent(stoppedWorkflow),
+    );
+    lawSetText(
+      root,
+      "[data-lusser-law-metric='wrong']",
+      formatLawPercent(wrongWorkflow),
+    );
+    renderLusserChart(root, stepReliability, steps, target);
+    renderLusserOutcomes(root, correctWorkflow, stoppedWorkflow, wrongWorkflow);
+
+    const meetsTarget = correctWorkflow >= target;
+    root.classList.toggle("is-law-warning", !meetsTarget);
+    if (verdict) {
+      verdict.textContent = meetsTarget
+        ? "Meets the 95% completion target"
+        : `${formatLawPercent(correctWorkflow)} completes correctly`;
+    }
+
+    if (reading) {
+      const targetGuidance =
+        requiredCoverage > detection + 0.000_001
+          ? `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step and ${formatLawPercent(requiredCoverage, 2)} combined detection and repair. Detection at ${detectionPercent.toFixed(0)}% cannot reach that target even with perfect repair.`
+          : `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step; the current detection path can reach it if repair after detection is at least ${formatLawPercent(detection > 0 ? requiredCoverage / detection : 1, 1)}.`;
+      reading.textContent = `At ${formatLawPercent(stepReliability, 3)} per step, ${steps} independent critical steps complete correctly ${formatLawPercent(correctWorkflow)} of the time. ${formatLawPercent(stoppedWorkflow)} stop safely and ${formatLawPercent(wrongWorkflow)} return a wrong result. ${targetGuidance}`;
+    }
+  };
+
+  form.addEventListener("input", () => {
+    setLusserPresetState(root);
+    update();
+  });
+  for (const button of root.querySelectorAll<HTMLButtonElement>(
+    "[data-lusser-preset]",
+  )) {
+    button.addEventListener("click", () => {
+      const preset = button.dataset.lusserPreset;
+      if (preset === "detected") {
+        setLusserValues(root, {
+          correctness: 95,
+          detection: 90,
+          recovery: 0,
+          steps: 20,
+        });
+      } else {
+        setLusserValues(root, {
+          correctness: 95,
+          detection: 90,
+          recovery: 100,
+          steps: 100,
+        });
+      }
+      setLusserPresetState(root, preset);
+      update();
+    });
+  }
+  update();
+}
+
+function setLusserValues(
+  root: HTMLElement,
+  values: Record<"correctness" | "detection" | "recovery" | "steps", number>,
+) {
+  for (const [name, value] of Object.entries(values)) {
+    const input = root.querySelector<HTMLInputElement>(
+      `[data-lusser-law-input='${name}']`,
+    );
+    if (input) input.value = String(value);
+  }
+}
+
+function setLusserPresetState(root: HTMLElement, activePreset?: string) {
+  for (const button of root.querySelectorAll<HTMLButtonElement>(
+    "[data-lusser-preset]",
+  )) {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.lusserPreset === activePreset),
+    );
+  }
+}
+
+function renderLusserChart(
+  root: HTMLElement,
+  stepReliability: number,
+  selectedSteps: number,
+  target: number,
+) {
+  const chart = root.querySelector<SVGElement>("[data-lusser-chart]");
+  if (!chart) return;
+
+  const maximumSteps = 200;
+  const width = 600;
+  const height = 180;
+  const left = 38;
+  const top = 18;
+  const x = (step: number) => left + (step / maximumSteps) * width;
+  const y = (reliability: number) => top + height - reliability * height;
+  const points = Array.from({ length: maximumSteps + 1 }, (_, step) => ({
+    step,
+    reliability: Math.pow(stepReliability, step),
+  }));
+  const path = points
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"}${x(point.step).toFixed(1)},${y(point.reliability).toFixed(1)}`,
+    )
+    .join(" ");
+  const selectedReliability = Math.pow(stepReliability, selectedSteps);
+  const grid = [0, 0.25, 0.5, 0.75, 1]
+    .map(
+      (ratio) =>
+        `<line x1="${left}" y1="${y(ratio)}" x2="${left + width}" y2="${y(ratio)}" />`,
+    )
+    .join("");
+
+  chart.innerHTML = `<g class="lusser-grid">${grid}</g>
+<line class="lusser-target-line" x1="${left}" y1="${y(target)}" x2="${left + width}" y2="${y(target)}" />
+<text class="lusser-target-label" x="${left + 7}" y="${y(target) - 6}">95% target</text>
+<path class="lusser-reliability-path" d="${path}" />
+<line class="lusser-selected-guide" x1="${x(selectedSteps)}" y1="${top}" x2="${x(selectedSteps)}" y2="${top + height}" />
+<circle class="lusser-selected-point" cx="${x(selectedSteps)}" cy="${y(selectedReliability)}" r="7" />`;
+  chart.setAttribute(
+    "aria-label",
+    `Reliability curve over 200 independent critical steps. At ${selectedSteps} steps, correct completion is ${formatLawPercent(selectedReliability)}. The target is 95%.`,
+  );
+}
+
+function renderLusserOutcomes(
+  root: HTMLElement,
+  correct: number,
+  stopped: number,
+  wrong: number,
+) {
+  const outcomes = { correct, stopped, wrong };
+  for (const [name, probability] of Object.entries(outcomes)) {
+    const segment = root.querySelector<HTMLElement>(
+      `[data-lusser-outcome-segment='${name}']`,
+    );
+    if (segment) segment.style.inlineSize = `${probability * 100}%`;
+  }
+  const bar = root.querySelector<HTMLElement>("[data-lusser-outcome-bar]");
+  bar?.setAttribute(
+    "aria-label",
+    `${formatLawPercent(correct)} correct completion, ${formatLawPercent(stopped)} safe stop, and ${formatLawPercent(wrong)} wrong result.`,
+  );
+}
+
+function formatDecimal(value: number, digits: number) {
+  return value.toFixed(digits).replace(/^0/, "");
+}
+
+function formatLawPercent(value: number, digits = 1) {
+  return `${(value * 100).toFixed(digits)}%`;
 }
 
 function initializeAmdahlLaw(root: HTMLElement) {

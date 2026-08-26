@@ -1,0 +1,166 @@
+<section
+  id="demo-reliability-chain-lab"
+  data-demo-anchor
+  class="law-demo law-demo-lusser is-law-warning"
+  data-lusser-law-demo
+  aria-labelledby="lusser-law-demo-heading"
+>
+  <div class="law-demo-header">
+    <div>
+      <p class="law-demo-kicker">
+        Lusser’s Law · R<sub>workflow</sub> = ∏r<sub>i</sub>
+      </p>
+      <h3 id="lusser-law-demo-heading">
+        Track the error that survives every safeguard
+      </h3>
+    </div>
+    <div class="law-demo-verdict" data-lusser-law-verdict aria-live="polite">
+      60.6% completes correctly
+    </div>
+  </div>
+
+  <div class="law-demo-grid">
+    <form class="law-demo-controls" data-lusser-law-form>
+      <p class="law-demo-step">01 / Calibrate one critical step</p>
+      <div
+        class="lusser-presets"
+        role="group"
+        aria-label="Reliability scenarios"
+      >
+        <button type="button" data-lusser-preset="post" aria-pressed="true">
+          Post assumption
+        </button>
+        <button
+          type="button"
+          data-lusser-preset="detected"
+          aria-pressed="false"
+        >
+          Caught, not repaired
+        </button>
+      </div>
+      <label>
+        <span>Initial correctness, C</span>
+        <input
+          type="range"
+          min="70"
+          max="99.9"
+          step="0.1"
+          value="95"
+          data-lusser-law-input="correctness"
+        />
+        <output data-lusser-law-output="correctness">95.0%</output>
+      </label>
+      <label>
+        <span>Error detection, D</span>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="90"
+          data-lusser-law-input="detection"
+        />
+        <output data-lusser-law-output="detection">90%</output>
+      </label>
+      <label>
+        <span>Repair after detection, K</span>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="100"
+          data-lusser-law-input="recovery"
+        />
+        <output data-lusser-law-output="recovery">100%</output>
+      </label>
+      <label>
+        <span>Critical steps, n</span>
+        <input
+          type="range"
+          min="1"
+          max="200"
+          value="100"
+          data-lusser-law-input="steps"
+        />
+        <output data-lusser-law-output="steps">100 steps</output>
+      </label>
+      <p class="law-demo-control-note">
+        Idealized boundary: identical independent steps, every step required,
+        and the first terminal outcome decides the run.
+      </p>
+    </form>
+
+    <div class="law-demo-workspace">
+      <div class="lusser-equations" aria-label="Reliability calculations">
+        <div>
+          <small>One step · prediction or recovered error</small>
+          <strong data-lusser-step-equation
+            >r = .950 + (.050 × .900 × 1.000)</strong
+          >
+          <span data-lusser-step-result>= 99.500%</span>
+        </div>
+        <div>
+          <small>Series chain · every critical step succeeds</small>
+          <strong data-lusser-workflow-equation>R(100) = .99500^100</strong>
+          <span data-lusser-workflow-result>= 60.6%</span>
+        </div>
+      </div>
+
+      <div class="lusser-chart-frame">
+        <div class="lusser-chart-heading">
+          <span>Correct completion across the chain</span>
+          <strong data-lusser-chart-value>60.6%</strong>
+        </div>
+        <svg
+          data-lusser-chart
+          viewBox="0 0 660 235"
+          role="img"
+          aria-label="Workflow reliability curve over 200 independent critical steps"
+        ></svg>
+        <div class="lusser-axis">
+          <span>0 steps</span><span>Critical chain →</span
+          ><span>200 steps</span>
+        </div>
+      </div>
+
+      <div class="lusser-outcomes">
+        <div class="lusser-outcomes-heading">
+          <span>Where runs end</span>
+          <small>Correctness and safety are separate</small>
+        </div>
+        <div
+          class="lusser-outcome-bar"
+          data-lusser-outcome-bar
+          role="img"
+          aria-label="60.6% correct completion, 0% safe stop, and 39.4% wrong result"
+        >
+          <i data-lusser-outcome-segment="correct"></i>
+          <i data-lusser-outcome-segment="stopped"></i>
+          <i data-lusser-outcome-segment="wrong"></i>
+        </div>
+      </div>
+
+      <dl class="law-demo-metrics law-demo-metrics-four lusser-metrics">
+        <div>
+          <dt>Step gate</dt>
+          <dd data-lusser-law-metric="step">99.500%</dd>
+        </div>
+        <div>
+          <dt>Correct completion</dt>
+          <dd data-lusser-law-metric="correct">60.6%</dd>
+        </div>
+        <div>
+          <dt>Safe stop</dt>
+          <dd data-lusser-law-metric="stopped">0.0%</dd>
+        </div>
+        <div>
+          <dt>Wrong result</dt>
+          <dd data-lusser-law-metric="wrong">39.4%</dd>
+        </div>
+      </dl>
+      <p class="law-demo-reading" data-lusser-law-reading>
+        At 99.500% per step, 100 independent critical steps complete correctly
+        60.6% of the time.
+      </p>
+    </div>
+  </div>
+</section>

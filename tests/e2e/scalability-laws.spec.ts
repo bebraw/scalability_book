@@ -49,6 +49,44 @@ test.describe("scalability law labs", () => {
     );
   });
 
+  test("separates detected errors from recovered workflow completion", async ({
+    page,
+  }) => {
+    await page.goto("/demos/#demo-reliability-chain-lab");
+    const demo = page.locator("[data-lusser-law-demo]");
+
+    await expect(demo.locator('[data-lusser-law-metric="step"]')).toHaveText(
+      "99.500%",
+    );
+    await expect(demo.locator('[data-lusser-law-metric="correct"]')).toHaveText(
+      "60.6%",
+    );
+    await expect(demo.locator('[data-lusser-law-metric="stopped"]')).toHaveText(
+      "0.0%",
+    );
+    await expect(demo.locator("[data-lusser-chart]")).toHaveAttribute(
+      "aria-label",
+      /At 100 steps, correct completion is 60\.6%/,
+    );
+
+    await demo.locator('[data-lusser-preset="detected"]').click();
+    await expect(
+      demo.locator('[data-lusser-law-output="recovery"]'),
+    ).toHaveText("0%");
+    await expect(demo.locator('[data-lusser-law-metric="correct"]')).toHaveText(
+      "35.8%",
+    );
+    await expect(demo.locator('[data-lusser-law-metric="stopped"]')).toHaveText(
+      "57.7%",
+    );
+    await expect(demo.locator('[data-lusser-law-metric="wrong"]')).toHaveText(
+      "6.4%",
+    );
+    await expect(demo.locator("[data-lusser-law-reading]")).toContainText(
+      "stop safely",
+    );
+  });
+
   test("finds the declining side of a USL capacity curve", async ({ page }) => {
     await page.goto("/demos/#demo-contention-curve-lab");
     const demo = page.locator("[data-usl-demo]");

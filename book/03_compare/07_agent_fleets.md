@@ -226,6 +226,45 @@ Repeated review also consumes the same scarce integration capacity that bounds t
 If students repeat an agent review, they should record the fixed code, prompt, harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 
+### Lusser's Law and the reliability chain
+
+A workflow whose accepted result depends on every critical step has the structure of a series system.
+If step `i` has reliability `r_i`, the workflow reliability is:
+
+`R_workflow = ∏ r_i`
+
+When `n` independent critical steps have the same reliability `r`, this reduces to `R_workflow = r^n`.
+This product rule is commonly called Lusser's Law or the product law for series reliability :citep[tait1995lusser].
+It explains why a small per-step failure probability can dominate a long workflow even when no individual step looks especially risky.
+
+Redundancy within one step has a different topology.
+[Jason Gorman's compact formulation](https://bsky.app/profile/jasongorman.bsky.social/post/3mtxx4cdiqc26) uses `C` for the probability that the first prediction is correct and `P` for the conditional probability that an incorrect prediction is caught.
+For completion reliability, catching the prediction must also restore the step to a correct state; under that stronger interpretation:
+
+`r = C + (1 - C)P = 1 - (1 - C)(1 - P)`
+
+The complement expression describes the prediction-or-recovery paths within one step; Lusser's Law describes the product across serial steps.
+The distinction matters because detection alone does not complete a workflow.
+If `D` is the probability that an incorrect prediction is detected and `K` is the probability of successful repair after detection, then the completion reliability of one step is:
+
+`r = C + (1 - C)DK`
+
+An incorrect result that is detected but not repaired can stop safely, while an undetected result can propagate.
+Safety, liveness, and correctness should therefore be reported separately rather than collapsed into one success percentage.
+
+### Reliability chain lab
+
+The first preset below reproduces the compact idealization with 95% initial correctness, 90% catch-and-repair coverage, and 100 independent critical steps.
+Before changing the controls, predict whether the workflow remains above 50% correct completion.
+Then select **Caught, not repaired** and compare correct completion with safe stopping.
+
+{{ import "site/includes/lusser-law-demo.html" }}
+
+The model assumes identical independent steps, treats every step as necessary, and assigns the first terminal outcome to the whole run.
+Real agent workflows can share model blind spots, context, tools, and upstream state; steps can have different reliabilities; and later validation can sometimes repair earlier failures.
+Use the curve as a design probe, not a reliability forecast.
+Estimate `C`, `D`, and `K` from repeated accepted outcomes at a declared boundary, and use `∏ r_i` when observed steps differ instead of replacing them with an unsupported average.
+
 ### Amdahl's Law and the sequential bottleneck
 
 Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].

@@ -79,6 +79,8 @@ Formal models help students state that limit precisely enough to challenge their
   It is useful for event ingestion, queues, database connection pools, and review backlogs when the observed system is reasonably stable.
 - **Amdahl's Law** bounds the benefit of parallelism when part of the work remains sequential :citep[amdahl1967validity].
   It applies to request paths, batch processing, deployments, and agent workflows.
+- **Lusser's Law** multiplies the reliability of independent critical steps in a series system :citep[tait1995lusser].
+  It is useful for testing whether a long request, deployment, or agent workflow can meet an end-to-end correctness target.
 - **The Universal Scalability Law** extends the parallel-speedup question by accounting for contention and coordination or coherency costs :citep[gunther2008scalability].
   It is useful when measured throughput improves, flattens, and then worsens as concurrency increases.
 

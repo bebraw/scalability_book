@@ -10721,6 +10721,251 @@
   border-inline-start-color: var(--law-alert);
 }
 
+/* Lusser's Law: a reliability trace with safety outcomes */
+.law-demo-lusser {
+  --lusser-stopped: var(--warning);
+  --lusser-wrong: var(--danger);
+  background:
+    linear-gradient(
+      112deg,
+      color-mix(in srgb, var(--success) 7%, transparent),
+      transparent 38%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 1.7rem,
+      color-mix(in srgb, var(--border) 24%, transparent) 1.7rem 1.74rem
+    ),
+    var(--panel);
+}
+
+.prose .law-demo-lusser .law-demo-kicker sub {
+  font-size: 0.72em;
+  text-transform: none;
+}
+
+.lusser-presets {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lusser-presets button {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.49rem;
+  font-weight: 750;
+  letter-spacing: 0.035em;
+  line-height: 1.35;
+  min-block-size: 2.55rem;
+  padding: 0.45rem 0.55rem;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.lusser-presets button:hover,
+.lusser-presets button:focus-visible {
+  border-color: var(--law-accent);
+  color: var(--law-accent);
+}
+
+.lusser-presets button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--law-accent) 10%, var(--panel));
+  box-shadow: inset 0 -0.18rem var(--law-accent);
+  color: var(--law-accent);
+}
+
+.lusser-equations {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lusser-equations > div {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--code-text);
+  display: grid;
+  gap: 0.28rem;
+  min-width: 0;
+  padding: 0.82rem 0.9rem;
+}
+
+.lusser-equations small {
+  color: color-mix(in srgb, var(--code-text) 65%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.43rem;
+  letter-spacing: 0.055em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.lusser-equations strong {
+  font-family: var(--font-serif);
+  font-size: clamp(0.85rem, 1.8vw, 1.08rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.lusser-equations span {
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.lusser-chart-frame {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 2.15rem,
+      color-mix(in srgb, var(--border) 35%, transparent) 2.15rem 2.2rem
+    ),
+    color-mix(in srgb, var(--bg) 82%, var(--panel));
+  border: 1px solid var(--border);
+  padding: 0.62rem 0.75rem 0.45rem;
+}
+
+.lusser-chart-heading,
+.lusser-outcomes-heading {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.lusser-chart-heading span,
+.lusser-outcomes-heading span,
+.lusser-outcomes-heading small {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.lusser-chart-heading strong {
+  color: var(--law-accent);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+}
+
+[data-lusser-chart] {
+  color: var(--law-accent);
+  display: block;
+  inline-size: 100%;
+}
+
+.lusser-grid line {
+  stroke: color-mix(in srgb, var(--border) 65%, transparent);
+  stroke-width: 1;
+}
+
+.lusser-target-line {
+  stroke: var(--lusser-stopped);
+  stroke-dasharray: 4 5;
+  stroke-width: 1.5;
+}
+
+.lusser-target-label {
+  fill: var(--lusser-stopped);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lusser-reliability-path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-linejoin: bevel;
+  stroke-width: 5;
+}
+
+.lusser-selected-guide {
+  stroke: var(--muted);
+  stroke-dasharray: 3 5;
+  stroke-width: 1;
+}
+
+.lusser-selected-point {
+  fill: var(--law-signal);
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+
+.lusser-axis {
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.43rem;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+
+.lusser-outcomes {
+  background: color-mix(in srgb, var(--bg) 78%, var(--panel));
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.68rem 0.75rem;
+}
+
+.lusser-outcome-bar {
+  background: var(--border);
+  display: flex;
+  inline-size: 100%;
+  min-block-size: 0.72rem;
+  overflow: hidden;
+}
+
+.lusser-outcome-bar i {
+  block-size: 0.72rem;
+  display: block;
+  transition: inline-size 180ms ease-out;
+}
+
+.lusser-outcome-bar [data-lusser-outcome-segment="correct"] {
+  background: var(--law-signal);
+}
+
+.lusser-outcome-bar [data-lusser-outcome-segment="stopped"] {
+  background: var(--lusser-stopped);
+}
+
+.lusser-outcome-bar [data-lusser-outcome-segment="wrong"] {
+  background: var(--lusser-wrong);
+}
+
+.lusser-metrics > div {
+  box-shadow: inset 0 0.16rem var(--border);
+}
+
+.lusser-metrics > div:nth-child(1),
+.lusser-metrics > div:nth-child(2) {
+  box-shadow: inset 0 0.16rem var(--law-signal);
+}
+
+.lusser-metrics > div:nth-child(3) {
+  box-shadow: inset 0 0.16rem var(--lusser-stopped);
+}
+
+.lusser-metrics > div:nth-child(4) {
+  box-shadow: inset 0 0.16rem var(--lusser-wrong);
+}
+
+.lusser-metrics > div:nth-child(3) dd {
+  color: var(--lusser-stopped);
+}
+
+.lusser-metrics > div:nth-child(4) dd {
+  color: var(--lusser-wrong);
+}
+
 .little-law-queue {
   align-content: start;
   background:
@@ -10950,6 +11195,16 @@
     flex-direction: column;
     gap: 0.25rem;
     padding-inline-start: 3.6rem;
+  }
+
+  .lusser-equations {
+    grid-template-columns: 1fr;
+  }
+
+  .lusser-outcomes-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.2rem;
   }
 }
 
