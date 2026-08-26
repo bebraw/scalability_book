@@ -1,7 +1,7 @@
 # How to develop in a scalable way?
 
 As systems evolve, they tend to become more difficult to develop as the existing requirements and code may work against you.
-This problem has been amplified with the introduction of so-called agentic coding, where computer agents leveraging Large Language Models (LLMs) essentially do the coding work for us.
+This problem has been amplified with the introduction of so-called agentic coding, where software agents use Large Language Models (LLMs), development tools, and feedback from their environment to carry out coding tasks.
 While the abstraction level has shifted, arguably this hasn't changed the fundamentals behind software engineering.
 We are still in a position where we have to figure out different types of requirements and map them to our applications.
 It is this gap between requirements and implementation where software engineering becomes difficult since transforming requirements into concrete code can typically be done in many different ways.
@@ -9,6 +9,35 @@ It is this gap between requirements and implementation where software engineerin
 In this chapter, I will bring you up to speed with agentic development while considering its impact on software engineering and web development in particular.
 Note that the space is moving fast at the moment, so some of the content may already be outdated by the time you read it so make sure to do your own research on top of reading this chapter!
 I recommend maintaining your own agentic development template and doing experiments actively since as you do it, you will learn to work better with the machine and becoming aware of its limitations though limitations tend to move over time and tend to be contextual and even model dependent.
+
+## What is an agent?
+
+The agent concept predates LLMs.
+In classical AI, an agent is situated in an environment: sensors turn stimuli into percepts, a controller chooses what to do, and actuators turn its commands into actions.
+A purposive agent chooses actions in relation to goals or preferences.
+This literature explicitly uses robots as a motivating example while treating computer programs as agents in information environments under the same model :citep[poole2023artificial].
+
+In this book, a **coding agent** is a goal-directed software system that repeatedly observes a development environment, chooses a next action, performs it through available tools, and uses the result to continue, change direction, stop, or escalate.
+An LLM by itself is not the whole agent.
+The model operates inside an agent harness that assembles observations, exposes tools, carries state between steps, invokes the model, and returns the effects of actions to the next step.
+A survey focused on software-engineering agents uses the closely related modules of perception, memory, and action, with the LLM as their cognitive core :citep[wang2025agentsse].
+
+`goal and current state → observe → decide → act → changed state → observe again`
+
+| Agent concept       | Robot                                      | Coding agent                                                                             | What to tune                                                                    |
+| ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Goal or preference  | Reach a destination while avoiding hazards | Requested outcome, acceptance criteria, constraints, budget, and stopping conditions     | Task specification, examples, graders, priorities, and escalation rules         |
+| Environment         | A room, road, or factory floor             | Repository, filesystem, terminal, browser, remote services, and collaborating people     | Sandbox, workspace setup, available services, and environmental determinism     |
+| Sensors / perception | Camera, microphone, or proximity sensor    | Prompt and instructions, file reads, search results, tool output, test failures, and images | Context selection, retrieval, observation format, provenance, and feedback quality |
+| Controller / brain  | Control software that selects motor commands | LLM plus the harness loop that constructs context and interprets model outputs            | Model and runtime configuration, instructions, planning policy, and orchestration |
+| State / memory      | A map, state estimate, and recent readings | Context window, session history, task state, retrieved documents, and durable project memory | Selection, summarization, retention, freshness, and source-of-truth rules        |
+| Actuators / actions | Wheels, arms, speaker, or display           | File edits, shell commands, browser interaction, API calls, and messages                  | Tool design, permissions, approvals, validation, rollback, and rate limits       |
+
+The analogy is a design model, not a claim that a coding agent has a body, desires, or a human-like mind.
+Its observations can be incomplete, its internal model can be wrong, its tool calls can fail, and its stated goal can be an inadequate proxy for the outcome people actually want.
+Developing an agent therefore means more than changing the prompt or swapping the LLM.
+You can improve what it can observe, how it decides and remembers, what actions it may take, how action effects return as feedback, and how its goal is translated into checks and stopping conditions.
+The constrain–generate–validate–revise loop later in this chapter is one practical way to tune these parts together.
 
 ## How are agents changing web development?
 
