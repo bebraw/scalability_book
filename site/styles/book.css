@@ -68,6 +68,76 @@
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
+.prose > pre > code.hljs {
+  background: transparent;
+  color: inherit;
+  display: block;
+  padding: 0;
+}
+.prose > pre :is(.hljs-comment, .hljs-quote) {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+.prose > pre :is(.hljs-keyword, .hljs-selector-tag, .hljs-subst) {
+  color: var(--syntax-keyword);
+}
+.prose > pre :is(.hljs-literal, .hljs-number, .hljs-symbol, .hljs-bullet) {
+  color: var(--syntax-literal);
+}
+.prose
+  > pre
+  :is(
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-property,
+    .hljs-variable,
+    .hljs-template-variable
+  ) {
+  color: var(--syntax-property);
+}
+.prose > pre :is(.hljs-string, .hljs-doctag, .hljs-regexp) {
+  color: var(--syntax-string);
+}
+.prose
+  > pre
+  :is(
+    .hljs-title,
+    .hljs-section,
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-type,
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-name
+  ) {
+  color: var(--syntax-title);
+}
+.prose
+  > pre
+  :is(
+    .hljs-meta,
+    .hljs-meta .hljs-keyword,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo
+  ) {
+  color: var(--syntax-meta);
+}
+.prose > pre .hljs-addition {
+  color: var(--syntax-addition);
+}
+.prose > pre .hljs-deletion {
+  color: var(--syntax-deletion);
+}
+.prose > pre .hljs-emphasis {
+  font-style: italic;
+}
+.prose > pre .hljs-strong {
+  font-weight: 700;
+}
+.prose > pre .hljs-link {
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
 .prose > .semantic-table {
   border-collapse: collapse;
   border-spacing: 0;

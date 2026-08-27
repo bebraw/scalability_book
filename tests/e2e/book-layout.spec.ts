@@ -55,6 +55,54 @@ test.describe("book reading layout", () => {
     expect(Math.abs(listGap - paragraphGap)).toBeLessThan(1);
   });
 
+  test("ships theme-aware syntax highlighting as generated HTML", async ({
+    page,
+    request,
+  }) => {
+    const response = await request.get("/chapters/benchmarking/");
+    expect(response.ok()).toBe(true);
+    expect(await response.text()).toContain(
+      '<span class="hljs-keyword">import</span>',
+    );
+
+    await page.goto("/chapters/benchmarking/");
+
+    const code = page.locator(".prose > pre > code.language-ts").first();
+    const keyword = code.locator(".hljs-keyword").first();
+    const string = code.locator(".hljs-string").first();
+    await expect(code).toBeVisible();
+    await expect(keyword).toBeVisible();
+    await expect(string).toBeVisible();
+
+    const themePalettes = new Set<string>();
+    for (const theme of ["light", "dark", "sepia", "contrast", "calm"]) {
+      await page.locator("[data-theme-picker]").selectOption(theme);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+
+      const palette = await code.evaluate((element) => {
+        const pre = element.closest("pre");
+        const keywordToken = element.querySelector(".hljs-keyword");
+        const stringToken = element.querySelector(".hljs-string");
+        if (!pre || !keywordToken || !stringToken) {
+          throw new Error("Expected a highlighted code block");
+        }
+
+        return {
+          background: getComputedStyle(pre).backgroundColor,
+          foreground: getComputedStyle(element).color,
+          keyword: getComputedStyle(keywordToken).color,
+          string: getComputedStyle(stringToken).color,
+        };
+      });
+
+      expect(palette.keyword).not.toBe(palette.foreground);
+      expect(palette.keyword).not.toBe(palette.string);
+      themePalettes.add(JSON.stringify(palette));
+    }
+
+    expect(themePalettes.size).toBe(5);
+  });
+
   test("keeps chapter cards in each landing-page row the same height", async ({
     page,
   }) => {

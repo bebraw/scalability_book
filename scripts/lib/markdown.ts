@@ -627,6 +627,8 @@ function decorateCode(code: HastElement): void {
     return;
   }
 
+  // Highlight during site generation so chapters ship styled HTML, not a
+  // browser-side syntax-highlighting runtime.
   const highlighted = highlight.highlight(plainText(code), { language }).value;
   code.children = fromHtml(highlighted, { fragment: true })
     .children as HastElementContent[];

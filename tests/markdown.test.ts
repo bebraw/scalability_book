@@ -63,6 +63,40 @@ Draft
   assert.match(rendered.content, /Draft/);
 });
 
+test("fenced code is syntax-highlighted during Markdown rendering", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+\`\`\`ts
+const message = "Hello";
+\`\`\`
+`,
+    { number: "2" },
+  );
+
+  assert.match(rendered.content, /<code[^>]*class="hljs language-ts"[^>]*>/);
+  assert.match(rendered.content, /<span class="hljs-keyword">const<\/span>/);
+  assert.match(rendered.content, /<span class="hljs-string">"Hello"<\/span>/);
+});
+
+test("plain-text fences stay uncolored without requiring a browser runtime", () => {
+  const rendered = renderMarkdown(
+    `# Chapter
+
+\`\`\`text
+No syntax here.
+\`\`\`
+`,
+    { number: "2" },
+  );
+
+  assert.match(
+    rendered.content,
+    /<code[^>]*class="hljs language-text"[^>]*>No syntax here\.\n<\/code>/,
+  );
+  assert.doesNotMatch(rendered.content, /hljs-keyword/);
+});
+
 test("unclosed Markdown comment blocks fail with the opening line", () => {
   assert.throws(
     () => renderMarkdown("# Chapter\n\n::: comment\nDraft\n", { number: "2" }),
