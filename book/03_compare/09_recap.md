@@ -201,3 +201,11 @@ It should include the strongest evidence from the earlier artifacts: assumptions
 - What would you simplify before adding more infrastructure?
 - What would you make explicit before adding more agents?
 - What would you measure before making the next scaling decision?
+
+## Summary
+
+The three implementations make both the application and its development system available for comparison.
+A strong conclusion uses shared acceptance criteria and project evidence to distinguish observed differences from proposed explanations, while keeping scope, practice effects, and failed attempts visible.
+The human-agent decision path adds another comparison boundary by showing who framed, designed, executed, verified, accepted, observed, and adapted consequential work.
+The purpose is not to select the most autonomous workflow or the most elaborate architecture, but to identify which allocation of people, agents, code, and infrastructure produced understandable outcomes at a sustainable review and recovery cost.
+Scalability remains an engineering judgment about which growth to prepare for, which trade-offs to accept, and what to measure next.

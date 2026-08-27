@@ -299,3 +299,11 @@ Change one value at a time and explain whether the mismatch suggests overload, i
 The law does not identify the cause of latency, prove that a queue is healthy, or promise that the system can sustain any chosen arrival rate.
 Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
 A large mismatch is a reason to inspect the measurement setup or system stability, not permission to force the numbers to fit.
+
+## Summary
+
+Benchmarking is a disciplined comparison rather than the collection of isolated numbers.
+A useful benchmark begins with a decision or prediction, defines a representative workload and system boundary, controls relevant conditions, repeats measurements that vary, and preserves the baseline for comparison.
+Because a metric can distort behavior once it becomes a target, proxy measures should be paired with product outcomes and regression guardrails.
+Workflow evals, observability, browser journeys, and resource measurements apply the same basic discipline while answering different questions.
+Formal relationships such as Little's Law can check whether observations are mutually consistent, but they do not replace a clearly stated boundary or an explanation of what the evidence cannot establish.

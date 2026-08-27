@@ -166,3 +166,11 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 Students should produce a friction audit.
 It should name the largest sources of setup, comprehension, change, testing, review, operational, and coordination friction, then choose one feedback loop to improve before building implementation B.
 The audit should include the project's validation ladder and identify one check that should move earlier, later, or become conditional.
+
+## Summary
+
+Friction is the cost of setting up, understanding, changing, testing, reviewing, operating, and coordinating a system.
+Some friction protects important boundaries, while accidental friction delays useful work without adding evidence or control.
+Agents can reduce visible effort while moving cost into comprehension, debugging, review, or long-term ownership, so speed alone is not proof of improvement.
+Reproducible setup, explicit responsibilities, useful diagnostics, and a risk-based feedback ladder make the development system easier to change without weakening its safeguards.
+A friction audit should identify the most expensive bottleneck and improve one feedback loop that the team can measure again.

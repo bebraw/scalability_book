@@ -302,3 +302,11 @@ It should also state where the technique displaced complexity, such as into clie
 If the target design contains asynchronous multi-step work that can perform an external side effect, include one crash-after-side-effect audit.
 Record the last durable coordination fact, the external effect that may already have occurred, the timeout and retry rule, the retry-safety or deduplication mechanism and its owner, any stable key it uses, the terminal-state behavior, and the evidence available to an operator.
 If no component at the effect boundary can deduplicate, state that duplicate delivery remains possible.
+
+## Summary
+
+Scaling begins with a pressure and an approaching limit, not with a preferred technique.
+Formal models can expose bounds and inconsistencies, while measurements show which boundary the running system is actually approaching.
+Caching, queues, replicas, partitioning, rate limits, background work, and isolation create capacity or resilience by accepting new costs, failure modes, and operational obligations.
+Latency, geography, consistency, sustainability, and human coordination therefore belong in the same trade-off analysis as throughput.
+A credible target design explains why each mechanism is needed, where it moves complexity, which signal reveals trouble, and how the system can degrade, recover, or adapt when its assumptions fail.

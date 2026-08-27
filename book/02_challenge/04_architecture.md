@@ -391,3 +391,11 @@ Students should review the architecture and data-flow diagrams submitted with im
 The hypothesis should state what the group intends to preserve or change and why.
 Students should also complete an ownership card for the event workflow and identify one structural signal that would cause them to review that ownership again.
 Implementation B should still include its own diagrams and decision record, but the chapter is primarily reading and analysis rather than a second large deliverable.
+
+## Summary
+
+Architecture determines where responsibilities, state, contracts, and change live in a web application.
+The constraints of the web make delivery, rendering, activation, and interaction related but separate decisions, and no single application shape or API style is best for every context.
+Validation, authorization, persistence, and external effects need explicit boundaries because those are the places where assumptions become correctness and recovery obligations.
+Diagrams, feature specifications, decision records, agent instructions, and ownership cards keep architectural intent reviewable after the original implementation.
+The goal is not to accumulate patterns, but to choose boundaries that fit the system's consumers, pressures, and expected changes.

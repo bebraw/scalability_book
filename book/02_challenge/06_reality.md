@@ -144,3 +144,11 @@ A good reconstruction makes trade-offs visible instead of trying to solve every 
 
 Students should produce a challenged-assumptions list and a pressure map.
 The map should connect each shared pressure scenario to the part of implementations A and B it stresses, the limit being approached, the likely failure mode, the first signal that would reveal the problem, one possible scaling response, and at least one prepared recovery action.
+
+## Summary
+
+Production pressure reveals assumptions that were easy to overlook while a system was small and reliable.
+Growth, dependency failure, changing correctness needs, and operational constraints push components toward saturation, where latency, queues, errors, and recovery cost begin to rise.
+Designing from failure means naming the limit, the first useful signal, the expected failure mode, and a prepared response before choosing a scaling technique.
+Implementation B should challenge selected assumptions without abandoning the common acceptance core or pretending to solve every future problem.
+The pressure map turns that reasoning into an explicit bridge from observed limits to the later comparison and scaling decisions.

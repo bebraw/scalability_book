@@ -270,3 +270,12 @@ The fleet run maps to a workspace, delegated tasks map to work items, agents and
 By loading a transformed trace into implementation C, students turn the application into a debugging and observability tool for the workflow that produced it.
 The goal is not to build a universal agent platform.
 It is to use event history, filters, summaries, and selected relationships to find coordination failures that the final code alone does not reveal.
+
+## Summary
+
+An agent fleet is useful only when both the task and the project can support bounded parallel work.
+Roles allocate activity, but decision responsibility, authority, acceptance, escalation, and accountability still have to be mapped explicitly.
+Project memory needs ownership and a lifecycle, while task control should remain separate from access to files, tools, credentials, and external actions.
+Fleet performance should be judged by accepted outcomes together with latency, cost, coordination, failed attempts, and human review effort rather than by agent activity alone.
+Least-privilege trust boundaries and a human owner remain essential for consequential or upstream work.
+The execution trace makes these claims inspectable and gives implementation C useful data for finding retries, overlap, handoff failures, and unplanned intervention.
