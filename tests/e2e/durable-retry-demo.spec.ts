@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("durable effect retry lab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/scaling/#durable-effect-retry-lab");
+    await page.goto("/appendices/durable-workflows/#durable-effect-retry-lab");
     await expect(page.locator("[data-durable-retry]")).toBeVisible();
   });
 

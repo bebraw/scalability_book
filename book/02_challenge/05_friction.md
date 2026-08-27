@@ -99,36 +99,19 @@ Possible techniques:
 ### Treat the environment as a versioned input
 
 A dependency lockfile does not describe the whole development environment.
-Runtime and package-manager versions, system packages, local services, process startup and readiness, test hooks, browser or command-line tools, and supported operating-system, architecture, and resource assumptions can remain hidden on one workstation.
-When another contributor, CI worker, or agent sandbox receives the same repository but cannot run its checks, the failure may reveal an implicit input, an incorrect support boundary, or an external or transient dependency.
-
+Runtime and package-manager versions, system packages, local services, configuration names, process readiness, supported platforms, and relevant resource limits can remain hidden on one workstation.
 For an agent, this state is part of the task rather than neutral background.
-In an internal Anthropic experiment that held the Claude model, harness, and Terminal-Bench 2.0 task set constant, reported infrastructure-error rates fell from 5.8% under strict enforcement to 0.5% with uncapped resources across six configurations; above roughly three times the benchmark specification, additional headroom was also associated with solution strategies that could not succeed under tighter limits :citep[segato2026infrastructure].
-The vendor-authored study concerns benchmark infrastructure rather than developer onboarding, but it supports recording CPU and memory allocations, hard limits, and enforcement policy; time limits are a separate run condition worth recording.
 
-Keep four related claims separate:
+Declare the supported environment and one path from a fresh checkout to a running application and its baseline checks.
+Record required configuration names without secret values, inject secrets at runtime, and name the host, hardware, network, mutable data, and external-service boundaries that remain outside the declaration.
+A container or environment manager can implement this contract, but its presence does not by itself prove isolation or reproducibility.
 
-- **Setup automation** provides a bootstrap path, but that path may still be unpinned, stateful, or dependent on the network.
-- A **declared environment** records and, where possible, pins the toolchain, dependencies, service definitions, configuration schema, seed-data revision, and supported platform and resource scope needed to reconstruct setup and run the baseline checks.
-- **Hermetic execution** isolates an action from undeclared host state and external services and restricts it to declared inputs and controlled tools; running inside a container does not establish this by itself.
-- A **[reproducible build](https://reproducible-builds.org/docs/definition/)** means that, given the same source, build environment, and build instructions, independent builders produce bit-for-bit identical copies of the specified artifacts.
+Use the cross-team audit as the test.
+Record setup time and outcome, undocumented intervention or retry, the failure stage, and relevant host or resource conditions.
+After a repair, replay the path from fresh state.
+The result supports a bounded claim about that setup—not that production is identical or that a stochastic agent will produce the same patch.
 
-[devenv](https://devenv.sh/) is one Nix-based example: it can declare packages, languages, tasks, services, processes, tests, hooks, profiles, and containers, while its lock file records external inputs.
-It is an implementation example rather than evidence that one tool or Nix fits every project.
-In a large-scale study of 709,816 package instances from historical Nixpkgs snapshots, more than 99% could be rebuilt successfully, while bitwise reproducibility ranged from 69% to 91% :citep[malka2025functional].
-That result concerns package builds, not interactive development workflows or cross-platform equivalence, and shows that declared inputs alone do not guarantee bitwise-identical outputs.
-Native setup scripts, development containers, and other environment managers can support the same project contract.
-
-Declare which secrets are required and how they are supplied, but inject their values at runtime rather than pinning or committing them in the environment definition.
-Name host kernels, hardware, networks, mutable service data, and external APIs that remain non-reproducible boundaries; prefer local or demonstration substitutes for the baseline and never require production credentials.
-Mutable downloads still need a lock, checksum, digest, or explicit freshness policy.
-Strict pins need an update and security-review policy; reproducibility should not turn an old dependency into an invisible permanent dependency.
-
-Use the existing cross-team audit as the test.
-From a fresh checkout on another supported machine or container, with project caches, generated files, and project-owned service state absent, run the documented setup and baseline validation and record the host prerequisites already present.
-Capture the setup time and outcome, any undocumented intervention or retry, the failure stage, and relevant host, resource, or network conditions; record required configuration names but never secret values.
-After a repair, the authors or CI should replay the path from a fresh state.
-The result supports a bounded claim about the declared setup, not that production is identical or that a stochastic agent will produce the same patch.
+[Appendix B: Reproducible development environments](/appendices/reproducible-environments/) distinguishes setup automation, declared environments, hermetic execution, and reproducible builds and provides the complete fresh-state audit.
 
 ### Agents can move friction rather than remove it
 
@@ -140,19 +123,8 @@ Lower entry friction can move cost into comprehension, debugging, security revie
 Before adopting an unfamiliar stack, use a bounded spike to compare it with a familiar baseline under the same behavioral tests and explicit performance and resource targets; require a team member to explain and modify the result; and record the toolchain and rollback path.
 Choose the stack only when the measured benefit survives those ownership costs.
 
-> **A reading diff routes attention**
->
-> Large changes may repeat the same migration across call sites or include generated and mechanically forced edits.
-> [`meat`](https://github.com/boldsoftware/meat) is an experimental tool that asks a model to choose rows to remove, fold, or elide, then mechanically checks and applies that plan to the immutable original diff.
-> The surviving code is therefore source-derived rather than regenerated by the model.
->
-> The view is still lossy.
-> An [author-run analysis of the Python-only diffs from three selected commits](https://github.com/boldsoftware/meat/blob/f39f41dfe7b5b37a12b35fdfbaecc7e779855bd3/analysis/python-famous-commits-2026-08-02/REPORT.md) records an aggregate 30.1% byte reduction; it also documents cases where the output hid decisive test outcomes and made an old/new default inversion look like a one-sided addition.
-> The report illustrates the mechanism and its failure modes; it does not measure reviewer effectiveness.
-> In a different task, a mutation-based preprint found that GPT-4 and GPT-5.2 summaries of 12 controlled synthetic Python programs and 50 human-written benchmark programs sometimes described familiar algorithmic intent while missing mutated behavior; it did not study diffs or human reviewers :citep[khatib2026summarization].
->
-> Use a reading diff as an attention map, not as acceptance evidence.
-> Keep the raw diff and independent checks available, inspect omitted regions at consequential boundaries, and return for decomposition any change that remains too large or coupled to understand.
+Compressed diffs and summaries can route attention, but a lossy view is not acceptance evidence.
+Keep the complete artifact and independent checks available; [Appendix A](/appendices/evaluating-agentic-workflows/#compressed-evidence-and-repeated-review) develops a bounded audit for compressed review evidence.
 
 ### Feedback economics
 
@@ -160,21 +132,8 @@ Validation can itself become a source of friction.
 A ten-minute clean-install or browser suite may provide valuable release evidence while being a poor response to every saved file.
 Conversely, a fast test that never crosses the changed boundary can create confidence without useful coverage.
 
-> **When findings become inventory**
->
-> :citet[lawson2026bugs] uses the provocative claim that teams can now choose how many bugs they want by asking agents to continue reviewing.
-> The operational choice is narrower: a team can choose how much defect-search and verification effort to fund, which known risks to accept, and when to stop.
-> It cannot count the unknown defects that remain.
->
-> Cheap reports may shift rather than remove friction.
-> In a live study at Mozilla and Ubisoft, reviewers directly accepted 8.1% and 7.2% of generated comments, respectively, while another 14.6% and 20.5% were marked useful as review or development tips.
-> At Ubisoft, the median instrumented interval for evaluating generated comments was about 43 seconds per patch, an upper bound on active evaluation time.
-> The study measured adoption rather than defect-detection accuracy, but it shows that suggestions still consume attention :citep[olewicki2026review].
->
-> Each finding still needs independent evidence such as a reproduction, a reachable path, or a violated invariant, followed by an impact judgment, a repair decision, and regression evidence.
-> A review loop without a stopping rule can create its own backlog, while repeated local patches can make the system harder to understand.
-> When several reports share a cause, ask whether a simpler boundary or invariant could eliminate the class before adding another exception.
-> Stop against an explicit risk threshold, not when the agent runs out of concerns.
+Agent review can keep producing candidate findings after the useful ones are exhausted.
+Count independently confirmed findings and the human time needed to adjudicate them, and stop against an explicit risk threshold; [Appendix A](/appendices/evaluating-agentic-workflows/#compressed-evidence-and-repeated-review) develops the full review-evidence exercise.
 
 For one representative change, map the project's feedback ladder.
 :ref[table:feedback-ladder]{text="The table below"} separates the evidence needed during implementation from the more expensive evidence needed at a changed boundary or release decision.
@@ -200,13 +159,7 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 - Have them identify the three most expensive changes they can imagine making.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
-- Audit a frozen reading diff against the raw diff for one bounded representative change.
-  Before opening either view, predeclare two or three behavior or architecture questions.
-  Record provisional answers after the reading view, then inspect the full raw diff and relevant checks and record every correction, omitted or misleading critical detail, and the time spent in each stage.
-  Treat this as an audit of that representation, not evidence that it improves review efficiency.
-- Time-box an agent review of one representative change.
-  Record candidate, independently confirmed, duplicate, and rejected findings along with triage and repair time.
-- Define a risk-based stopping rule for the review and identify whether one simplification could eliminate a defect class.
+- Use the optional review-evidence exercise in Appendix A when compressed diffs or repeated agent review are relevant to the project.
 
 ## Project artifact
 

@@ -166,7 +166,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Model evaluation lab",
-    chapter: "Benchmarking",
+    chapter: "Appendix A: Agent workflow evaluation",
     include: "site/includes/model-eval-demo.html",
     script: "/model-eval-demo.js",
   },
@@ -202,7 +202,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Fleet trace debugger",
-    chapter: "Agent fleets",
+    chapter: "Appendix D: Agent-system security",
     include: "site/includes/fleet-trace-debugger.html",
     script: "/fleet-trace-debugger.js",
   },
@@ -214,7 +214,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Reliability chain lab",
-    chapter: "Agent fleets",
+    chapter: "Appendix E: Scalability models",
     include: "site/includes/lusser-law-demo.html",
     script: "/scalability-laws.js",
   },
@@ -238,7 +238,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Contention curve lab",
-    chapter: "Scaling",
+    chapter: "Appendix E: Scalability models",
     include: "site/includes/usl-demo.html",
     script: "/scalability-laws.js",
   },
@@ -250,7 +250,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Durable effect retry lab",
-    chapter: "Scaling",
+    chapter: "Appendix F: Durable workflows",
     include: "site/includes/durable-retry-demo.html",
     script: "/durable-retry-demo.js",
   },
@@ -892,21 +892,30 @@ async function getChapter(file, index) {
   const fallbackTitle = titleFromFilename(file);
   const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
   const title = firstHeading || fallbackTitle;
-  const chapterNumber = chapterNumberFromFilename(file);
+  const appendixMatch = path.basename(file).match(/^([A-Z])_/);
+  const isAppendix = Boolean(appendixMatch);
+  const chapterNumber = appendixMatch?.[1] || chapterNumberFromFilename(file);
   const slug =
     chapterNumber === "0" || index === 0
       ? "introduction"
-      : path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
+      : path
+          .basename(file, ".md")
+          .replace(/^(?:\d+|[A-Z])_/, "")
+          .replaceAll("_", "-");
 
   return {
     file,
     index,
-    collection: "chapters",
-    kind: "chapter",
-    label: chapterNumber === "0" ? "Introduction" : `Chapter ${chapterNumber}`,
+    collection: isAppendix ? "appendices" : "chapters",
+    kind: isAppendix ? "appendix" : "chapter",
+    label: isAppendix
+      ? `Appendix ${chapterNumber}`
+      : chapterNumber === "0"
+        ? "Introduction"
+        : `Chapter ${chapterNumber}`,
     number: chapterNumber,
     slug,
-    url: `/chapters/${slug}/`,
+    url: isAppendix ? `/appendices/${slug}/` : `/chapters/${slug}/`,
     title,
     source,
   };
@@ -926,7 +935,7 @@ async function getPartPage(part) {
     file: part.file,
     collection: "parts",
     kind: "part",
-    label: `Part ${part.number}`,
+    label: part.number ? `Part ${part.number}` : part.title,
     number: part.number,
     slug,
     title,

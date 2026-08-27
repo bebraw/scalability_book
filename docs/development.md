@@ -6,10 +6,12 @@ This document covers local website development, preview, feedback review, and de
 
 The book website is configured through [site.config.jsonc](../site.config.jsonc).
 Use the `chapters` list there to choose which Markdown chapters are published; omitted chapters are not generated, which keeps work-in-progress material out of the site.
-Use the `parts` list to group the nine course chapters into the three course sections, point at each part's Markdown intro file, and describe each section's allowed AI assistance mode.
+Use the `parts` list to group the nine course chapters into the three course sections and to collect the optional appendices after them.
+Each entry can point at its own Markdown introduction and contain its ordered reading list.
 The file supports `//` and `/* ... */` comments.
 
 Markdown source files live under [book/](../book/), with each part intro next to its related chapters.
+Appendix source files use an uppercase letter prefix such as `A_topic.md`; the build labels them as appendices and publishes them below `/appendices/`.
 HTMLisp templates live under [site/](../site/): page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
 
 Scientific references live in [bibliography.bib](../bibliography.bib).

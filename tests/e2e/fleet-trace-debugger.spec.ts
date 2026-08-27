@@ -10,7 +10,7 @@ const correctMappings = {
 
 test.describe("fleet trace debugger", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/agent-fleets/#fleet-trace-debugger");
+    await page.goto("/appendices/agent-system-security/#fleet-trace-debugger");
     await expect(page.locator("[data-fleet-trace]")).toBeVisible();
   });
 

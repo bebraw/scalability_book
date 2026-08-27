@@ -110,7 +110,12 @@ test.describe("client activation lens", () => {
     await expect(
       page.locator('[data-citation="vepsalainen2025islands"]'),
     ).toHaveAttribute("href", "#reference-vepsalainen2025islands");
-    await expect(page.locator(".semantic-bibliography > li")).toHaveCount(3);
+    await expect(
+      page.locator("#reference-vepsalainen2024resumability"),
+    ).toBeVisible();
+    await expect(
+      page.locator("#reference-vepsalainen2025islands"),
+    ).toBeVisible();
   });
 
   test("stays within a narrow viewport", async ({ page }) => {

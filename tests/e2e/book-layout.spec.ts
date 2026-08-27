@@ -116,7 +116,7 @@ test.describe("book reading layout", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/chapters/benchmarking/");
+    await page.goto("/appendices/evaluating-agentic-workflows/");
 
     const table = page.locator('[id="table:agent-evaluation-vocabulary"]');
     await expect(table).toBeVisible();

@@ -93,39 +93,13 @@ Students must apply at least one suitable law or formal model to an application-
 Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out.
 A formula added after the design decision is not evidence that the formula guided the decision.
 
-### Contention curve lab
+### Contention beyond Amdahl's bound
 
-Amdahl's Law models a fixed sequential share but does not describe the way shared resources and coordination can become more expensive as concurrency grows.
-The Universal Scalability Law models relative capacity as:
+Amdahl's Law models a fixed sequential share but does not describe shared resources and coordination becoming more expensive as concurrency grows.
+The Universal Scalability Law adds contention and coherency terms, allowing modeled capacity to rise, flatten, and eventually fall.
+Its parameters should be fitted from representative throughput measurements rather than selected by intuition.
 
-`C(N) = N / (1 + α(N - 1) + βN(N - 1))`
-
-Here `α` represents contention or serialization cost and `β` represents coherency or coordination cost.
-The curve can rise, flatten, and eventually fall: adding workers may reduce total capacity when coordination grows faster than useful work.
-
-{{ import "site/includes/usl-demo.html" }}
-
-First set both costs to zero and inspect the ideal linear curve.
-Then add contention, add coherency cost, and find the first concurrency level after the modeled peak.
-The parameters should ultimately be fitted from measured throughput at several concurrency levels; arbitrary sliders illustrate the model's shape but do not predict a real deployment.
-
-> **Case study: limiting concurrency to protect throughput**
->
-> [PlanetScale describes a Vitess and MySQL production incident](https://planetscale.com/blog/concurrency-vs-throughput-vitess-mysql) in which a long-running transaction, immediate application retries, and a transaction pool raised to about 10,000 allowed more than 10,000 requests to accumulate inside the storage engine.
-> Snapshot reads grew more expensive as the long transaction preserved an increasingly long version history; more requests exceeded their latency limit and retried.
-> Work in progress rose while completed query throughput fell.
-> Increasing the pool had silenced pool-full errors but weakened the boundary protecting the database.
->
-> The team later reduced the pool to roughly 1,000 and changed full-pool behavior so requests could wait for a slot within a bounded timeout.
-> During a later burst on another shard, demand peaked around 25,000 slot requests per second while reported query throughput stayed near 60,000 per second and fewer than 200 statements executed inside MySQL at once.
-> If those figures describe the same stable boundary and observation window, Little's Law gives an upper estimate of `W < 200 / 60,000` seconds, or about 3.3 milliseconds.
-> The important separation is between clients seeking work, work admitted to the constrained resource, and useful work completed.
->
-> A queue does not create capacity; it moves waiting to a boundary where it can be observed and limited.
-> This report changed pool size and waiting behavior together, the later burst did not reproduce the original incident, and no tail-latency distribution was reported.
-> It also uses the Universal Scalability Law as an explanatory lens rather than fitting its parameters from measurements.
-> Treat the numbers as evidence for this workload, not as a universal pool target.
-> The durable lesson is that admission control can raise throughput when in-flight requests slow one another down, provided waiting is bounded, overload remains visible, and the underlying long transaction and retry behavior are still addressed.
+[Appendix E](/appendices/scalability-models/#contention-curve-lab) develops the model, provides the interactive contention curve, and examines a production case in which limiting admitted concurrency protected useful throughput.
 
 ## Common scaling techniques
 
@@ -198,34 +172,17 @@ Design questions:
 
 [NATS](https://nats.io/) makes one version of this trade-off concrete: Core NATS provides ephemeral publish-subscribe communication, while JetStream adds stored, replayable streams.
 
-### Durable execution preserves coordination progress
+### Durable coordination does not make effects exactly-once
 
-A queue can preserve a pending work item, but an asynchronous multi-step operation that must survive process failure also needs durable coordination state.
-An explicit application state machine can store each transition and its current state in a database.
-A replay-based workflow engine instead persists scheduling decisions and task results, then reconstructs logical control state by replaying deterministic orchestration code against that history.
-In the replay-based design, calls to databases, APIs, models, and tools sit behind external-work boundaries; replay reuses results that reached workflow history rather than issuing those calls again :citep[burckhardt2021durablefunctions].
+A queue can preserve pending work, while an explicit state machine or replay-based workflow can preserve progress across process failure.
+Neither mechanism guarantees exactly-once external effects.
+If a receiver accepts a webhook and the worker crashes before recording completion, recovery may repeat the call.
 
-Durable orchestration does not guarantee exactly-once external effects.
-Suppose the worker sends a subscriber webhook for event `E42`, the receiver accepts it, and the worker crashes before recording completion.
-A timeout and retry may send the webhook again.
-Temporal documents this boundary explicitly for Activities: an Activity may be retried and should therefore tolerate repeated execution, and a stable business idempotency key enforced by the called service is one way to make a non-idempotent effect safe to repeat :citep[temporal2026activitydefinition].
-The caller must reuse that key across attempts, and the called service must apply the effect and record the key atomically.
-If no component at the effect boundary can deduplicate, duplicate delivery remains possible; compensation or manual repair may be the honest recovery path.
+Use a stable business idempotency key across attempts and require the effect owner to record that key atomically with the effect.
+When no component at the effect boundary can deduplicate, duplicate delivery remains possible and compensation or manual repair may be the honest recovery path.
+Bound retry time and cost, classify permanent failures, expose terminal states, and remember that cancellation may not stop or undo an in-flight effect.
 
-For the event project, the event store remains authoritative for domain events, while state-machine state or workflow history records coordination progress.
-Bound total retry time and resource cost, classify permanent errors, and expose terminal states.
-Cancellation is a request to stop: it may not preempt an in-flight external effect and does not by itself undo one that already completed.
-Every approach adds durable state and operational ownership; replay-based engines also require replay-compatible code evolution and management of history growth and retention.
-
-### Durable effect retry lab
-
-The lab below stops a worker after a webhook receiver applies its effect but before the workflow records completion.
-Predict the outcome, inject the crash, then compare retry keys and receiver enforcement while keeping the logical command, physical attempts, outbound calls, effects, and durable completions separate.
-
-{{ import "site/includes/durable-retry-demo.html" }}
-
-The simulation holds the failure point constant.
-It demonstrates how one bounded retry contract behaves; it does not establish that every receiver, workflow engine, or external operation exposes the same enforcement boundary.
+[Appendix F: Durable workflows and retry-safe effects](/appendices/durable-workflows/) compares explicit and replay-based coordination, develops the crash-after-effect boundary, and contains the durable retry lab.
 
 ## Latency and geography
 

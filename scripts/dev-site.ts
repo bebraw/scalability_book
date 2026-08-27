@@ -688,7 +688,10 @@ function getSlug(file, index) {
     return "introduction";
   }
 
-  return path.basename(file, ".md").replace(/^\d+_/, "").replaceAll("_", "-");
+  return path
+    .basename(file, ".md")
+    .replace(/^(?:\d+|[A-Z])_/, "")
+    .replaceAll("_", "-");
 }
 
 function parseJsonc(source) {

@@ -116,7 +116,7 @@ They expand comprehension capacity only when they reduce uncertainty rather than
 A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both sides: generated comments sometimes contributed to later revisions, but reviewers still had to inspect them and accepted only a minority :citep[olewicki2026review].
 
 Effort is not correctness evidence: a quick change can be sound, a laborious change can be wrong, and neither hours nor transcript length shows that software meets its requirements.
-The Benchmarking chapter separates provenance, endorsement, accountability, and evidence when evaluating an accepted result.
+The human-agent relationship below separates provenance, endorsement, accountability, and evidence when evaluating an accepted result.
 
 :citet[brooks1987silver] distinguishes accidental difficulties that tools can reduce from essential difficulties rooted in the software problem, with complexity central among them.
 :citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
@@ -157,6 +157,28 @@ Ambiguous intent, weak evidence, irreversible commitments, and material external
 Invoking a tool does not transfer accountability to it.
 The accepting person or group still needs enough understanding, evidence, and control to stand behind the result and correct it.
 The Agent Fleets chapter develops the research background, decision path, and authority-mapping exercise.
+
+Perceived effort can influence quality judgments when quality is difficult to assess :citep[kruger2004effort].
+It is a heuristic, not correctness evidence.
+:ref[table:trust-questions]{text="The table below"} separates four questions that should not be collapsed into one quality judgment.
+
+| Concept        | Question it answers                                                                                         | Record to preserve                                                | Does not prove                         |
+| -------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
+| Provenance     | Which exact revision or artifact is this, and which inputs, people, and tools produced or transformed it?   | Artifact identity, revision, material inputs, actors, and tools   | That the artifact is correct           |
+| Endorsement    | Who stands behind which claim or decision on the final revision, including any reservations?                | Named endorser, endorsed claim, scope, revision, and reservations | That every property was checked        |
+| Accountability | Who owns the consequences and must correct, maintain, or retire the result if it becomes wrong or outdated? | Accountable owner and correction or retirement obligation         | That the owner produced the artifact   |
+| Evidence       | Which properties were checked on that revision, under what conditions, and what remains unverified?         | Check, environment, result, revision, limits, and omissions       | Universal quality outside those checks |
+
+::caption[Questions that separate an artifact's origin, endorsement, accountability, and evidence.]
+::label[table:trust-questions]
+
+[_Sloptimists, Sloperators and Slopportunism_](https://atharvaraykar.com/sloptimists-sloperators-and-slopportunism/) makes the distinction concrete: Atharva Raykar describes the essay body as unedited model output, then says in his commentary that he does not fully endorse it.
+Disclosed origin and human acceptance are different, and neither establishes quality.
+Survey respondents have reported tracking and monitoring for later review or debugging as reasons for declaring AI-generated code, but the available study did not test whether declaration improves software quality :citep[kashif2026declaration].
+
+Use the AI-use log together with the submitted project evidence: record material assistance and corrections in the log, and bind checks and known limits to the submitted revision.
+Provenance can make a process traceable; it does not make the artifact correct or transfer responsibility to the tool.
+Record effort for comparison and reflection, not as a quality score.
 
 The loop below is the local form of this relationship.
 The human and agent may occupy different positions in each phase, but the workflow still needs a visible owner, admissible actions, acceptance evidence, and a route for correction.
@@ -208,7 +230,7 @@ Model choice should follow the work and local evidence.
 A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
 Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules.
 A model name is not a capability result: runtime configuration, context, tools, hardware fit, routing, and fallback can all change the outcome and its cost or data boundary.
-The Benchmarking chapter shows how to identify and compare the configuration that actually served the work.
+The appendix on evaluating agentic development workflows shows how to identify and compare the configuration that actually served the work.
 
 Context selection is another generation decision.
 Focused retrieval and compact tool output can reduce irrelevant material, but any lossy view can also hide the fact needed to complete or review the task.

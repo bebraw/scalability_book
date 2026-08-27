@@ -59,8 +59,8 @@
     },
   ],
 
-  // The course runs in three three-week parts. Each part maps to three book
-  // chapters and constrains the AI assistance mode allowed during that phase.
+  // The course runs in three three-week parts. Each course part maps to three
+  // chapters; the final unnumbered part contains optional appendices.
   "parts": [
     {
       "number": "I",
@@ -93,6 +93,20 @@
         "book/03_compare/07_agent_fleets.md",
         "book/03_compare/08_scaling.md",
         "book/03_compare/09_recap.md",
+      ],
+    },
+    {
+      "number": "",
+      "title": "Appendices",
+      "description": "Optional deep dives into methods and implementation details that support the main reading path.",
+      "file": "book/04_appendices/00_appendices.md",
+      "chapters": [
+        "book/04_appendices/A_evaluating_agentic_workflows.md",
+        "book/04_appendices/B_reproducible_environments.md",
+        "book/04_appendices/C_advanced_web_boundaries.md",
+        "book/04_appendices/D_agent_system_security.md",
+        "book/04_appendices/E_scalability_models.md",
+        "book/04_appendices/F_durable_workflows.md",
       ],
     },
   ],

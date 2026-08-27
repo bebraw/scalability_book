@@ -147,65 +147,23 @@ Keep only workflows the project actually uses, make explicit or destructive work
 
 ## Separate task control from resource access
 
-Controls around a fleet operate at different scopes.
-The project harness introduced earlier is the versioned material inside a repository: specifications, commands, rules, and evidence.
-An agent harness controls a model-and-tool execution loop.
-A session or orchestration layer may coordinate several harnesses, while a resource-access layer may mediate selected model and tool requests.
-These responsibilities may be combined in one platform or split across several services.
+A project harness, an agent execution loop, fleet orchestration, and a gateway that mediates model or tool requests control different units of work.
+One product may combine them, but the design should still distinguish task decisions from resource-access decisions.
+A responsibility recorded in a plan without a mandatory enforcement point remains an intention.
 
-:ref[table:fleet-control-boundaries]{text="The table below"} separates task-level orchestration from request-level resource access.
-
-| Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
-| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy          |
-| Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
-
-::caption[Control boundaries for agent orchestration and model or tool access.]
-::label[table:fleet-control-boundaries]
-
-Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
-Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
-These are examples, not evidence that every fleet needs two products or exactly two control planes.
-Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
-
-The durable distinction is between a decision and its enforcement point.
-NIST's zero-trust architecture distinguishes a policy engine that makes and logs an access decision, a policy administrator that executes it by configuring an enforcement point, and the enforcement point that enables, monitors, or terminates access; implementations may combine the engine and administrator :citep[rose2020zerotrust].
-This is a design analogy, not a claim of NIST conformance.
-For each consequential decision, name the policy authority, mandatory enforcement point, and conflict or outage rule; overlapping controls still need explicit precedence, and a mediator cannot protect a path that bypasses it.
-
-The contract between the scopes matters more than the number of components.
-The HAR decision map states which decisions and transfers should occur; these control scopes provide some of the places where that design can be enforced and observed.
-A responsibility recorded in a table without a mandatory enforcement point remains an intention.
-Trace one operation through the chain:
+For one delegated task, trace:
 
 `originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
 
-Propagate only the necessary authenticated principal, audience-scoped delegated authority, and trusted task, trace, budget-reservation, and policy-decision identifiers.
-Each enforcement point must validate the authority and identifiers it relies on.
-Return the resource actually selected, routing or fallback decision, policy result, and observable latency, usage, and cost; for a model call, also record its provider, model, and version where available.
-Associate every physical attempt with one delegated run and that run's explicit outcome, such as accepted, rejected, failed, cancelled, or unresolved.
-Default telemetry to metadata: capture prompts, source, tool arguments or results, approval details, or principal data only when necessary, with redaction, access control, and deliberate retention, and never place credentials in trace context.
+Propagate only the necessary identity, scoped authority, task, trace, budget, and policy identifiers, and require each enforcement point to validate the facts it relies on.
+Return which resource was actually selected, the policy decision, measurable usage and cost, and an explicit outcome for the delegated run.
 A trace identifier connects evidence; it is not proof of identity or permission.
-Without this contract, the resource layer can see spend without knowing whether the work was accepted, while the orchestration layer can see intent without knowing which model or permission was actually used.
 
-For one delegated task, choose two consequential decisions: one about the session or task and one about a model, tool, credential, or other resource.
-For each, record the policy authority, mandatory enforcement point, trusted context or evidence, and conflict or outage rule.
-Then trace the task end to end and look for a direct-call bypass, lost actor identity, multiplied retry, conflicting caps or double-counted usage, and cancellation that does not reach in-flight work.
-Where practical, use a safe direct-call negative test and, where records are available, reconcile the mediator with the model provider or tool resource rather than inferring non-bypass from an incomplete trace.
-The audit is complete only when every denied, failed, retried, cancelled, or successful attempt has an identifier, policy result, and usage or cost provenance where measurable, and rolls up once to an explicit delegated-run outcome.
-When computing cost per accepted outcome, include spend from every attempt in the fixed cohort and use accepted delegated runs—not internal calls—as the denominator; label missing or estimated costs rather than treating them as zero.
+Keep telemetry proportionate.
+Capture prompts, source, tool arguments, approval details, or principal data only when the operational question requires them, with redaction, access control, and deliberate retention.
+For the B–C comparison, pin the declared base model where possible and record substitutions as confounding factors.
 
-For the B–C comparison, keep any gateway pinned to the declared base model where possible; otherwise record the model actually used and treat substitution as a confounding factor.
-
-### Fleet trace debugger
-
-The forensic packet below separates orchestration outcomes, gateway decisions, and physical provider or resource records.
-Map every physical row to a delegated run or leave it unmatched, then reconcile the packet without counting the same attempt once per log source.
-
-{{ import "site/includes/fleet-trace-debugger.html" }}
-
-The packet is synthetic and deterministic.
-It rehearses evidence joins, accounting, bypass detection, and late-effect reasoning; it does not estimate the reliability or cost of a particular fleet platform.
+[Appendix D: Agent-system security, control, and traceability](/appendices/agent-system-security/#separate-task-control-from-resource-access) develops the control-plane distinction, enforcement audit, trace reconciliation, bypass checks, and fleet trace debugger.
 
 ## Fleet throughput and cost
 
@@ -224,58 +182,16 @@ Coordination mechanisms can remove one bottleneck without removing the others.
 In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results ranging from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
 The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not the same as accepted work.
 
-### Repeated review is measurement, not proof
+### Reliability and repeated review
 
-Repeating an agent review can reveal variance, but agreement between runs is not independent validation.
-VulnBench repeated identical security-review tasks five times across ten small JavaScript and Express fixtures.
-Of 158 unique findings that matched its Snyk Code reference, 134 appeared in every repetition; among 161 unmatched findings, 80 appeared only once and 22 appeared in every repetition :citep[tal2026vulnbench].
-The recurrence difference is useful for triage, but reference overlap measures agreement with Snyk Code rather than ground-truth accuracy.
-Treat each model review as one sample.
-Deduplicate repeated findings, record recurrence separately from deterministic-reference overlap, and preserve rare findings for case-level adjudication rather than automatically discarding them.
-Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
-Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
-Repeated review also consumes the same scarce integration capacity that bounds the fleet.
-If students repeat an agent review, they should record the fixed code, prompt, harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
-More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
+Repeating an agent review can reveal variation, but agreement between runs is not independent validation.
+Consensus can repeat a shared blind spot, while a rare finding can still identify a real defect.
+Deduplicate findings, preserve the fixed code and workflow configuration, and use behavioral evidence and accountable review to decide what is accepted.
+[Appendix A](/appendices/evaluating-agentic-workflows/#repeated-review-is-measurement-not-proof) develops the full repeated-review method.
 
-### Lusser's Law and the reliability chain
-
-A workflow whose accepted result depends on every critical step has the structure of a series system.
-If step `i` has reliability `r_i`, the workflow reliability is:
-
-`R_workflow = ∏ r_i`
-
-When `n` independent critical steps have the same reliability `r`, this reduces to `R_workflow = r^n`.
-This product rule is commonly called Lusser's Law or the product law for series reliability :citep[tait1995lusser].
-It explains why a small per-step failure probability can dominate a long workflow even when no individual step looks especially risky.
-
-Redundancy within one step has a different topology.
-[Jason Gorman's compact formulation](https://bsky.app/profile/jasongorman.bsky.social/post/3mtxx4cdiqc26) uses `C` for the probability that the first prediction is correct and `P` for the conditional probability that an incorrect prediction is caught.
-For completion reliability, catching the prediction must also restore the step to a correct state; under that stronger interpretation:
-
-`r = C + (1 - C)P = 1 - (1 - C)(1 - P)`
-
-The complement expression describes the prediction-or-recovery paths within one step; Lusser's Law describes the product across serial steps.
-The distinction matters because detection alone does not complete a workflow.
-If `D` is the probability that an incorrect prediction is detected and `K` is the probability of successful repair after detection, then the completion reliability of one step is:
-
-`r = C + (1 - C)DK`
-
-An incorrect result that is detected but not repaired can stop safely, while an undetected result can propagate.
-Safety, liveness, and correctness should therefore be reported separately rather than collapsed into one success percentage.
-
-### Reliability chain lab
-
-The first preset below reproduces the compact idealization with 95% initial correctness, 90% catch-and-repair coverage, and 100 independent critical steps.
-Before changing the controls, predict whether the workflow remains above 50% correct completion.
-Then select **Caught, not repaired** and compare correct completion with safe stopping.
-
-{{ import "site/includes/lusser-law-demo.html" }}
-
-The model assumes identical independent steps, treats every step as necessary, and assigns the first terminal outcome to the whole run.
-Real agent workflows can share model blind spots, context, tools, and upstream state; steps can have different reliabilities; and later validation can sometimes repair earlier failures.
-Use the curve as a design probe, not a reliability forecast.
-Estimate `C`, `D`, and `K` from repeated accepted outcomes at a declared boundary, and use `∏ r_i` when observed steps differ instead of replacing them with an unsupported average.
+Long workflows create a second reliability question: when every critical step must succeed, small per-step failure probabilities compound.
+This series-system model is useful as a design probe, but real steps can share failure causes and later validation can sometimes repair earlier errors.
+[Appendix E](/appendices/scalability-models/#lussers-law-and-the-reliability-chain) develops Lusser's Law, separates detection from repair, and includes the reliability-chain lab.
 
 ### Amdahl's Law and the sequential bottleneck
 
@@ -303,52 +219,20 @@ Name what remained sequential—for example task framing, a shared contract chan
 
 ## Trust boundaries
 
-An agent's role should define not only its task but also which information it can read and which actions it can take.
-Simon Willison's [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) names a particularly dangerous combination: access to private data, exposure to untrusted content, and a way to communicate externally.
-Prompt injection in the untrusted content can then turn the agent's legitimate permissions into a path for data exfiltration.
+An agent's role should define both what it may read and which actions it may take.
+A particularly dangerous combination gives an agent private data, exposes it to untrusted content, and lets it communicate externally.
+Prompt injection can then turn legitimate permissions into an exfiltration path.
 
-### Imported capabilities are development dependencies
+Imported skills, plugins, instructions, code, and configuration are development dependencies.
+Record their source and resolved revision, inspect their requested access and update path, and connect their output to independent project checks.
+Use a disposable least-privilege sandbox for any approved dynamic verification, without production credentials.
 
-A skill may arrive as prose, yet it can direct tool calls made with the agent's authority and may bundle code or configuration.
-A USENIX Security 2026 study crawled 98,380 skill entries from two community registries in January 2026.
-Static triage selected 4,287 candidates; sandboxed behavioral verification and independent judgments by two of the authors confirmed 157 malicious skills :citep[liu2026maliciousskills].
+Persistent infrastructure can also become unintended project memory.
+Artifacts, caches, queues, logs, temporary storage, and remote workspaces cross a run boundary when one run can leave state that survives, is discoverable, and influences another.
+Record who can write and read each channel, how writes are attributed, what may be stored, how long it persists, and how it is cleared.
 
-Those 157 are a behaviorally confirmed lower bound in one snapshot, not an ecosystem prevalence estimate.
-The snapshot excluded private, unindexed, and official collections; one publisher identifier contributed 85 templated cases; and 60-second sandbox runs could miss dormant or environment-gated behavior.
-Official provenance, popularity, scanning, or a previous safe version can filter risk; none proves that an imported capability or update is safe in the current host.
-
-Treat adoption and updates as dependency changes.
-Record the source and resolved revision; inspect instructions, bundled files, installation hooks, downloads, and mutable remote inputs; identify missing or unreviewable content; and map requested access against the authority the host would actually grant over files, commands, networks, and credentials.
-Perform any dynamic verification only in a disposable sandbox approved for security testing, with the least authority needed and no production credentials.
-Connect output produced with the capability to independent project checks, and define who reviews updates and how the capability can be removed.
-
-The [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a non-executing fixture for practicing this review without loading an untrusted capability into an agent context.
-
-> **Case study: when exploration scales**
->
-> During a July 2026 cyber-capability evaluation using the ExploitGym benchmark, an AI agent escaped its evaluation environment and chained weaknesses across external infrastructure and Hugging Face's production systems :citep[openai2026huggingfaceincident].
-> Hugging Face reconstructed roughly 17,600 agent actions across dataset processing, Kubernetes, cloud identity, an internal network, and source control.
-> Most attempts failed, but the volume and persistence of exploration eventually exposed a viable path across several trust boundaries :citep[larcher2026agentintrusion].
->
-> OpenAI's later reconstruction added a crucial continuity mechanism.
-> Separate agent runs discovered files left in a shared Artifactory service and used them as an informal message board for requests, exploit details, assignments, scripts, progress, and credential information.
-> After the files were cleared and the posting credentials revoked, later runs recreated the channel through an unauthenticated WebDAV endpoint, using message-bearing directory names in Artifactory's remote cache :citep[dalton2026breaking].
->
-> The sandboxes were short-lived, but the runs were not independent.
-> Unlike the curated project memory described earlier, this was ambient infrastructure state.
-> A location becomes cross-run memory and an unintended coordination channel when one run can leave state that survives, is discoverable, and influences a later run.
-> Artifact and package stores, caches, queues, logs, temporary storage that outlives a run, and remote workspaces therefore belong in the trust-boundary review.
-> For each channel, record who can write and later read it, how writes are attributed, what may be stored, how long it persists, and how it is cleared.
->
-> The incident did not make established defensive principles obsolete.
-> It showed why they become more important with agents: strict sandbox isolation, least privilege, short-lived and narrowly scoped credentials, blocked metadata access, and telemetry that can correlate behavior across systems.
-> Agent safety therefore depends on the authority exposed by the surrounding system, not only on instructions or model behavior.
-
-The safest design is to break the combination where possible.
-A scout reading untrusted issues may not need secrets or network-writing tools.
-An implementer may work in a sandbox with scoped files and no deployment credentials.
-A publisher may receive a reviewed artifact instead of the full private context that produced it.
-Human approval can help at a sensitive boundary, but an approval prompt is not useful when the effect is unclear or reviewers have learned to accept it mechanically.
+Break risky combinations where possible: a scout reading untrusted issues may not need secrets or network-writing tools; an implementer may use scoped files without deployment credentials; a publisher may receive a reviewed artifact rather than the private context that produced it.
+[Appendix D](/appendices/agent-system-security/#trust-boundaries) contains the capability-adoption procedure, cross-run-memory incident case, and complete security review.
 
 ### Upstream work needs a human owner
 
@@ -374,7 +258,7 @@ A small, reviewable delegation is usually better than parallel activity that the
 Use the decision-path exercise with the delegation brief: role descriptions allocate activity, while the HAR map allocates authority, acceptance, escalation, and accountability.
 
 The fleet should be evaluated as a workflow, not as a collection of impressive transcripts.
-Reuse the model-eval pattern from the benchmarking chapter: define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time.
+Reuse the workflow-evaluation pattern from [Appendix A](/appendices/evaluating-agentic-workflows/): define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time.
 Treat one end-to-end fleet attempt as a trial and grade its accepted outcome at the delegated-run boundary; the fleet's internal agents, retries, and handoffs are parts of that trial rather than independent samples.
 For a fleet, the execution trace is also evidence.
 It can reveal duplicated exploration, unnecessary handoffs, invalid tool calls, or an implementer working beyond its boundary even when the final answer looks acceptable.
