@@ -354,12 +354,6 @@ That is a stronger lead than the end-to-end latency alone, but it still does not
 The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
 
-## Observability with OpenTelemetry (OTEL)
-
-Explanation should go here.
-
-Demo should go here.
-
 ## Measuring browser journeys with Playwright and Lighthouse
 
 Server latency does not describe the whole user experience.
