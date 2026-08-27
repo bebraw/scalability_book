@@ -13,6 +13,7 @@ const probe = path.join(
 test("rebuilds development output when site styles change", async ({
   request,
 }) => {
+  await setSourceWatching(request, true);
   const initialRevision = await getBuildRevision(request);
 
   try {
@@ -26,8 +27,17 @@ test("rebuilds development output when site styles change", async ({
     expect(response.status()).toBe(200);
   } finally {
     await unlink(probe).catch(() => undefined);
+    await setSourceWatching(request, false);
   }
 });
+
+async function setSourceWatching(request: APIRequestContext, enabled: boolean) {
+  const response = await request.post("/api/dev/source-watching", {
+    data: { enabled },
+  });
+
+  expect(response.status()).toBe(200);
+}
 
 async function getBuildRevision(request: APIRequestContext) {
   const response = await request.get("/api/editor/status");

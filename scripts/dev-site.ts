@@ -1,6 +1,14 @@
 // @ts-nocheck
+import { createHash } from "node:crypto";
 import { createReadStream, renameSync, watch } from "node:fs";
-import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  readFile,
+  readdir,
+  rm,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -10,13 +18,16 @@ const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const commentsPath = path.join(dataDir, "comments.json");
 const configPath = path.join(root, "site.config.jsonc");
+const sourceRebuildDebounce = 250;
 let config = await loadSiteConfig();
 let activeBuild = null;
 let buildQueued = false;
 let buildRevision = 0;
 let rebuildTimer = null;
+let sourceWatchingEnabled = process.env.SOURCE_WATCHING !== "manual";
 const devUpdateClients = new Set();
 const pendingSourceChanges = new Set();
+const sourceSnapshots = new Map();
 const host = "127.0.0.1";
 const port = Number(process.env.PORT || 3000);
 const contentTypes = new Map([
@@ -56,6 +67,24 @@ const server = createServer(async (request, response) => {
 
     if (url.pathname === "/api/editor/status") {
       return sendJson(response, { editable: true, buildRevision });
+    }
+
+    if (url.pathname === "/api/dev/source-watching") {
+      if (request.method !== "POST") {
+        response.writeHead(405, { Allow: "POST" });
+        return response.end("Method not allowed");
+      }
+
+      const body = await readJsonBody(request);
+      sourceWatchingEnabled = body.enabled === true;
+
+      if (!sourceWatchingEnabled) {
+        clearTimeout(rebuildTimer);
+        rebuildTimer = null;
+        pendingSourceChanges.clear();
+      }
+
+      return sendJson(response, { enabled: sourceWatchingEnabled });
     }
 
     if (url.pathname === "/api/dev/events") {
@@ -134,10 +163,10 @@ const server = createServer(async (request, response) => {
   }
 });
 
+await startSourceWatchers();
 server.listen(port, host, () => {
   console.log(`Serving editable book site at http://${host}:${port}`);
 });
-startSourceWatchers();
 
 function handleDevEvents(request, response) {
   response.writeHead(200, {
@@ -609,7 +638,7 @@ async function runBuild() {
   buildRevision++;
 }
 
-function startSourceWatchers() {
+async function startSourceWatchers() {
   const sources = [
     { target: path.join(root, "book"), recursive: true },
     { target: path.join(root, "site"), recursive: true },
@@ -619,11 +648,20 @@ function startSourceWatchers() {
     { target: configPath, recursive: false },
   ];
 
+  await Promise.all(sources.map(seedSourceSnapshots));
+
   for (const source of sources) {
     const sourceWatcher = watch(
       source.target,
       { recursive: source.recursive },
-      (_eventType, filename) => scheduleSourceRebuild(filename),
+      (_eventType, filename) => {
+        void scheduleSourceRebuild(source, filename).catch((error) => {
+          console.error(
+            `Could not inspect source change for ${source.target}`,
+            error,
+          );
+        });
+      },
     );
     sourceWatcher.on("error", (error) => {
       console.error(`Source watcher failed for ${source.target}`, error);
@@ -631,8 +669,64 @@ function startSourceWatchers() {
   }
 }
 
-function scheduleSourceRebuild(filename) {
-  pendingSourceChanges.add(filename?.toString() || "");
+async function seedSourceSnapshots(source) {
+  if (!source.recursive) {
+    const snapshot = await getSourceSnapshot(source.target);
+
+    if (snapshot !== null) {
+      sourceSnapshots.set(source.target, snapshot);
+    }
+
+    return;
+  }
+
+  await seedDirectorySnapshots(source.target);
+}
+
+async function seedDirectorySnapshots(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+
+  await Promise.all(
+    entries.map(async (entry) => {
+      const target = path.join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        await seedDirectorySnapshots(target);
+        return;
+      }
+
+      if (entry.isFile()) {
+        sourceSnapshots.set(target, await getSourceSnapshot(target));
+      }
+    }),
+  );
+}
+
+async function scheduleSourceRebuild(source, filename) {
+  const changedPath = filename?.toString() || path.basename(source.target);
+  const changedTarget = source.recursive
+    ? path.join(source.target, changedPath)
+    : source.target;
+  const snapshot = await getSourceSnapshot(changedTarget);
+
+  // Recursive watchers also report parent-directory metadata changes for the
+  // concrete child event. Rebuilding for both lets the duplicate arrive after
+  // the first build and reload an otherwise idle browser.
+  if (snapshot === null) {
+    return;
+  }
+
+  if (sourceSnapshots.get(changedTarget) === snapshot) {
+    return;
+  }
+
+  sourceSnapshots.set(changedTarget, snapshot);
+
+  if (!sourceWatchingEnabled) {
+    return;
+  }
+
+  pendingSourceChanges.add(changedPath);
   clearTimeout(rebuildTimer);
   rebuildTimer = setTimeout(async () => {
     const sourceChanges = [...pendingSourceChanges];
@@ -652,7 +746,26 @@ function scheduleSourceRebuild(filename) {
     } catch (error) {
       console.error("Source rebuild failed", error);
     }
-  }, 75);
+  }, sourceRebuildDebounce);
+}
+
+async function getSourceSnapshot(target) {
+  try {
+    const info = await stat(target);
+
+    if (info.isDirectory()) {
+      return null;
+    }
+
+    const content = await readFile(target);
+    return createHash("sha256").update(content).digest("base64url");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return "missing";
+    }
+
+    throw error;
+  }
 }
 
 function broadcastDevUpdate(event) {

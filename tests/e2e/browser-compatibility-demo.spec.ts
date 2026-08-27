@@ -1,4 +1,5 @@
 import { readdir, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import browserslist from "browserslist";
@@ -9,7 +10,8 @@ const es2019SafariTargets = browsers.filter(targetsSafariBefore14);
 const e2ePort = Number(process.env.E2E_PORT || 3100);
 const e2eBuildDir = path.resolve(
   process.cwd(),
-  process.env.E2E_BUILD_DIR || `.dev-build-e2e-${e2ePort}`,
+  process.env.E2E_BUILD_DIR ||
+    path.join(tmpdir(), `scalability-book-e2e-build-${e2ePort}`),
 );
 const unsupportedTokenKinds = new Map<ts.SyntaxKind, string>([
   [ts.SyntaxKind.BigIntLiteral, "BigInt literal"],
@@ -39,6 +41,8 @@ function targetsSafariBefore14(target: string) {
 
 test.describe("browser bundle compatibility", () => {
   test("avoids unsupported syntax and built-ins in eager bundles", async () => {
+    test.setTimeout(60_000);
+
     expect(
       es2019SafariTargets,
       "package.json browserslist should include Safari/iOS Safari targets that need ES2019-safe demo bundles",

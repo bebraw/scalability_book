@@ -20,21 +20,38 @@ events.addEventListener("css", (event) => {
     return;
   }
 
+  let pendingStylesheets = stylesheets.length;
+  let reloadRequested = false;
+
   for (const stylesheet of stylesheets) {
     const replacement = stylesheet.cloneNode() as HTMLLinkElement;
     const url = new URL(stylesheet.href);
     url.searchParams.set("dev-hmr", String(revision));
     replacement.href = url.href;
-    replacement.addEventListener("load", () => stylesheet.remove(), {
-      once: true,
-    });
-    replacement.addEventListener("error", () => window.location.reload(), {
-      once: true,
-    });
+    replacement.addEventListener(
+      "load",
+      () => {
+        stylesheet.remove();
+        pendingStylesheets -= 1;
+
+        if (pendingStylesheets === 0) {
+          devDocumentRoot.dataset.devRevision = String(revision);
+        }
+      },
+      { once: true },
+    );
+    replacement.addEventListener(
+      "error",
+      () => {
+        if (!reloadRequested) {
+          reloadRequested = true;
+          window.location.reload();
+        }
+      },
+      { once: true },
+    );
     stylesheet.after(replacement);
   }
-
-  devDocumentRoot.dataset.devRevision = String(revision);
 });
 
 events.addEventListener("reload", () => {

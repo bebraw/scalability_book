@@ -517,7 +517,7 @@ function formatDimensionList(keys: DimensionKey[]) {
     return `${labels[0]} and ${labels[1]}`;
   }
 
-  return `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}`;
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
 }
 
 function formatCompactDimensionList(keys: DimensionKey[]) {
@@ -527,7 +527,7 @@ function formatCompactDimensionList(keys: DimensionKey[]) {
     return labels[0] ?? "";
   }
 
-  return `${labels.slice(0, -1).join(", ")} + ${labels.at(-1)}`;
+  return `${labels.slice(0, -1).join(", ")} + ${labels[labels.length - 1]}`;
 }
 
 function formatDimensionExposure(score: number) {

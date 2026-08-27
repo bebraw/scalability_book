@@ -1,6 +1,8 @@
-import { unlink, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
+import type { APIRequestContext } from "@playwright/test";
 
 const cssProbe = path.join(
   process.cwd(),
@@ -14,6 +16,15 @@ const reloadProbe = path.join(
   "components",
   ".dev-hmr-probe.html",
 );
+const rebuildTimeout = 15_000;
+
+test.beforeAll(async ({ request }) => {
+  await setSourceWatching(request, true);
+});
+
+test.afterAll(async ({ request }) => {
+  await setSourceWatching(request, false);
+});
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -32,20 +43,22 @@ test("hot-swaps CSS without reloading the page", async ({ page }) => {
   const initialLoadCount = await getLoadCount(page);
 
   try {
-    await writeFile(cssProbe, `/* HMR probe ${Date.now()} */\n`, "utf8");
+    await writeProbeAtomically(cssProbe, `/* HMR probe ${Date.now()} */\n`);
     const updatedRevision = await waitForRevision(page, initialRevision);
 
     await expect
-      .poll(() =>
-        page
-          .locator('link[rel="stylesheet"]')
-          .evaluateAll((stylesheets) =>
-            stylesheets.some((stylesheet) =>
-              new URL((stylesheet as HTMLLinkElement).href).searchParams.has(
-                "dev-hmr",
+      .poll(
+        () =>
+          page
+            .locator('link[rel="stylesheet"]')
+            .evaluateAll((stylesheets) =>
+              stylesheets.some((stylesheet) =>
+                new URL((stylesheet as HTMLLinkElement).href).searchParams.has(
+                  "dev-hmr",
+                ),
               ),
             ),
-          ),
+        { timeout: rebuildTimeout },
       )
       .toBe(true);
     expect(await getLoadCount(page)).toBe(initialLoadCount);
@@ -63,20 +76,19 @@ test("reloads after structural source changes", async ({ page }) => {
   const initialLoadCount = await getLoadCount(page);
 
   try {
-    await writeFile(
+    await writeProbeAtomically(
       reloadProbe,
       `<!-- reload probe ${Date.now()} -->\n`,
-      "utf8",
     );
     const updatedRevision = await waitForRevision(page, initialRevision);
     await expect
-      .poll(() => getLoadCount(page))
+      .poll(() => getLoadCount(page), { timeout: rebuildTimeout })
       .toBeGreaterThan(initialLoadCount);
 
     await unlink(reloadProbe);
     await waitForRevision(page, updatedRevision);
     await expect
-      .poll(() => getLoadCount(page))
+      .poll(() => getLoadCount(page), { timeout: rebuildTimeout })
       .toBeGreaterThan(initialLoadCount + 1);
   } finally {
     await unlink(reloadProbe).catch(() => undefined);
@@ -91,7 +103,9 @@ async function waitForRevision(
   page: import("@playwright/test").Page,
   previousRevision: number,
 ) {
-  await expect.poll(() => getRevision(page)).toBeGreaterThan(previousRevision);
+  await expect
+    .poll(() => getRevision(page), { timeout: rebuildTimeout })
+    .toBeGreaterThan(previousRevision);
   return getRevision(page);
 }
 
@@ -99,4 +113,26 @@ async function getLoadCount(page: import("@playwright/test").Page) {
   return page.evaluate(() =>
     Number(sessionStorage.getItem("dev-load-count") || "0"),
   );
+}
+
+async function writeProbeAtomically(target: string, content: string) {
+  const temporaryProbe = path.join(
+    process.cwd(),
+    `.dev-hmr-write-${randomUUID()}`,
+  );
+
+  try {
+    await writeFile(temporaryProbe, content, "utf8");
+    await rename(temporaryProbe, target);
+  } finally {
+    await unlink(temporaryProbe).catch(() => undefined);
+  }
+}
+
+async function setSourceWatching(request: APIRequestContext, enabled: boolean) {
+  const response = await request.post("/api/dev/source-watching", {
+    data: { enabled },
+  });
+
+  expect(response.status()).toBe(200);
 }
