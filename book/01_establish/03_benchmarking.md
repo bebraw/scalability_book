@@ -15,18 +15,18 @@ A **measurement** assigns evidence to an observed property.
 A **benchmark** uses declared conditions to compare that property across workloads, systems, or revisions.
 Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed latency objective as concurrent demand increases.
 
-To give you a simple example, consider tools like [artillery](https://www.npmjs.com/package/artillery) or [k6](https://k6.io/).
-These tools encapsulate best practices around load testing in various ways while giving statistically valid results.
-I have used k6 for some of my papers and found it an invaluable tool for gaining insights.
-Often an agent can help you to come up with these kinds of measurements, although it is important to validate what they emit and consider what you are measuring and why as there are many things you could measure, some of which are more relevant than others.
+Define the protocol before selecting a runner:
 
-To give you some idea, consider the following points:
+- **Decision and claim:** What comparison or threshold would change an engineering decision?
+- **Workload:** Which event-recording, querying, filtering, or browser actions are performed, and in what mix?
+- **Load:** How many users, requests, events, or concurrent sessions apply the workload, and for how long?
+- **Boundary and conditions:** Which application revision, environment, data volume, cache state, dependencies, and client conditions are included?
+- **Metrics and distribution:** Which latency, throughput, error, resource, or queue measurements answer the question, and which percentiles or ranges preserve important variation?
+- **Acceptance and limits:** What result would support or challenge the claim, and what does the setup leave untested?
 
-- Define workload: what actions are being simulated?
-- Define load: how many users, requests, events, or concurrent sessions?
-- Define metrics: latency, throughput, error rate, resource usage, queue depth, database time.
-- Distinguish average latency from percentiles.
-- Distinguish cold start, warm cache, and sustained load behavior.
+Tools such as [Artillery](https://www.npmjs.com/package/artillery) and [k6](https://k6.io/) can generate load, schedule scenarios, and collect observations from that protocol.
+They cannot decide whether the workload represents real use, whether the boundary matches the question, or whether the comparison supports a statistically defensible conclusion.
+An agent can help draft a script, but the generated workload, metrics, thresholds, and interpretation still have to be reviewed against the intended decision.
 
 ### Simulated benchmark lab
 
@@ -40,11 +40,10 @@ Predict the default result before running the simulated workload, then compare t
 Treat the first result as a baseline, change one condition, and predict again before recording the comparison.
 The useful lesson is not the simulated number itself: it is that the workload, load, metric, and acceptance threshold have to be stated together.
 
-It is important to note that while synthetic benchmarks like these are useful, they can be limited by their nature since they might omit factors visible in a production environment.
-For example, it can be difficult to simulate what happens under load when many users are performing certain kinds of actions you cannot anticipate.
-It is possible that real usage will exercise portions of your system you did not think to benchmark especially if your application is complex.
-Under these conditions, you may hit third-party limitations you might not expect or there might be something in your infrastructure that breaks under specific kind of loads.
-It is for this reason learning chaos engineering can be useful since it tests exactly what happens when a piece of infrastructure breaks since that is exactly what can happen in practice at the worst possible moment.
+Synthetic benchmarks deliberately simplify reality.
+They can omit workload mixes, client behavior, cache histories, data shapes, provider quotas, dependency contention, and failure combinations that appear in production.
+A result therefore supports a claim only for its declared conditions.
+Compare synthetic evidence with field telemetry where available, and revise the protocol when real behavior exposes a missing condition.
 
 ### Benchmark browser journeys with Playwright and Lighthouse
 

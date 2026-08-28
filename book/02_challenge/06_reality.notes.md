@@ -28,6 +28,8 @@
 - Add one prompt about development reality: what happens when model access, latency, privacy requirements, cost, or human review capacity changes?
 - Keep the company-authored case-study caveat visible and avoid presenting source-reported figures as transferable performance expectations.
 - If a case is replaced later, preserve coverage of retry amplification, data authority, global change propagation, and recovery-plane independence.
+- A future practical exercise could use bounded fault injection to challenge one selected production assumption.
+  Require a steady-state expectation, narrow blast radius, abort condition, recovery path, and evidence plan; keep it distinct from a load benchmark and do not present failure injection as proof that untested combinations are safe.
 
 ## Reader material moved during the case-study rewrite
 
