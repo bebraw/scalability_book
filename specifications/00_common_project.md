@@ -243,6 +243,7 @@ Each implementation must provide:
 - an example configuration file when configuration is required;
 - no committed secrets;
 - a repeatable way to create enough demonstration data for the acceptance scenarios;
+- a repeatable workload adapter for the shared runtime protocol;
 - at least one automated validation command;
 - tests covering the work-item lifecycle and its event recording;
 - project instructions for the AI development workflow;
@@ -257,10 +258,66 @@ If the stack requires unusual system dependencies or hardware, document them nea
 
 ---
 
-## 7. Progressive Scalability Analysis
+## 7. Shared Runtime Workload and Progressive Scalability Analysis
 
 You do not have to build a production-scale distributed system.
-You must be able to reason about what your implementation would do under pressure.
+You must be able to measure a stable baseline and reason about what your implementation would do under pressure.
+
+### 7.1 Shared baseline workload
+
+Run the same stack-neutral workload against implementations A, B, and C.
+The workload measures logical user operations from the adapter's request until the application returns an observable result, not individual internal network requests.
+The adapter may drive the user interface, a documented application interface, or another repeatable boundary that exercises the real application and persistence path.
+
+Start each measured profile from this fixture:
+
+- eight workspaces named `workspace-01` through `workspace-08`;
+- fifty work items per workspace: twenty in the initial state, fifteen in the active state, and fifteen in the finished state;
+- all activity events implied by creating and transitioning those items;
+- four actors named `actor-01` through `actor-04`, distributed deterministically across the fixture;
+- stable fixture keys that the adapter can map to implementation-specific identifiers.
+
+A workload cycle uses this operation mix:
+
+| Share | Logical operation | Target rule |
+| ---: | --- | --- |
+| 30% | Read the activity feed | Divide evenly between the unfiltered feed, one workspace, and one event type |
+| 15% | Read a workspace summary | Rotate evenly through the eight workspaces |
+| 20% | Create a work item | Rotate workspaces and actors; use a unique deterministic title |
+| 15% | Move an existing initial item to the active state | Use a distinct valid target for each operation |
+| 10% | Move an existing active item to the finished state | Use a distinct valid target for each operation |
+| 10% | Attempt an unsupported transition | Treat the documented rejection as an expected result, then verify that state and events did not change |
+
+Use a fixed operation-order seed and record it.
+Concurrent operations in this baseline should use distinct work items; contention on the same item belongs in a pressure scenario.
+
+Run the following profiles:
+
+| Profile | Operations | Concurrency | Repetitions | Reset rule |
+| --- | ---: | ---: | ---: | --- |
+| Warm-up | 100 | 1 | 1 unmeasured | Reset and reseed afterward |
+| Steady | 500 | 4 | 3 measured | Reset and reseed before each repetition |
+| Burst | 200 | 16 | 3 measured | Reset and reseed before each repetition |
+
+For every measured repetition, record:
+
+- implementation identifier, commit, environment, configuration, adapter version, and operation-order seed;
+- elapsed time and successful logical operations per second;
+- median and 95th-percentile end-to-end operation latency overall, and by operation type when the sample is large enough;
+- expected rejections separately from timeouts, crashes, invalid responses, and other unexpected errors;
+- post-run checks for state, event, filter, and summary correctness;
+- one resource-efficiency proxy that can be collected consistently across phases, such as peak memory, CPU time, database growth, or billed execution time.
+
+Report each repetition and the median result rather than presenting only the best run.
+Absolute results from different hardware or hosted environments should not be ranked as though the environment were controlled.
+If a platform limit prevents a profile from completing, preserve that result as evidence and label any reduced diagnostic run instead of silently changing the protocol.
+
+The baseline is an experimental reference, not a claim that this operation mix represents every real workload.
+
+### 7.2 Progressive pressure analysis
+
+Use the baseline workload as the starting point for the cumulative pressure analysis.
+Change one main condition at a time where practical so the effect remains interpretable—for example concurrency, fixture size, dependency latency, or repeated requests.
 
 Use these scenarios as a shared pressure catalog:
 
@@ -274,7 +331,7 @@ Use these scenarios as a shared pressure catalog:
 - a need to retain, aggregate, archive, or delete old events.
 
 Do not exhaustively apply the entire catalog after every phase.
-In Establish, select one **primary pressure** that is likely to expose an important architectural limit and define a concrete scenario for it.
+In Establish, select one **primary pressure** that is likely to expose an important architectural limit and define it as a documented transformation of the baseline workload.
 Reuse that scenario and its procedure in Challenge and Compare so the three implementations remain comparable.
 Challenge adds one **secondary pressure** revealed by an architectural difference or observation.
 Compare uses the broader catalog to interpret important differences across A, B, and C, but only relevant pressures need in-depth analysis.
@@ -359,7 +416,7 @@ State what could and could not be measured.
 
 - acceptance-scenario results;
 - automated test results;
-- one runtime measurement based on repeated runs of the shared course workload, plus at least one declared resource-efficiency signal;
+- results from the repeated [shared baseline workload](/project/#7-1-shared-baseline-workload), including the declared resource-efficiency proxy;
 - known defects or incomplete requirements;
 - deployment URL, local run evidence, or another agreed operational artifact.
 
@@ -461,4 +518,4 @@ The phase specifications describe the emphasis and deliverables for each build.
 - Review proposed exotic stacks early for feasibility, licensing, security, and available deployment paths without steering everyone toward the same technologies.
 - Treat setup difficulty as evidence, not automatic failure.
   The group should lose credit when its supported path is incomplete or irreproducible, not merely because the auditor has never used the language.
-- The exact rubric weights and shared runtime workload still need to be defined.
+- The exact rubric weights still need to be defined.

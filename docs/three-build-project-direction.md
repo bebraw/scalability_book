@@ -128,6 +128,7 @@ The first specification draft now includes:
 - a fixed core application brief and acceptance suite;
 - phase-specific AI and orchestration constraints;
 - a transfer policy between implementations;
+- a stack-neutral shared runtime workload and fixture;
 - a common evidence template;
 - the bounded cross-team audit;
 - common evaluation principles.
@@ -137,7 +138,6 @@ The next iteration should settle:
 - whether the Work Activity Tracker domain is the right balance between comparability and student choice;
 - exact model and agent environments;
 - the stack proposal and approval process;
-- the shared runtime workload and fixture data;
 - a small portable fleet-trace example or transformation template;
 - three equivalent audit change probes;
 - phase rubrics and grading weights;

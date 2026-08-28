@@ -136,4 +136,4 @@ A larger implementation B is not automatically a better implementation.
   A tool that silently delegates to several agents may invalidate the intended comparison.
 - Require the same primary stack by default, but allow justified exceptions.
   Stack experimentation across groups is desirable; uncontrolled stack changes within one group's comparison are harder to interpret.
-- Consider supplying the same small runtime workload used in Establish so architectural comparisons include measured behavior.
+- Require the published baseline workload and the group's primary-pressure transformation to remain stable so architectural comparisons include measured behavior.

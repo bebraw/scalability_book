@@ -164,7 +164,7 @@ This application analysis is separate from the workflow model required in sectio
 ### 5.6 Validate one realistic deployment
 
 Select implementation A, B, or C based on the evidence collected so far.
-Deploy it in an instructor-approved realistic environment outside the author's development process and rerun the shared workload.
+Deploy it in an instructor-approved realistic environment outside the author's development process and rerun the [shared baseline workload](/project/#7-1-shared-baseline-workload).
 Record the environment and configuration, operational steps, result, difference from the local run, first observed constraint, and what the run does not prove about larger scale.
 
 ---

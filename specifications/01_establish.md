@@ -82,7 +82,7 @@ In the stack decision record, explain:
 ### 3.4 Analyze initial scalability
 
 Choose one primary pressure from the shared catalog that is likely to expose an important limit in implementation A.
-Define a concrete workload, conditions, and procedure that can be repeated for implementations B and C.
+Define it as a documented transformation of the [shared baseline workload](/project/#7-1-shared-baseline-workload) that can be repeated for implementations B and C.
 Run it where the available workload and environment allow; otherwise mark the result as a reasoned projection.
 
 Identify the likely first bottleneck, the resource or dependency approaching its limit, the first useful operational signal, one plausible response or recovery action, and the trade-off it introduces.
