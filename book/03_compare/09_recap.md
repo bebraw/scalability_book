@@ -1,22 +1,155 @@
 # What do three agent-assisted implementations teach us about web scalability?
 
-By the end of the course, you have established a baseline, challenged its assumptions through a second implementation, and compared both with a fleet-produced third implementation.
-The point of this sequence is not only to practice implementation.
-It is to see how web applications and their development systems respond when more people, data, traffic, features, dependencies, tools, and assumptions enter the picture.
+Scalability is the ability to keep a system useful while the conditions around it change.
+Technical capacity is part of that ability, but usefulness also depends on architecture, feedback, development friction, operational judgment, and the way human and agent work is governed.
+A web application that serves more requests but becomes unsafe to change is only partially scalable.
+So is a development workflow that generates changes faster than the team can understand, validate, or correct them.
 
-The central claim could be: scalability is the ability to keep a system useful while the conditions around it change.
-That includes technical capacity, but it also includes architecture, feedback loops, team coordination, and the way AI-assisted development is governed.
+The concepts in this book form a connected system rather than a checklist of techniques.
+Growth challenges assumptions; architecture determines where pressure is felt; measurement makes the resulting behavior visible; people and agents choose a response; and the response changes both the application and the cost of its next change.
+The three course implementations make that system concrete enough to compare.
 
 > **Sustainability angle**
 >
-> A scalable system should not only survive growth.
-> It should use resources deliberately.
-> The final reflection should ask whether the project handles more work efficiently or merely pushes more computation, storage, bandwidth, and human attention into the problem.
+> A scalable system should not merely survive growth by consuming more computation, storage, bandwidth, and human attention.
+> The final comparison should ask which additional resources produced useful capacity or learning and which merely displaced waste into infrastructure, model use, review, or maintenance.
 
-## The project arc
+## One system, three connected loops
 
-The three projects give the course its shape.
-:ref[table:project-arc]{text="The table below"} makes the controlled comparison explicit: required behavior is held as stable as practical while the development system changes.
+The course concepts can be organized into three feedback loops.
+Each loop preserves a different form of usefulness, but no loop operates independently.
+
+| Loop                    | Recurring sequence                                                                                      | What can accumulate                                       | Evidence that closes the loop                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Application scalability | Pressure → challenged assumption → saturation boundary → signal → response → new trade-off              | Load, data, latency, failures, and operational complexity | Browser behavior, benchmarks, metrics, traces, and recovery results        |
+| Development scalability | Intent → implementation → validation → accepted change → project memory → next change                   | Knowledge, coupling, technical debt, and friction         | Tests, setup results, review findings, change effort, and decision records |
+| Agentic development     | Authority allocation → agent execution → trace → acceptance or rejection → correction → next delegation | Attempts, handoffs, review demand, model use, and trust   | Workflow traces, interventions, accepted outcomes, and correction evidence |
+
+::caption[Three connected feedback loops for reasoning about scalable web development.]
+::label[table:scalability-concept-map]
+
+The loops share several concepts.
+**Web architecture** supplies the boundaries across which requests, data, ownership, and failures travel.
+**Measurement and observability** turn behavior at those boundaries into evidence.
+**Scalability models** help estimate which limit matters and how much improvement is theoretically available.
+**Friction and technical debt** describe how earlier choices affect the cost of the next response.
+**Human–agent relationships** determine who may interpret evidence, choose an action, execute it, and accept the result.
+
+The connections are cyclical.
+A scaling response becomes a development task.
+The development system determines whether people and agents can implement that task safely.
+Their accepted changes alter the application's architecture, capacity, and next likely failure.
+New observations then begin another pass through the loops.
+
+## The application loop: respond to pressure
+
+Application scalability begins with a change in conditions rather than a preferred technology.
+More users, events, tenants, failures, stakeholders, or independently evolving clients challenge an assumption in the current design.
+The assumption may concern request rate, data size, retry behavior, ownership, consistency, or the ability of one component to wait for another.
+
+Web architecture determines where the pressure becomes visible.
+A browser request crosses the client, network, API, domain logic, storage, and possibly a queue or external service.
+Each boundary defines a contract and a possible wait, failure, retry, compatibility problem, or trust transition.
+When demand approaches a binding resource or organizational limit, the system reaches a saturation boundary.
+That boundary may be CPU, a connection pool, queue capacity, third-party quota, deployment path, or the attention available for diagnosis.
+
+Measurement closes the gap between a plausible story and an engineering claim.
+A browser journey establishes whether the user-visible behavior still works.
+A benchmark locates latency or throughput under a declared workload.
+Metrics show a changing rate or backlog, while traces connect symptoms to the request path that produced them.
+The evidence should answer a specific question: which assumption failed, at which boundary, under what conditions?
+
+Only then does a scaling technique become a reasoned response.
+An index, cache, queue, replica, rate limit, partition, or asynchronous worker relieves a particular pressure while introducing new consistency, freshness, failure, cost, or operational obligations.
+Formal models help bound expectations: Amdahl's Law exposes sequential work, queueing models expose waiting, and contention models show why adding capacity may eventually produce diminishing or negative returns.
+The response completes the loop by creating a new system with new assumptions.
+
+Use these questions to trace the application loop in one implementation:
+
+- Which change in conditions challenged a specific architectural assumption?
+- Which signal identified the first binding boundary rather than a downstream symptom?
+- Which response addressed that boundary, and what new failure mode or operating cost did it introduce?
+
+## The development loop: preserve the ability to change
+
+Every application response has to pass through a development system.
+An intention becomes code, configuration, schema, tests, documentation, and deployment behavior.
+Validation then determines whether the change satisfies the user-visible contract and remains compatible with the surrounding system.
+Accepted work changes both the application and the knowledge future contributors need.
+
+This is where project legibility and friction connect to scalability.
+Stable commands, realistic fixtures, useful errors, bounded modules, explicit API contracts, architecture notes, and fast feedback make the next change easier to understand and verify.
+Hidden assumptions, tangled responsibilities, slow tests, stale guidance, and unclear ownership make it harder.
+Technical debt is therefore not only untidy code; it is reduced optionality and a higher future cost of coordinated change.
+
+Web boundaries make development friction concrete.
+Adding one required event field may require a form, client validation, request schema, domain rule, database migration, activity rendering, and compatibility test.
+A clean contract helps those parts evolve together without forcing them into one module.
+A blurred contract makes a small feature cross many unrelated files and reviewers.
+
+Feedback can turn repeated friction into project memory.
+A review comment may become maintained guidance, a common defect may become a regression test, a risky dependency may gain an adapter, and an architectural choice may become a decision record.
+That conversion is not automatic: transcripts and generated explanations are candidate evidence until someone verifies and promotes them.
+If the lesson remains only in one person's memory or one agent session, the loop does not improve the project for its next contributor.
+
+Use these questions to trace the development loop:
+
+- Which project property made a later change easier or harder to implement and review?
+- Which validation boundary caught an error, and which important behavior remained invisible?
+- What knowledge from the change became durable project guidance, an executable check, or a clarified contract?
+
+## The agentic loop: turn execution into accepted change
+
+Agentic development changes who performs parts of the development loop, but it does not remove the loop.
+Implementation A and B use broadly single-agent workflows with different model capability; implementation C changes the orchestration structure by introducing a fleet.
+In every case, the important boundary is not generated output but accepted change.
+
+Before execution, the human–agent relationship allocates authority.
+An agent may gather information, propose an interpretation, prepare a change, or execute within a bounded scope.
+The task should identify its objective, context, allowed files and tools, expected evidence, non-goals, and stopping or escalation condition.
+Project readiness affects whether the agent can follow that allocation: explicit commands, maintained contracts, and observable feedback reduce dependence on hidden human context.
+
+Execution produces more than a final diff.
+The trace can show exploration, tool calls, failed checks, retries, delegated work, review, and human intervention.
+Those events explain whether a fast result came from clean decomposition, repeated attempts, transferred review effort, or an agent exceeding its intended authority.
+A branch, pull request, or agent message remains activity until the declared tests and accountable reviewer accept the behavior.
+
+Correction completes the loop.
+A useful workflow can observe a divergence, diagnose it, assign a bounded repair, and revalidate the whole user journey.
+Repeated agent agreement is not a substitute for this evidence because several agents may share the same blind spot.
+Likewise, adding agents helps only when tasks are independent enough to outweigh handoffs, integration, and reviewer backpressure.
+
+Use these questions to trace the agentic loop:
+
+- Which decisions could the agent propose, prepare, or execute, and who accepted the consequences?
+- What did the workflow trace reveal that the finished repository did not?
+- Did orchestration reduce accepted completion time or merely move effort into integration, review, and correction?
+
+## How the loops affect one another
+
+Consider adding a queue to protect event ingestion during a traffic spike.
+The three-loop view prevents the queue from appearing as an isolated scaling technique.
+
+| Perspective                   | Consequence of the queue                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Application loop              | Burst absorption improves, but freshness lag, backlog growth, duplicates, and worker saturation become possible                             |
+| Development loop              | The project gains worker code, retry and idempotency rules, new local setup, deployment, tests, and ownership                               |
+| Agentic loop                  | Tasks may decompose around producer, consumer, and verification boundaries, but their shared event contract must settle first               |
+| Evidence connecting all three | Queue age, end-to-end event visibility, duplicate rate, failure recovery, review effort, and trace history show whether the response worked |
+
+::caption[One scaling response interpreted through all three loops.]
+::label[table:queue-three-loop-example]
+
+The same reasoning applies to caching, partitioning, background jobs, browser-side state, or a new external service.
+A locally faster application can become harder to operate or change.
+A highly legible project can improve human and agent work without increasing runtime capacity.
+A larger fleet can accelerate independent changes while saturating integration and review.
+Scalability is the judgment needed to see these coupled effects before optimizing one visible metric.
+
+## Apply the map to the three implementations
+
+The three projects give the course a controlled comparison as far as classroom conditions allow.
+Required behavior and submission evidence remain as stable as practical while the model and orchestration setup change.
 
 | Build                                               | Agent setup                   | Held as stable as practical                           | Deliberately varied                                                        | Evidence goal                                                                |
 | --------------------------------------------------- | ----------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -27,178 +160,93 @@ The three projects give the course its shape.
 ::caption[The three course implementations and the evidence each comparison contributes.]
 ::label[table:project-arc]
 
-The first working version is not the final design.
-It is one implementation produced by one development system.
-The later builds test which outcomes recur under the common requirements, which outcomes change with model capability or orchestration, and which responsibilities remain human.
-Because the team also gains experience, these comparisons support local explanations rather than universal rankings.
+The comparison is local rather than causal proof.
+The team learns between builds; tools, model behavior, optional scope, hardware, and reporting quality may differ; and each implementation can embody different architectural choices.
+These are limitations to record, not reasons to abandon comparison.
+The common brief makes careful claims possible when observations remain separate from explanations.
 
-## Scalable development
+### Build the evidence matrix
 
-Scalable development begins before traffic grows.
-A project scales better when its structure, commands, tests, naming, documentation, and interfaces make change easier to understand.
-AI-assisted development makes this more visible because agents are sensitive to unclear context.
-If the project is hard for an agent to navigate, it is often hard for a new human contributor too.
+Use the concept map to compare the implementations across the same boundaries.
+Replace each evidence prompt in the matrix with a concrete artifact, result, or explicit `not measured` entry.
 
-Reflection prompts:
+| Evidence dimension             | Implementation A                        | Implementation B                        | Implementation C                          | Synthesis question                                                          |
+| ------------------------------ | --------------------------------------- | --------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| Accepted browser behavior      | Acceptance probe and escaped defects    | Acceptance probe and escaped defects    | Acceptance probe and correction evidence  | Which differences affected users rather than only repository structure?     |
+| Architecture and contracts     | Request trace and key boundary decision | Request trace and key boundary decision | Request trace and key boundary decision   | Which boundaries made independent change safer or harder?                   |
+| Pressure and saturation        | Pressure map and first predicted limit  | Pressure map and first predicted limit  | Pressure map and first predicted limit    | How did each architecture respond to the same growth scenario?              |
+| Measurement and recovery       | Benchmark, signals, and recovery result | Benchmark, signals, and recovery result | Benchmark, signals, and recovery result   | What was directly observed, and which behavior remained invisible?          |
+| Development friction           | Cross-team audit and change effort      | Cross-team audit and change effort      | Cross-team audit and change effort        | Which setup, test, or coupling cost would dominate the next change?         |
+| Human–agent workflow           | Trace, interventions, and review effort | Trace, interventions, and review effort | Fleet trace, handoffs, and review backlog | Which allocation produced accepted work at a sustainable correction cost?   |
+| Resource use and externalities | Runtime and model-use evidence          | Runtime and model-use evidence          | Runtime and model-use evidence            | Did added resources create useful capacity, quality, or only more activity? |
 
-- Which part of your project became easier to change over time?
-- Which part became harder to change, and why?
-- What instructions, conventions, or tests would have helped a new contributor?
-- Where did AI assistance speed up development, and where did it create review work?
-- Which skills or architectural knowledge could the group still demonstrate without AI assistance?
+::caption[Evidence matrix for synthesizing the three implementations through the shared concept map.]
+::label[table:final-evidence-matrix]
 
-## Scalability as a multi-dimensional idea
+Do not turn absent evidence into a favorable score.
+If a build was not load-tested, state that its saturation behavior is proposed rather than observed.
+If model usage was not captured, do not infer efficiency from elapsed time.
+If implementation C produced more branches but required more review and correction, count both the activity and the acceptance cost.
 
-Scalability is not a synonym for performance.
-A system can scale users, data, teams, change, operations, and cost in different ways.
-It can also fail to scale in one dimension while doing well in another.
-A design that handles more requests but becomes impossible to modify is only partially scalable.
+### Separate observation, inference, and proposal
 
-Reflection prompts:
+A strong synthesis labels the status of each important claim:
 
-- Which dimension of scalability mattered most in your project?
-- Did your design optimize one dimension by making another worse?
-- What would change if the project had ten times more users, data, or contributors?
-- What would change if operating cost or energy use became a first-class constraint?
+- **Observed:** directly inspected or measured in a repository, running application, audit, test, trace, or recorded workflow.
+- **Inferred:** a plausible explanation for an observation, with alternatives and confounding factors kept visible.
+- **Proposed:** a future response or target design that was not implemented and validated in the compared build.
 
-## Web architecture
+For example, “implementation B had the lowest measured p95 under the declared workload” is an observation.
+“Its data model caused the difference” is an inference unless the comparison isolates that factor.
+“A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
+This vocabulary lets students reason beyond the available experiment without presenting plans as results.
 
-The web gives us useful constraints: clients and servers, requests and responses, URLs, HTTP methods, caches, APIs, databases, and asynchronous work.
-These are not just implementation details.
-They shape what can be evolved independently and what becomes coupled.
+## Turn comparison into a decision
 
-Reflection prompts:
+The final synthesis should end with a decision under constraints rather than a universal ranking.
+A local single-agent workflow may be appropriate when privacy or cost dominates and tasks remain modest.
+A foundation-model single agent may justify its external dependency when capability reduces correction or expands the range of accepted tasks.
+A fleet may justify its coordination cost when the project exposes several independent workstreams and has enough integration and review capacity.
+The preferred architecture may likewise vary with the pressure, competence envelope, and operating skills of the team.
 
-- Which API decisions made later work easier?
-- Which API decisions became awkward after requirements changed?
-- Where did client, server, and database responsibilities blur?
-- What would you document so another team could safely build against your system?
+Use the evidence matrix to build the final argument:
 
-## Friction and technical debt
-
-Technical debt is not only messy code.
-It is anything that makes future work slower, riskier, or less understandable.
-Friction appears in setup, unclear ownership, slow tests, hidden assumptions, missing observability, brittle dependencies, and code that resists change.
-
-Reflection prompts:
-
-- What was the largest source of friction in your project?
-- Was the friction caused by code, architecture, tooling, collaboration, or unclear goals?
-- Which shortcut was reasonable at the time?
-- Which shortcut should now be paid down?
-
-## Measurement and observability
-
-Without measurement, scalability discussions become guesses.
-Benchmarking, logs, metrics, traces, and useful errors make system behavior visible.
-Good measurement does not mean measuring everything.
-It means choosing evidence that answers a specific question.
-
-Reflection prompts:
-
-- What did you measure, and what did the measurement actually prove?
-- Did any measure become a target that could improve without the intended outcome improving?
-- Which metric would warn you first that the system is overloaded?
-- What important behavior is still invisible?
-- Did your tests or benchmarks match realistic use?
-- Did a nominally successful agent stay within the reasonable intent and boundaries of its task?
-
-## Reality and changing assumptions
-
-Systems meet reality when users behave unexpectedly, data grows, traffic spikes, dependencies fail, teams misunderstand each other, or old assumptions stop holding.
-The Challenge part makes this normal mismatch explicit and applies the same pressure scenarios to independent implementations.
-A scalable system is designed to adapt when assumptions change.
-
-Reflection prompts:
-
-- Which assumptions differed between implementations A and B, and which shared pressures challenged both?
-- What failure mode did you discover only after building the first version?
-- How did your design respond to overload, bad input, retries, duplicates, or partial failure?
-- What would you redesign first if the project continued?
-
-## Agent fleets, project readiness, and human-agent relationship
-
-Agentic development scales only when work is bounded and reviewable.
-More agents do not automatically create more progress.
-They can also create duplicated work, conflicting edits, shallow reasoning, and integration burden.
-A project becomes safer for agents when intent, constraints, commands, tests, and review expectations are explicit.
-
-The three implementations are also three human-agent configurations.
-Implementation A and B change model capability while retaining a broadly single-agent workflow; implementation C changes the orchestration and coordination structure.
-Comparing only the finished applications would hide where humans framed intent, delegated authority, supplied context, accepted evidence, intervened, and remained responsible.
-Use the HAR decision path from the development and fleet chapters to compare one consequential feature from need through adaptation.
-The goal is not to identify the build with the most agent autonomy.
-It is to determine which allocation produced accepted outcomes with a review and recovery burden the group could actually sustain.
-
-Reflection prompts:
-
-- What made your project easier or harder for an agent to work on?
-- Which task was suitable for an agent fleet, and which task needed one careful contributor?
-- How did you divide work into roles, files, outputs, and acceptance criteria?
-- For one feature, who or what defined, designed, implemented, verified, released, observed, and adapted it?
-- At each consequential decision, could the agent propose, prepare, or execute, and what justified that authority?
-- What evidence did you use before trusting agent output?
-- Which approval represented informed acceptance, and which risked becoming ceremonial because the reviewer lacked context, time, or a recovery path?
-- What did the fleet debugging view reveal about failures, retries, handoffs, review, or human intervention that the finished code did not show?
-- Did parallel work reduce accepted completion time, or only move work into integration and review?
-- Where did the observed execution path diverge from the planned authority, escalation, or accountability map?
-
-## Scaling techniques and trade-offs
-
-Scaling is a sequence of trade-offs made in response to pressure.
-Caching, queues, indexing, replicas, sharding, CDNs, rate limiting, background jobs, feature flags, and isolation all solve some problems while introducing others.
-The question is not "which technique is best?" but "which pressure justifies which cost?"
-
-Reflection prompts:
-
-- What pressure did your scaling decision respond to?
-- Which scaling technique did you choose, and what did it cost?
-- Which technique did you deliberately avoid?
-- What new failure mode did your scaling design introduce?
-
-## Final reflection
-
-A strong final reflection should use evidence from the three implementations rather than general claims.
-It should connect development setup and architectural decisions to consequences: what each workflow produced, what changed, what was measured, what broke, what improved, and what the group would choose next.
-
-Useful structure:
-
-1. Describe the common brief, fixed acceptance core, and comparison limits.
-2. Compare the local-model and foundation-model single-agent workflows.
-3. Compare the foundation-model single agent with the agent fleet.
-4. Compare the three architectures and their responses to the same scalability pressures.
-5. Compare one feature's human-agent decision path across A, B, and C, including authority, evidence, escalation, recovery, and accountable ownership.
-6. Present evidence from tests, benchmarks, audits, the fleet debugging view, traces, interventions, and resource or time measurements.
-7. Separate observed differences from possible causes, including practice effects and scope differences.
-8. Name the trade-offs, remaining risks, and development setup the group would choose next.
-9. Explain what the project taught the group about application and development-system scalability.
+1. State the common brief, acceptance core, deliberately varied development setup, and comparison limits.
+2. Trace one important outcome through the application, development, and agentic loops.
+3. Compare the strongest evidence from A, B, and C, including failures, correction, and resource use.
+4. Label observations, inferences, and proposals.
+5. Choose an application architecture and development setup for one stated future scenario.
+6. Explain the rejected alternatives, the trade-offs accepted, the first likely saturation boundary, and the next measurement.
 
 ### Final reflection package builder
 
-The lightweight builder below helps assemble evidence from the course before writing the final reflection.
-Select the artifacts you have, then use the generated outline to see which claims are supported and which evidence is still missing.
+The builder below assembles evidence already produced during the course.
+Select the artifacts you have, then use the generated outline to find claims that still lack support.
 
 {{ import "site/includes/final-reflection-demo.html" }}
 
 ## Project artifact
 
-Students should submit a final reflection package.
-It should include the strongest evidence from the earlier artifacts: assumptions, architecture diagrams, friction audit, measurement result, pressure map, agent workflow evidence, one planned-versus-observed HAR decision map, scaling trade-off table, and a short explanation of what changed in their understanding.
+Submit the completed evidence matrix and a final decision narrative.
+The package should include the common acceptance result, request-path or architecture evidence, pressure and measurement results, cross-team friction audits, human–agent workflow evidence, one planned-versus-observed decision path, resource-use evidence where available, and remaining risks.
+For each major claim, mark whether it is observed, inferred, or proposed.
+
+The final narrative should use those artifacts to explain which application architecture and development setup the group would choose under a stated set of constraints.
+It should also identify the first expected boundary, the signal that would reveal its approach, and the decision the group would revisit when conditions change.
 
 ## Questions to carry forward
 
-- What kind of growth is this system actually prepared for?
-- What kind of growth would break it first?
-- Which parts are easy to change, and which parts resist change?
-- What evidence supports your answer?
-- What would you simplify before adding more infrastructure?
-- What would you make explicit before adding more agents?
-- What would you measure before making the next scaling decision?
+- Which form of growth is the system actually prepared for, and what evidence establishes that claim?
+- Which application, development, or review boundary is most likely to saturate first?
+- What would you simplify before adding infrastructure or agents?
+- Which signal and correction path would let the next team adapt without guessing?
 
 ## Summary
 
-The three implementations make both the application and its development system available for comparison.
-A strong conclusion uses shared acceptance criteria and project evidence to distinguish observed differences from proposed explanations, while keeping scope, practice effects, and failed attempts visible.
-The human-agent decision path adds another comparison boundary by showing who framed, designed, executed, verified, accepted, observed, and adapted consequential work.
-The purpose is not to select the most autonomous workflow or the most elaborate architecture, but to identify which allocation of people, agents, code, and infrastructure produced understandable outcomes at a sustainable review and recovery cost.
-Scalability remains an engineering judgment about which growth to prepare for, which trade-offs to accept, and what to measure next.
+Web scalability emerges from three connected loops.
+The application loop responds to pressure at architectural boundaries; the development loop determines the cost of changing those boundaries; and the agentic loop determines how execution becomes accepted and correctable work.
+Measurement connects observation to judgment across all three.
+
+The three implementations provide evidence for reasoning through this concept map, not contestants in a universal ranking.
+A strong synthesis compares accepted browser behavior, architecture, pressure, observability, friction, human–agent work, and resource use while keeping observations separate from explanations and proposals.
+The final engineering decision names the conditions it serves, the trade-offs it accepts, the first likely boundary, and what to measure when those conditions change.
