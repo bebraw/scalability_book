@@ -130,6 +130,7 @@ The first specification draft now includes:
 - a transfer policy between implementations;
 - a stack-neutral shared runtime workload and fixture;
 - three bounded, equivalent audit change probes with a stable protocol;
+- a portable fleet-trace fixture, schema, mapping guide, and repeat-import contract;
 - a common evidence template;
 - the bounded cross-team audit;
 - common evaluation principles.
@@ -139,7 +140,6 @@ The next iteration should settle:
 - whether the Work Activity Tracker domain is the right balance between comparability and student choice;
 - exact model and agent environments;
 - the stack proposal and approval process;
-- a small portable fleet-trace example or transformation template;
 - phase rubrics and grading weights;
 - expected project and audit time;
 - the submission structure used by the learning platform.

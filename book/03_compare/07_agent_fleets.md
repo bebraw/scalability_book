@@ -282,6 +282,8 @@ The result supports a local decision about this task; reliability claims require
 Finally, transform the execution trace into implementation C.
 The fleet run maps to a workspace, delegated tasks to work items, agents and humans to actors, and attempts, validations, failures, reviews, and interventions to activity events.
 Use the application's history, filters, summaries, and relationships to answer two questions: where did coordination first fail, and which correction produced accepted behavior?
+A [portable fleet-trace example](/downloads/project/fleet-trace-example.zip) provides a small transformation target, mapping guide, redaction record, and repeat-import contract.
+Adapt the actual tool export to that level of evidence rather than treating the example as a universal agent-tool schema.
 The goal is not to build a universal agent platform.
 It is to make the workflow that built the web application inspectable through the web application itself.
 

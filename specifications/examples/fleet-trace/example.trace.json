@@ -1,0 +1,359 @@
+{
+  "schema_version": "1.0",
+  "run": {
+    "id": "run-compare-001",
+    "title": "Add workspace activity filtering",
+    "started_at": "2026-04-14T09:00:00Z",
+    "ended_at": "2026-04-14T09:21:00Z",
+    "outcome": "accepted",
+    "source": {
+      "system": "course-example-fleet",
+      "export_revision": "example-v1",
+      "exported_at": "2026-04-14T09:25:00Z"
+    }
+  },
+  "actors": [
+    {
+      "id": "human-integrator",
+      "name": "Integration owner",
+      "kind": "human",
+      "role": "integration and acceptance",
+      "model": null
+    },
+    {
+      "id": "agent-interface",
+      "name": "Interface agent",
+      "kind": "agent",
+      "role": "contract and browser behavior",
+      "model": "declared-foundation-model"
+    },
+    {
+      "id": "agent-data",
+      "name": "Data agent",
+      "kind": "agent",
+      "role": "query and persistence changes",
+      "model": "declared-foundation-model"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-contract",
+      "title": "Define the activity-filter contract",
+      "state": "done",
+      "outcome": "accepted",
+      "assigned_actor_id": "agent-interface",
+      "parent_task_id": null,
+      "depends_on": [],
+      "created_at": "2026-04-14T09:00:10Z",
+      "started_at": "2026-04-14T09:01:00Z",
+      "completed_at": "2026-04-14T09:04:00Z",
+      "metrics": {
+        "duration_ms": 180000,
+        "input_tokens": 2200,
+        "output_tokens": 640,
+        "cost_usd": 0.08
+      }
+    },
+    {
+      "id": "task-implementation",
+      "title": "Implement workspace filtering",
+      "state": "done",
+      "outcome": "accepted",
+      "assigned_actor_id": "agent-data",
+      "parent_task_id": null,
+      "depends_on": ["task-contract"],
+      "created_at": "2026-04-14T09:04:30Z",
+      "started_at": "2026-04-14T09:05:00Z",
+      "completed_at": "2026-04-14T09:12:00Z",
+      "metrics": {
+        "duration_ms": 420000,
+        "input_tokens": 5100,
+        "output_tokens": 1480,
+        "cost_usd": 0.21
+      }
+    },
+    {
+      "id": "task-validation",
+      "title": "Validate filtering through the browser",
+      "state": "done",
+      "outcome": "accepted",
+      "assigned_actor_id": "agent-interface",
+      "parent_task_id": null,
+      "depends_on": ["task-implementation"],
+      "created_at": "2026-04-14T09:12:30Z",
+      "started_at": "2026-04-14T09:13:00Z",
+      "completed_at": "2026-04-14T09:21:00Z",
+      "metrics": {
+        "duration_ms": 480000,
+        "input_tokens": 3900,
+        "output_tokens": 920,
+        "cost_usd": 0.14
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "event-001",
+      "sequence": 1,
+      "type": "task_created",
+      "task_id": "task-contract",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:00:10Z",
+      "attempt_id": null,
+      "metadata": {
+        "source_event_type": "task.registered"
+      }
+    },
+    {
+      "id": "event-002",
+      "sequence": 2,
+      "type": "delegation",
+      "task_id": "task-contract",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:00:30Z",
+      "attempt_id": null,
+      "metadata": {
+        "assigned_to": "agent-interface",
+        "acceptance": "Contract names workspace and event-type behavior"
+      }
+    },
+    {
+      "id": "event-003",
+      "sequence": 3,
+      "type": "task_started",
+      "task_id": "task-contract",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:01:00Z",
+      "attempt_id": "attempt-contract-01",
+      "metadata": {}
+    },
+    {
+      "id": "event-004",
+      "sequence": 4,
+      "type": "task_completed",
+      "task_id": "task-contract",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:04:00Z",
+      "attempt_id": "attempt-contract-01",
+      "metadata": {
+        "result": "Contract accepted"
+      }
+    },
+    {
+      "id": "event-005",
+      "sequence": 5,
+      "type": "handoff",
+      "task_id": "task-contract",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:04:10Z",
+      "attempt_id": "attempt-contract-01",
+      "metadata": {
+        "to_task_id": "task-implementation",
+        "summary": "Filter contract ready for query implementation"
+      }
+    },
+    {
+      "id": "event-006",
+      "sequence": 6,
+      "type": "task_created",
+      "task_id": "task-implementation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:04:30Z",
+      "attempt_id": null,
+      "metadata": {
+        "source_event_type": "task.registered"
+      }
+    },
+    {
+      "id": "event-007",
+      "sequence": 7,
+      "type": "delegation",
+      "task_id": "task-implementation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:04:40Z",
+      "attempt_id": null,
+      "metadata": {
+        "assigned_to": "agent-data",
+        "acceptance": "Workspace filter is enforced by the persisted query"
+      }
+    },
+    {
+      "id": "event-008",
+      "sequence": 8,
+      "type": "task_started",
+      "task_id": "task-implementation",
+      "actor_id": "agent-data",
+      "occurred_at": "2026-04-14T09:05:00Z",
+      "attempt_id": "attempt-data-01",
+      "metadata": {}
+    },
+    {
+      "id": "event-009",
+      "sequence": 9,
+      "type": "failure",
+      "task_id": "task-implementation",
+      "actor_id": "agent-data",
+      "occurred_at": "2026-04-14T09:08:20Z",
+      "attempt_id": "attempt-data-01",
+      "metadata": {
+        "category": "validation",
+        "summary": "Query returned events from another workspace"
+      }
+    },
+    {
+      "id": "event-010",
+      "sequence": 10,
+      "type": "retry",
+      "task_id": "task-implementation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:09:00Z",
+      "attempt_id": "attempt-data-02",
+      "metadata": {
+        "reason": "Correct the workspace predicate and rerun the focused check"
+      }
+    },
+    {
+      "id": "event-011",
+      "sequence": 11,
+      "type": "task_completed",
+      "task_id": "task-implementation",
+      "actor_id": "agent-data",
+      "occurred_at": "2026-04-14T09:12:00Z",
+      "attempt_id": "attempt-data-02",
+      "metadata": {
+        "result": "Focused query check passed"
+      }
+    },
+    {
+      "id": "event-012",
+      "sequence": 12,
+      "type": "handoff",
+      "task_id": "task-implementation",
+      "actor_id": "agent-data",
+      "occurred_at": "2026-04-14T09:12:10Z",
+      "attempt_id": "attempt-data-02",
+      "metadata": {
+        "to_task_id": "task-validation",
+        "summary": "Implementation ready for browser validation"
+      }
+    },
+    {
+      "id": "event-013",
+      "sequence": 13,
+      "type": "task_created",
+      "task_id": "task-validation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:12:30Z",
+      "attempt_id": null,
+      "metadata": {
+        "source_event_type": "task.registered"
+      }
+    },
+    {
+      "id": "event-014",
+      "sequence": 14,
+      "type": "delegation",
+      "task_id": "task-validation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:12:40Z",
+      "attempt_id": null,
+      "metadata": {
+        "assigned_to": "agent-interface",
+        "acceptance": "Browser journey excludes events from other workspaces"
+      }
+    },
+    {
+      "id": "event-015",
+      "sequence": 15,
+      "type": "task_started",
+      "task_id": "task-validation",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:13:00Z",
+      "attempt_id": "attempt-validation-01",
+      "metadata": {}
+    },
+    {
+      "id": "event-016",
+      "sequence": 16,
+      "type": "validation",
+      "task_id": "task-validation",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:15:40Z",
+      "attempt_id": "attempt-validation-01",
+      "metadata": {
+        "check": "workspace-filter-browser-journey",
+        "result": "failed",
+        "summary": "The filter reset after a page refresh"
+      }
+    },
+    {
+      "id": "event-017",
+      "sequence": 17,
+      "type": "human_intervention",
+      "task_id": "task-validation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:16:20Z",
+      "attempt_id": null,
+      "metadata": {
+        "reason": "Clarified that the selected workspace must survive refresh",
+        "action": "Added the missing URL-state acceptance condition"
+      }
+    },
+    {
+      "id": "event-018",
+      "sequence": 18,
+      "type": "retry",
+      "task_id": "task-validation",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:17:00Z",
+      "attempt_id": "attempt-validation-02",
+      "metadata": {
+        "reason": "Repeat the browser journey after preserving URL state"
+      }
+    },
+    {
+      "id": "event-019",
+      "sequence": 19,
+      "type": "validation",
+      "task_id": "task-validation",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:19:30Z",
+      "attempt_id": "attempt-validation-02",
+      "metadata": {
+        "check": "workspace-filter-browser-journey",
+        "result": "passed"
+      }
+    },
+    {
+      "id": "event-020",
+      "sequence": 20,
+      "type": "review",
+      "task_id": "task-validation",
+      "actor_id": "human-integrator",
+      "occurred_at": "2026-04-14T09:20:30Z",
+      "attempt_id": "attempt-validation-02",
+      "metadata": {
+        "result": "accepted",
+        "evidence": "Focused check and full browser journey passed"
+      }
+    },
+    {
+      "id": "event-021",
+      "sequence": 21,
+      "type": "task_completed",
+      "task_id": "task-validation",
+      "actor_id": "agent-interface",
+      "occurred_at": "2026-04-14T09:21:00Z",
+      "attempt_id": "attempt-validation-02",
+      "metadata": {
+        "result": "Integration accepted"
+      }
+    }
+  ],
+  "redaction": {
+    "status": "redacted",
+    "removed": ["credentials", "full_prompts", "source_code", "tool_output"],
+    "reviewed_by": "human-integrator",
+    "notes": "Only compact task, failure, validation, and intervention summaries remain."
+  }
+}

@@ -96,6 +96,8 @@ In addition to the common evidence, record where possible:
 
 Export or transform evidence from the actual fleet run into a documented machine-readable trace.
 JSON is recommended, but another portable format is acceptable.
+Use the downloadable [portable fleet-trace example](/downloads/project/fleet-trace-example.zip) to study the minimum schema, application mapping, redaction record, and repeat-import contract.
+It is a transformation target rather than a required internal storage schema or a universal export format.
 
 Map the fleet workflow to the application concepts:
 
@@ -232,8 +234,8 @@ Fleet size, transcript length, generated code volume, and architectural complexi
 - Set a practical upper bound on fleet size or total model budget if resource use could become excessive.
 - Require compact evidence.
   Raw multi-agent traces can become too large to review and may contain sensitive information.
-- Provide a small example trace or transformation template if the approved fleet tools do not expose a usable export.
-  Grade the mapping and the debugging reasoning rather than adapter complexity.
+- Use the portable example trace as the minimum transformation reference when the approved fleet tools do not expose a usable export.
+  Grade the mapping and debugging reasoning rather than adapter complexity or exact schema imitation.
 - Keep live ingestion and advanced graph visualization optional.
   The required learning outcome is trace-based understanding of the fleet, not integration with a particular agent platform.
 - Align the final comparison with the course learning outcomes and the 30-point project rubric when the rubric is finalized.

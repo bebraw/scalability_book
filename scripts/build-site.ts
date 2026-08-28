@@ -620,6 +620,7 @@ if (includeEditor) {
 }
 await copyStaticAssets();
 await writeLabDownloads();
+await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 if (includeEditor) {
   await copyEditorAssets();
@@ -1051,6 +1052,15 @@ async function writeLabDownloads() {
         path.join(downloadsDirectory, `${lab.name}.zip`),
       ),
     ),
+  );
+}
+
+async function writeProjectDownloads() {
+  const downloadsDirectory = path.join(buildDir, "downloads", "project");
+
+  await writeDirectoryZip(
+    path.join(root, "specifications", "examples", "fleet-trace"),
+    path.join(downloadsDirectory, "fleet-trace-example.zip"),
   );
 }
 
