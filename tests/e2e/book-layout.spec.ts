@@ -1,6 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("book reading layout", () => {
+  test("starts with the book introduction", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Start reading" }).click();
+
+    await expect(page).toHaveURL(/\/chapters\/introduction\/$/);
+    await expect(page.locator(".chapter-main h1")).toContainText(
+      "Elements of Scalable Web Development",
+    );
+  });
+
   test("keeps body copy within a readable line length", async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
     await page.goto("/chapters/scalable-development/");
