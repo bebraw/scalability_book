@@ -1,4 +1,4 @@
-# Establish
+# Establish — Build and measure a baseline
 
 In this part of the book, we establish the idea of scalability and developing web applications in scale.
 Besides developing your first book project, you will start to think about different aspects related to scalability to form your own view of the topic.

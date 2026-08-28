@@ -1,7 +1,7 @@
 {
   "domain": "scalableweb.dev",
-  "title": "Elements of Scalable Web Applications",
-  "description": "Course book for Designing and Building Scalable Web Applications at Aalto University.",
+  "title": "Elements of Scalable Web Development",
+  "description": "Architecture, measurement, scaling pressure, and agentic workflows.",
   "course": "Designing and Building Scalable Web Applications",
   "audience": "MSc-level students",
   "author": {
@@ -64,7 +64,7 @@
   "parts": [
     {
       "number": "I",
-      "title": "Establish",
+      "title": "Establish — Build and measure a baseline",
       "description": "Define scalability, build implementation A, and establish a shared evidence baseline.",
       "file": "book/01_establish/00_establish.md",
       "chapters": [
@@ -75,7 +75,7 @@
     },
     {
       "number": "II",
-      "title": "Challenge",
+      "title": "Challenge — Expose architectural assumptions",
       "description": "Challenge the baseline through architecture, friction, production pressure, and implementation B.",
       "file": "book/02_challenge/00_challenge.md",
       "chapters": [
@@ -86,7 +86,7 @@
     },
     {
       "number": "III",
-      "title": "Compare",
+      "title": "Compare — Evaluate workflows and scaling responses",
       "description": "Build implementation C through a declared agent fleet, compare all three systems, and form an engineering judgment.",
       "file": "book/03_compare/00_compare.md",
       "chapters": [

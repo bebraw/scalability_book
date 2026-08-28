@@ -1,4 +1,4 @@
-# What is scalability?
+# What does scalability mean for web development?
 
 If you ask two developers, they will likely give you different definitions of scalability.
 Scalability can be a complex concept, especially in the context of the web.

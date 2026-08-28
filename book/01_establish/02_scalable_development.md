@@ -1,4 +1,4 @@
-# How to develop in a scalable way?
+# How can coding agents support scalable development?
 
 As systems evolve, they tend to become more difficult to develop as the existing requirements and code may work against you.
 This problem has been amplified with the introduction of so-called agentic coding, where software agents use Large Language Models (LLMs), development tools, and feedback from their environment to carry out coding tasks.

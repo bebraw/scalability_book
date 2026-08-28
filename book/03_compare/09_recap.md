@@ -1,4 +1,4 @@
-# What can the three implementations teach us?
+# What do three agent-assisted implementations teach us about web scalability?
 
 By the end of the course, you have established a baseline, challenged its assumptions through a second implementation, and compared both with a fleet-produced third implementation.
 The point of this sequence is not only to practice implementation.

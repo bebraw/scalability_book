@@ -1,4 +1,4 @@
-# How to measure and observe web applications?
+# How can we measure web applications and development workflows?
 
 If you want to understand your application and its characteristics in detail, you will have to both measure and observe it.
 While it was important before the agentic era of web development, it has become even more important now that we might be running code in production we do not fully understand or did not have time to verify.

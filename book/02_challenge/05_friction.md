@@ -1,4 +1,4 @@
-# Where does development friction come from?
+# How does development friction limit web projects?
 
 Friction is the resistance a team feels when trying to understand, change, test, review, deploy, or operate a system.
 It is the everyday experience of technical debt.

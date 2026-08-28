@@ -1,4 +1,6 @@
-# Elements of Scalable Web Applications
+# Elements of Scalable Web Development
+
+_Architecture, measurement, scaling pressure, and agentic workflows_
 
 This is the course book for the [Designing and Building Scalable Web Applications](https://fitech101.aalto.fi/en/courses/designing-and-building-scalable-web-applications) course held at Aalto University.
 The new course book is hosted at [scalableweb.dev](https://scalableweb.dev/).

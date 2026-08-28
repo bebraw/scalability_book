@@ -1,4 +1,4 @@
-# How should systems respond to scaling pressure?
+# How should web applications respond to scaling pressure?
 
 Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change.
 By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions.

@@ -1,4 +1,4 @@
-# Challenge
+# Challenge — Expose architectural assumptions
 
 Technical debt is the cost of earlier choices that make later change harder.
 The metaphor is useful only if we remember that debt is not automatically bad.

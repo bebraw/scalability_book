@@ -1,4 +1,4 @@
-# What happens when assumptions meet reality?
+# Which web application assumptions fail under pressure?
 
 Reality is what happens when implementation assumptions meet real users, real data, real failures, real costs, and real constraints.
 The common functional scope remains stable across the three builds, but shared pressure scenarios reveal where each design would become insufficient.

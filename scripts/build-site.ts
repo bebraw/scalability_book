@@ -100,7 +100,7 @@ const demoScriptIncludes = [
   },
   {
     title: "Scalability dimensions lab",
-    chapter: "What is scalability?",
+    chapter: "What does scalability mean for web development?",
     include: "site/includes/scalability-dimensions-demo.html",
     script: "/scalability-dimensions-demo.js",
   },

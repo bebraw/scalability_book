@@ -1,4 +1,4 @@
-# How to coordinate agent fleets?
+# When do agent fleets improve web development?
 
 An agent fleet is a coordinated set of agents or agent roles working on parts of a larger task.
 Using the anatomy introduced earlier, a fleet connects several goal-directed observe–decide–act loops rather than creating a new kind of agent.

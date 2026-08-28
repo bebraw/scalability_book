@@ -95,7 +95,7 @@ export function createSiteRenderer({
 
     return renderHtmlisp(templates.siteIndex, {
       bookContents: renderHomeContents(),
-      coverAlt: "Cover of Elements of Scalable Web Applications",
+      coverAlt: `Cover of ${config.title}`,
       coverImageUrl: "/assets/book-cover.svg",
       title: config.title,
       description: config.description,

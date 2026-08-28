@@ -1,4 +1,4 @@
-# Compare
+# Compare — Evaluate workflows and scaling responses
 
 Compare is about producing implementation C through a declared agent fleet and then explaining what all three systems reveal.
 The [Compare project brief](/project/compare/) defines the fleet workflow, its trace-based debugging view, and the final three-way comparison.
