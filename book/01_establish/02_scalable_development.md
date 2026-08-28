@@ -365,8 +365,15 @@ This chapter's contribution is to make intent, constraints, feedback, and owners
 
 ## Summary
 
-Agentic development has changed the way web applications are built.
-In short, you can move far faster now but this ability also comes with built-in risks.
-Therefore, it is essential that you pick up strong engineering practices and develop your intuition of working with agents since that is a skill of its own.
-At best, being able to work with the machine well can work as a force multiplier allowing you to implement ideas otherwise out of your reach.
-This also means having a different attitude towards development as the shift is moving you towards a managerial position and development lead now that you have a pair or even a team of tireless agents working for you.
+Coding agents have changed web development by increasing the rate at which a specification can become candidate code.
+A generated change is not completed work: useful throughput is accepted behavior that people can explain, validate, integrate, correct, and remain willing to own.
+When generation outruns those capacities, speed reappears as review backlog, shallow acceptance, rework, or technical debt.
+
+Specifications, architecture notes, project instructions, examples, tests, and validation commands therefore become control surfaces for both people and agents.
+They constrain what may vary, return evidence to the next attempt, and help future work recover the intent behind the codebase.
+Deterministic checks can bound probabilistic generation, but they establish only the properties and conditions they actually examine.
+
+Human–agent control should be allocated per decision rather than expressed as one global autonomy level.
+An agent may propose, prepare, or execute within explicit limits, while provenance, endorsement, accountability, and evidence remain separate questions.
+For a web application, acceptance must reach beyond a plausible browser view to the relevant HTTP contracts, authorization rules, persistence behavior, retry semantics, and maintenance obligations.
+Whatever produced the change, maintained work still needs an accountable human owner.

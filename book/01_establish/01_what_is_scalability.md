@@ -227,7 +227,7 @@ They should be revised when evidence reveals a different limit, not protected as
 
 ## Summary
 
-Scalability is the ability to continue meeting a stated goal as a named pressure grows or changes.
+Scalability describes whether a system can continue meeting a stated goal as a named pressure grows or changes.
 Demand, data, contributors, and change provide four reusable pressures for examining the event tracker and its development system.
 Architecture and infrastructure are responses; product priorities and constraints determine which responses are acceptable.
 
