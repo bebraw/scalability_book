@@ -1,3 +1,7 @@
+## Chapter purpose moved from reader content
+
+In this chapter, I will bring you up to speed with agentic development while considering its impact on software engineering and web development in particular.
+
 The implementation should remain deliberately modest.
 Interpretive freedom is not a request for more features.
 A small monolith, a server-rendered application, a rich client with an API, an event-oriented design, or an unusual language can all be appropriate when the group can explain the choice and provide a reliable path for another group to run it.

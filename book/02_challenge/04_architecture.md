@@ -1,28 +1,8 @@
 # How does web architecture shape scalability?
 
-This chapter should connect the course project to the web as an architectural environment.
 Students often experience web development as a collection of frameworks, libraries, and deployment platforms, but scalable web applications are shaped by older and deeper constraints: clients and servers, requests and responses, networks, latency, caches, URLs, protocols, browsers, APIs, and failure.
 
-The central claim could be: web architecture is not neutral plumbing.
-It gives us constraints and affordances, and scalable systems are built by working with those constraints rather than pretending they do not exist.
-
 ## Why web architecture matters
-
-Ideas to develop:
-
-- A local app can hide many problems because everything is close together.
-  A web app cannot.
-- Every request crosses a boundary: process, machine, network, organization, or trust.
-- Latency, retries, partial failure, caching, and authentication are architectural facts.
-- Frontend and backend code change at different speeds and often have different owners.
-- APIs become commitments.
-  Once clients depend on them, changing them becomes expensive.
-
-Possible event tracking example:
-
-- Recording an event looks simple in the UI, but it crosses the browser, network, authentication layer, API handler, validation logic, storage layer, and possibly analytics.
-- Each boundary can fail or interpret data differently.
-- A scalable design makes these boundaries explicit.
 
 ### Architecture is maintained, not declared
 
@@ -47,22 +27,6 @@ Either development model can produce mud when local changes accumulate without s
 
 ## The basic shape of a web application
 
-Outline:
-
-1. Client
-   - Browser, mobile client, admin dashboard, or integration.
-   - Responsible for interaction, local state, and user feedback.
-2. Server
-   - Receives requests, validates intent, applies business rules, and coordinates storage.
-3. Data store
-   - Persists state, events, users, domain entities, and derived views.
-4. External services
-   - Authentication, email, analytics, payments, object storage, queues, or monitoring.
-5. Operations layer
-   - Deployment, configuration, logs, metrics, alerts, and incident response.
-
-Development idea: use the same event recording action and trace it through each layer.
-
 ### Request boundary lab
 
 The demonstration below traces one `POST /events` request through the browser, network, API, storage, and response path.
@@ -74,15 +38,6 @@ Use this before drawing the architecture diagram.
 If the request path is unclear, the diagram is likely to hide the most important architectural decisions.
 
 ## Constraints of the web
-
-Potential subsections:
-
-- **Latency**: why physical distance and network hops matter.
-- **Partial failure**: why the client, server, database, and third-party services can disagree.
-- **Concurrency**: why two users can act at the same time and produce unexpected states.
-- **Caching**: why caches improve performance but complicate freshness and invalidation.
-- **Security boundaries**: why every client input must be treated as untrusted.
-- **Compatibility**: why deployed clients and existing API consumers cannot be updated instantly.
 
 > **Sustainability angle**
 >
@@ -381,7 +336,7 @@ Prompts:
 Students should review the architecture and data-flow diagrams submitted with implementation A, identify one consequential architectural choice, and write an architecture hypothesis for implementation B.
 The hypothesis should state what the group intends to preserve or change and why.
 Students should also complete an ownership card for the event workflow and identify one structural signal that would cause them to review that ownership again.
-Implementation B should still include its own diagrams and decision record, but the chapter is primarily reading and analysis rather than a second large deliverable.
+Implementation B should still include its own diagrams and decision record.
 
 ## Summary
 

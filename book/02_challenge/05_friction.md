@@ -4,20 +4,7 @@ Friction is the resistance a team feels when trying to understand, change, test,
 It is the everyday experience of technical debt.
 A system with high friction may still be useful, but each change requires more effort than it should.
 
-The central claim could be: scalability is not only about handling more users.
-A project also has to scale the work of changing it.
-
 ## Forms of friction
-
-Possible subsections:
-
-- **Setup friction**: the project is hard to run locally.
-- **Comprehension friction**: it is unclear where behavior lives or why decisions were made.
-- **Change friction**: small feature changes require edits in many unrelated places.
-- **Testing friction**: tests are missing, slow, flaky, or disconnected from important behavior.
-- **Review friction**: diffs are large, noisy, or hard to reason about.
-- **Operational friction**: logs, errors, configuration, and deployment behavior are unclear.
-- **Coordination friction**: people duplicate work or break each other's assumptions.
 
 > **Sustainability angle**
 >
@@ -31,17 +18,6 @@ Cleanliness did not change the task pass rate, but agents working in cleaner rep
 The result does not show that every clean-code rule improves every task, but it supports a narrower and useful claim: maintainability affects the operational footprint of agentic development, not only human preference.
 
 ## Friction in the event tracking project
-
-Examples to develop:
-
-- Event types are stored as free-form strings, so typos become data quality problems.
-- The UI and backend disagree about required event fields.
-- Filtering works only because the dataset is tiny.
-- There is no seed data, so every reviewer tests with different assumptions.
-- The storage model makes simple summaries difficult.
-- There is no clear place to add validation.
-- AI-generated code works but follows several inconsistent patterns.
-- The chosen theme is not documented clearly enough, so later readers cannot tell which domain assumptions are intentional.
 
 > **Identify the commitment point**
 >
@@ -77,17 +53,6 @@ After using the demo, students should apply the same structure to implementation
 For one implemented choice, compare introduction with safe reversal: mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
 
 ## Reducing friction
-
-Possible techniques:
-
-- Make setup reproducible with one documented command.
-- Define module boundaries and name responsibilities clearly.
-- Add focused tests around the most important behavior.
-- Write down assumptions before they become archaeology.
-- Use schema validation where data crosses boundaries.
-- Keep APIs small and explicit.
-- Add useful error messages.
-- Keep generated code under the same review standard as human-written code.
 
 ### Treat the environment as a versioned input
 
@@ -145,14 +110,6 @@ The exact commands depend on the project.
 The important property is that each stage has a named purpose.
 Measure both time-to-first-useful-failure and total readiness time.
 If a slow check repeatedly catches problems that no earlier stage sees, consider whether a cheaper focused signal can move that feedback forward without weakening the final gate.
-
-## Exercise ideas
-
-- Ask students to perform a friction audit of implementation A.
-- Have them identify the three most expensive changes they can imagine making.
-- Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
-- Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
-- Use the optional review-evidence exercise in Appendix A when compressed diffs or repeated agent review are relevant to the project.
 
 ## Project artifact
 

@@ -1,9 +1,6 @@
 # How should web applications respond to scaling pressure?
 
 Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change.
-By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions.
-This chapter applies the same pressures to all three architectures before synthesizing a justified target design.
-It develops technical scaling techniques without turning them into a catalog of cloud products.
 
 The central claim is that scaling is not one move.
 It is a sequence of trade-offs made in response to specific pressure.
@@ -19,8 +16,6 @@ Before choosing a technique, ask what problem is being solved:
 - Is the system failing during traffic spikes?
 - Are deployments too risky?
 - Are teams blocked by shared ownership?
-
-Development idea: reuse the event tracking system and map each pressure to a possible response, regardless of whether the chosen theme is a conference, shop, workflow, game, or something else.
 
 ### Scaling pressure lab
 
@@ -505,21 +500,6 @@ That ability requires optionality prepared before the incident:
 More controls are not automatically better.
 An undocumented switch or unsafe manual path creates another failure mode.
 The goal is to balance work that prevents known failures with work that improves the ability to respond when the design encounters a surprise.
-
-## Exercise ideas
-
-- Students reconstruct one documented case as a chain of user experience, saturation boundary, evidence, intervention, reported outcome, limitation, and transferable principle.
-- Students identify which statements in that case are source-reported facts, which are interpretations, and which are proposals for the tracker.
-- Following the GitHub case, students measure repeated access and one user-facing latency distribution before proposing a cache; if the measured pressure is instead database work, they generate representative history, inspect the query plan, and test one query bound or index.
-- Following the Spotify case, students mark the synchronous correctness boundary, identify deferrable work, and define the acceptance status, backlog-age, retry, terminal-failure, and recovery signals a queue would require.
-- Following the Shopify case, students identify work that continues after a client disconnects or times out, then identify the local state and first shared dependency that additional application instances would stress.
-- Students choose one of these transfers, preserve a baseline, apply the smallest justified response, and compare evidence before and after.
-- Students choose two scaling techniques for a target design and explain why they did not choose three others.
-- Students draw the event pipeline for all three implementations and for the proposed target design.
-- Students identify the first metric that would reveal overload.
-- Students explain one failure mode introduced by their own scaling design.
-- Students name one plausible saturation boundary and demonstrate or describe a prepared recovery action that does not require inventing a new tool during the incident.
-- Students use the waterbed lens to identify where a selected scaling technique displaced complexity.
 
 ## Project artifact
 

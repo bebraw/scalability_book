@@ -15,8 +15,6 @@ Over the past few years, the web has begun to undergo a major shift in both how 
 This change is driven in part by the introduction of Large Language Models (LLMs) and agents.
 The shift presents a major challenge for developers: while generating code is cheap, developing in a scalable manner is not.
 For me, scalability has both hard and soft aspects: a service must work technically, but keeping it maintainable also requires social infrastructure.
-Therefore, the purpose of this chapter is to introduce you to scalability-related challenges and get you thinking about the topic.
-As you work through the book, you will develop your own view of scalability.
 
 ## Dimensions of scalability
 

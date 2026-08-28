@@ -24,3 +24,54 @@
   The feedforward/feedback distinction maps well to setup instructions, tests, linters, architecture notes, and review prompts as friction reducers.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support a short section on review friction.
   The useful angle is not "skip review", but "move repeatable review comments into tools, tests, formatters, conventions, and smaller module boundaries".
+
+## Drafting scaffold moved from reader content
+
+- The central claim could be: scalability is not only about handling more users.
+  A project also has to scale the work of changing it.
+
+### Forms of friction
+
+Possible subsections:
+
+- **Setup friction**: the project is hard to run locally.
+- **Comprehension friction**: it is unclear where behavior lives or why decisions were made.
+- **Change friction**: small feature changes require edits in many unrelated places.
+- **Testing friction**: tests are missing, slow, flaky, or disconnected from important behavior.
+- **Review friction**: diffs are large, noisy, or hard to reason about.
+- **Operational friction**: logs, errors, configuration, and deployment behavior are unclear.
+- **Coordination friction**: people duplicate work or break each other's assumptions.
+
+### Event-tracking examples
+
+Examples to develop:
+
+- Event types are stored as free-form strings, so typos become data quality problems.
+- The UI and backend disagree about required event fields.
+- Filtering works only because the dataset is tiny.
+- There is no seed data, so every reviewer tests with different assumptions.
+- The storage model makes simple summaries difficult.
+- There is no clear place to add validation.
+- AI-generated code works but follows several inconsistent patterns.
+- The chosen theme is not documented clearly enough, so later readers cannot tell which domain assumptions are intentional.
+
+### Reducing friction
+
+Possible techniques:
+
+- Make setup reproducible with one documented command.
+- Define module boundaries and name responsibilities clearly.
+- Add focused tests around the most important behavior.
+- Write down assumptions before they become archaeology.
+- Use schema validation where data crosses boundaries.
+- Keep APIs small and explicit.
+- Add useful error messages.
+- Keep generated code under the same review standard as human-written code.
+
+### Exercise ideas
+
+- Ask students to perform a friction audit of implementation A.
+- Have them identify the three most expensive changes they can imagine making.
+- Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
+- Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
+- Use the optional review-evidence exercise in Appendix A when compressed diffs or repeated agent review are relevant to the project.

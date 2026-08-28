@@ -26,3 +26,58 @@
 - Obsidian candidate: `Clippings/_Processed/Emerging trends in software architecture from the practitioner’s perspective A five-year review.md` could provide a practitioner-facing reference for why cloud native, Kubernetes, serverless, containers, DevOps, AI, and observability keep appearing in architecture discussions.
   It may work best as context, not as a technology checklist students should copy.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could be used later in the chapter or previewed here as an example of architecture shaped by retries, task queues, timers, state recovery, and long-running workflows.
+
+## Drafting scaffold moved from reader content
+
+- This chapter should connect the course project to the web as an architectural environment.
+- The central claim could be: web architecture is not neutral plumbing.
+  It gives us constraints and affordances, and scalable systems are built by working with those constraints rather than pretending they do not exist.
+
+### Why web architecture matters
+
+Ideas to develop:
+
+- A local app can hide many problems because everything is close together.
+  A web app cannot.
+- Every request crosses a boundary: process, machine, network, organization, or trust.
+- Latency, retries, partial failure, caching, and authentication are architectural facts.
+- Frontend and backend code change at different speeds and often have different owners.
+- APIs become commitments.
+  Once clients depend on them, changing them becomes expensive.
+
+Possible event tracking example:
+
+- Recording an event looks simple in the UI, but it crosses the browser, network, authentication layer, API handler, validation logic, storage layer, and possibly analytics.
+- Each boundary can fail or interpret data differently.
+- A scalable design makes these boundaries explicit.
+
+### Basic shape outline
+
+1. Client
+   - Browser, mobile client, admin dashboard, or integration.
+   - Responsible for interaction, local state, and user feedback.
+2. Server
+   - Receives requests, validates intent, applies business rules, and coordinates storage.
+3. Data store
+   - Persists state, events, users, domain entities, and derived views.
+4. External services
+   - Authentication, email, analytics, payments, object storage, queues, or monitoring.
+5. Operations layer
+   - Deployment, configuration, logs, metrics, alerts, and incident response.
+
+Development idea: use the same event recording action and trace it through each layer.
+
+### Web constraints outline
+
+Potential subsections:
+
+- **Latency**: why physical distance and network hops matter.
+- **Partial failure**: why the client, server, database, and third-party services can disagree.
+- **Concurrency**: why two users can act at the same time and produce unexpected states.
+- **Caching**: why caches improve performance but complicate freshness and invalidation.
+- **Security boundaries**: why every client input must be treated as untrusted.
+- **Compatibility**: why deployed clients and existing API consumers cannot be updated instantly.
+
+### Delivery note
+
+- The chapter is primarily reading and analysis rather than a second large deliverable.

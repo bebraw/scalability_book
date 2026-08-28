@@ -1,3 +1,8 @@
+## Chapter purpose moved from reader content
+
+Therefore, the purpose of this chapter is to introduce you to scalability-related challenges and get you thinking about the topic.
+As you work through the book, you will develop your own view of scalability.
+
 ### Premature scaling
 
 Becoming too successful can kill a software product.

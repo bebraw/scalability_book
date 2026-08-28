@@ -6,7 +6,6 @@ While the abstraction level has shifted, arguably this hasn't changed the fundam
 We are still in a position where we have to figure out different types of requirements and map them to our applications.
 It is this gap between requirements and implementation where software engineering becomes difficult since transforming requirements into concrete code can typically be done in many different ways.
 
-In this chapter, I will bring you up to speed with agentic development while considering its impact on software engineering and web development in particular.
 Note that the space is moving fast at the moment, so some of the content may already be outdated by the time you read it so make sure to do your own research on top of reading this chapter!
 I recommend maintaining your own agentic development template and doing experiments actively since as you do it, you will learn to work better with the machine and becoming aware of its limitations though limitations tend to move over time and tend to be contextual and even model dependent.
 

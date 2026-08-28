@@ -23,7 +23,3 @@ Use this lab to turn the [shared specification](/project/) into a direction to e
 As a result, it gives you a document that you can improve further.
 
 {{ import "site/includes/project-fit-checker.html" }}
-
-## What is covered in this part of the book
-
-In this part of the book, we will first define what is scalability before focusing on scalable development, and benchmarking to generate a measured baseline to compare against as you proceed with the book projects.

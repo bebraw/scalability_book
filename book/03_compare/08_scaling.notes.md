@@ -21,3 +21,25 @@
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` could support concrete scaling trade-offs around queues, retries, timers, durable state, and workflow visibility.
   Use it to ask what new operational responsibilities appear when asynchronous processing is introduced.
 - Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support a "measure what matters" reminder: scaling work should name the user or operational outcome it improves, not only the infrastructure metric it moves.
+
+## Drafting scaffold moved from reader content
+
+- By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions.
+- This chapter applies the same pressures to all three architectures before synthesizing a justified target design.
+- It develops technical scaling techniques without turning them into a catalog of cloud products.
+- Development idea: reuse the event tracking system and map each pressure to a possible response, regardless of whether the chosen theme is a conference, shop, workflow, game, or something else.
+
+### Exercise ideas
+
+- Students reconstruct one documented case as a chain of user experience, saturation boundary, evidence, intervention, reported outcome, limitation, and transferable principle.
+- Students identify which statements in that case are source-reported facts, which are interpretations, and which are proposals for the tracker.
+- Following the GitHub case, students measure repeated access and one user-facing latency distribution before proposing a cache; if the measured pressure is instead database work, they generate representative history, inspect the query plan, and test one query bound or index.
+- Following the Spotify case, students mark the synchronous correctness boundary, identify deferrable work, and define the acceptance status, backlog-age, retry, terminal-failure, and recovery signals a queue would require.
+- Following the Shopify case, students identify work that continues after a client disconnects or times out, then identify the local state and first shared dependency that additional application instances would stress.
+- Students choose one of these transfers, preserve a baseline, apply the smallest justified response, and compare evidence before and after.
+- Students choose two scaling techniques for a target design and explain why they did not choose three others.
+- Students draw the event pipeline for all three implementations and for the proposed target design.
+- Students identify the first metric that would reveal overload.
+- Students explain one failure mode introduced by their own scaling design.
+- Students name one plausible saturation boundary and demonstrate or describe a prepared recovery action that does not require inventing a new tool during the incident.
+- Students use the waterbed lens to identify where a selected scaling technique displaced complexity.

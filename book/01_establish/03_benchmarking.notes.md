@@ -1,3 +1,7 @@
+## Chapter purpose moved from reader content
+
+In this chapter, we will discuss topics like why systems behave different during development and in production under load with real data and slow networks while there are many concurrent users and failures you might not expect.
+
 Possible event tracking benchmarks:
 
 - Record 1,000 domain events.
