@@ -278,6 +278,21 @@ The later implementations can reuse the reporting frame without pretending that 
 
 For the complete evaluation vocabulary, grader design, configuration qualification, repeated-trial methods, uncertainty, and routing experiments, continue with [Appendix A: Evaluating agentic development workflows](/appendices/evaluating-agentic-workflows/).
 
+## Project artifact
+
+Complete the measurement and observation baseline required by the [Establish project specification](/project/establish/).
+Preserve it with implementation A so the same reporting categories can be applied to implementations B and C.
+Include:
+
+- one representative runtime workload, load level, system boundary, and predicted result,
+- the runtime and browser-visible metrics collected, their acceptance thresholds, and the observed distribution where the values vary,
+- one telemetry signal or trace that helps explain the result,
+- one bounded AI-assisted task with its configuration, outcome, checks, trace, retries, human correction, and acceptance decision,
+- the application revision and relevant environment conditions,
+- and one inspected failure, the limits of the evidence, and the first signal that would warn the group that behavior is moving outside the measured conditions.
+
+This is a local baseline for a declared application and development setup, not a universal ranking of models, tools, or architectures.
+
 ## Summary
 
 Benchmarking turns a question about web behavior into a disciplined comparison rather than a collection of isolated numbers.

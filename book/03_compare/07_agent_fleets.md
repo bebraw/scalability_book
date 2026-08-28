@@ -282,6 +282,22 @@ Use the application's history, filters, summaries, and relationships to answer t
 The goal is not to build a universal agent platform.
 It is to make the workflow that built the web application inspectable through the web application itself.
 
+## Project artifact
+
+Produce implementation C and the bounded fleet workflow required by the [Compare project specification](/project/compare/).
+The artifact should make delegation, authority, integration, validation, and correction inspectable rather than merely showing that several agents ran.
+Include:
+
+- the declared base model, harness, and relevant execution configuration,
+- the task graph, roles, boundaries, dependencies, and expected outputs,
+- the authority map, human approval points, and accountable integration owner,
+- validation commands, review criteria, and the stopping or reduction conditions for the fleet,
+- one deterministic workflow probe and measurements comparable with the earlier implementations,
+- and a transformed fleet trace loaded into implementation C, together with debugging findings that identify where coordination failed and which correction produced accepted web behavior.
+
+Preserve consequential changes to the fleet plan and the evidence behind acceptance.
+The fleet configuration and trace are part of the submitted development system, not background process trivia.
+
 ## Summary
 
 Agent fleets grow usefully from one agent only when the task contains real independent work.

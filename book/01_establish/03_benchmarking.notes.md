@@ -271,12 +271,6 @@ Ideas to develop:
 - Students add one efficiency observation, such as resource use per event, database queries per request, bundle size, storage growth, or repeated background work.
 - Students propose one sustainability-oriented improvement and explain the trade-off it introduces.
 
-## Project artifact
-
-Students should create the shared measurement protocol and the implementation A baseline.
-It should define one repeatable runtime workload, one load level, the metrics collected, the common development-workflow evidence, one small model-evaluation task set if appropriate, at least one deterministic probe, the first result, one inspected failure, what the result does not prove, and which signal would warn them first that the system is under pressure.
-The same protocol should be rerun for implementations B and C.
-
 ## Notes for further development
 
 - Add a small tool-neutral example using `curl`, a simple script, or a common load testing tool.

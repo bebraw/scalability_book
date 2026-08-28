@@ -23,11 +23,6 @@ This chapter follows one practical progression:
 - Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` can provide a research-backed maintainability caution.
 - Obsidian candidate: `Clippings/_Processed/Durable Execution Solutions.md` can connect development-time fleets to durable production workflows.
 
-## Project artifact
-
-Students should produce implementation C and its bounded fleet workflow.
-The artifact should include the declared base model, task graph, role definitions, allowed files or modules, expected outputs, integration ownership, validation commands, review criteria, one deterministic workflow probe, comparable workflow measurements, a transformed trace loaded into implementation C, and debugging findings showing where coordination failed or human judgment was required.
-
 ## Common mistake
 
 The common mistake is to treat a fleet as a way to avoid thinking.

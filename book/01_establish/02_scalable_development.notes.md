@@ -45,12 +45,6 @@ After this chapter, students should be able to:
 - Evaluate AI-assisted code as maintainable software rather than as a one-time output.
 - Connect development practices to implementations A, B, and C and the development setup used for each.
 
-## Project artifact
-
-Students should create a first version of the project harness.
-It should include a README, setup command, one agent instruction file, one architecture note, one feature spec for the core event workflow, one decision record for the initial stack or storage choice, one fast validation command, and a short AI-use log.
-The harness can be lightweight, but it should be concrete enough that another group can run and inspect the project and that the final comparison can explain its development workflow.
-
 ## Notes for further development
 
 - Keep the development-approaches table chronological by representative milestone, not by disputed invention date.

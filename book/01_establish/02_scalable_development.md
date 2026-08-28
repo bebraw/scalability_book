@@ -347,6 +347,22 @@ Publishing an issue or patch transfers some of that cost to an external maintain
 The [Agent Fleets chapter](/chapters/agent-fleets/) treats publication as an externally consequential action that needs a human owner.
 Within the course projects, the same principle is simpler: generate as quickly as useful, but accept only work the group can explain, validate, and remain willing to maintain.
 
+## Project artifact
+
+For [implementation A](/project/establish/), create the first version of the project harness alongside the web application.
+Keep it small enough to maintain, but concrete enough that another group can run the project, inspect the main event workflow, and understand how agent-produced work becomes accepted work.
+Include:
+
+- a README with the supported setup and run path,
+- project instructions for the coding agent,
+- one architecture note and one feature specification for the core event workflow,
+- one decision record for a consequential stack or storage choice,
+- one fast validation command,
+- and a short AI-use record that binds a representative task to its relevant configuration, checks, human correction, acceptance decision, and known limits.
+
+The complete harness and evidence requirements remain defined by the project specification.
+This chapter's contribution is to make intent, constraints, feedback, and ownership explicit before generated changes accumulate.
+
 ## Summary
 
 Agentic development has changed the way web applications are built.
