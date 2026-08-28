@@ -270,15 +270,16 @@ Try completing the loop once with the default constraints and once after selecti
 The generated candidate is deterministic teaching data rather than model output.
 The useful part is the shape of the loop: validation produces evidence, revision makes the learning explicit, and the revised memory changes the next generation boundary instead of becoming a vague instruction to "try again."
 
-## The job is to convert non-determinism into determinism
+## Bound probabilistic generation with deterministic controls
 
-Simply put, the new job of a developer is to turn non-deterministic input into deterministic behavior.
-That does not make the model itself deterministic; it surrounds interpretation with explicit boundaries that keep the application predictable.
-This observation is at the core of how LLMs work since they rely on statistical inference meaning if you prompt them twice, likely the result will be in some way different.
-For this reason, it is a good idea to figure out how to reduce the chance that this interpretation process goes wrong.
-A part of this has to do with our technical choices and in his talk, David Khourshid ([Beyond the Prompt: "Goodbye slop; welcome determinism"](https://www.youtube.com/watch?v=uMvTAF280so)) argues using explicit models, state machines, and deterministic core logic around generative components.
-This gives validation a clearer target: let the model handle work that benefits from interpretation, but express business rules, state transitions, permissions, and invariants in forms that tests and tools can check repeatedly.
-When you codify your domain knowledge as models, they are easy to verify and more difficult for models to break.
+Agentic development does not make the generator deterministic.
+The practical goal is to keep variation inside explicit boundaries so behavior remains predictable where correctness depends on it.
+Two runs may interpret the same task differently, but they do not need unrestricted authority to invent business rules, state transitions, permissions, or completion criteria.
+
+Developers can decide what may vary and encode what must remain stable.
+In his talk, David Khourshid ([Beyond the Prompt: "Goodbye slop; welcome determinism"](https://www.youtube.com/watch?v=uMvTAF280so)) argues for explicit models, state machines, and deterministic core logic around generative components.
+This gives validation a clearer target: let the model handle work that benefits from interpretation, while expressing rules and invariants in forms that tools can check repeatedly.
+The resulting controls can still encode the wrong rule or omit an important condition; determinism makes a boundary repeatable, not automatically correct or complete.
 
 Khourshid describes one way to combine these ideas as letting an LLM navigate a deterministic state machine: given a goal and the current state, the model chooses from the events the machine currently permits.
 The demonstration below applies that pattern to an agent delivering a code change.
@@ -290,6 +291,7 @@ The statechart expresses hierarchy, parallel verification, recovery, and complet
 Notice what the statechart provides beyond a linear checklist.
 One cancellation rule applies throughout the compound active state, tests and human review can progress independently, and either kind of failure can return the workflow to implementation.
 The model may choose a route, but the statechart defines the available routes.
+It does not prove that the generated code satisfies the web application's requirements: the tests, review criteria, and observed behavior still have to provide that evidence.
 
 Deterministic boundaries also depend on how the application represents valid data and commits state.
 The [Architecture chapter](/chapters/architecture/) develops that connection through constructive data modeling, runtime parsing, authorization, and atomic persistence.
