@@ -8,6 +8,14 @@ The book has been split into three parts during which you will learn more about 
 The project will remain the same but the way you implement it will change to give perspective on development level scaling.
 You will pick up ideas behind technical scaling during this process.
 
+While people have built websites and applications for decades, the work was performed largely by developers writing code manually.
+That practice has shifted during the past few years as coding agents have begun to write code for us.
+The shift allows us to develop more complex web applications faster than before, but it also introduces engineering challenges.
+Those challenges are the subject of this book.
+
+You will learn about agents in the context of web development, not as a separate topic.
+The goal is to learn how to use them effectively while developing your own understanding of scalability across both the web application and the development process that produces it.
+
 > **Sustainability angle**
 >
 > Scalability also has an environmental dimension.
