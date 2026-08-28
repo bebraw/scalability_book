@@ -8,14 +8,15 @@ The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—
 Controls around a fleet operate at different scopes.
 The project harness introduced earlier is the versioned material inside a repository: specifications, commands, rules, and evidence.
 An agent harness controls a model-and-tool execution loop.
-A session or orchestration layer may coordinate several harnesses, while a resource-access layer may mediate selected model and tool requests.
+A session or orchestration layer may coordinate several agent harnesses, while a resource-access layer may mediate selected model and tool requests.
 These responsibilities may be combined in one platform or split across several services.
+Together with the people, review process, and ownership rules around them, these layers form the broader development system.
 
 :ref[table:fleet-control-boundaries]{text="The table below"} separates task-level orchestration from request-level resource access.
 
 | Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
 | ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Session and task orchestration | Run, delegated task, workspace | Harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy          |
+| Session and task orchestration | Run, delegated task, workspace | Agent-harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy    |
 | Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
 
 ::caption[Control boundaries for agent orchestration and model or tool access.]

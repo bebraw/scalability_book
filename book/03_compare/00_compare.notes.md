@@ -3,9 +3,9 @@
 - Frame the part as fortifying both the system and the development process.
   The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
 - Use [Pi](https://pi.dev/) as the concrete tool for this part.
-  Pi is a minimal terminal coding harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
+  Pi is a minimal terminal agent harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
 - Present Pi as a teaching vehicle rather than as the point of the chapter.
-  The lesson is not "use this specific tool", but "a serious agent workflow needs a harness, explicit context, scoped capabilities, and reviewable traces".
+  The lesson is not "use this specific tool", but "a serious agent workflow needs an agent harness, explicit context, scoped capabilities, and reviewable traces".
 - Connect Pi to the revised comparison: locally hosted single agent for implementation A, foundation-model single agent for implementation B, and an explicitly designed fleet for implementation C.
 - State the fleet's base model and keep it equal to the implementation B foundation model when practical.
   The comparison should change orchestration deliberately instead of changing model capability and orchestration at once.
@@ -37,7 +37,7 @@ Use Pi, Acolyte, and Mastra as complementary examples rather than as competing t
 The useful framing is a stack of concerns:
 
 - [Pi](https://pi.dev/) as local development orchestration.
-  Pi is useful for showing how students can shape a coding-agent harness around their project: project instructions, skills, prompt templates, model choices, session history, and small subagent workflows.
+  Pi is useful for showing how students can shape an agent harness through model choices, tools, session history, extensions, and small subagent workflows while consuming instructions and skills from the project harness.
 - [Acolyte](https://acolyte.sh/) as controlled and observable agent execution.
   Acolyte is useful for discussing runtime boundaries: sessions, tasks, lifecycle phases, typed tool contracts, workspace scoping, sandboxing, traces, and memory.
   Verify these details with the author before presenting them as final claims.

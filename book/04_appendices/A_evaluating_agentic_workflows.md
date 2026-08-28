@@ -174,7 +174,7 @@ Only an interval wholly on the required side of a boundary supports that local d
 An interval containing zero is not proof that the candidates are equal.
 Treat other metrics and unplanned slices as descriptive or exploratory unless their joint decision rule and multiple-comparison treatment were declared in advance.
 When no defensible interval is available, show the raw paired outcomes, label the comparison exploratory, and restrict the claim to those tasks.
-An interval still describes uncertainty conditional on the sample and scoring process; it cannot repair unrepresentative tasks, judge bias, contamination, or a changed harness.
+An interval still describes uncertainty conditional on the sample and scoring process; it cannot repair unrepresentative tasks, judge bias, contamination, or a change to the agent harness or evaluation harness.
 
 **Paired comparison check.**
 For one predeclared binary acceptance result per independent task, count tasks accepted by both candidates, only the first, only the second, or neither.
@@ -195,7 +195,7 @@ The result therefore shows what a strong verifier can enable, not how well the a
 Databricks presents routing as an emerging coding-agent cost-control technique and reports an internal benchmark result, but publishes too little about that router evaluation to predict savings in another codebase :citep[wendell2026codingcosts].
 This motivates a local experiment, not a promised saving.
 
-When access rules permit both models—or when instructor-provided outputs are available—choose an efficient and a stronger model within the same declared harness and assemble a small set of representative tasks.
+When access rules permit both models—or when instructor-provided outputs are available—choose an efficient and a stronger model within the same declared agent harness and assemble a small set of representative tasks.
 Keep near-duplicates and tasks from the same module in the same partition, using one partition to define the policy and reserving the other for held-out evaluation.
 
 Define two evidence layers before running the comparison.
@@ -204,7 +204,7 @@ The **final adjudicator** uses held-out tests or blinded human review that the p
 A policy that stops after passing its visible gate but fails final adjudication is a false acceptance.
 
 On the first partition, define and freeze either a routing rule that uses only facts available before generation or a cheap-first cascade that uses the policy-visible gate after its first result.
-Freeze the task features, thresholds, prompts, model and harness versions, budgets, retry rules, and exclusion rules before inspecting the held-out results.
+Freeze the task features, thresholds, prompts, versions of the model and agent harness, budgets, retry rules, and exclusion rules before inspecting the held-out results.
 Compare the policy with always using either model and, when the task set permits it, random selection at the same stronger-model call rate.
 The random baseline tests whether the policy selects useful cases rather than benefiting only from its mixture of models.
 
@@ -216,7 +216,7 @@ That comparison can expose false acceptances and unnecessary escalations; withou
 
 The result supports a local decision only if the policy meets a predeclared quality and risk threshold while improving the chosen cost or latency measure.
 After using held-out results to change the policy, evaluate again on fresh tasks.
-High-risk work can bypass the router or retain mandatory review, and the policy should be recalibrated when models, prices, harnesses, or the task distribution change.
+High-risk work can bypass the router or retain mandatory review, and the policy should be recalibrated when models, prices, agent harnesses, or the task distribution change.
 
 ## Compressed evidence and repeated review
 
@@ -272,7 +272,7 @@ Deduplicate repeated findings, record recurrence separately from deterministic-r
 Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
 Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
 Repeated review also consumes the same scarce integration capacity that bounds the fleet.
-If students repeat an agent review, they should record the fixed code, prompt, harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
+If students repeat an agent review, they should record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 
 ## Apply the method selectively

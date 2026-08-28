@@ -18,7 +18,7 @@ This literature explicitly uses robots as a motivating example while treating co
 
 In this book, a **coding agent** is a goal-directed software system that repeatedly observes a development environment, chooses a next action, performs it through available tools, and uses the result to continue, change direction, stop, or escalate.
 An LLM by itself is not the whole agent.
-The model operates inside an agent harness that assembles observations, exposes tools, carries state between steps, invokes the model, and returns the effects of actions to the next step.
+The model operates inside an **agent harness** that assembles observations, exposes tools, carries state between steps, invokes the model, and returns the effects of actions to the next step.
 A survey focused on software-engineering agents uses the closely related modules of perception, memory, and action, with the LLM as their cognitive core :citep[wang2025agentsse].
 
 Within this system, the controller repeats an observe–decide–act loop as actions change the environment and create new observations.
@@ -29,7 +29,7 @@ Within this system, the controller repeats an observe–decide–act loop as act
 | Goal or preference   | Reach a destination while avoiding hazards   | Requested outcome, acceptance criteria, constraints, budget, and stopping conditions         | Task specification, examples, graders, priorities, and escalation rules            |
 | Environment          | A room, road, or factory floor               | Repository, filesystem, terminal, browser, remote services, and collaborating people         | Sandbox, workspace setup, available services, and environmental determinism        |
 | Sensors / perception | Camera, microphone, or proximity sensor      | Prompt and instructions, file reads, search results, tool output, test failures, and images  | Context selection, retrieval, observation format, provenance, and feedback quality |
-| Controller / brain   | Control software that selects motor commands | LLM plus the harness loop that constructs context and interprets model outputs               | Model and runtime configuration, instructions, planning policy, and orchestration  |
+| Controller / brain   | Control software that selects motor commands | LLM plus the agent-harness loop that constructs context and interprets model outputs         | Model and runtime configuration, instructions, planning policy, and orchestration  |
 | State / memory       | A map, state estimate, and recent readings   | Context window, session history, task state, retrieved documents, and durable project memory | Selection, summarization, retention, freshness, and source-of-truth rules          |
 | Actuators / actions  | Wheels, arms, speaker, or display            | File edits, shell commands, browser interaction, API calls, and messages                     | Tool design, permissions, approvals, validation, rollback, and rate limits         |
 
@@ -59,7 +59,7 @@ The approaches overlap and can be combined; the chronology is not a progression 
 | Early 2000s              | [Test-Driven and Behavior-Driven Development](https://dannorth.net/introducing-bdd/)                | Executable examples and tests                                            | Humans implement through short behavior and test feedback loops                   | Evidence moves close to implementation; checks cover only the properties and examples they encode                               |
 | February 2025            | [Vibe coding](https://x.com/karpathy/status/1886192184808149383)                                    | Conversational intent and the running result                             | An agent generates while a person observes and redirects visible behavior         | Exploration becomes fast; traceability and control of hidden contracts, data, security, and maintenance remain weak             |
 | August–September 2025    | [Spec-Driven Development](https://github.com/github/spec-kit/blob/main/docs/history.md)             | Specification, plan, tasks, and implementation artifacts                 | Agents work through durable phases with review between them                       | Intent survives one session or agent; artifact maintenance and drift from runtime behavior become new work                      |
-| February 2026            | [Harness engineering](https://openai.com/index/harness-engineering/)                                | Repository structure, tools, instructions, linters, and tests            | Agents repeatedly act inside encoded boundaries                                   | Mechanized feedback supports repeated high-throughput work; building and maintaining the project-specific environment is costly |
+| February 2026            | [Harness engineering](https://openai.com/index/harness-engineering/)                                | Project harness: repository structure, instructions, tools, and tests    | Agents repeatedly act inside encoded boundaries                                   | Mechanized feedback supports repeated high-throughput work; building and maintaining the project-specific environment is costly |
 | April 2026               | [Shift-Up](https://arxiv.org/abs/2604.20436)                                                        | Executable BDD requirements, C4 models, and ADRs                         | Agents implement while people focus on requirements, architecture, and acceptance | Established design knowledge becomes a persistent guardrail; the current evaluation is exploratory and adds upfront work        |
 | April 2026               | [Structured Prompt-Driven Development](https://martinfowler.com/articles/structured-prompt-driven/) | Version-controlled business, domain, design, task, and safeguard context | Agents generate within a reviewed prompt boundary                                 | Prompts become governable and reusable team artifacts; keeping them aligned becomes development work                            |
 
@@ -186,7 +186,7 @@ Implementation can therefore be a way to learn what the specification should say
 | Stage     | Governing question                          | Main action                                                                  | Exit evidence                                           |
 | --------- | ------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
 | Constrain | What outcome is wanted, and what may vary?  | State the goal, context, boundaries, budget, and stopping or escalation rule | A bounded task and explicit acceptance criteria         |
-| Generate  | Which candidate might satisfy those limits? | Let a chosen model and harness act with relevant context and tools           | A candidate artifact plus its trace, cost, and attempts |
+| Generate  | Which candidate might satisfy those limits? | Let a chosen model and agent harness act with relevant context and tools     | A candidate artifact plus its trace, cost, and attempts |
 | Validate  | Does the candidate satisfy the real need?   | Apply independent checks and inspect the artifact a user will consume        | Acceptance evidence and known unverified properties     |
 | Revise    | What should change before the next attempt? | Correct the result and codify learning in durable project material           | An improved artifact and better starting constraints    |
 
@@ -299,19 +299,33 @@ The [Architecture chapter](/chapters/architecture/) develops that connection thr
 ## The project harness
 
 When using agents, the application code is only one part of the project.
-The other part is the harness around the code: the files, commands, rules, and examples that help humans and agents understand what is expected.
-A good harness reduces the amount of hidden context a contributor needs before they can make a useful change.
+The other part is the **project harness** around the code: the versioned files, commands, rules, and examples that help humans and agents understand what is expected.
+This is related to, but distinct from, the agent harness introduced earlier.
 
-The harness must also make failures at system boundaries visible.
+| Term               | Scope                                   | What it includes                                                                                              | Governing question                                                |
+| ------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Agent harness      | One model-and-tool execution loop       | Context assembly, tools, state, permissions, model invocation, and action feedback                            | How can the model observe, decide, and act?                       |
+| Project harness    | One repository or maintained codebase   | Instructions, specifications, architecture notes, environments, commands, tests, rules, and examples          | How can a contributor change this project without hidden context? |
+| Development system | The process that changes an application | People, agents, agent harnesses, project harnesses, review, integration, ownership, and organizational policy | How does candidate work become accepted and maintainable change?  |
+
+::caption[Three related control layers in agentic development.]
+::label[table:agentic-development-control-layers]
+
+An agent harness can consume a project's instructions and invoke its commands, but those artifacts remain part of the project harness rather than the runtime itself.
+A development system may use several agent harnesses against the same project harness and still rely on people for review, integration, and ownership.
+This section focuses on the project layer.
+A good project harness reduces the amount of hidden context a contributor needs before they can make a useful change.
+
+The project harness must also make failures at system boundaries visible.
 An analysis of more than 3,800 reported bugs across three coding tools found that API, integration, or configuration errors accounted for 36.9% of root causes, while tool invocation and command execution were the most affected workflow stages :citep[zhang2026pitfalls].
 The sample is limited to public issue reports, but the result is a useful warning: model reasoning is only one possible failure source.
 Strict tool contracts, useful errors, reproducible commands, and observable execution belong to the project harness too.
 
-It is this harness that keeps your project maintainable, and you will end up evolving throughout your project while sharing good practices with other projects.
+It is this project harness that keeps your project maintainable, and you will end up evolving it throughout your project while sharing good practices with other projects.
 One purpose of this book is to make you aware of those practices since I had to spend a lot of time myself to discover many of them and not all are obvious.
-As you work on your project, it is a good idea to push anything repetitive to your harness.
+As you work on your project, it is a good idea to push repeatable project knowledge and feedback into the project harness.
 
-For example, my [vibe-template](https://github.com/bebraw/vibe-template) project separates the starter application from the harness around it.
+For example, my [vibe-template](https://github.com/bebraw/vibe-template) project separates the starter application from the project harness around it.
 The Cloudflare Worker and TypeScript setup are specific implementation choices, but the reusable lesson is more general: the repository contains agent instructions, architecture rules, feature specs, decision records, setup notes, and validation commands.
 Those artifacts make it easier to start quickly without letting the codebase become a pile of undocumented accidents.
 This project comes with a ready-made process for me to pull my practices to other projects so it may be worth studying as an example.
@@ -321,7 +335,7 @@ The practical baseline is simpler than the list: can another student or agent cl
 An environment definition is part of that contract rather than neutral background; the [Friction chapter](/chapters/friction/) develops how to test it from a fresh checkout.
 That chapter also explains why validation cost should follow change risk instead of running every check after every edit.
 
-### Reuse practices without cloning the whole harness
+### Reuse practices without cloning the whole project harness
 
 Once a useful practice has emerged, copying the complete starter repository into an existing project is usually too coarse.
 Adoption and maintenance are different problems.
@@ -330,7 +344,7 @@ Later improvements need a smaller migration note or patch that preserves the tar
 
 The reusable unit is therefore not necessarily the template snapshot.
 It can be a bounded practice with provenance, an adoption path, and an update path.
-This keeps the harness evolvable without making every downstream project carry every experiment performed by its source template.
+This keeps the project harness evolvable without making every downstream project carry every experiment performed by its source template.
 
 [Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
 The broader lesson is to reuse a bounded practice with provenance rather than freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
@@ -362,7 +376,7 @@ Include:
 - one fast validation command,
 - and a short AI-use record that binds a representative task to its relevant configuration, checks, human correction, acceptance decision, and known limits.
 
-The complete harness and evidence requirements remain defined by the project specification.
+The complete requirements for the project harness and evidence package remain defined by the project specification.
 This chapter's contribution is to make intent, constraints, feedback, and ownership explicit before generated changes accumulate.
 
 ## Summary

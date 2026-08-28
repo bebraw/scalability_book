@@ -249,13 +249,13 @@ Agentic development introduces a second system to observe: the development workf
 The parallel is useful as long as outcome evidence remains separate from diagnostic traces.
 An HTTP trace can explain how a request traveled through the application but does not prove that the user received the correct result; an agent transcript can explain how a change was produced but does not prove that the accepted implementation is correct.
 
-| Evidence role         | Web application                                         | Agentic development workflow                         |
-| --------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
-| Outcome to protect    | Useful user and operational behavior                    | Accepted implementation and maintained project goal  |
-| Controlled comparison | Benchmark run under a declared workload                 | Bounded task or evaluation trial                     |
-| Diagnostic evidence   | Logs, metrics, request traces, and profiles             | Prompts, tool calls, diffs, checks, and retries      |
-| Configuration         | Revision, deployment, dependencies, and resource limits | Model, harness, tools, starting revision, and limits |
-| Intervention          | Operator diagnosis, mitigation, and recovery            | Human review, correction, approval, and escalation   |
+| Evidence role         | Web application                                         | Agentic development workflow                               |
+| --------------------- | ------------------------------------------------------- | ---------------------------------------------------------- |
+| Outcome to protect    | Useful user and operational behavior                    | Accepted implementation and maintained project goal        |
+| Controlled comparison | Benchmark run under a declared workload                 | Bounded task or evaluation trial                           |
+| Diagnostic evidence   | Logs, metrics, request traces, and profiles             | Prompts, tool calls, diffs, checks, and retries            |
+| Configuration         | Revision, deployment, dependencies, and resource limits | Model, agent harness, tools, starting revision, and limits |
+| Intervention          | Operator diagnosis, mitigation, and recovery            | Human review, correction, approval, and escalation         |
 
 ::caption[Parallel evidence roles in a running web application and its agentic development workflow.]
 ::label[table:application-agent-workflow-evidence]

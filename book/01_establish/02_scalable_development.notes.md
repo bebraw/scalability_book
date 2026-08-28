@@ -55,7 +55,7 @@ After this chapter, students should be able to:
   Students should record task framing, relevant model/tool configuration, validation outcome, human correction, and approximate cost or latency without submitting an unreadable raw transcript.
 - Explain that local models are affected by hardware, serving configuration, context limits, and quantization.
   Ask for contextual reporting rather than simplistic local-versus-cloud rankings.
-- Keep the harness discussion, but distinguish a common course harness from implementation-specific project memory.
-  Decide in the shared specification which harness files are supplied, which students author, and which may be carried into later builds.
+- Keep the project-harness discussion, but distinguish common course material from implementation-specific project memory.
+  Decide in the shared specification which project-harness files are supplied, which students author, and which may be carried into later builds.
 - Keep the implementation discovery lab aligned with the shared specification as the project evolves.
   It should support reasoning and conversation rather than score whether a group has found the “right” idea.

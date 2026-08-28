@@ -9,7 +9,7 @@ In this part, you define what should remain true under pressure, establish a con
 The three chapters form one progression:
 
 1. [What does scalability mean for web development?](/chapters/what-is-scalability/) identifies the maintained goal, relevant pressures, constraints, and evidence a scalability claim would need.
-2. [How can coding agents support scalable development?](/chapters/scalable-development/) treats the application and its development harness as one controlled system, with explicit constraints, validation, correction, and ownership.
+2. [How can coding agents support scalable development?](/chapters/scalable-development/) treats the application and its development system as connected systems, with explicit constraints, validation, correction, and ownership.
 3. [How can we measure web applications and development workflows?](/chapters/benchmarking/) turns runtime behavior and the development process into a repeatable evidence baseline.
 
 By the end of Establish, implementation A should be modest, complete enough to exercise the common behavior, and bound to a declared revision and evidence package.
@@ -20,7 +20,7 @@ Its value is that later comparisons do not have to rely on memory or impressions
 
 The [Establish project specification](/project/establish/) shows what you should implement during this part of the book.
 You will implement the shared project through a single-agent workflow backed by the approved locally hosted model.
-The purpose is to experience what that particular model, harness, and environment make easy or difficult while producing a baseline that can be inspected and measured.
+The purpose is to experience what that particular model, agent harness, project harness, and environment make easy or difficult while producing a baseline that can be inspected and measured.
 
 The specification leaves many decisions open deliberately, and you can customize the domain to your liking while choosing your own technical stack, rendering approach, storage, architecture, deployment path, and one specific implementation question worth investigating.
 There is no single required architecture, and the first choice does not need to be final.

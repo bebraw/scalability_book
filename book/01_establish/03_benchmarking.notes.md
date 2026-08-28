@@ -78,7 +78,7 @@ For example, students might compare models on tasks such as:
 Model capability and tool reliability are also separate variables.
 In [Better Models: Worse Tools](https://lucumr.pocoo.org/2026/7/4/better-models-worse-tools/), Armin Ronacher documents newer models completing the reasoning for an edit correctly while emitting arguments that violated a nested tool schema.
 The failures depended on the conversation history, client behavior, schema shape, and whether strict tool invocation was enabled.
-A model eval should therefore exercise the real harness and tools rather than test only a model's prose in isolation.
+A model eval should therefore exercise the real agent harness and tools rather than test only a model's prose in isolation.
 
 Each eval should define:
 
@@ -118,7 +118,7 @@ Build that diagnostic path from the cheapest reliable checks upward:
 5. Test the judge itself.
    Swap the order of compared answers, repeat selected cases, and compare its labels with a small set of human labels before relying on it at scale.
 6. Inspect failing rows instead of reporting only the average.
-   Preserve important real failures as regression cases that can be rerun after a prompt, model, tool, or harness change.
+   Preserve important real failures as regression cases that can be rerun after a prompt, model, tool, or agent-harness change.
 
 LLM judges can favor an answer because of its position, length, or similarity to the judge's own style rather than because it is correct.
 These are properties of the measurement instrument, so changing to a more capable judge does not remove the need for calibration.
@@ -300,6 +300,6 @@ Ideas to develop:
 - Obsidian candidate: `Clippings/_Processed/Building eval systems that improve your AI product.md` can support the error-analysis-first framing: start by looking at actual failures, then design evaluators around those failure modes rather than generic scores.
 - Obsidian candidate: `Clippings/_Processed/hamelsmuevals-skills Skills for AI Evals to compliment the course AI Evals For Engineers & PMs.md` can provide a checklist of eval design concerns: eval audits, error analysis, synthetic data, judge prompts, evaluator validation, RAG evaluation, and review interfaces.
 - External candidate: OpenAI Evals (`https://github.com/openai/evals`) is useful as a framework and registry reference for evaluating LLMs and LLM systems.
-- External candidate: Inspect AI (`https://github.com/UKGovernmentBEIS/inspect_ai`) is useful as a model-evaluation framework reference, especially if the chapter needs a more formal eval harness example.
+- External candidate: Inspect AI (`https://github.com/UKGovernmentBEIS/inspect_ai`) is useful as a model-evaluation framework reference, especially if the chapter needs a more formal evaluation-harness example.
 - External candidate: LangSmith evaluation concepts (`https://docs.langchain.com/langsmith/evaluation-concepts`) gives accessible vocabulary for datasets, examples, experiments, evaluator scores, and traces.
 - External candidate: Statistics for LLM Evals (`https://statsforevals.com/`) can support statistical interpretation of eval results and model comparisons.
