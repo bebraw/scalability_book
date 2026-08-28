@@ -1,20 +1,39 @@
 # Challenge — Expose architectural assumptions
 
-Technical debt is the cost of earlier choices that make later change harder.
-The metaphor is useful only if we remember that debt is not automatically bad.
-Sometimes taking a shortcut is rational because the team is learning, time is limited, or the future is uncertain.
-The problem begins when the debt is invisible, unpriced, or allowed to compound until the system can no longer change safely.
+Implementation A established a bounded baseline, not an architecture assumed to be correct.
+Challenge asks which hidden boundaries made that application work, what it costs to change them, and which assumptions fail when the application leaves its controlled starting conditions.
+The result is a second implementation and evidence package that can be compared with the baseline rather than a revision of the same codebase.
 
-In this part, the course challenges the baseline from three directions: architecture makes its hidden boundaries visible, friction exposes the cost of changing it, and production pressure reveals which assumptions no longer hold.
-The [Challenge project brief](/project/challenge/) asks students to implement the same behavior afresh with a foundation-model single agent and compare implementation B with the local-model baseline.
+## From hidden assumptions to comparable evidence
 
-Students challenge their understanding rather than modifying the earlier codebase.
-Requirements and acceptance checks remain stable while the implementation and development setup provide a new architectural hypothesis.
+The three chapters form one progression:
 
-## Core claim
+1. [How does web architecture shape scalability?](/chapters/architecture/) separates responsibilities from locations, traces how web placement choices accumulated, and turns one implementation A decision into an architecture hypothesis.
+2. [How does development friction limit web projects?](/chapters/friction/) follows one browser-visible change across setup, code, contracts, validation, review, and deployment to expose where the project resists change.
+3. [Which web application assumptions fail under pressure?](/chapters/reality/) connects documented production failures, application signals, degradation, and recovery to assumptions that local correctness left untested.
 
-Technical debt is reduced optionality.
-A system with high debt may still run, pass tests, and satisfy users today, but it gives the team fewer good choices tomorrow.
+By the end of Challenge, implementation B should preserve the common required behavior while expressing a fresh architecture and a declared foundation-model single-agent workflow.
+Its measurements and development evidence should remain comparable with implementation A, while its differences become hypotheses to examine rather than improvements attributed automatically to the model.
+
+## Implementation B — Work Activity Tracker
+
+The [Challenge project specification](/project/challenge/) defines the second fresh implementation.
+Requirements, permitted acceptance material, shared pressures, and reporting categories remain stable.
+Application code and implementation-specific tests do not carry forward, and neither the earlier architecture nor its development history becomes the default.
+The exact transfer policy remains defined by the project brief.
+
+Students now know the domain better than they did during Establish.
+That practice effect is part of the comparison: record what changed, distinguish model and workflow differences from team learning where the evidence permits it, and leave the explanation unresolved when it does not.
+Use implementation A and its public discussion as evidence about earlier choices, not as a repository to improve incrementally.
+
+## Technical debt reduces optionality
+
+Technical debt names earlier choices that make later change harder.
+A shortcut can be rational while a team is learning or time is limited; the problem begins when its future cost stays invisible, unpriced, or allowed to compound.
+A system with high debt may still run, pass tests, and satisfy users today while giving the team fewer safe choices tomorrow.
+
+Architecture makes those commitments visible, friction reveals their daily cost, and production pressure shows which ones restrict recovery or growth.
+Challenge therefore treats debt as one supporting lens for comparing the two implementations rather than as a synonym for defects or for every simple design.
 
 > **Sustainability angle**
 >
