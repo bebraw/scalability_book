@@ -247,7 +247,8 @@ Each implementation must provide:
 - at least one automated validation command;
 - tests covering the work-item lifecycle and its event recording;
 - project instructions for the AI development workflow;
-- an architecture or data-flow diagram;
+- an architecture or data-flow diagram and a short architecture note for the core event workflow;
+- one maintained feature specification for the core event workflow, including its acceptance path;
 - a short decision record explaining the stack choice.
 
 Setup may use native tools, containers, a development environment definition, or another documented mechanism.
@@ -279,25 +280,25 @@ Start each measured profile from this fixture:
 
 A workload cycle uses this operation mix:
 
-| Share | Logical operation | Target rule |
-| ---: | --- | --- |
-| 30% | Read the activity feed | Divide evenly between the unfiltered feed, one workspace, and one event type |
-| 15% | Read a workspace summary | Rotate evenly through the eight workspaces |
-| 20% | Create a work item | Rotate workspaces and actors; use a unique deterministic title |
-| 15% | Move an existing initial item to the active state | Use a distinct valid target for each operation |
-| 10% | Move an existing active item to the finished state | Use a distinct valid target for each operation |
-| 10% | Attempt an unsupported transition | Treat the documented rejection as an expected result, then verify that state and events did not change |
+| Share | Logical operation                                  | Target rule                                                                                            |
+| ----: | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+|   30% | Read the activity feed                             | Divide evenly between the unfiltered feed, one workspace, and one event type                           |
+|   15% | Read a workspace summary                           | Rotate evenly through the eight workspaces                                                             |
+|   20% | Create a work item                                 | Rotate workspaces and actors; use a unique deterministic title                                         |
+|   15% | Move an existing initial item to the active state  | Use a distinct valid target for each operation                                                         |
+|   10% | Move an existing active item to the finished state | Use a distinct valid target for each operation                                                         |
+|   10% | Attempt an unsupported transition                  | Treat the documented rejection as an expected result, then verify that state and events did not change |
 
 Use a fixed operation-order seed and record it.
 Concurrent operations in this baseline should use distinct work items; contention on the same item belongs in a pressure scenario.
 
 Run the following profiles:
 
-| Profile | Operations | Concurrency | Repetitions | Reset rule |
-| --- | ---: | ---: | ---: | --- |
-| Warm-up | 100 | 1 | 1 unmeasured | Reset and reseed afterward |
-| Steady | 500 | 4 | 3 measured | Reset and reseed before each repetition |
-| Burst | 200 | 16 | 3 measured | Reset and reseed before each repetition |
+| Profile | Operations | Concurrency |  Repetitions | Reset rule                              |
+| ------- | ---------: | ----------: | -----------: | --------------------------------------- |
+| Warm-up |        100 |           1 | 1 unmeasured | Reset and reseed afterward              |
+| Steady  |        500 |           4 |   3 measured | Reset and reseed before each repetition |
+| Burst   |        200 |          16 |   3 measured | Reset and reseed before each repetition |
 
 For every measured repetition, record:
 
@@ -327,6 +328,7 @@ Use these scenarios as a shared pressure catalog:
 - storage growth over time;
 - slow or temporarily unavailable dependencies;
 - retries that may repeat a request;
+- automated reads or writes whose application value, resource cost, or access pattern differs from ordinary interactive use;
 - demand for recent activity and historical summaries;
 - a need to retain, aggregate, archive, or delete old events.
 
@@ -344,6 +346,8 @@ For each pressure analyzed in depth, identify:
 - one plausible response;
 - at least one prepared recovery action available if the limit is reached;
 - the new cost or failure mode introduced by that response.
+
+When automated use or data exposure is the selected pressure, also distinguish cooperating, authorized, and abusive consumers; state which information is intentionally public or retained; and account for the false-positive and accessibility cost of the proposed control.
 
 Use runtime evidence where the available workload and environment allow it.
 Label reasoned projections as projections rather than observations.
@@ -396,10 +400,13 @@ Use the same evidence categories after every phase so later comparisons can refe
 
 - implementation identifier and commit;
 - language, framework, storage, and deployment approach;
-- model artifact and serving configuration relevant to the result: name, resolved revision or digest when exposed, quantization where applicable, runtime version, allocated context where exposed, and actual inference route for reported evaluation attempts when observable; otherwise record the declared route and limitation;
-- agent tool and relevant configuration, including the source, resolved revision or content digest, and update policy of any imported skill, plugin, or instruction bundle that materially affected the workflow; when neither a revision nor a digest is exposed, record the retrieval date and observed update behavior;
+- model name and whether inference was local, departmental, or externally hosted;
+- agent tool and version or retrieval date, together with any imported skill, plugin, or instruction bundle that materially affected the workflow;
 - orchestration configuration, if any;
-- local hardware or hosted-environment details relevant to the result, including memory limits and accelerator residency or CPU/GPU offload where exposed, together with paths by which project data may leave that environment and any fallback policy.
+- local hardware class or hosted environment relevant to the result, paths by which project data may leave that environment, and any fallback policy.
+
+When the tool exposes them and they materially affect a comparison, also record the resolved model revision or digest, quantization, runtime, allocated context, actual inference route, memory limits, accelerator residency or CPU/GPU offload, and resolved revision or content digest of imported capabilities.
+Mark unavailable fields as unavailable rather than spending project time estimating hidden configuration.
 
 ### 9.2 Effort and execution
 
@@ -408,6 +415,7 @@ Use the same evidence categories after every phase so later comparisons can refe
 - approximate model usage, cost, or locally measurable resource use;
 - failed or abandoned attempts worth noting;
 - important human interventions and corrections.
+- one representative AI-assisted task record containing the task brief, relevant model and agent configuration, checks, trace or compact execution evidence, human correction, acceptance decision, and known limits.
 
 Exact accounting is not expected when a tool does not expose it.
 State what could and could not be measured.
@@ -431,7 +439,7 @@ The Compare phase adds one realistic deployment outside the author's development
 - architecture and data-flow diagram;
 - stack decision record;
 - the phase's cumulative scalability-pressure record;
-- largest source of setup, comprehension, change, testing, review, and operational friction;
+- a standardized friction audit covering setup, comprehension, change, testing, review, deployment, operations, and coordination, including the largest source of resistance and one improvement or follow-up decision;
 - short reflection distinguishing observation from a possible explanation.
 
 Do not submit an uncurated raw agent transcript as the main evidence.
@@ -552,4 +560,4 @@ The phase specifications describe the emphasis and deliverables for each build.
 - Review proposed exotic stacks early for feasibility, licensing, security, and available deployment paths without steering everyone toward the same technologies.
 - Treat setup difficulty as evidence, not automatic failure.
   The group should lose credit when its supported path is incomplete or irreproducible, not merely because the auditor has never used the language.
-- The exact rubric weights still need to be defined.
+- Use the published [course assessment rubric](grading.md); announce any course-run revision before students begin the affected phase.

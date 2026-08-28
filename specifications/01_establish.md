@@ -81,7 +81,11 @@ In the stack decision record, explain:
 
 ### 3.4 Analyze initial scalability
 
+Produce two bounded scalability claims: one about runtime demand or data and one about contributors or change.
+For each, name the maintained goal, pressure, range or scenario, boundary, constraints, likely first limit, first useful signal, candidate response, expected trade-off, supporting or challenging evidence, and one intentionally excluded dimension.
+
 Choose one primary pressure from the shared catalog that is likely to expose an important limit in implementation A.
+Use the runtime or data claim as the starting hypothesis for that choice, and retain the contributor or change claim for the later friction and development-workflow comparison.
 Define it as a documented transformation of the [shared baseline workload](/project/#7-1-shared-baseline-workload) that can be repeated for implementations B and C.
 Run it where the available workload and environment allow; otherwise mark the result as a reasoned projection.
 

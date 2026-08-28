@@ -97,13 +97,25 @@ Compare the cumulative pressure evidence for A and B:
 - Did the foundation model introduce infrastructure or abstractions that the evidence does not justify?
 - Which implementation responds better to the pressures studied, and according to what evidence?
 
+For one queue, pool, request path, or other conserved-work boundary in A or B, apply Little's Law over one consistent observation window.
+Record average work in progress (`L`), average completion rate (`λ`), and average time in the system (`W`); check whether `L = λW` is approximately coherent; and state whether arrivals and completions were sufficiently balanced for the relationship to be useful.
+Use the result to interpret the boundary, not to claim a cause of delay or stability outside the observed conditions.
+
+Connect one failed assumption or approaching limit to a justified response pattern such as an index, derived view, idempotency boundary, bounded queue, partition, quota, backpressure, rate limit, or graceful degradation.
+At this phase the response may remain a design hypothesis, but name the new correctness, failure, operational, or recovery obligation it would introduce.
+
+Complete the chapter's documented-case transfer and pressure map as part of this cumulative pressure record.
+Link the selected source, separate reported facts from interpretation and project transfer, trace the failure across the relevant web boundaries, and identify the assumption, amplification path, user-visible effect, first useful signal, recovery mode, and evidence that recovery is complete.
+
 ---
 
 ## 5. Deliverables
 
 Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation B plus:
 
+- the architecture hypothesis for implementation B;
 - an updated capability ownership card for the main event workflow;
+- the documented-case transfer, pressure map, and Little's Law check;
 - a concise A–B comparison.
 
 The A–B comparison should distinguish:

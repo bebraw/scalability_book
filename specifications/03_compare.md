@@ -163,10 +163,22 @@ Apply at least one scalability law or formal model to an application-architectur
 Name the variables and assumptions, show the calculation or reasoning, connect the result to runtime evidence or a stated pressure, and explain what the model does not capture.
 This application analysis is separate from the workflow model required in section 5.4.
 
-### 5.6 Validate one realistic deployment
+### 5.6 Implement and evaluate one scaling response
+
+Select implementation A, B, or C and one pressure supported by runtime evidence or a credibly projected limit that the available environment can exercise.
+Preserve the accepted revision and its baseline evidence, then implement the smallest justified response to that limit.
+The response may be an index, bounded cache, idempotency boundary, admission control, queue with an explicit pending state, tenant isolation mechanism, or another technique justified by the evidence.
+Distributed infrastructure is not required.
+
+Keep the relevant fixture, workload, correctness checks, and measurement procedure unchanged.
+Rerun the common acceptance scenarios and the selected pressure, report every repetition, and compare latency, throughput, errors, correctness, and the chosen resource-efficiency proxy before and after.
+Exercise one failure or recovery obligation introduced by the response.
+State whether the result supported, challenged, or left the original hypothesis unresolved, and preserve an unsuccessful result instead of silently replacing it with a more elaborate design.
+
+### 5.7 Validate one realistic deployment
 
 Select implementation A, B, or C based on the evidence collected so far.
-Deploy it in an instructor-approved realistic environment outside the author's development process and rerun the [shared baseline workload](/project/#7-1-shared-baseline-workload).
+Deploy the revision selected after the scaling-response experiment in an instructor-approved realistic environment outside the author's development process and rerun the [shared baseline workload](/project/#7-1-shared-baseline-workload).
 Record the environment and configuration, operational steps, result, difference from the local run, first observed constraint, and what the run does not prove about larger scale.
 
 ---
@@ -181,8 +193,10 @@ Submit the [common submission bundle](/project/#9-common-submission-bundle-and-c
 - evidence from the fleet debugging view and at least two findings;
 - fleet coordination measurements and analysis;
 - one application-level formal-model analysis and one workflow-level formal-model analysis;
+- before-and-after evidence for one implemented scaling response, including its new failure or recovery obligation;
 - deployed workload evidence from one selected implementation;
-- a final A–B–C comparison.
+- a target architecture and scaling trade-off table that distinguish implemented evidence from remaining proposals;
+- a completed evidence matrix and final decision narrative that together form the final A–B–C comparison.
 
 The selected trace should show consequential delegation, validation, integration, failure, or human intervention.
 Do not submit an uncurated transcript dump in place of analysis.
