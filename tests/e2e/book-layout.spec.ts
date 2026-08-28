@@ -69,15 +69,18 @@ test.describe("book reading layout", () => {
     page,
     request,
   }) => {
-    const response = await request.get("/chapters/benchmarking/");
+    const response = await request.get("/appendices/advanced-web-boundaries/");
     expect(response.ok()).toBe(true);
     expect(await response.text()).toContain(
-      '<span class="hljs-keyword">import</span>',
+      '<span class="hljs-keyword">type</span>',
     );
 
-    await page.goto("/chapters/benchmarking/");
+    await page.goto("/appendices/advanced-web-boundaries/");
 
-    const code = page.locator(".prose > pre > code.language-ts").first();
+    const code = page
+      .locator(".prose > pre > code.language-ts")
+      .filter({ has: page.locator(".hljs-string") })
+      .first();
     const keyword = code.locator(".hljs-keyword").first();
     const string = code.locator(".hljs-string").first();
     await expect(code).toBeVisible();
