@@ -1,7 +1,5 @@
 ## Notes for further development
 
-- Add a table mapping pressure, technique, benefit, and cost.
-- Include a short warning against premature scaling.
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
 - Apply the same pressure set to all three implementations before recommending changes.
   The chapter should compare how each architecture responds rather than assuming implementation B is the sole object of analysis.
