@@ -1,13 +1,26 @@
 ## Chapter purpose
 
-- Define friction as the practical symptom of technical debt.
-- Help students notice friction in their own implementation A systems.
-- Show how friction appears in code, tooling, documentation, tests, dependencies, and collaboration.
-- Connect friction to agentic development: agents amplify both good structure and bad structure.
+- Define friction as the resistance encountered while changing a web system across browser, contract, validation, data, representation, cache, and deployment boundaries.
+- Separate protective friction from accidental repeated work.
+- Help students identify commitment points and distinguish cheap introduction from safe reversal.
+- Ground setup, comprehension, change, migration, and feedback friction in linked cases from Spotify, GitHub, Shopify, Stripe, and Slack.
+- Apply one stable change request and audit rubric to implementations A and B.
+- Connect friction to agentic development: agents can reduce, amplify, or relocate it.
+
+## Implemented spine
+
+1. Trace one event-category change from the browser to production.
+2. Identify setup, comprehension, change, testing, review, deployment, operational, and coordination friction along that path.
+3. Separate protective friction from accidental friction.
+4. Use a linked table of documented cases as evidence about distinct points in the change path.
+5. Identify when an API, data, queue, cache, or deployment choice crosses a commitment point.
+6. Reduce friction through versioned environments, traceable responsibilities, and explicit contracts without hiding boundaries.
+7. Show how agents can move friction into review, debugging, operations, and ownership.
+8. Match the feedback ladder to the changed boundary.
+9. Apply the workflow and friction audits to implementations A and B.
 
 ## Notes for further development
 
-- Add a friction checklist that students can reuse before implementation B.
 - Connect this chapter to the peer assessment process: friction is often felt by teammates first.
 - Consider including a small before/after example where a tangled event handler is split into clearer validation, storage, and presentation pieces.
 - Turn the friction audit into a standardized instrument applied to every build.
@@ -24,6 +37,8 @@
   The feedforward/feedback distinction maps well to setup instructions, tests, linters, architecture notes, and review prompts as friction reducers.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support a short section on review friction.
   The useful angle is not "skip review", but "move repeatable review comments into tools, tests, formatters, conventions, and smaller module boundaries".
+- Keep the company-authored case-study caveat visible and avoid treating reported figures as transferable expectations.
+- If cases are replaced later, preserve coverage of project setup and deployment, environment drift, architectural comprehension, live data migration, and feedback-system pressure.
 
 ## Drafting scaffold moved from reader content
 
