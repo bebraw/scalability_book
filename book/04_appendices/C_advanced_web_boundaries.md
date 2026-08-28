@@ -1,6 +1,6 @@
 # Advanced control boundaries in web applications
 
-Use this appendix when a design depends on state continuity across requests, type-level invariants, runtime-generated interfaces, or executable HTTP contracts.
+Use this appendix when a design depends on state continuity across requests, transactional invariants, client activation, runtime-generated interfaces, or a detailed application contract.
 The [Architecture chapter](/chapters/architecture/) keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
 
 ## Stateless requests still depend on state
@@ -46,6 +46,30 @@ For each request, record the authenticated principal and scope, authoritative st
 Design the flow so `C7` produces one event and its retry returns the original result, Bob cannot act merely by knowing `W1`, and the archived write returns a defined application error such as `workspace_archived` rather than silently recreating state.
 Finish by naming which information is carried by the client and which state remains authoritative on the server.
 
+## Preserve durable invariants with transactions
+
+A database transaction groups operations into one unit with four commonly named properties: atomicity, consistency, isolation, and durability, or ACID :citep[haerder1983recovery].
+**Atomicity** means the operations commit together or not at all.
+**Consistency** means a committed transaction leaves the data within its declared invariants; the database cannot invent those application rules, so they still have to be expressed through constraints, guarded writes, or validated domain logic.
+**Isolation** describes how concurrent transactions are allowed to observe and affect one another.
+The exact guarantee depends on the selected isolation level rather than on the mere presence of a transaction.
+**Durability** means a successful commit survives the failures covered by the storage system's contract.
+
+The work-item lifecycle contains a useful transaction boundary.
+A successful transition changes the current state and records the corresponding activity event.
+If either write escapes alone, the activity feed and work item disagree.
+The same invariant is threatened when two requests make a decision from the same old state or when the application returns success before persistence is durable.
+
+### ACID transaction lab
+
+Choose one disturbance, predict where the invariant could leak, and run it first with application-managed writes.
+Then introduce a database transaction and, for concurrent requests, compare read committed with serializable execution.
+
+{{ import "site/includes/acid-transaction-lab.html" }}
+
+The simulation does not imply that every database implements an isolation level or durable commit in the same way.
+For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+
 ## Model valid data combinations
 
 A transaction constrains how a valid state change becomes durable.
@@ -87,6 +111,41 @@ In the existing `specs/{feature}/spec.md`, show one broad record or result and o
 Replace it with a stack-native tagged union, sealed hierarchy, or guarded constructor.
 Where the stack supports checked variants, add a compile-fail type fixture; add a runtime test for any parser or guarded constructor at a data boundary, and reuse an existing supported-behavior test.
 Record one important invariant that remains enforced elsewhere, such as authorization or atomic concurrent transition.
+
+## Activate delivered interfaces
+
+Rendering and navigation do not explain how delivered HTML becomes interactive.
+A server-rendered page may contain useful content while the browser still has to recover or load the behavior behind its controls.
+That activation work affects payload size, client processing, first-interaction latency, and application structure.
+
+| Approach              | Activation unit                         | Main benefit                                           | Main constraint                                                  |
+| --------------------- | --------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
+| Hydration             | The rendered component tree             | Familiar, general application model                    | Re-executes client code to recover state and listeners           |
+| Progressive hydration | Ordered portions of the same tree       | Prioritizes important interaction                      | The application is still eventually hydrated                     |
+| Islands architecture  | Explicit interactive regions            | Static HTML elsewhere; work can be deferred or avoided | Shared state, navigation, and communication across islands       |
+| Resumability          | Serialized state and handler boundaries | Continues without replaying the application            | Serializable state and framework compiler or runtime constraints |
+
+::caption[Client activation approaches and their principal trade-offs.]
+::label[table:client-activation-approaches]
+
+Islands partition a page into static and interactive regions and attach a loading strategy to each interactive region.
+Resumability changes how execution crosses the server-client boundary: component boundaries, application state, and listener references are serialized into the delivered HTML so the browser can continue without replaying the application :citep[vepsalainen2024resumability].
+A resumable framework can therefore create fine-grained islands automatically.
+
+The strongest fit for explicit islands is an application with meaningful static regions and a smaller amount of separable interactivity.
+Research on edge-powered islands found that work could be deferred or avoided, but also concluded that the benefit becomes harder to obtain as an application grows more dynamic and difficult to divide into independent portions :citep[vepsalainen2025islands].
+Inter-island state, navigation, and communication then become architectural costs rather than incidental implementation details.
+
+### Client activation lens
+
+The lab below holds the server-rendered event page constant and changes only how its behavior becomes available in the browser.
+Compare what happens before the first interaction, then run the same record-event action.
+The transfer values are illustrative teaching values, not framework benchmarks; a real comparison should record production bundles, client execution, and interaction latency on representative devices.
+
+{{ import "site/includes/client-activation-lens.html" }}
+
+Ask which code and state must cross the boundary, which work happens before the user requests it, which latency moves to the first interaction, and what new constraints the chosen technique introduces.
+For each interactive region in the project, record its activation strategy, state owner, and communication path.
 
 ## Runtime UI generation changes the control boundary
 
@@ -136,6 +195,44 @@ Finally, identify the additional containment and evidence that would be required
 The descriptor schema and action vocabulary are API contracts.
 The next section examines what follows once such contracts cross client and server boundaries.
 
+## Choose an application interaction style
+
+An interface distributes knowledge between consumers and providers: which addresses or operations exist, how data is represented, what errors mean, and how either side can change independently.
+Several interaction styles can expose the same behavior while placing coupling in different locations.
+
+| Style                  | What the consumer knows in advance                         | Where change pressure concentrates                         | Typical operational concern                         |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
+| Resource-oriented HTTP | Resource addresses, representations, methods, and statuses | Resource and representation compatibility                  | Caching, idempotency, pagination, and versioning    |
+| Hypermedia-driven REST | Entry points, media types, and stable relation semantics   | Relation semantics and completeness of advertised controls | Link validity, client interpretation, and adoption  |
+| GraphQL                | A typed schema and the fields needed for each operation    | Schema governance, field evolution, and deprecation        | Authorization, resolver behavior, and query cost    |
+| RPC                    | Named methods and request or response message contracts    | Method and message compatibility                           | Deadlines, retries, idempotency, and streaming flow |
+
+::caption[Application interaction styles and where each places coupling.]
+::label[table:api-interaction-styles]
+
+Resource-oriented HTTP uses the uniform method and status semantics of HTTP.
+Hypermedia-driven REST adds links or controls so representations advertise available transitions; HATEOAS is therefore a REST constraint rather than a separate peer to REST :citep[fielding2000architectural].
+[GraphQL](https://spec.graphql.org/September2025/) lets a consumer select a response shape against a typed schema.
+[RPC](https://grpc.io/docs/what-is-grpc/core-concepts/) exposes named operations and explicit messages.
+GraphQL and RPC commonly travel over HTTP, so transport and application interaction style remain separate choices.
+
+Event streams, queues, webhooks, and publish-subscribe interfaces add another decision: communication can become asynchronous.
+That can reduce temporal coupling while making delivery guarantees, ordering, replay, idempotency, and schema evolution explicit parts of the contract.
+
+### API contract lens
+
+The lab below holds one user intent constant: start work on item 42 and obtain its current state, title, workspace, and available next actions.
+Switch the interaction style to see what crosses the wire, what the consumer must know in advance, and where a request for one more related field creates pressure.
+
+{{ import "site/includes/api-contract-lens.html" }}
+
+No style wins every row.
+A stable public resource model, a workflow discovered through hypermedia, a frontend assembling related data, and an internal service command provide different reasons to accept different forms of coupling.
+Begin with consumers, change patterns, network conditions, tooling, and ownership rather than a preferred acronym.
+
+For the project, design a minimal event-creation operation and event-query operation in one style.
+Then identify what changes when consumers retry, devices go offline, a new workflow state appears, many tenants share the system, or the interface needs an additional related field.
+
 ## Executable HTTP contracts
 
 An API description becomes more durable when representative requests and expected responses are executable.
@@ -173,5 +270,5 @@ The common project specification does not require an HTTP API, so this technique
 ## Use the boundary that matches the risk
 
 These techniques solve different problems.
-Explicit handles and idempotency protect continuity across requests; constructive models reduce contradictory in-memory states; transactions protect durable invariants under concurrency and failure; descriptor schemas constrain runtime composition; isolation contains executable output; and HTTP examples preserve an interface contract.
+Explicit handles and idempotency protect continuity across requests; transactions protect durable invariants under concurrency and failure; constructive models reduce contradictory in-memory states; activation approaches move browser work; descriptor schemas constrain runtime composition; isolation contains executable output; interaction styles distribute coupling; and HTTP examples preserve an interface contract.
 Choose the smallest boundary that makes the relevant decision observable and enforceable.

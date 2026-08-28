@@ -17,6 +17,8 @@
 7. Caching as coordination of controlled copies.
 8. Architectural maintenance and a final dimensions table.
 
+The core chapter now states the architectural consequence of application interaction styles, client activation, and transactions; their detailed comparisons and labs live in Appendix C.
+
 Treat the progression as overlapping capability shifts rather than a maturity ladder.
 Newer approaches address different pressures and retain physical, operational, and data constraints.
 

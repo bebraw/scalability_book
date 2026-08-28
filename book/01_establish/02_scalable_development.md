@@ -1,13 +1,8 @@
 # How can coding agents support scalable development?
 
-As systems evolve, they tend to become more difficult to develop as the existing requirements and code may work against you.
-This problem has been amplified with the introduction of so-called agentic coding, where software agents use Large Language Models (LLMs), development tools, and feedback from their environment to carry out coding tasks.
-While the abstraction level has shifted, arguably this hasn't changed the fundamentals behind software engineering.
-We are still in a position where we have to figure out different types of requirements and map them to our applications.
-It is this gap between requirements and implementation where software engineering becomes difficult since transforming requirements into concrete code can typically be done in many different ways.
-
-Note that the space is moving fast at the moment, so some of the content may already be outdated by the time you read it so make sure to do your own research on top of reading this chapter!
-I recommend maintaining your own agentic development template and doing experiments actively since as you do it, you will learn to work better with the machine and becoming aware of its limitations though limitations tend to move over time and tend to be contextual and even model dependent.
+As systems evolve, existing requirements and code constrain later change.
+Agentic coding can amplify that pressure by increasing the rate at which Large Language Models (LLMs), tools, and environmental feedback produce candidate implementations.
+The abstraction level has shifted, but the central engineering problem remains: requirements still have to become one of many possible concrete implementations that people can validate and maintain.
 
 ## What is an agent?
 
@@ -81,48 +76,43 @@ They hold required web behavior stable while students compare how different mode
 ### When generation outruns comprehension
 
 Greater code-production capacity does not make software development scale by itself.
-Across three field experiments with 4,867 developers, access to an AI coding assistant increased completed tasks by about 26% in the pooled estimate, although the individual experiments were noisy and varied :citep[cui2026effects].
-This is evidence that tools can raise the production rate in some settings, not that every developer or project becomes faster.
+The evidence below describes different parts of the resulting capacity mismatch rather than one universal productivity law.
 
-Comprehension was already a substantial part of development before generative AI.
-In a field study covering 78 professional developers, seven projects, and 3,148 working hours, :citet[xia2018comprehension] classified about 58% of observed time as program comprehension, compared with about 24% navigation and 5% editing.
-Their measure included activity across IDEs, browsers, and documents, and the projects came from two companies using Java and C#.
-The percentages are therefore not a universal reading-to-writing ratio, but they show why producing more text does not remove the work of understanding a system.
-Code and change understanding is also a central part of review, where it supports knowledge transfer and alternative solutions as well as defect detection :citep[bacchelli2013review].
+| Evidence                                                                                                                                                                     | What it supports                                                                     | Important limit                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| Three field experiments covering 4,867 developers found about 26% more completed tasks with an AI coding assistant :citep[cui2026effects]                                    | Candidate production can increase in some settings                                   | Individual experiments were noisy, and the result does not apply equally to every person or project |
+| A study of 78 developers across seven projects classified about 58% of observed time as program comprehension :citep[xia2018comprehension]                                   | Understanding already consumed substantial development capacity before generative AI | Two companies using Java and C# do not establish a universal reading-to-writing ratio               |
+| A professional code-review study found that understanding supports knowledge transfer and alternative solutions as well as defect detection :citep[bacchelli2013review]      | Review is broader than checking whether generated code passes                        | The study predates current coding agents                                                            |
+| A live LLM-review study at Mozilla and Ubisoft found that generated comments sometimes informed revisions, but reviewers accepted only a minority :citep[olewicki2026review] | AI-assisted review can contribute evidence while still consuming human judgment      | One deployment does not establish the effectiveness of every review agent                           |
 
-AI can therefore increase the arrival rate of candidate changes more readily than a team can increase its comprehension capacity.
-A generated diff is inventory, not completed work.
-The relevant throughput is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
+::caption[Evidence behind the distinction between candidate production and accepted change.]
+::label[table:candidate-production-and-comprehension]
+
+An agent can increase the arrival rate of candidate changes more readily than a team can increase its comprehension, review, and integration capacity.
+A generated diff is therefore inventory, not completed work.
+Useful throughput is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
 When candidate arrival exceeds that capacity, the backlog appears as large diffs, delayed review, shallow acceptance, rework, or technical debt.
-Because of this problem, alternate ways for reviewing code have become available.
-For example, [codiff](https://github.com/nkzw-tech/codiff) implements a walkthrough mode besides a regular diff that allows developers walk through proposed changes in a guided manner so that context behind changes is visible.
 
-Here, "reading" is shorthand for building and testing a useful mental model, not manually inspecting every generated line.
-Types, tests, contracts, static analysis, small modules, architectural notes, and AI-assisted search or review can compress the work by directing attention and supplying evidence.
-They expand comprehension capacity only when they reduce uncertainty rather than create more assertions to inspect.
-A live study of an LLM review assistant at Mozilla and Ubisoft illustrates both sides: generated comments sometimes contributed to later revisions, but reviewers still had to inspect them and accepted only a minority :citep[olewicki2026review].
+Types, tests, contracts, static analysis, small modules, architectural notes, and assisted search can direct attention and compress review.
+They help only when they reduce uncertainty rather than create more assertions to inspect.
+Effort and transcript length remain poor correctness proxies: a quick change can be sound, a laborious change can be wrong, and neither proves that the application meets its requirements.
 
-Effort is not correctness evidence: a quick change can be sound, a laborious change can be wrong, and neither hours nor transcript length shows that software meets its requirements.
-The human-agent relationship below separates provenance, endorsement, accountability, and evidence when evaluating an accepted result.
+:citet[brooks1987silver] distinguishes difficulties tools can reduce from essential difficulties rooted in the software problem, while :citet[lehman1980programs] observes that evolving programs become more complex unless deliberate work maintains or simplifies them.
+The [case studies](/case-studies/) show how faster generation interacts with product understanding, validation, and maintained project guidance in concrete projects.
 
-:citet[brooks1987silver] distinguishes accidental difficulties that tools can reduce from essential difficulties rooted in the software problem, with complexity central among them.
-:citet[lehman1980programs] similarly observes that an evolving program tends to become more complex unless deliberate work is performed to maintain or simplify it.
-Agentic development can reduce the effort of producing a change, but by increasing the rate of change it makes architecture, validation, and the project harness more consequential.
-
-The [case studies](/case-studies/) show how these pressures play out in projects with different scopes and outcomes.
-They include three projects from my own work and two external cases focused on independent validation and maintained agent guidance.
-Slideotter and Kirjolab reached a scope I could not have implemented alone, but their histories also show how generation speed can outrun product and architectural understanding.
-
-## From visible speed to sustainable development
+## Sustainable throughput requires ownership
 
 Prompting can produce visible results quickly, especially when a task is easy to specify.
-The difficult part is sustaining change after the first result: supplying enough context, constraining what may vary, and requiring relevant evidence before accepting the output.
-Guardrails and quality gates help, but they consume time and can be optimized mechanically if a score becomes the goal.
-The [Benchmarking chapter](/chapters/benchmarking/) develops that measurement problem.
+Sustaining change requires enough context, explicit variation boundaries, relevant acceptance evidence, and an owner who can correct the result.
+Guardrails and quality gates help, but they consume time and can be optimized mechanically if their score becomes the goal; the [Benchmarking chapter](/chapters/benchmarking/) develops that problem.
 
 Agentic development therefore includes the supporting development system as well as the application.
 Project instructions, architecture notes, tests, static analysis, reproducible commands, and reviewable examples can make future changes cheaper and safer.
 Their value depends on whether they reduce uncertainty around the work that matters, not on how many checks or documents the repository contains.
+
+The ownership standard should follow the work's consequences and expected lifetime rather than whether a human or model typed it.
+A disposable experiment may need little maintenance, while shared code makes other people inherit the cost of understanding, operating, and correcting it—what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve).
+Publishing an issue or patch also transfers cost to an external maintainer, so the [Agent Fleets chapter](/chapters/agent-fleets/) treats publication as an externally consequential action that needs a human owner.
 
 > **Sustainability angle**
 >
@@ -172,9 +162,8 @@ The human and agent may occupy different positions in each phase, but the workfl
 
 ## Constrain, generate, validate, revise
 
-Roughly put, when you develop with agents you follow a loop where you constrain, generate, validate, and revise before starting again.
-The overall efficiency of your development efforts is defined by the efficiency of this loop and I believe mastering this loop is also the key to enabling effective agentic development at scale.
-Even in a personal context, it is worth considering the loop and how you are contributing towards its operation.
+Agentic development follows a repeated loop: constrain what may happen, generate a candidate, validate it against the intended outcome, and revise both the result and the project's durable knowledge.
+The loop's useful throughput depends on the evidence required to advance each stage, not on generation speed alone.
 
 Constraints at the start of a task are hypotheses, not necessarily complete knowledge.
 :citet[brooks1987silver] argues that rapid prototyping supports the iterative specification of requirements because important questions become visible only when people interact with a concrete system.
@@ -203,16 +192,12 @@ Implementation can therefore be a way to learn what the specification should say
 
 **Constraining**
 
-By constraining process I mean defining the constraints of your systems, or even an individual prompt.
-Constraints are useful in sense that they allow less and effectively remove options.
-A good example of a constraint is for example defining what kind of development stack to use when starting a project.
-In addition, constraints can be stored at your project itself and commonly agentic projects include a lot of documentation that describes the meta-level of your project so it is easy for an agent to understand the context where it operates.
-As you look at projects developed by agents, you'll notice standard files, such as `AGENTS.md`, that are exactly about constraining how an agent can work within a project.
+Constrain both the task and the environment in which it runs.
+State the outcome, what may vary, relevant architecture and technology boundaries, budget, forbidden actions, acceptance criteria, and escalation rule.
+Durable project instructions such as `AGENTS.md` can preserve constraints that should apply beyond one prompt.
 
 **Generation**
 
-The second part of the loop, generation, is where the agent is doing its work based on your prompt.
-Although it sounds trivial, it is an important part since it is easy to get this one wrong or end up with higher expenses than you would like.
 Model choice should follow the work and local evidence.
 A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
 Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules.
@@ -225,10 +210,8 @@ Keep important raw evidence retrievable and test context-reduction policies inst
 
 **Validation**
 
-Validation is perhaps the most important part of the loop since it defines the overall performance of your loop in sense that with good validation you can get decent results even from poor models as validation helps to keep them on track.
-Interestingly enough you can have your agents develop a big chunk, or even all, of validation logic for you.
-The idea is to give your agents tools to let them validate their work.
-The most obvious thing to do is to set up strict validation rules for your projects, but the idea scales beyond development.
+Validation decides whether a candidate advances or returns for correction.
+Agents can generate and run checks, but those checks are candidate artifacts too: acceptance depends on their demonstrated relationship to the required behavior.
 
 Validation is stronger when it compares a candidate with an independent reference or inspects the artifact a user actually consumes.
 The [Webernetes case study](/case-studies/webernetes/) develops the first pattern through tests shared with a real k3s cluster; the [Slideotter case study](/case-studies/slideotter/) develops the second through geometry, browser, and rendered-output checks.
@@ -246,10 +229,8 @@ The concern-directed mutation lab lets you apply the pattern to authorization, r
 
 **Revision**
 
-Revision, the final part of the loop, is the part where you reflect and adjust based on your understanding.
-This is the part where you apply your enhanced learning to have a better starting point for the next loop.
-Essentially this is the part where learnings become codified for example as updated requirements, tests, architectural decisions, or project instructions.
-It is important to document your learnings as otherwise the implementation might drift apart from its specification and supporting material.
+Revision corrects the candidate and improves the next starting point.
+Codify durable learning in requirements, tests, architectural decisions, or project instructions; otherwise the implementation and its supporting material drift apart.
 
 ## Agents learn patterns from your codebase
 
@@ -313,22 +294,14 @@ This is related to, but distinct from, the agent harness introduced earlier.
 
 An agent harness can consume a project's instructions and invoke its commands, but those artifacts remain part of the project harness rather than the runtime itself.
 A development system may use several agent harnesses against the same project harness and still rely on people for review, integration, and ownership.
-This section focuses on the project layer.
-A good project harness reduces the amount of hidden context a contributor needs before they can make a useful change.
+A good project harness reduces the hidden context needed to make a useful change and returns failures in forms that people and agents can act on.
 
-The project harness must also make failures at system boundaries visible.
 An analysis of more than 3,800 reported bugs across three coding tools found that API, integration, or configuration errors accounted for 36.9% of root causes, while tool invocation and command execution were the most affected workflow stages :citep[zhang2026pitfalls].
 The sample is limited to public issue reports, but the result is a useful warning: model reasoning is only one possible failure source.
 Strict tool contracts, useful errors, reproducible commands, and observable execution belong to the project harness too.
 
-It is this project harness that keeps your project maintainable, and you will end up evolving it throughout your project while sharing good practices with other projects.
-One purpose of this book is to make you aware of those practices since I had to spend a lot of time myself to discover many of them and not all are obvious.
-As you work on your project, it is a good idea to push repeatable project knowledge and feedback into the project harness.
-
-For example, my [vibe-template](https://github.com/bebraw/vibe-template) project separates the starter application from the project harness around it.
-The Cloudflare Worker and TypeScript setup are specific implementation choices, but the reusable lesson is more general: the repository contains agent instructions, architecture rules, feature specs, decision records, setup notes, and validation commands.
-Those artifacts make it easier to start quickly without letting the codebase become a pile of undocumented accidents.
-This project comes with a ready-made process for me to pull my practices to other projects so it may be worth studying as an example.
+[vibe-template](https://github.com/bebraw/vibe-template) provides one concrete example: it separates a starter application from agent instructions, architecture rules, feature specifications, decision records, setup notes, and validation commands.
+The reusable lesson is to push repeatable project knowledge and feedback into maintained artifacts rather than leave them in one conversation.
 
 The [common project specification](/project/#6-minimum-project-harness) owns the exact required artifacts.
 The practical baseline is simpler than the list: can another student or agent clone the project, understand its intended shape, run it and its checks, and make a small change without guessing?
@@ -337,31 +310,12 @@ That chapter also explains why validation cost should follow change risk instead
 
 ### Reuse practices without cloning the whole project harness
 
-Once a useful practice has emerged, copying the complete starter repository into an existing project is usually too coarse.
-Adoption and maintenance are different problems.
-A capability such as mutation testing can be packaged with its fit criteria, files, dependencies, integration instructions, and checks so another project can adopt only that capability.
-Later improvements need a smaller migration note or patch that preserves the target project's conventions instead of restoring the source template around it.
-
-The reusable unit is therefore not necessarily the template snapshot.
-It can be a bounded practice with provenance, an adoption path, and an update path.
-This keeps the project harness evolvable without making every downstream project carry every experiment performed by its source template.
+Copying a complete starter repository into an existing project is usually too coarse.
+Package a reusable capability with its fit criteria, files, dependencies, integration instructions, checks, provenance, and update path so a project can adopt the practice without inheriting every source-template decision.
 
 [Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
-The broader lesson is to reuse a bounded practice with provenance rather than freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
-
-Imported capabilities also introduce a trust boundary because their instructions or bundled code may influence tools operating with the agent's authority.
-The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security and ownership implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
-
-## Maintained work needs an owner
-
-It is useful to distinguish disposable code from what Cory Doctorow calls [accretive work](https://pluralistic.net/2026/07/02/canonization/#operate-iterate-improve).
-A one-off program can be valuable even when nobody will maintain it.
-Once code becomes shared, other people inherit the cost of understanding, reviewing, operating, and correcting it.
-The standard should therefore follow the consequences and expected lifetime of the work rather than whether a human or model typed it.
-
-Publishing an issue or patch transfers some of that cost to an external maintainer.
-The [Agent Fleets chapter](/chapters/agent-fleets/) treats publication as an externally consequential action that needs a human owner.
-Within the course projects, the same principle is simpler: generate as quickly as useful, but accept only work the group can explain, validate, and remain willing to maintain.
+Imported capabilities also create a trust boundary because instructions or bundled code may influence tools operating with the agent's authority.
+The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
 
 ## Project artifact
 

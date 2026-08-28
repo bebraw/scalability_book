@@ -93,44 +93,11 @@ The data section returns to that distinction.
 
 ### Application contracts outlive deployment choices
 
-An interface distributes knowledge between consumers and providers: which addresses or operations exist, how data is represented, what errors mean, and how either side can change independently.
-Several interaction styles can expose the same behavior while placing coupling in different locations.
+HTTP can carry several application interaction styles, including resource-oriented messages, hypermedia controls, GraphQL operations, and RPC calls.
+Each style distributes knowledge and change pressure differently between consumers and providers, but none removes the need to define representations, errors, retries, authorization, and compatibility.
 
-| Style                  | What the consumer knows in advance                         | Where change pressure concentrates                         | Typical operational concern                         |
-| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
-| Resource-oriented HTTP | Resource addresses, representations, methods, and statuses | Resource and representation compatibility                  | Caching, idempotency, pagination, and versioning    |
-| Hypermedia-driven REST | Entry points, media types, and stable relation semantics   | Relation semantics and completeness of advertised controls | Link validity, client interpretation, and adoption  |
-| GraphQL                | A typed schema and the fields needed for each operation    | Schema governance, field evolution, and deprecation        | Authorization, resolver behavior, and query cost    |
-| RPC                    | Named methods and request or response message contracts    | Method and message compatibility                           | Deadlines, retries, idempotency, and streaming flow |
-
-::caption[Application interaction styles and where each places coupling.]
-::label[table:api-interaction-styles]
-
-Resource-oriented HTTP uses the uniform method and status semantics of HTTP.
-Hypermedia-driven REST adds links or controls so representations advertise available transitions; HATEOAS is therefore a REST constraint rather than a separate peer to REST :citep[fielding2000architectural].
-[GraphQL](https://spec.graphql.org/September2025/) lets a consumer select a response shape against a typed schema.
-[RPC](https://grpc.io/docs/what-is-grpc/core-concepts/) exposes named operations and explicit messages.
-GraphQL and RPC commonly travel over HTTP, so transport and application interaction style remain separate choices.
-
-Event streams, queues, webhooks, and publish-subscribe interfaces add another decision: communication can become asynchronous.
-That can reduce temporal coupling while making delivery guarantees, ordering, replay, idempotency, and schema evolution explicit parts of the contract.
-
-#### API contract lens
-
-The lab below holds one user intent constant: start work on item 42 and obtain its current state, title, workspace, and available next actions.
-Switch the interaction style to see what crosses the wire, what the consumer must know in advance, and where a request for one more related field creates pressure.
-
-{{ import "site/includes/api-contract-lens.html" }}
-
-No style wins every row.
-A stable public resource model, a workflow discovered through hypermedia, a frontend assembling related data, and an internal service command provide different reasons to accept different forms of coupling.
-Begin with consumers, change patterns, network conditions, tooling, and ownership rather than a preferred acronym.
-
-For the project, design a minimal event-creation operation and event-query operation in one style.
-Then identify what changes when consumers retry, devices go offline, a new workflow state appears, many tenants share the system, or the interface needs an additional related field.
-
-Representative requests and expected responses can make an HTTP contract executable without depending on an implementation framework.
-[Appendix C](/appendices/advanced-web-boundaries/#executable-http-contracts) contains a complete Hurl example and explains the evidence such a contract test does and does not provide.
+For the project, choose one minimal event-creation and event-query contract, then ask how it changes when requests are retried, devices go offline, workflow states evolve, or consumers need additional data.
+[Appendix C](/appendices/advanced-web-boundaries/#choose-an-application-interaction-style) compares the interaction styles and contains the API contract lens and executable HTTP example.
 
 ## Cloud made infrastructure programmable
 
@@ -223,37 +190,9 @@ That platform-specific contract should be documented as part of the architecture
 ### Activation is a separate architectural decision
 
 Rendering and navigation do not explain how delivered HTML becomes interactive.
-A server-rendered page may contain useful content while the browser still has to recover or load the behavior behind its controls.
-That activation work affects payload size, client processing, first-interaction latency, and application structure.
-
-| Approach              | Activation unit                         | Main benefit                                           | Main constraint                                                  |
-| --------------------- | --------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
-| Hydration             | The rendered component tree             | Familiar, general application model                    | Re-executes client code to recover state and listeners           |
-| Progressive hydration | Ordered portions of the same tree       | Prioritizes important interaction                      | The application is still eventually hydrated                     |
-| Islands architecture  | Explicit interactive regions            | Static HTML elsewhere; work can be deferred or avoided | Shared state, navigation, and communication across islands       |
-| Resumability          | Serialized state and handler boundaries | Continues without replaying the application            | Serializable state and framework compiler or runtime constraints |
-
-::caption[Client activation approaches and their principal trade-offs.]
-::label[table:client-activation-approaches]
-
-Islands partition a page into static and interactive regions and attach a loading strategy to each interactive region.
-Resumability changes how execution crosses the server-client boundary: component boundaries, application state, and listener references are serialized into the delivered HTML so the browser can continue without replaying the application :citep[vepsalainen2024resumability].
-A resumable framework can therefore create fine-grained islands automatically.
-
-The strongest fit for explicit islands is an application with meaningful static regions and a smaller amount of separable interactivity.
-Research on edge-powered islands found that work could be deferred or avoided, but also concluded that the benefit becomes harder to obtain as an application grows more dynamic and difficult to divide into independent portions :citep[vepsalainen2025islands].
-Inter-island state, navigation, and communication then become architectural costs rather than incidental implementation details.
-
-#### Client activation lens
-
-The lab below holds the server-rendered event page constant and changes only how its behavior becomes available in the browser.
-Compare what happens before the first interaction, then run the same record-event action.
-The transfer values are illustrative teaching values, not framework benchmarks; a real comparison should record production bundles, client execution, and interaction latency on representative devices.
-
-{{ import "site/includes/client-activation-lens.html" }}
-
-Ask which code and state must cross the boundary, which work happens before the user requests it, which latency moves to the first interaction, and what new constraints the chosen technique introduces.
-For each interactive region in the project, record its activation strategy, state owner, and communication path.
+Hydration, progressive hydration, islands, and resumability move different amounts of code, state, and startup work across the server-browser boundary.
+Record which regions need behavior, when that behavior becomes available, and which state or communication constraints the approach introduces.
+[Appendix C](/appendices/advanced-web-boundaries/#activate-delivered-interfaces) compares the activation approaches and provides a focused lab.
 
 ### Runtime generation adds a control boundary
 
@@ -305,27 +244,11 @@ When a mutation can commit before its response is lost, use a stable application
 
 ### Transactions preserve invariants across failure and concurrency
 
-A database transaction groups operations into one unit with four commonly named properties: atomicity, consistency, isolation, and durability, or ACID :citep[haerder1983recovery].
-**Atomicity** means the operations commit together or not at all.
-**Consistency** means a committed transaction leaves the data within its declared invariants; the database cannot invent those application rules, so they still have to be expressed through constraints, guarded writes, or validated domain logic.
-**Isolation** describes how concurrent transactions are allowed to observe and affect one another.
-The exact guarantee depends on the selected isolation level rather than on the mere presence of a transaction.
-**Durability** means a successful commit survives the failures covered by the storage system's contract.
+A transaction groups operations that must commit together and defines how concurrent work may interact.
+For the event tracker, a successful lifecycle transition must update current state and append its activity event without allowing either write to escape alone.
+The deployed database's constraints, isolation level, acknowledgment point, and failure model determine the actual guarantee.
 
-The work-item lifecycle contains a useful transaction boundary.
-A successful transition changes the current state and records the corresponding activity event.
-If either write escapes alone, the activity feed and the work item disagree.
-The same invariant is threatened when two requests make a decision from the same old state or when the application returns success before persistence is durable.
-
-#### ACID transaction lab
-
-Choose one disturbance, predict where the invariant could leak, and run it first with application-managed writes.
-Then introduce a database transaction and, for concurrent requests, compare read committed with serializable execution.
-
-{{ import "site/includes/acid-transaction-lab.html" }}
-
-The simulation does not imply that every database implements an isolation level or durable commit in the same way.
-For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+[Appendix C](/appendices/advanced-web-boundaries/#preserve-durable-invariants-with-transactions) develops ACID, concurrent transitions, and the transaction lab.
 
 ### Model valid data combinations
 
