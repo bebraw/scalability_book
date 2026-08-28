@@ -1,3 +1,11 @@
+## Implemented introduction spine
+
+1. Define scalability as maintained valued behavior under pressure.
+2. Treat the web application and its development system as connected objects of analysis.
+3. State the agentic-web thesis before author context: coding agents raise implementation capacity and shift human attention toward intent, constraints, validation, integration, and ownership.
+4. Explain the three fresh implementations as a bounded comparison rather than a universal model ranking.
+5. Map each chapter to the evidence or decision it contributes to the final synthesis.
+
 ## Project artifacts
 
 Each chapter should help you produce or revise one concrete project artifact.
