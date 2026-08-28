@@ -12,6 +12,11 @@ The public website is generated from those chapters and deployed at [scalableweb
 
 Development, preview, feedback, and deployment notes are in [docs/development.md](docs/development.md).
 
+## PDF edition
+
+Run `npm run pdf` to build the site and create an iPad-friendly reading edition at `output/pdf/elements-of-scalable-web-development.pdf`.
+The PDF includes the main chapters, appendices, case studies, and course project guide; interactive labs link back to the web edition.
+
 ## Feedback comments
 
 The deployed site supports paragraph-level feedback.

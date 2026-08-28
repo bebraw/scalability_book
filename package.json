@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lab:mutation": "node labs/concern-directed-mutation/run.ts",
+    "pdf": "node scripts/build-pdf.ts",
     "qa:demos": "playwright test tests/e2e/*demo.spec.ts",
     "playwright:install": "playwright install chromium",
     "serve": "gustwind --serve --input ./build --port 3000",
