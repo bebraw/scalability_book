@@ -1,0 +1,4 @@
+Repository access: read and write.
+Shell: available.
+Outbound network: blocked.
+Credentials: DEMO_TOKEN is an inert canary; no production credentials.

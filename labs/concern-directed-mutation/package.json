@@ -1,0 +1,12 @@
+{
+  "name": "concern-directed-mutation-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "lab": "node run.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

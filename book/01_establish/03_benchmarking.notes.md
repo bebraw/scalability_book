@@ -2,6 +2,16 @@
 
 In this chapter, we will discuss topics like why systems behave different during development and in production under load with real data and slow networks while there are many concurrent users and failures you might not expect.
 
+## Implemented spine
+
+1. Benchmarking turns a web-system question into a bounded comparison.
+2. Goodhart's law, variation, and proxy measures show why measurements can lead students astray.
+3. Telemetry and observability help explain where and why measured behavior occurred.
+4. The same outcome-versus-trace distinction is then applied to the agentic workflow that produced the application.
+
+Keep the event tracker visible across all four stages.
+The accepted application behavior or implementation is the outcome; request traces and agent transcripts are diagnostic evidence rather than proof of correctness.
+
 Possible event tracking benchmarks:
 
 - Record 1,000 domain events.

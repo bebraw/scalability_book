@@ -1,5 +1,12 @@
 // @ts-nocheck
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -10,6 +17,7 @@ import {
 import { renderHtmlisp } from "./lib/htmlisp.ts";
 import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
+import { writeDirectoryZip } from "./lib/zip.ts";
 import {
   chapterNumberFromFilename,
   escapeAttribute,
@@ -611,6 +619,7 @@ if (includeEditor) {
   await compileSiteScript("scripts/dev-reload.ts", "dev-reload.js");
 }
 await copyStaticAssets();
+await writeLabDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 if (includeEditor) {
   await copyEditorAssets();
@@ -1025,6 +1034,23 @@ async function copyStaticAssets() {
   await copyFile(
     path.join(siteDir, "assets", "blank-map-world.svg"),
     path.join(assetsDir, "blank-map-world.svg"),
+  );
+}
+
+async function writeLabDownloads() {
+  const labsDirectory = path.join(root, "labs");
+  const downloadsDirectory = path.join(buildDir, "downloads", "labs");
+  const labs = (await readdir(labsDirectory, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  await Promise.all(
+    labs.map((lab) =>
+      writeDirectoryZip(
+        path.join(labsDirectory, lab.name),
+        path.join(downloadsDirectory, `${lab.name}.zip`),
+      ),
+    ),
   );
 }
 

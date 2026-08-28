@@ -86,7 +86,7 @@ Record the source and resolved revision; inspect instructions, bundled files, in
 Perform any dynamic verification only in a disposable sandbox approved for security testing, with the least authority needed and no production credentials.
 Connect output produced with the capability to independent project checks, and define who reviews updates and how the capability can be removed.
 
-The [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a non-executing fixture for practicing this review without loading an untrusted capability into an agent context.
+The skill-adoption lab provides a non-executing fixture for practicing this review without loading an untrusted capability into an agent context; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
 
 > **Case study: when exploration scales**
 >

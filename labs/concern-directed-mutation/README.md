@@ -11,14 +11,16 @@ The starting requirements are:
 
 ## Establish the starting point
 
-From the repository root, run the baseline and all three mutants:
+From this lab directory, run the baseline and all three mutants:
 
 ```sh
-npm run lab:mutation -- baseline
-npm run lab:mutation -- authorization-bypass
-npm run lab:mutation -- retry-duplication
-npm run lab:mutation -- archive-write
+npm run lab -- baseline
+npm run lab -- authorization-bypass
+npm run lab -- retry-duplication
+npm run lab -- archive-write
 ```
+
+When working from the book repository root, replace `lab` with `lab:mutation` in these commands.
 
 All four commands initially pass.
 A passing mutant has **survived**: the current tests do not distinguish that fault from the baseline.

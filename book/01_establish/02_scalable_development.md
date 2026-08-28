@@ -242,7 +242,7 @@ The [Webernetes case study](/case-studies/webernetes/) develops the first patter
 
 A reversible mutation can strengthen this relationship by checking that a test distinguishes the accepted implementation from one named fault.
 That contrast does not prove the mutant is realistic or the broader requirement is satisfied, but it is stronger than coverage alone.
-The [concern-directed mutation lab](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) lets you apply the pattern to authorization, retry, or archived-state behavior.
+The concern-directed mutation lab lets you apply the pattern to authorization, retry, or archived-state behavior; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) or [download the standalone lab](/downloads/labs/concern-directed-mutation.zip).
 
 **Revision**
 
@@ -334,7 +334,7 @@ This keeps the harness evolvable without making every downstream project carry e
 The broader lesson is to reuse a bounded practice with provenance rather than freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
 
 Imported capabilities also introduce a trust boundary because their instructions or bundled code may influence tools operating with the agent's authority.
-The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security and ownership implications, while the [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a bounded review exercise.
+The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security and ownership implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
 
 ## Maintained work needs an owner
 

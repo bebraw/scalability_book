@@ -1,13 +1,19 @@
 # How can we measure web applications and development workflows?
 
-If you want to understand your application and its characteristics in detail, you will have to both measure and observe it.
-While it was important before the agentic era of web development, it has become even more important now that we might be running code in production we do not fully understand or did not have time to verify.
-It can be argued that this was always the case as it is not uncommon that any software of sufficient complexity has issues we are not aware of and for this reason we should measure and observe regardless of how our software was developed.
+You cannot evaluate a property of a web application without evidence about it.
+A page that feels fast on one developer's machine does not establish how it behaves for other devices, workloads, data volumes, or network conditions.
+Benchmarking turns a question about that behavior into a controlled comparison.
 
-Before you can design for large scale, it is good to understand how to measure and observe since ideally you can test certain characteristics of your application before pushing towards production.
-Measuring requires conscious design, and it is worth considering what and how to measure.
+Measurement is necessary, but it is not self-explanatory.
+A metric can represent the wrong outcome, conceal variation, or become misleading when people and agents optimize for it.
+Even a trustworthy result can show that behavior changed without explaining why.
+This chapter therefore moves from benchmarking, through the limits of measurement, to observability and finally to evidence about the agentic workflow that produced the application.
 
-## How to get started with measurements?
+## Benchmark to test a claim
+
+A **measurement** assigns evidence to an observed property.
+A **benchmark** uses declared conditions to compare that property across workloads, systems, or revisions.
+Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed latency objective as concurrent demand increases.
 
 To give you a simple example, consider tools like [artillery](https://www.npmjs.com/package/artillery) or [k6](https://k6.io/).
 These tools encapsulate best practices around load testing in various ways while giving statistically valid results.
@@ -40,7 +46,117 @@ It is possible that real usage will exercise portions of your system you did not
 Under these conditions, you may hit third-party limitations you might not expect or there might be something in your infrastructure that breaks under specific kind of loads.
 It is for this reason learning chaos engineering can be useful since it tests exactly what happens when a piece of infrastructure breaks since that is exactly what can happen in practice at the worst possible moment.
 
-## When a measure becomes a target
+### Benchmark browser journeys with Playwright and Lighthouse
+
+Server latency does not describe the whole user experience.
+A browser still has to download resources, parse and execute JavaScript, calculate styles, lay out the page, paint it, and respond to input.
+Three related tools expose different parts of that work:
+
+- The browser's [Performance APIs](https://developer.mozilla.org/en-US/docs/Web/API/Performance_API) can measure marks, durations, resources, and selected rendering events in the page itself.
+- [Playwright](https://playwright.dev/) drives a real browser through a repeatable user journey and checks whether the expected behavior occurred.
+- [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/) audits a page in a controlled lab setup and reports performance metrics and diagnostics.
+
+These tools are complementary rather than interchangeable.
+A Playwright test can prove that filtering the event list produces the expected rows, but its elapsed test time is not a Web Vital.
+A Lighthouse navigation can diagnose initial page load, but it does not prove that the application's business flow works.
+Lighthouse user flows can audit interactions, although they require browser automation outside the page; a normal web page cannot grant itself the required browser-control privileges.
+
+#### Browser performance workbench
+
+The workbench below runs completely in the current page.
+It builds and filters an event list either as one uninterrupted task or in batches that yield to the browser.
+It measures from the start of the work until the next painted frame, repeats the same flow five times, and reports both total time and the longest JavaScript slice observed by its own instrumentation.
+
+{{ import "site/includes/browser-performance-workbench.html" }}
+
+Before each measurement, predict which strategy will finish sooner and which will leave the main thread available sooner.
+Run both strategies with the same number of events.
+Then increase the workload and check whether the conclusion remains the same.
+
+This is a real measurement, but it is deliberately narrow.
+The timer includes work performed by this demo on this browser and device; it is not a Lighthouse score, INP measurement, or claim about other users.
+The chunked strategy may take longer overall because it waits between batches while still improving responsiveness by avoiding one long uninterrupted task.
+This distinction between throughput and responsiveness is often more useful than asking which version is simply "faster."
+
+For client-side collection in a real application, the small [web-vitals](https://github.com/GoogleChrome/web-vitals) library implements LCP, INP, CLS, FCP, and TTFB using browser APIs and follows the same measurement rules used by Google's web-performance tools.
+Those measurements describe actual page visits.
+Lighthouse instead provides synthetic lab evidence under declared conditions.
+
+#### From page metrics to product metrics
+
+Standard browser metrics deliberately use definitions that work across many kinds of pages.
+That makes them comparable, but the element selected for a metric such as LCP is not necessarily the part of the interface that a user came to see.
+An event tracker might care when its event list becomes visible; another application might care about a search-results region, product summary, or account overview.
+The measurement boundary should follow the question rather than whichever element happens to be largest.
+
+[Element Timing](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceElementTiming) can report when one annotated image or text element rendered.
+The experimental [Container Timing API](https://csswizardry.com/2026/07/meaasuring-component-performance-with-the-container-timing-api/) extends that idea to an author-defined DOM region and reports a sequence as new contentful areas inside it are painted.
+That sequence can reveal whether a component appeared together or accumulated through several delayed stages, moving the measurement boundary from a browser-selected element toward a user-recognizable product component.
+
+Container Timing does not declare that a component is complete, interactive, accurate, or ready to use.
+Those are product claims that may require application instrumentation or interaction measurements in addition to paint evidence.
+Because the API is experimental, its immediate value here is the design principle rather than the exact interface: choose a meaningful region, give the signal a stable name, state how an entry is selected from the sequence, sample collection deliberately, and record which browsers and users the dataset represents.
+
+For the course project, choose one user-recognizable region and define what useful evidence would mean for it.
+Then decide whether a page-level Web Vital, one Element Timing entry, a sequence of container paints, or an application milestone best supports that claim, and explain what the chosen signal cannot prove.
+
+#### Run a page audit on your own machine
+
+Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
+It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
+
+1. Choose one representative public route and state why it matters to a user.
+2. Select the mobile profile and run the same URL five times without changing the application.
+3. Record LCP, TBT, CLS, transferred bytes, and the overall performance score for every run.
+4. Report the median and the fastest-to-slowest range for each time-based metric.
+5. Select one Lighthouse diagnostic, make one change, deploy it, and repeat the five runs under the same conditions.
+6. State the narrow conclusion supported by the comparison and at least one factor it does not control.
+
+The PageSpeed Insights result can include Lighthouse lab data and, for sufficiently popular public pages, field data derived from real Chrome visits.
+Keep those sources separate: lab and field measurements use different populations and conditions.
+
+If the application is not public, open it in Chrome, select **Developer Tools → Lighthouse**, choose the mobile profile, and generate a report locally.
+Close unrelated applications where practical, do not run audits concurrently, and keep the browser version, profile, URL, application version, and machine consistent.
+
+Performance values vary even when the application has not changed because the browser, client hardware, resource contention, network, and server introduce noise.
+:citet[hericko2021representative] found that five consecutive Lighthouse runs aggregated with the median greatly reduced variability in their experiment.
+
+#### Study a repeatable Playwright journey
+
+PageSpeed Insights is convenient for navigation audits, but it cannot exercise a private or multi-step project flow.
+The standalone Playwright lab separates a small event-filter fixture from the browser journey that exercises it, so you can inspect locators, interaction, assertions, and trace collection without first adapting the example to a framework.
+[Study the source](https://github.com/bebraw/scalability_book/tree/main/labs/playwright-journey) or [download the standalone lab](/downloads/labs/playwright-journey.zip).
+
+The example establishes that filtering produces the expected visible row.
+It does not measure application loading, network behavior, or Web Vitals because it opens a local fixture.
+After it passes, replace the fixture URL with the project's real route and adapt the accessible names while preserving the same user-visible contract.
+Inspect the trace to verify what was acted on and rendered, then use Lighthouse or another suitable performance tool separately; the flow can be correct but slow, or appear fast because it failed to perform the intended work.
+
+Teams that need a repeatable CI gate can use the official `lighthouse` Node module or [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to collect several runs and assert a budget.
+Start with reporting rather than a strict pass/fail threshold, learn the normal variation of the runner, and only then set a budget with enough tolerance to detect a meaningful regression.
+
+### Check measurements against a model
+
+Measurements become more useful when they can be checked against a model.
+Little's Law states that, for a stable system over a suitable observation period, average work in progress (`L`) equals the average arrival rate (`λ`) multiplied by average time in the system (`W`) :citep[little1961proof]:
+
+`L = λW`
+
+For an event pipeline, `L` can be the average number of events waiting or being processed, `λ` the average arrival rate, and `W` the average time from arrival to completion.
+If 20 events arrive per second and each spends half a second in the system, the expected average work in progress is 10 events.
+
+#### Queue balance lab
+
+Use the lab below to check whether three observed averages are mutually consistent.
+Change one value at a time and explain whether the mismatch suggests overload, incompatible measurement windows, or a missing boundary.
+
+{{ import "site/includes/little-law-demo.html" }}
+
+The law does not identify the cause of latency, prove that a queue is healthy, or promise that the system can sustain any chosen arrival rate.
+Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
+A large mismatch is a reason to inspect the measurement setup or system stability, not permission to force the numbers to fit.
+
+## Measurements can lead you astray
 
 [Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law) states: "Any observed statistical regularity will tend to collapse once pressure is placed upon it for control purposes" :citep[goodhart1975monetary].
 In plain language, the relationship that made a metric informative can break down when that metric is used as a target.
@@ -82,27 +198,28 @@ The scenarios use deterministic illustrative values to make the feedback loop vi
 Try at least two targets.
 Notice that monitoring the proxy is still useful after the repair, but it no longer decides success alone.
 
-## Evaluating agentic workflows
+### Resource proxies are not the outcome
 
-The development workflow is also a system that can be measured.
-For a bounded task, record whether the resulting artifact passed its acceptance checks, how long the work took, what it cost, how many retries occurred, and how much human review or correction it required.
-Generated lines of code, transcript length, and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
-Organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
+Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
 
-Keep the **task**, one attempted **trial**, its actual **outcome**, and the **trace** that led there distinct.
-Grade the outcome when several valid paths can solve the task; use the trace to diagnose failures, account for intervention and cost, and check process requirements such as permission compliance.
-A plausible transcript does not prove that the claimed change occurred, while one repository test is usually only one check on the result.
+:citet[barrocas2026ecoassist] provide one bounded example of a before-and-after energy study.
+On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 deliberately resource-heavy standalone webpages.
+The pages were selected for a size above 600 KB and at least ten DOM-affecting operations, so the sample does not represent arbitrary production applications.
+The benchmark compared each optimized page with its own unoptimized baseline, not with another optimizer.
 
-Bind each result to the configuration that produced it: the model and runtime where exposed, the agent harness and tools, the starting revision, relevant resource limits, and any routing or fallback.
-Then preserve the same reporting categories across implementations A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
-Treat the comparison as evidence about those tasks and conditions rather than a universal model or workflow ranking.
+In a separate single-condition lab study, twenty early-career developers generated and optimized portfolio pages and reported low workload.
+The study did not compare productivity against a control, and five participants observed removed content or layout changes after optimization.
+The reported before-and-after page measurements do not include the optimizing model's full training and inference footprint; the paper estimates that overhead separately, and neither result is a whole-system carbon estimate.
+Treat the optimization as a candidate change that must preserve the intended product behavior, not as evidence that a lower energy number is automatically better.
 
-For the Establish project, choose one representative AI-assisted task and preserve its task brief, relevant context, configuration, outcome, checks, trace, corrections, and acceptance decision.
-The later implementations can reuse the reporting frame without pretending that one task is a statistically stable benchmark.
+Reuse one representative Playwright journey and the repeated-measurement discipline above.
+Preserve the baseline, make one targeted AI-assisted frontend optimization, and run the same journey under the same declared conditions.
+Repeat it at least five times before and after when the chosen signal varies from run to run.
+Record direct energy if the platform exposes a defensible measure; otherwise label transferred bytes, JavaScript or asset size, CPU time, or long-task time as **resource proxies**, not energy or carbon.
+For deterministic measures such as built asset size, record one before-and-after value; for run-varying measures, report the median and range.
+Re-run the functional checks, inspect for visual or accessibility regressions, note any rejected suggestion or regression, and state what the comparison cannot establish.
 
-For the complete evaluation vocabulary, grader design, configuration qualification, repeated-trial methods, uncertainty, and routing experiments, continue with [Appendix A: Evaluating agentic development workflows](/appendices/evaluating-agentic-workflows/).
-
-## Observability and telemetry
+## Measurement alone cannot explain behavior
 
 A benchmark can reveal that the request distribution changed, but it does not necessarily explain why one request was slow.
 Telemetry provides evidence about a running system through signals such as traces, metrics, and logs.
@@ -127,182 +244,50 @@ That is a stronger lead than the end-to-end latency alone, but it still does not
 The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
 
-## Measuring browser journeys with Playwright and Lighthouse
+## Observe the agentic workflow too
 
-Server latency does not describe the whole user experience.
-A browser still has to download resources, parse and execute JavaScript, calculate styles, lay out the page, paint it, and respond to input.
-Three related tools expose different parts of that work:
+Agentic development introduces a second system to observe: the development workflow that produces and changes the web application.
+The parallel is useful as long as outcome evidence remains separate from diagnostic traces.
+An HTTP trace can explain how a request traveled through the application but does not prove that the user received the correct result; an agent transcript can explain how a change was produced but does not prove that the accepted implementation is correct.
 
-- The browser's [Performance APIs](https://developer.mozilla.org/en-US/docs/Web/API/Performance_API) can measure marks, durations, resources, and selected rendering events in the page itself.
-- [Playwright](https://playwright.dev/) drives a real browser through a repeatable user journey and checks whether the expected behavior occurred.
-- [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/) audits a page in a controlled lab setup and reports performance metrics and diagnostics.
+| Evidence role         | Web application                                         | Agentic development workflow                         |
+| --------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| Outcome to protect    | Useful user and operational behavior                    | Accepted implementation and maintained project goal  |
+| Controlled comparison | Benchmark run under a declared workload                 | Bounded task or evaluation trial                     |
+| Diagnostic evidence   | Logs, metrics, request traces, and profiles             | Prompts, tool calls, diffs, checks, and retries      |
+| Configuration         | Revision, deployment, dependencies, and resource limits | Model, harness, tools, starting revision, and limits |
+| Intervention          | Operator diagnosis, mitigation, and recovery            | Human review, correction, approval, and escalation   |
 
-These tools are complementary rather than interchangeable.
-A Playwright test can prove that filtering the event list produces the expected rows, but its elapsed test time is not a Web Vital.
-A Lighthouse navigation can diagnose initial page load, but it does not prove that the application's business flow works.
-Lighthouse user flows can audit interactions, although they require browser automation outside the page; a normal web page cannot grant itself the required browser-control privileges.
+::caption[Parallel evidence roles in a running web application and its agentic development workflow.]
+::label[table:application-agent-workflow-evidence]
 
-### Browser performance workbench
+For a bounded task, record whether the resulting artifact passed its acceptance checks, how long the work took, what it cost, how many retries occurred, and how much human review or correction it required.
+Generated lines of code, transcript length, and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
+Organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
 
-The workbench below runs completely in the current page.
-It builds and filters an event list either as one uninterrupted task or in batches that yield to the browser.
-It measures from the start of the work until the next painted frame, repeats the same flow five times, and reports both total time and the longest JavaScript slice observed by its own instrumentation.
+Keep the **task**, one attempted **trial**, its actual **outcome**, and the **trace** that led there distinct.
+Grade the outcome when several valid paths can solve the task; use the trace to diagnose failures, account for intervention and cost, and check process requirements such as permission compliance.
+A plausible transcript does not prove that the claimed change occurred, while one repository test is usually only one check on the result.
 
-{{ import "site/includes/browser-performance-workbench.html" }}
+Bind each result to the configuration that produced it: the model and runtime where exposed, the agent harness and tools, the starting revision, relevant resource limits, and any routing or fallback.
+Then preserve the same reporting categories across implementations A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
+Treat the comparison as evidence about those tasks and conditions rather than a universal model or workflow ranking.
 
-Before each measurement, predict which strategy will finish sooner and which will leave the main thread available sooner.
-Run both strategies with the same number of events.
-Then increase the workload and check whether the conclusion remains the same.
+For the Establish project, choose one representative AI-assisted task and preserve its task brief, relevant context, configuration, outcome, checks, trace, corrections, and acceptance decision.
+The later implementations can reuse the reporting frame without pretending that one task is a statistically stable benchmark.
 
-This is a real measurement, but it is deliberately narrow.
-The timer includes work performed by this demo on this browser and device; it is not a Lighthouse score, INP measurement, or claim about other users.
-The chunked strategy may take longer overall because it waits between batches while still improving responsiveness by avoiding one long uninterrupted task.
-This distinction between throughput and responsiveness is often more useful than asking which version is simply "faster."
-
-For client-side collection in a real application, the small [web-vitals](https://github.com/GoogleChrome/web-vitals) library implements LCP, INP, CLS, FCP, and TTFB using browser APIs and follows the same measurement rules used by Google's web-performance tools.
-Those measurements describe actual page visits.
-Lighthouse instead provides synthetic lab evidence under declared conditions.
-
-### From page metrics to product metrics
-
-Standard browser metrics deliberately use definitions that work across many kinds of pages.
-That makes them comparable, but the element selected for a metric such as LCP is not necessarily the part of the interface that a user came to see.
-An event tracker might care when its event list becomes visible; another application might care about a search-results region, product summary, or account overview.
-The measurement boundary should follow the question rather than whichever element happens to be largest.
-
-[Element Timing](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceElementTiming) can report when one annotated image or text element rendered.
-The experimental [Container Timing API](https://csswizardry.com/2026/07/meaasuring-component-performance-with-the-container-timing-api/) extends that idea to an author-defined DOM region and reports a sequence as new contentful areas inside it are painted.
-That sequence can reveal whether a component appeared together or accumulated through several delayed stages, moving the measurement boundary from a browser-selected element toward a user-recognizable product component.
-
-Container Timing does not declare that a component is complete, interactive, accurate, or ready to use.
-Those are product claims that may require application instrumentation or interaction measurements in addition to paint evidence.
-Because the API is experimental, its immediate value here is the design principle rather than the exact interface: choose a meaningful region, give the signal a stable name, state how an entry is selected from the sequence, sample collection deliberately, and record which browsers and users the dataset represents.
-
-For the course project, choose one user-recognizable region and define what useful evidence would mean for it.
-Then decide whether a page-level Web Vital, one Element Timing entry, a sequence of container paints, or an application milestone best supports that claim, and explain what the chosen signal cannot prove.
-
-### Run a page audit on your own machine
-
-Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
-It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
-
-1. Choose one representative public route and state why it matters to a user.
-2. Select the mobile profile and run the same URL five times without changing the application.
-3. Record LCP, TBT, CLS, transferred bytes, and the overall performance score for every run.
-4. Report the median and the fastest-to-slowest range for each time-based metric.
-5. Select one Lighthouse diagnostic, make one change, deploy it, and repeat the five runs under the same conditions.
-6. State the narrow conclusion supported by the comparison and at least one factor it does not control.
-
-The PageSpeed Insights result can include Lighthouse lab data and, for sufficiently popular public pages, field data derived from real Chrome visits.
-Keep those sources separate: lab and field measurements use different populations and conditions.
-
-If the application is not public, open it in Chrome, select **Developer Tools → Lighthouse**, choose the mobile profile, and generate a report locally.
-Close unrelated applications where practical, do not run audits concurrently, and keep the browser version, profile, URL, application version, and machine consistent.
-
-Performance values vary even when the application has not changed because the browser, client hardware, resource contention, network, and server introduce noise.
-:citet[hericko2021representative] found that five consecutive Lighthouse runs aggregated with the median greatly reduced variability in their experiment.
-
-### Add a repeatable Playwright journey
-
-PageSpeed Insights is convenient for navigation audits, but it cannot exercise a private or multi-step project flow.
-Start with the standalone test below so the first Playwright exercise does not depend on a framework, development server, or route that may not exist.
-Save it as `performance-flow.spec.ts` in a project created with `npm init playwright@latest`:
-
-```ts
-import { expect, test } from "@playwright/test";
-
-test("filters recorded events", async ({ page }) => {
-  await page.setContent(`
-    <label>
-      Filter events
-      <input type="search" data-filter />
-    </label>
-    <ul aria-label="Events">
-      <li>event.created</li>
-      <li>storage.retry</li>
-      <li>event.observed</li>
-    </ul>
-    <script>
-      const filter = document.querySelector("[data-filter]");
-      const events = [...document.querySelectorAll("li")];
-
-      filter.addEventListener("input", () => {
-        const query = filter.value.toLowerCase();
-        for (const event of events) {
-          event.hidden = !event.textContent.toLowerCase().includes(query);
-        }
-      });
-    </script>
-  `);
-
-  await page.getByRole("searchbox", { name: "Filter events" }).fill("retry");
-  await expect(page.locator("li:visible")).toHaveText(["storage.retry"]);
-});
-```
-
-Run the journey visibly:
-
-```sh
-npx playwright test performance-flow.spec.ts --headed --trace on
-```
-
-Because `page.setContent()` creates the fixture inside the browser, this test works without `localhost` or network access.
-It teaches locators, interaction, assertions, and trace inspection, but it does not measure application loading or network behavior.
-After the standalone version passes, replace `page.setContent()` with the project's real route and adapt the accessible names while preserving the same user-visible contract.
-
-Inspect the Playwright trace to verify what was clicked, requested, and rendered.
-Use Lighthouse or PageSpeed Insights separately on a real local or deployed URL for performance metrics; the temporary page created by `page.setContent()` is not a Lighthouse audit target.
-Keeping the functional assertion and the performance evidence separate makes a failure easier to interpret: the flow can be correct but slow, or fast because it failed to do the intended work.
-
-Teams that need a repeatable CI gate can use the official `lighthouse` Node module or [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to collect several runs and assert a budget.
-Start with reporting rather than a strict pass/fail threshold, learn the normal variation of the runner, and only then set a budget with enough tolerance to detect a meaningful regression.
-
-### Test an energy-aware change
-
-Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
-
-:citet[barrocas2026ecoassist] provide one bounded example of a before-and-after energy study.
-On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 deliberately resource-heavy standalone webpages.
-The pages were selected for a size above 600 KB and at least ten DOM-affecting operations, so the sample does not represent arbitrary production applications.
-The benchmark compared each optimized page with its own unoptimized baseline, not with another optimizer.
-
-In a separate single-condition lab study, twenty early-career developers generated and optimized portfolio pages and reported low workload.
-The study did not compare productivity against a control, and five participants observed removed content or layout changes after optimization.
-The reported before-and-after page measurements do not include the optimizing model's full training and inference footprint; the paper estimates that overhead separately, and neither result is a whole-system carbon estimate.
-Treat the optimization as a candidate change that must preserve the intended product behavior, not as evidence that a lower energy number is automatically better.
-
-Reuse one representative Playwright journey and the repeated-measurement discipline above.
-Preserve the baseline, make one targeted AI-assisted frontend optimization, and run the same journey under the same declared conditions.
-Repeat it at least five times before and after when the chosen signal varies from run to run.
-Record direct energy if the platform exposes a defensible measure; otherwise label transferred bytes, JavaScript or asset size, CPU time, or long-task time as **resource proxies**, not energy or carbon.
-For deterministic measures such as built asset size, record one before-and-after value; for run-varying measures, report the median and range.
-Re-run the functional checks, inspect for visual or accessibility regressions, note any rejected suggestion or regression, and state what the comparison cannot establish.
-
-## From measurements to Little's Law
-
-Measurements become more useful when they can be checked against a model.
-Little's Law states that, for a stable system over a suitable observation period, average work in progress (`L`) equals the average arrival rate (`λ`) multiplied by average time in the system (`W`) :citep[little1961proof]:
-
-`L = λW`
-
-For an event pipeline, `L` can be the average number of events waiting or being processed, `λ` the average arrival rate, and `W` the average time from arrival to completion.
-If 20 events arrive per second and each spends half a second in the system, the expected average work in progress is 10 events.
-
-### Queue balance lab
-
-Use the lab below to check whether three observed averages are mutually consistent.
-Change one value at a time and explain whether the mismatch suggests overload, incompatible measurement windows, or a missing boundary.
-
-{{ import "site/includes/little-law-demo.html" }}
-
-The law does not identify the cause of latency, prove that a queue is healthy, or promise that the system can sustain any chosen arrival rate.
-Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
-A large mismatch is a reason to inspect the measurement setup or system stability, not permission to force the numbers to fit.
+For the complete evaluation vocabulary, grader design, configuration qualification, repeated-trial methods, uncertainty, and routing experiments, continue with [Appendix A: Evaluating agentic development workflows](/appendices/evaluating-agentic-workflows/).
 
 ## Summary
 
-Benchmarking is a disciplined comparison rather than the collection of isolated numbers.
-A useful benchmark begins with a decision or prediction, defines a representative workload and system boundary, controls relevant conditions, repeats measurements that vary, and preserves the baseline for comparison.
-Because a metric can distort behavior once it becomes a target, proxy measures should be paired with product outcomes and regression guardrails.
-Workflow evals, observability, browser journeys, and resource measurements apply the same basic discipline while answering different questions.
-Formal relationships such as Little's Law can check whether observations are mutually consistent, but they do not replace a clearly stated boundary or an explanation of what the evidence cannot establish.
+Benchmarking turns a question about web behavior into a disciplined comparison rather than a collection of isolated numbers.
+A useful benchmark begins with a decision or prediction, defines a representative workload and system boundary, controls relevant conditions, repeats measurements that vary, and preserves the baseline.
+Formal relationships such as Little's Law can check whether observations are mutually consistent, but they do not replace that declared boundary.
+
+The resulting numbers remain partial evidence.
+Goodhart's law explains why a proxy can lose its relationship to the intended outcome once it becomes a target, while distributions, counterevidence, and regression checks make that divergence easier to see.
+Telemetry and observability address a different limitation: they help investigate where and why measured behavior occurred, including conditions the benchmark did not anticipate.
+
+The same separation applies to agentic development.
+The accepted implementation is the outcome to evaluate; the agent trace, configuration, retries, and human interventions are evidence for explaining how that outcome arose.
+Neither an application trace nor an agent transcript proves correctness by itself.
