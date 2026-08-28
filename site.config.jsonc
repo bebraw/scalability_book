@@ -16,12 +16,12 @@
     "book/01_establish/01_what_is_scalability.md",
     "book/01_establish/02_scalable_development.md",
     "book/01_establish/03_benchmarking.md",
-    /*"book/02_challenge/04_architecture.md",
+    "book/02_challenge/04_architecture.md",
     "book/02_challenge/05_friction.md",
     "book/02_challenge/06_reality.md",
     "book/03_compare/07_agent_fleets.md",
     "book/03_compare/08_scaling.md",
-    "book/03_compare/09_recap.md"*/
+    "book/03_compare/09_recap.md",
   ],
 
   // Case studies support the chapters without interrupting their main argument.
