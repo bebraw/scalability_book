@@ -314,9 +314,18 @@ Third-party libraries, public starter templates, framework generators, and gener
 
 ---
 
-## 9. Comparable Evidence Package
+## 9. Common Submission Bundle and Comparable Evidence
 
-Submit the same evidence categories after every phase:
+After every phase, submit one common bundle containing:
+
+- that phase's implementation in its own repository or clean implementation directory;
+- the comparable evidence categories in sections 9.1–9.4;
+- the bounded cross-team audit report and a short response from the authors; and
+- the additions named by the phase specification.
+
+A listed requirement does not automatically require a separate file.
+One clearly structured artifact may satisfy several fields, and the phase specifications name only additions to this common bundle.
+Use the same evidence categories after every phase so later comparisons can refer to the earlier package rather than reconstruct it.
 
 ### 9.1 Development setup
 
@@ -350,9 +359,7 @@ Use the same resource-efficiency signal and procedure across phases where practi
 If direct energy measurement is unavailable, report an observable resource proxy and do not relabel it as energy or carbon.
 
 Every implementation must have a reproducible operational path.
-By the final submission, the group must also select one of implementations A, B, or C, deploy it in an instructor-approved realistic environment outside the author's development process, and rerun the shared workload there.
-A hosted service or containerized environment is suitable; a purely hypothetical deployment plan is not.
-Record the environment, configuration, result, and limits of the comparison with local measurements.
+The Compare phase adds one realistic deployment outside the author's development process; its specification defines that final requirement.
 
 ### 9.4 Engineering explanation
 

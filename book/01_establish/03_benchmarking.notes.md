@@ -194,7 +194,7 @@ A good plan names the symptom, the first signal to inspect, and what that signal
 
 ## What to measure in the project
 
-Use the [comparable evidence package in the common specification](/project/#9-comparable-evidence-package) as the stable reporting frame for all three implementations.
+Use the [common submission bundle and comparable evidence fields](/project/#9-common-submission-bundle-and-comparable-evidence) as the stable reporting frame for all three implementations.
 The measurements below help turn that frame into an operational protocol rather than a collection of isolated numbers.
 
 Prompts:

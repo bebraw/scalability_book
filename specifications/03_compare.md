@@ -168,13 +168,8 @@ Record the environment and configuration, operational steps, result, difference 
 
 ## 6. Deliverables
 
-Submit:
+Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation C plus:
 
-- implementation C in its own repository or implementation directory;
-- the complete common evidence package;
-- acceptance-scenario and automated-test results;
-- architecture and data-flow diagram;
-- scalability pressure map;
 - fleet plan or task graph;
 - a compact selected execution trace;
 - the documented transformed trace and a repeatable way to load it;
@@ -182,7 +177,6 @@ Submit:
 - fleet coordination measurements and analysis;
 - one application-level formal-model analysis and one workflow-level formal-model analysis;
 - deployed workload evidence from one selected implementation;
-- the cross-team audit report and a short response from the authors;
 - a final A–B–C comparison.
 
 The selected trace should show consequential delegation, validation, integration, failure, or human intervention.

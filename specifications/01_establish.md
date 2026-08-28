@@ -67,7 +67,7 @@ The template is a distribution artifact, not the finished architecture of the pr
 
 ### 3.2 Establish the evidence baseline
 
-Produce the common evidence package while the work is happening.
+Record the comparable evidence fields in the common submission bundle while the work is happening.
 Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
 
 ### 3.3 Record the stack hypothesis
@@ -89,17 +89,10 @@ Identify the likely first bottleneck, one operational signal, one plausible resp
 
 ## 4. Deliverables
 
-Submit:
+Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation A plus:
 
-- implementation A in its own repository or implementation directory;
-- the complete common evidence package;
-- acceptance-scenario and automated-test results;
-- architecture and data-flow diagram;
 - a capability ownership card for the main event workflow;
-- stack decision record;
-- scalability pressure map;
-- short local-model workflow reflection;
-- the cross-team audit report and a short response from the authors.
+- a short local-model workflow reflection.
 
 The workflow reflection should answer:
 

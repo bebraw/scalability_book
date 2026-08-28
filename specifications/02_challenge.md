@@ -98,17 +98,10 @@ Compare its pressure map with implementation A:
 
 ## 5. Deliverables
 
-Submit:
+Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation B plus:
 
-- implementation B in its own repository or implementation directory;
-- the complete common evidence package;
-- acceptance-scenario and automated-test results;
-- architecture and data-flow diagram;
 - an updated capability ownership card for the main event workflow;
-- updated stack decision record;
-- scalability pressure map;
-- a concise A–B comparison;
-- the cross-team audit report and a short response from the authors.
+- a concise A–B comparison.
 
 The A–B comparison should distinguish:
 
