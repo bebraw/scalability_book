@@ -86,13 +86,16 @@ The group has more domain knowledge during Challenge, and this practice effect i
 
 ### 4.4 Apply runtime pressure
 
-Apply the same shared scalability scenarios to implementation B.
-Compare its pressure map with implementation A:
+Repeat the primary pressure selected in Establish against implementation B using the same workload and procedure where practical.
+Then select one secondary pressure from the shared catalog that is exposed by an architectural difference or by evidence from A or B.
+Analyze how both implementations would respond to that secondary pressure; run it when practical and label projections clearly.
+
+Compare the cumulative pressure evidence for A and B:
 
 - Did the new implementation make different architectural assumptions?
 - Does it fail or slow down in a different place?
 - Did the foundation model introduce infrastructure or abstractions that the evidence does not justify?
-- Which implementation is easier to scale, and according to what evidence?
+- Which implementation responds better to the pressures studied, and according to what evidence?
 
 ---
 

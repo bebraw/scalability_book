@@ -257,12 +257,12 @@ If the stack requires unusual system dependencies or hardware, document them nea
 
 ---
 
-## 7. Scalability Analysis Shared by All Phases
+## 7. Progressive Scalability Analysis
 
 You do not have to build a production-scale distributed system.
 You must be able to reason about what your implementation would do under pressure.
 
-Apply these shared scenarios to every implementation:
+Use these scenarios as a shared pressure catalog:
 
 - many independent workspaces;
 - concurrent users changing different and identical work items;
@@ -273,7 +273,13 @@ Apply these shared scenarios to every implementation:
 - demand for recent activity and historical summaries;
 - a need to retain, aggregate, archive, or delete old events.
 
-For each implementation, identify:
+Do not exhaustively apply the entire catalog after every phase.
+In Establish, select one **primary pressure** that is likely to expose an important architectural limit and define a concrete scenario for it.
+Reuse that scenario and its procedure in Challenge and Compare so the three implementations remain comparable.
+Challenge adds one **secondary pressure** revealed by an architectural difference or observation.
+Compare uses the broader catalog to interpret important differences across A, B, and C, but only relevant pressures need in-depth analysis.
+
+For each pressure analyzed in depth, identify:
 
 - what is likely to fail or slow down first;
 - the resource, quota, dependency, or operational limit being approached;
@@ -282,7 +288,9 @@ For each implementation, identify:
 - at least one prepared recovery action available if the limit is reached;
 - the new cost or failure mode introduced by that response.
 
-The goal is justified reasoning, not adding distributed infrastructure without evidence.
+Use runtime evidence where the available workload and environment allow it.
+Label reasoned projections as projections rather than observations.
+The goal is a cumulative, justified analysis, not repeated hypothetical matrices or distributed infrastructure added without evidence.
 
 ---
 
@@ -365,7 +373,7 @@ The Compare phase adds one realistic deployment outside the author's development
 
 - architecture and data-flow diagram;
 - stack decision record;
-- scalability pressure map;
+- the phase's cumulative scalability-pressure record;
 - largest source of setup, comprehension, change, testing, review, and operational friction;
 - short reflection distinguishing observation from a possible explanation.
 

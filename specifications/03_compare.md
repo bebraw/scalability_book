@@ -139,7 +139,10 @@ Amdahl's Law, Little's Law, queueing, backpressure, or the Universal Scalability
 
 ### 5.5 Analyze the three applications
 
-Compare implementations A, B, and C using the same runtime pressure scenarios.
+Repeat the primary pressure against implementation C using the same workload and procedure where practical.
+Compare A, B, and C under that shared pressure.
+Then use the broader pressure catalog to select only the additional scenarios needed to explain consequential architectural differences.
+You do not need to apply every catalog scenario exhaustively to every implementation.
 
 The final analysis must address:
 
@@ -154,7 +157,7 @@ The final analysis must address:
 
 The final result should support a conditional engineering decision, not declare a universal winner.
 
-Apply at least one scalability law or formal model to an application-architecture decision.
+Apply at least one scalability law or formal model to an application-architecture decision raised by the primary or selected pressures.
 Name the variables and assumptions, show the calculation or reasoning, connect the result to runtime evidence or a stated pressure, and explain what the model does not capture.
 This application analysis is separate from the workflow model required in section 5.4.
 
@@ -193,7 +196,7 @@ The final comparison should answer:
 3. What evidence suggests that model capability contributed to the A–B differences?
 4. What evidence suggests that orchestration contributed to the B–C differences?
 5. What alternative explanations remain?
-6. Which application architecture responds best to the shared scalability pressures, and why?
+6. Which application architecture responds best to the primary and selected scalability pressures, and why?
 7. Under what project constraints would the group choose:
    - a local single agent;
    - a foundation-model single agent;

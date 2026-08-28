@@ -81,9 +81,12 @@ In the stack decision record, explain:
 
 ### 3.4 Analyze initial scalability
 
-Apply the shared scalability scenarios to implementation A.
+Choose one primary pressure from the shared catalog that is likely to expose an important limit in implementation A.
+Define a concrete workload, conditions, and procedure that can be repeated for implementations B and C.
+Run it where the available workload and environment allow; otherwise mark the result as a reasoned projection.
+
+Identify the likely first bottleneck, the resource or dependency approaching its limit, the first useful operational signal, one plausible response or recovery action, and the trade-off it introduces.
 You are not expected to add distributed infrastructure.
-Identify the likely first bottleneck, one operational signal, one plausible response, and its trade-off.
 
 ---
 
