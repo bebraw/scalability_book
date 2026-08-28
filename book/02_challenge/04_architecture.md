@@ -54,6 +54,23 @@ Each boundary has an owner, a failure mode, and a contract that future clients, 
 Use this trace before drawing the architecture diagram.
 If the request path is unclear, the diagram is likely to hide the most important architectural decisions.
 
+### Automated consumers change demand and exposure
+
+A crawler, integration, monitoring probe, authorized agent, and abusive bot can send technically similar HTTP requests while creating very different value, cost, and risk.
+Architecture should therefore distinguish which representations are intentionally public, which actions require identity and authorization, which expensive paths need a quota or admission boundary, and which automated uses the product is willing to support.
+
+The [Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.html) lets a cooperating crawler discover access preferences in `/robots.txt`.
+It is not authorization or a content-security boundary, and listing a path there makes the path discoverable.
+Information that must remain private still needs an application-layer access control; public information should be designed with the assumption that a permitted consumer can copy it.
+
+Rate limiting controls resource use rather than deciding whether every automated consumer is malicious.
+An HTTP `429 Too Many Requests` response can explain the limit and carry `Retry-After`, but [RFC 6585](https://www.rfc-editor.org/rfc/rfc6585.html#section-4) deliberately leaves the identity and counting policy to the application.
+Limits based only on an IP address can group unrelated users or be distributed across many addresses, while limits tied to an account, tenant, capability, or costly operation require their own fairness and privacy decisions.
+
+The [OWASP automated-threat catalog](https://owasp.org/www-project-automated-threats-to-web-applications/assets/oats/EN/OAT-011_Scraping) treats scraping as one form of automated use among several, and its practical implication here is to begin from the endpoint and intended outcome rather than from a generic “block bots” goal.
+For one exposed path, record the legitimate consumers, information returned, authoritative action or cost triggered, likely abuse pattern, first useful signal, control point, acceptable false-positive cost, and recovery or override path.
+Cache safe public reads, minimize exposed and retained data, protect expensive or consequential actions, and observe origin work per useful outcome before adding a challenge to every request.
+
 > **Sustainability angle**
 >
 > Placement determines resource flow.
@@ -98,6 +115,17 @@ Each style distributes knowledge and change pressure differently between consume
 
 For the project, choose one minimal event-creation and event-query contract, then ask how it changes when requests are retried, devices go offline, workflow states evolve, or consumers need additional data.
 [Appendix C](/appendices/advanced-web-boundaries/#choose-an-application-interaction-style) compares the interaction styles and contains the API contract lens and executable HTTP example.
+
+### Organizational boundaries shape application contracts
+
+An application contract is also a communication contract between its owners.
+In his original 1968 paper, [Melvin Conway](https://www.melconway.com/Home/pdf/committees.pdf) observed that organizations tend to produce system structures shaped by their communication structures.
+For web architecture, this means that a shared API or data model can become the place where several teams must coordinate, while a nominally independent service can remain tightly coupled when every change still requires the same people to agree.
+
+Do not create a service boundary merely to imitate an organizational chart.
+Instead, identify a capability with coherent authority and change reasons, give its owners enough control to evolve its internals, and keep the consumer contract small enough that other teams can depend on it without joining every implementation decision.
+When one workflow crosses several owners, record who may change the contract, how compatibility is checked, how consumers learn about deprecation or migration, and which decision requires cross-team agreement.
+The ownership card later in this chapter should therefore name both the code boundary and the communication boundary that maintains it.
 
 ## Cloud made infrastructure programmable
 
@@ -381,6 +409,8 @@ The hypothesis should use the conceptual model and dimensions table to state:
 - which consumer, representation, execution location, and authority the selected workflow uses,
 - which pressure justifies preserving or changing that placement,
 - what new contract, consistency rule, or operational obligation follows,
+- which automated consumers may reach the selected path and where cooperation, access control, quotas, or rate limits belong,
+- which team or organizational boundary owns the contract and which changes require coordination across it,
 - and what evidence would show whether the decision works.
 
 Students should also complete an ownership card for the event workflow and identify one structural signal that would cause them to review that ownership again.

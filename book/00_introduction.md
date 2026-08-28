@@ -49,6 +49,10 @@ The comparison is bounded rather than perfectly controlled.
 Students learn the domain between phases, implementations may make different design choices, and model or tool configurations can change.
 The shared specification, acceptance material, pressures, and reporting categories make those differences discussable without pretending that the course establishes a universal ranking.
 
+Each main chapter ends with a **Project artifact** section.
+These sections are staged checkpoints for building the current phase's evidence; they do not silently create separate submissions.
+The [common project specification](/project/) and current phase specification provide the authoritative deliverable checklist, and one clearly structured artifact may satisfy several chapter checkpoints.
+
 > **Protect learning, not only output**
 >
 > Immediate task performance is not the only outcome worth protecting.

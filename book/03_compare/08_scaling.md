@@ -225,6 +225,30 @@ Important trade-offs to make explicit:
 > Sustainability is also a trade-off.
 > Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
 
+## Implement the smallest justified response
+
+A target diagram shows that a group can reason about a possible architecture.
+It does not yet show that the response works in the selected application, preserves required behavior, or moves the expected limit.
+Complete one bounded implementation experiment before finalizing the target design.
+
+Select implementation A, B, or C and one pressure for which the group has runtime evidence or a credibly projected limit that the available environment can exercise.
+Preserve the accepted revision and its workload result, then implement the smallest response that addresses that limit.
+Suitable experiments include a measured query index, a bounded cache, an idempotency boundary, admission control, a queue with an explicit pending state, tenant isolation, or another technique justified by the evidence.
+Distributed infrastructure is not required.
+
+Keep the workload, fixture, correctness checks, and measurement procedure unchanged where the response is intended to affect them.
+After the change:
+
+1. rerun the common acceptance scenarios and inspect for behavior displaced by the response;
+2. rerun the selected pressure and report every repetition rather than only the best result;
+3. compare latency, throughput, errors, correctness, and the chosen resource-efficiency proxy before and after;
+4. exercise one failure or recovery obligation introduced by the response, such as stale data, a duplicate retry, a full queue, a rejected request, or an unavailable worker;
+5. state whether the result supported, challenged, or left the original hypothesis unresolved.
+
+An unsuccessful intervention remains useful evidence when the baseline, change, and failure are preserved.
+Do not replace a negative result silently with a more elaborate design.
+The target architecture can retain the response, revise it, or reject it, but it should distinguish this implemented evidence from its remaining proposals.
+
 ## Prepare to be surprised
 
 Design can expand the competence envelope, but finite systems always retain another boundary.
@@ -245,8 +269,9 @@ The goal is to balance work that prevents known failures with work that improves
 
 ## Project artifact
 
-Students should produce a three-way scaling comparison and one justified target design.
+Students should produce a three-way scaling comparison, one implemented and measured scaling response, and one justified target design.
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
+The implemented response should preserve its before-and-after revisions, unchanged workload and acceptance evidence, observed result, new failure or recovery obligation, and conclusion.
 For at least one pressure, connect the proposed response to a documented production account.
 Separate what the source directly reports from the student's interpretation and from the transfer proposed for the project; do not assume that the source's scale, result, or accepted trade-off carries over.
 It should include one formal model applied to an application decision and one applied to the development workflow.

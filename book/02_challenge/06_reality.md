@@ -97,6 +97,33 @@ This framing turns “Will it scale?” into four more useful questions:
 3. What failure or feedback loop begins at saturation?
 4. Which prepared recovery actions can return the system to a useful state?
 
+## Connect failed assumptions to response patterns
+
+Diagnosis comes before technique selection, but students still need a compact vocabulary for responding once a failed assumption and binding limit are visible.
+The patterns below are starting hypotheses rather than infrastructure that every implementation should acquire.
+
+| Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Writes and reads compete for one path                       | Separate the authoritative write path from derived read views        | Define freshness, rebuild, and reconciliation; measure write completion and read usefulness  |
+| A burst contains work that need not finish synchronously    | Queue or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
+| A request may be repeated after an ambiguous result         | Use a stable idempotency key and authoritative deduplication         | Store the mutation and reusable result atomically; test a retry after a lost response        |
+| One tenant or domain instance consumes shared capacity      | Partition, quota, or isolate work by a meaningful domain boundary    | Define routing, fairness, cross-partition operations, and migration                          |
+| Incoming work exceeds the rate at which it can be completed | Apply backpressure, admission control, rate limits, or load shedding | Make rejection explicit, bound waiting, guide retries, and preserve the essential path       |
+| Optional work threatens a core operation                    | Degrade a named capability while preserving the core                 | Define the degraded user state, dependency boundary, recovery trigger, and completion signal |
+| History grows beyond the useful query or retention path     | Add a measured index, derived summary, archival, or deletion path    | Account for write cost, staleness, rebuild, retention policy, and restored-state checks      |
+
+These responses can be combined, but each combination creates another operating contract.
+A queue without idempotency can repeat effects, partitioning without a suitable key can make ordinary queries expensive, and rate limiting without useful client feedback can turn controlled rejection into immediate retry pressure.
+Choose the smallest response that addresses the observed or credibly projected limit.
+
+The Little's Law relationship introduced in the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) can check one queue or in-flight boundary.
+If a stable event-processing stage contains an average of 120 waiting or active events and completes an average of 8 events per second, the implied average time in the stage is `W = L / λ = 120 / 8 = 15 seconds`.
+That calculation does not explain the delay, but it can expose incompatible measurements or show that a claimed user-visible completion time cannot fit the observed backlog and throughput.
+If arrivals and completions are not approximately balanced during the observation window, record the system as changing or overloaded instead of forcing the averages into the law.
+
+For implementations A and B, select one queue, pool, request path, or other conserved-work boundary.
+State its boundary, estimate or measure average work in progress, completion rate, and average time in the system over one consistent window, then explain whether `L = λW` is approximately coherent and what the relationship leaves unexplained.
+
 ## Recovery is part of the architecture
 
 Recovery is not a generic command executed after diagnosis.
@@ -162,6 +189,8 @@ The artifact should:
 - link the selected source and separate its reported facts from the student's interpretation,
 - trace one failure across consumer, network, execution, authority, and operational boundaries,
 - name the assumption, binding limit, first useful signal, amplification path, and user-visible effect,
+- apply Little's Law to one declared queue, pool, request path, or other conserved-work boundary and interpret its limits,
+- connect the failed assumption to one justified response pattern and the new obligation that response would introduce,
 - identify a prepared recovery mode and the evidence that would show recovery is complete,
 - and explain what differs between the two implementations without changing the common acceptance core.
 
