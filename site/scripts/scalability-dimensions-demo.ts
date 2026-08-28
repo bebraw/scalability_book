@@ -1,15 +1,5 @@
-type DimensionKey =
-  | "development"
-  | "architecture"
-  | "infrastructure"
-  | "data"
-  | "business";
-type PressureKey =
-  | "traffic"
-  | "history"
-  | "contributors"
-  | "requirements"
-  | "budget";
+type DimensionKey = "demand" | "data" | "contributors" | "change";
+type PressureKey = "traffic" | "history" | "contributors" | "requirements";
 
 type Dimension = {
   label: string;
@@ -38,28 +28,13 @@ type RadarAnimationState = {
 };
 
 const dimensions: Record<DimensionKey, Dimension> = {
-  development: {
-    label: "Development process",
-    radarLabel: "Development",
-    component: "Project guidance, review capacity, testing, and ownership",
-    signal: "lead time, review delay, rework, and failed integrations",
-    tradeoff:
-      "More automation can increase output faster than people can understand and review it.",
-  },
-  architecture: {
-    label: "Architecture",
-    radarLabel: "Architecture",
-    component: "Boundaries, contracts, dependencies, and change surfaces",
-    signal: "change fan-out, coupled deployments, and migration effort",
-    tradeoff:
-      "Stronger boundaries reduce coupling but add contracts that must be maintained.",
-  },
-  infrastructure: {
-    label: "Infrastructure",
-    radarLabel: "Infrastructure",
-    component: "Request paths, compute capacity, and deployment limits",
+  demand: {
+    label: "Demand",
+    radarLabel: "Demand",
+    component:
+      "Browser work, request paths, dependencies, and compute capacity",
     signal:
-      "p95 latency, error rate, utilization, and queue depth during peaks",
+      "tail latency, error rate, utilization, and queue depth during peaks",
     tradeoff:
       "Extra capacity can improve headroom while increasing cost and operational complexity.",
   },
@@ -72,14 +47,24 @@ const dimensions: Record<DimensionKey, Dimension> = {
     tradeoff:
       "Keeping all history exact, available, and immediately queryable can become expensive.",
   },
-  business: {
-    label: "Business",
-    radarLabel: "Business",
-    component: "Operating cost, support load, ownership, and time to value",
+  contributors: {
+    label: "Contributors",
+    radarLabel: "Contributors",
+    component: "Project guidance, ownership, review capacity, and integration",
     signal:
-      "cost per useful event, support burden, delivery time, and service value",
+      "lead time, review delay, conflicting changes, rework, and failed integrations",
     tradeoff:
-      "Technical headroom is not sustainable if its cost or coordination burden outgrows the product.",
+      "More parallel human or agent work can increase output faster than the project can review and integrate it.",
+  },
+  change: {
+    label: "Change",
+    radarLabel: "Change",
+    component:
+      "Contracts, dependencies, migrations, tests, and deployment paths",
+    signal:
+      "change fan-out, regression rate, migration effort, and recovery time",
+    tradeoff:
+      "Stronger compatibility and review controls preserve safety while adding work to each change.",
   },
 };
 
@@ -87,61 +72,46 @@ const pressures: Record<PressureKey, Pressure> = {
   traffic: {
     label: "Many people submit events at the same time",
     weights: {
-      development: 0,
-      architecture: 1,
-      infrastructure: 3,
+      demand: 3,
       data: 1,
-      business: 1,
+      contributors: 0,
+      change: 0,
     },
   },
   history: {
     label: "Event history grows for months",
     weights: {
-      development: 0,
-      architecture: 1,
-      infrastructure: 1,
+      demand: 1,
       data: 3,
-      business: 1,
+      contributors: 0,
+      change: 0,
     },
   },
   contributors: {
     label: "Several teams or agents change the codebase",
     weights: {
-      development: 3,
-      architecture: 2,
-      infrastructure: 0,
+      demand: 0,
       data: 0,
-      business: 1,
+      contributors: 3,
+      change: 1,
     },
   },
   requirements: {
     label: "Event types and rules change every week",
     weights: {
-      development: 2,
-      architecture: 3,
-      infrastructure: 0,
-      data: 1,
-      business: 1,
-    },
-  },
-  budget: {
-    label: "Infrastructure cost and energy use must stay bounded",
-    weights: {
-      development: 1,
-      architecture: 1,
-      infrastructure: 2,
-      data: 1,
-      business: 3,
+      demand: 0,
+      data: 0,
+      contributors: 1,
+      change: 3,
     },
   },
 };
 
 const dimensionOrder: DimensionKey[] = [
-  "development",
-  "architecture",
-  "infrastructure",
+  "demand",
   "data",
-  "business",
+  "contributors",
+  "change",
 ];
 
 const radarCenter = 120;
@@ -324,7 +294,7 @@ function buildDimensionRadar(
     .join(" ");
   const selectedPoints = geometry.scorePoints
     .map((score, index) => {
-      const key = dimensionOrder[index] ?? "development";
+      const key = dimensionOrder[index] ?? "demand";
 
       return `<circle class="dimensions-demo-radar-score-point" data-dimensions-demo-radar-vertex="${key}" cx="${score.x}" cy="${score.y}" r="3.8">
           <title>${escapeDimensionsHtml(dimensions[key].label)}: ${formatDimensionExposure(scores[key])}</title>
@@ -335,7 +305,7 @@ function buildDimensionRadar(
   return `<figure class="dimensions-demo-radar-chart" data-dimensions-demo-radar-chart>
     <svg viewBox="0 0 240 240" role="img" aria-labelledby="dimensions-radar-title dimensions-radar-desc" focusable="false">
       <title id="dimensions-radar-title">Scalability dimensions radar</title>
-      <desc id="dimensions-radar-desc">A five-axis radar chart comparing each dimension's share of the maximum modeled pressure for the development process, architecture, infrastructure, data, and business.</desc>
+      <desc id="dimensions-radar-desc">A four-axis radar chart comparing each dimension's share of the maximum modeled pressure for demand, data, contributors, and change.</desc>
       <g class="dimensions-demo-radar-grid">
         ${rings}
         ${axes}
@@ -498,7 +468,7 @@ function buildDimensionsInterpretation(
   }
 
   if (primary.length === 1) {
-    const dimension = dimensions[primary[0] ?? "development"];
+    const dimension = dimensions[primary[0] ?? "demand"];
 
     return `${dimension.label} has the highest relative pressure. ${dimension.tradeoff}`;
   }

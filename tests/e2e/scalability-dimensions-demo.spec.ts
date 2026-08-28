@@ -14,11 +14,11 @@ test.describe("scalability dimensions demo", () => {
     const demo = page.locator("[data-dimensions-demo]");
 
     await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
-      "2 pressures: Infrastructure + Data",
+      "2 pressures: Demand + Data",
     );
     await expect(
       demo.locator("[data-dimensions-demo-metric='primary']"),
-    ).toContainText("Infrastructure and Data");
+    ).toContainText("Demand and Data");
     await expect(
       demo.locator("[data-dimensions-demo-interpretation]"),
     ).toContainText("share the highest relative pressure");
@@ -43,19 +43,19 @@ test.describe("scalability dimensions demo", () => {
       .setChecked(true);
 
     await expect(demo.locator("[data-dimensions-demo-radar]")).toContainText(
-      "Development",
+      "Contributors",
     );
     await expect(demo.locator("[data-dimensions-demo-radar]")).toContainText(
-      "Architecture",
+      "Change",
     );
     await expect(
       demo.locator("[data-dimensions-demo-metric='primary']"),
-    ).toContainText("Development process");
+    ).toContainText("Contributors and Change");
     await expect(
       demo.locator("[data-dimensions-demo-interpretation]"),
-    ).toContainText("has the highest relative pressure");
+    ).toContainText("share the highest relative pressure");
     await expect(demo.locator("[data-dimensions-demo-verdict]")).toContainText(
-      "2 pressures: Development",
+      "2 pressures: Contributors + Change",
     );
     await expect(
       demo.locator("[data-dimensions-demo-radar] svg"),
@@ -98,18 +98,15 @@ test.describe("scalability dimensions demo", () => {
     });
 
     expect(exposures).toEqual([
-      "Development process: 100% of modeled pressure",
-      "Architecture: 100% of modeled pressure",
-      "Infrastructure: 100% of modeled pressure",
+      "Demand: 100% of modeled pressure",
       "Data: 100% of modeled pressure",
-      "Business: 100% of modeled pressure",
+      "Contributors: 100% of modeled pressure",
+      "Change: 100% of modeled pressure",
     ]);
     expect(verticesReachOuterRing).toBe(true);
     await expect(
       demo.locator("[data-dimensions-demo-metric='primary']"),
-    ).toContainText(
-      "Development process, Architecture, Infrastructure, Data, and Business",
-    );
+    ).toContainText("Demand, Data, Contributors, and Change");
   });
 
   test("keeps the layout stable across pressure combinations", async ({

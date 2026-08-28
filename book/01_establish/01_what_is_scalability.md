@@ -1,124 +1,238 @@
 # What does scalability mean for web development?
 
-If you ask two developers, they will likely give you different definitions of scalability.
-Scalability can be a complex concept, especially in the context of the web.
-In this book, we consider the scalability of web applications in particular, although many of the ideas also apply to content-focused websites.
-A single site commonly has both characteristics, so this book uses the terms liberally.
+A web application may cope with more requests while becoming harder to modify, accept more events while making old events too slow to query, or let more agents produce code while overwhelming review and integration.
+All of these are examples of how scalability can be a challenging topic.
+In this book, **scalability** means a system's ability to continue meeting a stated goal as a named pressure grows or changes.
+The goal, pressure, system boundary, and evidence are all part of the claim.
+Without them, scalability becomes a vague synonym for “large” or “well engineered.”
 
-In this book, I use scalability to mean a system's ability to continue meeting its goals as the demands around it grow or change.
-These demands may be technical, developmental, or organizational.
-A system can therefore scale well in one respect while struggling in another.
-Performance describes how a system behaves under given conditions, whereas scalability describes how that behavior changes when the conditions change.
+This framing is especially useful for the web because one user outcome can cross a browser, a network, an application boundary, persistent data, caches, external services, and operational tooling.
+The system also has to keep changing as browsers, consumers, requirements, dependencies, developers, and development agents evolve independently.
+Runtime scale and development scale are therefore related without being interchangeable.
 
-Within the broader context of scalability, the web presents its own challenges because of how it is designed and used.
-Over the past few years, the web has begun to undergo a major shift in both how we develop for it and how we consume it.
-This change is driven in part by the introduction of Large Language Models (LLMs) and agents.
-The shift presents a major challenge for developers: while generating code is cheap, developing in a scalable manner is not.
-For me, scalability has both hard and soft aspects: a service must work technically, but keeping it maintainable also requires social infrastructure.
+The central claim of this chapter is that scalability is a relationship between **pressure** and **maintained behavior**.
+Architecture and infrastructure are possible responses to that relationship; they are not themselves the things that grow.
 
-## Dimensions of scalability
+## Begin with the goal that must continue to hold
 
-Scalability can be considered from multiple viewpoints, ranging from the development process to how web applications perform under load in practice.
-I will cover several of these angles next to give you some food for thought.
-The list is not exhaustive because the concept is broad, and there are likely other ways to decompose scalability.
-That said, I consider five aspects of scalability essential: development process, architecture, infrastructure, data, and business.
+Consider the event tracker at the center of the course project.
+At its smallest useful scale, a consumer records an event, the application validates and authorizes the request, accepted state becomes durable, and a later activity view exposes the result.
+A baseline should state which parts of that behavior matter rather than merely report that the application runs.
+
+Different goals produce different scalability claims:
+
+- A successful submission should still create one accepted event when many consumers submit concurrently.
+- Recent activity should remain useful as retained history grows.
+- A bounded feature change should remain understandable and reviewable as more people or agents contribute.
+- An HTTP or data contract should remain evolvable as clients and requirements change independently.
+
+Each claim can be expressed through the same frame:
+
+> As **pressure P** changes within **range or scenario R**, the system within **boundary B** continues to meet **goal G**, as shown by **evidence E**, under **constraints C**.
+
+The frame prevents one successful observation from becoming a universal promise.
+A browser measurement says little about database recovery; one load level does not prove behavior at another; and a fast generated change does not prove that another contributor can understand or reverse it.
+The Benchmarking chapter develops how to produce bounded evidence for these claims.
+
+## Four pressures organize the course
+
+Many taxonomies of scalability are possible.
+This book uses four pressures that can be applied consistently to the event tracker and to its three independent implementations: demand, data, contributors, and change.
+
+| Pressure     | What grows or changes                                                                   | Goal that may need to hold                                             | Early signals in a web project                                                     |
+| ------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Demand       | Requests, concurrent actions, connected clients, traffic bursts, or geographic distance | Useful responses, accepted writes, latency, fairness, and correctness  | Tail latency, error rate, saturation, queue depth, browser responsiveness          |
+| Data         | Stored events, tenants, relationships, event variety, or retention time                 | Durable writes, useful queries, integrity, recovery, and bounded cost  | Storage growth, write latency, query plans, replica lag, recovery time             |
+| Contributors | Developers, teams, agents, parallel tasks, or handoffs                                  | Understandable ownership, reviewable changes, and reliable integration | Lead time, review queues, merge conflicts, rework, failed integrations             |
+| Change       | Requirements, client versions, schemas, dependencies, policies, or deployment frequency | Compatible evolution, maintained behavior, and safe recovery           | Change fan-out, regression rate, migration effort, failed rollbacks, recovery time |
+
+::caption[Four pressures used to form bounded scalability claims in this book.]
+::label[table:web-scalability-pressures]
+
+The dimensions interact without collapsing into one score.
+More demand usually creates more data.
+More contributors can increase the rate of change.
+Frequent schema changes can increase data migration work even when traffic stays constant.
+A design can therefore scale well along one axis while approaching a limit on another.
 
 > **Sustainability angle**
 >
-> Scaling a system typically scales resource consumption too.
-> Although a system may scale to meet demand technically, doing so may be inefficient.
-> I consider ecological sustainability another valuable angle that cuts across the other dimensions.
-> Because of this, I have included short callouts throughout the book to offer these kinds of additional perspectives on the topic.
+> Meeting greater demand usually consumes more computation, storage, transfer, or human attention.
+> A technically successful response may still be inefficient.
+> Record resource use per useful outcome and the work displaced elsewhere instead of treating capacity as the only goal.
 
-## Scalability of the development process
+### Demand changes the distribution of web behavior
 
-The way I see it, no matter what kind of web application you are developing, you always have to consider the scalability of your development process.
-Eventually, it may become a constraint as your application and ambitions grow.
-For a small throwaway application, the development process may not matter much, but it can become important if you plan to develop the application further or over a longer period of time.
-These days, the development process must also account for how developers and machines work together.
-LLMs have taken over some work that people previously performed manually, shifting responsibilities in the process.
-This is why I believe today's web developers should understand how to work with models.
+Demand is not only a higher request count.
+More consumers create more concurrency, more varied devices and networks, more retries after ambiguous responses, and more opportunities for rare paths to occur.
+A browser may remain responsive while the origin saturates, or the server may respond quickly while client rendering stalls on a growing activity view.
 
-I consider the currently available models to be power tools.
-While power tools can be fun to use, they can also cause a lot of damage if not used responsibly.
-In other words, it is now easier than ever to accumulate massive amounts of technical debt that may cause problems later.
-Before the large-scale introduction of models, reaching similar situations might have required years, and even then the process involved far more human intervention.
-Today, developers can build extremely complex applications without spending much time understanding the code.
-This can be dangerous because it erodes trust in the result: it may be difficult to tell whether the code is correct or even appropriate.
-LLMs are good at generating code, but their output can easily get out of hand.
-They cannot replace your understanding of the problem, although they can complement it.
+People are not the only consumers.
+Integrations, crawlers, and authorized agents can call an interface repeatedly and faster than a person operating a screen.
+The goal should therefore describe the authoritative outcome and acceptable user experience rather than assume one kind of client behavior.
 
-Technical debt may be acceptable and may never need to be repaid.
-For certain tasks, such as technical feasibility spikes or ideation, debt might not matter.
-Once you understand what you need to build, proper engineering can take place.
-Since generating code is cheap, you can use experimentation to deepen your understanding of the problem and arrive at a better solution.
+### Data changes paths as well as volume
 
-## Scalability of architecture
+Data pressure includes more than disk space.
+As event history grows, the useful write, read, analytical, deletion, archival, and recovery paths can diverge.
+A query that works for a few hundred events may scan too much history later; an index that accelerates one filter can increase write cost; and keeping every derived view immediately current can make ingestion harder.
 
-As a concept, architecture is nebulous because it captures how we shape things and how they relate to one another.
-In software, architecture is visible in concepts such as cohesion and modularity.
-The way we structure our software has an impact on its scalability because it can either constrain or enable scalability-related factors.
-For example, tight coupling between services may make them difficult to deploy to a loosely coupled deployment target.
-Coupling relates to boundaries and contracts, which lie at the core of software architecture.
-Understanding the responsibilities of different entities is one of the key tasks of a software architect, after all.
-A software architect must also consider how the system will evolve because it is rarely fixed and will change over time.
-It is worth remembering that LLMs tend to copy patterns available in your codebase.
-Therefore, setting a good example has even more value than before because building the right way can save you from a lot of uncertainty and refactoring.
-Our current tools are arguably not ideal for LLM-driven development.
-It is therefore worth considering which architectural primitives will help LLMs make good decisions as they craft technical solutions for you.
+The important questions are which state is authoritative, which views can be rebuilt, which results may be stale, and how long information should remain available.
+Those choices determine which data goals must be maintained as volume and variety change.
 
-## Scalability of infrastructure
+### Contributors increase coordination pressure
 
-Consider what happens when your product gets discovered by an aggregator like Hacker News and makes it to the top.
-You can only imagine the amount of traffic you have to be able to deal with at once, and it may be far more than you have prepared for.
-While this is generally a good thing in terms of business, it is also a scaling concern especially in terms of infrastructure since too much traffic can literally crash your site.
-How do you architect for a sudden spike of traffic like this?
-Since an event, such as a Hacker News traffic surge, is so short, it is difficult to react to it in time so you will have to prepare upfront.
-You will have to plan for spikes in time to make sure you can deal with success as otherwise your serves might be hugged to death, momentarily at least.
+A codebase that one person understands informally may become difficult to change when several people, teams, or agents work in parallel.
+More code output does not automatically increase accepted product output.
+Review capacity, integration, ownership, project memory, and the ability to diagnose failed work can become binding limits first.
 
-For infrastructure, the challenge is two-fold as typically you think about in terms of horizontal and vertical scalability.
-These mean either scaling a single node within infrastructure so that it is stronger, hence vertical or scaling up, or adding more nodes to the system as a form of horizontal scalability or scaling out.
-It is a good question who is responsible for this portion of scalability since over time companies have moved from their own hosting towards cloud computing and beyond.
-These days it is possible to pay for function invocations bought from edge hosting providers meaning the economics behind infrastructure have changed considerably over the past few decades as computation has become abstracted, and you might not be even aware as a developer where and how your code is running exactly.
+Agents make this pressure especially visible because they can generate several plausible changes before a person could have implemented one.
+Stable contracts, focused tasks, executable checks, and explicit ownership can let contributors work more independently.
+They also require maintenance and can become harmful if they preserve rules that no longer serve the product.
 
-## Scalability of data
+### Change makes old commitments visible
 
-While a considerable chunk of work has to do with computation and processing, underneath all this you typically have some type of data unless your application is ephemeral by its nature and does not store any permanent records.
-If you need records, then you will need to store your data somewhere somehow and this is typically the point where you either need a file system or a database or both.
-Data comes with its own sets of problems since you have to consider where it is stored and how.
-You may also want to back up your data so it does not get lost.
-To make things worse, you may have to consider how it is read and written while dealing with concurrent usage that may lead to conflicts.
-As you can see, the topic can get complex fast, and this complexity depends largely on your use cases.
+A web application changes even when its traffic does not.
+Browsers, APIs, integrations, event schemas, authentication rules, libraries, hosting platforms, and user expectations evolve on different schedules.
+Once a consumer relies on a response or production data adopts a representation, a change may require compatibility and migration rather than a simple code replacement.
 
-## Scalability in business
+Change scalability is the ability to keep making justified changes without turning every release into a coordinated rewrite.
+It depends on visible boundaries, useful tests, staged evolution, and recovery paths, but no design eliminates the need to understand what has already become a commitment.
 
-Another way to look at scalability is to consider an established, even decades old service, that generates revenue yet requires maintenance and new features.
-Here the challenge is to make changes without breaking anything that used to work as that could be expensive.
-Furthermore, there is likely organizational structure to consider, and the system might simply be too big for a single developer to be able to make all the changes needed.
-On top of that, the stack used by the system might be considered antiquated or not following the latest technological trends at least.
-These examples illustrate inertia within older systems and affect their technical scalability.
-These systems might still scale well performance-wise, but it might be difficult to scale them otherwise due to technical or social concerns.
+## One pressure can cross the whole web system
 
-## Scalability is multidimensional
+Suppose a domain-specific event causes many consumers to submit events during the same short interval.
+That one demand pressure can affect several boundaries:
 
-As you can see, scalability is a multidimensional concept going beyond technical concerns.
-As a topic, it is open to interpretation and often different aspects of scalability are interrelated.
-They can also be conflicting which means that likely you cannot optimize each are at the same time, but you may have to compromise.
-That is an important part of the engineering challenge and also the impetus behind this book as I want you to develop your own thinking around scalability.
+1. The browser must keep the interaction responsive and communicate pending, accepted, or failed state.
+2. The HTTP boundary must handle concurrency, timeouts, retries, authentication, and request limits.
+3. Application execution may exhaust workers, connections, memory, or dependency quotas.
+4. The authoritative store must preserve event and workflow invariants under concurrent writes.
+5. Queries and cached activity views must expose an acceptable level of freshness.
+6. Operators need signals that distinguish user-visible failure from waiting, overload, duplication, or stale derived state.
 
-The demonstration below applies growth pressures to the five dimensions introduced in this chapter.
-Select the pressures that matter for the event tracker and observe which dimensions receive the most strain.
-A single pressure can affect several dimensions, and some combinations may leave multiple dimensions equally exposed.
+Adding application servers helps only if application execution is the binding limit and the rest of the path can absorb the new work.
+Optimizing the browser helps only the work that occurs there.
+The response has to follow the pressure to the first limit that threatens the stated goal.
+
+The same reasoning applies to development pressure.
+Adding agents can increase candidate changes while review or integration remains fixed.
+The result may be more waiting and rework rather than more accepted behavior.
+The scalable unit is therefore the complete path to a useful outcome, not the amount of activity at one stage.
+
+## Separate pressures, responses, and constraints
+
+The earlier taxonomy deliberately names what varies.
+Several other concerns shape the response:
+
+- **Architecture** assigns responsibilities, authority, contracts, and allowed dependencies across the system.
+- **Infrastructure** supplies execution, storage, networking, deployment, and operational capacity.
+- **Product and business priorities** determine which user outcomes matter, which risks are tolerable, and when additional capacity or coordination is worth its cost.
+- **Constraints** such as budget, energy use, privacy, regulation, geography, hardware, provider quotas, time, and team expertise narrow the acceptable design space.
+
+These are not secondary concerns.
+They explain why two applications facing similar demand may choose different responses.
+The distinction simply prevents a mechanism such as cloud infrastructure from being mistaken for the pressure it is meant to address.
+
+A **binding limit** is the condition currently preventing the system from maintaining its goal as pressure increases.
+It may be a browser's main thread, network bandwidth, CPU, memory, a connection pool, database coordination, an external-service quota, a review queue, or missing expertise.
+Increasing capacity somewhere else can add cost and complexity without moving that limit.
+
+## Distinguish scalability from neighboring properties
+
+Several useful properties are easy to conflate with scalability.
+The difference lies in the condition being studied.
+
+| Property    | Question                                                                | Example evidence from the event tracker                                       |
+| ----------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Performance | How does the system behave under one stated set of conditions?          | Latency and resource use for one activity-view workload                       |
+| Scalability | How does maintained behavior change as a named pressure changes?        | Latency, correctness, and resource curves across increasing concurrent writes |
+| Elasticity  | Can supplied capacity expand and contract as demand changes over time?  | Provisioning delay, backlog, and cost during and after a traffic burst        |
+| Resilience  | Can the system preserve or recover useful service when something fails? | Accepted events and recovery time when storage or a dependency is unavailable |
+| Efficiency  | How much resource or coordination produces one useful outcome?          | Compute, transfer, storage, or review time per accepted event or change       |
+
+::caption[Scalability and related system properties answer different questions.]
+::label[table:scalability-related-properties]
+
+A system can perform well at its current load but degrade sharply as demand grows.
+It can add capacity automatically yet reproduce a correctness error on every instance.
+It can survive a dependency failure through expensive overprovisioning.
+No single metric establishes all five properties.
+
+## Reason from pressure to evidence
+
+Use one causal chain before choosing a scaling technique:
+
+`pressure → binding limit → response → trade-off → evidence`
+
+- **Pressure:** name what changes and the plausible range or scenario.
+- **Binding limit:** identify what first prevents the maintained goal from holding.
+- **Response:** change the application, architecture, infrastructure, workflow, or scope at that limit.
+- **Trade-off:** state which cost, latency, complexity, consistency, autonomy, or recovery obligation moved elsewhere.
+- **Evidence:** repeat a representative observation that could challenge the claim.
+
+For a runtime example, concurrent event submissions may exhaust the database connection pool before CPU becomes scarce.
+Admission control or buffering might protect accepted writes, but it can add waiting and require an explicit pending state.
+A useful evaluation would inspect success, duplication, tail latency, queue age, and recovery as the workload changes rather than only count server instances.
+
+For a development example, parallel agent tasks may produce changes faster than people can review them.
+Smaller task boundaries, executable contracts, and automated checks might move repeatable findings earlier, but maintaining those controls also consumes time.
+Evidence should cover accepted outcomes, review delay, rework, failed integrations, and human intervention rather than generated lines of code.
+
+This chain does not guarantee the correct response.
+It makes the hypothesis explicit enough to test and revise.
+
+## Constraints prevent premature scaling
+
+Scalability is not a requirement to prepare every component for unlimited growth.
+An implementation that serves its likely demand, preserves its data, and remains understandable to its owners can be more appropriate than a distributed design built for a hypothetical future.
+Every additional cache, queue, replica, service, region, contract, and automation layer creates a new operating and change obligation.
+
+Premature scaling begins when a solution is selected before the pressure, goal, or limit is known.
+Preparation is still valuable when it preserves a cheap path to learn: keep authority clear, avoid irreversible coupling without a reason, collect a baseline, and identify the signal that would justify the next move.
+The aim is not to predict the final architecture.
+It is to make the next decision from evidence rather than from a generic idea of scale.
+
+For the course project, time, available hardware, privacy, model access, team expertise, and implementation scope are legitimate design inputs.
+A bounded local implementation can be a strong baseline precisely because its constraints are visible.
+Later implementations can test different hypotheses without pretending that newer or more distributed means better.
+
+## Scalability dimensions lab
+
+The demonstration below applies four pressures to the event tracker.
+Select the scenarios that matter and observe which dimensions receive the greatest relative strain.
+The weights are deterministic teaching inputs, not measurements of a real application, so use the result to form a claim rather than to select an architecture.
 
 {{ import "site/includes/scalability-dimensions-demo.html" }}
 
-Use the radar to identify which dimensions require attention before choosing techniques.
-As you can see, a system can scale in one dimension while becoming worse in another.
+Choose one leading dimension and write its pressure, maintained goal, likely first limit, and first useful signal.
+Then select a second pressure and inspect how the conclusion changes.
+If several dimensions rise together, preserve them as separate claims instead of averaging them into a single scalability score.
+
+## Project artifact
+
+Students should produce two bounded scalability claims for implementation A: one about runtime demand or data, and one about contributors or change.
+For each claim, record:
+
+- the goal that must continue to hold,
+- the pressure and plausible range or scenario,
+- the system boundary and relevant constraints,
+- the likely first binding limit and signal,
+- one candidate response and its expected trade-off,
+- the evidence that would support or challenge the claim,
+- and one dimension intentionally left outside the claim.
+
+These claims become inputs to the shared measurement protocol in the Benchmarking chapter.
+They should be revised when evidence reveals a different limit, not protected as predictions that must appear correct.
 
 ## Summary
 
-As you can see, scalability is a multidimensional construct and there is no single right way to define it.
-I like to split it to its development process related and technical portions.
-It is arguable how to divide those technical portions and often different scalability concerns are interrelated.
-It is even possible that by improving some specific aspect, you may inadvertently worsen another.
-Therefore, compromises are common in scalability type of work, although there are some kind of good practices to follow that we will cover in this book in the coming chapters.
+Scalability is the ability to continue meeting a stated goal as a named pressure grows or changes.
+Demand, data, contributors, and change provide four reusable pressures for examining the event tracker and its development system.
+Architecture and infrastructure are responses; product priorities and constraints determine which responses are acceptable.
+
+Performance describes one set of conditions, scalability describes change across conditions, elasticity describes capacity adaptation, resilience describes behavior under failure, and efficiency relates useful outcomes to consumed resources or coordination.
+None substitutes for the others.
+
+A useful scalability argument follows pressure to a binding limit, proposes a response, exposes the resulting trade-off, and names evidence that could disprove it.
+This turns “Can it scale?” from a slogan into a bounded engineering question.
