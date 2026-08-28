@@ -1,7 +1,7 @@
 # Evaluating agentic development workflows
 
 Use this appendix when you need to design, run, or critique an evaluation of a coding agent or a complete agentic development workflow.
-The measurement chapter introduces the minimum evidence needed for the three course implementations; this appendix develops the vocabulary, controls, graders, uncertainty, and routing questions in depth.
+The [Benchmarking chapter](/chapters/benchmarking/) introduces the minimum evidence needed for the three course implementations; this appendix develops the vocabulary, controls, graders, uncertainty, and routing questions in depth.
 
 ## Anatomy of an agent evaluation
 

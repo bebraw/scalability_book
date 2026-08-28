@@ -1,7 +1,7 @@
 # Agent-system security, control, and traceability
 
 Use this appendix when an agent workflow crosses several orchestration, model, tool, credential, or network boundaries.
-The Agent Fleets chapter keeps the essential rules—allocate decision authority, enforce least privilege, preserve evidence, and keep a human owner—while this appendix develops control-plane separation, end-to-end trace reconciliation, capability adoption, and persistent cross-run state.
+The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—allocate decision authority, enforce least privilege, preserve evidence, and keep a human owner—while this appendix develops control-plane separation, end-to-end trace reconciliation, capability adoption, and persistent cross-run state.
 
 ## Separate task control from resource access
 

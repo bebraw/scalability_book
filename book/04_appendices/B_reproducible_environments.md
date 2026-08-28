@@ -1,7 +1,7 @@
 # Reproducible development environments
 
 Use this appendix when setup failures, hidden host state, inconsistent resource limits, or environmental drift make a project difficult to run or evaluate.
-The Friction chapter keeps the essential project rule—declare the supported environment and test it from a fresh checkout—while this appendix develops the distinctions and audit procedure in depth.
+The [Friction chapter](/chapters/friction/) keeps the essential project rule—declare the supported environment and test it from a fresh checkout—while this appendix develops the distinctions and audit procedure in depth.
 
 ## Treat the environment as a versioned input
 

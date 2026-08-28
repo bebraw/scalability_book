@@ -65,19 +65,19 @@ Each of these parts responds to specific scalability related questions and I hav
 
 **Establish — Build and measure a baseline:**
 
-1. What does scalability mean for web development? -- In this chapter I consider aspects related to scalability in the context of web development.
-2. How can coding agents support scalable development? -- Given the shape of development is changing, I consider the implications of artificial intelligence (AI) and agents in this chapter, including how humans and agents divide authority, judgment, and responsibility.
-3. How can we measure web applications and development workflows? -- While AI speeds up development of artefacts, this also highlights the importance of measuring and observing our applications.
+1. [What does scalability mean for web development?](/chapters/what-is-scalability/) -- In this chapter I consider aspects related to scalability in the context of web development.
+2. [How can coding agents support scalable development?](/chapters/scalable-development/) -- Given the shape of development is changing, I consider the implications of artificial intelligence (AI) and agents in this chapter, including how humans and agents divide authority, judgment, and responsibility.
+3. [How can we measure web applications and development workflows?](/chapters/benchmarking/) -- While AI speeds up development of artefacts, this also highlights the importance of measuring and observing our applications.
    That is why I will show you how to measure and observe your web applications in this chapter.
 
 **Challenge — Expose architectural assumptions:**
 
-4. How does web architecture shape scalability? -- Architecture and scalability go hand in hand, and in this chapter I'll consider the implications of this connection.
-5. How does development friction limit web projects? -- As web applications become more complex, they become more difficult to develop and in this chapter we consider sources of friction and what to do about it.
-6. Which web application assumptions fail under pressure? -- In this chapter we consider which assumptions fail under real users, data, concurrency, failures, costs, and constraints.
+4. [How does web architecture shape scalability?](/chapters/architecture/) -- Architecture and scalability go hand in hand, and in this chapter I'll consider the implications of this connection.
+5. [How does development friction limit web projects?](/chapters/friction/) -- As web applications become more complex, they become more difficult to develop and in this chapter we consider sources of friction and what to do about it.
+6. [Which web application assumptions fail under pressure?](/chapters/reality/) -- In this chapter we consider which assumptions fail under real users, data, concurrency, failures, costs, and constraints.
 
 **Compare — Evaluate workflows and scaling responses:**
 
-7. When do agent fleets improve web development? -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
-8. How should web applications respond to scaling pressure? -- How do all three implementations respond to the same pressures, and what would a justified target architecture retain or change?
-9. What do three agent-assisted implementations teach us about web scalability? -- What conclusions do the evidence support, and which application architecture and development workflow would we choose under stated constraints?
+7. [When do agent fleets improve web development?](/chapters/agent-fleets/) -- How do project instructions, tests, task boundaries, roles, and review loops make agentic development safer and more scalable?
+8. [How should web applications respond to scaling pressure?](/chapters/scaling/) -- How do all three implementations respond to the same pressures, and what would a justified target architecture retain or change?
+9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) -- What conclusions do the evidence support, and which application architecture and development workflow would we choose under stated constraints?

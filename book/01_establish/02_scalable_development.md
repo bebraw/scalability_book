@@ -40,55 +40,43 @@ The analogy is a design model, not a claim that a coding agent has a body, desir
 Its observations can be incomplete, its internal model can be wrong, its tool calls can fail, and its stated goal can be an inadequate proxy for the outcome people actually want.
 Developing an agent therefore means more than changing the prompt or swapping the LLM.
 You can improve what it can observe, how it decides and remembers, what actions it may take, how action effects return as feedback, and how its goal is translated into checks and stopping conditions.
-The constrain–generate–validate–revise loop later in this chapter is one practical way to tune these parts together.
+The [constrain–generate–validate–revise loop](#constrain-generate-validate-revise) later in this chapter is one practical way to tune these parts together.
 
-## How are agents changing web development?
+## How did development control change before and after agents?
 
-For a long time, web applications were written manually using a suitable editor.
-Of course visual editors able to generate HTML have existed since the 90s, but for any serious development often code had to be written by hand unless a specific platform specific abstraction was available to at least reduce this type of work.
-Since late-2022 with the introduction of ChatGPT, the way we program begun to shift, first with so-called copilots that complete sections of code as you write it, and then with agents that can develop what you want based on prompting.
-On top of this we have whole systems that can orchestrate how multiple agents develop a system even independently.
-Regardless of the approach, the challenge is always how to ensure the system is producing right outputs.
+Coding agents did not introduce specifications, executable tests, model-driven generation, or iterative feedback.
+The distinctive change is that a probabilistic, tool-using system can now perform much more of the implementation loop and produce candidate changes at a rate that may exceed human comprehension, review, and integration.
+Earlier engineering artifacts consequently reappear as machine-readable context, constraints, and feedback.
 
-In the context of this book, we will first use a local model to implement [the book project](/project/) before trying the same with a foundation model and moving onto a fleet of agents to appreciate the differences and related challenges as the used approach, or even a model, can make a difference.
-The ideas behind effective agentic development are good development practices in general, and you should have a good idea of at least some of those after finishing reading this chapter.
+:ref[table:development-approaches-history]{text="The table below"} uses representative milestones rather than claiming that a broad practice was invented in one year.
+The approaches overlap and can be combined; the chronology is not a progression from worse to better.
 
-## Vibe coding vs. discipline
+| Representative milestone | Approach                                                                                            | Primary artifact                                                         | Implementation loop                                                               | Main control and trade-off                                                                                                      |
+| ------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1970                     | [Staged, plan- and design-led development](https://www.praxisframework.org/files/royce1970.pdf)     | Requirements, architecture, interface, and test plans                    | Humans implement through planned stages with feedback between them                | Documentation and staged verification create traceability; discoveries arriving late can invalidate expensive commitments       |
+| 2001                     | [Iterative and agile development](https://agilemanifesto.org/)                                      | Working increments, a backlog, and stakeholder feedback                  | Humans build and review small slices repeatedly                                   | Short feedback supports learning; architecture and cross-cutting quality require continuous stewardship                         |
+| 2001                     | [Model-Driven Architecture](https://www.omg.org/mda/)                                               | Platform-independent and platform-specific models                        | Deterministic generators transform models into implementation artifacts           | A model can create repeatable leverage across platforms; escape paths and generator constraints can become expensive            |
+| Early 2000s              | [Test-Driven and Behavior-Driven Development](https://dannorth.net/introducing-bdd/)                | Executable examples and tests                                            | Humans implement through short behavior and test feedback loops                   | Evidence moves close to implementation; checks cover only the properties and examples they encode                               |
+| February 2025            | [Vibe coding](https://x.com/karpathy/status/1886192184808149383)                                    | Conversational intent and the running result                             | An agent generates while a person observes and redirects visible behavior         | Exploration becomes fast; traceability and control of hidden contracts, data, security, and maintenance remain weak             |
+| August–September 2025    | [Spec-Driven Development](https://github.com/github/spec-kit/blob/main/docs/history.md)             | Specification, plan, tasks, and implementation artifacts                 | Agents work through durable phases with review between them                       | Intent survives one session or agent; artifact maintenance and drift from runtime behavior become new work                      |
+| February 2026            | [Harness engineering](https://openai.com/index/harness-engineering/)                                | Repository structure, tools, instructions, linters, and tests            | Agents repeatedly act inside encoded boundaries                                   | Mechanized feedback supports repeated high-throughput work; building and maintaining the project-specific environment is costly |
+| April 2026               | [Shift-Up](https://arxiv.org/abs/2604.20436)                                                        | Executable BDD requirements, C4 models, and ADRs                         | Agents implement while people focus on requirements, architecture, and acceptance | Established design knowledge becomes a persistent guardrail; the current evaluation is exploratory and adds upfront work        |
+| April 2026               | [Structured Prompt-Driven Development](https://martinfowler.com/articles/structured-prompt-driven/) | Version-controlled business, domain, design, task, and safeguard context | Agents generate within a reviewed prompt boundary                                 | Prompts become governable and reusable team artifacts; keeping them aligned becomes development work                            |
 
-Since agentic development allows you to produce vast amounts of code fast through prompting, this brings you to the same old practices encountered by developers for decades at an elevated rate.
-The term vibe coding coined by Andrej Karpathy in February 2025 captures well the dark side of this kind of development and for this reason it is occasionally used as a pejorative against development practices that focus on visual results while forgetting what is underneath.
-This does not mean vibe coding cannot be useful as a prototyping technique, but that it can be dangerous to forget to design your codebase so that it follows good practices and follow security practices to avoid leaking client data or causing unnecessary cost or reputation loss to the developer.
+::caption[Representative milestones in the movement from human implementation and deterministic generation toward agent-executed development workflows.]
+::label[table:development-approaches-history]
 
-:citet[foote1997mud] describe a Big Ball of Mud as a system whose organization is dictated more by expediency than design.
-Big Ball of Mud connects well with the idea of vibe coding since a system can evolve faster than understanding of its structure.
-As code is fast to generate, it is also fast to learn about your actual requirements that shape software architecture.
-This is particularly true for spikes and early prototypes.
+For the event tracker, every approach could produce the same visible event form and activity view.
+The difference is where intent and control live: a staged design can describe the complete request and data path, an iterative team can deliver it as a vertical slice, BDD can express its accepted behavior, a model can generate schemas or clients, and an agentic workflow can interpret repository context and act across all of those artifacts.
+A working browser view alone still does not establish authorization, HTTP compatibility, durable persistence, retry behavior, or safe evolution.
 
-::: comment
+Shift-Up makes the historical reuse explicit by treating BDD requirements, C4 models, and ADRs as agent guardrails.
+Its initial evaluation compared unstructured vibe coding, structured prompting, and a partial Shift-Up workflow while building a full-stack snack-bar web application :citep[lipsanen2026shiftup].
+Treat that comparison as an exploratory example rather than a universal ranking of the approaches.
 
-Fowler's rule of three, attributed to Don Roberts, recommends refactoring when a similar implementation appears for the third time :citep[fowler1999refactoring].
-The accumulated examples can reveal an abstraction that would have been speculative earlier.
-
-:::
-
-## Shifting-Up – Trading development speed for human control
-
-It turns out, to get most out of agentic development, you will need a certain amount of discipline.
-That is the main reason why it is important to understand technical details as in what should good architecture look like and how to develop software sustainably.
-:citet[lipsanen2026shiftup] consider this issue and propose structured development as an alternative to unstructured vibe coding.
-On top of structured development, the authors propose the Shift-Up approach that trades development speed for human control.
-Practices are still emerging, and I have no doubt we will find better and worse ways to work with machines.
-The question is what values we want to emphasize.
-In short, agentic development has changed web development by shifting the abstraction level.
-Instead of writing code, you massage the codebase into your preferred shape.
-
-::: comment
-
-Adoption is also moving faster than measurement.
-:citet[giray2025adoption] found broad use and perceived gains in cycle time and quality, but limited objective measurement and uneven investment in training and governance.
-This makes disciplined project evidence more important than impressions of speed.
-
-:::
+In this book, the same bounded project is first implemented with a local model, then a foundation model, and finally a fleet of agents.
+The phases do not prescribe one row of the table.
+They hold required web behavior stable while students compare how different models, constraints, validation, and orchestration affect the path from a candidate change to accepted work.
 
 ### When generation outruns comprehension
 
@@ -130,7 +118,7 @@ Slideotter and Kirjolab reached a scope I could not have implemented alone, but 
 Prompting can produce visible results quickly, especially when a task is easy to specify.
 The difficult part is sustaining change after the first result: supplying enough context, constraining what may vary, and requiring relevant evidence before accepting the output.
 Guardrails and quality gates help, but they consume time and can be optimized mechanically if a score becomes the goal.
-The Benchmarking chapter develops that measurement problem.
+The [Benchmarking chapter](/chapters/benchmarking/) develops that measurement problem.
 
 Agentic development therefore includes the supporting development system as well as the application.
 Project instructions, architecture notes, tests, static analysis, reproducible commands, and reviewable examples can make future changes cheaper and safer.
@@ -155,7 +143,7 @@ Ambiguous intent, weak evidence, irreversible commitments, and material external
 
 Invoking a tool does not transfer accountability to it.
 The accepting person or group still needs enough understanding, evidence, and control to stand behind the result and correct it.
-The Agent Fleets chapter develops the research background, decision path, and authority-mapping exercise.
+The [Agent Fleets chapter](/chapters/agent-fleets/) develops the research background, decision path, and authority-mapping exercise.
 
 Perceived effort can influence quality judgments when quality is difficult to assess :citep[kruger2004effort].
 It is a heuristic, not correctness evidence.
@@ -229,7 +217,7 @@ Model choice should follow the work and local evidence.
 A more capable model may avoid retries on uncertain or coupled tasks, while a smaller model may reliably satisfy strong checks on bounded work.
 Treat labels such as "planning" and "implementation" as routing hypotheses rather than rules.
 A model name is not a capability result: runtime configuration, context, tools, hardware fit, routing, and fallback can all change the outcome and its cost or data boundary.
-The appendix on evaluating agentic development workflows shows how to identify and compare the configuration that actually served the work.
+[Appendix A: Evaluating agentic development workflows](/appendices/evaluating-agentic-workflows/) shows how to identify and compare the configuration that actually served the work.
 
 Context selection is another generation decision.
 Focused retrieval and compact tool output can reduce irrelevant material, but any lossy view can also hide the fact needed to complete or review the task.
@@ -304,7 +292,7 @@ One cancellation rule applies throughout the compound active state, tests and hu
 The model may choose a route, but the statechart defines the available routes.
 
 Deterministic boundaries also depend on how the application represents valid data and commits state.
-The Architecture chapter develops that connection through constructive data modeling, runtime parsing, authorization, and atomic persistence.
+The [Architecture chapter](/chapters/architecture/) develops that connection through constructive data modeling, runtime parsing, authorization, and atomic persistence.
 
 ## The project harness
 
@@ -328,7 +316,7 @@ This project comes with a ready-made process for me to pull my practices to othe
 
 The [common project specification](/project/#6-minimum-project-harness) owns the exact required artifacts.
 The practical baseline is simpler than the list: can another student or agent clone the project, understand its intended shape, run it and its checks, and make a small change without guessing?
-An environment definition is part of that contract rather than neutral background; the Friction chapter develops how to test it from a fresh checkout.
+An environment definition is part of that contract rather than neutral background; the [Friction chapter](/chapters/friction/) develops how to test it from a fresh checkout.
 That chapter also explains why validation cost should follow change risk instead of running every check after every edit.
 
 ### Reuse practices without cloning the whole harness
@@ -346,7 +334,7 @@ This keeps the harness evolvable without making every downstream project carry e
 The broader lesson is to reuse a bounded practice with provenance rather than freezing a changing reference inside a permanent prompt or relying on the model's training data to remain current.
 
 Imported capabilities also introduce a trust boundary because their instructions or bundled code may influence tools operating with the agent's authority.
-The Agent Fleets chapter develops the security and ownership implications, while the [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a bounded review exercise.
+The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security and ownership implications, while the [skill-adoption lab](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) provides a bounded review exercise.
 
 ## Maintained work needs an owner
 
@@ -356,7 +344,7 @@ Once code becomes shared, other people inherit the cost of understanding, review
 The standard should therefore follow the consequences and expected lifetime of the work rather than whether a human or model typed it.
 
 Publishing an issue or patch transfers some of that cost to an external maintainer.
-The Agent Fleets chapter treats publication as an externally consequential action that needs a human owner.
+The [Agent Fleets chapter](/chapters/agent-fleets/) treats publication as an externally consequential action that needs a human owner.
 Within the course projects, the same principle is simpler: generate as quickly as useful, but accept only work the group can explain, validate, and remain willing to maintain.
 
 ## Summary

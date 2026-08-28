@@ -32,7 +32,7 @@ Each claim can be expressed through the same frame:
 
 The frame prevents one successful observation from becoming a universal promise.
 A browser measurement says little about database recovery; one load level does not prove behavior at another; and a fast generated change does not prove that another contributor can understand or reverse it.
-The Benchmarking chapter develops how to produce bounded evidence for these claims.
+The [Benchmarking chapter](/chapters/benchmarking/) develops how to produce bounded evidence for these claims.
 
 ## Four pressures organize the course
 
@@ -222,7 +222,7 @@ For each claim, record:
 - the evidence that would support or challenge the claim,
 - and one dimension intentionally left outside the claim.
 
-These claims become inputs to the shared measurement protocol in the Benchmarking chapter.
+These claims become inputs to the shared measurement protocol in the [Benchmarking chapter](/chapters/benchmarking/).
 They should be revised when evidence reveals a different limit, not protected as predictions that must appear correct.
 
 ## Summary

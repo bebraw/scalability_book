@@ -99,7 +99,7 @@ Before the point, deleting a candidate implementation may be enough.
 Near the point, expand-and-contract changes, mixed-version tests, staged rollout, and observation add protective friction because they preserve options.
 After the point, “roll back” must name what happens to accepted data and dependent consumers rather than only which code artifact is deployed.
 
-The Reality chapter returns to compatibility, migration, rollback, and fix-forward under production pressure.
+The [Reality chapter](/chapters/reality/) returns to compatibility, migration, rollback, and fix-forward under production pressure.
 Here, make the asymmetry between introduction and safe reversal visible.
 [Florian Herrengt's practitioner essay](https://blog.florianherrengt.com/ai-removing-middle-class-software-engineering.html) dramatizes this asymmetry with database changes; its broader labor-market prediction is outside this claim.
 

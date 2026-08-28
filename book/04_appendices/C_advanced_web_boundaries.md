@@ -1,7 +1,7 @@
 # Advanced control boundaries in web applications
 
 Use this appendix when a design depends on state continuity across requests, type-level invariants, runtime-generated interfaces, or executable HTTP contracts.
-The Architecture chapter keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
+The [Architecture chapter](/chapters/architecture/) keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
 
 ## Stateless requests still depend on state
 

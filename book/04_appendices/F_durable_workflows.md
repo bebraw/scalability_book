@@ -1,7 +1,7 @@
 # Durable workflows and retry-safe effects
 
 Use this appendix when an asynchronous operation spans several steps, must survive process failure, or can repeat an external side effect.
-The Scaling chapter keeps the essential design warning: durable coordination does not make external effects exactly-once.
+The [Scaling chapter](/chapters/scaling/) keeps the essential design warning: durable coordination does not make external effects exactly-once.
 This appendix develops explicit state machines, replay-based workflows, retry boundaries, idempotency, compensation, cancellation, and operator evidence.
 
 ## Durable execution preserves coordination progress

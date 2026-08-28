@@ -51,7 +51,7 @@ The value lies in reconstructing those mechanisms from the linked sources rather
 
 ## Trace one failure across the web boundary
 
-The architecture chapter separated consumer, representation, execution, and authority.
+The [Architecture chapter](/chapters/architecture/) separated consumer, representation, execution, and authority.
 A production failure becomes understandable when the same roles are traced over time rather than inspected as a static diagram.
 
 Consider a deliberately small event-tracker scenario:
@@ -152,7 +152,7 @@ Do not claim that the project has reproduced the source company's scale, infrast
 
 Students should explain which assumptions differ between implementations A and B and which remain shared.
 A good reconstruction makes failure and recovery obligations visible without trying to solve every possible future problem.
-The Scaling chapter can then choose techniques in response to demonstrated pressure rather than previewing a catalog here.
+The [Scaling chapter](/chapters/scaling/) can then choose techniques in response to demonstrated pressure rather than previewing a catalog here.
 
 ## Project artifact
 

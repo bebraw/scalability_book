@@ -53,6 +53,8 @@ The harness can be lightweight, but it should be concrete enough that another gr
 
 ## Notes for further development
 
+- Keep the development-approaches table chronological by representative milestone, not by disputed invention date.
+  The rows are composable control patterns rather than a maturity ladder, and the source links should remain attached to the milestone claims.
 - Add a short distinction between transferable knowledge and transferable code.
   Good specifications, tests, examples, and validation practices should improve across phases without allowing the later implementation to become a fork of the first.
 - Make the evidence log part of the constrain-generate-validate loop.
