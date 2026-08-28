@@ -1,25 +1,38 @@
 # Establish — Build and measure a baseline
 
-In this part of the book, we establish the idea of scalability and developing web applications in scale.
-Besides developing your first book project, you will start to think about different aspects related to scalability to form your own view of the topic.
-These learnings will come in handy in the latter parts of the book as you will rebuild your project twice but in a different way.
+A baseline is a bounded point of comparison, not an implementation assumed to be correct or an architecture that later work must imitate.
+It gives the next two builds stable behavior, questions, and evidence against which meaningful differences can be discussed.
+In this part, you define what should remain true under pressure, establish a controlled agent-assisted development process, and measure the first implementation of the shared web application.
 
-## Book project - Work Activity Tracker
+## From scalability claims to comparable evidence
+
+The three chapters form one progression:
+
+1. [What does scalability mean for web development?](/chapters/what-is-scalability/) identifies the maintained goal, relevant pressures, constraints, and evidence a scalability claim would need.
+2. [How can coding agents support scalable development?](/chapters/scalable-development/) treats the application and its development harness as one controlled system, with explicit constraints, validation, correction, and ownership.
+3. [How can we measure web applications and development workflows?](/chapters/benchmarking/) turns runtime behavior and the development process into a repeatable evidence baseline.
+
+By the end of Establish, implementation A should be modest, complete enough to exercise the common behavior, and bound to a declared revision and evidence package.
+Its value is not that it predicts the final design.
+Its value is that later comparisons do not have to rely on memory or impressions.
+
+## Implementation A — Work Activity Tracker
 
 The [Establish project specification](/project/establish/) shows what you should implement during this part of the book.
-Essentially you will be implementing the book project using a single, locally hosted agent.
-As a result, you should end up with a baseline for comparison and the architecture of the application does not have to be final as you will refine it during the other two iterations as you understand the topic better.
-The key thing is to get used to agent driven development using a small model first.
+You will implement the shared project through a single-agent workflow backed by the approved locally hosted model.
+The purpose is to experience what that particular model, harness, and environment make easy or difficult while producing a baseline that can be inspected and measured.
 
 The specification leaves many decisions open deliberately, and you can customize the domain to your liking while choosing your own technical stack, rendering approach, storage, architecture, deployment path, and one specific implementation question worth investigating.
-There is no single right way to implement the project, but likely there are better and worse ways as we might learn after completing all three iterations.
+There is no single required architecture, and the first choice does not need to be final.
+Record assumptions and trade-offs so the later builds can reveal which differences matter under the shared requirements and pressures.
 
-Note that while you cannot transfer the implementation to the following parts of the book, you can take requirements, acceptance tests, examples, evidence templates, and any lessons you gained to them.
-In this sense, each project is a greenfield one when it comes to the implementation.
+The following parts begin from fresh implementations.
+You may carry forward the common specification, permitted acceptance material, technology-neutral lessons, and the reporting method, but not application code or implementation-specific tests.
+This preserves learning while keeping the three development setups meaningfully comparable.
 
 ## Implementation discovery lab
 
 Use this lab to turn the [shared specification](/project/) into a direction to explore.
-As a result, it gives you a document that you can improve further.
+It produces a first project-direction document that you can refine as implementation creates evidence.
 
 {{ import "site/includes/project-fit-checker.html" }}

@@ -1,3 +1,6 @@
-## Part outline moved from reader content
+## Implemented spine
 
-In this part of the book, we will first define what is scalability before focusing on scalable development, and benchmarking to generate a measured baseline to compare against as you proceed with the book projects.
+- Treat implementation A as a bounded point of comparison rather than the preferred architecture.
+- Move from scalability goals and pressures, through a controlled local-agent workflow, to comparable runtime and development evidence.
+- Keep the Work Activity Tracker modest enough to complete and inspect.
+- Carry permitted requirements, acceptance material, technology-neutral lessons, and the reporting method forward without transferring implementation code.
