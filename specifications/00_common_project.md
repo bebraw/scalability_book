@@ -442,6 +442,8 @@ Preserve enough task, prompt, trace, and review information to explain consequen
 ## 10. Bounded Cross-Team Audit
 
 After each phase, another group will inspect the implementation for a limited period using only the repository and submitted instructions.
+Use the same audit tool policy in every phase and, where scheduling allows, the same auditing group.
+Record unavoidable changes in auditors or tools as comparison limitations.
 
 The auditing group will:
 
@@ -450,8 +452,40 @@ The auditing group will:
 3. check a sample of the common acceptance scenarios;
 4. locate where one important domain behavior is implemented;
 5. identify one hidden assumption, inconsistency, or comprehension problem;
-6. attempt or estimate a small change probe supplied for that phase;
+6. attempt the small change probe supplied for that phase;
 7. return a concise friction report.
+
+### 10.1 Change-probe protocol
+
+The instructor releases one phase-specific probe only after the implementation has been submitted.
+The probes use different product language but exercise an equivalent vertical slice and acceptance burden.
+Their exact change shape is withheld until release.
+
+The change-probe portion of the audit lasts thirty minutes.
+Begin timing after the auditor receives the prompt and has a runnable checkout, so setup friction and change friction remain separate observations.
+During the time box:
+
+- use only the submitted repository, its instructions, and the common audit tool policy;
+- do not ask the authors where the change belongs;
+- work in a disposable branch or copy rather than modifying the submitted implementation;
+- run relevant existing checks before adding a focused automated test when time permits;
+- stop when the time expires, even if the change remains incomplete.
+
+If the submitted setup cannot be made runnable during the audit, record the probe as **not attempted because setup blocked it**.
+An estimate may be included as commentary, but it does not count as completed change evidence.
+
+### 10.2 Friction report
+
+Return any patch or diff together with a report containing:
+
+- setup outcome and setup time, reported separately from the probe;
+- time required to identify the likely user-interface, application, domain, persistence, and test locations;
+- probe outcome: complete, partial, blocked, or not attempted;
+- acceptance checks completed and still missing;
+- files or boundaries changed and any duplicated change that appeared necessary;
+- commands run and their results, including existing regressions;
+- assumptions, documentation gaps, and remaining uncertainty;
+- the first point at which progress became slow or blocked.
 
 The audit is not a full code review and does not transfer ownership.
 Auditors are not expected to become experts in the chosen stack.
@@ -513,8 +547,8 @@ The phase specifications describe the emphasis and deliverables for each build.
   Prefer observable behavior over framework-specific APIs or file layouts.
 - Decide whether every group receives the same local model endpoint or whether local hardware is part of the exercise.
   If hardware varies, require it to be reported and avoid ranking groups by raw latency.
-- Provide equivalent, bounded change probes for the three audits.
-  Do not reveal all probes at the start if prior knowledge would make later audits meaningless.
+- Keep the exact prompts in the instructor-only probe sheet out of published student materials.
+  Release only the current phase's prompt after submission and preserve the common time box and reporting rubric.
 - Review proposed exotic stacks early for feasibility, licensing, security, and available deployment paths without steering everyone toward the same technologies.
 - Treat setup difficulty as evidence, not automatic failure.
   The group should lose credit when its supported path is incomplete or irreproducible, not merely because the auditor has never used the language.

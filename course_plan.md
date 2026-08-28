@@ -57,7 +57,7 @@ In short:
 - Compare - build it again with an agent fleet, load the fleet's execution trace into the resulting application as debugging data, then measure, explain, and critique all three implementations and workflows.
 
 The full handover-and-return cycle is no longer the main mechanism.
-A bounded cross-team audit should preserve the unfamiliar-system lesson: another group runs the project from its documentation, applies the common checks, identifies a hidden assumption, and attempts or estimates one small standardized change.
+A bounded cross-team audit should preserve the unfamiliar-system lesson: another group runs the project from its documentation, applies the common checks, identifies a hidden assumption, and attempts one phase-specific but structurally equivalent change.
 
 The first specification draft now consists of a [common application contract](specifications/00_common_project.md) and separate [Establish](specifications/01_establish.md), [Challenge](specifications/02_challenge.md), and [Compare](specifications/03_compare.md) overlays.
 The rationale, comparison design, risks, and evidence requirements are recorded in [`docs/three-build-project-direction.md`](docs/three-build-project-direction.md).

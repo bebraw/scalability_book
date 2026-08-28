@@ -4,7 +4,7 @@
 - Separate protective friction from accidental repeated work.
 - Help students identify commitment points and distinguish cheap introduction from safe reversal.
 - Ground setup, comprehension, change, migration, and feedback friction in linked cases from Spotify, GitHub, Shopify, Stripe, and Slack.
-- Apply one stable change request and audit rubric to implementations A and B.
+- Apply phase-specific probes with one stable change shape and audit rubric to implementations A and B.
 - Connect friction to agentic development: agents can reduce, amplify, or relocate it.
 
 ## Implemented spine
@@ -27,8 +27,8 @@
   Keep the same setup, comprehension, change, testing, review, operational, and coordination categories so cross-build comparisons are meaningful.
 - Make the bounded cross-team audit the primary source of setup and comprehension evidence.
   Authors are poor judges of their own hidden context.
-- Define one small common change request that auditors can attempt or estimate against each implementation.
-  The change must be narrow enough to fit the audit and stable enough to compare.
+- Use the defined thirty-minute change probes and audit rubric.
+  Keep the product language phase-specific while holding the affected creation, validation, persistence, display, and testing path stable.
 - Separate generated-code friction from workflow friction.
   A clean final repository may still have required excessive retries, prompt repair, integration, or human review to produce.
 - For implementation C, add fleet-specific coordination friction without changing the base audit rubric.

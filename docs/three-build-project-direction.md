@@ -129,6 +129,7 @@ The first specification draft now includes:
 - phase-specific AI and orchestration constraints;
 - a transfer policy between implementations;
 - a stack-neutral shared runtime workload and fixture;
+- three bounded, equivalent audit change probes with a stable protocol;
 - a common evidence template;
 - the bounded cross-team audit;
 - common evaluation principles.
@@ -139,7 +140,6 @@ The next iteration should settle:
 - exact model and agent environments;
 - the stack proposal and approval process;
 - a small portable fleet-trace example or transformation template;
-- three equivalent audit change probes;
 - phase rubrics and grading weights;
 - expected project and audit time;
 - the submission structure used by the learning platform.
