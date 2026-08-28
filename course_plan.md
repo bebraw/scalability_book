@@ -127,7 +127,7 @@ That means 15 hours of effort per week so the course is demanding time-wise.
 I've done a rough calculation of the hour distribution below (average case):
 
 - Lectures - 9 \* 2 = 18h
-- Course learning diary - 9 \* 2 = 18h
+- Reading, lecture preparation, and course learning diary - 9 \* 2 = 18h
 - Projects and reflection - 99h in total, distributed approximately as:
   - Establish - 30h: core build 14h, harness and validation 6h, workload and evidence 5h, audit 3h, reflection and assessment 2h
   - Challenge - 30h: fresh build 13h, architecture and validation 5h, pressure and comparison evidence 7h, audit 3h, reflection and assessment 2h

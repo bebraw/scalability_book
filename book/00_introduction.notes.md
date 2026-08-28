@@ -21,6 +21,32 @@ By the end of the course, these artifacts should form a small engineering portfo
 - Chapter 8: three-way scaling comparison, target design, and scaling trade-off table.
 - Chapter 9: final evidence-based reflection.
 
+## 5 ECTS scope guidance moved from reader content
+
+The complete book is broader than the required reading contract for one course run.
+For the nine-lecture, 5 ECTS course, the introduction, three part openings, and nine numbered chapters form the required conceptual path.
+The project specifications are working references used while producing evidence.
+Case studies and appendices are selected extensions: read one when the instructor assigns it or when it answers a problem the project has reached, not simply because it appears in the book.
+
+The planned 135 hours are divided as follows:
+
+| Activity                                         | Planned time | Scope                                                                                                    |
+| ------------------------------------------------ | -----------: | -------------------------------------------------------------------------------------------------------- |
+| Lectures or equivalent activities                |     18 hours | Nine two-hour sessions                                                                                   |
+| Reading, lecture preparation, and learning diary |     18 hours | Approximately two hours per lecture for the aligned chapter, preparation, and a concise reflective entry |
+| Group projects, evidence, and reflection         |     99 hours | Three bounded builds and their cumulative evidence rather than three polished products                   |
+
+Suggested reading contract:
+
+- Required path: the introduction, part openings, and nine numbered chapters.
+- Project reference: the common specification, current phase specification, environment sheet, and assessment rubric; consult the relevant sections while working rather than memorizing them.
+- Selected extension: case studies, appendices, and optional labs only when assigned or useful to a declared project question.
+- The complete PDF is not a cover-to-cover assignment.
+
+The practical ceiling matters as much as the reading path.
+The shared event-tracking behavior should stay modest; only one scaling response is implemented and remeasured; and distributed infrastructure, extra product workflows, and broad visual polish are optional.
+When the available time becomes tight, reduce optional features and extension reading before weakening acceptance checks, measurement, recovery, review, or reflection.
+
 ## Notes for further development
 
 - Preserve the traditional scalability thread explicitly.

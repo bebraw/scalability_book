@@ -8,6 +8,15 @@
 
 ## Notes for further development
 
+### 5 ECTS scope guidance moved from reader content
+
+The three numbered chapters in this part are the required Challenge reading.
+Use a case study or appendix selectively when it supports the documented-case transfer, architecture hypothesis, pressure analysis, or a problem the group has actually observed.
+
+The project ceiling is one fresh implementation B, one standardized friction audit, and a focused comparison under the shared primary pressure plus one revealing secondary pressure.
+Students should recognize several response patterns but do not need to implement distributed versions of them during Challenge.
+Keep optional features out when they would weaken comparability, operational evidence, or the cross-team audit.
+
 - Add a short story from a student project: a simple design that worked until a new requirement made it awkward.
 - Include a table of "shortcut now" vs "future cost".
 - Keep the tone balanced.

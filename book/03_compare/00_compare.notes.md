@@ -1,5 +1,14 @@
 ## Notes for further development
 
+### 5 ECTS scope guidance moved from reader content
+
+The three numbered chapters in this part are the required Compare reading.
+Use deeper workflow, security, scalability-model, and durable-workflow appendices as references for the specific decision being tested rather than as an additional survey syllabus.
+
+The project ceiling is one bounded fleet implementation C, one implemented and remeasured scaling response in the selected application, one realistic deployment, and one final evidence-based decision.
+The target architecture may contain clearly labeled proposals beyond that experiment; students are not expected to build every mechanism they can justify conceptually.
+Preserve a negative result when it is informative instead of spending the remaining time escalating to a larger intervention.
+
 - Frame the part as fortifying both the system and the development process.
   The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
 - Use [Pi](https://pi.dev/) as the concrete tool for this part.
