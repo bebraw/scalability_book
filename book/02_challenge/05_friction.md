@@ -7,13 +7,6 @@ A system with high friction may still be useful, but each change requires more e
 The central claim could be: scalability is not only about handling more users.
 A project also has to scale the work of changing it.
 
-## Chapter purpose
-
-- Define friction as the practical symptom of technical debt.
-- Help students notice friction in their own implementation A systems.
-- Show how friction appears in code, tooling, documentation, tests, dependencies, and collaboration.
-- Connect friction to agentic development: agents amplify both good structure and bad structure.
-
 ## Forms of friction
 
 Possible subsections:

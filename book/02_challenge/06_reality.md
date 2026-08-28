@@ -7,13 +7,6 @@ This chapter helps students challenge implementation A while they form and evalu
 The central claim could be: systems rarely fail because one textbook pattern was missing.
 They fail because their original assumptions no longer match their operating environment.
 
-## Chapter purpose
-
-- Bridge the comparison from implementation A to implementation B.
-- Help students identify what breaks first when scale and uncertainty increase.
-- Introduce failure modes that appear outside local development.
-- Teach students to reason from pressure rather than from fashionable architecture patterns.
-
 ## Pressures that expose assumptions
 
 :ref[table:scaling-pressures]{text="The table below"} turns six forms of growth into assumptions to challenge, signals to watch, and responses to prepare.

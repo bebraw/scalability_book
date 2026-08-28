@@ -8,15 +8,6 @@ It develops technical scaling techniques without turning them into a catalog of 
 The central claim is that scaling is not one move.
 It is a sequence of trade-offs made in response to specific pressure.
 
-## Chapter purpose
-
-- Give students a practical vocabulary for scaling web applications.
-- Analyze documented production cases without assuming their results transfer unchanged.
-- Compare how implementations A, B, and C respond to the same scaling pressures.
-- Apply formal scalability models to application and development-workflow decisions.
-- Show that scaling choices have costs in complexity, consistency, operations, and development speed.
-- Prepare the transition from application scaling to development-process fortification.
-
 ## Start with the pressure
 
 Before choosing a technique, ask what problem is being solved:

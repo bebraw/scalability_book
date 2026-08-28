@@ -1,3 +1,10 @@
+## Chapter purpose
+
+- Define friction as the practical symptom of technical debt.
+- Help students notice friction in their own implementation A systems.
+- Show how friction appears in code, tooling, documentation, tests, dependencies, and collaboration.
+- Connect friction to agentic development: agents amplify both good structure and bad structure.
+
 ## Notes for further development
 
 - Add a friction checklist that students can reuse before implementation B.

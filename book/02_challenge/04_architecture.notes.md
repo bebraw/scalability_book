@@ -1,3 +1,12 @@
+## Chapter purpose
+
+- Explain the web as a distributed system.
+- Show how browser, server, network, and database boundaries shape application design.
+- Introduce API contracts as long-lived interfaces between independently changing parts.
+- Connect web architecture to the event tracking project without requiring one fixed application theme.
+- Use the completed implementation A systems as concrete architecture cases.
+- Prepare students to make and explain architectural choices in implementation B.
+
 ## Notes for further development
 
 - Add one diagram showing a request path for recording an event.

@@ -1,281 +1,291 @@
 # When do agent fleets improve web development?
 
-An agent fleet is a coordinated set of agents or agent roles working on parts of a larger task.
-Using the anatomy introduced earlier, a fleet connects several goal-directed observe–decide–act loops rather than creating a new kind of agent.
-One agent's artifact or message can become another agent's observation, while the orchestration layer assigns goals, routes results, and controls shared tools and state.
-Fleets can increase throughput when work decomposes cleanly, but they also introduce coordination cost.
-They work only when the project itself is legible enough that agents can operate without depending on hidden human context.
+An agent fleet is a coordinated set of independently operating agent executions working on parts of a larger task.
+The distinction matters.
+Writing four role descriptions into one prompt may help one agent reason, but it does not create four execution contexts, four tool users, or parallel work.
+A fleet connects several goal-directed observe–decide–act loops: one agent's artifact or message becomes another agent's observation, while an orchestration layer assigns work, routes results, and controls shared tools and state.
 
-The central claim could be: more agents do not automatically mean more progress.
-Agentic development scales only when the project teaches agents how to work inside it and when roles, boundaries, artifacts, and review loops are explicit.
+For web development, the attraction is clear.
+A feature often spans interaction design, browser behavior, an API contract, persistence, deployment, and verification.
+Those concerns create possible parallel work, but they also create seams where a locally reasonable change can break the application as a whole.
+The central claim of this chapter is therefore that more agents do not automatically mean more progress.
+Agentic development scales only when the work decomposes cleanly, the project teaches agents how to operate inside it, and integration and error correction remain explicit.
+
+Unless stated otherwise, “fleet” here means part of the development system that produces a web application.
+An agent deployed inside the application is a runtime component with its own users, data, permissions, latency, evaluation, and operational obligations.
+The settings reuse concepts such as tools, traces, workflows, and access control, but they are not the same experiment.
 
 > **Sustainability angle**
 >
 > Parallel agents multiply compute use.
 > A fleet is easier to justify when decomposition improves quality, reduces rework, or saves substantial human time.
-> Clear setup, fast tests, stable commands, useful errors, and scoped tasks reduce wasted attempts and make each model call more likely to produce reviewable value.
+> Clear setup, fast tests, stable commands, useful errors, and scoped tasks make each model call more likely to produce reviewable value.
 
-## Chapter purpose
+## From one agent to a fleet
 
-- Explain when agent fleets are useful and when they are unnecessary.
-- Define what "agent-ready" means in practical project terms.
-- Show how tests, documentation, conventions, setup, and architecture support agentic development.
-- Teach role design for small development workflows.
-- Show how to decompose and recombine work safely.
-- Apply Amdahl's Law to parallel agent work and sequential integration or review.
-- Connect agent readiness, development-time fleets, and production agent systems.
+A fleet should be an answer to the shape of the work, not the starting assumption.
+Begin with the smallest coordination structure that can complete the task.
 
-## Working outline
+| Stage                 | Structure                                                       | Useful when                                                           | New cost or risk                                                     |
+| --------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| One agent             | One context and action stream                                   | The change is small, coupled, or depends on frequent interpretation   | Limited concurrency; one interpretation can dominate                 |
+| Sequential delegation | One agent hands a bounded result to the next                    | Later work genuinely depends on an earlier finding or decision        | Handoff latency and accumulated misunderstanding                     |
+| Parallel specialists  | Independent agents work against a settled interface             | Tasks touch different modules and have independently testable outputs | Duplicate exploration, conflicts, and a growing review queue         |
+| Integrated fleet      | Orchestration, isolated workspaces, shared contracts, and gates | The workflow repeats often enough to justify explicit infrastructure  | Control, observability, recovery, and integration become system work |
 
-1. Why agent readiness matters
-   - AI tools can generate code quickly, but unclear projects make review and repair expensive.
-   - Hidden assumptions become failure modes.
-   - Agent readiness benefits humans too.
-2. What makes a project agent-ready
-   - `AGENTS.md` or equivalent project-level guidance.
-   - Commands, conventions, architecture notes, test expectations, forbidden operations, and review checklist.
-   - Fast tests, linting, type checks, seed data, local setup, realistic fixtures, and useful errors.
-3. Why fleets are tempting
-   - Parallel exploration, faster implementation, specialized review, and repeatable workflows.
-4. Why fleets are risky
-   - Conflicting edits, duplicated work, shallow understanding, context loss, and integration burden.
-5. Minimal fleet roles
-   - `scout`, `planner`, `implementer`, and `reviewer`.
-6. Safe task design
-   - Objective, context, allowed files, expected tests, non-goals, and acceptance criteria.
-   - Small modules, stable APIs, explicit ownership, migrations, compatibility tests, and feature flags.
-7. Workflow patterns
-   - Scout then plan.
-   - Implement then review.
-   - Parallel scouts for independent subsystems.
-8. Integration discipline
-   - The human integrates findings, resolves conflicts, runs tests, and preserves architectural intent.
-9. Tooling examples
-   - Use Pi, Acolyte, and Mastra only after the principles are clear.
-   - Present tools as examples of boundaries, traces, workflows, and reviewable execution.
-10. Course project application
+::caption[Progression from a single coding agent to an integrated development fleet.]
+::label[table:fleet-progression]
 
-- Students harden their event tracking project, use a small fleet for one bounded improvement, and submit evidence of the workflow.
+The first useful expansion is often sequential rather than parallel.
+A read-only scout maps the relevant routes, components, data flow, and tests; an implementer then receives the compressed findings and a bounded objective.
+This keeps noisy reconnaissance out of the implementation context without pretending that dependent work can happen simultaneously.
+An implementer followed by a reviewer is another sequential pattern: the reviewer receives a concrete diff and validation evidence rather than guessing what might change.
 
-## Map decision responsibility before assigning roles
+Parallelism becomes reasonable only after a shared decision has settled the seam between tasks.
+For implementation C, one possible dependency graph is:
 
-The fleet roles above describe activities, but an activity role does not by itself allocate decision responsibility.
-A `planner` might only prepare alternatives, or it might silently settle architecture and scope through the plan it produces.
-A `reviewer` might provide another opinion, or it might act as the actual acceptance gate.
-The role name does not reveal the difference.
+`reconnaissance → shared domain and API contract → interface work ∥ data work → integration → browser acceptance`
 
-The Human Agent Relationship framing introduced earlier treats the fleet as a development control system.
-Following the decision-path formulation of :citet[nissila2026decisionpath], trace a feature through:
-
-> **Need → Define → Design → Implement → Verify → Release → Observe → Adapt**
-
-Not every project needs a separate person or agent at every step, and adjacent steps may collapse in a small change.
-The useful unit is the consequential decision.
-For each one, distinguish the performer from the accountable owner and record how much authority is delegated.
-The function-specific automation model of :citet[parasuraman2000automation] is useful here: acquiring information, analyzing it, selecting an action, and implementing that action can receive different allocations even inside one named task.
-NIST similarly recommends defining and differentiating roles and responsibilities for human-AI configurations and oversight rather than assuming that the presence of a human establishes effective control :citep[tabassi2023airmf].
-
-This allocation problem has a longer research history.
-Mixed-initiative interaction combines direct human control with automation while considering uncertainty, costs, and benefits :citep[horvitz1999mixedinitiative], and the design target is appropriate reliance rather than maximum trust :citep[lee2004trust].
-Joint-activity research adds common ground, mutual predictability, and directability :citep[klein2004teamplayer], while human-AI interaction guidance emphasizes making capabilities and likely errors visible and supporting invocation, dismissal, and correction :citep[amershi2019guidelines].
-
-:ref[table:fleet-decision-responsibility]{text="The table below"} gives one concrete allocation of performance, authority, evidence, recovery, and accountability across a feature's decision path.
-
-| Decision                           | Performer and authority                                   | Acceptance evidence                                              | Escalation or recovery                                          | Accountable owner |
-| ---------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- | ----------------- |
-| Interpret an ambiguous requirement | Agent proposes interpretations; human selects or reframes | Examples, affected users, assumptions, and unresolved questions  | Escalate when alternatives change the required behavior         | Outcome owner     |
-| Change a shared interface          | Agent prepares an ADR and compatibility analysis          | Contract checks, affected consumers, migration and rollback plan | Escalate before breaking or externally visible change           | System owner      |
-| Implement a bounded change         | Agent executes within named files, tools, and budget      | Focused tests, baseline gate, diff, and known limits             | Stop on scope expansion, failed invariant, or unavailable check | Integrating human |
-| Release and observe                | Automation executes an approved reversible path           | Deployment identity, health signals, and rollback trigger        | Roll back or page the named responder on threshold breach       | Release owner     |
-
-::caption[Example allocation of authority, evidence, recovery, and accountability across development decisions.]
-::label[table:fleet-decision-responsibility]
-
-This table is a design example, not a universal role model.
-Authority should vary with the decision's ambiguity, coupling, observability, reversibility, and consequence.
-The same agent can legitimately execute one bounded implementation decision while being limited to proposing an architectural or product decision.
-
-Coactive Design adds a practical test for whether the allocation can work.
-Each interdependence needs sufficient **observability** of relevant state, **predictability** of likely behavior, and **directability** through instructions, correction, stopping, or reallocation :citep[johnson2014coactive].
-A human approval box does not provide these properties automatically.
-If the approver receives an opaque artifact, cannot identify what will happen next, or cannot interrupt or recover the action, the relationship may be human-on-paper but agent-controlled in practice.
-
-### Decision-path exercise
-
-Before running the fleet, choose one consequential feature and create a small HAR decision map.
-Start from the eight-step path above, merge steps that genuinely share one decision, and record for at least four decisions:
-
-- the intended outcome and accountable human or group
-- the primary performer and the agent's authority: `propose`, `prepare`, or `execute`
-- the allowed context, files, tools, credentials, budget, and external effects
-- the evidence required for acceptance
-- an observable escalation condition and named responder
-- the stop, rollback, compensation, or supersession path
-
-Include at least one human-owned decision, one agent proposal, and one bounded agent execution.
-After the run, annotate where the observed path differed from the planned path.
-The map is the normative design; the execution trace is descriptive evidence.
-A mismatch may reveal hidden authority, missing escalation, ceremonial approval, or work that no one explicitly accepted.
-
-## Give project memory a lifecycle
-
-Long-running and parallel work produces questions, hypotheses, plans, decisions, and behavioral evidence.
-Treating all of them as equally authoritative makes it difficult for both humans and agents to know which statements still govern the project.
-A useful project-memory lifecycle distinguishes four roles:
-
-1. **Explore:** keep unresolved questions, alternatives, and temporary findings in a working map or session artifact.
-2. **Decide:** record consequential choices and their trade-offs in a decision record.
-3. **Specify:** promote settled behavior and capability contracts into the relevant feature specification or architecture document.
-4. **Verify and supersede:** connect the contract to executable evidence, and explicitly replace durable records when the decision changes.
-
-A discovery map should not silently become the specification, and an agent transcript should not become the only place where a lasting constraint exists.
-The fleet plan should tell each role where its output belongs and who may promote temporary findings into durable project memory.
-This reduces the chance that parallel agents act on different generations of the same decision.
-
-Retrieval should assemble candidate evidence, not create a second authority.
-Cerebras describes an internal knowledge base that keeps authoring in source-native systems, normalizes Slack, code, documents, and custom sources into a shared evidence schema, and constructs query context with scoped lexical and semantic retrieval, recency, rank fusion, reranking, and surrounding-context restoration.
-Its MCP interface exposes narrow retrieval primitives while leaving tool selection and synthesis to the client :citep[tai2026knowledge].
-This is a vendor-authored implementation case: the reported volume of more than 15,000 daily questions after three months indicates use, but the article provides neither controlled component ablations nor a complete answer-quality evaluation.
-
-For a fleet, return attributed evidence and keep governing records and acceptance checks outside synthesized answers.
-Preserve source identity, retrieval time, freshness, project scope, and permission context; surface conflicts; verify consequential claims; and promote only reviewed decisions into plans, specifications, or decision records.
-A fluent multi-source answer remains a derived view, not the authority it summarizes.
-
-Repeatable agent workflows can also be stored as small, named project skills rather than one continually growing instruction file.
-A review skill, debugging skill, or release skill can define its trigger, evidence, boundaries, and output contract.
-Keep only workflows the project actually uses, make explicit or destructive workflows opt-in, and preserve one obvious source of truth when the same instructions must be distributed to multiple tools.
-
-## Separate task control from resource access
-
-A project harness, an agent execution loop, fleet orchestration, and a gateway that mediates model or tool requests control different units of work.
-One product may combine them, but the design should still distinguish task decisions from resource-access decisions.
-A responsibility recorded in a plan without a mandatory enforcement point remains an intention.
-
-For one delegated task, trace:
-
-`originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
-
-Propagate only the necessary identity, scoped authority, task, trace, budget, and policy identifiers, and require each enforcement point to validate the facts it relies on.
-Return which resource was actually selected, the policy decision, measurable usage and cost, and an explicit outcome for the delegated run.
-A trace identifier connects evidence; it is not proof of identity or permission.
-
-Keep telemetry proportionate.
-Capture prompts, source, tool arguments, approval details, or principal data only when the operational question requires them, with redaction, access control, and deliberate retention.
-For the B–C comparison, pin the declared base model where possible and record substitutions as confounding factors.
-
-[Appendix D: Agent-system security, control, and traceability](/appendices/agent-system-security/#separate-task-control-from-resource-access) develops the control-plane distinction, enforcement audit, trace reconciliation, bypass checks, and fleet trace debugger.
-
-## Fleet throughput and cost
-
-An agent fleet is a production system for changes, so its throughput should be measured at the system boundary rather than at the code-generation step.
-A provocative industry formulation in [We are now factory engineers, not product engineers](https://www.warp.dev/blog/we-are-now-factory-engineers-not-product-engineers) defines factory efficiency roughly as shipped product divided by inference cost plus human time.
-The exact formula is too simple to stand as a general metric: shipped features are not automatically valuable, and quality, risk, maintenance, and environmental costs can be displaced beyond the measurement window.
-It is nevertheless a useful prompt.
-Students should count review, correction, integration, failed runs, and monitoring instead of treating generated code as completed work.
-
-This view also explains why additional agents can reduce rather than increase effective throughput.
-Parallel generation creates a queue for human judgment, integration, and verification.
-Fleet size should follow the system's review capacity and the independence of the available tasks.
-If two agents need the same files, hidden assumptions, or reviewer at the same time, their apparent parallelism may only move waiting and conflict downstream.
-
-Coordination mechanisms can remove one bottleneck without removing the others.
-In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results ranging from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
-The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not the same as accepted work.
-
-### Reliability and repeated review
-
-Repeating an agent review can reveal variation, but agreement between runs is not independent validation.
-Consensus can repeat a shared blind spot, while a rare finding can still identify a real defect.
-Deduplicate findings, preserve the fixed code and workflow configuration, and use behavioral evidence and accountable review to decide what is accepted.
-[Appendix A](/appendices/evaluating-agentic-workflows/#repeated-review-is-measurement-not-proof) develops the full repeated-review method.
-
-Long workflows create a second reliability question: when every critical step must succeed, small per-step failure probabilities compound.
-This series-system model is useful as a design probe, but real steps can share failure causes and later validation can sometimes repair earlier errors.
-[Appendix E](/appendices/scalability-models/#lussers-law-and-the-reliability-chain) develops Lusser's Law, separates detection from repair, and includes the reliability-chain lab.
+The interface and data branches may run together because both depend on the same contract.
+The contract itself, integration, and end-to-end acceptance remain sequential.
+If both branches need to reinterpret the lifecycle, edit the same schema, or wait for the same person, their apparent parallelism merely moves waiting and conflict downstream.
 
 ### Amdahl's Law and the sequential bottleneck
 
 Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
-If `p` is the parallelizable share of the work and `N` agents execute that share, the idealized speedup is:
+If `p` is the parallelizable share and `N` agents execute that share, the idealized speedup is:
 
 `S(N) = 1 / ((1 - p) + p / N)`
 
-If half of a workflow is inherently sequential, unlimited agents cannot make the entire workflow more than twice as fast.
-In software development, framing the task, changing a shared interface, integrating overlapping edits, reviewing risk, and accepting the final result often remain sequential.
-Real fleets perform below the ideal bound because communication, duplicated exploration, conflicts, and waiting add overhead that the basic formula does not model.
+If half of a workflow is inherently sequential, unlimited agents cannot make the whole workflow more than twice as fast.
+In web development, framing the feature, settling a shared interface, integrating overlapping edits, reviewing risk, and accepting the browser-visible result often remain sequential.
+Real fleets perform below the ideal bound because communication, duplicated exploration, conflicts, and waiting add overhead that the formula does not model.
 
-Students should estimate the parallel and sequential portions of one fleet workflow, calculate the ideal bound, and then compare it with observed elapsed time and human review effort.
-The difference is evidence about coordination cost, not proof that the law failed.
-
-### Sequential work bound
-
-The lab below keeps the workflow at 100 units of work and changes only the parallelizable share and the number of agents.
+The lab below keeps the workflow at 100 units of work and changes only the parallelizable share and number of agents.
 Predict the effect of the next agent before moving the control, then compare the ideal speedup with the infinite-agent ceiling.
 
 {{ import "site/includes/amdahl-law-demo.html" }}
 
-Apply the same calculation to one observed fleet task.
-Name what remained sequential—for example task framing, a shared contract change, integration, review, or acceptance—and keep coordination time outside the ideal bound visible rather than hiding it inside the parallel share.
+Apply the calculation to one observed fleet task.
+Name the sequential work and keep coordination time visible rather than hiding it inside the parallel share.
+The difference between the ideal bound and the observed result is evidence about coordination cost, not proof that the law failed.
 
-## Trust boundaries
+## What documented web-development cases show
 
-An agent's role should define both what it may read and which actions it may take.
-A particularly dangerous combination gives an agent private data, exposes it to untrusted content, and lets it communicate externally.
-Prompt injection can then turn legitimate permissions into an exfiltration path.
+The shift is visible in web delivery.
+Vercel [reported in April 2026](https://vercel.com/blog/agentic-infrastructure) that coding agents initiated more than 30% of deployments on its platform, up 1,000% over six months.
+That is vendor telemetry from one platform rather than an industry-wide measurement, but it shows that agentic web development is no longer limited to editor experiments.
 
-Imported skills, plugins, instructions, code, and configuration are development dependencies.
-Record their source and resolved revision, inspect their requested access and update path, and connect their output to independent project checks.
-Use a disposable least-privilege sandbox for any approved dynamic verification, without production credentials.
+The four company-authored accounts below are more useful for examining how the work changes.
+Each describes its author's own tools and measurements; none is a controlled comparison showing that the result will transfer to the course project.
 
-Persistent infrastructure can also become unintended project memory.
-Artifacts, caches, queues, logs, temporary storage, and remote workspaces cross a run boundary when one run can leave state that survives, is discoverable, and influences another.
-Record who can write and read each channel, how writes are attributed, what may be stored, how long it persists, and how it is cleared.
+| Documented case                                                                                                                        | Practice in the web-development workflow                                          | Reported evidence and important limit                                              | Transfer question                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [GitHub assigns Copilot work in github.com](https://github.blog/ai-and-ml/github-copilot/how-copilot-helps-build-the-github-platform/) | Issues become proposed changes to UI, APIs, migrations, and production code       | One month of task examples; no counts, review time, or defect rate                 | Which decisions may an agent execute, and who accepts the result?        |
+| [Vercel teaches agents product design](https://vercel.com/blog/teaching-agents-product-design-at-vercel)                               | Repository skills, linters, and review carry UI and interaction decisions forward | Skills went unused in 56% of separate Next.js eval cases; setup-specific           | How does a web project make product judgment available and maintainable? |
+| [Stripe runs parallel Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents)                              | Unattended agents produce pull requests in isolated development environments      | More than 1,000 agent-written PRs merged weekly; no attempt or quality denominator | What infrastructure makes parallel work bounded and reviewable?          |
+| [Stripe evaluates web integrations](https://stripe.com/blog/can-ai-agents-build-real-stripe-integrations)                              | Agents modify frontends, backends, databases, and live payment flows              | Eleven realistic environments with UI and API graders; deliberately small suite    | What evidence establishes that the resulting web behavior is correct?    |
 
-Break risky combinations where possible: a scout reading untrusted issues may not need secrets or network-writing tools; an implementer may use scoped files without deployment credentials; a publisher may receive a reviewed artifact rather than the private context that produced it.
-[Appendix D](/appendices/agent-system-security/#trust-boundaries) contains the capability-adoption procedure, cross-run-memory incident case, and complete security review.
+::caption[Documented agentic-development cases and their transfer questions.]
+::label[table:documented-agentic-development-cases]
 
-### Upstream work needs a human owner
+Four lessons transfer without retelling each case.
 
-An issue or patch submitted upstream asks someone else to spend scarce attention on triage, comprehension, review, integration, and follow-up.
-:citet[gruhn2026meatproxy] describes a failure mode in which a person forwards model output and routes reviewer feedback back through the model without first understanding and validating the work.
-Writing the request in your own words is only a signal of engagement, not proof of correctness, but the submitting human should be able to restate the intent, explain the evidence and limits, answer feedback, and correct or withdraw the change.
+First, **execution and acceptance are separate**.
+Assigning an issue to an agent changes the primary performer; it does not automatically transfer the authority to merge, release, or declare the result correct.
+Second, **making guidance available is not the same as applying it**.
+Repository instructions, product-design skills, examples, and linters can make hidden web conventions legible, but retrieval and correct application remain distinct failure modes.
+Third, **parallel activity is not accepted throughput**.
+Isolated environments and automated checks make more concurrent attempts possible, yet review, integration, and failed attempts still consume time and compute.
+Fourth, **web correctness has to be tested through the web boundary**.
+Component, API, and database checks matter, but they do not replace a browser journey that crosses the layers the user actually experiences.
 
-:citet[garbutt2026humanity] distinguishes agent-assisted human contributions from end-to-end agent submissions and argues that the latter can transfer effort to maintainers and weaken the relationships through which contributors become maintainers.
-His supporting data covers five selected projects, the projected annual changes simply double first-half totals, and the source cannot identify which pull requests were agent-generated; the observations illustrate a plausible cost-transfer mechanism rather than establish causal prevalence or community effects.
-Before allowing an agent to publish upstream, require explicit human authorization, follow the project's policy and templates, respect opt-outs and rate limits, disclose material assistance when requested, and measure accepted maintenance value rather than submission volume.
+Implementation C turns those lessons into a local comparison.
+Students build the common event-tracking application through a bounded fleet workflow, load the execution trace into the application, and compare the accepted outcome with a single-agent counterfactual.
 
-## Delegation lab
+## Build a small web-development fleet
 
-A useful live demonstration should make the coordination cost visible.
-The point is not to show that four agents are better than one.
-The point is to let students try a task, choose roles, see the review burden, and produce a delegation brief that can be used in their own project.
+Pi is the primary teaching environment because its small core makes the orchestration visible.
+Its [quickstart](https://pi.dev/docs/latest/quickstart) documents installation, authentication, project-level `AGENTS.md`, and the initial tool set.
+Pi's [extension API](https://pi.dev/docs/latest/extensions) can add tools and lifecycle controls, while the repository's [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) demonstrates separate processes, isolated contexts, sequential chains, parallel tasks, and structured output.
+The reference is a starting point to inspect and adapt, not evidence that every project should use its exact role or security model.
+
+Students can use another environment if they preserve the same task graph, evidence, and acceptance boundary.
+The tools below solve related but different problems, so compare their unit of delegation before comparing feature lists.
+
+| Environment                                                                                                                                                                                     | Unit and coordination model                                                                | Isolation or control to inspect                                                          | Best fit in this chapter                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on harness because students can see and modify the mechanism                         |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation)                                                                                                       | Parent delegates fresh-context children singly or in parallel; nested delegation is opt-in | Inherited toolsets, separate terminals, optional worktrees, iteration and timeout limits | Broader multi-provider harness comparison with built-in delegation and persistent skills or memory |
+| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated comparison when students want several built-in fleet patterns                           |
+| [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents)                                                                                                     | Asynchronous repository task that researches, changes code, and opens a pull request       | Repository policy, hosted environment, checks, and pull-request review                   | Issue-to-pull-request comparison rather than a transparent local fleet                             |
+| [OpenAI Responses multi-agent](https://developers.openai.com/api/docs/guides/latest-model#what-is-new)                                                                                          | A model coordinates parallel subagents and synthesizes their results                       | API tools, prompts, application policy, usage, and returned evidence                     | Application-level orchestration comparison rather than a coding-harness lab                        |
+
+::caption[Current paths for trying delegation; verify the linked documentation because these products evolve quickly.]
+::label[table:fleet-tool-options]
+
+Hermes is broader than a coding copilot: it includes persistent memory, reusable skills, remote terminal backends, and messaging entry points.
+For the course comparison, restrict it to the repository workflow, declare whether persistent memory was available, and enable worktree isolation for concurrent writers.
+
+Production-agent frameworks are outside this table.
+They help teams deploy agent workflows inside applications, whereas the chapter's primary question is how agents build and verify a web application.
+
+### Prepare the project before adding agents
+
+Install Pi following its current quickstart, authenticate with a provider, and start in a version-controlled project.
+Before adding subagents, ask one agent to inspect the repository:
+
+> Inspect this project and propose an `AGENTS.md`; do not edit yet.
+> Include the project purpose, setup and validation commands, coding conventions, architectural boundaries, forbidden operations, and review checklist.
+> Cite the files that support each proposal and mark unknowns.
+
+Review the proposal before saving it.
+An instruction file is maintained project policy, not an automatically authoritative summary.
+For a web project it should expose at least the development command, unit and browser-test commands, route and persistence locations, styling and accessibility expectations, responsive states, secrets policy, and the definition of done.
+
+Project memory needs a lifecycle.
+Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a decision record; promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
+A discovery transcript should not silently become the specification, and parallel agents should not work from different generations of the same contract.
+Repeatable review or debugging workflows can become small project skills, while clear mechanical rules belong in linters or tests.
+
+### Define the web task graph
+
+The fleet produces the complete common core of implementation C rather than four unrelated features.
+Settle the domain vocabulary, lifecycle transitions, event schema, API shapes, error semantics, and browser acceptance journey before starting parallel implementation.
+Then assign bounded work such as:
+
+| Task                    | Web-specific responsibility                                                                            | Boundary and required output                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Contract scout          | Map routes, domain transitions, events, UI states, storage, and existing checks                        | Read-only; return file references, unknowns, and proposed contract decisions      |
+| Interface implementer   | Build forms, loading, empty, success, and error states; preserve accessibility and responsive behavior | Own named UI files; return focused checks and screenshots or browser observations |
+| Data implementer        | Implement persistence, valid transitions, event atomicity, API responses, and idempotency              | Own named server and data files; return API, migration, and invariant checks      |
+| Verifier and integrator | Integrate both branches and exercise the complete user journey                                         | May repair only assigned integration defects; return browser evidence and limits  |
+
+::caption[A minimal fleet bound to cross-layer concerns in implementation C.]
+::label[table:web-fleet-tasks]
+
+Role names are illustrative.
+Grade whether every task has an objective, allowed files and tools, expected output, validation commands, non-goals, owner, and stopping condition.
+If two roles must edit the same shared contract, resolve that decision before they branch or reduce the fleet.
+Use separate workspaces or worktrees for concurrent writers, and pin the same declared base model for the single-agent and fleet runs where possible.
+Record any substitution as a confounding factor.
+
+### Map authority and acceptance
+
+Names such as `scout`, `implementer`, and `reviewer` allocate activity, not decision responsibility.
+Following the decision-path formulation of :citet[nissila2026decisionpath], trace the feature through:
+
+> **Need → Define → Design → Implement → Verify → Release → Observe → Adapt**
+
+For each consequential decision, distinguish the performer from the accountable owner and allocate authority as `propose`, `prepare`, or `execute`.
+The function-specific automation model of :citet[parasuraman2000automation] is useful because gathering information, analyzing it, selecting an action, and executing it can receive different allocations inside one task.
+NIST similarly recommends defining roles, responsibilities, and oversight for human–AI configurations rather than assuming that the presence of a human creates effective control :citep[tabassi2023airmf].
+
+| Decision                           | Agent authority                               | Acceptance evidence                                                | Recovery or escalation                                           | Accountable owner |
+| ---------------------------------- | --------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------- |
+| Interpret an ambiguous requirement | Propose alternatives                          | User examples, affected behavior, assumptions, and unknowns        | Human selects or reframes before implementation                  | Outcome owner     |
+| Change a shared interface          | Prepare a contract and compatibility analysis | Consumer checks, migration implications, and rollback path         | Escalate before a breaking or externally visible change          | System owner      |
+| Implement a bounded change         | Execute within named files, tools, and budget | Focused checks, diff, baseline gate, and known limits              | Stop on scope expansion, failed invariant, or unavailable check  | Integrating human |
+| Accept the web behavior            | Propose a verdict from the complete evidence  | Browser journey, API and persistence checks, and reviewed failures | Reject, repair, or revert; do not infer acceptance from activity | Outcome owner     |
+
+::caption[Example authority and acceptance boundaries for a web-development fleet.]
+::label[table:fleet-decision-responsibility]
+
+Coactive Design offers a compact test for this allocation.
+Each dependency needs enough **observability** of relevant state, **predictability** of likely behavior, and **directability** through correction, stopping, or reallocation :citep[johnson2014coactive].
+A human approval box is ceremonial if the approver cannot see what happened, anticipate the next action, or recover from it.
+
+Task control and resource access also remain separate.
+For one delegated task, trace:
+
+`originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
+
+Propagate only the necessary identity, authority, task, trace, budget, and policy identifiers.
+An agent that reads untrusted issues should not automatically receive secrets or external write access; an implementer does not need deployment credentials; a publisher should receive a reviewed artifact rather than all private context.
+Treat imported extensions, skills, instructions, and configuration as executable project dependencies: inspect their source and requested access, pin a revision when practical, and use disposable least-privilege environments.
+Publishing an issue, patch, deployment, or message externally requires an explicitly accountable human who can explain the intent and evidence, respond to feedback, and correct or withdraw it.
+[Appendix D](/appendices/agent-system-security/#separate-task-control-from-resource-access) develops the enforcement and traceability model.
+
+## Practice failure and correction
+
+Small cross-layer mismatches make fleet risk easier to understand than abstract warnings.
+The goal of the labs is not to prove that four agents are better than one.
+It is to expose where decomposition, integration, validation, or correction fails.
+
+### Delegation lab
+
+Use the planner below before running real agents.
+Choose a task and project-readiness level, then change the roles and model allocation.
+The generated packet is a rehearsal: if the task is vague, boundaries overlap, or the review burden exceeds available capacity, reduce the fleet or harden the project first.
 
 {{ import "site/includes/agent-fleet-demo.html" }}
 
-The demonstration should be used as a rehearsal before students run real agents.
-If the task is vague, the project is not ready, or the chosen roles produce overlapping work, the best outcome is to reduce the fleet.
-A small, reviewable delegation is usually better than parallel activity that the student cannot integrate.
-Use the decision-path exercise with the delegation brief: role descriptions allocate activity, while the HAR map allocates authority, acceptance, escalation, and accountability.
+Translate the packet into a task graph rather than launching every named role automatically.
+Run three small patterns before the complete implementation: scout then plan, implement then review, and parallel scouts over independent subsystems.
+For each pattern, state why the tasks are sequential or independent and who integrates the result.
 
-The fleet should be evaluated as a workflow, not as a collection of impressive transcripts.
-Reuse the workflow-evaluation pattern from [Appendix A](/appendices/evaluating-agentic-workflows/): define a small set of representative tasks, add deterministic probes for expected artifacts and validation commands, inspect the failing task, and record cost, latency, and human review time.
-Treat one end-to-end fleet attempt as a trial and grade its accepted outcome at the delegated-run boundary; the fleet's internal agents, retries, and handoffs are parts of that trial rather than independent samples.
-For a fleet, the execution trace is also evidence.
-It can reveal duplicated exploration, unnecessary handoffs, invalid tool calls, or an implementer working beyond its boundary even when the final answer looks acceptable.
-A single-agent and fleet run on the same bounded task can support a local case decision about whether delegation paid for its coordination cost.
-If the comparison makes a reliability claim, predeclare repeated trials and whether success means at least one accepted outcome or consistent acceptance across them; keep every failed attempt in the cost and latency accounting.
+### Correction lab
 
-In the course project, this trace becomes application data.
-The fleet run maps to a workspace, delegated tasks map to work items, agents and humans map to actors, and execution details map to activity events.
-By loading a transformed trace into implementation C, students turn the application into a debugging and observability tool for the workflow that produced it.
+After the fleet integrates implementation C, select one seeded defect from the table below.
+The instructor can supply a faulty branch, or the student can introduce the fault after saving a known-good baseline.
+Do not reveal the chosen fault to the diagnosing agent.
+
+| Seeded defect                                       | Why local work may look correct                      | Web-visible or state-visible failure                                     |
+| --------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| UI and API use different event or field names       | Each side's focused tests use its own vocabulary     | A user action appears successful but activity or summary does not update |
+| An event is written before transition validation    | The valid-transition test remains green              | A rejected action still changes event history or derived counts          |
+| A retried mutation has no idempotency boundary      | One request produces the expected record             | A network retry duplicates an event or transition                        |
+| Interface and data agents changed the same contract | Both branches pass before integration                | The merged browser journey fails or displays a stale state               |
+| The verifier runs unit checks but no browser probe  | Components, handlers, and queries pass independently | The complete user journey cannot finish                                  |
+
+::caption[Small faults that expose fleet integration and correction problems.]
+::label[table:fleet-correction-faults]
+
+Use one correction loop throughout the lab:
+
+> **delegate → integrate → observe → diagnose → correct → revalidate**
+
+1. Run every focused check reported by the contributing agents and record which checks are green.
+2. Exercise the application through its web boundary: create a workspace and work item, perform valid lifecycle transitions, confirm activity and summary, filter the feed, refresh to verify persistence, and attempt one invalid transition.
+3. Verify that the invalid action changes neither current state nor event history.
+4. Use the diff and fleet trace to locate the first divergence between the settled contract and observed behavior.
+5. Assign one bounded correction task with an explicit hypothesis.
+   Avoid launching several speculative fixers against the same files.
+6. Run the focused regression check and the complete browser journey again.
+   A correction is accepted only when both pass and the trace records the failed attempt and repair.
+
+This lab makes error correction part of the architecture rather than an afterthought.
+A green unit check can be accurate within its boundary and still fail to protect the user journey.
+Likewise, agreement between repeated agent reviews is not independent validation: several runs can repeat the same blind spot.
+Preserve the fixed code and workflow configuration, deduplicate findings, and decide acceptance from behavioral evidence and accountable review.
+[Appendix A](/appendices/evaluating-agentic-workflows/#repeated-review-is-measurement-not-proof) develops the repeated-review method, while [Appendix E](/appendices/scalability-models/#lussers-law-and-the-reliability-chain) models detection and repair across a reliability chain.
+
+### Measure accepted throughput
+
+An agent run, branch, pull request, or generated file is activity.
+It becomes useful throughput only when the declared acceptance boundary accepts the result.
+Count failed runs, duplicated exploration, handoffs, merge conflicts, retries, total model use, elapsed time, active human integration time, and reviewer backlog.
+Fleet size should follow task independence and review capacity, not the number of available agents.
+
+Coordination mechanisms can remove one bottleneck without removing the others.
+In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
+The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not accepted web behavior.
+
+Treat one end-to-end fleet attempt as one trial.
+The internal agents, retries, and handoffs are parts of that trial rather than independent samples.
+Compare it with one single-agent run over the same brief, base model, acceptance tests, and evidence schema.
+The result supports a local decision about this task; reliability claims require predeclared repeated trials.
+
+Finally, transform the execution trace into implementation C.
+The fleet run maps to a workspace, delegated tasks to work items, agents and humans to actors, and attempts, validations, failures, reviews, and interventions to activity events.
+Use the application's history, filters, summaries, and relationships to answer two questions: where did coordination first fail, and which correction produced accepted behavior?
 The goal is not to build a universal agent platform.
-It is to use event history, filters, summaries, and selected relationships to find coordination failures that the final code alone does not reveal.
+It is to make the workflow that built the web application inspectable through the web application itself.
 
 ## Summary
 
-An agent fleet is useful only when both the task and the project can support bounded parallel work.
-Roles allocate activity, but decision responsibility, authority, acceptance, escalation, and accountability still have to be mapped explicitly.
-Project memory needs ownership and a lifecycle, while task control should remain separate from access to files, tools, credentials, and external actions.
-Fleet performance should be judged by accepted outcomes together with latency, cost, coordination, failed attempts, and human review effort rather than by agent activity alone.
-Least-privilege trust boundaries and a human owner remain essential for consequential or upstream work.
-The execution trace makes these claims inspectable and gives implementation C useful data for finding retries, overlap, handoff failures, and unplanned intervention.
+Agent fleets grow usefully from one agent only when the task contains real independent work.
+Documented web-development cases show the enabling pattern: legible project guidance, isolated execution, explicit acceptance, and end-to-end evidence.
+Pi provides a transparent path for building a small fleet, while the alternatives demonstrate that local coding harnesses, hosted pull-request agents, and application-level orchestration should not be treated as interchangeable.
+Implementation C binds delegation to interface, API, persistence, and browser concerns, then makes students repair a small cross-layer fault.
+Judge the fleet by accepted web behavior, correction quality, latency, cost, coordination, and human review effort—not by how many agents appeared busy.

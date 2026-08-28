@@ -1,3 +1,11 @@
+## Chapter purpose for the part
+
+- Give students a vocabulary for the hidden costs of software decisions.
+- Use the public implementation A discussion and architecture reading to make design differences visible before implementation B.
+- Connect technical debt to development friction, not only messy code.
+- Reuse the benchmarking and observability protocol established for implementation A.
+- Prepare students for implementation B, where the same required behavior is implemented afresh with a foundation model and compared with the local-model baseline.
+
 ## Notes for further development
 
 - Add a short story from a student project: a simple design that worked until a new requirement made it awkward.

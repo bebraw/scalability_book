@@ -1,3 +1,12 @@
+## Chapter purpose
+
+- Give students a practical vocabulary for scaling web applications.
+- Analyze documented production cases without assuming their results transfer unchanged.
+- Compare how implementations A, B, and C respond to the same scaling pressures.
+- Apply formal scalability models to application and development-workflow decisions.
+- Show that scaling choices have costs in complexity, consistency, operations, and development speed.
+- Prepare the transition from application scaling to development-process fortification.
+
 ## Notes for further development
 
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.

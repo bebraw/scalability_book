@@ -1,3 +1,10 @@
+## Chapter purpose
+
+- Bridge the comparison from implementation A to implementation B.
+- Help students identify what breaks first when scale and uncertainty increase.
+- Introduce failure modes that appear outside local development.
+- Teach students to reason from pressure rather than from fashionable architecture patterns.
+
 ## Notes for further development
 
 - Add a concise incident narrative that can be reused in lecture.

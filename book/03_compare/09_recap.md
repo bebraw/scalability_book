@@ -13,13 +13,6 @@ That includes technical capacity, but it also includes architecture, feedback lo
 > It should use resources deliberately.
 > The final reflection should ask whether the project handles more work efficiently or merely pushes more computation, storage, bandwidth, and human attention into the problem.
 
-## Chapter purpose
-
-- Reconnect the main ideas of the book.
-- Help students explain what changed between implementations A, B, and C.
-- Turn the final project discussion into evidence-based reflection.
-- Show that scalability is technical, architectural, organizational, and agentic.
-
 ## The project arc
 
 The three projects give the course its shape.

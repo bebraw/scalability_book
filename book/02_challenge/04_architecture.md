@@ -6,15 +6,6 @@ Students often experience web development as a collection of frameworks, librari
 The central claim could be: web architecture is not neutral plumbing.
 It gives us constraints and affordances, and scalable systems are built by working with those constraints rather than pretending they do not exist.
 
-## Chapter purpose
-
-- Explain the web as a distributed system.
-- Show how browser, server, network, and database boundaries shape application design.
-- Introduce API contracts as long-lived interfaces between independently changing parts.
-- Connect web architecture to the event tracking project without requiring one fixed application theme.
-- Use the completed implementation A systems as concrete architecture cases.
-- Prepare students to make and explain architectural choices in implementation B.
-
 ## Why web architecture matters
 
 Ideas to develop:
