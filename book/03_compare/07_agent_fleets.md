@@ -198,6 +198,16 @@ Coactive Design offers a compact test for this allocation.
 Each dependency needs enough **observability** of relevant state, **predictability** of likely behavior, and **directability** through correction, stopping, or reallocation :citep[johnson2014coactive].
 A human approval box is ceremonial if the approver cannot see what happened, anticipate the next action, or recover from it.
 
+The dark- and twilight-factory framing adds a routing question to this control design :citep[mollick2026agency].
+In a **dark factory**, people specify and accept work while agents perform most of the production loop with little human involvement.
+In a **twilight factory**, agents still perform most of the work, but the workflow proactively involves people when their participation would improve the decision or its consequences.
+For software development, treat this as an escalation responsibility rather than another global autonomy level.
+A facilitator need not be a separate agent: an orchestration policy or task instruction can require the workflow to look up when an action needs approval, relevant expertise is missing, several agents may share a blind spot, or removing the decision from people would weaken the judgment needed to own and correct the system.
+Routine, reversible, independently checkable implementation may continue unattended; consequential or formative decisions need an observable trigger, a named recipient, enough evidence to respond, and safe behavior while the workflow waits.
+
+For one delegated task, mark where the workflow should look up for approval, expertise, an independent perspective, or retention of human judgment.
+For each point, state the observable trigger, who receives the escalation, what context and evidence they receive, what the agent may do while waiting, and how the boundary is enforced.
+
 Task control and resource access also remain separate.
 For one delegated task, trace:
 
