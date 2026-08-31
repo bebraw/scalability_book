@@ -11,7 +11,7 @@ The three chapters form one progression:
 2. [How should web applications respond to scaling pressure?](/chapters/scaling/) identifies approaching limits, applies formal models, and compares possible responses without treating a technique catalog as a design.
 3. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) connects the application, development, and agentic loops and turns the three evidence packages into a final decision.
 
-By the end of Compare, students should have implementation C and its fleet trace, a three-way application and workflow comparison, and a target design whose claims distinguish observation, inference, and proposal.
+Complete Compare with implementation C and its fleet trace, a three-way application and workflow comparison, and a target design whose claims distinguish observation, inference, and proposal.
 
 ## Implementation C — Work Activity Tracker
 

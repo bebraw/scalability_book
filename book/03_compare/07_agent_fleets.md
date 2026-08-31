@@ -101,7 +101,7 @@ Fourth, **web correctness has to be tested through the web boundary**.
 Component, API, and database checks matter, but they do not replace a browser journey that crosses the layers the user actually experiences.
 
 Implementation C turns those lessons into a local comparison.
-Students build the common event-tracking application through a bounded fleet workflow, load the execution trace into the application, and compare the accepted outcome with a single-agent counterfactual.
+Build the common event-tracking application through a bounded fleet workflow, load the execution trace into the application, and compare the accepted outcome with a single-agent counterfactual.
 
 ## Build a small web-development fleet
 
@@ -110,17 +110,17 @@ Its [quickstart](https://pi.dev/docs/latest/quickstart) documents installation, 
 Pi's [extension API](https://pi.dev/docs/latest/extensions) can add tools and lifecycle controls, while the repository's [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) demonstrates separate processes, isolated contexts, sequential chains, parallel tasks, and structured output.
 The reference is a starting point to inspect and adapt, not evidence that every project should use its exact role or security model.
 
-Students can use another agent harness or hosted environment if they preserve the same task graph, evidence, and acceptance boundary.
+You may use another agent harness or hosted environment if you preserve the same task graph, evidence, and acceptance boundary.
 The tools below solve related but different problems, so compare their unit of delegation before comparing feature lists.
 Pi, Hermes, and Claude Code expose agent harnesses that may also coordinate subagents; their processes consume the repository's project harness.
 GitHub Copilot exposes a hosted issue-to-pull-request workflow, while the OpenAI Responses example concerns orchestration inside an application.
-The table classifies the layer exposed to the student rather than every component inside each product.
+The table classifies the layer exposed to you rather than every component inside each product.
 
 | Environment                                                                                                                                                                                     | Unit and coordination model                                                                | Isolation or control to inspect                                                          | Best fit in this chapter                                                                       |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because students can see and modify the mechanism           |
+| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because you can see and modify the mechanism                 |
 | [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation)                                                                                                       | Parent delegates fresh-context children singly or in parallel; nested delegation is opt-in | Inherited toolsets, separate terminals, optional worktrees, iteration and timeout limits | Broader multi-provider agent-harness comparison with built-in delegation and persistent memory |
-| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when students want several built-in fleet patterns         |
+| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when you want several built-in fleet patterns               |
 | [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents)                                                                                                     | Asynchronous repository task that researches, changes code, and opens a pull request       | Repository policy, hosted environment, checks, and pull-request review                   | Issue-to-pull-request comparison rather than a transparent local fleet                         |
 | [OpenAI Responses multi-agent](https://developers.openai.com/api/docs/guides/latest-model#what-is-new)                                                                                          | A model coordinates parallel subagents and synthesizes their results                       | API tools, prompts, application policy, usage, and returned evidence                     | Application-level orchestration comparison rather than an agent-harness lab                    |
 
@@ -230,7 +230,7 @@ For each pattern, state why the tasks are sequential or independent and who inte
 ### Correction lab
 
 After the fleet integrates implementation C, select one seeded defect from the table below.
-The instructor can supply a faulty branch, or the student can introduce the fault after saving a known-good baseline.
+The instructor can supply a faulty branch, or you can introduce the fault after saving a known-good baseline.
 Do not reveal the chosen fault to the diagnosing agent.
 
 | Seeded defect                                       | Why local work may look correct                      | Web-visible or state-visible failure                                     |
@@ -308,5 +308,5 @@ The fleet configuration and trace are part of the submitted development system, 
 Agent fleets grow usefully from one agent only when the task contains real independent work.
 Documented web-development cases show the enabling pattern: legible project guidance, isolated execution, explicit acceptance, and end-to-end evidence.
 Pi provides a transparent path for building a small fleet, while the alternatives demonstrate that local agent harnesses, hosted pull-request agents, and application-level orchestration should not be treated as interchangeable.
-Implementation C binds delegation to interface, API, persistence, and browser concerns, then makes students repair a small cross-layer fault.
+Implementation C binds delegation to interface, API, persistence, and browser concerns, then requires you to repair a small cross-layer fault.
 Judge the fleet by accepted web behavior, correction quality, latency, cost, coordination, and human review effort—not by how many agents appeared busy.

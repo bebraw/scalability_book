@@ -199,7 +199,7 @@ A strong synthesis labels the status of each important claim:
 For example, “implementation B had the lowest measured p95 under the declared workload” is an observation.
 “Its data model caused the difference” is an inference unless the comparison isolates that factor.
 “A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
-This vocabulary lets students reason beyond the available experiment without presenting plans as results.
+This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 
 ## Turn comparison into a decision
 

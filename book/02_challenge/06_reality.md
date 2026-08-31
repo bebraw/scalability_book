@@ -99,7 +99,7 @@ This framing turns “Will it scale?” into four more useful questions:
 
 ## Connect failed assumptions to response patterns
 
-Diagnosis comes before technique selection, but students still need a compact vocabulary for responding once a failed assumption and binding limit are visible.
+Diagnosis comes before technique selection, but you still need a compact vocabulary for responding once a failed assumption and binding limit are visible.
 The patterns below are starting hypotheses rather than infrastructure that every implementation should acquire.
 
 | Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
@@ -177,16 +177,16 @@ Choose one documented case and reconstruct it as a chain of trigger, latent cond
 Then transfer only the structure of that chain to the event tracker.
 Do not claim that the project has reproduced the source company's scale, infrastructure, or result.
 
-Students should explain which assumptions differ between implementations A and B and which remain shared.
+Explain which assumptions differ between implementations A and B and which remain shared.
 A good reconstruction makes failure and recovery obligations visible without trying to solve every possible future problem.
 The [Scaling chapter](/chapters/scaling/) can then choose techniques in response to demonstrated pressure rather than previewing a catalog here.
 
 ## Project artifact
 
-Students should produce a documented-case transfer and a pressure map for implementations A and B.
+Produce a documented-case transfer and a pressure map for implementations A and B.
 The artifact should:
 
-- link the selected source and separate its reported facts from the student's interpretation,
+- link the selected source and separate its reported facts from your interpretation,
 - trace one failure across consumer, network, execution, authority, and operational boundaries,
 - name the assumption, binding limit, first useful signal, amplification path, and user-visible effect,
 - apply Little's Law to one declared queue, pool, request path, or other conserved-work boundary and interpret its limits,

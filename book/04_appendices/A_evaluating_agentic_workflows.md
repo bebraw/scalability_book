@@ -272,7 +272,7 @@ Deduplicate repeated findings, record recurrence separately from deterministic-r
 Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
 Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
 Repeated review also consumes the same scarce integration capacity that bounds the fleet.
-If students repeat an agent review, they should record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
+If you repeat an agent review, record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 
 ## Apply the method selectively

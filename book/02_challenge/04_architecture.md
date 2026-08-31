@@ -1,6 +1,6 @@
 # How does web architecture shape scalability?
 
-Students often experience web development as a collection of frameworks, libraries, and deployment platforms.
+At first, web development can feel like a collection of frameworks, libraries, and deployment platforms.
 Those tools change quickly, but web applications still have to connect consumers, representations, computation, and authoritative data across networks that introduce latency, partial failure, independent change, and untrusted input.
 
 Web architecture has not progressed by replacing one correct design with another.
@@ -356,7 +356,7 @@ Either development model can preserve architecture through stable boundaries, re
 
 ### Make the implementation architecture reviewable
 
-Students have already made architecture choices in implementation A, even if they did not yet have a complete vocabulary for them.
+By this point, you have already made architecture choices in implementation A, even if you did not yet have a complete vocabulary for them.
 The public project discussion should make those choices visible: different groups received the same behavioral specification but chose different stacks, boundaries, storage models, and request paths.
 
 Each implementation should treat a small set of project memory files as architectural artifacts:
@@ -403,7 +403,7 @@ A design is coherent when these consequences agree rather than when it selects t
 
 ## Project artifact
 
-Students should review the architecture and data-flow diagrams submitted with implementation A, identify one consequential architectural choice, and write an architecture hypothesis for implementation B.
+Review the architecture and data-flow diagrams submitted with implementation A, identify one consequential architectural choice, and write an architecture hypothesis for implementation B.
 The hypothesis should use the conceptual model and dimensions table to state:
 
 - which consumer, representation, execution location, and authority the selected workflow uses,
@@ -413,7 +413,7 @@ The hypothesis should use the conceptual model and dimensions table to state:
 - which team or organizational boundary owns the contract and which changes require coordination across it,
 - and what evidence would show whether the decision works.
 
-Students should also complete an ownership card for the event workflow and identify one structural signal that would cause them to review that ownership again.
+Also complete an ownership card for the event workflow and identify one structural signal that would prompt another ownership review.
 Implementation B should still include its own diagrams and decision record.
 
 ## Summary

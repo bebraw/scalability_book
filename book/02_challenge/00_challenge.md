@@ -22,7 +22,7 @@ Requirements, permitted acceptance material, shared pressures, and reporting cat
 Application code and implementation-specific tests do not carry forward, and neither the earlier architecture nor its development history becomes the default.
 The exact transfer policy remains defined by the project brief.
 
-Students now know the domain better than they did during Establish.
+You enter Challenge with greater familiarity with the domain than you had during Establish.
 That practice effect is part of the comparison: record what changed, distinguish model and workflow differences from team learning where the evidence permits it, and leave the explanation unresolved when it does not.
 Use implementation A and its public discussion as evidence about earlier choices, not as a repository to improve incrementally.
 

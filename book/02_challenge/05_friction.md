@@ -198,7 +198,7 @@ Then use the friction audit to ask which part of that process is creating repeat
 
 The demonstration below treats friction as repeated work in a small change path.
 The goal is not to calculate exact minutes.
-The goal is to make students name where the resistance appears and choose one feedback loop to improve before adding more features.
+Name where the resistance appears and choose one feedback loop to improve before adding more features.
 
 {{ import "site/includes/friction-audit-demo.html" }}
 
@@ -212,7 +212,7 @@ A different score may come from architecture, tooling, documentation, generated 
 
 ## Project artifact
 
-Students should produce a friction audit for implementations A and B.
+Produce a friction audit for implementations A and B.
 It should:
 
 - trace one bounded web change from the browser-facing interaction through its contract, validation, data, derived view, cache, and deployment boundaries,

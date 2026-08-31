@@ -211,7 +211,7 @@ If several dimensions rise together, preserve them as separate claims instead of
 
 ## Project artifact
 
-Students should produce two bounded scalability claims for implementation A: one about runtime demand or data, and one about contributors or change.
+Produce two bounded scalability claims for implementation A: one about runtime demand or data, and one about contributors or change.
 For each claim, record:
 
 - the goal that must continue to hold,

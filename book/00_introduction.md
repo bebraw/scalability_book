@@ -46,7 +46,7 @@ Each phase begins from a fresh implementation and changes the development setup 
 3. **Compare:** a declared agent fleet produces implementation C before all three applications and development workflows are compared.
 
 The comparison is bounded rather than perfectly controlled.
-Students learn the domain between phases, implementations may make different design choices, and model or tool configurations can change.
+You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.
 The shared specification, acceptance material, pressures, and reporting categories make those differences discussable without pretending that the course establishes a universal ranking.
 
 Each main chapter ends with a **Project artifact** section.

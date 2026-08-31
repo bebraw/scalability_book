@@ -24,7 +24,7 @@ The demonstration below starts from a concrete event-tracking pressure: event wr
 {{ import "site/includes/scaling-pressure-demo.html" }}
 
 The important part is the exported trade-off table.
-Students should be able to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
+Use it to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
 
 ## Name the saturation boundary
 
@@ -62,7 +62,7 @@ The lesson is structural: removing one bottleneck changes the system's limiting 
 ## Use a formal model before choosing a technique
 
 A scaling technique should respond to an identified limit.
-Formal models help students state that limit precisely enough to challenge their own intuition.
+Formal models help you state that limit precisely enough to challenge your own intuition.
 :ref[table:scalability-laws]{text="The table below"} states four useful laws explicitly and separates what each can support from what it cannot establish.
 
 | Law                                                      | Exact relationship                                                                                                                | Main assumptions                                                                                 | Useful when                                                                                         | Cannot establish                                                            |
@@ -76,7 +76,7 @@ Formal models help students state that limit precisely enough to challenge their
 ::label[table:scalability-laws]
 
 The project does not require every model.
-Students must apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.
+Apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.
 Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out.
 A formula added after the design decision is not evidence that the formula guided the decision.
 
@@ -269,11 +269,11 @@ The goal is to balance work that prevents known failures with work that improves
 
 ## Project artifact
 
-Students should produce a three-way scaling comparison, one implemented and measured scaling response, and one justified target design.
+Produce a three-way scaling comparison, one implemented and measured scaling response, and one justified target design.
 The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
 The implemented response should preserve its before-and-after revisions, unchanged workload and acceptance evidence, observed result, new failure or recovery obligation, and conclusion.
 For at least one pressure, connect the proposed response to a documented production account.
-Separate what the source directly reports from the student's interpretation and from the transfer proposed for the project; do not assume that the source's scale, result, or accepted trade-off carries over.
+Separate what the source directly reports from your interpretation and from the transfer proposed for the project; do not assume that the source's scale, result, or accepted trade-off carries over.
 It should include one formal model applied to an application decision and one applied to the development workflow.
 Each row in the target design's trade-off table should name a pressure, the limit being approached, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, at least one prepared recovery action, and the reason a simpler alternative was not enough.
 It should also state where the technique displaced complexity, such as into clients, data freshness, background operations, routing, migration, or incident response.

@@ -71,7 +71,7 @@ Treat that comparison as an exploratory example rather than a universal ranking 
 
 In this book, the same bounded project is first implemented with a local model, then a foundation model, and finally a fleet of agents.
 The phases do not prescribe one row of the table.
-They hold required web behavior stable while students compare how different models, constraints, validation, and orchestration affect the path from a candidate change to accepted work.
+They hold required web behavior stable so you can compare how different models, constraints, validation, and orchestration affect the path from a candidate change to accepted work.
 
 ### When generation outruns comprehension
 
@@ -304,7 +304,7 @@ Strict tool contracts, useful errors, reproducible commands, and observable exec
 The reusable lesson is to push repeatable project knowledge and feedback into maintained artifacts rather than leave them in one conversation.
 
 The [common project specification](/project/#6-minimum-project-harness) owns the exact required artifacts.
-The practical baseline is simpler than the list: can another student or agent clone the project, understand its intended shape, run it and its checks, and make a small change without guessing?
+The practical baseline is simpler than the list: can a new contributor or agent clone the project, understand its intended shape, run it and its checks, and make a small change without guessing?
 An environment definition is part of that contract rather than neutral background; the [Friction chapter](/chapters/friction/) develops how to test it from a fresh checkout.
 That chapter also explains why validation cost should follow change risk instead of running every check after every edit.
 
