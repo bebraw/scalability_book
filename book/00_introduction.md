@@ -27,12 +27,30 @@ The central question is how application behavior and the development process can
 
 ## Why this book now
 
-This book is informed by twenty years of work in web development, my [research on the topic](https://survivejs.com/research/), a doctorate completed in 2025, and the conversations around agentic development that led me to organize [Future Frontend](https://futurefrontend.com/).
-The rapid change in coding agents forced me to rethink what a book about scalable web development should teach.
-The result is a 2026 snapshot rather than a claim to settled best practice: use its models and evidence to form your own judgments.
+If I had written this book only a few years ago, it would have focused strictly on web technologies rather than development itself.
+Coding agents changed that.
+Developers can now delegate substantial parts of implementation, moving more of their attention toward specification, architecture, validation, and ownership.
+Agents are also becoming consumers of web applications through browsers, APIs, and tools.
+This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.
 
-You can read the chapters independently and follow their references without completing the course project.
-The full progression is most useful when you want to connect runtime scalability, architecture, measurement, and agent-assisted development through one sustained example.
+During the past few months, I have developed projects whose complexity would previously have kept me from attempting them.
+The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), and [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/).
+Each taught me something different: generation can outpace product judgment, architecture can lag behind implementation, and deliberately narrow scope can turn the same capability into dependable software.
+Reading about other people's experience helps, but there is also value in making bounded mistakes of your own and forming your own judgment.
+
+While the book was developed to support a course I run at Aalto University, I have tried to keep the chapters independent so that you can use it as reference material.
+The course project complements the book and lets you experience different ways of developing web applications with agents.
+
+## How this book was made
+
+I developed this book with GPT-5.5 and GPT-5.6 through the kind of iterative human-agent workflow it studies.
+That collaboration let me explore more material and build interactive web demonstrations, but it also made validation and curation the central editorial work.
+I kept the main path relatively light by moving deeper investigations into case studies and appendices.
+The online edition remains a living book, and its feedback tools are part of that continuing review.
+
+The broader implication is that agents can help a person create a book tailored to a topic they want to study.
+Producing text is no longer the main constraint; validation and curation are.
+The way I developed this book reflects how I now develop web software in collaboration with models, and many of the lessons extend beyond web development.
 
 ## One application, three development systems
 
