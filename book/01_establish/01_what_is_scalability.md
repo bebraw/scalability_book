@@ -99,6 +99,26 @@ Once a consumer relies on a response or production data adopts a representation,
 Change scalability is the ability to keep making justified changes without turning every release into a coordinated rewrite.
 It depends on visible boundaries, useful tests, staged evolution, and recovery paths, but no design eliminates the need to understand what has already become a commitment.
 
+#### Field note — When agent speed made me the bottleneck
+
+Before AI-assisted development, I thought about scalability mainly through the conventional pressures of demand and data.
+Working with agents shifted my attention toward contributors and change.
+
+Agents can implement changes far faster than I can.
+That makes my judgment and review capacity a binding limit, but removing that limit is not necessarily desirable.
+The pace creates a psychological risk I think of as **speed blindness**: becoming so accustomed to rapid output that I stop asking whether the work still serves the intended direction.
+
+This helps explain why people report such different experiences with AI-assisted development.
+Rapid generation can be useful leverage in one context and a source of technical risk in another.
+Both accounts can be true.
+The outcome depends partly on whether the person retains enough understanding and judgment to direct the work.
+Otherwise, they become a proxy for the agent—pulling a slot machine and hoping that the next plausible result is the right one.
+
+This book is an example.
+Agents and I are developing it together, but I still own its vision and remain responsible for whether it forms a coherent book for my students.
+The agents can help research, draft, restructure, and check it; they cannot take over that responsibility.
+For me, scaling agent-assisted work means preserving that ownership while taking advantage of the speed.
+
 ## One pressure can cross the whole web system
 
 Suppose a domain-specific event causes many consumers to submit events during the same short interval.
