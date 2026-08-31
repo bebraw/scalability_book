@@ -202,8 +202,8 @@ Notice that monitoring the proxy is still useful after the repair, but it no lon
 Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
 
 :citet[barrocas2026ecoassist] provide one bounded example of a before-and-after energy study.
-On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 deliberately resource-heavy standalone webpages.
-The pages were selected for a size above 600 KB and at least ten DOM-affecting operations, so the sample does not represent arbitrary production applications.
+On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 standalone webpages selected for a size above 600 KB and at least ten DOM-affecting operations.
+The sample therefore emphasizes pages with substantial optimization potential and does not represent arbitrary production applications.
 The benchmark compared each optimized page with its own unoptimized baseline, not with another optimizer.
 
 In a separate single-condition lab study, twenty early-career developers generated and optimized portfolio pages and reported low workload.

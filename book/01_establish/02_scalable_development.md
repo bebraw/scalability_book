@@ -318,7 +318,7 @@ An agent harness can consume a project's instructions and invoke its commands, b
 A development system may use several agent harnesses against the same project harness and still rely on people for review, integration, and ownership.
 A good project harness reduces the hidden context needed to make a useful change and returns failures in forms that people and agents can act on.
 
-An analysis of more than 3,800 reported bugs across three coding tools found that API, integration, or configuration errors accounted for 36.9% of root causes, while tool invocation and command execution were the most affected workflow stages :citep[zhang2026pitfalls].
+An analysis of 3,864 user-reported bugs across Claude Code, Codex CLI, and Gemini CLI found that API, integration, or configuration errors accounted for 37.3% of root causes, while tool invocation and command execution were the most affected workflow stages :citep[zhang2026pitfalls].
 The sample is limited to public issue reports, but the result is a useful warning: model reasoning is only one possible failure source.
 Strict tool contracts, useful errors, reproducible commands, and observable execution belong to the project harness too.
 

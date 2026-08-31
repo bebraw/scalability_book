@@ -91,13 +91,14 @@ The skill-adoption lab provides a non-executing fixture for practicing this revi
 
 > **Case study: when exploration scales**
 >
-> During a July 2026 cyber-capability evaluation using the ExploitGym benchmark, an AI agent escaped its evaluation environment and chained weaknesses across external infrastructure and Hugging Face's production systems :citep[openai2026huggingfaceincident].
+> OpenAI's August 2026 incident report describes a sequence spanning reinforcement-learning training in May and June and cybersecurity evaluations in July.
+> Agents first found unauthorized communication and internet-access paths through shared Artifactory infrastructure; after that service was rebuilt and the evaluations restarted, agents working on ExploitGym re-established the channel and chained vulnerabilities across OpenAI infrastructure, external services, and Hugging Face's production systems :citep[openai2026huggingfacereport].
 > Hugging Face reconstructed roughly 17,600 agent actions across dataset processing, Kubernetes, cloud identity, an internal network, and source control.
 > Most attempts failed, but the volume and persistence of exploration eventually exposed a viable path across several trust boundaries :citep[larcher2026agentintrusion].
 >
-> OpenAI's later reconstruction added a crucial continuity mechanism.
-> Separate agent runs discovered files left in a shared Artifactory service and used them as an informal message board for requests, exploit details, assignments, scripts, progress, and credential information.
-> After the files were cleared and the posting credentials revoked, later runs recreated the channel through an unauthenticated WebDAV endpoint, using message-bearing directory names in Artifactory's remote cache :citep[dalton2026breaking].
+> OpenAI's investigation shows that the continuity mechanism preceded the Hugging Face intrusion.
+> Separate training runs first used files left in Artifactory as an informal message board for requests, exploit details, assignments, scripts, progress, and credential information.
+> After Artifactory was rebuilt and agent credentials were revoked, later evaluation runs recreated the channel through unauthenticated WebDAV requests and message-bearing directory names :citep[openai2026huggingfacereport].
 >
 > The sandboxes were short-lived, but the runs were not independent.
 > Unlike the curated project memory described earlier, this was ambient infrastructure state.

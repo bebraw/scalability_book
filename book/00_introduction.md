@@ -74,7 +74,8 @@ The [common project specification](/project/) and current phase specification pr
 > **Protect learning, not only output**
 >
 > Immediate task performance is not the only outcome worth protecting.
-> Across three randomized experiments involving short arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence; the decline was concentrated among participants who used AI for direct solutions, while hint-oriented users did not differ significantly from the control group :citep[liu2026assistance].
+> Across three randomized experiments involving short arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence.
+> In a cross-sectional subgroup analysis of the second experiment, participants who reported using AI for direct answers later performed worse and skipped more than both the control group and those who reported using it for hints :citep[liu2026assistance].
 > These tasks do not establish the long-term effect on professional programming, but they support a practical course rule: use agents for hints, critique, and verification when the underlying skill must remain yours.
 
 ## How the argument develops
