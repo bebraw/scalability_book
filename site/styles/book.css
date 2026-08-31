@@ -48,6 +48,35 @@
   max-width: none;
   margin: 0 0 1rem;
 }
+.prose .chapter-history {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font: 650 0.72rem/1.4 var(--font-ui);
+  gap: 0.45rem 0.7rem;
+  letter-spacing: 0.035em;
+  margin: -1.45rem 0 2.4rem;
+  max-width: 66ch;
+}
+.prose .chapter-history div {
+  align-items: baseline;
+  display: flex;
+  gap: 0.3rem;
+}
+.prose .chapter-history div + div::before {
+  color: var(--border);
+  content: "·";
+  margin-right: 0.25rem;
+}
+.prose .chapter-history dt {
+  text-transform: uppercase;
+}
+.prose .chapter-history dd {
+  color: var(--text);
+  font-weight: 500;
+  margin: 0;
+}
 .prose img {
   max-width: 100%;
 }

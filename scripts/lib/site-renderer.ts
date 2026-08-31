@@ -14,6 +14,7 @@ export type BookPage = {
   ariaDisabled?: string | null;
   className?: string;
   collection: string;
+  createdAt?: string;
   file: string;
   index?: number;
   kind: string;
@@ -25,6 +26,7 @@ export type BookPage = {
   source: string;
   status?: string;
   title: string;
+  updatedAt?: string;
   url: string | null;
 };
 export type PartMetadata = {
@@ -115,7 +117,7 @@ export function createSiteRenderer({
       chapterFile: page.file,
       chapterLabel: page.label,
       chapterSlug: page.slug,
-      content: rendered.content,
+      content: insertChapterHistory(rendered.content, page),
       nextLink: renderPaginationLink(next, "Next", "next"),
       previousLink: renderPaginationLink(previous, "Previous", "prev"),
     });
@@ -345,4 +347,40 @@ export function createSiteRenderer({
       url: chapter.url || "",
     });
   }
+}
+
+function insertChapterHistory(content: string, page: BookPage): string {
+  if (!page.createdAt || !page.updatedAt) {
+    return content;
+  }
+
+  const history = `<dl class="chapter-history" aria-label="Chapter history" title="Dates derived from Git history">
+  <div><dt>Created</dt><dd><time datetime="${escapeAttribute(page.createdAt)}">${escapeHtml(formatGitDate(page.createdAt))}</time></dd></div>
+  <div><dt>Updated</dt><dd><time datetime="${escapeAttribute(page.updatedAt)}">${escapeHtml(formatGitDate(page.updatedAt))}</time></dd></div>
+</dl>`;
+  const headingEnd = content.indexOf("</h1>");
+
+  if (headingEnd === -1) {
+    return `${history}\n${content}`;
+  }
+
+  const insertionPoint = headingEnd + "</h1>".length;
+
+  return `${content.slice(0, insertionPoint)}\n${history}${content.slice(insertionPoint)}`;
+}
+
+function formatGitDate(value: string): string {
+  const calendarDate = value.slice(0, 10);
+  const date = new Date(`${calendarDate}T00:00:00Z`);
+
+  if (Number.isNaN(date.valueOf())) {
+    return calendarDate;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+    year: "numeric",
+  }).format(date);
 }

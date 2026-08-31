@@ -11,6 +11,30 @@ test.describe("book reading layout", () => {
     );
   });
 
+  test("shows Git creation and update dates below the chapter title", async ({
+    page,
+  }) => {
+    await page.goto("/chapters/scalable-development/");
+
+    const heading = page.locator(".prose > h1");
+    const history = page.locator(".prose > .chapter-history");
+
+    await expect(history).toHaveAttribute("aria-label", "Chapter history");
+    await expect(history.locator("dt")).toHaveText(["Created", "Updated"]);
+    await expect(history.locator("time")).toHaveCount(2);
+    await expect(history.locator("time").first()).toHaveAttribute(
+      "datetime",
+      /^\d{4}-\d{2}-\d{2}T/,
+    );
+    await expect(history.locator("time").last()).toHaveAttribute(
+      "datetime",
+      /^\d{4}-\d{2}-\d{2}T/,
+    );
+    await expect(heading.locator("xpath=following-sibling::*[1]")).toHaveClass(
+      "chapter-history",
+    );
+  });
+
   test("keeps body copy within a readable line length", async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
     await page.goto("/chapters/scalable-development/");

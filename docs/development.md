@@ -14,6 +14,10 @@ Markdown source files live under [book/](../book/), with each part intro next to
 Appendix source files use an uppercase letter prefix such as `A_topic.md`; the build labels them as appendices and publishes them below `/appendices/`.
 HTMLisp templates live under [site/](../site/): page-level templates are in `site/layouts/`, and reusable pieces are in `site/components/`.
 
+Chapter pages show their creation and latest-update dates from Git author history.
+The build follows file renames and omits the date row when Git history is unavailable.
+Deployment checkouts should fetch the full repository history; a shallow clone can only use the commits present in that clone and may report a later creation date.
+
 Scientific references live in [bibliography.bib](../bibliography.bib).
 Use `:cite[key]` for a parenthetical citation or `:citet[key]` when the authors form part of the sentence, and place `::bibliography[]` under a `## References` heading in each chapter that cites sources.
 The build fails when a citation key is missing from the bibliography.

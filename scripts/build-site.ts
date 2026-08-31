@@ -15,6 +15,7 @@ import {
   resolveTrustedHtmlImports,
 } from "./lib/markdown.ts";
 import { renderHtmlisp } from "./lib/htmlisp.ts";
+import { getGitFileDates } from "./lib/git-history.ts";
 import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
@@ -898,7 +899,10 @@ function getAllConfiguredChapterFiles(config) {
 }
 
 async function getChapter(file, index) {
-  const source = await readFile(path.join(root, file), "utf8");
+  const [source, gitDates] = await Promise.all([
+    readFile(path.join(root, file), "utf8"),
+    getGitFileDates(root, file),
+  ]);
   const fallbackTitle = titleFromFilename(file);
   const firstHeading = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
   const title = firstHeading || fallbackTitle;
@@ -914,6 +918,7 @@ async function getChapter(file, index) {
           .replaceAll("_", "-");
 
   return {
+    ...gitDates,
     file,
     index,
     collection: isAppendix ? "appendices" : "chapters",
