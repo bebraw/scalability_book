@@ -173,6 +173,30 @@ If two roles must edit the same shared contract, resolve that decision before th
 Use separate workspaces or worktrees for concurrent writers, and pin the same declared base model for the single-agent and fleet runs where possible.
 Record any substitution as a confounding factor.
 
+### Research note — A clean merge is not a correct integration
+
+Recent experiments separate three properties that are easy to collapse: concurrent writing, coordination, and accepted behavior.
+CodeCRDT used a shared CRDT document and an observation-driven claim protocol so agents could edit concurrently without locks.
+Across 600 evaluations of six small TypeScript and React tasks with Claude Sonnet 4.5, every run converged without a textual merge failure, yet preliminary inspection still found semantic conflicts in roughly 5–10% of results.
+Raw completion time ranged from a 21.1% speedup to a 39.4% slowdown depending on the task :citep[pugachev2025codecrdt].
+The coordination substrate solved document convergence; it did not make independently reasonable changes semantically compatible or guarantee useful parallelism.
+
+AgentRoom evaluated a separate coordination design that paired a CRDT-backed shared filesystem with explicit file claims, agent status, and message broadcasts :citep[cho2026agentroom].
+For the CLI-stable models in its evaluation, two-agent rooms reduced a specific one-file abandonment mode and lowered run-to-run variation relative to solo execution.
+At matched compute on one task, its primary LLM-judge composite favored AgentRoom over independent parallel generation followed by post-hoc file union.
+A separate seven-run bundle probe ordered the full system above shared-only and prompt-only partial conditions, but the interval for the coordination-layer step included zero.
+The result remains preliminary.
+The paper was a recent preprint, its headline tasks shared one Express and TypeScript environment, agents authored their own tests, and the main quality comparison did not use a held-out execution oracle.
+
+Repository-scale evidence shows why this distinction matters outside a controlled shared document.
+AgenticFlict selected 142,652 open or closed-but-unmerged agent-authored pull requests from the AIDev dataset; deterministic merge simulation succeeded for 107,026, and 27.67% of that restricted sample produced textual conflicts :citep[ogenrwot2026agenticflict].
+The dataset does not isolate fleets or establish that agents caused the conflicts; it measures agent-authored changes colliding with the repository state into which they would be merged.
+It nevertheless documents a substantial collection of integration failures that a fleet design should not treat as an incidental cleanup concern.
+
+Together, these studies support a bounded conclusion.
+A shared substrate can prevent some textual collisions, and an explicit coordination interface can reduce some duplicated or abandoned work, but neither replaces a settled contract or end-to-end acceptance evidence.
+Parallelize only work whose ownership and dependencies are clear, then test the integrated behavior through the web boundary.
+
 ### Map authority and acceptance
 
 Names such as `scout`, `implementer`, and `reviewer` allocate activity, not decision responsibility.
@@ -193,6 +217,10 @@ NIST similarly recommends defining roles, responsibilities, and oversight for hu
 
 ::caption[Example authority and acceptance boundaries for a web-development fleet.]
 ::label[table:fleet-decision-responsibility]
+
+Claim Plane illustrates how an orchestration system could enforce this allocation before writing begins.
+Each worker declares a versioned change intent containing its base revision, resources, dependencies, and committed or contingent operations; a deterministic control plane admits compatible intents, serializes unresolved overlap, and rejects undeclared mutation.
+Its six-pair mechanism check is deliberately too small for comparative performance claims, but it demonstrates the difference between asking an agent to respect a boundary and making that boundary an enforced admission rule :citep[nikolaev2026claimplane].
 
 Coactive Design offers a compact test for this allocation.
 Each dependency needs enough **observability** of relevant state, **predictability** of likely behavior, and **directability** through correction, stopping, or reallocation :citep[johnson2014coactive].
@@ -281,8 +309,7 @@ Count failed runs, duplicated exploration, handoffs, merge conflicts, retries, t
 Fleet size should follow task independence and review capacity, not the number of available agents.
 
 Coordination mechanisms can remove one bottleneck without removing the others.
-In 600 trials across six tasks, CodeCRDT achieved deterministic convergence and zero textual merge failures, yet reported results from a 21.1% speedup to a 39.4% slowdown and still observed semantic conflicts :citep[pugachev2025codecrdt].
-The prototype does not establish a general fleet speedup, but it makes the distinction concrete: converged files are not necessarily compatible ideas, and conflict-free integration is not accepted web behavior.
+The research note above showed that textual convergence, explicit coordination, and integrated correctness require different evidence.
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.
