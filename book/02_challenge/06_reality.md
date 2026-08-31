@@ -29,6 +29,27 @@ Testing the happy path proves none of them.
 > Production pressure often exposes waste that local development hides: retry storms, polling, failed jobs, duplicated events, abandoned data, and oversized logs.
 > Backoff, deduplication, retention, and load shedding can reduce both failure amplification and unnecessary resource use.
 
+### Field note — When caching complexity became an availability risk
+
+In a commercial Next.js project, GitHub effectively served as the backend for most of the site's meaningful data.
+Two sections used Next.js caching incorrectly, causing production page requests to repeatedly reach the GitHub API.
+This remained invisible during local development because our traffic never approached the API quota.
+
+Under high production load, the repeated requests exhausted the quota.
+Because the site could not present useful content without GitHub, a rate limit on one external dependency became a site-wide outage.
+During the incident, I debugged the behavior with LLM assistance and found one faulty caching path.
+After the quota reset, traffic exposed a second path with the same problem, causing another period of downtime.
+
+We eventually removed the GitHub dependency because it had also become unstable for our needs.
+In retrospect, load testing should have revealed that site traffic was being amplified into API traffic, while monitoring should have warned us before the quota became an availability boundary.
+
+The incident also reinforced my preference for simpler web primitives.
+For this kind of site, I consider Next.js's interacting rendering and caching mechanisms more complex than the product warranted.
+If rebuilding it today, I would use a [multi-page application with hypermedia-driven fragments](/chapters/architecture/#rendering-moves-work-across-time-and-place) and View Transitions for the interactive portions.
+
+That architecture would not eliminate the need for caching, monitoring, fallbacks, and bounded external dependencies.
+Its advantage would be making page requests, fragment requests, and data access paths more explicit—and therefore easier to understand before production traffic tests them.
+
 ## What documented web incidents reveal
 
 The four accounts below were published by the organizations that experienced the incidents.
