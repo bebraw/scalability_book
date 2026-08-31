@@ -231,6 +231,15 @@ A target diagram shows that a group can reason about a possible architecture.
 It does not yet show that the response works in the selected application, preserves required behavior, or moves the expected limit.
 Complete one bounded implementation experiment before finalizing the target design.
 
+### Field note — Thesis Journey Tracker
+
+[Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) serves only two people, so runtime scale was not the problem.
+The goal was to deliver the project quickly while keeping it easy to maintain and adjust as the supervision workflow changed.
+I deliberately chose a lightweight, server-rendered interface instead of a conventional single-page application.
+The [first agent-generated version](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29) rendered complete pages, but less than two hours later the agent introduced a narrow [HTML-fragment endpoint for the student panel](https://github.com/bebraw/thesis-journey-tracker/commit/e895c2ace4).
+A small browser script replaced that panel without a full refresh and retained ordinary navigation as a fallback.
+This provided responsiveness where it mattered without requiring a client-side application architecture for the whole system.
+
 Select implementation A, B, or C and one pressure for which the group has runtime evidence or a credibly projected limit that the available environment can exercise.
 Preserve the accepted revision and its workload result, then implement the smallest response that addresses that limit.
 Suitable experiments include a measured query index, a bounded cache, an idempotency boundary, admission control, a queue with an explicit pending state, tenant isolation, or another technique justified by the evidence.
