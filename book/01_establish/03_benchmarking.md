@@ -185,6 +185,17 @@ Keep raw distributions and failed examples available instead of retaining only a
 Review the proxy when the workload, system, incentives, or development process changes.
 An effective metric is not permanently valid; it is a hypothesis that must survive contact with the behavior it influences.
 
+### Field note — Slideotter
+
+[Slideotter](/case-studies/slideotter/) let me test whether a local language model could support presentation authoring.
+Using Qwen3.5-9B through the project's generation harness, I found that it could usually produce semantically sensible drafts: the slides contained information related to the requested topic and formed a recognizable presentation.
+That established adequacy, not excellence.
+Some slides remained weak or misunderstood my intent.
+
+This conclusion came from my editorial review rather than a separate evaluation.
+The observed result belonged to the complete configuration—model, prompts, schemas, validators, and review workflow—so I could not confidently attribute poor outputs to the model rather than the harness.
+Structural and rendering checks could establish that a deck was valid; they could not establish that it was a good response to what I meant.
+
 ### Goodhart pressure test
 
 The challenge below turns that four-part review into two decisions.
