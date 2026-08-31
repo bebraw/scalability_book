@@ -209,6 +209,20 @@ A foundation-model single agent may justify its external dependency when capabil
 A fleet may justify its coordination cost when the project exposes several independent workstreams and has enough integration and review capacity.
 The preferred architecture may likewise vary with the pressure, competence envelope, and operating skills of the team.
 
+### Field note — Familiarity is part of effective capability
+
+Raw model capability is not my only selection criterion.
+Familiarity with how a model communicates affects how quickly I can understand, review, and correct its work.
+
+GPT-family models make sense to me because their default communication style fits how I process technical information.
+By contrast, I strongly dislike Claude's default prose: it feels unfamiliar and is harder for me to understand.
+This is a personal workflow fit rather than a claim that one model is universally better.
+
+That difference creates real review friction.
+A nominally more capable or faster model may still be a worse choice if I have to translate its explanations before I can judge its work.
+Familiarity therefore belongs in the evaluation alongside task quality, speed, cost, privacy, and correction effort.
+It can also confound comparisons: changing models changes both model capability and the human reviewer's fluency with its output.
+
 Use the evidence matrix to build the final argument:
 
 1. State the common brief, acceptance core, deliberately varied development setup, and comparison limits.
