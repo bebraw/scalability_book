@@ -354,6 +354,24 @@ In an agentic project, architecture notes, specifications, examples, tests, and 
 The cathedral and bazaar metaphor describes how development and feedback are organized, whereas a Big Ball of Mud describes the resulting structure :citep[raymond2001cathedral].
 Either development model can preserve architecture through stable boundaries, review, and continuous integration, and either can produce mud when local changes accumulate without stewardship.
 
+### Field note — When syntax familiarity stopped deciding the stack
+
+As I have gained experience, I have learned to value architectural simplicity over mainstream convention.
+Technology choices are often cargo-culted: teams select the familiar framework because others use it or because its syntax and APIs make implementation convenient.
+
+Agents change that calculation.
+I no longer need to know every API or syntax detail before I can explore a technology.
+The agent can handle much of that mechanical work, allowing me to focus on whether the approach fits the problem, whether I understand its important boundaries, and whether I can evaluate the resulting behavior.
+
+I am currently applying this approach to a proof of concept built around [Apache Jena](https://jena.apache.org/) for validating a knowledge base.
+I am not a strong Java developer, and I do not yet understand the problem well enough to claim that the prototype represents the right architecture.
+At this stage, the purpose is narrower: determine whether the approach can produce anything useful.
+
+This does not make technical understanding unnecessary.
+It changes which understanding matters first.
+For exploratory work, I can let the agent handle unfamiliar syntax while I evaluate the problem, the model, and the observed results.
+If the prototype proves useful, its architecture and maintainability still need deliberate review before it becomes a durable system.
+
 ### Make the implementation architecture reviewable
 
 By this point, you have already made architecture choices in implementation A, even if you did not yet have a complete vocabulary for them.
