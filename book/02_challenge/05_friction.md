@@ -143,6 +143,19 @@ Lower entry friction can move cost into comprehension, debugging, security revie
 Before adopting an unfamiliar stack, use a bounded spike to compare it with a familiar baseline under the same behavioral tests and explicit performance and resource targets; require a team member to explain and modify the result; and record the toolchain and rollback path.
 Choose the stack only when the measured benefit survives those ownership costs.
 
+#### Field note — A boundary discovered across projects
+
+Larger foundation models made it easy for me to expand [Slideotter](/case-studies/slideotter/) before its product model and backend responsibilities had settled.
+The codebase eventually became difficult enough to reason about that I am now considering redeveloping much of the backend.
+
+Developing [Kirjolab](/case-studies/kirjolab/) clarified the missing boundary.
+Both projects need a knowledge base that owns source material, relationships among sources, and provenance linking generated content back to those sources.
+Slideotter should own slide definitions and themes, while Kirjolab owns its research and writing workflows.
+Presentation-specific coordination may still carry references and temporary workflow state, but it should not duplicate ownership of the underlying knowledge.
+
+The agents made broad implementation feasible; they did not decide the durable boundary between the systems.
+Faster generation moved friction from producing features to discovering what each project should own.
+
 This cost can be visible even when final behavior is unchanged.
 :citet[trivedi2026cleanliness] compared matched clean and deliberately degraded repositories across 660 agent trials.
 Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often.
