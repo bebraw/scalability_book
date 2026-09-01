@@ -10,6 +10,11 @@ type SiteConfig = {
   themes: unknown;
   title: string;
 };
+type CaseStudy = {
+  summary: string;
+  title: string;
+  url: string;
+};
 export type BookPage = {
   ariaDisabled?: string | null;
   className?: string;
@@ -53,6 +58,7 @@ type RenderPart = Omit<PartMetadata, "chapters" | "partPage"> & {
   partPage?: BookPage | null;
 };
 type CreateSiteRendererOptions = {
+  caseStudies: CaseStudy[];
   chapters: BookPage[];
   config: SiteConfig;
   indexChapters: BookPage[];
@@ -76,6 +82,7 @@ type RenderLayoutOptions = {
 };
 
 export function createSiteRenderer({
+  caseStudies,
   chapters,
   config,
   indexChapters,
@@ -97,6 +104,7 @@ export function createSiteRenderer({
 
     return renderHtmlisp(templates.siteIndex, {
       bookContents: renderHomeContents(),
+      caseStudyContents: renderHomeCaseStudies(),
       coverAlt: `Cover of ${config.title}`,
       coverImageUrl: "/assets/book-cover.svg",
       title: config.title,
@@ -177,6 +185,21 @@ export function createSiteRenderer({
       currentChapter: null,
       mode: "home",
     });
+  }
+
+  function renderHomeCaseStudies(): string {
+    return caseStudies
+      .map(
+        (caseStudy, index) => `<li>
+  <a href="${escapeAttribute(caseStudy.url)}">
+    <span class="home-case-study-number" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+    <strong>${escapeHtml(caseStudy.title)}</strong>
+    <small>${escapeHtml(caseStudy.summary)}</small>
+    <span class="home-case-study-arrow" aria-hidden="true">→</span>
+  </a>
+</li>`,
+      )
+      .join("\n");
   }
 
   function renderSidebarContents(currentChapter: BookPage): string {

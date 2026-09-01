@@ -1,9 +1,38 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("case studies", () => {
+  test("keeps home-page case studies inside the mobile viewport", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    await expect(page.locator(".home-case-studies")).toBeVisible();
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
   test("publishes the case studies and links them from the chapter", async ({
     page,
   }) => {
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "Case studies" }),
+    ).toBeVisible();
+    await expect(page.locator(".home-case-study-list > li")).toHaveCount(5);
+    await expect(
+      page.getByRole("link", {
+        name: /Slideotter – Learning faster than the product converged/,
+      }),
+    ).toHaveAttribute("href", "/case-studies/slideotter/");
+    await expect(
+      page.getByRole("link", { name: "Browse the collection" }),
+    ).toHaveAttribute("href", "/case-studies/");
+
     await page.goto("/chapters/scalable-development/");
 
     await expect(

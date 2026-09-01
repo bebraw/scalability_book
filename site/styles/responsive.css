@@ -160,6 +160,19 @@
     align-items: start;
     grid-template-columns: 1fr;
   }
+  .home-case-studies-header {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+  .home-case-studies-header > a {
+    justify-self: start;
+  }
+  .home-case-study-list a {
+    grid-template-columns: 2rem minmax(0, 1fr) 1.25rem;
+  }
+  .home-case-study-list small {
+    grid-column: 2 / -1;
+  }
   .cover-panel {
     align-items: stretch;
     grid-template-columns: minmax(5.5rem, 7rem) minmax(0, 1fr);

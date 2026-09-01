@@ -36,4 +36,22 @@
     <h2 id="contents-heading">Book contents</h2>
     <Raw &html="(resolve bookContents)"></Raw>
   </section>
+  <section class="home-case-studies" aria-labelledby="case-studies-heading">
+    <header class="home-case-studies-header">
+      <div>
+        <p class="eyebrow">Field evidence</p>
+        <h2 id="case-studies-heading">Case studies</h2>
+      </div>
+      <p>
+        Project histories that connect the book’s concepts to concrete
+        development decisions, failures, and lessons.
+      </p>
+      <a href="/case-studies/"
+        >Browse the collection <span aria-hidden="true">→</span></a
+      >
+    </header>
+    <ol class="home-case-study-list">
+      <Raw &html="(resolve caseStudyContents)"></Raw>
+    </ol>
+  </section>
 </main>

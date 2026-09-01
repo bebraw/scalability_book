@@ -342,14 +342,6 @@ const indexPartPages = await Promise.all(
       status: "",
     })),
 );
-const renderer = createSiteRenderer({
-  chapters,
-  config,
-  indexChapters,
-  indexPartPages,
-  partMetadata,
-  templates,
-});
 const projectSpecifications = await Promise.all(
   projectSpecificationDefinitions.map(async (definition) => {
     const source = await readFile(path.join(root, definition.file), "utf8");
@@ -380,6 +372,15 @@ const caseStudies = await Promise.all(
     };
   }),
 );
+const renderer = createSiteRenderer({
+  caseStudies,
+  chapters,
+  config,
+  indexChapters,
+  indexPartPages,
+  partMetadata,
+  templates,
+});
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
