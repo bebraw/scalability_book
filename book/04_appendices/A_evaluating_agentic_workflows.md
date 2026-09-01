@@ -280,3 +280,24 @@ More review samples are justified only when they improve accepted outcomes or al
 A course project does not need a public-benchmark-scale evaluation system.
 Begin with a few representative tasks, deterministic checks where possible, preserved outcomes and failures, and a declared workflow configuration.
 Add repeated trials, judge calibration, statistical intervals, or routing experiments only when the decision being made requires that additional evidence.
+
+### Field note — Let repeated failures shape the first evals
+
+My practical threshold for codifying an eval is when I begin to see a pattern and trust my judgment enough to describe it.
+I do not yet have enough experience to claim a general method for designing strong eval suites, however.
+So far, I have mostly allowed development models to propose the evaluators, then complained about obvious weaknesses I found while reviewing their code.
+
+[Slideotter](/case-studies/slideotter/) provides the clearest example of where this still became useful.
+I asked a stronger development model to mutate presentation scenarios and exercise the smaller local models and their generation harness.
+The mutations explored combinations and failure cases I would not have devised on my own.
+
+Some outputs failed in surprising ways.
+Those failures became new regression scenarios, stronger validators, and improvements to the surrounding prompts, schemas, and generation scaffolding.
+The resulting loop helped me extract more useful behavior from weaker local models.
+
+This was closer to mutation-based probing than an independent evaluation of presentation quality.
+The development model could introduce its own blind spots, and model-generated evaluators could reward the same assumptions that shaped the implementation.
+Structural and rendering checks could establish that a presentation was valid under the tested scenarios; they could not establish that it communicated the topic well.
+
+I therefore treat generated evals as a way to discover and preserve recurring failure patterns, not as an automatic source of ground truth.
+Editorial judgment remains necessary until repeated observations become clear enough to encode and the evaluator itself has been challenged against known successes and failures.
