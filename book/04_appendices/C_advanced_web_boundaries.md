@@ -183,6 +183,36 @@ Contractor-built pages were preferred over the generated pages in 50.0% of compa
 The pipeline combined Gemini with search and image tools, extensive instructions, and post-processing; generation often took one to two minutes and was excluded from the ratings.
 The study therefore measures preference in that setup, not task success, correctness, accessibility, security, maintainability, or production readiness :citep[leviathan2026generativeui].
 
+### Field note — Constrain generation around the hard part
+
+For Slideotter's first version, reliable layout was essential.
+I had the development model research the presentation-tooling space, but I did not want the runtime to become an unconstrained code generator.
+
+The repository established the layout boundary before adding the browser studio.
+Geometry validation, text-fit checks, and rendered snapshot comparison appeared on the first development day.
+[Geometry validation](https://github.com/bebraw/slideotter/commit/f7d004f4), [text-fit validation](https://github.com/bebraw/slideotter/commit/684e4b7c), and [render-baseline validation](https://github.com/bebraw/slideotter/commit/79301707) preserve that sequence.
+
+When LLM-backed authoring arrived, the plan explicitly assigned different responsibilities to the model and the application.
+The model would propose intent and structured content; the server would validate, materialize, and gate its application; the existing engine would render and preview the result.
+Common slide types moved into schema-backed JSON rather than requiring the model to manipulate arbitrary JavaScript.
+The [LLM and slide-spec plan](https://github.com/bebraw/slideotter/commit/24d335ec) and its [schema-backed implementation](https://github.com/bebraw/slideotter/commit/fa56cd04) record that boundary.
+
+The boundary tightened as the product developed.
+Preview, comparison, PDF export, and layout validation converged on one shared DOM renderer, so the layout checked by the system was the layout the user actually saw.
+The [DOM-first rendering decision](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0015-dom-first-rendering-and-validation.md) makes that runtime authoritative.
+
+This constraint gave up arbitrary model-authored HTML, CSS, and executable components.
+In exchange, the system became easier to build, develop, understand, and validate.
+The model could choose semantic intent or a supported layout family while local code retained control of geometry, spacing, overflow, media placement, and rendering.
+
+The constraint did not have to freeze visual variety.
+Slideotter later expanded through named slide families and reusable declarative layout definitions while keeping the built-in set small and predictable.
+New layouts can grow through validated data rather than new executable renderer paths, as recorded in the [layout-expansion decision](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0049-minimal-built-in-layouts-and-user-defined-layout-expansion.md).
+
+The lesson is not that every generative interface needs the same schema.
+It is that the system should retain authority over the property that must work reliably.
+For Slideotter, that property was layout.
+
 ## Descriptor boundary audit
 
 Create one small event-summary data fixture and keep it unchanged.
