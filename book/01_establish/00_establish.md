@@ -30,6 +30,28 @@ The following parts begin from fresh implementations.
 You may carry forward the common specification, permitted acceptance material, technology-neutral lessons, and the reporting method, but not application code or implementation-specific tests.
 This preserves learning while keeping the three development setups meaningfully comparable.
 
+### Instructor perspective — Carry the learning, not the code
+
+Build the same application three times for three related reasons.
+
+First, compare what different development methodologies make easy, difficult, or risky: a locally hosted single agent, a foundation-model single agent, and an agent fleet.
+Second, experience how quickly you can now produce a complete new implementation.
+Third, observe how growing domain knowledge changes the result as you understand your chosen topic more deeply with each build.
+
+This is not a controlled comparison in which only one variable changes.
+Your growing experience is part of what the course is intended to reveal.
+
+Agent-assisted development makes application code cheap to produce, but it also makes it easy to produce the wrong application quickly.
+A plausible working build may embody a weak product interpretation, an unsuitable architecture, or assumptions that only become visible through use and measurement.
+When that happens, begin again instead of preserving the build merely because you already invested effort in it.
+
+Carry forward the durable assets: domain understanding, accepted behavior, specifications, permitted acceptance material, trustworthy data, measurement evidence, and improved development skill.
+Let those assets guide the next implementation even when the earlier code does not survive.
+
+By the third build, you should have both comparative evidence and greater confidence in creating a complex web application with agents.
+Rebuilding is not the goal by itself.
+The goal is to recognize when preserving what you learned matters more than preserving the code.
+
 ## Implementation discovery lab
 
 Use this lab to turn the [shared specification](/project/) into a direction to explore.
