@@ -35,6 +35,25 @@ A system with high debt may still run, pass tests, and satisfy users today while
 Architecture makes those commitments visible, friction reveals their daily cost, and production pressure shows which ones restrict recovery or growth.
 Challenge therefore treats debt as one supporting lens for comparing the two implementations rather than as a synonym for defects or for every simple design.
 
+### Field note — Codify the development system
+
+Earlier in my agentic-development work, speed blindness was a significant source of debt.
+Agents could produce changes faster than I could evaluate them, while I was still learning how to structure their work.
+Models have improved since then, but so has my ability to build an effective development system around them.
+
+[Vibe Template](https://github.com/bebraw/vibe-template) captures that experience in a codified form.
+Its lasting value is not the starter application.
+It is the accumulated judgment expressed through project initialization, architecture rules, specifications, decision records, agent instructions, review practices, and layered validation.
+I can begin a project from a development system I understand and then prune or adapt it to the actual need.
+
+Some of its controls came from mistakes in downstream projects.
+For example, the experience documented in the [Kirjolab case study](/case-studies/kirjolab/) led me to add earlier structural feedback so that functional progress does not hide growing architectural confusion.
+
+I encourage you to develop your own equivalent over time.
+Notice which practices repeatedly help or fail, codify that learning in reviewable artifacts and commands, and revise the system as your judgment, projects, and models change.
+The goal is not to copy my template.
+It is to stop relearning the same development lessons from scratch.
+
 > **Sustainability angle**
 >
 > Inefficient design can become sustainability debt.
