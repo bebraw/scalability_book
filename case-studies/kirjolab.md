@@ -170,6 +170,8 @@ Kirjolab would own manuscripts, manuscript-specific claims, evidence links, pros
 An evidence link would pin a claim to an exact document and reviewed annotation revision in the knowledge base.
 A newer document or changed annotation would require explicit review before it could replace that evidence.
 
+{{ import "site/includes/shared-knowledge-boundary-figure.html" }}
+
 The initial workflow would be:
 
 1. **Select or import a source.** Add an immutable document to the external knowledge base or select one already available.

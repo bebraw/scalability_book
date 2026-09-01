@@ -127,6 +127,8 @@ A shared knowledge base would own sources, relationships among them, and provena
 Slideotter would own presentation-level metadata, outline variants, slide definitions, themes, and the approval workflow.
 [Kirjolab](/case-studies/kirjolab/) could use the same knowledge base for its research and writing workflows without either product duplicating the underlying knowledge.
 
+{{ import "site/includes/shared-knowledge-boundary-figure.html" }}
+
 The smallest complete Slideotter workflow would be:
 
 1. **Select or amend the source material.** Begin with material and relationships already available in the shared knowledge base, adding or correcting knowledge when necessary.

@@ -43,6 +43,8 @@ After the quota reset, traffic exposed a second path with the same problem, caus
 We eventually removed the GitHub dependency because it had also become unstable for our needs.
 In retrospect, load testing should have revealed that site traffic was being amplified into API traffic, while monitoring should have warned us before the quota became an availability boundary.
 
+{{ import "site/includes/dependency-failure-figure.html" }}
+
 The incident also reinforced my preference for simpler web primitives.
 For this kind of site, I consider Next.js's interacting rendering and caching mechanisms more complex than the product warranted.
 If rebuilding it today, I would use a [multi-page application with hypermedia-driven fragments](/chapters/architecture/#rendering-moves-work-across-time-and-place) and View Transitions for the interactive portions.

@@ -84,7 +84,8 @@ export function renderProgressionDiagram(diagram: ProgressionDiagram): string {
   const sharedArrowId = `${diagram.id}-shared-arrow`;
 
   return `<svg
-  class="progression-diagram"
+  class="book-diagram progression-diagram"
+  data-book-diagram="${escapeXml(diagram.id)}"
   data-progression-diagram="${escapeXml(diagram.id)}"
   viewBox="0 0 ${width} ${height}"
   role="img"

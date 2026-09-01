@@ -191,6 +191,8 @@ Use one causal chain before choosing a scaling technique:
 - **Trade-off:** state which cost, latency, complexity, consistency, autonomy, or recovery obligation moved elsewhere.
 - **Evidence:** repeat a representative observation that could challenge the claim.
 
+{{ import "site/includes/pressure-evidence-figure.html" }}
+
 For a runtime example, concurrent event submissions may exhaust the database connection pool before CPU becomes scarce.
 Admission control or buffering might protect accepted writes, but it can add waiting and require an explicit pending state.
 A useful evaluation would inspect success, duplication, tail latency, queue age, and recovery as the workload changes rather than only count server instances.

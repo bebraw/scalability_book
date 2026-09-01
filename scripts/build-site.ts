@@ -17,9 +17,9 @@ import {
 import { renderHtmlisp } from "./lib/htmlisp.ts";
 import { getGitFileDates } from "./lib/git-history.ts";
 import {
-  courseProgressionDiagram,
-  renderProgressionDiagram,
-} from "./lib/render-progression-diagram.ts";
+  injectBookDiagrams,
+  renderBookDiagrams,
+} from "./lib/render-book-diagrams.ts";
 import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
@@ -289,9 +289,7 @@ const demoScriptIncludes = [
 
 await validateDemoAnchors();
 const statechartDiagramHtml = await renderStatechartDiagram();
-const courseProgressionDiagramHtml = renderProgressionDiagram(
-  courseProgressionDiagram,
-);
+const bookDiagramHtml = renderBookDiagrams();
 
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
@@ -386,7 +384,7 @@ const caseStudies = await Promise.all(
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
   const rendered = renderMarkdown(page.source, page, bibliographySource);
-  rendered.content = injectCourseProgressionDiagram(rendered.content);
+  rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
   rendered.content = injectStatechartDiagram(rendered.content);
   const previous = bookPages[index - 1];
   const next = bookPages[index + 1];
@@ -475,6 +473,7 @@ for (const caseStudy of caseStudies) {
     { number: "" },
     bibliographySource,
   );
+  rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
 
   await writePage(
     `case-studies/${caseStudy.slug}/index.html`,
@@ -659,13 +658,6 @@ function injectStatechartDiagram(source) {
   return source.replace(
     /<div\s+data-statechart-elk-placeholder(?:="")?\s*><\/div>/,
     statechartDiagramHtml,
-  );
-}
-
-function injectCourseProgressionDiagram(source) {
-  return source.replace(
-    /<div\s+data-course-progression-placeholder(?:="")?\s*><\/div>/,
-    courseProgressionDiagramHtml,
   );
 }
 

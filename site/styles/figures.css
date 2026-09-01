@@ -1,0 +1,230 @@
+/* Static pedagogical figures generated as SVG during the book build. */
+.book-diagram-figure {
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+  margin: 2.15rem 0 2.4rem;
+  max-width: 64rem;
+}
+
+.book-diagram-canvas {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    color-mix(in srgb, var(--text) 1.5%, var(--panel));
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: clamp(0.5rem, 1.2vw, 0.85rem);
+}
+
+.book-diagram-canvas:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 0.2rem;
+}
+
+.book-diagram {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.book-diagram text {
+  fill: var(--text);
+  font-family: var(--font-ui);
+}
+
+.book-diagram-kicker {
+  fill: var(--accent-strong) !important;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 1.2px;
+}
+
+.book-diagram-title {
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.book-diagram-detail {
+  fill: var(--muted) !important;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.book-diagram-node > rect {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.book-diagram-marker path {
+  fill: var(--accent-strong);
+}
+
+.linear-flow-diagram {
+  min-width: 62rem;
+}
+
+.linear-flow-connectors path,
+.linear-flow-feedback path {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+.linear-flow-node.is-emphasis > rect {
+  fill: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  stroke: var(--accent-strong);
+  stroke-width: 2;
+}
+
+.linear-flow-node.is-danger > rect {
+  fill: color-mix(in srgb, #c74c42 10%, var(--bg));
+  stroke: color-mix(in srgb, #c74c42 72%, var(--text));
+  stroke-width: 2;
+}
+
+.linear-flow-feedback rect,
+.linear-flow-note rect,
+.knowledge-boundary-link-label rect,
+.three-loops-return-label rect {
+  fill: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  stroke: var(--accent-strong);
+  stroke-width: 1;
+}
+
+.linear-flow-feedback text,
+.knowledge-boundary-link-label text,
+.three-loops-return-label text {
+  fill: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.35px;
+}
+
+.linear-flow-note rect {
+  fill: color-mix(in srgb, var(--text) 3%, var(--panel));
+  stroke: var(--border);
+  stroke-dasharray: 5 4;
+}
+
+.knowledge-boundary-diagram {
+  min-width: 46rem;
+}
+
+.knowledge-boundary-source > rect,
+.three-loops-shared > rect {
+  fill: color-mix(in srgb, var(--accent) 11%, var(--panel));
+  stroke: color-mix(in srgb, var(--accent-strong) 68%, var(--border));
+  stroke-width: 1.5;
+}
+
+.knowledge-boundary-source-title {
+  font-size: 23px;
+}
+
+.knowledge-boundary-connectors path {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-width: 2.2;
+}
+
+.knowledge-boundary-link-label rect {
+  fill: var(--panel);
+}
+
+.knowledge-boundary-link-label text {
+  font-size: 11px;
+  letter-spacing: 0.7px;
+}
+
+.knowledge-boundary-product.is-slideotter > rect {
+  fill: color-mix(in srgb, var(--accent) 7%, var(--bg));
+}
+
+.knowledge-boundary-product.is-kirjolab > rect {
+  fill: color-mix(in srgb, var(--text) 3%, var(--bg));
+}
+
+.knowledge-boundary-item-mark {
+  fill: var(--accent-strong);
+  stroke: none;
+}
+
+.three-loops-diagram {
+  min-width: 58rem;
+}
+
+.three-loops-shared-links path {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 5 5;
+  stroke-width: 1.5;
+}
+
+.three-loops-shared-marker path {
+  fill: var(--border);
+}
+
+.three-loops-connections path {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.3;
+}
+
+.three-loops-card.is-application-loop > rect {
+  fill: color-mix(in srgb, var(--accent) 7%, var(--bg));
+}
+
+.three-loops-card.is-development-loop > rect {
+  fill: color-mix(in srgb, var(--text) 3%, var(--bg));
+}
+
+.three-loops-card.is-agentic-loop > rect {
+  fill: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  stroke: var(--accent-strong);
+  stroke-width: 2;
+}
+
+.three-loops-purpose {
+  font-size: 14px;
+}
+
+.three-loops-sequence {
+  fill: var(--muted) !important;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.book-diagram-figure figcaption {
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-size: 0.96rem;
+  inline-size: 100%;
+  line-height: 1.48;
+  margin-block-start: 0.75rem;
+  max-width: none;
+}
+
+@media print {
+  .book-diagram-canvas {
+    overflow: visible;
+  }
+
+  .book-diagram {
+    min-width: 0 !important;
+  }
+}

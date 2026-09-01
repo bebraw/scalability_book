@@ -41,6 +41,8 @@ The development system determines whether people and agents can implement that t
 Their accepted changes alter the application's architecture, capacity, and next likely failure.
 New observations then begin another pass through the loops.
 
+{{ import "site/includes/three-connected-loops-figure.html" }}
+
 ## The application loop: respond to pressure
 
 Application scalability begins with a change in conditions rather than a preferred technology.
