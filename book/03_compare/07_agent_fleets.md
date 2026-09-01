@@ -100,6 +100,22 @@ Isolated environments and automated checks make more concurrent attempts possibl
 Fourth, **web correctness has to be tested through the web boundary**.
 Component, API, and database checks matter, but they do not replace a browser journey that crosses the layers the user actually experiences.
 
+### Field note — Different reviewers expose different blind spots
+
+I have found [GPT-5.6 Ultra](https://learn.chatgpt.com/docs/models) particularly useful for reviewing implementations.
+OpenAI describes Ultra as going beyond a single-agent run by using subagents for complex work, while its [multi-agent documentation](https://developers.openai.com/api/docs/guides/responses-multi-agent) explains how a root agent delegates focused work and synthesizes the results.
+In practice, this has produced useful review insights and additional perspectives that helped me tighten implementations.
+
+When the proposed fixes seem reasonable, I usually accept them and have the agent implement them.
+I intervene when I disagree with the design direction, particularly when a simpler solution would preserve the intent with less complexity.
+The fleet expands the review surface, but it does not take ownership of the design.
+
+I have also had a colleague use Claude to review one of my GitHub pull requests.
+It surfaced different issues from GPT, showing the practical value of reviewing the same implementation through another model family.
+Claude also occasionally overstated an issue or expressed a different design opinion.
+The disagreement was useful because it made assumptions visible, but resolving it still required human judgment.
+Using different model families can broaden review coverage, while their findings remain proposals rather than decisions.
+
 Implementation C turns those lessons into a local comparison.
 Build the common event-tracking application through a bounded fleet workflow, load the execution trace into the application, and compare the accepted outcome with a single-agent counterfactual.
 
