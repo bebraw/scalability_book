@@ -116,6 +116,29 @@ An implementer may work in a sandbox with scoped files and no deployment credent
 A publisher may receive a reviewed artifact instead of the full private context that produced it.
 Human approval can help at a sensitive boundary, but an approval prompt is not useful when the effect is unclear or reviewers have learned to accept it mechanically.
 
+### Field note — Permission follows the risk profile
+
+I do not maintain one universal list of actions that agents may or may not perform.
+The appropriate authority depends on the project and its risk profile.
+
+I consider three factors first:
+
+1. **Financial cost.** Could the action create meaningful or unbounded spending?
+2. **Possible consequences.** Could a mistake affect users, sensitive data, external systems, or something else that matters?
+3. **Recoverability.** Can I detect the mistake and restore a useful state without disproportionate effort or harm?
+
+For small, low-risk projects, I allow agents to work relatively freely with Cloudflare infrastructure.
+Direct API or dashboard changes are acceptable when I do not expect major spending, the project contains no sensitive data, and a mistake would have limited consequences.
+If an action may introduce cost, I negotiate a limit with the agent before it proceeds.
+
+This convenience trades away some reproducibility and reviewability.
+A direct infrastructure change may not leave the repository as a complete description of the deployed state.
+I accept that trade-off only when the experiment is disposable enough that I can inspect, recreate, or abandon it without material harm.
+
+The same permission should not transfer automatically to another project.
+As financial exposure, consequences, or recovery difficulty increase, the agent's role should narrow from executing the action to preparing a reviewed change.
+Authority should follow the expected loss and recovery path, not the mere fact that an agent successfully performed a similar action elsewhere.
+
 ## Complete the control-boundary review
 
 For each consequential action, name the decision authority, mandatory enforcement point, granted scope, evidence returned, and conflict or outage rule.
