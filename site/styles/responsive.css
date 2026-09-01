@@ -1,4 +1,9 @@
 /* Responsive and motion preferences */
+@media (min-width: 68rem) {
+  .book-part[aria-labelledby="appendices-heading"] .chapter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 @media (max-width: 76rem) {
   .header-actions {
     column-gap: 0.9rem;

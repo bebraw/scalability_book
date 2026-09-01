@@ -157,6 +157,27 @@ test.describe("book reading layout", () => {
     expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(1);
   });
 
+  test("lays out the six appendices as two rows of three", async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 900 });
+    await page.goto("/");
+
+    const cards = page.locator(
+      '.book-part[aria-labelledby="appendices-heading"] .chapter-grid > li',
+    );
+    await expect(cards).toHaveCount(6);
+
+    const rowCounts = await cards.evaluateAll((items) => {
+      const rows = new Map<number, number>();
+      for (const item of items) {
+        const top = Math.round(item.getBoundingClientRect().top);
+        rows.set(top, (rows.get(top) || 0) + 1);
+      }
+      return [...rows.values()];
+    });
+
+    expect(rowCounts).toEqual([3, 3]);
+  });
+
   test("renders scientific citations and the chapter bibliography", async ({
     page,
   }) => {
