@@ -42,3 +42,31 @@ The result supports a bounded claim about the declared setup, not that productio
 Not every project needs hermetic execution or bit-for-bit reproducible builds.
 Choose the weakest environment contract that still supports the decision: documented setup for ordinary collaboration, a declared and pinned environment for comparable course evidence, isolation for actions that must not depend on host state, or reproducible artifacts when independent builders must verify identical output.
 State the remaining external boundaries instead of implying that a tool has removed them.
+
+### Field note — Make validation local and proportional
+
+I value a development environment that is easy to bootstrap and safe to bootstrap again.
+Setup should be idempotent: rerunning it should converge on the supported project state or report a clear incompatibility instead of accumulating hidden changes.
+Without that property, stale dependencies and one-off repairs can eventually leave a project insecure or unable to run.
+
+An agent should be able to perform most validation locally.
+Remote CI is too slow to serve as the primary feedback loop when an agent can produce several changes during one CI cycle.
+This does not make CI unnecessary.
+For larger projects, it remains valuable as an independent acceptance gate.
+Its role depends on the project's scope and the cost of its checks.
+
+I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template).
+The validation loop has several strengths:
+
+1. **Run focused checks during ordinary iteration.** Select tests, diagnostics, and mutation targets from the affected files where the dependency information is reliable.
+2. **Run a broader gate before accepting substantial work.** Use the project's baseline validation when a change crosses boundaries or the affected-file analysis may be incomplete.
+3. **Reserve expensive checks for justified cases.** A full mutation run can be too costly for every iteration, so use it for high-risk changes, explicit audits, or scheduled validation.
+4. **Retain CI where independence matters.** Larger projects still benefit from a clean remote environment before merge or deployment.
+5. **Use containers when isolation earns its cost.** A container-based local run is safer when setup requires difficult system dependencies or could otherwise disturb the developer's machine.
+   Simpler projects may not need that boundary.
+
+Affected validation introduces its own obligation: the selector must recognize configuration changes, deleted files, shared dependencies, and other cases that should widen the check.
+A fast loop is only useful when it fails conservatively instead of silently excluding relevant work.
+
+The goal is not to run fewer checks for its own sake.
+It is to give agents the fastest trustworthy feedback available while preserving broader and more independent validation for decisions that justify the additional cycle time.
