@@ -47,12 +47,30 @@ Default telemetry to metadata: capture prompts, source, tool arguments or result
 A trace identifier connects evidence; it is not proof of identity or permission.
 Without this contract, the resource layer can see spend without knowing whether the work was accepted, while the orchestration layer can see intent without knowing which model or permission was actually used.
 
-For one delegated task, choose two consequential decisions: one about the session or task and one about a model, tool, credential, or other resource.
-For each, record the policy authority, mandatory enforcement point, trusted context or evidence, and conflict or outage rule.
-Then trace the task end to end and look for a direct-call bypass, lost actor identity, multiplied retry, conflicting caps or double-counted usage, and cancellation that does not reach in-flight work.
+Audit one delegated task:
+
+1. Choose two consequential decisions: one about the session or task and one about a model, tool, credential, or other resource.
+2. For each decision, record the policy authority, mandatory enforcement point, trusted context or evidence, and conflict or outage rule.
+3. Trace the task end to end.
+
+During the trace, look for:
+
+- a direct-call bypass;
+- lost actor identity;
+- multiplied retries;
+- conflicting caps or double-counted usage;
+- cancellation that does not reach in-flight work.
+
 Where practical, use a safe direct-call negative test and, where records are available, reconcile the mediator with the model provider or tool resource rather than inferring non-bypass from an incomplete trace.
-The audit is complete only when every denied, failed, retried, cancelled, or successful attempt has an identifier, policy result, and usage or cost provenance where measurable, and rolls up once to an explicit delegated-run outcome.
-When computing cost per accepted outcome, include spend from every attempt in the fixed cohort and use accepted delegated runs—not internal calls—as the denominator; label missing or estimated costs rather than treating them as zero.
+
+The audit is complete only when every denied, failed, retried, cancelled, or successful attempt:
+
+- has an identifier and policy result;
+- has usage or cost provenance where measurable;
+- rolls up once to an explicit delegated-run outcome.
+
+When computing cost per accepted outcome, include spend from every attempt in the fixed cohort.
+Use accepted delegated runs—not internal calls—as the denominator, and label missing or estimated costs rather than treating them as zero.
 
 For the B–C comparison, keep any gateway pinned to the declared base model where possible; otherwise record the model actually used and treat substitution as a confounding factor.
 

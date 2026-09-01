@@ -278,16 +278,34 @@ The goal is to balance work that prevents known failures with work that improves
 
 ## Project artifact
 
-Produce a three-way scaling comparison, one implemented and measured scaling response, and one justified target design.
-The comparison should apply the same pressure set to implementations A, B, and C and distinguish what is observed in running code from what is proposed.
-The implemented response should preserve its before-and-after revisions, unchanged workload and acceptance evidence, observed result, new failure or recovery obligation, and conclusion.
-For at least one pressure, connect the proposed response to a documented production account.
-Separate what the source directly reports from your interpretation and from the transfer proposed for the project; do not assume that the source's scale, result, or accepted trade-off carries over.
-It should include one formal model applied to an application decision and one applied to the development workflow.
-Each row in the target design's trade-off table should name a pressure, the limit being approached, the chosen technique, the benefit, the cost, the new failure mode, the operational signal to watch, at least one prepared recovery action, and the reason a simpler alternative was not enough.
-It should also state where the technique displaced complexity, such as into clients, data freshness, background operations, routing, migration, or incident response.
+Produce three connected deliverables:
+
+1. **Three-way comparison.** Apply the same pressure set to implementations A, B, and C. Mark each result as observed in running code or proposed.
+2. **Implemented response.** Preserve the before-and-after revisions, unchanged workload and acceptance checks, observed result, new failure or recovery obligation, and conclusion.
+3. **Target design.** Justify the selected responses and explain why simpler alternatives are insufficient.
+
+Across the package:
+
+- connect at least one pressure and proposed response to a documented production account;
+- separate what the source reports, your interpretation, and the transfer you propose for the project; do not assume that the source's scale, result, or trade-off carries over;
+- apply one formal model to an application decision and one to the development workflow.
+
+Use one trade-off table row for each response in the target design. Record:
+
+- the pressure and approaching limit;
+- the technique, intended benefit, cost, and new failure mode;
+- the operational signal and at least one prepared recovery action;
+- where complexity moved, such as into clients, data freshness, background operations, routing, migration, or incident response;
+- why a simpler alternative was not enough.
+
 If the target design contains asynchronous multi-step work that can perform an external side effect, include one [crash-after-side-effect audit](/appendices/durable-workflows/#audit-the-effect-boundary).
-Record the last durable coordination fact, the external effect that may already have occurred, the timeout and retry rule, the retry-safety or deduplication mechanism and its owner, any stable key it uses, the terminal-state behavior, and the evidence available to an operator.
+Record:
+
+- the last durable coordination fact and the external effect that may already have occurred;
+- the timeout and retry rule;
+- the retry-safety or deduplication mechanism, its owner, and any stable key it uses;
+- the terminal-state behavior and evidence available to an operator.
+
 If no component at the effect boundary can deduplicate, state that duplicate delivery remains possible.
 
 ## Summary
@@ -296,7 +314,9 @@ Scaling begins with a pressure and an approaching limit, not with a preferred te
 Formal models can expose bounds and inconsistencies, while measurements show which boundary the running system is actually approaching.
 The linked production cases make those relationships concrete through controlled cache staleness, queued publication work, and the removal of abandoned requests.
 None of those responses transfers automatically; each begins a question that the project must answer with its own workload and evidence.
+
 Orchestration can maintain declared application capacity, but it cannot make a saturated dependency or incompatible local state scale horizontally.
 Caching, queues, replicas, partitioning, rate limits, background work, and isolation can create capacity or resilience only by accepting new costs, failure modes, and operational obligations.
+
 Latency, geography, consistency, sustainability, and human coordination therefore belong in the same trade-off analysis as throughput.
 A credible target design explains why each mechanism is needed, where it moves complexity, which signal reveals trouble, and how the system can degrade, recover, or adapt when its assumptions fail.

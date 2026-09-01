@@ -243,12 +243,25 @@ Select the artifacts you have, then use the generated outline to find claims tha
 
 ## Project artifact
 
-Submit the completed evidence matrix and a final decision narrative.
-The package should include the common acceptance result, request-path or architecture evidence, pressure and measurement results, cross-team friction audits, human–agent workflow evidence, one planned-versus-observed decision path, resource-use evidence where available, and remaining risks.
-For each major claim, mark whether it is observed, inferred, or proposed.
+Submit two connected artifacts:
 
-The final narrative should use those artifacts to explain which application architecture and development setup the group would choose under a stated set of constraints.
-It should also identify the first expected boundary, the signal that would reveal its approach, and the decision the group would revisit when conditions change.
+1. the completed evidence matrix;
+2. a final decision narrative.
+
+The evidence package should include:
+
+- the common acceptance result;
+- request-path or architecture evidence;
+- pressure and measurement results;
+- cross-team friction audits;
+- human–agent workflow evidence;
+- one planned-versus-observed decision path;
+- resource-use evidence where available;
+- remaining risks.
+
+Mark each major claim as observed, inferred, or proposed.
+
+Use the final narrative to choose an application architecture and development setup under stated constraints. Identify the first expected boundary, the signal that would reveal its approach, and the decision to revisit when conditions change.
 
 ## Author perspective — Learn where to look
 

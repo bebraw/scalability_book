@@ -167,14 +167,21 @@ When a protocol permits `k` trials per task, name the reliability question befor
 More attempts make pass@k easier to satisfy and pass^k harder, so the same workflow can look increasingly capable by one measure and increasingly unreliable by the other.
 Predeclare `k`, budgets, stopping rules, and whether failed attempts remain in latency and cost totals; do not use pass@k to imply first-attempt reliability.
 
-Report the independent task count, task source, one predeclared primary outcome, and observed paired difference.
-If a course-provided or otherwise justified paired interval method fits the outcome, include the interval and name the method.
+Report:
+
+- the independent task count and task source;
+- one predeclared primary outcome;
+- the observed paired difference;
+- a suitable paired interval and its method, when a course-provided or otherwise justified method fits the outcome.
+
 Before inspecting results, define the signed difference and the practical boundary or bounds that would change the decision.
-Only an interval wholly on the required side of a boundary supports that local decision; overlap leaves it inconclusive, and statistical separation can still describe a difference too small to matter.
+Only an interval wholly on the required side of a boundary supports that local decision.
+Overlap leaves the result inconclusive, while statistical separation can still describe a difference too small to matter.
 An interval containing zero is not proof that the candidates are equal.
+
 Treat other metrics and unplanned slices as descriptive or exploratory unless their joint decision rule and multiple-comparison treatment were declared in advance.
 When no defensible interval is available, show the raw paired outcomes, label the comparison exploratory, and restrict the claim to those tasks.
-An interval still describes uncertainty conditional on the sample and scoring process; it cannot repair unrepresentative tasks, judge bias, contamination, or a change to the agent harness or evaluation harness.
+An interval describes uncertainty conditional on the sample and scoring process; it cannot repair unrepresentative tasks, judge bias or contamination, or account for a change to the agent or evaluation harness.
 
 **Paired comparison check.**
 For one predeclared binary acceptance result per independent task, count tasks accepted by both candidates, only the first, only the second, or neither.
@@ -267,10 +274,12 @@ Repeating an agent review can reveal variance, but agreement between runs is not
 VulnBench repeated identical security-review tasks five times across ten small JavaScript and Express fixtures.
 Of 158 unique findings that matched its Snyk Code reference, 134 appeared in every repetition; among 161 unmatched findings, 80 appeared only once and 22 appeared in every repetition :citep[tal2026vulnbench].
 The recurrence difference is useful for triage, but reference overlap measures agreement with Snyk Code rather than ground-truth accuracy.
+
 Treat each model review as one sample.
 Deduplicate repeated findings, record recurrence separately from deterministic-reference overlap, and preserve rare findings for case-level adjudication rather than automatically discarding them.
 Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
 Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
+
 Repeated review also consumes the same scarce integration capacity that bounds the fleet.
 If you repeat an agent review, record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.

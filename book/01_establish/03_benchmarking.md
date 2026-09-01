@@ -222,12 +222,17 @@ The study did not compare productivity against a control, and five participants 
 The reported before-and-after page measurements do not include the optimizing model's full training and inference footprint; the paper estimates that overhead separately, and neither result is a whole-system carbon estimate.
 Treat the optimization as a candidate change that must preserve the intended product behavior, not as evidence that a lower energy number is automatically better.
 
-Reuse one representative Playwright journey and the repeated-measurement discipline above.
-Preserve the baseline, make one targeted AI-assisted frontend optimization, and run the same journey under the same declared conditions.
-Repeat it at least five times before and after when the chosen signal varies from run to run.
-Record direct energy if the platform exposes a defensible measure; otherwise label transferred bytes, JavaScript or asset size, CPU time, or long-task time as **resource proxies**, not energy or carbon.
-For deterministic measures such as built asset size, record one before-and-after value; for run-varying measures, report the median and range.
-Re-run the functional checks, inspect for visual or accessibility regressions, note any rejected suggestion or regression, and state what the comparison cannot establish.
+Run one bounded optimization experiment:
+
+1. Choose one representative Playwright journey and preserve its baseline.
+2. Make one targeted AI-assisted frontend optimization.
+3. Run the same journey under the same declared conditions before and after the change.
+   If the chosen signal varies, repeat each condition at least five times.
+4. Record direct energy only if the platform exposes a defensible measure.
+   Otherwise label transferred bytes, JavaScript or asset size, CPU time, or long-task time as **resource proxies**, not energy or carbon.
+5. For a deterministic measure such as built asset size, report one value per condition.
+   For a run-varying measure, report the median and range.
+6. Re-run the functional checks, inspect for visual or accessibility regressions, note rejected suggestions or regressions, and state what the comparison cannot establish.
 
 ## Measurement alone cannot explain behavior
 

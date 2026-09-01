@@ -216,11 +216,15 @@ For Slideotter, that property was layout.
 ## Descriptor boundary audit
 
 Create one small event-summary data fixture and keep it unchanged.
-First define the prop schema and payload for one fixed summary component.
-Then define minimal prop schemas for an approved registry such as `metric`, `eventList`, and `button`, plus a small action allowlist, and express the same fixture as a declarative descriptor.
-Define where and how the system rejects an unknown component, raw HTML or script, an unregistered action, a control without an accessible name, and excessive nesting.
-For each rejection, state the enforcing layer, error, and test, and use the fixed read-only summary as the fallback.
-Finally, identify the additional containment and evidence that would be required before the application could execute model-generated code.
+Then:
+
+1. Define the prop schema and payload for one fixed summary component.
+2. Define minimal prop schemas for an approved registry such as `metric`, `eventList`, and `button`, plus a small action allowlist.
+3. Express the same fixture as a declarative descriptor.
+4. Reject unknown components, raw HTML or script, unregistered actions, controls without accessible names, and excessive nesting.
+   For each rejection, name the enforcing layer, error, and test.
+5. Use the fixed read-only summary as the fallback.
+6. Identify the additional containment and evidence required before the application could execute model-generated code.
 
 The descriptor schema and action vocabulary are API contracts.
 The next section examines what follows once such contracts cross client and server boundaries.

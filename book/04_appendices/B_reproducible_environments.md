@@ -32,9 +32,15 @@ Mutable downloads still need a lock, checksum, digest, or explicit freshness pol
 Strict pins need an update and security-review policy; reproducibility should not turn an old dependency into an invisible permanent dependency.
 
 Use the existing cross-team audit as the test.
-From a fresh checkout on another supported machine or container, with project caches, generated files, and project-owned service state absent, run the documented setup and baseline validation and record the host prerequisites already present.
-Capture the setup time and outcome, any undocumented intervention or retry, the failure stage, and relevant host, resource, or network conditions; record required configuration names but never secret values.
-After a repair, the authors or CI should replay the path from a fresh state.
+Run it as follows:
+
+1. Start from a fresh checkout on another supported machine or container.
+   Remove project caches, generated files, and project-owned service state from the starting conditions.
+2. Record the host prerequisites already present, then run the documented setup and baseline validation.
+3. Capture the setup time and outcome, any undocumented intervention or retry, the failure stage, and relevant host, resource, or network conditions.
+   Record required configuration names, but never secret values.
+4. After a repair, have the authors or CI replay the path from a fresh state.
+
 The result supports a bounded claim about the declared setup, not that production is identical or that a stochastic agent will produce the same patch.
 
 ## Choose the required strength
