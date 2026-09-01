@@ -22,6 +22,7 @@ import {
 } from "./lib/render-book-diagrams.ts";
 import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
+import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import {
   chapterNumberFromFilename,
@@ -372,6 +373,7 @@ const caseStudies = await Promise.all(
     };
   }),
 );
+const openGraphCards: OpenGraphCard[] = [];
 const renderer = createSiteRenderer({
   caseStudies,
   chapters,
@@ -380,6 +382,7 @@ const renderer = createSiteRenderer({
   indexPartPages,
   partMetadata,
   templates,
+  onOpenGraphCard: (card) => openGraphCards.push(card),
 });
 
 for (let index = 0; index < bookPages.length; index++) {
@@ -403,7 +406,10 @@ for (let index = 0; index < bookPages.length; index++) {
   await writePage(
     `${page.collection}/${page.slug}/index.html`,
     renderer.renderLayout({
-      title: `${page.title} - ${config.title}`,
+      title:
+        page.title === config.title
+          ? config.title
+          : `${page.title} - ${config.title}`,
       description: config.description,
       currentUrl: page.url,
       stylesheets: pageStylesheets,
@@ -524,6 +530,14 @@ await writePage(
     children: renderDemoGalleryPage(demoGallery),
   }),
 );
+
+await writeOpenGraphImages({
+  author: config.author.name,
+  buildDir,
+  cards: openGraphCards,
+  domain: config.domain,
+  siteTitle: config.title,
+});
 
 await compileSiteStylesheet("styles.css");
 await compileSiteStylesheet("styles/case-studies.css");

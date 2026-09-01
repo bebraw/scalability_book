@@ -1,6 +1,12 @@
 import { renderHtmlisp } from "./htmlisp.ts";
 import { escapeAttribute, escapeHtml, slugify } from "./text.ts";
 import type { RenderedMarkdown, TableOfContentsItem } from "./markdown.ts";
+import {
+  getOpenGraphCardTitle,
+  getOpenGraphImagePath,
+  getOpenGraphLabel,
+  type OpenGraphCard,
+} from "./open-graph.ts";
 
 type SiteConfig = {
   author: { name: string; url: string };
@@ -65,6 +71,7 @@ type CreateSiteRendererOptions = {
   indexPartPages: BookPage[];
   partMetadata: PartMetadataCollection;
   templates: Templates;
+  onOpenGraphCard?: (card: OpenGraphCard) => void;
 };
 type RenderBookPageOptions = {
   page: BookPage;
@@ -89,6 +96,7 @@ export function createSiteRenderer({
   indexPartPages,
   partMetadata,
   templates,
+  onOpenGraphCard,
 }: CreateSiteRendererOptions) {
   return {
     renderBookPage,
@@ -140,6 +148,19 @@ export function createSiteRenderer({
     children,
   }: RenderLayoutOptions): string {
     const canonicalUrl = `https://${config.domain}${currentUrl}`;
+    const imagePath = getOpenGraphImagePath(currentUrl);
+    const imageUrl = `https://${config.domain}${imagePath}`;
+    const cardTitle = getOpenGraphCardTitle(title, config.title);
+    const imageAlt =
+      cardTitle === config.title
+        ? `Social preview for ${config.title}`
+        : `Social preview for ${cardTitle}, from ${config.title}`;
+
+    onOpenGraphCard?.({
+      imagePath,
+      label: getOpenGraphLabel(currentUrl),
+      title: cardTitle,
+    });
 
     return renderHtmlisp(templates.baseLayout, {
       authorName: config.author.name,
@@ -147,6 +168,8 @@ export function createSiteRenderer({
       canonicalUrl,
       children,
       description,
+      ogImageAlt: imageAlt,
+      ogImageUrl: imageUrl,
       scriptTags: scripts
         .map((src) => `<script src="${escapeAttribute(src)}" defer></script>`)
         .join("\n"),
