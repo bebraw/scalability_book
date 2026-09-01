@@ -23,6 +23,24 @@ Bound total retry time and resource cost, classify permanent errors, and expose 
 Cancellation is a request to stop: it may not preempt an in-flight external effect and does not by itself undo one that already completed.
 Every approach adds durable state and operational ownership; replay-based engines also require replay-compatible code evolution and management of history growth and retention.
 
+### Field note — Preserve partial value during model refinement
+
+I have encountered this problem repeatedly with local models in [Slideotter](/case-studies/slideotter/).
+A model may return structurally valid slide data that still contains metadata-like language in audience-visible fields.
+Slideotter treats this as a [semantic leak](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0050-visible-text-quarantine.md): authoring instructions, schema labels, sourcing notes, or layout guidance have crossed into presentation content.
+
+The current workflow preserves completed slides and allows generation to resume from the failed slide.
+That is better than restarting the entire deck, but retry is not always the right product concept.
+Parts of the rejected slide may already be correct, and blindly regenerating it can discard useful work.
+
+I now see this as a refinement problem.
+Transport failures and malformed structured output can be retried internally, but semantically questionable content should become a partial candidate.
+The system should preserve valid fields, quarantine the rejected parts, and let the user edit them, regenerate only those fields, or request a broader rewrite.
+
+This changes the workflow state from `failed → retry` to something closer to `drafted → needs refinement → approved`.
+The durable unit is not merely a model request.
+It is the user's evolving presentation intent and the portions of the candidate that have already passed review.
+
 ## Durable effect retry lab
 
 The lab below stops a worker after a webhook receiver applies its effect but before the workflow records completion.
