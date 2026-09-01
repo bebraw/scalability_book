@@ -248,6 +248,30 @@ For each major claim, mark whether it is observed, inferred, or proposed.
 The final narrative should use those artifacts to explain which application architecture and development setup the group would choose under a stated set of constraints.
 It should also identify the first expected boundary, the signal that would reveal its approach, and the decision the group would revisit when conditions change.
 
+## Author perspective — Learn where to look
+
+I do not expect you to become an expert in every topic covered by this book.
+I want the book to give you a wider map of the concerns that shape a web application and set you on a path toward learning more.
+
+Agentic development makes implementation increasingly accessible.
+As a result, I see the quality of the applications you create as a reflection of the depth of your knowledge and judgment.
+A model can produce a plausible implementation quickly, but you still need to recognize which product, architecture, accessibility, sustainability, security, validation, operational, and maintenance questions deserve attention.
+
+Like in art, part of the skill is knowing where to look.
+You cannot investigate every detail at once, but you need enough awareness to notice that a concern exists.
+Sustainability is a good example: if it is absent from your mental map, it is easy to ignore when defining requirements, selecting an architecture, or evaluating the result.
+
+Awareness does not provide the answer by itself.
+It tells you when to pause, form a better question, gather evidence, or seek deeper expertise instead of accepting the first plausible default.
+
+I have also learned a great deal by developing this book.
+I do not understand every topic in it completely, and I do not consider that a failure.
+The durable skill is learning how to learn while strengthening your ability to question claims, compare evidence, and revise your judgment.
+This matters in education and throughout professional practice, especially while tools and assumptions continue to change.
+
+Use this book as a map rather than a catalog of final answers.
+The goal is to help you see more of the system, recognize what you do not yet understand, and know where to look next.
+
 ## Questions to carry forward
 
 - Which form of growth is the system actually prepared for, and what evidence establishes that claim?
