@@ -269,6 +269,28 @@ Small cross-layer mismatches make fleet risk easier to understand than abstract 
 The goal of the labs is not to prove that four agents are better than one.
 It is to expose where decomposition, integration, validation, or correction fails.
 
+### Field note — Correct the direction before the details
+
+Not every unsuccessful agent session is worth repairing.
+Sometimes I stop the session, discard its unaccepted changes by returning to the last known-good Git state, and begin again.
+Rebuilding the context from the start can be more valuable than continuing a conversation whose assumptions already point the work in the wrong direction.
+
+The first judgment is about the overall direction, not unfinished details.
+This matters particularly for user-interface work.
+Agents can produce a large amount of plausible UI quickly, but they still do not produce a perfect interface by default.
+My contribution is to notice when the composition, interaction model, or product feel is wrong before the agent spends more effort polishing it.
+
+The intervention threshold depends on the project and its maturity.
+For a rough prototype whose purpose is discovery, I can tolerate more inconsistency and let the implementation expose the problem.
+For a production application, I care much more about reviewing visible direction early so that weak decisions do not become an increasingly expensive surface to correct.
+
+I rely heavily on screenshots when giving this feedback because they preserve the rendered state being discussed.
+I have also begun experimenting with shared browser sessions as a more interactive form of co-creation.
+A further possibility is feedback from inside the application itself: capture the current UI state, let me indicate where the problem appears, and attach my description of what is wrong to that state.
+
+That workflow is still a direction I am exploring rather than an established practice.
+Its appeal is that correction becomes grounded in the interface itself instead of depending on a detached verbal reconstruction of what I saw.
+
 ### Delegation lab
 
 Use the planner below before running real agents.
