@@ -63,6 +63,8 @@ Each phase begins from a fresh implementation and changes the development setup 
 2. **Challenge:** a foundation model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
 3. **Compare:** a declared agent fleet produces implementation C before all three applications and development workflows are compared.
 
+{{ import "site/includes/course-progression-figure.html" }}
+
 The comparison is bounded rather than perfectly controlled.
 You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.
 The shared specification, acceptance material, pressures, and reporting categories make those differences discussable without pretending that the course establishes a universal ranking.

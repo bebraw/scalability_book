@@ -80,6 +80,152 @@
 .prose img {
   max-width: 100%;
 }
+.course-progression-figure {
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+  margin: 2.15rem 0 2.4rem;
+  max-width: 64rem;
+}
+.course-progression-canvas {
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--text) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    color-mix(in srgb, var(--text) 1.5%, var(--panel));
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: clamp(0.5rem, 1.2vw, 0.85rem);
+}
+.course-progression-canvas:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 0.2rem;
+}
+.progression-diagram {
+  display: block;
+  height: auto;
+  min-width: 58rem;
+  width: 100%;
+}
+.progression-diagram text {
+  fill: var(--text);
+  font-family: var(--font-ui);
+}
+.progression-shared > rect {
+  fill: color-mix(in srgb, var(--accent) 11%, var(--panel));
+  stroke: color-mix(in srgb, var(--accent-strong) 68%, var(--border));
+  stroke-width: 1.5;
+}
+.progression-kicker {
+  fill: var(--accent-strong) !important;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 1.2px;
+}
+.progression-shared-title,
+.progression-stage-title,
+.progression-outcome-title {
+  font-size: 20px;
+  font-weight: 850;
+}
+.progression-shared-title {
+  font-size: 23px;
+}
+.progression-detail {
+  fill: var(--muted) !important;
+  font-size: 15px;
+  font-weight: 650;
+}
+.progression-shared-links path {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 5 5;
+  stroke-width: 1.5;
+}
+.progression-stage > rect {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.progression-fresh rect {
+  fill: color-mix(in srgb, var(--text) 5%, var(--panel));
+  stroke: var(--border);
+}
+.progression-fresh text {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+}
+.progression-learning path {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+.progression-learning rect {
+  fill: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  stroke: var(--accent-strong);
+  stroke-width: 1;
+}
+.progression-learning text {
+  fill: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.4px;
+}
+.progression-outcome > rect {
+  fill: color-mix(in srgb, var(--accent) 13%, var(--bg));
+  stroke: var(--accent-strong);
+  stroke-width: 2;
+}
+.progression-reset rect {
+  fill: color-mix(in srgb, var(--text) 3%, var(--panel));
+  stroke: var(--border);
+  stroke-dasharray: 5 4;
+}
+.progression-reset path {
+  fill: none;
+  stroke: var(--muted);
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+.progression-reset text {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.progression-arrow-marker path {
+  fill: var(--accent-strong);
+}
+.progression-shared-arrow-marker path {
+  fill: var(--border);
+}
+.course-progression-figure figcaption {
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-size: 0.96rem;
+  inline-size: 100%;
+  line-height: 1.48;
+  margin-block-start: 0.75rem;
+  max-width: none;
+}
+@media print {
+  .course-progression-canvas {
+    overflow: visible;
+  }
+  .progression-diagram {
+    min-width: 0;
+  }
+}
 .prose blockquote {
   border-left: 0.3rem solid var(--accent);
   color: var(--muted);

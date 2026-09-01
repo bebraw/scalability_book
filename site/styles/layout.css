@@ -557,6 +557,13 @@
     grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
     max-width: 112rem;
   }
+  .book-shell[data-navigation-collapsed="true"]
+    .prose
+    > .course-progression-figure {
+    grid-column: 1 / -1;
+    inline-size: min(100%, 64rem);
+    justify-self: center;
+  }
   .book-shell .prose {
     display: grid;
     grid-template-columns:
