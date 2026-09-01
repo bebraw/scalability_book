@@ -50,12 +50,12 @@ Setup should be idempotent: rerunning it should converge on the supported projec
 Without that property, stale dependencies and one-off repairs can eventually leave a project insecure or unable to run.
 
 An agent should be able to perform most validation locally.
-Remote CI is too slow to serve as the primary feedback loop when an agent can produce several changes during one CI cycle.
+In my agent-assisted projects, remote CI has generally been too slow to serve as the primary feedback loop because an agent can produce several changes during one CI cycle.
 This does not make CI unnecessary.
 For larger projects, it remains valuable as an independent acceptance gate.
 Its role depends on the project's scope and the cost of its checks.
 
-I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template).
+I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template), whose [affected-guardrail decision](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/implemented/ADR-026-run-affected-guardrails-when-possible.md) documents the focused path and its fallbacks to broader validation.
 The validation loop has several strengths:
 
 1. **Run focused checks during ordinary iteration.** Select tests, diagnostics, and mutation targets from the affected files where the dependency information is reliable.

@@ -12,7 +12,7 @@ The second is the development system of people, agents, tools, instructions, tes
 Scaling one while ignoring the limits of the other does not create a scalable project.
 
 Coding agents make this connection especially important.
-Writing every line of a web application by hand is no longer a sensible default for most projects: agents can now perform substantial parts of the implementation loop from a specification and feedback from their environment.
+In my own work, writing every line of a web application by hand is no longer the default: agents can now perform substantial parts of the implementation loop from a specification and feedback from their environment.
 That added production capacity does not remove the need for software engineering.
 It moves more human attention toward intent, architecture, constraints, validation, integration, and ownership while making weak feedback loops more consequential.
 

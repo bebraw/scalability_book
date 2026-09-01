@@ -130,6 +130,8 @@ I consider three factors first:
 For small, low-risk projects, I allow agents to work relatively freely with Cloudflare infrastructure.
 Direct API or dashboard changes are acceptable when I do not expect major spending, the project contains no sensitive data, and a mistake would have limited consequences.
 If an action may introduce cost, I negotiate a limit with the agent before it proceeds.
+That agreement is a decision boundary, not an enforcement mechanism.
+Where spending could become material, the limit also needs a provider budget, quota, or another control outside the model.
 
 This convenience trades away some reproducibility and reviewability.
 A direct infrastructure change may not leave the repository as a complete description of the deployed state.

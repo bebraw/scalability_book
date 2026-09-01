@@ -1,6 +1,6 @@
 # Formal scalability and reliability models
 
-Use this appendix when a scaling or workflow decision needs more than the introductory Little's Law or Amdahl's Law treatment in the main chapters.
+Use this appendix when a scaling or workflow decision needs more than the introductory [Little's Law](/chapters/benchmarking/#check-measurements-against-a-model) or [Amdahl's Law](/chapters/agent-fleets/#amdahls-law-and-the-sequential-bottleneck) treatment in the main chapters.
 The models below expose two different ways that adding work can reduce success: serial reliability compounds across critical steps, while contention and coordination can flatten or reverse throughput gains.
 
 ## Author perspective — Use models to see the limits

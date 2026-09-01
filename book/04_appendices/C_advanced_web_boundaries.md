@@ -185,7 +185,7 @@ The study therefore measures preference in that setup, not task success, correct
 
 ### Field note — Constrain generation around the hard part
 
-For Slideotter's first version, reliable layout was essential.
+For the first version of [Slideotter](/case-studies/slideotter/), reliable layout was essential.
 I had the development model research the presentation-tooling space, but I did not want the runtime to become an unconstrained code generator.
 
 The repository established the layout boundary before adding the browser studio.

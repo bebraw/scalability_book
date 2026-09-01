@@ -288,7 +288,8 @@ I do not yet have enough experience to claim a general method for designing stro
 So far, I have mostly allowed development models to propose the evaluators, then complained about obvious weaknesses I found while reviewing their code.
 
 [Slideotter](/case-studies/slideotter/) provides the clearest example of where this still became useful.
-I asked a stronger development model to mutate presentation scenarios and exercise the smaller local models and their generation harness.
+The repository preserves the resulting [generation fuzz harness](https://github.com/bebraw/slideotter/blob/main/scripts/fuzz-lmstudio-generation.ts).
+I asked a stronger development model to mutate presentation scenarios and exercise the smaller local models through that harness.
 The mutations explored combinations and failure cases I would not have devised on my own.
 
 Some outputs failed in surprising ways.
