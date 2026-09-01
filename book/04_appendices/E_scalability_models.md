@@ -3,6 +3,22 @@
 Use this appendix when a scaling or workflow decision needs more than the introductory Little's Law or Amdahl's Law treatment in the main chapters.
 The models below expose two different ways that adding work can reduce success: serial reliability compounds across critical steps, while contention and coordination can flatten or reverse throughput gains.
 
+## Author perspective — Use models to see the limits
+
+I do not use these laws directly in my everyday development work.
+I include them because they have educational value: they make the limits behind scalability visible.
+
+Parallelization cannot remove work that must remain sequential.
+Additional workers still share resources and require coordination.
+Longer workflows accumulate more opportunities for failure.
+These constraints exist regardless of how quickly code can be generated or how much infrastructure can be provisioned.
+
+The purpose of the models and labs is therefore not formula memorization or precise prediction.
+It is to make relationships concrete enough to challenge claims such as “more agents will make the work proportionally faster” or “adding capacity will continue increasing throughput.”
+
+Use the equations to recognize the shape of a limit and identify what should be measured.
+Real decisions still require evidence from the actual system.
+
 ## Lusser's Law and the reliability chain
 
 A workflow whose accepted result depends on every critical step has the structure of a series system.
