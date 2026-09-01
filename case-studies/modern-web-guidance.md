@@ -90,6 +90,21 @@ A team adopting a living capability can keep the boundary explicit:
 
 This makes the external skill a reviewable development dependency rather than invisible model knowledge.
 
+## Field note — Curate external knowledge without transferring authority
+
+I have not used Modern Web Guidance directly enough to claim that it improved a particular implementation.
+I adopted it into [Vibe Template](https://github.com/bebraw/vibe-template) because I consider current web-platform guidance useful context for an agent to have when a relevant decision appears.
+
+The integration deliberately narrows the upstream capability.
+Retrieval uses a reviewed, pinned version with telemetry disabled, and the skill activates only when browser-facing work requires a platform choice, compatibility interpretation, or fallback.
+Project architecture, specifications, user instructions, and validation remain authoritative over anything retrieved.
+
+This is less about installing another tool than defining a knowledge boundary.
+An agent should be able to discover that a relevant browser feature, compatibility concern, or native platform pattern exists without loading an entire changing guide into every task or treating external guidance as a project requirement.
+
+For now, this is a reasoned design choice rather than evidence of improved project outcomes.
+The capability still needs to justify itself through the decisions and implementations it influences.
+
 ## What Modern Web Guidance teaches
 
 Modern Web Guidance demonstrates a scalable way to package fast-changing expertise: maintain it once, retrieve a bounded part when relevant, express compatibility as a local constraint, and test whether the imported knowledge improves checked behavior.
