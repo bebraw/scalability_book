@@ -170,17 +170,17 @@ The common brief makes careful claims possible when observations remain separate
 ### Build the evidence matrix
 
 Use the concept map to compare the implementations across the same boundaries.
-Replace each evidence prompt in the matrix with a concrete artifact, result, or explicit `not measured` entry.
+For each dimension, record evidence from implementations A, B, and C—or explicitly state `not measured`—before answering the comparison question.
 
-| Evidence dimension             | Implementation A                        | Implementation B                        | Implementation C                          | Synthesis question                                                          |
-| ------------------------------ | --------------------------------------- | --------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
-| Accepted browser behavior      | Acceptance probe and escaped defects    | Acceptance probe and escaped defects    | Acceptance probe and correction evidence  | Which differences affected users rather than only repository structure?     |
-| Architecture and contracts     | Request trace and key boundary decision | Request trace and key boundary decision | Request trace and key boundary decision   | Which boundaries made independent change safer or harder?                   |
-| Pressure and saturation        | Pressure map and first predicted limit  | Pressure map and first predicted limit  | Pressure map and first predicted limit    | How did each architecture respond to the same growth scenario?              |
-| Measurement and recovery       | Benchmark, signals, and recovery result | Benchmark, signals, and recovery result | Benchmark, signals, and recovery result   | What was directly observed, and which behavior remained invisible?          |
-| Development friction           | Cross-team audit and change effort      | Cross-team audit and change effort      | Cross-team audit and change effort        | Which setup, test, or coupling cost would dominate the next change?         |
-| Human–agent workflow           | Trace, interventions, and review effort | Trace, interventions, and review effort | Fleet trace, handoffs, and review backlog | Which allocation produced accepted work at a sustainable correction cost?   |
-| Resource use and externalities | Runtime and model-use evidence          | Runtime and model-use evidence          | Runtime and model-use evidence            | Did added resources create useful capacity, quality, or only more activity? |
+| Evidence dimension             | Collect from each implementation                                                               | Compare across implementations                                                 |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Accepted browser behavior      | Acceptance results, escaped defects, and correction evidence                                   | Which differences affected users rather than only repository structure?        |
+| Architecture and contracts     | Request trace and key boundary decisions                                                       | Which boundaries made independent change safer or harder?                      |
+| Pressure and saturation        | Pressure map and first predicted or observed limit                                             | How did each architecture respond to the same growth scenario?                 |
+| Measurement and recovery       | Benchmark, operational signals, and recovery result                                            | What was directly observed, and what remained invisible?                       |
+| Development friction           | Cross-team audit and change effort                                                             | Which setup, test, or coupling cost would dominate the next change?            |
+| Human–agent workflow           | Execution trace, interventions, and review effort; include handoffs and backlog for the fleet | Which allocation produced accepted work at a sustainable correction cost?      |
+| Resource use and externalities | Runtime and model-use evidence                                                                 | Did added resources create useful capacity or quality, or merely more activity? |
 
 ::caption[Evidence matrix for synthesizing the three implementations through the shared concept map.]
 ::label[table:final-evidence-matrix]
