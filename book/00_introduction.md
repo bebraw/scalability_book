@@ -34,7 +34,7 @@ Agents are also becoming consumers of web applications through browsers, APIs, a
 This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.
 
 During the past few months, I have developed projects whose complexity would previously have kept me from attempting them.
-The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), and [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/).
+The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/), and [this book's own development system](/case-studies/elements-of-scalable-web-development/).
 Each taught me something different: generation can outpace product judgment, architecture can lag behind implementation, and deliberately narrow scope can turn the same capability into dependable software.
 Reading about other people's experience helps, but there is also value in making bounded mistakes of your own and forming your own judgment.
 

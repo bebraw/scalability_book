@@ -63,6 +63,12 @@
       "repositoryUrl": "https://github.com/GoogleChrome/modern-web-guidance-src",
       "summary": "How fast-changing web-platform knowledge can become a retrieved, versioned, and task-evaluated development dependency.",
     },
+    {
+      "file": "case-studies/elements-of-scalable-web-development.md",
+      "slug": "elements-of-scalable-web-development",
+      "repositoryUrl": "https://github.com/bebraw/scalability_book",
+      "summary": "How an agent-assisted manuscript became a tested publishing system and made editorial judgment the limiting resource.",
+    },
   ],
 
   // The course runs in three three-week parts. Each course part maps to three

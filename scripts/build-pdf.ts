@@ -175,6 +175,11 @@ const groups = [
         "case-studies/modern-web-guidance",
         "build/case-studies/modern-web-guidance/index.html",
       ),
+      entry(
+        "Elements of Scalable Web Development - When a book became a web project",
+        "case-studies/elements-of-scalable-web-development",
+        "build/case-studies/elements-of-scalable-web-development/index.html",
+      ),
     ],
   },
   {
