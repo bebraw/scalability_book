@@ -106,11 +106,12 @@
     flex-wrap: wrap;
   }
   .theme-picker {
+    justify-self: start;
     min-width: 0;
   }
   .theme-picker select {
     min-width: 0;
-    width: 100%;
+    width: auto;
   }
   .edit-toggle {
     justify-self: start;

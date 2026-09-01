@@ -89,6 +89,26 @@ test.describe("book reading layout", () => {
     expect(Math.abs(listGap - paragraphGap)).toBeLessThan(1);
   });
 
+  test("keeps the theme picker compact on narrow screens", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const picker = page.getByRole("combobox", { name: "Theme" });
+    const pickerControl = page.locator(".theme-picker");
+    const headerActions = page.locator(".header-actions");
+
+    await expect(picker).toBeVisible();
+    const pickerBox = await pickerControl.boundingBox();
+    const headerActionsBox = await headerActions.boundingBox();
+
+    expect(pickerBox).not.toBeNull();
+    expect(headerActionsBox).not.toBeNull();
+    expect(pickerBox!.width).toBeLessThan(headerActionsBox!.width / 2);
+
+    await picker.selectOption("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  });
+
   test("ships theme-aware syntax highlighting as generated HTML", async ({
     page,
     request,
