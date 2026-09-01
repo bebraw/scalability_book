@@ -155,15 +155,38 @@ The expensive part was that the structural feedback arrived later than the funct
 
 ## What I would do differently
 
-If I started Kirjolab again with the knowledge gained from the project, I would preserve the strict harness and core product model while changing the sequence.
+If I started Kirjolab again with the knowledge gained from the project, the largest change would be to separate manuscript ownership from source-data ownership.
 
-1. **Begin with capability-oriented ownership.** I would establish thin composition roots and directories for authoring, references, PDFs, projects, review, and integrations before those capabilities accumulated hundreds of files.
-2. **Hold the first release to one closed loop.** Evidence capture, a traceable claim, a reviewable model suggestion, and portable prose would form the initial product.
-   Structured reviews and broad integrations would wait for evidence from that loop.
-3. **Add structural feedback earlier.** File size, fan-in, churn concentration, flat-directory growth, and cross-capability dependencies would be reviewed alongside coverage and behavior.
-4. **Prune the project template.** I would retain affected checks, mutation testing, local CI, ADRs, and specification rules while removing skills and capability material unrelated to the product.
-5. **Create independent evidence.** Public CI results, representative research datasets, usability sessions, deployment signals, and before-and-after change-friction measurements would complement repository-owned tests.
-6. **Use review checkpoints.** Even for a single-developer project, grouped pull requests or explicit architectural checkpoints would create opportunities to review the direction of a capability rather than only the correctness of individual commits.
+An external knowledge base would own source records, relationships among sources, and annotations.
+Annotations would normally belong to the user who created them, with explicit sharing when the user wants others to reuse them.
+This gives annotations value beyond any one manuscript and allows [Slideotter](/case-studies/slideotter/) to use the same researched material without duplicating it.
+
+I would use a deliberately simple document model.
+Every imported PDF would be an immutable, uniquely identified document.
+A collection could group related documents, such as successive drafts or editions, without treating one as a silent replacement for another.
+The system could alert a user that a related document exists, but existing references would continue to point to the exact document originally reviewed.
+
+Kirjolab would own manuscripts, manuscript-specific claims, evidence links, prose, and review state.
+An evidence link would pin a claim to an exact document and reviewed annotation revision in the knowledge base.
+A newer document or changed annotation would require explicit review before it could replace that evidence.
+
+The initial workflow would be:
+
+1. **Select or import a source.** Add an immutable document to the external knowledge base or select one already available.
+2. **Annotate the source.** Store reusable, user-owned annotations against that exact document, sharing them only when intended.
+3. **Develop the manuscript argument.** Create manuscript-owned claims and connect them to selected annotations through stable evidence links.
+4. **Draft and review prose.** Treat model suggestions as candidates until the researcher accepts, edits, or rejects them.
+5. **Preserve reviewed evidence.** Keep accepted claims linked to the document and annotation revision that supported the decision.
+6. **Surface related documents without silent migration.** Use collections to reveal newer drafts or editions, while requiring deliberate review before manuscript evidence changes.
+
+I would retain the project's strict validation harness, portable manuscript format, and explicit human acceptance boundary while changing the implementation sequence:
+
+1. **Establish the ownership boundary first.** Keep knowledge-base integration, manuscript state, and presentation concerns behind separate contracts.
+2. **Hold the first release to one closed loop.** Source selection, annotation, a traceable claim, candidate prose, and explicit acceptance would form the initial product.
+3. **Add structural feedback early.** Review file size, fan-in, churn concentration, flat-directory growth, and cross-capability dependencies alongside behavior and coverage.
+4. **Prune the project template.** Retain affected checks, mutation testing, local CI, decision records, and specification rules while removing unrelated capability material.
+5. **Create independent evidence.** Use representative research material, usability sessions, deployment signals, and change-friction measurements to complement repository-owned tests.
+6. **Use architectural checkpoints.** Review whether ownership boundaries still match the product before allowing another broad capability expansion.
 
 ## What Kirjolab teaches
 
