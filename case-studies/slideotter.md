@@ -122,12 +122,27 @@ Slideotter helped make the later refactoring possible; it did not by itself prev
 
 ## What I would do differently
 
-1. **Choose one delivery target first.** I would make the local browser studio the only initial runtime and defer desktop and cloud paths until repeated use justified them.
-2. **Close one authoring loop.** A brief, an approved outline, a small supported slide set, explicit candidate review, and a validated PDF would define the first product.
-3. **Use real decks as the roadmap.** New layout families, retrieval methods, and editing modes would follow observed failures across several presentations.
-4. **Budget architecture as the system grows.** Module size, fan-in, churn concentration, and cross-workflow dependencies would be reviewed alongside artifact quality.
-5. **Measure product success separately.** Time to a usable deck, corrections per slide, regeneration rate, and repeated use would complement repository and validation metrics.
-6. **Prune the harness around the chosen loop.** A smaller set of high-value checks would reduce maintenance cost while the product hypothesis remained uncertain.
+I would no longer treat Slideotter as the owner of its source material.
+A shared knowledge base would own sources, relationships among them, and provenance.
+Slideotter would own presentation-level metadata, outline variants, slide definitions, themes, and the approval workflow.
+[Kirjolab](/case-studies/kirjolab/) could use the same knowledge base for its research and writing workflows without either product duplicating the underlying knowledge.
+
+The smallest complete Slideotter workflow would be:
+
+1. **Select or amend the source material.** Begin with material and relationships already available in the shared knowledge base, adding or correcting knowledge when necessary.
+2. **Define the presentation metadata.** Record the title, purpose, audience, duration, language, theme, and other presentation-level constraints.
+   Themes and similar properties should remain easy to change later.
+3. **Develop outline variants.** Allow several outlines to derive from the same base metadata.
+   Each variant may override relevant properties, such as its intended audience, without duplicating the whole presentation definition.
+4. **Approve an outline before expanding it.** Select and revise one candidate before generating the complete slide set.
+5. **Generate and review the slides.** Treat slide definitions, layout, theme, and rendered output as reviewable candidates rather than accepted presentation state.
+6. **Support repeated approval and revision.** Approval should identify a reviewed version, not permanently close the artifact.
+   Later changes create another candidate that can be reviewed and approved again.
+7. **Choose one delivery target first.** Make the local browser studio the initial runtime and defer desktop and cloud paths until repeated use justifies them.
+8. **Use real decks as the roadmap.** Add layout families, retrieval methods, and editing modes in response to observed failures across several presentations.
+9. **Budget architecture as the system grows.** Review module size, fan-in, churn concentration, and cross-workflow dependencies alongside artifact quality.
+10. **Measure product success separately.** Track time to an approved deck, corrections per slide, outline revisions, regeneration rate, and repeated use rather than relying on repository or validation metrics.
+11. **Prune the harness around the chosen loop.** Keep the smallest set of checks that protects source provenance, approval state, slide validity, and rendered quality while the product hypothesis remains uncertain.
 
 ## What Slideotter teaches
 
