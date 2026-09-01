@@ -4,16 +4,27 @@ type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
 };
 type KVNamespaceListKey<Key extends string = string> = { name: Key };
-type KVNamespaceListResult<Key extends string = string> = {
-  keys: KVNamespaceListKey<Key>[];
-};
+type KVNamespaceListResult<Key extends string = string> =
+  | {
+      keys: KVNamespaceListKey<Key>[];
+      list_complete: true;
+    }
+  | {
+      cursor: string;
+      keys: KVNamespaceListKey<Key>[];
+      list_complete: false;
+    };
 type KVNamespace<Key extends string = string> = {
   get(key: Key): Promise<string | null>;
   get<ExpectedValue = unknown>(
     key: Key,
     type: "json",
   ): Promise<ExpectedValue | null>;
-  list(options?: { prefix?: string }): Promise<KVNamespaceListResult<Key>>;
+  list(options?: {
+    cursor?: string;
+    limit?: number;
+    prefix?: string;
+  }): Promise<KVNamespaceListResult<Key>>;
   put(
     key: Key,
     value: string,
@@ -74,6 +85,10 @@ export default {
 
     if (url.pathname === "/api/comments") {
       return handleCommentsRequest(request, env, url);
+    }
+
+    if (url.pathname === "/api/admin/comments") {
+      return handleAdminCommentsRequest(request, env);
     }
 
     if (url.pathname === "/api/stuck") {
@@ -380,6 +395,43 @@ async function handleCommentsRequest(
   return methodNotAllowed("GET, POST");
 }
 
+async function handleAdminCommentsRequest(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return methodNotAllowed("GET");
+  }
+
+  if (!env.COMMENTS_KV) {
+    return json(
+      { message: "Comments storage is not configured" },
+      { status: 503 },
+    );
+  }
+
+  const user = await getSessionUser(request, env);
+
+  if (!user || !isAdmin(user.login, env)) {
+    return json(
+      { message: "Only the book owner can review all comments" },
+      { status: 403 },
+    );
+  }
+
+  const chapterKeys = await listCommentKeys(env.COMMENTS_KV);
+  const commentsByChapter = await Promise.all(
+    chapterKeys.map((key) =>
+      getChapterComments(env, key.name.replace(/^comments:/, "")),
+    ),
+  );
+
+  return json(
+    { comments: commentsByChapter.flat() },
+    { headers: { "Cache-Control": "private, no-store" } },
+  );
+}
+
 async function handleStuckRequest(
   request: Request,
   env: Env,
@@ -491,9 +543,9 @@ async function handleResolveRequest(
     return json({ message: "Invalid resolution reason" }, { status: 400 });
   }
 
-  const chapterKeys = await env.COMMENTS_KV.list({ prefix: "comments:" });
+  const chapterKeys = await listCommentKeys(env.COMMENTS_KV);
 
-  for (const key of chapterKeys.keys) {
+  for (const key of chapterKeys) {
     const chapter = key.name.replace(/^comments:/, "");
     const comments = await getChapterComments(env, chapter);
     const comment = comments.find((item) => item.id === id);
@@ -539,9 +591,9 @@ async function handleHideRequest(
   }
 
   const id = decodeURIComponent(encodedId);
-  const chapterKeys = await env.COMMENTS_KV.list({ prefix: "comments:" });
+  const chapterKeys = await listCommentKeys(env.COMMENTS_KV);
 
-  for (const key of chapterKeys.keys) {
+  for (const key of chapterKeys) {
     const chapter = key.name.replace(/^comments:/, "");
     const comments = await getChapterComments(env, chapter);
     const comment = comments.find((item) => item.id === id);
@@ -723,9 +775,11 @@ async function mutateComment(
   update: (comment: any) => void,
 ) {
   const id = decodeURIComponent(encodedId);
-  const chapterKeys = await env.COMMENTS_KV?.list({ prefix: "comments:" });
+  const chapterKeys = env.COMMENTS_KV
+    ? await listCommentKeys(env.COMMENTS_KV)
+    : [];
 
-  for (const key of chapterKeys?.keys || []) {
+  for (const key of chapterKeys) {
     const chapter = key.name.replace(/^comments:/, "");
     const comments = await getChapterComments(env, chapter);
     const comment = comments.find((item) => item.id === id);
@@ -741,6 +795,22 @@ async function mutateComment(
   }
 
   return null;
+}
+
+async function listCommentKeys(namespace: KVNamespace) {
+  const keys: KVNamespaceListKey[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const page = await namespace.list({
+      prefix: "comments:",
+      ...(cursor ? { cursor } : {}),
+    });
+    keys.push(...page.keys);
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  return keys;
 }
 
 function visibleCommentsForUser(
@@ -926,7 +996,7 @@ function isValidSlug(value: unknown): value is string {
 function isValidParagraphId(value: unknown): value is string {
   return (
     typeof value === "string" &&
-    (/^p-[a-z0-9-]+$/.test(value) || value === "p-chapter-reflection")
+    (/^p-[a-z0-9_-]+$/.test(value) || value === "p-chapter-reflection")
   );
 }
 

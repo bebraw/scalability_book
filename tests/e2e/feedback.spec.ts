@@ -15,6 +15,11 @@ test.describe("paragraph feedback", () => {
       "Feedback: local-editor",
     );
     await expect(page.locator("[data-comments-view]")).toHaveValue("admin");
+    await expect(page.locator("[data-feedback-admin-link]")).toBeVisible();
+    await expect(page.locator("[data-feedback-admin-link]")).toHaveAttribute(
+      "href",
+      "/admin/feedback/",
+    );
     await expect(page.locator("[data-reflection-prompts]")).toBeVisible();
     await expect(page.locator(".comment-thread")).toHaveCount(0);
     await expect(page.locator("[data-stuck-button]")).toHaveCount(0);
@@ -133,6 +138,7 @@ test("hides reflection prompts for logged-out readers", async ({ page }) => {
     "false",
   );
   await expect(page.locator("[data-reflection-prompts]")).toBeHidden();
+  await expect(page.locator("[data-feedback-admin-link]")).toBeHidden();
 });
 
 async function waitForFeedback(page: Page) {

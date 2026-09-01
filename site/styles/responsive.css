@@ -151,7 +151,8 @@
   .feedback-controls select {
     width: 100%;
   }
-  .feedback-controls button {
+  .feedback-controls button,
+  .feedback-controls a {
     white-space: nowrap;
   }
   .hero {

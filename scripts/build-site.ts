@@ -424,6 +424,18 @@ await writePage(
   }),
 );
 
+await writePage(
+  "admin/feedback/index.html",
+  renderer.renderLayout({
+    title: `Reader feedback - ${config.title}`,
+    description: "Review feedback and comments from across the book.",
+    currentUrl: "/admin/feedback/",
+    stylesheets: ["/styles/feedback-admin.css"],
+    scripts: ["/feedback-admin.js", ...developmentScripts],
+    children: renderFeedbackAdminPage(bookPages),
+  }),
+);
+
 for (let index = 0; index < projectSpecifications.length; index++) {
   const specification = projectSpecifications[index];
   const rendered = renderMarkdown(
@@ -516,11 +528,13 @@ await writePage(
 await compileSiteStylesheet("styles.css");
 await compileSiteStylesheet("styles/case-studies.css");
 await compileSiteStylesheet("styles/demos.css");
+await compileSiteStylesheet("styles/feedback-admin.css");
 await compileSiteStylesheet("styles/project.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
+await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteScript(
   "scripts/project-fit-checker.ts",
@@ -725,6 +739,104 @@ function renderDemoGalleryPage(content) {
 <article class="prose demo-gallery-prose">
 ${content}
 </article>
+</main>`;
+}
+
+function renderFeedbackAdminPage(pages) {
+  const chapterData = JSON.stringify(
+    pages.map(({ label, slug, title, url }) => ({ label, slug, title, url })),
+  ).replaceAll("<", "\\u003c");
+
+  return `<main class="feedback-admin-page" id="content" data-feedback-admin>
+  <section class="feedback-admin-hero" aria-labelledby="feedback-admin-title">
+    <div>
+      <p class="feedback-admin-eyebrow">Book administration</p>
+      <h1 id="feedback-admin-title">Reader feedback</h1>
+      <p>See every comment in one place, find the passages drawing attention, and return to the book with the reader&rsquo;s context intact.</p>
+    </div>
+    <div class="feedback-admin-identity" data-feedback-admin-identity role="status" aria-live="polite">
+      Checking access&hellip;
+    </div>
+  </section>
+
+  <section class="feedback-admin-access" data-feedback-admin-access aria-live="polite">
+    <p>Loading feedback&hellip;</p>
+  </section>
+
+  <div data-feedback-admin-dashboard hidden>
+    <section class="feedback-admin-metrics" aria-label="Feedback summary">
+      <article>
+        <span>Open</span>
+        <strong data-feedback-metric="open">0</strong>
+        <small>Awaiting review</small>
+      </article>
+      <article>
+        <span>All feedback</span>
+        <strong data-feedback-metric="total">0</strong>
+        <small>Across the book</small>
+      </article>
+      <article>
+        <span>Resolved</span>
+        <strong data-feedback-metric="resolved">0</strong>
+        <small>Closed loops</small>
+      </article>
+      <article>
+        <span>Active chapters</span>
+        <strong data-feedback-metric="chapters">0</strong>
+        <small>With responses</small>
+      </article>
+    </section>
+
+    <div class="feedback-admin-workspace">
+      <form class="feedback-admin-filters" data-feedback-filters>
+        <div class="feedback-filter-heading">
+          <p class="feedback-admin-eyebrow">Review queue</p>
+          <button type="reset">Clear filters</button>
+        </div>
+        <label class="feedback-search-field">
+          <span>Search</span>
+          <input type="search" name="query" placeholder="Comment, author, or chapter" autocomplete="off" />
+        </label>
+        <div class="feedback-filter-grid">
+          <label>
+            <span>Status</span>
+            <select name="status">
+              <option value="all">All statuses</option>
+              <option value="open">Open</option>
+              <option value="resolved">Resolved</option>
+              <option value="hidden">Hidden</option>
+              <option value="featured">Featured</option>
+            </select>
+          </label>
+          <label>
+            <span>Category</span>
+            <select name="category">
+              <option value="all">All categories</option>
+            </select>
+          </label>
+          <label>
+            <span>Chapter</span>
+            <select name="chapter">
+              <option value="all">All chapters</option>
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <section class="feedback-admin-results" aria-labelledby="feedback-results-title">
+        <div class="feedback-results-heading">
+          <div>
+            <p class="feedback-admin-eyebrow">Current view</p>
+            <h2 id="feedback-results-title" data-feedback-result-summary>All feedback</h2>
+          </div>
+          <a href="/">Back to the book</a>
+        </div>
+        <div class="feedback-admin-list" data-feedback-list aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="application/json" id="feedback-chapter-data">${chapterData}</script>
 </main>`;
 }
 

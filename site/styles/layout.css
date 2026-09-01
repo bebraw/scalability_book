@@ -66,7 +66,8 @@
 }
 .tools-toggle,
 .edit-toggle,
-.feedback-controls button {
+.feedback-controls button,
+.feedback-controls a {
   background: var(--accent-strong);
   border: 1px solid var(--accent-strong);
   border-radius: 0.35rem;
@@ -74,12 +75,23 @@
   cursor: pointer;
   font: 700 0.82rem/1.15 var(--font-ui);
   padding: 0.36rem 0.65rem;
+  text-decoration: none;
+}
+.feedback-controls a {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+.feedback-controls [hidden] {
+  display: none;
 }
 .tools-toggle:hover,
 .edit-toggle:hover,
-.feedback-controls button:hover {
+.feedback-controls button:hover,
+.feedback-controls a:hover {
   background: var(--accent);
   border-color: var(--accent);
+  color: var(--panel);
 }
 .feedback-controls {
   align-items: center;
@@ -100,7 +112,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.feedback-controls button {
+.feedback-controls button,
+.feedback-controls a {
   background: transparent;
   color: var(--text);
   min-block-size: 2rem;
@@ -115,7 +128,8 @@
   font-size: 0.85rem;
   padding: 0.28rem 0.45rem;
 }
-.feedback-controls button:hover {
+.feedback-controls button:hover,
+.feedback-controls a:hover {
   color: var(--panel);
 }
 .site-footer {

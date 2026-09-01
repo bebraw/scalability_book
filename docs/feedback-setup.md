@@ -125,6 +125,7 @@ Admins can use the feedback view selector in the navigation header to preview th
 
 In `Admin view`, moderation controls are available in paragraph feedback threads.
 The `Export` button downloads a Markdown summary for the current chapter.
+The `Review all` link opens `/admin/feedback/`, where admins can see, search, and filter feedback across every chapter before opening a comment's exact passage.
 
 In local editing mode, admins can promote a featured note into the chapter Markdown as a clarification block.
 Promotion appends the clarification to the chapter source and uses the local editor API, so it is not available on the deployed read-only site.

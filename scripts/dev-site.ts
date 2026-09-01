@@ -110,6 +110,10 @@ const server = createServer(async (request, response) => {
       return handleCommentsRequest(request, response, url);
     }
 
+    if (url.pathname === "/api/admin/comments") {
+      return handleAdminCommentsRequest(request, response);
+    }
+
     if (url.pathname === "/api/stuck") {
       return handleStuckRequest(request, response);
     }
@@ -253,6 +257,19 @@ async function handleCommentsRequest(request, response, url) {
 
   response.writeHead(405, { Allow: "GET, POST" });
   return response.end("Method not allowed");
+}
+
+async function handleAdminCommentsRequest(request, response) {
+  if (request.method !== "GET") {
+    response.writeHead(405, { Allow: "GET" });
+    return response.end("Method not allowed");
+  }
+
+  const commentsByChapter = await loadComments();
+
+  return sendJson(response, {
+    comments: Object.values(commentsByChapter).flat(),
+  });
 }
 
 async function handleStuckRequest(request, response) {
@@ -881,7 +898,7 @@ function isValidSlug(value) {
 function isValidParagraphId(value) {
   return (
     typeof value === "string" &&
-    (/^p-[a-z0-9-]+$/.test(value) || value === "p-chapter-reflection")
+    (/^p-[a-z0-9_-]+$/.test(value) || value === "p-chapter-reflection")
   );
 }
 

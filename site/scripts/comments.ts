@@ -88,6 +88,9 @@ if (commentsRoot) {
   const exportButton = document.querySelector<HTMLButtonElement>(
     "[data-comments-export]",
   );
+  const adminLink = document.querySelector<HTMLAnchorElement>(
+    "[data-feedback-admin-link]",
+  );
   const viewControl = document.querySelector<HTMLElement>(
     "[data-comments-view-control]",
   );
@@ -174,6 +177,9 @@ if (commentsRoot) {
     viewControl.hidden = !auth.admin;
     if (exportButton) {
       exportButton.hidden = !auth.admin;
+    }
+    if (adminLink) {
+      adminLink.hidden = !auth.admin;
     }
 
     if (!auth.admin) {

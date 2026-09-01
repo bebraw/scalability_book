@@ -97,6 +97,7 @@ The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV`
 Students sign in with GitHub, use the paragraph comment control, and post comments.
 Students see only their own comments and admin replies to those comments.
 Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, reply to comments, resolve comments, hide comments that should not be shown back to students, and feature curated reader notes publicly.
+Admins can open `/admin/feedback/` (or choose `Review all` from a chapter's feedback controls) to search and filter feedback from across the whole book.
 
 Local editing stores feedback data in `.local/comments.json`.
 To review production feedback locally, pull from Cloudflare KV first:
