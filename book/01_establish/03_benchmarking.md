@@ -283,6 +283,30 @@ Bind each result to the configuration that produced it: the model and runtime wh
 Then preserve the same reporting categories across implementations A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
 Treat the comparison as evidence about those tasks and conditions rather than a universal model or workflow ranking.
 
+### Field note — Preserve accepted context, not every interaction
+
+I have not established a practice of preserving complete agent transcripts or detailed workflow telemetry.
+When I return to an agent-assisted project, I rely mainly on its code, resulting documentation, and commit history.
+The code shows the implemented state, the documentation describes the intended system, and the history preserves how both changed over time.
+Together they provide durable context for future human and agent work without requiring every interaction to remain available.
+
+Architecture Decision Records are especially valuable to me.
+I let agents draft and amend them, but I prompt and negotiate important decisions with care.
+A strong initial prompt can set the project direction and reduce uncertainty by narrowing the space the agent has to interpret.
+When I do not yet understand the domain well enough, leaving some details open can be appropriate; implementation and review can then expose what the next decision needs to settle.
+
+[Vibe Template](https://github.com/bebraw/vibe-template) codifies this practice in its [ADR workflow](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/README.md).
+A lasting architectural change must add or update an ADR in the same change set.
+Proposed, accepted, and implemented decisions have distinct lifecycle states, and an ADR reaches `implemented` only when the repository actually reflects it.
+Superseded decisions remain available as history rather than disappearing when the direction changes.
+
+An ADR is still an interpretation.
+It records the rationale, alternatives, trade-offs, and decision that I accepted; it is not a neutral transcript of every prompt, disagreement, or abandoned path.
+Code, documentation, ADRs, and commit history can therefore preserve accepted project context without fully reconstructing the agentic workflow that produced it.
+
+Tracking prompts, retries, model use, correction effort, cost, or other workflow signals could reveal more.
+I have not yet researched that practice deeply enough to know which additional evidence would justify its collection and maintenance cost.
+
 For the Establish project, choose one representative AI-assisted task and preserve its task brief, relevant context, configuration, outcome, checks, trace, corrections, and acceptance decision.
 The later implementations can reuse the reporting frame without pretending that one task is a statistically stable benchmark.
 
