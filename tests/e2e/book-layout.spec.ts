@@ -93,17 +93,26 @@ test.describe("book reading layout", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
+    const header = page.locator(".site-header");
+    const brand = page.locator(".brand");
+    const navigation = page.locator('.site-header nav[aria-label="Primary"]');
     const picker = page.getByRole("combobox", { name: "Theme" });
     const pickerControl = page.locator(".theme-picker");
-    const headerActions = page.locator(".header-actions");
 
     await expect(picker).toBeVisible();
+    const headerBox = await header.boundingBox();
+    const brandBox = await brand.boundingBox();
+    const navigationBox = await navigation.boundingBox();
     const pickerBox = await pickerControl.boundingBox();
-    const headerActionsBox = await headerActions.boundingBox();
 
+    expect(headerBox).not.toBeNull();
+    expect(brandBox).not.toBeNull();
+    expect(navigationBox).not.toBeNull();
     expect(pickerBox).not.toBeNull();
-    expect(headerActionsBox).not.toBeNull();
-    expect(pickerBox!.width).toBeLessThan(headerActionsBox!.width / 2);
+    expect(headerBox!.height).toBeLessThan(96);
+    expect(pickerBox!.width).toBeLessThanOrEqual(44);
+    expect(Math.abs(brandBox!.y - pickerBox!.y)).toBeLessThan(8);
+    expect(navigationBox!.y).toBeGreaterThan(brandBox!.y);
 
     await picker.selectOption("dark");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
