@@ -766,7 +766,7 @@ function renderFeedbackAdminPage(pages) {
     <div>
       <p class="feedback-admin-eyebrow">Book administration</p>
       <h1 id="feedback-admin-title">Reader feedback</h1>
-      <p>See every comment in one place, find the passages drawing attention, and return to the book with the reader&rsquo;s context intact.</p>
+      <p>Review open issues, resolve the ones that have been handled, and keep the archive available when earlier context matters.</p>
     </div>
     <div class="feedback-admin-identity" data-feedback-admin-identity role="status" aria-live="polite">
       Checking access&hellip;
@@ -790,9 +790,9 @@ function renderFeedbackAdminPage(pages) {
         <small>Across the book</small>
       </article>
       <article>
-        <span>Resolved</span>
+        <span>Archived</span>
         <strong data-feedback-metric="resolved">0</strong>
-        <small>Closed loops</small>
+        <small>Resolved issues</small>
       </article>
       <article>
         <span>Active chapters</span>
@@ -815,9 +815,9 @@ function renderFeedbackAdminPage(pages) {
           <label>
             <span>Status</span>
             <select name="status">
-              <option value="all">All statuses</option>
-              <option value="open">Open</option>
-              <option value="resolved">Resolved</option>
+              <option value="open">Open issues</option>
+              <option value="resolved">Archive</option>
+              <option value="all">All feedback</option>
               <option value="hidden">Hidden</option>
               <option value="featured">Featured</option>
             </select>
@@ -841,10 +841,11 @@ function renderFeedbackAdminPage(pages) {
         <div class="feedback-results-heading">
           <div>
             <p class="feedback-admin-eyebrow">Current view</p>
-            <h2 id="feedback-results-title" data-feedback-result-summary>All feedback</h2>
+            <h2 id="feedback-results-title" data-feedback-result-summary>Open issues</h2>
           </div>
           <a href="/">Back to the book</a>
         </div>
+        <p class="feedback-admin-action-status" data-feedback-action-status role="status" aria-live="polite"></p>
         <div class="feedback-admin-list" data-feedback-list aria-live="polite"></div>
       </section>
     </div>

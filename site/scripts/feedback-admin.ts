@@ -41,6 +41,11 @@ type FeedbackChapter = {
   url: string;
 };
 
+type ResolveFeedback = (
+  comment: AdminFeedbackComment,
+  reason: string,
+) => Promise<void>;
+
 type FeedbackFilters = HTMLFormElement & {
   elements: HTMLFormControlsCollection & {
     category: HTMLSelectElement;
@@ -131,6 +136,10 @@ function setupDashboard(
     root.querySelector<HTMLElement>("[data-feedback-result-summary]"),
     "feedback result summary",
   );
+  const actionStatus = requireElement(
+    root.querySelector<HTMLElement>("[data-feedback-action-status]"),
+    "feedback action status",
+  );
   const chapterBySlug = new Map(
     chapters.map((chapter) => [chapter.slug, chapter]),
   );
@@ -138,7 +147,6 @@ function setupDashboard(
     (left, right) => dateValue(right.createdAt) - dateValue(left.createdAt),
   );
 
-  updateMetrics(root, sortedComments);
   populateCategoryFilter(filters.elements.category, sortedComments);
   populateChapterFilter(
     filters.elements.chapter,
@@ -148,9 +156,33 @@ function setupDashboard(
 
   const render = () => {
     const visible = filterComments(sortedComments, filters, chapterBySlug);
-    summary.textContent = resultSummary(visible.length, sortedComments.length);
-    renderComments(list, visible, chapterBySlug);
+    const status = filters.elements.status.value;
+    const statusTotal = sortedComments.filter(
+      (comment) => status === "all" || matchesStatus(comment, status),
+    ).length;
+
+    updateMetrics(root, sortedComments);
+    summary.textContent = resultSummary(visible.length, statusTotal, status);
+    renderComments(list, visible, chapterBySlug, resolveFeedback);
   };
+
+  async function resolveFeedback(
+    comment: AdminFeedbackComment,
+    reason: string,
+  ): Promise<void> {
+    const resolved = await fetchJson<AdminFeedbackComment>(
+      `/api/comments/${encodeURIComponent(comment.id)}/resolve`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      },
+    );
+
+    Object.assign(comment, resolved);
+    actionStatus.textContent = `${chapterTitle(comment.chapter, chapterBySlug)} feedback resolved as ${resolutionLabels.get(reason) || "Resolved"} and moved to the archive.`;
+    render();
+  }
 
   filters.addEventListener("input", render);
   filters.addEventListener("reset", () => window.setTimeout(render, 0));
@@ -281,6 +313,7 @@ function renderComments(
   list: HTMLElement,
   comments: AdminFeedbackComment[],
   chapterBySlug: Map<string, FeedbackChapter>,
+  onResolve: ResolveFeedback,
 ): void {
   list.replaceChildren();
 
@@ -297,7 +330,7 @@ function renderComments(
 
   const fragment = document.createDocumentFragment();
   for (const comment of comments) {
-    fragment.append(renderComment(comment, chapterBySlug));
+    fragment.append(renderComment(comment, chapterBySlug, onResolve));
   }
   list.append(fragment);
 }
@@ -305,6 +338,7 @@ function renderComments(
 function renderComment(
   comment: AdminFeedbackComment,
   chapterBySlug: Map<string, FeedbackChapter>,
+  onResolve: ResolveFeedback,
 ): HTMLElement {
   const card = document.createElement("article");
   card.className = "feedback-admin-card";
@@ -358,6 +392,37 @@ function renderComment(
   );
   details.append(open);
 
+  if (!comment.resolvedAt && !comment.hiddenAt) {
+    const resolve = document.createElement("button");
+    const formId = `resolve-feedback-${comment.id.replace(/[^a-z0-9_-]/gi, "-")}`;
+    resolve.className = "feedback-card-resolve";
+    resolve.type = "button";
+    resolve.textContent = "Resolve";
+    resolve.setAttribute("aria-controls", formId);
+    resolve.setAttribute("aria-expanded", "false");
+    resolve.addEventListener("click", () => {
+      const existing = card.querySelector<HTMLFormElement>(
+        ".feedback-card-resolution",
+      );
+
+      if (existing) {
+        existing.remove();
+        resolve.setAttribute("aria-expanded", "false");
+        resolve.focus();
+        return;
+      }
+
+      resolve.setAttribute("aria-expanded", "true");
+      card.append(
+        renderResolutionForm(formId, comment, onResolve, () => {
+          resolve.setAttribute("aria-expanded", "false");
+          resolve.focus();
+        }),
+      );
+    });
+    details.append(resolve);
+  }
+
   card.append(header, body, details);
 
   const replies = Array.isArray(comment.replies) ? comment.replies : [];
@@ -366,6 +431,77 @@ function renderComment(
   }
 
   return card;
+}
+
+function renderResolutionForm(
+  id: string,
+  comment: AdminFeedbackComment,
+  onResolve: ResolveFeedback,
+  onCancel: () => void,
+): HTMLFormElement {
+  const form = document.createElement("form");
+  form.className = "feedback-card-resolution";
+  form.id = id;
+
+  const label = document.createElement("label");
+  const labelText = document.createElement("span");
+  labelText.textContent = "Resolution outcome";
+  const select = document.createElement("select");
+  select.name = "reason";
+  select.required = true;
+  select.append(createOption("", "Choose an outcome"));
+  for (const [value, text] of resolutionLabels) {
+    select.append(createOption(value, text));
+  }
+  label.append(labelText, select);
+
+  const actions = document.createElement("div");
+  actions.className = "feedback-resolution-actions";
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.textContent = "Resolve and archive";
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = "Cancel";
+  cancel.addEventListener("click", () => {
+    form.remove();
+    onCancel();
+  });
+  actions.append(submit, cancel);
+
+  const status = document.createElement("p");
+  status.className = "feedback-resolution-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!resolutionLabels.has(select.value)) {
+      status.textContent = "Choose an outcome before resolving this issue.";
+      select.focus();
+      return;
+    }
+
+    select.disabled = true;
+    submit.disabled = true;
+    cancel.disabled = true;
+    submit.textContent = "Archiving…";
+
+    try {
+      await onResolve(comment, select.value);
+    } catch (error) {
+      status.textContent = errorMessage(error);
+      select.disabled = false;
+      submit.disabled = false;
+      cancel.disabled = false;
+      submit.textContent = "Resolve and archive";
+    }
+  });
+
+  form.append(label, actions, status);
+  window.setTimeout(() => select.focus(), 0);
+  return form;
 }
 
 function renderReplies(replies: AdminFeedbackReply[]): HTMLElement {
@@ -517,12 +653,36 @@ function commentStatus(comment: AdminFeedbackComment): string {
   return "Open";
 }
 
-function resultSummary(visible: number, total: number): string {
+function resultSummary(visible: number, total: number, status: string): string {
+  const label = statusLabel(status, total);
+
   if (visible === total) {
-    return `${total} ${total === 1 ? "response" : "responses"}`;
+    return `${total} ${label}`;
   }
 
-  return `${visible} of ${total} responses`;
+  return `${visible} of ${total} ${label}`;
+}
+
+function statusLabel(status: string, count: number): string {
+  const singular = count === 1;
+
+  if (status === "open") {
+    return singular ? "open issue" : "open issues";
+  }
+
+  if (status === "resolved") {
+    return singular ? "archived issue" : "archived issues";
+  }
+
+  if (status === "hidden") {
+    return singular ? "hidden response" : "hidden responses";
+  }
+
+  if (status === "featured") {
+    return singular ? "featured response" : "featured responses";
+  }
+
+  return singular ? "response" : "responses";
 }
 
 function createOption(value: string, label: string): HTMLOptionElement {
@@ -554,9 +714,15 @@ function dateValue(value: string): number {
   return Number.isNaN(date) ? 0 : date;
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
+async function fetchJson<T>(
+  url: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const headers = new Headers(options.headers);
+  headers.set("Accept", "application/json");
   const response = await fetch(url, {
-    headers: { Accept: "application/json" },
+    ...options,
+    headers,
   });
   const body = (await response.json().catch(() => ({}))) as T & {
     message?: string;

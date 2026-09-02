@@ -59,6 +59,10 @@ test("collects feedback from across the book into one review view", async ({
   await expect(page.locator('[data-feedback-metric="chapters"]')).toHaveText(
     "2",
   );
+  await expect(page.locator('[data-feedback-metric="open"]')).toHaveText("2");
+  await expect(page.locator('[data-feedback-metric="resolved"]')).toHaveText(
+    "0",
+  );
 
   const introductionCard = page.locator(".feedback-admin-card", {
     hasText: "Dashboard seed: clarify the opening definition.",
@@ -67,16 +71,57 @@ test("collects feedback from across the book into one review view", async ({
     introductionCard.getByRole("link", { name: /open feedback context/i }),
   ).toHaveAttribute("href", `/chapters/introduction/#${introductionParagraph}`);
 
+  await introductionCard.getByRole("button", { name: "Resolve" }).click();
+  await introductionCard
+    .getByRole("combobox", { name: "Resolution outcome" })
+    .selectOption("fixed");
+  await introductionCard
+    .getByRole("button", { name: "Resolve and archive" })
+    .click();
+
+  await expect(introductionCard).toHaveCount(0);
+  await expect(page.locator('[data-feedback-metric="open"]')).toHaveText("1");
+  await expect(page.locator('[data-feedback-metric="resolved"]')).toHaveText(
+    "1",
+  );
+  await expect(page.locator("[data-feedback-action-status]")).toContainText(
+    "moved to the archive",
+  );
+
+  const statusFilter = page.locator('select[name="status"]');
+  await statusFilter.selectOption("resolved");
+  const archivedCard = page.locator(".feedback-admin-card", {
+    hasText: "Dashboard seed: clarify the opening definition.",
+  });
+  await expect(archivedCard).toBeVisible();
+  await expect(archivedCard).toContainText("Fixed");
+  await expect(
+    archivedCard.getByRole("button", { name: "Resolve" }),
+  ).toHaveCount(0);
+
+  await page.reload();
+  await expect(page.locator("[data-feedback-admin-dashboard]")).toBeVisible();
+  await expect(page.locator('select[name="status"]')).toHaveValue("open");
+  await expect(page.locator(".feedback-admin-card")).toHaveCount(1);
+  await page.locator('select[name="status"]').selectOption("resolved");
+  await expect(
+    page.locator(".feedback-admin-card", {
+      hasText: "Dashboard seed: clarify the opening definition.",
+    }),
+  ).toBeVisible();
+
+  await statusFilter.selectOption("open");
+
   await page
     .getByPlaceholder("Comment, author, or chapter")
     .fill("scaling example");
   await expect(page.locator(".feedback-admin-card")).toHaveCount(1);
   await expect(page.locator("[data-feedback-result-summary]")).toContainText(
-    "1 of 2 responses",
+    "1 open issue",
   );
 
   await page.locator("[data-feedback-filters]").getByRole("button").click();
-  await expect(page.locator(".feedback-admin-card")).toHaveCount(2);
+  await expect(page.locator(".feedback-admin-card")).toHaveCount(1);
 
   await page.setViewportSize({ width: 390, height: 844 });
   const pageWidth = await page.locator("html").evaluate((element) => ({
