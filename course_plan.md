@@ -61,6 +61,7 @@ A bounded cross-team audit should preserve the unfamiliar-system lesson: another
 
 The first specification draft now consists of a [common application contract](specifications/00_common_project.md) and separate [Establish](specifications/01_establish.md), [Challenge](specifications/02_challenge.md), and [Compare](specifications/03_compare.md) overlays.
 The rationale, comparison design, risks, and evidence requirements are recorded in [`docs/three-build-project-direction.md`](docs/three-build-project-direction.md).
+The highest-leverage operational opportunities before the first run are recorded in [`docs/first-run-course-improvements.md`](docs/first-run-course-improvements.md).
 
 ## AI development-system comparison
 

@@ -11,6 +11,14 @@ test.describe("paragraph feedback", () => {
   test("shows authenticated admin controls without the old page feedback panel", async ({
     page,
   }) => {
+    const toolsButton = page.getByRole("button", { name: "Tools" });
+    const toolsPanel = page.locator("[data-tools-panel]");
+
+    await expect(toolsButton).toBeVisible();
+    await expect(toolsPanel).toBeHidden();
+    await toolsButton.click();
+    await expect(toolsButton).toHaveAttribute("aria-expanded", "true");
+    await expect(toolsPanel).toBeVisible();
     await expect(page.locator("[data-comments-status]")).toContainText(
       "Feedback: local-editor",
     );

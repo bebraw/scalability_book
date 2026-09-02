@@ -111,6 +111,7 @@
     grid-template-columns: 1fr auto;
     gap: 0.4rem 0.65rem;
     justify-content: stretch;
+    position: static;
     width: 100%;
   }
   .site-header nav {
@@ -170,13 +171,9 @@
     justify-self: start;
   }
   .site-tools-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
     display: none;
     gap: 0.75rem;
     grid-column: 1 / -1;
-    padding: 0.75rem;
   }
   [data-tools-open="true"] .site-tools-panel {
     display: grid;

@@ -1,5 +1,22 @@
 import { expect, test } from "@playwright/test";
 
+test("links an authenticated admin to the feedback overview", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const toolsButton = page.getByRole("button", { name: "Tools" });
+  await expect(toolsButton).toBeVisible();
+  await toolsButton.click();
+
+  const overviewLink = page.getByRole("link", { name: /feedback overview/i });
+  await expect(overviewLink).toHaveAttribute("href", "/admin/feedback/");
+  await overviewLink.click();
+
+  await expect(page).toHaveURL(/\/admin\/feedback\/$/);
+  await expect(page.locator("[data-feedback-admin-dashboard]")).toBeVisible();
+});
+
 test("collects feedback from across the book into one review view", async ({
   page,
 }) => {
@@ -87,6 +104,8 @@ test("keeps private feedback hidden from non-admin readers", async ({
 
   await page.goto("/admin/feedback/");
 
+  await expect(page.locator("[data-feedback-admin-link]")).toBeHidden();
+  await expect(page.getByRole("button", { name: "Tools" })).toBeHidden();
   await expect(
     page.getByRole("heading", { name: "Administrator access required" }),
   ).toBeVisible();
