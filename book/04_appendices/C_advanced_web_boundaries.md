@@ -183,6 +183,28 @@ Contractor-built pages were preferred over the generated pages in 50.0% of compa
 The pipeline combined Gemini with search and image tools, extensive instructions, and post-processing; generation often took one to two minutes and was excluded from the ratings.
 The study therefore measures preference in that setup, not task success, correctness, accessibility, security, maintainability, or production readiness :citep[leviathan2026generativeui].
 
+### Show the context behind a generated view
+
+A generated view can satisfy its schema while concealing why particular information was selected or omitted.
+Show a compact **context receipt** that lets the user inspect the inputs and transformation behind the view.
+For example, a lecture-material selector could display:
+
+> **Inputs:** aggregate counts from predefined audience choices and a named revision of the curated reading list.
+>
+> **Sent to the model provider:** those counts and reading-list entries; no names, individual responses, or private notes.
+>
+> **Transformation:** selected and ordered existing readings; the complete list remains available.
+>
+> **External action:** none; the result only changes this view.
+
+This is an illustrative design, not a claim about a deployed system.
+Populate the receipt from application-controlled input and action records, not the model's recollection of what it used.
+Keep it accurate when context changes or a deterministic fallback replaces generation, and describe any additional data the application sends.
+Offer a route to inspect the source material and revise the selection criteria.
+
+The receipt makes data use and selection inspectable; it does not itself enforce privacy or authorize an action.
+Those boundaries still belong to the application, and the receipt should avoid exposing sensitive input values merely to demonstrate transparency.
+
 ### Field note — Constrain generation around the hard part
 
 For the first version of [Slideotter](/case-studies/slideotter/), reliable layout was essential.

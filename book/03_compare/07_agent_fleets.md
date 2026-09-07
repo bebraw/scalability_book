@@ -134,9 +134,9 @@ The table classifies the layer exposed to you rather than every component inside
 
 | Environment                                                                                                                                                                                     | Unit and coordination model                                                                | Isolation or control to inspect                                                          | Best fit in this chapter                                                                       |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because you can see and modify the mechanism                 |
+| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because you can see and modify the mechanism                |
 | [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation)                                                                                                       | Parent delegates fresh-context children singly or in parallel; nested delegation is opt-in | Inherited toolsets, separate terminals, optional worktrees, iteration and timeout limits | Broader multi-provider agent-harness comparison with built-in delegation and persistent memory |
-| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when you want several built-in fleet patterns               |
+| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when you want several built-in fleet patterns              |
 | [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents)                                                                                                     | Asynchronous repository task that researches, changes code, and opens a pull request       | Repository policy, hosted environment, checks, and pull-request review                   | Issue-to-pull-request comparison rather than a transparent local fleet                         |
 | [OpenAI Responses multi-agent](https://developers.openai.com/api/docs/guides/latest-model#what-is-new)                                                                                          | A model coordinates parallel subagents and synthesizes their results                       | API tools, prompts, application policy, usage, and returned evidence                     | Application-level orchestration comparison rather than an agent-harness lab                    |
 
@@ -166,6 +166,27 @@ Project memory needs a lifecycle.
 Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a decision record; promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
 A discovery transcript should not silently become the specification, and parallel agents should not work from different generations of the same contract.
 Repeatable review or debugging workflows can become small project skills, while clear mechanical rules belong in linters or tests.
+
+### Optional exercise — Retrieve guidance after a contract changes
+
+[Memoryfields](https://calpaterson.com/memoryfields.html) proposes portable Markdown memory with an optional rebuildable search index, while [Zed's agentic Xanadu essay](https://zed.dev/blog/agentic-xanadu) proposes stable text identities linking code and conversation history.
+These are architectural proposals, not controlled evidence that either approach improves accepted development work.
+They help separate three questions: **provenance** identifies where a claim came from; **validity** concerns whether it still applies; **retrieval** selects evidence for the present task.
+An identifiable old statement may be useful history and wrong guidance for the current implementation.
+
+Use a small fixture with two revisions of an event-list endpoint:
+
+1. In the earlier revision, the endpoint returns an array; in the current revision, it returns an object containing `items` and `nextCursor`.
+   Preserve both contracts with their source revisions and status, but deliberately leave one searchable summary describing the old response as current.
+2. Ask the agent separately what the earlier contract required and how a client should parse today's response.
+   Require supporting source revisions and a client check against the current fixture.
+3. Compare source inspection alone with source inspection plus retrieved project memory, keeping the task, model, tools, and starting code fixed in fresh sessions.
+   Inspect whether the stale summary is retrieved, whether the contradiction is noticed, and which source controls the answer.
+4. Record accepted behavior, stale claims, evidence recovered, retrieval cost, and the effort needed to correct or retire the summary.
+
+Keep the historical contract available while preventing it from silently governing current work.
+A timestamp or source link helps inspection but does not establish validity by itself.
+Judge memory by the work it improves, including its initialization and maintenance cost.
 
 ### Define the web task graph
 
@@ -262,6 +283,25 @@ An agent that reads untrusted issues should not automatically receive secrets or
 Treat imported extensions, skills, instructions, and configuration as executable project dependencies: inspect their source and requested access, pin a revision when practical, and use disposable least-privilege environments.
 Publishing an issue, patch, deployment, or message externally requires an explicitly accountable human who can explain the intent and evidence, respond to feedback, and correct or withdraw it.
 [Appendix D](/appendices/agent-system-security/#separate-task-control-from-resource-access) develops the enforcement and traceability model.
+
+### Optional exercise — Test a human review gate
+
+[Human Todos](https://arsctx.com/blog/human-todos/) proposes marking consequential changes for human review and blocking selected implementation steps until a human resolves them.
+The marker makes a decision visible, but an unresolved-marker check cannot detect a marker the producing agent omitted.
+Use the pattern to test the authority boundary already defined above.
+
+In a disposable branch or review fixture, declare that changing an existing endpoint's authorization or adding a new endpoint requires human review before acceptance.
+Check both cases: a rule limited to modified existing handlers would miss the new endpoint.
+The review obligation should come from an independently maintained change-scope rule, with a named owner for ambiguous cases, rather than only the producing agent's annotations.
+
+Try three failures: leave a marker unresolved, omit a required marker, and remove a marker without human approval.
+For each, identify the changed behavior, the rule that requires review, and the component that blocks acceptance.
+Then supply an approval record tied to the reviewed revision and an authenticated human reviewer; change the relevant code again and confirm that the earlier approval no longer satisfies the gate.
+The agent must not be able to satisfy the gate merely by editing its own marker or approval file.
+
+Record missed review obligations, false alarms, review time, and interruptions alongside the accepted behavior.
+Code outside a designated core can still expose data or alter permissions, so allocate review by effects as well as file or layer.
+Independent scope checks can also be incomplete; passing these seeded cases establishes coverage of those cases, not every consequential change.
 
 ## Practice failure and correction
 

@@ -179,7 +179,25 @@ Use the AI-use log together with the submitted project evidence: record material
 Provenance can make a process traceable; it does not make the artifact correct or transfer responsibility to the tool.
 Record effort for comparison and reflection, not as a quality score.
 
-The loop below is the local form of this relationship.
+### Optional exercise — Write with an agent as navigator
+
+The [Navigator Agent pattern](https://arsctx.com/blog/navigator-agent/) assigns implementation to the human while the agent provides guidance.
+It is a practitioner proposal, not evidence that typing suggested code preserves understanding.
+Use it to explore which assistance helps you retain a skill you need to own.
+
+1. Choose two small, comparable tasks involving an unfamiliar part of the stack, such as parsing an API response or enforcing a lifecycle transition.
+   State the required behavior and give each task the same time budget.
+2. For one task, write the code yourself while the agent offers hints, explanations, and critique.
+   Predict the next step before requesting a hint, and record where guidance changed your reasoning.
+3. For the other task, let the agent implement the change and use the remaining time to review and correct it.
+   Apply the same kinds of acceptance checks to both results.
+4. In a later session, without the agent or transcript, explain each implementation's invariant and repair a small, previously unseen fault.
+   Record correctness, explanation quality, time, and assistance needed during the original work.
+
+Compare accepted output with later unaided performance; code volume and keystrokes measure neither understanding nor retained judgment.
+Task differences and practice order can explain a result from one pair, so use this as a learning diagnostic rather than a causal study.
+
+The loop below makes these allocations explicit across a complete task.
 The human and agent may occupy different positions in each phase, but the workflow still needs a visible owner, admissible actions, acceptance evidence, and a route for correction.
 
 ## Constrain, generate, validate, revise

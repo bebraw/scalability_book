@@ -188,6 +188,35 @@ For one predeclared binary acceptance result per independent task, count tasks a
 Use an instructor-supplied interval or a justified paired method to interpret those counts against the predeclared decision boundary; do not compare two separate error bars.
 The single representative project task above remains a case comparison; use this check with a multi-task project cohort or instructor-provided data.
 
+## Read a harness benchmark's cost denominator
+
+FrontierHarness v1.0 compares 12 configurations across 30 software-development and terminal tasks, using one Kimi K3 model and one attempt per task–configuration cell :citep[zhu2026frontierharness].
+Its authors describe interactions among the harness, model, gateway, and caching behavior, and explicitly decline to attribute the cost gap to the harness alone.
+Use it as a benchmark-reading exercise: identify the tested configuration and cost population before interpreting a ranking.
+A single attempt per cell does not measure repeated-run reliability.
+
+The following numbers are invented teaching data, not FrontierHarness results.
+Suppose four distinct tasks each receive one attempt: two accepted attempts cost $1 and $3, while two failed attempts cost $8 and $12.
+The total measured execution spend is $24, the acceptance rate is 2/4, and there are no retries or missing usage records.
+:ref[table:harness-cost-denominators]{text="The table below"} derives three different summaries from this same cohort.
+
+| Measure                        | Calculation                  | Question answered                                               |
+| ------------------------------ | ---------------------------- | --------------------------------------------------------------- |
+| Median successful-attempt cost | Median of $1 and $3 = $2     | What did a typical successful attempt cost?                     |
+| Mean attempted-task cost       | $24 / 4 attempted tasks = $6 | What did an attempted task cost on average, including failures? |
+| Total spend per accepted task  | $24 / 2 accepted tasks = $12 | What did all attempted work cost per accepted task?             |
+
+::caption[Different cost populations produce different answers from the same invented task cohort.]
+::label[table:harness-cost-denominators]
+
+Calling all three numbers "cost per task" hides the distinction.
+If retries are allowed, include their spend while counting each accepted task once; label missing costs rather than treating them as zero.
+Report human review and other unpriced resources separately when they are outside the measured execution spend.
+
+For the published benchmark, also distinguish the median cache-hit rate across runs from the fraction of all input tokens served from cache.
+A few long runs can dominate token-weighted usage, and a high cache-hit rate can coexist with expensive failures.
+Before transferring a ranking to your project, test representative tasks with repeated fresh trials and the model, gateway, and cache conditions you intend to use.
+
 ## From evaluation to routing
 
 A lower per-request price does not necessarily make a model cheaper for a task.
