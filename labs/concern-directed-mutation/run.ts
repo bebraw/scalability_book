@@ -19,6 +19,10 @@ if (mutation) {
 
   if (mutation === "baseline") {
     console.log("Running the baseline against the starter tests.\n");
+  } else if (mutation === "storage-refactor") {
+    console.log(
+      "Running the behavior-preserving storage refactor. The tests should still pass.\n",
+    );
   } else {
     console.log(
       `Running ${mutation}. A green result means this mutant survived the starter tests.\n`,

@@ -288,6 +288,21 @@ Bind each result to the configuration that produced it: the model and runtime wh
 Then preserve the same reporting categories across implementations A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
 Treat the comparison as evidence about those tasks and conditions rather than a universal model or workflow ranking.
 
+> **From a coding task to software delivery**
+>
+> A faster patch is only one part of getting a useful change into production.
+> DORA's five delivery metrics cover change lead time, deployment frequency, failed deployment recovery time, change fail rate, and deployment rework rate :citep[harvey2026dorametrics].
+> Interpret them together for one application or service over a declared period.
+> They describe delivery throughput and instability, while the task record above describes one attempt at producing a change.
+>
+> Consider an invented timeline: work starts at 09:00, a patch is committed at 09:20, and it reaches production at 15:00.
+> The twenty-minute interval ends at a commit; DORA change lead time runs from that commit to deployment, five hours and forty minutes later.
+> If the deployment fails and service recovers at 15:30, record the thirty-minute recovery separately.
+> Failed and incident-driven deployments also belong in the period's failure and rework counts, with their denominators stated.
+>
+> A short project may have too few deployments or failures for stable rates.
+> Use this timeline to interpret the measurement boundaries; individual rankings and an uncontrolled before/after chart cannot establish an AI effect.
+
 ### Field note — Preserve accepted context, not every interaction
 
 I have not established a practice of preserving complete agent transcripts or detailed workflow telemetry.

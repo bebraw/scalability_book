@@ -1,5 +1,6 @@
 export const mutationNames = [
   "baseline",
+  "storage-refactor",
   "authorization-bypass",
   "retry-duplication",
   "archive-write",
@@ -51,7 +52,7 @@ export function parseMutation(value: string | undefined): MutationName {
   }
 
   throw new Error(
-    `Unknown mutation "${candidate}". Choose one of: ${mutationNames.join(", ")}.`,
+    `Unknown fixture mode "${candidate}". Choose one of: ${mutationNames.join(", ")}.`,
   );
 }
 
@@ -67,6 +68,9 @@ export function createTracker(mutation: MutationName = "baseline"): Tracker {
     ],
   ]);
   const events = new Map<string, RecordedEvent[]>();
+  // The refactor keeps one ordered log instead of grouping events by workspace.
+  // Both representations expose the same tracker contract.
+  const eventLog: { workspaceId: string; event: RecordedEvent }[] = [];
   const eventsByCommand = new Map<string, RecordedEvent>();
   let nextEventNumber = 1;
 
@@ -81,9 +85,12 @@ export function createTracker(mutation: MutationName = "baseline"): Tracker {
     return true;
   };
 
-  const listEvents = (workspaceId: string) => [
-    ...(events.get(workspaceId) ?? []),
-  ];
+  const listEvents = (workspaceId: string) =>
+    mutation === "storage-refactor"
+      ? eventLog
+          .filter((entry) => entry.workspaceId === workspaceId)
+          .map((entry) => entry.event)
+      : [...(events.get(workspaceId) ?? [])];
 
   const recordEvent = (command: RecordEventCommand): RecordEventResult => {
     const workspace = workspaces.get(command.workspaceId);
@@ -124,9 +131,13 @@ export function createTracker(mutation: MutationName = "baseline"): Tracker {
     };
     nextEventNumber += 1;
 
-    const workspaceEvents = events.get(workspace.id) ?? [];
-    workspaceEvents.push(event);
-    events.set(workspace.id, workspaceEvents);
+    if (mutation === "storage-refactor") {
+      eventLog.push({ workspaceId: workspace.id, event });
+    } else {
+      const workspaceEvents = events.get(workspace.id) ?? [];
+      workspaceEvents.push(event);
+      events.set(workspace.id, workspaceEvents);
+    }
     eventsByCommand.set(commandKey, event);
 
     return { kind: "recorded", event, replayed: false };

@@ -46,6 +46,53 @@ For each task, keep a reference solution or known passing run to show that the s
 Everything required by a grader should be justified by the task brief or a declared invariant; an agent should not fail because the evaluator silently assumed a filepath, output format, or environmental resource.
 Balance positive and negative cases so optimizing one behavior does not produce its opposite failure elsewhere.
 
+### Evaluate the cost of the next change
+
+An initial pass does not show how easily an implementation can be extended.
+SlopCodeBench addresses this by asking agents to extend their own solutions through successive specification checkpoints, leaving internal structure open and measuring structural erosion and redundant code alongside functional correctness :citep[orlanski2026slopcodebench].
+The useful design idea is to preserve the implementation between changes so earlier decisions can affect later work.
+Its structural measures are diagnostic proxies; human comprehension and maintenance effort still need their own evidence.
+
+Consider two implementations, X and Y, of a small parcel-quotation tool.
+Each receives the same three changes in the same order:
+
+1. Quote one domestic parcel using a fixed rate and reject invalid weights.
+2. Accept a batch, preserving input order and reporting invalid parcels individually.
+3. Accept configurable rates while preserving the original rate when configuration is omitted.
+
+The following numbers are **invented teaching data**, not SlopCodeBench results or measurements from a course project.
+Suppose the fictional trace shows X duplicating rate logic in its batch path, while Y reuses the single-parcel calculation.
+At checkpoint 3, X accidentally removes the default from the batch path, breaking a previously passing check.
+Both implementations eventually pass all current and retained acceptance checks after any repairs.
+
+:ref[table:successive-change-cost]{text="The table below"} records what that final pass alone would hide.
+Each paired cell gives **X / Y**; times are active human minutes for that checkpoint, with review and repair recorded separately.
+Agent spend includes every attempt and retry through acceptance, including calls made during repairs, but excludes human time.
+
+| Checkpoint             | Regressions found before repair | Review minutes | Repair minutes | Agent spend (USD) |
+| ---------------------- | ------------------------------- | -------------- | -------------- | ----------------- |
+| 1 — Single quote       | 0 / 0                           | 6 / 6          | 0 / 0          | 0.40 / 0.40       |
+| 2 — Batch quotes       | 0 / 0                           | 12 / 8         | 0 / 0          | 0.80 / 0.70       |
+| 3 — Configurable rates | 1 / 0                           | 24 / 9         | 18 / 0         | 2.40 / 0.90       |
+
+::caption[Invented checkpoint evidence for two implementations that eventually pass the same acceptance checks.]
+::label[table:successive-change-cost]
+
+Both implementations finish three checkpoints, but X consumes 60 human minutes of review and repair and USD 3.60 in agent spend; Y consumes 23 minutes and USD 2.00.
+The fictional trace suggests where to investigate the difference: a duplicated rule made a later change harder to propagate.
+A real comparison would still need to distinguish architecture from task difficulty, reviewer familiarity, model variation, and other changed conditions.
+Fewer lines or duplicated blocks would not establish the explanation by themselves.
+
+For a local study, freeze the change sequence, acceptance contracts, model and harness configuration, per-checkpoint budgets, and stopping rules.
+Retain each checkpoint revision, the new and regression checks, failures before repair, final acceptance decision, review and repair effort, and all-attempt cost.
+Count budget exits and unfinished trajectories rather than reporting only sequences that completed.
+Checkpoints within one trajectory depend on earlier work; three checkpoints are not three independent trials.
+Repeated fresh trajectories can expose variation.
+
+This optional example examines successive changes within one implementation.
+The course's A–B–C comparison examines three fresh implementations, and its bounded audit probes measure another group's ability to understand and change each one.
+Those designs answer different questions and should retain their separate reporting boundaries.
+
 ## Qualify the served configuration
 
 A model name or local endpoint is not a capability result.

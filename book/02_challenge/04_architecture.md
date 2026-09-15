@@ -242,6 +242,28 @@ For the event tracker, raw events, current work-item state, and derived summarie
 Raw events may support replay or audit, current state must preserve workflow invariants, and summaries can often be rebuilt or temporarily stale.
 The architecture should state which data is authoritative, which is derived, where each is placed, and what happens when a location cannot reach its authority.
 
+### Rebuild a view without repeating its effects
+
+A retained event history can support several derived views when it records the inputs needed to compute them.
+:citet[kreps2013log] explains how deterministic processing of the same ordered history reconstructs state.
+Changing the computation can instead produce a new view from that history.
+
+Suppose a workspace dashboard currently counts all activity and now needs separate counts for started and completed work.
+An illustrative retained fixture contains `E1: work_started`, `E2: work_completed`, and `E3: work_started`, all for workspace `W1` in that order.
+Replaying those records through the new aggregation gives two starts and one completion.
+The rebuild writes a separate summary and records its last processed position; the application can keep serving the old summary until the new one catches up to an agreed position and is verified.
+Events arriving during the rebuild must be included through that cutover position, then processing must continue without skipping or double-counting them.
+
+Recomputing the summary must not resend the notifications originally triggered by those events.
+Keep the projection that updates the summary separate from notification delivery.
+If delivery itself needs recovery, its durable record and receiver-enforced idempotency belong to the effect boundary described in [Appendix F](/appendices/durable-workflows/#durable-execution-preserves-coordination-progress).
+Rebuilding derived data and resuming a workflow are different uses of history.
+
+For this example, declare the event identity, workspace, type, schema version, ordering, and retained starting point, together with the aggregation version and acceptable summary lag.
+If older records have expired or omit a field needed by the new rule, the full view cannot be reconstructed from that log alone.
+The same limitation applies to the course tracker: an activity history is not automatically a complete source for rebuilding every work-item field or permission.
+The architectural choice is which views the retained facts can support and who owns their rebuild and freshness obligations.
+
 ### Data placement follows authority and access
 
 An origin-centered application can keep its primary database close to the application server and pay one predictable network cost for most operations.

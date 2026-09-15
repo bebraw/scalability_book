@@ -265,7 +265,10 @@ The [Webernetes case study](/case-studies/webernetes/) develops the first patter
 
 A reversible mutation can strengthen this relationship by checking that a test distinguishes the accepted implementation from one named fault.
 That contrast does not prove the mutant is realistic or the broader requirement is satisfied, but it is stronger than coverage alone.
-The concern-directed mutation lab lets you apply the pattern to authorization, retry, or archived-state behavior; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) or [download the standalone lab](/downloads/labs/concern-directed-mutation.zip).
+Tests must also tolerate correct changes.
+:citet[bromley2026tests] illustrates generated tests that copy implementation logic or accept either outcome; a complementary check is whether the same tests accept a behavior-preserving refactor.
+The concern-directed mutation lab lets you apply both checks to authorization, retry, or archived-state behavior: pass the baseline, fail the selected fault, and pass a variant that stores the events differently.
+[Study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) or [download the standalone lab](/downloads/labs/concern-directed-mutation.zip).
 
 **Revision**
 
