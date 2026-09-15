@@ -5,12 +5,8 @@ The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—
 
 ## Separate task control from resource access
 
-Controls around a fleet operate at different scopes.
-The project harness introduced earlier is the versioned material inside a repository: specifications, commands, rules, and evidence.
-An agent harness controls a model-and-tool execution loop.
-A session or orchestration layer may coordinate several agent harnesses, while a resource-access layer may mediate selected model and tool requests.
-These responsibilities may be combined in one platform or split across several services.
-Together with the people, review process, and ownership rules around them, these layers form the broader development system.
+A session or orchestration layer coordinates agent tasks; a resource-access layer mediates selected model and tool requests.
+These responsibilities can share a platform or span several services, but their decisions and enforcement points must agree.
 
 :ref[table:fleet-control-boundaries]{text="The table below"} separates task-level orchestration from request-level resource access.
 
@@ -22,19 +18,13 @@ Together with the people, review process, and ownership rules around them, these
 ::caption[Control boundaries for agent orchestration and model or tool access.]
 ::label[table:fleet-control-boundaries]
 
-Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
-Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
-These are examples, not evidence that every fleet needs two products or exactly two control planes.
-Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
-
 The durable distinction is between a decision and its enforcement point.
 NIST's zero-trust architecture distinguishes a policy engine that makes and logs an access decision, a policy administrator that executes it by configuring an enforcement point, and the enforcement point that enables, monitors, or terminates access; implementations may combine the engine and administrator :citep[rose2020zerotrust].
 This is a design analogy, not a claim of NIST conformance.
 For each consequential decision, name the policy authority, mandatory enforcement point, and conflict or outage rule; overlapping controls still need explicit precedence, and a mediator cannot protect a path that bypasses it.
 
-The contract between the scopes matters more than the number of components.
-The HAR decision map states which decisions and transfers should occur; these control scopes provide some of the places where that design can be enforced and observed.
-A responsibility recorded in a table without a mandatory enforcement point remains an intention.
+The HAR decision map identifies the intended transfers of work and authority.
+Check where the controls enforce and observe those transfers.
 Trace one operation through the chain:
 
 `originating actor → fleet session → delegated task → model or tool attempt → validation → delegated-run outcome`
@@ -159,8 +149,34 @@ The same permission should not transfer automatically to another project.
 As financial exposure, consequences, or recovery difficulty increase, the agent's role should narrow from executing the action to preparing a reviewed change.
 Authority should follow the expected loss and recovery path, not the mere fact that an agent successfully performed a similar action elsewhere.
 
+## Tool examples (September 2026)
+
+These examples distinguish the unit of delegation exposed by each tool.
+They describe the documentation used for this edition; verify the linked versions before adoption.
+The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) defines the supported assignments for a particular course run.
+
+| Environment                                                                                                                                                                                     | Unit and coordination model                                                                | Isolation or control to inspect                                                          | Best fit in this chapter                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because you can see and modify the mechanism                |
+| [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation)                                                                                                       | Parent delegates fresh-context children singly or in parallel; nested delegation is opt-in | Inherited toolsets, separate terminals, optional worktrees, iteration and timeout limits | Broader multi-provider agent-harness comparison with built-in delegation and persistent memory |
+| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when you want several built-in fleet patterns              |
+| [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents)                                                                                                     | Asynchronous repository task that researches, changes code, and opens a pull request       | Repository policy, hosted environment, checks, and pull-request review                   | Issue-to-pull-request comparison rather than a transparent local fleet                         |
+| [OpenAI Responses multi-agent](https://developers.openai.com/api/docs/guides/latest-model#what-is-new)                                                                                          | A model coordinates parallel subagents and synthesizes their results                       | API tools, prompts, application policy, usage, and returned evidence                     | Application-level orchestration comparison rather than an agent-harness lab                    |
+
+::caption[Current paths for trying delegation; verify the linked documentation because these products evolve quickly.]
+::label[table:fleet-tool-options]
+
+Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
+Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
+These are examples, not evidence that every fleet needs two products or exactly two control planes.
+Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
+
+For any option, inspect how child tasks inherit tools and credentials, whether concurrent writers are isolated, what state survives between runs, and how the execution trace is exported.
+Hermes also supports persistent memory, skills, remote terminals, and messaging; restrict those capabilities to the declared repository workflow when comparing it with a coding harness.
+Application-level agent orchestration has separate runtime users, data, and operational obligations.
+
 ## Complete the control-boundary review
 
 For each consequential action, name the decision authority, mandatory enforcement point, granted scope, evidence returned, and conflict or outage rule.
 Then follow one denied, failed, retried, cancelled, or successful attempt across every relevant system and confirm that it rolls up exactly once to an explicit delegated-run outcome.
-A diagram or approval step is not a control unless the action cannot bypass it.
+Include a bypass check for any control the decision relies on.

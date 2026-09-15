@@ -1,16 +1,8 @@
 # How does web architecture shape scalability?
 
-At first, web development can feel like a collection of frameworks, libraries, and deployment platforms.
-Those tools change quickly, but web applications still have to connect consumers, representations, computation, and authoritative data across networks that introduce latency, partial failure, independent change, and untrusted input.
-
-Web architecture has not progressed by replacing one correct design with another.
-Instead, it has expanded the places where responsibility can live.
-Physical servers made the machine visible; cloud platforms made capacity programmable; content delivery networks placed copies near consumers; programmable edge platforms placed bounded computation beside those copies; and modern rendering approaches divide work across build systems, servers, edge locations, and browsers.
-As computation became more commoditized, architects gained placement options without escaping the constraints of distance, state, trust, cost, and failure.
-
-The central claim of this chapter is that every movement of responsibility addresses a particular pressure and creates a new coordination obligation.
-Newer placement is not inherently better.
-The useful question is what should move, why it should move, and which contract must remain stable when it does.
+Web architecture connects consumers, representations, computation, and authoritative data across networks.
+Servers, cloud services, programmable edges, and browsers offer different places to put that work, with different latency, trust, cost, and failure consequences.
+Ask which pressure justifies moving a responsibility and which contract must remain stable when it moves.
 
 ## A conceptual model: separate roles from locations
 
@@ -37,13 +29,6 @@ A `GET /events` request asks for a representation and may be answered from a bro
 A `POST /events` request expresses an action whose validation may begin near the consumer, but whose accepted result must eventually reach the component that owns the event history.
 The two paths can share an interface while placing execution, copies, and authority differently.
 
-> **Changed consumer assumption: agents**
->
-> An agent may follow links in rendered HTML, operate a browser, call an API, or invoke a capability-oriented interface.
-> It still reaches the application through an existing consumer boundary, but it can act repeatedly, retry after ambiguous failure, traverse interfaces faster than a person, and initiate consequential actions without a person examining every intermediate screen.
-> Contracts, authorization, idempotency, rate limits, action confirmation, and evidence therefore become more important; the agent does not become a new architectural tier.
-> The same operation should have one authoritative meaning whether a person clicked a form, an integration sent a request, or an authorized agent invoked it.
-
 ### Request boundary lab
 
 The demonstration below traces one `POST /events` request through the browser, network, API, storage, and response path.
@@ -56,7 +41,9 @@ If the request path is unclear, the diagram is likely to hide the most important
 
 ### Automated consumers change demand and exposure
 
-A crawler, integration, monitoring probe, authorized agent, and abusive bot can send technically similar HTTP requests while creating very different value, cost, and risk.
+A crawler, integration, monitoring probe, authorized agent, and abusive bot can send technically similar HTTP requests while creating different value, cost, and risk.
+Agents can traverse interfaces quickly, retry ambiguous failures, and act without a person inspecting every screen.
+The same operation should retain its authoritative meaning whether invoked by a form, integration, or agent.
 Architecture should therefore distinguish which representations are intentionally public, which actions require identity and authorization, which expensive paths need a quota or admission boundary, and which automated uses the product is willing to support.
 
 The [Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.html) lets a cooperating crawler discover access preferences in `/robots.txt`.
@@ -89,8 +76,7 @@ Capacity is purchased and installed before it is used, a failed machine has to b
 Horizontal scaling adds machines, but then request routing, deployment, shared state, and data coordination become system responsibilities.
 The architecture can still be excellent: a stable workload, predictable cost, data locality, regulatory control, or specialized hardware may justify owned infrastructure.
 
-The important distinction is not “old server” versus “modern platform.”
-It is whether the application assumes one long-lived machine, several interchangeable processes, or services whose lifecycle is controlled elsewhere.
+Record whether the application assumes one long-lived machine, interchangeable processes, or services whose lifecycle is controlled elsewhere.
 
 ### HTTP provides a stable seam
 
@@ -103,10 +89,8 @@ A request method communicates intent, the target identifies what the request con
 Correct use of safe and idempotent methods, validators, cache metadata, authentication, and content negotiation affects what browsers and intermediaries are allowed to do.
 HTTP is therefore architectural material rather than plumbing supplied by a framework.
 
-HTTP being stateless does not mean the application has no state.
-It means each request has understandable semantics in isolation from the connection that carried it.
-Identity, authorization, workflow continuity, and durable state still need explicit homes.
-The data section returns to that distinction.
+HTTP gives each request understandable semantics independently of its connection.
+Application identity, continuity, and durable state still need explicit owners; the [data section](#stateless-requests-still-depend-on-state) develops those obligations.
 
 ### Application contracts outlive deployment choices
 
@@ -200,8 +184,7 @@ CSR is common in single-page applications because the browser can fetch data, re
 The terms are not synonyms: CSR is a rendering strategy, while SPA describes a broader navigation and state-management shape.
 An HDA can receive its initial document through SSR, while an MPA can serve pages from a statically generated or incrementally regenerated cache.
 
-The useful comparison is not which acronym wins.
-Ask what each decision does to freshness, origin or edge work, navigation, client responsibility, caching, accessibility, and failure.
+Compare the consequences for freshness, server work, navigation, client responsibility, caching, accessibility, and failure.
 
 ### Web architecture lens
 
@@ -224,13 +207,10 @@ Record which regions need behavior, when that behavior becomes available, and wh
 
 ### Runtime generation adds a control boundary
 
-A component written by a coding agent during development becomes ordinary application code once it has been reviewed and committed.
-Runtime-generative UI is different: model output can select data, composition, or executable behavior while the application is running.
-
-The more freedom the output receives, the more the host must control.
-A declarative descriptor needs an approved component and action registry, schema validation, authorization when actions execute, bounded structure, and a safe fallback.
-Generated executable code additionally needs isolation without ambient credentials, a narrow bridge to host data and tools, explicit permissions, resource limits, and observability.
-[Appendix C](/appendices/advanced-web-boundaries/#runtime-ui-generation-changes-the-control-boundary) develops the full control-boundary spectrum and a descriptor-boundary audit.
+Runtime-generative UI lets model output choose data, composition, or executable behavior while the application runs.
+A descriptor needs a validated vocabulary of components and actions; executable output additionally needs isolation and tightly scoped access to host data and tools.
+Both need authorization at action time and a safe fallback.
+[Appendix C](/appendices/advanced-web-boundaries/#runtime-ui-generation-changes-the-control-boundary) develops these controls and the descriptor audit.
 
 ## Data limits how freely responsibility can move
 
@@ -259,10 +239,9 @@ Keep the projection that updates the summary separate from notification delivery
 If delivery itself needs recovery, its durable record and receiver-enforced idempotency belong to the effect boundary described in [Appendix F](/appendices/durable-workflows/#durable-execution-preserves-coordination-progress).
 Rebuilding derived data and resuming a workflow are different uses of history.
 
-For this example, declare the event identity, workspace, type, schema version, ordering, and retained starting point, together with the aggregation version and acceptable summary lag.
-If older records have expired or omit a field needed by the new rule, the full view cannot be reconstructed from that log alone.
-The same limitation applies to the course tracker: an activity history is not automatically a complete source for rebuilding every work-item field or permission.
-The architectural choice is which views the retained facts can support and who owns their rebuild and freshness obligations.
+Record the event identities, workspace, type, schema and aggregation versions, ordering, retained starting point, and acceptable summary lag.
+Expired or incomplete records may prevent a rebuild; the course tracker's activity history does not necessarily contain every work-item field or permission.
+Name which views the retained facts support and who owns their rebuild and freshness.
 
 ### Data placement follows authority and access
 
@@ -281,16 +260,11 @@ Partitioning can increase capacity or isolation, but then the partition key dete
 
 ### Stateless requests still depend on state
 
-Stateless request handling means that an interchangeable server does not need an earlier request's hidden in-process session to interpret the next one.
-It does not mean that the application has no state.
-A later request may carry an explicit workspace or workflow handle, while the service still has to authenticate the caller, authorize access, resolve authoritative state, and define that state's lifecycle.
-
-A handle is an address, not authorization.
-If its state exists only on the instance that minted it, affinity has merely moved behind a new identifier.
-Likewise, a protocol request identifier does not automatically make a domain mutation safe to retry.
-When a mutation can commit before its response is lost, use a stable application command or idempotency key and store the mutation and reusable result atomically at the authoritative boundary.
-
-[Appendix C](/appendices/advanced-web-boundaries/#stateless-requests-still-depend-on-state) develops state placement, authorization, request continuity, and a two-instance retry audit.
+An interchangeable server may receive a workspace handle without sharing an earlier request's in-process session.
+It must still authenticate the caller, authorize access, and resolve authoritative state.
+A handle does not grant permission, and state available only on its originating instance still requires affinity.
+Retries after a lost response need a stable application command identity, with the mutation and reusable result stored atomically.
+[Appendix C](/appendices/advanced-web-boundaries/#stateless-requests-still-depend-on-state) provides the two-instance state and retry audit.
 
 ### Transactions preserve invariants across failure and concurrency
 
@@ -302,14 +276,9 @@ The deployed database's constraints, isolation level, acknowledgment point, and 
 
 ### Model valid data combinations
 
-A transaction constrains how a valid state change becomes durable.
-Constructive data modeling reduces the contradictory combinations that ordinary code can create before that boundary.
-Use a tagged union, sealed hierarchy, guarded constructor, or another stack-native representation when each outcome requires different data.
-
-A precise in-memory representation does not establish authorization, persistence, or concurrency safety.
-Untrusted or deserialized input still needs runtime parsing, and the durable write must still check authoritative state and preserve the relevant invariant atomically.
-
-[Appendix C](/appendices/advanced-web-boundaries/#model-valid-data-combinations) contains a complete transition-result example and a selected-invariant exercise.
+Constructive data modeling uses tagged unions, sealed hierarchies, or guarded constructors to require the data belonging to each outcome.
+It reduces contradictory in-memory values; runtime parsing, authorization, and atomic persistence still enforce their own rules.
+[Appendix C](/appendices/advanced-web-boundaries/#model-valid-data-combinations) develops a transition-result example and selected-invariant exercise.
 
 ## Caching coordinates controlled copies
 
@@ -364,49 +333,26 @@ Record the final response headers, cache status, `Age`, and origin traffic rathe
 
 ## Architecture is maintained as responsibility moves
 
-A system does not avoid architectural decay merely because it began with a diagram or a recognizable framework.
-:citet[foote1997mud] identify throwaway code, piecemeal growth, and pressure to keep the system working as forces that gradually produce a Big Ball of Mud.
-The growing set of placement options can accelerate that decay when a project adopts cloud services, edge functions, browser state, caches, and generated components without recording which role each one owns.
-
-Conscious architecture does not mean designing the entire system in advance.
-It means repeatedly deciding which boundaries must remain visible, which shortcuts are temporary, and when working code needs to be reorganized before further growth makes change unsafe.
-Christopher Alexander's pattern language offers a middle path between a complete upfront blueprint and unregulated growth: shared patterns allow local, piecemeal changes while preserving relationships that contribute to a coherent whole :citep[alexander1977pattern].
-
-In an agentic project, architecture notes, specifications, examples, tests, and decision records give humans and agents a project-specific language for making changes without rediscovering—or accidentally redefining—the system on every task.
-The cathedral and bazaar metaphor describes how development and feedback are organized, whereas a Big Ball of Mud describes the resulting structure :citep[raymond2001cathedral].
-Either development model can preserve architecture through stable boundaries, review, and continuous integration, and either can produce mud when local changes accumulate without stewardship.
+Throwaway code, piecemeal growth, and pressure to keep a system working can gradually blur its structure :citep[foote1997mud].
+Adding services, edge functions, browser state, or caches creates more responsibilities to keep coherent.
+Record their owners, revisit temporary shortcuts, and reorganize code when several unrelated change reasons accumulate together.
+Architecture notes and decision records preserve those choices for later contributors.
 
 ### Field note — When syntax familiarity stopped deciding the stack
 
-As I have gained experience, I have learned to value architectural simplicity over mainstream convention.
-Technology choices are often cargo-culted: teams select the familiar framework because others use it or because its syntax and APIs make implementation convenient.
+Agents let me explore technologies before I know every syntax detail or API.
+I am using that capability in an [Apache Jena](https://jena.apache.org/) proof of concept for validating a knowledge base.
+I am not a strong Java developer, and I do not yet know whether this is the right architecture; the immediate question is whether the approach produces useful results.
 
-Agents change that calculation.
-I no longer need to know every API or syntax detail before I can explore a technology.
-The agent can handle much of that mechanical work, allowing me to focus on whether the approach fits the problem, whether I understand its important boundaries, and whether I can evaluate the resulting behavior.
-
-I am currently applying this approach to a proof of concept built around [Apache Jena](https://jena.apache.org/) for validating a knowledge base.
-I am not a strong Java developer, and I do not yet understand the problem well enough to claim that the prototype represents the right architecture.
-At this stage, the purpose is narrower: determine whether the approach can produce anything useful.
-
-This does not make technical understanding unnecessary.
-It changes which understanding matters first.
-For exploratory work, I can let the agent handle unfamiliar syntax while I evaluate the problem, the model, and the observed results.
-If the prototype proves useful, its architecture and maintainability still need deliberate review before it becomes a durable system.
+I can delegate unfamiliar syntax while examining the data model and observed behavior.
+If the prototype proves useful, its architecture, maintainability, and my ability to own it still need review.
 
 ### Make the implementation architecture reviewable
 
 By this point, you have already made architecture choices in implementation A, even if you did not yet have a complete vocabulary for them.
 The public project discussion should make those choices visible: different groups received the same behavioral specification but chose different stacks, boundaries, storage models, and request paths.
 
-Each implementation should treat a small set of project memory files as architectural artifacts:
-
-- `ARCHITECTURE.md` records global rules and cross-cutting constraints, such as application shape, storage model, validation boundaries, deployment assumptions, and rules future changes should preserve.
-- `specs/{feature}/spec.md` records feature-level contracts, workflows, regression guardrails, and verification steps.
-- `docs/adrs/` or a simple decision log records durable decisions and trade-offs that future groups would otherwise have to rediscover.
-- `AGENTS.md` records how AI tools should operate in the repository, including required commands, review expectations, protected files, and escalation points.
-
-If the code, diagram, specification, and decision log disagree, the project has an architectural problem even if the application still runs.
+Keep the architecture diagram consistent with the [project harness](/chapters/scalable-development/#the-project-harness): global rules, feature contracts, decision records, and agent instructions should describe the same implementation.
 
 A component diagram can show that two boxes exist without explaining which one owns a decision.
 For each independently evolvable capability, record its source root, composition root, state authority, public contracts, allowed dependency direction, and intentionally excluded responsibilities.
@@ -439,7 +385,7 @@ Use the table to compare architectures without treating any option as a universa
 
 The rows interact.
 Moving rendering to the edge may require a cache-freshness policy; moving interaction to the browser may require a new API contract; moving compute into replaceable cloud instances may require state to leave process memory; and moving reads near users may lengthen the path to authoritative writes.
-A design is coherent when these consequences agree rather than when it selects the newest option in each row.
+Check that the consequences of those choices agree.
 
 ## Project artifact
 
@@ -458,11 +404,6 @@ Implementation B should still include its own diagrams and decision record.
 
 ## Summary
 
-Web architecture has accumulated placement choices rather than moving through a ladder of universally better designs.
-Origin-centered systems make physical machines and request paths visible.
-Cloud platforms make pooled capacity programmable and move operational work into provider contracts.
-CDNs move reusable representations closer to consumers, while programmable edge platforms can also move bounded request handling into that delivery path.
-Rendering divides work across build time, request time, edge execution, and the browser; durable data authority constrains how freely that work can move; and caching coordinates the copies created along the way.
-
-HTTP and application contracts let consumers survive many of these topology changes, including the addition of agents as more autonomous consumers.
-The architectural task is to place each responsibility in response to a real pressure, preserve the authority and contracts that make the system coherent, and remain able to explain and revise the decision as the application changes.
+Architecture assigns execution, representations, and data authority to locations that fit the pressure.
+HTTP and application contracts let consumers survive many placement changes, while state and caching introduce coordination obligations.
+Keep those obligations and their owners visible so the next change can be evaluated against the same model.

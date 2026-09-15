@@ -1,7 +1,6 @@
 # What does scalability mean for web development?
 
 A web application may cope with more requests while becoming harder to modify, accept more events while making old events too slow to query, or let more agents produce code while overwhelming review and integration.
-All of these are examples of how scalability can be a challenging topic.
 In this book, **scalability** means a system's ability to continue meeting a stated goal as a named pressure grows or changes.
 The goal, pressure, system boundary, and evidence are all part of the claim.
 Without them, scalability becomes a vague synonym for “large” or “well engineered.”
@@ -9,9 +8,6 @@ Without them, scalability becomes a vague synonym for “large” or “well eng
 This framing is especially useful for the web because one user outcome can cross a browser, a network, an application boundary, persistent data, caches, external services, and operational tooling.
 The system also has to keep changing as browsers, consumers, requirements, dependencies, developers, and development agents evolve independently.
 Runtime scale and development scale are therefore related without being interchangeable.
-
-The central claim of this chapter is that scalability is a relationship between **pressure** and **maintained behavior**.
-Architecture and infrastructure are possible responses to that relationship; they are not themselves the things that grow.
 
 ## Begin with the goal that must continue to hold
 
@@ -150,9 +146,7 @@ Several other concerns shape the response:
 - **Product and business priorities** determine which user outcomes matter, which risks are tolerable, and when additional capacity or coordination is worth its cost.
 - **Constraints** such as budget, energy use, privacy, regulation, geography, hardware, provider quotas, time, and team expertise narrow the acceptable design space.
 
-These are not secondary concerns.
-They explain why two applications facing similar demand may choose different responses.
-The distinction simply prevents a mechanism such as cloud infrastructure from being mistaken for the pressure it is meant to address.
+These concerns explain why applications facing similar demand may choose different responses.
 
 A **binding limit** is the condition currently preventing the system from maintaining its goal as pressure increases.
 It may be a browser's main thread, network bandwidth, CPU, memory, a connection pool, database coordination, an external-service quota, a review queue, or missing expertise.
@@ -212,8 +206,7 @@ Every additional cache, queue, replica, service, region, contract, and automatio
 
 Premature scaling begins when a solution is selected before the pressure, goal, or limit is known.
 Preparation is still valuable when it preserves a cheap path to learn: keep authority clear, avoid irreversible coupling without a reason, collect a baseline, and identify the signal that would justify the next move.
-The aim is not to predict the final architecture.
-It is to make the next decision from evidence rather than from a generic idea of scale.
+Use that evidence to decide when the current architecture needs to change.
 
 For the course project, time, available hardware, privacy, model access, team expertise, and implementation scope are legitimate design inputs.
 A bounded local implementation can be a strong baseline precisely because its constraints are visible.
@@ -249,12 +242,6 @@ They should be revised when evidence reveals a different limit, not protected as
 
 ## Summary
 
-Scalability describes whether a system can continue meeting a stated goal as a named pressure grows or changes.
-Demand, data, contributors, and change provide four reusable pressures for examining the event tracker and its development system.
-Architecture and infrastructure are responses; product priorities and constraints determine which responses are acceptable.
-
-Performance describes one set of conditions, scalability describes change across conditions, elasticity describes capacity adaptation, resilience describes behavior under failure, and efficiency relates useful outcomes to consumed resources or coordination.
-None substitutes for the others.
-
-A useful scalability argument follows pressure to a binding limit, proposes a response, exposes the resulting trade-off, and names evidence that could disprove it.
-This turns “Can it scale?” from a slogan into a bounded engineering question.
+A scalability claim states the goal, changing pressure, constraints, and evidence.
+Demand, data, contributors, and change help locate the first binding limit; architecture and infrastructure supply possible responses.
+Trace the response's trade-off and name an observation that could challenge it.

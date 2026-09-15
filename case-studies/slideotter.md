@@ -122,39 +122,25 @@ Slideotter helped make the later refactoring possible; it did not by itself prev
 
 ## What I would do differently
 
-I would no longer treat Slideotter as the owner of its source material.
-A shared knowledge base would own sources, relationships among them, and provenance.
-Slideotter would own presentation-level metadata, outline variants, slide definitions, themes, and the approval workflow.
-[Kirjolab](/case-studies/kirjolab/) could use the same knowledge base for its research and writing workflows without either product duplicating the underlying knowledge.
+I would use the [shared knowledge-base design described in the Kirjolab case](/case-studies/kirjolab/#what-i-would-do-differently).
+Slideotter would own presentation metadata, outline variants, slide definitions, themes, and approval state while referencing the shared source material.
 
-{{ import "site/includes/shared-knowledge-boundary-figure.html" }}
+The first product loop would be:
 
-The smallest complete Slideotter workflow would be:
+1. Select or amend the source material and define the audience, purpose, duration, language, and theme.
+2. Develop outline variants that reuse the base metadata, then approve one before expanding it.
+3. Generate and review the slides, including their layout and rendered output.
+4. Bind approval to a reviewed version; later changes produce a new candidate.
 
-1. **Select or amend the source material.** Begin with material and relationships already available in the shared knowledge base, adding or correcting knowledge when necessary.
-2. **Define the presentation metadata.** Record the title, purpose, audience, duration, language, theme, and other presentation-level constraints.
-   Themes and similar properties should remain easy to change later.
-3. **Develop outline variants.** Allow several outlines to derive from the same base metadata.
-   Each variant may override relevant properties, such as its intended audience, without duplicating the whole presentation definition.
-4. **Approve an outline before expanding it.** Select and revise one candidate before generating the complete slide set.
-5. **Generate and review the slides.** Treat slide definitions, layout, theme, and rendered output as reviewable candidates rather than accepted presentation state.
-6. **Support repeated approval and revision.** Approval should identify a reviewed version, not permanently close the artifact.
-   Later changes create another candidate that can be reviewed and approved again.
-7. **Choose one delivery target first.** Make the local browser studio the initial runtime and defer desktop and cloud paths until repeated use justifies them.
-8. **Use real decks as the roadmap.** Add layout families, retrieval methods, and editing modes in response to observed failures across several presentations.
-9. **Budget architecture as the system grows.** Review module size, fan-in, churn concentration, and cross-workflow dependencies alongside artifact quality.
-10. **Measure product success separately.** Track time to an approved deck, corrections per slide, outline revisions, regeneration rate, and repeated use rather than relying on repository or validation metrics.
-11. **Prune the harness around the chosen loop.** Keep the smallest set of checks that protects source provenance, approval state, slide validity, and rendered quality while the product hypothesis remains uncertain.
+I would begin with the local browser studio and defer desktop and cloud delivery until repeated use justified them.
+Real decks would guide layout, retrieval, and editing work.
+Time to an approved deck, corrections, outline revisions, regeneration, and repeated use would test product value separately from repository checks.
+
+Keep the harness focused on provenance, approval state, slide validity, and rendering.
+Review module ownership and dependencies as the loop grows.
 
 ## What Slideotter teaches
 
-Slideotter demonstrates that rapid implementation can be a powerful learning method.
-It discovered useful rendering, review, validation, and agent-control patterns that would have been difficult to design in the abstract.
-
-It also shows the limit of learning through code production alone.
-A repository can become technically sophisticated faster than its product can become necessary.
-Validation can protect a workflow, but only usage can establish whether that workflow deserves the surrounding system.
-
-The central lesson is to separate two kinds of progress.
-Slideotter made substantial progress in understanding how an agent-assisted presentation workbench could be built.
-It made less progress in proving the smallest version that should be built and operated.
+Slideotter taught me how an agent-assisted presentation workbench could be built, especially its rendering and review controls.
+It provided less evidence for the smallest version that people would repeatedly use.
+The next product decision needs that usage evidence before another expansion of capability.

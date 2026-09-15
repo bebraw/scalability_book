@@ -192,16 +192,6 @@ I would retain the project's strict validation harness, portable manuscript form
 
 ## What Kirjolab teaches
 
-Kirjolab did not fail because it needed refactoring.
-Early implementation was also a way to discover the real product and its architecture.
-The mistake would be to treat the first working structure as evidence that the development system could sustain the same pace indefinitely.
-
-The case suggests four broader lessons:
-
-- A strong harness can make extraordinary development speed technically useful.
-- Functional gates and structural gates answer different questions.
-- Agents amplify the patterns and ownership boundaries already present in a repository.
-- Refactoring is most effective when its lessons become new project constraints rather than remaining a one-time cleanup.
-
-The technical success was not that the first architecture was final.
-It was that the project could move quickly, reveal where its assumptions failed, and use its validation system to turn that learning into a better structure.
+Kirjolab's first implementation exposed a useful product and the structural limits of its development workflow.
+Functional checks made refactoring safer, but the project also needed feedback about ownership, dependencies, and the cost of its next change.
+The lasting improvement was to carry those lessons into the project constraints before expanding further.

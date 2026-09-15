@@ -99,7 +99,6 @@ The [recorded integration decision](https://github.com/bebraw/vibe-template/blob
 Retrieval uses a reviewed, pinned version with telemetry disabled, and the skill activates only when browser-facing work requires a platform choice, compatibility interpretation, or fallback.
 Project architecture, specifications, user instructions, and validation remain authoritative over anything retrieved.
 
-This is less about installing another tool than defining a knowledge boundary.
 An agent should be able to discover that a relevant browser feature, compatibility concern, or native platform pattern exists without loading an entire changing guide into every task or treating external guidance as a project requirement.
 
 For now, this is a reasoned design choice rather than evidence of improved project outcomes.
@@ -107,8 +106,5 @@ The capability still needs to justify itself through the decisions and implement
 
 ## What Modern Web Guidance teaches
 
-Modern Web Guidance demonstrates a scalable way to package fast-changing expertise: maintain it once, retrieve a bounded part when relevant, express compatibility as a local constraint, and test whether the imported knowledge improves checked behavior.
-
-It also shows why the surrounding harness matters as much as the prose.
-Search, versioning, calibration, paired runs, browser checks, and update policy determine whether the guidance can be evaluated and maintained.
-The durable lesson is to connect imported knowledge to local evidence without confusing either the guide or its grader with proof of product quality.
+External guidance becomes an inspectable dependency when retrieval, versioning, compatibility, and updates are connected to local checks.
+Paired agent runs can test whether it improves selected tasks; the guide and its grader still leave broader product quality to be evaluated.

@@ -165,19 +165,10 @@ I would establish several supporting boundaries earlier:
 5. **Preserve more workflow evidence.** Record a small representative set of prompts, model and harness versions, rejected proposals, review interventions, and correction time so later claims about agentic development have firmer support.
 6. **Separate manuscript ownership from reusable source knowledge.** The repository should own the book's argument and prose, while a versioned knowledge base could hold reusable documents, annotations, and relationships that other manuscripts or presentation systems can share.
 
-The purpose of these changes would not be to slow production.
-It would be to direct speed toward a coherent learning experience and make the cost of correction visible earlier.
+These changes would direct production toward a coherent learning experience and expose correction costs earlier.
 
 ## What the book project teaches
 
-This project suggests five broader lessons:
-
-- A digital book can become a web application with its own architecture, operations, compatibility requirements, and feedback loops.
-- When implementation becomes cheap, coherence, evidence, and accountable judgment become more visible constraints.
-- Subjective review remains essential, but repeated complaints can often become durable project guidance or executable checks.
-- One repository can connect manuscript, software, validation, and history without making their evidence interchangeable.
-- A rich commit history supports a bounded case analysis, not a causal productivity claim.
-
-The project succeeded when the site and manuscript could change quickly without surrendering the author's responsibility for what the book means.
-The durable artifact is not only the generated website or the amount of accepted text.
-It is a development system that helps future revisions recover the argument, inspect the evidence, and correct the result.
+The manuscript and publishing system made editorial judgment the limiting resource.
+One repository helped connect text, software, validation, and history, but checks on one could not establish the quality of another.
+The development system is useful when it helps a future revision recover the argument, inspect its evidence, and correct the result.

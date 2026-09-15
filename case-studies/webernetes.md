@@ -4,8 +4,7 @@
 Sam Rose built it at ngrok to support durable, interactive explanations of Kubernetes rather than to replace a production cluster.
 
 The project is relevant to scalable development because language models produced most of a large port in a short period, while acceptance still depended on human review, explicit porting rules, and behavioral comparison with a real implementation.
-Its strongest lesson is not that generated code can be trusted at scale.
-It is that a development harness can turn some compatibility claims into observable contrasts.
+Its development harness turns selected compatibility claims into observable contrasts.
 
 The figures below come from Rose's [30 June 2026 retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser) and describe that snapshot rather than the repository's later state.
 
@@ -94,5 +93,4 @@ Webernetes shows a strong pattern for agent-assisted compatibility work:
 4. Turn mismatches into failing tests before changing the implementation.
 5. Keep human review responsible for scope, fidelity, and the limits of the evidence.
 
-The transferable asset is not the volume of generated code.
-It is the development system that makes selected claims inspectable and disagreements reproducible.
+The shared checks make selected compatibility claims inspectable and disagreements reproducible.

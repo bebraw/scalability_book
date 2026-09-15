@@ -1,6 +1,6 @@
 # Formal scalability and reliability models
 
-Use this appendix when a scaling or workflow decision needs more than the introductory [Little's Law](/chapters/benchmarking/#check-measurements-against-a-model) or [Amdahl's Law](/chapters/agent-fleets/#amdahls-law-and-the-sequential-bottleneck) treatment in the main chapters.
+Use this appendix when a scaling or workflow decision needs more than the introductory [Little's Law](/chapters/benchmarking/#check-measurements-against-a-model) or [Amdahl's Law](/chapters/agent-fleets/#amdahl-s-law-and-the-sequential-bottleneck) treatment in the main chapters.
 The models below expose two different ways that adding work can reduce success: serial reliability compounds across critical steps, while contention and coordination can flatten or reverse throughput gains.
 
 ## Author perspective — Use models to see the limits
@@ -18,6 +18,24 @@ It is to make relationships concrete enough to challenge claims such as “more 
 
 Use the equations to recognize the shape of a limit and identify what should be measured.
 Real decisions still require evidence from the actual system.
+
+## Choose a model
+
+Use the question to select a model, then check that its assumptions fit the observation.
+:ref[table:scalability-laws]{text="The table below"} collects the relationships introduced across the main chapters and this appendix.
+
+| Law                                                      | Exact relationship                                                                                                                | Main assumptions                                                                                 | Useful when                                                                                         | Cannot establish                                                            |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Little's Law :citep[little1961proof]                     | `L = λW`, where `L` is average work in progress, `λ` is average throughput or arrival rate, and `W` is average time in the system | Stable long-run averages, one consistent system boundary, and conserved work                     | Relating queue or review backlog, throughput, and elapsed time                                      | The cause of delay, tail latency, or stability from one snapshot            |
+| Amdahl's Law :citep[amdahl1967validity]                  | `S(N) = 1 / ((1 - p) + p/N)`, where `p` is the parallelizable fraction and `N` is the parallel capacity                           | Fixed workload and fractions, with no added parallel overhead in the bound                       | Bounding speedup for request paths, batch work, deployments, or agent workflows                     | Contention, coordination cost, load growth, or the actual parallel fraction |
+| Lusser's Law :citep[tait1995lusser]                      | `R_system = ∏ R_i` for independent components that must all succeed in a series system                                            | Every named step is critical and step failures are independent                                   | Checking whether a request, deployment, or agent workflow can meet an end-to-end reliability target | Correlated failures, recovery behavior, or omitted dependency paths         |
+| Universal Scalability Law :citep[gunther2008scalability] | `C(N) = N / (1 + α(N - 1) + βN(N - 1))`, where `α` models contention and `β` coordination or coherency cost                       | One workload and configuration, with parameters fitted to representative throughput measurements | Describing capacity that rises, flattens, and then falls as concurrency grows                       | The causal mechanism or safe extrapolation beyond the measured range        |
+
+::caption[Formal scalability models, their assumptions, and suitable application boundaries.]
+::label[table:scalability-laws]
+
+For each use, identify the variables, calculation, observation boundary, and what remains unexplained.
+The [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) works through Little's Law, and the [Agent Fleets chapter](/chapters/agent-fleets/#amdahl-s-law-and-the-sequential-bottleneck) introduces Amdahl's bound.
 
 ## Lusser's Law and the reliability chain
 

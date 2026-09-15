@@ -1,21 +1,28 @@
 # How should web applications respond to scaling pressure?
 
-Scaling is the work of changing a system so it can tolerate growth in users, data, traffic, teams, or change.
-
-The central claim is that scaling is not one move.
-It is a sequence of trade-offs made in response to specific pressure.
+Scaling changes a system in response to a specific pressure.
+Each response should relieve an identified limit while making its new costs and failure modes visible.
 
 ## Start with the pressure
 
-Before choosing a technique, ask what problem is being solved:
+Use the pressure map from the Reality chapter to select a response hypothesis.
+:ref[table:scaling-response-patterns]{text="The table below"} connects common pressures to the contracts each response adds.
 
-- Are writes too slow?
-- Are reads too slow?
-- Is the database too large?
-- Is one tenant affecting another?
-- Is the system failing during traffic spikes?
-- Are deployments too risky?
-- Are teams blocked by shared ownership?
+| Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Writes and reads compete for one path                       | Separate the authoritative write path from derived read views        | Define freshness, rebuild, and reconciliation; measure write completion and read usefulness  |
+| A burst contains work that need not finish synchronously    | Queue or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
+| A request may be repeated after an ambiguous result         | Use a stable idempotency key and authoritative deduplication         | Store the mutation and reusable result atomically; test a retry after a lost response        |
+| One tenant or domain instance consumes shared capacity      | Partition, quota, or isolate work by a meaningful domain boundary    | Define routing, fairness, cross-partition operations, and migration                          |
+| Incoming work exceeds the rate at which it can be completed | Apply backpressure, admission control, rate limits, or load shedding | Make rejection explicit, bound waiting, guide retries, and preserve the essential path       |
+| Optional work threatens a core operation                    | Degrade a named capability while preserving the core                 | Define the degraded user state, dependency boundary, recovery trigger, and completion signal |
+| History grows beyond the useful query or retention path     | Add a measured index, derived summary, archival, or deletion path    | Account for write cost, staleness, rebuild, retention policy, and restored-state checks      |
+
+::caption[Scaling response hypotheses and the obligations they introduce.]
+::label[table:scaling-response-patterns]
+
+Combine techniques only where the pressure requires them.
+A queue can duplicate effects without idempotency, and controlled rejection can amplify load if clients immediately retry.
 
 ### Scaling pressure lab
 
@@ -61,19 +68,20 @@ The lesson is structural: removing one bottleneck changes the system's limiting 
 
 ## Use a formal model before choosing a technique
 
-A scaling technique should respond to an identified limit.
-Formal models help you state that limit precisely enough to challenge your own intuition.
-:ref[table:scalability-laws]{text="The table below"} states four useful laws explicitly and separates what each can support from what it cannot establish.
+Formal models help challenge an intuition about the limit.
+Choose the question before the equation:
 
-| Law                                                      | Exact relationship                                                                                                                | Main assumptions                                                                                 | Useful when                                                                                         | Cannot establish                                                            |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Little's Law :citep[little1961proof]                     | `L = λW`, where `L` is average work in progress, `λ` is average throughput or arrival rate, and `W` is average time in the system | Stable long-run averages, one consistent system boundary, and conserved work                     | Relating queue or review backlog, throughput, and elapsed time                                      | The cause of delay, tail latency, or stability from one snapshot            |
-| Amdahl's Law :citep[amdahl1967validity]                  | `S(N) = 1 / ((1 - p) + p/N)`, where `p` is the parallelizable fraction and `N` is the parallel capacity                           | Fixed workload and fractions, with no added parallel overhead in the bound                       | Bounding speedup for request paths, batch work, deployments, or agent workflows                     | Contention, coordination cost, load growth, or the actual parallel fraction |
-| Lusser's Law :citep[tait1995lusser]                      | `R_system = ∏ R_i` for independent components that must all succeed in a series system                                            | Every named step is critical and step failures are independent                                   | Checking whether a request, deployment, or agent workflow can meet an end-to-end reliability target | Correlated failures, recovery behavior, or omitted dependency paths         |
-| Universal Scalability Law :citep[gunther2008scalability] | `C(N) = N / (1 + α(N - 1) + βN(N - 1))`, where `α` models contention and `β` coordination or coherency cost                       | One workload and configuration, with parameters fitted to representative throughput measurements | Describing capacity that rises, flattens, and then falls as concurrency grows                       | The causal mechanism or safe extrapolation beyond the measured range        |
+| Question                                        | Model and worked treatment                                                                   |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Do backlog, throughput, and average time agree? | [Little's Law](/chapters/benchmarking/#check-measurements-against-a-model)                   |
+| How much speedup can the parallel part provide? | [Amdahl's Law](/chapters/agent-fleets/#amdahl-s-law-and-the-sequential-bottleneck)           |
+| How do failures across critical steps combine?  | [Series reliability](/appendices/scalability-models/#lusser-s-law-and-the-reliability-chain) |
+| Can coordination make added concurrency slower? | [Universal Scalability Law](/appendices/scalability-models/#contention-curve-lab)            |
 
-::caption[Formal scalability models, their assumptions, and suitable application boundaries.]
-::label[table:scalability-laws]
+::caption[Questions that guide the choice of a formal model.]
+::label[table:scalability-model-questions]
+
+[Appendix E](/appendices/scalability-models/#choose-a-model) collects the equations, assumptions, and limits.
 
 The project does not require every model.
 Apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.
@@ -82,11 +90,9 @@ A formula added after the design decision is not evidence that the formula guide
 
 ### Contention beyond Amdahl's bound
 
-Amdahl's Law models a fixed sequential share but does not describe shared resources and coordination becoming more expensive as concurrency grows.
-The Universal Scalability Law adds contention and coherency terms, allowing modeled capacity to rise, flatten, and eventually fall.
-Its parameters should be fitted from representative throughput measurements rather than selected by intuition.
-
-[Appendix E](/appendices/scalability-models/#contention-curve-lab) develops the model, provides the interactive contention curve, and examines a production case in which limiting admitted concurrency protected useful throughput.
+Amdahl's fixed sequential share omits coordination costs that grow with concurrency.
+The [contention curve in Appendix E](/appendices/scalability-models/#contention-curve-lab) makes that difference visible and examines a production case of limiting admitted work.
+Fit its parameters to representative throughput measurements before using it for a capacity claim.
 
 ## Three documented cases of web scaling pressure
 
@@ -178,7 +184,7 @@ Real systems need explicit definitions for reads as well as writes, failure dete
 
 In some project themes, geography may matter very little.
 In others, a platform serving users or devices in different regions may need to consider latency, data residency, or regional failure.
-This is a good place to teach restraint: not every project needs multi-region architecture.
+Justify multi-region architecture against the project's latency, availability, and operating requirements.
 
 ### Latency budget lab
 
@@ -194,36 +200,19 @@ The useful lesson is the shape of the problem: distance creates a lower bound, a
 
 ## Trade-offs
 
-> **Simplicity makes deficiencies visible**
->
-> “I conclude that there are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies and the other way is to make it so complicated that there are no obvious deficiencies.
-> The first method is far more difficult.” :citep[hoare1981emperor]{locator="p. 81"}
->
-> Hoare was writing about overambitious programming-language design, not distributed systems.
-> The contrast is about inspectability, not proof that a simple design is defect-free.
-> Applied to scaling, it becomes a review test: **what pressure justifies each added mechanism, what new failure mode does it introduce, and why is the simpler design insufficient?**
+For each mechanism, explain what becomes simpler and what becomes harder:
 
-Important trade-offs to make explicit:
+- Caching reduces repeated computation but adds freshness and invalidation decisions.
+- Queues shorten synchronous work but add backlog, retries, idempotency, and delayed completion.
+- Partitioning reduces shared-resource pressure but adds routing, migration, and cross-partition queries.
 
-- Simplicity vs capacity.
-- Consistency vs availability.
-- Real-time accuracy vs eventual correctness.
-- Low latency vs operational complexity.
-- Shared infrastructure vs tenant isolation.
-- Fast feature delivery vs strict contracts.
-- Automation vs human control.
-
-> **The waterbed effect**
->
-> The waterbed theory of complexity uses a physical metaphor: pushing complexity down in one place may make it rise somewhere else rather than remove it from the system :citep[randal2003perl6].
-> In a scaling design, caching moves repeated computation into invalidation and freshness decisions; queues move request latency into backlog, retries, idempotency, and delayed correctness; and partitioning moves shared-resource pressure into routing, migration, and cross-partition queries.
-> This is not a formal law that every simplification must preserve a fixed quantity of complexity.
-> It is a review question that complements the distinction between essential and accidental difficulty :citep[brooks1987silver]: **what became simpler, and where did the displaced complexity reappear?**
+The “waterbed” metaphor describes this movement of complexity :citep[randal2003perl6]; it is a review question, not a law that complexity must remain constant.
+Ask what pressure justifies the mechanism, why a simpler design is insufficient, and which new failure would make you reconsider.
 
 > **Sustainability angle**
 >
-> Sustainability is also a trade-off.
-> Keeping raw data forever, precomputing every possible summary, or running capacity for rare peaks can be reasonable in some domains, but the decision should be named and justified.
+> Retaining raw data, precomputing summaries, and reserving peak capacity consume resources even when they protect a useful goal.
+> State that goal and measure the recurring cost.
 
 ## Implement the smallest justified response
 
@@ -280,7 +269,8 @@ The goal is to balance work that prevents known failures with work that improves
 
 Produce three connected deliverables:
 
-1. **Three-way comparison.** Apply the same pressure set to implementations A, B, and C. Mark each result as observed in running code or proposed.
+1. **Three-way comparison.** Apply the same pressure set to implementations A, B, and C.
+   Mark each result as observed in running code or proposed.
 2. **Implemented response.** Preserve the before-and-after revisions, unchanged workload and acceptance checks, observed result, new failure or recovery obligation, and conclusion.
 3. **Target design.** Justify the selected responses and explain why simpler alternatives are insufficient.
 
@@ -290,7 +280,8 @@ Across the package:
 - separate what the source reports, your interpretation, and the transfer you propose for the project; do not assume that the source's scale, result, or trade-off carries over;
 - apply one formal model to an application decision and one to the development workflow.
 
-Use one trade-off table row for each response in the target design. Record:
+Use one trade-off table row for each response in the target design.
+Record:
 
 - the pressure and approaching limit;
 - the technique, intended benefit, cost, and new failure mode;
@@ -310,13 +301,6 @@ If no component at the effect boundary can deduplicate, state that duplicate del
 
 ## Summary
 
-Scaling begins with a pressure and an approaching limit, not with a preferred technique.
-Formal models can expose bounds and inconsistencies, while measurements show which boundary the running system is actually approaching.
-The linked production cases make those relationships concrete through controlled cache staleness, queued publication work, and the removal of abandoned requests.
-None of those responses transfers automatically; each begins a question that the project must answer with its own workload and evidence.
-
-Orchestration can maintain declared application capacity, but it cannot make a saturated dependency or incompatible local state scale horizontally.
-Caching, queues, replicas, partitioning, rate limits, background work, and isolation can create capacity or resilience only by accepting new costs, failure modes, and operational obligations.
-
-Latency, geography, consistency, sustainability, and human coordination therefore belong in the same trade-off analysis as throughput.
-A credible target design explains why each mechanism is needed, where it moves complexity, which signal reveals trouble, and how the system can degrade, recover, or adapt when its assumptions fail.
+Choose a scaling response from the pressure and first binding limit.
+Use a suitable model to bound expectations, implement the smallest justified change, and repeat the workload through the real deployment.
+Judge both the improvement and the consistency, recovery, resource, and ownership costs it introduces.

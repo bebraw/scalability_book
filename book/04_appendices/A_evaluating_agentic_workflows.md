@@ -1,7 +1,19 @@
 # Evaluating agentic development workflows
 
-Use this appendix when you need to design, run, or critique an evaluation of a coding agent or a complete agentic development workflow.
-The [Benchmarking chapter](/chapters/benchmarking/) introduces the minimum evidence needed for the three course implementations; this appendix develops the vocabulary, controls, graders, uncertainty, and routing questions in depth.
+Use this appendix to design, run, or critique an agentic-development evaluation.
+The [Benchmarking chapter](/chapters/benchmarking/) defines the course baseline.
+
+## Apply the method selectively
+
+Begin with representative tasks, checked outcomes, preserved failures, and a declared workflow configuration.
+Read [evaluation anatomy](#anatomy-of-an-agent-evaluation), [task selection](#capability-and-regression-evals), and [grader design](#the-eval-suite-is-also-software) for that minimal path.
+Add other sections when the decision requires them:
+
+- [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
+- [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
+- [Cost denominators](#read-a-harness-benchmark-s-cost-denominator) and [routing](#from-evaluation-to-routing) for efficiency decisions.
+- [Compressed evidence](#compressed-evidence-and-repeated-review) and [repeated review](#repeated-review-is-measurement-not-proof) for review workflows.
+- Research examples on [judges](#research-example-evaluating-the-evaluator) and [coordination](#research-example-coordination-and-integration) for interpreting published comparisons.
 
 ## Anatomy of an agent evaluation
 
@@ -50,7 +62,7 @@ Balance positive and negative cases so optimizing one behavior does not produce 
 
 An initial pass does not show how easily an implementation can be extended.
 SlopCodeBench addresses this by asking agents to extend their own solutions through successive specification checkpoints, leaving internal structure open and measuring structural erosion and redundant code alongside functional correctness :citep[orlanski2026slopcodebench].
-The useful design idea is to preserve the implementation between changes so earlier decisions can affect later work.
+Preserving the implementation lets earlier decisions affect later work.
 Its structural measures are diagnostic proxies; human comprehension and maintenance effort still need their own evidence.
 
 Consider two implementations, X and Y, of a small parcel-quotation tool.
@@ -83,66 +95,12 @@ The fictional trace suggests where to investigate the difference: a duplicated r
 A real comparison would still need to distinguish architecture from task difficulty, reviewer familiarity, model variation, and other changed conditions.
 Fewer lines or duplicated blocks would not establish the explanation by themselves.
 
-For a local study, freeze the change sequence, acceptance contracts, model and harness configuration, per-checkpoint budgets, and stopping rules.
-Retain each checkpoint revision, the new and regression checks, failures before repair, final acceptance decision, review and repair effort, and all-attempt cost.
-Count budget exits and unfinished trajectories rather than reporting only sequences that completed.
-Checkpoints within one trajectory depend on earlier work; three checkpoints are not three independent trials.
-Repeated fresh trajectories can expose variation.
+Use the [task and grader controls](#capability-and-regression-evals) with a frozen change sequence, served configuration, per-checkpoint budgets, and stopping rules.
+Retain revisions, checks, pre-repair failures, acceptance decisions, human effort, and all-attempt cost, including unfinished trajectories.
+Checkpoints depend on earlier work; repeat fresh trajectories to study variation rather than counting checkpoints as independent trials.
 
-This optional example examines successive changes within one implementation.
-The course's A–B–C comparison examines three fresh implementations, and its bounded audit probes measure another group's ability to understand and change each one.
-Those designs answer different questions and should retain their separate reporting boundaries.
-
-## Qualify the served configuration
-
-A model name or local endpoint is not a capability result.
-Bind an accepted outcome to the configuration that served it: resolved model revision or digest and quantization, runtime version, allocated context, prompt and tool scaffold, and relevant hardware and accelerator residency or CPU/GPU offload where exposed.
-When an approved service does not expose a field, mark it unavailable and name the evidence source or service operator rather than estimating it.
-
-In a study of 9.7K test examples across long-input and long-form-output benchmarks, quantization effects varied by method, model, task, context length, and language :citep[mekala2025quantization].
-The study used vLLM on datacenter GPUs and did not test coding agents, Ollama, or consumer-device deployments, so one quantized build should not inherit another build's score.
-Hardware constrains which configurations fit and their latency, throughput, and resource use; it does not establish task capability.
-
-Keep capability, hardware fit, and data location as separate claims.
-Running inference locally identifies where model computation occurs, not the data boundary of tools, telemetry, storage, or network calls.
-A fallback can select a different model or configuration and change the capability, latency, cost, and data boundary.
-Ollama, for example, exposes an installed model's [digest and quantization](https://docs.ollama.com/api/tags) and a running model's [allocated context and server-reported model VRAM bytes](https://docs.ollama.com/api/ps).
-It can also forward cloud-model requests while callers continue using its local API, so `localhost` alone does not prove local execution ([cloud models](https://docs.ollama.com/cloud)).
-
-Assign a stable identifier to each served configuration in the evaluation.
-Record its exposed model, runtime, context, scaffold, tools, hardware boundary, outbound paths, and fallback policy, then link every attempt and acceptance result to that identifier.
-For an opaque departmental service, use operator- or instructor-supplied metadata; otherwise mark unavailable fields and name the evidence source.
-Qualify the configuration against a predeclared representative task and deterministic check, and treat the result as evidence for that task rather than a general ranking of local and hosted models.
-
-Context selection and output reduction are also configuration decisions.
-Long tool outputs and interaction histories consume context and can increase latency or cost, which has motivated command-aware filters such as [rtk](https://github.com/rtk-ai/rtk) and model-generated summaries.
-A shorter agent-facing view does not by itself establish a lower total bill or an unchanged task outcome.
-In a SWE-agent workshop study, observation masking and model-generated summaries reduced cost in most of five tested model configurations, but its paired analysis found that both significantly lowered solve rate in one reasoning-model configuration :citep[lindenbauer2025complexity].
-On controlled long-horizon tool-use benchmarks, ACON reduced peak input tokens while largely retaining task performance :citep[kang2026acon].
-Neither study validates every command filter; together they show that context reduction is a behavior change to test, not free efficiency.
-
-> **Compact the working view; preserve the raw record**
->
-> Treat compressed output as a working view, not as the evidence record.
-> Keep raw output retrievable during the run and preserve the producer's exit status independently.
-> For bounded qualification cases and consequential failures, retain the original command or query, working directory, separate output streams, pagination or continuation metadata, and explicit omission markers under a stable handle.
-> Apply the underlying system's data-minimization, secret-handling, residency, access, and deletion rules; disable archival where those rules cannot be met.
-> Prefer native structured output as a comparison baseline, make capture failures visible, and treat retrieved output as untrusted text rather than embedded instructions.
->
-> Qualify each important compression policy with the same task cohort and acceptance checks used for the uncompressed view.
-> Include compression calls, raw retrievals, retries, and failed attempts when reporting total cost per accepted outcome.
-> A reduction in shell-output bytes is only a component metric.
-
-**Tool-output preflight.**
-Use instructor-supplied or synthetic non-sensitive raw artifacts for one passing command and one deliberately tricky output: an exit-zero warning, a failing diagnostic, or an unusual line in a repetitive log.
-Production and secret-bearing output are outside this exercise.
-If the policy claims to handle pagination, add one paginated artifact.
-
-Before generating compact views, list the critical facts in each raw artifact and require every compact fixture to mark at least one explicit omission.
-Record the command and tool version, reduction-policy version, configuration, and content hash.
-Verify that source status, separate output-stream provenance, critical facts, omission markers, retrieval handle, and pagination metadata survive.
-Report critical facts retained over critical facts present, false or materially misleading facts, and any policy-safe fallback.
-Passing this preflight can reject an obviously lossy or unsafe policy; claims about cost or task effectiveness require paired end-to-end outcomes.
+This optional design studies successive changes within one implementation.
+The course's A–B–C builds start fresh, while cross-team probes examine another group's ability to understand and change each build.
 
 ## The eval suite is also software
 
@@ -150,7 +108,7 @@ Terminal-Bench provides a concrete example of a versioned agent benchmark whose 
 Terminal-Bench 2.1 changed 26 tasks from the earlier suite to repair bugs, adjust timeouts or resources, and improve robustness against reward hacking :citep[terminalbench2026v21].
 Its `fix-code-vulnerability` task, for example, pins a Bottle source revision and Python image, specifies CPU, memory, storage, and time limits, requires both a patch and a structured report, and checks the result with original and security-focused tests.
 
-The revisions make a methodological point more important than a leaderboard position: the measurement instrument can be wrong.
+The measurement instrument can be wrong.
 Ambiguous instructions, incomplete graders, leaked state, shared caches, resource contention, and permissive reference matching can create failures or passes unrelated to the intended capability.
 Record the suite version and environment with every result, validate a reference solution, start trials from clean state, and read selected traces before trusting an aggregate score.
 When a task or grader changes materially, do not silently compare the new score with results from the previous instrument.
@@ -158,7 +116,6 @@ When a task or grader changes materially, do not silently compare the new score 
 For this course, inspecting one packaged benchmark task is more useful than running the entire public suite.
 Identify its claimed capability, starting state, visible instructions, hidden or external assumptions, graders, reference solution, resource boundary, and plausible gaming paths.
 Then state what a passing result would and would not establish.
-The exercise teaches benchmark anatomy without replacing the project's local tasks with a heterogeneous and potentially expensive leaderboard workload.
 
 > **Advanced option: derive candidate tasks from repository history**
 >
@@ -173,12 +130,7 @@ Others require a rubric or human judgment.
 When a model acts as a judge, test whether answer order, verbosity, confidence, or the judge's own style changes its scores; LLM judges have documented position and self-enhancement biases :citep[zheng2023mtbench].
 Keep a small human-reviewed calibration set and report disagreement rather than treating the judge as ground truth.
 
-:citet[falck2026training] offer a useful case in which evaluation becomes supervision.
-Their Replica setup trains a 27B agent on 242 figure-replication tasks using auto-generated per-task rubrics, three judge samples, and turn-level credit assignment, then scores it on 68 held-out AI-for-science tasks.
-The rubric judge was more repeatable than a generic judge in the paper's repeated-sampling analysis.
-In a blinded study of ten training tasks selected because the judges disagreed, its Kendall rank correlation with expert rankings was 0.19 rather than 0.15 for the generic judge; on disputed pairs, experts sided with the rubric judge 63% of the time, a difference that was not statistically significant (`p = 0.109`).
-Because the same judge design supplied training rewards and the headline evaluation, the task holdout did not make the scoring process independent.
-The evidence supports a bounded claim about a lower-noise training signal and improved scores under this judge, not that the judge is ground truth or that the system performs open-ended scientific innovation.
+A separate [research example](#research-example-evaluating-the-evaluator) examines what happens when a judge supplies both training rewards and the headline evaluation.
 
 The demonstration below separates deterministic probes from a rubric score.
 Use it to inspect a failing task and decide whether the problem lies in the result, the rubric, or the evaluation setup.
@@ -234,6 +186,57 @@ An interval describes uncertainty conditional on the sample and scoring process;
 For one predeclared binary acceptance result per independent task, count tasks accepted by both candidates, only the first, only the second, or neither.
 Use an instructor-supplied interval or a justified paired method to interpret those counts against the predeclared decision boundary; do not compare two separate error bars.
 The single representative project task above remains a case comparison; use this check with a multi-task project cohort or instructor-provided data.
+
+## Qualify the served configuration
+
+A model name or local endpoint is not a capability result.
+Bind an accepted outcome to the configuration that served it: resolved model revision or digest and quantization, runtime version, allocated context, prompt and tool scaffold, and relevant hardware and accelerator residency or CPU/GPU offload where exposed.
+When an approved service does not expose a field, mark it unavailable and name the evidence source or service operator rather than estimating it.
+
+In a study of 9.7K test examples across long-input and long-form-output benchmarks, quantization effects varied by method, model, task, context length, and language :citep[mekala2025quantization].
+The study used vLLM on datacenter GPUs and did not test coding agents, Ollama, or consumer-device deployments, so one quantized build should not inherit another build's score.
+Hardware constrains which configurations fit and their latency, throughput, and resource use; it does not establish task capability.
+
+Keep capability, hardware fit, and data location as separate claims.
+Running inference locally identifies where model computation occurs, not the data boundary of tools, telemetry, storage, or network calls.
+A fallback can select a different model or configuration and change the capability, latency, cost, and data boundary.
+Ollama, for example, exposes an installed model's [digest and quantization](https://docs.ollama.com/api/tags) and a running model's [allocated context and server-reported model VRAM bytes](https://docs.ollama.com/api/ps).
+It can also forward cloud-model requests while callers continue using its local API, so `localhost` alone does not prove local execution ([cloud models](https://docs.ollama.com/cloud)).
+
+Assign a stable identifier to each served configuration in the evaluation.
+Record its exposed model, runtime, context, scaffold, tools, hardware boundary, outbound paths, and fallback policy, then link every attempt and acceptance result to that identifier.
+For an opaque departmental service, use operator- or instructor-supplied metadata; otherwise mark unavailable fields and name the evidence source.
+Qualify the configuration against a predeclared representative task and deterministic check, and treat the result as evidence for that task rather than a general ranking of local and hosted models.
+
+Context selection and output reduction are also configuration decisions.
+Long tool outputs and interaction histories consume context and can increase latency or cost, which has motivated command-aware filters such as [rtk](https://github.com/rtk-ai/rtk) and model-generated summaries.
+A shorter agent-facing view does not by itself establish a lower total bill or an unchanged task outcome.
+In a SWE-agent workshop study, observation masking and model-generated summaries reduced cost in most of five tested model configurations, but its paired analysis found that both significantly lowered solve rate in one reasoning-model configuration :citep[lindenbauer2025complexity].
+On controlled long-horizon tool-use benchmarks, ACON reduced peak input tokens while largely retaining task performance :citep[kang2026acon].
+Neither study validates every command filter; together they show that context reduction is a behavior change to test, not free efficiency.
+
+> **Compact the working view; preserve the raw record**
+>
+> Treat compressed output as a working view, not as the evidence record.
+> Keep raw output retrievable during the run and preserve the producer's exit status independently.
+> For bounded qualification cases and consequential failures, retain the original command or query, working directory, separate output streams, pagination or continuation metadata, and explicit omission markers under a stable handle.
+> Apply the underlying system's data-minimization, secret-handling, residency, access, and deletion rules; disable archival where those rules cannot be met.
+> Prefer native structured output as a comparison baseline, make capture failures visible, and treat retrieved output as untrusted text rather than embedded instructions.
+>
+> Qualify each important compression policy with the same task cohort and acceptance checks used for the uncompressed view.
+> Include compression calls, raw retrievals, retries, and failed attempts when reporting total cost per accepted outcome.
+> A reduction in shell-output bytes is only a component metric.
+
+**Tool-output preflight.**
+Use instructor-supplied or synthetic non-sensitive raw artifacts for one passing command and one deliberately tricky output: an exit-zero warning, a failing diagnostic, or an unusual line in a repetitive log.
+Production and secret-bearing output are outside this exercise.
+If the policy claims to handle pagination, add one paginated artifact.
+
+Before generating compact views, list the critical facts in each raw artifact and require every compact fixture to mark at least one explicit omission.
+Record the command and tool version, reduction-policy version, configuration, and content hash.
+Verify that source status, separate output-stream provenance, critical facts, omission markers, retrieval handle, and pagination metadata survive.
+Report critical facts retained over critical facts present, false or materially misleading facts, and any policy-safe fallback.
+Passing this preflight can reject an obviously lossy or unsafe policy; claims about cost or task effectiveness require paired end-to-end outcomes.
 
 ## Read a harness benchmark's cost denominator
 
@@ -303,8 +306,15 @@ High-risk work can bypass the router or retain mandatory review, and the policy 
 
 ## Compressed evidence and repeated review
 
-A compact view can route attention, and repeated review can reveal variation, but neither is acceptance evidence.
-The following two cases show why the raw artifact, independent checks, and a stopping rule remain necessary.
+Use compact views to direct attention and repeated reviews to search for missed defects.
+Keep a common acceptance protocol:
+
+1. Preserve the full artifact and independent checks, and inspect omitted material at consequential decisions.
+2. Confirm each finding through a reproduction, reachable path, or violated invariant before judging its impact.
+3. Record triage and repair effort, and look for a common cause when several findings recur.
+4. Stop against a declared risk threshold; decompose a change that remains too large or coupled to understand.
+
+The cases below show why these controls matter.
 
 > **A reading diff routes attention**
 >
@@ -316,25 +326,13 @@ The following two cases show why the raw artifact, independent checks, and a sto
 > An [author-run analysis of the Python-only diffs from three selected commits](https://github.com/boldsoftware/meat/blob/f39f41dfe7b5b37a12b35fdfbaecc7e779855bd3/analysis/python-famous-commits-2026-08-02/REPORT.md) records an aggregate 30.1% byte reduction; it also documents cases where the output hid decisive test outcomes and made an old/new default inversion look like a one-sided addition.
 > The report illustrates the mechanism and its failure modes; it does not measure reviewer effectiveness.
 > In a different task, a mutation-based preprint found that GPT-4 and GPT-5.2 summaries of 12 controlled synthetic Python programs and 50 human-written benchmark programs sometimes described familiar algorithmic intent while missing mutated behavior; it did not study diffs or human reviewers :citep[khatib2026summarization].
->
-> Use a reading diff as an attention map, not as acceptance evidence.
-> Keep the raw diff and independent checks available, inspect omitted regions at consequential boundaries, and return for decomposition any change that remains too large or coupled to understand.
 
 > **When findings become inventory**
 >
-> :citet[lawson2026bugs] uses the provocative claim that teams can now choose how many bugs they want by asking agents to continue reviewing.
-> The operational choice is narrower: a team can choose how much defect-search and verification effort to fund, which known risks to accept, and when to stop.
-> It cannot count the unknown defects that remain.
->
-> Cheap reports may shift rather than remove friction.
+> Continued review creates reports that still require verification and a repair decision.
 > In a live study at Mozilla and Ubisoft, reviewers directly accepted 8.1% and 7.2% of generated comments, respectively, while another 14.6% and 20.5% were marked useful as review or development tips.
 > At Ubisoft, the median instrumented interval for evaluating generated comments was about 43 seconds per patch, an upper bound on active evaluation time.
 > The study measured adoption rather than defect-detection accuracy, but it shows that suggestions still consume attention :citep[olewicki2026review].
->
-> Each finding still needs independent evidence such as a reproduction, a reachable path, or a violated invariant, followed by an impact judgment, a repair decision, and regression evidence.
-> A review loop without a stopping rule can create its own backlog, while repeated local patches can make the system harder to understand.
-> When several reports share a cause, ask whether a simpler boundary or invariant could eliminate the class before adding another exception.
-> Stop against an explicit risk threshold, not when the agent runs out of concerns.
 
 ### Review-evidence exercise
 
@@ -342,7 +340,7 @@ Choose one bounded representative change.
 Before opening a compact or agent-produced review view, predeclare two or three behavior or architecture questions.
 Record provisional answers after that view, then inspect the complete artifact and relevant checks and record every correction, omitted or misleading critical detail, and the time spent in each stage.
 For agent findings, record candidate, independently confirmed, duplicate, and rejected findings together with triage and repair time.
-Stop against an explicit risk threshold and ask whether one simpler boundary or invariant could eliminate a repeated defect class.
+Apply the acceptance protocol above when deciding which findings to repair and when to stop.
 
 ## Repeated review is measurement, not proof
 
@@ -360,13 +358,40 @@ Repeated review also consumes the same scarce integration capacity that bounds t
 If you repeat an agent review, record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 
-## Apply the method selectively
+## Research example: evaluating the evaluator
 
-A course project does not need a public-benchmark-scale evaluation system.
-Begin with a few representative tasks, deterministic checks where possible, preserved outcomes and failures, and a declared workflow configuration.
-Add repeated trials, judge calibration, statistical intervals, or routing experiments only when the decision being made requires that additional evidence.
+:citet[falck2026training] offer a useful case in which evaluation becomes supervision.
+Their Replica setup trains a 27B agent on 242 figure-replication tasks using auto-generated per-task rubrics, three judge samples, and turn-level credit assignment, then scores it on 68 held-out AI-for-science tasks.
+The rubric judge was more repeatable than a generic judge in the paper's repeated-sampling analysis.
+In a blinded study of ten training tasks selected because the judges disagreed, its Kendall rank correlation with expert rankings was 0.19 rather than 0.15 for the generic judge; on disputed pairs, experts sided with the rubric judge 63% of the time, a difference that was not statistically significant (`p = 0.109`).
+Because the same judge design supplied training rewards and the headline evaluation, the task holdout did not make the scoring process independent.
+The evidence supports a bounded claim about a lower-noise training signal and improved scores under this judge, not that the judge is ground truth or that the system performs open-ended scientific innovation.
 
-### Field note — Let repeated failures shape the first evals
+## Research example: coordination and integration
+
+Recent experiments separate three properties that are easy to collapse: concurrent writing, coordination, and accepted behavior.
+CodeCRDT used a shared CRDT document and an observation-driven claim protocol so agents could edit concurrently without locks.
+Across 600 evaluations of six small TypeScript and React tasks with Claude Sonnet 4.5, every run converged without a textual merge failure, yet preliminary inspection still found semantic conflicts in roughly 5–10% of results.
+Raw completion time ranged from a 21.1% speedup to a 39.4% slowdown depending on the task :citep[pugachev2025codecrdt].
+The coordination substrate solved document convergence; it did not make independently reasonable changes semantically compatible or guarantee useful parallelism.
+
+AgentRoom evaluated a separate coordination design that paired a CRDT-backed shared filesystem with explicit file claims, agent status, and message broadcasts :citep[cho2026agentroom].
+For the CLI-stable models in its evaluation, two-agent rooms reduced a specific one-file abandonment mode and lowered run-to-run variation relative to solo execution.
+At matched compute on one task, its primary LLM-judge composite favored AgentRoom over independent parallel generation followed by post-hoc file union.
+A separate seven-run bundle probe ordered the full system above shared-only and prompt-only partial conditions, but the interval for the coordination-layer step included zero.
+The result remains preliminary.
+The paper was a recent preprint, its headline tasks shared one Express and TypeScript environment, agents authored their own tests, and the main quality comparison did not use a held-out execution oracle.
+
+Repository-scale evidence shows why this distinction matters outside a controlled shared document.
+AgenticFlict selected 142,652 open or closed-but-unmerged agent-authored pull requests from the AIDev dataset; deterministic merge simulation succeeded for 107,026, and 27.67% of that restricted sample produced textual conflicts :citep[ogenrwot2026agenticflict].
+The dataset does not isolate fleets or establish that agents caused the conflicts; it measures agent-authored changes colliding with the repository state into which they would be merged.
+It nevertheless documents a substantial collection of integration failures that a fleet design should not treat as an incidental cleanup concern.
+
+Together, these studies support a bounded conclusion.
+A shared substrate can prevent some textual collisions, and an explicit coordination interface can reduce some duplicated or abandoned work, but neither replaces a settled contract or end-to-end acceptance evidence.
+Parallelize only work whose ownership and dependencies are clear, then test the integrated behavior through the web boundary.
+
+## Field note — Let repeated failures shape the first evals
 
 My practical threshold for codifying an eval is when I begin to see a pattern and trust my judgment enough to describe it.
 I do not yet have enough experience to claim a general method for designing strong eval suites, however.

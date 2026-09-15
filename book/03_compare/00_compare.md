@@ -21,14 +21,11 @@ When practical, use the same foundation model as implementation B so orchestrati
 
 Implementation C also turns its development process into application data.
 A transformed fleet trace is loaded into the Work Activity Tracker so its history, filters, and relationships can expose attempts, failures, handoffs, validation, correction, and human intervention.
-The result is a bounded workflow debugger, not a claim that the application has become a universal agent platform.
+Use that view to locate where coordination failed and which correction worked.
 
 ## Compare applications and development systems
 
-Scalability has two connected objects of analysis here: the web application and the development system that changes it.
-Application scalability remains the subject of the book; the three AI-assisted setups are the experimental lens.
-Compare what the tools made easier, what they made riskier, and what project structures made accepted work legible enough to review and maintain.
+Explain what each setup made easier or riskier, which application architecture best fits the selected pressure, and what the team can sustain.
 
-The course does not establish a universal ranking of models or workflows.
-The implementations can differ in architecture, the team learns between builds, and the served configurations may change.
-The shared specification and evidence make those effects discussable; they do not make every causal explanation identifiable.
+Record architectural, configuration, and practice differences as alternative explanations for the result.
+The final decision should name the conditions under which you would choose the application and development workflow.

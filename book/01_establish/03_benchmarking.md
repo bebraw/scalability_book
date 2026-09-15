@@ -1,17 +1,12 @@
 # How can we measure web applications and development workflows?
 
-You cannot evaluate a property of a web application without evidence about it.
-A page that feels fast on one developer's machine does not establish how it behaves for other devices, workloads, data volumes, or network conditions.
-Benchmarking turns a question about that behavior into a controlled comparison.
-
-Measurement is necessary, but it is not self-explanatory.
-A metric can represent the wrong outcome, conceal variation, or become misleading when people and agents optimize for it.
-Even a trustworthy result can show that behavior changed without explaining why.
-This chapter therefore moves from benchmarking, through the limits of measurement, to observability and finally to evidence about the agentic workflow that produced the application.
+A page that feels fast on one developer's machine may behave differently under another workload, device, or network.
+Benchmarking makes that comparison explicit; observability helps investigate the result.
+Both need checks that the measured property still represents the outcome people want.
 
 ## Benchmark to test a claim
 
-A **measurement** assigns evidence to an observed property.
+A **measurement** records a value for a property using a stated procedure.
 A **benchmark** uses declared conditions to compare that property across workloads, systems, or revisions.
 Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed latency objective as concurrent demand increases.
 
@@ -38,7 +33,7 @@ The values are deterministic and run only in the browser, so this is a teaching 
 
 Predict the default result before running the simulated workload, then compare the average with p95.
 Treat the first result as a baseline, change one condition, and predict again before recording the comparison.
-The useful lesson is not the simulated number itself: it is that the workload, load, metric, and acceptance threshold have to be stated together.
+Record the workload, load, metric, and acceptance threshold together.
 
 Synthetic benchmarks deliberately simplify reality.
 They can omit workload mixes, client behavior, cache histories, data shapes, provider quotas, dependency contention, and failure combinations that appear in production.
@@ -83,23 +78,13 @@ Lighthouse instead provides synthetic lab evidence under declared conditions.
 
 #### From page metrics to product metrics
 
-Standard browser metrics deliberately use definitions that work across many kinds of pages.
-That makes them comparable, but the element selected for a metric such as LCP is not necessarily the part of the interface that a user came to see.
-An event tracker might care when its event list becomes visible; another application might care about a search-results region, product summary, or account overview.
-The measurement boundary should follow the question rather than whichever element happens to be largest.
+A page-level metric may describe a different element from the one the user came to see.
+For the event tracker, define a milestone such as the event list becoming visible and usable.
+[Element Timing](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceElementTiming) can report rendering of a supported annotated element; application instrumentation and interaction checks can establish the remaining behavior.
+Choose the signal from the product question, name its collection rule, and record the browsers and users represented.
+Paint evidence alone cannot establish that a region is interactive or correct.
 
-[Element Timing](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceElementTiming) can report when one annotated image or text element rendered.
-The experimental [Container Timing API](https://csswizardry.com/2026/07/meaasuring-component-performance-with-the-container-timing-api/) extends that idea to an author-defined DOM region and reports a sequence as new contentful areas inside it are painted.
-That sequence can reveal whether a component appeared together or accumulated through several delayed stages, moving the measurement boundary from a browser-selected element toward a user-recognizable product component.
-
-Container Timing does not declare that a component is complete, interactive, accurate, or ready to use.
-Those are product claims that may require application instrumentation or interaction measurements in addition to paint evidence.
-Because the API is experimental, its immediate value here is the design principle rather than the exact interface: choose a meaningful region, give the signal a stable name, state how an entry is selected from the sequence, sample collection deliberately, and record which browsers and users the dataset represents.
-
-For the course project, choose one user-recognizable region and define what useful evidence would mean for it.
-Then decide whether a page-level Web Vital, one Element Timing entry, a sequence of container paints, or an application milestone best supports that claim, and explain what the chosen signal cannot prove.
-
-#### Run a page audit on your own machine
+#### Audit a representative page
 
 Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
 It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
@@ -131,8 +116,7 @@ It does not measure application loading, network behavior, or Web Vitals because
 After it passes, replace the fixture URL with the project's real route and adapt the accessible names while preserving the same user-visible contract.
 Inspect the trace to verify what was acted on and rendered, then use Lighthouse or another suitable performance tool separately; the flow can be correct but slow, or appear fast because it failed to perform the intended work.
 
-Teams that need a repeatable CI gate can use the official `lighthouse` Node module or [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to collect several runs and assert a budget.
-Start with reporting rather than a strict pass/fail threshold, learn the normal variation of the runner, and only then set a budget with enough tolerance to detect a meaningful regression.
+For a repeatable CI gate, [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) can collect runs and assert a budget; measure the runner's normal variation before choosing its threshold.
 
 ### Check measurements against a model
 
@@ -157,10 +141,8 @@ A large mismatch is a reason to inspect the measurement setup or system stabilit
 
 ## Measurements can lead you astray
 
-[Goodhart's law](https://en.wikipedia.org/wiki/Goodhart%27s_law) states: "Any observed statistical regularity will tend to collapse once pressure is placed upon it for control purposes" :citep[goodhart1975monetary].
-In plain language, the relationship that made a metric informative can break down when that metric is used as a target.
-The familiar shorthand is that a measure tends to stop being a good measure when it becomes the target.
-This is especially relevant to software because dashboards and quality gates make measurable proxies easy to optimize.
+Goodhart's law describes how a metric can stop tracking the desired outcome when it becomes a target :citep[goodhart1975monetary].
+Software dashboards and quality gates make such proxies easy to optimize.
 
 Consider a few examples:
 
@@ -212,15 +194,11 @@ Notice that monitoring the proxy is still useful after the repair, but it no lon
 
 Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
 
-:citet[barrocas2026ecoassist] provide one bounded example of a before-and-after energy study.
-On a single M4 MacBook and Chrome testbed, the authors report a mean 13.4% reduction in local CPU and GPU energy, recorded with Powermetrics after EcoAssist optimized 500 standalone webpages selected for a size above 600 KB and at least ten DOM-affecting operations.
-The sample therefore emphasizes pages with substantial optimization potential and does not represent arbitrary production applications.
-The benchmark compared each optimized page with its own unoptimized baseline, not with another optimizer.
-
-In a separate single-condition lab study, twenty early-career developers generated and optimized portfolio pages and reported low workload.
-The study did not compare productivity against a control, and five participants observed removed content or layout changes after optimization.
-The reported before-and-after page measurements do not include the optimizing model's full training and inference footprint; the paper estimates that overhead separately, and neither result is a whole-system carbon estimate.
-Treat the optimization as a candidate change that must preserve the intended product behavior, not as evidence that a lower energy number is automatically better.
+EcoAssist illustrates the need to check the product alongside resource use :citep[barrocas2026ecoassist].
+Its before-and-after benchmark reported reduced local CPU and GPU energy on selected standalone webpages using one M4 MacBook and Chrome testbed.
+In a separate lab study, some participants observed removed content or changed layouts after optimization.
+The measurements concern those pages and that device, exclude the optimizing model's full footprint, and are not a whole-system carbon estimate.
+An optimization must preserve the intended behavior as well as improve the selected resource measure.
 
 Run one bounded optimization experiment:
 
@@ -261,9 +239,8 @@ Also notice that useful domain spans and attributes require conscious instrument
 
 ## Observe the agentic workflow too
 
-Agentic development introduces a second system to observe: the development workflow that produces and changes the web application.
-The parallel is useful as long as outcome evidence remains separate from diagnostic traces.
-An HTTP trace can explain how a request traveled through the application but does not prove that the user received the correct result; an agent transcript can explain how a change was produced but does not prove that the accepted implementation is correct.
+Observe the development workflow as well as the application.
+In both, outcome checks establish what worked and traces help explain the path to that result.
 
 | Evidence role         | Web application                                         | Agentic development workflow                               |
 | --------------------- | ------------------------------------------------------- | ---------------------------------------------------------- |
@@ -276,17 +253,13 @@ An HTTP trace can explain how a request traveled through the application but doe
 ::caption[Parallel evidence roles in a running web application and its agentic development workflow.]
 ::label[table:application-agent-workflow-evidence]
 
-For a bounded task, record whether the resulting artifact passed its acceptance checks, how long the work took, what it cost, how many retries occurred, and how much human review or correction it required.
-Generated lines of code, transcript length, and nominal hours saved are weak outcome measures because they can move work into review, rework, or maintenance.
-Organizations report broad AI adoption and perceived productivity gains, while objective measurement of productivity and quality remains limited :citep[giray2025adoption].
-
 Keep the **task**, one attempted **trial**, its actual **outcome**, and the **trace** that led there distinct.
-Grade the outcome when several valid paths can solve the task; use the trace to diagnose failures, account for intervention and cost, and check process requirements such as permission compliance.
-A plausible transcript does not prove that the claimed change occurred, while one repository test is usually only one check on the result.
+Grade the outcome; use the trace to diagnose failures, account for cost and intervention, and check requirements such as permission compliance.
+Bind the result to the model and runtime where exposed, harness, tools, starting revision, resource limits, and routing or fallback.
 
-Bind each result to the configuration that produced it: the model and runtime where exposed, the agent harness and tools, the starting revision, relevant resource limits, and any routing or fallback.
-Then preserve the same reporting categories across implementations A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
-Treat the comparison as evidence about those tasks and conditions rather than a universal model or workflow ranking.
+Use the same reporting categories across A, B, and C: accepted outcome, checks, elapsed time, retries, cost or resource use, human correction, and known limits.
+Generated lines and transcript length can hide work shifted into review or maintenance; they do not replace these outcome measures.
+[Appendix A](/appendices/evaluating-agentic-workflows/) develops grader design, repeated trials, uncertainty, and configuration qualification.
 
 > **From a coding task to software delivery**
 >
@@ -306,57 +279,29 @@ Treat the comparison as evidence about those tasks and conditions rather than a 
 ### Field note — Preserve accepted context, not every interaction
 
 I have not established a practice of preserving complete agent transcripts or detailed workflow telemetry.
-When I return to an agent-assisted project, I rely mainly on its code, resulting documentation, and commit history.
-The code shows the implemented state, the documentation describes the intended system, and the history preserves how both changed over time.
-Together they provide durable context for future human and agent work without requiring every interaction to remain available.
+When returning to a project, I rely mainly on code, documentation, and commit history to recover the implemented state and accepted intent.
 
-Architecture Decision Records are especially valuable to me.
-I let agents draft and amend them, but I prompt and negotiate important decisions with care.
-A strong initial prompt can set the project direction and reduce uncertainty by narrowing the space the agent has to interpret.
-When I do not yet understand the domain well enough, leaving some details open can be appropriate; implementation and review can then expose what the next decision needs to settle.
+Architecture Decision Records are especially useful.
+[Vibe Template's ADR workflow](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/README.md) keeps proposed, accepted, implemented, and superseded decisions distinct.
+I let agents draft records, but negotiate important choices carefully; implementation can then expose what an unresolved decision still needs to settle.
 
-[Vibe Template](https://github.com/bebraw/vibe-template) codifies this practice in its [ADR workflow](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/README.md).
-A lasting architectural change must add or update an ADR in the same change set.
-Proposed, accepted, and implemented decisions have distinct lifecycle states, and an ADR reaches `implemented` only when the repository actually reflects it.
-Superseded decisions remain available as history rather than disappearing when the direction changes.
-
-An ADR is still an interpretation.
-It records the rationale, alternatives, trade-offs, and decision that I accepted; it is not a neutral transcript of every prompt, disagreement, or abandoned path.
-Code, documentation, ADRs, and commit history can therefore preserve accepted project context without fully reconstructing the agentic workflow that produced it.
-
-Tracking prompts, retries, model use, correction effort, cost, or other workflow signals could reveal more.
-I have not yet researched that practice deeply enough to know which additional evidence would justify its collection and maintenance cost.
-
-For the Establish project, choose one representative AI-assisted task and preserve its task brief, relevant context, configuration, outcome, checks, trace, corrections, and acceptance decision.
-The later implementations can reuse the reporting frame without pretending that one task is a statistically stable benchmark.
-
-For the complete evaluation vocabulary, grader design, configuration qualification, repeated-trial methods, uncertainty, and routing experiments, continue with [Appendix A: Evaluating agentic development workflows](/appendices/evaluating-agentic-workflows/).
+Those records preserve the rationale I accepted, not every prompt, disagreement, retry, or abandoned path.
+They cannot reconstruct the complete agent workflow.
+For the course comparison, preserve the selected task's trace and correction record while the work happens, rather than trying to infer them later from the accepted repository.
 
 ## Project artifact
 
-Complete the measurement and observation baseline required by the [Establish project specification](/project/establish/).
-Preserve it with implementation A so the same reporting categories can be applied to implementations B and C.
-Include:
+Add implementation A's measurement baseline to the [Establish evidence bundle](/project/establish/):
 
-- one representative runtime workload, load level, system boundary, and predicted result,
-- the runtime and browser-visible metrics collected, their acceptance thresholds, and the observed distribution where the values vary,
-- one telemetry signal or trace that helps explain the result,
-- one bounded AI-assisted task with its configuration, outcome, checks, trace, retries, human correction, and acceptance decision,
-- the application revision and relevant environment conditions,
-- and one inspected failure, the limits of the evidence, and the first signal that would warn the group that behavior is moving outside the measured conditions.
+- the representative runtime workload, load, conditions, prediction, thresholds, and results, including distributions for varying measurements;
+- one explanatory telemetry signal and inspected failure, with the first warning that behavior is leaving the measured conditions;
+- one representative AI-assisted task and its configuration, trace, checks, retries, correction, cost or resource use, and acceptance decision.
 
-This is a local baseline for a declared application and development setup, not a universal ranking of models, tools, or architectures.
+Tie the records to the application revision and retain the reporting frame for B and C.
+State what each comparison leaves untested.
 
 ## Summary
 
-Benchmarking turns a question about web behavior into a disciplined comparison rather than a collection of isolated numbers.
-A useful benchmark begins with a decision or prediction, defines a representative workload and system boundary, controls relevant conditions, repeats measurements that vary, and preserves the baseline.
-Formal relationships such as Little's Law can check whether observations are mutually consistent, but they do not replace that declared boundary.
-
-The resulting numbers remain partial evidence.
-Goodhart's law explains why a proxy can lose its relationship to the intended outcome once it becomes a target, while distributions, counterevidence, and regression checks make that divergence easier to see.
-Telemetry and observability address a different limitation: they help investigate where and why measured behavior occurred, including conditions the benchmark did not anticipate.
-
-The same separation applies to agentic development.
-The accepted implementation is the outcome to evaluate; the agent trace, configuration, retries, and human interventions are evidence for explaining how that outcome arose.
-Neither an application trace nor an agent transcript proves correctness by itself.
+A benchmark tests a claim under declared conditions; telemetry helps investigate the behavior it reveals.
+Preserve variation and check that an improved proxy still represents the desired outcome.
+For agent-assisted work, evaluate the accepted artifact and use configuration, attempts, and interventions to explain how it arose.

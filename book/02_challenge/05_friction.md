@@ -9,7 +9,7 @@ Each boundary adds knowledge, evidence, and coordination that the change must pr
 It is the everyday experience of technical debt, hidden coupling, and weak feedback.
 A system with high friction may still be useful, but each change requires more effort than its behavior alone would suggest.
 
-The central claim of this chapter is that friction accumulates where a web change crosses boundaries and commitments.
+Friction accumulates as a change crosses interfaces, teams, and commitments that are costly to reverse.
 Some of that friction protects users, data, and collaborators; some merely repeats work.
 The goal is not to remove every constraint, but to move useful evidence earlier and remove resistance that provides no corresponding control.
 
@@ -79,10 +79,7 @@ Follow the links for the architecture and migration details, then use the transf
 ::caption[Documented cases interpreted as forms of web-development friction.]
 ::label[table:documented-web-friction-cases]
 
-The cases cover the same route from a different angle.
-Spotify reduces the decisions required to start and deploy a web project; GitHub treats the development environment as replaceable infrastructure; Shopify brings architectural feedback into review; Stripe accepts deliberate migration work to protect live data; and Slack adds control to keep the validation system useful under load.
-Together they show why a shorter workflow is not automatically a better workflow.
-The useful outcome is a change path with less repeated work and enough evidence at each consequential boundary.
+The migration case exposes a question that setup speed alone cannot answer: when does a change stop being safely reversible through code alone?
 
 ## Find the commitment point
 
@@ -101,26 +98,17 @@ After the point, “roll back” must name what happens to accepted data and dep
 
 The [Reality chapter](/chapters/reality/) returns to compatibility, migration, rollback, and fix-forward under production pressure.
 Here, make the asymmetry between introduction and safe reversal visible.
-[Florian Herrengt's practitioner essay](https://blog.florianherrengt.com/ai-removing-middle-class-software-engineering.html) dramatizes this asymmetry with database changes; its broader labor-market prediction is outside this claim.
 
 ## Reduce friction without hiding the boundary
 
 ### Treat the environment as a versioned input
 
-A dependency lockfile does not describe the whole development environment.
-Runtime and package-manager versions, system packages, local services, configuration names, process readiness, supported platforms, and relevant resource limits can remain hidden on one workstation.
-For an agent, this state is part of the task rather than neutral background.
+Declare a path from a fresh checkout to a running application and its baseline checks, including toolchain versions, services, configuration names, supported platforms, and resource limits.
+Inject secrets at runtime and name external dependencies that the declaration cannot reconstruct.
 
-Declare the supported environment and one path from a fresh checkout to a running application and its baseline checks.
-Record required configuration names without secret values, inject secrets at runtime, and name the host, hardware, network, mutable data, and external-service boundaries that remain outside the declaration.
-A container or environment manager can implement this contract, but its presence does not by itself prove isolation or reproducibility.
-
-Use the cross-team audit as the test.
-Record setup time and outcome, undocumented intervention or retry, the failure stage, and relevant host or resource conditions.
-After a repair, replay the path from fresh state.
-The result supports a bounded claim about that setup—not that production is identical or that a stochastic agent will produce the same patch.
-
-[Appendix B: Reproducible development environments](/appendices/reproducible-environments/) distinguishes setup automation, declared environments, hermetic execution, and reproducible builds and provides the complete fresh-state audit.
+Use the cross-team audit to record setup time, failures, retries, and undocumented intervention.
+Replay repairs from fresh state.
+[Appendix B](/appendices/reproducible-environments/) develops the audit and distinguishes declared setup, isolation, and bit-for-bit reproducibility.
 
 ### Make ownership and contracts traceable
 
@@ -145,24 +133,15 @@ Choose the stack only when the measured benefit survives those ownership costs.
 
 #### Field note — A boundary discovered across projects
 
-Larger foundation models made it easy for me to expand [Slideotter](/case-studies/slideotter/) before its product model and backend responsibilities had settled.
-The codebase eventually became difficult enough to reason about that I am now considering redeveloping much of the backend.
-
-Developing [Kirjolab](/case-studies/kirjolab/) clarified the missing boundary.
-Both projects need a knowledge base that owns source material, relationships among sources, and provenance linking generated content back to those sources.
-Slideotter should own slide definitions and themes, while Kirjolab owns its research and writing workflows.
-Presentation-specific coordination may still carry references and temporary workflow state, but it should not duplicate ownership of the underlying knowledge.
-
-The agents made broad implementation feasible; they did not decide the durable boundary between the systems.
-Faster generation moved friction from producing features to discovering what each project should own.
+Agents helped me expand Slideotter before its product and backend responsibilities had settled.
+Developing Kirjolab exposed a shared need: source material and provenance should have one owner, while each product owns its writing or presentation workflow.
+The [Kirjolab case study](/case-studies/kirjolab/#what-i-would-do-differently) develops that proposed split.
+Faster generation moved my work from producing features to deciding what each project should own.
 
 This cost can be visible even when final behavior is unchanged.
 :citet[trivedi2026cleanliness] compared matched clean and deliberately degraded repositories across 660 agent trials.
 Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often.
 The result does not show that every clean-code rule improves every task, but it supports a narrower claim: maintainability can affect the operational footprint of agentic development, not only human preference.
-
-Compressed diffs and summaries can route attention, but a lossy view is not acceptance evidence.
-Keep the complete artifact and independent checks available; [Appendix A](/appendices/evaluating-agentic-workflows/#compressed-evidence-and-repeated-review) develops a bounded audit for compressed review evidence.
 
 ## Match feedback to the changed boundary
 
@@ -190,8 +169,7 @@ For one representative change, map the project's feedback ladder.
 ::caption[The project feedback ladder from focused checks to boundary-specific evidence.]
 ::label[table:feedback-ladder]
 
-The exact commands depend on the project.
-The important property is that each stage has a named purpose.
+Name the purpose of each stage and choose the commands accordingly.
 Measure both time-to-first-useful-failure and total readiness time.
 If a slow check repeatedly catches problems that no earlier stage sees, consider whether a cheaper focused signal can move that feedback forward without weakening the final gate.
 
@@ -237,12 +215,6 @@ It should:
 
 ## Summary
 
-Development friction is the resistance encountered while setting up, understanding, changing, testing, reviewing, deploying, operating, and coordinating a web system.
-Following one category change from browser to production shows why apparently local work becomes cross-boundary work.
-
-The documented Spotify, GitHub, Shopify, Stripe, and Slack cases show different responses: automate repeated setup, make environments replaceable, bring dependency evidence into review, stage committed data changes, and protect the feedback system under load.
-Their reported results belong to their own contexts, but the mechanisms provide questions that can be transferred to a smaller project.
-
-Some friction protects important boundaries, while accidental friction delays useful work without adding evidence or control.
-Agents can reduce visible implementation effort while moving cost into comprehension, debugging, review, operations, or long-term ownership.
-A versioned environment, traceable responsibilities, visible commitment points, and a risk-based feedback ladder make a web application easier to change without weakening its safeguards.
+Follow one change from the browser through contracts, data, validation, and deployment to locate its largest source of friction.
+Preserve checks that protect accepted behavior, expose the point where reversal becomes a coordinated operation, and move useful feedback earlier where possible.
+Repeat the same audit to see whether the next implementation actually makes the change easier.

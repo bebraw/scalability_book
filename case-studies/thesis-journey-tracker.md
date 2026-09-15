@@ -104,9 +104,7 @@ The repository has one contributor and does not expose adoption, uptime, support
 Several modules remain large, including calendar parsing and complex view components.
 The case therefore demonstrates fit and sustainability at its intended scale, not readiness for an institution-wide deployment.
 
-This distinction is important.
-Scalability is not maximum size.
-A system is successful when its development and operational model remain proportional to the demand it actually has.
+Evaluate the development and operational model against the demand the system actually serves.
 
 ## Comparison with the larger projects
 
@@ -137,15 +135,6 @@ I would improve the evidence around the deployed system:
 
 ## What Thesis Journey Tracker teaches
 
-Agentic development did not make the project successful merely by producing the first version quickly.
-The important choices were to bound the problem, consolidate the first pass, use the application in its intended setting, and let production concerns redirect later work.
-
-The case suggests four lessons:
-
-- A small negative product boundary can constrain agents more effectively than a long feature list.
-- Simple deployment architecture preserves attention for the domain workflow.
-- Production success creates new requirements around security, recovery, observability, and release authority.
-- A system should be evaluated at its intended scale before it is judged against hypothetical growth.
-
-Thesis Journey Tracker is less ambitious than Slideotter or Kirjolab, and that is part of why it works.
-Its development system is proportional to a real, bounded service rather than to every adjacent possibility.
+The tracker became a useful production tool by keeping one supervision workflow small, consolidating the first implementation, and letting use reveal operational requirements.
+That experience supports its fit at the intended small-team scale.
+Broader adoption would need new evidence about availability, load, support, and recovery.

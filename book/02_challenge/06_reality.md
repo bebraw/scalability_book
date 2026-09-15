@@ -3,9 +3,8 @@
 A web application that works locally has shown that one implementation can satisfy one workload in one controlled environment.
 Production changes the environment: browser applications and integrations retry, networks delay or lose responses, live data accumulates, shared dependencies slow down, deployments change running systems, and operators have to recover without discarding authoritative state.
 
-The central claim is that production failure exposes a mismatch between what an architecture assumed and what its operating environment actually did.
-The first task is therefore not to choose a scaling technique.
-It is to reconstruct the failure chain, identify the assumption that broke, find the earliest useful signal, and preserve a path back to useful service.
+Production failures expose architectural assumptions that do not hold under actual operating conditions.
+Reconstruct the failure chain, locate the earliest useful signal, and identify a path back to useful service.
 
 ## Local correctness leaves production assumptions untested
 
@@ -68,9 +67,8 @@ Treat each reported number as evidence about that system and use the transfer qu
 ::caption[Documented web incidents interpreted as failed assumptions and recovery questions.]
 ::label[table:documented-web-reality-cases]
 
-Read together, the cases expose four different failure mechanisms.
-Discord shows how retries can amplify reduced capacity; GitHub shows why protecting authoritative data may require prolonged degraded availability; Fastly shows how one valid configuration can acquire a global blast radius; and Cloudflare shows why recovery tooling cannot depend entirely on the service it must repair.
-The value lies in reconstructing those mechanisms from the linked sources rather than copying the companies' architectures or treating their remediations as universal patterns.
+Use one incident to identify the earliest point where a prepared control could have interrupted propagation.
+Then test that reasoning against a smaller event-tracker failure.
 
 ## Trace one failure across the web boundary
 
@@ -122,22 +120,10 @@ This framing turns “Will it scale?” into four more useful questions:
 
 ## Connect failed assumptions to response patterns
 
-Diagnosis comes before technique selection, but you still need a compact vocabulary for responding once a failed assumption and binding limit are visible.
-The patterns below are starting hypotheses rather than infrastructure that every implementation should acquire.
-
-| Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
-| ----------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Writes and reads compete for one path                       | Separate the authoritative write path from derived read views        | Define freshness, rebuild, and reconciliation; measure write completion and read usefulness  |
-| A burst contains work that need not finish synchronously    | Queue or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
-| A request may be repeated after an ambiguous result         | Use a stable idempotency key and authoritative deduplication         | Store the mutation and reusable result atomically; test a retry after a lost response        |
-| One tenant or domain instance consumes shared capacity      | Partition, quota, or isolate work by a meaningful domain boundary    | Define routing, fairness, cross-partition operations, and migration                          |
-| Incoming work exceeds the rate at which it can be completed | Apply backpressure, admission control, rate limits, or load shedding | Make rejection explicit, bound waiting, guide retries, and preserve the essential path       |
-| Optional work threatens a core operation                    | Degrade a named capability while preserving the core                 | Define the degraded user state, dependency boundary, recovery trigger, and completion signal |
-| History grows beyond the useful query or retention path     | Add a measured index, derived summary, archival, or deletion path    | Account for write cost, staleness, rebuild, retention policy, and restored-state checks      |
-
-These responses can be combined, but each combination creates another operating contract.
-A queue without idempotency can repeat effects, partitioning without a suitable key can make ordinary queries expensive, and rate limiting without useful client feedback can turn controlled rejection into immediate retry pressure.
-Choose the smallest response that addresses the observed or credibly projected limit.
+For the lost-response example, the response is an idempotent command: preserve one operation identity and return its recorded result on retry.
+The new obligation is atomic storage of the state change and reusable result.
+Other pressures call for different responses; [Chapter 8's response guide](/chapters/scaling/#start-with-the-pressure) connects them to the operating contracts they introduce.
+First check whether the measurements describe a coherent failure.
 
 The Little's Law relationship introduced in the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) can check one queue or in-flight boundary.
 If a stable event-processing stage contains an average of 120 waiting or active events and completes an average of 8 events per second, the implied average time in the stage is `W = L / λ = 120 / 8 = 15 seconds`.
@@ -163,9 +149,6 @@ The available response depends on what has already become externally visible or 
 
 ::caption[Recovery modes and the preparation each requires before an incident.]
 ::label[table:web-recovery-modes]
-
-The cases show that these modes can be combined.
-Discord shed optional work while capacity returned; GitHub degraded features and failed forward to protect accepted writes; Fastly disabled a triggering configuration before deploying a permanent fix; Cloudflare used break-glass access to restore a known-good route.
 
 Two boundaries deserve particular attention.
 First, recovery tooling should not depend entirely on the component it is meant to repair.
@@ -202,7 +185,7 @@ Do not claim that the project has reproduced the source company's scale, infrast
 
 Explain which assumptions differ between implementations A and B and which remain shared.
 A good reconstruction makes failure and recovery obligations visible without trying to solve every possible future problem.
-The [Scaling chapter](/chapters/scaling/) can then choose techniques in response to demonstrated pressure rather than previewing a catalog here.
+Use that diagnosis to choose and test a response in the [Scaling chapter](/chapters/scaling/).
 
 ## Project artifact
 
@@ -219,11 +202,6 @@ The artifact should:
 
 ## Summary
 
-Production exposes architectural assumptions that a local happy path leaves untested.
-The Discord, GitHub, Fastly, and Cloudflare incidents show different forms of the same structure: a latent condition meets a trigger, propagation crosses boundaries, user-visible behavior changes, and recovery depends on preparation that existed before the incident.
-
-Useful analysis connects consumer outcomes to the binding limit, amplification path, authoritative state, and recovery evidence.
-Retries can worsen saturation, automated failover can produce a topology the application cannot use safely, global configuration can create global blast radius, and rollback can fail when its control path shares the failed dependency.
-
-Reality asks what failed, how anyone knew, and how useful service could be recovered.
-Scaling follows by asking which architectural change is justified by that evidence.
+Trace a failure from trigger and latent condition through propagation, user effect, and recovery.
+Use the first useful signal to locate the broken assumption and evaluate a response with its new obligations.
+Recovery must protect authoritative state and remain possible when ordinary tools fail; successful requests can resume before reconciliation and deferred work are complete.

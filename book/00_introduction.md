@@ -11,12 +11,6 @@ The first is the web application that receives requests, moves data, preserves a
 The second is the development system of people, agents, tools, instructions, tests, and review that changes the application.
 Scaling one while ignoring the limits of the other does not create a scalable project.
 
-Coding agents make this connection especially important.
-In my own work, writing every line of a web application by hand is no longer the default: agents can now perform substantial parts of the implementation loop from a specification and feedback from their environment.
-That added production capacity does not remove the need for software engineering.
-It moves more human attention toward intent, architecture, constraints, validation, integration, and ownership while making weak feedback loops more consequential.
-
-Agents are consequently treated here in the context of web development rather than as a separate subject.
 The central question is how application behavior and the development process can continue to meet their goals as pressure grows.
 
 > **Sustainability angle**
@@ -43,14 +37,10 @@ The course project complements the book and lets you experience different ways o
 
 ## How this book was made
 
-I developed this book with GPT-5.5 and GPT-5.6 through the kind of iterative human-agent workflow it studies.
-That collaboration let me explore more material and build interactive web demonstrations, but it also made validation and curation the central editorial work.
-I kept the main path relatively light by moving deeper investigations into case studies and appendices.
-The online edition remains a living book, and its feedback tools are part of that continuing review.
-
-The broader implication is that agents can help a person create a book tailored to a topic they want to study.
-Producing text is no longer the main constraint; validation and curation are.
-The way I developed this book reflects how I now develop web software in collaboration with models, and many of the lessons extend beyond web development.
+I developed this book with GPT-5.5 and GPT-5.6 through the iterative human–agent workflow it studies.
+The collaboration let me explore more material and build interactive demonstrations; validation and curation remained my central editorial work.
+The [book's case study](/case-studies/elements-of-scalable-web-development/) examines that process and its evidence limits.
+The online edition remains a living book whose feedback tools support continuing review.
 
 ## One application, three development systems
 
@@ -101,4 +91,4 @@ The [common project specification](/project/) and current phase specification pr
 9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) synthesizes a justified target architecture and development workflow from the three builds.
 
 The main chapters provide the shortest path through the argument.
-The [appendices](/appendices/) preserve deeper evaluation methods, implementation details, security controls, and formal models for readers who need them.
+The [appendices](/parts/appendices/) preserve deeper evaluation methods, implementation details, security controls, and formal models for readers who need them.

@@ -55,11 +55,8 @@ I value a development environment that is easy to bootstrap and safe to bootstra
 Setup should be idempotent: rerunning it should converge on the supported project state or report a clear incompatibility instead of accumulating hidden changes.
 Without that property, stale dependencies and one-off repairs can eventually leave a project insecure or unable to run.
 
-An agent should be able to perform most validation locally.
-In my agent-assisted projects, remote CI has generally been too slow to serve as the primary feedback loop because an agent can produce several changes during one CI cycle.
-This does not make CI unnecessary.
-For larger projects, it remains valuable as an independent acceptance gate.
-Its role depends on the project's scope and the cost of its checks.
+In my agent-assisted projects, remote CI has usually been too slow for the primary feedback loop: an agent can produce several changes during one cycle.
+I use local validation during iteration and retain clean, independent CI where the acceptance risk justifies it.
 
 I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template), whose [affected-guardrail decision](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/implemented/ADR-026-run-affected-guardrails-when-possible.md) documents the focused path and its fallbacks to broader validation.
 The validation loop has several strengths:
@@ -74,5 +71,4 @@ The validation loop has several strengths:
 Affected validation introduces its own obligation: the selector must recognize configuration changes, deleted files, shared dependencies, and other cases that should widen the check.
 A fast loop is only useful when it fails conservatively instead of silently excluding relevant work.
 
-The goal is not to run fewer checks for its own sake.
-It is to give agents the fastest trustworthy feedback available while preserving broader and more independent validation for decisions that justify the additional cycle time.
+Give agents fast, trustworthy local feedback, and widen validation when the change's risk or scope requires it.
