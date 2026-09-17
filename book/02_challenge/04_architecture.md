@@ -311,6 +311,24 @@ The [HTTP caching specification](https://httpwg.org/specs/rfc9111.html) defines 
 - `Vary` makes selected request headers part of response selection.
   This can protect correctness, but every varying dimension can fragment the cache.
 
+Query parameters can fragment the cache even when the response is identical.
+For example, `/offer?utm_source=newsletter` and `/offer?utm_source=search` may serve the same page but occupy separate cache entries.
+The proposed `No-Vary-Search` response header lets an origin declare which query parameters a supporting cache may ignore when matching URLs:
+
+```http
+No-Vary-Search: params=("utm_source" "utm_medium")
+```
+
+With this policy, differences in those campaign parameters can permit reuse of a stored response, while a content-changing parameter such as `colour` still distinguishes responses.
+Unlike `Vary`, which selects responses using request headers, `No-Vary-Search` concerns the URL's query component.
+It changes matching, without rewriting the URL or relaxing storage, freshness, or validation requirements.
+
+List only parameters known to be safe to ignore so that new, unknown parameters still distinguish responses.
+Identical HTML is insufficient if reuse would bypass required server processing, such as authorization or signature verification.
+An ignored parameter also cannot be relied on to bypass the cache for debugging.
+As of September 2026, the [HTTP Working Group specification](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) remains a draft: verify syntax and behavior in the target caches before relying on it.
+Harry Roberts's [practical introduction](https://csswizardry.com/2026/05/better-browser-caching-with-no-vary-search/) develops the campaign-URL example further.
+
 Validators avoid retransmitting an unchanged body.
 An origin can attach an `ETag`; once the stored response needs validation, a cache sends that value through `If-None-Match`.
 A matching validator allows the origin to return `304 Not Modified` without the representation body, while a changed validator produces a new `200` response.
