@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "scalable-web-pilot",
+  "title": "Explore scalable web systems",
+  "description": "Two short modules: define a scaling claim, experiment with its limits, and design a useful measurement. Your progress stays in this browser.",
+  "modules": [
+    {
+      "id": "scalability",
+      "source": "./scalability.md",
+      "title": "Understand scaling pressure",
+      "description": "Name the pressure, predict an ideal speedup, and distinguish a model from evidence."
+    },
+    {
+      "id": "measurement",
+      "source": "./measurement.md",
+      "title": "Design a useful measurement",
+      "description": "Choose a measurement boundary, explore Little’s Law, and write a reproducible experiment."
+    }
+  ]
+}

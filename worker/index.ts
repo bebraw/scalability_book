@@ -1,4 +1,5 @@
 import { assetManifest } from "./generated/asset-manifest";
+import { studyHeaders } from "../shared/study-headers";
 
 type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
@@ -146,6 +147,10 @@ export default {
       response.headers.get("content-type")?.includes("text/html")
     ) {
       headers.set("Cache-Control", "public, max-age=300");
+    }
+
+    for (const [name, value] of Object.entries(studyHeaders(url.pathname))) {
+      headers.set(name, value);
     }
 
     return new Response(response.body, {

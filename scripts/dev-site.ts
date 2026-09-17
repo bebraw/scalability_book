@@ -12,6 +12,7 @@ import {
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { studyHeaders } from "../shared/study-headers.ts";
 
 const root = process.cwd();
 const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
@@ -34,6 +35,7 @@ const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
   [".js", "text/javascript; charset=utf-8"],
+  [".mjs", "text/javascript; charset=utf-8"],
   [".json", "application/json; charset=utf-8"],
   [".png", "image/png"],
   [".svg", "image/svg+xml"],
@@ -522,6 +524,7 @@ async function serveStatic(response, url) {
   response.writeHead(200, {
     "Content-Type":
       contentTypes.get(path.extname(file)) || "application/octet-stream",
+    ...studyHeaders(url.pathname),
   });
   return createReadStream(file).pipe(response);
 }
@@ -660,6 +663,7 @@ async function startSourceWatchers() {
   const sources = [
     { target: path.join(root, "book"), recursive: true },
     { target: path.join(root, "site"), recursive: true },
+    { target: path.join(root, "study"), recursive: true },
     { target: path.join(root, "scripts", "lib"), recursive: true },
     { target: path.join(root, "scripts", "build-site.ts"), recursive: false },
     { target: path.join(root, "bibliography.bib"), recursive: false },

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>More workers, same sequential work</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: clamp(16px, 3vh, 32px);
+        font:
+          20px/1.4 system-ui,
+          sans-serif;
+        color: #20342d;
+        background: #f4f7f2;
+      }
+      h1 {
+        font-size: clamp(24px, 3vw, 36px);
+        line-height: 1.1;
+        margin: 0 0 16px;
+      }
+      .result {
+        font-size: clamp(56px, 17vh, 100px);
+        font-weight: 750;
+        line-height: 1;
+        letter-spacing: -0.06em;
+      }
+      .bar {
+        display: flex;
+        height: 32px;
+        margin: 12px 0 8px;
+        background: #e0e6dc;
+      }
+      #serial {
+        background: #a94225;
+      }
+      #parallel {
+        background: #39765a;
+      }
+      label {
+        display: block;
+        margin: 20px 0;
+      }
+      input {
+        display: block;
+        width: 100%;
+        accent-color: #39765a;
+      }
+      .note {
+        font-size: 16px;
+        color: #48564d;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      p {
+        margin: 8px 0;
+      }
+      .controller {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 0 36px;
+      }
+      .controller > h1,
+      .controller > p:last-of-type {
+        grid-column: 1 / -1;
+      }
+      .controller > .result,
+      .controller > #summary,
+      .controller > .bar,
+      .controller > p {
+        grid-column: 1;
+      }
+      .controller > #controls {
+        grid-column: 2;
+        grid-row: 2 / 6;
+      }
+      @media (max-width: 650px) {
+        .controller {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>More workers, same sequential work</h1>
+    <div class="result" id="speedup"></div>
+    <p id="summary"></p>
+    <div class="bar" aria-hidden="true">
+      <div id="serial"></div>
+      <div id="parallel"></div>
+    </div>
+    <p class="note">
+      Rust: sequential time. Green: parallel time. Full track: time with one
+      worker.
+    </p>
+    <div id="controls">
+      <label
+        >Parallel portion <output id="portion-label"></output
+        ><input id="portion" type="range" min="0" max="100" step="5" value="80"
+      /></label>
+      <label
+        >Workers <output id="workers-label"></output
+        ><input id="workers" type="range" min="1" max="32" value="4"
+      /></label>
+    </div>
+    <p class="note">
+      Amdahl’s law: 1 / ((1 − p) + p / n). Fixed workload; ideal parallel
+      execution, no coordination overhead. Illustrative predictions, not
+      measurements.
+    </p>
+    <script>
+      const get = (id) => document.getElementById(id);
+      document.body.classList.toggle(
+        "controller",
+        LectureDemo.role === "controller",
+      );
+      LectureDemo.onState((state) => {
+        const portion = Number(state.portion ?? 80);
+        const workers = Number(state.workers ?? 4);
+        const serial = 1 - portion / 100;
+        const parallel = portion / 100 / workers;
+        get("speedup").textContent = (1 / (serial + parallel)).toFixed(2) + "×";
+        get("summary").textContent =
+          `${portion}% parallel work · ${workers} workers · ideal speedup`;
+        get("serial").style.width = serial * 100 + "%";
+        get("parallel").style.width = parallel * 100 + "%";
+        get("portion").value = portion;
+        get("workers").value = workers;
+        get("portion-label").textContent = portion + "%";
+        get("workers-label").textContent = workers;
+      });
+      get("controls").hidden = LectureDemo.role !== "controller";
+      for (const id of ["portion", "workers"]) {
+        get(id).addEventListener("input", () => {
+          LectureDemo.setState({
+            portion: Number(get("portion").value),
+            workers: Number(get("workers").value),
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

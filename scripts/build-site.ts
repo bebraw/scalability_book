@@ -8,6 +8,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import { buildStudy } from "./lib/study-build.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
   getPublicMarkdownSource,
@@ -659,6 +660,7 @@ await copyStaticAssets();
 await writeLabDownloads();
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
+await buildStudy(root, path.join(buildDir, "learn/pilot"));
 if (includeEditor) {
   await copyEditorAssets();
 }

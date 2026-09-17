@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.ts",
+    "study:export": "node scripts/export-study.ts",
     "comments:pull": "node scripts/sync-comments.ts pull",
     "comments:push": "node scripts/sync-comments.ts push",
     "comments:sync": "node scripts/sync-comments.ts sync",
