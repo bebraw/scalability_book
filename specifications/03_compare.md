@@ -252,4 +252,4 @@ Fleet size, transcript length, generated code volume, and architectural complexi
   Grade the mapping and debugging reasoning rather than adapter complexity or exact schema imitation.
 - Keep live ingestion and advanced graph visualization optional.
   The required learning outcome is trace-based understanding of the fleet, not integration with a particular agent platform.
-- Align the final comparison with the course learning outcomes and the 30-point project rubric when the rubric is finalized.
+- Align the final comparison with the course learning outcomes and the published [30-point project rubric](grading.md).

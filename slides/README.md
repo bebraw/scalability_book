@@ -1,7 +1,9 @@
 # Lecture slide drafts
 
 These nine Markdown decks provide a content-first starting point for the course lectures.
-They follow the sequence in `course_plan.md`, use the matching book chapter as their primary source, and end with the project evidence students should produce.
+They follow the topic sequence in `course_plan.md`, use the matching book chapter as their primary source, and end with the project evidence students should produce.
+Use `lecture_plan.md` for the actual session format: Lectures 4, 7, and 9 are primarily project presentations.
+Their decks supply preparation, brief framing, and selective discussion prompts; they are not additional full lectures to deliver alongside the presentations.
 
 Each file uses Marp-compatible frontmatter and `---` slide separators.
 The source comments at the end of each slide are intended to become speaker-note source blocks when the decks are converted to PowerPoint or another presentation format.

@@ -25,6 +25,12 @@ Lectures 4, 7, and 9 are primarily project-presentation sessions.
 Lectures 4 and 7 reserve only enough additional time to introduce the next project phase and answer immediate practical questions.
 The matching book material can be studied independently and revisited in later discussion when it helps interpret project evidence.
 The remaining lectures develop the ideas and practices that the teams need for the current project phase.
+The course-plan table describes the associated reading and project work as well as class activity; its evidence is not all produced during the lecture itself.
+The slide drafts are a pool of framing and discussion material, especially in presentation-led sessions.
+
+Before each phase begins, complete the [course environment sheet](specifications/course_environment.md) and confirm supported access, budget, and fallback arrangements.
+Implementation A is submitted before Lecture 4, B before Lecture 7, and C before Lecture 9.
+Schedule the bounded cross-team audit after each submission within the existing project allocation; announce the audit window and probe release separately so setup and change work do not consume presentation time.
 
 ## Lecture sequence
 
@@ -51,7 +57,9 @@ Possible elements:
 - use these experiences to open the chapter's discussion of intent, constraints, validation, correction, ownership, and development throughput;
 - compare places where agents accelerated work with places where they moved effort into review or debugging;
 - demonstrate a bounded agent-supported development task live;
-- discuss what evidence would be needed before accepting the demonstrated result.
+- discuss what evidence would be needed before accepting the demonstrated result;
+- connect the demonstration to the required reproducible harness, validation commands, and decision and AI-use records;
+- introduce the shared engineering-session protocol for use during Establish project work.
 
 The exact live demonstration can follow current student concerns.
 It is more useful to expose observation, failure, correction, and validation than to present a perfectly scripted successful run.
@@ -64,7 +72,7 @@ Possible elements:
 - discuss two or three concrete measurement or observability cases;
 - introduce Little's Law as a way to check whether measurements at one declared boundary are coherent;
 - demonstrate a benchmark, browser measurement, request trace, or observability workflow;
-- connect the examples to the evidence teams need for implementation A.
+- connect the examples to the shared baseline workload, one repeatable primary pressure, and development-workflow evidence teams will reuse across A, B, and C.
 
 One or two live demonstrations can be used depending on time and what the teams have already managed to implement.
 The goal is to leave teams able to create and interpret a modest, repeatable evidence baseline rather than to survey every observability tool.
@@ -84,8 +92,8 @@ A team might show:
 - one question the group is carrying forward.
 
 Connections to web architecture can emerge through the presentations and questions, but the session does not need to teach the architecture chapter separately.
-Students can study that material independently.
-Finish with a concise introduction to Challenge, the expectations for a fresh implementation B, and the practical questions teams need answered before starting.
+Assign the architecture chapter as preparation and revisit unclear boundaries during Lecture 5.
+Finish with a concise introduction to Challenge, the expectations for a fresh implementation B, the architecture hypothesis, permitted transfer of artifacts, and the practical questions teams need answered before starting.
 
 ### 5. Development friction
 
@@ -108,7 +116,8 @@ Possible elements:
 - connect pressure, failed assumption, saturation boundary, amplification, user-visible effect, response, and recovery;
 - revisit retries, idempotency, queues, backpressure, degradation, and recovery when the cases justify them;
 - apply Little's Law to a suitable queue or in-flight boundary;
-- connect the discussion to the A–B pressure evidence required for Challenge.
+- connect the discussion to the repeated primary pressure and one revealing secondary pressure required for Challenge;
+- show how a documented case becomes a project pressure map, distinguishing source facts, interpretation, and transfer to the students' application.
 
 The lecture can lean toward cases, a live pressure-map exercise, or project discussion depending on which form makes the causal chain clearest to the group.
 
@@ -124,8 +133,10 @@ Useful presentation material includes:
 - an interpretation together with a plausible alternative explanation.
 
 Use the presentations to separate observed differences from attribution to a model, stack, workflow, or growing team experience.
-Finish with a concise launch of Compare and implementation C, including the fleet constraint, required evidence, and immediate practical questions.
-Students can study the deeper treatment of task decomposition, authority, integration, review capacity, and Amdahl's Law independently.
+Finish with a concise launch of Compare and implementation C, including the fleet constraint, task and authority boundaries, integration and validation gates, and immediate practical questions.
+Point students to the portable trace example and the requirement to load their transformed fleet trace into C and explain at least two debugging findings.
+Assign the fleet chapter as preparation, including task decomposition, authority, integration, review capacity, and Amdahl's Law.
+Use Lecture 8 to work through the application and workflow models students must apply.
 
 ### 8. Scaling pressure and justified responses
 
@@ -134,8 +145,9 @@ Possible elements:
 - capture how students currently see scaling pressure and compare the answers with earlier discussions;
 - begin from observed or credibly projected limits rather than from a catalog of techniques;
 - discuss saturation, formal models, and examples of caching, indexing, queues, partitioning, rate limiting, orchestration, or geographical distribution;
+- work through one application-level model and one workflow-level model, naming variables, assumptions, evidence, and limits; use Amdahl's Law to discuss sequential integration or review work;
 - examine how each response moves complexity and creates another failure or recovery obligation;
-- connect the discussion to the before-and-after intervention and deployment work required for Compare.
+- connect the discussion to the before-and-after intervention in one selected implementation, a check of its new failure or recovery obligation, and the shared workload rerun after realistic deployment required for Compare.
 
 The balance between cases, interactive demonstrations, and project clinics can follow the evidence teams have available.
 Negative or unresolved interventions are worth discussing when the baseline, change, and uncertainty are clear.
@@ -145,7 +157,7 @@ Negative or unresolved interventions are worth discussing when the baseline, cha
 Reserve most of the session for teams to present implementation C and their A–B–C comparison.
 Ask teams to emphasize:
 
-- the strongest observed evidence;
+- the strongest observed evidence, including a finding from implementation C's fleet debugging view;
 - one important inference and its alternatives;
 - one proposed response that remains untested;
 - the conditional application and development-workflow decision they would make;
@@ -222,6 +234,7 @@ Neither a project card nor a four-minute stage contribution is meant to summariz
 Schedule one approximately 30-minute shared engineering session within each phase's project work, following the [common protocol](specifications/00_common_project.md#shared-engineering-sessions).
 Rotate operator, challenger, and validator responsibilities across Establish, Challenge, and Compare.
 Use the existing decision record or AI-use log for its evidence.
+These sessions take place within project work and replace ordinary discussion and reflection; they are not additional lecture activities or submissions.
 
 ## Learning diary and reflection
 
@@ -233,6 +246,8 @@ Entries do not need a rigid lecture template, but prompts can be offered when us
 - Which claim or decision would I now revise?
 - What did I personally contribute to or investigate in the current phase?
 - What remains uncertain, and how might I learn more?
+
+In each phase's existing self-assessment, require one consequential decision the student challenged, tested, or reviewed, with an evidence link and outcome, as specified in the [rubric](specifications/grading.md).
 
 At the end of each phase, students can reflect on the relationship between the group's evidence and their own current understanding.
 This does not require every student to have completed every task.
