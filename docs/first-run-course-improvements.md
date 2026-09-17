@@ -68,7 +68,7 @@ It does not require changing or displaying the official learning outcomes.
 
 ## 5. Protect instructor attention
 
-At the maximum cohort size, the current design can produce approximately 45 group-phase submissions, 450 lecture-diary entries, 150 phase-level self- and peer-assessment packages, and 39–45 stage presentations.
+At the maximum cohort size, the current design can produce approximately 51 group-phase submissions, 450 lecture-diary entries, 150 phase-level self- and peer-assessment packages, and 51 stage presentations when about 50 students form 17 groups.
 
 Before launch:
 

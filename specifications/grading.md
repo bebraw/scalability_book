@@ -72,6 +72,9 @@ Production polish is not graded; specificity and reflection are.
 | Response to feedback and group reflection  |    0-3 | Summarizes agreements and differences, records one adjustment, and identifies a groupworking condition that affected the result.                                                                 |
 | Reliable contribution and shared ownership |    0-3 | Instructor judgment based on corroborated project history, submitted evidence, self-assessment, and peer reports shows that the student contributed and supported shared acceptance of the work. |
 
+In each phase's existing self-assessment, answer: “Identify one consequential decision you challenged, tested, or reviewed; link the evidence and explain the outcome.”
+Use this evidence when assessing contribution and shared ownership; prompt counts, commit counts, and transcript length do not establish learning or contribution.
+
 Peer ratings are evidence, not automatic votes on another student's grade.
 The instructor resolves unsupported, retaliatory, mutually inflated, or contradictory reports against the project record and may ask for clarification.
 Private circumstances should be handled through the course's ordinary support process rather than disclosed to teammates in detail.
@@ -90,7 +93,7 @@ To pass, a student must:
 2. receive at least 50% of the available total points.
 
 Let `p = 100 × earned_points / available_points` after any formally approved absence adjustment.
-The final grade is:
+Once all passing requirements are met, the final grade is:
 
 |       Percentage | Grade |
 | ---------------: | ----: |

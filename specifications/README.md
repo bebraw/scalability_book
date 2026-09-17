@@ -11,6 +11,7 @@ The [course environment sheet](course_environment.md) defines the model, harness
 The [assessment rubric](grading.md) defines the project, participation, learning-diary, and self- and peer-assessment scoring.
 
 Read the common specification together with the current phase specification.
+Every phase includes a shared engineering session with rotating responsibilities.
 
 ## How chapter artifacts become submissions
 

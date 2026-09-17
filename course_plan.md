@@ -91,6 +91,10 @@ This should remain a domain choice within the event-tracking brief rather than a
 
 Each project phase should include evidence that the application or design has been run in a realistic environment: a local deployment command, hosted URL, container, deployment notes, benchmark run, logs, screenshots from a running instance, or another operational artifact appropriate to the phase.
 
+Each phase includes one approximately 30-minute [shared engineering session](specifications/00_common_project.md#shared-engineering-sessions), with operator, challenger, and validator responsibilities rotating across phases.
+Each student predicts first, the group investigates with the agent, and a student other than the operator explains the acceptance decision.
+The record belongs in the existing decision record or AI-use log.
+
 The students are expected to perform self- and peer-assessment after each phase of the project so feedback may be shared with the project group and the students can reflect on their groupworking.
 
 ## Course learning diary
@@ -136,3 +140,6 @@ I've done a rough calculation of the hour distribution below (average case):
 
 The phase allocations are planning budgets rather than required time sheets.
 When the common core or evidence cannot fit the budget, reduce optional scope before weakening acceptance, recovery, or review evidence.
+
+The shared engineering sessions replace ordinary project discussion and reflection within these budgets.
+Reuse session decisions in existing records rather than adding reports; the total remains 135 hours.

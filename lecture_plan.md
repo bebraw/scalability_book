@@ -33,7 +33,7 @@ The remaining lectures develop the ideas and practices that the teams need for t
 Possible elements:
 
 - introduce the course, related work, practical arrangements, and the three-project structure;
-- form the teams, unless they have been formed beforehand;
+- form teams, unless already formed: groups must have three students wherever possible, with instructor-arranged exceptions for cohort remainders, support needs, or membership changes;
 - explain how group projects, lectures, learning diaries, reflection, and assessment fit together;
 - collect students' initial associations with scalability through a word cloud or similar activity;
 - discuss the different views of scalability developed in the first chapter;
@@ -177,8 +177,7 @@ The lecturer can help by asking about boundaries, evidence, trade-offs, alternat
 
 ### Large-cohort option
 
-With approximately 50 students, 13–15 teams are workable when Lectures 4, 7, and 9 devote most of their time to presentations.
-Team size can therefore follow what supports the projects and student participation rather than being determined only by stage time.
+With approximately 50 students, plan for about 17 teams and adapt presentation timing to the actual cohort.
 
 Before Lectures 4, 7, and 9, each team can submit a lightweight **project card** assembled from its existing deliverables:
 
@@ -194,9 +193,10 @@ They support rather than replace the stage presentations.
 
 When every team presents at every checkpoint, a workable default is:
 
-1. **Team presentations, approximately 65–75 minutes.** Give each of 13–15 teams about five minutes. A team can use roughly four minutes for the project and one minute for a clarifying question or transition.
+1. **Team presentations, approximately 68 minutes.** Give each of about 17 teams four minutes, including a brief clarifying question or transition.
 2. **Shared interpretation, approximately 10 minutes.** Collect questions and comparisons during the presentations, then discuss recurring themes or two particularly useful contrasts rather than opening a long question period after every team.
-3. **Phase transition.** In Lectures 4 and 7, use the remaining planned time and, when useful, part of the 15-minute margin to introduce the next project. Lecture 9 can use this time for the final word cloud and reflection.
+3. **Phase transition.** In Lectures 4 and 7, use the remaining planned time and, when useful, part of the 15-minute margin to introduce the next project.
+   Lecture 9 can use this time for the final word cloud and reflection.
 
 This deliberately gives the presentation-focused lectures a different balance from the other meetings.
 The architecture, fleet, and recap chapters do not also need to be delivered as condensed lectures during the same session.
@@ -205,7 +205,7 @@ If some projects need deeper discussion, rotating spotlight presentations remain
 Every team can still provide a short update, while a few teams receive a longer question period because their results expose a useful contrast, failure, or unresolved issue.
 
 If the room supports movement, a demo gallery is another option.
-Half of each team stays with the project while the other half visits, and the roles switch midway.
+One member of each trio hosts the project while two visit; rotate through three rounds so everyone hosts and visits.
 A short plenary then brings forward contrasting results or questions that occurred across several teams.
 
 The presentation focus can change by phase:
@@ -215,7 +215,13 @@ The presentation focus can change by phase:
 - **Lecture 9:** one conditional decision, the strongest observation supporting it, and the next boundary or question.
 
 Teams can rotate speakers across the three phases.
-Neither a project card nor a five-minute stage contribution is meant to summarize the whole submission; each gives the class enough shared evidence to notice patterns and decide what deserves discussion.
+Neither a project card nor a four-minute stage contribution is meant to summarize the whole submission; each gives the class enough shared evidence to notice patterns and decide what deserves discussion.
+
+## Shared engineering sessions
+
+Schedule one approximately 30-minute shared engineering session within each phase's project work, following the [common protocol](specifications/00_common_project.md#shared-engineering-sessions).
+Rotate operator, challenger, and validator responsibilities across Establish, Challenge, and Compare.
+Use the existing decision record or AI-use log for its evidence.
 
 ## Learning diary and reflection
 

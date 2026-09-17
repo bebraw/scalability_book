@@ -17,6 +17,31 @@ The purpose is to compare how different development systems approach the same bo
 The phase specifications define additional constraints and deliverables.
 This common specification applies to all three phases.
 
+## Shared engineering sessions
+
+Each group must hold one shared engineering session of approximately 30 minutes per phase, within its existing project work.
+Use three responsibilities: **operator** works with the agent and explains the request; **challenger** questions assumptions and proposes alternatives; **validator** inspects the implementation, runs checks, and explains the acceptance decision.
+Rotate these responsibilities across phases so each student practices all three.
+For an approved pair, combine challenger and validator and rotate the operator; for a larger group, divide active investigation and validation tasks so everyone contributes.
+
+Use this sequence:
+
+1. Before consulting the agent, each student briefly predicts the behavior or proposes a design.
+2. Compare predictions, agree on the question, and investigate the implementation with the agent.
+3. Run a relevant check and have someone other than the operator explain whether to accept, revise, or reject the result and what remains uncertain.
+
+Use a question tied to the current phase:
+
+- **Establish:** Does a work-item transition reliably produce the corresponding activity event?
+- **Challenge:** What happens when two clients attempt the same transition concurrently?
+- **Compare:** Does a proposed scaling response improve the measured limit, and what new failure can it introduce?
+
+An equivalent question is acceptable when it examines the same phase's correctness, pressure, or scaling reasoning.
+Record participants and responsibilities, the initial disagreement or prediction, the check and result, and the acceptance decision compactly in the existing decision record or AI-use log.
+Link the relevant code or evidence; do not submit another report or a raw chat transcript.
+This session replaces part of ordinary project discussion and reflection within the published time budget.
+Shared work may be remote and does not require a shared personal account.
+
 ---
 
 ## 1. Application Brief
