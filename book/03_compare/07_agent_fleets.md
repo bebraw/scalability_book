@@ -58,6 +58,8 @@ Predict the effect of the next agent before moving the control, then compare the
 
 {{ import "site/includes/amdahl-law-demo.html" }}
 
+{{ import "exercise:fleets-amdahl" }}
+
 Apply the calculation to one observed fleet task.
 Name the sequential work and keep coordination time visible rather than hiding it inside the parallel share.
 The difference between the ideal bound and the observed result is evidence about coordination cost, not proof that the law failed.

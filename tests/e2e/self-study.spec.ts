@@ -1,9 +1,155 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import course from "../../study/pilot/course.json" with { type: "json" };
 
 const root = "/learn/pilot/";
 const scalability = root + "scalability/index.html";
 const measurement = root + "measurement/index.html";
+
+for (const module of course.modules
+  .slice()
+  .filter((m) => !["scalability", "measurement"].includes(m.id))) {
+  test(`${module.id}: reading, feedback, links, and mobile demos`, async ({
+    page,
+    request,
+    browser,
+    baseURL,
+  }) => {
+    const url = root + module.id + "/index.html";
+    const data = await (
+      await request.get(root + module.id + "/module.json")
+    ).json();
+    expect(data.steps).toHaveLength(5);
+    expect(JSON.stringify(data)).not.toMatch(
+      /speaker-notes|defaultId|study-pilot-|\/Users\//,
+    );
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const step of data.steps) {
+      await page.goto(url + "#slide-" + step.id);
+      const section = page.locator("#slide-" + step.id);
+      await expect(section).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      for (const link of await section.locator("a").all()) {
+        const href = await link.getAttribute("href");
+        expect((await request.get(new URL(href!, page.url()).href)).ok()).toBe(
+          true,
+        );
+      }
+      expect(await section.innerText()).not.toMatch(/\]\(\.\//);
+      if (step.demo) {
+        await expect(section.locator(".demo-host")).toHaveAttribute(
+          "data-demo-status",
+          "ready",
+        );
+        const frame = section.frameLocator("iframe");
+        await expect(frame.locator("#controls")).toBeVisible();
+        expect(
+          await frame
+            .locator("body")
+            .evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+        ).toBe(true);
+        await page.screenshot({
+          path: test.info().outputPath(module.id + "-mobile.png"),
+          fullPage: true,
+        });
+      }
+      if (step.activity?.correctOption) {
+        const { options, correctOption } = step.activity;
+        const wrong = options.find(
+          (option: { id: string }) => option.id !== correctOption,
+        );
+        const right = options.find(
+          (option: { id: string }) => option.id === correctOption,
+        );
+        await section.getByLabel(wrong.label, { exact: true }).check();
+        await section.getByRole("button", { name: "Check answer" }).click();
+        await expect(section.locator(".answer-result")).toContainText(
+          "Not quite",
+        );
+        await section.getByLabel(right.label, { exact: true }).check();
+        await section.getByRole("button", { name: "Check answer" }).click();
+        await expect(section.locator(".answer-result")).toContainText(
+          "Correct",
+        );
+      }
+    }
+    await page
+      .locator("#slide-apply")
+      .getByText("Reveal discussion", { exact: true })
+      .click();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(errors).toEqual([]);
+    const context = await browser.newContext({
+      javaScriptEnabled: false,
+      baseURL,
+      viewport: { width: 390, height: 844 },
+    });
+    const reading = await context.newPage();
+    await reading.goto(url);
+    await expect(reading.locator(".study-step:visible")).toHaveCount(5);
+    for (const poster of await reading.locator(".demo-poster").all())
+      await expect(poster).toBeVisible();
+    for (const host of await reading.locator(".demo-host").all())
+      await expect(host).toBeHidden();
+    expect(
+      await reading.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await context.close();
+  });
+}
+
+test("new demos exercise acceptance, uncertain writes, friction, and capacity", async ({
+  page,
+}) => {
+  await page.goto(root + "agent-development/index.html#slide-gates");
+  let demo = page.frameLocator("#slide-gates iframe");
+  for (const name of ["PLAN APPROVED", "PATCH READY", "TESTS PASS"])
+    await demo.getByRole("button", { name, exact: true }).click();
+  await expect(
+    demo.getByRole("button", { name: "RELEASE", exact: true }),
+  ).toHaveCount(0);
+  for (const name of [
+    "REVIEW START",
+    "REQUEST CHANGES",
+    "PATCH READY",
+    "TESTS PASS",
+    "REVIEW START",
+    "APPROVE",
+    "RELEASE",
+  ])
+    await demo.getByRole("button", { name, exact: true }).click();
+  await expect(demo.locator("#verdict")).toHaveText("Change released.");
+  await page.goto(root + "architecture/index.html#slide-request");
+  demo = page.frameLocator("#slide-request iframe");
+  for (const scenario of ["lost", "retry"]) {
+    await demo.locator("#scenario").selectOption(scenario);
+    for (let i = 0; i < 4; i++)
+      await demo.getByRole("button", { name: "Next boundary" }).click();
+    await expect(demo.locator("#outcome")).toContainText("One durable effect");
+  }
+  await page.goto(root + "friction/index.html#slide-timings");
+  demo = page.frameLocator("#slide-timings iframe");
+  await expect(demo.locator("#total")).toHaveText("60");
+  await demo.getByRole("button", { name: "Halve editing time" }).click();
+  await expect(demo.locator("#total")).toHaveText("55");
+  await page.goto(root + "responses/index.html#slide-capacity");
+  demo = page.frameLocator("#slide-capacity iframe");
+  await demo.locator("#load").fill("150");
+  await expect(demo.locator("#effect")).toHaveText("Backlog grows by 40/s");
+  await demo.locator("#admission").check();
+  await expect(demo.locator("#effect")).toHaveText("40/s explicitly rejected");
+  await demo.getByRole("button", { name: "Add 40/s at limit" }).click();
+  await expect(demo.locator("#limit")).toHaveText("Downstream · 130/s");
+  await expect(demo.locator("#effect")).toHaveText("20/s explicitly rejected");
+});
 
 test("authored reading and module links render as working anchors", async ({
   page,
@@ -46,9 +192,8 @@ test("pilot has independent demos, persistent progress, and authored feedback", 
   browser,
 }) => {
   const errors: string[] = [];
-  await page.goto("/");
-  await page.getByRole("link", { name: "Explore the modules" }).click();
-  await expect(page.locator(".module-list li")).toHaveCount(2);
+  await page.goto(root);
+  await expect(page.locator(".module-list li")).toHaveCount(9);
   await page.locator(".module-start").first().click();
   page.on("pageerror", (error) => errors.push(error.message));
   await page.locator("#slide-pressure .complete-step").click();

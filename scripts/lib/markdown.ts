@@ -1,3 +1,4 @@
+import { renderExercise } from "./exercise-html.ts";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Cite } from "@citation-js/core";
@@ -185,6 +186,8 @@ export function getPublicMarkdownSource(source: string): string {
 }
 
 function readMarkdownImport(importPath: string): string {
+  if (importPath.startsWith("exercise:"))
+    return renderExercise(importPath.slice(9));
   if (path.isAbsolute(importPath) || !importPath.endsWith(".html")) {
     throw new Error(`Invalid Markdown import path: ${importPath}`);
   }

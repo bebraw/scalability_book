@@ -1,5 +1,8 @@
-import { assetManifest } from "./generated/asset-manifest";
-import { studyHeaders } from "../shared/study-headers";
+import type { D1Database } from "@cloudflare/workers-types";
+import { handleLearning, d1AnswerStore } from "./learning.ts";
+import { safeReturnTo } from "../shared/exercises.ts";
+import { assetManifest } from "./generated/asset-manifest.ts";
+import { studyHeaders } from "../shared/study-headers.ts";
 
 type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
@@ -35,6 +38,7 @@ type KVNamespace<Key extends string = string> = {
 
 type Env = {
   ASSETS: Fetcher;
+  LEARNING_DB?: D1Database;
   COMMENTS_KV?: KVNamespace;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
@@ -78,6 +82,15 @@ export default {
         ok: true,
         assets: assetManifest.length,
       });
+    }
+
+    if (url.pathname.startsWith("/api/learning/")) {
+      const user = await getSessionUser(request, env);
+      return handleLearning(
+        request,
+        user?.id && Number.isSafeInteger(user.id) ? `github:${user.id}` : null,
+        env.LEARNING_DB ? d1AnswerStore(env.LEARNING_DB) : undefined,
+      );
     }
 
     if (url.pathname.startsWith("/api/auth/")) {
@@ -209,9 +222,20 @@ async function handleAuthRequest(
     redirect.searchParams.set("scope", "read:user");
     redirect.searchParams.set("state", state);
 
-    return redirectResponse(redirect.toString(), {
-      "Set-Cookie": buildCookie(oauthStateCookie, state, { maxAge: 600 }),
-    });
+    const headers = new Headers();
+    headers.append(
+      "Set-Cookie",
+      buildCookie(oauthStateCookie, state, { maxAge: 600 }),
+    );
+    headers.append(
+      "Set-Cookie",
+      buildCookie(
+        "scalableweb_return_to",
+        safeReturnTo(url.searchParams.get("returnTo")),
+        { maxAge: 600 },
+      ),
+    );
+    return redirectResponse(redirect.toString(), headers);
   }
 
   if (url.pathname === "/api/auth/github/callback") {
@@ -264,23 +288,28 @@ async function handleAuthRequest(
       },
     });
     const githubUser = (await userResponse.json()) as {
+      id?: number;
       login?: string;
       avatar_url?: string;
       html_url?: string;
     };
 
-    if (!githubUser.login) {
+    if (!githubUser.login || !Number.isSafeInteger(githubUser.id)) {
       return json({ message: "Unable to read GitHub user" }, { status: 400 });
     }
 
     const user = {
+      id: githubUser.id,
       login: githubUser.login,
       avatarUrl: githubUser.avatar_url || null,
       url: githubUser.html_url || null,
     };
     const session = await signSession(user, env);
 
-    const headers = new Headers({ Location: "/" });
+    const headers = new Headers({
+      Location: safeReturnTo(getCookie(request, "scalableweb_return_to")),
+    });
+    headers.append("Set-Cookie", expireCookie("scalableweb_return_to"));
     headers.append(
       "Set-Cookie",
       buildCookie(sessionCookie, session, { maxAge: 60 * 60 * 24 * 30 }),
@@ -928,15 +957,33 @@ async function getSessionUser(request: Request, env: Env) {
     return null;
   }
 
-  const expected = await hmac(payload, env.SESSION_SECRET);
-
-  if (signature !== expected) {
+  try {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(env.SESSION_SECRET),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"],
+    );
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      Uint8Array.from(atobUrl(signature), (c) => c.charCodeAt(0)),
+      new TextEncoder().encode(payload),
+    );
+    if (!valid) return null;
+  } catch {
     return null;
   }
 
   let data: {
     exp: number;
-    user: { login: string; avatarUrl: string | null; url: string | null };
+    user: {
+      id?: number;
+      login: string;
+      avatarUrl: string | null;
+      url: string | null;
+    };
   };
 
   try {
@@ -945,7 +992,13 @@ async function getSessionUser(request: Request, env: Env) {
     return null;
   }
 
-  if (data.exp < Date.now()) {
+  if (
+    !data ||
+    !Number.isFinite(data.exp) ||
+    data.exp < Date.now() ||
+    !data.user ||
+    typeof data.user.login !== "string"
+  ) {
     return null;
   }
 
@@ -1017,7 +1070,11 @@ function getCookie(request: Request, name: string) {
   const cookies = request.headers.get("Cookie") || "";
   const match = cookies.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
 
-  return match?.[1] ? decodeURIComponent(match[1]) : null;
+  try {
+    return match?.[1] ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
 }
 
 function getClientIp(request: Request) {
@@ -1042,18 +1099,19 @@ function expireCookie(name: string) {
 }
 
 function redirectResponse(location: string, headers: HeadersInit = {}) {
+  const responseHeaders = new Headers(headers);
+  responseHeaders.set("Location", location);
+  responseHeaders.set("Cache-Control", "private, no-store");
   return new Response(null, {
     status: 302,
-    headers: {
-      Location: location,
-      ...headers,
-    },
+    headers: responseHeaders,
   });
 }
 
 function json(data: unknown, init: ResponseInit = {}) {
   const headers = new Headers(init.headers);
   headers.set("Content-Type", "application/json; charset=utf-8");
+  headers.set("Cache-Control", "private, no-store");
 
   return new Response(JSON.stringify(data), {
     ...init,

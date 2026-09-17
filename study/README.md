@@ -1,7 +1,8 @@
 # Self-study pilot
 
-The site build exports two reviewed learning modules to `/learn/pilot/`.
-The public sequence is deliberately smaller than the nine university lectures.
+The site build exports nine learning modules to `/learn/pilot/`.
+Each module is a short independent adaptation of its matching book chapter and lecture.
+Presentation-led sessions become conceptual exercises, with classroom logistics omitted.
 Obsidian remains the source for live teaching; `pilot/` is the versioned publication source.
 
 ## Build and preview
@@ -29,7 +30,10 @@ An npm exporter package can replace this checkout adapter later without changing
 5. Deploy the complete site through its normal deployment process; do not overlay individual chunks from different exports.
 
 Local Markdown images and `demoPoster` assets are embedded by the exporter.
-The pilot includes the book's pressure-to-evidence SVG, Amdahl's model, and the lecture's Little's Law demo.
+The pilot includes the book's pressure-to-evidence SVG and six interactive models: Amdahl, Little's Law, delivery acceptance, request boundaries, development friction, and saturation.
+The four newly copied HTML demos and posters come from the Obsidian lecture assets; published copies are maintained here.
+The request-path and acceptance demos include mobile wrapping fixes in these local copies.
+No live agent service is required by the agent-development exercises.
 These are illustrative models, with assumptions and public explanations beside them.
 The SVG posters are authored static illustrations, not recorded demo state.
 Studio hides posters only after a demo initializes successfully; print, failed-demo, and no-JavaScript views retain them.
@@ -48,3 +52,22 @@ The site uses the generated bundle directly, without HTML normalization or CSS f
 No audience service, authentication, or Studio server is required to use the pilot.
 
 Canonical exporter contract: [Lecture Studio self-study handover](https://github.com/bebraw/lecture-studio/blob/186da328a3deea328c85b566d107174ce645552c/docs/self-study-handover.md).
+
+## Module map
+
+| Lecture / chapter             | Published module  | Interactive model                |
+| ----------------------------- | ----------------- | -------------------------------- |
+| 1 Scalability                 | scalability       | Amdahl                           |
+| 2 Agent-supported development | agent-development | Delivery acceptance              |
+| 3 Measurement                 | measurement       | Little’s Law                     |
+| 4 Architecture                | architecture      | Request boundaries               |
+| 5 Development friction        | friction          | Workflow timings                 |
+| 6 Assumptions under pressure  | pressure          | Retry safety                     |
+| 7 Agent fleets                | fleets            | Amdahl                           |
+| 8 Scaling responses           | responses         | Saturation                       |
+| 9 Engineering judgment        | judgment          | Comparison tables and reflection |
+
+Every module has five sections, formative feedback, an application prompt, and a chapter link.
+The established course ID and `/learn/pilot/` URLs remain stable during this expansion.
+Existing modules retain their IDs and content so adding modules does not invalidate their saved progress.
+Relative links currently use `./` prefixes to work around Studio’s URL filter (upstream report, finding 5).

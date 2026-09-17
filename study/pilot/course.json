@@ -2,7 +2,7 @@
   "version": 1,
   "id": "scalable-web-pilot",
   "title": "Explore scalable web systems",
-  "description": "Two short modules: define a scaling claim, experiment with its limits, and design a useful measurement. Your progress stays in this browser.",
+  "description": "Nine short modules connect scaling claims, agent-supported development, measurement, architecture, pressure, and engineering decisions. Your progress stays in this browser.",
   "modules": [
     {
       "id": "scalability",
@@ -11,10 +11,52 @@
       "description": "Name the pressure, predict an ideal speedup, and distinguish a model from evidence."
     },
     {
+      "id": "agent-development",
+      "source": "./agent-development.md",
+      "title": "Make agent work reviewable",
+      "description": "Bound a change, exercise acceptance gates, and improve the feedback loop."
+    },
+    {
       "id": "measurement",
       "source": "./measurement.md",
       "title": "Design a useful measurement",
       "description": "Choose a measurement boundary, explore Little’s Law, and write a reproducible experiment."
+    },
+    {
+      "id": "architecture",
+      "source": "./architecture.md",
+      "title": "Follow a request across boundaries",
+      "description": "Locate authority, inspect an uncertain write, and state an architectural hypothesis."
+    },
+    {
+      "id": "friction",
+      "source": "./friction.md",
+      "title": "Find the cost around a change",
+      "description": "Separate workflow costs, experiment with illustrative timings, and test one improvement."
+    },
+    {
+      "id": "pressure",
+      "source": "./pressure.md",
+      "title": "Expose an assumption under pressure",
+      "description": "Trace a failure chain, examine retry safety, and design a discriminating pressure test."
+    },
+    {
+      "id": "fleets",
+      "source": "./fleets.md",
+      "title": "Bound parallel agent work",
+      "description": "Define task contracts, explore sequential limits, and preserve integration evidence."
+    },
+    {
+      "id": "responses",
+      "source": "./responses.md",
+      "title": "Choose and test a scaling response",
+      "description": "Find a binding limit, move it in a model, and test the cost introduced by an intervention."
+    },
+    {
+      "id": "judgment",
+      "source": "./judgment.md",
+      "title": "Make a conditional engineering decision",
+      "description": "Separate observation from explanation, compare consequences, and identify the next check."
     }
   ]
 }

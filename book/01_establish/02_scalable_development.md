@@ -158,6 +158,8 @@ The demonstration applies that pattern to delivering a code change.
 
 {{ import "site/includes/statechart-boundary-demo.html" }}
 
+{{ import "exercise:development-gates" }}
+
 One cancellation rule covers the active state, tests and human review can proceed independently, and either failure can return the workflow to implementation.
 The statechart restricts the available routes; the checks and reviewer still determine whether the code meets the requirement.
 Deterministic controls can encode a wrong or incomplete rule.

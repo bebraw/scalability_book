@@ -36,6 +36,8 @@ Each boundary has an owner, a failure mode, and a contract that future clients, 
 
 {{ import "site/includes/request-trace-demo.html" }}
 
+{{ import "exercise:architecture-outcome" }}
+
 Use this trace before drawing the architecture diagram.
 If the request path is unclear, the diagram is likely to hide the most important architectural decisions.
 

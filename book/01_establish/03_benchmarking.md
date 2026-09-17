@@ -29,6 +29,8 @@ The demonstration below models 60 requests to an event-recording endpoint.
 Change the number of concurrent clients, the share of requests that take a slow storage path, and the p95 latency objective.
 The values are deterministic and run only in the browser, so this is a teaching model rather than a capacity test.
 
+{{ import "exercise:measurement-prediction" }}
+
 {{ import "site/includes/benchmark-simulation-demo.html" }}
 
 Predict the default result before running the simulated workload, then compare the average with p95.
@@ -134,6 +136,8 @@ Use the lab below to check whether three observed averages are mutually consiste
 Change one value at a time and explain whether the mismatch suggests overload, incompatible measurement windows, or a missing boundary.
 
 {{ import "site/includes/little-law-demo.html" }}
+
+{{ import "exercise:measurement-boundary" }}
 
 The law does not identify the cause of latency, prove that a queue is healthy, or promise that the system can sustain any chosen arrival rate.
 Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
@@ -288,6 +292,8 @@ I let agents draft records, but negotiate important choices carefully; implement
 Those records preserve the rationale I accepted, not every prompt, disagreement, retry, or abandoned path.
 They cannot reconstruct the complete agent workflow.
 For the course comparison, preserve the selected task's trace and correction record while the work happens, rather than trying to infer them later from the accepted repository.
+
+{{ import "exercise:measurement-experiment" }}
 
 ## Project artifact
 

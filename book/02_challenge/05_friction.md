@@ -182,6 +182,8 @@ It separates agent speed from workflow quality, because an agent can produce mor
 
 {{ import "site/includes/workflow-loop-demo.html" }}
 
+{{ import "exercise:friction-cycle" }}
+
 Use this first to make the human-in-the-loop process explicit.
 Then use the friction audit to ask which part of that process is creating repeated work.
 

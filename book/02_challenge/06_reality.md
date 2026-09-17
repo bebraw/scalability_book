@@ -163,6 +163,8 @@ The consequences persist: a response may protect one boundary while moving waiti
 
 {{ import "site/includes/pressure-map-demo.html" }}
 
+{{ import "exercise:pressure-retries" }}
+
 Try one path, inspect the debrief, and replay with a different response.
 Use the exported brief to connect the operating pressure to the stressed component, binding limit, likely failure, first signal, and prepared recovery.
 The values are deterministic teaching inputs rather than measured capacity, so the useful evidence is the causal explanation and not the final number.

@@ -4,6 +4,14 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-05-02",
   "compatibility_flags": ["nodejs_compat"],
+  // Private exercise answers use a separate D1 database. Provision and migrate
+  // it before enabling production saves; see docs/chapter-exercises.md.
+  // "d1_databases": [{
+  //   "binding": "LEARNING_DB",
+  //   "database_name": "scalability-book-learning",
+  //   "database_id": "<created-database-id>",
+  //   "migrations_dir": "migrations"
+  // }],
   "build": {
     "command": "npm run worker:build",
   },

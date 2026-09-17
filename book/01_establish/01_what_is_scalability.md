@@ -220,6 +220,8 @@ The weights are deterministic teaching inputs, not measurements of a real applic
 
 {{ import "site/includes/scalability-dimensions-demo.html" }}
 
+{{ import "exercise:scalability-contract" }}
+
 Choose one leading dimension and write its pressure, maintained goal, likely first limit, and first useful signal.
 Then select a second pressure and inspect how the conclusion changes.
 If several dimensions rise together, preserve them as separate claims instead of averaging them into a single scalability score.

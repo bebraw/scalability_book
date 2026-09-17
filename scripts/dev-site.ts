@@ -12,11 +12,14 @@ import {
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { localAnswerStore } from "./lib/local-answers.ts";
+import { handleLearning } from "../worker/learning.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 
 const root = process.cwd();
 const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
+const answers = localAnswerStore(dataDir);
 const commentsPath = path.join(dataDir, "comments.json");
 const configPath = path.join(root, "site.config.jsonc");
 const sourceRebuildDebounce = 250;
@@ -67,6 +70,25 @@ if (process.env.RESET_LOCAL_COMMENTS === "1" && process.env.LOCAL_DATA_DIR) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || "/", `http://${host}:${port}`);
+
+    if (url.pathname.startsWith("/api/learning/")) {
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(request.headers)) {
+        if (value)
+          headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+      }
+      const method = request.method || "GET";
+      const webRequest = new Request(url, {
+        method,
+        headers,
+        ...(method !== "GET" && method !== "HEAD"
+          ? { body: request, duplex: "half" }
+          : {}),
+      });
+      const result = await handleLearning(webRequest, "local-editor", answers);
+      response.writeHead(result.status, Object.fromEntries(result.headers));
+      return response.end(await result.text());
+    }
 
     if (url.pathname === "/api/editor/status") {
       return sendJson(response, { editable: true, buildRevision });

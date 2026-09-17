@@ -95,6 +95,8 @@ For example, “implementation B had the lowest measured p95 under the declared 
 “A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 
+{{ import "exercise:judgment-evidence" }}
+
 ## Turn comparison into a decision
 
 Choose an architecture and development workflow for the stated goals and constraints.

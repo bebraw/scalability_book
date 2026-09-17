@@ -8,6 +8,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import { exercises } from "../shared/exercises.ts";
 import { buildStudy } from "./lib/study-build.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -395,6 +396,7 @@ for (let index = 0; index < bookPages.length; index++) {
   const next = bookPages[index + 1];
   const pageScripts = [
     ...commonBookScripts,
+    ...(page.source.includes('import "exercise:') ? ["/exercises.js"] : []),
     ...(hasDemoInclude(page.source) ? ["/demo-anchors.js"] : []),
     ...getDemoScriptsForSource(page.source),
     ...(includeEditor ? editorScripts : []),
@@ -509,7 +511,7 @@ for (const caseStudy of caseStudies) {
 }
 
 const demoGalleryHeading = renderMarkdown(
-  "# Demo showcase",
+  "# Demos and exercises",
   { number: "" },
   bibliographySource,
 );
@@ -519,12 +521,14 @@ const demoGallery = injectStatechartDiagram(
 await writePage(
   "demos/index.html",
   renderer.renderLayout({
-    title: `Demo showcase - ${config.title}`,
-    description: "A single page for previewing and debugging course demos.",
+    title: `Demos and exercises - ${config.title}`,
+    description:
+      "Explore course demos and practise with automatically checked exercises.",
     currentUrl: "/demos/",
     stylesheets: [demoStylesheet],
     scripts: [
       "/demo-anchors.js",
+      "/exercises.js",
       ...new Set(demoScriptIncludes.map(({ script }) => script)),
       ...developmentScripts,
     ],
@@ -600,6 +604,12 @@ await compileSiteScript(
   "browser-performance-workbench.js",
 );
 await compileSiteScript("scripts/scalability-laws.ts", "scalability-laws.js");
+await compileSiteBundle(
+  "scripts/exercises.ts",
+  "exercises.js",
+  "BookExercises",
+  "es2019",
+);
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
 await compileSiteScript(
   "scripts/observability-signal-demo.ts",
@@ -717,11 +727,24 @@ async function validateDemoAnchors() {
 }
 
 function getDemoGalleryHtml() {
+  const exerciseEntries = Object.entries(exercises);
+  const chapterLink = (id) => {
+    const chapter = chapters.find((page) =>
+      page.source.includes(`import "exercise:${id}"`),
+    );
+    return chapter
+      ? `<p><a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a></p>`
+      : "";
+  };
   const sections = demoScriptIncludes
     .map(({ title, chapter, include }, index) => {
       const demoId = `demo-${slugify(title)}`;
       const galleryId = `${demoId}-gallery`;
       const displayIndex = String(index + 1).padStart(2, "0");
+      const practice = exerciseEntries
+        .filter(([, exercise]) => exercise.demo?.id === demoId)
+        .map(([id]) => `{{ import "exercise:${id}" }}\n${chapterLink(id)}`)
+        .join("\n");
 
       return `<section class="demo-gallery-item" id="${escapeAttribute(galleryId)}">
 <div class="demo-gallery-item-header">
@@ -733,20 +756,30 @@ function getDemoGalleryHtml() {
 <span class="demo-gallery-status"><i aria-hidden="true"></i> Ready</span>
 </div>
 {{ import "${include}" }}
+${practice}
 </section>`;
     })
     .join("\n\n");
 
+  const standalone = exerciseEntries
+    .filter(([, exercise]) => !exercise.demo)
+    .map(
+      ([id]) =>
+        `<section class="demo-gallery-item">\n{{ import "exercise:${id}" }}\n${chapterLink(id)}\n</section>`,
+    )
+    .join("\n");
   return `<div class="demo-gallery-lede">
-<p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface.</p>
+<p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface. Where practice is available, switch to its tab to check your understanding. Saved results are shared with the chapter exercises.</p>
 <dl class="demo-gallery-stats">
 <div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
-<div><dt>Runtime</dt><dd>Browser</dd></div>
+<div><dt>Exercises</dt><dd>${exerciseEntries.length}</dd></div>
 <div><dt>Mode</dt><dd>Self-guided</dd></div>
 </dl>
 </div>
 
 ${sections}
+<h2>More practice</h2>
+${standalone}
 `;
 }
 

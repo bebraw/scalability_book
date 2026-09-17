@@ -63,6 +63,8 @@ Then enable backpressure and compare hidden backlog growth with explicit rejecti
 
 {{ import "site/includes/saturation-boundary-demo.html" }}
 
+{{ import "exercise:scaling-bottleneck" }}
+
 Treat the rates as a reasoning aid rather than measured capacity.
 The lesson is structural: removing one bottleneck changes the system's limiting factor, while retries can consume headroom before useful demand changes.
 
