@@ -128,16 +128,36 @@ Remove secrets and unnecessary prompt or source-code content before submission.
 
 ### 5.4 Compare one agent with the fleet
 
-Compare implementation C with implementation B:
+Treat implementations A, B, and C as comparative engineering cases, not estimates of the causal effects of model capability or orchestration.
+Compare the recorded B and C workflows:
 
-- Which tasks benefited from delegation?
+- Which observations suggest a benefit from delegation, and what else could explain them?
 - Which tasks were too coupled, ambiguous, or small to delegate?
-- Where did the fleet increase throughput?
+- Where did accepted throughput differ, under what conditions?
 - Where did sequential work or review capacity become the bottleneck?
 - Would one careful agent or a human have been preferable for any task?
 
 Apply at least one relevant scalability law or formal model to the workflow.
 Amdahl's Law, Little's Law, queueing, backpressure, or the Universal Scalability Law may be appropriate.
+
+For one narrower contrast, replace part of the existing fleet rehearsal with a **bounded paired task**:
+
+1. Freeze one accepted repository revision and a small change brief with independent acceptance checks before either attempt.
+   Use two fresh copies of that revision and fresh agent sessions; this probe may reuse B and does not become the starting code for C.
+2. Run one single-agent attempt and one bounded fleet attempt using the same base-model version, harness, available tools and permissions, environment, brief, and acceptance checks.
+   Declare the fleet size and decomposition as the treatment being examined.
+3. Give both attempts the same predeclared wall-time limit, no more than 20 minutes each, and the same aggregate model-resource limit using the tool's supported token, cost, or request accounting.
+   Count every fleet worker and retry against that limit; record which limit stops each attempt and any accounting gaps.
+4. Hold the human-intervention policy constant, preserve failed and partial outcomes, and include integration and independent review in the recorded effort.
+   Rotate condition order across groups where practical; do not transfer solutions or feedback from the first attempt to the second.
+5. Compare accepted behavior, elapsed time, human effort, resource use, and correction work.
+   Report one pair as one exploratory contrast; agents within the fleet are not independent trials.
+   Human familiarity and stochastic variation can still affect the result.
+
+This is a small task, not a fourth application or a requirement to repeat a whole build.
+If matched access or accounting is unavailable, use instructor-supplied paired traces with the same metadata and checks; identify their provenance and missing evidence.
+An unmatched pair may still be analyzed descriptively, but cannot establish an orchestration effect.
+Link the pair and its limits in the fleet evidence bundle rather than adding a separate report.
 
 ### 5.5 Analyze the three applications
 
@@ -191,7 +211,7 @@ Include the cross-team audit and response, and link the already-submitted A and 
 ### 6.2 Fleet evidence
 
 Connect the fleet plan and task graph to a compact selected execution trace, its documented transformation, a repeatable loader into C, and application views answering at least two debugging questions.
-Include coordination measurements, the B–C analysis, and one workflow-level formal-model analysis.
+Include coordination measurements, the B–C case analysis, the bounded paired task or supplied traces, and one workflow-level formal-model analysis.
 The trace should expose consequential delegation, validation, integration, failure, or human intervention; select evidence that explains the findings rather than submitting an uncurated transcript dump.
 
 ### 6.3 Scaling and deployment experiment
@@ -214,7 +234,8 @@ Use the final decision bundle to make one conditional engineering argument:
 
 1. **Establish the comparison.** State what the common specification kept stable and what differed across A, B, and C, including optional scope and measurement gaps.
 2. **Explain the consequential results.** Compare application architecture under the shared and selected pressures and development effort through acceptance; use the fleet debugging findings to show what final code or a raw transcript concealed.
-3. **Bound the explanation.** Assess whether model capability plausibly contributed to A–B differences and orchestration to B–C differences, keeping alternative explanations and comparison limits visible.
+3. **Bound the explanation.** Separate A–B–C observations from hypotheses about model capability, practice, architecture, and orchestration.
+   Use the bounded paired task for the narrower workflow contrast, stating what was controlled and what remains unresolved; neither one pair nor the three builds establishes a general effect.
 4. **Choose and set a revisit condition.** For stated project constraints, choose an architecture and a local single agent, comparison-model single agent, or fleet; explain rejected alternatives, responsibilities that remained human across the phases, ownership of operations and correction, and the next saturation signal or measurement that would change the decision.
 
 Label important claims as observed, inferred, or proposed.
@@ -241,6 +262,7 @@ Fleet size, transcript length, generated code volume, and architectural complexi
 ## Instructor Notes
 
 - Use the Challenge model as the fleet base model when tooling and access allow it.
+- Before Compare begins, publish matched resource limits and condition-order assignments for the paired probe; provide a trace alternative when equivalent access is unavailable.
 - Clarify whether sequential delegation counts.
   It can be pedagogically valid when the handoffs are explicit, although at least one parallel branch gives stronger evidence about integration and review pressure.
 - Set a practical upper bound on fleet size or total model budget if resource use could become excessive.

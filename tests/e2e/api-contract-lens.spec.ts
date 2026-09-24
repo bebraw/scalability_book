@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test.describe("API contract lens", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/architecture/#api-contract-lens");
+    await page.goto(
+      "/appendices/advanced-web-boundaries/#demo-api-contract-lens",
+    );
     await expect(page.locator("[data-api-contract-lens]")).toBeVisible();
   });
 

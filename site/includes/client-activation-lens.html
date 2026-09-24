@@ -5,12 +5,14 @@
   data-activation-lens
   aria-labelledby="activation-lens-heading"
 >
-  <div class="scaling-demo-header activation-lens-header">
+  <div class="scaling-demo-header activation-lens-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Browser activation cutaway</p>
-      <h3 id="activation-lens-heading">What wakes up before the click?</h3>
+      <p class="scaling-demo-kicker demo-kicker">Client activation lab</p>
+      <h3 id="activation-lens-heading">
+        How does the page become interactive?
+      </h3>
     </div>
-    <div class="activation-lens-question" aria-live="polite">
+    <div class="activation-lens-question demo-summary" aria-live="polite">
       <span data-activation-lens-mode-badge>Hydration</span>
       <small data-activation-lens-boundary-badge>component tree</small>
     </div>
@@ -36,7 +38,7 @@
           />
           <span>
             <strong>Hydration</strong>
-            <small>Replay the rendered tree</small>
+            <small>Attach behavior to server HTML</small>
           </span>
         </label>
         <label>
@@ -48,7 +50,7 @@
           />
           <span>
             <strong>Islands</strong>
-            <small>Wake an explicit region</small>
+            <small>Activate selected regions</small>
           </span>
         </label>
         <label>
@@ -60,7 +62,7 @@
           />
           <span>
             <strong>Resumability</strong>
-            <small>Continue at the handler</small>
+            <small>Load behavior when needed</small>
           </span>
         </label>
       </div>
@@ -160,7 +162,7 @@
 
     <div class="activation-lens-readout">
       <div>
-        <p class="request-trace-section-label">Architectural reading</p>
+        <p class="request-trace-section-label">What this means</p>
         <h4 data-activation-lens-title>Replay the application</h4>
         <p data-activation-lens-summary></p>
       </div>

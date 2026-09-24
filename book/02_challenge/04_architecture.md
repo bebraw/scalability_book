@@ -21,7 +21,9 @@ Begin with four architectural roles:
 
 Roles are not machines.
 One machine may perform several roles, and one role may be distributed across many machines.
-An **origin** is the authoritative source for a representation in an HTTP exchange, not necessarily one physical server.
+An **origin server** serves the resource in an HTTP exchange, rather than forwarding the request as an intermediary; the role need not be one physical machine.
+In web security and HTTP URI terminology, an **origin** is the normalized scheme, host, and port tuple, such as `https`, `example.org`, and `443` ([RFC 9110, section 4.3.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-4.3.1)).
+CDN discussions also use “origin” as shorthand for the upstream origin server or backend; this placement alone does not identify the authoritative data store.
 Likewise, an edge function may execute application logic without becoming the authority for the data it reads.
 
 Use the event tracker to keep the model concrete.
@@ -117,21 +119,28 @@ The ownership card later in this chapter should therefore name both the code bou
 ## Rendering moves work across time and place
 
 Cloud and edge platforms expanded where code can execute, while build tooling and capable browsers expanded when a representation can be created.
-Rendering labels often collapse these decisions into one framework-shaped category.
+Start with **who constructs the next view and how it reaches the browser**:
 
-Server-side rendering (SSR), static site generation (SSG), incremental static regeneration (ISR), and client-side rendering (CSR) primarily describe **where and when a view is produced or refreshed**.
-Multi-page applications (MPAs), hypermedia-driven applications (HDAs), and single-page applications (SPAs) primarily describe **how the browser reaches later application states**.
+- A conventional multi-page application (MPA) follows links and submits forms to receive complete HTML documents.
+- A hypermedia-driven application (HDA) keeps views and available actions in server-provided HTML; browser code follows those controls and can apply HTML fragments to parts of the page :citep[gross2022hda].
+- A typical single-page application (SPA) fetches data and uses client-side rendering (CSR) to construct subsequent views without replacing the document.
 
-CSR is common in single-page applications because the browser can fetch data, render views, and handle later navigation without replacing the document.
-The terms are not synonyms: CSR is a rendering strategy, while SPA describes a broader navigation and state-management shape.
-An HDA can receive its initial document through SSR, while an MPA can serve pages from a statically generated or incrementally regenerated cache.
+These are representative flows, not mutually exclusive categories: a conventional MPA also uses hypermedia, and partial page updates alone do not distinguish HDA from SPA.
+The distinction in the latter two examples is whether server HTML or a client application model defines the views and actions.
+An HDA can still use scripts for local interface behavior :citep[gross2022hypermediascripting].
+
+Then ask **how the initial view is produced**.
+Server-side rendering (SSR) produces HTML for a request; static site generation (SSG) produces it ahead of requests; incremental static regeneration (ISR) refreshes previously generated HTML; CSR builds the view in the browser.
+CSR is the natural starting point for the SPA example, but an SPA can also initialize from server-rendered HTML and take over later rendering, as React's hydration API illustrates :citep[reactHydrateRoot].
+Caching server-generated HTML can serve an MPA or HDA without moving control of its views to the browser.
 
 Compare the consequences for freshness, server work, navigation, client responsibility, caching, accessibility, and failure.
 
 ### Web architecture lens
 
-Use the same event-recording interaction across nine combinations.
-First choose how the initial document is produced, then choose how the application presents the state after `POST /events`.
+Use the same event-recording interaction across the three flows.
+First choose how the application presents the state after `POST /events`, then vary how its first view arrives.
+The MPA and HDA examples start with server HTML; the SPA example starts with CSR and also supports server-rendered or cached initial HTML.
 Run the trace and watch which artifact crosses the network.
 
 {{ import "site/includes/web-architecture-lens.html" }}

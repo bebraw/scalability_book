@@ -80,9 +80,7 @@ test.describe("browser performance workbench", () => {
           button:
             getComputedStyle(button!).backgroundColor ===
             resolveColor("--accent"),
-          status:
-            getComputedStyle(status!).color ===
-            resolveColor("--accent-strong"),
+          status: getComputedStyle(status!).color === resolveColor("--text"),
         };
       });
 

@@ -213,26 +213,26 @@ test.describe("book reading layout", () => {
     await page.goto("/chapters/scalable-development/");
 
     const citation = page.locator(
-      '.semantic-citation[data-citation="lipsanen2026shiftup"]',
+      '.semantic-citation[data-citation="poole2023artificial"]',
     );
-    await expect(citation).toContainText("Lipsanen et al.");
+    await expect(citation).toContainText("Poole & Mackworth");
     await expect(page.locator(".semantic-bibliography")).toContainText(
-      "Shift-Up",
+      "Artificial Intelligence: Foundations of Computational Agents",
     );
     await expect(citation).toHaveAttribute(
       "href",
-      "#reference-lipsanen2026shiftup",
+      "#reference-poole2023artificial",
     );
 
     await citation.click();
-    await expect(page).toHaveURL(/#reference-lipsanen2026shiftup$/);
-    await expect(page.locator("#reference-lipsanen2026shiftup")).toBeVisible();
+    await expect(page).toHaveURL(/#reference-poole2023artificial$/);
+    await expect(page.locator("#reference-poole2023artificial")).toBeVisible();
   });
 
   test("numbers tables and links references to the table itself", async ({
     page,
   }) => {
-    await page.goto("/chapters/scaling/");
+    await page.goto("/appendices/scalability-models/");
 
     const table = page.locator('[id="table:scalability-laws"]');
     const reference = page.locator(
@@ -240,7 +240,7 @@ test.describe("book reading layout", () => {
     );
 
     await expect(table.locator("caption")).toContainText(
-      "Table 8.2. Formal scalability models",
+      "Table E.1. Formal scalability models",
     );
     await reference.click();
     await expect(page).toHaveURL(/#table:scalability-laws$/);

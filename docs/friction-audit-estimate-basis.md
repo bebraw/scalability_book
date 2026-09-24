@@ -1,33 +1,28 @@
-# Friction audit estimate basis
+# Friction audit measurement basis
 
-The friction audit demo is a teaching model, not a forecasting tool.
-Its goal is to make relative pressure visible: setup, comprehension, change, testing, review, and rework do not shrink equally when an agent helps.
+The audit records observations; it no longer generates stage times, risk labels, or rework counts from friction scores or assistance presets.
+The previous coefficients were invented teaching assumptions, and describing them as empirically calibrated was unjustified.
 
-The default human-only numbers are small classroom-scale estimates for a focused change to the course event tracker.
-Each process step has a base time, then friction points add a small penalty:
+## Quantities and boundaries
 
-- Setup: 0.25 minutes per friction point.
-- Comprehension: 0.75 minutes per friction point.
-- Change: 1 minute per friction point.
-- Testing: 0.75 minutes per friction point.
+- Each stage contains observed active person-minutes for the baseline and candidate attempts.
+- A person's time is assigned once; rework belongs to the stage in which it occurs.
+- Concurrent people's effort adds, but the sum is not elapsed wall time; passive waiting is recorded separately.
+- A blank or invalid entry remains missing, while an explicit zero means measured zero effort.
+- Total effort requires all eight stages; the displayed difference is candidate minus baseline, including increases.
+- One-off intervention cost is recorded separately and added to the observed difference for the first comparison; ongoing maintenance belongs in the evidence notes.
+- Acceptance is a user-recorded check result, not a judgment inferred from lower effort.
+- The record retains revisions, configuration, evidence, hypothesis, limits, and the next check or reversal condition.
 
-The assistance multipliers are calibrated against published software development productivity studies:
+This arithmetic does not estimate causation, recurring savings, break-even time, or rework risk.
+A repeated comparable task, unchanged acceptance conditions, and inspectable timing records are needed to assess a proposed improvement.
+Practice effects and changing conditions can remain even when both attempts pass.
 
-- Peng et al. found that GitHub Copilot users completed a constrained HTTP server task 55.8% faster than the control group.
-- Becker et al. found that early-2025 AI tools made experienced open-source developers 19% slower on real tasks in mature projects.
-- Zhang et al. report that Copilot is useful for generation, but integration, correctness checking, and project fit remain recurring challenges.
+## Role of the productivity studies
 
-The demo therefore uses conservative multipliers instead of treating agents as a uniform speed boost:
+[Peng et al. (2023)](https://arxiv.org/html/2302.06590v1) report a task-time reduction in a controlled HTTP-server task, while [Becker et al. (2025)](https://arxiv.org/html/2507.09089v2) report longer completion times with AI access for experienced developers working in familiar mature repositories.
+These are contrasting empirical cases under different conditions, not bounds or calibration data for stage-specific coefficients.
+Their aggregate effects cannot supply this audit's setup, comprehension, editing, review, or risk values.
 
-- Human only: no multiplier.
-- Agent with weak project context: setup, comprehension, and testing are 5% slower; editing is 20% faster; rework risk increases.
-- Agent with good instructions and tests: setup is 15% faster, comprehension is 20% faster, editing is 35% faster, and testing is 25% faster; rework risk decreases.
-
-These assumptions keep the weak-agent path close to human-only work instead of making it magically fast.
-They also keep the harnessed-agent path below the best-case Copilot benchmark because the demo includes locating code, verifying behavior, and explaining the change, not just writing an implementation.
-
-Sources:
-
-- Peng et al., "The Impact of AI on Developer Productivity: Evidence from GitHub Copilot", 2023: https://arxiv.org/abs/2302.06590
-- Becker et al., "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity", 2025: https://arxiv.org/abs/2507.09089
-- Zhang et al., "A Study of the Development Practice of Using Copilot as an Assistant for Developers", 2023: https://arxiv.org/abs/2303.08733
+The separate study-pilot exercise retains explicitly invented, editable sequential timings for arithmetic practice.
+It does not claim empirical calibration or predict outcomes for a repository.

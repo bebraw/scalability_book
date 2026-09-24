@@ -5,12 +5,18 @@
   data-usl-demo
   aria-labelledby="usl-demo-heading"
 >
-  <div class="law-demo-header">
+  <div class="law-demo-header demo-header">
     <div>
-      <p class="law-demo-kicker">Universal Scalability Law · C(N)</p>
-      <h3 id="usl-demo-heading">See when adding concurrency starts taking capacity away</h3>
+      <p class="law-demo-kicker demo-kicker">
+        Universal Scalability Law · C(N)
+      </p>
+      <h3 id="usl-demo-heading">See when more workers reduce throughput</h3>
     </div>
-    <div class="law-demo-verdict" data-usl-verdict aria-live="polite">
+    <div
+      class="law-demo-verdict demo-summary"
+      data-usl-verdict
+      aria-live="polite"
+    >
       Capacity is still rising
     </div>
   </div>
@@ -20,31 +26,70 @@
       <p class="law-demo-step">01 / Shape the scaling cost</p>
       <label>
         <span>Contention, α</span>
-        <input type="range" min="0" max="0.1" step="0.005" value="0.03" data-usl-input="alpha" />
+        <input
+          type="range"
+          min="0"
+          max="0.1"
+          step="0.005"
+          value="0.03"
+          data-usl-input="alpha"
+        />
         <output data-usl-output="alpha">0.030</output>
       </label>
       <label>
         <span>Coherency cost, β</span>
-        <input type="range" min="0" max="0.01" step="0.0005" value="0.002" data-usl-input="beta" />
+        <input
+          type="range"
+          min="0"
+          max="0.01"
+          step="0.0005"
+          value="0.002"
+          data-usl-input="beta"
+        />
         <output data-usl-output="beta">0.0020</output>
       </label>
       <label>
         <span>Selected concurrency, N</span>
-        <input type="range" min="1" max="32" value="8" data-usl-input="concurrency" />
+        <input
+          type="range"
+          min="1"
+          max="32"
+          value="8"
+          data-usl-input="concurrency"
+        />
         <output data-usl-output="concurrency">8 workers</output>
       </label>
     </form>
 
     <div class="law-demo-workspace">
       <div class="usl-chart-frame">
-        <svg data-usl-chart viewBox="0 0 640 250" role="img" aria-label="Relative capacity from one to 32 concurrent workers"></svg>
-        <div class="usl-axis"><span>1 worker</span><span>Concurrency →</span><span>32 workers</span></div>
+        <svg
+          data-usl-chart
+          viewBox="0 0 640 250"
+          role="img"
+          aria-label="Relative capacity from one to 32 concurrent workers"
+        ></svg>
+        <div class="usl-axis">
+          <span>1 worker</span><span>Concurrency →</span><span>32 workers</span>
+        </div>
       </div>
       <dl class="law-demo-metrics law-demo-metrics-four">
-        <div><dt>Selected capacity</dt><dd data-usl-metric="selected">5.57×</dd></div>
-        <div><dt>Peak at</dt><dd data-usl-metric="peak-n">22</dd></div>
-        <div><dt>Peak capacity</dt><dd data-usl-metric="peak-capacity">7.33×</dd></div>
-        <div><dt>Next worker</dt><dd data-usl-metric="next">helps</dd></div>
+        <div>
+          <dt>Selected capacity</dt>
+          <dd data-usl-metric="selected">5.57×</dd>
+        </div>
+        <div>
+          <dt>Peak concurrency</dt>
+          <dd data-usl-metric="peak-n">22</dd>
+        </div>
+        <div>
+          <dt>Peak capacity</dt>
+          <dd data-usl-metric="peak-capacity">7.33×</dd>
+        </div>
+        <div>
+          <dt>Next worker</dt>
+          <dd data-usl-metric="next">helps</dd>
+        </div>
       </dl>
       <p class="law-demo-reading" data-usl-reading>
         At eight workers, added concurrency still increases modeled capacity.

@@ -35,7 +35,7 @@ test.describe("scaling pressure demo", () => {
     ).toContainText("freshness budget");
     await expect(
       demo.locator("[data-scaling-demo-waterbed-summary]"),
-    ).toContainText("4 moves relocate complexity");
+    ).toContainText("4 moves add new operating obligations");
     await expect(demo.locator("[data-scaling-demo-waterbed]")).toContainText(
       "Invalidation, freshness budgets",
     );

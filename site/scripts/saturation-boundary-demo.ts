@@ -216,7 +216,7 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
       ? `${result.boundary.label} saturated`
       : `${result.boundary.label} is closest`;
     summary.textContent = result.saturated
-      ? `${Math.abs(result.headroom)} ev/s beyond the current envelope.`
+      ? `${Math.abs(result.headroom)} ev/s above current capacity.`
       : `${result.headroom} ev/s of headroom remains.`;
     diagnosis.textContent = buildSaturationDiagnosis(
       result,
@@ -388,7 +388,7 @@ function buildSaturationDiagnosis(
   backpressure: boolean,
 ) {
   if (!result.saturated) {
-    return `${result.boundary.label} is the closest boundary, but the modeled pipeline remains inside its current envelope.`;
+    return `${result.boundary.label} is closest to its limit, but all modeled stages have spare capacity.`;
   }
 
   if (backpressure) {

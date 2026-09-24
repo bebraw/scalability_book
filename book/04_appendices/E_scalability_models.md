@@ -40,7 +40,7 @@ The [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-
 ## Lusser's Law and the reliability chain
 
 A workflow whose accepted result depends on every critical step has the structure of a series system.
-If step `i` has reliability `r_i`, the workflow reliability is:
+If every step is critical and the step outcomes are independent, with step `i` having reliability `r_i`, the workflow reliability is:
 
 `R_workflow = ∏ r_i`
 
@@ -63,6 +63,36 @@ If `D` is the probability that an incorrect prediction is detected and `K` is th
 An incorrect result that is detected but not repaired can stop safely, while an undetected result can propagate.
 Safety, liveness, and correctness should therefore be reported separately rather than collapsed into one success percentage.
 
+### Estimate from all eligible attempts
+
+Fix the task population and step boundary before collecting outcomes.
+Independently adjudicate initial and final correctness for every eligible attempt, including rejected, stopped, and failed attempts; the workflow's own acceptance label cannot reveal its missed errors.
+For the one-step model:
+
+- `C = initially correct attempts / all eligible attempts`;
+- `D = detected initial errors / all initial errors`;
+- `K = successfully repaired initial errors / detected initial errors`.
+
+Consider 100 fully adjudicated attempts: 80 start correct, 20 start incorrect, 15 of those errors are detected, and 12 of the detected errors are repaired.
+Then `C = 80/100 = 0.8`, `D = 15/20 = 0.75`, and `K = 12/15 = 0.8`.
+Substitution gives `r = 0.8 + 0.2 × 0.75 × 0.8 = 0.92`: 92 correct completions, three detected but unrepaired errors, and five undetected errors.
+The three unrepaired attempts count as safe stops only if the workflow actually prevents their effects from propagating.
+
+This decomposition assumes initially correct results remain correct and that an initial error reaches correctness only through the modeled detection-and-repair path.
+If review can damage a correct result or a later stage can repair an undetected error, record those transitions and revise the model.
+With no initial errors, `D` is unestimated; with no detected errors, `K` is unestimated.
+Do not replace a zero-denominator rate with 100% or multiply an undefined estimate: report the observed terminal counts directly.
+Missing adjudication leaves unknown outcomes, which must remain visible and limit any reliability estimate.
+
+### Test the independence assumption
+
+Suppose two critical steps are each correct on 90 of 100 runs, but the same ten runs fail both steps because they share a faulty input.
+Their marginal reliabilities are both 0.9, yet both succeed on 90 runs, not the 81 predicted by multiplying the marginals.
+The general relationship is `P(S₁ and S₂) = P(S₁) × P(S₂ | S₁)`; here the second factor is 1, not 0.9.
+If instead the two ten-run failure sets are disjoint, both steps succeed on 80 runs, below the independent prediction of 81.
+Other dependence structures give different results, so the product of marginal rates is not a safe upper or lower bound without further assumptions.
+Measure joint outcomes or conditional rates when steps share causes of failure.
+
 ## Reliability chain lab
 
 The first preset below reproduces the compact idealization with 95% initial correctness, 90% catch-and-repair coverage, and 100 independent critical steps.
@@ -74,7 +104,8 @@ Then select **Caught, not repaired** and compare correct completion with safe st
 The model assumes identical independent steps, treats every step as necessary, and assigns the first terminal outcome to the whole run.
 Real agent workflows can share model blind spots, context, tools, and upstream state; steps can have different reliabilities; and later validation can sometimes repair earlier failures.
 Use the curve as a design probe, not a reliability forecast.
-Estimate `C`, `D`, and `K` from repeated accepted outcomes at a declared boundary, and use `∏ r_i` when observed steps differ instead of replacing them with an unsupported average.
+Estimate `C`, `D`, and `K` from all eligible attempts using the denominators above.
+Use `∏ r_i` for differing step reliabilities only when the independence assumption is defensible; replacing them with one average does not resolve dependence.
 
 ## Contention curve lab
 

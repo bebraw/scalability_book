@@ -5,12 +5,12 @@
   data-durable-retry
   aria-labelledby="durable-retry-heading"
 >
-  <header class="durable-retry-header">
+  <header class="durable-retry-header demo-header">
     <div>
-      <p class="durable-retry-kicker">Scaling failure lab</p>
-      <h3 id="durable-retry-heading">Crash between effect and checkpoint</h3>
+      <p class="durable-retry-kicker demo-kicker">Durable retry lab</p>
+      <h3 id="durable-retry-heading">See when a retry duplicates an effect</h3>
     </div>
-    <div class="durable-retry-summary" aria-live="polite">
+    <div class="durable-retry-summary demo-summary" aria-live="polite">
       <span data-durable-retry-verdict>Predict the recovery outcome</span>
       <small data-durable-retry-summary>
         One command can produce more than one physical attempt.
@@ -138,7 +138,7 @@
           <li class="durable-retry-fault" data-durable-retry-stage="fault">
             <span>!</span>
             <div>
-              <strong>Crash seam</strong>
+              <strong>Crash point</strong>
               <small>Completion never reaches history</small>
             </div>
           </li>

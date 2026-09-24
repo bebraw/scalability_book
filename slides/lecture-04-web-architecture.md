@@ -66,13 +66,18 @@ At every hop, ask:
 
 # Rendering moves work across time and place
 
-SSR, SSG, ISR, and CSR primarily describe **where and when a view is produced or refreshed**.
+Start with **who builds the next view**:
 
-SPA, MPA, and hypermedia patterns primarily describe **how the browser reaches later application states**.
+- MPA example: server HTML, full-page navigation.
+- HDA example: server HTML and action controls, targeted updates.
+- SPA example: JSON data, browser renders the view (CSR).
+
+Then choose how the **first view** arrives: request-time HTML (SSR), prebuilt HTML (SSG/ISR), or browser rendering (CSR).
+An SPA can start with server HTML and render later views in the browser.
 
 Compare their consequences for freshness, cacheability, client work, accessibility, navigation, origin load, and failure.
 
-<!-- [Sources] book/02_challenge/04_architecture.md -->
+<!-- [Sources] book/02_challenge/04_architecture.md; https://htmx.org/essays/hypermedia-driven-applications/; https://react.dev/reference/react-dom/client/hydrateRoot -->
 
 ---
 

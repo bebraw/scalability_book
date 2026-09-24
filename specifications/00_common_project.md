@@ -294,6 +294,8 @@ You must be able to measure a stable baseline and reason about what your impleme
 Run the same stack-neutral workload against implementations A, B, and C.
 The workload measures logical user operations from the adapter's request until the application returns an observable result, not individual internal network requests.
 The adapter may drive the user interface, a documented application interface, or another repeatable boundary that exercises the real application and persistence path.
+Choose that boundary before measuring A and keep it across B and C: API-response latency and browser-visible completion are different outcomes.
+Define the start and completion events, including response validation and what constitutes acknowledged persistence; separate additional diagnostic boundaries rather than ranking them together.
 
 Start each measured profile from this fixture:
 
@@ -319,22 +321,40 @@ Concurrent operations in this baseline should use distinct work items; contentio
 
 Run the following profiles:
 
-| Profile | Operations | Concurrency |  Repetitions | Reset rule                              |
-| ------- | ---------: | ----------: | -----------: | --------------------------------------- |
-| Warm-up |        100 |           1 | 1 unmeasured | Reset and reseed afterward              |
-| Steady  |        500 |           4 |   3 measured | Reset and reseed before each repetition |
-| Burst   |        200 |          16 |   3 measured | Reset and reseed before each repetition |
+| Profile            | Operations | Concurrency |  Repetitions | Reset rule                              |
+| ------------------ | ---------: | ----------: | -----------: | --------------------------------------- |
+| Warm-up            |        100 |           1 | 1 unmeasured | Reset and reseed afterward              |
+| Steady             |        500 |           4 |   3 measured | Reset and reseed before each repetition |
+| Higher concurrency |        200 |          16 |   3 measured | Reset and reseed before each repetition |
+
+These are **closed-loop** profiles: each of the declared workers dispatches its next logical operation only after its previous operation completes or times out, with no intentional think time.
+Workers take operations from the fixed seeded sequence until it is exhausted; concurrency is a maximum, not a guaranteed arrival rate.
+Disable adapter retries for the baseline, and record any application-level retry policy and internal attempts separately from logical operations.
+Record the cache policy too: resetting the fixture after warm-up does not guarantee warm data caches.
+
+Predeclare one per-operation timeout and one overall run deadline, held constant across comparable runs.
+Use 10 seconds per operation and five minutes per measured repetition unless the instructor approves different limits for the chosen boundary before the comparison.
+At the run deadline, stop dispatching, record queued operations as not started and active operations as unfinished, and preserve their identifiers for reconciliation.
+A timeout is an observed deadline crossing, not an exact completion latency or proof that a write did not commit.
+After the run, reconcile state and events for timed-out or unfinished writes, and report unresolved outcomes explicitly.
+Quiesce or isolate outstanding work before resetting the fixture so a late write cannot contaminate the next repetition.
 
 For every measured repetition, record:
 
 - implementation identifier, commit, environment, configuration, adapter version, and operation-order seed;
-- elapsed time and successful logical operations per second;
-- median and 95th-percentile end-to-end operation latency overall, and by operation type when the sample is large enough;
+- elapsed time, scheduled and dispatched counts, completed valid operations, and valid completions per second;
+- median and 95th-percentile latency for completed valid operations, clearly labeled as conditional on completion, plus their sample counts and the percentile calculation;
+- separate counts for not-started, unfinished, and timed-out operations, including their known waiting durations or deadline lower bounds;
 - expected rejections separately from timeouts, crashes, invalid responses, and other unexpected errors;
 - post-run checks for state, event, filter, and summary correctness;
 - one resource-efficiency proxy that can be collected consistently across phases, such as peak memory, CPU time, database growth, or billed execution time.
 
 Report each repetition and the median result rather than presenting only the best run.
+Expected unsupported-transition rejections count as valid completed operations only when the unchanged-state check passes; unexpected admission rejections do not.
+Show read, write, and expected-rejection counts separately so fast refusals cannot conceal lost useful work.
+For the baseline p95, use the nearest-rank observation at `ceil(0.95 × n)` in the sorted valid latencies, and retain the raw observations.
+In 200 observations, only about ten lie in the upper 5%; per-operation subsets are smaller still.
+These short runs expose variation and regressions, but cannot establish stable production tail latency; report small subsets descriptively and avoid spurious decimal precision.
 Absolute results from different hardware or hosted environments should not be ranked as though the environment were controlled.
 If a platform limit prevents a profile from completing, preserve that result as evidence and label any reduced diagnostic run instead of silently changing the protocol.
 
@@ -378,6 +398,24 @@ Use runtime evidence where the available workload and environment allow it.
 Label reasoned projections as projections rather than observations.
 The goal is a cumulative, justified analysis, not repeated hypothetical matrices or distributed infrastructure added without evidence.
 
+### 7.3 Arrival-controlled overload and recovery
+
+When a selected pressure or scaling claim concerns sustained incoming demand, queue growth, or admission control, add a bounded **open-loop** pressure run within that experiment.
+It replaces part of the existing pressure analysis rather than adding another mandatory scenario for every build.
+Schedule arrivals independently of earlier completions; a closed-loop client population can reduce its own offered load as the application slows.
+
+Use a pilot to select and then freeze three arrival rates expected to be below, near, and above the observed service limit, with 30 seconds at each rate followed by up to 60 seconds of drain and recovery observation.
+Declare the operation mix, fixture, timing boundary, request timeout, maximum in-flight work, and total attempt budget before the comparison, and keep them stable when rerunning the selected pressure.
+Do not silently lower an assigned rate when the generator or application cannot keep up.
+If a generator cap prevents dispatch, count the scheduled operation as not dispatched; do not accumulate an unbounded catch-up queue.
+
+Record scheduled arrivals, actual dispatch times and scheduling lag, application admissions where observable, expected domain rejections, overload rejections, valid completions, timeouts, and unfinished work separately.
+If admission is not observable, label it unknown rather than inferring it from dispatch.
+Report both scheduled-arrival-to-result time, which includes generator waiting, and dispatch-to-result time, with the same outcome and censoring rules as the baseline.
+Record queue length or age and resource use during load and drain where observable; distinguish application backlog from generator lag.
+At the drain deadline, retain unfinished identifiers, check for late writes or duplicates, and verify ordinary service has recovered.
+If it has not, report that result and perform the prepared recovery action.
+
 ---
 
 ## 8. Permitted Transfer Between Implementations
@@ -400,6 +438,8 @@ You may not carry forward:
 - generated components or configuration copied from an earlier implementation;
 - an earlier repository used as the starting point for the next phase;
 - prompts that contain substantial blocks of the earlier implementation.
+
+The [bounded paired task](03_compare.md#5-4-compare-one-agent-with-the-fleet) is an explicit exception for experimental copies of a frozen revision, not for implementation C's starting code.
 
 When uncertain, disclose the reuse in the evidence package.
 The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.

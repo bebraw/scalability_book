@@ -1,3 +1,7 @@
+:root {
+  --demo-font-label: 0.75rem;
+}
+
 /* Interactive demo components */
 [data-demo-anchor] {
   scroll-margin-block-start: 5.5rem;
@@ -221,7 +225,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.35rem;
   justify-content: center;
@@ -310,13 +314,13 @@
   cursor: help !important;
   display: inline-flex;
   flex: 0 0 auto;
-  font-size: 0.72rem !important;
+  font-size: var(--demo-font-label) !important;
   font-weight: 900 !important;
   justify-content: center;
   line-height: 1 !important;
-  min-height: 1.18rem !important;
+  min-height: 1.5rem !important;
   padding: 0 !important;
-  width: 1.18rem;
+  width: 1.5rem;
 }
 .project-fit-label-row [role="tooltip"] {
   background: var(--text);
@@ -521,7 +525,7 @@
   color: color-mix(in srgb, var(--muted) 72%, transparent);
   content: "DIRECTION / 01";
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   inset-block-start: 1.1rem;
   inset-inline-start: 0.65rem;
@@ -623,7 +627,7 @@
   border-color: var(--border);
   color: var(--text);
   font-size: 0.76rem;
-  min-height: 2rem;
+  min-height: 2.5rem;
   padding: 0.36rem 0.55rem;
 }
 .project-fit--discovery .project-fit-presets button:hover,
@@ -1153,7 +1157,7 @@
 }
 .agent-fleet-metrics dt {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -1341,7 +1345,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.35rem;
   justify-content: center;
@@ -1554,50 +1558,93 @@
   border-block-start: 1px solid var(--border);
   padding-block-start: 0.45rem;
 }
+/* Observed-effort audit: metadata and measurements share a reading row. */
 .friction-demo-grid {
-  align-items: start;
   display: grid;
+  align-items: start;
   gap: 0.75rem;
-  grid-template-columns:
-    minmax(13rem, 0.9fr)
-    minmax(18rem, 1.2fr)
-    minmax(14rem, 0.95fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   margin-block-start: 1rem;
 }
-.friction-demo-column {
-  display: grid;
-  gap: 0.75rem;
-}
-.friction-demo-scale {
-  gap: 0.28rem;
-}
-.friction-demo-scale small {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.7rem;
-  font-weight: 750;
-  letter-spacing: 0.02em;
-  line-height: 1.25;
-}
-.friction-demo-process-panel {
+.friction-demo .scaling-demo-panel {
   min-width: 0;
 }
-@media (width <= 78rem) {
-  .friction-demo-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 1.1fr);
-  }
-  .friction-demo-process-panel {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
+.friction-demo input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  min-height: 2.65rem;
+  min-width: 0;
+  width: 100%;
+  padding: 0.55rem;
+}
+.friction-demo textarea {
+  min-height: 0;
+}
+.friction-demo input:focus-visible,
+.friction-demo select:focus-visible,
+.friction-demo textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.prose .friction-audit-note {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  max-width: none;
+}
+.friction-observation-row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  border-block-end: 1px solid var(--border);
+  padding-block: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+}
+.friction-observation-heading {
+  color: var(--muted);
+  font-weight: 800;
+}
+.friction-observation-row input {
+  text-align: right;
+}
+.friction-input-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.friction-acceptance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.friction-audit-results {
+  grid-column: 1 / -1;
 }
 @media (width <= 54rem) {
   .friction-demo-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .friction-demo-process-panel {
-    grid-column: auto;
-    grid-row: auto;
+}
+@media (width <= 32rem) {
+  .friction-acceptance {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .friction-observation-row {
+    gap: 0.4rem;
+    font-size: var(--demo-font-label);
   }
 }
 .dimensions-demo-grid {
@@ -1688,7 +1735,7 @@
 .dimensions-demo-radar-label {
   fill: var(--text);
   font-family: var(--font-ui);
-  font-size: 0.44rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   paint-order: stroke;
   stroke: var(--panel);
@@ -1702,37 +1749,6 @@
   .dimensions-demo-output {
     grid-template-columns: 1fr;
   }
-}
-.friction-demo-files {
-  display: grid;
-  gap: 0.45rem;
-}
-.friction-demo-files span {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.74rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.friction-demo-files ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.friction-demo-files li {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 0.76rem;
-  font-weight: 800;
-  line-height: 1.2;
-  max-width: none;
-  padding: 0.35rem 0.55rem;
 }
 .friction-demo .scaling-demo-progress {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1758,7 +1774,7 @@
 .workflow-demo-signal small {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 .workflow-demo-range {
@@ -1785,7 +1801,7 @@
 .workflow-demo-evidence small {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   text-transform: uppercase;
@@ -1845,7 +1861,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.45rem;
   justify-content: center;
@@ -1871,7 +1887,7 @@
   border-radius: 999px;
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   grid-column: 2;
   justify-self: start;
@@ -1919,7 +1935,7 @@
 .pressure-map-baseline span {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   text-transform: uppercase;
@@ -1968,7 +1984,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.45rem;
   justify-content: center;
@@ -1990,7 +2006,7 @@
   border-radius: 999px;
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   grid-column: 2;
   justify-self: start;
@@ -2013,7 +2029,7 @@
 .pressure-map-card dt {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   text-transform: uppercase;
@@ -2124,7 +2140,7 @@
     color-mix(in srgb, var(--pressure-incident-warning) 35%, var(--border));
   color: var(--muted);
   display: flex;
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
   gap: 0.7rem;
   line-height: 1.4;
   margin-inline: calc(clamp(1rem, 2vw, 1.5rem) * -1);
@@ -2134,7 +2150,7 @@
   color: var(--pressure-incident-warning);
   flex: 0 0 auto;
   font-family: var(--font-mono);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -2166,7 +2182,7 @@
   border-radius: 999px;
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   height: 1.55rem;
   justify-content: center;
@@ -2184,7 +2200,7 @@
 }
 .pressure-incident-progress li small {
   color: inherit;
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   line-height: 1.15;
 }
 .pressure-incident-progress li.is-active {
@@ -2265,7 +2281,7 @@
 .pressure-incident-surface-signals > span {
   color: var(--accent-strong);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.08em;
   line-height: 1.2;
@@ -2338,7 +2354,7 @@
 .pressure-incident-pipeline article > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
 }
 .pressure-incident-pipeline article > div {
@@ -2347,7 +2363,7 @@
 }
 .pressure-incident-pipeline article small {
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   line-height: 1.2;
   text-transform: uppercase;
@@ -2360,7 +2376,7 @@
 .pressure-incident-pipeline article em {
   border-block-start: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 800;
   line-height: 1.2;
@@ -2392,7 +2408,7 @@
 }
 .pressure-incident-metrics > div > span {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1.2;
@@ -2408,7 +2424,7 @@
 }
 .pressure-incident-metrics small {
   color: var(--muted);
-  font-size: 0.61rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .pressure-incident-metrics > div[data-state="safe"] > strong {
@@ -2437,7 +2453,7 @@
 }
 .pressure-incident-log > header small {
   color: var(--muted);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
 }
 .pressure-incident-log ol {
   display: grid;
@@ -2477,7 +2493,7 @@
 .pressure-incident-log time {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
 }
 .prose .pressure-incident-prompt {
@@ -2500,7 +2516,7 @@
 }
 .pressure-incident-surface-signals li {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   max-width: none;
   padding-inline-start: 0.1rem;
@@ -2567,7 +2583,7 @@
 }
 .pressure-incident-options label > span small {
   color: var(--muted);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 500;
   line-height: 1.3;
 }
@@ -2576,7 +2592,7 @@
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 850;
   line-height: 1;
@@ -2601,7 +2617,7 @@
 .pressure-incident-reading > span {
   color: var(--accent-strong);
   font-family: var(--font-mono);
-  font-size: 0.61rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2670,7 +2686,7 @@
 .pressure-incident-debrief > header span {
   color: var(--accent-strong);
   font-family: var(--font-mono);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2711,7 +2727,7 @@
 .pressure-incident-constraint-grid article > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2744,7 +2760,7 @@
 }
 .pressure-incident-reflection > ol li {
   color: var(--muted);
-  font-size: 0.73rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   max-width: none;
   padding-inline-start: 0.15rem;
@@ -2929,7 +2945,7 @@
 .saturation-boundary-demand small {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.08em;
   line-height: 1.2;
@@ -2983,7 +2999,7 @@
 .saturation-boundary-stage-index {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.1em;
 }
@@ -2998,7 +3014,7 @@
   color: var(--muted);
   display: block;
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.25;
   margin-block-start: 0.15rem;
 }
@@ -3026,7 +3042,7 @@
   background: var(--stage-color);
   color: var(--panel);
   font-family: var(--font-ui);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -3067,7 +3083,7 @@
 .saturation-boundary-diagnosis dt {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.07em;
   line-height: 1.2;
@@ -3137,7 +3153,7 @@
 }
 .saturation-boundary-switch small {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 500;
   line-height: 1.3;
 }
@@ -3245,7 +3261,7 @@
 .request-trace-phone small {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   text-transform: uppercase;
@@ -3294,7 +3310,7 @@
 .request-trace-wire span {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -3314,7 +3330,7 @@
   border-radius: 999px;
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   padding: 0.35rem 0.5rem;
@@ -3369,7 +3385,7 @@
 .prose .request-trace-section-label {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.06em;
   line-height: 1.2;
@@ -3409,7 +3425,7 @@
 .request-trace-rule-primary span {
   color: var(--accent-strong);
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   line-height: 1.2;
   text-transform: uppercase;
@@ -3421,7 +3437,7 @@
   color: var(--muted);
   cursor: pointer;
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   line-height: 1.2;
   text-transform: uppercase;
@@ -3457,7 +3473,7 @@
   color: var(--accent-strong);
   content: counter(request-trace-rule);
   display: inline-flex;
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.15rem;
   justify-content: center;
@@ -3549,7 +3565,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   grid-row: 1 / span 2;
   height: 1.35rem;
@@ -3566,7 +3582,7 @@
 .request-trace-flow-node small {
   color: color-mix(in srgb, var(--text) 72%, var(--muted));
   font-family: var(--font-ui);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   grid-column: 1 / -1;
   line-height: 1.1;
@@ -3590,7 +3606,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.45rem;
   justify-content: center;
@@ -3612,7 +3628,7 @@
   border-radius: 999px;
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   justify-self: start;
   line-height: 1.1;
@@ -3643,7 +3659,7 @@
 .request-trace-node dt {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   line-height: 1.2;
   text-transform: uppercase;
@@ -3668,68 +3684,6 @@
   font-size: 0.76rem;
   line-height: 1.35;
   max-width: none;
-}
-.friction-demo-process {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0;
-}
-.friction-demo-process-step {
-  align-items: start;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.3rem;
-  display: grid;
-  gap: 0.25rem 0.6rem;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding: 0.55rem 0.65rem;
-}
-.friction-demo-process-step > span {
-  align-items: center;
-  background: color-mix(in srgb, var(--accent) 18%, var(--bg));
-  border-radius: 999px;
-  color: var(--text);
-  display: inline-flex;
-  font-size: 0.72rem;
-  font-weight: 900;
-  height: 1.45rem;
-  justify-content: center;
-  width: 1.45rem;
-}
-.friction-demo-process-step strong {
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 0.82rem;
-  line-height: 1.2;
-}
-.prose .friction-demo-process-step p {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  margin: 0.1rem 0 0;
-  max-width: none;
-}
-.friction-demo-process-step small,
-.friction-demo-process-step em {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.7rem;
-  font-style: normal;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.friction-demo-process-step small {
-  grid-column: 2;
-}
-.friction-demo-process-step em {
-  color: var(--text);
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  justify-self: end;
-}
-.friction-demo-audit-step {
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.8fr);
 }
 .friction-demo-package {
   display: grid;
@@ -3855,7 +3809,7 @@
 }
 .latency-demo-map-label span {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -3872,7 +3826,7 @@
 .prose .latency-demo-source {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: -0.25rem 0 0;
   max-width: none;
@@ -3906,7 +3860,7 @@
 }
 .scaling-demo-metrics dt {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -3927,7 +3881,7 @@
   padding: 0.42rem 0.55rem;
 }
 .demo-metrics-compact dt {
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.15;
   min-width: 0;
 }
@@ -3966,18 +3920,13 @@
   position: relative;
 }
 .scaling-waterbed-lens::after {
-  border-block-start: 1px dashed
-    color-mix(in srgb, var(--accent-strong) 45%, var(--border));
-  content: "";
-  inset: 2.9rem 0.65rem auto;
-  pointer-events: none;
-  position: absolute;
+  content: none;
 }
 .scaling-waterbed-lens header {
-  align-items: end;
+  align-items: start;
   display: grid;
   gap: 0.5rem;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   position: relative;
   z-index: 1;
 }
@@ -3988,7 +3937,7 @@
 .scaling-waterbed-lens header span {
   color: var(--accent-strong);
   font-family: var(--font-ui);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.1em;
   line-height: 1.1;
@@ -4004,9 +3953,9 @@
 .scaling-waterbed-lens header > strong {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
-  text-align: end;
+  text-align: start;
 }
 .scaling-waterbed-flow {
   display: grid;
@@ -4027,7 +3976,7 @@
 .scaling-waterbed-flow article strong {
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .scaling-waterbed-flow article span {
@@ -4039,7 +3988,7 @@
 .prose .scaling-waterbed-flow > p {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.3;
   margin: 0;
   max-width: none;
@@ -4171,7 +4120,7 @@
   border-radius: 999px;
   color: var(--text);
   display: inline-flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 1.35rem;
   justify-content: center;
@@ -4399,7 +4348,7 @@
 }
 .observability-demo-result span {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -4466,7 +4415,7 @@
 }
 .reflection-package-evidence small {
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
   line-height: 1.32;
 }
 .reflection-package-gaps ul {
@@ -4690,7 +4639,7 @@
   display: inline-flex;
   flex: 0 0 auto;
   font: inherit;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   justify-content: center;
   line-height: 1;
@@ -4791,7 +4740,7 @@
 }
 .model-eval-results th {
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .model-eval-results tr:last-child td {
@@ -4889,7 +4838,7 @@
 .prose .orchestration-lab-kicker {
   color: var(--orchestration-accent);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.1em;
   margin: 0 0 0.5rem;
@@ -4943,7 +4892,7 @@
 }
 .orchestration-lab-status small {
   color: var(--orchestration-muted);
-  font-size: 0.73rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin-block-start: 0.25rem;
 }
@@ -4954,7 +4903,7 @@
     color-mix(in srgb, var(--orchestration-amber) 38%, transparent);
   color: var(--orchestration-muted);
   display: flex;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   gap: 0.75rem;
   line-height: 1.4;
   padding: 0.55rem clamp(1rem, 2.5vw, 1.6rem);
@@ -4997,7 +4946,7 @@
 .orchestration-metrics span {
   color: var(--orchestration-muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -5118,7 +5067,7 @@
 .orchestration-service small {
   color: var(--orchestration-muted);
   font-family: var(--font-mono);
-  font-size: 0.61rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -5129,7 +5078,7 @@
 .orchestration-service > span:last-child {
   color: var(--orchestration-accent);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .orchestration-route {
@@ -5169,12 +5118,12 @@
 .orchestration-node > header span {
   color: var(--orchestration-accent);
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
 }
 .orchestration-node > header strong {
   color: var(--orchestration-text);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
 }
 .orchestration-node ul {
   display: grid;
@@ -5223,12 +5172,12 @@
 .orchestration-pod strong {
   color: var(--orchestration-text);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
 }
 .orchestration-pod small {
   color: var(--orchestration-muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   margin-block-start: 0.15rem;
 }
 .orchestration-pod[data-pod-release="v2"] {
@@ -5250,7 +5199,7 @@
 .orchestration-node-empty {
   align-self: center;
   color: var(--orchestration-muted);
-  font: 0.58rem/1.3 var(--font-mono);
+  font: var(--demo-font-label)/1.3 var(--font-mono);
   letter-spacing: 0.04em;
   text-align: center;
   text-transform: uppercase;
@@ -5275,18 +5224,18 @@
 }
 .orchestration-observer-heading span {
   color: var(--orchestration-text);
-  font: 800 0.72rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .orchestration-observer-heading small {
   color: var(--orchestration-muted);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   margin-block-start: 0.25rem;
 }
 .orchestration-observer-heading strong {
   color: var(--orchestration-accent);
-  font: 700 0.68rem/1.2 var(--font-mono);
+  font: 700 var(--demo-font-label)/1.2 var(--font-mono);
 }
 .orchestration-observer ol {
   display: grid;
@@ -5301,7 +5250,7 @@
   border-block-end: 1px solid
     color-mix(in srgb, var(--orchestration-line) 65%, transparent);
   display: grid;
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   gap: 0.65rem;
   grid-template-columns: 5.4rem minmax(0, 1fr);
   line-height: 1.35;
@@ -5312,7 +5261,7 @@
 .orchestration-observer li strong {
   color: var(--orchestration-amber);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .orchestration-observer li span {
@@ -5327,7 +5276,7 @@
   color: var(--orchestration-text);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.06em;
   padding: 0.8rem 1rem;
@@ -5371,7 +5320,7 @@
 .prose .benchmark-demo-eyebrow {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.09em;
   line-height: 1.2;
@@ -5417,7 +5366,7 @@
   border: 1px solid var(--border);
   color: var(--text);
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   line-height: 1.25;
   padding: 0.52rem 0.6rem 0.52rem 1.65rem;
@@ -5494,7 +5443,7 @@
   color: var(--muted);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   gap: 0.3rem;
   text-transform: uppercase;
 }
@@ -5536,7 +5485,7 @@
 .prose .benchmark-demo-chart.is-awaiting p {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: 22ch;
@@ -5552,7 +5501,7 @@
   color: var(--muted);
   content: "Previous run · settings changed";
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   inset-block-start: 50%;
   inset-inline-start: 50%;
@@ -5602,7 +5551,7 @@
   background: var(--panel);
   color: var(--warning);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 850;
   inset-block-end: 0.2rem;
@@ -5615,7 +5564,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   justify-content: space-between;
   margin-block-start: 0.35rem;
 }
@@ -5631,7 +5580,7 @@
   border-inline-start: 0.2rem solid var(--accent-strong);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: none;
@@ -5664,12 +5613,12 @@
 }
 .otel-demo-pipeline b {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .otel-demo-pipeline small {
   color: var(--muted);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
 }
 .otel-demo-pipeline > i {
   align-self: center;
@@ -5684,7 +5633,7 @@
   border-block-start: 0;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: none;
@@ -5717,14 +5666,14 @@
 .otel-demo-trace-heading code {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
   overflow-wrap: anywhere;
   text-align: end;
 }
 .prose .otel-demo-trace-instruction {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: -0.25rem 0 0;
   max-width: none;
@@ -5734,7 +5683,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   justify-content: space-between;
   margin-inline-start: min(42%, 12rem);
   padding-block: 0.55rem 0.28rem;
@@ -5779,7 +5728,7 @@
 .otel-demo-span-label small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .otel-demo-span-track {
@@ -5809,7 +5758,7 @@
 }
 .otel-demo-span-row > strong {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   text-align: end;
 }
 .otel-demo-inspector {
@@ -5835,13 +5784,13 @@
 .otel-demo-attributes dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .otel-demo-span-facts dd,
 .otel-demo-attributes dd {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   margin: 0.18rem 0 0;
   overflow-wrap: anywhere;
 }
@@ -5861,7 +5810,7 @@
 .otel-demo-record summary {
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   padding: 0.6rem;
   text-transform: uppercase;
@@ -5875,7 +5824,7 @@
   border-radius: 0;
   color: var(--panel);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-block-size: 20rem;
@@ -5891,7 +5840,7 @@
 .prose .otel-demo-record p {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: none;
@@ -5905,176 +5854,6 @@
   }
 }
 
-/* Shared systems-lab treatment for demos in chapters and the showcase. */
-:is(
-  .project-fit,
-  .model-eval-demo,
-  .observability-demo,
-  .reflection-package-demo,
-  .agent-fleet-demo,
-  .scaling-demo,
-  .orchestration-lab
-) {
-  background:
-    linear-gradient(
-      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
-      transparent 1px
-    ),
-    var(--panel);
-  background-size: 1.5rem 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 0;
-  box-sizing: border-box;
-  box-shadow: var(--shadow);
-  inline-size: 100%;
-  max-inline-size: none;
-  max-width: none;
-  position: relative;
-}
-.book-shell
-  .prose
-  > :is(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  ) {
-  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
-  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-:is(
-  .project-fit,
-  .model-eval-demo,
-  .observability-demo,
-  .reflection-package-demo,
-  .agent-fleet-demo,
-  .scaling-demo,
-  .orchestration-lab
-)::before {
-  background: var(--accent-strong);
-  block-size: 0.2rem;
-  content: "";
-  inline-size: 4rem;
-  inset-block-start: -1px;
-  inset-inline-start: -1px;
-  position: absolute;
-  z-index: 2;
-}
-.prose
-  :is(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  )
-  :where([class$="-kicker"]) {
-  color: var(--accent-strong);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-}
-.prose
-  :is(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  )
-  :where(
-    [class$="-panel"],
-    [class$="-summary"],
-    [class$="-score"],
-    .demo-card,
-    .project-fit-option,
-    .model-eval-card
-  ) {
-  border-radius: 0;
-  box-shadow: none;
-}
-.prose
-  :is(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  )
-  :where(button, select, textarea, input:not([type="range"])) {
-  border-radius: 0;
-}
-.prose
-  :is(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  )
-  :where(button, summary) {
-  text-underline-offset: 0.16em;
-}
-
-/* The catalogue supplies its own outer frame and numbered navigation rail. */
-.demo-gallery-item
-  > :where(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo,
-    .orchestration-lab
-  ) {
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  inline-size: 100%;
-  margin: 0;
-  max-inline-size: none;
-  max-width: none;
-}
-.demo-gallery-item
-  > :where(
-    .project-fit,
-    .model-eval-demo,
-    .observability-demo,
-    .reflection-package-demo,
-    .agent-fleet-demo,
-    .scaling-demo
-  ):not(.orchestration-lab) {
-  background: transparent;
-}
-.demo-gallery-item
-  > section
-  > :where(
-    .project-fit-header,
-    .model-eval-header,
-    .observability-demo-header,
-    .reflection-package-demo-header,
-    .agent-fleet-header,
-    .scaling-demo-header,
-    .orchestration-lab-header
-  ) {
-  border-block-end-color: var(--border);
-}
 .statechart-demo {
   --statechart-ink: color-mix(in srgb, var(--text) 88%, #142a32);
   --statechart-line: color-mix(in srgb, var(--text) 22%, var(--border));
@@ -6105,7 +5884,7 @@
   border-radius: 999px;
   color: var(--bg);
   display: inline-flex;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   justify-content: center;
   width: 1.75rem;
@@ -6121,7 +5900,7 @@
   border-radius: 999px;
   color: var(--accent-strong);
   display: inline-block;
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   letter-spacing: 0.05em;
   margin-inline-start: 0.28rem;
@@ -6145,7 +5924,7 @@
   background: color-mix(in srgb, var(--text) 4%, var(--panel));
   color: var(--muted);
   cursor: pointer;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.05em;
   padding: 0.52rem 0.65rem;
@@ -6189,7 +5968,7 @@
 }
 .statechart-agent-controls label > span {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -6213,7 +5992,7 @@
 }
 .statechart-agent-proposal > div span,
 .statechart-agent-proposal > div i {
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 850;
   letter-spacing: 0.05em;
@@ -6238,7 +6017,7 @@
 .prose .statechart-agent-proposal > p {
   color: color-mix(in srgb, var(--bg) 70%, transparent);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
   max-width: none;
@@ -6254,7 +6033,7 @@
   border-radius: 0.28rem;
   cursor: pointer;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   line-height: 1.2;
   min-height: 2.2rem;
@@ -6286,7 +6065,7 @@
 }
 .statechart-enabled-events > div:first-child small {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
 }
 .statechart-enabled-events > div:last-child {
   display: flex;
@@ -6297,7 +6076,7 @@
   background: var(--panel);
   border-color: var(--border);
   color: var(--text);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   min-height: 1.9rem;
   overflow-wrap: anywhere;
   padding: 0.34rem 0.42rem;
@@ -6308,7 +6087,7 @@
 }
 .statechart-no-events {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-style: italic;
 }
 .statechart-agent-decision {
@@ -6331,7 +6110,7 @@
 }
 .statechart-agent-decision-heading span {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -6339,7 +6118,7 @@
 .statechart-agent-decision-heading code {
   background: transparent;
   color: var(--accent-strong);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   overflow-wrap: anywhere;
   padding: 0;
 }
@@ -6366,7 +6145,7 @@
 }
 .statechart-agent-decision-heading small {
   color: var(--muted);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
 }
 .statechart-agent-options {
   display: flex;
@@ -6386,7 +6165,7 @@
   text-align: start;
 }
 .statechart-agent-options button span {
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
 }
 .statechart-agent-options button[data-statechart-demo-event="CANCEL"] {
@@ -6423,14 +6202,14 @@
 }
 .statechart-workflow-parent-label span {
   color: var(--text);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .statechart-workflow-parent-label small {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
 }
 .statechart-workflow-mainline {
   align-items: center;
@@ -6463,14 +6242,14 @@
 }
 .statechart-workflow-state small {
   color: var(--muted);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .statechart-workflow-state strong {
   color: var(--text);
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
   line-height: 1.1;
 }
 .statechart-workflow-state.is-current,
@@ -6489,7 +6268,7 @@
 }
 .statechart-workflow-arrow span {
   color: var(--muted);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   text-align: center;
   text-transform: uppercase;
@@ -6537,7 +6316,7 @@
 }
 .statechart-workflow-region > b {
   color: var(--muted);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   line-height: 1.15;
   text-transform: uppercase;
 }
@@ -6550,12 +6329,12 @@
 }
 .statechart-workflow-region > div > i {
   color: var(--muted);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
 }
 .statechart-workflow-mini-state {
   display: inline-block;
-  font-size: 0.53rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   min-width: 0;
   padding: 0.28rem 0.32rem;
@@ -6573,7 +6352,7 @@
 }
 .statechart-workflow-return > span {
   color: var(--muted);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   grid-column: 1 / -1;
   justify-self: start;
@@ -6597,13 +6376,13 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   padding: 0.18rem 0.3rem;
 }
 .statechart-workflow-return small {
   color: var(--muted);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   font-style: italic;
 }
 .statechart-workflow-return > i {
@@ -6643,7 +6422,7 @@
 .prose .statechart-workflow-outcome-path > p {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   grid-column: 1 / -1;
   letter-spacing: 0.05em;
@@ -6664,14 +6443,14 @@
 }
 .statechart-workflow-outcome-source small {
   color: var(--muted);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   text-transform: uppercase;
 }
 .statechart-workflow-outcome-source code {
   background: transparent;
   color: var(--text);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   padding: 0;
 }
@@ -6694,7 +6473,7 @@
 .statechart-workflow-readout span,
 .statechart-workflow-ledger > div > span {
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -6702,14 +6481,14 @@
 .statechart-workflow-readout code {
   background: transparent;
   color: var(--accent-strong);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   overflow-wrap: anywhere;
   padding: 0;
 }
 .prose .statechart-workflow-readout p {
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
   max-width: none;
@@ -6726,7 +6505,7 @@
 .prose .statechart-demo-definition-actions p {
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
   max-width: 46ch;
@@ -6742,7 +6521,7 @@
   border: 1px solid var(--border);
   border-radius: 0.28rem;
   color: var(--text);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   min-height: 2rem;
   padding: 0.4rem 0.5rem;
@@ -6853,11 +6632,11 @@
 .statechart-workflow-ledger li span,
 .statechart-workflow-ledger li small {
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
 }
 .statechart-workflow-ledger li code {
   color: var(--text);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
 }
 .statechart-workflow-ledger li small {
@@ -6867,7 +6646,7 @@
 .statechart-workflow-ledger li.is-empty {
   color: var(--muted);
   display: block;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-style: italic;
 }
 
@@ -7394,7 +7173,7 @@
 .architecture-lens-equation small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   grid-column: 1 / -1;
   letter-spacing: 0.08em;
   text-align: right;
@@ -7437,7 +7216,7 @@
 }
 .architecture-lens legend {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.04em;
   padding-inline: 0.35rem;
@@ -7491,6 +7270,20 @@
   outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
   outline-offset: 2px;
 }
+.architecture-lens-options input:disabled {
+  cursor: not-allowed;
+}
+.architecture-lens-options input:disabled + span {
+  background: var(--bg);
+  border-style: dashed;
+  transform: none;
+}
+.prose .architecture-lens-initial-help {
+  color: var(--muted);
+  font-size: 0.86rem;
+  margin: 0;
+  max-width: none;
+}
 .architecture-lens-options strong {
   color: var(--text);
   font-family: var(--font-mono);
@@ -7498,7 +7291,7 @@
 }
 .architecture-lens-options small {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.25;
 }
 .architecture-lens-workbench {
@@ -7554,7 +7347,7 @@
 }
 .architecture-lens-browser-bar code {
   color: var(--panel);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
   margin-inline-start: 0.3rem;
   opacity: 0.8;
 }
@@ -7567,6 +7360,7 @@
   display: flex;
   gap: 0.5rem;
   justify-content: space-between;
+  min-block-size: 5.1rem;
   padding-block-end: 0.55rem;
 }
 .architecture-lens-document-head > div {
@@ -7574,7 +7368,7 @@
 }
 .architecture-lens-document-head small {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .architecture-lens-document-head strong {
@@ -7588,7 +7382,7 @@
     color-mix(in srgb, var(--architecture-flow) 55%, var(--border));
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   padding: 0.22rem 0.3rem;
 }
 .architecture-lens-document ul {
@@ -7601,7 +7395,7 @@
 .architecture-lens-document li {
   border-block-end: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.3;
   max-width: none;
   padding: 0.45rem 0;
@@ -7610,7 +7404,7 @@
   color: var(--muted);
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   width: 3.2rem;
 }
 .architecture-lens-draft {
@@ -7626,20 +7420,20 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   justify-content: space-between;
   text-transform: uppercase;
 }
 .architecture-lens-draft > span small {
   color: var(--architecture-primary);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
 }
 .architecture-lens-draft input {
   background: var(--panel);
   border: 1px solid var(--border);
   color: var(--text);
   font: inherit;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   min-width: 0;
   padding: 0.38rem 0.45rem;
   width: 100%;
@@ -7654,7 +7448,7 @@
   color: var(--panel);
   cursor: pointer;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   padding: 0.5rem 0.6rem;
   width: 100%;
@@ -7671,7 +7465,7 @@
   border-block-start: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   min-height: 2.9rem;
   padding: 0.5rem 0.8rem;
 }
@@ -7694,17 +7488,17 @@
 .architecture-lens-receipt dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .architecture-lens-receipt dd {
   color: var(--text);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   line-height: 1.25;
   margin: 0.12rem 0 0;
-  min-height: 1.55rem;
+  min-height: 1.9rem;
   overflow-wrap: anywhere;
 }
 .architecture-lens-receipt .architecture-lens-transfer {
@@ -7720,16 +7514,17 @@
 }
 .architecture-lens-transfer strong {
   color: var(--text);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
   white-space: nowrap;
 }
 .architecture-lens-transfer small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   grid-column: 1 / -1;
   line-height: 1.2;
+  min-block-size: 1.8rem;
 }
 .architecture-lens-transfer-track {
   align-self: center;
@@ -7741,21 +7536,13 @@
 }
 .architecture-lens-transfer-track i {
   background: var(--architecture-primary);
-  flex: 0 0 var(--transfer-warm, 36%);
+  flex: 0 0 var(--transfer-share, 100%);
   min-width: 0.2rem;
-}
-.architecture-lens-transfer-track b {
-  background: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--architecture-flow) 75%, var(--panel)) 0 0.2rem,
-    color-mix(in srgb, var(--architecture-flow) 28%, var(--panel)) 0.2rem 0.4rem
-  );
-  flex: 0 0 var(--transfer-cold-extra, 0%);
 }
 .prose .architecture-lens-transfer-note {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
   max-width: none;
@@ -7778,7 +7565,7 @@
 .architecture-lens-session output {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   text-transform: uppercase;
 }
@@ -7794,7 +7581,7 @@
 .prose .architecture-lens-session p {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
   max-width: none;
@@ -7817,7 +7604,7 @@
   display: flex;
   flex-direction: column;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   inset: 0 auto 0 0;
   letter-spacing: 0.08em;
   position: absolute;
@@ -7869,20 +7656,20 @@
 }
 .architecture-sequence-participant span {
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
 }
 .architecture-sequence-participant small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.25;
 }
 .architecture-sequence-participant::after {
   content: "";
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
   min-block-size: 0.58rem;
   text-transform: uppercase;
@@ -7918,7 +7705,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   gap: 0.4rem;
   inset-inline: 0;
@@ -7993,14 +7780,14 @@
 }
 .architecture-sequence-message strong {
   color: var(--text);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.15;
   white-space: nowrap;
 }
 .architecture-sequence-message small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -8097,13 +7884,13 @@
 .architecture-lens-facts dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .architecture-lens-facts dd {
   color: var(--text);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0.18rem 0 0;
 }
@@ -8111,7 +7898,7 @@
   background: color-mix(in srgb, var(--warning) 9%, var(--panel));
   border-inline-start: 0.22rem solid var(--warning);
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   grid-column: 1 / -1;
   inline-size: 100%;
   max-width: none;
@@ -8231,7 +8018,7 @@
 .activation-lens-question small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
 }
 .prose .activation-lens-intro {
   color: var(--muted);
@@ -8249,7 +8036,7 @@
 .activation-lens-mode-picker legend {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   letter-spacing: 0.08em;
   padding: 0 0 0.42rem;
@@ -8299,7 +8086,7 @@
 .activation-lens-mode-options small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   line-height: 1.25;
 }
 .activation-lens-mode-options input:checked + span {
@@ -8346,14 +8133,14 @@
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   margin-inline-start: 0.3rem;
   padding: 0.16rem 0.45rem;
 }
 .activation-lens-browser-bar span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   margin-inline-start: auto;
   text-transform: uppercase;
 }
@@ -8381,7 +8168,7 @@
   color: var(--muted);
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   margin-block-end: 0.35rem;
   text-transform: uppercase;
@@ -8389,14 +8176,16 @@
 .activation-region > [data-activation-region-state] {
   background: var(--bg);
   border: 1px solid var(--activation-region-color);
-  bottom: 0.3rem;
   color: var(--muted);
+  display: block;
   font-family: var(--font-mono);
-  font-size: 0.46rem;
-  line-height: 1;
+  font-size: var(--demo-font-label);
+  inline-size: fit-content;
+  line-height: 1.25;
+  margin: 0.45rem 0 0 auto;
+  max-inline-size: 100%;
   padding: 0.18rem 0.25rem;
-  position: absolute;
-  right: 0.3rem;
+  text-align: end;
   text-transform: uppercase;
 }
 .activation-region.is-active {
@@ -8485,7 +8274,7 @@
   background: var(--bg);
   border-inline-start: 0.14rem solid var(--activation-region-color);
   color: var(--text);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   line-height: 1.3;
   max-width: none;
   padding: 0.27rem 0.35rem;
@@ -8493,7 +8282,7 @@
 .activation-region--feed b {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   margin-inline-end: 0.35rem;
 }
 .activation-region--form {
@@ -8515,7 +8304,7 @@
   border: 1px solid var(--text);
   color: var(--panel);
   cursor: pointer;
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   min-block-size: 1.65rem;
   padding: 0.35rem;
@@ -8562,7 +8351,7 @@
   border-block-start: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: none;
@@ -8581,12 +8370,12 @@
 .activation-lens-phase-heading span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 .activation-lens-phase-heading strong {
   color: var(--activation-hot);
-  font-size: 0.6rem;
+  font-size: var(--demo-font-label);
 }
 .activation-lens-trace {
   counter-reset: none;
@@ -8631,7 +8420,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   height: 1.45rem;
   justify-content: center;
   position: relative;
@@ -8649,13 +8438,13 @@
 }
 .activation-lens-trace strong {
   color: var(--text);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .activation-lens-trace small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.53rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 .activation-lens-trace li.is-active > span,
@@ -8684,13 +8473,13 @@
 .activation-lens-metrics dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .activation-lens-metrics dd {
   color: var(--text);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 780;
   line-height: 1.3;
   margin: 0.35rem 0 0;
@@ -8713,7 +8502,7 @@
 }
 .prose .activation-lens-readout p {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: 58ch;
@@ -8728,7 +8517,7 @@
 .activation-lens-pressure > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -8739,7 +8528,7 @@
 .prose .activation-lens-note {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.53rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0.55rem 0 0;
   max-width: none;
@@ -8835,7 +8624,7 @@
 .api-contract-lens-badge small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
 }
 .prose .api-contract-lens-intro {
   color: var(--muted);
@@ -8853,7 +8642,7 @@
 .api-contract-lens-picker legend {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   letter-spacing: 0.08em;
   padding-block-end: 0.42rem;
@@ -8896,13 +8685,13 @@
 }
 .api-contract-lens-options strong {
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .api-contract-lens-options small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .api-contract-lens-options input:checked + span {
@@ -8943,13 +8732,13 @@
 .api-contract-lens-change small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .api-contract-lens-intent strong {
   color: var(--text);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.3;
 }
 .api-contract-lens-change {
@@ -8996,7 +8785,7 @@
 .api-contract-lens-panel-heading span,
 .api-contract-lens-panel-heading strong {
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -9011,7 +8800,7 @@
   border: 0;
   border-radius: 0;
   color: var(--code-text);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   line-height: 1.48;
   margin: 0;
   min-block-size: 18.8rem;
@@ -9038,7 +8827,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   gap: 0.28rem;
   min-height: 1.75rem;
   padding: 0.28rem 0.38rem;
@@ -9050,7 +8839,7 @@
 }
 .api-contract-lens-flow span b {
   color: var(--api-contract-ink);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
 }
 .api-contract-lens-flow i {
   border-block-start: 1px dashed var(--border);
@@ -9112,7 +8901,7 @@
   color: var(--muted);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   height: 1.28rem;
   justify-content: center;
   margin-block-start: 0.02rem;
@@ -9125,14 +8914,14 @@
 .api-contract-lens-trace strong {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.53rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
 .prose .api-contract-lens-trace p {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: none;
@@ -9180,10 +8969,10 @@
   text-transform: uppercase;
 }
 .api-contract-lens-runway > button span {
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
 }
 .api-contract-lens-runway > button small {
-  font-size: 0.43rem;
+  font-size: var(--demo-font-label);
   font-weight: 650;
   letter-spacing: 0.04em;
   opacity: 0.72;
@@ -9214,14 +9003,14 @@
 .api-contract-lens-receipt span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.45rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .api-contract-lens-receipt strong {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 .api-contract-lens-receipt.is-complete {
@@ -9240,7 +9029,7 @@
   border-block-start: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.53rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: none;
@@ -9256,7 +9045,7 @@
   color: var(--text);
   display: flex;
   font-family: var(--font-ui);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   gap: 0.42rem;
   margin: 0 0 0.5rem;
 }
@@ -9266,7 +9055,7 @@
   color: var(--api-contract-ink);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   height: 1.2rem;
   justify-content: center;
   width: 1.2rem;
@@ -9281,7 +9070,7 @@
 .api-contract-lens-ledger li {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   max-width: none;
   padding-inline-start: 0.82rem;
@@ -9310,13 +9099,13 @@
 .api-contract-lens-delta small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .api-contract-lens-delta strong {
   color: var(--text);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
 }
 .api-contract-lens-facts {
@@ -9335,13 +9124,13 @@
 .api-contract-lens-facts dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .api-contract-lens-facts dd {
   color: var(--text);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 780;
   line-height: 1.3;
   margin: 0.35rem 0 0;
@@ -9364,7 +9153,7 @@
 }
 .prose .api-contract-lens-readout p {
   color: var(--muted);
-  font-size: 0.69rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: 58ch;
@@ -9383,18 +9172,18 @@
 .api-contract-lens-caution > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .api-contract-lens-caution > strong {
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
 }
 .prose .api-contract-lens-note {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0.55rem 0 0;
   max-width: none;
@@ -9510,7 +9299,7 @@
 .cache-control-lab-badge small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
 }
 .prose .cache-control-lab-intro {
   color: var(--muted);
@@ -9528,7 +9317,7 @@
 .cache-control-lab-profiles legend {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   letter-spacing: 0.08em;
   padding-block-end: 0.42rem;
@@ -9571,13 +9360,13 @@
 }
 .cache-control-lab-profile-options strong {
   color: var(--text);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .cache-control-lab-profile-options small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
 }
 .cache-control-lab-profile-options input:checked + span {
@@ -9611,7 +9400,7 @@
 .cache-control-lab-origin-change small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -9624,7 +9413,7 @@
 .cache-control-lab-age > strong {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   text-align: right;
 }
 .cache-control-lab-origin-change {
@@ -9649,7 +9438,7 @@
 }
 .cache-control-lab-origin-change strong {
   color: var(--text);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
 }
 .cache-control-lab-stage {
   display: grid;
@@ -9675,7 +9464,7 @@
 .cache-control-lab-panel-heading span,
 .cache-control-lab-panel-heading strong {
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -9690,7 +9479,7 @@
   border: 0;
   border-radius: 0;
   color: var(--code-text);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   line-height: 1.52;
   margin: 0;
   min-block-size: 10.6rem;
@@ -9732,7 +9521,7 @@
 .cache-control-lab-clock span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
 }
 .cache-control-lab-clock span:nth-of-type(2) {
   text-align: center;
@@ -9766,21 +9555,21 @@
   color: var(--cache-ink);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   height: 1.3rem;
   justify-content: center;
   width: 1.3rem;
 }
 .cache-control-node strong {
   color: var(--text);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.2;
   margin-block-start: 0.35rem;
 }
 .cache-control-node small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 .cache-control-node.is-active {
@@ -9831,7 +9620,7 @@
   color: var(--cache-ink);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   height: 1.4rem;
   justify-content: center;
   width: 1.4rem;
@@ -9842,12 +9631,12 @@
 }
 .cache-control-lab-decision li strong {
   color: var(--text);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
 }
 .cache-control-lab-decision li small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.51rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 .cache-control-lab-decision li.is-active {
@@ -9865,7 +9654,7 @@
   color: var(--panel);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.57rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   margin: 0.62rem;
   min-block-size: 2rem;
@@ -9900,13 +9689,13 @@
 .cache-control-lab-facts dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .cache-control-lab-facts dd {
   color: var(--text);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 780;
   line-height: 1.3;
   margin: 0.35rem 0 0;
@@ -9929,7 +9718,7 @@
 }
 .prose .cache-control-lab-readout p {
   color: var(--muted);
-  font-size: 0.69rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: 58ch;
@@ -9944,18 +9733,18 @@
 .cache-control-lab-rule > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .cache-control-lab-rule > strong {
   color: var(--text);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
 }
 .prose .cache-control-lab-note {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0.55rem 0 0;
   max-width: none;
@@ -10077,7 +9866,7 @@
 .prose .browser-performance-eyebrow {
   color: var(--performance-accent);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 1.2;
@@ -10105,13 +9894,13 @@
 .browser-performance-summary span {
   color: var(--performance-signal);
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
   font-weight: 700;
 }
 
 .browser-performance-summary small {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
 }
 
@@ -10152,7 +9941,7 @@
 .browser-performance-strategies legend {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -10207,14 +9996,14 @@
 
 .browser-performance-strategies span {
   color: var(--muted);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
 }
 
 .browser-performance-strategies strong {
   color: var(--text);
   display: block;
-  font-size: 0.71rem;
+  font-size: var(--demo-font-label);
   margin-block-end: 0.08rem;
 }
 
@@ -10224,7 +10013,7 @@
   color: var(--bg);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.05em;
   min-block-size: 2.7rem;
@@ -10245,7 +10034,7 @@
 .prose .browser-performance-caveat {
   border-inline-start: 0.2rem solid var(--performance-accent);
   color: var(--muted);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: none;
@@ -10269,7 +10058,7 @@
   border: 1px solid var(--performance-signal);
   color: var(--performance-signal);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.07em;
   padding: 0.27rem 0.4rem;
   text-transform: uppercase;
@@ -10289,7 +10078,7 @@
   align-self: center;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   line-height: 1.5;
   margin: 0 auto;
   max-width: 34ch;
@@ -10311,7 +10100,7 @@
 
 .browser-performance-run > span {
   color: var(--muted);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   text-transform: uppercase;
 }
 
@@ -10334,13 +10123,13 @@
 
 .browser-performance-run > strong {
   color: var(--text);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   text-align: end;
 }
 
 .browser-performance-run > small {
   color: var(--muted);
-  font-size: 0.47rem;
+  font-size: var(--demo-font-label);
   grid-column: 2 / -1;
   margin-block-start: -0.42rem;
 }
@@ -10368,7 +10157,7 @@
 .browser-performance-metrics dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   line-height: 1.35;
   min-block-size: 2.7em;
@@ -10388,7 +10177,7 @@
   background: color-mix(in srgb, var(--performance-signal) 8%, var(--panel));
   border-inline-start: 0.22rem solid var(--performance-signal);
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.5;
   margin: 0;
   max-width: none;
@@ -10413,7 +10202,7 @@
   text-align: end;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   position: absolute;
   text-transform: uppercase;
@@ -10440,12 +10229,12 @@
 .browser-performance-event i {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.42rem;
+  font-size: var(--demo-font-label);
 }
 
 .browser-performance-event strong {
   color: var(--text);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -10549,7 +10338,7 @@
 .prose .law-demo-step {
   color: var(--law-accent);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   font-weight: 700;
   letter-spacing: 0.09em;
   line-height: 1.35;
@@ -10574,7 +10363,7 @@
   color: var(--law-signal);
   display: grid;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -10611,7 +10400,7 @@
 .law-demo-controls label > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.57rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -10625,14 +10414,14 @@
 .law-demo-controls output {
   color: var(--law-accent);
   font-family: var(--font-mono);
-  font-size: 0.61rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
 }
 
 .prose .law-demo-control-note {
   border-inline-start: 0.2rem solid var(--law-alert);
   color: var(--muted);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
   line-height: 1.5;
   margin: 0;
   max-width: none;
@@ -10663,7 +10452,7 @@
 .law-demo-equation small {
   color: color-mix(in srgb, var(--code-text) 70%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -10689,7 +10478,7 @@
 .law-demo-metrics dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.47rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   line-height: 1.35;
   min-block-size: 2.7em;
@@ -10709,7 +10498,7 @@
   background: color-mix(in srgb, var(--law-signal) 7%, var(--panel));
   border-inline-start: 0.22rem solid var(--law-signal);
   color: var(--muted);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   line-height: 1.52;
   margin: 0;
   max-width: none;
@@ -10757,7 +10546,7 @@
   color: var(--muted);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.49rem;
+  font-size: var(--demo-font-label);
   font-weight: 750;
   letter-spacing: 0.035em;
   line-height: 1.35;
@@ -10798,7 +10587,7 @@
 .lusser-equations small {
   color: color-mix(in srgb, var(--code-text) 65%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.43rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.055em;
   line-height: 1.4;
   text-transform: uppercase;
@@ -10814,7 +10603,7 @@
 .lusser-equations span {
   color: var(--code-text);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
 }
 
@@ -10842,7 +10631,7 @@
 .lusser-outcomes-heading small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.45rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.045em;
   text-transform: uppercase;
 }
@@ -10902,7 +10691,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.43rem;
+  font-size: var(--demo-font-label);
   justify-content: space-between;
   text-transform: uppercase;
 }
@@ -11027,7 +10816,7 @@
 .amdahl-baseline > strong,
 .amdahl-parallel > strong {
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
 }
 
 .amdahl-baseline > span,
@@ -11075,7 +10864,7 @@
 .amdahl-legend span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
 }
 
 .amdahl-legend span::before {
@@ -11145,7 +10934,7 @@
   color: var(--muted);
   display: flex;
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   justify-content: space-between;
   text-transform: uppercase;
 }
@@ -11264,21 +11053,21 @@
 .cgv-loop-map span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   grid-row: 1 / 3;
 }
 
 .cgv-loop-map strong {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .cgv-loop-map small {
   color: var(--muted);
-  font-size: 0.57rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
@@ -11298,7 +11087,7 @@
   color: var(--cgv-pass);
   content: "✓";
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   position: absolute;
   right: 0.55rem;
   top: 0.45rem;
@@ -11308,7 +11097,7 @@
   background: var(--cgv-fail);
   color: var(--bg);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.05em;
   opacity: 0;
@@ -11372,14 +11161,14 @@
 
 .cgv-fixture-bar > span {
   color: var(--border-strong);
-  font-size: 0.36rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.08rem;
 }
 
 .cgv-fixture-bar > strong {
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
 }
 
 .cgv-fixture-bar > button {
@@ -11387,7 +11176,7 @@
   border: 0;
   color: var(--bg);
   font-family: var(--font-mono);
-  font-size: 0.42rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   opacity: 0.48;
   padding: 0.32rem 0.4rem;
@@ -11412,7 +11201,7 @@
   border: 0;
   border-block-end: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   line-height: 1.3;
   padding: 0.4rem 0.5rem;
   text-align: start;
@@ -11421,7 +11210,7 @@
 .cgv-fixture th {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.43rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -11439,7 +11228,7 @@
 .prose .cgv-eyebrow {
   color: var(--cgv-active);
   font-family: var(--font-mono);
-  font-size: 0.51rem;
+  font-size: var(--demo-font-label);
   font-weight: 700;
   letter-spacing: 0.08em;
   margin: 0 0 0.25rem;
@@ -11483,12 +11272,12 @@
 
 .cgv-constraints label strong {
   color: var(--text);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
 }
 
 .cgv-constraints label small {
   color: var(--muted);
-  font-size: 0.59rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
 }
 
@@ -11500,7 +11289,7 @@
 .cgv-task-brief > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -11508,7 +11297,7 @@
 .prose .cgv-task-brief p {
   color: var(--text);
   font-family: var(--font-serif);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0.16rem 0 0;
   max-width: none;
@@ -11525,7 +11314,7 @@
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   padding: 0.25rem 0.4rem;
   text-transform: uppercase;
   white-space: nowrap;
@@ -11536,7 +11325,7 @@
   border: 1px solid var(--border);
   color: var(--code-text);
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   min-block-size: 8.2rem;
   padding: 0.8rem;
@@ -11555,7 +11344,7 @@
 .cgv-artifact-grid section > span {
   color: color-mix(in srgb, var(--code-text) 58%, transparent);
   display: block;
-  font-size: 0.44rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   margin-block-end: 0.42rem;
   text-transform: uppercase;
@@ -11572,7 +11361,7 @@
 .cgv-revision > span {
   color: color-mix(in srgb, var(--code-text) 58%, transparent);
   display: block;
-  font-size: 0.44rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   margin-block-end: 0.5rem;
   text-transform: uppercase;
@@ -11595,7 +11384,7 @@
     color-mix(in srgb, var(--code-text) 18%, transparent);
   color: var(--code-text);
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
   margin: 0;
   max-width: none;
   padding-block-start: 0.45rem;
@@ -11604,7 +11393,7 @@
 .cgv-artifact-grid p b {
   color: color-mix(in srgb, var(--code-text) 58%, transparent);
   display: block;
-  font-size: 0.42rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.04em;
   margin-block-end: 0.12rem;
   text-transform: uppercase;
@@ -11615,7 +11404,7 @@
   border-inline-start: 0.16rem solid var(--cgv-active);
   color: var(--code-text);
   font-family: var(--font-mono);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   line-height: 1.55;
   margin: 0;
   overflow: auto;
@@ -11637,7 +11426,7 @@
 
 .cgv-candidate dt {
   color: color-mix(in srgb, var(--code-text) 62%, transparent);
-  font-size: 0.46rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -11648,7 +11437,7 @@
 
 .prose .cgv-candidate p {
   color: var(--code-text);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   margin: 0;
   max-width: none;
 }
@@ -11678,7 +11467,7 @@
   color: var(--muted);
   display: grid;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   inline-size: 1.4rem;
   text-align: center;
@@ -11691,12 +11480,12 @@
 
 .cgv-checks strong {
   color: var(--text);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
 }
 
 .cgv-checks small {
   color: var(--muted);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
 }
 
 .cgv-checks li.is-pass {
@@ -11721,7 +11510,7 @@
   background: color-mix(in srgb, var(--accent) 7%, var(--panel));
   border-inline-start: 0.2rem solid var(--accent);
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.5;
   margin: 0;
   max-width: none;
@@ -11741,7 +11530,7 @@
   color: var(--text);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   min-block-size: 2.45rem;
   padding: 0.6rem 0.85rem;
@@ -11859,7 +11648,7 @@
 .prose .durable-retry-kicker {
   color: inherit;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.12em;
   margin: 0 0 0.45rem;
@@ -11935,7 +11724,7 @@
   color: var(--panel);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 2rem;
   justify-content: center;
@@ -11956,7 +11745,7 @@
 .prose .durable-retry-ledger header p,
 .prose .durable-retry-artifact p {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.42;
   margin: 0.18rem 0 0;
   max-width: none;
@@ -11977,7 +11766,7 @@
 .durable-retry-prediction legend {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.045em;
   line-height: 1.35;
@@ -12069,7 +11858,7 @@
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   gap: 0.48rem;
   justify-content: center;
@@ -12130,7 +11919,7 @@
 .durable-retry-rail li > span {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
 }
 
@@ -12142,14 +11931,14 @@
 
 .durable-retry-rail strong {
   font-family: var(--font-mono);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
 
 .durable-retry-rail small {
   color: var(--muted);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
@@ -12191,14 +11980,14 @@
 .durable-retry-fault-note > span {
   color: var(--danger);
   font-family: var(--font-mono);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
 
 .prose .durable-retry-fault-note p {
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: none;
@@ -12210,7 +11999,7 @@
   border: 1px solid var(--border);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   padding: 0.08rem 0.22rem;
 }
 
@@ -12234,7 +12023,7 @@
 .durable-retry-metrics dt {
   color: color-mix(in srgb, var(--panel) 72%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.055em;
   line-height: 1.3;
@@ -12286,14 +12075,14 @@
 .durable-retry-app-state dt {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.055em;
   text-transform: uppercase;
 }
 
 .durable-retry-app-state dd {
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   overflow-wrap: anywhere;
@@ -12312,7 +12101,7 @@
 
 .durable-retry-ledger table {
   border-collapse: collapse;
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   min-width: 100%;
@@ -12339,7 +12128,7 @@
   background: var(--bg);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.045em;
   text-transform: uppercase;
 }
@@ -12399,7 +12188,7 @@
 
 .durable-retry-result [data-durable-retry-result-label] {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -12447,7 +12236,7 @@
 .durable-retry-artifact > summary {
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 850;
   letter-spacing: 0.04em;
   padding: 0.9rem 1rem;
@@ -12475,7 +12264,7 @@
   border-radius: 0;
   color: var(--panel);
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   grid-column: 1 / -1;
   line-height: 1.5;
   min-height: 15rem;
@@ -12604,7 +12393,7 @@
 .prose .fleet-trace-kicker {
   color: var(--panel);
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.13em;
   margin: 0 0 0.45rem;
@@ -12654,7 +12443,7 @@
 }
 
 .fleet-trace-summary small {
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
 }
 
@@ -12689,7 +12478,7 @@
   color: var(--panel);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 2.15rem;
   justify-content: center;
@@ -12706,7 +12495,7 @@
 
 .prose .fleet-trace-section-heading p {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0.2rem 0 0;
   max-width: 78ch;
@@ -12721,7 +12510,7 @@
   border: 1px solid var(--border);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   padding: 0.08rem 0.22rem;
 }
 
@@ -12737,7 +12526,7 @@
 .fleet-trace-packet-stamp small {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.5rem;
+  font-size: var(--demo-font-label);
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -12745,14 +12534,14 @@
 
 .fleet-trace-packet-stamp code {
   border: 0;
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   padding: 0;
 }
 
 .fleet-trace-packet-stamp small {
   color: var(--success);
-  font-size: 0.48rem;
+  font-size: var(--demo-font-label);
 }
 
 .fleet-trace-run-strip {
@@ -12778,7 +12567,7 @@
   color: var(--panel);
   display: inline-flex;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   height: 2.15rem;
   justify-content: center;
@@ -12791,18 +12580,18 @@
 }
 
 .fleet-trace-run-strip strong {
-  font-size: 0.74rem;
+  font-size: var(--demo-font-label);
 }
 
 .fleet-trace-run-strip small {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
 }
 
 .fleet-trace-run-strip em {
   border: 1px solid currentColor;
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: var(--demo-font-label);
   font-style: normal;
   font-weight: 900;
   letter-spacing: 0.045em;
@@ -12845,7 +12634,7 @@
   background: var(--fleet-trace-ink);
   color: var(--panel);
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.06em;
   padding: 0.45rem 0.52rem;
@@ -12859,7 +12648,7 @@
 .prose .fleet-trace-rollup h5,
 .prose .fleet-trace-findings h5 {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.04em;
   margin: 0;
@@ -12871,7 +12660,7 @@
 .fleet-trace-physical-label small {
   color: var(--muted);
   display: block;
-  font-size: 0.58rem;
+  font-size: var(--demo-font-label);
   margin-block-start: 0.1rem;
 }
 
@@ -12889,7 +12678,7 @@
 
 .fleet-trace-lab table {
   border-collapse: collapse;
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   min-width: 42rem;
@@ -12909,7 +12698,7 @@
   background: var(--bg);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -12924,7 +12713,7 @@
 .fleet-trace-lab td small {
   color: var(--muted);
   display: block;
-  font-size: 0.52rem;
+  font-size: var(--demo-font-label);
   margin-block-start: 0.2rem;
 }
 
@@ -12946,7 +12735,7 @@
   border: 1px solid var(--fleet-trace-line);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   min-width: 7.5rem;
   padding: 0.52rem 0.65rem;
@@ -12970,7 +12759,7 @@
 
 .fleet-trace-physical-label strong {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   letter-spacing: 0.035em;
   text-transform: uppercase;
 }
@@ -12984,7 +12773,7 @@
   border: 1px solid var(--fleet-trace-line);
   border-radius: 0;
   color: var(--text);
-  font-size: 0.64rem;
+  font-size: var(--demo-font-label);
   min-height: 2.25rem;
   padding: 0.4rem 1.5rem 0.4rem 0.45rem;
   width: 8.5rem;
@@ -13041,7 +12830,7 @@
 
 .prose .fleet-trace-actions p {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: 68ch;
@@ -13061,7 +12850,7 @@
   color: var(--text);
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.035em;
   min-height: 2.65rem;
@@ -13116,7 +12905,7 @@
 .fleet-trace-metrics dt {
   color: color-mix(in srgb, var(--panel) 72%, transparent);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -13176,7 +12965,7 @@
   border-inline-start: 0.2rem solid var(--warning);
   color: var(--warning);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.05em;
   padding-inline-start: 0.35rem;
@@ -13194,13 +12983,13 @@
 }
 
 .fleet-trace-findings strong {
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
 .prose .fleet-trace-findings p {
   color: var(--muted);
-  font-size: 0.62rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: none;
@@ -13215,7 +13004,7 @@
 .fleet-trace-artifact > summary {
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   font-weight: 900;
   letter-spacing: 0.04em;
   padding: 0.9rem;
@@ -13235,7 +13024,7 @@
 
 .prose .fleet-trace-artifact p {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0;
   max-width: 75ch;
@@ -13247,7 +13036,7 @@
   border-radius: 0;
   color: var(--panel);
   font-family: var(--font-mono);
-  font-size: 0.63rem;
+  font-size: var(--demo-font-label);
   grid-column: 1 / -1;
   line-height: 1.5;
   min-height: 19rem;
@@ -13327,130 +13116,6 @@
   }
 }
 
-/* Keep the trace-heavy labs inside the same visual shell as the catalogue. */
-:is(.durable-retry-lab, .fleet-trace-lab) {
-  background:
-    linear-gradient(
-      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
-      transparent 1px
-    ),
-    var(--panel);
-  background-size: 1.5rem 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 0;
-  box-shadow: var(--shadow);
-  inline-size: 100%;
-  max-inline-size: none;
-  max-width: none;
-  position: relative;
-}
-
-.book-shell .prose > :is(.durable-retry-lab, .fleet-trace-lab) {
-  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
-  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-:is(.durable-retry-lab, .fleet-trace-lab)::before {
-  background: var(--accent-strong);
-  block-size: 0.2rem;
-  content: "";
-  inline-size: 4rem;
-  inset-block-start: -1px;
-  inset-inline-start: -1px;
-  position: absolute;
-  z-index: 2;
-}
-
-:is(.durable-retry-header, .fleet-trace-header) {
-  align-items: start;
-  background: transparent;
-  border-block-end: 1px solid var(--border);
-  color: var(--text);
-  gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
-  padding: clamp(1rem, 2vw, 1.5rem);
-}
-
-:is(.durable-retry-header, .fleet-trace-header) > div:first-child {
-  padding: 0;
-}
-
-.prose :is(.durable-retry-kicker, .fleet-trace-kicker) {
-  color: var(--accent-strong);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  line-height: 1.2;
-  margin: 0 0 0.35rem;
-}
-
-.prose :is(.durable-retry-header, .fleet-trace-header) h3 {
-  color: var(--text);
-  font-size: clamp(1.45rem, 1.3vw + 1rem, 2.05rem);
-  letter-spacing: 0;
-  line-height: 1.12;
-}
-
-:is(.durable-retry-summary, .fleet-trace-summary) {
-  align-content: start;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  gap: 0;
-  padding: 0.8rem;
-}
-
-:is(.durable-retry-summary, .fleet-trace-summary) span {
-  display: block;
-  font-family: var(--font-ui);
-  font-size: 1.25rem;
-  font-weight: 850;
-  letter-spacing: 0;
-  line-height: 1.1;
-  text-transform: none;
-}
-
-:is(.durable-retry-summary, .fleet-trace-summary) small {
-  color: var(--muted);
-  display: block;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  margin-top: 0.35rem;
-}
-
-[data-theme="dark"] :is(.durable-retry-summary, .fleet-trace-summary),
-[data-theme="contrast"] :is(.durable-retry-summary, .fleet-trace-summary) {
-  color: var(--text);
-}
-
-.demo-gallery-item > :where(.durable-retry-lab, .fleet-trace-lab) {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  inline-size: 100%;
-  margin: 0;
-  max-inline-size: none;
-  max-width: none;
-}
-
-@media (max-width: 56rem) {
-  :is(.durable-retry-header, .fleet-trace-header) {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 40rem) {
-  :is(.durable-retry-lab, .fleet-trace-lab) {
-    box-shadow: none;
-  }
-}
-
 /* Goodhart pressure test: an industrial calibration card that visibly splits
    a winning dashboard from a degrading outcome. */
 .goodhart-demo {
@@ -13520,8 +13185,8 @@
 .prose .goodhart-section-heading p,
 .prose .goodhart-board-heading p,
 .prose .goodhart-debrief-heading p {
-  color: var(--warning);
-  font: 850 0.67rem/1.2 var(--font-mono);
+  color: var(--accent-strong);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.11em;
   margin: 0 0 0.35rem;
   max-width: none;
@@ -13573,7 +13238,7 @@
   align-items: center;
   color: var(--muted);
   display: flex;
-  font: 800 0.72rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   gap: 0.55rem;
   letter-spacing: 0.08em;
   margin: 0;
@@ -13649,7 +13314,7 @@
   background: var(--text);
   color: var(--panel);
   display: inline-flex;
-  font: 850 0.72rem/1 var(--font-mono);
+  font: 850 var(--demo-font-label)/1 var(--font-mono);
   justify-content: center;
   min-block-size: 2.3rem;
 }
@@ -13681,7 +13346,7 @@
 .goodhart-predictions legend,
 .goodhart-safeguards legend {
   color: var(--muted);
-  font: 800 0.68rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   margin-block-end: 0.55rem;
   padding: 0;
@@ -13731,7 +13396,7 @@
   background: color-mix(in srgb, var(--warning) 14%, var(--panel));
   border: 1px solid color-mix(in srgb, var(--warning) 46%, var(--border));
   color: var(--warning);
-  font: 850 0.62rem/1 var(--font-mono);
+  font: 850 var(--demo-font-label)/1 var(--font-mono);
   min-inline-size: 2.55rem;
   padding: 0.38rem 0.3rem;
   text-align: center;
@@ -13753,7 +13418,7 @@
 .goodhart-targets small,
 .goodhart-safeguards small {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
@@ -13767,7 +13432,7 @@
 .goodhart-contract-note span {
   color: var(--accent-strong);
   display: block;
-  font: 800 0.63rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -13804,7 +13469,7 @@
   border-radius: 0;
   color: var(--panel);
   cursor: pointer;
-  font: 850 0.72rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   inline-size: 100%;
   letter-spacing: 0.06em;
   margin-block-start: 1rem;
@@ -13851,7 +13516,7 @@
   border: 2px solid var(--muted);
   color: var(--muted);
   flex: 0 0 auto;
-  font: 900 0.64rem/1 var(--font-mono);
+  font: 900 var(--demo-font-label)/1 var(--font-mono);
   letter-spacing: 0.08em;
   padding: 0.42rem 0.52rem;
   transform: rotate(-2deg);
@@ -13887,7 +13552,7 @@
 
 .goodhart-measure-kind {
   color: var(--muted);
-  font: 800 0.61rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -13957,7 +13622,7 @@
 .goodhart-gaming-path > span {
   color: var(--warning);
   display: block;
-  font: 850 0.64rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -14050,7 +13715,7 @@
 
 .goodhart-four-part dt {
   color: var(--warning);
-  font: 850 0.64rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -14070,7 +13735,7 @@
 }
 
 .goodhart-artifact label {
-  font: 850 0.68rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -14080,7 +13745,7 @@
   border: 1px solid var(--text);
   border-radius: 0;
   color: var(--panel);
-  font: 0.72rem/1.55 var(--font-mono);
+  font: var(--demo-font-label)/1.55 var(--font-mono);
   inline-size: 100%;
   min-block-size: 14rem;
   padding: 0.85rem;
@@ -14100,7 +13765,7 @@
   border-radius: 0;
   color: var(--text);
   cursor: pointer;
-  font: 800 0.7rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   padding: 0.65rem 0.8rem;
 }
 
@@ -14154,7 +13819,7 @@
   .goodhart-progress li {
     align-items: start;
     flex-direction: column;
-    font-size: 0.62rem;
+    font-size: var(--demo-font-label);
     gap: 0.35rem;
   }
 
@@ -14231,7 +13896,7 @@
 .prose .acid-lab-kicker,
 .prose .cap-lab-kicker {
   color: var(--panel);
-  font: 850 0.68rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.1em;
   margin: 0 0 0.48rem;
   max-width: none;
@@ -14313,7 +13978,7 @@
 .acid-lab-controls label > span,
 .cap-lab-controls label > span {
   color: var(--muted);
-  font: 800 0.64rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
@@ -14350,7 +14015,7 @@
   border-radius: 0;
   color: var(--text);
   cursor: pointer;
-  font: 800 0.7rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   min-block-size: 2.65rem;
   padding: 0.62rem 0.78rem;
 }
@@ -14384,7 +14049,7 @@
 
 .prose .acid-lab-control-note {
   color: var(--muted);
-  font: 0.72rem/1.4 var(--font-mono);
+  font: var(--demo-font-label)/1.4 var(--font-mono);
   margin: -0.35rem 0 0;
   max-width: none;
 }
@@ -14425,7 +14090,7 @@
 
 .acid-lab-rail li > span {
   color: var(--muted);
-  font: 800 0.62rem/1 var(--font-mono);
+  font: 800 var(--demo-font-label)/1 var(--font-mono);
 }
 
 .acid-lab-rail strong {
@@ -14434,7 +14099,7 @@
 
 .acid-lab-rail small {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
@@ -14483,7 +14148,7 @@
   color: var(--panel);
   display: inline-flex;
   flex: 0 0 1.65rem;
-  font: 900 0.68rem/1 var(--font-mono);
+  font: 900 var(--demo-font-label)/1 var(--font-mono);
   height: 1.65rem;
   justify-content: center;
 }
@@ -14499,7 +14164,7 @@
 .prose .acid-lab-record header p,
 .prose .cap-lab-evidence header p {
   color: var(--muted);
-  font-size: 0.66rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0.2rem 0 0;
   max-width: none;
@@ -14524,7 +14189,7 @@
 
 .acid-lab-record dt,
 .acid-lab-record dd {
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
 }
@@ -14545,7 +14210,7 @@
 
 .acid-lab table {
   border-collapse: collapse;
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   margin: 0;
   min-width: 100%;
 }
@@ -14559,7 +14224,7 @@
 
 .acid-lab th {
   color: var(--muted);
-  font: 800 0.6rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -14606,12 +14271,12 @@
 }
 
 .acid-lab-trace li span {
-  font: 850 0.65rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
 }
 
 .acid-lab-trace li small {
   color: var(--muted);
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
 }
 
@@ -14633,7 +14298,7 @@
 .cap-lab-properties dt {
   align-items: center;
   display: flex;
-  font: 800 0.69rem/1.25 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.25 var(--font-mono);
   gap: 0.42rem;
 }
 
@@ -14651,7 +14316,7 @@
 .acid-lab-properties dd,
 .cap-lab-properties dd {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0.38rem 0 0;
 }
@@ -14704,7 +14369,7 @@
 .acid-lab-invariant span,
 .cap-lab-reading span {
   color: var(--panel);
-  font: 800 0.61rem/1.2 var(--font-mono);
+  font: 800 var(--demo-font-label)/1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -14721,7 +14386,7 @@
 .prose .acid-lab-invariant p,
 .prose .cap-lab-reading p {
   color: color-mix(in srgb, currentColor 74%, transparent);
-  font-size: 0.72rem;
+  font-size: var(--demo-font-label);
   line-height: 1.45;
   margin: 0.25rem 0 0;
   max-width: 78ch;
@@ -14732,7 +14397,7 @@
   background: color-mix(in srgb, var(--warning) 7%, var(--panel));
   border-block-start: 1px solid var(--border);
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.5;
   margin: 0;
   max-width: none;
@@ -14853,14 +14518,14 @@
 .cap-lab-topology article > header span {
   background: var(--cap-night);
   color: var(--panel);
-  font: 900 0.68rem/1 var(--font-mono);
+  font: 900 var(--demo-font-label)/1 var(--font-mono);
   letter-spacing: 0.08em;
   padding: 0.38rem 0.45rem;
 }
 
 .cap-lab-topology article > header small {
   color: var(--muted);
-  font: 750 0.61rem/1.2 var(--font-mono);
+  font: 750 var(--demo-font-label)/1.2 var(--font-mono);
 }
 
 .cap-lab-topology article > strong {
@@ -14883,7 +14548,7 @@
 
 .cap-lab-topology article dt,
 .cap-lab-topology article dd {
-  font-size: 0.67rem;
+  font-size: var(--demo-font-label);
   line-height: 1.35;
   margin: 0;
 }
@@ -14907,7 +14572,7 @@
 
 .cap-lab-network span {
   color: var(--muted);
-  font: 750 0.56rem/1.2 var(--font-mono);
+  font: 750 var(--demo-font-label)/1.2 var(--font-mono);
   text-align: center;
   text-transform: uppercase;
 }
@@ -14950,11 +14615,11 @@
 
 .cap-lab-evidence li > span {
   color: var(--muted);
-  font: 850 0.61rem/1.2 var(--font-mono);
+  font: 850 var(--demo-font-label)/1.2 var(--font-mono);
 }
 
 .prose .cap-lab-evidence li p {
-  font-size: 0.7rem;
+  font-size: var(--demo-font-label);
   line-height: 1.4;
   margin: 0;
   max-width: none;
@@ -14978,7 +14643,7 @@
 
 .cap-lab-counters dt {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: var(--demo-font-label);
 }
 
 .cap-lab-counters dd {
@@ -15106,5 +14771,217 @@
   .cap-lab-actions,
   .cap-lab-actions button {
     width: 100%;
+  }
+}
+
+/* Common demo shell. Topic-specific diagrams keep their own internal layout. */
+.prose [data-demo-anchor] {
+  --demo-padding: clamp(1rem, 2vw, 1.5rem);
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent-strong) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--panel);
+  background-size: 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-family: var(--font-ui);
+  inline-size: 100%;
+  max-inline-size: none;
+  margin-block: 2rem;
+  padding: var(--demo-padding);
+  position: relative;
+}
+.book-shell .prose > [data-demo-anchor],
+.book-shell .prose > .exercise-tabs {
+  inline-size: calc(100% + var(--book-demo-inline-extension, 0rem));
+}
+.prose [data-demo-anchor]::before {
+  background: var(--accent-strong);
+  block-size: 0.2rem;
+  content: "";
+  inline-size: 4rem;
+  inset: -1px auto auto -1px;
+  position: absolute;
+}
+.prose [data-demo-anchor]::after {
+  content: none;
+}
+.prose [data-demo-anchor] > .demo-header {
+  align-items: start;
+  background: transparent;
+  border: 0;
+  border-block-end: 1px solid var(--border);
+  color: var(--text);
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  margin: 0 0 1rem;
+  padding: 0 0 1rem;
+}
+.prose [data-demo-anchor] > .demo-header > div:first-child {
+  min-inline-size: 0;
+  padding: 0;
+}
+.prose [data-demo-anchor] .demo-kicker {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: var(--demo-font-label);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  margin: 0 0 0.4rem;
+  max-inline-size: none;
+  text-transform: uppercase;
+}
+.prose [data-demo-anchor] .demo-header h3 {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 1.3vw + 1rem, 2.05rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+  margin: 0;
+  max-inline-size: 28ch;
+  text-transform: none;
+  text-wrap: balance;
+}
+.prose [data-demo-anchor] .demo-summary {
+  align-content: start;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--text);
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 1.0625rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.35;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0.8rem;
+  text-transform: none;
+}
+.prose [data-demo-anchor] .demo-summary > span:not([aria-hidden="true"]),
+.prose [data-demo-anchor] .demo-summary strong {
+  color: var(--text);
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 1.0625rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+.prose [data-demo-anchor] .demo-summary small {
+  color: var(--muted);
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  margin-block-start: 0.35rem;
+  text-transform: none;
+}
+.prose [data-demo-anchor] .architecture-lens-equation {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: start;
+}
+.prose [data-demo-anchor] .architecture-lens-equation > span {
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+}
+.prose [data-demo-anchor] .orchestration-lab-status {
+  display: flex;
+  align-items: start;
+}
+.prose [data-demo-anchor] h4 {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+.prose
+  [data-demo-anchor]
+  :where(
+    [class$="-panel"],
+    [class$="-summary"],
+    [class$="-score"],
+    .demo-card,
+    .project-fit-option,
+    .model-eval-card
+  ) {
+  border-radius: 0;
+  box-shadow: none;
+}
+.prose
+  [data-demo-anchor]
+  :where(button, select, textarea, input:not([type="range"])) {
+  border-radius: 0;
+}
+.prose
+  [data-demo-anchor]
+  :where(button, select, input[type="text"], input[type="number"], textarea) {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.prose
+  [data-demo-anchor]
+  :where(button, select, input[type="text"], input[type="number"]) {
+  min-block-size: 2.5rem;
+}
+.prose [data-demo-anchor] textarea[readonly] {
+  font-family: var(--font-mono);
+}
+.prose
+  [data-demo-anchor]
+  :where(
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex="0"]
+  ):focus-visible {
+  box-shadow: 0 0 0 2px var(--panel);
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+/* The gallery already supplies the outer frame. */
+.prose .demo-gallery-item [data-demo-anchor] {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+}
+@media (width <= 56rem) {
+  .prose [data-demo-anchor] > .demo-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (width <= 40rem) {
+  .prose [data-demo-anchor] {
+    box-shadow: none;
+  }
+  .prose
+    [data-demo-anchor]
+    :where(select, input[type="text"], input[type="number"], textarea) {
+    font-size: 1rem;
   }
 }

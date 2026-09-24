@@ -5,20 +5,20 @@
   data-pressure-map-demo
   aria-labelledby="pressure-map-demo-heading"
 >
-  <div class="scaling-demo-header pressure-incident-header">
+  <div class="scaling-demo-header pressure-incident-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Incident response challenge</p>
+      <p class="scaling-demo-kicker demo-kicker">Incident response challenge</p>
       <h3 id="pressure-map-demo-heading">Keep the event pipeline useful</h3>
     </div>
     <div
-      class="scaling-demo-summary pressure-incident-summary"
+      class="scaling-demo-summary pressure-incident-summary demo-summary"
       aria-live="polite"
     >
       <span data-pressure-map-demo-verdict
         >Round 1 of 3 · Find the boundary</span
       >
       <small data-pressure-map-demo-summary>
-        The conference doors just opened. Commit to evidence before changing the
+        The conference doors just opened. Choose evidence before changing the
         system.
       </small>
     </div>
@@ -59,7 +59,7 @@
       >
         <header class="pressure-incident-section-heading">
           <div>
-            <span>Live system</span>
+            <span>Simulated system</span>
             <h4 id="pressure-incident-console-title">Conference check-in</h4>
           </div>
           <time data-pressure-map-demo-clock>09:02</time>
@@ -151,7 +151,7 @@
             </li>
             <li class="is-current">
               <time>09:02</time>
-              <p>Arrival demand crosses the current capacity envelope.</p>
+              <p>Incoming demand exceeds current capacity.</p>
             </li>
           </ol>
         </section>
@@ -207,8 +207,7 @@
         </fieldset>
 
         <p class="pressure-incident-cost-note" data-pressure-map-demo-cost-note>
-          The response and its displaced complexity will carry into the next
-          round.
+          The response and its new costs carry into the next round.
         </p>
 
         <button

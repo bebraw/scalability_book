@@ -5,12 +5,14 @@
   data-otel-trace-demo
   aria-labelledby="otel-trace-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">OpenTelemetry trace explorer</p>
+      <p class="scaling-demo-kicker demo-kicker">
+        OpenTelemetry trace explorer
+      </p>
       <h3 id="otel-trace-demo-heading">Follow one request, span by span</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
+    <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-otel-demo-verdict>Slow storage path found</span>
       <small>
         A client-only trace simulation. No telemetry is collected, exported, or
@@ -35,7 +37,7 @@
 
   <div class="otel-demo-controls">
     <label>
-      <span>Captured request</span>
+      <span>Simulated request</span>
       <select data-otel-demo-scenario>
         <option value="healthy">Healthy event write</option>
         <option value="slow" selected>Slow event write</option>
@@ -88,7 +90,11 @@
       </div>
       <details class="otel-demo-record">
         <summary>Inspect conceptual span record</summary>
-        <pre><code data-otel-demo-span-record></code></pre>
+        <pre
+          tabindex="0"
+          role="region"
+          aria-label="Conceptual span record"
+        ><code data-otel-demo-span-record></code></pre>
         <p>
           This keeps the important structure visible. Literal OTLP/JSON adds
           typed values and a more verbose envelope, and a real export may

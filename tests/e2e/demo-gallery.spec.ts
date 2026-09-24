@@ -2,14 +2,83 @@ import { expect, test } from "@playwright/test";
 import { expectedDemoCount } from "./demo-fixtures.ts";
 
 test.describe("demo showcase", () => {
+  test("all demos share a readable header and control style", async ({
+    page,
+  }) => {
+    await page.goto("/demos/");
+    const demos = page.locator("[data-demo-anchor]");
+    await expect(demos.locator(":scope > .demo-header")).toHaveCount(
+      expectedDemoCount,
+    );
+    await expect(demos.locator(".demo-kicker")).toHaveCount(expectedDemoCount);
+    await expect(demos.locator(".demo-summary")).toHaveCount(expectedDemoCount);
+    for (const demo of await demos.all()) {
+      await expect(demo).toHaveCSS("border-top-width", "0px");
+      await expect(demo).toHaveCSS("box-shadow", "none");
+      await expect(demo).toHaveCSS("background-image", "none");
+    }
+
+    for (const theme of ["light", "dark", "sepia", "contrast", "calm"]) {
+      await page.locator("[data-theme-picker]").selectOption(theme);
+      const styles = await demos.evaluateAll((elements) =>
+        elements.map((element) => {
+          const title = getComputedStyle(element.querySelector("h3")!);
+          const summary = getComputedStyle(
+            element.querySelector(".demo-summary")!,
+          );
+          return {
+            titleFont: title.fontFamily,
+            titleSize: title.fontSize,
+            titleColor: title.color,
+            summaryFont: summary.fontFamily,
+            summarySize: summary.fontSize,
+            summaryColor: summary.color,
+            summaryBackground: summary.backgroundColor,
+          };
+        }),
+      );
+      for (const style of styles) expect(style).toEqual(styles[0]);
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    const defects = await demos.evaluateAll((elements) =>
+      elements.flatMap((element) => {
+        const header = element.querySelector(".demo-header")!;
+        const defects: string[] = [];
+        if (
+          getComputedStyle(header).gridTemplateColumns.split(" ").length !== 1
+        )
+          defects.push(element.id + ": header columns");
+        if (element.scrollWidth > element.clientWidth + 1)
+          defects.push(element.id + ": overflow");
+        for (const control of element.querySelectorAll<HTMLElement>(
+          "button, select, input[type='text'], input[type='number']",
+        )) {
+          if (!control.checkVisibility()) continue;
+          if (
+            control.getBoundingClientRect().height <
+            (control.classList.contains("project-fit-help") ? 24 : 39)
+          )
+            defects.push(element.id + ": small control");
+          if (Number.parseFloat(getComputedStyle(control).fontSize) < 12)
+            defects.push(element.id + ": small control text");
+        }
+        return defects;
+      }),
+    );
+    expect(defects).toEqual([]);
+  });
+
   test("presents every demo as one themed systems-lab catalogue", async ({
     page,
   }) => {
     await page.goto("/demos/");
 
     const gallery = page.locator(".demo-gallery-page");
-    const items = gallery.locator(".demo-gallery-item");
-    await expect(gallery.locator("h1")).toContainText("Demo showcase");
+    const items = gallery.locator(".demo-gallery-item").filter({
+      has: page.locator("[data-demo-anchor]"),
+    });
+    await expect(gallery.locator("h1")).toContainText("Demos and exercises");
     await expect(gallery.locator(".demo-gallery-lede")).toContainText(
       "Work through one module at a time",
     );

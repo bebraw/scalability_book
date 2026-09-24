@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test.describe("ACID transaction lab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/architecture/#demo-acid-transaction-lab");
+    await page.goto(
+      "/appendices/advanced-web-boundaries/#demo-acid-transaction-lab",
+    );
     await expect(page.locator("[data-acid-lab]")).toBeVisible();
   });
 

@@ -138,7 +138,7 @@ const incidentRounds: IncidentRound[] = [
       "Which signal identifies the first binding limit, and what is the smallest defensible response?",
     summary:
       "The conference doors just opened. Commit to evidence before changing the system.",
-    event: "Arrival demand crosses the current capacity envelope.",
+    event: "Incoming demand exceeds current capacity.",
     surfaceSignals: [
       "Offered load climbed from 75 to 140 events per second.",
       "Completed throughput flattened near 110 events per second.",

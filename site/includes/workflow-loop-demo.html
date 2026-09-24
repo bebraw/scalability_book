@@ -5,15 +5,16 @@
   data-workflow-demo
   aria-labelledby="workflow-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Workflow loop lab</p>
+      <p class="scaling-demo-kicker demo-kicker">Workflow loop lab</p>
       <h3 id="workflow-demo-heading">Trace a human-agent change loop</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
+    <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-workflow-demo-verdict>Choose the workflow shape</span>
       <small>
-        Friction appears in feedback, review packages, and correction loops.
+        A hypothetical workflow. Counts and review times are invented
+        assumptions, not measurements.
       </small>
     </div>
   </div>
@@ -74,8 +75,8 @@
       <div class="scaling-demo-panel">
         <h4 id="workflow-feedback-title">Feedback evidence</h4>
         <p class="demo-note">
-          Score what the workflow can prove before a human reviewer reads the
-          diff.
+          Set the scenario’s setup, context, and test assumptions. These ratings
+          do not verify correctness.
         </p>
         <div class="workflow-demo-signals">
           <label class="workflow-demo-signal">
@@ -127,18 +128,18 @@
         </div>
       </div>
       <div class="scaling-demo-panel">
-        <h4>Loop pressure</h4>
+        <h4>Results under these assumptions</h4>
         <dl class="scaling-demo-metrics">
           <div>
-            <dt>Likely correction loops</dt>
+            <dt>Simulated correction loops</dt>
             <dd data-workflow-demo-metric="loops">0</dd>
           </div>
           <div>
-            <dt>Human review load</dt>
+            <dt>Simulated review time</dt>
             <dd data-workflow-demo-metric="review">0 min</dd>
           </div>
           <div>
-            <dt>Automation leverage</dt>
+            <dt>Automation support (model)</dt>
             <dd data-workflow-demo-metric="leverage">-</dd>
           </div>
         </dl>

@@ -75,7 +75,7 @@ study:
 
 The client receives no successful response.
 
-## Slide: Separate rendering from navigation
+## Slide: Who builds the next view?
 
 ```yaml
 id: views
@@ -84,16 +84,17 @@ chapter: Read
 source: Course book chapter 4; adapted from lecture 04
 study:
   explanation: |-
-    Rendering choices describe where and when a view is produced or refreshed. Navigation choices describe how the browser reaches later application states. Treat these as related decisions rather than one ranking of frameworks.
+    Compare three representative flows: an MPA receives complete server HTML documents; an HDA follows server-provided controls and receives HTML updates; a typical SPA receives data and builds views in the browser using CSR. Both HDA and SPA can update part of a page, so update size alone does not distinguish them.
 
-    Choose using freshness, cacheability, client work, accessibility, origin load, and failure behavior. The right choice depends on the user path and constraints.
+    Then vary the first load. An SPA can start with server-rendered HTML and take over later rendering. Cached server HTML can serve an MPA or HDA while keeping its views and actions server-defined. Choose using freshness, cacheability, client work, accessibility, origin load, and failure behavior.
 ```
 
-| Decision                  | Examples                        | Evidence to seek                          |
-| ------------------------- | ------------------------------- | ----------------------------------------- |
-| Produce or refresh a view | SSR, SSG, ISR, CSR              | Freshness and work at client/origin       |
-| Reach the next state      | SPA, MPA, hypermedia            | Navigation and failure behavior           |
-| Preserve an invariant     | Authoritative service and store | Authorization and concurrent-write checks |
+| Decision                | Examples                                   | Evidence to seek                          |
+| ----------------------- | ------------------------------------------ | ----------------------------------------- |
+| Construct the next view | Server HTML or browser rendering from data | Who defines views and available actions   |
+| Apply the next view     | Whole document or targeted update          | Navigation and local-state behavior       |
+| Deliver the first view  | SSR, SSG, ISR, CSR                         | Freshness and work at client/origin       |
+| Preserve an invariant   | Authoritative service and store            | Authorization and concurrent-write checks |
 
 ## Slide: Make an architectural hypothesis
 

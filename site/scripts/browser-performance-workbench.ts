@@ -55,7 +55,7 @@ function initializeBrowserPerformanceWorkbench(root: HTMLElement) {
       for (let index = 0; index < trialCount; index += 1) {
         status.textContent = `Measuring run ${index + 1} of ${trialCount}…`;
         surface.replaceChildren();
-        await nextPaint();
+        await afterRenderingOpportunities();
         trials.push(await runTrial(surface, settings));
         renderChart(root, trials, trialCount);
       }
@@ -98,11 +98,7 @@ async function runTrial(
   performance.mark(startMark);
 
   if (settings.strategy === "single") {
-    longestSlice = appendAndFilterRange(
-      surface,
-      0,
-      settings.eventCount,
-    );
+    longestSlice = appendAndFilterRange(surface, 0, settings.eventCount);
   } else {
     for (let start = 0; start < settings.eventCount; start += batchSize) {
       const end = Math.min(start + batchSize, settings.eventCount);
@@ -116,7 +112,7 @@ async function runTrial(
 
   // Force style and layout work into the measured interaction.
   void surface.offsetHeight;
-  await nextPaint();
+  await afterRenderingOpportunities();
 
   performance.mark(endMark);
   const measure = performance.measure(measureName, startMark, endMark);
@@ -174,7 +170,7 @@ function renderChart(
 <span>Run ${index + 1}</span>
 <div><i style="inline-size:${Math.max(3, (total / maximum) * 100)}%"></i></div>
 <strong>${formatDuration(total)}</strong>
-<small>longest slice ${formatDuration(longestSlice)}</small>
+<small>instrumented JS slice ${formatDuration(longestSlice)}</small>
 </div>`,
     )
     .join("");
@@ -211,7 +207,7 @@ function renderResult(
       settings.strategy === "chunked"
         ? "Yielding can reduce uninterrupted work while increasing the flow's elapsed time."
         : "One uninterrupted task may finish sooner, but it gives the browser fewer chances to paint or respond."
-    } This local result is evidence about this run environment, not every user's device.`;
+    } The slice excludes later layout and rendering; input delay is not measured. This local result is evidence about this run environment, not every user's device.`;
   }
 }
 
@@ -239,7 +235,8 @@ function nextFrame() {
   return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 }
 
-async function nextPaint() {
+// Two frame callbacks are a scheduling proxy, not a pixel-presentation timestamp.
+async function afterRenderingOpportunities() {
   await nextFrame();
   await nextFrame();
 }

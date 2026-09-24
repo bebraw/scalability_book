@@ -5,14 +5,12 @@
   data-model-eval
   aria-labelledby="model-eval-heading"
 >
-  <div class="model-eval-header">
+  <div class="model-eval-header demo-header">
     <div>
-      <p class="model-eval-kicker">Challenge eval lab</p>
-      <h3 id="model-eval-heading">
-        Compare two model attempts on the same task
-      </h3>
+      <p class="model-eval-kicker demo-kicker">Model evaluation lab</p>
+      <h3 id="model-eval-heading">Compare two attempts on one task</h3>
     </div>
-    <div class="model-eval-summary" aria-live="polite">
+    <div class="model-eval-summary demo-summary" aria-live="polite">
       <span data-model-eval-verdict>Score the attempts</span>
       <small data-model-eval-caveat
         >The result is local to this task set, not a universal model
@@ -56,8 +54,8 @@
       <div class="model-eval-field">
         <label for="model-eval-task">Eval task</label>
         <p>
-          Start with one task from the work you actually do in Challenge. The
-          eval is only meaningful if the task represents your real project work.
+          Start with one task from the work you actually do in Challenge. Choose
+          a task that represents your project work.
         </p>
         <select id="model-eval-task" name="task" data-model-eval-task>
           <option value="bottleneck">Find one likely scaling bottleneck</option>

@@ -5,14 +5,14 @@
   data-cache-control-lab
   aria-labelledby="cache-control-lab-heading"
 >
-  <div class="scaling-demo-header cache-control-lab-header">
+  <div class="scaling-demo-header cache-control-lab-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">HTTP reuse control room</p>
+      <p class="scaling-demo-kicker demo-kicker">HTTP cache lab</p>
       <h3 id="cache-control-lab-heading">
         Where does the next response come from?
       </h3>
     </div>
-    <div class="cache-control-lab-badge" aria-live="polite">
+    <div class="cache-control-lab-badge demo-summary" aria-live="polite">
       <span data-cache-outcome>Fresh cache hit</span>
       <small data-cache-source>shared cache</small>
     </div>
@@ -47,7 +47,8 @@
             data-cache-profile
           />
           <span
-            ><strong>Public summary</strong><small>shared + SWR</small></span
+            ><strong>Public summary</strong
+            ><small>serve stale while updating</small></span
           >
         </label>
         <label>
@@ -158,7 +159,7 @@
 
     <div class="cache-control-lab-readout">
       <div>
-        <p class="request-trace-section-label">Architectural reading</p>
+        <p class="request-trace-section-label">What this means</p>
         <h4 data-cache-title>Reuse the fingerprinted response</h4>
         <p data-cache-summary></p>
       </div>

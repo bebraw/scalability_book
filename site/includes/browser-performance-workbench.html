@@ -5,14 +5,16 @@
   data-browser-performance-workbench
   aria-labelledby="browser-performance-workbench-heading"
 >
-  <div class="browser-performance-header">
+  <div class="browser-performance-header demo-header">
     <div>
-      <p class="browser-performance-kicker">Browser performance workbench</p>
+      <p class="browser-performance-kicker demo-kicker">
+        Browser performance workbench
+      </p>
       <h3 id="browser-performance-workbench-heading">
-        Repeat one interaction before trusting it
+        Compare two browser update strategies
       </h3>
     </div>
-    <div class="browser-performance-summary" aria-live="polite">
+    <div class="browser-performance-summary demo-summary" aria-live="polite">
       <span data-browser-performance-status>Ready for five local runs</span>
       <small>
         Measurements come from this browser and this device. No data leaves the
@@ -73,7 +75,7 @@
 
       <p class="browser-performance-caveat">
         Predict first: which strategy has the shorter total time, and which has
-        the shorter uninterrupted slice?
+        the shorter instrumented JavaScript slice?
       </p>
     </form>
 
@@ -81,7 +83,7 @@
       <div class="browser-performance-results-heading">
         <div>
           <p class="browser-performance-eyebrow">02 / Inspect the runs</p>
-          <h4>Time until the next painted frame</h4>
+          <h4>Elapsed time including frame waits</h4>
         </div>
         <span class="browser-performance-local-badge">Local evidence</span>
       </div>
@@ -109,14 +111,15 @@
           <dd data-browser-performance-metric="maximum">—</dd>
         </div>
         <div>
-          <dt>Median longest slice</dt>
+          <dt>Longest JS slice (median)</dt>
           <dd data-browser-performance-metric="slice">—</dd>
         </div>
       </dl>
 
       <p class="browser-performance-reading" data-browser-performance-reading>
-        One run is an observation. Repeated runs show whether that observation
-        was typical.
+        Five runs show variation in this browser. Frame callbacks are a
+        scheduling proxy, not proof of pixel presentation; slices exclude later
+        layout and rendering.
       </p>
     </section>
   </div>

@@ -14,7 +14,7 @@ Define the protocol before selecting a runner:
 
 - **Decision and claim:** What comparison or threshold would change an engineering decision?
 - **Workload:** Which event-recording, querying, filtering, or browser actions are performed, and in what mix?
-- **Load:** How many users, requests, events, or concurrent sessions apply the workload, and for how long?
+- **Load:** Do arrivals follow previous completions or an independent schedule, at what concurrency or rate, and for how long?
 - **Boundary and conditions:** Which application revision, environment, data volume, cache state, dependencies, and client conditions are included?
 - **Metrics and distribution:** Which latency, throughput, error, resource, or queue measurements answer the question, and which percentiles or ranges preserve important variation?
 - **Acceptance and limits:** What result would support or challenge the claim, and what does the setup leave untested?
@@ -22,6 +22,21 @@ Define the protocol before selecting a runner:
 Tools such as [Artillery](https://www.npmjs.com/package/artillery) and [k6](https://k6.io/) can generate load, schedule scenarios, and collect observations from that protocol.
 They cannot decide whether the workload represents real use, whether the boundary matches the question, or whether the comparison supports a statistically defensible conclusion.
 An agent can help draft a script, but the generated workload, metrics, thresholds, and interpretation still have to be reviewed against the intended decision.
+
+### Check whether the generator hides overload
+
+A **closed-loop** worker waits for a result before issuing its next operation; an **open-loop** generator schedules arrivals independently of completions.
+Suppose four closed-loop workers immediately repeat requests with no think time or overhead.
+At 0.1 seconds per request they offer about 40 requests per second; at one second they offer only four.
+The same concurrency setting has reduced demand just when the application became slower.
+By contrast, an independent stream of 20 requests per second facing a service capacity of four creates about 16 additional waiting or rejected requests per second, under this simplified constant-rate model.
+Neither experiment substitutes for the other: the [open-versus-closed workload study by Schroeder, Wierman, and Harchol-Balter](https://www.usenix.org/conference/nsdi-06/open-versus-closed-cautionary-tale) demonstrates why the arrival model changes the interpretation.
+
+The [shared project baseline](/project/#7-1-shared-baseline-workload) uses a small closed-loop workload and fixes the timing boundary, deadlines, outcome counts, and percentile rule.
+Its higher-concurrency profile is not evidence of sustaining an independent production arrival rate.
+Use the [bounded arrival-controlled pressure run](/project/#7-3-arrival-controlled-overload-and-recovery) when testing queues, overload, or admission control.
+Count offered, admitted, and completed work separately: a lower latency among successful requests can coexist with more rejected or unfinished work.
+Timeouts supply deadline lower bounds, not observed completion times; report them beside the completed-request latency distribution.
 
 ### Simulated benchmark lab
 
@@ -61,7 +76,8 @@ Lighthouse user flows can audit interactions, although they require browser auto
 
 The workbench below runs completely in the current page.
 It builds and filters an event list either as one uninterrupted task or in batches that yield to the browser.
-It measures from the start of the work until the next painted frame, repeats the same flow five times, and reports both total time and the longest JavaScript slice observed by its own instrumentation.
+It measures from the start of the work through two animation-frame callbacks after the DOM work, repeats the same flow five times, and reports total elapsed time and the longest instrumented JavaScript slice.
+The callbacks provide rendering opportunities, not a timestamp proving that pixels reached the display ([HTML rendering algorithm](https://html.spec.whatwg.org/multipage/webappapis.html#update-the-rendering)).
 
 {{ import "site/includes/browser-performance-workbench.html" }}
 
@@ -71,7 +87,8 @@ Then increase the workload and check whether the conclusion remains the same.
 
 This is a real measurement, but it is deliberately narrow.
 The timer includes work performed by this demo on this browser and device; it is not a Lighthouse score, INP measurement, or claim about other users.
-The chunked strategy may take longer overall because it waits between batches while still improving responsiveness by avoiding one long uninterrupted task.
+The chunked strategy may take longer overall while shortening the measured JavaScript segments and leaving opportunities for other browser work.
+The longest-slice metric excludes the forced layout after those segments and other rendering work; the demo does not measure input delay, so it cannot by itself establish improved responsiveness.
 This distinction between throughput and responsiveness is often more useful than asking which version is simply "faster."
 
 For client-side collection in a real application, the small [web-vitals](https://github.com/GoogleChrome/web-vitals) library implements LCP, INP, CLS, FCP, and TTFB using browser APIs and follows the same measurement rules used by Google's web-performance tools.

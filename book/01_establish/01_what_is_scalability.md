@@ -104,11 +104,10 @@ Agents can implement changes far faster than I can.
 That makes my judgment and review capacity a binding limit, but removing that limit is not necessarily desirable.
 The pace creates a psychological risk I think of as **speed blindness**: becoming so accustomed to rapid output that I stop asking whether the work still serves the intended direction.
 
-This helps explain why people report such different experiences with AI-assisted development.
-Rapid generation can be useful leverage in one context and a source of technical risk in another.
-Both accounts can be true.
-The outcome depends partly on whether the person retains enough understanding and judgment to direct the work.
-Otherwise, they become a proxy for the agent—pulling a slot machine and hoping that the next plausible result is the right one.
+This is a hypothesis about my own workflow, not an explanation established by comparing other people's experiences.
+Task difficulty, repository familiarity, and tool configuration could also explain different outcomes.
+To challenge the hypothesis, I could alternate rapid generation and bounded changes on comparable tasks, recording review effort, defects found after acceptance, and whether I can explain the change unaided.
+If greater speed did not reduce understanding or increase missed defects under those conditions, speed alone would be a poor explanation for the risk I describe.
 
 This book is an example.
 Agents and I are developing it together, but I still own its vision and remain responsible for whether it forms a coherent book for my students.

@@ -5,15 +5,16 @@
   data-request-trace-demo
   aria-labelledby="request-trace-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Architecture boundary trace</p>
+      <p class="scaling-demo-kicker demo-kicker">Architecture boundary trace</p>
       <h3 id="request-trace-demo-heading">Trace one event request</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
+    <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-request-trace-demo-verdict>Trace POST /events</span>
       <small>
-        Architecture becomes concrete when a request crosses boundaries.
+        Follow a request from the browser to storage and back. Risk labels are
+        illustrative.
       </small>
     </div>
   </div>
@@ -131,7 +132,7 @@
               <dd data-request-trace-demo-metric="path">-</dd>
             </div>
             <div>
-              <dt>Highest risk</dt>
+              <dt>Modeled risk</dt>
               <dd data-request-trace-demo-metric="risk">-</dd>
             </div>
             <div>

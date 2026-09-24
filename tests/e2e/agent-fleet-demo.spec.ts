@@ -10,7 +10,7 @@ test.describe("agent fleet demo", () => {
     const demo = page.locator("[data-agent-fleet]");
 
     await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
-      "4 roles, medium risk",
+      "4 roles, medium modeled risk",
     );
     await expect(demo.locator(".agent-fleet-grid")).toBeVisible();
     await expect(demo.locator("[data-agent-fleet-steps]")).toContainText(

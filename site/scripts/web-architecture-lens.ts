@@ -23,7 +23,6 @@ type ArchitectureSequenceMessage = {
 
 type ArchitectureInteractionEffect = {
   artifact: string;
-  coldExtraKb: number;
   completed: string;
   requests: string;
   scope: string;
@@ -33,11 +32,10 @@ type ArchitectureInteractionEffect = {
   transferKb: number;
 };
 
-const architectureTransferScaleKb = 50;
+const architectureTransferScaleKb = 18;
 
-const architectureCombinations: Record<
-  `${DeliveryMode}-${InteractionMode}`,
-  ArchitectureCombination
+const architectureCombinations: Partial<
+  Record<`${DeliveryMode}-${InteractionMode}`, ArchitectureCombination>
 > = {
   "ssr-mpa": {
     summary:
@@ -51,13 +49,13 @@ const architectureCombinations: Record<
   },
   "ssr-hda": {
     summary:
-      "The first visit is server-rendered. Later controls ask the server for the HTML fragment that represents the next valid state.",
+      "The server supplies the view and its action controls. Following a control returns server-rendered HTML for the target region.",
     document: "Server renders current data per GET",
     transition: "POST → targeted HTML fragment",
     freshness: "Fresh at render time; repeated render work",
     client: "Interpret controls and swap the named target",
     caution:
-      "The server keeps transition knowledge, while a small client runtime enables partial updates.",
+      "Browser scripts interpret the HTML controls and can keep local UI state; the server defines the application actions.",
   },
   "isr-mpa": {
     summary:
@@ -71,33 +69,13 @@ const architectureCombinations: Record<
   },
   "isr-hda": {
     summary:
-      "The initial document can come from an incrementally regenerated cache, while mutations return fresh server-owned HTML fragments.",
+      "The initial document and its controls come from cached server HTML. Following a control returns a fresh server-rendered fragment.",
     document: "Edge serves pre-rendered, cached HTML",
     transition: "POST → targeted HTML fragment",
     freshness: "Cached document and live fragment can differ",
     client: "Interpret controls and swap the named target",
     caution:
-      "This hybrid is valid, but cache invalidation must reconcile the document with later fragment updates.",
-  },
-  "csr-mpa": {
-    summary:
-      "A static shell and JavaScript boot in the browser, which fetches JSON and renders the view. A later document navigation repeats that boot sequence.",
-    document: "Shell + JavaScript, then JSON data",
-    transition: "POST → redirect → boot and render again",
-    freshness: "Data can be fresh while the deployed client is stale",
-    client: "Fetch data, render views, and manage loading state",
-    caution:
-      "CSR commonly powers SPAs, but CSR alone does not create client-side routing or persistent SPA state.",
-  },
-  "csr-hda": {
-    summary:
-      "The browser renders the initial view from JSON, while later mutations return server-rendered HTML fragments for targeted updates.",
-    document: "Shell + JavaScript, then JSON data",
-    transition: "POST → targeted HTML fragment",
-    freshness: "Client data and server fragments can diverge",
-    client: "Render the initial view, then interpret fragment controls",
-    caution:
-      "This hybrid maintains both JSON-to-UI and HTML-fragment representations; use it only when that split is deliberate.",
+      "Caching does not change who defines the views and controls. Writes still need to invalidate the cached document.",
   },
   "ssr-spa": {
     summary:
@@ -163,6 +141,9 @@ function initializeArchitectureLens(root: HTMLElement) {
   const sessionActions = root.querySelector<HTMLInputElement>(
     "[data-architecture-lens-session-actions]",
   );
+  const clientRendering = root.querySelector<HTMLInputElement>(
+    '[data-architecture-lens-delivery][value="csr"]',
+  );
 
   if (
     !form ||
@@ -172,7 +153,8 @@ function initializeArchitectureLens(root: HTMLElement) {
     !status ||
     !events ||
     !draft ||
-    !sessionActions
+    !sessionActions ||
+    !clientRendering
   ) {
     return;
   }
@@ -180,17 +162,12 @@ function initializeArchitectureLens(root: HTMLElement) {
   let runRevision = 0;
 
   const renderSession = () => {
-    const delivery = getSelectedMode<DeliveryMode>(
-      root,
-      "[data-architecture-lens-delivery]",
-      "ssr",
-    );
     const interaction = getSelectedMode<InteractionMode>(
       root,
       "[data-architecture-lens-interaction]",
       "mpa",
     );
-    const effect = getArchitectureInteractionEffect(delivery, interaction);
+    const effect = getArchitectureInteractionEffect(interaction);
     const actions = Number(sessionActions.value);
     const requests = Number(effect.requests) * actions;
     const transferKb = effect.transferKb * actions;
@@ -225,8 +202,10 @@ function initializeArchitectureLens(root: HTMLElement) {
       "[data-architecture-lens-interaction]",
       "mpa",
     );
+    clientRendering.disabled = interaction !== "spa";
     const combination = architectureCombinations[`${delivery}-${interaction}`];
-    const effect = getArchitectureInteractionEffect(delivery, interaction);
+    if (!combination) return;
+    const effect = getArchitectureInteractionEffect(interaction);
 
     root.dataset.delivery = delivery;
     root.dataset.interaction = interaction;
@@ -243,7 +222,7 @@ function initializeArchitectureLens(root: HTMLElement) {
     setArchitectureLensText(
       root,
       "[data-architecture-lens-title]",
-      `${delivery.toUpperCase()} + ${interaction.toUpperCase()}`,
+      `${interaction.toUpperCase()} + ${delivery.toUpperCase()}`,
     );
     setArchitectureLensText(
       root,
@@ -294,12 +273,8 @@ function initializeArchitectureLens(root: HTMLElement) {
       "[data-architecture-lens-transfer]",
     );
     transfer?.style.setProperty(
-      "--transfer-warm",
+      "--transfer-share",
       `${(effect.transferKb / architectureTransferScaleKb) * 100}%`,
-    );
-    transfer?.style.setProperty(
-      "--transfer-cold-extra",
-      `${(effect.coldExtraKb / architectureTransferScaleKb) * 100}%`,
     );
 
     trace.innerHTML = buildArchitectureTrace(delivery, interaction);
@@ -315,7 +290,14 @@ function initializeArchitectureLens(root: HTMLElement) {
 
   form.addEventListener("submit", (event) => event.preventDefault());
   form.addEventListener("change", (event) => {
-    const target = event.target as HTMLElement;
+    const target = event.target as HTMLInputElement;
+    if (target.matches("[data-architecture-lens-interaction]")) {
+      const initialMode = target.value === "spa" ? "csr" : "ssr";
+      const initialInput = root.querySelector<HTMLInputElement>(
+        `[data-architecture-lens-delivery][value="${initialMode}"]`,
+      );
+      if (initialInput) initialInput.checked = true;
+    }
     if (
       target.matches(
         "[data-architecture-lens-delivery], [data-architecture-lens-interaction]",
@@ -327,17 +309,12 @@ function initializeArchitectureLens(root: HTMLElement) {
   sessionActions.addEventListener("input", renderSession);
   runButton.addEventListener("click", () => {
     const revision = ++runRevision;
-    const delivery = getSelectedMode<DeliveryMode>(
-      root,
-      "[data-architecture-lens-delivery]",
-      "ssr",
-    );
     const interaction = getSelectedMode<InteractionMode>(
       root,
       "[data-architecture-lens-interaction]",
       "mpa",
     );
-    const effect = getArchitectureInteractionEffect(delivery, interaction);
+    const effect = getArchitectureInteractionEffect(interaction);
     const steps = Array.from(
       trace.querySelectorAll<HTMLElement>("[data-architecture-lens-step]"),
     );
@@ -391,13 +368,11 @@ function initializeArchitectureLens(root: HTMLElement) {
 }
 
 function getArchitectureInteractionEffect(
-  delivery: DeliveryMode,
   interaction: InteractionMode,
 ): ArchitectureInteractionEffect {
   if (interaction === "spa") {
     return {
       artifact: "JSON delta",
-      coldExtraKb: 0,
       completed:
         "1 request completed. JSON updated client state; the affected UI rerendered and the local draft stayed.",
       requests: "1",
@@ -412,7 +387,6 @@ function getArchitectureInteractionEffect(
   if (interaction === "hda") {
     return {
       artifact: "HTML fragment",
-      coldExtraKb: 0,
       completed:
         "1 request completed. Only #activity-list changed; the local draft stayed.",
       requests: "1",
@@ -424,20 +398,16 @@ function getArchitectureInteractionEffect(
     };
   }
 
-  const requests = delivery === "csr" ? "3" : "2";
-  const csr = delivery === "csr";
   return {
-    artifact: csr ? "Shell + JS + JSON" : "Complete HTML",
-    coldExtraKb: csr ? 45 : 0,
-    completed: `${requests} requests completed. The document was replaced; unsaved DOM state reset.`,
-    requests,
+    artifact: "Complete HTML",
+    completed:
+      "2 requests completed. The document was replaced; unsaved DOM state reset.",
+    requests: "2",
     scope: "Whole document",
     state: "Reset",
-    transfer: csr ? "≈5 KB warm / ≈50 KB cold" : "≈18 KB",
-    transferDetail: csr
-      ? "shell + JSON; cold cache adds JavaScript"
-      : "complete document",
-    transferKb: csr ? 5 : 18,
+    transfer: "≈18 KB",
+    transferDetail: "complete document",
+    transferKb: 18,
   };
 }
 
@@ -474,7 +444,11 @@ function buildArchitectureTrace(
   }> = [
     { id: "browser", label: "Browser", detail: "client" },
     { id: "edge", label: "Edge cache", detail: "delivery" },
-    { id: "server", label: "Server", detail: "rules + HTML" },
+    {
+      id: "server",
+      label: "Server",
+      detail: interaction === "spa" ? "rules + data" : "rules + HTML",
+    },
     { id: "database", label: "Database", detail: "durable state" },
   ];
   const messages = buildArchitectureSequenceMessages(delivery, interaction);
@@ -557,7 +531,9 @@ function buildArchitectureSequenceMessages(
             "server",
             "browser",
             "Complete HTML",
-            "rendered for this request",
+            interaction === "hda"
+              ? "view + action controls"
+              : "rendered for this request",
             "response",
           ),
         ]
@@ -576,7 +552,9 @@ function buildArchitectureSequenceMessages(
               "edge",
               "browser",
               "Cached HTML",
-              "serve immediately",
+              interaction === "hda"
+                ? "server view + controls"
+                : "serve immediately",
               "response",
             ),
             sequenceMessage(
@@ -649,10 +627,8 @@ function buildArchitectureSequenceMessages(
               6,
               "browser",
               "browser",
-              interaction === "spa" ? "Initialize SPA" : "Render view",
-              interaction === "spa"
-                ? "create client state + UI"
-                : "JavaScript creates the UI",
+              "Initialize SPA",
+              "create client state + UI",
               "local",
             ),
           ];
@@ -675,7 +651,9 @@ function buildArchitectureSequenceMessages(
       "browser",
       "server",
       "POST /events",
-      "record Architecture study",
+      interaction === "hda"
+        ? "follow server-provided control"
+        : "record Architecture study",
       "request",
     ),
     sequenceMessage(
@@ -729,7 +707,7 @@ function buildArchitectureSequenceMessages(
         "server",
         "browser",
         "HTML fragment",
-        "#activity-list + next controls",
+        "server-rendered #activity-list",
         "response",
       ),
       sequenceMessage(
@@ -737,58 +715,7 @@ function buildArchitectureSequenceMessages(
         "browser",
         "browser",
         "Swap target",
-        "no document navigation",
-        "local",
-      ),
-    );
-  } else if (delivery === "csr") {
-    interactionMessages.push(
-      sequenceMessage(
-        10,
-        "server",
-        "browser",
-        "303 See Other",
-        "navigate after the write",
-        "response",
-      ),
-      sequenceMessage(
-        11,
-        "browser",
-        "edge",
-        "GET /activity",
-        "request application shell",
-        "request",
-      ),
-      sequenceMessage(
-        12,
-        "edge",
-        "browser",
-        "HTML shell + JS",
-        "boot client again",
-        "response",
-      ),
-      sequenceMessage(
-        13,
-        "browser",
-        "server",
-        "GET /api/activities",
-        "fetch current data",
-        "request",
-      ),
-      sequenceMessage(
-        14,
-        "server",
-        "browser",
-        "JSON activities",
-        "data, not UI",
-        "response",
-      ),
-      sequenceMessage(
-        15,
-        "browser",
-        "browser",
-        "Render view",
-        "JavaScript replaces the UI",
+        "target declared in HTML",
         "local",
       ),
     );

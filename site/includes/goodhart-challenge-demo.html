@@ -5,12 +5,18 @@
   data-goodhart-demo
   aria-labelledby="goodhart-demo-heading"
 >
-  <div class="goodhart-header">
+  <div class="goodhart-header demo-header">
     <div>
-      <p class="goodhart-kicker">Goodhart pressure test</p>
-      <h3 id="goodhart-demo-heading">Can your metric survive an optimizer?</h3>
+      <p class="goodhart-kicker demo-kicker">Goodhart pressure test</p>
+      <h3 id="goodhart-demo-heading">
+        Can improving a metric hurt the outcome?
+      </h3>
     </div>
-    <div class="goodhart-status" aria-live="polite" aria-atomic="true">
+    <div
+      class="goodhart-status demo-summary"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <span data-goodhart-status>Choose a proxy to put under pressure</span>
       <small
         >A deterministic two-round challenge. The values are illustrative, not
@@ -43,7 +49,7 @@
         <div class="goodhart-section-heading">
           <span aria-hidden="true">01</span>
           <div>
-            <p>Write the target contract</p>
+            <p>Choose the measurement</p>
             <h4 id="goodhart-target-title">Which proxy gets rewarded?</h4>
           </div>
         </div>
@@ -105,7 +111,7 @@
           data-goodhart-apply
           disabled
         >
-          Apply target pressure
+          Optimize the target
         </button>
       </section>
 
@@ -147,7 +153,7 @@
             </p>
           </article>
           <article data-goodhart-measure-card="2">
-            <span class="goodhart-measure-kind">Counter-signal</span>
+            <span class="goodhart-measure-kind">Warning signal</span>
             <h5 data-goodhart-measure-label="2">—</h5>
             <p>
               <span data-goodhart-measure-before="2">—</span>
@@ -185,7 +191,7 @@
       <div class="goodhart-section-heading">
         <span aria-hidden="true">02</span>
         <div>
-          <p>The number won. The outcome lost.</p>
+          <p>The metric improved; the outcome worsened.</p>
           <h4 id="goodhart-repair-title" tabindex="-1">
             Close the gaming path
           </h4>

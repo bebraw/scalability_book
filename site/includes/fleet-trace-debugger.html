@@ -5,15 +5,15 @@
   data-fleet-trace
   aria-labelledby="fleet-trace-heading"
 >
-  <header class="fleet-trace-header">
+  <header class="fleet-trace-header demo-header">
     <div>
-      <p class="fleet-trace-kicker">Compare forensic lab</p>
-      <h3 id="fleet-trace-heading">Reconcile what the fleet actually used</h3>
+      <p class="fleet-trace-kicker demo-kicker">Fleet trace debugger</p>
+      <h3 id="fleet-trace-heading">Match fleet activity to resource costs</h3>
     </div>
-    <div class="fleet-trace-summary" aria-live="polite">
+    <div class="fleet-trace-summary demo-summary" aria-live="polite">
       <span data-fleet-trace-verdict>0 of 5 ledger rows assigned</span>
       <small data-fleet-trace-summary>
-        Intent, mediation, and physical use are separate evidence streams.
+        Compare planned work, gateway decisions, and actual resource use.
       </small>
     </div>
   </header>
@@ -26,7 +26,7 @@
       <div class="fleet-trace-section-heading">
         <span aria-hidden="true">01</span>
         <div>
-          <h4 id="fleet-trace-packet-heading">Inspect the fixed packet</h4>
+          <h4 id="fleet-trace-packet-heading">Inspect the supplied logs</h4>
           <p>
             Compare orchestration intent with gateway decisions before touching
             the physical ledger.
@@ -120,7 +120,9 @@
       <div class="fleet-trace-section-heading">
         <span aria-hidden="true">02</span>
         <div>
-          <h4 id="fleet-trace-mapping-heading">Attribute every physical row</h4>
+          <h4 id="fleet-trace-mapping-heading">
+            Match each resource record to a run
+          </h4>
           <p>
             Map each provider or resource record to <code>R41</code>,
             <code>R42</code>, or <code>unmatched</code>. Do not infer a run

@@ -263,7 +263,7 @@ function initializeScalingDemo(root: HTMLElement) {
     waterbedSummary.textContent =
       selected.length === 0
         ? "Choose a scaling move"
-        : `${selected.length} move${selected.length === 1 ? "" : "s"} relocate complexity`;
+        : `${selected.length} move${selected.length === 1 ? "" : "s"} add new operating obligations`;
     updateScalingMetrics(metricNodes, result);
     verdict.textContent = `${selected.length} moves, ${getScalingRiskLabel(
       result.complexity,
@@ -313,7 +313,7 @@ function initializeScalingDemo(root: HTMLElement) {
       await navigator.clipboard?.writeText(artifact.value);
       copy.textContent = "Copied";
       window.setTimeout(() => {
-        copy.textContent = "Copy artifact";
+        copy.textContent = "Copy plan";
       }, 1400);
     } catch {
       copy.textContent = "Select text";

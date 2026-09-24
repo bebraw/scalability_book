@@ -95,6 +95,8 @@ For example, “implementation B had the lowest measured p95 under the declared 
 “Its data model caused the difference” is an inference unless the comparison isolates that factor.
 “A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
+The three builds are engineering case studies, with design, experience, and tool conditions changing together.
+Keep their observations separate from the [bounded paired workflow task](/project/compare/#5-4-compare-one-agent-with-the-fleet), which holds a frozen revision and declared conditions stable for a narrower exploratory contrast.
 
 > **Case — Faster libraries and uncertain attribution**
 >

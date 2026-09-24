@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test.describe("client activation lens", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/architecture/#client-activation-lens");
+    await page.goto(
+      "/appendices/advanced-web-boundaries/#demo-client-activation-lens",
+    );
     await expect(page.locator("[data-activation-lens]")).toBeVisible();
   });
 

@@ -174,9 +174,13 @@ Report:
 - a suitable paired interval and its method, when a course-provided or otherwise justified method fits the outcome.
 
 Before inspecting results, define the signed difference and the practical boundary or bounds that would change the decision.
-Only an interval wholly on the required side of a boundary supports that local decision.
-Overlap leaves the result inconclusive, while statistical separation can still describe a difference too small to matter.
+One conservative, predeclared rule is to require a suitable interval wholly beyond the practical boundary before claiming the required effect.
+Under that rule, overlap leaves the effect claim inconclusive, while statistical separation can still describe a difference too small to matter.
 An interval containing zero is not proof that the candidates are equal.
+
+An engineering action also depends on consequences, cost, and reversibility.
+A cheap reversible trial with monitoring and a rollback condition may be justified while the effect remains uncertain; an expensive irreversible migration may warrant more evidence.
+State the decision rule and its rationale separately from the claim about the measured effect.
 
 Treat other metrics and unplanned slices as descriptive or exploratory unless their joint decision rule and multiple-comparison treatment were declared in advance.
 When no defensible interval is available, show the raw paired outcomes, label the comparison exploratory, and restrict the claim to those tasks.

@@ -6,27 +6,27 @@ test.describe("web architecture lens", () => {
     await expect(page.locator("[data-architecture-lens]")).toBeVisible();
   });
 
-  test("separates delivery from interaction and composes all nine cases", async ({
+  test("keeps HDA server-driven when its first view is cached", async ({
     page,
   }) => {
     const demo = page.locator("[data-architecture-lens]");
 
     await expect(demo.locator("[data-architecture-lens-title]")).toHaveText(
-      "SSR + MPA",
+      "MPA + SSR",
     );
     await expect(
       demo.locator('[data-architecture-lens-fact="transition"]'),
     ).toContainText("complete HTML");
 
     await demo
-      .locator('[data-architecture-lens-delivery][value="isr"]')
+      .locator('[data-architecture-lens-interaction][value="hda"]')
       .check();
     await demo
-      .locator('[data-architecture-lens-interaction][value="hda"]')
+      .locator('[data-architecture-lens-delivery][value="isr"]')
       .check();
 
     await expect(demo.locator("[data-architecture-lens-title]")).toHaveText(
-      "ISR + HDA",
+      "HDA + ISR",
     );
     await expect(
       demo.locator("[data-architecture-lens-summary]"),
@@ -36,6 +36,12 @@ test.describe("web architecture lens", () => {
     );
     await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
       "HTML fragment",
+    );
+    await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
+      "follow server-provided control",
+    );
+    await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
+      "server-rendered #activity-list",
     );
     await expect(
       demo.locator(".architecture-sequence-participant"),
@@ -106,22 +112,13 @@ test.describe("web architecture lens", () => {
     ).toContainText("DOM state reset");
   });
 
-  test("compares interaction cost across every combination", async ({
+  test("compares interaction cost across the supported flows and first loads", async ({
     page,
   }) => {
     const demo = page.locator("[data-architecture-lens]");
     const combinations = [
       ["ssr", "mpa", "2", "Complete HTML", "Whole document", "Reset", "≈18 KB"],
       ["isr", "mpa", "2", "Complete HTML", "Whole document", "Reset", "≈18 KB"],
-      [
-        "csr",
-        "mpa",
-        "3",
-        "Shell + JS + JSON",
-        "Whole document",
-        "Reset",
-        "≈5 KB warm / ≈50 KB cold",
-      ],
       [
         "ssr",
         "hda",
@@ -133,15 +130,6 @@ test.describe("web architecture lens", () => {
       ],
       [
         "isr",
-        "hda",
-        "1",
-        "HTML fragment",
-        "#activity-list only",
-        "Preserved",
-        "≈1.2 KB",
-      ],
-      [
-        "csr",
         "hda",
         "1",
         "HTML fragment",
@@ -188,10 +176,10 @@ test.describe("web architecture lens", () => {
       transfer,
     ] of combinations) {
       await demo
-        .locator(`[data-architecture-lens-delivery][value="${delivery}"]`)
+        .locator(`[data-architecture-lens-interaction][value="${interaction}"]`)
         .check();
       await demo
-        .locator(`[data-architecture-lens-interaction][value="${interaction}"]`)
+        .locator(`[data-architecture-lens-delivery][value="${delivery}"]`)
         .check();
       await expect(
         demo.locator('[data-architecture-lens-receipt="requests"]'),
@@ -242,7 +230,7 @@ test.describe("web architecture lens", () => {
     );
   });
 
-  test("shows an initialized SPA updating client state from JSON", async ({
+  test("lets an SPA start with server HTML and render subsequent views from JSON", async ({
     page,
   }) => {
     const demo = page.locator("[data-architecture-lens]");
@@ -250,6 +238,15 @@ test.describe("web architecture lens", () => {
     await demo
       .locator('[data-architecture-lens-interaction][value="spa"]')
       .check();
+    await demo
+      .locator('[data-architecture-lens-delivery][value="ssr"]')
+      .check();
+    await expect(demo.locator("[data-architecture-lens-title]")).toHaveText(
+      "SPA + SSR",
+    );
+    await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
+      "Complete HTML",
+    );
     await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
       "Initialize SPA",
     );
@@ -272,17 +269,17 @@ test.describe("web architecture lens", () => {
     ).toContainText("client state");
   });
 
-  test("shows CSR booting JavaScript and rendering API data", async ({
+  test("starts the SPA example with CSR and renders API data", async ({
     page,
   }) => {
     const demo = page.locator("[data-architecture-lens]");
 
     await demo
-      .locator('[data-architecture-lens-delivery][value="csr"]')
+      .locator('[data-architecture-lens-interaction][value="spa"]')
       .check();
 
     await expect(demo.locator("[data-architecture-lens-title]")).toHaveText(
-      "CSR + MPA",
+      "SPA + CSR",
     );
     await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
       "HTML shell + JS",
@@ -291,23 +288,49 @@ test.describe("web architecture lens", () => {
       "JSON activities",
     );
     await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
-      "Render view",
+      "create client state + UI",
     );
-    await expect(
-      demo.locator("[data-architecture-lens-caution]"),
-    ).toContainText("SPAs");
     await expect(
       demo.locator('[data-architecture-lens-receipt="requests"]'),
-    ).toHaveText("3");
-    await expect(
-      demo.locator("[data-architecture-lens-transfer]"),
-    ).toHaveAttribute(
-      "style",
-      /--transfer-warm: 10%; --transfer-cold-extra: 90%/,
-    );
+    ).toHaveText("1");
     await expect(
       demo.locator(".architecture-sequence-participant.is-idle"),
     ).toHaveCount(0);
+  });
+
+  test("keeps client-rendered starts in the SPA example when switching flows", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-architecture-lens]");
+    const csr = demo.locator('[data-architecture-lens-delivery][value="csr"]');
+    const ssr = demo.locator('[data-architecture-lens-delivery][value="ssr"]');
+
+    await expect(csr).toBeDisabled();
+    await demo
+      .locator('[data-architecture-lens-interaction][value="spa"]')
+      .check();
+    await expect(csr).toBeEnabled();
+    await expect(csr).toBeChecked();
+    await demo
+      .locator('[data-architecture-lens-interaction][value="hda"]')
+      .check();
+    await expect(csr).toBeDisabled();
+    await expect(ssr).toBeChecked();
+    await expect(demo.locator("[data-architecture-lens-title]")).toHaveText(
+      "HDA + SSR",
+    );
+    await demo
+      .locator('[data-architecture-lens-interaction][value="spa"]')
+      .check();
+    await expect(csr).toBeChecked();
+    await demo
+      .locator('[data-architecture-lens-interaction][value="mpa"]')
+      .check();
+    await expect(csr).toBeDisabled();
+    await expect(ssr).toBeChecked();
+    await expect(demo.locator("#architecture-lens-initial-help")).toContainText(
+      "representative flows",
+    );
   });
 
   test("follows the active book theme", async ({ page }) => {
@@ -330,15 +353,17 @@ test.describe("web architecture lens", () => {
     const demo = page.locator("[data-architecture-lens]");
     const heights: number[] = [];
 
-    for (const delivery of ["ssr", "isr", "csr"]) {
-      for (const interaction of ["mpa", "hda", "spa"]) {
-        await demo
-          .locator(`[data-architecture-lens-delivery][value="${delivery}"]`)
-          .check();
+    for (const interaction of ["mpa", "hda", "spa"]) {
+      for (const delivery of interaction === "spa"
+        ? ["ssr", "isr", "csr"]
+        : ["ssr", "isr"]) {
         await demo
           .locator(
             `[data-architecture-lens-interaction][value="${interaction}"]`,
           )
+          .check();
+        await demo
+          .locator(`[data-architecture-lens-delivery][value="${delivery}"]`)
           .check();
         heights.push((await demo.boundingBox())?.height ?? 0);
       }

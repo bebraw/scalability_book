@@ -71,10 +71,12 @@ The progression compares a local single agent, a single agent using a second app
 Model capability is an observed, task-dependent result rather than a ranking built into the phase names.
 
 The comparison has two main transitions.
+The three builds are comparative engineering case studies: practice, design, model, and environment can change together, so their differences do not identify model or orchestration effects.
 Establish to Challenge changes the assigned model and potentially its serving configuration while keeping the single-agent workflow broadly comparable.
 Record changes to tools, context, hardware, and hosting so they are not mistaken for effects of model capability alone.
 Challenge to Compare changes orchestration while keeping the fleet's base model declared and, preferably, equal to the Challenge model.
 This avoids treating a fleet as if it were a model category.
+Within Compare, one bounded paired task on a frozen repository provides a narrower single-agent versus fleet contrast under the same model, checks, and resource limits; it replaces part of the existing comparison work and remains exploratory.
 
 Possible phase mapping:
 
@@ -145,4 +147,5 @@ The phase allocations are planning budgets rather than required time sheets.
 When the common core or evidence cannot fit the budget, reduce optional scope before weakening acceptance, recovery, or review evidence.
 
 The shared engineering sessions replace ordinary project discussion and reflection within these budgets.
+The bounded paired task replaces part of Compare's fleet build and correction allocation rather than adding a fourth application.
 Reuse session decisions in existing records rather than adding reports; the total remains 135 hours.

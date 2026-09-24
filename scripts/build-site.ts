@@ -94,6 +94,14 @@ const projectSpecificationDefinitions = [
     slug: "compare",
     summary: "Implementation C · declared agent fleet.",
   },
+  {
+    file: "specifications/grading.md",
+    label: "Assessment",
+    phase: "grading",
+    sequence: "04",
+    slug: "grading",
+    summary: "Scoring, essential learning outcomes, and reassessment.",
+  },
 ];
 const demoScriptIncludes = [
   {
@@ -979,8 +987,12 @@ function rewriteProjectSpecificationLinks(source) {
     ]),
   );
 
-  return source.replace(/\]\((\d{2}_[^)]+\.md)\)/g, (match, filename) =>
-    urlByFilename.has(filename) ? `](${urlByFilename.get(filename)})` : match,
+  return source.replace(
+    /\]\(([^()/#]+\.md)(#[^)]*)?\)/g,
+    (match, filename, fragment = "") =>
+      urlByFilename.has(filename)
+        ? `](${urlByFilename.get(filename)}${fragment})`
+        : match,
   );
 }
 

@@ -35,11 +35,11 @@ const evidenceItems: Record<EvidenceKey, EvidenceItem> = {
       "Fleet plan, selected trace, transformed trace, repeatable loader, and debugging findings",
     section: "2. Fleet evidence",
     evidencePrompt:
-      "Connect the task graph to the run, show at least two debugging findings in C, and include coordination measurements, B–C analysis, and one workflow-level formal-model analysis.",
+      "Connect the task graph to the run, show at least two debugging findings in C, and include coordination measurements, the B–C case analysis, the bounded paired task, and one workflow-level formal-model analysis.",
     limitationPrompt:
-      "Include failed attempts and human review; record missing usage or trace data and alternative explanations for the B–C result.",
+      "Include failed attempts and human review; record missing usage or trace data, unmatched conditions in the paired task, and alternative explanations for the B–C result.",
     missing:
-      "Connect the fleet plan, trace, loader, and two debugging findings to coordination measurements and the workflow model.",
+      "Connect the fleet plan, trace, loader, and two debugging findings to coordination measurements, the bounded paired task, and the workflow model.",
   },
   experiment: {
     label: "Scaling and deployment experiment",
@@ -125,7 +125,7 @@ function initializeReflectionPackageDemo(root: HTMLElement) {
       await navigator.clipboard.writeText(outline.value);
       copy.textContent = "Copied";
       window.setTimeout(() => {
-        copy.textContent = "Copy package";
+        copy.textContent = "Copy evidence index";
       }, 1400);
     } catch {
       copy.textContent = "Select text";

@@ -9,7 +9,7 @@ test.describe("implementation discovery lab", () => {
     const lab = page.locator("[data-project-fit]");
     await expect(lab).toBeVisible();
     await expect(lab.locator("[data-project-fit-score]")).toHaveText(
-      "0/4 anchors",
+      "0/4 choices recorded",
     );
     await expect(lab).not.toContainText("Too thin");
 
@@ -47,7 +47,7 @@ test.describe("implementation discovery lab", () => {
       .fill("Pinned versions, seed data, setup command, and test command");
 
     await expect(lab.locator("[data-project-fit-score]")).toHaveText(
-      "4/4 anchors",
+      "4/4 choices recorded",
     );
     await lab.locator('[data-project-fit-tab="4"]').click();
 

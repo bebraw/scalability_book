@@ -422,7 +422,7 @@ function updateProjectFit(
   const completeCount = anchors.filter((anchor) => anchor.complete).length;
   const questions = getQuestions(values);
 
-  elements.score.textContent = `${completeCount}/${anchors.length} anchors`;
+  elements.score.textContent = `${completeCount}/${anchors.length} choices recorded`;
   elements.verdict.textContent = getVerdict(completeCount);
   elements.meter.forEach((segment, index) => {
     segment.classList.toggle("is-active", index < completeCount);
@@ -561,7 +561,7 @@ function getVerdict(completeCount: number) {
     case 1:
       return "One anchor is set. Let it inform the next decision.";
     default:
-      return "Begin with the character of your implementation.";
+      return "Begin by choosing the app’s purpose.";
   }
 }
 

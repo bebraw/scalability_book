@@ -5,23 +5,21 @@
   data-api-contract-lens
   aria-labelledby="api-contract-lens-heading"
 >
-  <div class="scaling-demo-header api-contract-lens-header">
+  <div class="scaling-demo-header api-contract-lens-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Contract topology lab</p>
-      <h3 id="api-contract-lens-heading">
-        Where does the client learn what it can do?
-      </h3>
+      <p class="scaling-demo-kicker demo-kicker">API contract lab</p>
+      <h3 id="api-contract-lens-heading">Compare what the client must know</h3>
     </div>
-    <div class="api-contract-lens-badge" aria-live="polite">
+    <div class="api-contract-lens-badge demo-summary" aria-live="polite">
       <span data-api-contract-style>Resource HTTP</span>
       <small data-api-contract-boundary>address + representation</small>
     </div>
   </div>
 
   <p class="api-contract-lens-intro">
-    Hold the domain intent constant. Move between contracts to see which facts
-    live in client code, which arrive from the server, and where change creates
-    coordination.
+    Perform the same operation through each API style. Track what the client
+    must know, what the server supplies, and which changes require both to
+    update.
   </p>
 
   <form data-api-contract-form>
@@ -133,9 +131,12 @@
         </p>
       </div>
 
-      <aside class="api-contract-lens-ledger" aria-label="Knowledge ledger">
+      <aside
+        class="api-contract-lens-ledger"
+        aria-label="Who supplies the information?"
+      >
         <div class="api-contract-lens-panel-heading">
-          <span>Knowledge ledger</span>
+          <span>Who supplies the information?</span>
           <strong>before the request</strong>
         </div>
         <section>
@@ -167,14 +168,14 @@
         <dd data-api-contract-fact="cache"></dd>
       </div>
       <div>
-        <dt>Pressure lands on</dt>
+        <dt>Who must adapt?</dt>
         <dd data-api-contract-fact="pressure"></dd>
       </div>
     </dl>
 
     <div class="api-contract-lens-readout">
       <div>
-        <p class="request-trace-section-label">Architectural reading</p>
+        <p class="request-trace-section-label">What this means</p>
         <h4 data-api-contract-title>Coordinate around resources</h4>
         <p data-api-contract-summary></p>
       </div>

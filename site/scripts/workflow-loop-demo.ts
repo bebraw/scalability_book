@@ -41,7 +41,7 @@ const workflowModes: Record<WorkflowModeKey, WorkflowMode> = {
   },
   "agent-weak": {
     title: "Agent drafts with weak project context",
-    copy: "The agent writes faster, but unclear setup and weak tests push more work into human review.",
+    copy: "This scenario assumes faster drafting but more review when setup and tests are weak.",
     defaultSignals: { setup: 1, context: 1, tests: 1 },
     actors: [
       {
@@ -114,7 +114,7 @@ const signalEvidence: Record<
   }
 > = {
   setup: {
-    weak: "Setup is still a conversation. The reviewer becomes the runtime environment.",
+    weak: "Setup is still a conversation. The reviewer has to resolve missing setup steps.",
     partial:
       "A command exists, but missing data or configuration still creates guesswork.",
     strong: "The change can be run with known data before review.",
@@ -236,7 +236,7 @@ function initializeWorkflowDemo(root: HTMLElement) {
     });
     updateWorkflowMetrics(metrics, result);
     evidence.innerHTML = buildWorkflowEvidence(signalScores);
-    verdict.textContent = `${result.loops} loop${result.loops === 1 ? "" : "s"} likely`;
+    verdict.textContent = `${result.loops} loop${result.loops === 1 ? "" : "s"} (simulated)`;
     interpretation.textContent = buildWorkflowInterpretation(result);
     artifact.value = buildWorkflowArtifact(mode, signalScores, result);
     updateWorkflowStage(steps, tabs, previous, next, currentStep, false);
@@ -388,14 +388,14 @@ function buildWorkflowInterpretation(
   result: ReturnType<typeof calculateWorkflow>,
 ) {
   if (result.leverage === "High") {
-    return "The workflow has enough local feedback that the human can review intent instead of rediscovering basic issues.";
+    return "This scenario assumes local checks resolve basic issues, leaving more time to review intent. Verify that assumption with a real change.";
   }
 
   if (result.loops >= 3) {
-    return "The workflow is likely to bounce between agent, tools, and reviewer. Improve setup, context, or tests before asking for more output.";
+    return "These assumptions produce repeated correction cycles. Use a real change to test whether better setup, context, or tests would reduce them.";
   }
 
-  return "The workflow can move, but some review work is still compensating for weak local feedback.";
+  return "This scenario assigns some review effort to missing local feedback. Measure that effort before choosing an intervention.";
 }
 
 function buildWorkflowEvidence(scores: Record<WorkflowSignalKey, number>) {
@@ -425,11 +425,12 @@ function buildWorkflowArtifact(
   return [
     `Workflow: ${mode.title}`,
     "",
-    `Likely correction loops: ${result.loops}`,
-    `Human review load: ${result.reviewMinutes} min`,
-    `Automation leverage: ${result.leverage}`,
+    `Simulated correction loops: ${result.loops}`,
+    `Simulated review time: ${result.reviewMinutes} min`,
+    `Automation support (model): ${result.leverage}`,
     "",
-    "Feedback signals:",
+    "Illustrative assumptions, not measured performance. Ratings do not verify correctness.",
+    "Feedback assumptions:",
     ...Object.entries(scores).map(
       ([key, value]) =>
         `- ${signalLabels[key as WorkflowSignalKey]}: ${value}/5`,

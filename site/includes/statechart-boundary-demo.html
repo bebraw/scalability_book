@@ -5,12 +5,12 @@
   data-statechart-demo
   aria-labelledby="statechart-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Deterministic boundary lab</p>
-      <h3 id="statechart-demo-heading">Give the agent a map</h3>
+      <p class="scaling-demo-kicker demo-kicker">Deterministic boundary lab</p>
+      <h3 id="statechart-demo-heading">Limit the agent to valid transitions</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
+    <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-statechart-demo-verdict>Goal: ship a safe change</span>
       <small data-statechart-demo-summary>
         The agent can choose only events enabled by the statechart.
@@ -26,7 +26,7 @@
       <div class="statechart-demo-section-heading">
         <span aria-hidden="true">01</span>
         <div>
-          <h4 id="statechart-agent-heading">Agentic shell</h4>
+          <h4 id="statechart-agent-heading">Agent choices</h4>
           <p>One goal can produce different valid routes through the model.</p>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <span aria-hidden="true">02</span>
         <div>
           <h4 id="statechart-core-heading">
-            Deterministic core <em>XState v5 + ELK</em>
+            Statechart rules <em>XState v5 + ELK</em>
           </h4>
           <p>
             Hierarchy shares rules; parallel regions represent simultaneous

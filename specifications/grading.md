@@ -25,8 +25,8 @@ Use the following general interpretation within each point range:
 - **Some credit:** partial evidence exists, but the result is difficult to reproduce, compare, or defend.
 - **No credit:** absent, unusable, contradicted by the artifact, or presented without the evidence needed to assess it.
 
-A visually polished or feature-rich application does not compensate for failure of the common behavioral core.
-Conversely, a modest implementation can earn full credit when it satisfies the contract and supports its decisions with strong evidence.
+Score required behavior and correctness independently of visual polish or extra features.
+A modest implementation can earn full credit when it satisfies the contract and supports its decisions with strong evidence.
 
 ### Establish-specific criteria: 10 points
 
@@ -104,4 +104,4 @@ Once all passing requirements are met, the final grade is:
 | 80% to below 90% |     4 |
 |     90% or above |     5 |
 
-Keep the original evidence and scoring record when a factual correction, approved accommodation, or formal reassessment changes a result.
+Keep the original evidence and scoring record when a correction or approved adjustment changes a result.

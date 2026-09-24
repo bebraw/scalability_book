@@ -6,12 +6,12 @@
   data-acid-result="ready"
   aria-labelledby="acid-lab-heading"
 >
-  <header class="acid-lab-header">
+  <header class="acid-lab-header demo-header">
     <div>
-      <p class="acid-lab-kicker">Database invariant workbench</p>
-      <h3 id="acid-lab-heading">Keep state and history in one truth</h3>
+      <p class="acid-lab-kicker demo-kicker">ACID transaction lab</p>
+      <h3 id="acid-lab-heading">Keep state and history consistent</h3>
     </div>
-    <div class="acid-lab-summary" aria-live="polite">
+    <div class="acid-lab-summary demo-summary" aria-live="polite">
       <span data-acid-verdict>Choose a failure boundary</span>
       <small data-acid-summary>
         One lifecycle transition must produce exactly one activity event.
@@ -21,8 +21,8 @@
 
   <p class="acid-lab-intro">
     Run the same work-item operation with application-managed writes or a
-    database transaction. The ledger exposes which guarantee actually protects
-    the project contract.
+    database transaction. Inspect the records to see which guarantee protects
+    the transition.
   </p>
 
   <form class="acid-lab-form" data-acid-form>
@@ -146,7 +146,7 @@
           <span aria-hidden="true">T</span>
           <div>
             <h4 id="acid-trace-heading">Execution trace</h4>
-            <p>The moment where the guarantee holds or leaks.</p>
+            <p>Follow the writes, responses, and failures.</p>
           </div>
         </header>
         <ol data-acid-trace>

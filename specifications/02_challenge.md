@@ -83,6 +83,7 @@ Compare implementations A and B in terms of:
 - optional scope completed.
 
 Do not present correlation as proof.
+This is a comparison of two engineering cases, not an estimate of the effect of changing the model alone.
 The group has more domain knowledge during Challenge, and this practice effect is part of the comparison's limitations.
 
 ### 4.4 Apply runtime pressure

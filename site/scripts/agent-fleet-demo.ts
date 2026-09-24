@@ -266,7 +266,7 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     modelImpact.textContent = buildModelImpactSummary(modelResult);
     verdict.textContent =
       selectedRoles.length > 1
-        ? `${selectedRoles.length} roles, ${riskLabel.toLowerCase()} risk`
+        ? `${selectedRoles.length} roles, ${riskLabel.toLowerCase()} modeled risk`
         : "Use one careful agent";
     workflowSteps.innerHTML = buildSteps(selectedRoles)
       .map((item) => `<li>${escapeAgentFleetHtml(item)}</li>`)
@@ -606,14 +606,14 @@ ${changeSize}/5
 Recommended pattern:
 ${patternLabel}
 
-Integration risk:
+Modeled integration risk:
 ${riskLabel}
 
 Estimated model impact:
 - Direct model cost: ${modelResult.cost.toFixed(2)} EUR
 - Model latency: ${Math.round(modelResult.latency)} min
 - Human review time: ${Math.round(modelResult.reviewMinutes)} min
-- Rework risk: ${getRiskLabel(modelResult.reworkScore)}
+- Modeled rework risk: ${getRiskLabel(modelResult.reworkScore)}
 
 Roles and expected outputs:
 ${roles}
@@ -763,7 +763,7 @@ ${projectContext.context}
 - Project readiness: ${selectedReadiness}
 - Change size: ${changeSize}/5
 - Workflow pattern: ${patternLabel}
-- Integration risk: ${riskLabel}
+- Modeled integration risk: ${riskLabel}
 
 ## Roles and models
 ${roleList}
@@ -772,7 +772,7 @@ ${roleList}
 - Direct model cost: ${modelResult.cost.toFixed(2)} EUR
 - Model latency: ${Math.round(modelResult.latency)} min
 - Human review time: ${Math.round(modelResult.reviewMinutes)} min
-- Rework risk: ${getRiskLabel(modelResult.reworkScore)}
+- Modeled rework risk: ${getRiskLabel(modelResult.reworkScore)}
 
 ## Evidence checklist
 - Each role named concrete files, commands, assumptions, and risks:

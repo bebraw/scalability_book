@@ -7,12 +7,12 @@
   data-cap-result="ready"
   aria-labelledby="cap-lab-heading"
 >
-  <header class="cap-lab-header">
+  <header class="cap-lab-header demo-header">
     <div>
-      <p class="cap-lab-kicker">Distributed data fault table</p>
-      <h3 id="cap-lab-heading">Decide what happens across a partition</h3>
+      <p class="cap-lab-kicker demo-kicker">CAP partition lab</p>
+      <h3 id="cap-lab-heading">Compare write policies during a partition</h3>
     </div>
-    <div class="cap-lab-summary" aria-live="polite">
+    <div class="cap-lab-summary demo-summary" aria-live="polite">
       <span data-cap-verdict>All regions can communicate</span>
       <small data-cap-summary>
         Cut the network before testing the write policy.
@@ -126,7 +126,9 @@
           <span aria-hidden="true">LOG</span>
           <div>
             <h4 id="cap-log-heading">Request and repair log</h4>
-            <p>Responses are facts too; reconciliation cannot un-send one.</p>
+            <p>
+              Repair cannot retract a success response already seen by a client.
+            </p>
           </div>
         </header>
         <ol data-cap-log>
@@ -155,8 +157,8 @@
 
     <dl class="cap-lab-properties" aria-label="CAP property assessment">
       <div data-cap-property="consistency" data-status="idle">
-        <dt><b>C</b> Atomic consistency</dt>
-        <dd>One current value</dd>
+        <dt><b>C</b> Write consistency</dt>
+        <dd>One transition history</dd>
       </div>
       <div data-cap-property="availability" data-status="idle">
         <dt><b>A</b> Availability</dt>
@@ -171,7 +173,7 @@
     <section class="cap-lab-reading" aria-live="polite">
       <div class="cap-lab-reading-mark" aria-hidden="true">↔</div>
       <div>
-        <span>Architectural reading</span>
+        <span>What this means</span>
         <h4 data-cap-reading>CAP has not constrained the request path yet</h4>
         <p data-cap-explanation>
           With communication intact, the replicas can coordinate before they
@@ -183,7 +185,8 @@
 
   <p class="cap-lab-note">
     The model holds workload, topology, and failure constant so the policy is
-    visible. Real systems define quorums, timeouts, leases, conflict resolution,
-    and consistency guarantees more precisely.
+    visible. The write-invariant check alone does not establish linearizability
+    for all reads and writes. Real systems also define quorums, timeouts,
+    leases, and conflict resolution.
   </p>
 </section>

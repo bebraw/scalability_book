@@ -1,6 +1,36 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
+  test("publishes the assessment rubric and preserves specification fragments", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/project/");
+    const pairedTask = page.getByRole("link", {
+      name: "bounded paired task",
+      exact: true,
+    });
+    await expect(pairedTask).toHaveAttribute(
+      "href",
+      "/project/compare/#5-4-compare-one-agent-with-the-fleet",
+    );
+    await pairedTask.click();
+    await expect(
+      page.locator('[id="5-4-compare-one-agent-with-the-fleet"]'),
+    ).toBeVisible();
+    await page.locator('.project-index a[href="/project/grading/"]').click();
+    await expect(page.locator("#passing-and-final-grade")).toBeVisible();
+    await expect(page.locator(".project-prose")).toContainText(
+      "receive at least 10 points from each of the three projects",
+    );
+    await expect(page.locator(".project-prose")).toContainText(
+      "receive at least 50% of the available total points",
+    );
+    const source = await request.get("/project/source/grading.md");
+    expect(source.status()).toBe(200);
+    expect(await source.text()).toContain("## Passing and final grade");
+  });
+
   test("publishes the common contract and phase briefs from the site navigation", async ({
     page,
   }) => {

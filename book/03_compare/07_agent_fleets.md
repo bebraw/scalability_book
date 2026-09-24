@@ -247,8 +247,9 @@ Record reviewer backlog alongside completed tasks to see whether the fleet is ex
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.
-Compare it with one single-agent run over the same brief, base model, acceptance tests, and evidence schema.
-The result supports a local decision about this task; reliability claims require predeclared repeated trials.
+For a narrower workflow contrast, use the [Compare project's bounded paired task](/project/compare/#5-4-compare-one-agent-with-the-fleet): fresh copies of the same frozen revision, the same brief, model, checks, environment, intervention policy, and aggregate resource limits.
+The full B and C builds remain case studies because their design choices and the team's experience differ.
+One matched pair supports an exploratory observation about this task; reliability or general effect claims require a justified sampling design and repeated trials.
 
 Finally, transform the execution trace into implementation C.
 The fleet run maps to a workspace, delegated tasks to work items, agents and humans to actors, and attempts, validations, failures, reviews, and interventions to activity events.

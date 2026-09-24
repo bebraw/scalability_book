@@ -229,7 +229,7 @@ function initializeLatencyDemo(root: HTMLElement) {
     updateLatencyMap(root, mapLabels, distances, result);
     updateDatabasePlacementCopy(root, distances.appDb);
     updateHardwareProfileCopy(root, hardware.value);
-    verdict.textContent = `${Math.round(result.total)} ms estimated response`;
+    verdict.textContent = `${Math.round(result.total)} ms modeled response`;
     breakdown.innerHTML = buildLatencyBreakdown(result)
       .map((item) => `<li>${escapeLatencyHtml(item)}</li>`)
       .join("");

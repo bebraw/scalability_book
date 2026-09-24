@@ -189,19 +189,20 @@ Then use the friction audit to ask which part of that process is creating repeat
 
 ### Friction audit lab
 
-The demonstration below treats friction as repeated work in a small change path.
-The goal is not to calculate exact minutes.
-Name where the resistance appears and choose one feedback loop to improve before adding more features.
+The audit below records observed effort in a bounded change path and makes an intervention's hypothesis explicit.
+Enter active person-minutes from your records, keeping passive waiting, acceptance evidence, and changed conditions in the notes.
+The arithmetic can show increased effort as well as a reduction; it does not predict productivity or assign risk from an assistance mode.
 
 {{ import "site/includes/friction-audit-demo.html" }}
 
 Apply the same audit to implementation A using the category change or another equivalently bounded request.
-Score setup, comprehension, change, testing, review, deployment, operations, and coordination; name the largest source of resistance; and choose one concrete improvement.
+Observe setup, comprehension, change, testing, review, deployment, operations, and coordination; use timing records and concrete blockages to identify the largest supported source of resistance and choose one intervention to test.
+Leave unmeasured stages unknown rather than treating them as zero, and record the intervention's introduction and ongoing maintenance costs separately.
 For one implemented choice, compare introduction with safe reversal: mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
 
 Repeat the unchanged audit for implementation B.
 The comparison is useful only if the change request and categories remain stable.
-A different score may come from architecture, tooling, documentation, generated defaults, or team practice; the audit should identify the mechanism rather than attributing every difference to the implementation approach.
+A difference may come from architecture, tooling, documentation, generated defaults, or team practice; the audit should expose competing explanations rather than attribute every difference to the implementation approach.
 
 ## Project artifact
 

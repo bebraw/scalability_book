@@ -5,231 +5,382 @@
   data-friction-demo
   aria-labelledby="friction-demo-heading"
 >
-  <div class="scaling-demo-header">
+  <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Friction audit lab</p>
-      <h3 id="friction-demo-heading">Find the slow part of a small change</h3>
+      <p class="scaling-demo-kicker demo-kicker">Friction audit lab</p>
+      <h3 id="friction-demo-heading">Did the change reduce effort?</h3>
     </div>
-    <div class="scaling-demo-summary" aria-live="polite">
-      <span data-friction-demo-verdict>Score the change path</span>
-      <small
-        >Friction compounds when setup, tests, review, and context fail.</small
-      >
+    <div class="scaling-demo-summary demo-summary" aria-live="polite">
+      <span data-friction-demo-verdict>No complete comparison yet</span>
+      <small>Your observations, with missing evidence kept visible.</small>
     </div>
   </div>
-
   <form class="friction-demo-grid" data-friction-demo-form>
-    <div class="friction-demo-column">
-      <section
-        class="scaling-demo-panel"
-        aria-labelledby="friction-change-title"
-      >
-        <h4 id="friction-change-title">Change request</h4>
-        <label>
-          <span>Scenario</span>
-          <select data-friction-demo-scenario>
-            <option value="required-field" selected>
-              Add a required event property
-            </option>
-            <option value="reviewer-setup">
-              Run the project as a reviewer
-            </option>
-            <option value="filter-summary">
-              Add a filterable event summary
-            </option>
-            <option value="production-bug">
-              Explain a production data bug
-            </option>
-          </select>
-        </label>
-        <div class="demo-card">
-          <p data-friction-demo-scenario-copy>
-            A new event type needs one required field in the UI, API, storage,
-            and summary view.
-          </p>
-        </div>
-        <div class="friction-demo-files">
-          <span>Likely touch points</span>
-          <ul data-friction-demo-files></ul>
-        </div>
-        <label>
-          <span>Assistance mode</span>
-          <select data-friction-demo-assistance>
-            <option value="human" selected>Human only</option>
-            <option value="weak-agent">Agent with weak project context</option>
-            <option value="harnessed-agent">
-              Agent with good instructions and tests
-            </option>
-          </select>
-        </label>
-        <div class="demo-card">
-          <p data-friction-demo-agent-copy>
-            In this mode, you do the search, edit, test, and review work
-            manually.
-          </p>
-        </div>
-        <details class="demo-reference">
-          <summary>Estimate basis</summary>
-          <p>
-            The agent multipliers are bounded by published developer
-            productivity studies: a constrained Copilot task was 55.8% faster,
-            while a 2025 open-source field experiment found experienced
-            developers 19% slower with AI tools on mature projects.
-          </p>
-          <ul>
-            <li>
-              <a href="https://arxiv.org/abs/2302.06590">Peng et al. 2023</a>
-            </li>
-            <li>
-              <a href="https://arxiv.org/abs/2507.09089">Becker et al. 2025</a>
-            </li>
-            <li>
-              <a href="https://arxiv.org/abs/2303.08733">Zhang et al. 2023</a>
-            </li>
-          </ul>
-        </details>
-      </section>
-
-      <section
-        class="scaling-demo-panel"
-        aria-labelledby="friction-audit-title"
-      >
-        <h4 id="friction-audit-title">What slows this down?</h4>
-        <label class="friction-demo-scale">
-          <span>Startup work</span>
-          <input
-            type="range"
-            min="0"
-            max="5"
-            value="3"
-            data-friction-demo-score="setup"
-          />
-          <small>one command -> manual setup</small>
-        </label>
-        <label class="friction-demo-scale">
-          <span>Finding the code path</span>
-          <input
-            type="range"
-            min="0"
-            max="5"
-            value="4"
-            data-friction-demo-score="comprehension"
-          />
-          <small>obvious file -> scattered rules</small>
-        </label>
-        <label class="friction-demo-scale">
-          <span>Places to change</span>
-          <input
-            type="range"
-            min="0"
-            max="5"
-            value="4"
-            data-friction-demo-score="change"
-          />
-          <small>one module -> many synchronized edits</small>
-        </label>
-        <label class="friction-demo-scale">
-          <span>Proof work</span>
-          <input
-            type="range"
-            min="0"
-            max="5"
-            value="3"
-            data-friction-demo-score="testing"
-          />
-          <small>focused test -> manual click path</small>
-        </label>
-      </section>
-    </div>
-
-    <section class="scaling-demo-panel friction-demo-process-panel">
-      <h4>Change process</h4>
-      <div class="friction-demo-process" data-friction-demo-process></div>
+    <section
+      class="scaling-demo-panel"
+      aria-labelledby="friction-context-title"
+    >
+      <h4 id="friction-context-title">01 / Define the comparison</h4>
+      <label
+        ><span>Bounded task and acceptance checks</span
+        ><textarea
+          rows="3"
+          data-friction-note="task"
+          placeholder="What must work, and which checks establish it?"
+        ></textarea>
+      </label>
+      <label
+        ><span>Intervention and hypothesis</span
+        ><textarea
+          rows="3"
+          data-friction-note="hypothesis"
+          placeholder="What changed? Which effort might decrease or increase?"
+        ></textarea>
+      </label>
+      <label
+        ><span>Baseline revision and configuration</span
+        ><input
+          type="text"
+          data-friction-note="baseline"
+          placeholder="Revision, tools, model, environment, people"
+      /></label>
+      <label
+        ><span>Candidate revision and configuration</span
+        ><input
+          type="text"
+          data-friction-note="candidate"
+          placeholder="Revision, tools, model, environment, people"
+      /></label>
+      <label
+        ><span>Evidence, conditions, and limits</span
+        ><textarea
+          rows="4"
+          data-friction-note="evidence"
+          placeholder="Link timing records and check results. Record waiting, failures, practice effects, and changed conditions."
+        ></textarea>
+      </label>
     </section>
-
-    <div class="friction-demo-column">
-      <section class="scaling-demo-panel">
-        <h4>Audit result</h4>
-        <dl class="scaling-demo-metrics demo-metrics-compact">
-          <div>
-            <dt>Estimated change cost</dt>
-            <dd data-friction-demo-metric="before">0 min</dd>
-          </div>
-          <div>
-            <dt>Likely rework loops</dt>
-            <dd data-friction-demo-metric="loops">0</dd>
-          </div>
-          <div>
-            <dt>Agent rework risk</dt>
-            <dd data-friction-demo-metric="agentRisk">-</dd>
-          </div>
-          <div>
-            <dt>Largest source</dt>
-            <dd data-friction-demo-metric="largest">-</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section
-        class="scaling-demo-panel"
-        aria-labelledby="friction-improve-title"
-      >
-        <h4 id="friction-improve-title">Choose one feedback loop</h4>
-        <label>
-          <span>Improvement</span>
-          <select data-friction-demo-improvement>
-            <option value="setup-script">
-              One-command setup with seed data
-            </option>
-            <option value="schema-validation" selected>
-              Shared schema validation at boundaries
-            </option>
-            <option value="focused-tests">
-              Focused tests for the important behavior
-            </option>
-            <option value="small-review">
-              Smaller change boundary and review checklist
-            </option>
-          </select>
-        </label>
-        <div class="demo-card">
-          <p data-friction-demo-improvement-copy>
-            Everyone starts from the same runnable project and known data.
-          </p>
+    <section
+      class="scaling-demo-panel"
+      aria-labelledby="friction-observations-title"
+    >
+      <h4 id="friction-observations-title">02 / Record observed effort</h4>
+      <p class="friction-audit-note" id="friction-unit-note">
+        Active person-minutes, not elapsed time. Assign each person's time once,
+        including rework. Leave unknown values blank; enter 0 only for measured
+        zero effort. Record passive waiting separately in the evidence notes.
+      </p>
+      <div class="friction-observations" aria-describedby="friction-unit-note">
+        <div
+          class="friction-observation-row friction-observation-heading"
+          aria-hidden="true"
+        >
+          <strong>Stage</strong><span>Baseline</span><span>Candidate</span>
         </div>
-
-        <h4>Impact</h4>
-        <dl class="scaling-demo-metrics demo-metrics-compact">
-          <div>
-            <dt>Before</dt>
-            <dd data-friction-demo-metric="before">0 min</dd>
-          </div>
-          <div>
-            <dt>After</dt>
-            <dd data-friction-demo-metric="after">0 min</dd>
-          </div>
-          <div>
-            <dt>Time saved</dt>
-            <dd data-friction-demo-metric="saved">0 min</dd>
-          </div>
-        </dl>
-        <p class="demo-note" data-friction-demo-interpretation>
-          Pick a feedback loop to see what repeated work it removes.
-        </p>
-        <details class="friction-demo-package">
-          <summary>Friction audit artifact</summary>
-          <div class="scaling-demo-artifact-header">
-            <h4>Friction audit artifact</h4>
-            <button type="button" data-friction-demo-copy>Copy audit</button>
-          </div>
-          <textarea
-            data-friction-demo-artifact
-            aria-label="Generated friction audit"
-            readonly
-            spellcheck="false"
-          ></textarea>
-        </details>
-      </section>
-    </div>
+        <div class="friction-observation-row">
+          <strong>Setup</strong>
+          <label
+            ><span class="friction-input-label"
+              >Setup: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="setup"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Setup: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="setup"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Comprehension</strong>
+          <label
+            ><span class="friction-input-label"
+              >Comprehension: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="comprehension"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Comprehension: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="comprehension"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Change</strong>
+          <label
+            ><span class="friction-input-label"
+              >Change: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="change"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Change: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="change"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Testing</strong>
+          <label
+            ><span class="friction-input-label"
+              >Testing: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="testing"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Testing: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="testing"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Review</strong>
+          <label
+            ><span class="friction-input-label"
+              >Review: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="review"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Review: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="review"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Deployment</strong>
+          <label
+            ><span class="friction-input-label"
+              >Deployment: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="deployment"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Deployment: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="deployment"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Operations</strong>
+          <label
+            ><span class="friction-input-label"
+              >Operations: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="operations"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Operations: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="operations"
+              data-friction-period="after"
+          /></label>
+        </div>
+        <div class="friction-observation-row">
+          <strong>Coordination</strong>
+          <label
+            ><span class="friction-input-label"
+              >Coordination: baseline person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="coordination"
+              data-friction-period="before"
+          /></label>
+          <label
+            ><span class="friction-input-label"
+              >Coordination: candidate person-minutes</span
+            ><input
+              type="number"
+              min="0"
+              step="any"
+              inputmode="decimal"
+              placeholder="—"
+              data-friction-stage="coordination"
+              data-friction-period="after"
+          /></label>
+        </div>
+      </div>
+      <label
+        ><span>One-off intervention cost (person-minutes)</span
+        ><input
+          type="number"
+          min="0"
+          step="any"
+          inputmode="decimal"
+          placeholder="Unknown"
+          data-friction-investment
+      /></label>
+      <p class="friction-audit-note">
+        Keep this cost outside the task-stage entries. Record ongoing
+        maintenance costs and who bears them in the evidence notes.
+      </p>
+      <div class="friction-acceptance">
+        <label
+          ><span>Baseline acceptance</span
+          ><select data-friction-acceptance="before">
+            <option value="unchecked">Not checked</option>
+            <option value="pass">Passes checks</option>
+            <option value="fail">Fails checks</option>
+          </select></label
+        >
+        <label
+          ><span>Candidate acceptance</span
+          ><select data-friction-acceptance="after">
+            <option value="unchecked">Not checked</option>
+            <option value="pass">Passes checks</option>
+            <option value="fail">Fails checks</option>
+          </select></label
+        >
+      </div>
+    </section>
+    <section
+      class="scaling-demo-panel friction-audit-results"
+      aria-labelledby="friction-result-title"
+    >
+      <h4 id="friction-result-title">03 / Interpret the observation</h4>
+      <dl class="scaling-demo-metrics demo-metrics-compact">
+        <div>
+          <dt>Baseline effort</dt>
+          <dd data-friction-demo-metric="before">Incomplete</dd>
+        </div>
+        <div>
+          <dt>Candidate effort</dt>
+          <dd data-friction-demo-metric="after">Incomplete</dd>
+        </div>
+        <div>
+          <dt>Candidate − baseline</dt>
+          <dd data-friction-demo-metric="difference">Incomplete</dd>
+        </div>
+        <div>
+          <dt>Difference + one-off cost</dt>
+          <dd data-friction-demo-metric="net">Incomplete</dd>
+        </div>
+      </dl>
+      <p
+        class="friction-audit-note"
+        data-friction-demo-interpretation
+        aria-live="polite"
+      ></p>
+      <p class="friction-audit-note">
+        Positive differences mean more effort; negative differences mean less.
+        One comparison cannot establish causation, future savings, or rework
+        risk. Check the evidence and acceptance conditions before deciding what
+        to repeat.
+      </p>
+      <label
+        ><span>Next check or reversal condition</span
+        ><textarea
+          rows="2"
+          data-friction-note="next"
+          placeholder="Which result would challenge the hypothesis?"
+        ></textarea>
+      </label>
+      <details class="friction-demo-package">
+        <summary>Review and copy the audit</summary>
+        <label
+          ><span>Audit record</span
+          ><textarea readonly data-friction-demo-artifact></textarea>
+        </label>
+        <button type="button" data-friction-demo-copy>Copy audit</button>
+      </details>
+      <p class="friction-audit-note">
+        Entries stay in this page and are not saved after reload. Copy the audit
+        to preserve it.
+      </p>
+    </section>
   </form>
 </section>

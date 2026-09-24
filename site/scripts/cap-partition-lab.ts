@@ -80,7 +80,7 @@
       node("initial", "none", "replica", "connected", "connected"),
     );
     setMetrics(root, 0, 0, 0);
-    setProperty(root, "consistency", "idle", "One current value");
+    setProperty(root, "consistency", "idle", "One transition history");
     setProperty(root, "availability", "idle", "No partition yet");
     setProperty(root, "partition", "idle", "Network connected");
     renderLog(root, [log("idle", "00", "Replicas agree that I42 is initial.")]);

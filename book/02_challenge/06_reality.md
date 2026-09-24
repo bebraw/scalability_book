@@ -48,8 +48,11 @@ The incident also reinforced my preference for simpler web primitives.
 For this kind of site, I consider Next.js's interacting rendering and caching mechanisms more complex than the product warranted.
 If rebuilding it today, I would use a [multi-page application with hypermedia-driven fragments](/chapters/architecture/#rendering-moves-work-across-time-and-place) and View Transitions for the interactive portions.
 
-That architecture would not eliminate the need for caching, monitoring, fallbacks, and bounded external dependencies.
-Its advantage would be making page requests, fragment requests, and data access paths more explicit—and therefore easier to understand before production traffic tests them.
+That alternative would still need caching, monitoring, fallbacks, and bounded external dependencies.
+My hypothesis is that explicit page, fragment, and data-access paths would make this site's behavior easier to explain and operate.
+The caching incident does not test that counterfactual.
+I would compare a small implementation of the same journey under the same cache and dependency-failure checks, asking an unfamiliar maintainer to trace a response and diagnose a stale result.
+If diagnosis remained equally difficult or required more coordination, that would challenge my preference.
 
 ## What documented web incidents reveal
 

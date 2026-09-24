@@ -5,74 +5,32 @@
   data-architecture-lens
   aria-labelledby="architecture-lens-heading"
 >
-  <div class="scaling-demo-header architecture-lens-header">
+  <div class="scaling-demo-header architecture-lens-header demo-header">
     <div>
-      <p class="scaling-demo-kicker">Two architectural decisions</p>
-      <h3 id="architecture-lens-heading">Compose a web request</h3>
+      <p class="scaling-demo-kicker demo-kicker">Who builds the next view?</p>
+      <h3 id="architecture-lens-heading">Compare web application flows</h3>
     </div>
-    <div class="architecture-lens-equation" aria-live="polite">
-      <span data-architecture-lens-delivery-badge>SSR</span>
-      <i aria-hidden="true">×</i>
+    <div class="architecture-lens-equation demo-summary" aria-live="polite">
       <span data-architecture-lens-interaction-badge>MPA</span>
-      <small>delivery × interaction</small>
+      <i aria-hidden="true">+</i>
+      <span data-architecture-lens-delivery-badge>SSR</span>
+      <small>application flow + first load</small>
     </div>
   </div>
 
   <div class="architecture-lens-intro">
-    <strong>These labels answer different questions.</strong>
+    <strong>Start with the application flow.</strong>
     <p>
-      SSR, ISR, and CSR describe where and when a view is produced. MPA, HDA,
-      and SPA describe how the browser moves to later application states.
+      Compare a full page, an HTML fragment, and a view built from JSON. HDA
+      keeps views and action controls on the server; the SPA example builds
+      views in the browser. Both can update part of a page.
     </p>
   </div>
 
   <form data-architecture-lens-form>
     <div class="architecture-lens-controls">
       <fieldset>
-        <legend><span>01</span> Where and when is the view produced?</legend>
-        <div class="architecture-lens-options">
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="ssr"
-              data-architecture-lens-delivery
-              checked
-            />
-            <span
-              ><strong>SSR</strong
-              ><small>Render for each document request</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="isr"
-              data-architecture-lens-delivery
-            />
-            <span
-              ><strong>ISR</strong
-              ><small>Serve cached HTML, then regenerate</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="csr"
-              data-architecture-lens-delivery
-            />
-            <span
-              ><strong>CSR</strong
-              ><small>Render in the browser; common in SPAs</small></span
-            >
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend><span>02</span> How is the next state presented?</legend>
+        <legend><span>01</span> How does the application update?</legend>
         <div class="architecture-lens-options">
           <label>
             <input
@@ -84,7 +42,7 @@
             />
             <span
               ><strong>MPA</strong
-              ><small>Navigate to a complete document</small></span
+              ><small>Server HTML, full-page navigation</small></span
             >
           </label>
           <label>
@@ -96,7 +54,7 @@
             />
             <span
               ><strong>HDA</strong
-              ><small>Follow controls and swap HTML</small></span
+              ><small>Server HTML, targeted updates</small></span
             >
           </label>
           <label>
@@ -108,12 +66,66 @@
             />
             <span
               ><strong>SPA</strong
-              ><small>Update client state and render locally</small></span
+              ><small>JSON data, browser builds views</small></span
+            >
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset aria-describedby="architecture-lens-initial-help">
+        <legend><span>02</span> How does the first view arrive?</legend>
+        <div class="architecture-lens-options">
+          <label>
+            <input
+              type="radio"
+              name="delivery"
+              value="ssr"
+              data-architecture-lens-delivery
+              checked
+            />
+            <span
+              ><strong>SSR</strong
+              ><small>HTML rendered for this request</small></span
+            >
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="delivery"
+              value="isr"
+              data-architecture-lens-delivery
+            />
+            <span
+              ><strong>ISR</strong
+              ><small>Cached HTML, regenerated later</small></span
+            >
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="delivery"
+              value="csr"
+              data-architecture-lens-delivery
+              disabled
+            />
+            <span
+              ><strong>CSR</strong
+              ><small>Browser builds the first view</small></span
             >
           </label>
         </div>
       </fieldset>
     </div>
+
+    <p
+      class="architecture-lens-initial-help"
+      id="architecture-lens-initial-help"
+    >
+      Choosing a flow starts MPA and HDA with SSR, and SPA with CSR. Then vary
+      the first load: an SPA can also start with server HTML. CSR is available
+      only in the SPA example; these are representative flows, not every
+      possible hybrid.
+    </p>
 
     <div class="architecture-lens-workbench">
       <div class="architecture-lens-browser" data-architecture-lens-browser>
@@ -153,7 +165,7 @@
             <dd data-architecture-lens-receipt="requests">2</dd>
           </div>
           <div>
-            <dt>Returned UI</dt>
+            <dt>Response content</dt>
             <dd data-architecture-lens-receipt="artifact">Complete HTML</dd>
           </div>
           <div>
@@ -172,7 +184,7 @@
             <dd>
               <strong data-architecture-lens-transfer-label>≈18 KB</strong>
               <span class="architecture-lens-transfer-track" aria-hidden="true">
-                <i></i><b></b>
+                <i></i>
               </span>
               <small data-architecture-lens-transfer-detail
                 >complete document</small
@@ -181,8 +193,8 @@
           </div>
         </dl>
         <p class="architecture-lens-transfer-note">
-          Illustrative compressed responses. Headers and the common POST body
-          are excluded; CSR assumes a 45 KB JavaScript bundle on a cold cache.
+          Illustrative compressed responses after the action. Initial HTML,
+          JavaScript downloads, headers, and the common POST body are excluded.
         </p>
         <div class="architecture-lens-session">
           <label>
@@ -211,8 +223,8 @@
 
     <div class="architecture-lens-readout">
       <div>
-        <p class="request-trace-section-label">What this combination means</p>
-        <h4 data-architecture-lens-title>SSR + MPA</h4>
+        <p class="request-trace-section-label">What this flow means</p>
+        <h4 data-architecture-lens-title>MPA + SSR</h4>
         <p data-architecture-lens-summary></p>
       </div>
       <dl class="architecture-lens-facts">
