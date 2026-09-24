@@ -2,7 +2,8 @@
 
 [Thesis Journey Tracker](https://github.com/bebraw/thesis-journey-tracker) is a private dashboard for a small thesis-supervision team.
 It tracks students, thesis phases, meetings, topics, notes, workload, and backups without trying to become a general student information system.
-I developed it with coding agents beginning in March 2026, and it is in production and working well.
+I developed it with coding agents beginning in March 2026.
+At the time of this case review, I was using it successfully in production.
 
 The project is useful as a counter-case to Slideotter and Kirjolab.
 All three used rapid agent-assisted development and strong validation.
@@ -24,7 +25,7 @@ The production assessment above is based on my direct use of the deployed applic
 | Application, test, and script lines reviewed | About 20,500                                     |
 | Runtime                                      | Cloudflare Workers and D1                        |
 | Rendering model                              | Server-rendered HTML with limited client script  |
-| Production status                            | Deployed and working in the author's use         |
+| Production status at review                  | Deployed and working in the author's use         |
 
 ## The first pass was deliberately narrow
 

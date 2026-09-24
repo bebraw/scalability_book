@@ -38,11 +38,11 @@ Conversely, a modest implementation can earn full credit when it satisfies the c
 
 ### Challenge-specific criteria: 10 points
 
-| Criterion                                            | Points | Full-credit evidence                                                                                                                                                                               |
-| ---------------------------------------------------- | -----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fresh and comparable foundation-model implementation |    0-3 | Implementation B starts cleanly, respects the single-agent and transfer constraints, completes the common core, and records scope or configuration differences.                                    |
-| Architecture, friction, and pressure analysis        |    0-5 | The architecture hypothesis, ownership card, standardized audit, primary and secondary pressures, documented-case transfer, recovery reasoning, and Little's Law check form one coherent analysis. |
-| A-B interpretation                                   |    0-2 | Observations, plausible explanations, practice effects, stack or hardware differences, and unresolved alternatives are separated clearly.                                                          |
+| Criterion                                     | Points | Full-credit evidence                                                                                                                                                                               |
+| --------------------------------------------- | -----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fresh and comparable implementation B         |    0-3 | Implementation B starts cleanly, respects the single-agent and transfer constraints, completes the common core, and records scope or configuration differences.                                    |
+| Architecture, friction, and pressure analysis |    0-5 | The architecture hypothesis, ownership card, standardized audit, primary and secondary pressures, documented-case transfer, recovery reasoning, and Little's Law check form one coherent analysis. |
+| A-B interpretation                            |    0-2 | Observations, plausible explanations, practice effects, stack or hardware differences, and unresolved alternatives are separated clearly.                                                          |
 
 ### Compare-specific criteria: 10 points
 

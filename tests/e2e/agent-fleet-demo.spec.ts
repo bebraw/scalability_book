@@ -37,7 +37,7 @@ test.describe("agent fleet demo", () => {
       "Medium",
     );
     await expect(demo.locator("[data-agent-fleet-model-impact]")).toContainText(
-      "Implementer uses a small model",
+      "Implementer uses profile P",
     );
 
     await demo.locator(".agent-fleet-brief-step summary").click();
@@ -64,7 +64,7 @@ test.describe("agent fleet demo", () => {
       /src\/routes\/events\.ts/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /implementer \(Small model\)/,
+      /implementer \(Profile P\)/,
     );
     await demo.locator("[data-agent-fleet-packet-tab='scout']").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
@@ -78,7 +78,7 @@ test.describe("agent fleet demo", () => {
     );
     await demo.locator("[data-agent-fleet-packet-tab='implementer']").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /Recommended model:\nSmall/,
+      /Hypothetical model profile:\nProfile P/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /Validation command:/,

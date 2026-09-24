@@ -176,30 +176,34 @@ The same permission should not transfer automatically to another project.
 As financial exposure, consequences, or recovery difficulty increase, the agent's role should narrow from executing the action to preparing a reviewed change.
 Authority should follow the expected loss and recovery path, not the mere fact that an agent successfully performed a similar action elsewhere.
 
-## Tool examples (September 2026)
+## Choose a delegation environment
 
-These examples distinguish the unit of delegation exposed by each tool.
-They describe the documentation used for this edition; verify the linked versions before adoption.
-The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) defines the supported assignments for a particular course run.
+Choose the execution and control boundaries the exercise needs before choosing a product.
+The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) records the supported tool, version, model route, limits, and fallback for each course run.
+A product can expose several of the patterns in :ref[table:fleet-tool-options]; its name alone does not identify the workflow being measured.
 
-| Environment                                                                                                                                                                                     | Unit and coordination model                                                                | Isolation or control to inspect                                                          | Best fit in this chapter                                                                       |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| [Pi](https://pi.dev/docs/latest/quickstart) plus its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) | Local agent processes in single, sequential-chain, or parallel modes                       | Project trust, extension code, agent tools, contexts, and process output                 | Primary hands-on agent-harness lab because you can see and modify the mechanism                |
-| [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation)                                                                                                       | Parent delegates fresh-context children singly or in parallel; nested delegation is opt-in | Inherited toolsets, separate terminals, optional worktrees, iteration and timeout limits | Broader multi-provider agent-harness comparison with built-in delegation and persistent memory |
-| [Claude Code](https://code.claude.com/docs/en/agents)                                                                                                                                           | Subagents, parallel sessions, and experimental agent teams                                 | Tool permissions, separate contexts, optional worktree isolation                         | Integrated agent-harness comparison when you want several built-in fleet patterns              |
-| [GitHub Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents)                                                                                                     | Asynchronous repository task that researches, changes code, and opens a pull request       | Repository policy, hosted environment, checks, and pull-request review                   | Issue-to-pull-request comparison rather than a transparent local fleet                         |
-| [OpenAI Responses multi-agent](https://developers.openai.com/api/docs/guides/latest-model#what-is-new)                                                                                          | A model coordinates parallel subagents and synthesizes their results                       | API tools, prompts, application policy, usage, and returned evidence                     | Application-level orchestration comparison rather than an agent-harness lab                    |
+| Delegation pattern        | Where work is coordinated                                   | Controls to inspect                                                                         | Evidence to retain                                                            |
+| ------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Separate local processes  | A local harness starts child processes                      | Inherited tools and credentials, process termination, shared files, and worktree boundaries | Child inputs and outputs, process status, tool calls, and integration changes |
+| Managed child sessions    | A parent session delegates through a harness or service     | Child permissions, context and memory inheritance, nesting limits, and cancellation         | Parent–child identifiers, attempt outcomes, usage, and retained state         |
+| Hosted repository task    | A service schedules work in a repository environment        | Repository access, network policy, credentials, checks, and merge authority                 | Task revision, environment configuration, changes, checks, and review outcome |
+| Application orchestration | Application code or an API coordinates model and tool calls | Tool execution location, authorization, retries, budgets, and result acceptance             | Call graph, tool results, failures, usage, and accepted application outcome   |
 
-::caption[Current paths for trying delegation; verify the linked documentation because these products evolve quickly.]
+::caption[Delegation boundaries to inspect when selecting a course environment.]
 ::label[table:fleet-tool-options]
 
-Omnigent illustrates the first scope: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
-Unity AI Gateway illustrates the second: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
+For an optional code-reading exercise, Pi's [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) makes process creation and result handling inspectable.
+Record the source commit you read and trace one child from launch to completion or cancellation.
+For a service-based contrast, the [Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent) describes delegated model work and application tool execution; inspect which responsibilities remain with the caller.
+These are entry points for examining mechanisms, not required installations or a ranking of current products.
+
+Omnigent illustrates harness coordination: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
+Unity AI Gateway illustrates traffic governance: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
 These are examples, not evidence that every fleet needs two products or exactly two control planes.
 Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
 
 For any option, inspect how child tasks inherit tools and credentials, whether concurrent writers are isolated, what state survives between runs, and how the execution trace is exported.
-Hermes also supports persistent memory, skills, remote terminals, and messaging; restrict those capabilities to the declared repository workflow when comparing it with a coding harness.
+Persistent memory, remote execution, and external messaging must be included in the declared workflow when enabled; they can change both the comparison and the authority boundary.
 Application-level agent orchestration has separate runtime users, data, and operational obligations.
 
 ## Complete the control-boundary review

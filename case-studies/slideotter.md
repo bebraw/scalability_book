@@ -24,7 +24,7 @@ A mechanical extraction and a difficult product decision are not comparable unit
 | TypeScript test or specification files                        | 49                                                        |
 | TypeScript and JavaScript lines in application and test areas | About 98,000                                              |
 | Implemented architecture decision records                     | 58                                                        |
-| Public product status                                         | Alpha                                                     |
+| Public product status at review                               | Alpha                                                     |
 
 ## What worked
 

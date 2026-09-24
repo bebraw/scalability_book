@@ -93,50 +93,44 @@
 
     <div class="agent-fleet-column">
       <section class="agent-fleet-panel agent-fleet-models-step">
-        <h4 id="agent-fleet-models-title">Model assignment</h4>
+        <h4 id="agent-fleet-models-title">Hypothetical model profiles</h4>
         <p>
-          Match model strength to role difficulty. Direct cost is only one part
-          of the decision; review and rework can dominate the workflow.
+          Assign hypothetical profiles to explore cost and review trade-offs.
+          All figures are illustrative assumptions, not model measurements. This
+          scenario assumes higher-cost profiles need less review; task evidence
+          may show a different relationship.
         </p>
         <div class="agent-fleet-model-options">
           <label data-agent-fleet-model-row="scout">
             <span>Scout model</span>
             <select data-agent-fleet-model="scout">
-              <option value="small">Small: cheap reconnaissance</option>
-              <option value="balanced" selected>
-                Balanced: normal default
-              </option>
-              <option value="strong">Strong: careful analysis</option>
+              <option value="small">P: lower cost, more review</option>
+              <option value="balanced" selected>Q: middle assumptions</option>
+              <option value="strong">R: higher cost, less review</option>
             </select>
           </label>
           <label data-agent-fleet-model-row="planner">
             <span>Planner model</span>
             <select data-agent-fleet-model="planner">
-              <option value="small">Small: cheap planning</option>
-              <option value="balanced" selected>
-                Balanced: normal default
-              </option>
-              <option value="strong">Strong: safer decomposition</option>
+              <option value="small">P: lower cost, more review</option>
+              <option value="balanced" selected>Q: middle assumptions</option>
+              <option value="strong">R: higher cost, less review</option>
             </select>
           </label>
           <label data-agent-fleet-model-row="implementer">
             <span>Implementer model</span>
             <select data-agent-fleet-model="implementer">
-              <option value="small">Small: cheap edits</option>
-              <option value="balanced" selected>
-                Balanced: normal default
-              </option>
-              <option value="strong">Strong: lower rework risk</option>
+              <option value="small">P: lower cost, more review</option>
+              <option value="balanced" selected>Q: middle assumptions</option>
+              <option value="strong">R: higher cost, less review</option>
             </select>
           </label>
           <label data-agent-fleet-model-row="reviewer">
             <span>Reviewer model</span>
             <select data-agent-fleet-model="reviewer">
-              <option value="small">Small: checklist review</option>
-              <option value="balanced" selected>
-                Balanced: normal default
-              </option>
-              <option value="strong">Strong: better risk finding</option>
+              <option value="small">P: lower cost, more review</option>
+              <option value="balanced" selected>Q: middle assumptions</option>
+              <option value="strong">R: higher cost, less review</option>
             </select>
           </label>
         </div>
@@ -145,7 +139,7 @@
 
     <div class="agent-fleet-column agent-fleet-output-column">
       <section class="agent-fleet-panel agent-fleet-review-step">
-        <h4 id="agent-fleet-plan-title">Recommended workflow</h4>
+        <h4 id="agent-fleet-plan-title">Workflow under these assumptions</h4>
         <ol data-agent-fleet-steps></ol>
         <dl class="agent-fleet-metrics demo-metrics-compact">
           <div>
@@ -157,19 +151,19 @@
             <dd data-agent-fleet-risk>Low</dd>
           </div>
           <div>
-            <dt>Best pattern</dt>
+            <dt>Suggested pattern</dt>
             <dd data-agent-fleet-pattern>Single agent</dd>
           </div>
           <div>
-            <dt>Model cost</dt>
+            <dt>Illustrative model cost</dt>
             <dd data-agent-fleet-model-cost>0.00 EUR</dd>
           </div>
           <div>
-            <dt>Model latency</dt>
+            <dt>Illustrative model latency</dt>
             <dd data-agent-fleet-model-latency>0 min</dd>
           </div>
           <div>
-            <dt>Review time</dt>
+            <dt>Illustrative review time</dt>
             <dd data-agent-fleet-review-time>0 min</dd>
           </div>
           <div>

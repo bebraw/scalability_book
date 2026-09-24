@@ -93,7 +93,7 @@ Stronger: “With 20 concurrent users creating events, p95 accepted-write latenc
 The course builds the same Work Activity Tracker three times:
 
 1. **Establish:** local model, single-agent workflow.
-2. **Challenge:** foundation model, single-agent workflow.
+2. **Challenge:** comparison model, single-agent workflow.
 3. **Compare:** declared agent fleet.
 
 The shared behavior stays stable so differences in architecture, evidence, and workflow become discussable.

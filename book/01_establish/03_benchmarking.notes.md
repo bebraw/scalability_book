@@ -91,14 +91,14 @@ Each eval should define:
 > **Sustainability angle**
 >
 > Model evals should include cost and resource awareness.
-> A stronger model may reduce rework, but it may also cost more, run slower, or consume more compute.
-> A weaker model may be acceptable if the task is well-scoped, the feedback loop is strong, and the human review burden stays reasonable.
+> A model that scores better on these tasks may reduce rework, but it may also cost more, run slower, or consume more compute.
+> A lower-cost model may be acceptable if it meets the same acceptance criteria and the human review burden stays reasonable.
 
 Development ideas:
 
 - Define a small set of project-specific tasks during implementation A and record the local-model baseline.
-  Rerun the same tasks with the foundation-model and fleet workflows when implementations B and C become available.
-- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the foundation model.
+  Rerun the same tasks with the comparison-model and fleet workflows when implementations B and C become available.
+- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the comparison model.
 - Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
 - Use human review for quality judgments that require understanding of the project.
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
@@ -289,7 +289,7 @@ Ideas to develop:
 - Make the implementation A public discussion use benchmark evidence.
   Groups should arrive at lecture 4 able to show at least one result and explain its limits.
 - Keep the sample sizes and claims modest.
-  The final wording should favor “in our tasks and environment” over universal claims about local models, foundation models, or fleets.
+  The final wording should favor “in our tasks and environment” over universal rankings of models or orchestration patterns.
 - Connect privacy to observability: event tracking systems can easily log sensitive behavior regardless of the chosen theme.
 - Add references on green software engineering, resource efficiency, carbon-aware computing, and cloud provider sustainability reporting.
 - Obsidian candidate: `Clippings/_Processed/Correlation charts Connect the dots between site speed and business success.md` could support the point that metrics should connect to user-visible or stakeholder-visible outcomes.

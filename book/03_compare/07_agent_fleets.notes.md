@@ -9,7 +9,7 @@ This chapter follows one practical progression:
 
 ## Notes for further development
 
-- Add a small trace-transformation example that maps a real Pi fleet export to the common project model.
+- Add a small trace-transformation example that maps an export from the assigned fleet harness to the common project model.
   Include failure, retry, review, and human-intervention events when the source tool exposes them.
 - Show the distinction between state and history: a task may currently be complete even though its trace contains failed attempts, repeated work, rejected reviews, or expensive handoffs.
 - Include a before/after example where a vague task fails because the project is illegible, then succeeds after adding tests, task boundaries, and instructions.

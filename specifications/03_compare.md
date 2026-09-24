@@ -26,7 +26,7 @@ Use:
 - the same common specification and acceptance scenarios;
 - the transfer policy in the common specification;
 - a declared base model;
-- normally the same foundation model and primary stack used for Challenge.
+- normally the same comparison model and primary stack used for Challenge.
 
 Keeping the model and stack stable makes B–C primarily a comparison of orchestration.
 If the available fleet tooling requires another model or stack, document the difference and treat it as a limitation.
@@ -215,7 +215,7 @@ The final comparison should answer:
 6. Which application architecture responds best to the primary and selected scalability pressures, and why?
 7. Under what project constraints would the group choose:
    - a local single agent;
-   - a foundation-model single agent;
+   - a comparison-model single agent;
    - an agent fleet?
 8. What remained a human responsibility in every phase?
 9. What did the fleet debugging view reveal that was difficult to see from the final code or raw transcript alone?

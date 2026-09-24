@@ -67,17 +67,22 @@ The difference between the ideal bound and the observed result is evidence about
 ## What documented web-development cases show
 
 The company-authored accounts below show different ways to organize agentic web development.
-Their reported results concern their own systems; the transfer questions identify what to inspect in the event tracker.
+Read each account as a snapshot of its stated tasks and configuration, not a current estimate of agent productivity.
+The transfer questions identify what to inspect in the event tracker.
 
-| Documented case                                                                                                                        | Practice in the web-development workflow                                          | Reported evidence and important limit                                              | Transfer question                                                        |
-| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [GitHub assigns Copilot work in github.com](https://github.blog/ai-and-ml/github-copilot/how-copilot-helps-build-the-github-platform/) | Issues become proposed changes to UI, APIs, migrations, and production code       | One month of task examples; no counts, review time, or defect rate                 | Which decisions may an agent execute, and who accepts the result?        |
-| [Vercel teaches agents product design](https://vercel.com/blog/teaching-agents-product-design-at-vercel)                               | Repository skills, linters, and review carry UI and interaction decisions forward | Skills went unused in 56% of separate Next.js eval cases; setup-specific           | How does a web project make product judgment available and maintainable? |
-| [Stripe runs parallel Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents)                              | Unattended agents produce pull requests in isolated development environments      | More than 1,000 agent-written PRs merged weekly; no attempt or quality denominator | What infrastructure makes parallel work bounded and reviewable?          |
-| [Stripe evaluates web integrations](https://stripe.com/blog/can-ai-agents-build-real-stripe-integrations)                              | Agents modify frontends, backends, databases, and live payment flows              | Eleven realistic environments with UI and API graders; deliberately small suite    | What evidence establishes that the resulting web behavior is correct?    |
+| Documented case                                                                                                                        | Practice in the web-development workflow                                          | Reported evidence and important limit                                                     | Transfer question                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [GitHub assigns Copilot work in github.com](https://github.blog/ai-and-ml/github-copilot/how-copilot-helps-build-the-github-platform/) | Issues become proposed changes to UI, APIs, migrations, and production code       | One month of task examples; no counts, review time, or defect rate                        | Which decisions may an agent execute, and who accepts the result?        |
+| [Vercel teaches agents product design](https://vercel.com/blog/teaching-agents-product-design-at-vercel)                               | Repository skills, linters, and review carry UI and interaction decisions forward | June 2026 workflow account; no general product-quality effect established                 | How does a web project make product judgment available and maintainable? |
+| [Stripe runs parallel Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents)                              | Unattended agents produce pull requests in isolated development environments      | February 2026 report of over 1,000 merged PRs per week; no attempt or quality denominator | What infrastructure makes parallel work bounded and reviewable?          |
+| [Stripe evaluates web integrations](https://stripe.com/blog/can-ai-agents-build-real-stripe-integrations)                              | Agents modify frontends, backends, databases, and live payment flows              | March 2026 suite of eleven environments with UI and API graders; limited task coverage    | What evidence establishes that the resulting web behavior is correct?    |
 
 ::caption[Documented agentic-development cases and their transfer questions.]
 ::label[table:documented-agentic-development-cases]
+
+Vercel’s separate [January 2026 Next.js evaluation](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) reported that an available skill went uninvoked in 56% of cases under its default setup.
+That is evidence about guidance retrieval in that evaluation, not the success rate of the later product-design workflow or a universal ranking of skills against instruction files.
+The transferable check is to observe whether guidance was loaded before judging whether it was followed.
 
 For implementation C, connect each delegated task to its acceptance check and integration owner.
 The comparison with a single agent must include failed attempts and human review, which the published activity counts do not always expose.
@@ -93,14 +98,14 @@ Different reviewers can broaden the search, but I remain responsible for accepti
 
 ## Build a small web-development fleet
 
-The examples use Pi because its [reference subagent extension](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts) exposes separate processes, isolated contexts, chains, and parallel tasks.
-Inspect and adapt its controls to the project.
-Use the [course-assigned environment](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) for the assessed comparison, preserving the task graph, declared configuration, and acceptance checks.
-[Appendix D's dated tool reference](/appendices/agent-system-security/#tool-examples-september-2026) compares coding harnesses, hosted repository tasks, and application orchestration interfaces.
+Use the [course-assigned environment](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) and record its version, model routes, delegation settings, and tool permissions.
+The lab requires bounded child tasks, inspectable results, and an explicit integration owner.
+[Appendix D's environment guide](/appendices/agent-system-security/#choose-a-delegation-environment) helps you inspect these boundaries and offers optional implementation examples.
 
 ### Prepare the project before adding agents
 
-For the Pi example, follow its [quickstart](https://pi.dev/docs/latest/quickstart), authenticate with the approved provider, and start in a version-controlled project.
+Follow the setup instructions published for the assigned harness and start in a version-controlled project.
+Confirm that the single-agent baseline has delegation disabled before enabling the declared fleet configuration.
 Before adding subagents, ask one agent to inspect the repository:
 
 > Inspect this project and propose an `AGENTS.md`; do not edit yet.

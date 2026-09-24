@@ -20,9 +20,12 @@ test.describe("model eval demo", () => {
     );
 
     await demo.locator("[data-model-eval-next]").click();
-    await demo.locator("[data-model-eval-sample='strong']").click();
-    await demo.locator("[data-model-eval-sample='small']").click();
-    await expect(demo.locator("[data-model-output='strong']")).toHaveValue(
+    await demo.locator("[data-model-eval-sample='y']").click();
+    await expect(demo.locator("[data-model-eval-conclusion]")).toHaveText(
+      /Paste both model outputs/,
+    );
+    await demo.locator("[data-model-eval-sample='x']").click();
+    await expect(demo.locator("[data-model-output='x']")).toHaveValue(
       /created_at/,
     );
     await expect(demo.locator(".model-eval-help")).toHaveCount(6);
@@ -30,21 +33,22 @@ test.describe("model eval demo", () => {
     await expect(demo.getByRole("tooltip").first()).toContainText(
       "clearly uses the supplied context",
     );
-    await expect(demo.locator("[data-model-card='strong']")).toBeInViewport();
-    await expect(demo.locator("[data-model-card='small']")).toBeInViewport();
+    await expect(demo.locator("[data-model-card='x']")).toBeInViewport();
+    await expect(demo.locator("[data-model-card='y']")).toBeInViewport();
 
     await demo.locator("[data-model-eval-next]").click();
     await expect(demo.locator("[data-model-eval-verdict]")).toContainText(
-      "Stronger model: 9/9",
+      "Attempt X: 6/6",
     );
     await expect(demo.locator("[data-model-eval-results]")).toContainText(
-      "Smaller model",
+      "Attempt Y",
     );
     await expectElementsInsideDemo(demo, [
       "[data-model-eval-results]",
       ".model-eval-note",
     ]);
     await expect(demo.locator("[data-model-eval-next]")).toBeDisabled();
+    await expect(demo).toContainText("Illustrative cost");
   });
 
   test("updates task, score, checks, and local conclusion", async ({
@@ -58,23 +62,33 @@ test.describe("model eval demo", () => {
     );
 
     await demo.locator("[data-model-eval-tab='2']").click();
-    await demo.locator("[data-model-eval-sample='strong']").click();
-    await demo.locator("[data-model-eval-sample='small']").click();
-    await demo
-      .locator("[data-model='small'][data-rubric='specificity']")
-      .fill("2");
+    await demo.locator("[data-model-eval-sample='x']").click();
+    await demo.locator("[data-model-eval-sample='y']").click();
+    await demo.locator("[data-model='y'][data-rubric='specificity']").fill("2");
 
     await demo.locator("[data-model-eval-tab='3']").click();
     await demo.locator("[data-model-eval-check='file']").setChecked(false);
 
     await expect(demo.locator("[data-model-eval-verdict]")).toContainText(
-      "Stronger model: 8/9",
+      "Attempt X: 6/6",
     );
     await expect(demo.locator("[data-model-eval-results]")).toContainText(
       "4/6",
     );
     await expect(demo.locator("[data-model-eval-conclusion]")).toContainText(
       "scores higher",
+    );
+    await expect(demo.locator("[data-model-eval-conclusion]")).toContainText(
+      "Complete the comparison protocol",
+    );
+
+    // A lower score for X can reverse the result; the attempt label is not a rank.
+    await demo.locator("[data-model-eval-tab='2']").click();
+    await demo.locator("[data-model='x'][data-rubric='grounding']").fill("0");
+    await demo.locator("[data-model='x'][data-rubric='specificity']").fill("0");
+    await demo.locator("[data-model-eval-tab='3']").click();
+    await expect(demo.locator("[data-model-eval-verdict]")).toContainText(
+      "Attempt Y: 4/6",
     );
   });
 });

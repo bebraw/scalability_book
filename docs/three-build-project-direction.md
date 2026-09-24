@@ -14,8 +14,8 @@ Each group should implement the same bounded application brief three times.
 The core requirements and acceptance checks should remain stable enough that the results can be compared.
 What changes between phases is the AI-assisted development setup:
 
-1. **Establish: locally hosted model, single-agent workflow.** Build the smallest compliant baseline and make the limits of a less capable or less convenient model visible.
-2. **Challenge: foundation model, single-agent workflow.** Build a fresh implementation from the same brief and compare what greater model capability changes.
+1. **Establish: locally hosted model, single-agent workflow.** Build the smallest compliant baseline and measure what the assigned model and environment make easy or difficult.
+2. **Challenge: comparison model, single-agent workflow.** Build a fresh implementation from the same brief and test a stated hypothesis about differences in task quality, cost, or development effort.
 3. **Compare: agent fleet.** Build a third implementation through explicit roles, task boundaries, handoffs, integration, and review.
    Use a declared base model so orchestration is not confused with model capability.
 
@@ -29,7 +29,8 @@ The point is to compare development systems against a common target.
   Repeating a bounded build creates room to study specification quality, validation, architecture, review, and coordination.
 - A common brief provides a control.
   Differences in output can be discussed with reference to the same required behavior rather than to three unrelated products.
-- The progression separates two questions reasonably well: local versus foundation models foregrounds model capability, while single-agent versus fleet work foregrounds orchestration.
+- The progression separates two questions: A–B compares assigned model configurations, while B–C foregrounds orchestration when the base model is held constant.
+  Hosting, harness differences, and practice effects limit causal attribution; no phase assumes a capability ranking.
 - Repetition lets students move from task completion toward judgment.
   They should become faster at seeing hidden assumptions, generated complexity, weak tests, and avoidable coordination.
 - The course can treat AI-assisted development itself as a scalability problem: throughput, latency, cost, context, decomposition, integration, and human review all have limits.
@@ -51,7 +52,7 @@ Otherwise groups can change scope between phases and lose the basis for comparis
 ## What should vary
 
 - **Establish:** the approved local model and its single-agent environment.
-- **Challenge:** the approved foundation model in a comparable single-agent environment.
+- **Challenge:** the approved comparison model in a comparable single-agent environment.
 - **Compare:** the orchestration design: roles, parallelism, handoffs, permissions, integration, and review.
   The base model must be recorded and should preferably match Challenge when the course wants to isolate orchestration effects.
 

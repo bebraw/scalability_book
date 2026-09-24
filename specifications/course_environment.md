@@ -11,7 +11,7 @@ A phase does not begin until every student has a supported access path, a declar
 | Phase     | Required assignment before launch                                                                                                                                                                                                                                                          |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Establish | Approved local model artifact or departmental endpoint; resolved revision where exposed; runtime and quantization where applicable; supported hardware or hosted allocation; single-agent harness; context and tool limits; network and data-boundary policy; fallback and support contact |
-| Challenge | Approved foundation model and endpoint; single-agent harness and enforcement rule; account or credit provision; data-boundary and retention policy; tool limits; fallback and support contact                                                                                              |
+| Challenge | Approved second model and endpoint; comparison hypothesis; single-agent harness and enforcement rule; account or credit provision; data-boundary and retention policy; tool limits; fallback and support contact                                                                           |
 | Compare   | Approved fleet harness; declared base model, preferably the Challenge model; maximum concurrent agents and total budget; isolation and external-action policy; trace export or transformation path; fallback and support contact                                                           |
 
 The instructor should publish one filled table per course run with the following fields:
@@ -28,8 +28,16 @@ The instructor should publish one filled table per course run with the following
 | Fallback when the assigned service is unavailable | To be announced | To be announced | To be announced |
 | Support and exception path                        | To be announced | To be announced | To be announced |
 
+## Verify the assigned workflow
+
+Before launch, run one small task with the published configuration and retain its trace.
+For Establish and Challenge, confirm that automatic delegation and unapproved model routes are disabled or fail closed; one visible chat window is not evidence of one agent.
+For Compare, verify child-task attribution, cancellation, usage accounting, workspace isolation, and trace export with the selected harness version.
+Repeat this check after a material tool or routing change and record the change date.
+
 ## Comparison rules
 
+- Choose a Challenge model different from Establish and publish the hypothesis the comparison will test; either model may be a foundation model, and hosting or size alone does not establish a capability ranking.
 - Keep the Challenge model as the Compare fleet's base model when practical so B-C primarily changes orchestration.
 - If a model, route, harness, or hardware allocation changes, record the actual configuration and narrow the comparison claim.
 - Do not rank local inference latency across unequal student hardware as though the environment were controlled.

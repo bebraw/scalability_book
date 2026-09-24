@@ -38,7 +38,7 @@ You may:
 
 You may not:
 
-- use a foundation model to generate, repair, review, or explain application code;
+- use a model or inference route outside the approved Establish configuration to generate, repair, review, or explain application code;
 - delegate work to subagents or run coding agents in parallel;
 - copy a prior implementation of the course application.
 

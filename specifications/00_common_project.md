@@ -7,7 +7,7 @@ The required behavior remains substantially the same.
 The development setup changes:
 
 1. **Establish:** locally hosted model and a single-agent workflow.
-2. **Challenge:** foundation model and a single-agent workflow.
+2. **Challenge:** comparison model and a single-agent workflow.
 3. **Compare:** an agent fleet using a declared base model.
 
 Each phase produces a separate implementation.

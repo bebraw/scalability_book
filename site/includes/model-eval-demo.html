@@ -103,7 +103,10 @@
         <h4>Paste and score attempts</h4>
         <p>
           Run the shared prompt with two models, paste each output, then score
-          against the rubric. Use samples only when demonstrating the workflow.
+          against the rubric before revealing model identities. X and Y are
+          attempt labels, unrelated to course phases A and B. Sample answers and
+          the displayed cost and latency figures are invented teaching examples.
+          Record actual usage separately when evaluating your own runs.
         </p>
         <button
           type="button"
@@ -124,20 +127,21 @@
       <div class="model-eval-checks">
         <h4>Compare the local result</h4>
         <p>
-          Add deterministic checks where possible, then report a narrow claim
-          about this task set.
+          Confirm the comparison protocol, then report a narrow claim about this
+          task set. These shared checks do not add points to either answer;
+          executable acceptance checks must be run separately for each attempt.
         </p>
         <label>
           <input type="checkbox" data-model-eval-check="headings" checked />
-          Required headings are present
+          Both attempts received the same task and context
         </label>
         <label>
           <input type="checkbox" data-model-eval-check="file" checked />
-          Answer names a concrete file, query, or endpoint
+          Both attempts were scored with the same rubric
         </label>
         <label>
           <input type="checkbox" data-model-eval-check="measurement" checked />
-          Answer proposes a confirming measurement
+          Human corrections and review effort were recorded
         </label>
       </div>
       <div class="model-eval-note">
@@ -152,11 +156,10 @@
           <table>
             <thead>
               <tr>
-                <th>Model</th>
+                <th>Attempt</th>
                 <th>Quality</th>
-                <th>Checks</th>
-                <th>Latency</th>
-                <th>Cost</th>
+                <th>Illustrative latency</th>
+                <th>Illustrative cost</th>
               </tr>
             </thead>
             <tbody data-model-eval-results></tbody>

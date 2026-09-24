@@ -270,7 +270,7 @@ Before transferring a ranking to your project, test representative tasks with re
 ## From evaluation to routing
 
 A lower per-request price does not necessarily make a model cheaper for a task.
-An inexpensive attempt that fails may have to be repeated with a stronger model, while still consuming context, validation, and review time.
+An inexpensive attempt that fails may have to be repeated with a model that succeeds more often on that task, while still consuming context, validation, and review time.
 Conversely, always selecting the strongest available model can waste capacity when a smaller model can reliably clear the same acceptance bar.
 The useful comparison is therefore cost per accepted outcome, not token price or first-attempt cost.
 
@@ -281,7 +281,7 @@ The result therefore shows what a strong verifier can enable, not how well the a
 Databricks presents routing as an emerging coding-agent cost-control technique and reports an internal benchmark result, but publishes too little about that router evaluation to predict savings in another codebase :citep[wendell2026codingcosts].
 This motivates a local experiment, not a promised saving.
 
-When access rules permit both models—or when instructor-provided outputs are available—choose an efficient and a stronger model within the same declared agent harness and assemble a small set of representative tasks.
+When access rules permit both models—or when instructor-provided outputs are available—choose two models with different measured cost and task-success profiles within the same declared agent harness and assemble a small set of representative tasks.
 Keep near-duplicates and tasks from the same module in the same partition, using one partition to define the policy and reserving the other for held-out evaluation.
 
 Define two evidence layers before running the comparison.
@@ -369,7 +369,7 @@ The evidence supports a bounded claim about a lower-noise training signal and im
 
 ## Research example: coordination and integration
 
-Recent experiments separate three properties that are easy to collapse: concurrent writing, coordination, and accepted behavior.
+The experiments below separate three properties that are easy to collapse: concurrent writing, coordination, and accepted behavior.
 CodeCRDT used a shared CRDT document and an observation-driven claim protocol so agents could edit concurrently without locks.
 Across 600 evaluations of six small TypeScript and React tasks with Claude Sonnet 4.5, every run converged without a textual merge failure, yet preliminary inspection still found semantic conflicts in roughly 5–10% of results.
 Raw completion time ranged from a 21.1% speedup to a 39.4% slowdown depending on the task :citep[pugachev2025codecrdt].

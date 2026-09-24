@@ -6,10 +6,9 @@ test.describe("project specification", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("link", { name: "Project" })).toHaveAttribute(
-      "href",
-      "/project/",
-    );
+    await expect(
+      page.getByRole("link", { name: "Project", exact: true }),
+    ).toHaveAttribute("href", "/project/");
     await expect(
       page.getByRole("link", { name: /Open the specification/ }),
     ).toHaveAttribute("href", "/project/");
@@ -99,17 +98,17 @@ test.describe("project specification", () => {
   }) => {
     await page.goto("/chapters/scalable-development/");
     await expect(
-      page.getByRole("link", { name: "the book project" }),
-    ).toHaveAttribute("href", "/project/");
+      page.getByRole("link", { name: "common project specification" }),
+    ).toHaveAttribute("href", "/project/#6-minimum-project-harness");
 
     await page.goto("/parts/challenge/");
     await expect(
-      page.getByRole("link", { name: "Challenge project brief" }),
+      page.getByRole("link", { name: "Challenge specification" }),
     ).toHaveAttribute("href", "/project/challenge/");
 
     await page.goto("/parts/compare/");
     await expect(
-      page.getByRole("link", { name: "Compare project brief" }),
+      page.getByRole("link", { name: "Compare project specification" }),
     ).toHaveAttribute("href", "/project/compare/");
   });
 });

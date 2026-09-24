@@ -11,12 +11,12 @@ Preserve a negative result when it is informative instead of spending the remain
 
 - Frame the part as fortifying both the system and the development process.
   The central claim could be: scalable systems need technical capacity, but they also need boundaries, feedback loops, conventions, and review practices strong enough to absorb parallel human and machine work.
-- Use [Pi](https://pi.dev/) as the concrete tool for this part.
-  Pi is a minimal terminal agent harness that can be customized with project instructions, skills, prompt templates, extensions, packages, model configuration, and scripted modes.
-- Present Pi as a teaching vehicle rather than as the point of the chapter.
-  The lesson is not "use this specific tool", but "a serious agent workflow needs an agent harness, explicit context, scoped capabilities, and reviewable traces".
-- Connect Pi to the revised comparison: locally hosted single agent for implementation A, foundation-model single agent for implementation B, and an explicitly designed fleet for implementation C.
-- State the fleet's base model and keep it equal to the implementation B foundation model when practical.
+- Use the environment published for the course run as the concrete tool for this part.
+  Appendix D's Pi extension example is an optional code-reading exercise, not an implicit tool assignment.
+- Teach explicit context, scoped capabilities, cancellation, and reviewable traces through the assigned harness.
+  Students should identify where each control is enforced and what the trace can establish.
+- Connect the assigned harness to the comparison: locally hosted single agent for implementation A, comparison-model single agent for implementation B, and an explicitly designed fleet for implementation C.
+- State the fleet's base model and keep it equal to the implementation B comparison model when practical.
   The comparison should change orchestration deliberately instead of changing model capability and orchestration at once.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit.
   This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.

@@ -50,10 +50,15 @@ The required browser-visible behavior remains substantially stable while product
 Each phase begins from a fresh implementation and changes the development setup deliberately:
 
 1. **Establish:** a locally hosted model in a single-agent workflow produces implementation A and its evidence baseline.
-2. **Challenge:** a foundation model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
+2. **Challenge:** a second, approved model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
 3. **Compare:** a declared agent fleet produces implementation C before all three applications and development workflows are compared.
 
 {{ import "site/includes/course-progression-figure.html" }}
+
+The **comparison model** is the model assigned to Challenge, chosen to test a stated hypothesis about task quality, cost, or development effort.
+Local describes where inference runs; it does not name a capability class.
+Both phases may use foundation models: broadly pretrained models adaptable to many tasks, as defined in the [Stanford report that introduced the term](https://crfm.stanford.edu/report.html).
+Neither hosting location nor model size establishes which workflow will perform better on the course tasks.
 
 The comparison is bounded rather than perfectly controlled.
 You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.

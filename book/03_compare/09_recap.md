@@ -54,7 +54,7 @@ Evaluate both the pressure relieved and the new obligations.
 
 ## Apply the map to the three implementations
 
-A establishes the local single-agent baseline, B rebuilds the same required behavior with a foundation-model single agent, and C introduces fleet orchestration.
+A establishes the local single-agent baseline, B rebuilds the same required behavior with a comparison-model single agent, and C introduces fleet orchestration.
 The common brief and protocol make their differences inspectable.
 They do not isolate every cause: the team learns between builds, and architectures, tools, hardware, optional scope, or reporting may differ.
 Record those differences when interpreting a result.

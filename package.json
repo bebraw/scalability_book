@@ -25,7 +25,9 @@
     "preview:worker": "npm run worker:build && wrangler dev",
     "deploy": "npm run worker:build && wrangler deploy",
     "validate": "npm run types:check && gustwind --validate --input ./build",
-    "types:check": "tsc --noEmit"
+    "types:check": "tsc --noEmit",
+    "review": "python3 scripts/review-diff.py",
+    "test:review": "python3 -B -m unittest discover -s tests -p review_diff_test.py"
   },
   "engines": {
     "node": ">=24"

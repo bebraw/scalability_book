@@ -94,6 +94,6 @@ Shift-Up makes the historical reuse explicit by treating BDD requirements, C4 mo
 Its initial evaluation compared unstructured vibe coding, structured prompting, and a partial Shift-Up workflow while building a full-stack snack-bar web application :citep[lipsanen2026shiftup].
 Treat that comparison as an exploratory example rather than a universal ranking of the approaches.
 
-In this book, the same bounded project is first implemented with a local model, then a foundation model, and finally a fleet of agents.
+In this book, the same bounded project is first implemented with a local model, then a comparison model, and finally a fleet of agents.
 The phases do not prescribe one row of the table.
 They hold required web behavior stable so you can compare how different models, constraints, validation, and orchestration affect the path from a candidate change to accepted work.

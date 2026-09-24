@@ -1,5 +1,5 @@
 type EvalTaskId = "bottleneck" | "benchmark" | "data-model";
-type ModelId = "strong" | "small";
+type ModelId = "x" | "y";
 type RubricKey = "grounding" | "specificity" | "measurement";
 
 type EvalTask = {
@@ -33,10 +33,8 @@ const tasks: Record<EvalTaskId, EvalTask> = {
       "Explains a measurement that could confirm or reject the claim.",
     ],
     outputs: {
-      strong:
-        "Bottleneck: the latest-events read path for GET /events.\nEvidence from the context: the endpoint sorts each project's events by created_at, but the migration only mentions indexes on project_id and event_type.\nWhy it matters under higher load: as project event volume grows, the database may scan or sort too much data to return the latest 50 events.\nOne measurement that would confirm or reject it: seed projects with increasing event counts and record p95 latency plus the query plan for the ORDER BY created_at query.",
-      small:
-        "Bottleneck: the database could become slow when there are many events.\nEvidence from the context: the app stores workflow events and users view activity.\nWhy it matters under higher load: more events usually means slower pages.\nOne measurement that would confirm or reject it: run a load test and see if it is slow.",
+      x: "Bottleneck: the latest-events read path for GET /events.\nEvidence from the context: the endpoint sorts each project's events by created_at, but the migration only mentions indexes on project_id and event_type.\nWhy it matters under higher load: as project event volume grows, the database may scan or sort too much data to return the latest 50 events.\nOne measurement that would confirm or reject it: seed projects with increasing event counts and record p95 latency plus the query plan for the ORDER BY created_at query.",
+      y: "Bottleneck: the database could become slow when there are many events.\nEvidence from the context: the app stores workflow events and users view activity.\nWhy it matters under higher load: more events usually means slower pages.\nOne measurement that would confirm or reject it: run a load test and see if it is slow.",
     },
   },
   benchmark: {
@@ -52,10 +50,8 @@ const tasks: Record<EvalTaskId, EvalTask> = {
       "Includes latency, throughput, error rate, and at least one limitation.",
     ],
     outputs: {
-      strong:
-        "Workload: submit check-in events while organizers repeatedly load the latest arrivals and admins filter by session.\nLoad level: simulate 20,000 events over 30 minutes, with short bursts of 100 concurrent submitters.\nMetrics: write p95 latency, latest-arrivals p95 latency, filter latency, throughput, error rate, database CPU, and query count per request.\nWhat the result does not prove: it does not prove production behavior because the data, network, hardware, and user timing are synthetic.",
-      small:
-        "Workload: test check-ins and admin viewing.\nLoad level: use lots of users.\nMetrics: speed and errors.\nWhat the result does not prove: it may be different in production.",
+      x: "Workload: submit check-in events while organizers repeatedly load the latest arrivals and admins filter by session.\nLoad level: simulate 20,000 events over 30 minutes, with short bursts of 100 concurrent submitters.\nMetrics: write p95 latency, latest-arrivals p95 latency, filter latency, throughput, error rate, database CPU, and query count per request.\nWhat the result does not prove: it does not prove production behavior because the data, network, hardware, and user timing are synthetic.",
+      y: "Workload: test check-ins and admin viewing.\nLoad level: use lots of users.\nMetrics: speed and errors.\nWhat the result does not prove: it may be different in production.",
     },
   },
   "data-model": {
@@ -71,18 +67,16 @@ const tasks: Record<EvalTaskId, EvalTask> = {
       "Identifies one assumption that should be clarified before redesign.",
     ],
     outputs: {
-      strong:
-        "Main entities: Project, User, and Event.\nHow events relate to them: each Event belongs to one Project through project_id. An Event may refer to the User who caused it through actor_id, but actor_id can be null for system-created events. payload_json stores event-specific details.\nOne unclear assumption: the schema does not show which event_type values are allowed or how payload_json is validated for each type.",
-      small:
-        "Main entities: projects, users, and events.\nHow events relate to them: users create events in projects and the event has data in JSON.\nOne unclear assumption: the database may need more tables later.",
+      x: "Main entities: Project, User, and Event.\nHow events relate to them: each Event belongs to one Project through project_id. An Event may refer to the User who caused it through actor_id, but actor_id can be null for system-created events. payload_json stores event-specific details.\nOne unclear assumption: the schema does not show which event_type values are allowed or how payload_json is validated for each type.",
+      y: "Main entities: projects, users, and events.\nHow events relate to them: users create events in projects and the event has data in JSON.\nOne unclear assumption: the database may need more tables later.",
     },
   },
 };
 
 const models: ModelAttempt[] = [
   {
-    id: "strong",
-    label: "Stronger model",
+    id: "x",
+    label: "Attempt X",
     latency: 18,
     cost: 0.42,
     sampleScores: {
@@ -92,8 +86,8 @@ const models: ModelAttempt[] = [
     },
   },
   {
-    id: "small",
-    label: "Smaller model",
+    id: "y",
+    label: "Attempt Y",
     latency: 6,
     cost: 0.04,
     sampleScores: {
@@ -308,7 +302,7 @@ function renderModelCard(model: ModelAttempt, task: EvalTask) {
   return `<article class="model-eval-card" data-model-card="${model.id}">
     <header>
       <h4>${escapeModelEvalHtml(model.label)}</h4>
-      <span>${model.latency}s / ${model.cost.toFixed(2)} EUR</span>
+      <span>Illustrative: ${model.latency}s / ${model.cost.toFixed(2)} EUR</span>
     </header>
     <label class="model-eval-output-field">
       <span>Model output</span>
@@ -331,7 +325,7 @@ function updateScores(
   const checks = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-model-eval-check]"),
   );
-  const checkScore = checks.filter((check) => check.checked).length;
+  const protocolComplete = checks.every((check) => check.checked);
   const rows = models.map((model) => {
     const quality = getQualityScore(root, model.id);
     const output = root.querySelector<HTMLTextAreaElement>(
@@ -341,13 +335,11 @@ function updateScores(
     return {
       model,
       quality,
-      checks: checkScore,
-      total: quality + checkScore,
       hasOutput: Boolean(output?.value.trim()),
     };
   });
   const best = [...rows].sort(
-    (a, b) => b.total - a.total || a.model.cost - b.model.cost,
+    (a, b) => b.quality - a.quality || a.model.cost - b.model.cost,
   )[0];
   const cheapest = [...rows].sort((a, b) => a.model.cost - b.model.cost)[0];
 
@@ -374,17 +366,26 @@ function updateScores(
       (row) => `<tr>
         <td>${escapeModelEvalHtml(row.model.label)}</td>
         <td>${row.quality}/6</td>
-        <td>${row.checks}/3</td>
         <td>${row.model.latency}s</td>
         <td>${row.model.cost.toFixed(2)} EUR</td>
       </tr>`,
     )
     .join("");
 
-  verdict.textContent = rows.every((row) => row.hasOutput)
-    ? `${best.model.label}: ${best.total}/9`
+  const allHaveOutput = rows.every((row) => row.hasOutput);
+  verdict.textContent = allHaveOutput
+    ? `${best.model.label}: ${best.quality}/6`
     : "Paste outputs to score";
-  conclusion.textContent = buildConclusion(task, best, cheapest);
+  conclusion.textContent = [
+    allHaveOutput
+      ? buildConclusion(task, best, cheapest)
+      : "Paste both model outputs, then score them against the rubric before drawing a local conclusion.",
+    protocolComplete
+      ? ""
+      : "Complete the comparison protocol before interpreting these scores.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function getQualityScore(root: HTMLElement, model: ModelId) {
@@ -397,18 +398,18 @@ function getQualityScore(root: HTMLElement, model: ModelId) {
 
 function buildConclusion(
   task: EvalTask,
-  best: { model: ModelAttempt; total: number; hasOutput?: boolean },
-  cheapest: { model: ModelAttempt; total: number; hasOutput?: boolean },
+  best: { model: ModelAttempt; quality: number; hasOutput?: boolean },
+  cheapest: { model: ModelAttempt; quality: number; hasOutput?: boolean },
 ) {
   if (!best.hasOutput || !cheapest.hasOutput) {
     return "Paste both model outputs, then score them against the rubric before drawing a local conclusion.";
   }
 
   if (best.model.id === cheapest.model.id) {
-    return `${best.model.label} is both the highest-scoring and cheapest option on "${task.label}". That supports using it for this narrow task, but only after checking more examples.`;
+    return `Under the illustrative cost assumptions, ${best.model.label} is both the highest-scoring and cheapest option on "${task.label}". Measure actual cost and test more examples before choosing a model for this task.`;
   }
 
-  return `${best.model.label} scores higher on "${task.label}", while ${cheapest.model.label} is cheaper and faster. A defensible report would say which failure pattern matters more: answer quality, review time, latency, or cost.`;
+  return `${best.model.label} scores higher on "${task.label}", while ${cheapest.model.label} has lower illustrative cost and latency. Replace those assumptions with measurements from your runs. A defensible report would say which failure pattern matters more: answer quality, review time, latency, or cost.`;
 }
 
 function updateModelEvalStage(

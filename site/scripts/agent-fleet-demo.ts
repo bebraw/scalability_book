@@ -123,21 +123,21 @@ const roleRiskWeight: Record<RoleId, number> = {
 
 const agentModels: Record<AgentModelId, AgentModelConfig> = {
   small: {
-    label: "Small",
+    label: "Profile P",
     costPerUnit: 0.03,
     latencyPerUnit: 1.5,
     reviewModifier: 1.35,
     riskModifier: 1.2,
   },
   balanced: {
-    label: "Balanced",
+    label: "Profile Q",
     costPerUnit: 0.12,
     latencyPerUnit: 3.5,
     reviewModifier: 1,
     riskModifier: 0,
   },
   strong: {
-    label: "Strong",
+    label: "Profile R",
     costPerUnit: 0.38,
     latencyPerUnit: 7,
     reviewModifier: 0.72,
@@ -476,14 +476,14 @@ function buildModelImpactSummary(
   modelResult: ReturnType<typeof getModelImpact>,
 ) {
   if (!modelResult.weakestRole && !modelResult.strongestRole) {
-    return "Balanced model choices keep direct cost, latency, and review load predictable.";
+    return "Profile Q uses the middle cost, latency, and review assumptions in this simulation.";
   }
 
   if (modelResult.weakestRole) {
-    return `${capitalizeRole(modelResult.weakestRole)} uses a small model. Direct model cost drops, but review and rework risk rise for that role.`;
+    return `${capitalizeRole(modelResult.weakestRole)} uses profile P. This simulation assumes lower direct cost and latency but more review and rework for that role; verify that trade-off with actual tasks.`;
   }
 
-  return `${capitalizeRole(modelResult.strongestRole)} uses a strong model. Direct model cost and latency rise, but expected review time and rework risk drop.`;
+  return `${capitalizeRole(modelResult.strongestRole)} uses profile R. This simulation assumes higher direct cost and latency but less review and rework for that role; higher spending does not establish that outcome.`;
 }
 
 function getPatternLabel(
@@ -572,12 +572,14 @@ function buildAgentFleetBrief({
       ? selectedRoles
           .map(
             (role) =>
-              `- ${role} (${agentModels[selectedModels[role] ?? "balanced"].label} model): ${roleOutput[role]}`,
+              `- ${role} (${agentModels[selectedModels[role] ?? "balanced"].label}): ${roleOutput[role]}`,
           )
           .join("\n")
       : "- No role selected.";
 
-  return `Objective:
+  return `Example packet: replace model profiles and repository fields with your assigned configuration.
+
+Objective:
 ${selectedTask.objective}
 
 Project readiness:
@@ -665,8 +667,8 @@ function buildRolePrompt(
   return `Role:
 ${capitalizeRole(role)}
 
-Recommended model:
-${model.label}
+Hypothetical model profile:
+${model.label} — replace with the approved model identifier before use
 
 Objective:
 ${selectedTask.objective}

@@ -19,7 +19,7 @@ The figures below come from Rose's [30 June 2026 retrospective](https://ngrok.co
 | Generated code reported               | Almost 100,000 lines                                                     |
 | Tests reported                        | 204 integration tests and 1,855 unit tests                               |
 | Behavioral reference                  | The same integration-test operations executed against a real k3s cluster |
-| Current project status                | Experimental; APIs and supported resources may change                    |
+| Status in the reviewed snapshot       | Experimental; APIs and supported resources may change                    |
 
 Commit, file, line, and test counts describe scale and process shape.
 They do not establish correctness, productivity, or production readiness.

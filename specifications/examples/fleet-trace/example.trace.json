@@ -25,14 +25,14 @@
       "name": "Interface agent",
       "kind": "agent",
       "role": "contract and browser behavior",
-      "model": "declared-foundation-model"
+      "model": "declared-comparison-model"
     },
     {
       "id": "agent-data",
       "name": "Data agent",
       "kind": "agent",
       "role": "query and persistence changes",
-      "model": "declared-foundation-model"
+      "model": "declared-comparison-model"
     }
   ],
   "tasks": [

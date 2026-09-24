@@ -55,7 +55,7 @@ The required behavior and acceptance checks stay stable while the AI-assisted de
 In short:
 
 - Establish - build a working baseline with a locally hosted model and a single-agent workflow.
-- Challenge - build the same required behavior afresh with a foundation model and compare the process and result.
+- Challenge - build the same required behavior afresh with a comparison model and compare the process and result.
 - Compare - build it again with an agent fleet, load the fleet's execution trace into the resulting application as debugging data, then measure, explain, and critique all three implementations and workflows.
 
 The full handover-and-return cycle is no longer the main mechanism.
@@ -67,22 +67,23 @@ The highest-leverage operational opportunities before the first run are recorded
 
 ## AI development-system comparison
 
-The earlier proposal used a declining-capability arc: strong foundation model, weaker mini model, then weak department-hosted model.
-Replace that with a progression from a local single agent to a foundation-model single agent and finally to a declared agent fleet.
+The progression compares a local single agent, a single agent using a second approved model, and a declared agent fleet.
+Model capability is an observed, task-dependent result rather than a ranking built into the phase names.
 
 The comparison has two main transitions.
-Establish to Challenge changes model capability while keeping the single-agent workflow broadly comparable.
+Establish to Challenge changes the assigned model and potentially its serving configuration while keeping the single-agent workflow broadly comparable.
+Record changes to tools, context, hardware, and hosting so they are not mistaken for effects of model capability alone.
 Challenge to Compare changes orchestration while keeping the fleet's base model declared and, preferably, equal to the Challenge model.
 This avoids treating a fleet as if it were a model category.
 
 Possible phase mapping:
 
 - Establish: use a supported locally hosted model and a single-agent workflow to create the smallest compliant implementation and the first evidence package.
-- Challenge: start from the same specification, not the Establish code, and use a foundation model through a single-agent workflow.
+- Challenge: start from the same specification, not the Establish code, and use a comparison model through a single-agent workflow.
   Compare capability, speed, defects, architecture, review effort, and resource use.
 - Compare: build a third implementation through bounded fleet roles and explicit integration.
   Transform the fleet trace into application data so the result becomes a debugging and observability tool for its own development workflow.
-  Compare the fleet with the foundation-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
+  Compare the fleet with the comparison-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
 
 This arc can help grading: evaluate the common required behavior, scalability reasoning, quality of evidence, and the group's ability to constrain, generate, validate, integrate, and review AI-assisted work.
 Do not reward generated output volume.

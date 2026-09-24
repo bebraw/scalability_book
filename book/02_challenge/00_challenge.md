@@ -1,7 +1,7 @@
 # Challenge — Expose architectural assumptions
 
 Challenge examines the architecture behind implementation A, the cost of changing it, and the assumptions that fail under production pressure.
-Build implementation B afresh with a foundation-model single agent and compare its behavior and development effort with the baseline.
+Build implementation B afresh with a comparison-model single agent and compare its behavior and development effort with the baseline.
 
 ## From hidden assumptions to comparable evidence
 

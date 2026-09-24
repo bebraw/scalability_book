@@ -12,6 +12,12 @@ The public website is generated from those chapters and deployed at [scalableweb
 
 Development, preview, feedback, and deployment notes are in [docs/development.md](docs/development.md).
 
+## Reviewing changes
+
+Run `npm run review` to open a readable HTML diff of the working copy against `HEAD`.
+The report puts book content first and highlights changed words, with staged-only and revision-to-revision comparisons available.
+See [the review guide](docs/reviewing-changes.md) for options and requirements.
+
 ## PDF edition
 
 Run `npm run pdf` to build the site and create an iPad-friendly reading edition at `output/pdf/elements-of-scalable-web-development.pdf`.

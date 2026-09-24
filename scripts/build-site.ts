@@ -84,7 +84,7 @@ const projectSpecificationDefinitions = [
     phase: "challenge",
     sequence: "02",
     slug: "challenge",
-    summary: "Implementation B · foundation model · single agent.",
+    summary: "Implementation B · comparison model · single agent.",
   },
   {
     file: "specifications/03_compare.md",

@@ -46,7 +46,7 @@ export const courseProgressionDiagram: ProgressionDiagram = {
     {
       phase: "Challenge",
       build: "Implementation B",
-      setup: ["Foundation model", "Single-agent workflow"],
+      setup: ["Comparison model", "Single-agent workflow"],
     },
     {
       phase: "Compare",
