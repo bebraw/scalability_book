@@ -231,6 +231,29 @@ I carried those lessons back to my project template so that structural feedback 
 I also found that [mutation testing with Stryker](https://stryker-mutator.io/) and [cognitive-complexity analysis with Fallow](https://fallow.tools/docs/explanations/health/) complement one another: one challenges whether tests detect behavioral changes, while the other identifies code that is becoming difficult to reason about.
 Agents tend to follow the patterns already present in a codebase, so the project should establish and reinforce the direction it wants future changes to take.
 
+### Choose what to participate in
+
+A workflow can produce acceptable software and leave its owner able to explain it, while removing an activity they wanted to experience.
+In a personal essay, :citet[stewart2026alienation] describes missing the investigation and decisions involved in implementation even when the result passes his checks.
+:citet[mollick2026overhang] offers a complementary perspective: human knowledge, taste, and initiative can turn agent capability into projects a person would otherwise struggle to attempt.
+These accounts motivate choices about delegation; they do not establish a universal effect on skill or well-being.
+
+:ref[table:assistance-outcomes]{text="The table below"} separates three outcomes when choosing an assistance mode.
+
+| Outcome              | Question                                                    | Evidence                                            |
+| -------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+| Accepted output      | Does the result meet the intended need?                     | Independent behavioral checks and acceptance review |
+| Retained competence  | Can the person explain and change it later?                 | Delayed unaided explanation or repair               |
+| Valued participation | Which parts of the work does the person want to experience? | Stated purpose, preferences, and reflection         |
+
+::caption[Different outcomes of assistance require different evidence.]
+::label[table:assistance-outcomes]
+
+Learning, investigating with colleagues, and enjoying implementation can be purposes of the work.
+Choose what to delegate in light of those purposes as well as the result's quality and cost.
+Manual work, agent critique, supervised implementation, and delegation can each fit a different task.
+Finishing the agreed work can be a reason to stop, even when the agent has capacity for another task.
+
 ### Optional exercise — Write with an agent as navigator
 
 The [Navigator Agent pattern](https://arsctx.com/blog/navigator-agent/) assigns implementation to the human while the agent provides guidance.
@@ -248,6 +271,9 @@ Use it to explore which assistance helps you retain a skill you need to own.
 
 Compare accepted output with later unaided performance; code volume and keystrokes measure neither understanding nor retained judgment.
 Task differences and practice order can explain a result from one pair, so use this as a learning diagnostic rather than a causal study.
+
+As an optional reflection in your learning diary or discussion, name an activity you wanted to retain, whether the assistance mode preserved it, and what mode you would choose next time.
+Your preference is separate from the behavioral checks and later unaided performance.
 
 ## Project artifact
 

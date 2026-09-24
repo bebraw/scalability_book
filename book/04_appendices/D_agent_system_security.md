@@ -80,6 +80,33 @@ An agent's role should define not only its task but also which information it ca
 Simon Willison's [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/) names a particularly dangerous combination: access to private data, exposure to untrusted content, and a way to communicate externally.
 Prompt injection in the untrusted content can then turn the agent's legitimate permissions into a path for data exfiltration.
 
+### Separate credential custody, action authorization, and containment
+
+A credential-injecting proxy can let an agent call a service while another process holds the real credential.
+[fnox's credential-proxy documentation](https://fnox.jdx.dev/guide/proxy) describes supplying placeholders and substituting credentials into matching HTTPS requests; it explicitly distinguishes this from an operating-system sandbox.
+[Claw Patrol's security model](https://clawpatrol.dev/docs/security-model/) also separates protection of injected credentials from broader host access and network containment.
+These are documented designs, accessed September 24, 2026; their effectiveness depends on the deployed configuration and its actual access paths.
+
+:ref[table:credential-control-properties]{text="The table below"} separates the properties to check.
+
+| Property             | Governing question                                                        | Evidence to seek                                                                                     |
+| -------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Credential custody   | Can the agent obtain the protected credential through any available path? | Denied access to credential sources and no disclosure through environment, logs, or returned results |
+| Action authorization | Which services, resources, and operations does the task permit?           | An allowed operation succeeds while an out-of-scope resource or operation is refused                 |
+| Containment          | Which files, processes, and network destinations can the agent reach?     | Forbidden access is blocked even when the agent attempts to bypass the mediator                      |
+
+::caption[Credential protection, operation permissions, and containment require separate evidence.]
+::label[table:credential-control-properties]
+
+Suppose an agent may read one workspace's events to calculate an activity count.
+Keeping its credential hidden does not prevent an overly broad permission from allowing access to another workspace or a write operation.
+The agent may also receive permitted data and send it through a separate network route.
+Protecting the credential, restricting authenticated operations, and controlling that route address different failures.
+
+For an optional version of the control-boundary audit, use a paper fixture or dummy service to follow these three failures.
+Name the component that would refuse each action and what happens if the mediator is unavailable; a required check must not silently become permission to continue.
+For executable checks, preserve the denied results and configuration as evidence for the tested paths; a paper analysis remains a proposed design.
+
 ### Imported capabilities are development dependencies
 
 A skill may arrive as prose, yet it can direct tool calls made with the agent's authority and may bundle code or configuration.

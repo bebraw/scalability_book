@@ -135,6 +135,21 @@ Keep the historical contract available while preventing it from silently governi
 A timestamp or source link helps inspection but does not establish validity by itself.
 Judge memory by the work it improves, including its initialization and maintenance cost.
 
+**Variant — The current contract omits a consumer.**
+A discoverable contract can still leave out an obligation.
+[Code Contracts](https://github.com/spolu/code-contracts) places identified requirements beside code, but its formatter checks syntax and duplicate identifiers rather than semantic compliance.
+[Decision Engineering](https://github.com/hpark0011/decision-engineering) records intended decisions, their dependencies, enforcement, and verification; the record still needs checking against actual consumers and behavior.
+
+Extend the fixture with a CSV export whose stated requirement is to include every event matching the selected filter.
+Keep the data fixed and use enough matching events to require at least two pages.
+Omit this consumer from the contract map and give it an implementation that reads `items` but ignores `nextCursor`.
+The response-schema check passes, yet a check comparing exported event IDs with the independently defined expected set fails.
+This is an invented teaching fault: it tests an incomplete current record as well as the earlier exercise's stale guidance.
+
+Trace the missing obligation to the consumer, contract, acceptance check, and accountable owner.
+Repair the export and update the map, then confirm that it includes every expected event exactly once.
+Record missed obligations, false alarms, and the effort to maintain the records alongside the existing exercise notes.
+
 ### Define the web task graph
 
 The fleet produces the complete common core of implementation C rather than four unrelated features.

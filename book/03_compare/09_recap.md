@@ -95,6 +95,17 @@ For example, “implementation B had the lowest measured p95 under the declared 
 “A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 
+> **Case — Faster libraries and uncertain attribution**
+>
+> :citet[lemire2026optimization] reports rebuilding revisions of six libraries and measuring workload-specific runtime gains on one Intel Xeon Gold 6548N machine.
+> For the ada URL parser, he reports throughput rising from 0.54 to 1.28 GB/s on a corpus of 100,000 URLs.
+> He also states that he cannot determine how much AI contributed to every change and discloses an advisory relationship with one contributing tool provider.
+>
+> The reported measurements support a claim about those revisions, workloads, and hardware.
+> Attributing the gains to AI requires a comparison the account does not provide, and the parser's gain does not establish an application's end-to-end speedup.
+> What additional evidence would you need to compare development effort or isolate AI's contribution?
+> Keep the useful runtime result and the uncertainty about its cause visible together.
+
 {{ import "exercise:judgment-evidence" }}
 
 ## Turn comparison into a decision
