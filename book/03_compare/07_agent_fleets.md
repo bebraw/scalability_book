@@ -121,40 +121,6 @@ Keep unresolved questions and temporary findings in a working artifact; record c
 A discovery transcript should not silently become the specification, and parallel agents should not work from different generations of the same contract.
 Repeatable review or debugging workflows can become small project skills, while clear mechanical rules belong in linters or tests.
 
-### Optional exercise — Retrieve guidance after a contract changes
-
-An identifiable old statement may be useful history and wrong guidance for the current implementation.
-Keep three questions separate: **provenance** identifies where a claim came from; **validity** concerns whether it still applies; **retrieval** selects material for the present task.
-
-Use a small fixture with two revisions of an event-list endpoint:
-
-1. In the earlier revision, the endpoint returns an array; in the current revision, it returns an object containing `items` and `nextCursor`.
-   Preserve both contracts with their source revisions and status, but deliberately leave one searchable summary describing the old response as current.
-2. Ask the agent separately what the earlier contract required and how a client should parse today's response.
-   Require supporting source revisions and a client check against the current fixture.
-3. Compare source inspection alone with source inspection plus retrieved project memory, keeping the task, model, tools, and starting code fixed in fresh sessions.
-   Inspect whether the stale summary is retrieved, whether the contradiction is noticed, and which source controls the answer.
-4. Record accepted behavior, stale claims, evidence recovered, retrieval cost, and the effort needed to correct or retire the summary.
-
-Keep the historical contract available while preventing it from silently governing current work.
-A timestamp or source link helps inspection but does not establish validity by itself.
-Judge memory by the work it improves, including its initialization and maintenance cost.
-
-**Variant — The current contract omits a consumer.**
-A discoverable contract can still leave out an obligation.
-[Code Contracts](https://github.com/spolu/code-contracts) places identified requirements beside code, but its formatter checks syntax and duplicate identifiers rather than semantic compliance.
-[Decision Engineering](https://github.com/hpark0011/decision-engineering) records intended decisions, their dependencies, enforcement, and verification; the record still needs checking against actual consumers and behavior.
-
-Extend the fixture with a CSV export whose stated requirement is to include every event matching the selected filter.
-Keep the data fixed and use enough matching events to require at least two pages.
-Omit this consumer from the contract map and give it an implementation that reads `items` but ignores `nextCursor`.
-The response-schema check passes, yet a check comparing exported event IDs with the independently defined expected set fails.
-This is an invented teaching fault: it tests an incomplete current record as well as the earlier exercise's stale guidance.
-
-Trace the missing obligation to the consumer, contract, acceptance check, and accountable owner.
-Repair the export and update the map, then confirm that it includes every expected event exactly once.
-Record missed obligations, false alarms, and the effort to maintain the records alongside the existing exercise notes.
-
 ### Define the web task graph
 
 The fleet produces the complete common core of implementation C rather than four unrelated features.
@@ -186,21 +152,19 @@ Keep integrated behavior checks after concurrent work.
 
 ### Map authority and acceptance
 
-Trace the feature through the decision path described by :citet[nissila2026decisionpath]:
+Reuse the [constrain–generate–validate–revise loop](/chapters/scalable-development/#constrain-generate-validate-revise).
+Delegation changes who performs the work and where results must come together; it does not remove any stage.
+For each consequential decision, name the performer, accountable owner, and whether the agent may **propose**, **prepare**, or **execute**.
+Authority can differ between decisions within one task :citep[parasuraman2000automation].
 
-> **Need → Define → Design → Implement → Verify → Release → Observe → Adapt**
+| Stage     | Fleet work                                                                    | Authority and acceptance boundary                                                                |
+| --------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Constrain | Settle the requirement, shared contract, task graph, and stopping rules       | Agents propose alternatives; the owner resolves ambiguity and authorizes the scope               |
+| Generate  | Execute bounded tasks in isolated workspaces and integrate their outputs      | Agents act within declared files, tools, and budgets; the integrator owns the combined candidate |
+| Validate  | Check focused results and the complete browser journey                        | Agents provide evidence and a proposed verdict; the accepting owner reviews failures and limits  |
+| Revise    | Diagnose a mismatch, assign one correction, and update the contract or checks | The owner resolves any scope change; acceptance requires validation of the corrected revision    |
 
-For each consequential decision, name the performer, accountable owner, and agent authority: `propose`, `prepare`, or `execute`.
-Different functions within one task can receive different authority :citep[parasuraman2000automation].
-
-| Decision                           | Agent authority                               | Acceptance evidence                                                | Recovery or escalation                                           | Accountable owner |
-| ---------------------------------- | --------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------- |
-| Interpret an ambiguous requirement | Propose alternatives                          | User examples, affected behavior, assumptions, and unknowns        | Human selects or reframes before implementation                  | Outcome owner     |
-| Change a shared interface          | Prepare a contract and compatibility analysis | Consumer checks, migration implications, and rollback path         | Escalate before a breaking or externally visible change          | System owner      |
-| Implement a bounded change         | Execute within named files, tools, and budget | Focused checks, diff, baseline gate, and known limits              | Stop on scope expansion, failed invariant, or unavailable check  | Integrating human |
-| Accept the web behavior            | Propose a verdict from the complete evidence  | Browser journey, API and persistence checks, and reviewed failures | Reject, repair, or revert; do not infer acceptance from activity | Outcome owner     |
-
-::caption[Example authority and acceptance boundaries for a web-development fleet.]
+::caption[The same development loop with explicit fleet responsibilities and authority.]
 ::label[table:fleet-decision-responsibility]
 
 For example, an interface agent may discover that a requested field requires changing a shared event schema.
@@ -212,27 +176,9 @@ For each approval or stop rule, name the component that enforces it; a marker th
 
 Trace one delegated task from originating actor through session, tool attempts, validation, and final outcome.
 Grant only the required tools, data, and external access, and preserve the identity and policy evidence needed to reconcile those attempts.
+Ownership continues through release, observation, and later correction :citep[nissila2026decisionpath].
 Publishing a patch, deployment, or message requires an accountable human who can explain, correct, or withdraw it.
 [Appendix D](/appendices/agent-system-security/) develops enforcement, imported-capability review, and trace reconciliation.
-
-### Optional exercise — Test a human review gate
-
-[Human Todos](https://arsctx.com/blog/human-todos/) proposes marking consequential changes for human review and blocking selected implementation steps until a human resolves them.
-The marker makes a decision visible, but an unresolved-marker check cannot detect a marker the producing agent omitted.
-Use the pattern to test the authority boundary already defined above.
-
-In a disposable branch or review fixture, declare that changing an existing endpoint's authorization or adding a new endpoint requires human review before acceptance.
-Check both cases: a rule limited to modified existing handlers would miss the new endpoint.
-The review obligation should come from an independently maintained change-scope rule, with a named owner for ambiguous cases, rather than only the producing agent's annotations.
-
-Try three failures: leave a marker unresolved, omit a required marker, and remove a marker without human approval.
-For each, identify the changed behavior, the rule that requires review, and the component that blocks acceptance.
-Then supply an approval record tied to the reviewed revision and an authenticated human reviewer; change the relevant code again and confirm that the earlier approval no longer satisfies the gate.
-The agent must not be able to satisfy the gate merely by editing its own marker or approval file.
-
-Record missed review obligations, false alarms, review time, and interruptions alongside the accepted behavior.
-Code outside a designated core can still expose data or alter permissions, so allocate review by effects as well as file or layer.
-Independent scope checks can also be incomplete; passing these seeded cases establishes coverage of those cases, not every consequential change.
 
 ## Practice failure and correction
 
@@ -280,18 +226,15 @@ Do not reveal the chosen fault to the diagnosing agent.
 ::caption[Small faults that expose fleet integration and correction problems.]
 ::label[table:fleet-correction-faults]
 
-Use one correction loop throughout the lab:
+Apply the same development loop to the seeded fault:
 
-> **delegate → integrate → observe → diagnose → correct → revalidate**
-
-1. Run every focused check reported by the contributing agents and record which checks are green.
-2. Exercise the application through its web boundary: create a workspace and work item, perform valid lifecycle transitions, confirm activity and summary, filter the feed, refresh to verify persistence, and attempt one invalid transition.
-3. Verify that the invalid action changes neither current state nor event history.
-4. Use the diff and fleet trace to locate the first divergence between the settled contract and observed behavior.
-5. Assign one bounded correction task with an explicit hypothesis.
-   Avoid launching several speculative fixers against the same files.
-6. Run the focused regression check and the complete browser journey again.
-   A correction is accepted only when both pass and the trace records the failed attempt and repair.
+1. **Constrain:** preserve the known-good baseline, settled contract, and expected user journey; name the integration owner and correction scope.
+2. **Generate:** integrate the candidate containing the seeded defect and retain the contributing agents' focused results.
+3. **Validate:** rerun those checks, then create a workspace and work item, perform valid lifecycle transitions, confirm activity and summary, filter the feed, and refresh to verify persistence.
+   Attempt an invalid transition and verify that it changes neither current state nor event history.
+4. **Revise:** use the diff and fleet trace to locate the first divergence from the contract, then assign one bounded correction with an explicit hypothesis.
+   Avoid several speculative fixers against the same files.
+   Preserve the failed attempt and repair in the trace, update the relevant check or contract, and return to validation: both the focused regression check and complete browser journey must pass before acceptance.
 
 A focused check can pass while the complete user journey fails.
 Repeated agent agreement can also preserve a shared blind spot; resolve findings through behavioral evidence.
@@ -313,6 +256,11 @@ Use the application's history, filters, summaries, and relationships to answer t
 A [portable fleet-trace example](/downloads/project/fleet-trace-example.zip) provides a small transformation target, mapping guide, redaction record, and repeat-import contract.
 Adapt the actual tool export to that level of evidence rather than treating the example as a universal agent-tool schema.
 Use the application to inspect the workflow that built it.
+
+## Optional extensions
+
+To investigate a specific boundary further, use Appendix D's exercises on [retrieving changed guidance](/appendices/agent-system-security/#retrieve-guidance-after-a-contract-changes), [checking contract completeness](/appendices/agent-system-security/#check-a-contract-against-its-consumers), or [testing a human review gate](/appendices/agent-system-security/#test-a-human-review-gate).
+The walkthrough above provides the required path from decomposition through correction and measured coordination cost.
 
 ## Project artifact
 

@@ -25,7 +25,7 @@ Identify what made the change difficult and which lesson became an executable ch
 
 ### The agentic loop: turn execution into accepted change
 
-The workflow allocates authority, executes tasks, checks outcomes, and corrects failures.
+The constrain–generate–validate–revise loop allocates authority, produces a candidate, checks it, and corrects failures.
 Its trace exposes attempts, handoffs, and human intervention that the final repository can hide.
 Determine whether delegation reduced completion time through acceptance or moved effort into integration and review.
 
@@ -61,8 +61,9 @@ Record those differences when interpreting a result.
 
 ### Build the evidence matrix
 
-Compare the implementations across the same dimensions.
-For each dimension, record evidence from implementations A, B, and C—or explicitly state `not measured`—before answering the comparison question.
+The matrix belongs in the **final decision** bundle of the [four-part Compare submission](/project/compare/#6-deliverables).
+For each dimension, link evidence from implementations A, B, and C—or explicitly state `not measured`—before answering the comparison question.
+Use the earlier phase records and the implementation, fleet, and scaling/deployment bundles as sources; the matrix is an index and interpretation of that evidence.
 
 | Evidence dimension             | Collect from each implementation                                                              | Compare across implementations                                                  |
 | ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -110,14 +111,16 @@ This vocabulary lets you reason beyond the available experiment without presenti
 
 ## Turn comparison into a decision
 
-Choose an architecture and development workflow for the stated goals and constraints.
-Use the matrix to build one argument:
+Use the [final comparison structure](/project/compare/#7-final-comparison) to turn the matrix into one argument: establish the comparison, explain consequential results, bound the explanation, and choose with a revisit condition.
+A useful decision connects a constraint to evidence and an owner:
 
-1. State the common brief, acceptance core, deliberately varied setup, and comparison limits.
-2. Trace one consequential result through the application, development, and agentic loops, including a planned-versus-observed decision path.
-3. Compare the strongest A–B–C evidence, including failures, correction, and resource use; label observations, inferences, and proposals.
-4. Choose an architecture and workflow for a future scenario, explain rejected alternatives and accepted trade-offs, and name the owner of operational and correction work.
-5. Identify the first expected saturation boundary, the signal that would reveal it, and what to measure before revisiting the decision.
+> For **[goal and constraints]**, choose **[architecture and workflow]** because **[observed result and its limits]**.
+> Reject **[alternative]** because **[cost or unsupported assumption]**.
+> **[Owner]** accepts the operational and correction obligations; revisit the choice when **[signal or pressure]** changes.
+
+In the queue example, faster HTTP acknowledgment alone would not justify the decision.
+The argument must also account for event-visibility delay, recovery behavior, and the effort to maintain and review the new worker path.
+Use the same evidence to explain both the benefit and its price.
 
 ### Field note — Familiarity is part of effective capability
 
@@ -128,15 +131,16 @@ Changing models therefore changes both the tool and the reviewer's fluency with 
 
 ### Final reflection package builder
 
-The builder assembles evidence already produced during the course.
-Select the artifacts you have, then use its outline to find claims that still lack support.
+The builder uses the same four bundles as the specification.
+Mark the bundles you have assembled and replace the outline prompts with links to your evidence.
+The selections help organize the submission; they do not verify its completeness or the strength of its claims.
 
 {{ import "site/includes/final-reflection-demo.html" }}
 
 ## Project artifact
 
 Complete the evidence matrix and final decision narrative within the [Compare submission](/project/compare/#6-deliverables).
-Use the argument above to connect existing artifacts, mark missing evidence and remaining risks, and defend the next decision.
+Link the other three bundles and earlier phase records, mark missing evidence and remaining risks, and defend the next decision.
 
 ## Author perspective — Learn where to look
 

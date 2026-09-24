@@ -2,6 +2,7 @@
 
 Use this appendix when an agent workflow crosses several orchestration, model, tool, credential, or network boundaries.
 The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—allocate decision authority, enforce least privilege, preserve evidence, and keep a human owner—while this appendix develops control-plane separation, end-to-end trace reconciliation, capability adoption, and persistent cross-run state.
+The [optional fleet exercises](#optional-fleet-exercises) test project memory, contract completeness, and human review gates.
 
 ## Separate task control from resource access
 
@@ -23,7 +24,7 @@ NIST's zero-trust architecture distinguishes a policy engine that makes and logs
 This is a design analogy, not a claim of NIST conformance.
 For each consequential decision, name the policy authority, mandatory enforcement point, and conflict or outage rule; overlapping controls still need explicit precedence, and a mediator cannot protect a path that bypasses it.
 
-The HAR decision map identifies the intended transfers of work and authority.
+The [fleet authority map](/chapters/agent-fleets/#map-authority-and-acceptance) identifies the intended transfers of work and authority.
 Check where the controls enforce and observe those transfers.
 Trace one operation through the chain:
 
@@ -211,3 +212,64 @@ Application-level agent orchestration has separate runtime users, data, and oper
 For each consequential action, name the decision authority, mandatory enforcement point, granted scope, evidence returned, and conflict or outage rule.
 Then follow one denied, failed, retried, cancelled, or successful attempt across every relevant system and confirm that it rolls up exactly once to an explicit delegated-run outcome.
 Include a bypass check for any control the decision relies on.
+
+## Optional fleet exercises
+
+These extensions revisit the constraints and acceptance boundaries of the [fleet walkthrough](/chapters/agent-fleets/).
+Choose one when project memory, a missing consumer obligation, or a human approval gate is relevant; completing all three is not required.
+For any chosen exercise, add its findings to the existing fleet evidence rather than creating another submission.
+
+### Retrieve guidance after a contract changes
+
+An identifiable old statement may be useful history and wrong guidance for the current implementation.
+Keep three questions separate: **provenance** identifies where a claim came from; **validity** concerns whether it still applies; **retrieval** selects material for the present task.
+
+Use a small fixture with two revisions of an event-list endpoint:
+
+1. In the earlier revision, the endpoint returns an array; in the current revision, it returns an object containing `items` and `nextCursor`.
+   Preserve both contracts with their source revisions and status, but deliberately leave one searchable summary describing the old response as current.
+2. Ask the agent separately what the earlier contract required and how a client should parse today's response.
+   Require supporting source revisions and a client check against the current fixture.
+3. Compare source inspection alone with source inspection plus retrieved project memory, keeping the task, model, tools, and starting code fixed in fresh sessions.
+   Inspect whether the stale summary is retrieved, whether the contradiction is noticed, and which source controls the answer.
+4. Record accepted behavior, stale claims, evidence recovered, retrieval cost, and the effort needed to correct or retire the summary.
+
+Keep the historical contract available while preventing it from silently governing current work.
+A timestamp or source link helps inspection but does not establish validity by itself.
+Judge memory by the work it improves, including its initialization and maintenance cost.
+
+### Check a contract against its consumers
+
+Use the two-revision event-list fixture above, whose current response contains `items` and `nextCursor`.
+A discoverable contract can still leave out an obligation.
+[Code Contracts](https://github.com/spolu/code-contracts) places identified requirements beside code, but its formatter checks syntax and duplicate identifiers rather than semantic compliance.
+[Decision Engineering](https://github.com/hpark0011/decision-engineering) records intended decisions, their dependencies, enforcement, and verification; the record still needs checking against actual consumers and behavior.
+
+Extend the fixture with a CSV export whose stated requirement is to include every event matching the selected filter.
+Keep the data fixed and use enough matching events to require at least two pages.
+Omit this consumer from the contract map and give it an implementation that reads `items` but ignores `nextCursor`.
+The response-schema check passes, yet a check comparing exported event IDs with the independently defined expected set fails.
+This is an invented teaching fault: it tests an incomplete current record as well as the earlier exercise's stale guidance.
+
+Trace the missing obligation to the consumer, contract, acceptance check, and accountable owner.
+Repair the export and update the map, then confirm that it includes every expected event exactly once.
+Record missed obligations, false alarms, and the effort to maintain the records alongside the existing exercise notes.
+
+### Test a human review gate
+
+[Human Todos](https://arsctx.com/blog/human-todos/) proposes marking consequential changes for human review and blocking selected implementation steps until a human resolves them.
+The marker makes a decision visible, but an unresolved-marker check cannot detect a marker the producing agent omitted.
+Use the pattern to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).
+
+In a disposable branch or review fixture, declare that changing an existing endpoint's authorization or adding a new endpoint requires human review before acceptance.
+Check both cases: a rule limited to modified existing handlers would miss the new endpoint.
+The review obligation should come from an independently maintained change-scope rule, with a named owner for ambiguous cases, rather than only the producing agent's annotations.
+
+Try three failures: leave a marker unresolved, omit a required marker, and remove a marker without human approval.
+For each, identify the changed behavior, the rule that requires review, and the component that blocks acceptance.
+Then supply an approval record tied to the reviewed revision and an authenticated human reviewer; change the relevant code again and confirm that the earlier approval no longer satisfies the gate.
+The agent must not be able to satisfy the gate merely by editing its own marker or approval file.
+
+Record missed review obligations, false alarms, review time, and interruptions alongside the accepted behavior.
+Code outside a designated core can still expose data or alter permissions, so allocate review by effects as well as file or layer.
+Independent scope checks can also be incomplete; passing these seeded cases establishes coverage of those cases, not every consequential change.

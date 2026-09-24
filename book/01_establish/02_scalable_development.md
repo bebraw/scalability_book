@@ -87,9 +87,9 @@ Compare a run with the default constraints with one that selects every constrain
 The candidate is deterministic teaching data, not model output.
 Use validation failures to revise the project's rules and context before the next generation attempt.
 
-## Human-agent relationship is a control design
+## Assign authority and ownership
 
-Here, **Human Agent Relationship** (HAR) means the allocation of intent, authority, execution, evidence, intervention, and accountability across the development workflow.
+At each stage of the loop, decide who may act, which evidence permits the next step, and who owns the result.
 For each decision, an agent may **propose** an option, **prepare** an action for approval, or **execute** within explicit limits.
 Ambiguous intent, weak evidence, irreversible commitments, and material external effects should narrow that authority.
 

@@ -43,22 +43,11 @@ If the request path is unclear, the diagram is likely to hide the most important
 
 ### Automated consumers change demand and exposure
 
-A crawler, integration, monitoring probe, authorized agent, and abusive bot can send technically similar HTTP requests while creating different value, cost, and risk.
-Agents can traverse interfaces quickly, retry ambiguous failures, and act without a person inspecting every screen.
-The same operation should retain its authoritative meaning whether invoked by a form, integration, or agent.
-Architecture should therefore distinguish which representations are intentionally public, which actions require identity and authorization, which expensive paths need a quota or admission boundary, and which automated uses the product is willing to support.
-
-The [Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.html) lets a cooperating crawler discover access preferences in `/robots.txt`.
-It is not authorization or a content-security boundary, and listing a path there makes the path discoverable.
-Information that must remain private still needs an application-layer access control; public information should be designed with the assumption that a permitted consumer can copy it.
-
-Rate limiting controls resource use rather than deciding whether every automated consumer is malicious.
-An HTTP `429 Too Many Requests` response can explain the limit and carry `Retry-After`, but [RFC 6585](https://www.rfc-editor.org/rfc/rfc6585.html#section-4) deliberately leaves the identity and counting policy to the application.
-Limits based only on an IP address can group unrelated users or be distributed across many addresses, while limits tied to an account, tenant, capability, or costly operation require their own fairness and privacy decisions.
-
-The [OWASP automated-threat catalog](https://owasp.org/www-project-automated-threats-to-web-applications/assets/oats/EN/OAT-011_Scraping) treats scraping as one form of automated use among several, and its practical implication here is to begin from the endpoint and intended outcome rather than from a generic “block bots” goal.
-For one exposed path, record the legitimate consumers, information returned, authoritative action or cost triggered, likely abuse pattern, first useful signal, control point, acceptable false-positive cost, and recovery or override path.
-Cache safe public reads, minimize exposed and retained data, protect expensive or consequential actions, and observe origin work per useful outcome before adding a challenge to every request.
+A crawler, integration, monitoring probe, agent, and abusive bot may send similar requests while creating different value, cost, and risk.
+Keep the operation's authoritative meaning stable across consumers, then decide which reads are public, which actions require authorization, and which expensive paths need quotas or admission control.
+For the event tracker, a public summary might be cached while event writes require an authorized actor and a bounded request rate.
+Cooperative crawling rules such as `robots.txt` do not enforce access control.
+[Appendix C](/appendices/advanced-web-boundaries/#automated-consumers-change-demand-and-exposure) develops crawler policy, rate-limit identity, and an endpoint review.
 
 > **Sustainability angle**
 >
@@ -66,19 +55,31 @@ Cache safe public reads, minimize exposed and retained data, protect expensive o
 > Chatty APIs, unnecessary round trips, duplicated computation, oversized payloads, heavy client bundles, aggressive polling, and poorly targeted edge execution all turn architectural choices into recurring resource use.
 > Moving work is valuable when it removes a justified constraint rather than merely multiplying infrastructure.
 
-## The origin-centered web made machines visible
+## Choose where work runs
 
-In an origin-centered design, a browser sends a request to a known server, the server applies application logic, reads or changes data, and returns a representation.
-The earliest useful deployment for a dynamic site may be one physical machine running the web server and database.
-Larger installations can place a reverse proxy or load balancer in front of several application servers and move the database to separate hardware.
-This is often described as a three-tier shape—presentation, application logic, and data—even though the tiers are responsibilities and do not have to occupy three machines.
+An origin-centered application can begin with one server handling requests and storing data.
+Separating presentation, application logic, and data into three tiers separates responsibilities; it does not require three machines.
+Cloud provisioning and programmable edges expand the placement options without removing the origin's authority or the need to recover from failure.
 
-Physical ownership makes several constraints difficult to ignore.
-Capacity is purchased and installed before it is used, a failed machine has to be repaired or replaced, and vertical scaling has a hardware ceiling.
-Horizontal scaling adds machines, but then request routing, deployment, shared state, and data coordination become system responsibilities.
-The architecture can still be excellent: a stable workload, predictable cost, data locality, regulatory control, or specialized hardware may justify owned infrastructure.
+| Placement choice            | Pressure it can address                                                 | Obligation to examine                                                     |
+| --------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Owned or hosted server      | Predictable workload, hardware control, or data locality                | Capacity planning, replacement, and recovery                              |
+| Replaceable cloud instances | Variable demand and automated provisioning                              | Startup delay, quotas, shared state, and downstream saturation            |
+| Managed service             | Limited team capacity for operating a database, queue, or storage layer | Provider limits, consistency, cost, export, and recovery contracts        |
+| CDN and programmable edge   | Repeated delivery, distant consumers, or early request rejection        | Cache correctness, execution limits, and distance to authoritative writes |
 
-Record whether the application assumes one long-lived machine, interchangeable processes, or services whose lifecycle is controlled elsewhere.
+::caption[Placement choices, the pressures they address, and the work they retain.]
+::label[table:web-placement-choices]
+
+These choices can coexist in one application.
+The [NIST cloud definition](https://csrc.nist.gov/pubs/sp/800/145/final) emphasizes pooled resources, rapid provisioning, elasticity, and measured service; these change how capacity is acquired, not how quickly a database can accept writes.
+A session, upload, or job kept only on one replaceable instance can disappear or become unreachable from the next request.
+Show where that state survives and which dependency saturates first.
+
+A [CDN](https://www.rfc-editor.org/rfc/rfc6392.html) moves reusable representations close to consumers; a programmable edge also runs bounded request handling there.
+The event tracker can deliver public assets and a cached summary near users while keeping event writes beside the authoritative database.
+If an edge function must contact that database on every request, the long trip remains.
+Choose placement from reuse, locality, trust, and operational capacity, and show managed dependencies and provider boundaries in the diagram.
 
 ### HTTP provides a stable seam
 
@@ -112,67 +113,6 @@ Do not create a service boundary merely to imitate an organizational chart.
 Instead, identify a capability with coherent authority and change reasons, give its owners enough control to evolve its internals, and keep the consumer contract small enough that other teams can depend on it without joining every implementation decision.
 When one workflow crosses several owners, record who may change the contract, how compatibility is checked, how consumers learn about deprecation or migration, and which decision requires cross-team agreement.
 The ownership card later in this chapter should therefore name both the code boundary and the communication boundary that maintains it.
-
-## Cloud made infrastructure programmable
-
-Cloud computing changed how capacity is acquired and operated more than it changed the physical laws beneath an application.
-The [NIST definition of cloud computing](https://csrc.nist.gov/pubs/sp/800/145/final) emphasizes on-demand access to a shared pool of configurable resources, rapid provisioning and release, elasticity, and measured service.
-These properties made compute, storage, and networking available through APIs instead of only through hardware procurement and manual installation.
-
-### From named machines to replaceable capacity
-
-A cloud-hosted application may still run the same web server and database that ran on owned hardware.
-The architectural shift appears when instances can be created from declarations, replaced after failure, scaled with demand, and distributed across failure zones.
-Teams can move from a pet-like server with accumulated local state toward replaceable instances whose configuration and dependencies are explicit.
-
-This shift favors stateless request handlers because interchangeable instances are easier to add, remove, and recover.
-It also makes hidden machine-local assumptions more dangerous.
-A session, uploaded file, background job, or generated artifact stored only on one instance can disappear when the platform replaces it or can become unreachable when the next request reaches another instance.
-
-Elasticity is not infinite capacity.
-New instances take time to start, quotas and downstream services impose limits, and a database or external API may saturate before the application tier does.
-Measured service also turns inefficient design into a recurring bill.
-Cloud architecture therefore requires capacity signals, cost signals, and explicit saturation boundaries rather than faith in automatic scaling.
-
-### Managed services move operational work
-
-Object storage, managed databases, identity services, queues, functions, and observability platforms let a team delegate installation, patching, replication, or availability work to a provider.
-That can reduce undifferentiated operations and make sophisticated capabilities accessible to smaller teams.
-It also creates service contracts: supported regions, quotas, consistency behavior, failure modes, pricing dimensions, export paths, and recovery procedures become architectural dependencies.
-
-Cloud did not make infrastructure disappear.
-It changed who controls each layer and which parts the application can observe.
-An architecture diagram should therefore show managed dependencies and provider boundaries instead of collapsing them into an anonymous cloud shape.
-
-## CDNs grew into a programmable edge
-
-Cloud platforms made centralized pools of computation easier to allocate.
-Content delivery networks addressed a different physical constraint: a distant origin cannot make light travel faster, and repeated delivery from one location wastes both time and origin capacity.
-
-### CDNs began by moving representations
-
-The web had used proxies, replicas, and caches long before “edge” became a general application-platform label.
-[RFC 3040](https://www.rfc-editor.org/rfc/rfc3040.html), published in 2001, documents an already distributed web of origins, surrogates, caching proxies, replica selection, and cache coordination.
-[RFC 6392](https://www.rfc-editor.org/rfc/rfc6392.html) describes a CDN as content-delivery, request-routing, distribution, and accounting infrastructure in which edge servers deliver copies close to users.
-
-This content-oriented model moves a reusable representation while the origin remains authoritative.
-For the event tracker, public scripts, styles, images, and a non-personalized summary can be delivered near consumers without moving the event-writing authority.
-The benefit depends on reuse: a personalized or rapidly changing representation with a fragmented cache key may miss often enough that the edge only adds another hop.
-
-### Programmability moved request handling beside the cache
-
-Once providers had globally distributed request-routing and delivery infrastructure, they could expose some processing at the same locations.
-For example, the 2017 [Lambda@Edge release](https://aws.amazon.com/about-aws/whats-new/2017/07/lambda-at-edge-now-generally-available/) connected functions to CloudFront viewer and origin request or response events, allowing code to inspect, rewrite, authorize, personalize, or generate responses near users.
-This illustrates the expansion from selecting and serving content to running bounded application logic in the delivery path.
-
-Edge is relative rather than singular.
-An execution location can be close to a user but far from the authoritative database, close to a device but outside a cloud region, or close to an origin service while still crossing organizational boundaries.
-Moving request validation, routing, personalization, or rendering outward can reduce latency and origin work.
-Moving an authoritative write outward can instead create a coordination problem across locations.
-
-The edge therefore extends rather than replaces origin and cloud architecture.
-Use it when locality, repeated delivery, early rejection, or distributed ingress addresses a measured pressure.
-Keep work centralized when it depends on strongly coordinated data, specialized runtime capabilities, or operational simplicity.
 
 ## Rendering moves work across time and place
 
@@ -224,26 +164,9 @@ For the event tracker, raw events, current work-item state, and derived summarie
 Raw events may support replay or audit, current state must preserve workflow invariants, and summaries can often be rebuilt or temporarily stale.
 The architecture should state which data is authoritative, which is derived, where each is placed, and what happens when a location cannot reach its authority.
 
-### Rebuild a view without repeating its effects
-
-A retained event history can support several derived views when it records the inputs needed to compute them.
-:citet[kreps2013log] explains how deterministic processing of the same ordered history reconstructs state.
-Changing the computation can instead produce a new view from that history.
-
-Suppose a workspace dashboard currently counts all activity and now needs separate counts for started and completed work.
-An illustrative retained fixture contains `E1: work_started`, `E2: work_completed`, and `E3: work_started`, all for workspace `W1` in that order.
-Replaying those records through the new aggregation gives two starts and one completion.
-The rebuild writes a separate summary and records its last processed position; the application can keep serving the old summary until the new one catches up to an agreed position and is verified.
-Events arriving during the rebuild must be included through that cutover position, then processing must continue without skipping or double-counting them.
-
-Recomputing the summary must not resend the notifications originally triggered by those events.
-Keep the projection that updates the summary separate from notification delivery.
-If delivery itself needs recovery, its durable record and receiver-enforced idempotency belong to the effect boundary described in [Appendix F](/appendices/durable-workflows/#durable-execution-preserves-coordination-progress).
-Rebuilding derived data and resuming a workflow are different uses of history.
-
-Record the event identities, workspace, type, schema and aggregation versions, ordering, retained starting point, and acceptable summary lag.
-Expired or incomplete records may prevent a rebuild; the course tracker's activity history does not necessarily contain every work-item field or permission.
-Name which views the retained facts support and who owns their rebuild and freshness.
+A derived summary may be rebuilt from retained events only when that history contains the necessary facts.
+Recomputing it must not repeat external effects such as notifications, and new events must not be lost during the rebuild.
+[Appendix C](/appendices/advanced-web-boundaries/#rebuild-a-view-without-repeating-its-effects) works through a summary rebuild and cutover.
 
 ### Data placement follows authority and access
 
@@ -313,23 +236,9 @@ The [HTTP caching specification](https://httpwg.org/specs/rfc9111.html) defines 
 - `Vary` makes selected request headers part of response selection.
   This can protect correctness, but every varying dimension can fragment the cache.
 
-Query parameters can fragment the cache even when the response is identical.
-For example, `/offer?utm_source=newsletter` and `/offer?utm_source=search` may serve the same page but occupy separate cache entries.
-The proposed `No-Vary-Search` response header lets an origin declare which query parameters a supporting cache may ignore when matching URLs:
-
-```http
-No-Vary-Search: params=("utm_source" "utm_medium")
-```
-
-With this policy, differences in those campaign parameters can permit reuse of a stored response, while a content-changing parameter such as `colour` still distinguishes responses.
-Unlike `Vary`, which selects responses using request headers, `No-Vary-Search` concerns the URL's query component.
-It changes matching, without rewriting the URL or relaxing storage, freshness, or validation requirements.
-
-List only parameters known to be safe to ignore so that new, unknown parameters still distinguish responses.
-Identical HTML is insufficient if reuse would bypass required server processing, such as authorization or signature verification.
-An ignored parameter also cannot be relied on to bypass the cache for debugging.
-As of September 2026, the [HTTP Working Group specification](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) remains a draft: verify syntax and behavior in the target caches before relying on it.
-Harry Roberts's [practical introduction](https://csswizardry.com/2026/05/better-browser-caching-with-no-vary-search/) develops the campaign-URL example further.
+The cache key must distinguish requests whose responses or required processing differ.
+Query parameters can fragment reuse even when they only describe a campaign, but ignoring an authorization or content-selection parameter can make reuse incorrect.
+[Appendix C](/appendices/advanced-web-boundaries/#query-parameters-and-cache-identity) develops the optional `No-Vary-Search` mechanism and its limits.
 
 Validators avoid retransmitting an unchanged body.
 An origin can attach an `ETag`; once the stored response needs validation, a cache sends that value through `If-None-Match`.
@@ -384,10 +293,10 @@ Consolidate ownership, split responsibilities, or document a justified exception
 
 ## Architectural dimensions for a web application
 
-The history of the web expanded the available choices along several dimensions.
+Placement, rendering, data, and ownership choices interact along several dimensions.
 Use the table to compare architectures without treating any option as a universal destination.
 
-| Dimension                | Choices that expanded over time                                              | Pressure the choices can address                         | Obligation introduced by the decision                               |
+| Dimension                | Available choices                                                            | Pressure the choices can address                         | Obligation introduced by the decision                               |
 | ------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
 | Infrastructure ownership | Owned server, hosted machine, VM, container, function, managed service       | Provisioning speed, utilization, operational capacity    | Provider contracts, quotas, cost visibility, and recovery           |
 | Execution placement      | Build system, browser, origin, cloud region, edge location                   | Latency, elasticity, device capability, or data locality | More boundaries, deployment targets, and partial-failure paths      |

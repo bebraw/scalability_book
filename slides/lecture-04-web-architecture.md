@@ -37,8 +37,8 @@ A diagram is useful only when it exposes those decisions.
 | -------------- | ----------------------------------------------------------- |
 | Consumer       | Who or what initiates the interaction?                      |
 | Representation | Which document, message, or interface crosses the boundary? |
-| Computation    | Where is behavior evaluated?                                |
-| Data           | Where is state authoritative, copied, indexed, or derived?  |
+| Execution      | Where is behavior evaluated?                                |
+| Authority      | Which component decides and preserves the current truth?    |
 
 One component may perform several roles.
 Keep the responsibilities conceptually separate.
@@ -89,7 +89,7 @@ Distinguish:
 
 Authentication, authorization, rate policy, data minimization, and useful error responses protect application boundaries.
 
-<!-- [Sources] book/02_challenge/04_architecture.md -->
+<!-- [Sources] book/02_challenge/04_architecture.md; book/04_appendices/C_advanced_web_boundaries.md -->
 
 ---
 

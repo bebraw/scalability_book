@@ -7,141 +7,100 @@
 >
   <div class="reflection-package-demo-header">
     <div>
-      <p class="reflection-package-demo-kicker">Final reflection package</p>
+      <p class="reflection-package-demo-kicker">Compare evidence index</p>
       <h3 id="reflection-package-demo-heading">
-        Build a reflection from course artifacts
+        Assemble the four Compare bundles
       </h3>
     </div>
     <div class="reflection-package-demo-summary" aria-live="polite">
-      <span data-reflection-package-verdict>Pick project evidence</span>
+      <span data-reflection-package-verdict>Select assembled bundles</span>
       <small
-        >A strong reflection names the artifact, the claim it supports, and the
-        limitation it does not prove.</small
-      >
+        >Selections organize your evidence; they do not verify completeness or
+        the strength of a claim. Check the
+        <a href="/project/compare/#6-deliverables">Compare deliverables</a>.
+      </small>
     </div>
   </div>
 
   <form class="reflection-package-grid" data-reflection-package-form>
     <div class="reflection-package-panel">
-      <h4>Artifacts in your folder</h4>
+      <h4>Bundles with linked evidence</h4>
       <div class="reflection-package-evidence">
         <label>
           <input
             type="checkbox"
-            value="architecture"
+            value="implementation"
             data-reflection-package-evidence
             checked
           />
-          <span>
-            <strong>Request trace screenshot or ADR</strong>
-            <small
-              >Example: POST /events boundary trace with owner notes.</small
-            >
-          </span>
+          <span
+            ><strong>Implementation</strong
+            ><small
+              >Accepted C revision and common evidence, including the cross-team
+              audit and response; links to A and B.</small
+            ></span
+          >
         </label>
         <label>
           <input
             type="checkbox"
-            value="assumption"
+            value="fleet"
+            data-reflection-package-evidence
+          />
+          <span
+            ><strong>Fleet evidence</strong
+            ><small
+              >Plan, trace, loader, two debugging findings, coordination
+              measurements, and workflow model.</small
+            ></span
+          >
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="experiment"
             data-reflection-package-evidence
             checked
           />
-          <span>
-            <strong>Changed assumption brief</strong>
-            <small
-              >Example: offline retries made duplicate events visible.</small
-            >
-          </span>
+          <span
+            ><strong>Scaling and deployment experiment</strong
+            ><small
+              >Application model, implemented and remeasured response, failure
+              or recovery check, and deployed workload.</small
+            ></span
+          >
         </label>
         <label>
           <input
             type="checkbox"
-            value="friction"
-            data-reflection-package-evidence
-            checked
-          />
-          <span>
-            <strong>Friction audit result</strong>
-            <small
-              >Example: one required event field touched UI, API, and summary
-              code.</small
-            >
-          </span>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            value="measurement"
-            data-reflection-package-evidence
-            checked
-          />
-          <span>
-            <strong>Measurement screenshot or table</strong>
-            <small
-              >Example: trace showed database time, not rendering, dominated
-              p95.</small
-            >
-          </span>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            value="workflow"
+            value="decision"
             data-reflection-package-evidence
           />
-          <span>
-            <strong>Human-agent workflow trace</strong>
-            <small
-              >Example: scout found files, implementer changed them, reviewer
-              caught a missing path.</small
-            >
-          </span>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            value="scaling"
-            data-reflection-package-evidence
-            checked
-          />
-          <span>
-            <strong>Scaling trade-off table</strong>
-            <small
-              >Example: queue ingestion helped writes but created freshness
-              lag.</small
-            >
-          </span>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            value="risk"
-            data-reflection-package-evidence
-          />
-          <span>
-            <strong>Remaining risk note</strong>
-            <small
-              >Example: next failure is queue backlog; measure event age before
-              adding workers.</small
-            >
-          </span>
+          <span
+            ><strong>Final decision</strong
+            ><small
+              >Evidence matrix, target architecture, trade-offs, and one
+              conditional decision with ownership and a revisit
+              condition.</small
+            ></span
+          >
         </label>
       </div>
     </div>
 
     <div class="reflection-package-panel reflection-package-gaps">
-      <h4>What to add before writing</h4>
+      <h4>Bundles still to assemble</h4>
       <ul data-reflection-package-missing></ul>
     </div>
 
     <div class="reflection-package-panel reflection-package-outline">
       <div class="reflection-package-outline-header">
-        <h4>Draft package</h4>
+        <h4>Draft evidence index</h4>
         <button type="button" data-reflection-package-copy>Copy package</button>
       </div>
       <textarea
         data-reflection-package-outline
-        aria-label="Generated reflection package"
+        aria-label="Generated Compare evidence index"
         rows="18"
         readonly
         spellcheck="false"

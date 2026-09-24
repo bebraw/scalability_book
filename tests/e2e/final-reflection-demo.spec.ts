@@ -6,40 +6,52 @@ test.describe("final reflection package demo", () => {
     await expect(page.locator("[data-reflection-package-demo]")).toBeVisible();
   });
 
-  test("assembles an evidence-based reflection outline", async ({ page }) => {
+  test("assembles the four Compare bundles without treating selection as verification", async ({
+    page,
+  }) => {
     const demo = page.locator("[data-reflection-package-demo]");
 
     await expect(
       demo.locator("[data-reflection-package-verdict]"),
-    ).toContainText("5 of 7 evidence pieces ready");
+    ).toContainText("2 of 4 bundles selected");
     await expect(
       demo.locator("[data-reflection-package-missing]"),
-    ).toContainText("Human-agent workflow trace");
+    ).toContainText("Fleet evidence");
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /Artifact to attach or cite:\nScaling planner trade-off table/,
+      /Application model, before-and-after scaling response, and deployed workload evidence/,
     );
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /Write this paragraph:/,
+      /new failure or recovery check/,
     );
 
     await demo
-      .locator("[data-reflection-package-evidence][value='workflow']")
+      .locator("[data-reflection-package-evidence][value='fleet']")
       .setChecked(true);
     await demo
-      .locator("[data-reflection-package-evidence][value='risk']")
+      .locator("[data-reflection-package-evidence][value='decision']")
       .setChecked(true);
 
     await expect(
       demo.locator("[data-reflection-package-verdict]"),
-    ).toContainText("7 of 7 evidence pieces ready");
+    ).toContainText("4 of 4 bundles selected");
     await expect(
       demo.locator("[data-reflection-package-missing]"),
-    ).toContainText("All core evidence categories");
+    ).toContainText("selection does not establish completeness");
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /Prompt, agent output, review note, or correction loop/,
+      /workflow-level formal-model analysis/,
     );
     await expect(demo.locator("[data-reflection-package-outline]")).toHaveValue(
-      /No core evidence gaps/,
+      /check the linked evidence against the specification/,
     );
+
+    await demo
+      .locator("[data-reflection-package-evidence][value='experiment']")
+      .setChecked(false);
+    await expect(
+      demo.locator("[data-reflection-package-missing]"),
+    ).toContainText("realistic deployed-workload evidence");
+    await expect(
+      demo.locator("[data-reflection-package-outline]"),
+    ).not.toHaveValue(/## 3\. Scaling and deployment experiment/);
   });
 });

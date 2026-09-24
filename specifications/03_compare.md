@@ -146,16 +146,10 @@ Compare A, B, and C under that shared pressure.
 Then use the broader pressure catalog to select only the additional scenarios needed to explain consequential architectural differences.
 You do not need to apply every catalog scenario exhaustively to every implementation.
 
-The final analysis must address:
-
-- functional completeness and defects;
-- architecture and data flow;
-- scalability, reliability, maintainability, simplicity, and resource efficiency;
-- setup, comprehension, change, testing, review, operational, and coordination friction;
-- runtime measurements and their limits;
-- model and orchestration evidence;
-- optional scope;
-- the influence of practice, hardware, stack, tools, and other confounding factors.
+Use the [final evidence matrix](/chapters/recap/#build-the-evidence-matrix) to compare accepted behavior, architecture, pressure, measurement and recovery, development friction, human–agent workflow, and resource use.
+Judge scalability, reliability, maintainability, simplicity, and resource efficiency from that evidence.
+Include optional-scope differences and the influence of practice, hardware, stack, tools, and other confounding factors.
+Link existing phase evidence and mark missing measurements explicitly.
 
 The final result should support a conditional engineering decision, not declare a universal winner.
 
@@ -185,42 +179,46 @@ Record the environment and configuration, operational steps, result, difference 
 
 ## 6. Deliverables
 
-Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation C plus:
+Organize the final submission into four bundles.
+These are sections in one evidence index, not four new documents or repositories.
+Link each artifact once and refer to it from the relevant analysis; the common evidence and phase-specific requirements may share the same artifact.
 
-- fleet plan or task graph;
-- a compact selected execution trace;
-- the documented transformed trace and a repeatable way to load it;
-- evidence from the fleet debugging view and at least two findings;
-- fleet coordination measurements and analysis;
-- one application-level formal-model analysis and one workflow-level formal-model analysis;
-- before-and-after evidence for one implemented scaling response, including its new failure or recovery obligation;
-- deployed workload evidence from one selected implementation;
-- a target architecture and scaling trade-off table that distinguish implemented evidence from remaining proposals;
-- a completed evidence matrix and final decision narrative that together form the final A–B–C comparison.
+### 6.1 Implementation
 
-The selected trace should show consequential delegation, validation, integration, failure, or human intervention.
-Do not submit an uncurated transcript dump in place of analysis.
+Provide the accepted implementation C revision and its [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence), including setup, configuration, time and resource use, validation, architecture, pressure, and friction evidence.
+Include the cross-team audit and response, and link the already-submitted A and B revisions and evidence for comparison.
+
+### 6.2 Fleet evidence
+
+Connect the fleet plan and task graph to a compact selected execution trace, its documented transformation, a repeatable loader into C, and application views answering at least two debugging questions.
+Include coordination measurements, the B–C analysis, and one workflow-level formal-model analysis.
+The trace should expose consequential delegation, validation, integration, failure, or human intervention; select evidence that explains the findings rather than submitting an uncurated transcript dump.
+
+### 6.3 Scaling and deployment experiment
+
+Include one application-level formal-model analysis, the before-and-after evidence for an implemented scaling response, and its new failure or recovery obligation.
+Add the realistic deployed-workload evidence and identify the selected implementation, revisions, environment, and measurement limits.
+Sections 5.5–5.7 define the experiment; the application model is separate from the workflow model in the fleet bundle.
+
+### 6.4 Final decision
+
+Combine the A–B–C evidence matrix with one decision narrative following section 7.
+Include the target architecture and scaling trade-off table, distinguishing implemented results from remaining proposals.
+Reference the other bundles and earlier phase evidence instead of repeating their measurements or writing another report for each comparison question.
 
 ---
 
 ## 7. Final Comparison
 
-The final comparison should answer:
+Use the final decision bundle to make one conditional engineering argument:
 
-1. What remained stable because the specification was stable?
-2. What differed between the three implementations?
-3. What evidence suggests that model capability contributed to the A–B differences?
-4. What evidence suggests that orchestration contributed to the B–C differences?
-5. What alternative explanations remain?
-6. Which application architecture responds best to the primary and selected scalability pressures, and why?
-7. Under what project constraints would the group choose:
-   - a local single agent;
-   - a comparison-model single agent;
-   - an agent fleet?
-8. What remained a human responsibility in every phase?
-9. What did the fleet debugging view reveal that was difficult to see from the final code or raw transcript alone?
+1. **Establish the comparison.** State what the common specification kept stable and what differed across A, B, and C, including optional scope and measurement gaps.
+2. **Explain the consequential results.** Compare application architecture under the shared and selected pressures and development effort through acceptance; use the fleet debugging findings to show what final code or a raw transcript concealed.
+3. **Bound the explanation.** Assess whether model capability plausibly contributed to A–B differences and orchestration to B–C differences, keeping alternative explanations and comparison limits visible.
+4. **Choose and set a revisit condition.** For stated project constraints, choose an architecture and a local single agent, comparison-model single agent, or fleet; explain rejected alternatives, responsibilities that remained human across the phases, ownership of operations and correction, and the next saturation signal or measurement that would change the decision.
 
-Use tables and diagrams where they make exact comparisons easier to understand.
+Label important claims as observed, inferred, or proposed.
+The [recap chapter](/chapters/recap/#turn-comparison-into-a-decision) shows how to connect the matrix to this argument.
 
 ---
 

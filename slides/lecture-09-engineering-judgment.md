@@ -116,14 +116,14 @@ The decision should name who owns its operational and correction obligations.
 
 # Finish with the next boundary
 
-The final package should contain:
+Use four bundles in one evidence index:
 
-- three reproducible implementations;
-- comparable runtime and workflow evidence;
-- one implemented and remeasured scaling response;
-- a conditional architecture and workflow decision;
-- rejected alternatives and remaining uncertainty;
-- the next pressure, boundary, and measurement.
+- **Implementation:** C and its common evidence, cross-team audit and response, with links to A and B.
+- **Fleet evidence:** plan, trace, loader, debugging findings, coordination measurements, and workflow model.
+- **Scaling and deployment experiment:** application model, implemented and remeasured response, new failure or recovery check, and realistic deployed workload.
+- **Final decision:** evidence matrix, target architecture, trade-offs, ownership, and the next boundary or measurement.
+
+Link existing evidence rather than writing a report for each comparison question.
 
 Scalability is not a finish line.
 It is a disciplined way to reason about change.

@@ -1,6 +1,6 @@
 # Advanced control boundaries in web applications
 
-Use this appendix when a design depends on state continuity across requests, transactional invariants, client activation, runtime-generated interfaces, or a detailed application contract.
+Use this appendix when a design depends on state continuity across requests, transactional invariants, client activation, runtime-generated interfaces, a detailed application contract, event-view rebuilding, or endpoint and cache policy.
 The [Architecture chapter](/chapters/architecture/) keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
 
 ## Stateless requests still depend on state
@@ -69,6 +69,27 @@ Then introduce a database transaction and, for concurrent requests, compare read
 
 The simulation does not imply that every database implements an isolation level or durable commit in the same way.
 For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+
+## Rebuild a view without repeating its effects
+
+A retained event history can support several derived views when it records the inputs needed to compute them.
+:citet[kreps2013log] explains how deterministic processing of the same ordered history reconstructs state.
+Changing the computation can instead produce a new view from that history.
+
+Suppose a workspace dashboard currently counts all activity and now needs separate counts for started and completed work.
+An illustrative retained fixture contains `E1: work_started`, `E2: work_completed`, and `E3: work_started`, all for workspace `W1` in that order.
+Replaying those records through the new aggregation gives two starts and one completion.
+The rebuild writes a separate summary and records its last processed position; the application can keep serving the old summary until the new one catches up to an agreed position and is verified.
+Events arriving during the rebuild must be included through that cutover position, then processing must continue without skipping or double-counting them.
+
+Recomputing the summary must not resend the notifications originally triggered by those events.
+Keep the projection that updates the summary separate from notification delivery.
+If delivery itself needs recovery, its durable record and receiver-enforced idempotency belong to the effect boundary described in [Appendix F](/appendices/durable-workflows/#durable-execution-preserves-coordination-progress).
+Rebuilding derived data and resuming a workflow are different uses of history.
+
+Record the event identities, workspace, type, schema and aggregation versions, ordering, retained starting point, and acceptable summary lag.
+Expired or incomplete records may prevent a rebuild; the course tracker's activity history does not necessarily contain every work-item field or permission.
+Name which views the retained facts support and who owns their rebuild and freshness.
 
 ## Model valid data combinations
 
@@ -311,3 +332,46 @@ The common project specification does not require an HTTP API, so this technique
 These techniques solve different problems.
 Explicit handles and idempotency protect continuity across requests; transactions protect durable invariants under concurrency and failure; constructive models reduce contradictory in-memory states; activation approaches move browser work; descriptor schemas constrain runtime composition; isolation contains executable output; interaction styles distribute coupling; and HTTP examples preserve an interface contract.
 Choose the smallest boundary that makes the relevant decision observable and enforceable.
+
+## Endpoint and cache policy
+
+Use these details when automated demand or fragmented cache reuse is a relevant pressure in the [Architecture chapter](/chapters/architecture/).
+
+### Automated consumers change demand and exposure
+
+A crawler, integration, monitoring probe, authorized agent, and abusive bot can send technically similar HTTP requests while creating different value, cost, and risk.
+Agents can traverse interfaces quickly, retry ambiguous failures, and act without a person inspecting every screen.
+The same operation should retain its authoritative meaning whether invoked by a form, integration, or agent.
+Architecture should therefore distinguish which representations are intentionally public, which actions require identity and authorization, which expensive paths need a quota or admission boundary, and which automated uses the product is willing to support.
+
+The [Robots Exclusion Protocol](https://www.rfc-editor.org/rfc/rfc9309.html) lets a cooperating crawler discover access preferences in `/robots.txt`.
+It is not authorization or a content-security boundary, and listing a path there makes the path discoverable.
+Information that must remain private still needs an application-layer access control; public information should be designed with the assumption that a permitted consumer can copy it.
+
+Rate limiting controls resource use rather than deciding whether every automated consumer is malicious.
+An HTTP `429 Too Many Requests` response can explain the limit and carry `Retry-After`, but [RFC 6585](https://www.rfc-editor.org/rfc/rfc6585.html#section-4) deliberately leaves the identity and counting policy to the application.
+Limits based only on an IP address can group unrelated users or be distributed across many addresses, while limits tied to an account, tenant, capability, or costly operation require their own fairness and privacy decisions.
+
+The [OWASP automated-threat catalog](https://owasp.org/www-project-automated-threats-to-web-applications/assets/oats/EN/OAT-011_Scraping) treats scraping as one form of automated use among several, and its practical implication here is to begin from the endpoint and intended outcome rather than from a generic “block bots” goal.
+For one exposed path, record the legitimate consumers, information returned, authoritative action or cost triggered, likely abuse pattern, first useful signal, control point, acceptable false-positive cost, and recovery or override path.
+Cache safe public reads, minimize exposed and retained data, protect expensive or consequential actions, and observe origin work per useful outcome before adding a challenge to every request.
+
+### Query parameters and cache identity
+
+Query parameters can fragment the cache even when the response is identical.
+For example, `/offer?utm_source=newsletter` and `/offer?utm_source=search` may serve the same page but occupy separate cache entries.
+The proposed `No-Vary-Search` response header lets an origin declare which query parameters a supporting cache may ignore when matching URLs:
+
+```http
+No-Vary-Search: params=("utm_source" "utm_medium")
+```
+
+With this policy, differences in those campaign parameters can permit reuse of a stored response, while a content-changing parameter such as `colour` still distinguishes responses.
+Unlike `Vary`, which selects responses using request headers, `No-Vary-Search` concerns the URL's query component.
+It changes matching, without rewriting the URL or relaxing storage, freshness, or validation requirements.
+
+List only parameters known to be safe to ignore so that new, unknown parameters still distinguish responses.
+Identical HTML is insufficient if reuse would bypass required server processing, such as authorization or signature verification.
+An ignored parameter also cannot be relied on to bypass the cache for debugging.
+As of September 2026, the [HTTP Working Group specification](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) remains a draft: verify syntax and behavior in the target caches before relying on it.
+Harry Roberts's [practical introduction](https://csswizardry.com/2026/05/better-browser-caching-with-no-vary-search/) develops the campaign-URL example further.

@@ -48,15 +48,16 @@ Splitting by files alone can distribute code while leaving the real design decis
 
 ---
 
-# Roles should describe authority, not personalities
+# Use the same development loop with explicit owners
 
-| Role        | Typical authority                           | Required evidence                  |
-| ----------- | ------------------------------------------- | ---------------------------------- |
-| Explorer    | Propose alternatives                        | Options, assumptions, unknowns     |
-| Implementer | Change a bounded surface                    | Diff and focused checks            |
-| Reviewer    | Evaluate against declared criteria          | Findings and verdict               |
-| Integrator  | Resolve contracts and combine accepted work | Integrated checks and known limits |
-| Operator    | Exercise deployment or recovery             | Run evidence and rollback state    |
+| Stage     | Fleet responsibility                    | Acceptance boundary                           |
+| --------- | --------------------------------------- | --------------------------------------------- |
+| Constrain | Settle contracts and dependencies       | Owner resolves ambiguity and scope            |
+| Generate  | Delegate, implement, and integrate      | Agents execute within declared limits         |
+| Validate  | Check focused work and the full journey | Accepting owner reviews evidence and failures |
+| Revise    | Diagnose, correct, and update checks    | Revalidate the corrected revision             |
+
+For each decision, state whether an agent may **propose**, **prepare**, or **execute**.
 
 <!-- [Sources] book/03_compare/07_agent_fleets.md -->
 

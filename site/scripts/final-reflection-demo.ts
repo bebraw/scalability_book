@@ -1,138 +1,69 @@
-type EvidenceKey =
-  | "architecture"
-  | "assumption"
-  | "friction"
-  | "measurement"
-  | "workflow"
-  | "scaling"
-  | "risk";
+type EvidenceKey = "implementation" | "fleet" | "experiment" | "decision";
 
 type EvidenceItem = {
   label: string;
   artifact: string;
   section: string;
-  example: string;
-  claimPrompt: string;
   evidencePrompt: string;
   limitationPrompt: string;
   missing: string;
 };
 
 const evidenceOrder: EvidenceKey[] = [
-  "architecture",
-  "assumption",
-  "friction",
-  "measurement",
-  "workflow",
-  "scaling",
-  "risk",
+  "implementation",
+  "fleet",
+  "experiment",
+  "decision",
 ];
 
 const evidenceItems: Record<EvidenceKey, EvidenceItem> = {
-  architecture: {
-    label: "Request trace screenshot or ADR",
-    artifact: "POST /events request trace or architecture decision record",
-    section: "Original design and boundary choice",
-    example:
-      "POST /events crosses browser, network, API handler, database, and response boundaries.",
-    claimPrompt:
-      "Claim: The first scalable design choice was the boundary that mattered most.",
+  implementation: {
+    label: "Implementation",
+    artifact:
+      "Accepted C revision and common submission bundle; links to A and B",
+    section: "1. Implementation",
     evidencePrompt:
-      "Evidence to cite: Name the boundary, owner, request/response contract, and failure mode shown in the trace or ADR.",
+      "Link setup, configuration, time and resource use, acceptance checks, architecture, pressure and friction evidence, and the cross-team audit and response.",
     limitationPrompt:
-      "What it does not prove: This does not prove the runtime can handle load; it only explains the design boundary.",
+      "Identify the checked revisions, environment, failed checks, and unverified properties.",
     missing:
-      "Add a request trace screenshot or ADR so the reflection has a concrete starting design.",
+      "Link implementation C and its common evidence, including the cross-team audit and response; reuse the submitted A and B records.",
   },
-  assumption: {
-    label: "Changed assumption brief",
-    artifact: "Reality pressure map or changed-assumption note",
-    section: "What changed after Establish",
-    example:
-      "Offline retries, deletion requests, burst traffic, or multiple tenants changed the system pressure.",
-    claimPrompt:
-      "Claim: The project became harder because one original assumption stopped holding.",
+  fleet: {
+    label: "Fleet evidence",
+    artifact:
+      "Fleet plan, selected trace, transformed trace, repeatable loader, and debugging findings",
+    section: "2. Fleet evidence",
     evidencePrompt:
-      "Evidence to cite: State the old assumption, the new pressure, the stressed component, and first observable signal.",
+      "Connect the task graph to the run, show at least two debugging findings in C, and include coordination measurements, B–C analysis, and one workflow-level formal-model analysis.",
     limitationPrompt:
-      "What it does not prove: This does not prove the chosen fix is correct; it only identifies the pressure.",
+      "Include failed attempts and human review; record missing usage or trace data and alternative explanations for the B–C result.",
     missing:
-      "Name the changed assumption; otherwise Challenge can sound like arbitrary refactoring.",
+      "Connect the fleet plan, trace, loader, and two debugging findings to coordination measurements and the workflow model.",
   },
-  friction: {
-    label: "Friction audit result",
-    artifact: "Friction audit table or improvement before/after",
-    section: "Friction found while changing the system",
-    example:
-      "Adding one required event field touched form validation, API validation, storage, summary view, and tests.",
-    claimPrompt:
-      "Claim: Development scalability was limited by a specific source of friction.",
+  experiment: {
+    label: "Scaling and deployment experiment",
+    artifact:
+      "Application model, before-and-after scaling response, and deployed workload evidence",
+    section: "3. Scaling and deployment experiment",
     evidencePrompt:
-      "Evidence to cite: Name the change, the slowest step, the friction score, and the improvement that reduced it.",
+      "Link one application-level formal-model analysis, the implemented response, every measurement repetition under the same procedure, its new failure or recovery check, and the realistic deployment run.",
     limitationPrompt:
-      "What it does not prove: This does not prove all future changes are easy; it describes one representative path.",
+      "Name the implementation, revisions, workload, environment, and resource proxy; retain disappointing results and state what the deployment does not prove.",
     missing:
-      "Include one friction observation so the reflection covers development scalability, not only runtime behavior.",
+      "Link the application model, implemented and remeasured scaling response, new failure or recovery obligation, and realistic deployed-workload evidence.",
   },
-  measurement: {
-    label: "Measurement screenshot or table",
-    artifact: "Benchmark, metric, trace, log, or database inspection result",
-    section: "Evidence from measurement",
-    example:
-      "A trace separated API time from database time, or a benchmark showed p95 latency under a specific workload.",
-    claimPrompt:
-      "Claim: One operational question was answered by measurement rather than intuition.",
+  decision: {
+    label: "Final decision",
+    artifact:
+      "A–B–C evidence matrix, target architecture, trade-off table, and one decision narrative",
+    section: "4. Final decision",
     evidencePrompt:
-      "Evidence to cite: Name the symptom, selected signal, value observed, workload, and date/context of the run.",
+      "Establish the comparison, explain consequential results, bound attribution to models or orchestration, and choose an architecture and workflow for stated constraints with a revisit condition.",
     limitationPrompt:
-      "What it does not prove: State the workload or environment that was not covered.",
+      "Label observation, inference, and proposal; mark missing evidence, rejected alternatives, human responsibilities, the owner of operations and correction, and the next saturation signal or measurement.",
     missing:
-      "Add one measurement result; claims about scalability need evidence beyond intuition.",
-  },
-  workflow: {
-    label: "Human-agent workflow trace",
-    artifact: "Prompt, agent output, review note, or correction loop",
-    section: "How work was delegated and reviewed",
-    example:
-      "A scout found files, an implementer changed them, and a reviewer or test caught a missing validation path.",
-    claimPrompt:
-      "Claim: Agent assistance changed the workflow, but human review still owned integration.",
-    evidencePrompt:
-      "Evidence to cite: Name the delegated role, output, validation command, human correction, and remaining risk.",
-    limitationPrompt:
-      "What it does not prove: This does not prove delegation is always faster; it shows where it worked or failed locally.",
-    missing:
-      "Add workflow evidence if AI assistance was used; otherwise note why this dimension did not apply.",
-  },
-  scaling: {
-    label: "Scaling trade-off table",
-    artifact: "Scaling planner trade-off table",
-    section: "Scaling decision and trade-off",
-    example:
-      "Queue ingestion relieved write bursts but introduced queue depth, retry, and freshness risks.",
-    claimPrompt:
-      "Claim: The selected scaling move answered one named pressure while introducing a new cost.",
-    evidencePrompt:
-      "Evidence to cite: Name the pressure, selected move, expected benefit, new failure mode, and signal to watch.",
-    limitationPrompt:
-      "What it does not prove: This does not prove the technique is universally best; it is a trade-off for this pressure.",
-    missing:
-      "Include a scaling trade-off so the reflection does not present a technique as a free improvement.",
-  },
-  risk: {
-    label: "Remaining risk note",
-    artifact: "Next-risk note or next-measurement plan",
-    section: "Remaining risk and next step",
-    example:
-      "The next failure could be queue backlog, stale dashboards, noisy tenants, or unclear review ownership.",
-    claimPrompt:
-      "Claim: The reflection ends with the next uncertainty, not a claim of being done.",
-    evidencePrompt:
-      "Evidence to cite: Name the remaining risk, first signal to watch, and what action would be taken before scaling further.",
-    limitationPrompt:
-      "What it does not prove: This is a risk forecast, not evidence that the failure has happened.",
-    missing:
-      "End with a remaining risk or next measurement so the reflection stays honest about uncertainty.",
+      "Use the evidence matrix to support one conditional decision, with the target architecture, trade-offs, ownership, and a revisit condition.",
   },
 };
 
@@ -172,10 +103,10 @@ function initializeReflectionPackageDemo(root: HTMLElement) {
     const selected = getSelectedEvidence(inputs);
     const missingKeys = evidenceOrder.filter((key) => !selected.includes(key));
 
-    verdict.textContent = `${selected.length} of ${evidenceOrder.length} evidence pieces ready`;
+    verdict.textContent = `${selected.length} of ${evidenceOrder.length} bundles selected`;
     missing.innerHTML =
       missingKeys.length === 0
-        ? `<li class="is-complete">All core evidence categories are represented.</li>`
+        ? `<li class="is-complete">All four bundles selected. Verify their evidence against the specification; selection does not establish completeness.</li>`
         : missingKeys
             .map(
               (key) =>
@@ -224,42 +155,35 @@ function buildReflectionOutline(
 
     return `## ${item.section}
 
-Artifact to attach or cite:
+Evidence to link:
 ${item.artifact}
-
-Concrete example:
-${item.example}
-
-${item.claimPrompt}
 
 ${item.evidencePrompt}
 
+Limits to record:
 ${item.limitationPrompt}
 
-Write this paragraph:
-- In our project, ...
-- The artifact shows ...
-- This supports the claim that ...
-- It does not prove ...`;
+Artifact links and interpretation:
+[Add links and explain the evidence here.]`;
   });
   const missingLines =
     missing.length === 0
-      ? ["- No core evidence gaps flagged by the package builder."]
+      ? [
+          "- All four bundles are selected; check the linked evidence against the specification before submission.",
+        ]
       : missing.map((key) => `- ${evidenceItems[key].missing}`);
 
   return [
-    "# Final reflection package draft",
+    "# Compare evidence index",
     "",
-    "Thesis: Explain how the project changed from Establish to Challenge to Compare. Every claim below should point to a named artifact.",
+    "Use four sections in one evidence index. Link each artifact once and reuse it across the analysis; these sections do not require separate documents.",
     "",
     ...selectedSections,
-    "## Evidence gaps to address before submission",
+    "## Bundles still to assemble or verify",
     "",
     ...missingLines,
     "",
-    "## Final synthesis",
-    "",
-    "What did this project teach you about scalability as a technical, architectural, organizational, and agentic concern?",
+    "Requirements: /project/compare/#6-deliverables",
   ].join("\n");
 }
 
