@@ -19,7 +19,7 @@ Record what you learned from A's public discussion and distinguish that practice
 
 ## Technical debt reduces optionality
 
-Technical debt names earlier choices that make later change harder.
+[Technical debt](/concepts/#technical-debt) names earlier choices that make later change harder.
 A shortcut can be rational while a team is learning or time is limited; the problem begins when its future cost stays invisible, unpriced, or allowed to compound.
 A system with high debt may still run, pass tests, and satisfy users today while giving the team fewer safe choices tomorrow.
 
@@ -29,7 +29,7 @@ Challenge therefore treats debt as one supporting lens for comparing the two imp
 ### Field note — Codify the development system
 
 Earlier in my agentic-development work, agents produced changes faster than I could evaluate them.
-I have since codified recurring lessons in [Vibe Template](https://github.com/bebraw/vibe-template): initialization, architecture rules, specifications, decision records, instructions, and layered validation.
+I have since codified recurring lessons in [Vibe Template](https://github.com/bebraw/vibe-template): initialization, architecture rules, specifications, [decision records](/concepts/#decision-log), instructions, and layered validation.
 The [Kirjolab experience](/case-studies/kirjolab/) added earlier structural feedback when functional progress began hiding architectural confusion.
 
 Build your own equivalent by turning repeated mistakes and useful practices into reviewable guidance and commands.

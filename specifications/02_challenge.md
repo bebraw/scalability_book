@@ -27,7 +27,7 @@ Begin in a new repository or clean implementation directory.
 
 Use:
 
-- the same common specification and acceptance scenarios;
+- the same common specification and [acceptance scenarios](/concepts/#acceptance-criteria);
 - the transfer policy in the common specification;
 - the approved comparison model;
 - one coding-agent process at a time;
@@ -88,7 +88,7 @@ The group has more domain knowledge during Challenge, and this practice effect i
 
 ### 4.4 Apply runtime pressure
 
-Repeat the primary pressure selected in Establish against implementation B using the same workload and procedure where practical.
+Repeat the primary [pressure](/concepts/#pressure) selected in Establish against implementation B using the same workload and procedure where practical.
 Then select one secondary pressure from the shared catalog that is exposed by an architectural difference or by evidence from A or B.
 Analyze how both implementations would respond to that secondary pressure; run it when practical and label projections clearly.
 
@@ -99,7 +99,7 @@ Compare the cumulative pressure evidence for A and B:
 - Did the comparison model introduce infrastructure or abstractions that the evidence does not justify?
 - Which implementation responds better to the pressures studied, and according to what evidence?
 
-For one queue, pool, request path, or other conserved-work boundary in A or B, apply Little's Law over one consistent observation window.
+For one queue, pool, request path, or other conserved-work boundary in A or B, apply [Little's Law](/concepts/#little-law) over one consistent observation window.
 Record average work in progress (`L`), average completion rate (`λ`), and average time in the system (`W`); check whether `L = λW` is approximately coherent; and state whether arrivals and completions were sufficiently balanced for the relationship to be useful.
 Use the result to interpret the boundary, not to claim a cause of delay or stability outside the observed conditions.
 

@@ -8,6 +8,10 @@ const escape = (text: string) =>
 export function renderExercise(id: string): string {
   if (!isExerciseId(id)) throw new Error(`Unknown exercise: ${id}`);
   const exercise = exercises[id]!;
+  const prompt = exercise.prompt
+    .split("\n\n")
+    .map((paragraph) => `<p>${escape(paragraph)}</p>`)
+    .join("\n");
   const fields = exercise.fields
     .map((field) => {
       const name = `${id}-${field.id}`;
@@ -21,7 +25,7 @@ export function renderExercise(id: string): string {
   return `<section class="book-exercise" id="exercise-${id}" data-exercise="${id}" data-version="${exercise.version}" aria-labelledby="${id}-title">
   <p class="exercise-kicker">Pause &amp; think</p>
   <h3 id="${id}-title">${escape(exercise.title)}</h3>
-  <p>${escape(exercise.prompt)}</p>
+  ${prompt}
   <div class="exercise-work" hidden>
     ${fields}
     <p class="exercise-privacy" id="${id}-privacy">Automatically checked practice. Saved answers are private to your account.</p>

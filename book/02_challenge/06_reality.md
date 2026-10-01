@@ -1,7 +1,7 @@
 # Which web application assumptions fail under pressure?
 
 A web application that works locally has shown that one implementation can satisfy one workload in one controlled environment.
-Production changes the environment: browser applications and integrations retry, networks delay or lose responses, live data accumulates, shared dependencies slow down, deployments change running systems, and operators have to recover without discarding authoritative state.
+Production changes the environment: browser applications and integrations [retry](/concepts/#retry), networks delay or lose responses, live data accumulates, shared dependencies slow down, deployments change running systems, and operators have to recover without discarding [authoritative state](/concepts/#state-authority).
 
 Production failures expose architectural assumptions that do not hold under actual operating conditions.
 Reconstruct the failure chain, locate the earliest useful signal, and identify a path back to useful service.
@@ -20,7 +20,7 @@ Consider five assumptions that local development can easily hide:
 - **Data behavior:** replicas can lag, writes can conflict, queues can age, and a restored endpoint can still return stale or incomplete state.
 - **Operational behavior:** the dashboard, deployment system, credentials, status page, or rollback mechanism may depend on the service being repaired.
 
-These are architectural assumptions because they determine where authority, waiting, retries, and recovery live.
+These are architectural assumptions because they determine where authority, waiting, retries, and [recovery](/concepts/#recovery) live.
 Testing the happy path proves none of them.
 
 > **Sustainability angle**
@@ -31,7 +31,7 @@ Testing the happy path proves none of them.
 ### Field note — When caching complexity became an availability risk
 
 In a commercial Next.js project, GitHub effectively served as the backend for most of the site's meaningful data.
-Two sections used Next.js caching incorrectly, causing production page requests to repeatedly reach the GitHub API.
+Two sections used Next.js [caching](/concepts/#cache) incorrectly, causing production page requests to repeatedly reach the GitHub API.
 This remained invisible during local development because our traffic never approached the API quota.
 
 Under high production load, the repeated requests exhausted the quota.
@@ -80,7 +80,7 @@ A production failure becomes understandable when the same roles are traced over 
 
 Consider a deliberately small event-tracker scenario:
 
-1. A browser sends `POST /events` without a stable idempotency key.
+1. A browser sends `POST /events` without a stable [idempotency key](/concepts/#idempotency).
 2. The origin validates the request and commits the event to the authoritative store.
 3. The response is lost after the commit, so the browser sees a timeout.
 4. Client application logic retries because it cannot tell whether the action completed.
@@ -90,7 +90,12 @@ Consider a deliberately small event-tracker scenario:
 
 No individual observation explains the whole failure.
 The timeout is a consumer symptom, the lost response is a network event, the retry is a policy, the duplicate is an authority failure, and the stale view is a derived-state delay.
-Useful evidence has to connect them through a stable command identifier, request trace, commit result, cache status, and user-visible outcome.
+Useful evidence has to connect them through a stable command identifier, [request trace](/concepts/#observability), commit result, cache status, and user-visible outcome.
+
+[Idempotency](/concepts/#idempotency) is a property of the intended effect: repeating one logical operation must have the same effect at the declared boundary as performing it once.
+First name every outcome the application contract promises, then check whether repeating the operation preserves them together.
+An unchanged work-item status is insufficient when the same command also promises one activity event for that transition.
+The [retry exercise](#exercise-pressure-retries) asks you to inspect both; [Appendix C](/appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety) develops the specific HTTP method semantics.
 
 The corrective design is similarly cross-boundary.
 The consumer reuses one idempotency key, the authority stores the mutation and reusable result atomically, and the interface makes a pending or confirmed outcome visible.
@@ -100,7 +105,7 @@ Retries may then recover from transport ambiguity without inventing a second dom
 
 A system has a **competence envelope**: the range of conditions it can handle with its current resources, architecture, procedures, tools, and expertise.
 Ordinary disturbances move the system around inside that envelope.
-Saturation occurs when pressure reaches a binding limit and pushes the system to or beyond the boundary of what it can currently handle :citep[woods2018graceful].
+[Saturation](/concepts/#saturation) occurs when pressure reaches a binding limit and pushes the system to or beyond the boundary of what it can currently handle :citep[woods2018graceful].
 
 The limit is not necessarily a server at 100 percent CPU.
 It may be physical, such as memory or network bandwidth; deliberately imposed, such as a bounded queue, connection pool, quota, or rate limit; or organizational, such as responders unable to diagnose several interacting failures quickly enough.
@@ -128,7 +133,7 @@ The new obligation is atomic storage of the state change and reusable result.
 Other pressures call for different responses; [Chapter 8's response guide](/chapters/scaling/#start-with-the-pressure) connects them to the operating contracts they introduce.
 First check whether the measurements describe a coherent failure.
 
-The Little's Law relationship introduced in the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) can check one queue or in-flight boundary.
+The Little's Law relationship introduced in the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) can check one [queue](/concepts/#queue) or in-flight boundary.
 If a stable event-processing stage contains an average of 120 waiting or active events and completes an average of 8 events per second, the implied average time in the stage is `W = L / λ = 120 / 8 = 15 seconds`.
 That calculation does not explain the delay, but it can expose incompatible measurements or show that a claimed user-visible completion time cannot fit the observed backlog and throughput.
 If arrivals and completions are not approximately balanced during the observation window, record the system as changing or overloaded instead of forcing the averages into the law.
@@ -141,14 +146,14 @@ State its boundary, estimate or measure average work in progress, completion rat
 Recovery is not a generic command executed after diagnosis.
 The available response depends on what has already become externally visible or durably authoritative.
 
-| Recovery mode         | What it protects                                        | Required preparation                                                    | Main risk                                                              |
-| --------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Reject or shed load   | Remaining capacity and core operations                  | Admission rules, retry guidance, and an explicit non-critical boundary  | Rejected work may be retried immediately or lost silently              |
-| Degrade functionality | Data integrity or one essential user path               | Features that can be paused independently and clear user states         | Hidden dependency means the supposedly optional work is still required |
-| Roll back             | A known-good code or configuration path                 | Compatible state, retained artifact, health gate, and reachable control | Durable writes or migrations may make reversal unsafe                  |
-| Fix forward           | Accepted state that cannot safely be discarded          | Reconciliation plan, bounded change, and strong observation             | Recovery takes longer while the system remains degraded                |
-| Rebuild and replay    | Authoritative history and deferred effects              | Backups, logs, replayable work, ordering, and deduplication             | Backlog load can trigger another saturation cycle                      |
-| Break glass           | Recovery when the ordinary control plane is unavailable | Independent access, narrow authority, audit, and regular testing        | Emergency power can bypass normal safeguards                           |
+| Recovery mode         | What it protects                                        | Required preparation                                                                              | Main risk                                                                                  |
+| --------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Reject or shed load   | Remaining capacity and core operations                  | [Admission rules](/concepts/#backpressure), retry guidance, and an explicit non-critical boundary | Rejected work may be retried immediately or lost silently                                  |
+| Degrade functionality | Data integrity or one essential user path               | Features that can be paused independently and clear user states                                   | Hidden dependency means the supposedly optional work is still required                     |
+| Roll back             | A known-good code or configuration path                 | Compatible state, retained artifact, health gate, and reachable control                           | Durable writes or migrations may make [reversal](/concepts/#decision-reversibility) unsafe |
+| Fix forward           | Accepted state that cannot safely be discarded          | Reconciliation plan, bounded change, and strong observation                                       | Recovery takes longer while the system remains degraded                                    |
+| Rebuild and replay    | Authoritative history and deferred effects              | Backups, logs, replayable work, ordering, and deduplication                                       | Backlog load can trigger another saturation cycle                                          |
+| Break glass           | Recovery when the ordinary control plane is unavailable | Independent access, narrow authority, audit, and regular testing                                  | Emergency power can bypass normal safeguards                                               |
 
 ::caption[Recovery modes and the preparation each requires before an incident.]
 ::label[table:web-recovery-modes]
@@ -167,6 +172,10 @@ The consequences persist: a response may protect one boundary while moving waiti
 {{ import "site/includes/pressure-map-demo.html" }}
 
 {{ import "exercise:pressure-retries" }}
+
+Before revealing the worked answer, explain which promised effect your verdict depends on.
+Then change one assumption: suppose the second record is only a diagnostic request log, while the contract's activity event is recorded once.
+Would your verdict change, and what makes those records different?
 
 Try one path, inspect the debrief, and replay with a different response.
 Use the exported brief to connect the operating pressure to the stressed component, binding limit, likely failure, first signal, and prepared recovery.

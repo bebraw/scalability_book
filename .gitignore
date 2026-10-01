@@ -6,5 +6,7 @@ worker/generated/
 .local-e2e/
 playwright-report/
 test-results/
+output/book-concepts/
+output/concept-pilot/
 .DS_Store
 .wrangler

@@ -67,12 +67,18 @@ npm run dev
 `npm run dev` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages.
 In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally.
 
-Development output is kept in `.dev-build/`, separate from the production `build/` directory.
+Development output is kept in `.local/dev-build/<port>/site/`, separate from the production `build/` directory.
+The default port therefore uses `.local/dev-build/3000/site/`; previews on different ports have separate output.
+Rebuilds use `site.next/` and `site.previous/` within that same port directory and remove them after a successful swap or a failed build.
+On the next rebuild after an interrupted swap, the server restores the previous site if necessary and removes stale staging output.
+Set `BUILD_DIR` to override the served directory; its `.next` and `.previous` companions follow the same cleanup rules.
 You can therefore build or preview the published site without removing draft chapter routes from a running development server.
+To clear all default development output, stop the dev servers and remove only `.local/dev-build/`.
+Local feedback and saved exercise answers live elsewhere in `.local/` and should be retained.
 
 The development server watches `book/`, `site/`, the site build helpers, `bibliography.bib`, and `site.config.jsonc`.
 Saving CSS hot-swaps the generated stylesheets without losing page state.
-Markdown, template, configuration, and browser-script changes rebuild `.dev-build/` and automatically reload the page after the atomic output swap.
+Markdown, template, configuration, and browser-script changes rebuild the development output and automatically reload the page after the atomic output swap.
 
 The editor writes changes back to the Markdown source files and rebuilds the local static output after saving.
 The editor uses EasyMDE for Markdown editing, preview, side-by-side view, and fullscreen mode.

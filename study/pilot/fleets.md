@@ -50,6 +50,10 @@ study:
 
 Treat a worker count as a model input, not a recommended fleet size.
 
+[Try the feature-and-review exercise](./../../../chapters/agent-fleets/#exercise-fleets-amdahl).
+Predict whether doubling the fleet doubles accepted output before calculating.
+Explain what happens to the review queue, then change one assumption and name the evidence you would collect before adding agents.
+
 ## Slide: When should a task wait?
 
 ```yaml
@@ -111,5 +115,8 @@ study:
   prompt: Split a small feature into two tasks only if they can proceed independently after a shared prerequisite. Specify each outcome, change surface, acceptance check, and escalation rule. Who validates the combined result?
   answer: For example, a settled API contract may permit a client view and server handler to develop separately. Both need focused checks; the integrator also tests authorization, errors, and the full request path. If the contract is still disputed, record that dependency rather than claiming immediate parallel progress.
 ```
+
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Fagent-fleets%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
 
 [All modules](./../index.html) or [return to the book](./../../../).

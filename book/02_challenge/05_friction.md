@@ -5,8 +5,8 @@ It can first become difficult to change.
 A feature that sounds local may cross a browser form, an HTTP contract, server-side validation, persistent data, a query, a cached representation, and a deployment path.
 Each boundary adds knowledge, evidence, and coordination that the change must preserve.
 
-**Development friction** is the resistance a team feels when trying to set up, understand, change, test, review, deploy, or operate that system.
-It is the everyday experience of technical debt, hidden coupling, and weak feedback.
+**[Development friction](/concepts/#development-friction)** is the resistance a team feels when trying to set up, understand, change, test, review, deploy, or operate that system.
+It is the everyday experience of [technical debt](/concepts/#technical-debt), hidden coupling, and weak feedback.
 A system with high friction may still be useful, but each change requires more effort than its behavior alone would suggest.
 
 Friction accumulates as a change crosses interfaces, teams, and commitments that are costly to reverse.
@@ -55,7 +55,7 @@ The category change exposes several related forms of resistance:
 These categories interact.
 For example, unclear ownership increases comprehension time, produces wider changes, and sends more uncertainty into review.
 A slow or untrusted test suite encourages larger batches, making a failure harder to localize.
-An undocumented environment turns every collaborator into a separate integration experiment.
+An undocumented [environment](/concepts/#reproducible-environment) turns every collaborator into a separate integration experiment.
 
 Not all of this resistance is waste.
 Authentication, validation, compatibility checks, migration stages, review, and release gates can be **protective friction** when they control a named risk and return useful evidence.
@@ -99,6 +99,43 @@ After the point, “roll back” must name what happens to accepted data and dep
 The [Reality chapter](/chapters/reality/) returns to compatibility, migration, rollback, and fix-forward under production pressure.
 Here, make the asymmetry between introduction and safe reversal visible.
 
+### Plan soft and hard decisions
+
+Use **[decision reversibility](/concepts/#decision-reversibility)** when planning a change.
+A **soft decision** is still cheap to revise or undo because few durable effects or external dependencies rely on it.
+A **hard decision** requires more coordination or recovery to change safely because accepted data, consumers, or operating commitments depend on it.
+Soft and hard describe a spectrum, and the same decision can become harder as those dependencies accumulate.
+
+Trying a category representation in an isolated branch can remain a soft decision.
+Once production events store that representation and independently deployed clients rely on it, changing the same choice may require compatibility and migration.
+The amount of code changed does not tell you how much freedom remains.
+A hard decision can be necessary and justified; its reversal cost alone does not make it technical debt.
+
+Keep uncertain choices soft while a bounded experiment can still answer the question.
+Before crossing the commitment point, record what makes the choice hard, the evidence that justifies committing, and how you would revise it safely.
+Ask: what can we change locally today, who or what will depend on it tomorrow, and what evidence would show that reversal succeeded?
+
+### Keep a decision log
+
+Preserve that reasoning in a **[decision log](/concepts/#decision-log)** so a future contributor can understand why a choice was made and when to reconsider it.
+An **Architecture Decision Record (ADR)** is one format for a consequential architecture choice.
+[Michael Nygard's ADR approach](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) records context, decision, status, and consequences, retaining superseded records with a link to their replacement.
+
+For this course, also record the alternatives considered, supporting evidence, owner, current reversibility, and a condition for revisiting the choice.
+Acceptance and implementation status answer different questions from reversibility: an accepted decision can remain soft, and implementing it may create dependencies that make it hard.
+
+| Record field               | Illustrative category decision                                                                                                         |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Context and choice         | Trial an optional category field to support filtering while preserving existing events.                                                |
+| Alternatives and rationale | Defer the field or introduce it now; use the bounded trial to test the change path before committing.                                  |
+| Status and owner           | Accepted for an isolated trial; the team must review the evidence before production adoption.                                          |
+| Evidence and consequences  | Link tests for uncategorized events and older clients; note the compatibility obligation introduced by storing the field.              |
+| Reversibility              | Soft in the isolated branch; harder once production data and independent clients depend on the representation.                         |
+| Revisit condition          | Review before production adoption, or when a failed compatibility check challenges the choice; name the migration needed for reversal. |
+
+Use the project's existing decision record or log rather than creating a separate reporting bundle.
+When evidence changes the choice, record the new rationale and link the earlier decision so the history of the commitment remains visible.
+
 ## Reduce friction without hiding the boundary
 
 ### Treat the environment as a versioned input
@@ -114,7 +151,7 @@ Replay repairs from fresh state.
 
 The category path should have one understandable owner for each rule even if several layers enforce it.
 The browser may give immediate feedback, but the server-side input boundary owns acceptance.
-The database may constrain stored values, but the application contract owns what consumers are promised.
+The database may constrain stored values, but the [application contract](/concepts/#contract) owns what consumers are promised.
 The cache may copy a representation, but it does not own the authoritative event.
 
 Record those responsibilities in the architecture, specification, schema, types, and tests that future developers and agents are likely to inspect.
@@ -177,7 +214,7 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 
 ### Workflow loop lab
 
-The demonstration below puts the work into a visible loop: human framing, implementation, tool feedback, review, and correction.
+The demonstration below puts the work into a [visible loop](/concepts/#feedback-loop): human framing, implementation, tool feedback, review, and correction.
 It separates agent speed from workflow quality, because an agent can produce more output while still pushing uncertainty into human review.
 
 {{ import "site/includes/workflow-loop-demo.html" }}
@@ -212,6 +249,7 @@ It should:
 - trace one bounded web change from the browser-facing interaction through its contract, validation, data, derived view, cache, and deployment boundaries,
 - separate protective friction from repeated work that provides no useful evidence or control,
 - identify the first commitment point and explain what safe reversal requires after it,
+- explain which decisions remain soft, which have become hard, and what would change their reversibility, linking one consequential choice to its decision-log entry,
 - name the largest source of setup, comprehension, change, testing, review, deployment, operational, or coordination friction,
 - map the project's validation ladder and identify one check that should move earlier, later, or become conditional,
 - and improve one feedback loop that can be measured again without changing the audit request.

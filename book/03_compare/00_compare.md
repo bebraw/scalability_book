@@ -1,7 +1,7 @@
 # Compare — Evaluate workflows and scaling responses
 
 Implementations A and B expose what changed across two single-agent development systems, but they do not yet show what orchestration adds or costs.
-Compare produces implementation C through a declared agent fleet, applies common scaling pressures to all three applications, and turns their evidence into a justified target architecture and development workflow.
+Compare produces implementation C through a declared [agent fleet](/concepts/#agent-fleet), applies common scaling pressures to all three applications, and turns their evidence into a justified target architecture and development workflow.
 
 ## From orchestration to an evidence-based decision
 

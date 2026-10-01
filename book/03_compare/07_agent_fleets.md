@@ -1,6 +1,6 @@
 # When do agent fleets improve web development?
 
-An **agent fleet** coordinates independently operating agents on parts of a larger task.
+An **[agent fleet](/concepts/#agent-fleet)** coordinates independently operating agents on parts of a larger task.
 Each has its own execution context and tool actions; an orchestration layer assigns work, routes results, and controls shared state.
 Writing several roles into one prompt does not create those separate executions.
 
@@ -39,12 +39,12 @@ For implementation C, one possible dependency graph is:
 `reconnaissance → shared domain and API contract → interface work ∥ data work → integration → browser acceptance`
 
 The interface and data branches may run together because both depend on the same contract.
-The contract itself, integration, and end-to-end acceptance remain sequential.
+The contract itself, integration, and end-to-end [acceptance](/concepts/#acceptance-criteria) remain sequential.
 If both branches need to reinterpret the lifecycle, edit the same schema, or wait for the same person, their apparent parallelism merely moves waiting and conflict downstream.
 
 ### Amdahl's Law and the sequential bottleneck
 
-Amdahl's Law gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
+[Amdahl's Law](/concepts/#amdahl-law) gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
 If `p` is the parallelizable share and `N` agents execute that share, the idealized speedup is:
 
 `S(N) = 1 / ((1 - p) + p / N)`
@@ -62,7 +62,12 @@ Predict the effect of the next agent before moving the control, then compare the
 
 Apply the calculation to one observed fleet task.
 Name the sequential work and keep coordination time visible rather than hiding it inside the parallel share.
-The difference between the ideal bound and the observed result is evidence about coordination cost, not proof that the law failed.
+The difference between the ideal bound and the observed result is evidence about [coordination cost](/concepts/#contention), not proof that the law failed.
+
+Before revealing the worked answer, explain why completion time for one feature and [accepted throughput](/concepts/#throughput) over many features can change differently.
+Trace the result through [review capacity](/concepts/#review-budget), the [queue](/concepts/#queue), and [saturation](/concepts/#saturation).
+Then change one assumption: suppose some candidates are rejected, or review times vary.
+Which rates and waiting times would you measure again, and what evidence would justify adding agents, changing review capacity, or bounding admission?
 
 ## What documented web-development cases show
 
@@ -117,7 +122,7 @@ An instruction file is maintained project policy, not an automatically authorita
 For a web project it should expose at least the development command, unit and browser-test commands, route and persistence locations, styling and accessibility expectations, responsive states, secrets policy, and the definition of done.
 
 Project memory needs a lifecycle.
-Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a decision record; promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
+Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a [decision log](/concepts/#decision-log); promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
 A discovery transcript should not silently become the specification, and parallel agents should not work from different generations of the same contract.
 Repeatable review or debugging workflows can become small project skills, while clear mechanical rules belong in linters or tests.
 
@@ -155,7 +160,7 @@ Keep integrated behavior checks after concurrent work.
 Reuse the [constrain–generate–validate–revise loop](/chapters/scalable-development/#constrain-generate-validate-revise).
 Delegation changes who performs the work and where results must come together; it does not remove any stage.
 For each consequential decision, name the performer, accountable owner, and whether the agent may **propose**, **prepare**, or **execute**.
-Authority can differ between decisions within one task :citep[parasuraman2000automation].
+[Authority](/concepts/#authority) can differ between decisions within one task :citep[parasuraman2000automation].
 
 | Stage     | Fleet work                                                                    | Authority and acceptance boundary                                                                |
 | --------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -205,7 +210,7 @@ The generated packet is a rehearsal: if the task is vague, boundaries overlap, o
 
 {{ import "site/includes/agent-fleet-demo.html" }}
 
-Translate the packet into a task graph rather than launching every named role automatically.
+Translate the packet into a [task graph](/concepts/#task-graph) rather than launching every named role automatically.
 Run three small patterns before the complete implementation: scout then plan, implement then review, and parallel scouts over independent subsystems.
 For each pattern, state why the tasks are sequential or independent and who integrates the result.
 
@@ -243,7 +248,7 @@ Repeated agent agreement can also preserve a shared blind spot; resolve findings
 ### Measure accepted throughput
 
 Measure time and cost through acceptance, including failed runs, duplicated exploration, handoffs, merge conflicts, retries, model use, and active human integration and review.
-Record reviewer backlog alongside completed tasks to see whether the fleet is exceeding the team's acceptance capacity.
+Record [reviewer backlog](/concepts/#review-budget) alongside completed tasks to see whether the fleet is exceeding the team's acceptance capacity.
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.

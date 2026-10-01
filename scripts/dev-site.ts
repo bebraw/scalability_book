@@ -1,23 +1,22 @@
 // @ts-nocheck
 import { createHash } from "node:crypto";
-import { createReadStream, renameSync, watch } from "node:fs";
-import {
-  mkdir,
-  readFile,
-  readdir,
-  rm,
-  stat,
-  writeFile,
-} from "node:fs/promises";
+import { createReadStream, watch } from "node:fs";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { localAnswerStore } from "./lib/local-answers.ts";
 import { handleLearning } from "../worker/learning.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import {
+  developmentBuildPaths,
+  rebuildDevelopmentSite,
+} from "./lib/dev-build.ts";
 
 const root = process.cwd();
-const buildDir = path.resolve(root, process.env.BUILD_DIR || ".dev-build");
+const port = Number(process.env.PORT || 3000);
+const buildPaths = developmentBuildPaths(root, port, process.env.BUILD_DIR);
+const buildDir = buildPaths.current;
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const answers = localAnswerStore(dataDir);
 const commentsPath = path.join(dataDir, "comments.json");
@@ -33,7 +32,6 @@ const devUpdateClients = new Set();
 const pendingSourceChanges = new Set();
 const sourceSnapshots = new Map();
 const host = "127.0.0.1";
-const port = Number(process.env.PORT || 3000);
 const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -195,6 +193,7 @@ const server = createServer(async (request, response) => {
 await startSourceWatchers();
 server.listen(port, host, () => {
   console.log(`Serving editable book site at http://${host}:${port}`);
+  console.log(`Development output: ${buildDir}`);
 });
 
 function handleDevEvents(request, response) {
@@ -632,52 +631,29 @@ async function drainBuildQueue() {
 }
 
 async function runBuild() {
-  const nextBuildDir = `${buildDir}.next`;
-  const previousBuildDir = `${buildDir}.previous`;
+  await rebuildDevelopmentSite(buildPaths, async (nextBuildDir) => {
+    await new Promise((resolve, reject) => {
+      const child = spawn(
+        process.execPath,
+        ["scripts/build-site.ts", "--all-chapters", "--editable"],
+        {
+          cwd: root,
+          env: { ...process.env, BUILD_DIR: nextBuildDir },
+          stdio: "inherit",
+        },
+      );
 
-  await new Promise((resolve, reject) => {
-    const child = spawn(
-      process.execPath,
-      ["scripts/build-site.ts", "--all-chapters", "--editable"],
-      {
-        cwd: root,
-        env: { ...process.env, BUILD_DIR: nextBuildDir },
-        stdio: "inherit",
-      },
-    );
+      child.on("error", reject);
+      child.on("exit", (code) => {
+        if (code === 0) {
+          resolve();
+          return;
+        }
 
-    child.on("exit", (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-
-      reject(new Error(`Build failed with exit code ${code}`));
+        reject(new Error(`Build failed with exit code ${code}`));
+      });
     });
   });
-
-  await rm(previousBuildDir, { recursive: true, force: true });
-  let movedPreviousBuild = false;
-
-  try {
-    renameSync(buildDir, previousBuildDir);
-    movedPreviousBuild = true;
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      throw error;
-    }
-  }
-
-  try {
-    renameSync(nextBuildDir, buildDir);
-  } catch (error) {
-    if (movedPreviousBuild) {
-      renameSync(previousBuildDir, buildDir);
-    }
-    throw error;
-  }
-
-  await rm(previousBuildDir, { recursive: true, force: true });
   buildRevision++;
 }
 
@@ -686,6 +662,7 @@ async function startSourceWatchers() {
     { target: path.join(root, "book"), recursive: true },
     { target: path.join(root, "site"), recursive: true },
     { target: path.join(root, "study"), recursive: true },
+    { target: path.join(root, "shared"), recursive: true },
     { target: path.join(root, "scripts", "lib"), recursive: true },
     { target: path.join(root, "scripts", "build-site.ts"), recursive: false },
     { target: path.join(root, "bibliography.bib"), recursive: false },
@@ -747,16 +724,23 @@ async function seedDirectorySnapshots(directory) {
 }
 
 async function scheduleSourceRebuild(source, filename) {
-  const changedPath = filename?.toString() || path.basename(source.target);
-  const changedTarget = source.recursive
-    ? path.join(source.target, changedPath)
-    : source.target;
+  const reportedPath = filename?.toString();
+  const changedPath = reportedPath || path.basename(source.target);
+  const changedTarget =
+    source.recursive && reportedPath
+      ? path.join(source.target, reportedPath)
+      : source.target;
   const snapshot = await getSourceSnapshot(changedTarget);
 
   // Recursive watchers also report parent-directory metadata changes for the
   // concrete child event. Rebuilding for both lets the duplicate arrive after
   // the first build and reload an otherwise idle browser.
-  if (snapshot === null) {
+  // A filename-less event refers to the watched directory itself. A missing
+  // path is a deletion only when that file was previously observed.
+  if (
+    snapshot === null ||
+    (snapshot === "missing" && !sourceSnapshots.has(changedTarget))
+  ) {
     return;
   }
 
@@ -786,7 +770,9 @@ async function scheduleSourceRebuild(source, filename) {
           ? "css"
           : "reload",
       );
-      console.log(`Rebuilt after ${filename || "a source change"}`);
+      console.log(
+        `Rebuilt after ${sourceChanges.join(", ") || "a source change"}`,
+      );
     } catch (error) {
       console.error("Source rebuild failed", error);
     }

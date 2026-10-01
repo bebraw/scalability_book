@@ -7,7 +7,7 @@ I developed the manuscript and publishing system together through iterative work
 This makes the book a useful case study in its own subject.
 It is a web project whose application behavior, development system, and human–agent workflow evolved together.
 Agent assistance made producing candidate text and code fast, but it did not make the educational argument, source interpretation, or visual judgment automatic.
-As the project grew, coherence and review became the binding constraints.
+As the project grew, coherence and [review](/concepts/#review-budget) became the binding constraints.
 
 The repository supports analysis of what changed and which checks were added.
 It does not preserve a complete division between human- and agent-produced work or provide a controlled evaluation of productivity or learning outcomes.
@@ -91,7 +91,7 @@ Many useful revisions began as qualitative judgments: a claim felt inaccurate, a
 Those complaints were not defects an automated check could discover reliably on its own.
 Once identified, however, an agent could trace the relevant source and implementation, propose a bounded correction, and sometimes encode part of the lesson as a test.
 
-Recent commits show several forms of this loop:
+Recent commits show several forms of this [loop](/concepts/#feedback-loop):
 
 - [citation scope was corrected across chapters](https://github.com/bebraw/scalability_book/commit/c167420a57d1f3b48478054e28532f6c22976fa7);
 - [a repetitive evidence matrix was collapsed](https://github.com/bebraw/scalability_book/commit/fdc3aaaa89aafda88b16db03e27cfa0cbb9f38ba);
@@ -120,7 +120,7 @@ Neither can determine whether a chapter teaches the right idea at the right mome
 A citation parser can prove that a bibliography key exists without proving that the source supports the surrounding sentence.
 A generated slide can contain relevant information while still being a weak presentation.
 
-The project therefore needed two related acceptance systems.
+The project therefore needed two related [acceptance systems](/concepts/#acceptance-criteria).
 Executable checks constrained properties that could be stated mechanically.
 Editorial review judged meaning, emphasis, progression, source interpretation, and fit for the intended readers.
 Automating the first system made the second more important rather than obsolete.

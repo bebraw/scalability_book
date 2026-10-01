@@ -1,6 +1,6 @@
 # Advanced control boundaries in web applications
 
-Use this appendix when a design depends on state continuity across requests, transactional invariants, client activation, runtime-generated interfaces, a detailed application contract, event-view rebuilding, or endpoint and cache policy.
+Use this appendix when a design depends on state continuity across requests, HTTP method semantics, transactional [invariants](/concepts/#invariant), client activation, runtime-generated interfaces, a detailed application contract, event-view rebuilding, or endpoint and cache policy.
 The [Architecture chapter](/chapters/architecture/) keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
 
 ## Stateless requests still depend on state
@@ -29,7 +29,7 @@ If the state remains available only on the instance that minted the handle, affi
 Retries add another state boundary.
 If a mutation commits but its response is lost, a retry may reach a different instance and apply the mutation again.
 Do not assume that a protocol request identifier makes a domain operation idempotent.
-Use an application-level command identifier or idempotency key, bind it to the caller, handle, operation, and relevant arguments, and store the mutation and reusable result atomically in the authoritative application state.
+Use an application-level command identifier or [idempotency](/concepts/#idempotency) key, bind it to the caller, handle, operation, and relevant arguments, and store the mutation and reusable result atomically in the [authoritative](/concepts/#state-authority) application state.
 
 **State placement audit.** Assume two interchangeable server instances, `A` and `B`, share one application store.
 Alice's validated token identifies principal `alice` in tenant `T1` with `events:write`; creating a workspace grants her access to it.
@@ -46,12 +46,41 @@ For each request, record the authenticated principal and scope, authoritative st
 Design the flow so `C7` produces one event and its retry returns the original result, Bob cannot act merely by knowing `W1`, and the archived write returns a defined application error such as `workspace_archived` rather than silently recreating state.
 Finish by naming which information is carried by the client and which state remains authoritative on the server.
 
+## Distinguish HTTP method semantics from domain retry safety
+
+The [Pressure chapter's exercise](/chapters/reality/#exercise-pressure-retries) starts from the domain contract: inspect all promised effects of one logical command.
+HTTP adds standardized method semantics that clients and intermediaries can use.
+In [RFC 9110, sections 9.2.1–9.2.2](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2), **safe** means the client requests no state change, while **idempotent** means repeating the request preserves its intended server effect.
+
+| Method          | Safe? | Idempotent by method semantics? |
+| --------------- | ----- | ------------------------------- |
+| `GET`, `HEAD`   | Yes   | Yes                             |
+| `PUT`, `DELETE` | No    | Yes                             |
+| `POST`          | No    | No general guarantee            |
+
+::caption[Selected HTTP methods and their standardized properties.]
+::label[table:http-method-properties]
+
+Identical responses are unnecessary.
+For example, an API could return `204` after deletion and `404` on a retry because the resource is already absent; the intended removal still happened once.
+The RFC also permits incidental effects such as an access-log entry per request.
+The exercise's domain activity event is different: exactly one event for the transition is a promised application outcome.
+
+A `POST` command can have an application-specific retry guarantee.
+For the tracker, one design binds a stable command key to the caller, workspace, operation, and relevant arguments, then atomically enforces that key with the state change, activity event, and reusable result.
+Specify conflicting payloads, key retention, and concurrent attempts as part of the contract.
+The key and HTTP method alone do not implement that guarantee; the state-placement audit above and [Appendix F's effect audit](/appendices/durable-workflows/#audit-the-effect-boundary) locate its enforcement.
+
+**HTTP semantics check.** Explain whether each observation contradicts idempotency: a repeated deletion returns a different status; repeated completion adds another promised domain event; repeated retrieval adds an incidental access-log entry.
+For each, name the intended effect and distinguish it from the response or diagnostic record.
+Then explain what evidence a client would need before automatically retrying the application's `POST` command.
+
 ## Preserve durable invariants with transactions
 
 A database transaction groups operations into one unit with four commonly named properties: atomicity, consistency, isolation, and durability, or ACID :citep[haerder1983recovery].
 **Atomicity** means the operations commit together or not at all.
 **Consistency** means a committed transaction leaves the data within its declared invariants; the database cannot invent those application rules, so they still have to be expressed through constraints, guarded writes, or validated domain logic.
-**Isolation** describes how concurrent transactions are allowed to observe and affect one another.
+**Isolation** describes how concurrent [transactions](/concepts/#transaction) are allowed to observe and affect one another.
 The exact guarantee depends on the selected isolation level rather than on the mere presence of a transaction.
 **Durability** means a successful commit survives the failures covered by the storage system's contract.
 
@@ -135,7 +164,7 @@ Record one important invariant that remains enforced elsewhere, such as authoriz
 
 ## Activate delivered interfaces
 
-Rendering and navigation do not explain how delivered HTML becomes interactive.
+[Rendering](/concepts/#rendering) and navigation do not explain how delivered HTML becomes interactive.
 A server-rendered page may contain useful content while the browser still has to recover or load the behavior behind its controls.
 That activation work affects payload size, client processing, first-interaction latency, and application structure.
 
@@ -191,7 +220,7 @@ Treat this as a design lens rather than a settled taxonomy.
 This axis can be combined with server-side or client-side rendering, hydration, islands, or resumability.
 It does not replace those choices.
 A declarative descriptor is still untrusted input: reject unknown components and actions, validate data bindings and accessible names, bound size and nesting, and authorize an action when it is invoked.
-Resolve action identifiers through trusted application code; naming an action in generated data does not grant authority to perform it.
+Resolve action identifiers through trusted application code; naming an action in generated data does not grant [authority](/concepts/#authority) to perform it.
 
 Executable generated UI expands the boundary further.
 It needs a separate-origin sandbox or equivalent isolated runtime without ambient credentials, a narrow bridge to host data and tools, explicit network, storage, navigation, and tool permissions, resource limits, observability, and a safe fallback.
@@ -252,7 +281,7 @@ Then:
 5. Use the fixed read-only summary as the fallback.
 6. Identify the additional containment and evidence required before the application could execute model-generated code.
 
-The descriptor schema and action vocabulary are API contracts.
+The descriptor schema and action vocabulary are [API contracts](/concepts/#contract).
 The next section examines what follows once such contracts cross client and server boundaries.
 
 ## Choose an application interaction style
@@ -358,7 +387,7 @@ Cache safe public reads, minimize exposed and retained data, protect expensive o
 
 ### Query parameters and cache identity
 
-Query parameters can fragment the cache even when the response is identical.
+Query parameters can fragment the [cache](/concepts/#cache) even when the response is identical.
 For example, `/offer?utm_source=newsletter` and `/offer?utm_source=search` may serve the same page but occupy separate cache entries.
 The proposed `No-Vary-Search` response header lets an origin declare which query parameters a supporting cache may ignore when matching URLs:
 

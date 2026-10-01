@@ -1,10 +1,10 @@
 # Exercises throughout the book
 
-Eleven automatically checked exercises cover all nine main chapters.
-Measurement has three; each remaining chapter has one.
+Thirteen automatically checked exercises cover all nine main chapters.
+Measurement has four, Scaling has two, and each remaining chapter has one.
 Questions use numeric calculations or fixed choices with explicit assumptions.
 The demos and explanatory prose remain in their original chapter locations.
-Live lecture sources are unchanged.
+The lecture plan links the two cumulative questions for short discussions.
 The earlier standalone modules are retained for comparison while this direction is reviewed; the homepage now points into the chapter.
 
 ## Content and versions
@@ -12,6 +12,7 @@ The earlier standalone modules are retained for comparison while this direction 
 `shared/exercises.ts` is the canonical source for question text, discussion, stable ID, and version.
 Insert an exercise in a chapter with `{{ import "exercise:measurement-boundary" }}`.
 The same renderer supplies static reading and interactive markup; no second slide explanation is maintained for this pilot.
+Separate prediction, setup, and calculation instructions with a blank line in the canonical prompt to render them as distinct paragraphs.
 Increment the version when changing what the question asks, and keep its stable ID.
 Earlier saved versions retain their original prompt and answer and appear in a disclosure below the current exercise.
 
@@ -56,7 +57,9 @@ Tests cover identity isolation, disk persistence, conflicting writes, version re
 
 Version 2 of the three measurement exercises replaces the original free-text pilot.
 Exercises introduced in the other chapters start at version 1.
-Earlier version-1 responses remain readable and do not count as completing the revised exercise.
+Version 2 of `fleets-amdahl` turns the ideal-speedup calculation into a feature-and-review scenario: learners predict the effect of a larger fleet, calculate isolated completion time and ongoing rates, then interpret accepted throughput and backlog growth.
+Version 2 of `pressure-retries` asks learners to inspect both the work-item status and its promised activity event before assessing idempotency and selecting a retry mechanism.
+Earlier version-1 responses remain readable and do not count as completing the revised questions.
 Numeric fields accept finite decimal/scientific notation with exact expected values; the questions specify units and the percentile convention.
 
 ## Explore and Practice tabs
@@ -71,6 +74,56 @@ Each exercise gets its own tab rather than an exercise count.
 Practice shows completion after checking, and edits clear that completion indicator.
 Without JavaScript and when printing, both demo and exercise remain in the reading flow.
 
-The `/demos/` showcase renders the same exercise definitions and Explore/Practice pairs, plus the two standalone exercises.
+The `/demos/` showcase renders the same exercise definitions and Explore/Practice pairs, plus the four standalone exercises.
 Stable exercise IDs share saved progress with the chapter versions.
 Links return to each exercise in its chapter.
+
+## Concepts across the book
+
+The book's concept reference is published at `/concepts/` and linked from the main navigation.
+Every published chapter, appendix, part introduction, case study, and project brief has a scoped “Follow an idea” index.
+Chapter indexes include an ungraded connection prompt; selected terms in the prose also open the reference.
+The nine self-study modules link to the matching view of the complete graph.
+
+`shared/concepts.ts` and `shared/book-concepts.ts` own definitions, assumptions, worked examples, common mistakes, and curated teaching locations.
+`shared/concept-relationships.ts` and `shared/book-concept-relationships.ts` own explained, undirected teaching connections.
+They are not inferred prerequisites or causal claims.
+`shared/concept-pages.ts` separately records where ideas are discussed and the chapter connection prompts.
+Co-occurrence does not create a conceptual edge.
+
+The complete graph supports topic search, reading and theme filters, neighborhood focus, zoom, and panning.
+Every connection has a short authored label alongside its explanation.
+“Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and remembers the reader's choice in local storage.
+Labeled views make additional room for captions without covering concept nodes.
+Its view can be shared through the query parameters `q`, `reading`, `theme`, and `topic`.
+A deterministic layout is generated from the registry by `shared/concept-graph.ts`; no per-concept coordinates need maintenance.
+The filtered text list and relationship explanations provide the same navigation without relying on the diagram.
+Static SVG links, reference passages, and relationship text remain available without JavaScript.
+
+Concept links open a keyboard-dismissible reading pane and preserve the reading position and original opener's focus.
+Each pane shows the concept's complete neighborhood, including ideas beyond the current chapter.
+The reference library is fetched once when needed on reading pages; failed fetches fall back to the ordinary reference URL.
+Modified clicks retain normal browser navigation.
+The reference page itself is complete static HTML and needs no library fetch.
+
+To add an idea, author its passages and teaching locations, add relationships with short labels and explanations, and assign relevant reading memberships.
+Use ordinary Markdown links such as `[idempotency](/concepts/#idempotency)` at useful teaching occurrences, rather than automatically linking every mention.
+Build-time integration inserts the scoped index before the first second-level heading without changing source offsets used by paragraph feedback.
+Concept reference links are excluded from paragraph identity hashes so adding these reading aids preserves existing feedback targets.
+The registry tests check published-page coverage, relationship integrity, and caption spacing in overview, focused, and scoped layouts.
+Browser checks verify every curated teaching anchor, search and navigation, the label toggle and persistence, contrast in all themes, mobile overflow, accessibility, keyboard dismissal, and the static fallback.
+
+The `measurement-transfer` and `scaling-model-choice` exercises reuse the existing checking and private-save system.
+Their adjacent explanation prompts are ungraded: a correct calculation is not evidence that the learner can justify a boundary or choose an intervention.
+The matching self-study modules link to the canonical questions.
+
+The revised Fleets practice follows the same pattern: prediction before calculation, checked values and an interpretation choice, then an ungraded explanation and an assumption change before revealing the worked answer.
+Its ongoing rates describe overlapping implementation and review; the question explicitly separates these from startup counts and from the completion time of an isolated feature.
+
+The revised Pressure practice teaches idempotency as a property of all intended effects at the declared boundary.
+An unchanged status with a duplicate promised activity event is the misconception checked by the question.
+The adjacent ungraded prompt changes the domain event to a diagnostic request log and asks learners to justify the boundary again.
+HTTP method properties and response differences are developed in Appendix C, with links from the chapter, concept card, lecture plan, and self-study module.
+
+During teaching, ask learners to explain a connection before opening its reference and to name where an analogy stops.
+Use the existing lecture notes and diary prompts to capture recurring confusions; the concept expansion adds no required submission or separate assessment.

@@ -52,10 +52,13 @@ async function waitForNewerBuild(
   let revision = previousRevision;
 
   await expect
-    .poll(async () => {
-      revision = await getBuildRevision(request);
-      return revision;
-    })
+    .poll(
+      async () => {
+        revision = await getBuildRevision(request);
+        return revision;
+      },
+      { timeout: 15_000 },
+    )
     .toBeGreaterThan(previousRevision);
 
   return revision;

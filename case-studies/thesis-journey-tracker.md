@@ -84,7 +84,7 @@ The [deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/mai
 A connected Cloudflare build creates a deployable version, but a reviewed version is promoted explicitly after CI succeeds.
 
 That boundary matters in agentic development.
-Passing a gate authorizes consideration for release; it does not have to grant an agent or build system automatic production authority.
+Passing a gate authorizes consideration for release; it does not have to grant an agent or build system automatic [production authority](/concepts/#authority).
 The repository also documents migrations, account creation, secret rotation, backup retention, preview-URL exposure, and rollback-relevant version handling.
 
 ### Recovery is a first-class feature
@@ -93,11 +93,11 @@ The application supports JSON export and restore as well as scheduled R2 backups
 Backups are written only when data changes, with periodic refresh so retention policies preserve recent restore points.
 The setup instructions require the R2 lifecycle rule to be inspected rather than assuming that a command succeeded.
 
-This is validation applied to operations: the intended safety property is a recoverable dataset, not merely a successful backup API call.
+This is validation applied to operations: the intended safety property is a [recoverable dataset](/concepts/#recovery), not merely a successful backup API call.
 
 ## Why this evidence is still bounded
 
-Production use is stronger evidence than a working repository, but it is not universal evidence of scalability.
+Production use is stronger evidence than a working repository, but it is not universal evidence of [scalability](/concepts/#scalability).
 The current application serves a private personal or small-team context.
 Its own security documentation accepts residual denial-of-service and cost exposure that would need edge controls under broader traffic.
 

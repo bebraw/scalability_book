@@ -18,13 +18,13 @@ Add other sections when the decision requires them:
 ## Anatomy of an agent evaluation
 
 A software test usually invokes known code with controlled inputs and checks the result.
-An agent evaluation must also define the situation in which a model acts, because tool access, instructions, the starting repository, resource limits, and intermediate state can all change the result.
+An [agent evaluation](/concepts/#eval) must also define the situation in which a model acts, because tool access, instructions, the starting repository, resource limits, and intermediate state can all change the result.
 The following vocabulary helps keep those layers separate :citep[grace2026demystifying]:
 :ref[table:agent-evaluation-vocabulary]{text="The table below"} locates each term within one evaluation.
 
 | Term                | Unit or scope                 | What it records or does                                                                                                   | Common confusion                                      |
 | ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Task                | One declared problem          | Defines inputs and success criteria                                                                                       | A repeated attempt is not a new independent task      |
+| Task                | One declared problem          | Defines inputs and [success criteria](/concepts/#acceptance-criteria)                                                                                       | A repeated attempt is not a new independent task      |
 | Trial               | One attempt at one task       | Runs the task once so repeated trials can expose behavioral variation                                                     | Trial count is not task diversity                     |
 | Outcome             | End state of one trial        | Preserves the resulting patch, database state, generated artifact, or other effect                                        | The final claim is not necessarily the actual outcome |
 | Trace or transcript | Path through one trial        | Records outputs, tool calls, intermediate results, and relevant interventions                                             | A plausible trace does not prove a correct outcome    |
@@ -38,7 +38,7 @@ The following vocabulary helps keep those layers separate :citep[grace2026demyst
 
 These terms describe different measurement objects.
 A repository test is often one deterministic grader inside an agent evaluation rather than the entire evaluation.
-A public benchmark is a shared evaluation suite designed for comparison across systems, while a local product or project evaluation should represent the work and failure modes that matter in its own setting.
+A public [benchmark](/concepts/#benchmark) is a shared evaluation suite designed for comparison across systems, while a local product or project evaluation should represent the work and failure modes that matter in its own setting.
 An RL environment additionally exposes a reward signal for optimization or training.
 Treating these as synonyms hides differences in task selection, incentives, and supported claims.
 
@@ -100,7 +100,7 @@ Retain revisions, checks, pre-repair failures, acceptance decisions, human effor
 Checkpoints depend on earlier work; repeat fresh trajectories to study variation rather than counting checkpoints as independent trials.
 
 This optional design studies successive changes within one implementation.
-The course's A–B–C builds start fresh, while cross-team probes examine another group's ability to understand and change each build.
+The course's A–B–C builds start fresh, while [cross-team probes](/concepts/#change-probe) examine another group's ability to understand and change each build.
 
 ## The eval suite is also software
 
@@ -160,7 +160,7 @@ When possible, run both candidates on the same task IDs and predeclare how repea
 Repeated calls reveal variation within a task; they do not turn one task into many independent tasks.
 If many tasks are variants of one template, repository, or issue family, disclose that dependence and narrow the claim.
 
-When a protocol permits `k` trials per task, name the reliability question before selecting a summary.
+When a protocol permits `k` trials per task, name the [reliability](/concepts/#reliability) question before selecting a summary.
 **Pass@k** asks whether at least one of the `k` trials succeeds and is useful when several attempts are genuinely available and one accepted solution is enough.
 **Pass^k** asks whether all `k` trials succeed and is useful when users need the behavior to be dependable every time :citep[grace2026demystifying].
 More attempts make pass@k easier to satisfy and pass^k harder, so the same workflow can look increasingly capable by one measure and increasingly unreliable by the other.
@@ -358,7 +358,7 @@ Deduplicate repeated findings, record recurrence separately from deterministic-r
 Consensus can repeat a shared blind spot, while a low-frequency report can still identify a real defect.
 Behavioral tests, invariants, deterministic analysis, and accountable review remain the acceptance evidence.
 
-Repeated review also consumes the same scarce integration capacity that bounds the fleet.
+Repeated review also consumes the same [scarce integration capacity](/concepts/#review-budget) that bounds the fleet.
 If you repeat an agent review, record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 

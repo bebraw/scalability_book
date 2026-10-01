@@ -16,8 +16,8 @@ Bind implementation A to a declared revision and evidence package so later compa
 ## Implementation A — Work Activity Tracker
 
 The [Establish project specification](/project/establish/) defines the implementation and evidence requirements.
-Choose a domain interpretation, stack, and architecture that fit the common contract and one question you want to investigate.
-Record the assumptions and trade-offs that later builds should test.
+Choose a domain interpretation, stack, and architecture that fit the [common contract](/concepts/#contract) and one question you want to investigate.
+Record the assumptions and [trade-offs](/concepts/#trade-off) that later builds should test.
 Follow the [shared transfer policy](/project/#8-permitted-transfer-between-implementations) when carrying material into those fresh implementations.
 
 ### Instructor perspective — Carry the learning, not the code

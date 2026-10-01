@@ -12,6 +12,10 @@ Agentic development provides a current context for studying web scalability and 
 The book gives each lecture a shared conceptual starting point, but the session does not have to reproduce the chapter as a presentation.
 Lectures can move among a short framing, student impressions, concrete cases, live demonstrations, project experiences, and open discussion.
 
+Use each chapter's “Try a connection” prompt as a short retrieval discussion before opening the [complete concept graph](https://scalableweb.dev/concepts/).
+Ask students to explain an edge using project evidence, follow it into another chapter or case, and name an assumption that limits the transfer.
+The graph supports discovery and revisiting ideas without adding a separate submission.
+
 The first run should remain adaptable:
 
 - use student questions and project evidence to decide where discussion needs to go deeper;
@@ -71,6 +75,7 @@ Possible elements:
 - establish the practical vocabulary teams need for workloads, load, latency, throughput, errors, distributions, resource use, logs, metrics, and traces;
 - discuss two or three concrete measurement or observability cases;
 - introduce Little's Law as a way to check whether measurements at one declared boundary are coherent;
+- use the book's [event-to-review question](https://scalableweb.dev/chapters/benchmarking/#exercise-measurement-transfer) for a brief individual calculation, then compare boundaries and assumptions in pairs;
 - demonstrate a benchmark, browser measurement, request trace, or observability workflow;
 - connect the examples to the shared baseline workload, one repeatable primary pressure, and development-workflow evidence teams will reuse across A, B, and C.
 
@@ -115,6 +120,8 @@ Possible elements:
 - work through one or more concrete failure or incident chains;
 - connect pressure, failed assumption, saturation boundary, amplification, user-visible effect, response, and recovery;
 - revisit retries, idempotency, queues, backpressure, degradation, and recovery when the cases justify them;
+- use the [status-and-activity retry exercise](https://scalableweb.dev/chapters/reality/#exercise-pressure-retries): ask students to predict individually, inspect all promised effects in pairs, and explain their verdict before revealing the worked answer; change the duplicate domain event to a diagnostic request log and revisit the boundary;
+- use [Appendix C's HTTP method discussion](https://scalableweb.dev/appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety) when teams need the distinction between method semantics, response differences, and application-specific retry guarantees;
 - apply Little's Law to a suitable queue or in-flight boundary;
 - connect the discussion to the repeated primary pressure and one revealing secondary pressure required for Challenge;
 - show how a documented case becomes a project pressure map, distinguishing source facts, interpretation, and transfer to the students' application.
@@ -146,6 +153,8 @@ Possible elements:
 - begin from observed or credibly projected limits rather than from a catalog of techniques;
 - discuss saturation, formal models, and examples of caching, indexing, queues, partitioning, rate limiting, orchestration, or geographical distribution;
 - work through one application-level model and one workflow-level model, naming variables, assumptions, evidence, and limits; use Amdahl's Law to discuss sequential integration or review work;
+- use the [feature-and-review exercise](https://scalableweb.dev/chapters/agent-fleets/#exercise-fleets-amdahl): have students predict individually whether doubling agents doubles accepted output, calculate in pairs, then explain the review backlog and challenge one assumption before revealing the worked answer;
+- revisit Little's Law and Amdahl's Law through the [model-choice question](https://scalableweb.dev/chapters/scaling/#exercise-scaling-model-choice), asking students to justify the choice before opening the references;
 - examine how each response moves complexity and creates another failure or recovery obligation;
 - connect the discussion to the before-and-after intervention in one selected implementation, a check of its new failure or recovery obligation, and the shared workload rerun after realistic deployment required for Compare.
 

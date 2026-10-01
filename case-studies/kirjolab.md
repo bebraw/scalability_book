@@ -33,7 +33,7 @@ The first scholarly workspace slice followed about an hour later.
 
 ### The harness existed before the feature pressure
 
-The most consequential early decision was to treat the project harness as part of the product.
+The most consequential early decision was to treat the [project harness](/concepts/#harness) as part of the product.
 Generated code had to pass deterministic checks rather than merely look plausible.
 The initial harness already checked formatting, types, coverage, browser behavior, security-sensitive browser boundaries, and mutation resistance.
 Later changes added more focused diagnostics and faster affected-file paths.
@@ -72,7 +72,7 @@ The ability to say “not yet” was part of the technical success.
 
 ### The history preserves the learning
 
-Small semantic commits, feature specifications, architecture decision records, review notes, and explicit supersession make the project unusually inspectable.
+Small semantic commits, feature specifications, [architecture decision records](/concepts/#decision-log), review notes, and explicit supersession make the project unusually inspectable.
 The [Build Week notes](https://github.com/bebraw/kirjolab/blob/main/docs/build-week-2026-submission.md) even distinguish the contest-period implementation from the earlier foundation.
 
 This documentation supports a stronger account than “the agent was fast.”
@@ -113,7 +113,7 @@ The initial template supplied the practices that made rapid work safe.
 It also began with 978 files and about 142,000 inserted lines, including vendored process material, skills, capability kits, and update infrastructure.
 Most of that was not product code.
 
-This is a real trade-off rather than a simple mistake.
+This is a real [trade-off](/concepts/#trade-off) rather than a simple mistake.
 Rich repository context gave agents explicit instructions and reusable workflows.
 It also increased navigation cost, search noise, and the amount of project material that could enter a model's context.
 I would keep the harness, but start from a more sharply pruned version of it.
@@ -148,7 +148,7 @@ It included:
 On 30 July, [ADR-198](https://github.com/bebraw/kirjolab/blob/main/docs/adrs/implemented/ADR-198-organize-source-by-capability.md) recorded that `src/client/` held 312 files and `src/domain/` held 119 files at their roots.
 The resulting migration moved them into shallow product-named directories without inventing package or runtime boundaries.
 
-This is the “revise” step of the constrain, generate, validate, revise loop at repository scale.
+This is the “revise” step of the [constrain, generate, validate, revise loop](/concepts/#feedback-loop) at repository scale.
 Implementation exposed the actual domains and change patterns.
 Refactoring converted that evidence into new constraints for subsequent work.
 The expensive part was that the structural feedback arrived later than the functional feedback.

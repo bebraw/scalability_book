@@ -2,6 +2,22 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderMarkdown } from "../scripts/lib/markdown.ts";
 
+test("concept references preserve paragraph feedback identity", () => {
+  const original = renderMarkdown(
+    "# Chapter\n\nA **coding agent** needs a harness and **saturation** evidence.",
+    { number: "1" },
+  );
+  const linked = renderMarkdown(
+    "# Chapter\n\nA **[coding agent](/concepts/#agent)** needs a [harness](/concepts/#harness) and [**saturation**](/concepts/#saturation) evidence.",
+    { number: "1" },
+  );
+  assert.equal(
+    linked.content.match(/data-comment-target="([^"]+)"/)?.[1],
+    original.content.match(/data-comment-target="([^"]+)"/)?.[1],
+  );
+  assert.match(linked.content, /href="\/concepts\/#agent"/);
+});
+
 test("unnumbered documents preserve authored heading numbers", () => {
   const rendered = renderMarkdown("# Brief\n\n## 1. Purpose\n\n### 1.1 Scope", {
     number: "",

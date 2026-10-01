@@ -111,6 +111,9 @@ study:
     There is no single correct split. A useful answer names concrete work, such as independent implementations followed by shared integration. Record elapsed time for the same accepted outcome, including review and rework. Compare the measured speedup with the model and investigate the difference.
 ```
 
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Fwhat-is-scalability%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [Continue with measurement](./../measurement/index.html) or [return to the book](./../../../).
 
 ## Slide: Classroom-only context

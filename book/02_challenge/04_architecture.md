@@ -14,7 +14,7 @@ Begin with four architectural roles:
 | Consumer       | Who or what expresses intent and observes the result?    | A person using a browser, an integration, a crawler, or an agent       |
 | Representation | What crosses a boundary to make state or action visible? | HTML, JSON, an image, a stream, a form, or a hypermedia control        |
 | Execution      | Where is behavior evaluated?                             | A build process, browser, physical server, cloud service, or edge node |
-| Authority      | Which component decides and preserves the current truth? | An application service, database, event log, or external system        |
+| [Authority](/concepts/#state-authority)      | Which component decides and preserves the current truth? | An application service, database, event log, or external system        |
 
 ::caption[Four roles that remain useful as web deployment locations change.]
 ::label[table:web-architecture-roles]
@@ -27,7 +27,7 @@ CDN discussions also use “origin” as shorthand for the upstream origin serve
 Likewise, an edge function may execute application logic without becoming the authority for the data it reads.
 
 Use the event tracker to keep the model concrete.
-A `GET /events` request asks for a representation and may be answered from a browser cache, an edge cache, or the origin.
+A `GET /events` request asks for a representation and may be answered from a browser [cache](/concepts/#cache), an edge cache, or the origin.
 A `POST /events` request expresses an action whose validation may begin near the consumer, but whose accepted result must eventually reach the component that owns the event history.
 The two paths can share an interface while placing execution, copies, and authority differently.
 
@@ -123,7 +123,7 @@ Start with **who constructs the next view and how it reaches the browser**:
 
 - A conventional multi-page application (MPA) follows links and submits forms to receive complete HTML documents.
 - A hypermedia-driven application (HDA) keeps views and available actions in server-provided HTML; browser code follows those controls and can apply HTML fragments to parts of the page :citep[gross2022hda].
-- A typical single-page application (SPA) fetches data and uses client-side rendering (CSR) to construct subsequent views without replacing the document.
+- A typical single-page application (SPA) fetches data and uses client-side [rendering](/concepts/#rendering) (CSR) to construct subsequent views without replacing the document.
 
 These are representative flows, not mutually exclusive categories: a conventional MPA also uses hypermedia, and partial page updates alone do not distinguish HDA from SPA.
 The distinction in the latter two examples is whether server HTML or a client application model defines the views and actions.
@@ -146,7 +146,7 @@ Run the trace and watch which artifact crosses the network.
 {{ import "site/includes/web-architecture-lens.html" }}
 
 The ISR behavior in the lab is a simplified stale-while-revalidate model.
-Exact regeneration, invalidation, and consistency behavior depend on the framework and deployment platform.
+Exact regeneration, invalidation, and [consistency](/concepts/#consistency) behavior depend on the framework and deployment platform.
 That platform-specific contract should be documented as part of the architecture.
 
 ### Activation is a separate architectural decision
@@ -170,7 +170,7 @@ A read may be served from a replica or cache, but concurrent writes still need a
 Moving execution closer to users without deciding where authority lives can exchange network latency for inconsistent state, complex conflict resolution, or a longer path to the real owner.
 
 For the event tracker, raw events, current work-item state, and derived summaries have different roles.
-Raw events may support replay or audit, current state must preserve workflow invariants, and summaries can often be rebuilt or temporarily stale.
+Raw events may support replay or audit, current state must preserve workflow [invariants](/concepts/#invariant), and summaries can often be rebuilt or temporarily stale.
 The architecture should state which data is authoritative, which is derived, where each is placed, and what happens when a location cannot reach its authority.
 
 A derived summary may be rebuilt from retained events only when that history contains the necessary facts.
@@ -190,14 +190,14 @@ One application may use a relational source of truth, object storage for attachm
 
 Distribution makes four distinctions especially important: authoritative versus derived data, reads versus writes, transactional versus analytical work, and current state versus retained history.
 Replicating a read path may reduce latency without changing write authority.
-Partitioning can increase capacity or isolation, but then the partition key determines which queries and transactions remain local.
+Partitioning can increase capacity or isolation, but then the partition key determines which queries and [transactions](/concepts/#transaction) remain local.
 
 ### Stateless requests still depend on state
 
 An interchangeable server may receive a workspace handle without sharing an earlier request's in-process session.
 It must still authenticate the caller, authorize access, and resolve authoritative state.
 A handle does not grant permission, and state available only on its originating instance still requires affinity.
-Retries after a lost response need a stable application command identity, with the mutation and reusable result stored atomically.
+Retries after a lost response need a [stable application command identity](/concepts/#idempotency), with the mutation and reusable result stored atomically.
 [Appendix C](/appendices/advanced-web-boundaries/#stateless-requests-still-depend-on-state) provides the two-instance state and retry audit.
 
 ### Transactions preserve invariants across failure and concurrency
@@ -274,7 +274,7 @@ Record the final response headers, cache status, `Age`, and origin traffic rathe
 Throwaway code, piecemeal growth, and pressure to keep a system working can gradually blur its structure :citep[foote1997mud].
 Adding services, edge functions, browser state, or caches creates more responsibilities to keep coherent.
 Record their owners, revisit temporary shortcuts, and reorganize code when several unrelated change reasons accumulate together.
-Architecture notes and decision records preserve those choices for later contributors.
+Architecture notes and a [decision log](/concepts/#decision-log) preserve those choices for later contributors.
 
 ### Field note — When syntax familiarity stopped deciding the stack
 
@@ -343,5 +343,5 @@ Implementation B should still include its own diagrams and decision record.
 ## Summary
 
 Architecture assigns execution, representations, and data authority to locations that fit the pressure.
-HTTP and application contracts let consumers survive many placement changes, while state and caching introduce coordination obligations.
+HTTP and [application contracts](/concepts/#contract) let consumers survive many placement changes, while state and caching introduce coordination obligations.
 Keep those obligations and their owners visible so the next change can be evaluated against the same model.

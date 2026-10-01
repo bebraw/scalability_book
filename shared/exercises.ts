@@ -17,6 +17,100 @@ export type Exercise = {
   fields: ExerciseField[];
 };
 export const exercises: Record<string, Exercise> = {
+  "measurement-transfer": {
+    version: 1,
+    title: "Follow work from events to review",
+    prompt:
+      "A stable event pipeline completes 20 events/s with average end-to-end time 0.5 s. A stable development workflow accepts four changes/hour with average time from submission to acceptance of three hours. Both times include waiting inside their respective boundaries. Calculate the average work in progress implied by Little's Law for each. Then suppose submissions rise to six changes/hour while acceptance stays at four, with no discarded changes. Can the earlier steady-state calculation describe this growing backlog indefinitely?",
+    discussion:
+      "The event calculation is 20 × 0.5 = 10 events. The development calculation is 4 × 3 = 12 changes. The same relationship applies to different work when boundaries, windows, and units agree. After the increase, unfinished changes accumulate at two/hour, so the earlier stable calculation cannot describe the backlog indefinitely. Check arrival/completion balance and waiting time again. Neither calculation identifies the cause of delay or proves the waiting time is acceptable.",
+    fields: [
+      {
+        id: "events",
+        label: "Average event work in progress (events)",
+        kind: "number",
+        correct: "10",
+        explanation: "20 events/s × 0.5 s = 10 events inside the boundary.",
+      },
+      {
+        id: "changes",
+        label: "Average development work in progress (changes)",
+        kind: "number",
+        correct: "12",
+        explanation:
+          "4 changes/hour × 3 hours = 12 changes, including waiting and processing.",
+      },
+      {
+        id: "balance",
+        label:
+          "Does the earlier stable calculation still describe the growing backlog?",
+        kind: "choice",
+        correct: "no",
+        options: [
+          { value: "yes", label: "Yes: acceptance is still four/hour" },
+          {
+            value: "no",
+            label: "No: submissions and acceptance no longer balance",
+          },
+          {
+            value: "capacity",
+            label: "Yes: more submissions increase review capacity",
+          },
+        ],
+        explanation:
+          "Six submissions minus four accepted changes add two unfinished changes/hour. Recheck stability before using the earlier average time.",
+      },
+    ],
+  },
+  "scaling-model-choice": {
+    version: 1,
+    title: "Choose the question before the equation",
+    prompt:
+      "You have two questions. First, a stable event pipeline completes 40 events/s with average time 0.25 s inside one declared boundary: what average work in progress is consistent with those observations? Second, a fixed development task has an 80% parallelizable share and a 20% sequential share: what is the ideal speedup with four workers and no added coordination cost? Choose a law for each question, then calculate its result.",
+    discussion:
+      "Little's Law answers the flow-consistency question: 40 × 0.25 = 10 events. Amdahl's Law answers the fixed-workload speedup question: 1 / (0.2 + 0.8/4) = 2.5. Matching averages do not identify a bottleneck or prove acceptable latency. Ideal speedup does not guarantee accepted-change throughput: integration overhead, variable tasks, and correctness can change the result. Explain which measurement or assumption you would check before recommending more workers.",
+    fields: [
+      {
+        id: "flow",
+        label: "Which law answers the event work-in-progress question?",
+        kind: "choice",
+        correct: "little",
+        options: [
+          { value: "little", label: "Little's Law" },
+          { value: "amdahl", label: "Amdahl's Law" },
+        ],
+        explanation:
+          "Little's Law relates average work in progress, completion rate, and average time at one stable boundary.",
+      },
+      {
+        id: "wip",
+        label: "Calculated average work in progress (events)",
+        kind: "number",
+        correct: "10",
+        explanation: "40 events/s × 0.25 s = 10 events.",
+      },
+      {
+        id: "parallel",
+        label: "Which law answers the ideal parallel-speedup question?",
+        kind: "choice",
+        correct: "amdahl",
+        options: [
+          { value: "little", label: "Little's Law" },
+          { value: "amdahl", label: "Amdahl's Law" },
+        ],
+        explanation:
+          "Amdahl's Law bounds ideal speedup with a fixed workload and sequential fraction.",
+      },
+      {
+        id: "speedup",
+        label: "Ideal speedup with four workers (times baseline)",
+        kind: "number",
+        correct: "2.5",
+        explanation:
+          "1 / (0.2 + 0.8/4) = 1 / 0.4 = 2.5. Actual coordination costs can reduce the gain.",
+      },
+    ],
+  },
   "measurement-prediction": {
     demo: { id: "demo-tail-latency-simulator", label: "Benchmark" },
     version: 2,
@@ -337,24 +431,37 @@ export const exercises: Record<string, Exercise> = {
     },
   },
   "pressure-retries": {
-    version: 1,
-    title: "Count the effects of a retry",
+    version: 2,
+    title: "The status is unchanged. Is the operation idempotent?",
     prompt:
-      "An event request commits once, but its response is lost. The client retries on another instance. There is no deduplication, and that retry also commits once. Count the stored effects, then select the mechanism that prevents this duplicate effect when the same operation is retried.",
+      "Before choosing, predict whether an unchanged final status is enough to make an operation idempotent. Write a brief reason naming the effects you would inspect.\n\nA work item starts in progress with no completion activity event. Its completion contract promises to set the status to Done and record exactly one activity event for that transition. The first attempt commits both, but its response is lost. A retry on another instance leaves the status at Done and appends a second completion activity event. Both commits are durable, and there is no deduplication.\n\nCount the stored completion activity events, assess the whole operation against its contract, and select the mechanism that would prevent the duplicate event for retries of this logical command.",
     discussion:
-      "There are two stored effects. Reusing a stable operation key works when authoritative storage atomically records the mutation and reusable result under that key. A per-instance cache cannot coordinate retries routed elsewhere.",
+      "There are two completion activity events. The status assignment is idempotent in isolation, but the whole operation is not: its promised effect includes exactly one activity event for the transition. Idempotency is this property of the intended effect, rather than the name of a retry mechanism. One implementation reuses a stable command key and atomically enforces that key while recording the state change, activity event, and reusable result in authoritative storage. A retry then returns the recorded outcome without appending another event. A per-instance cache cannot coordinate retries routed elsewhere, and a longer timeout cannot guarantee that a response arrives. The caller's uncertainty does not change the stored facts given in this scenario. Explain why a transaction that commits both writes together still needs a rule for repeated commands.",
     fields: [
       {
         id: "effects",
-        label: "Stored effects after both commits",
+        label: "Stored completion activity events after both commits",
         kind: "number",
         correct: "2",
         explanation:
-          "One original commit plus one retry commit creates two effects.",
+          "The first attempt records one completion activity event and the retry records another: two events remain in the history.",
+      },
+      {
+        id: "idempotent",
+        label: "Is the whole operation idempotent under this contract?",
+        kind: "choice",
+        correct: "no",
+        options: [
+          { value: "yes", label: "Yes: the status is unchanged" },
+          { value: "no", label: "No: the activity was duplicated" },
+          { value: "unknown", label: "Unknown: the caller saw a timeout" },
+        ],
+        explanation:
+          "The contract promises one activity event as well as the Done status. The duplicate domain activity event violates that promise even though the status is unchanged.",
       },
       {
         id: "mechanism",
-        label: "Which mechanism prevents the duplicate effect?",
+        label: "Which mechanism prevents the duplicate event?",
         kind: "choice",
         correct: "atomic",
         options: [
@@ -364,7 +471,7 @@ export const exercises: Record<string, Exercise> = {
           },
           {
             value: "atomic",
-            label: "Atomically record effect and result by key",
+            label: "Enforce a shared key atomically",
           },
           {
             value: "timeout",
@@ -372,7 +479,7 @@ export const exercises: Record<string, Exercise> = {
           },
         ],
         explanation:
-          "Use the same stable key across retries and enforce it atomically in authoritative storage.",
+          "Reuse a stable command key and atomically enforce it with the state change, activity event, and reusable result at their shared authority.",
       },
     ],
     demo: {
@@ -381,26 +488,73 @@ export const exercises: Record<string, Exercise> = {
     },
   },
   "fleets-amdahl": {
-    version: 1,
-    title: "Calculate the parallel speedup",
+    version: 2,
+    title: "Does a faster feature mean more accepted work?",
     prompt:
-      "Assume 80% of a fixed task can run in parallel, 20% is sequential, and coordination has no cost. Use S(N) = 1 / (0.2 + 0.8 / N). Calculate the speedup with four workers and the limit as the worker count grows without bound.",
+      "Before calculating, predict whether doubling a fleet from four to eight agents will double accepted output, and explain your prediction.\n\nEach feature needs 80 minutes of implementation with one agent and 20 minutes of review by one person. The agents work together on one feature, divide implementation time perfectly, and start the next feature as soon as implementation ends. Review of earlier features can overlap that implementation. Assume no coordination cost, continuous work, every feature passes review, and no withdrawal.\n\nCalculate completion time for an isolated feature with no queue ahead, then production and review rates for the eight-agent fleet. Use ongoing rates, not counts in the first clock hour. Finally, calculate unfinished-work growth and assess the effect of doubling the fleet.",
     discussion:
-      "Four workers give 1 / 0.4 = 2.5 times the original speed. Even infinitely many workers leave the sequential 20%, so the limit is 1 / 0.2 = 5. Coordination costs would reduce these ideal results.",
+      "With four agents, an isolated feature takes 80/4 + 20 = 40 minutes; with eight, it takes 80/8 + 20 = 30 minutes. These correspond to ideal Amdahl speedups of 100/40 = 2.5 and 100/30 ≈ 3.33 for the fixed task. During continuous work, four agents finish implementation every 20 minutes, producing three candidates/hour; eight finish every 10 minutes, producing six. One reviewer can accept at most 60/20 = three features/hour. With eight agents, unfinished work therefore grows by 6 − 3 = three features/hour. Doubling the fleet finishes an isolated feature sooner but leaves accepted throughput unchanged. Later features wait longer as the review backlog grows, so 30 minutes does not describe every feature in that stream. Explain which assumption you would investigate before recommending more agents, and what evidence would justify changing review capacity or admission.",
     fields: [
       {
-        id: "four",
-        label: "Speedup with four workers (×)",
+        id: "four-time",
+        label: "Isolated feature completion with four agents (minutes)",
         kind: "number",
-        correct: "2.5",
-        explanation: "1 / (0.2 + 0.8 / 4) = 2.5.",
+        correct: "40",
+        explanation: "80/4 + 20 = 40 minutes, including review.",
       },
       {
-        id: "limit",
-        label: "Ideal speedup limit (×)",
+        id: "eight-time",
+        label: "Isolated feature completion with eight agents (minutes)",
         kind: "number",
-        correct: "5",
-        explanation: "As 0.8 / N approaches zero, the limit is 1 / 0.2 = 5.",
+        correct: "30",
+        explanation:
+          "80/8 + 20 = 30 minutes when no earlier work is waiting for review.",
+      },
+      {
+        id: "candidates",
+        label: "Eight-agent candidate production rate (features/hour)",
+        kind: "number",
+        correct: "6",
+        explanation:
+          "Implementation takes 80/8 = 10 minutes, so the fleet can produce 60/10 = six candidates/hour while review overlaps.",
+      },
+      {
+        id: "accepted",
+        label: "Maximum accepted throughput with eight agents (features/hour)",
+        kind: "number",
+        correct: "3",
+        explanation:
+          "One reviewer takes 20 minutes per feature and can accept 60/20 = three/hour. Candidate production exceeds that limit.",
+      },
+      {
+        id: "backlog",
+        label: "Eight-agent unfinished-work growth (features/hour)",
+        kind: "number",
+        correct: "3",
+        explanation:
+          "Six candidates minus three accepted features add three unfinished features/hour, with no rejection or withdrawal.",
+      },
+      {
+        id: "claim",
+        label: "What changes when four agents become eight?",
+        kind: "choice",
+        correct: "faster-only",
+        options: [
+          {
+            value: "both-double",
+            label: "Faster task; twice the accepted rate",
+          },
+          {
+            value: "faster-only",
+            label: "Faster task; same accepted rate",
+          },
+          {
+            value: "neither",
+            label: "No change to either measure",
+          },
+        ],
+        explanation:
+          "The isolated feature takes less time, but both fleets are limited to three accepted features/hour by the same reviewer.",
       },
     ],
     demo: {

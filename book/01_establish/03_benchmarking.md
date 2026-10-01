@@ -1,14 +1,14 @@
 # How can we measure web applications and development workflows?
 
 A page that feels fast on one developer's machine may behave differently under another workload, device, or network.
-Benchmarking makes that comparison explicit; observability helps investigate the result.
+Benchmarking makes that comparison explicit; [observability](/concepts/#observability) helps investigate the result.
 Both need checks that the measured property still represents the outcome people want.
 
 ## Benchmark to test a claim
 
 A **measurement** records a value for a property using a stated procedure.
-A **benchmark** uses declared conditions to compare that property across workloads, systems, or revisions.
-Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed latency objective as concurrent demand increases.
+A **[benchmark](/concepts/#benchmark)** uses declared conditions to compare that property across workloads, systems, or revisions.
+Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed [latency](/concepts/#latency) objective as concurrent demand increases.
 
 Define the protocol before selecting a runner:
 
@@ -16,7 +16,7 @@ Define the protocol before selecting a runner:
 - **Workload:** Which event-recording, querying, filtering, or browser actions are performed, and in what mix?
 - **Load:** Do arrivals follow previous completions or an independent schedule, at what concurrency or rate, and for how long?
 - **Boundary and conditions:** Which application revision, environment, data volume, cache state, dependencies, and client conditions are included?
-- **Metrics and distribution:** Which latency, throughput, error, resource, or queue measurements answer the question, and which percentiles or ranges preserve important variation?
+- **Metrics and distribution:** Which latency, [throughput](/concepts/#throughput), error, resource, or queue measurements answer the question, and which percentiles or ranges preserve important variation?
 - **Acceptance and limits:** What result would support or challenge the claim, and what does the setup leave untested?
 
 Tools such as [Artillery](https://www.npmjs.com/package/artillery) and [k6](https://k6.io/) can generate load, schedule scenarios, and collect observations from that protocol.
@@ -41,7 +41,7 @@ Timeouts supply deadline lower bounds, not observed completion times; report the
 ### Simulated benchmark lab
 
 The demonstration below models 60 requests to an event-recording endpoint.
-Change the number of concurrent clients, the share of requests that take a slow storage path, and the p95 latency objective.
+Change the number of concurrent clients, the share of requests that take a slow storage path, and the [p95 latency](/concepts/#tail-latency) objective.
 The values are deterministic and run only in the browser, so this is a teaching model rather than a capacity test.
 
 {{ import "exercise:measurement-prediction" }}
@@ -140,7 +140,7 @@ For a repeatable CI gate, [Lighthouse CI](https://github.com/GoogleChrome/lighth
 ### Check measurements against a model
 
 Measurements become more useful when they can be checked against a model.
-Little's Law states that, for a stable system over a suitable observation period, average work in progress (`L`) equals the average arrival rate (`λ`) multiplied by average time in the system (`W`) :citep[little1961proof]:
+[Little's Law](/concepts/#little-law) states that, for a stable system over a suitable observation period, average work in progress (`L`) equals the average arrival rate (`λ`) multiplied by average time in the system (`W`) :citep[little1961proof]:
 
 `L = λW`
 
@@ -160,9 +160,20 @@ The law does not identify the cause of latency, prove that a queue is healthy, o
 Before applying it, state the system boundary and check that arrivals and completions were approximately balanced during the observation window.
 A large mismatch is a reason to inspect the measurement setup or system stability, not permission to force the numbers to fit.
 
+### Follow the queue into development
+
+A [queue](/concepts/#queue) can contain events waiting for processing or changes waiting for review.
+Before calculating, name the work and [measurement boundary](/concepts/#measurement-boundary) in each case: generating a change and accepting it are different completion events.
+Try the question without opening the references, then use their assumptions to explain what carries across the two examples.
+
+{{ import "exercise:measurement-transfer" }}
+
+Explain one difference between the event pipeline and human review that could make a capacity prediction unreliable.
+The numerical check establishes the stated relationship; your explanation should also identify its limits.
+
 ## Measurements can lead you astray
 
-Goodhart's law describes how a metric can stop tracking the desired outcome when it becomes a target :citep[goodhart1975monetary].
+[Goodhart's law](/concepts/#goodhart-law) describes how a metric can stop tracking the desired outcome when it becomes a target :citep[goodhart1975monetary].
 Software dashboards and quality gates make such proxies easy to optimize.
 
 Consider a few examples:
@@ -302,7 +313,7 @@ Generated lines and transcript length can hide work shifted into review or maint
 I have not established a practice of preserving complete agent transcripts or detailed workflow telemetry.
 When returning to a project, I rely mainly on code, documentation, and commit history to recover the implemented state and accepted intent.
 
-Architecture Decision Records are especially useful.
+[Architecture Decision Records](/concepts/#decision-log) are especially useful.
 [Vibe Template's ADR workflow](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/README.md) keeps proposed, accepted, implemented, and superseded decisions distinct.
 I let agents draft records, but negotiate important choices carefully; implementation can then expose what an unresolved decision still needs to settle.
 

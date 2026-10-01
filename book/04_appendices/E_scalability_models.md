@@ -1,7 +1,7 @@
 # Formal scalability and reliability models
 
 Use this appendix when a scaling or workflow decision needs more than the introductory [Little's Law](/chapters/benchmarking/#check-measurements-against-a-model) or [Amdahl's Law](/chapters/agent-fleets/#amdahl-s-law-and-the-sequential-bottleneck) treatment in the main chapters.
-The models below expose two different ways that adding work can reduce success: serial reliability compounds across critical steps, while contention and coordination can flatten or reverse throughput gains.
+The models below expose two different ways that adding work can reduce success: serial [reliability](/concepts/#reliability) compounds across critical steps, while [contention](/concepts/#contention) and coordination can flatten or reverse throughput gains.
 
 ## Author perspective — Use models to see the limits
 
@@ -26,8 +26,8 @@ Use the question to select a model, then check that its assumptions fit the obse
 
 | Law                                                      | Exact relationship                                                                                                                | Main assumptions                                                                                 | Useful when                                                                                         | Cannot establish                                                            |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Little's Law :citep[little1961proof]                     | `L = λW`, where `L` is average work in progress, `λ` is average throughput or arrival rate, and `W` is average time in the system | Stable long-run averages, one consistent system boundary, and conserved work                     | Relating queue or review backlog, throughput, and elapsed time                                      | The cause of delay, tail latency, or stability from one snapshot            |
-| Amdahl's Law :citep[amdahl1967validity]                  | `S(N) = 1 / ((1 - p) + p/N)`, where `p` is the parallelizable fraction and `N` is the parallel capacity                           | Fixed workload and fractions, with no added parallel overhead in the bound                       | Bounding speedup for request paths, batch work, deployments, or agent workflows                     | Contention, coordination cost, load growth, or the actual parallel fraction |
+| [Little's Law](/concepts/#little-law) :citep[little1961proof]                     | `L = λW`, where `L` is average work in progress, `λ` is average throughput or arrival rate, and `W` is average time in the system | Stable long-run averages, one consistent system boundary, and conserved work                     | Relating queue or review backlog, throughput, and elapsed time                                      | The cause of delay, tail latency, or stability from one snapshot            |
+| [Amdahl's Law](/concepts/#amdahl-law) :citep[amdahl1967validity]                  | `S(N) = 1 / ((1 - p) + p/N)`, where `p` is the parallelizable fraction and `N` is the parallel capacity                           | Fixed workload and fractions, with no added parallel overhead in the bound                       | Bounding speedup for request paths, batch work, deployments, or agent workflows                     | Contention, coordination cost, load growth, or the actual parallel fraction |
 | Lusser's Law :citep[tait1995lusser]                      | `R_system = ∏ R_i` for independent components that must all succeed in a series system                                            | Every named step is critical and step failures are independent                                   | Checking whether a request, deployment, or agent workflow can meet an end-to-end reliability target | Correlated failures, recovery behavior, or omitted dependency paths         |
 | Universal Scalability Law :citep[gunther2008scalability] | `C(N) = N / (1 + α(N - 1) + βN(N - 1))`, where `α` models contention and `β` coordination or coherency cost                       | One workload and configuration, with parameters fitted to representative throughput measurements | Describing capacity that rises, flattens, and then falls as concurrency grows                       | The causal mechanism or safe extrapolation beyond the measured range        |
 
@@ -45,7 +45,7 @@ If every step is critical and the step outcomes are independent, with step `i` h
 `R_workflow = ∏ r_i`
 
 When `n` independent critical steps have the same reliability `r`, this reduces to `R_workflow = r^n`.
-This product rule is commonly called Lusser's Law or the product law for series reliability :citep[tait1995lusser].
+This product rule is commonly called [Lusser's Law](/concepts/#lusser-law) or the product law for series reliability :citep[tait1995lusser].
 It explains why a small per-step failure probability can dominate a long workflow even when no individual step looks especially risky.
 
 Redundancy within one step has a different topology.
@@ -65,7 +65,7 @@ Safety, liveness, and correctness should therefore be reported separately rather
 
 ### Estimate from all eligible attempts
 
-Fix the task population and step boundary before collecting outcomes.
+Fix the [task population and step boundary](/concepts/#measurement-boundary) before collecting outcomes.
 Independently adjudicate initial and final correctness for every eligible attempt, including rejected, stopped, and failed attempts; the workflow's own acceptance label cannot reveal its missed errors.
 For the one-step model:
 

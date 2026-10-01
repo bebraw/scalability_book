@@ -9,6 +9,11 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { exercises } from "../shared/exercises.ts";
+import {
+  attachConceptIndex,
+  renderConceptLibrary,
+  renderConceptPage,
+} from "./lib/concept-html.ts";
 import { buildStudy } from "./lib/study-build.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -400,10 +405,12 @@ for (let index = 0; index < bookPages.length; index++) {
   const rendered = renderMarkdown(page.source, page, bibliographySource);
   rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
   rendered.content = injectStatechartDiagram(rendered.content);
+  rendered.content = attachConceptIndex(rendered.content, page.url);
   const previous = bookPages[index - 1];
   const next = bookPages[index + 1];
   const pageScripts = [
     ...commonBookScripts,
+    "/concepts.js",
     ...(page.source.includes('import "exercise:') ? ["/exercises.js"] : []),
     ...(hasDemoInclude(page.source) ? ["/demo-anchors.js"] : []),
     ...getDemoScriptsForSource(page.source),
@@ -429,6 +436,20 @@ for (let index = 0; index < bookPages.length; index++) {
     }),
   );
 }
+
+await writePage(
+  "concepts/index.html",
+  renderer.renderLayout({
+    title: `Concepts that connect - ${config.title}`,
+    description:
+      "Explore concepts across the whole book: definitions, assumptions, examples, and explained connections.",
+    currentUrl: "/concepts/",
+    scripts: ["/concepts.js", ...developmentScripts],
+    children: renderConceptPage(),
+  }),
+);
+
+await writePage("concepts/library.html", renderConceptLibrary());
 
 await writePage(
   "index.html",
@@ -460,6 +481,7 @@ for (let index = 0; index < projectSpecifications.length; index++) {
     { number: "" },
     bibliographySource,
   );
+  rendered.content = attachConceptIndex(rendered.content, specification.url);
   const previous = projectSpecifications[index - 1];
   const next = projectSpecifications[index + 1];
 
@@ -472,7 +494,7 @@ for (let index = 0; index < projectSpecifications.length; index++) {
       description: specification.summary,
       currentUrl: specification.url,
       stylesheets: ["/styles/project.css"],
-      scripts: ["/toc-highlight.js", ...developmentScripts],
+      scripts: ["/toc-highlight.js", "/concepts.js", ...developmentScripts],
       children: renderProjectPage({
         content: rendered.content,
         next,
@@ -504,6 +526,7 @@ for (const caseStudy of caseStudies) {
     bibliographySource,
   );
   rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
+  rendered.content = attachConceptIndex(rendered.content, caseStudy.url);
 
   await writePage(
     `case-studies/${caseStudy.slug}/index.html`,
@@ -512,7 +535,7 @@ for (const caseStudy of caseStudies) {
       description: caseStudy.summary,
       currentUrl: caseStudy.url,
       stylesheets: ["/styles/case-studies.css"],
-      scripts: ["/toc-highlight.js", ...developmentScripts],
+      scripts: ["/toc-highlight.js", "/concepts.js", ...developmentScripts],
       children: renderCaseStudyPage(caseStudy, rendered),
     }),
   );
@@ -559,6 +582,12 @@ await compileSiteStylesheet("styles/feedback-admin.css");
 await compileSiteStylesheet("styles/project.css");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
+await compileSiteBundle(
+  "scripts/concepts.ts",
+  "concepts.js",
+  "BookConcepts",
+  "es2019",
+);
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
 await compileSiteScript("scripts/comments.ts", "comments.js");
 await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");

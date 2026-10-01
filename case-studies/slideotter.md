@@ -4,7 +4,7 @@
 I developed it with coding agents between April and June 2026, before beginning Kirjolab.
 It is the less successful product of the two, but it was an important development-system experiment.
 
-Slideotter produced a capable application, a strong validation harness, and several ideas that carried into later work.
+Slideotter produced a capable application, a strong [validation harness](/concepts/#harness), and several ideas that carried into later work.
 It did not reach the same clarity about its first production use.
 The case is therefore not a story of technical failure.
 It is a story of learning rapidly while the product, architecture, and deployment target were all still moving.
@@ -49,14 +49,14 @@ Its [repository instructions](https://github.com/bebraw/slideotter/blob/main/AGE
 
 Layout rules were established early so generated slides had explicit limits for overlap, clipping, margins, and text fit.
 Those rules narrowed the model's search space and turned several obvious visual defects into machine-checkable failures before review.
-They could not establish whether a slide communicated well, so rendered inspection and editorial judgment remained separate acceptance steps.
+They could not establish whether a slide communicated well, so rendered inspection and editorial judgment remained separate [acceptance steps](/concepts/#acceptance-criteria).
 
 That practice carried an important lesson into later projects: validation should inspect the thing the user consumes.
 For a presentation tool, the PDF is part of the behavior.
 
 ### The history retained decisions and reversals
 
-The repository contains a roadmap, a current-status document, architecture guides, manual test notes, competitive comparisons, and implemented or proposed architecture decision records.
+The repository contains a roadmap, a current-status document, architecture guides, manual test notes, competitive comparisons, and implemented or proposed [architecture decision records](/concepts/#decision-log).
 This made the rapid development legible after the fact.
 
 The documentation also became a coordination surface for agents.

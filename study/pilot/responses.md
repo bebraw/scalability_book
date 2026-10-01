@@ -104,4 +104,10 @@ study:
   answer: For example, a cache may reduce origin reads but fail the goal if it serves stale results beyond the allowed bound. Compare warm and cold behavior, exercise invalidation, and retain raw repetitions. A negative result is useful when the baseline, intervention, and uncertainty are clear.
 ```
 
+[Choose between Little's Law and Amdahl's Law](./../../../chapters/scaling/#exercise-scaling-model-choice).
+Justify the choice before opening the [concept definitions and examples](./../../../concepts/).
+
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Fscaling%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [All modules](./../index.html) or [return to the book](./../../../).

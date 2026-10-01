@@ -3,7 +3,7 @@
 [Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started) is a preview project supported by the Google Chrome and Microsoft Edge teams and the web-development community.
 It packages current web-platform guidance as skills that coding agents can search and retrieve while working.
 
-The case extends the idea of a project harness beyond one repository.
+The case extends the idea of a [project harness](/concepts/#harness) beyond one repository.
 Instead of expecting a model's training data or a permanent prompt to contain the latest HTML, CSS, accessibility, performance, and compatibility practices, a maintained capability supplies a smaller task-relevant guide.
 The project then evaluates whether access to that guide changes checked outcomes.
 
@@ -19,7 +19,7 @@ The project then evaluates whether access to that guide changes checked outcomes
 | Browser evidence       | Playwright assertions calibrated against reference and deliberately flawed pages |
 | Project status         | Preview, with content and tooling still evolving                                 |
 
-This is a case about the design of a knowledge dependency and its evaluation harness.
+This is a case about the design of a knowledge dependency and its [evaluation](/concepts/#eval) harness.
 It is not independent proof that every recommendation is correct or that installing the skill improves every web project.
 
 ## Retrieval keeps the working context bounded
@@ -71,9 +71,9 @@ The project uses two repositories: contributors work in the [source repository](
 The recommended CLI installation supports automatic updates.
 That provides a clear maintenance path for knowledge that should change with the platform.
 
-Automatic currency and reproducibility pull in different directions.
+Automatic currency and [reproducibility](/concepts/#reproducible-environment) pull in different directions.
 An evaluation or consequential change should record the resolved skill version or revision and the project's browser-support target.
-An organization may instead pin updates until review, especially because a skill can influence tool calls made with the agent's existing authority.
+An organization may instead pin updates until review, especially because a skill can influence tool calls made with the agent's existing [authority](/concepts/#authority).
 Official provenance, popularity, and a passing evaluation reduce some uncertainty; none grants the capability permission to override local architecture, security, privacy, or user requirements.
 
 ## A practical adoption pattern

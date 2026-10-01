@@ -12,9 +12,9 @@ The same evidence may support several criteria, but the same accomplishment is n
 
 | Criterion                                 | Points | Full-credit evidence                                                                                                                                                           |
 | ----------------------------------------- | -----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Required web behavior and correctness     |    0-6 | The common acceptance core works through the running application; persistence and invalid transitions behave correctly; known defects and missing evidence are reported.       |
-| Reproducible setup and operation          |    0-4 | An unfamiliar group can follow the supported setup, run the application and checks, obtain demonstration data, and understand the declared environment and operational limits. |
-| Scalability evidence and reasoning        |    0-5 | Workloads, boundaries, conditions, distributions, limits, signals, formal relationships where required, trade-offs, and unsupported claims are handled explicitly.             |
+| Required web behavior and correctness     |    0-6 | The [common acceptance core](/concepts/#acceptance-criteria) works through the running application; persistence and invalid transitions behave correctly; known defects and missing evidence are reported.       |
+| Reproducible setup and operation          |    0-4 | An unfamiliar group can follow the supported setup, run the application and checks, obtain demonstration data, and understand the [declared environment](/concepts/#reproducible-environment) and operational limits. |
+| Scalability evidence and reasoning        |    0-5 | Workloads, [boundaries](/concepts/#measurement-boundary), conditions, distributions, limits, signals, formal relationships where required, trade-offs, and unsupported claims are handled explicitly.             |
 | Architecture and change capacity          |    0-3 | Authority, request and data paths, contracts, ownership, consequential decisions, and change or recovery obligations are coherent and reviewable.                              |
 | Responsible development-workflow evidence |    0-2 | Material AI assistance, failed attempts, human correction, acceptance, resource use where measurable, and known limits are reported compactly and honestly.                    |
 

@@ -108,4 +108,7 @@ study:
   answer: For example, moving optional work to a queue may reduce response time while adding delayed completion, duplicate handling, and recovery work. Measure both the request and completion boundaries. Reject the claim if the response improves only by violating the required completion or correctness goal.
 ```
 
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Farchitecture%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [All modules](./../index.html) or [return to the book](./../../../).

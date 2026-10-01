@@ -107,4 +107,7 @@ study:
   answer: A useful response might retain a simple deployment while its measured workload meets the goal, with a named owner for recovery and a plan to revisit when queueing or review delay crosses a declared bound. Other decisions can be valid. Explain which finding changed your view and what remains untested; this reflection has no single correct answer.
 ```
 
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Frecap%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [All modules](./../index.html) or [return to the book](./../../../).

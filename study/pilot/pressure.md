@@ -53,6 +53,10 @@ study:
 
 Predict both the durable state and the caller's knowledge.
 
+[Try the status-and-activity retry exercise](./../../../chapters/reality/#exercise-pressure-retries).
+Name every promised effect before checking your answer, then explain whether the verdict would change if the extra record were only a diagnostic request log.
+Use [Appendix C](./../../../appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety) for the HTTP method distinction.
+
 ## Slide: Distinguish concurrency safety from appearance
 
 ```yaml
@@ -110,5 +114,8 @@ study:
   prompt: Choose a known request path. Name the pressure, failed assumption, amplification mechanism, first signal, user effect, and recovery check. What alternative explanation would you rule out?
   answer: For example, dependency latency can increase in-flight work and trigger retries, adding demand. Measure attempts separately from useful completions, preserve the workload definition, and observe recovery after the dependency returns. This is a hypothesis until evidence establishes the chain; a growing queue alone does not identify its cause.
 ```
+
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Freality%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
 
 [All modules](./../index.html) or [return to the book](./../../../).

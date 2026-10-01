@@ -107,4 +107,7 @@ study:
   answer: One possible improvement is an executable setup check that explains a missing dependency. Compare successful setup time and unresolved questions before and after, keeping the task and environment comparable. Record remaining limitations and practice effects. Faster completion alone does not establish that the repository caused the gain.
 ```
 
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Ffriction%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [All modules](./../index.html) or [return to the book](./../../../).

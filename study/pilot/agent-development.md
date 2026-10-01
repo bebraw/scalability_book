@@ -106,4 +106,7 @@ study:
   answer: For example, adding a transition requires one authorized state change and one matching activity event. Reject a result that duplicates an event on retry, accepts an invalid transition, or changes another user's item. Keep the setup, evidence, and decision with the revision. This is a reflection exercise; several valid designs are possible.
 ```
 
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Fscalable-development%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [All modules](./../index.html) or [return to the book](./../../../).

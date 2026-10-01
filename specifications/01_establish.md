@@ -51,7 +51,7 @@ Record consequential human intervention instead of hiding it.
 
 ### 3.1 Implement the common core
 
-Complete the required domain model, behavior, harness, and acceptance scenarios from the common specification.
+Complete the required domain model, behavior, [harness](/concepts/#harness), and acceptance scenarios from the common specification.
 Before expanding optional scope, describe the first closed product loop and list the capabilities deliberately deferred until that loop produces evidence.
 
 If the implementation begins from a starter template, record the template source and starting revision before pruning it.
@@ -72,12 +72,15 @@ Do not attempt to recreate model usage, failed attempts, or human intervention a
 
 ### 3.3 Record the stack hypothesis
 
-In the stack decision record, explain:
+In the stack [decision record](/concepts/#decision-log), explain:
 
 - why the chosen stack is suitable for this application;
 - what the group wants to learn by using it;
 - what setup, deployment, scalability, or maintainability risks it creates;
-- how well the local model appears to understand the stack.
+- how well the local model appears to understand the stack;
+- which choices remain [cheap to revise](/concepts/#decision-reversibility), what dependencies would make them harder, and what evidence would trigger a review.
+
+The [decision-log example](/chapters/friction/#keep-a-decision-log) shows how to record reversibility and a revisit condition alongside the rationale.
 
 ### 3.4 Analyze initial scalability
 

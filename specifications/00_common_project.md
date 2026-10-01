@@ -264,7 +264,7 @@ Each implementation must provide:
 
 - a `README.md` that explains the application, prerequisites, setup, running, testing, and the chosen stack;
 - one supported path from a clean checkout to a running application;
-- pinned or otherwise reproducible dependency and runtime versions;
+- pinned or otherwise [reproducible dependency and runtime versions](/concepts/#reproducible-environment);
 - an example configuration file when configuration is required;
 - no committed secrets;
 - a repeatable way to create enough demonstration data for the acceptance scenarios;
@@ -274,7 +274,7 @@ Each implementation must provide:
 - project instructions for the AI development workflow;
 - an architecture or data-flow diagram and a short architecture note for the core event workflow;
 - one maintained feature specification for the core event workflow, including its acceptance path;
-- a short decision record explaining the stack choice.
+- a short [decision record](/concepts/#decision-log) explaining the stack choice.
 
 Setup may use native tools, containers, a development environment definition, or another documented mechanism.
 Do not require an auditor to infer missing steps from knowledge held only by your team.
@@ -295,7 +295,7 @@ Run the same stack-neutral workload against implementations A, B, and C.
 The workload measures logical user operations from the adapter's request until the application returns an observable result, not individual internal network requests.
 The adapter may drive the user interface, a documented application interface, or another repeatable boundary that exercises the real application and persistence path.
 Choose that boundary before measuring A and keep it across B and C: API-response latency and browser-visible completion are different outcomes.
-Define the start and completion events, including response validation and what constitutes acknowledged persistence; separate additional diagnostic boundaries rather than ranking them together.
+Define the [start and completion events](/concepts/#measurement-boundary), including response validation and what constitutes acknowledged persistence; separate additional diagnostic boundaries rather than ranking them together.
 
 Start each measured profile from this fixture:
 
@@ -342,8 +342,8 @@ Quiesce or isolate outstanding work before resetting the fixture so a late write
 For every measured repetition, record:
 
 - implementation identifier, commit, environment, configuration, adapter version, and operation-order seed;
-- elapsed time, scheduled and dispatched counts, completed valid operations, and valid completions per second;
-- median and 95th-percentile latency for completed valid operations, clearly labeled as conditional on completion, plus their sample counts and the percentile calculation;
+- elapsed time, scheduled and dispatched counts, completed valid operations, and [valid completions per second](/concepts/#throughput);
+- median and [95th-percentile latency](/concepts/#tail-latency) for completed valid operations, clearly labeled as conditional on completion, plus their sample counts and the percentile calculation;
 - separate counts for not-started, unfinished, and timed-out operations, including their known waiting durations or deadline lower bounds;
 - expected rejections separately from timeouts, crashes, invalid responses, and other unexpected errors;
 - post-run checks for state, event, filter, and summary correctness;
@@ -525,7 +525,7 @@ The auditing group will:
 3. check a sample of the common acceptance scenarios;
 4. locate where one important domain behavior is implemented;
 5. identify one hidden assumption, inconsistency, or comprehension problem;
-6. attempt the small change probe supplied for that phase;
+6. attempt the small [change probe](/concepts/#change-probe) supplied for that phase;
 7. return a concise friction report.
 
 ### 10.1 Change-probe protocol

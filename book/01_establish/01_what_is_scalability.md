@@ -1,7 +1,7 @@
 # What does scalability mean for web development?
 
 A web application may cope with more requests while becoming harder to modify, accept more events while making old events too slow to query, or let more agents produce code while overwhelming review and integration.
-In this book, **scalability** means a system's ability to continue meeting a stated goal as a named pressure grows or changes.
+In this book, **[scalability](/concepts/#scalability)** means a system's ability to continue meeting a stated goal as a named [pressure](/concepts/#pressure) grows or changes.
 The goal, pressure, system boundary, and evidence are all part of the claim.
 Without them, scalability becomes a vague synonym for “large” or “well engineered.”
 
@@ -61,7 +61,7 @@ A design can therefore scale well along one axis while approaching a limit on an
 
 Demand is not only a higher request count.
 More consumers create more concurrency, more varied devices and networks, more retries after ambiguous responses, and more opportunities for rare paths to occur.
-A browser may remain responsive while the origin saturates, or the server may respond quickly while client rendering stalls on a growing activity view.
+A browser may remain responsive while the origin [saturates](/concepts/#saturation), or the server may respond quickly while client rendering stalls on a growing activity view.
 
 People are not the only consumers.
 Integrations, crawlers, and authorized agents can call an interface repeatedly and faster than a person operating a screen.
@@ -80,7 +80,7 @@ Those choices determine which data goals must be maintained as volume and variet
 
 A codebase that one person understands informally may become difficult to change when several people, teams, or agents work in parallel.
 More code output does not automatically increase accepted product output.
-Review capacity, integration, ownership, project memory, and the ability to diagnose failed work can become binding limits first.
+[Review capacity](/concepts/#review-budget), integration, ownership, project memory, and the ability to diagnose failed work can become binding limits first.
 
 Agents make this pressure especially visible because they can generate several plausible changes before a person could have implemented one.
 Stable contracts, focused tasks, executable checks, and explicit ownership can let contributors work more independently.
@@ -94,6 +94,7 @@ Once a consumer relies on a response or production data adopts a representation,
 
 Change scalability is the ability to keep making justified changes without turning every release into a coordinated rewrite.
 It depends on visible boundaries, useful tests, staged evolution, and recovery paths, but no design eliminates the need to understand what has already become a commitment.
+Planning for [decision reversibility](/concepts/#decision-reversibility) makes explicit which choices remain cheap to revise and which now require coordinated change.
 
 #### Field note — When agent speed made me the bottleneck
 
@@ -181,14 +182,14 @@ Use one causal chain before choosing a scaling technique:
 - **Pressure:** name what changes and the plausible range or scenario.
 - **Binding limit:** identify what first prevents the maintained goal from holding.
 - **Response:** change the application, architecture, infrastructure, workflow, or scope at that limit.
-- **Trade-off:** state which cost, latency, complexity, consistency, autonomy, or recovery obligation moved elsewhere.
+- **[Trade-off](/concepts/#trade-off):** state which cost, latency, complexity, consistency, autonomy, or recovery obligation moved elsewhere.
 - **Evidence:** repeat a representative observation that could challenge the claim.
 
 {{ import "site/includes/pressure-evidence-figure.html" }}
 
 For a runtime example, concurrent event submissions may exhaust the database connection pool before CPU becomes scarce.
 Admission control or buffering might protect accepted writes, but it can add waiting and require an explicit pending state.
-A useful evaluation would inspect success, duplication, tail latency, queue age, and recovery as the workload changes rather than only count server instances.
+A useful evaluation would inspect success, duplication, [tail latency](/concepts/#tail-latency), queue age, and recovery as the workload changes rather than only count server instances.
 
 For a development example, parallel agent tasks may produce changes faster than people can review them.
 Smaller task boundaries, executable contracts, and automated checks might move repeatable findings earlier, but maintaining those controls also consumes time.

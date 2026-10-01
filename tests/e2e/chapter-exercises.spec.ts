@@ -138,7 +138,7 @@ test("anonymous reading and no-JavaScript discussion remain available", async ({
   });
   const reading = await context.newPage();
   await reading.goto(chapter + selector);
-  await expect(reading.locator(".book-exercise")).toHaveCount(3);
+  await expect(reading.locator(".book-exercise")).toHaveCount(4);
   await expect(reading.locator(selector + " .exercise-work")).toBeHidden();
   await reading
     .locator(selector)
@@ -277,6 +277,15 @@ test("demo tabs preserve state, support keyboard and links, and print both panel
   await context.close();
 });
 
+const fleetAnswers = {
+  "four-time": "40",
+  "eight-time": "30",
+  candidates: "6",
+  accepted: "3",
+  backlog: "3",
+  claim: "faster-only",
+};
+
 const chapterPractice = [
   {
     chapter: "what-is-scalability",
@@ -301,12 +310,12 @@ const chapterPractice = [
   {
     chapter: "reality",
     id: "pressure-retries",
-    answers: { effects: "2", mechanism: "atomic" },
+    answers: { effects: "2", idempotent: "no", mechanism: "atomic" },
   },
   {
     chapter: "agent-fleets",
     id: "fleets-amdahl",
-    answers: { four: "2.5", limit: "5" },
+    answers: fleetAnswers,
   },
   {
     chapter: "scaling",
@@ -335,6 +344,44 @@ for (const fixture of chapterPractice) {
         await input.selectOption(value!);
       else await input.fill(value!);
     }
+    if (fixture.id === "fleets-amdahl") {
+      await expect(
+        exercise.locator(".exercise-discussion"),
+      ).not.toHaveAttribute("open", "");
+      await exercise.locator('[data-field="accepted"]').fill("6");
+      await exercise.locator('[data-field="backlog"]').fill("0");
+      await exercise
+        .locator('[data-field="claim"]')
+        .selectOption("both-double");
+      await exercise.getByRole("button", { name: "Check answer" }).click();
+      await expect(exercise.locator("[data-result]")).toContainText("Not yet");
+      await expect(
+        exercise.locator('[data-feedback="accepted"]'),
+      ).toContainText("One reviewer takes 20 minutes");
+      await expect(exercise.locator('[data-feedback="backlog"]')).toContainText(
+        "three unfinished features/hour",
+      );
+      await expect(exercise.locator('[data-feedback="claim"]')).toContainText(
+        "same reviewer",
+      );
+      await exercise.locator('[data-field="accepted"]').fill("3");
+      await exercise.locator('[data-field="backlog"]').fill("3");
+      await exercise
+        .locator('[data-field="claim"]')
+        .selectOption("faster-only");
+    }
+    if (fixture.id === "pressure-retries") {
+      await expect(
+        exercise.locator(".exercise-discussion"),
+      ).not.toHaveAttribute("open", "");
+      await exercise.locator('[data-field="idempotent"]').selectOption("yes");
+      await exercise.getByRole("button", { name: "Check answer" }).click();
+      await expect(exercise.locator("[data-result]")).toContainText("Not yet");
+      await expect(
+        exercise.locator('[data-feedback="idempotent"]'),
+      ).toContainText("duplicate domain activity event");
+      await exercise.locator('[data-field="idempotent"]').selectOption("no");
+    }
     await exercise.getByRole("button", { name: "Check answer" }).click();
     await expect(exercise.locator("[data-result]")).toContainText(
       "Correct — all parts passed",
@@ -344,7 +391,10 @@ for (const fixture of chapterPractice) {
       "Saved to the local preview server",
     );
     const saved = await page.request.get(`/api/learning/${fixture.id}`);
-    expect((await saved.json()).answers[0].completed).toBe(true);
+    const answer = (await saved.json()).answers[0];
+    expect(answer.completed).toBe(true);
+    if (["fleets-amdahl", "pressure-retries"].includes(fixture.id))
+      expect(answer.version).toBe(2);
     if (fixture.chapter !== "recap") {
       const group = page.locator(`[data-exercise-tabs="${fixture.id}"]`);
       await expect(
@@ -380,7 +430,7 @@ test("showcase includes all exercises and shares saved progress with chapters", 
   page,
 }) => {
   await page.goto("/demos/");
-  await expect(page.locator("[data-exercise]")).toHaveCount(11);
+  await expect(page.locator("[data-exercise]")).toHaveCount(13);
   await expect(page.locator(".exercise-tabs")).toHaveCount(9);
   await expect(
     page.locator('.exercise-tabs [role="tab"][aria-selected="true"]'),
@@ -388,8 +438,11 @@ test("showcase includes all exercises and shares saved progress with chapters", 
   const group = page.locator('[data-exercise-tabs="fleets-amdahl"]');
   await group.getByRole("tab", { name: /^Practice/ }).click();
   const exercise = group.locator('[data-exercise="fleets-amdahl"]');
-  await exercise.locator('[data-field="four"]').fill("2.5");
-  await exercise.locator('[data-field="limit"]').fill("5");
+  for (const [field, value] of Object.entries(fleetAnswers)) {
+    const input = exercise.locator(`[data-field="${field}"]`);
+    if (field === "claim") await input.selectOption(value);
+    else await input.fill(value);
+  }
   await exercise.getByRole("button", { name: "Check answer" }).click();
   await exercise.getByRole("button", { name: "Save result" }).click();
   await expect(exercise.locator(".exercise-status")).toContainText(
@@ -407,7 +460,10 @@ test("showcase includes all exercises and shares saved progress with chapters", 
   await expect(
     group.getByRole("tab", { name: "Practice · Complete" }),
   ).toHaveAttribute("aria-selected", "true");
-  await expect(exercise.locator('[data-field="four"]')).toHaveValue("2.5");
+  await expect(exercise.locator('[data-field="four-time"]')).toHaveValue("40");
+  await expect(exercise.locator('[data-field="claim"]')).toHaveValue(
+    "faster-only",
+  );
   await group.screenshot({
     path: test.info().outputPath("showcase-practice.png"),
   });

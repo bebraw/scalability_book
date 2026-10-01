@@ -1,6 +1,6 @@
 # How should web applications respond to scaling pressure?
 
-Scaling changes a system in response to a specific pressure.
+Scaling changes a system in response to a specific [pressure](/concepts/#pressure).
 Each response should relieve an identified limit while making its new costs and failure modes visible.
 
 ## Start with the pressure
@@ -11,7 +11,7 @@ Use the pressure map from the Reality chapter to select a response hypothesis.
 | Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
 | ----------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Writes and reads compete for one path                       | Separate the authoritative write path from derived read views        | Define freshness, rebuild, and reconciliation; measure write completion and read usefulness  |
-| A burst contains work that need not finish synchronously    | Queue or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
+| A burst contains work that need not finish synchronously    | [Queue](/concepts/#queue) or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
 | A request may be repeated after an ambiguous result         | Use a stable idempotency key and authoritative deduplication         | Store the mutation and reusable result atomically; test a retry after a lost response        |
 | One tenant or domain instance consumes shared capacity      | Partition, quota, or isolate work by a meaningful domain boundary    | Define routing, fairness, cross-partition operations, and migration                          |
 | Incoming work exceeds the rate at which it can be completed | Apply backpressure, admission control, rate limits, or load shedding | Make rejection explicit, bound waiting, guide retries, and preserve the essential path       |
@@ -30,13 +30,13 @@ The demonstration below starts from a concrete event-tracking pressure: event wr
 
 {{ import "site/includes/scaling-pressure-demo.html" }}
 
-The important part is the exported trade-off table.
+The important part is the exported [trade-off](/concepts/#trade-off) table.
 Use it to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
 
 ## Name the saturation boundary
 
 Scaling pressure becomes operationally important when it approaches a limit.
-The competence-envelope model introduced in the Challenge part calls the boundary condition **saturation**: the system can no longer absorb the disturbance with its current capabilities :citep[woods2018graceful].
+The competence-envelope model introduced in the Challenge part calls the boundary condition [**saturation**](/concepts/#saturation): the system can no longer absorb the disturbance with its current capabilities :citep[woods2018graceful].
 Naming the saturated resource prevents "add more servers" from becoming the default response.
 :ref[table:saturation-limit-categories]{text="The table below"} groups common limits by the evidence that reveals their approach.
 
@@ -59,7 +59,7 @@ These dynamics explain why a locally sensible mechanism can worsen a system-wide
 
 The model below compares one effective event rate with four declared stage limits.
 Increase demand until a boundary becomes binding, expand that limit, and observe which constraint becomes visible next.
-Then enable backpressure and compare hidden backlog growth with explicit rejection.
+Then enable [backpressure](/concepts/#backpressure) and compare hidden backlog growth with explicit rejection.
 
 {{ import "site/includes/saturation-boundary-demo.html" }}
 
@@ -85,6 +85,14 @@ Choose the question before the equation:
 
 [Appendix E](/appendices/scalability-models/#choose-a-model) collects the equations, assumptions, and limits.
 
+Before opening the concept references, choose between [Little's Law](/concepts/#little-law) and [Amdahl's Law](/concepts/#amdahl-law) for each question below.
+Explain your choice before checking the arithmetic.
+
+{{ import "exercise:scaling-model-choice" }}
+
+What would you still need to measure before recommending more workers?
+Connect the answer to [throughput](/concepts/#throughput), [latency](/concepts/#latency), and the assumptions of the chosen model.
+
 The project does not require every model.
 Apply at least one suitable law or formal model to an application-architecture decision and one to the development workflow.
 Each application should identify the variables, state the assumptions, show the calculation or reasoning, connect the result to a measured or proposed limit, and explain what the model leaves out.
@@ -92,7 +100,7 @@ A formula added after the design decision is not evidence that the formula guide
 
 ### Contention beyond Amdahl's bound
 
-Amdahl's fixed sequential share omits coordination costs that grow with concurrency.
+Amdahl's fixed sequential share omits [coordination costs](/concepts/#contention) that grow with concurrency.
 The [contention curve in Appendix E](/appendices/scalability-models/#contention-curve-lab) makes that difference visible and examines a production case of limiting admitted work.
 Fit its parameters to representative throughput measurements before using it for a capacity claim.
 
@@ -159,13 +167,13 @@ The fastest handler still waits for network propagation and every sequential rou
 
 Static assets and public cacheable responses can often move closer to users through a CDN or edge cache without moving the authoritative write path.
 Personalized data and mutations are harder: executing code at the edge does not remove the distance to a single authoritative database.
-Moving or replicating that authority introduces routing, failover, consistency, conflict, and residency decisions.
+Moving or replicating that authority introduces routing, failover, [consistency](/concepts/#consistency), conflict, and residency decisions.
 Measure which bytes and round trips dominate before treating multi-region deployment as the inevitable final stage of scaling.
 
 ### Partitions force an operational choice
 
 The CAP result is narrower than a general slogan about balancing consistency and availability.
-For a distributed read-write object in an asynchronous network, a network partition can prevent a design from guaranteeing both atomic consistency and an available response from every non-failing node :citep[gilbert2002brewer].
+For a distributed read-write object in an asynchronous network, a network [partition](/concepts/#partition) can prevent a design from guaranteeing both atomic consistency and an available response from every non-failing node :citep[gilbert2002brewer].
 Here **atomic consistency**, or **linearizability**, means each operation appears to take effect at one instant between its invocation and response, in an order that respects real time.
 If a write completes before a read begins, that read must see the written value or a later write in that order.
 **Availability** means every request to a non-failing node eventually completes with a response allowed by the object's contract; this guarantee does not impose a latency bound.

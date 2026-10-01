@@ -2,7 +2,7 @@
 
 _Architecture, measurement, scaling pressure, and agentic workflows_
 
-Scalability describes the relationship between changing pressure and the behavior people expect a system to maintain.
+[Scalability](/concepts/#scalability) describes the relationship between changing pressure and the behavior people expect a system to maintain.
 For a web application, that pressure may come from users, data, traffic, failures, geography, or new requirements.
 The response may involve architecture and infrastructure, but it can also change cost, complexity, ownership, and the speed at which the application can evolve.
 
@@ -22,7 +22,7 @@ The central question is how application behavior and the development process can
 ## Why this book now
 
 If I had written this book only a few years ago, it would have focused strictly on web technologies rather than development itself.
-Coding agents changed that.
+[Coding agents](/concepts/#agent) changed that.
 Developers can now delegate substantial parts of implementation, moving more of their attention toward specification, architecture, validation, and ownership.
 Agents are also becoming consumers of web applications through browsers, APIs, and tools.
 This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.

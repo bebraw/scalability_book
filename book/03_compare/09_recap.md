@@ -1,6 +1,6 @@
 # What do three agent-assisted implementations teach us about web scalability?
 
-Scalability is the ability to keep a system useful while its conditions change.
+[Scalability](/concepts/#scalability) is the ability to keep a system useful while its conditions change.
 The three implementations show how application behavior, the cost of change, and the development workflow constrain one another.
 Use their evidence to choose an architecture and workflow for a stated future scenario.
 
@@ -21,17 +21,17 @@ Trace which signal identified the limit and what new failure mode or operating c
 
 Each response must be implemented, checked, and maintained.
 Contracts, tests, setup, and project knowledge determine how expensive that work becomes.
-Identify what made the change difficult and which lesson became an executable check or maintained decision record.
+Identify what made the change difficult and which lesson became an executable check or maintained [decision record](/concepts/#decision-log).
 
 ### The agentic loop: turn execution into accepted change
 
-The constrain–generate–validate–revise loop allocates authority, produces a candidate, checks it, and corrects failures.
+The [constrain–generate–validate–revise loop](/concepts/#feedback-loop) allocates authority, produces a candidate, checks it, and corrects failures.
 Its trace exposes attempts, handoffs, and human intervention that the final repository can hide.
-Determine whether delegation reduced completion time through acceptance or moved effort into integration and review.
+Determine whether delegation reduced completion time through acceptance or moved effort into integration and [review](/concepts/#review-budget).
 
 ## How the loops affect one another
 
-Consider adding a queue to protect event ingestion during a traffic spike.
+Consider adding a [queue](/concepts/#queue) to protect event ingestion during a traffic spike.
 The response affects all three loops:
 
 | Perspective                   | Consequence of the queue                                                                                                                    |
@@ -71,7 +71,7 @@ Use the earlier phase records and the implementation, fleet, and scaling/deploym
 | Architecture and contracts     | Request trace and key boundary decisions                                                      | Which boundaries made independent change safer or harder?                       |
 | Pressure and saturation        | Pressure map and first predicted or observed limit                                            | How did each architecture respond to the same growth scenario?                  |
 | Measurement and recovery       | Benchmark, operational signals, and recovery result                                           | What was directly observed, and what remained invisible?                        |
-| Development friction           | Cross-team audit and change effort                                                            | Which setup, test, or coupling cost would dominate the next change?             |
+| Development friction           | Cross-team audit and [change effort](/concepts/#change-probe)                                                            | Which setup, test, or coupling cost would dominate the next change?             |
 | Human–agent workflow           | Execution trace, interventions, and review effort; include handoffs and backlog for the fleet | Which allocation produced accepted work at a sustainable correction cost?       |
 | Resource use and externalities | Runtime and model-use evidence                                                                | Did added resources create useful capacity or quality, or merely more activity? |
 
@@ -93,7 +93,7 @@ A strong synthesis labels the status of each important claim:
 
 For example, “implementation B had the lowest measured p95 under the declared workload” is an observation.
 “Its data model caused the difference” is an inference unless the comparison isolates that factor.
-“A queue would protect its write path” is a proposal until the new behavior and trade-offs are tested.
+“A queue would protect its write path” is a proposal until the new behavior and [trade-offs](/concepts/#trade-off) are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 The three builds are engineering case studies, with design, experience, and tool conditions changing together.
 Keep their observations separate from the [bounded paired workflow task](/project/compare/#5-4-compare-one-agent-with-the-fleet), which holds a frozen revision and declared conditions stable for a narrower exploratory contrast.
@@ -101,7 +101,7 @@ Keep their observations separate from the [bounded paired workflow task](/projec
 > **Case — Faster libraries and uncertain attribution**
 >
 > :citet[lemire2026optimization] reports rebuilding revisions of six libraries and measuring workload-specific runtime gains on one Intel Xeon Gold 6548N machine.
-> For the ada URL parser, he reports throughput rising from 0.54 to 1.28 GB/s on a corpus of 100,000 URLs.
+> For the ada URL parser, he reports [throughput](/concepts/#throughput) rising from 0.54 to 1.28 GB/s on a corpus of 100,000 URLs.
 > He also states that he cannot determine how much AI contributed to every change and discloses an advisory relationship with one contributing tool provider.
 >
 > The reported measurements support a claim about those revisions, workloads, and hardware.

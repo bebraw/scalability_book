@@ -8,7 +8,7 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 ## 1. Purpose
 
-Compare creates a third fresh implementation of the Work Activity Tracker through an agent fleet and then analyzes all three implementations and development workflows.
+Compare creates a third fresh implementation of the Work Activity Tracker through an [agent fleet](/concepts/#agent-fleet) and then analyzes all three implementations and development workflows.
 
 A fleet is an orchestration strategy, not a model category.
 The central question is whether decomposition, specialization, and parallelism improve the result enough to justify coordination, duplicated work, integration, review, and resource cost.
@@ -54,11 +54,11 @@ Use the smallest fleet that allows the group to study a real coordination questi
 
 Before implementation, record:
 
-- the task graph or workflow;
+- the [task graph](/concepts/#task-graph) or workflow;
 - each role or delegated responsibility;
 - allowed tools, files, or modules where relevant;
 - shared state that can survive between delegated runs, including who can write and later read it, how writes are attributed, how long it persists, and how it is cleared;
-- when session orchestration and resource access are separate, their policy ownership and precedence, bypass paths, and the authenticated identity, scoped delegated authority, and task, budget, policy, and trace identifiers passed across the boundary;
+- when session orchestration and resource access are separate, their policy ownership and precedence, bypass paths, and the authenticated identity, [scoped delegated authority](/concepts/#authority), and task, budget, policy, and trace identifiers passed across the boundary;
 - expected output and validation for each task;
 - dependencies and possible parallel work;
 - who or what owns integration;
@@ -89,7 +89,7 @@ In addition to the common evidence, record where possible:
 - conflicts or incompatible assumptions;
 - idle time or blocked tasks;
 - total model usage across the fleet;
-- active human integration and review time;
+- active human integration and [review time](/concepts/#review-budget);
 - defects found after individual agents considered their work complete.
 
 ### 5.3 Turn the fleet trace into debugging data
@@ -133,7 +133,7 @@ Compare the recorded B and C workflows:
 
 - Which observations suggest a benefit from delegation, and what else could explain them?
 - Which tasks were too coupled, ambiguous, or small to delegate?
-- Where did accepted throughput differ, under what conditions?
+- Where did [accepted throughput](/concepts/#throughput) differ, under what conditions?
 - Where did sequential work or review capacity become the bottleneck?
 - Would one careful agent or a human have been preferable for any task?
 

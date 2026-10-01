@@ -1,0 +1,855 @@
+import type { Concept, ConceptGroup } from "./concepts.ts";
+
+// These passages summarize the book's teaching claims. Contexts point to the
+// argument or example supporting each passage, rather than just a term match.
+function concept(
+  id: string,
+  title: string,
+  group: ConceptGroup,
+  definition: string,
+  assumptions: string,
+  example: string,
+  misconception: string,
+  contexts: [string, string, string][],
+): Concept {
+  return {
+    id,
+    title,
+    group,
+    definition,
+    assumptions,
+    example,
+    misconception,
+    contexts: contexts.map(([label, href, description]) => ({
+      label,
+      href,
+      description,
+    })),
+  };
+}
+
+export const bookConcepts: Concept[] = [
+  concept(
+    "development-friction",
+    "Development friction",
+    "Development",
+    "The resistance a team encounters while setting up, understanding, changing, testing, reviewing, deploying, or operating a system.",
+    "Locate a concrete blockage and the boundary it crosses. Some friction protects a named risk; a commitment is not automatically technical debt.",
+    "Adding an event category requires finding the HTTP contract, changing validation and stored data, updating the feed's cache key, and checking deployment compatibility. Record where effort and waiting accumulate before choosing an intervention.",
+    "All friction should be removed, or faster generation removes it. Validation and release gates can be protective, while generation can move effort into comprehension, review, and operation.",
+    [
+      [
+        "Friction: recognize the forms",
+        "/chapters/friction/#recognize-where-friction-appears",
+        "Distinguish setup, comprehension, change, and protective friction.",
+      ],
+      [
+        "Friction: find the commitment point",
+        "/chapters/friction/#find-the-commitment-point",
+        "Explain when a simple revert stops restoring the prior state.",
+      ],
+    ],
+  ),
+  concept(
+    "scalability",
+    "Scalability",
+    "Operations",
+    "The ability to maintain a declared goal as a relevant pressure changes, within stated constraints.",
+    "Name the goal, changing pressure, workload, and resources allowed to change. A scalability claim is conditional on these choices.",
+    "The tracker must keep valid-event p95 below 200 ms as offered traffic doubles, without exceeding its operating budget. This is a testable claim; ‘handles many users’ is not.",
+    "Scalability means maximum traffic. Data growth, more contributors, and frequent change can also threaten the maintained goal.",
+    [
+      [
+        "Scalability: begin with the goal",
+        "/chapters/what-is-scalability/#begin-with-the-goal-that-must-continue-to-hold",
+        "State the property that pressure must not break.",
+      ],
+      [
+        "Scaling: choose a response",
+        "/chapters/scaling/#start-with-the-pressure",
+        "Connect the changing pressure to an intervention.",
+      ],
+    ],
+  ),
+  concept(
+    "pressure",
+    "Scaling pressure",
+    "Operations",
+    "A change in demand, data, contributors, or rate of change that tests the system's ability to maintain its goal.",
+    "Separate the pressure from its symptom and from the proposed response. Describe the distribution of work, not only its total volume.",
+    "A reconnect burst increases event arrivals while the database size stays constant. A growing activity history can slow queries even with unchanged traffic.",
+    "‘We need caching’ names the pressure. It names a response whose relevance still needs evidence.",
+    [
+      [
+        "Scalability: four pressures",
+        "/chapters/what-is-scalability/#four-pressures-organize-the-course",
+        "Distinguish demand, data, contributors, and change.",
+      ],
+      [
+        "Pressure: identify the binding limit",
+        "/chapters/reality/#from-failed-assumptions-to-useful-signals",
+        "Trace a disturbance to its signals and limit.",
+      ],
+    ],
+  ),
+  concept(
+    "trade-off",
+    "Trade-off",
+    "Architecture",
+    "A choice that improves one desired property while imposing a cost, risk, or obligation elsewhere.",
+    "State which goal improves, who pays the cost, and under which conditions the choice remains worthwhile. Compare alternatives under compatible conditions.",
+    "Acknowledging events before processing shortens acknowledgment latency, but creates a pending state, queue, drain procedure, and a second completion boundary.",
+    "A faster benchmark establishes the best design. Correctness, recovery, operating cost, and maintainability may change the decision.",
+    [
+      [
+        "Scaling: assess the obligations",
+        "/chapters/scaling/#trade-offs",
+        "Explain the operating contract each response introduces.",
+      ],
+      [
+        "Recap: make a decision",
+        "/chapters/recap/#turn-comparison-into-a-decision",
+        "Use evidence and constraints to justify a preference.",
+      ],
+    ],
+  ),
+  concept(
+    "benchmark",
+    "Benchmark protocol",
+    "Evidence",
+    "A reproducible procedure that tests a specific performance claim with a declared workload, environment, boundaries, and success criteria.",
+    "Record versions, input distribution, warm-up, concurrency or arrival schedule, repetitions, failures, and unfinished work. Check that the generator is able to offer the intended load.",
+    "Run the same activity-feed workload against A, B, and C, preserving logical operation boundaries and reporting valid completions separately from overload rejections.",
+    "A single requests-per-second number ranks implementations. Different work, failure accounting, or generator behavior can make the numbers incomparable.",
+    [
+      [
+        "Measurement: test a claim",
+        "/chapters/benchmarking/#benchmark-to-test-a-claim",
+        "Declare the protocol before interpreting numbers.",
+      ],
+      [
+        "Project: common workload",
+        "/project/#7-1-shared-baseline-workload",
+        "Hold logical operations constant across implementations.",
+      ],
+    ],
+  ),
+  concept(
+    "tail-latency",
+    "Tail latency",
+    "Evidence",
+    "The slow end of the elapsed-time distribution, often described by a percentile such as p95 or p99.",
+    "State the percentile convention, population, sample size, and failure treatment. A small sample cannot precisely characterize rare slow outcomes.",
+    "Eighteen requests at 40 ms and two at 240 ms have a 60 ms mean and a nearest-rank p95 of 240 ms. The mean hides the slow minority.",
+    "A good mean implies a good tail, or p95 can replace average time in Little's Law. These statistics answer different questions.",
+    [
+      [
+        "Measurement: compare mean and tail",
+        "/chapters/benchmarking/#exercise-measurement-prediction",
+        "Calculate how a slow minority affects the result.",
+      ],
+      [
+        "Scaling: budget latency",
+        "/chapters/scaling/#latency-budget-lab",
+        "Account for the journey across stages.",
+      ],
+    ],
+  ),
+  concept(
+    "observability",
+    "Observability",
+    "Evidence",
+    "The capability to use telemetry to investigate system behavior across boundaries, including failures not anticipated when the system was instrumented.",
+    "Telemetry supplies evidence such as metrics, logs, and traces. Choose signals from the question and connect them with operation identity, time, and boundary; collecting signals alone does not establish observability or a cause.",
+    "For a duplicated event after a timeout, join the command identifier, request trace, commit result, retry, and visible activity. Healthy HTTP success alone misses the duplicate.",
+    "Collecting many logs establishes the cause. Signals need a coherent question and a traceable connection to the user outcome.",
+    [
+      [
+        "Pressure: trace a failure",
+        "/chapters/reality/#trace-one-failure-across-the-web-boundary",
+        "Join symptoms, policies, and authoritative outcomes.",
+      ],
+      [
+        "Measurement: signal selection",
+        "/chapters/benchmarking/#measurement-alone-cannot-explain-behavior",
+        "Use telemetry and the trace explorer to investigate behavior.",
+      ],
+    ],
+  ),
+  concept(
+    "goodhart-law",
+    "Goodhart's Law",
+    "Evidence",
+    "A warning that optimizing a proxy as a target can weaken its relationship to the outcome it was intended to represent.",
+    "Identify the useful outcome, the proxy, and how behavior changes when rewarded for the proxy. Check the outcome with evidence beyond the target metric.",
+    "Rewarding generated changes per hour can produce more small submissions while accepted output stays flat and reviewer waiting grows.",
+    "Every metric is useless. Metrics can inform decisions when their boundary, incentives, and omitted outcomes remain visible.",
+    [
+      [
+        "Measurement: challenge the metric",
+        "/chapters/benchmarking/#measurements-can-lead-you-astray",
+        "Use the Goodhart pressure test to inspect the proxy.",
+      ],
+      [
+        "Fleets: measure accepted output",
+        "/chapters/agent-fleets/#measure-accepted-throughput",
+        "Count accepted work and the human effort it needs.",
+      ],
+    ],
+  ),
+  concept(
+    "eval",
+    "Agent evaluation",
+    "Evidence",
+    "A declared task-and-grading procedure for assessing an agent workflow's capability, regression behavior, cost, and reliability.",
+    "Separate the evaluated agent harness from the evaluation harness. Preserve task inputs, served configuration, trial rules, graders, and failed attempts.",
+    "Run a contract-change task with fixed acceptance checks across repeated trials, recording correctness, retries, tokens, and reviewer minutes.",
+    "A pass on one task proves general reliability. Task selection, graders, environment, and trial variability limit the claim.",
+    [
+      [
+        "Appendix A: anatomy of an eval",
+        "/appendices/evaluating-agentic-workflows/#anatomy-of-an-agent-evaluation",
+        "Separate execution, environment, and grading.",
+      ],
+      [
+        "Modern Web Guidance: evaluate the guidance",
+        "/case-studies/modern-web-guidance/#the-guidance-has-an-evaluation-loop",
+        "Check whether a capability improves actual task outcomes.",
+      ],
+    ],
+  ),
+  concept(
+    "change-probe",
+    "Change probe",
+    "Evidence",
+    "A bounded modification used to observe how an unfamiliar maintainer can understand, change, and validate an implementation.",
+    "Declare the starting version, task, auditor familiarity, completion criteria, and effort boundary. One probe does not represent all future maintenance.",
+    "Ask another team to add one event filter. Record where they looked, what contracts they changed, validation effort, and the accepted result.",
+    "A system with passing behavior tests is necessarily easy to change. Navigability and the next-change cost need separate evidence.",
+    [
+      [
+        "Project: change-probe protocol",
+        "/project/#10-1-change-probe-protocol",
+        "Bound the audit and preserve comparable evidence.",
+      ],
+      [
+        "Appendix A: next-change cost",
+        "/appendices/evaluating-agentic-workflows/#evaluate-the-cost-of-the-next-change",
+        "Evaluate maintainability beyond first-pass success.",
+      ],
+    ],
+  ),
+  concept(
+    "agent",
+    "Coding agent",
+    "Development",
+    "A model-driven loop that observes context, chooses actions through tools, and uses resulting feedback to continue a development task.",
+    "Capabilities depend on the model, context, tools, environment, budget, and permitted authority. Generated work remains candidate work until accepted.",
+    "An agent edits an event handler, runs contract tests, inspects a failure, and revises the implementation before a maintainer accepts the change.",
+    "The model alone determines the development result. Its harness and the project's constraints materially shape what it can do and verify.",
+    [
+      [
+        "Development: define an agent",
+        "/chapters/scalable-development/#what-is-an-agent",
+        "Identify the observation–action loop.",
+      ],
+      [
+        "Fleets: move from one agent to several",
+        "/chapters/agent-fleets/#from-one-agent-to-a-fleet",
+        "Explain the new coordination obligations.",
+      ],
+    ],
+  ),
+  concept(
+    "harness",
+    "Project harness",
+    "Development",
+    "The project's durable instructions, commands, environment, checks, and review practices that make candidate changes inspectable and repeatable.",
+    "Keep the project harness distinct from an agent execution harness and an evaluation harness. Controls must be executable and maintained as the project changes.",
+    "Pinned versions, a documented test command, contract tests, and a review gate let an agent and an unfamiliar human validate the same event change.",
+    "A long instruction file makes the workflow controlled. Instructions require enforceable checks and an owner for acceptance.",
+    [
+      [
+        "Development: the project harness",
+        "/chapters/scalable-development/#the-project-harness",
+        "Connect instructions with executable controls.",
+      ],
+      [
+        "Kirjolab: prepare before feature pressure",
+        "/case-studies/kirjolab/#the-harness-existed-before-the-feature-pressure",
+        "See a harness support rapid delivery.",
+      ],
+    ],
+  ),
+  concept(
+    "acceptance-criteria",
+    "Acceptance criteria",
+    "Development",
+    "Declared observable conditions a candidate result must satisfy before it counts as completed work.",
+    "Criteria should follow the task and invariants, be testable where possible, and identify who accepts the result. Passing checks establish only what those checks cover.",
+    "An event change must preserve workspace isolation, show the new activity in the feed, and pass the shared tests before it counts as accepted throughput.",
+    "A clean diff or successful merge establishes correctness. Behavior, integration, and accountable review are separate obligations.",
+    [
+      [
+        "Fleets: authority and acceptance",
+        "/chapters/agent-fleets/#map-authority-and-acceptance",
+        "Assign acceptance before parallel work begins.",
+      ],
+      [
+        "Webernetes: shared behavioral tests",
+        "/case-studies/webernetes/#shared-tests-created-a-behavioral-contrast",
+        "Test generated behavior against a reference.",
+      ],
+    ],
+  ),
+  concept(
+    "authority",
+    "Action authority",
+    "Development",
+    "The permission granted to an actor to propose, prepare, or execute a decision or action within stated limits.",
+    "Name who may act and who remains accountable for the outcome. Separate holding credentials, being authorized to act, and being contained by the environment. Reading untrusted material does not grant it authority.",
+    "An implementation agent may edit a worktree and run tests, but may only prepare a release. A named maintainer authorizes the release and owns acceptance of its behavior.",
+    "Access to a tool implies permission for every action it supports. Credentials, action approval, and containment are different controls.",
+    [
+      [
+        "Development: assign authority",
+        "/chapters/scalable-development/#assign-authority-and-ownership",
+        "Make execution and acceptance ownership explicit.",
+      ],
+      [
+        "Appendix D: separate security controls",
+        "/appendices/agent-system-security/#separate-credential-custody-action-authorization-and-containment",
+        "Distinguish access, authorization, and containment.",
+      ],
+    ],
+  ),
+  concept(
+    "feedback-loop",
+    "Feedback loop",
+    "Development",
+    "A cycle that compares an observed result with a desired state and uses the difference to choose a correction.",
+    "Name the goal, signal, correction, delay, and owner. Faster feedback is useful only if it measures the relevant boundary.",
+    "Constrain an event change, generate it, run a failing contract check, and revise it. An orchestration controller similarly compares desired and observed capacity.",
+    "More frequent feedback guarantees improvement. A delayed or misleading signal can amplify the wrong behavior.",
+    [
+      [
+        "Development: constrain, generate, validate, revise",
+        "/chapters/scalable-development/#constrain-generate-validate-revise",
+        "Use the loop to turn candidate work into accepted work.",
+      ],
+      [
+        "Scaling: orchestration control",
+        "/chapters/scaling/#orchestration-maintains-declared-capacity",
+        "Compare development feedback with runtime control.",
+      ],
+    ],
+  ),
+  concept(
+    "decision-log",
+    "Decision log",
+    "Development",
+    "A maintained record of consequential decisions, their context, rationale, status, and consequences. An Architecture Decision Record (ADR) captures one architecturally significant choice in such a log.",
+    "For the course, include alternatives, evidence, ownership, current reversibility, and a revisit condition. Distinguish proposed, accepted, and implemented status from whether the choice remains soft or has become hard. Link superseding decisions to earlier records.",
+    "A record accepts an optional category field for an isolated trial, links compatibility tests, and requires review before production adoption. It notes that storing the representation and exposing it to independent clients will make reversal require compatibility or migration.",
+    "Writing an ADR makes a decision permanent, proves it was implemented, or replaces current tests and contracts. The log preserves rationale and review conditions; it must remain connected to the actual implementation and evidence.",
+    [
+      [
+        "Friction: record the commitment",
+        "/chapters/friction/#keep-a-decision-log",
+        "Record soft and hard choices with their evidence and revisit conditions.",
+      ],
+      [
+        "Measurement: preserve accepted context",
+        "/chapters/benchmarking/#field-note-preserve-accepted-context-not-every-interaction",
+        "Distinguish accepted rationale from a complete execution trace.",
+      ],
+      [
+        "Project: record the stack hypothesis",
+        "/project/establish/#3-3-record-the-stack-hypothesis",
+        "Use the existing stack decision record to make assumptions reviewable.",
+      ],
+    ],
+  ),
+  concept(
+    "decision-reversibility",
+    "Decision reversibility",
+    "Development",
+    "How easily a decision can be revised or undone safely. Soft decisions remain cheap to change; hard decisions require more coordination or recovery because other work depends on them.",
+    "Assess the current dependencies, durable effects, reversal cost, and evidence of safe recovery. Soft and hard are relative descriptions, and a choice can become harder as it is used.",
+    "A category representation tried in an isolated branch is easy to revise. Once production events store it and independent clients rely on it, changing that same choice requires compatibility or migration rather than only a code revert.",
+    "A small code change is always a soft decision, or a hard decision is automatically technical debt. Durable effects and dependencies determine reversal cost; some hard commitments are necessary and justified.",
+    [
+      [
+        "Friction: plan soft and hard decisions",
+        "/chapters/friction/#plan-soft-and-hard-decisions",
+        "Keep uncertain choices cheap to revise and identify what would make them hard.",
+      ],
+      [
+        "Scalability: change exposes commitments",
+        "/chapters/what-is-scalability/#change-makes-old-commitments-visible",
+        "Connect the ability to keep changing with the dependencies already created.",
+      ],
+      [
+        "Friction: keep a decision log",
+        "/chapters/friction/#keep-a-decision-log",
+        "Preserve what makes a choice reversible and when it should be reviewed.",
+      ],
+    ],
+  ),
+  concept(
+    "technical-debt",
+    "Technical debt",
+    "Development",
+    "Future change cost or reduced practical options created by earlier design or process shortcuts, compromises, or unmanaged coupling.",
+    "Identify the earlier choice, future change it obstructs, and evidence of its cost. A necessary hard commitment is not automatically debt; deliberately accepted debt can be justified when its future cost is visible and owned.",
+    "An undocumented schema assumption spreads into the API and UI. Adding one state later requires coordinated changes whose boundaries are hard to find.",
+    "Debt is merely untidy code. Coupled contracts, environments, and missing ownership can reduce optionality even when the code is neat.",
+    [
+      [
+        "Challenge: reduced optionality",
+        "/parts/challenge/#technical-debt-reduces-optionality",
+        "Connect commitments with future choices.",
+      ],
+      [
+        "Kirjolab: revise the architecture",
+        "/case-studies/kirjolab/#refactoring-was-the-revision-phase",
+        "Follow consolidation after rapid generation.",
+      ],
+      [
+        "Friction: find the commitment point",
+        "/chapters/friction/#find-the-commitment-point",
+        "Distinguish the cost of reversing a commitment from technical debt.",
+      ],
+    ],
+  ),
+  concept(
+    "reproducible-environment",
+    "Reproducible environment",
+    "Development",
+    "A declared setup that allows another run or maintainer to recreate the dependencies and conditions relevant to a result.",
+    "Choose the necessary strength: pinned versions, containers, or stronger isolation as the claim requires. Seeds and versions do not remove all nondeterminism.",
+    "The auditor uses the documented runtime, lockfile, database seed, and test commands to reproduce an event-feed failure from a clean checkout.",
+    "It works on one laptop, so the result is reproducible. Hidden services, mutable dependencies, and undeclared state can invalidate that inference.",
+    [
+      [
+        "Friction: version the environment",
+        "/chapters/friction/#treat-the-environment-as-a-versioned-input",
+        "Treat setup as part of the development boundary.",
+      ],
+      [
+        "Appendix B: choose the strength",
+        "/appendices/reproducible-environments/#choose-the-required-strength",
+        "Match reproducibility to the experiment.",
+      ],
+    ],
+  ),
+  concept(
+    "agent-fleet",
+    "Agent fleet",
+    "Development",
+    "Several agents working under an explicit task, coordination, authority, integration, and acceptance arrangement.",
+    "Useful parallelism depends on separable work and available integration capacity. Count accepted changes and coordination cost, not only simultaneous agents.",
+    "One agent changes the event contract, another updates consumers after that contract is fixed, and a reviewer tests their integrated behavior.",
+    "More agents guarantee more useful output. Shared dependencies and sequential review can erase the benefit.",
+    [
+      [
+        "Fleets: one agent to a fleet",
+        "/chapters/agent-fleets/#from-one-agent-to-a-fleet",
+        "Define what the fleet adds to the workflow.",
+      ],
+      [
+        "Compare: implementation C",
+        "/parts/compare/#implementation-c-work-activity-tracker",
+        "Declare and evaluate a fleet in the project.",
+      ],
+    ],
+  ),
+  concept(
+    "task-graph",
+    "Task graph",
+    "Development",
+    "A representation of work units and their dependencies, ownership, outputs, and integration points.",
+    "Dependencies must reflect shared contracts and actual acceptance order. Independent files do not necessarily mean independent behavior.",
+    "Fix the event schema before parallel API and UI tasks; reunite them in a shared-contract integration test.",
+    "Tasks that merge without conflicts were independent. A clean merge can still combine incompatible assumptions.",
+    [
+      [
+        "Fleets: define the task graph",
+        "/chapters/agent-fleets/#define-the-web-task-graph",
+        "Separate parallel work from ordered integration.",
+      ],
+      [
+        "Appendix D: task and resource control",
+        "/appendices/agent-system-security/#separate-task-control-from-resource-access",
+        "Keep task dependencies distinct from access permissions.",
+      ],
+    ],
+  ),
+  concept(
+    "review-budget",
+    "Review capacity",
+    "Development",
+    "The finite human attention and integration effort available to evaluate and accept candidate changes.",
+    "Record review, correction, waiting, acceptance, rejection, and withdrawal at a declared boundary. Human tasks vary; one observation of backlog or accepted output does not establish sustainable capacity.",
+    "In one hour, agents submit six changes and the maintainer accepts four. If none leave through rejection or withdrawal, unfinished work increases by two. Measure over time before treating four accepted changes/hour as sustainable capacity.",
+    "Review is an overhead that disappears with better generation. Understanding and accountable acceptance remain part of useful throughput.",
+    [
+      [
+        "Development: generation outruns comprehension",
+        "/chapters/scalable-development/#when-generation-outruns-comprehension",
+        "Locate the human constraint.",
+      ],
+      [
+        "Book case: coherence bottleneck",
+        "/case-studies/elements-of-scalable-web-development/#coherence-became-the-bottleneck",
+        "See editorial judgment limit delivery.",
+      ],
+    ],
+  ),
+  concept(
+    "contract",
+    "Application contract",
+    "Architecture",
+    "An agreement about observable behavior, valid inputs, outputs, errors, and obligations at an application boundary.",
+    "Identify consumers, versioning, authority, and compatibility expectations. Contracts include behavior that a type signature alone cannot express.",
+    "POST /events accepts one logical activity with workspace isolation and a declared duplicate policy, regardless of which runtime hosts the handler.",
+    "A deployment location or matching types fully defines the contract. Timing, retries, errors, and state effects also matter.",
+    [
+      [
+        "Architecture: contracts outlive deployment",
+        "/chapters/architecture/#application-contracts-outlive-deployment-choices",
+        "Separate behavior from where execution happens.",
+      ],
+      [
+        "Appendix C: executable HTTP contracts",
+        "/appendices/advanced-web-boundaries/#executable-http-contracts",
+        "Make boundary expectations testable.",
+      ],
+    ],
+  ),
+  concept(
+    "rendering",
+    "Rendering and activation",
+    "Architecture",
+    "Rendering creates a representation; activation connects that representation to interactive behavior. Their work can occur at different times and locations.",
+    "Trace data authority, representation freshness, delivered assets, and activation cost separately. A visible interface is not necessarily ready to act.",
+    "A static activity page arrives quickly, but client listeners and data must initialize before its filter works. Move work only after measuring the user journey.",
+    "Server rendering, client rendering, or hydration is universally fastest. The workload and interaction boundary determine the result.",
+    [
+      [
+        "Architecture: move rendering work",
+        "/chapters/architecture/#rendering-moves-work-across-time-and-place",
+        "Compare representation delivery choices.",
+      ],
+      [
+        "Appendix C: activate an interface",
+        "/appendices/advanced-web-boundaries/#activate-delivered-interfaces",
+        "Distinguish rendering from activation.",
+      ],
+    ],
+  ),
+  concept(
+    "state-authority",
+    "State authority",
+    "Architecture",
+    "The boundary responsible for committing and preserving the durable truth of domain actions.",
+    "Name which state is authoritative and how copies catch up. Permission to submit an action does not establish that it committed; a successful response or rebuilt view also needs evidence of the authoritative outcome.",
+    "The event store commits one activity. A delayed cached feed may show none yet; rebuilding the feed must not create a second activity.",
+    "Every copy is equally authoritative, or stateless handlers remove state. Authority still exists somewhere in the system.",
+    [
+      [
+        "Architecture: authority and access",
+        "/chapters/architecture/#data-placement-follows-authority-and-access",
+        "Follow ownership before choosing placement.",
+      ],
+      [
+        "Appendix C: rebuild without repeating effects",
+        "/appendices/advanced-web-boundaries/#rebuild-a-view-without-repeating-its-effects",
+        "Keep derived views separate from durable actions.",
+      ],
+    ],
+  ),
+  concept(
+    "transaction",
+    "Transaction",
+    "Architecture",
+    "A unit of state change with declared atomicity, isolation, and durability guarantees used to preserve invariants across concurrency and failure.",
+    "Check the actual store and isolation behavior. A database transaction does not automatically make effects in an external service atomic with its commit.",
+    "Commit the event and its reusable idempotency result together so a retried command cannot observe only half of the intended state.",
+    "Using a transaction makes every distributed action exactly once. External effects and ambiguous outcomes still need their own protocol.",
+    [
+      [
+        "Architecture: preserve invariants",
+        "/chapters/architecture/#transactions-preserve-invariants-across-failure-and-concurrency",
+        "Explain why the state changes belong together.",
+      ],
+      [
+        "Appendix C: transaction guarantees",
+        "/appendices/advanced-web-boundaries/#preserve-durable-invariants-with-transactions",
+        "Test concurrency and failure assumptions.",
+      ],
+    ],
+  ),
+  concept(
+    "invariant",
+    "Invariant",
+    "Architecture",
+    "A condition that must hold for every valid state or accepted transition within a declared domain boundary.",
+    "Specify the boundary and concurrent transitions. Validate at the authority; input validation alone may not protect against competing requests.",
+    "An event must reference a work item in the same workspace. The rule must survive concurrent writes and retries, not only the UI form.",
+    "Passing the happy path proves the invariant. Invalid combinations, concurrency, and partial failure challenge it.",
+    [
+      [
+        "Architecture: valid data combinations",
+        "/chapters/architecture/#model-valid-data-combinations",
+        "Make invalid combinations explicit.",
+      ],
+      [
+        "Appendix C: durable invariants",
+        "/appendices/advanced-web-boundaries/#preserve-durable-invariants-with-transactions",
+        "Place enforcement at the durable boundary.",
+      ],
+    ],
+  ),
+  concept(
+    "cache",
+    "Cache",
+    "Architecture",
+    "A controlled copy of a representation or result whose identity, freshness, invalidation, and access policy are part of the application contract.",
+    "Name the authority, cache key, eligible population, stale tolerance, and invalidation path. Shared caches must preserve isolation between users and workspaces.",
+    "Cache an activity feed by workspace and filter, then define when a newly committed event becomes visible. Omitting workspace from the key can expose another workspace's data.",
+    "Caching only changes speed. It also changes freshness, authorization exposure, dependency load, and recovery behavior.",
+    [
+      [
+        "Architecture: controlled copies",
+        "/chapters/architecture/#caching-coordinates-controlled-copies",
+        "Specify cache policy as behavior.",
+      ],
+      [
+        "Pressure: a dependency quota outage",
+        "/chapters/reality/#field-note-when-caching-complexity-became-an-availability-risk",
+        "Trace faulty caching into an availability failure.",
+      ],
+    ],
+  ),
+  concept(
+    "idempotency",
+    "Idempotency",
+    "Architecture",
+    "The property that repeating one logical operation has the same intended effect at a declared boundary as performing it once.",
+    "Name the operation and all its intended effects. For key-based deduplication, define key scope and lifetime, conflicting payload behavior, and atomic enforcement with the effect and result at their authority.",
+    "Completing a work item promises the Done status and one activity event. A retry that leaves the status unchanged but appends another event violates the whole operation's contract.",
+    "An unchanged final status proves the whole operation is idempotent. Its contract may include other effects; a local deduplication guarantee also does not establish exactly-once execution elsewhere.",
+    [
+      [
+        "Pressure: lost response and duplicate",
+        "/chapters/reality/#trace-one-failure-across-the-web-boundary",
+        "Follow one logical command through a retry.",
+      ],
+      [
+        "Pressure: inspect all promised effects",
+        "/chapters/reality/#exercise-pressure-retries",
+        "Assess the status and activity history together before choosing a retry mechanism.",
+      ],
+      [
+        "Appendix C: HTTP method semantics",
+        "/appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety",
+        "Separate intended effects, response differences, and incidental request logging.",
+      ],
+      [
+        "Appendix F: audit the effect",
+        "/appendices/durable-workflows/#audit-the-effect-boundary",
+        "Place deduplication at the authority for the effect.",
+      ],
+    ],
+  ),
+  concept(
+    "retry",
+    "Retry policy",
+    "Operations",
+    "The rules for attempting work again after failure or an ambiguous result, including limits, delay, deadlines, and operation identity.",
+    "Distinguish transient failure from permanent rejection and unknown completion. Bound attempts and preserve retry-safe semantics before adding retries.",
+    "A timeout after commit leaves the client uncertain. Reuse the command key and delay a bounded retry; synchronized immediate retries can overload the recovering dependency.",
+    "Retrying always improves availability. It can duplicate effects or amplify the pressure that caused the failure.",
+    [
+      [
+        "Pressure: production assumptions",
+        "/chapters/reality/#local-correctness-leaves-production-assumptions-untested",
+        "Account for network ambiguity and retry amplification.",
+      ],
+      [
+        "Appendix F: retry-safe effects",
+        "/appendices/durable-workflows/#audit-the-effect-boundary",
+        "Distinguish workflow progress from effect safety.",
+      ],
+    ],
+  ),
+  concept(
+    "backpressure",
+    "Admission and backpressure",
+    "Operations",
+    "Policies that bound admitted work or communicate downstream inability to keep up, preserving a declared service goal under pressure.",
+    "Specify capacity, rejection or slowing behavior, caller obligations, and recovery. Rejected work must stay visible in the outcome accounting.",
+    "A full event queue rejects optional submissions with a retry policy instead of accumulating unbounded waiting and exhausting memory.",
+    "Rejecting load means the design cannot scale, or a queue is unlimited capacity. Bounded admission can protect useful work while capacity is restored.",
+    [
+      [
+        "Scaling: response guide",
+        "/chapters/scaling/#start-with-the-pressure",
+        "Match the intervention to the pressured boundary.",
+      ],
+      [
+        "Pressure: recovery architecture",
+        "/chapters/reality/#recovery-is-part-of-the-architecture",
+        "Plan how overload and backlog drain end.",
+      ],
+    ],
+  ),
+  concept(
+    "recovery",
+    "Recovery",
+    "Operations",
+    "The prepared path from a disrupted state back to useful, correct service, including restored capacity, authoritative state, and backlog handling.",
+    "Check whether recovery tools depend on the failed service. Preserve operation identity and state integrity while replaying or draining work.",
+    "Restore the worker, then observe queue age and visible event freshness until the backlog drains. A healthy process alone does not establish recovery.",
+    "Restarting the endpoint ends the incident. Stale copies, duplicates, blocked tools, and pending work may persist.",
+    [
+      [
+        "Pressure: recovery is architecture",
+        "/chapters/reality/#recovery-is-part-of-the-architecture",
+        "Prepare the path before the disturbance.",
+      ],
+      [
+        "Thesis tracker: recovery features",
+        "/case-studies/thesis-journey-tracker/#recovery-is-a-first-class-feature",
+        "See recovery become part of the product.",
+      ],
+    ],
+  ),
+  concept(
+    "partition",
+    "Network partition",
+    "Operations",
+    "A disruption that prevents some nodes from communicating while they may continue running and accepting local work.",
+    "Specify the operation, consistency promise, and what each side may accept. A partition requires an operational choice about unavailable or divergent work.",
+    "Two regions cannot coordinate workspace writes. Either reject or delay some operations to preserve the declared consistency, or accept a weaker promise and reconciliation obligations.",
+    "A deployment can freely choose consistency and availability as independent switches during a partition. The operation's contract constrains the choice.",
+    [
+      [
+        "Scaling: operational choice",
+        "/chapters/scaling/#partitions-force-an-operational-choice",
+        "Explain the consequences for the tracker.",
+      ],
+      [
+        "Pressure: documented incidents",
+        "/chapters/reality/#what-documented-web-incidents-reveal",
+        "Follow divergent histories during a real partition.",
+      ],
+    ],
+  ),
+  concept(
+    "consistency",
+    "Consistency",
+    "Architecture",
+    "The promised relationship between operations and the state they can observe across concurrent access and replicated copies.",
+    "Name the actual guarantee and the relevant operation. Freshness delay, ordering, and durable integrity are related but different questions.",
+    "A committed event may reach a regional feed later. Decide whether that stale read is permitted and how the UI represents pending visibility.",
+    "All consistency choices are simply strong or eventual. The contract must describe what a consumer can rely on in its specific operation.",
+    [
+      [
+        "Scaling: geography and latency",
+        "/chapters/scaling/#latency-and-geography",
+        "Connect distance with observation guarantees.",
+      ],
+      [
+        "Architecture: data authority",
+        "/chapters/architecture/#data-placement-follows-authority-and-access",
+        "Distinguish authoritative state from copies.",
+      ],
+    ],
+  ),
+  concept(
+    "durable-workflow",
+    "Durable workflow",
+    "Operations",
+    "Execution that preserves coordination progress so work can resume after interruption without reconstructing every completed step.",
+    "Persistence of workflow progress does not itself make external effects retry-safe. Audit each effect's authority, operation identity, and uncertain-outcome handling.",
+    "A workflow checkpoints completed rendering and resumes publication after a crash. Publishing still needs a stable identity so an uncertain response cannot create duplicate artifacts.",
+    "Durable execution guarantees exactly-once external effects. Progress recovery and effect safety are separate guarantees.",
+    [
+      [
+        "Appendix F: preserve coordination progress",
+        "/appendices/durable-workflows/#durable-execution-preserves-coordination-progress",
+        "Separate durable coordination from effect semantics.",
+      ],
+      [
+        "Slideotter: durable boundaries",
+        "/case-studies/slideotter/#the-project-found-durable-authority-boundaries",
+        "Follow resumable work and artifact authority.",
+      ],
+    ],
+  ),
+  concept(
+    "contention",
+    "Contention",
+    "Models",
+    "Competition for shared resources or coordination that makes additional parallel workers spend more time waiting or synchronizing.",
+    "Declare the workload and shared resource. Fit or compare a contention model only with suitable measurements; its parameters are not universal constants.",
+    "More event workers compete for the same database lock. Parallelism increases, but completed throughput can plateau or fall as coordination grows.",
+    "Amdahl's ideal speedup bound accounts for every coordination cost. Added contention can make actual scaling worse than that bound suggests.",
+    [
+      [
+        "Scaling: beyond Amdahl",
+        "/chapters/scaling/#contention-beyond-amdahl-s-bound",
+        "Account for costs introduced by parallelism.",
+      ],
+      [
+        "Appendix E: contention curve",
+        "/appendices/scalability-models/#contention-curve-lab",
+        "Compare a model with the observed curve.",
+      ],
+    ],
+  ),
+  concept(
+    "lusser-law",
+    "Lusser's Law",
+    "Models",
+    "For a chain that requires every stage to succeed, independent stage success probabilities multiply to give the chain's success probability.",
+    "Define an eligible end-to-end attempt and the success criterion at each stage. Independence is a strong assumption; conditional stage success can describe a chain without assuming independence.",
+    "If three required stages each independently succeed with probability 0.99, chain success is 0.99³, about 0.9703. A shared outage invalidates the independence assumption.",
+    "High component reliability guarantees equally high journey reliability. Required stages accumulate failure opportunities, and common causes can change the calculation.",
+    [
+      [
+        "Appendix E: reliability chain",
+        "/appendices/scalability-models/#lusser-s-law-and-the-reliability-chain",
+        "Declare the chain and denominator.",
+      ],
+      [
+        "Appendix E: test independence",
+        "/appendices/scalability-models/#test-the-independence-assumption",
+        "Inspect shared failure rather than assuming it away.",
+      ],
+    ],
+  ),
+  concept(
+    "reliability",
+    "Reliability",
+    "Models",
+    "The probability or observed proportion of successful outcomes under a declared workload, environment, time horizon, and success criterion.",
+    "Include all eligible attempts in the denominator and state uncertainty. Agent first-attempt success and eventual success with retries answer different questions.",
+    "A task succeeds on 18 of 20 independent trials under one fixed configuration. Report the trials and uncertainty rather than claiming a general 90% guarantee.",
+    "One successful run establishes reliability, or success after repeated attempts implies first-attempt reliability.",
+    [
+      [
+        "Appendix A: uncertainty and trials",
+        "/appendices/evaluating-agentic-workflows/#report-uncertainty-not-only-point-estimates",
+        "Choose a success summary that matches the question.",
+      ],
+      [
+        "Appendix E: eligible attempts",
+        "/appendices/scalability-models/#estimate-from-all-eligible-attempts",
+        "Preserve the denominator across the journey.",
+      ],
+    ],
+  ),
+];

@@ -527,7 +527,13 @@ function decorateParagraph(
     from === undefined || to === undefined
       ? plainText(paragraph)
       : source.slice(from, to);
-  const baseId = stableParagraphId(authored);
+  // Adding a concept reference is a reading aid, not a new paragraph. Keep
+  // existing feedback attached when plain or emphasized words gain a link.
+  const identitySource = authored.replace(
+    /\[([^\]]+)\]\(\/concepts\/#[a-z-]+\)/g,
+    "$1",
+  );
+  const baseId = stableParagraphId(identitySource);
   const count = (paragraphCounts.get(baseId) || 0) + 1;
   paragraphCounts.set(baseId, count);
   const paragraphId = count === 1 ? baseId : `${baseId}-${count}`;

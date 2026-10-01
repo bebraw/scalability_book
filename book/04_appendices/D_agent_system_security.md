@@ -1,7 +1,7 @@
 # Agent-system security, control, and traceability
 
 Use this appendix when an agent workflow crosses several orchestration, model, tool, credential, or network boundaries.
-The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—allocate decision authority, enforce least privilege, preserve evidence, and keep a human owner—while this appendix develops control-plane separation, end-to-end trace reconciliation, capability adoption, and persistent cross-run state.
+The [Agent Fleets chapter](/chapters/agent-fleets/) keeps the essential rules—allocate decision [authority](/concepts/#authority), enforce least privilege, preserve evidence, and keep a human owner—while this appendix develops control-plane separation, end-to-end trace reconciliation, capability adoption, and persistent cross-run state.
 The [optional fleet exercises](#optional-fleet-exercises) test project memory, contract completeness, and human review gates.
 
 ## Separate task control from resource access
@@ -13,7 +13,7 @@ These responsibilities can share a platform or span several services, but their 
 
 | Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
 | ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Session and task orchestration | Run, delegated task, workspace | Agent-harness selection, task graph, session history, collaboration, delegated tool authority, sandbox choice, and task-level policy    |
+| Session and task orchestration | Run, delegated task, workspace | Agent-harness selection, [task graph](/concepts/#task-graph), session history, collaboration, delegated tool authority, sandbox choice, and task-level policy    |
 | Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
 
 ::caption[Control boundaries for agent orchestration and model or tool access.]
@@ -241,7 +241,7 @@ Judge memory by the work it improves, including its initialization and maintenan
 ### Check a contract against its consumers
 
 Use the two-revision event-list fixture above, whose current response contains `items` and `nextCursor`.
-A discoverable contract can still leave out an obligation.
+A discoverable [contract](/concepts/#contract) can still leave out an obligation.
 [Code Contracts](https://github.com/spolu/code-contracts) places identified requirements beside code, but its formatter checks syntax and duplicate identifiers rather than semantic compliance.
 [Decision Engineering](https://github.com/hpark0011/decision-engineering) records intended decisions, their dependencies, enforcement, and verification; the record still needs checking against actual consumers and behavior.
 
@@ -251,7 +251,7 @@ Omit this consumer from the contract map and give it an implementation that read
 The response-schema check passes, yet a check comparing exported event IDs with the independently defined expected set fails.
 This is an invented teaching fault: it tests an incomplete current record as well as the earlier exercise's stale guidance.
 
-Trace the missing obligation to the consumer, contract, acceptance check, and accountable owner.
+Trace the missing obligation to the consumer, contract, [acceptance check](/concepts/#acceptance-criteria), and accountable owner.
 Repair the export and update the map, then confirm that it includes every expected event exactly once.
 Record missed obligations, false alarms, and the effort to maintain the records alongside the existing exercise notes.
 

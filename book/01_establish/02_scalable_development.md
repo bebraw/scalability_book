@@ -8,7 +8,7 @@ Development scales when people can understand, validate, integrate, and maintain
 In classical AI, an agent observes an environment, chooses an action, and uses its effects to decide what to do next.
 The model applies both to physical robots and to programs acting in information environments :citep[poole2023artificial].
 
-In this book, a **coding agent** repeatedly observes a development environment and acts through tools to pursue a requested outcome.
+In this book, a **[coding agent](/concepts/#agent)** repeatedly observes a development environment and acts through tools to pursue a requested outcome.
 Its Large Language Model (LLM) operates inside an **agent harness** that assembles context, exposes tools, carries state, invokes the model, and returns action results as feedback.
 Software-engineering agent research describes related perception, memory, and action modules around the LLM :citep[wang2025agentsse].
 
@@ -31,8 +31,8 @@ Improving an agent therefore involves its environment and feedback as well as it
 
 ## Constrain, generate, validate, revise
 
-Agentic development follows a repeated loop: constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
-Useful throughput is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
+Agentic development follows a [repeated loop](/concepts/#feedback-loop): constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
+Useful [throughput](/concepts/#throughput) is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
 
 For the event tracker, consider adding CSV export.
 The task must settle which events are included, which fields may leave the application, and how the exported values are checked.
@@ -50,7 +50,7 @@ A working download button alone leaves those decisions unresolved.
 ::caption[The constrain–generate–validate–revise loop and the evidence that advances each stage.]
 ::label[table:agent-development-loop]
 
-**Constrain.** State the outcome, relevant context, allowed variation, budget, forbidden effects, acceptance criteria, and escalation rule.
+**Constrain.** State the outcome, relevant context, allowed variation, budget, forbidden effects, [acceptance criteria](/concepts/#acceptance-criteria), and escalation rule.
 Preserve recurring constraints in project instructions such as `AGENTS.md`.
 Treat initial requirements as hypotheses that interaction with a prototype may refine :citep[brooks1987silver].
 Programming also builds the understanding needed to explain and change the system :citep[naur1985theory].
@@ -91,7 +91,7 @@ Use validation failures to revise the project's rules and context before the nex
 
 At each stage of the loop, decide who may act, which evidence permits the next step, and who owns the result.
 For each decision, an agent may **propose** an option, **prepare** an action for approval, or **execute** within explicit limits.
-Ambiguous intent, weak evidence, irreversible commitments, and material external effects should narrow that authority.
+Ambiguous intent, weak evidence, [irreversible commitments](/concepts/#decision-reversibility), and material external effects should narrow that [authority](/concepts/#authority).
 
 For the CSV export, an agent might propose fields, implement the agreed format, and run checks; the accepting person still decides whether the exported data and access rules meet the requirement.
 The [Agent Fleets chapter](/chapters/agent-fleets/#map-authority-and-acceptance) extends this allocation across delegated tasks.
@@ -124,7 +124,7 @@ Publishing an issue or patch also creates work for an external maintainer, so so
 
 ## The project harness
 
-The **project harness** is the versioned material that lets humans and agents change a repository: instructions, specifications, architecture notes, setup, examples, and validation commands.
+The **[project harness](/concepts/#harness)** is the versioned material that lets humans and agents change a repository: instructions, specifications, architecture notes, setup, examples, and validation commands.
 It supplies project knowledge to the agent harness introduced earlier.
 
 | Term               | Scope                                   | What it includes                                                                                              | Governing question                                                |
@@ -195,8 +195,8 @@ The A–B–C phases vary the agent setup while preserving the required applicat
 
 ## When generation outruns comprehension
 
-An agent can increase the arrival rate of candidate changes while comprehension, review, and integration remain constrained.
-The resulting backlog appears as large diffs, delayed review, shallow acceptance, rework, or technical debt.
+An agent can increase the arrival rate of candidate changes while comprehension, [review](/concepts/#review-budget), and integration remain constrained.
+The resulting backlog appears as large diffs, delayed review, shallow acceptance, rework, or [technical debt](/concepts/#technical-debt).
 :ref[table:candidate-production-and-comprehension]{text="The table below"} collects evidence about different parts of that mismatch.
 
 | Evidence                                                                                                                                                                     | What it supports                                                                     | Important limit                                                                                     |

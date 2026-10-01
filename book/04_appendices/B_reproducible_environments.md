@@ -16,7 +16,7 @@ The vendor-authored study concerns benchmark infrastructure rather than develope
 Keep four related claims separate:
 
 - **Setup automation** provides a bootstrap path, but that path may still be unpinned, stateful, or dependent on the network.
-- A **declared environment** records and, where possible, pins the toolchain, dependencies, service definitions, configuration schema, seed-data revision, and supported platform and resource scope needed to reconstruct setup and run the baseline checks.
+- A **[declared environment](/concepts/#reproducible-environment)** records and, where possible, pins the toolchain, dependencies, service definitions, configuration schema, seed-data revision, and supported platform and resource scope needed to reconstruct setup and run the baseline checks.
 - **Hermetic execution** isolates an action from undeclared host state and external services and restricts it to declared inputs and controlled tools; running inside a container does not establish this by itself.
 - A **[reproducible build](https://reproducible-builds.org/docs/definition/)** means that, given the same source, build environment, and build instructions, independent builders produce bit-for-bit identical copies of the specified artifacts.
 
@@ -55,7 +55,7 @@ I value a development environment that is easy to bootstrap and safe to bootstra
 Setup should be idempotent: rerunning it should converge on the supported project state or report a clear incompatibility instead of accumulating hidden changes.
 Without that property, stale dependencies and one-off repairs can eventually leave a project insecure or unable to run.
 
-In my agent-assisted projects, remote CI has usually been too slow for the primary feedback loop: an agent can produce several changes during one cycle.
+In my agent-assisted projects, remote CI has usually been too slow for the primary [feedback loop](/concepts/#feedback-loop): an agent can produce several changes during one cycle.
 I use local validation during iteration and retain clean, independent CI where the acceptance risk justifies it.
 
 I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template), whose [affected-guardrail decision](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/implemented/ADR-026-run-affected-guardrails-when-possible.md) documents the focused path and its fallbacks to broader validation.

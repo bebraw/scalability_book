@@ -115,4 +115,10 @@ study:
     Other designs can be valid. The important feature is a reproducible comparison with a result that could disconfirm the claim. Keep raw measurements and limitations with the conclusion.
 ```
 
+[Connect event backlog to review work](./../../../chapters/benchmarking/#exercise-measurement-transfer).
+Try the calculation before revisiting the [concept definitions and examples](./../../../concepts/).
+
+[Explore connections across the book](./../../../concepts/?reading=%2Fchapters%2Fbenchmarking%2F).
+Explain one connection before opening the definition, then follow it to another reading and check where the analogy stops.
+
 [Revisit scaling pressure](./../scalability/index.html) or [return to the book](./../../../).

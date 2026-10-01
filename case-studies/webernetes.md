@@ -4,7 +4,7 @@
 Sam Rose built it at ngrok to support durable, interactive explanations of Kubernetes rather than to replace a production cluster.
 
 The project is relevant to scalable development because language models produced most of a large port in a short period, while acceptance still depended on human review, explicit porting rules, and behavioral comparison with a real implementation.
-Its development harness turns selected compatibility claims into observable contrasts.
+Its [development harness](/concepts/#harness) turns selected compatibility claims into observable contrasts.
 
 The figures below come from Rose's [30 June 2026 retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser) and describe that snapshot rather than the repository's later state.
 
@@ -46,7 +46,7 @@ Ported declarations carry breadcrumbs to a pinned upstream Kubernetes revision, 
 The objective is not idiomatic TypeScript in isolation.
 It is a mapping a reviewer can compare with the upstream implementation without reconstructing an unrelated local design.
 
-This is a useful distinction between generation speed and accepted-change throughput.
+This is a useful distinction between generation speed and [accepted-change throughput](/concepts/#throughput).
 Models expanded the amount of candidate implementation, but the human still had to understand the mapping, notice unjustified deviations, and decide which subset was worth maintaining.
 
 ## Shared tests created a behavioral contrast
@@ -55,7 +55,7 @@ Webernetes exposes a fake client shaped closely enough to `@kubernetes/client-no
 One harness targets a real k3s cluster in Node.js; the other targets Webernetes in a browser.
 If an operation passes against k3s and fails against the simulator, the mismatch becomes a concrete porting problem instead of a model's opinion about its own output.
 
-The repository instructions now strengthen that loop.
+The repository instructions now strengthen that [loop](/concepts/#feedback-loop).
 For Kubernetes-facing behavior, a contributor should first observe the test fail against the simulator and pass against k3s, then implement the fix.
 Simulator time also goes through a controllable cluster clock rather than ambient timers, making scheduling behavior easier to pause and test deterministically.
 
