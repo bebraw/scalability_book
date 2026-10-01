@@ -7,14 +7,6 @@ import {
 } from "../../shared/concept-graph.ts";
 
 (() => {
-  const graphUpdates = new WeakMap<
-    HTMLElement,
-    (preserveViewport?: boolean) => void
-  >();
-  let showLabels = false;
-  try {
-    showLabels = localStorage.getItem("concept-connection-labels") === "true";
-  } catch {}
   function initializeGraph(map: HTMLElement) {
     const complete = map.dataset.complete === "true";
     const fixedFocus = map.dataset.focus || "";
@@ -23,7 +15,8 @@ import {
     const labels = map.querySelector<HTMLInputElement>(
       "[data-concept-labels]",
     )!;
-    labels.checked = showLabels;
+    // A newly opened graph starts uncluttered, including clones of other views.
+    labels.checked = false;
     const select = map.querySelector<HTMLSelectElement>("[data-concept-focus]");
     const search = map.querySelector<HTMLInputElement>("[data-concept-search]");
     const reading = map.querySelector<HTMLSelectElement>(
@@ -338,22 +331,7 @@ import {
         history.replaceState(history.state, "", url);
       }
     }
-    graphUpdates.set(map, update);
-    labels.addEventListener("change", () => {
-      showLabels = labels.checked;
-      try {
-        localStorage.setItem("concept-connection-labels", String(showLabels));
-      } catch {}
-      for (const graph of document.querySelectorAll<HTMLElement>(
-        "[data-concept-map]",
-      )) {
-        const toggle = graph.querySelector<HTMLInputElement>(
-          "[data-concept-labels]",
-        );
-        if (toggle) toggle.checked = showLabels;
-        graphUpdates.get(graph)?.(true);
-      }
-    });
+    labels.addEventListener("change", () => update(true));
     const params = complete ? new URLSearchParams(location.search) : null;
     if (search) search.value = params?.get("q") || "";
     for (const [control, parameter] of [

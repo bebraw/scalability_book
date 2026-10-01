@@ -161,9 +161,13 @@ test("group highlighting and isolation are accessible on mobile", async ({
   });
 });
 
-test("connection labels can be toggled and followed across graph views", async ({
+test("connection labels stay local while following concepts across graph views", async ({
   page,
 }) => {
+  // A preference saved by the old global control must not affect new graphs.
+  await page.addInitScript(() =>
+    localStorage.setItem("concept-connection-labels", "true"),
+  );
   await page.goto("/concepts/");
   const map = page.locator("#concept-graph");
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
@@ -186,6 +190,9 @@ test("connection labels can be toggled and followed across graph views", async (
   const beforeCenter = await center();
   await toggle.check();
   await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
+  await expect(
+    page.locator("#decision-log [data-concept-labels]"),
+  ).not.toBeChecked();
   await page.evaluate(() => document.fonts.ready);
   const assertCaptionPadding = async (graph: Locator) => {
     const cramped = await graph
@@ -247,21 +254,52 @@ test("connection labels can be toggled and followed across graph views", async (
   await map.screenshot({
     path: test.info().outputPath("connection-labels.png"),
   });
+  const backgroundView = () =>
+    graphic.evaluate((element) => ({
+      left: element.scrollLeft,
+      top: element.scrollTop,
+      width: element.querySelector("svg")!.style.width,
+      viewBox: element.querySelector("svg")!.getAttribute("viewBox"),
+      positions: [...element.querySelectorAll("[data-concept-node] g")].map(
+        (node) => node.getAttribute("transform"),
+      ),
+    }));
+  const beforePane = await backgroundView();
   await map
     .getByRole("link", { name: "Explore Decision log", exact: true })
     .click();
   const pane = page.getByRole("dialog", { name: "Decision log", exact: true });
-  await expect(
-    pane.getByRole("checkbox", { name: "Show connection labels" }),
-  ).toBeChecked();
+  const paneToggle = pane.getByRole("checkbox", {
+    name: "Show connection labels",
+  });
+  await expect(paneToggle).not.toBeChecked();
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await paneToggle.check();
   await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(6);
   await assertCaptionPadding(pane);
+  await paneToggle.uncheck();
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await expect(toggle).toBeChecked();
+  expect(await backgroundView()).toEqual(beforePane);
+  await paneToggle.check();
   await pane
     .getByRole("link", { name: "Explore Decision reversibility", exact: true })
     .click();
+  const nextPane = page.getByRole("dialog", {
+    name: "Decision reversibility",
+    exact: true,
+  });
+  const nextToggle = nextPane.getByRole("checkbox", {
+    name: "Show connection labels",
+  });
+  await expect(nextToggle).not.toBeChecked();
+  await expect(nextPane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await nextToggle.check();
   await expect(
     page.locator(".concept-pane .concept-edge-label:visible"),
   ).toHaveCount(7);
+  await expect(toggle).toBeChecked();
+  expect(await backgroundView()).toEqual(beforePane);
   await page.keyboard.press("Escape");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/chapters/friction/");
@@ -271,26 +309,28 @@ test("connection labels can be toggled and followed across graph views", async (
   });
   await index.getByText("Explore concept connections", { exact: true }).click();
   const chapterMap = index.locator("[data-concept-map]");
-  await expect(
-    chapterMap.getByRole("checkbox", { name: "Show connection labels" }),
-  ).toBeChecked();
+  const chapterToggle = chapterMap.getByRole("checkbox", {
+    name: "Show connection labels",
+  });
+  await expect(chapterToggle).not.toBeChecked();
+  await expect(chapterMap.locator(".concept-edge-label:visible")).toHaveCount(
+    0,
+  );
+  await chapterToggle.check();
   await assertNoCaptionOverlap(chapterMap);
   await assertCaptionPadding(chapterMap);
   await chapterMap.getByLabel("Focus on").selectOption("decision-log");
   await expect(chapterMap.locator(".concept-edge-label:visible")).toHaveCount(
     5,
   );
-  await chapterMap
-    .getByRole("checkbox", { name: "Show connection labels" })
-    .uncheck();
+  await chapterToggle.uncheck();
   await expect(chapterMap.locator(".concept-edge-label:visible")).toHaveCount(
     0,
   );
+  await chapterToggle.check();
   await page.reload();
   await index.getByText("Explore concept connections", { exact: true }).click();
-  await expect(
-    chapterMap.getByRole("checkbox", { name: "Show connection labels" }),
-  ).not.toBeChecked();
+  await expect(chapterToggle).not.toBeChecked();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth > innerWidth,
