@@ -102,6 +102,7 @@ Here, make the asymmetry between introduction and safe reversal visible.
 ### Plan soft and hard decisions
 
 Use **[decision reversibility](/concepts/#decision-reversibility)** when planning a change.
+Soft and hard are the book's shorthand for low and high reversal cost, related to the [one-way/two-way-door distinction](https://www.aboutamazon.com/news/company-news/2016-letter-to-shareholders).
 A **soft decision** is still cheap to revise or undo because few durable effects or external dependencies rely on it.
 A **hard decision** requires more coordination or recovery to change safely because accepted data, consumers, or operating commitments depend on it.
 Soft and hard describe a spectrum, and the same decision can become harder as those dependencies accumulate.

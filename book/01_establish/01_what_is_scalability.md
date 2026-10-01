@@ -34,6 +34,8 @@ The [Benchmarking chapter](/chapters/benchmarking/) develops how to produce boun
 
 Many taxonomies of scalability are possible.
 This book uses four pressures that can be applied consistently to the event tracker and to its three independent implementations: demand, data, contributors, and change.
+These are the course's organizing dimensions, not an exhaustive or universally adopted taxonomy.
+Claims about contributors and change also concern maintainability, evolvability, and coordination; name the property being maintained rather than treating every dimension as one performance measure.
 
 | Pressure     | What grows or changes                                                                   | Goal that may need to hold                                             | Early signals in a web project                                                     |
 | ------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |

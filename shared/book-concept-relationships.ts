@@ -202,7 +202,13 @@ const connections: [string, string, string, string][] = [
     "observability",
     "feedback-loop",
     "goal-aligned signals",
-    "A feedback loop can choose a useful correction only when its signals describe the relevant goal and boundary.",
+    "A corrective feedback loop can choose a useful response only when its signals describe the relevant goal and boundary.",
+  ],
+  [
+    "feedback-loop",
+    "retry",
+    "reinforcing load",
+    "Overload can cause timeouts that trigger retries and add more load. A bounded retry policy with delay and admission control can limit this reinforcing feedback; retry-safe effects are still required.",
   ],
   [
     "goodhart-law",
@@ -298,7 +304,7 @@ const connections: [string, string, string, string][] = [
     "authority",
     "state-authority",
     "permission vs commit",
-    "Action authority asks who may authorize or execute an operation; state authority asks where its durable outcome is committed. An authorized attempt can still fail to commit.",
+    "Action authorization asks who may execute an operation; authoritative state establishes its committed outcome and the boundary responsible for preserving it. An authorized attempt can still fail to commit.",
   ],
   [
     "authority",

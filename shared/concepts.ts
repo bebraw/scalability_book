@@ -18,6 +18,10 @@ export type Concept = {
   example: string;
   misconception: string;
   contexts: { label: string; href: string; description: string }[];
+  usage?: {
+    note: string;
+    sources?: { label: string; href: string }[];
+  };
 };
 
 // Curated teaching passages, shared by the reference page and chapter panes.
@@ -34,6 +38,9 @@ const pilotConcepts: Concept[] = [
       "An event takes 20 ms inside the database but 200 ms from submission to visible activity. The database timer leaves out network, application, queue, and rendering time; it cannot establish the end-to-end latency.",
     misconception:
       "A faster component proves a faster user journey. Work outside the measured component can dominate or become slower.",
+    usage: {
+      note: "Measurement boundary is the book's descriptive label for a measurement's scope and timing convention, rather than a separate formal model.",
+    },
     contexts: [
       {
         label: "Measurement: declare the protocol",
@@ -139,6 +146,15 @@ const pilotConcepts: Concept[] = [
       "A request visits stages with capacities of 180, 110, 150, and 130 requests/s. With one visit per stage and no retries, the ceiling is 110/s. Raising that stage to 150/s moves the limit to the 130/s stage.",
     misconception:
       "Adding capacity to one component removes the system's limit. Another stage can bind first, and a quicker acknowledgment can conceal a growing backlog.",
+    usage: {
+      note: "The book uses saturation across technical and human limits, drawing on resilience engineering's treatment of finite adaptive capacity. Name the limiting capacity in each example; resource utilization alone does not describe every limit.",
+      sources: [
+        {
+          label: "Woods: the theory of graceful extensibility",
+          href: "https://link.springer.com/article/10.1007/s10669-018-9708-3",
+        },
+      ],
+    },
     contexts: [
       {
         label: "Pressure: name the binding limit",

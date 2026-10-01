@@ -89,7 +89,7 @@ export const conceptPages: ConceptPage[] = [
       "decision-log",
     ],
     prompt:
-      "A write succeeds but its activity is absent from a cached feed. Follow state authority, cache, and consistency: what evidence establishes the commit, and which freshness promise decides whether the missing activity is acceptable?",
+      "A write succeeds but its activity is absent from a cached feed. Follow authoritative state, cache, and consistency: what evidence establishes the commit, and which freshness promise decides whether the missing activity is acceptable?",
   },
   {
     url: "/chapters/friction/",
@@ -126,7 +126,7 @@ export const conceptPages: ConceptPage[] = [
       "queue",
     ],
     prompt:
-      "Trace a lost response through retry, idempotency, and state authority. Which signal distinguishes one recovered operation from a duplicate?",
+      "Trace a lost response through retry, idempotency, and authoritative state. Which signal distinguishes one recovered operation from a duplicate?",
   },
   {
     url: "/chapters/agent-fleets/",

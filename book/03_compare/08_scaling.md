@@ -11,7 +11,7 @@ Use the pressure map from the Reality chapter to select a response hypothesis.
 | Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
 | ----------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Writes and reads compete for one path                       | Separate the authoritative write path from derived read views        | Define freshness, rebuild, and reconciliation; measure write completion and read usefulness  |
-| A burst contains work that need not finish synchronously    | [Queue](/concepts/#queue) or buffer bounded background work                              | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
+| A burst contains work that need not finish synchronously    | [Queue](/concepts/#queue) or buffer bounded background work          | Expose pending and terminal states, queue age, retry behavior, and worker saturation         |
 | A request may be repeated after an ambiguous result         | Use a stable idempotency key and authoritative deduplication         | Store the mutation and reusable result atomically; test a retry after a lost response        |
 | One tenant or domain instance consumes shared capacity      | Partition, quota, or isolate work by a meaningful domain boundary    | Define routing, fairness, cross-partition operations, and migration                          |
 | Incoming work exceeds the rate at which it can be completed | Apply backpressure, admission control, rate limits, or load shedding | Make rejection explicit, bound waiting, guide retries, and preserve the essential path       |
@@ -50,8 +50,8 @@ Naming the saturated resource prevents "add more servers" from becoming the defa
 ::caption[Categories of saturation limits and their observable signals.]
 ::label[table:saturation-limit-categories]
 
-Saturation also creates feedback loops.
-Retries can amplify load, synchronous fan-out can overload an internal service, and blocked threads can make a CPU-based autoscaler misread demand.
+Saturation can create reinforcing [feedback loops](/concepts/#feedback-loop): overload causes timeouts, timeouts cause retries, and retries add load.
+Synchronous fan-out can overload an internal service, and blocked threads can make a CPU-based autoscaler misread demand.
 A resource leak may separate the causal change from the eventual failure by hours or months.
 These dynamics explain why a locally sensible mechanism can worsen a system-wide incident and why the pressure map must identify both the first limit and what happens after it is reached :citep[hochstein2026saturation].
 

@@ -11,6 +11,7 @@ function concept(
   example: string,
   misconception: string,
   contexts: [string, string, string][],
+  usage?: Concept["usage"],
 ): Concept {
   return {
     id,
@@ -20,6 +21,7 @@ function concept(
     assumptions,
     example,
     misconception,
+    ...(usage ? { usage } : {}),
     contexts: contexts.map(([label, href, description]) => ({
       label,
       href,
@@ -49,6 +51,9 @@ export const bookConcepts: Concept[] = [
         "Explain when a simple revert stops restoring the prior state.",
       ],
     ],
+    {
+      note: "Development friction is a descriptive umbrella for observed effort and waiting. The course's setup, comprehension, change, and protective-friction categories organize an audit; they are not a standardized productivity score.",
+    },
   ),
   concept(
     "scalability",
@@ -70,6 +75,9 @@ export const bookConcepts: Concept[] = [
         "Connect the changing pressure to an intervention.",
       ],
     ],
+    {
+      note: "The book applies scalability to runtime capacity and to development work. For contributors and change, relate the claim to maintainability, evolvability, or coordination as appropriate; name the goal rather than assuming one shared measure of scale.",
+    },
   ),
   concept(
     "pressure",
@@ -91,6 +99,9 @@ export const bookConcepts: Concept[] = [
         "Trace a disturbance to its signals and limit.",
       ],
     ],
+    {
+      note: "Scaling pressure is the book's organizing label. Demand, data, contributors, and change are four useful dimensions for this course, not an exhaustive or universally adopted taxonomy.",
+    },
   ),
   concept(
     "trade-off",
@@ -220,9 +231,9 @@ export const bookConcepts: Concept[] = [
   ),
   concept(
     "change-probe",
-    "Change probe",
+    "Maintainability assessment",
     "Evidence",
-    "A bounded modification used to observe how an unfamiliar maintainer can understand, change, and validate an implementation.",
+    "An assessment of the effort and effectiveness of understanding, changing, and validating software. This course gathers evidence through a bounded change task performed by an unfamiliar maintainer.",
     "Declare the starting version, task, auditor familiarity, completion criteria, and effort boundary. One probe does not represent all future maintenance.",
     "Ask another team to add one event filter. Record where they looked, what contracts they changed, validation effort, and the accepted result.",
     "A system with passing behavior tests is necessarily easy to change. Navigability and the next-change cost need separate evidence.",
@@ -238,6 +249,9 @@ export const bookConcepts: Concept[] = [
         "Evaluate maintainability beyond first-pass success.",
       ],
     ],
+    {
+      note: "Change probe names this course's task-based maintainability assessment protocol. One task supplies evidence about that change under the recorded conditions; it is not a complete maintainability assessment or a standardized score.",
+    },
   ),
   concept(
     "agent",
@@ -259,12 +273,21 @@ export const bookConcepts: Concept[] = [
         "Explain the new coordination obligations.",
       ],
     ],
+    {
+      note: "Agent is an established AI concept; coding agent has a more specific working meaning here. LLM practitioners vary in whether predefined workflows count as agents. The definition above requires model-directed action through tools.",
+      sources: [
+        {
+          label: "Anthropic: definitions of workflows and agents",
+          href: "https://www.anthropic.com/engineering/building-effective-agents",
+        },
+      ],
+    },
   ),
   concept(
     "harness",
     "Project harness",
     "Development",
-    "The project's durable instructions, commands, environment, checks, and review practices that make candidate changes inspectable and repeatable.",
+    "The versioned project instructions, specifications, architecture notes, environment, commands, and checks that make candidate changes inspectable and repeatable.",
     "Keep the project harness distinct from an agent execution harness and an evaluation harness. Controls must be executable and maintained as the project changes.",
     "Pinned versions, a documented test command, contract tests, and a review gate let an agent and an unfamiliar human validate the same event change.",
     "A long instruction file makes the workflow controlled. Instructions require enforceable checks and an owner for acceptance.",
@@ -280,6 +303,15 @@ export const bookConcepts: Concept[] = [
         "See a harness support rapid delivery.",
       ],
     ],
+    {
+      note: "Project harness is the book's name for this bundle of repository guidance and executable development controls. Harness terminology is still developing. The bundle supports the development workflow; the wider development system also includes people, review, integration, and ownership.",
+      sources: [
+        {
+          label: "Anthropic: an agent harness and its project environment",
+          href: "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+        },
+      ],
+    },
   ),
   concept(
     "acceptance-criteria",
@@ -304,7 +336,7 @@ export const bookConcepts: Concept[] = [
   ),
   concept(
     "authority",
-    "Action authority",
+    "Action authorization",
     "Development",
     "The permission granted to an actor to propose, prepare, or execute a decision or action within stated limits.",
     "Name who may act and who remains accountable for the outcome. Separate holding credentials, being authorized to act, and being contained by the environment. Reading untrusted material does not grant it authority.",
@@ -322,14 +354,23 @@ export const bookConcepts: Concept[] = [
         "Distinguish access, authorization, and containment.",
       ],
     ],
+    {
+      note: "The book also calls this action authority. Authorization concerns permission to act; accountability concerns ownership of the consequences. Keep both separate from which stored state is authoritative.",
+      sources: [
+        {
+          label: "NIST: authorization definitions and their contexts",
+          href: "https://csrc.nist.gov/glossary/term/authorization",
+        },
+      ],
+    },
   ),
   concept(
     "feedback-loop",
     "Feedback loop",
     "Development",
-    "A cycle that compares an observed result with a desired state and uses the difference to choose a correction.",
-    "Name the goal, signal, correction, delay, and owner. Faster feedback is useful only if it measures the relevant boundary.",
-    "Constrain an event change, generate it, run a failing contract check, and revise it. An orchestration controller similarly compares desired and observed capacity.",
+    "A cycle in which a system's effects feed back into its subsequent behavior. Negative feedback counteracts a deviation; positive feedback reinforces it.",
+    "Identify the causal path, signal, response, and delay. For a corrective loop, also name the desired state and owner. Negative feedback can still become unstable when delay or response strength is poorly controlled.",
+    "A failing contract check leads an agent to revise a change: corrective feedback. Overload causes timeouts, timeouts cause retries, and retries add load: reinforcing feedback.",
     "More frequent feedback guarantees improvement. A delayed or misleading signal can amplify the wrong behavior.",
     [
       [
@@ -342,7 +383,21 @@ export const bookConcepts: Concept[] = [
         "/chapters/scaling/#orchestration-maintains-declared-capacity",
         "Compare development feedback with runtime control.",
       ],
+      [
+        "Scaling: retry amplification",
+        "/chapters/scaling/#name-the-saturation-boundary",
+        "Trace the reinforcing cycle from overload to timeouts, retries, and more load.",
+      ],
     ],
+    {
+      note: "Positive and negative describe whether the loop reinforces or counteracts a change, not whether its outcome is desirable. The development examples mainly use corrective feedback; overload examples also use reinforcing feedback.",
+      sources: [
+        {
+          label: "Caltech: negative and positive feedback",
+          href: "https://murray.cds.caltech.edu/Is_control_a_type_of_negative_feedback%3F",
+        },
+      ],
+    },
   ),
   concept(
     "decision-log",
@@ -395,6 +450,15 @@ export const bookConcepts: Concept[] = [
         "Preserve what makes a choice reversible and when it should be reviewed.",
       ],
     ],
+    {
+      note: "Soft and hard decisions are the book's shorthand for low and high reversal cost. This relates to the one-way/two-way-door distinction, but the course treats reversal cost as a spectrum that changes with dependencies and durable effects.",
+      sources: [
+        {
+          label: "Amazon: reversible decisions and two-way doors",
+          href: "https://www.aboutamazon.com/news/company-news/2016-letter-to-shareholders",
+        },
+      ],
+    },
   ),
   concept(
     "technical-debt",
@@ -463,6 +527,15 @@ export const bookConcepts: Concept[] = [
         "Declare and evaluate a fleet in the project.",
       ],
     ],
+    {
+      note: "Multi-agent system is the established broader term. Agent fleet names the book's coordinated coding-agent arrangement within a development workflow. A multi-agent system need not use LLMs, pursue a shared goal, or have the integration and acceptance structure described here.",
+      sources: [
+        {
+          label: "Poole and Mackworth: multiagent systems",
+          href: "https://artint.info/3e/html/ArtInt3e.Ch14.S1.html",
+        },
+      ],
+    },
   ),
   concept(
     "task-graph",
@@ -505,6 +578,9 @@ export const bookConcepts: Concept[] = [
         "See editorial judgment limit delivery.",
       ],
     ],
+    {
+      note: "Review capacity applies capacity and queueing ideas to human review and integration. It is not a fixed personal productivity rating; task complexity, review depth, interruptions, and correction work affect the observed capacity.",
+    },
   ),
   concept(
     "contract",
@@ -550,9 +626,9 @@ export const bookConcepts: Concept[] = [
   ),
   concept(
     "state-authority",
-    "State authority",
+    "Authoritative state",
     "Architecture",
-    "The boundary responsible for committing and preserving the durable truth of domain actions.",
+    "The state treated as the source of truth for a named domain outcome, together with the boundary responsible for committing and preserving it.",
     "Name which state is authoritative and how copies catch up. Permission to submit an action does not establish that it committed; a successful response or rebuilt view also needs evidence of the authoritative outcome.",
     "The event store commits one activity. A delayed cached feed may show none yet; rebuilding the feed must not create a second activity.",
     "Every copy is equally authoritative, or stateless handlers remove state. Authority still exists somewhere in the system.",
@@ -568,6 +644,9 @@ export const bookConcepts: Concept[] = [
         "Keep derived views separate from durable actions.",
       ],
     ],
+    {
+      note: "The book also uses state authority for the boundary that owns authoritative state. Authority terminology varies by system; identify the particular record and owner rather than assuming every domain has one central store.",
+    },
   ),
   concept(
     "transaction",

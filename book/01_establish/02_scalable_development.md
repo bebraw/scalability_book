@@ -9,6 +9,7 @@ In classical AI, an agent observes an environment, chooses an action, and uses i
 The model applies both to physical robots and to programs acting in information environments :citep[poole2023artificial].
 
 In this book, a **[coding agent](/concepts/#agent)** repeatedly observes a development environment and acts through tools to pursue a requested outcome.
+LLM practitioners vary in whether predefined workflows count as agents; this book uses the model-directed action loop as its working definition.
 Its Large Language Model (LLM) operates inside an **agent harness** that assembles context, exposes tools, carries state, invokes the model, and returns action results as feedback.
 Software-engineering agent research describes related perception, memory, and action modules around the LLM :citep[wang2025agentsse].
 
@@ -32,6 +33,8 @@ Improving an agent therefore involves its environment and feedback as well as it
 ## Constrain, generate, validate, revise
 
 Agentic development follows a [repeated loop](/concepts/#feedback-loop): constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
+This is a corrective feedback loop: evidence of a deviation informs the next revision.
+Feedback can also reinforce a change, as when timeouts trigger retries that increase load and cause more timeouts; the [Scaling chapter](/chapters/scaling/#name-the-saturation-boundary) examines that case.
 Useful [throughput](/concepts/#throughput) is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
 
 For the event tracker, consider adding CSV export.
@@ -89,7 +92,7 @@ Use validation failures to revise the project's rules and context before the nex
 
 ## Assign authority and ownership
 
-At each stage of the loop, decide who may act, which evidence permits the next step, and who owns the result.
+At each stage of the loop, make **[action authorization](/concepts/#authority)** explicit: decide who may act, which evidence permits the next step, and who owns the result.
 For each decision, an agent may **propose** an option, **prepare** an action for approval, or **execute** within explicit limits.
 Ambiguous intent, weak evidence, [irreversible commitments](/concepts/#decision-reversibility), and material external effects should narrow that [authority](/concepts/#authority).
 
@@ -125,6 +128,7 @@ Publishing an issue or patch also creates work for an external maintainer, so so
 ## The project harness
 
 The **[project harness](/concepts/#harness)** is the versioned material that lets humans and agents change a repository: instructions, specifications, architecture notes, setup, examples, and validation commands.
+Project harness is the book's working label for that bundle of repository guidance and executable development controls; harness terminology varies between sources.
 It supplies project knowledge to the agent harness introduced earlier.
 
 | Term               | Scope                                   | What it includes                                                                                              | Governing question                                                |

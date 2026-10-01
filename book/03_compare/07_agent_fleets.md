@@ -1,6 +1,8 @@
 # When do agent fleets improve web development?
 
 An **[agent fleet](/concepts/#agent-fleet)** coordinates independently operating agents on parts of a larger task.
+It is a cooperative multi-agent system used for development; fleet is the book's working label for the coordination, integration, and acceptance arrangement described here.
+The broader term multi-agent system also covers agents with different goals and agents that do not use LLMs.
 Each has its own execution context and tool actions; an orchestration layer assigns work, routes results, and controls shared state.
 Writing several roles into one prompt does not create those separate executions.
 

@@ -33,7 +33,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   await group.selectOption("Models");
   await expect(nodes).toHaveCount(45);
   await expect(map.locator("[data-concept-edge]:not(.is-hidden)")).toHaveCount(
-    101,
+    102,
   );
   await expect(map.locator("[data-concept-node].is-group-member")).toHaveCount(
     5,
@@ -68,7 +68,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   await expect(page).toHaveURL(/group-view=highlight/);
 
   await map.getByRole("checkbox", { name: "Show connection labels" }).check();
-  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(101);
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
   const labeledViewport = await viewport();
   await only.check();
   await expect(nodes).toHaveCount(5);
@@ -185,7 +185,7 @@ test("connection labels can be toggled and followed across graph views", async (
     });
   const beforeCenter = await center();
   await toggle.check();
-  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(101);
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
   await page.evaluate(() => document.fonts.ready);
   const assertCaptionPadding = async (graph: Locator) => {
     const cramped = await graph
@@ -426,10 +426,10 @@ test("graph labels keep contrast during hover and keyboard focus in every theme"
     await chapterMap.getByLabel("Focus on").selectOption("authority");
     await checkMap(chapterMap, "chapter graph");
     await chapterMap
-      .getByRole("link", { name: "Explore Action authority", exact: true })
+      .getByRole("link", { name: "Explore Action authorization", exact: true })
       .click();
     const pane = page.getByRole("dialog", {
-      name: "Action authority",
+      name: "Action authorization",
       exact: true,
     });
     await expect(pane).toBeVisible();
@@ -514,7 +514,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await page.goto("/concepts/");
   const map = page.locator("#concept-graph");
   const status = map.locator("[data-concept-map-status]");
-  await expect(status).toHaveText("45 concepts · 101 connections");
+  await expect(status).toHaveText("45 concepts · 102 connections");
   const graphic = map.locator(".concept-map-graphic");
   const svg = graphic.locator("svg");
   const before = await svg.evaluate(
@@ -528,6 +528,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     element.scrollLeft = 150;
     element.scrollTop = 150;
   });
+  await graphic.scrollIntoViewIfNeeded();
   const box = (await graphic.boundingBox())!;
   await page.mouse.move(box.x + 30, box.y + 30);
   await page.mouse.down();
@@ -536,6 +537,31 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   expect(await graphic.evaluate((element) => element.scrollLeft)).toBeLessThan(
     150,
   );
+  await map.getByLabel("Search topics").fill("change probe");
+  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
+  await map
+    .getByRole("link", {
+      name: "Explore Maintainability assessment",
+      exact: true,
+    })
+    .click();
+  const assessmentPane = page.getByRole("dialog", {
+    name: "Maintainability assessment",
+    exact: true,
+  });
+  await expect(assessmentPane.locator("[data-concept-usage]")).toContainText(
+    "this course's task-based maintainability assessment protocol",
+  );
+  expect(
+    await assessmentPane.evaluate((element) => {
+      const usage = element.querySelector("[data-concept-usage]")!;
+      const graph = element.querySelector("[data-concept-map]")!;
+      return Boolean(
+        usage.compareDocumentPosition(graph) & Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    }),
+  ).toBe(true);
+  await page.keyboard.press("Escape");
   await map.getByLabel("Search topics").fill("ADR");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
   await map
@@ -779,6 +805,15 @@ test("static graph and curated chapter links remain usable without JavaScript", 
   await expect(page.locator("[data-concept-card]")).toHaveCount(45);
   await expect(page.locator("#queue")).toContainText(
     "Adding a queue creates processing capacity",
+  );
+  await expect(page.locator("#agent [data-concept-usage]")).toContainText(
+    "LLM practitioners vary",
+  );
+  await expect(
+    page.locator("#agent [data-concept-usage]").getByRole("link"),
+  ).toHaveAttribute(
+    "href",
+    "https://www.anthropic.com/engineering/building-effective-agents",
   );
   expect(
     await page.evaluate(

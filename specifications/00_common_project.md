@@ -260,6 +260,7 @@ No particular stack receives extra credit merely for being fashionable, complex,
 
 ## 6. Minimum Project Harness
 
+Project harness is the course's label for the repository guidance, reproducible setup, and executable checks that support its development workflow.
 Each implementation must provide:
 
 - a `README.md` that explains the application, prerequisites, setup, running, testing, and the chosen stack;
@@ -529,6 +530,9 @@ The auditing group will:
 7. return a concise friction report.
 
 ### 10.1 Change-probe protocol
+
+The change probe is this course's bounded task for [maintainability assessment](/concepts/#change-probe).
+It provides evidence about understanding, modifying, and validating one change under recorded conditions; it does not establish a complete maintainability score.
 
 The instructor releases one phase-specific probe only after the implementation has been submitted.
 The probes use different product language but exercise an equivalent vertical slice and acceptance burden.

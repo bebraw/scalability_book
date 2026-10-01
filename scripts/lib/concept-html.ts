@@ -51,6 +51,9 @@ function renderConceptCard(concept: Concept): string {
     ["Worked example", concept.example],
     ["Common mistake", concept.misconception],
   ];
+  const usage = concept.usage
+    ? `<div data-concept-usage><dt>Usage in this book</dt><dd>${escapeHtml(concept.usage.note)}${concept.usage.sources?.length ? `<ul>${concept.usage.sources.map((source) => `<li><a href="${escapeAttribute(source.href)}">${escapeHtml(source.label)}</a></li>`).join("")}</ul>` : ""}</dd></div>`
+    : "";
   const related = conceptRelationships.filter(
     (relation) =>
       relation.source === concept.id || relation.target === concept.id,
@@ -60,7 +63,7 @@ function renderConceptCard(concept: Concept): string {
   );
   return `<section class="concept-card" id="${concept.id}" data-concept-card="${concept.id}" aria-labelledby="concept-${concept.id}-title">
   <p class="concept-card-group">${concept.group}</p><h2 id="concept-${concept.id}-title" tabindex="-1">${escapeHtml(concept.title)}</h2>
-  <dl class="concept-passages">${sections.map(([label, text]) => `<div><dt>${label}</dt><dd>${escapeHtml(text)}</dd></div>`).join("")}</dl>
+  <dl class="concept-passages">${sections.map(([label, text], index) => `<div><dt>${label}</dt><dd>${escapeHtml(text)}</dd></div>${index === 0 ? usage : ""}`).join("")}</dl>
   <details class="concept-neighborhood"><summary>Explore this topic's connections</summary>${renderConceptGraph(`topic-${concept.id}`, [...neighborhood(concept.id, conceptRelationships)], concept.id)}</details>
   <h3>Follow the idea</h3>
   <ul class="concept-contexts">${concept.contexts.map((context) => `<li><a href="${escapeAttribute(context.href)}">${escapeHtml(context.label)}</a><p>${escapeHtml(context.description)}</p></li>`).join("")}</ul>
@@ -84,7 +87,7 @@ export function renderConceptLibrary(): string {
 
 export function renderConceptPage(): string {
   return `<main class="concept-reference" id="content">
-  <header class="concept-reference-header"><p class="eyebrow">The whole book · ${concepts.length} connected ideas</p><h1>Concepts that connect</h1><p>Start with an idea and discover where it leads. Follow a connection across application behavior, development work, and the evidence that lets you compare them.</p><p>The lines are authored teaching connections, not prerequisites or proof of causation. Each has an explanation and links back to the reading.</p></header>
+  <header class="concept-reference-header"><p class="eyebrow">The whole book · ${concepts.length} connected ideas</p><h1>Concepts that connect</h1><p>Start with an idea and discover where it leads. Follow a connection across application behavior, development work, and the evidence that lets you compare them.</p><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections, not prerequisites or proof of causation. Each has an explanation and links back to the reading.</p></header>
   <section id="concept-graph" aria-label="Explore concept connections">${renderConceptGraph("reference-concepts")}</section>
   <div class="concept-reference-layout"><nav class="concept-directory" aria-label="Concept reference"><p class="concept-index-label">Definitions and examples</p>${conceptGroups
     .map(
@@ -141,7 +144,7 @@ export function renderConceptGraph(
         if (current && candidate.length > 17) lines.push(word);
         else lines[lines.length - 1] = candidate;
       }
-      return `<a href="/concepts/#${concept.id}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}"${concept.id === focus ? ' class="is-current"' : ""} aria-label="Explore ${escapeAttribute(concept.title)}"><g transform="translate(${point.x} ${point.y})"><rect x="-95" y="-30" width="190" height="60" rx="12"/><text text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${(index - (lines.length - 1) / 2) * 19}">${escapeHtml(line)}</tspan>`).join("")}</text></g></a>`;
+      return `<a href="/concepts/#${concept.id}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}"${concept.id === focus ? ' class="is-current"' : ""} aria-label="Explore ${escapeAttribute(concept.title)}"><g transform="translate(${point.x} ${point.y})"><rect x="-95" y="-30" width="190" height="60" rx="12"/><text text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${(index - (lines.length - 1) / 2) * 19}">${escapeHtml(line)}</tspan>`).join("")}</text></g></a>`;
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : ""}" data-concept-map data-focus="${focus}" data-complete="${complete}">

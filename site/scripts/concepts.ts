@@ -557,6 +557,8 @@ import {
     const intro = document.createElement("dl");
     intro.className = "concept-passages";
     intro.append(definition);
+    const usage = card.querySelector("[data-concept-usage]");
+    if (usage) intro.append(usage);
     const graph = card.querySelector<HTMLElement>("[data-concept-map]")!;
     card.querySelector(".concept-neighborhood")!.remove();
     title.after(intro, graph);

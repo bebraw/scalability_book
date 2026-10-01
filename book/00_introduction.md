@@ -35,6 +35,10 @@ Reading about other people's experience helps, but there is also value in making
 While the book was developed to support a course I run at Aalto University, I have tried to keep the chapters independent so that you can use it as reference material.
 The course project complements the book and lets you experience different ways of developing web applications with agents.
 
+The book uses established vocabulary where possible.
+Terminology around coding agents and harnesses is still developing, and some labels describe this course's protocols or organizing framework.
+The [concept reference](/concepts/) gives working definitions, related sources, and “Usage in this book” notes where scope or terminology needs explanation.
+
 ## How this book was made
 
 I developed this book with GPT-5.5 and GPT-5.6 through the iterative human–agent workflow it studies.

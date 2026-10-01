@@ -9,12 +9,12 @@ Ask which pressure justifies moving a responsibility and which contract must rem
 A framework-shaped label such as “serverless application” or “single-page application” combines several decisions that can be examined separately.
 Begin with four architectural roles:
 
-| Role           | Question it answers                                      | Typical examples                                                       |
-| -------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Consumer       | Who or what expresses intent and observes the result?    | A person using a browser, an integration, a crawler, or an agent       |
-| Representation | What crosses a boundary to make state or action visible? | HTML, JSON, an image, a stream, a form, or a hypermedia control        |
-| Execution      | Where is behavior evaluated?                             | A build process, browser, physical server, cloud service, or edge node |
-| [Authority](/concepts/#state-authority)      | Which component decides and preserves the current truth? | An application service, database, event log, or external system        |
+| Role                                              | Question it answers                                      | Typical examples                                                       |
+| ------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Consumer                                          | Who or what expresses intent and observes the result?    | A person using a browser, an integration, a crawler, or an agent       |
+| Representation                                    | What crosses a boundary to make state or action visible? | HTML, JSON, an image, a stream, a form, or a hypermedia control        |
+| Execution                                         | Where is behavior evaluated?                             | A build process, browser, physical server, cloud service, or edge node |
+| [Authoritative state](/concepts/#state-authority) | Which component decides and preserves the current truth? | An application service, database, event log, or external system        |
 
 ::caption[Four roles that remain useful as web deployment locations change.]
 ::label[table:web-architecture-roles]
@@ -166,6 +166,8 @@ Both need authorization at action time and a safe fallback.
 ## Data limits how freely responsibility can move
 
 Compute and representations can often be duplicated or replaced more easily than authoritative data.
+Identify the **[authoritative state](/concepts/#state-authority)** for each domain outcome and the boundary that owns it.
+The book also uses state authority for this ownership question; it is separate from a caller's authorization to request a change.
 A read may be served from a replica or cache, but concurrent writes still need a rule for which result becomes true.
 Moving execution closer to users without deciding where authority lives can exchange network latency for inconsistent state, complex conflict resolution, or a longer path to the real owner.
 
@@ -293,7 +295,7 @@ The public project discussion should make those choices visible: different group
 Keep the architecture diagram consistent with the [project harness](/chapters/scalable-development/#the-project-harness): global rules, feature contracts, decision records, and agent instructions should describe the same implementation.
 
 A component diagram can show that two boxes exist without explaining which one owns a decision.
-For each independently evolvable capability, record its source root, composition root, state authority, public contracts, allowed dependency direction, and intentionally excluded responsibilities.
+For each independently evolvable capability, record its source root, composition root, authoritative state and its owner, public contracts, allowed dependency direction, and intentionally excluded responsibilities.
 The resulting ownership card is a review aid rather than a demand for one directory per feature.
 
 File size, fan-in, churn concentration, or a crowded directory can act as structural smoke alarms, but none proves that a split is correct.
@@ -305,18 +307,18 @@ Consolidate ownership, split responsibilities, or document a justified exception
 Placement, rendering, data, and ownership choices interact along several dimensions.
 Use the table to compare architectures without treating any option as a universal destination.
 
-| Dimension                | Available choices                                                            | Pressure the choices can address                         | Obligation introduced by the decision                               |
-| ------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
-| Infrastructure ownership | Owned server, hosted machine, VM, container, function, managed service       | Provisioning speed, utilization, operational capacity    | Provider contracts, quotas, cost visibility, and recovery           |
-| Execution placement      | Build system, browser, origin, cloud region, edge location                   | Latency, elasticity, device capability, or data locality | More boundaries, deployment targets, and partial-failure paths      |
-| Representation rendering | Build time, request time, incremental regeneration, client time              | Freshness, origin work, delivery speed, personalization  | Invalidation, duplicated logic, activation, and fallback behavior   |
-| Browser interaction      | Document navigation, hypermedia updates, client-managed navigation           | Interaction richness, continuity, client responsiveness  | Client state, compatibility, accessibility, and recovery            |
-| Client activation        | Hydration, progressive hydration, islands, resumability                      | Initial payload and time to useful interaction           | Serialization, loading policy, tooling, and cross-boundary state    |
-| State authority          | Client-local state, application service, database, event log, external owner | Correctness, offline work, audit, and integration        | Invariants, authorization, retries, and lifecycle                   |
-| Data distribution        | Central store, replicas, partitions, derived views                           | Volume, locality, isolation, and read or write pressure  | Consistency rules, routing, migration, and reconciliation           |
-| Caching and freshness    | Browser, intermediary, application, and data-layer copies                    | Repeated work, transfer, latency, and origin capacity    | Cache identity, freshness, invalidation, privacy, and observability |
-| Consumer contract        | HTML and forms, resource HTTP, hypermedia, GraphQL, RPC, events              | Independent evolution and different consumer needs       | Compatibility, idempotency, rate limits, and bounded authority      |
-| Operational ownership    | One team and machine through multiple teams, providers, and regions          | Organizational scale and specialized capability          | Explicit ownership, signals, incident paths, and decision records   |
+| Dimension                 | Available choices                                                            | Pressure the choices can address                         | Obligation introduced by the decision                               |
+| ------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------- |
+| Infrastructure ownership  | Owned server, hosted machine, VM, container, function, managed service       | Provisioning speed, utilization, operational capacity    | Provider contracts, quotas, cost visibility, and recovery           |
+| Execution placement       | Build system, browser, origin, cloud region, edge location                   | Latency, elasticity, device capability, or data locality | More boundaries, deployment targets, and partial-failure paths      |
+| Representation rendering  | Build time, request time, incremental regeneration, client time              | Freshness, origin work, delivery speed, personalization  | Invalidation, duplicated logic, activation, and fallback behavior   |
+| Browser interaction       | Document navigation, hypermedia updates, client-managed navigation           | Interaction richness, continuity, client responsiveness  | Client state, compatibility, accessibility, and recovery            |
+| Client activation         | Hydration, progressive hydration, islands, resumability                      | Initial payload and time to useful interaction           | Serialization, loading policy, tooling, and cross-boundary state    |
+| Authoritative state owner | Client-local state, application service, database, event log, external owner | Correctness, offline work, audit, and integration        | Invariants, authorization, retries, and lifecycle                   |
+| Data distribution         | Central store, replicas, partitions, derived views                           | Volume, locality, isolation, and read or write pressure  | Consistency rules, routing, migration, and reconciliation           |
+| Caching and freshness     | Browser, intermediary, application, and data-layer copies                    | Repeated work, transfer, latency, and origin capacity    | Cache identity, freshness, invalidation, privacy, and observability |
+| Consumer contract         | HTML and forms, resource HTTP, hypermedia, GraphQL, RPC, events              | Independent evolution and different consumer needs       | Compatibility, idempotency, rate limits, and bounded authority      |
+| Operational ownership     | One team and machine through multiple teams, providers, and regions          | Organizational scale and specialized capability          | Explicit ownership, signals, incident paths, and decision records   |
 
 ::caption[Architectural dimensions to examine when designing or comparing web applications.]
 ::label[table:web-architectural-dimensions]
