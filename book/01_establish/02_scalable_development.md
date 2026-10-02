@@ -217,6 +217,16 @@ Types, tests, small modules, and architectural notes can reduce the work needed 
 Their value is the uncertainty they resolve.
 Evolving software still needs deliberate work to maintain or simplify its structure :citep[lehman1980programs].
 
+### Test an explanation against behavior
+
+An agent can help you approach unfamiliar code through concrete examples, data-flow diagrams, and questions.
+The [explain-diff prompts](https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524) combine surrounding-code context, intuition, a grouped walkthrough, and a comprehension quiz.
+These are proposed aids to inspection; a model that writes both the explanation and its quiz can repeat the same mistaken assumption in both.
+
+For a consequential claim, predict an observable result, inspect the complete relevant code, and check that prediction against behavior.
+Separate what the implementation guarantees from conditions the explanation assumes, such as a worker staying alive or a request reaching the same instance.
+The [optional explanation challenge](/appendices/evaluating-agentic-workflows/#optional-exercise-challenge-an-explanation) uses a small event recorder to practice finding and correcting an overstatement.
+
 ### Field note — Kirjolab
 
 When GPT-5.6 became available, I decided to revisit one of my long-standing ideas.
