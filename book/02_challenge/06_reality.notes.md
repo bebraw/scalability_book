@@ -14,6 +14,7 @@
 4. One event-tracker failure traced across the web boundary.
 5. Signals, competence envelopes, and saturation.
 6. Recovery modes and recovery-plane independence.
+   The optional remediation fixture separates accepted fixes and successful releases from the running-instance and behavioral evidence needed to close a known exposure.
 7. Pressure-map synthesis and a case transfer across implementations A and B.
 
 ## Notes for further development
