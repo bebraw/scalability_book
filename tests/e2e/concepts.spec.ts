@@ -43,7 +43,10 @@ test("the entry page offers agent access and lookup before the complete graph", 
   });
   const lookup = page.getByRole("search", { name: "Concept lookup" });
   await lookup.getByLabel("Find a concept").fill("retry");
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(1);
+  await expect(
+    page.locator("#concept-graph [data-concept-node]:visible"),
+  ).toHaveCount(1);
+  await expect(page.locator(".concept-directory")).not.toBeVisible();
   await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
     "open",
     "",
@@ -51,11 +54,19 @@ test("the entry page offers agent access and lookup before the complete graph", 
   await expect(page).toHaveURL(/q=retry/);
   await page.reload();
   await expect(lookup.getByLabel("Find a concept")).toHaveValue("retry");
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(1);
+  await expect(
+    page.locator("#concept-graph [data-concept-node]:visible"),
+  ).toHaveCount(1);
   await lookup.getByLabel("Find a concept").fill("nonexistent-topic");
-  await expect(page.locator("[data-concept-empty]")).toBeVisible();
+  await expect(
+    page.locator("#concept-graph [data-concept-map-status]"),
+  ).toContainText("No topics match");
   await lookup.getByLabel("Find a concept").fill("");
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(0);
+  await expect(
+    page.locator("#concept-graph [data-concept-node]:visible"),
+  ).toHaveCount(45);
+  await expect(page).toHaveURL(/view=all/);
+  await explorer.locator(":scope > summary").click();
   await expect(page).toHaveURL(/\/concepts\/$/);
   await explorer.locator(":scope > summary").click();
   await expect(
@@ -245,7 +256,9 @@ test("reading links open their concepts and reflection without a new choice", as
   await expect(context.locator("[data-concept-context-prompt]")).toContainText(
     "Which quantities transfer through Little's Law",
   );
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(10);
+  await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
+    10,
+  );
   await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
     "open",
     "",
@@ -385,8 +398,12 @@ test("group highlighting preserves context before an explicit group-only view", 
       .locator("[data-concept-edge].is-group-bridge:not(.is-hidden)")
       .count(),
   ).toBeGreaterThan(0);
-  await expect(page.locator("[data-concept-group-tag]:visible")).toHaveCount(5);
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(45);
+  await expect(
+    page.locator("[data-concept-group-tag]:not([hidden])"),
+  ).toHaveCount(5);
+  await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
+    45,
+  );
   await expect(page).toHaveURL(/group-view=highlight/);
 
   await map.getByRole("checkbox", { name: "Show connection labels" }).check();
@@ -394,7 +411,9 @@ test("group highlighting preserves context before an explicit group-only view", 
   const labeledViewport = await viewport();
   await only.check();
   await expect(nodes).toHaveCount(5);
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(5);
+  await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
+    5,
+  );
   await expect(
     map.locator("[data-concept-edge].is-group-bridge:not(.is-hidden)"),
   ).toHaveCount(0);
@@ -971,7 +990,7 @@ test("graph labels have breathing room in both themes and viewport sizes", async
 test("the compact directory opens concepts without losing the browsing position", async ({
   page,
 }) => {
-  await page.goto("/concepts/?view=all");
+  await page.goto("/concepts/?view=list");
   const directory = page.locator(".concept-directory");
   await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
     45,
@@ -994,12 +1013,12 @@ test("the compact directory opens concepts without losing the browsing position"
   await expect(directory.locator(".concept-directory-item[open]")).toHaveCount(
     0,
   );
-  await expect(page).toHaveURL(/concepts\/\?view=all$/);
+  await expect(page).toHaveURL(/concepts\/\?view=list$/);
   await page.keyboard.press("Escape");
   await expect(summary).toBeFocused();
   expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scroll, 0);
   await directory
-    .getByRole("heading", { name: "Browse concepts" })
+    .getByRole("heading", { name: "Concept list" })
     .scrollIntoViewIfNeeded();
   await page.screenshot({
     path: test.info().outputPath("concept-directory-desktop.png"),
@@ -1051,7 +1070,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
       );
     expect(
       await directory
-        .locator("[data-concept-result]:visible")
+        .locator("[data-concept-result]:not([hidden])")
         .evaluateAll((items) =>
           items.map((item) => item.getAttribute("data-concept-result")).sort(),
         ),
@@ -1080,7 +1099,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     beforeDrag.y - 40 / beforeDrag.scale,
     1,
   );
-  await map.getByLabel("Search topics").fill("change probe");
+  await page.getByLabel("Find a concept").fill("change probe");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
   await assertDirectoryMatches();
   await map
@@ -1106,7 +1125,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     }),
   ).toBe(true);
   await page.keyboard.press("Escape");
-  await map.getByLabel("Search topics").fill("ADR");
+  await page.getByLabel("Find a concept").fill("ADR");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
   await map
     .getByRole("link", { name: "Explore Decision log", exact: true })
@@ -1123,16 +1142,19 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     page.getByRole("dialog", { name: "Decision reversibility", exact: true }),
   ).toBeVisible();
   await page.keyboard.press("Escape");
-  await map.getByLabel("Search topics").fill("Lusser");
+  await page.getByLabel("Find a concept").fill("Lusser");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
   await expect(
     map.getByRole("link", { name: "Explore Lusser's Law", exact: true }),
   ).toBeVisible();
-  await map.getByLabel("Search topics").fill("nonexistent-topic");
+  await page.getByLabel("Find a concept").fill("nonexistent-topic");
   await expect(status).toContainText("No topics match");
   await expect(graphic).not.toBeVisible();
   await assertDirectoryMatches();
-  await expect(directory.locator("[data-concept-empty]")).toBeVisible();
+  await expect(directory.locator("[data-concept-empty]")).not.toHaveAttribute(
+    "hidden",
+    "",
+  );
   await map.getByRole("button", { name: "Reset view" }).click();
   await map
     .getByRole("combobox", { name: "Reading", exact: true })
@@ -1194,7 +1216,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await map.getByText("Read the relationships", { exact: true }).click();
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   await map
-    .getByRole("heading", { name: "The complete concept graph" })
+    .getByRole("heading", { name: "Concepts and connections" })
     .scrollIntoViewIfNeeded();
   await page.screenshot({
     path: test.info().outputPath("complete-graph-desktop.png"),

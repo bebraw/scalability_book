@@ -33,15 +33,10 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
   function initializeGraph(map: HTMLElement) {
     const complete = map.dataset.complete === "true";
     const fixedFocus = map.dataset.focus || "";
-    const directory = complete
-      ? map
-          .closest(".concept-reference")
-          ?.querySelector<HTMLElement>(".concept-directory")
+    const page = complete
+      ? map.closest<HTMLElement>(".concept-reference")
       : null;
-    const refine = directory?.querySelector<HTMLElement>(
-      "[data-concept-refine]",
-    );
-    if (refine) refine.hidden = false;
+    const directory = page?.querySelector<HTMLElement>(".concept-directory");
     const controls = map.querySelector<HTMLElement>("[data-concept-controls]")!;
     controls.hidden = false;
     const labels = map.querySelector<HTMLInputElement>(
@@ -50,7 +45,9 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
     // Small graphs start with their propositions visible. This choice is local.
     labels.checked = !complete;
     const select = map.querySelector<HTMLSelectElement>("[data-concept-focus]");
-    const search = map.querySelector<HTMLInputElement>("[data-concept-search]");
+    const search = page?.querySelector<HTMLInputElement>(
+      "[data-concept-lookup-input]",
+    );
     const reading = map.querySelector<HTMLSelectElement>(
       "[data-concept-reading]",
     );
@@ -64,9 +61,6 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
     const groupHelp = map.querySelector<HTMLElement>(
       "[data-concept-group-help]",
     );
-    const page = complete
-      ? map.closest<HTMLElement>(".concept-reference")
-      : null;
     const explorer = page?.querySelector<HTMLDetailsElement>(
       "[data-concept-explorer]",
     );
@@ -77,11 +71,30 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
     const lookup = page?.querySelector<HTMLFormElement>(
       "[data-concept-lookup]",
     );
-    const lookupInput = lookup?.querySelector<HTMLInputElement>(
-      "[data-concept-lookup-input]",
-    );
     if (lookup) lookup.hidden = false;
     const params = complete ? new URLSearchParams(location.search) : null;
+    const viewTabs = [
+      ...map.querySelectorAll<HTMLButtonElement>("[data-concept-view]"),
+    ];
+    const graphPanel = map.querySelector<HTMLElement>(
+      "[data-concept-graph-panel]",
+    );
+    const labelToggle = labels.closest<HTMLElement>(
+      ".concept-map-label-toggle",
+    );
+    let presentation = params?.get("view") === "list" ? "list" : "graph";
+    let needsFit = false;
+    map
+      .querySelector<HTMLElement>("[data-concept-view-switch]")
+      ?.removeAttribute("hidden");
+    if (graphPanel) {
+      graphPanel.setAttribute("role", "tabpanel");
+      graphPanel.setAttribute("aria-labelledby", viewTabs[0]!.id);
+    }
+    if (directory) {
+      directory.setAttribute("role", "tabpanel");
+      directory.setAttribute("aria-labelledby", viewTabs[1]!.id);
+    }
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
     const viewport = complete ? new ConceptViewport(graphic, svg) : null;
@@ -266,10 +279,7 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
       )!.textContent =
         `${size} concepts${context.hidden ? " and their connections" : " in this view"}`;
       map.querySelector<HTMLElement>(".concept-map-heading h2")!.textContent =
-        readingTitle
-          ? "Connections in this reading"
-          : "The complete concept graph";
-      if (lookupInput) lookupInput.value = search?.value || "";
+        readingTitle ? "Concepts in this reading" : "Concepts and connections";
     }
     function clearFilters() {
       for (const control of [select, search, reading, group])
@@ -293,6 +303,22 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
       viewport?.render();
     });
     function update(preserveViewport = false) {
+      if (complete) {
+        for (const tab of viewTabs) {
+          const active = tab.dataset.conceptView === presentation;
+          tab.setAttribute("aria-selected", String(active));
+          tab.tabIndex = active ? 0 : -1;
+        }
+        graphPanel!.hidden = presentation !== "graph";
+        directory!.hidden = presentation !== "list";
+        if (expand) expand.hidden = presentation !== "graph";
+        if (labelToggle) labelToggle.hidden = presentation !== "graph";
+        map.classList.toggle("is-list-view", presentation === "list");
+        if (presentation === "list") {
+          hoveredNode = "";
+          focusedNode = "";
+        }
+      }
       const focus = select?.value || fixedFocus;
       const query = search?.value.trim().toLowerCase() || "";
       const groupName = group?.value || "";
@@ -492,7 +518,7 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
           : onlyGroup
             ? `Showing ${members.size} ${groupName} concepts. Connections to other groups are hidden.`
             : members.size
-              ? `${members.size} ${groupName} concepts highlighted. Filled nodes are members; dashed lines connect to other groups.`
+              ? `${members.size} ${groupName} concepts highlighted. ${presentation === "list" ? "Marked cards are group members; other concepts remain available." : "Filled nodes are members; dashed lines connect to other groups."}`
               : `No ${groupName} concepts in this view. Clear the search or choose another reading to find members.`;
       status.textContent =
         visible.size === 0
@@ -504,26 +530,30 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
         viewport!.restore(restoreGroupViewport);
         groupViewport = null;
       } else if (complete && !preserveViewport) {
-        if (overviewVisible) {
+        if (presentation === "list") needsFit = true;
+        else if (overviewVisible) {
           viewport!.x = bounds.width / 2;
           viewport!.y = bounds.height / 2;
           viewport!.readable();
         } else fit();
       }
+      if (complete && presentation === "graph" && needsFit) {
+        fit();
+        needsFit = false;
+      }
       if (complete) {
         const url = new URL(location.href);
+        let view = "";
+        if (explorer?.open) {
+          if (presentation === "list") view = location.hash ? "" : "list";
+          else if (
+            location.hash ||
+            !(focus || query || reading?.value || groupName)
+          )
+            view = "all";
+        }
         for (const [key, value] of [
-          [
-            "view",
-            explorer?.open &&
-            !focus &&
-            !query &&
-            !reading?.value &&
-            !groupName &&
-            !location.hash
-              ? "all"
-              : "",
-          ],
+          ["view", view],
           ["topic", focus],
           ["q", query],
           ["reading", reading?.value],
@@ -557,12 +587,21 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
       const target = location.hash
         ? document.getElementById(location.hash.slice(1))
         : null;
+      if (
+        target &&
+        directory?.contains(target) &&
+        params?.get("view") !== "all"
+      ) {
+        presentation = "list";
+        clearFilters();
+      }
       explorer.open = Boolean(
         search?.value ||
         select?.value ||
         reading?.value ||
         group?.value ||
         params?.get("view") === "all" ||
+        params?.get("view") === "list" ||
         (target && explorer.contains(target)),
       );
       if (tools) tools.open = !(reading?.value || search?.value);
@@ -583,19 +622,47 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
             .querySelector<HTMLElement>(".concept-map-heading h2")!
             .focus({ preventScroll: true });
         });
-      const lookupConcepts = () => {
-        const query = lookupInput?.value || "";
-        clearFilters();
-        if (search) search.value = query;
-        explorer.open = Boolean(query.trim());
-        if (tools) tools.open = false;
-        update();
-      };
-      lookupInput?.addEventListener("input", lookupConcepts);
       lookup?.addEventListener("submit", (event) => {
         event.preventDefault();
-        lookupConcepts();
+        explorer.open = true;
+        update(true);
         if (explorer.open) explorer.scrollIntoView({ block: "start" });
+      });
+      window.addEventListener("hashchange", () => {
+        const target = document.getElementById(location.hash.slice(1));
+        if (!target || !directory?.contains(target)) return;
+        presentation = "list";
+        clearFilters();
+        explorer.open = true;
+        update();
+        const item = target.closest<HTMLDetailsElement>(
+          ".concept-directory-item",
+        );
+        if (item) item.open = true;
+        target.scrollIntoView({ block: "start" });
+      });
+    }
+    for (const [index, tab] of viewTabs.entries()) {
+      const activate = (next: HTMLButtonElement) => {
+        presentation = next.dataset.conceptView!;
+        update(true);
+        next.focus({ preventScroll: true });
+      };
+      tab.addEventListener("click", () => activate(tab));
+      tab.addEventListener("keydown", (event) => {
+        const next =
+          event.key === "ArrowRight"
+            ? (index + 1) % viewTabs.length
+            : event.key === "ArrowLeft"
+              ? (index + viewTabs.length - 1) % viewTabs.length
+              : event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? viewTabs.length - 1
+                  : -1;
+        if (next === -1) return;
+        event.preventDefault();
+        activate(viewTabs[next]!);
       });
     }
     select?.addEventListener("change", () => {
@@ -611,6 +678,15 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
     for (const control of [search, reading])
       control?.addEventListener(control === search ? "input" : "change", () => {
         if (select) select.value = "";
+        if (
+          control === search &&
+          explorer &&
+          !explorer.open &&
+          search?.value.trim()
+        ) {
+          explorer.open = true;
+          if (tools) tools.open = false;
+        }
         update();
       });
     group?.addEventListener("change", () => {
