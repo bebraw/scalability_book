@@ -48,7 +48,6 @@
   display: none;
 }
 .concept-reference-header {
-  max-width: 46rem;
   margin-bottom: 2rem;
 }
 .concept-reference h1 {
@@ -61,6 +60,7 @@
 .concept-reference-notes {
   color: var(--muted);
   font: 0.85rem/1.6 var(--font-ui);
+  max-width: 46rem;
 }
 .concept-reference-notes > summary {
   cursor: pointer;
@@ -347,6 +347,15 @@
 }
 .concept-map-heading label {
   font: 0.8rem/1.5 var(--font-ui);
+}
+.concept-map-heading-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+.concept-map-heading-actions a {
+  font: 0.75rem/1.5 var(--font-ui);
 }
 .concept-map select {
   background: var(--panel);
@@ -730,6 +739,7 @@
   padding: 1.5rem;
 }
 .concept-neighborhood summary,
+.concept-learning-resources summary,
 .concept-reading-locations summary {
   cursor: pointer;
   font: 600 0.85rem/1.6 var(--font-ui);
@@ -741,6 +751,20 @@
 .concept-reading-locations {
   margin-top: 1rem;
   font: 0.85rem/1.6 var(--font-ui);
+}
+.concept-learning-resources {
+  border-block: 1px solid var(--border);
+  margin-block: 1rem;
+  font: 0.85rem/1.6 var(--font-ui);
+}
+.concept-learning-resources ul {
+  padding-left: 1.2rem;
+}
+.concept-learning-resources li + li {
+  margin-top: 1rem;
+}
+.concept-learning-resources p {
+  margin-block: 0.35rem;
 }
 .concept-map-controls {
   display: flex;
@@ -870,6 +894,7 @@
   font: 400 0.8rem/1.6 var(--font-ui);
 }
 .concept-map-actions button,
+.concept-map-heading-actions button,
 .concept-connection-practice button {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -888,6 +913,15 @@
   background-size: 18px 18px;
   cursor: grab;
   overscroll-behavior: contain;
+}
+.concept-map-complete.is-expanded {
+  --concept-graph-gutter: clamp(1rem, 2vw, 3rem);
+  box-sizing: border-box;
+  width: calc(100vw - 2 * var(--concept-graph-gutter));
+  margin-inline: calc(50% - 50vw + var(--concept-graph-gutter));
+}
+.concept-map-complete.is-expanded .concept-map-graphic {
+  height: max(32rem, 78vh);
 }
 .concept-map-complete .concept-map-graphic.is-dragging {
   cursor: grabbing;
@@ -919,9 +953,6 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
-.concept-map-heading > a {
-  font: 0.75rem/1.5 var(--font-ui);
-}
 .concept-directory [hidden],
 .concept-map-controls[hidden] {
   display: none;
@@ -948,6 +979,7 @@
 .concept-directory summary:focus-visible,
 .concept-reference-notes summary:focus-visible,
 .concept-neighborhood summary:focus-visible,
+.concept-learning-resources summary:focus-visible,
 .concept-reading-locations summary:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 3px;
@@ -982,10 +1014,16 @@
 }
 @media print {
   .concept-map-controls,
+  .concept-map-heading-actions button,
   .concept-map-help {
     display: none;
   }
-  .concept-map-complete .concept-map-graphic {
+  .concept-map-complete.is-expanded {
+    width: auto;
+    margin-inline: 0;
+  }
+  .concept-map-complete .concept-map-graphic,
+  .concept-map-complete.is-expanded .concept-map-graphic {
     height: auto;
     overflow: visible;
   }

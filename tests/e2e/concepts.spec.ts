@@ -1,6 +1,7 @@
 import { test, expect, type Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { conceptPages } from "../../shared/concept-pages.ts";
+import type { LearningResource } from "../../shared/learning-resources.ts";
 
 test("the entry page offers agent access and lookup before the complete graph", async ({
   page,
@@ -140,6 +141,71 @@ test("students can retrieve the graph and check its evidence with their own tool
   expect(await passage.text()).toContain(`id="${passageUrl.hash.slice(1)}"`);
 });
 
+test("agent resources return usable images, cite their source, and lead to a prediction experiment", async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  const graph = await (await request.get("/concepts/graph.json")).json();
+  expect(graph.learningResources).toHaveLength(83);
+  const pages = new Map<string, string>();
+  for (const resource of graph.learningResources as LearningResource[]) {
+    expect(new URL(resource.url).origin).toBe(new URL(baseURL!).origin);
+    const image = await request.get(resource.images.png);
+    expect(image.ok(), resource.id).toBe(true);
+    expect(image.headers()["content-type"]).toContain("image/png");
+    expect((await image.body()).subarray(0, 8).toString("hex")).toBe(
+      "89504e470d0a1a0a",
+    );
+    if (resource.images.svg) {
+      const vector = await request.get(resource.images.svg);
+      expect(vector.ok(), resource.id).toBe(true);
+      expect(vector.headers()["content-type"]).toContain("image/svg+xml");
+      const svg = await vector.text();
+      expect(svg).toContain('role="img"');
+      expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
+      expect(svg).not.toContain("var(--");
+      expect(svg).not.toContain("<script");
+    }
+    const source = new URL(resource.url);
+    if (!pages.has(source.pathname)) {
+      const response = await request.get(source.pathname);
+      expect(response.ok(), resource.id).toBe(true);
+      pages.set(source.pathname, await response.text());
+    }
+    if (source.hash)
+      expect(pages.get(source.pathname)).toContain(
+        `id="${source.hash.slice(1)}"`,
+      );
+  }
+  const law = graph.concepts.find(
+    (concept: { id: string }) => concept.id === "little-law",
+  );
+  expect(law.resourceIds).toContain("graph-little-law");
+  expect(law.resourceIds).toContain("demo-queue-balance-lab");
+  const lab = graph.learningResources.find(
+    (resource: LearningResource) => resource.id === "demo-queue-balance-lab",
+  );
+  await page.goto(law.url);
+  const resources = page.locator("#little-law .concept-learning-resources");
+  await resources.locator("summary").click();
+  await expect(resources).toContainText(lab.experiment.predict);
+  await resources
+    .getByRole("link", { name: "Queue balance lab", exact: true })
+    .click();
+  await expect(page).toHaveURL(lab.url);
+  const demo = page.locator("#demo-queue-balance-lab");
+  await demo
+    .locator('[data-little-law-input="time"]')
+    .evaluate((element: HTMLInputElement) => {
+      element.value = "1";
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  await expect(demo.locator('[data-little-law-metric="expected"]')).toHaveText(
+    "20.0",
+  );
+});
+
 test("copying the guide still works when clipboard access is unavailable", async ({
   page,
 }) => {
@@ -184,6 +250,76 @@ test("reading links open their concepts and reflection without a new choice", as
     "open",
     "",
   );
+});
+
+test("the graph expands into the display without changing the exploration", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  await page.goto("/concepts/?theme=Development");
+  await page.locator("[data-theme-picker]").selectOption("dark");
+  const map = page.locator("#concept-graph [data-concept-map]");
+  const graphic = map.locator(".concept-map-graphic");
+  const labels = map.getByRole("checkbox", { name: "Show connection labels" });
+  await labels.check();
+  const regular = (await map.boundingBox())!;
+  const regularCanvas = (await graphic.boundingBox())!;
+  const contextUrl = page.url();
+  const expand = map.getByRole("button", { name: "Expand graph", exact: true });
+  await expand.focus();
+  await expand.press("Enter");
+  const restore = map.getByRole("button", {
+    name: "Restore graph size",
+    exact: true,
+  });
+  await expect(restore).toHaveAttribute("aria-pressed", "true");
+  await expect(restore).toBeFocused();
+  const wide = (await map.boundingBox())!;
+  const wideCanvas = (await graphic.boundingBox())!;
+  expect(wide.width).toBeGreaterThan(2560 * 0.9);
+  expect(wide.width).toBeGreaterThan(regular.width * 1.8);
+  expect(wideCanvas.height).toBeGreaterThan(regularCanvas.height * 1.7);
+  await expect(map.getByRole("combobox", { name: "Topic group" })).toHaveValue(
+    "Development",
+  );
+  await expect(labels).toBeChecked();
+  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(45);
+  await expect(page).toHaveURL(contextUrl);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await map.screenshot({
+    path: test.info().outputPath("concept-graph-wide.png"),
+  });
+  await map.getByRole("button", { name: "Fit", exact: true }).click();
+  expect(
+    await graphic.evaluate((element) => {
+      const svg = element.querySelector("svg")!.getBoundingClientRect();
+      return (
+        svg.width <= element.clientWidth + 1 &&
+        svg.height <= element.clientHeight + 1
+      );
+    }),
+  ).toBe(true);
+  expect(
+    (await new AxeBuilder({ page }).include("#concept-graph").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await map.getByRole("button", { name: "Fit", exact: true }).click();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await restore.click();
+  await expect(expand).toHaveAttribute("aria-pressed", "false");
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  expect((await map.boundingBox())!.width).toBeCloseTo(regular.width, 0);
+  await expect(labels).toBeChecked();
+  await expect(page).toHaveURL(contextUrl);
 });
 
 test("group highlighting preserves context before an explicit group-only view", async ({

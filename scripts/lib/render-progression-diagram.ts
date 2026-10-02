@@ -131,7 +131,7 @@ export function renderProgressionDiagram(diagram: ProgressionDiagram): string {
       )
       .join("\n    ")}
     <path d="M ${stageCenters[0]} ${railY} L ${outcomeCenter} ${railY} L ${outcomeCenter} ${stageTop + stageHeight}" marker-end="url(#${arrowId})"></path>
-    <rect x="${left + 18}" y="435" width="${Math.min(480, sharedWidth - 36)}" height="37" rx="18.5"></rect>
+    <rect x="${left + 18}" y="435" width="${Math.min(600, sharedWidth - 36)}" height="37" rx="18.5"></rect>
     <text x="${left + 36}" y="460">CARRY FORWARD · ${escapeXml(diagram.carryForward)}</text>
   </g>
 

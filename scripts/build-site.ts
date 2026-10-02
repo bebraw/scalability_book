@@ -8,6 +8,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import { demoCatalog } from "../shared/demo-catalog.ts";
 import { exercises } from "../shared/exercises.ts";
 import {
   attachConceptIndex,
@@ -21,6 +22,7 @@ import {
   renderConceptGraphMarkdown,
 } from "./lib/concept-export.ts";
 import { buildStudy } from "./lib/study-build.ts";
+import { writeConceptVisuals } from "./lib/concept-visuals.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
   getPublicMarkdownSource,
@@ -117,200 +119,7 @@ const projectSpecificationDefinitions = [
     summary: "Scoring, essential learning outcomes, and reassessment.",
   },
 ];
-const demoScriptIncludes = [
-  {
-    title: "Implementation discovery lab",
-    chapter: "Scalable development",
-    include: "site/includes/project-fit-checker.html",
-    script: "/project-fit-checker.js",
-  },
-  {
-    title: "Constraint feedback loop",
-    chapter: "Scalable development",
-    include: "site/includes/constrain-generate-validate-demo.html",
-    script: "/constrain-generate-validate-demo.js",
-  },
-  {
-    title: "Deterministic boundary lab",
-    chapter: "Scalable development",
-    include: "site/includes/statechart-boundary-demo.html",
-    script: "/statechart-boundary-demo.js",
-  },
-  {
-    title: "Scalability dimensions lab",
-    chapter: "What does scalability mean for web development?",
-    include: "site/includes/scalability-dimensions-demo.html",
-    script: "/scalability-dimensions-demo.js",
-  },
-  {
-    title: "Boundary trace",
-    chapter: "Architecture",
-    include: "site/includes/request-trace-demo.html",
-    script: "/request-trace-demo.js",
-  },
-  {
-    title: "ACID transaction lab",
-    chapter: "Architecture",
-    include: "site/includes/acid-transaction-lab.html",
-    script: "/acid-transaction-lab.js",
-  },
-  {
-    title: "Cache decision lab",
-    chapter: "Architecture",
-    include: "site/includes/cache-control-lab.html",
-    script: "/cache-control-lab.js",
-  },
-  {
-    title: "Web architecture lens",
-    chapter: "Architecture",
-    include: "site/includes/web-architecture-lens.html",
-    script: "/web-architecture-lens.js",
-  },
-  {
-    title: "Client activation lens",
-    chapter: "Architecture",
-    include: "site/includes/client-activation-lens.html",
-    script: "/client-activation-lens.js",
-  },
-  {
-    title: "API contract lens",
-    chapter: "Architecture",
-    include: "site/includes/api-contract-lens.html",
-    script: "/api-contract-lens.js",
-  },
-  {
-    title: "Tail latency simulator",
-    chapter: "Benchmarking",
-    include: "site/includes/benchmark-simulation-demo.html",
-    script: "/benchmark-simulation-demo.js",
-  },
-  {
-    title: "Goodhart pressure test",
-    chapter: "Benchmarking",
-    include: "site/includes/goodhart-challenge-demo.html",
-    script: "/goodhart-challenge-demo.js",
-  },
-  {
-    title: "Browser performance workbench",
-    chapter: "Benchmarking",
-    include: "site/includes/browser-performance-workbench.html",
-    script: "/browser-performance-workbench.js",
-  },
-  {
-    title: "Queue balance lab",
-    chapter: "Benchmarking",
-    include: "site/includes/little-law-demo.html",
-    script: "/scalability-laws.js",
-  },
-  {
-    title: "Model evaluation lab",
-    chapter: "Appendix A: Agent workflow evaluation",
-    include: "site/includes/model-eval-demo.html",
-    script: "/model-eval-demo.js",
-  },
-  {
-    title: "Observability signal picker",
-    chapter: "Benchmarking",
-    include: "site/includes/observability-signal-demo.html",
-    script: "/observability-signal-demo.js",
-  },
-  {
-    title: "OpenTelemetry trace explorer",
-    chapter: "Benchmarking",
-    include: "site/includes/otel-trace-demo.html",
-    script: "/otel-trace-demo.js",
-  },
-  {
-    title: "Workflow loop",
-    chapter: "Friction",
-    include: "site/includes/workflow-loop-demo.html",
-    script: "/workflow-loop-demo.js",
-  },
-  {
-    title: "Friction audit",
-    chapter: "Friction",
-    include: "site/includes/friction-audit-demo.html",
-    script: "/friction-audit-demo.js",
-  },
-  {
-    title: "Changed assumptions map",
-    chapter: "Reality",
-    include: "site/includes/pressure-map-demo.html",
-    script: "/pressure-map-demo.js",
-  },
-  {
-    title: "Fleet trace debugger",
-    chapter: "Appendix D: Agent-system security",
-    include: "site/includes/fleet-trace-debugger.html",
-    script: "/fleet-trace-debugger.js",
-  },
-  {
-    title: "Agent fleet delegation",
-    chapter: "Agent fleets",
-    include: "site/includes/agent-fleet-demo.html",
-    script: "/agent-fleet-demo.js",
-  },
-  {
-    title: "Reliability chain lab",
-    chapter: "Appendix E: Scalability models",
-    include: "site/includes/lusser-law-demo.html",
-    script: "/scalability-laws.js",
-  },
-  {
-    title: "Sequential work bound",
-    chapter: "Agent fleets",
-    include: "site/includes/amdahl-law-demo.html",
-    script: "/scalability-laws.js",
-  },
-  {
-    title: "Scaling pressure planner",
-    chapter: "Scaling",
-    include: "site/includes/scaling-pressure-demo.html",
-    script: "/scaling-pressure-demo.js",
-  },
-  {
-    title: "Saturation boundary lab",
-    chapter: "Scaling",
-    include: "site/includes/saturation-boundary-demo.html",
-    script: "/saturation-boundary-demo.js",
-  },
-  {
-    title: "Contention curve lab",
-    chapter: "Appendix E: Scalability models",
-    include: "site/includes/usl-demo.html",
-    script: "/scalability-laws.js",
-  },
-  {
-    title: "Orchestration control loop",
-    chapter: "Scaling",
-    include: "site/includes/orchestration-demo.html",
-    script: "/orchestration-demo-loader.js",
-  },
-  {
-    title: "Durable effect retry lab",
-    chapter: "Appendix F: Durable workflows",
-    include: "site/includes/durable-retry-demo.html",
-    script: "/durable-retry-demo.js",
-  },
-  {
-    title: "CAP partition lab",
-    chapter: "Scaling",
-    include: "site/includes/cap-partition-lab.html",
-    script: "/cap-partition-lab.js",
-  },
-  {
-    title: "Latency budget map",
-    chapter: "Scaling",
-    include: "site/includes/latency-budget-demo.html",
-    script: "/latency-budget-demo.js",
-  },
-  {
-    title: "Final reflection package",
-    chapter: "Recap",
-    include: "site/includes/final-reflection-demo.html",
-    script: "/final-reflection-demo.js",
-  },
-];
+const demoScriptIncludes = demoCatalog;
 
 await validateDemoAnchors();
 const statechartDiagramHtml = await renderStatechartDiagram();
@@ -460,6 +269,7 @@ await writePage(
 
 await writePage("concepts/library.html", renderConceptLibrary());
 const exportedGraph = exportConceptGraph(siteUrl, config.title);
+await writeConceptVisuals(root, buildDir, siteUrl);
 await writePage(
   "concepts/graph.json",
   JSON.stringify(exportedGraph, null, 2) + "\n",

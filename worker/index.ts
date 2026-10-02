@@ -153,7 +153,10 @@ export default {
     headers.set("X-Content-Type-Options", "nosniff");
     headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
-    if (response.ok && immutableAssetPattern.test(url.pathname)) {
+    if (response.ok && url.pathname.startsWith("/concepts/visuals/")) {
+      // These stable resource URLs change with the authored graph and previews.
+      headers.set("Cache-Control", "public, max-age=0, must-revalidate");
+    } else if (response.ok && immutableAssetPattern.test(url.pathname)) {
       headers.set("Cache-Control", "public, max-age=31536000, immutable");
     } else if (
       response.ok &&

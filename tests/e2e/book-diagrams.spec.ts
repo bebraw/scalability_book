@@ -16,10 +16,6 @@ const diagrams = [
   },
   {
     id: "shared-knowledge-boundary",
-    route: "/case-studies/slideotter/#what-i-would-do-differently",
-  },
-  {
-    id: "shared-knowledge-boundary",
     route: "/case-studies/kirjolab/#what-i-would-do-differently",
   },
 ] as const;

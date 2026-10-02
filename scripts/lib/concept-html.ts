@@ -12,10 +12,12 @@ import {
   layoutNeighborhood,
   layoutEdgeLabels,
   layoutOverview,
+  layoutLabeledOverview,
   layoutConnection,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
+import { learningResources } from "../../shared/learning-resources.ts";
 
 const overview = layoutOverview(concepts, conceptRelationships, conceptGroups);
 const byId = new Map(concepts.map((concept) => [concept.id, concept]));
@@ -76,10 +78,16 @@ function renderConceptCard(concept: Concept): string {
   const readings = conceptPages.filter((page) =>
     page.concepts.includes(concept.id),
   );
+  const resources = learningResources.filter(
+    (resource) =>
+      resource.id !== "graph-complete" &&
+      resource.conceptIds.includes(concept.id),
+  );
   return `<section class="concept-card" id="${concept.id}" data-concept-card="${concept.id}" aria-labelledby="concept-${concept.id}-title">
   <p class="concept-card-group">${concept.group}</p><h2 id="concept-${concept.id}-title" tabindex="-1">${escapeHtml(concept.title)}</h2>
   <dl class="concept-passages">${sections.map(([label, text], index) => `<div><dt>${label}</dt><dd>${escapeHtml(text)}</dd></div>${index === 0 ? usage : ""}`).join("")}</dl>
   <details class="concept-neighborhood"><summary>Explore this topic's connections</summary>${renderConceptGraph(`topic-${concept.id}`, [...neighborhood(concept.id, conceptRelationships)], concept.id)}</details>
+  <details class="concept-learning-resources"><summary>Diagrams and experiments (${resources.length})</summary><ul>${resources.map((resource) => `<li><a href="${escapeAttribute(resource.url)}">${escapeHtml(resource.title)}</a><p>${escapeHtml(resource.caption)}</p><p><a href="${resource.images.png}">${resource.kind === "demo" ? "Static preview" : "Image (PNG)"}</a>${resource.images.svg ? ` · <a href="${resource.images.svg}">Vector image (SVG)</a>` : ""}</p>${resource.experiment ? `<p><strong>Predict first.</strong> ${escapeHtml(resource.experiment.predict)}</p>` : ""}</li>`).join("")}</ul></details>
   <h3>Follow the idea</h3>
   <ul class="concept-contexts">${concept.contexts.map((context) => `<li><a href="${escapeAttribute(context.href)}">${escapeHtml(context.label)}</a><p>${escapeHtml(context.description)}</p></li>`).join("")}</ul>
   <h3>Connect the concepts</h3>
@@ -120,9 +128,9 @@ export function renderConceptPage(
   <header class="concept-reference-header"><p class="eyebrow">Ideas across the book</p><h1>Concepts that connect</h1><p>Follow an idea through the book, or bring your own question and agent to the knowledge graph.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections. Read an arrow as a statement from its source, through the label, to its target. The label and explanation establish the meaning; an arrow alone does not establish causation or a prerequisite. Comparisons and associations use plain lines. Each connection links back to the reading.</p></details></header>
   <form class="concept-lookup" role="search" aria-label="Concept lookup" data-concept-lookup hidden><label for="concept-lookup">Find a concept</label><div><input id="concept-lookup" type="search" placeholder="Retry, review, latency" data-concept-lookup-input><button type="submit">Search</button></div></form>
   <section class="concept-agent" aria-labelledby="concept-agent-title">
-    <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-title">Explore with your own agent</h2><p>Choose something you want to understand. Give your agent access to the graph, follow connections into the reading, and check how well its explanation holds up.</p></div>
+    <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-title">Explore with your own agent</h2><p>Give your agent the guide to get started. Explore your current reading, connect two ideas, or try a short prediction experiment. Bring a question of your own whenever you have one, and check the explanation against the book.</p></div>
     <div class="concept-agent-access"><label for="concept-agent-guide-url">Give your agent this guide</label><div class="concept-agent-copy"><input id="concept-agent-guide-url" type="text" inputmode="url" value="${escapeAttribute(guideUrl)}" readonly data-concept-agent-url><button type="button" data-concept-agent-copy hidden>Copy URL</button></div><p class="concept-agent-status" data-concept-agent-status role="status"></p><p class="concept-agent-files"><a href="/concepts/agent-guide.md">Read the guide</a><a href="/concepts/graph.json">Graph as JSON</a><a href="/concepts/graph.md">Graph as Markdown</a></p></div>
-    <details class="concept-agent-setup"><summary>Connect it, then check it</summary><ol><li><strong>Connect your tools.</strong> Use an agent that can fetch URLs. If it works with files instead, download the guide and either graph format and add them to its context. The guide describes the data and how to follow connections.</li><li><strong>Choose your question.</strong> State what you think might explain it. Ask your agent to identify relevant concepts and inspect the linked passages in the book.</li><li><strong>Check the explanation.</strong> Follow a citation yourself. Compare the answer with the passage and its assumptions, and distinguish the book’s connections from connections your agent proposes. Keep a short record of what you accepted, challenged, or could not verify.</li></ol><p>Connecting the graph and judging what your agent retrieves are part of the learning. You can also explore it directly below.</p></details>
+    <details class="concept-agent-setup"><summary>Connect it, then check it</summary><ol><li><strong>Connect your tools.</strong> Use an agent that can fetch URLs. If it works with files instead, download the guide and either graph format and add them to its context. The guide describes the data and how to follow connections.</li><li><strong>Pick a starting point.</strong> If you are unsure, ask “Read this guide and help me get started.” Choose one of the suggested activities, or bring your own question. State a guess or prediction before asking for an explanation.</li><li><strong>Check the explanation.</strong> Follow a citation yourself. Compare the answer with the passage and its assumptions, and distinguish the book’s connections from connections your agent proposes. Keep a short record of what you accepted, challenged, or could not verify.</li></ol><p>Connecting the graph and judging what your agent retrieves are part of the learning. You can also explore it directly below.</p></details>
   </section>
   <details class="concept-explorer" id="concept-explorer" data-concept-explorer><summary><span data-concept-explorer-title>Explore the whole book</span><span class="concept-explorer-description" data-concept-explorer-description>${concepts.length} concepts and their connections</span></summary>
   <section class="concept-exploration-context" data-concept-context hidden aria-labelledby="concept-context-title"><div class="concept-exploration-heading"><div><p class="concept-context-label" data-concept-context-label></p><h2 id="concept-context-title" tabindex="-1" data-concept-context-title></h2></div><button type="button" data-concept-all>Explore the whole book →</button></div><p class="concept-prediction" data-concept-context-prompt></p><a data-concept-context-reading></a></section>
@@ -144,6 +152,7 @@ export function renderConceptGraph(
   prefix: string,
   ids = concepts.map((concept) => concept.id),
   focus = "",
+  labelledOverview = false,
 ): string {
   const complete = prefix === "reference-concepts";
   const items = ids.map((id) => byId.get(id)!);
@@ -153,7 +162,11 @@ export function renderConceptGraph(
       ids.includes(relation.target) &&
       (!focus || relation.source === focus || relation.target === focus),
   );
-  const layout = complete ? overview : layoutNeighborhood(ids, focus, true);
+  const layout = complete
+    ? labelledOverview
+      ? layoutLabeledOverview(overview.points, overview.width, overview.height)
+      : overview
+    : layoutNeighborhood(ids, focus, true);
   const points = new Map(layout.points.map((point) => [point.id, point]));
   const edges = relations
     .map((relation) => {
@@ -189,7 +202,7 @@ export function renderConceptGraph(
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : " has-connection-labels"}" data-concept-map data-focus="${focus}" data-complete="${complete}">
-  <div class="concept-map-heading"><h2>${complete ? "The complete concept graph" : "Explore the connections"}</h2>${complete ? `<a href="#concept-directory">Browse concepts ↓</a>` : ""}</div>
+  <div class="concept-map-heading"><h2>${complete ? "The complete concept graph" : "Explore the connections"}</h2>${complete ? `<div class="concept-map-heading-actions"><button type="button" data-concept-expand aria-pressed="false" aria-controls="${prefix}-graphic" hidden>Expand graph</button><a href="#concept-directory">Browse concepts ↓</a></div>` : ""}</div>
   ${complete ? `<details class="concept-map-tools" data-concept-map-tools hidden open><summary>Adjust the graph and filters</summary>` : ""}
   <div class="concept-map-controls" hidden data-concept-controls>
     ${complete ? `<label for="${prefix}-search">Search topics<input id="${prefix}-search" type="search" data-concept-search placeholder="Retry, review, latency"></label><label for="${prefix}-reading">Reading<select id="${prefix}-reading" data-concept-reading><option value="">Whole book</option>${conceptPages.map((page) => `<option value="${page.url}" data-ids="${page.concepts.join(" ")}" data-prompt="${escapeAttribute(page.prompt || "")}">${escapeHtml(page.title)}</option>`).join("")}</select></label>` : ""}
@@ -200,7 +213,7 @@ export function renderConceptGraph(
   </div>
   ${complete ? "</details>" : ""}
   <p${complete ? " data-concept-map-intro" : ""}>${complete ? "Search or choose a reading to narrow the graph and directory. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
-  <div class="concept-map-graphic"${complete ? ' tabindex="0" role="region" aria-label="Scrollable concept graph"' : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${edges}${captions}${nodes}</svg></div>
+  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Scrollable concept graph"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${edges}${captions}${nodes}</svg></div>
   ${complete ? `<p class="concept-map-help">Scroll the map to pan, or drag its background. Use + and − to zoom. Every topic and connection is also available as text below.</p>` : ""}
   <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels." : ""}</p>
   <p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>

@@ -84,6 +84,10 @@ import {
     const params = complete ? new URLSearchParams(location.search) : null;
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
+    const expand = map.querySelector<HTMLButtonElement>(
+      "[data-concept-expand]",
+    );
+    if (expand) expand.hidden = false;
     const nodes = [...map.querySelectorAll<SVGAElement>("[data-concept-node]")];
     const edges = [...map.querySelectorAll<SVGGElement>("[data-concept-edge]")];
     const captions = [
@@ -280,6 +284,17 @@ import {
         ),
       );
     }
+    expand?.addEventListener("click", () => {
+      const expanded = map.classList.toggle("is-expanded");
+      expand.setAttribute("aria-pressed", String(expanded));
+      expand.textContent = expanded ? "Restore graph size" : "Expand graph";
+      // Use the extra width for readable nodes; Fit still shows the whole map.
+      // Changing display size does not change the learner's selected context.
+      if (expanded && overviewVisible) zoom(graphic.clientWidth);
+      else fit();
+      graphic.scrollLeft = 0;
+      graphic.scrollTop = 0;
+    });
     function update(preserveViewport = false) {
       const focus = select?.value || fixedFocus;
       const query = search?.value.trim().toLowerCase() || "";
