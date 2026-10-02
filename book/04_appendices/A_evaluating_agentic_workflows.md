@@ -11,7 +11,7 @@ Add other sections when the decision requires them:
 
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
-- [Cost denominators](#read-a-harness-benchmark-s-cost-denominator) and [routing](#from-evaluation-to-routing) for efficiency decisions.
+- [Cost denominators](#read-a-harness-benchmark-s-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
 - [Compressed evidence](#compressed-evidence-and-repeated-review) and [repeated review](#repeated-review-is-measurement-not-proof) for review workflows.
 - Research examples on [judges](#research-example-evaluating-the-evaluator) and [coordination](#research-example-coordination-and-integration) for interpreting published comparisons.
 
@@ -307,6 +307,37 @@ That comparison can expose false acceptances and unnecessary escalations; withou
 The result supports a local decision only if the policy meets a predeclared quality and risk threshold while improving the chosen cost or latency measure.
 After using held-out results to change the policy, evaluate again on fresh tasks.
 High-risk work can bypass the router or retain mandatory review, and the policy should be recalibrated when models, prices, agent harnesses, or the task distribution change.
+
+### Check confidence before routing
+
+A closed choice set can simplify output validation.
+For example, [Clef's model card](https://huggingface.co/Cloudflare/clef) describes scoring schema-defined options and returning a probability for each.
+An allowed label can still be wrong, and the correct outcome may be missing from the choice set.
+
+**Confidence calibration** asks whether reported probabilities agree with the frequency of correct predictions over relevant cases :citep[guo2017calibration].
+A score of `0.9` needs evidence from comparable predictions before it can guide a routing threshold.
+Confidence about a classification also concerns a different outcome from whether the resulting patch passes acceptance or an action is [authorized](/concepts/#authority).
+Keep mandatory checks and permissions outside the learned score.
+
+**Optional exercise — Examine a confident classification.** A classifier must name the single layer affected by a proposed change, choosing `interface` or `data`.
+In an invented policy-development batch of 20 single-layer changes, every output chooses `interface` with confidence `0.9` and passes schema validation.
+The fixture's independently adjudicated reference labels are assumed correct: 12 are `interface` and eight are `data`.
+These are teaching inputs, rather than results from Clef or another model.
+
+1. Calculate the observed reference agreement for this confidence group.
+   Compare it with the reported confidence: what does each quantity measure, and what would you need before trusting the score on future changes?
+2. Suppose one change alters authorization and the project's policy requires human review.
+   Does a valid label or a higher confidence score satisfy that requirement?
+   Name the independent gate that should enforce it.
+3. Change the input: a diff crosses both layers, or the model receives an incomplete diff.
+   What can neither label express, and when should the workflow abstain, retrieve more evidence, or escalate?
+   Define that path even if the model returns a high score.
+
+Use development cases to set the policy, then freeze it and evaluate on fresh held-out cases using the outcome and cost accounting above.
+Record reference-label uncertainty, incorrect routes, abstentions, missing context, and changed task families; one confidence group does not describe calibration over every workload.
+Keep the findings in the existing evaluation notes.
+
+{{ import "site/includes/confidence-routing-answer.html" }}
 
 ## Compressed evidence and repeated review
 
