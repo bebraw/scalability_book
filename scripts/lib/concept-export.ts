@@ -11,7 +11,7 @@ export function exportConceptGraph(siteUrl: string, title: string) {
     concepts,
   }));
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     // Identify the authored content independently of the preview's origin.
     revision: createHash("sha256")
       .update(JSON.stringify({ concepts, conceptRelationships, conceptPages }))
@@ -24,9 +24,10 @@ export function exportConceptGraph(siteUrl: string, title: string) {
       markdown: absolute("/concepts/graph.md"),
     },
     semantics: {
-      relationships: "Authored, undirected teaching connections.",
+      relationships:
+        "Authored teaching connections with explicit directed or undirected semantics.",
       sourceAndTarget:
-        "Endpoint identifiers, not a direction, prerequisite, or proof of causation.",
+        "For direction=directed, read source → label → target. For direction=undirected, endpoint order has no meaning. The label and explanation establish the claim, not the arrow alone; direction does not imply a prerequisite.",
       readingMembership:
         "A concept is discussed in a reading. Co-occurrence does not create a graph edge.",
       coverage:
@@ -82,10 +83,10 @@ These are public, read-only files. Fetch them directly with an HTTP GET or a fil
 
 ## Data contract
 
-The JSON has \`schemaVersion: 1\`. Its \`revision\` is a SHA-256 hash of the authored graph content. Record it when keeping a retrieval trace; URLs identify the current publication, not an archived copy of that revision.
+The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SHA-256 hash of the authored graph content. Record it when keeping a retrieval trace; URLs identify the current publication, not an archived copy of that revision. Version 2 adds an explicit relationship direction and reviews the endpoint order and linking phrases; version 1 treated every connection as undirected.
 
 - \`concepts\`: stable \`id\`, \`title\`, \`group\`, \`definition\`, \`assumptions\`, \`example\`, \`misconception\`, and a \`url\` for citation. Optional \`usage\` notes explain vocabulary choices, with sources where available. \`contexts\` link to specific teaching passages. \`readings\` lists the broader reading locations.
-- \`relationships\`: \`source\` and \`target\` concept IDs, a short \`label\`, and an authored \`explanation\`. Connections are undirected. The endpoint names do not establish causation or prerequisite order.
+- \`relationships\`: \`source\` and \`target\` concept IDs, \`direction\` (\`directed\` or \`undirected\`), a short \`label\`, and an authored \`explanation\`. Read a directed connection as source → label → target. Comparisons and associations remain undirected. Preserve qualifications such as “can” and the conditions in the explanation; an arrow alone does not establish causation or a prerequisite.
 - \`readings\`: \`url\`, \`title\`, and \`concepts\` discussed there. Two concepts appearing in the same reading are not necessarily connected by an authored edge.
 - \`resources\`: the guide and both graph formats. All resource and citation URLs are absolute, including on a local preview.
 
@@ -95,7 +96,7 @@ Definitions and examples use the book's declared assumptions. Some vocabulary is
 
 1. Search concept titles, definitions, and usage notes for the student's terms. Report the matching IDs and why they seem relevant. If the question is ambiguous, clarify it with the student.
 2. Inspect a concept's assumptions, common mistake, and teaching passages, rather than relying on its title alone.
-3. Find incident relationships by checking both \`source\` and \`target\`. Follow the other endpoint to expand the neighborhood. Keep the authored edge explanation with each step.
+3. Find incident relationships by checking both \`source\` and \`target\`. Follow the other endpoint to expand the neighborhood. Discovery works in either direction, but preserve the original source, linking phrase, target, and explanation when stating a directed relationship. Following an incoming edge does not reverse its claim.
 4. Find relevant readings through \`contexts\`, \`concept.readings\`, or membership in \`readings[].concepts\`. Retrieve those pages to check the fuller argument and surrounding qualifications.
 5. Return the concepts and connection path used, citations to the concept or exact teaching passage, and any uncertainties. Describe what was actually retrieved.
 
@@ -107,6 +108,9 @@ function neighbors(graph, id) {
     .filter((edge) => edge.source === id || edge.target === id)
     .map((edge) => ({
       id: edge.source === id ? edge.target : edge.source,
+      source: edge.source,
+      target: edge.target,
+      direction: edge.direction,
       label: edge.label,
       explanation: edge.explanation,
     }));
@@ -174,7 +178,7 @@ ${graph.readings
 
 ## Connections
 
-${graph.relationships.map((edge) => `- ${link(edge.source)} ↔ ${link(edge.target)} — **${edge.label}:** ${edge.explanation}`).join("\n")}
+${graph.relationships.map((edge) => (edge.direction === "directed" ? `- ${link(edge.source)} **${edge.label}** → ${link(edge.target)} — ${edge.explanation}` : `- ${link(edge.source)} — ${link(edge.target)} — **${edge.label}:** ${edge.explanation}`)).join("\n")}
 `;
 }
 
@@ -183,7 +187,7 @@ export function renderConceptAgentIndex(graph: ExportedGraph): string {
 
 > A book and course on architecture, measurement, scaling pressure, and agentic workflows.
 
-The knowledge graph provides curated definitions, assumptions, examples, and explained teaching connections. Students choose their own questions and can retrieve the graph using their own agents. Connections are undirected teaching relationships, not prerequisites or proof of causation. Reading membership is recorded separately.
+The knowledge graph provides curated definitions, assumptions, examples, and explained teaching connections. Students choose their own questions and can retrieve the graph using their own agents. Directed connections read source → label → target; comparisons and associations are undirected. Each explanation establishes the relationship's meaning and assumptions. Arrows alone do not establish causation or a prerequisite. Reading membership is recorded separately.
 
 ## Knowledge graph
 

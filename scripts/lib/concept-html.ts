@@ -4,11 +4,15 @@ import {
   type Concept,
 } from "../../shared/concepts.ts";
 import { conceptPages } from "../../shared/concept-pages.ts";
-import { conceptRelationships } from "../../shared/concept-relationships.ts";
+import {
+  conceptRelationships,
+  type ConceptRelationship,
+} from "../../shared/concept-relationships.ts";
 import {
   layoutNeighborhood,
   layoutEdgeLabels,
   layoutOverview,
+  layoutConnection,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
@@ -17,6 +21,17 @@ const overview = layoutOverview(concepts, conceptRelationships, conceptGroups);
 const byId = new Map(concepts.map((concept) => [concept.id, concept]));
 const conceptLink = (concept: Concept) =>
   `<a href="/concepts/#${concept.id}">${escapeHtml(concept.title)}</a>`;
+
+function renderProposition(relation: ConceptRelationship, current = "") {
+  const endpoint = (id: string) => {
+    const concept = byId.get(id)!;
+    return id === current ? escapeHtml(concept.title) : conceptLink(concept);
+  };
+  const label = `<span class="concept-relationship-label">${escapeHtml(relation.label)}</span>`;
+  return relation.direction === "directed"
+    ? `${endpoint(relation.source)} ${label} <span aria-hidden="true">→</span> ${endpoint(relation.target)}`
+    : `${endpoint(relation.source)} <span aria-hidden="true">—</span> ${endpoint(relation.target)} ${label}`;
+}
 
 export function renderConceptIndex(url = ""): string {
   const page = conceptPages.find((page) => page.url === url);
@@ -74,7 +89,7 @@ function renderConceptCard(concept: Concept): string {
         relation.source === concept.id ? relation.target : relation.source;
       const target = byId.get(relatedId);
       if (!target) throw new Error(`Unknown related concept: ${relatedId}`);
-      return `<li>${conceptLink(target)} <span class="concept-relationship-label">${escapeHtml(relation.label)}</span><p>${escapeHtml(relation.explanation)}</p></li>`;
+      return `<li>${renderProposition(relation, concept.id)}<p>${escapeHtml(relation.explanation)}</p></li>`;
     })
     .join("")}</ul>
   <details class="concept-reading-locations"><summary>Find this idea across the book (${readings.length})</summary><ul>${readings.map((page) => `<li><a href="${page.url}">${escapeHtml(page.title)}</a></li>`).join("")}</ul></details>
@@ -102,7 +117,7 @@ export function renderConceptPage(
 ): string {
   const guideUrl = new URL("/concepts/agent-guide.md", siteUrl).href;
   return `<main class="concept-reference" id="content">
-  <header class="concept-reference-header"><p class="eyebrow">Ideas across the book</p><h1>Concepts that connect</h1><p>Follow an idea through the book, or bring your own question and agent to the knowledge graph.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections, not prerequisites or proof of causation. Each has an explanation and links back to the reading.</p></details></header>
+  <header class="concept-reference-header"><p class="eyebrow">Ideas across the book</p><h1>Concepts that connect</h1><p>Follow an idea through the book, or bring your own question and agent to the knowledge graph.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections. Read an arrow as a statement from its source, through the label, to its target. The label and explanation establish the meaning; an arrow alone does not establish causation or a prerequisite. Comparisons and associations use plain lines. Each connection links back to the reading.</p></details></header>
   <form class="concept-lookup" role="search" aria-label="Concept lookup" data-concept-lookup hidden><label for="concept-lookup">Find a concept</label><div><input id="concept-lookup" type="search" placeholder="Retry, review, latency" data-concept-lookup-input><button type="submit">Search</button></div></form>
   <section class="concept-agent" aria-labelledby="concept-agent-title">
     <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-title">Explore with your own agent</h2><p>Choose something you want to understand. Give your agent access to the graph, follow connections into the reading, and check how well its explanation holds up.</p></div>
@@ -138,13 +153,18 @@ export function renderConceptGraph(
       ids.includes(relation.target) &&
       (!focus || relation.source === focus || relation.target === focus),
   );
-  const layout = complete ? overview : layoutNeighborhood(ids, focus);
+  const layout = complete ? overview : layoutNeighborhood(ids, focus, true);
   const points = new Map(layout.points.map((point) => [point.id, point]));
   const edges = relations
     .map((relation) => {
       const a = points.get(relation.source)!,
         b = points.get(relation.target)!;
-      return `<g data-concept-edge="${relation.source} ${relation.target}"><title>${escapeHtml(`${relation.label}: ${relation.explanation}`)}</title><line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/></g>`;
+      const line = layoutConnection(a, b);
+      const proposition =
+        relation.direction === "directed"
+          ? `${byId.get(relation.source)!.title} ${relation.label} ${byId.get(relation.target)!.title}`
+          : `${byId.get(relation.source)!.title} — ${byId.get(relation.target)!.title}: ${relation.label}`;
+      return `<g data-concept-edge="${relation.source} ${relation.target}" data-direction="${relation.direction}"><title>${escapeHtml(`${proposition}. ${relation.explanation}`)}</title><line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}"/>${relation.direction === "directed" ? `<path data-concept-arrow d="M -8 -4 L 0 0 L -8 4 Z" transform="translate(${line.x2} ${line.y2}) rotate(${line.angle})" aria-hidden="true"/>` : ""}</g>`;
     })
     .join("");
   const captions = layoutEdgeLabels(layout.points, relations, layout, focus)
@@ -168,7 +188,7 @@ export function renderConceptGraph(
       return `<a href="/concepts/#${concept.id}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}"${concept.id === focus ? ' class="is-current"' : ""} aria-label="Explore ${escapeAttribute(concept.title)}"><g transform="translate(${point.x} ${point.y})"><rect x="-95" y="-30" width="190" height="60" rx="12"/><text text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${(index - (lines.length - 1) / 2) * 19}">${escapeHtml(line)}</tspan>`).join("")}</text></g></a>`;
     })
     .join("");
-  return `<div class="concept-map${complete ? " concept-map-complete" : ""}" data-concept-map data-focus="${focus}" data-complete="${complete}">
+  return `<div class="concept-map${complete ? " concept-map-complete" : " has-connection-labels"}" data-concept-map data-focus="${focus}" data-complete="${complete}">
   <div class="concept-map-heading"><h2>${complete ? "The complete concept graph" : "Explore the connections"}</h2>${complete ? `<a href="#concept-directory">Browse concepts ↓</a>` : ""}</div>
   ${complete ? `<details class="concept-map-tools" data-concept-map-tools hidden open><summary>Adjust the graph and filters</summary>` : ""}
   <div class="concept-map-controls" hidden data-concept-controls>
@@ -176,13 +196,15 @@ export function renderConceptGraph(
     ${!focus ? `<label for="${prefix}-focus">Focus on<select id="${prefix}-focus" data-concept-focus><option value="">${complete ? "Complete graph" : "All connections"}</option>${items.map((concept) => `<option value="${concept.id}">${escapeHtml(concept.title)}</option>`).join("")}</select></label>` : ""}
     ${complete ? `<div class="concept-map-actions"><button type="button" data-concept-reset>Reset view</button><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button></div>` : ""}
     ${complete ? `<div class="concept-map-group-controls"><label for="${prefix}-group">Topic group<select id="${prefix}-group" data-concept-group><option value="">All groups</option>${conceptGroups.map((group) => `<option>${group}</option>`).join("")}</select></label><fieldset class="concept-group-view" data-concept-group-controls disabled aria-describedby="${prefix}-group-help"><legend>Group view</legend><div><label><input type="radio" name="${prefix}-group-view" value="highlight" data-concept-group-mode checked><span>Highlight</span></label><label><input type="radio" name="${prefix}-group-view" value="only" data-concept-group-mode><span>Show only</span></label></div></fieldset><p class="concept-group-help" id="${prefix}-group-help" data-concept-group-help>Choose a group to highlight its members in context.</p></div>` : ""}
-    <label class="concept-map-label-toggle"><input type="checkbox" data-concept-labels>Show connection labels</label>
+    <label class="concept-map-label-toggle"><input type="checkbox" data-concept-labels${complete ? "" : " checked"}>Show connection labels</label>
   </div>
   ${complete ? "</details>" : ""}
   <p${complete ? " data-concept-map-intro" : ""}>${complete ? "Search or choose a reading to narrow the graph and directory. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
   <div class="concept-map-graphic"${complete ? ' tabindex="0" role="region" aria-label="Scrollable concept graph"' : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${edges}${captions}${nodes}</svg></div>
   ${complete ? `<p class="concept-map-help">Scroll the map to pan, or drag its background. Use + and − to zoom. Every topic and connection is also available as text below.</p>` : ""}
+  <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels." : ""}</p>
   <p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>
-  <details class="concept-map-relationships"><summary>Read the relationships</summary><ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${conceptLink(byId.get(relation.source)!)} · ${conceptLink(byId.get(relation.target)!)}</strong> <span class="concept-relationship-label">${escapeHtml(relation.label)}</span><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
+  <details class="concept-map-relationships"><summary>Read the relationships</summary><ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${renderProposition(relation)}</strong><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
+  <details class="concept-connection-practice"><summary>Try explaining a connection</summary><p>Hide the labels and choose two connected topics. Write a linking phrase and decide whether the statement needs a direction. Read it as a complete sentence, then compare it with the authored label and explanation. Which assumption makes it hold, and when might it fail?</p><button type="button" data-concept-practice-labels hidden>${complete ? "Compare with the labels" : "Hide labels to try"}</button></details>
   </div>`;
 }

@@ -3,6 +3,7 @@ import {
   layoutEdgeLabels,
   layoutLabeledOverview,
   labeledOverviewScale,
+  layoutConnection,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 
@@ -46,8 +47,8 @@ import {
     const labels = map.querySelector<HTMLInputElement>(
       "[data-concept-labels]",
     )!;
-    // A newly opened graph starts uncluttered, including clones of other views.
-    labels.checked = false;
+    // Small graphs start with their propositions visible. This choice is local.
+    labels.checked = !complete;
     const select = map.querySelector<HTMLSelectElement>("[data-concept-focus]");
     const search = map.querySelector<HTMLInputElement>("[data-concept-search]");
     const reading = map.querySelector<HTMLSelectElement>(
@@ -93,6 +94,7 @@ import {
       return {
         source: source!,
         target: target!,
+        direction: edge.dataset.direction!,
         label: captions[index]!.dataset.label!,
       };
     });
@@ -109,6 +111,85 @@ import {
       viewHeight: number;
       context: string;
     } | null = null;
+    let graphPoints: { id: string; x: number; y: number }[] = [];
+    let activeRelationships: typeof relationships = [];
+    let hoveredNode = "";
+    let focusedNode = "";
+    const practice = map.querySelector<HTMLDetailsElement>(
+      ".concept-connection-practice",
+    )!;
+    const practiceLabels = practice.querySelector<HTMLButtonElement>(
+      "[data-concept-practice-labels]",
+    )!;
+    practiceLabels.hidden = false;
+    practiceLabels.addEventListener("click", () => {
+      labels.checked = !labels.checked;
+      update(true);
+    });
+    practice.addEventListener("toggle", () => previewConnections());
+
+    function placeCaptions(positions: ReturnType<typeof layoutEdgeLabels>) {
+      for (const position of positions) {
+        const caption = captions.find(
+          (item) =>
+            item.dataset.conceptEdgeLabel ===
+            `${position.source} ${position.target}`,
+        )!;
+        caption.setAttribute(
+          "transform",
+          `translate(${position.x} ${position.y})`,
+        );
+        caption
+          .querySelector("line")!
+          .setAttribute("x2", String(position.anchorX - position.x));
+        caption
+          .querySelector("line")!
+          .setAttribute("y2", String(position.anchorY - position.y));
+      }
+    }
+
+    function previewConnections() {
+      if (!complete) return;
+      const id = focusedNode || hoveredNode;
+      const incident =
+        labels.checked || practice.open
+          ? []
+          : activeRelationships.filter(
+              (relation) => relation.source === id || relation.target === id,
+            );
+      const shown = new Set(
+        incident.map((relation) => `${relation.source} ${relation.target}`),
+      );
+      if (incident.length)
+        placeCaptions(
+          layoutEdgeLabels(graphPoints, incident, svg.viewBox.baseVal),
+        );
+      for (const [index, edge] of edges.entries()) {
+        const previewed = shown.has(edge.dataset.conceptEdge!);
+        edge.classList.toggle("is-previewed", previewed);
+        captions[index]!.classList.toggle("is-previewed", previewed);
+      }
+    }
+    if (complete)
+      for (const node of nodes) {
+        const id = node.dataset.conceptNode!;
+        node.addEventListener("pointerenter", () => {
+          hoveredNode = id;
+          previewConnections();
+        });
+        node.addEventListener("pointerleave", () => {
+          hoveredNode = "";
+          previewConnections();
+        });
+        node.addEventListener("focus", () => {
+          focusedNode = id;
+          previewConnections();
+        });
+        node.addEventListener("blur", () => {
+          focusedNode = "";
+          previewConnections();
+        });
+      }
 
     function updateContext(size: number) {
       if (!page || !explorer) return;
@@ -189,10 +270,13 @@ import {
       if (!complete) return;
       const bounds = svg.viewBox.baseVal;
       zoom(
-        Math.min(
-          graphic.clientWidth || 440,
-          (graphic.clientHeight * bounds.width) / bounds.height,
-          overviewVisible ? 5000 : 640,
+        Math.max(
+          Math.min(
+            graphic.clientWidth || 440,
+            (graphic.clientHeight * bounds.width) / bounds.height,
+            overviewVisible ? 5000 : 640,
+          ),
+          overviewVisible ? 240 : Math.min(graphic.clientWidth || 440, 440),
         ),
       );
     }
@@ -247,6 +331,9 @@ import {
       const wasLabeledOverview = labeledOverview;
       labeledOverview = overviewVisible && labels.checked;
       map.classList.toggle("has-connection-labels", labels.checked);
+      practiceLabels.textContent = labels.checked
+        ? "Hide labels to try"
+        : "Compare with the labels";
       const layout = overviewVisible
         ? labeledOverview
           ? layoutLabeledOverview(
@@ -287,7 +374,7 @@ import {
           );
       }
       let count = 0;
-      const activeRelationships: typeof relationships = [];
+      activeRelationships = [];
       for (const [index, edge] of edges.entries()) {
         const relation = relationships[index]!;
         const active =
@@ -316,48 +403,44 @@ import {
           (node) => node.dataset.conceptNode === relation.target,
         )!;
         const line = edge.querySelector("line")!;
-        const start = points.get(relation.source),
-          end = points.get(relation.target);
-        line.setAttribute("x1", String(start?.x ?? a.dataset.x));
-        line.setAttribute("y1", String(start?.y ?? a.dataset.y));
-        line.setAttribute("x2", String(end?.x ?? b.dataset.x));
-        line.setAttribute("y2", String(end?.y ?? b.dataset.y));
-      }
-      if (labels.checked) {
-        const graphPoints = visibleNodes.map(
-          (node) =>
-            points.get(node.dataset.conceptNode!) || {
-              id: node.dataset.conceptNode!,
-              x: Number(node.dataset.x),
-              y: Number(node.dataset.y),
-            },
-        );
-        const captionPositions = layoutEdgeLabels(
-          graphPoints,
-          activeRelationships,
-          layout || {
-            width: Number(svg.dataset.width),
-            height: Number(svg.dataset.height),
+        const start = points.get(relation.source) || {
+            x: Number(a.dataset.x),
+            y: Number(a.dataset.y),
           },
-          focus,
-        );
-        for (const position of captionPositions) {
-          const caption = captions.find(
-            (item) =>
-              item.dataset.conceptEdgeLabel ===
-              `${position.source} ${position.target}`,
-          )!;
-          caption.setAttribute(
+          end = points.get(relation.target) || {
+            x: Number(b.dataset.x),
+            y: Number(b.dataset.y),
+          };
+        const connection = layoutConnection(start, end);
+        for (const key of ["x1", "y1", "x2", "y2"] as const)
+          line.setAttribute(key, String(connection[key]));
+        edge
+          .querySelector("[data-concept-arrow]")
+          ?.setAttribute(
             "transform",
-            `translate(${position.x} ${position.y})`,
+            `translate(${connection.x2} ${connection.y2}) rotate(${connection.angle})`,
           );
-          caption
-            .querySelector("line")!
-            .setAttribute("x2", String(position.anchorX - position.x));
-          caption
-            .querySelector("line")!
-            .setAttribute("y2", String(position.anchorY - position.y));
-        }
+      }
+      graphPoints = visibleNodes.map(
+        (node) =>
+          points.get(node.dataset.conceptNode!) || {
+            id: node.dataset.conceptNode!,
+            x: Number(node.dataset.x),
+            y: Number(node.dataset.y),
+          },
+      );
+      if (labels.checked) {
+        placeCaptions(
+          layoutEdgeLabels(
+            graphPoints,
+            activeRelationships,
+            layout || {
+              width: Number(svg.dataset.width),
+              height: Number(svg.dataset.height),
+            },
+            focus,
+          ),
+        );
       }
       for (const row of map.querySelectorAll<HTMLElement>(
         "[data-concept-relation]",
@@ -390,6 +473,7 @@ import {
         "viewBox",
         `0 0 ${layout?.width ?? svg.dataset.width} ${layout?.height ?? svg.dataset.height}`,
       );
+      previewConnections();
       graphic.hidden = visible.size === 0;
       if (groupHelp)
         groupHelp.textContent = !groupName

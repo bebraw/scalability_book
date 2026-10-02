@@ -1,6 +1,26 @@
 export type GraphPoint = { id: string; x: number; y: number };
 export type GraphEdge = { source: string; target: string };
 
+// Stop at the node boundary so arrowheads remain visible outside its box.
+export function layoutConnection(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+) {
+  const dx = b.x - a.x,
+    dy = b.y - a.y;
+  const length = Math.hypot(dx, dy);
+  const inset = length ? Math.min(95 / Math.abs(dx), 30 / Math.abs(dy)) : 0;
+  const start = inset + (length ? 3 / length : 0);
+  const end = inset + (length ? 6 / length : 0);
+  return {
+    x1: a.x + dx * start,
+    y1: a.y + dy * start,
+    x2: b.x - dx * end,
+    y2: b.y - dy * end,
+    angle: (Math.atan2(dy, dx) * 180) / Math.PI,
+  };
+}
+
 export const labeledOverviewScale = 1.7;
 
 export function layoutLabeledOverview(
@@ -48,7 +68,7 @@ export function layoutNeighborhood(ids: string[], focus = "", labels = false) {
       x: position % 2 ? 325 : 115,
       y:
         (focus ? (labels ? 166 : 142) : labels ? 66 : 42) +
-        Math.floor(position / 2) * (labels ? (focus ? 116 : 160) : 90),
+        Math.floor(position / 2) * (labels ? (focus ? 116 : 200) : 90),
     };
   });
   return {
@@ -81,7 +101,7 @@ export function layoutEdgeLabels(
       return {
         ...edge,
         x: neighbor.x,
-        y: neighbor.y - 46,
+        y: neighbor.y - 62,
         width,
         anchorX: neighbor.x,
         anchorY: neighbor.y - 30,
@@ -120,7 +140,7 @@ export function layoutEdgeLabels(
           Math.max(0, width / 2 + halfWidth - Math.abs(x - box.x)) *
           Math.max(0, 12 + halfHeight - Math.abs(y - box.y));
         const score =
-          points.reduce((sum, point) => sum + overlap(point, 99, 34) * 10, 0) +
+          points.reduce((sum, point) => sum + overlap(point, 111, 46) * 10, 0) +
           placed.reduce(
             (sum, box) => sum + overlap(box, box.width / 2 + 4, 14) * 4,
             0,
@@ -133,7 +153,7 @@ export function layoutEdgeLabels(
     const blocked = (x: number, y: number) =>
       points.some(
         (point) =>
-          Math.abs(x - point.x) < width / 2 + 99 && Math.abs(y - point.y) < 46,
+          Math.abs(x - point.x) < width / 2 + 111 && Math.abs(y - point.y) < 58,
       ) ||
       placed.some(
         (box) =>

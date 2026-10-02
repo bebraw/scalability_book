@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { concepts } from "../shared/concepts.ts";
 import { conceptPages } from "../shared/concept-pages.ts";
 import { conceptRelationships } from "../shared/concept-relationships.ts";
-import { exportConceptGraph } from "../scripts/lib/concept-export.ts";
+import {
+  exportConceptGraph,
+  renderConceptAgentGuide,
+  renderConceptGraphMarkdown,
+} from "../scripts/lib/concept-export.ts";
 
 test("agent exports preserve the authored graph and evidence at each origin", () => {
   const title = "Elements of Scalable Web Development";
@@ -13,7 +17,7 @@ test("agent exports preserve the authored graph and evidence at each origin", ()
   assert.equal(published.revision, preview.revision);
   for (const graph of [published, preview]) {
     const origin = new URL(graph.url).origin;
-    assert.equal(graph.schemaVersion, 1);
+    assert.equal(graph.schemaVersion, 2);
     assert.deepEqual(graph.relationships, conceptRelationships);
     assert.equal(graph.concepts.length, concepts.length);
     assert.equal(graph.readings.length, conceptPages.length);
@@ -43,4 +47,22 @@ test("agent exports preserve the authored graph and evidence at each origin", ()
     for (const href of Object.values(graph.resources))
       assert.equal(new URL(href).origin, origin);
   }
+});
+
+test("agent text preserves proposition direction when discovering incoming edges", () => {
+  const graph = exportConceptGraph("https://scalableweb.dev/", "The book");
+  const markdown = renderConceptGraphMarkdown(graph);
+  assert.match(
+    markdown,
+    /\[Queue\][^\n]*\*\*can add waiting time to\*\* → \[Latency\]/,
+  );
+  assert.match(
+    markdown,
+    /\[Little's Law\][^\n]* — \[Amdahl's Law\][^\n]*different questions/,
+  );
+  assert.doesNotMatch(markdown, /↔/);
+  const guide = renderConceptAgentGuide(graph);
+  assert.match(guide, /schemaVersion: 2/);
+  assert.match(guide, /Following an incoming edge does not reverse its claim/);
+  assert.match(guide, /direction: edge.direction/);
 });

@@ -11,6 +11,7 @@ import {
   layoutEdgeLabels,
   layoutLabeledOverview,
   neighborhood,
+  layoutConnection,
 } from "../shared/concept-graph.ts";
 import { parseJsonc } from "../scripts/lib/text.ts";
 
@@ -47,6 +48,42 @@ test("the authored graph has valid unique edges and connects every concept", () 
       conceptPages.some((page) => page.concepts.includes(concept.id)),
       concept.id,
     );
+  }
+});
+
+test("direction follows the qualified statement while comparisons stay undirected", () => {
+  const find = (source: string, target: string) =>
+    conceptRelationships.find(
+      (edge) => edge.source === source && edge.target === target,
+    )!;
+  assert.equal(find("queue", "latency").direction, "directed");
+  assert.equal(find("queue", "latency").label, "can add waiting time to");
+  assert.equal(find("saturation", "throughput").direction, "directed");
+  assert.equal(
+    find("measurement-boundary", "latency").label,
+    "defines timing scope of",
+  );
+  assert.equal(find("little-law", "amdahl-law").direction, "undirected");
+  assert.equal(find("authority", "state-authority").direction, "undirected");
+  assert.ok(neighborhood("latency", conceptRelationships).has("queue"));
+  assert.ok(neighborhood("queue", conceptRelationships).has("latency"));
+});
+
+test("arrow tips stay outside their destination boxes in every direction", () => {
+  for (const b of [
+    { x: 300, y: 0 },
+    { x: -300, y: 0 },
+    { x: 0, y: 300 },
+    { x: 0, y: -300 },
+    { x: 210, y: 124 },
+    { x: -210, y: -124 },
+  ]) {
+    const a = { x: 0, y: 0 };
+    const edge = layoutConnection(a, b);
+    assert.ok(Math.abs(edge.x1) > 95 || Math.abs(edge.y1) > 30);
+    assert.ok(Math.abs(edge.x2 - b.x) > 95 || Math.abs(edge.y2 - b.y) > 30);
+    const angle = (edge.angle * Math.PI) / 180;
+    assert.ok(Math.cos(angle) * b.x + Math.sin(angle) * b.y > 0);
   }
 });
 

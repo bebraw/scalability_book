@@ -102,12 +102,18 @@ test("students can retrieve the graph and check its evidence with their own tool
   expect(dataResponse.ok()).toBe(true);
   expect(dataResponse.headers()["content-type"]).toContain("application/json");
   const graph = await dataResponse.json();
-  expect(graph.schemaVersion).toBe(1);
+  expect(graph.schemaVersion).toBe(2);
   expect(graph.revision).toMatch(/^[a-f0-9]{64}$/);
   expect(graph.concepts).toHaveLength(45);
   expect(graph.relationships).toHaveLength(102);
   expect(graph.readings).toHaveLength(conceptPages.length);
   expect(graph.semantics.relationships).toContain("undirected");
+  expect(
+    graph.relationships.find(
+      (edge: { source: string; target: string }) =>
+        edge.source === "queue" && edge.target === "latency",
+    ),
+  ).toMatchObject({ direction: "directed", label: "can add waiting time to" });
   const markdown = await request.get(graph.resources.markdown);
   expect(markdown.ok()).toBe(true);
   expect(await markdown.text()).toContain(graph.revision);
@@ -339,6 +345,106 @@ test("group highlighting and isolation are accessible on mobile", async ({
   });
 });
 
+test("arrows express qualified relationships and focus reveals labels without changing the map", async ({
+  page,
+}) => {
+  await page.goto("/concepts/?view=all");
+  const map = page.locator("#concept-graph");
+  const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
+  await expect(map.locator('[data-direction="directed"]')).toHaveCount(74);
+  await expect(map.locator('[data-direction="undirected"]')).toHaveCount(28);
+  await expect(
+    map.locator('[data-direction="undirected"] [data-concept-arrow]'),
+  ).toHaveCount(0);
+  const arrow = map.locator(
+    '[data-concept-edge="queue latency"] [data-concept-arrow]',
+  );
+  await expect(arrow).toBeVisible();
+  const positions = await map
+    .locator(".concept-map-graphic")
+    .evaluate((element) => ({
+      width: element.querySelector("svg")!.style.width,
+      nodes: [...element.querySelectorAll("[data-concept-node] g")].map(
+        (node) => node.getAttribute("transform"),
+      ),
+    }));
+  const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
+  await queue.focus();
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(6);
+  await expect(
+    map.locator('[data-concept-edge-label="queue latency"]'),
+  ).toContainText("can add waiting time to");
+  await expect(toggle).not.toBeChecked();
+  expect(
+    await map.locator(".concept-map-graphic").evaluate((element) => ({
+      width: element.querySelector("svg")!.style.width,
+      nodes: [...element.querySelectorAll("[data-concept-node] g")].map(
+        (node) => node.getAttribute("transform"),
+      ),
+    })),
+  ).toEqual(positions);
+  await toggle.focus();
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await queue.hover();
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(6);
+  await page.mouse.move(0, 0);
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await map.getByLabel("Focus on").selectOption("latency");
+  await map.getByRole("link", { name: "Explore Latency", exact: true }).click();
+  const pane = page.getByRole("dialog", { name: "Latency", exact: true });
+  await expect(
+    pane.getByRole("checkbox", { name: "Show connection labels" }),
+  ).toBeChecked();
+  const edge = pane.locator('[data-concept-edge="queue latency"]');
+  expect(
+    await edge.evaluate((element) => {
+      const line = element.querySelector("line")!;
+      const destination = element
+        .closest("svg")!
+        .querySelector(
+          '[data-concept-node="latency"] g',
+        )! as SVGGraphicsElement;
+      const matrix = destination.transform.baseVal.consolidate()!.matrix;
+      const dx = Number(line.getAttribute("x2")) - matrix.e;
+      const dy = Number(line.getAttribute("y2")) - matrix.f;
+      return Math.abs(dx) > 95 || Math.abs(dy) > 30;
+    }),
+  ).toBe(true);
+  await pane.getByText("Try explaining a connection", { exact: true }).click();
+  await pane
+    .getByRole("button", { name: "Hide labels to try", exact: true })
+    .click();
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await expect(toggle).not.toBeChecked();
+  await pane
+    .getByRole("button", { name: "Compare with the labels", exact: true })
+    .click();
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(6);
+  await pane
+    .locator(".concept-connection-practice")
+    .evaluate((element: HTMLDetailsElement) => {
+      element.open = false;
+    });
+  await pane.locator(".concept-map-graphic").evaluate((element) => {
+    element.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await pane.locator(".concept-map-graphic").screenshot({
+    path: test.info().outputPath("directional-connections-desktop.png"),
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("[data-theme-picker]").selectOption("dark");
+  await pane.locator(".concept-map-graphic").evaluate((element) => {
+    element.scrollIntoView({ block: "center", behavior: "instant" });
+  });
+  await pane.locator(".concept-map-graphic").screenshot({
+    path: test.info().outputPath("directional-connections-mobile.png"),
+  });
+  expect(
+    (await new AxeBuilder({ page }).include(".concept-pane").analyze())
+      .violations,
+  ).toEqual([]);
+});
+
 test("connection labels stay local while following concepts across graph views", async ({
   page,
 }) => {
@@ -370,7 +476,7 @@ test("connection labels stay local while following concepts across graph views",
   await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
   await expect(
     page.locator("#decision-log [data-concept-labels]"),
-  ).not.toBeChecked();
+  ).toBeChecked();
   await page.evaluate(() => document.fonts.ready);
   const assertCaptionPadding = async (graph: Locator) => {
     const cramped = await graph
@@ -398,11 +504,11 @@ test("connection labels stay local while following concepts across graph views",
   await map.getByLabel("Focus on").selectOption("decision-log");
   await expect(map.locator(".concept-edge-label:visible")).toHaveCount(6);
   await expect(map.locator(".concept-edge-label:visible")).toContainText([
-    "reversibility record",
-    "decision rationale",
+    "records conditions for",
+    "records rationale for",
     "accepted context",
-    "revisit condition",
-    "visible obligation",
+    "revisit conditions",
+    "can document",
     "decision ownership",
   ]);
   const assertNoCaptionOverlap = async (graph: Locator) => {
@@ -450,8 +556,8 @@ test("connection labels stay local while following concepts across graph views",
   const paneToggle = pane.getByRole("checkbox", {
     name: "Show connection labels",
   });
-  await expect(paneToggle).not.toBeChecked();
-  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await expect(paneToggle).toBeChecked();
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(6);
   await paneToggle.check();
   await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(6);
   await assertCaptionPadding(pane);
@@ -459,7 +565,6 @@ test("connection labels stay local while following concepts across graph views",
   await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(0);
   await expect(toggle).toBeChecked();
   expect(await backgroundView()).toEqual(beforePane);
-  await paneToggle.check();
   await pane
     .getByRole("link", { name: "Explore Decision reversibility", exact: true })
     .click();
@@ -470,8 +575,8 @@ test("connection labels stay local while following concepts across graph views",
   const nextToggle = nextPane.getByRole("checkbox", {
     name: "Show connection labels",
   });
-  await expect(nextToggle).not.toBeChecked();
-  await expect(nextPane.locator(".concept-edge-label:visible")).toHaveCount(0);
+  await expect(nextToggle).toBeChecked();
+  await expect(nextPane.locator(".concept-edge-label:visible")).toHaveCount(7);
   await nextToggle.check();
   await expect(
     page.locator(".concept-pane .concept-edge-label:visible"),
@@ -490,10 +595,7 @@ test("connection labels stay local while following concepts across graph views",
   const chapterToggle = chapterMap.getByRole("checkbox", {
     name: "Show connection labels",
   });
-  await expect(chapterToggle).not.toBeChecked();
-  await expect(chapterMap.locator(".concept-edge-label:visible")).toHaveCount(
-    0,
-  );
+  await expect(chapterToggle).toBeChecked();
   await chapterToggle.check();
   await assertNoCaptionOverlap(chapterMap);
   await assertCaptionPadding(chapterMap);
@@ -508,7 +610,7 @@ test("connection labels stay local while following concepts across graph views",
   await chapterToggle.check();
   await page.reload();
   await index.getByText("Explore concept connections", { exact: true }).click();
-  await expect(chapterToggle).not.toBeChecked();
+  await expect(chapterToggle).toBeChecked();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth > innerWidth,
@@ -1003,6 +1105,8 @@ test("a failed lazy library request falls back to the static reference", async (
 test("a topic leads through the graph and returns to the reading position", async ({
   page,
 }) => {
+  // Measure restoration after native focus scrolling, without an animation race.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/chapters/benchmarking/");
   const index = page.getByRole("navigation", {
     name: "Concepts in this reading",
