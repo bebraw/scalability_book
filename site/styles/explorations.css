@@ -1,0 +1,146 @@
+/* One question to enter, with depth available when the learner chooses it. */
+.exploration-page {
+  margin-inline: auto;
+  max-width: 66rem;
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+.exploration-header {
+  max-width: 48rem;
+  margin-block: 1.5rem 2rem;
+}
+.exploration-header h1 {
+  font: 500 clamp(2.25rem, 5vw, 3.6rem)/1.15 var(--font-serif);
+  margin-block: 0.6rem 1rem;
+  text-wrap: balance;
+}
+.exploration-header > p:not(.eyebrow) {
+  font: 1.15rem/1.7 var(--font-serif);
+}
+.exploration-start {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-strong);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem 2rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.exploration-start h2,
+.exploration-phase h2,
+.exploration-body h2 {
+  font: 500 1.6rem/1.3 var(--font-serif);
+  margin-block: 0 0.8rem;
+}
+.exploration-start p,
+.exploration-context,
+.exploration-note,
+.exploration-phase small,
+.exploration-return {
+  font: 0.9rem/1.65 var(--font-ui);
+}
+.exploration-context {
+  margin-block: 1.5rem 2rem;
+}
+.exploration-context nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  list-style: none;
+  margin-block: 0.8rem;
+  padding: 0;
+}
+.exploration-reading,
+.exploration-discussion {
+  border-top: 1px solid var(--border);
+  margin-block: 0;
+  padding-block: 0.6rem;
+}
+.exploration-reading > summary,
+.exploration-discussion > summary {
+  cursor: pointer;
+  font: 650 1rem/1.5 var(--font-ui);
+  padding-block: 0.6rem;
+}
+.exploration-body {
+  font: 1rem/1.8 var(--font-serif);
+  max-width: 46rem;
+  overflow-x: auto;
+  padding-block: 1.2rem;
+}
+.exploration-body h2:not(:first-child) {
+  margin-top: 1.6rem;
+}
+.exploration-body .heading-anchor {
+  position: static;
+  margin-inline-start: 0.5rem;
+  opacity: 0.65;
+}
+.exploration-body li {
+  margin-bottom: 1rem;
+}
+.exploration-body pre {
+  background: var(--panel);
+  font: 0.8rem/1.6 var(--font-mono);
+  overflow-x: auto;
+  padding: 1rem;
+}
+.exploration-body table {
+  border-collapse: collapse;
+  font: 0.85rem/1.5 var(--font-ui);
+  width: 100%;
+}
+.exploration-body th,
+.exploration-body td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem;
+  text-align: left;
+}
+.exploration-phase {
+  border-top: 1px solid var(--border);
+  padding-top: 1.2rem;
+  margin-top: 2rem;
+}
+.exploration-phase ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.exploration-phase li {
+  max-width: 46rem;
+  margin-block: 1.4rem;
+}
+.exploration-phase li > a {
+  font: 500 1.35rem/1.4 var(--font-serif);
+}
+.exploration-phase li > p {
+  margin-block: 0.4rem;
+}
+.exploration-note {
+  color: var(--muted);
+  margin-top: 1.5rem;
+}
+.exploration-page [hidden] {
+  display: none;
+}
+.exploration-page a,
+.exploration-page summary {
+  text-underline-offset: 0.2em;
+}
+.exploration-page a:focus-visible,
+.exploration-page summary:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 4px;
+}
+@media (max-width: 48rem) {
+  .exploration-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media print {
+  .exploration-start {
+    display: block;
+  }
+  .exploration-page details > div {
+    display: block;
+  }
+}

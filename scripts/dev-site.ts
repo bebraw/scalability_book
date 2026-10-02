@@ -665,6 +665,7 @@ async function startSourceWatchers() {
     { target: path.join(root, "site"), recursive: true },
     { target: path.join(root, "study"), recursive: true },
     { target: path.join(root, "shared"), recursive: true },
+    { target: path.join(root, "explorations"), recursive: true },
     { target: path.join(root, "scripts", "lib"), recursive: true },
     { target: path.join(root, "scripts", "build-site.ts"), recursive: false },
     { target: path.join(root, "bibliography.bib"), recursive: false },

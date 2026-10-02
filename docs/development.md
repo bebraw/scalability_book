@@ -76,7 +76,7 @@ You can therefore build or preview the published site without removing draft cha
 To clear all default development output, stop the dev servers and remove only `.local/dev-build/`.
 Local feedback and saved exercise answers live elsewhere in `.local/` and should be retained.
 
-The development server watches `book/`, `site/`, the site build helpers, `bibliography.bib`, and `site.config.jsonc`.
+The development server watches `book/`, `explorations/`, `site/`, the site build helpers, `bibliography.bib`, and `site.config.jsonc`.
 Saving CSS hot-swaps the generated stylesheets without losing page state.
 Markdown, template, configuration, and browser-script changes rebuild the development output and automatically reload the page after the atomic output swap.
 

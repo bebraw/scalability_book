@@ -319,25 +319,7 @@ A score of `0.9` needs evidence from comparable predictions before it can guide 
 Confidence about a classification also concerns a different outcome from whether the resulting patch passes acceptance or an action is [authorized](/concepts/#authority).
 Keep mandatory checks and permissions outside the learned score.
 
-**Optional exercise — Examine a confident classification.** A classifier must name the single layer affected by a proposed change, choosing `interface` or `data`.
-In an invented policy-development batch of 20 single-layer changes, every output chooses `interface` with confidence `0.9` and passes schema validation.
-The fixture's independently adjudicated reference labels are assumed correct: 12 are `interface` and eight are `data`.
-These are teaching inputs, rather than results from Clef or another model.
-
-1. Calculate the observed reference agreement for this confidence group.
-   Compare it with the reported confidence: what does each quantity measure, and what would you need before trusting the score on future changes?
-2. Suppose one change alters authorization and the project's policy requires human review.
-   Does a valid label or a higher confidence score satisfy that requirement?
-   Name the independent gate that should enforce it.
-3. Change the input: a diff crosses both layers, or the model receives an incomplete diff.
-   What can neither label express, and when should the workflow abstain, retrieve more evidence, or escalate?
-   Define that path even if the model returns a high score.
-
-Use development cases to set the policy, then freeze it and evaluate on fresh held-out cases using the outcome and cost accounting above.
-Record reference-label uncertainty, incorrect routes, abstentions, missing context, and changed task families; one confidence group does not describe calibration over every workload.
-Keep the findings in the existing evaluation notes.
-
-{{ import "site/includes/confidence-routing-answer.html" }}
+To test this distinction, give your agent the [confidence starting point](/explore/confidence-before-routing/agent.md), or [examine the invented classification batch yourself](/explore/confidence-before-routing/).
 
 ## Compressed evidence and repeated review
 
@@ -379,40 +361,8 @@ Apply the acceptance protocol above when deciding which findings to repair and w
 
 ### Optional exercise — Challenge an explanation
 
-An explanation and a quiz produced from it can share the same missing assumption.
-Use this invented fixture to check a claim independently, extending the review-evidence exercise above.
-Start with an empty store and one newly created recorder.
-All calls are sequential and concern the same authorized workspace and unchanged payload.
-Assume `appendEvent` adds a new durable event on every call, without its own duplicate check; stored events survive a worker restart.
-
-```js
-function makeRecorder(appendEvent) {
-  const completed = new Set();
-
-  return async function record(requestId) {
-    if (completed.has(requestId)) return;
-    await appendEvent(requestId);
-    completed.add(requestId);
-  };
-}
-```
-
-Suppose an agent explains this code as follows; the explanation deliberately overstates its guarantee:
-
-> After a request completes, its identifier is remembered.
-> Retrying with the same identifier cannot append another event, including after a worker restart.
-
-1. Before running anything or requesting help, predict the stored event count after each step: call `record("C7")`, repeat it on the same recorder, then restart the worker and retry `C7` with a newly created recorder sharing the existing store.
-   Identify which part of the explanation each prediction tests.
-2. Trace the state on paper or run a small check against the fixture.
-   A test list that survives recreating the recorder can stand in for the store; this simulates losing process-local state, rather than reproducing a complete production restart.
-   Check the stored events independently of the explanation or any generated quiz answer key.
-3. Identify the lifetime and owner of each relevant state value, then rewrite the claim with the narrowest conditions supported by the code.
-   Explain what must change to support the original restart guarantee; [Appendix C's state-placement audit](/appendices/advanced-web-boundaries/#stateless-requests-still-depend-on-state) develops the durable effect and retry-key boundary.
-4. In a later session, without the agent or explanation, predict what happens if the retry instead reaches a second worker with its own fresh recorder and the same store.
-   Record any change in your reasoning in the existing learning notes.
-
-{{ import "site/includes/explanation-challenge-answer.html" }}
+Predict what a small event recorder does when a worker restarts, then check an agent's explanation against the code.
+Give your agent the [explanation starting point](/explore/challenge-an-explanation/agent.md), or [work through the fixture yourself](/explore/challenge-an-explanation/).
 
 ## Repeated review is measurement, not proof
 

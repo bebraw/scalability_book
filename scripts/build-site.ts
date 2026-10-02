@@ -10,6 +10,13 @@ import {
 import path from "node:path";
 import { demoCatalog } from "../shared/demo-catalog.ts";
 import { exercises } from "../shared/exercises.ts";
+import { exportExplorations } from "../shared/explorations.ts";
+import {
+  renderExplorationAgentStart,
+  renderExplorationDiscussion,
+  renderExplorationIndex,
+  renderExplorationPage,
+} from "./lib/exploration-html.ts";
 import {
   attachConceptIndex,
   renderConceptLibrary,
@@ -280,6 +287,58 @@ await writePage(
   renderConceptAgentGuide(exportedGraph),
 );
 await writePage("llms.txt", renderConceptAgentIndex(exportedGraph));
+
+await writePage(
+  "explore/index.html",
+  renderer.renderLayout({
+    title: `Questions to explore - ${config.title}`,
+    description:
+      "Optional starting points for investigating your course tasks with your agent and the concept graph.",
+    currentUrl: "/explore/",
+    scripts: developmentScripts,
+    children: renderExplorationIndex(siteUrl),
+  }),
+);
+await writePage(
+  "explore/index.json",
+  JSON.stringify(
+    { schemaVersion: 1, explorations: exportedGraph.explorations },
+    null,
+    2,
+  ) + "\n",
+);
+for (const activity of exportExplorations(siteUrl)) {
+  const source = await readFile(
+    path.join(root, "explorations", `${activity.id}.md`),
+    "utf8",
+  );
+  const discussion = await readFile(
+    path.join(root, "explorations", `${activity.id}.discussion.md`),
+    "utf8",
+  );
+  await writePage(
+    `explore/${activity.id}/agent.md`,
+    renderExplorationAgentStart(activity, source, siteUrl),
+  );
+  await writePage(
+    `explore/${activity.id}/discussion.md`,
+    renderExplorationDiscussion(activity, discussion, siteUrl),
+  );
+  await writePage(
+    `explore/${activity.id}/index.html`,
+    renderer.renderLayout({
+      title: `${activity.title} - ${config.title}`,
+      description: activity.summary,
+      currentUrl: `/explore/${activity.id}/`,
+      scripts: ["/concepts.js", ...developmentScripts],
+      children: renderExplorationPage(
+        activity,
+        renderMarkdown(source, { number: "" }, bibliographySource).content,
+        renderMarkdown(discussion, { number: "" }, bibliographySource).content,
+      ),
+    }),
+  );
+}
 
 await writePage(
   "index.html",

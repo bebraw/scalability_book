@@ -18,6 +18,7 @@ import {
 } from "../../shared/concept-graph.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
+import { explorations, explorationUrl } from "../../shared/explorations.ts";
 
 const overview = layoutOverview(concepts, conceptRelationships, conceptGroups);
 const byId = new Map(concepts.map((concept) => [concept.id, concept]));
@@ -83,12 +84,16 @@ function renderConceptCard(concept: Concept): string {
       resource.id !== "graph-complete" &&
       resource.conceptIds.includes(concept.id),
   );
+  const activities = explorations.filter((activity) =>
+    activity.conceptIds.includes(concept.id),
+  );
   return `<section class="concept-card" id="${concept.id}" data-concept-card="${concept.id}" aria-labelledby="concept-${concept.id}-title">
   <p class="concept-card-group">${concept.group}</p><h2 id="concept-${concept.id}-title" tabindex="-1">${escapeHtml(concept.title)}</h2>
   <dl class="concept-passages">${sections.map(([label, text], index) => `<div><dt>${label}</dt><dd>${escapeHtml(text)}</dd></div>${index === 0 ? usage : ""}`).join("")}</dl>
   <details class="concept-neighborhood"><summary>Explore this topic's connections</summary>${renderConceptGraph(`topic-${concept.id}`, [...neighborhood(concept.id, conceptRelationships)], concept.id)}</details>
   <details class="concept-learning-resources"><summary>Diagrams and experiments (${resources.length})</summary><ul>${resources.map((resource) => `<li><a href="${escapeAttribute(resource.url)}">${escapeHtml(resource.title)}</a><p>${escapeHtml(resource.caption)}</p><p><a href="${resource.images.png}">${resource.kind === "demo" ? "Static preview" : "Image (PNG)"}</a>${resource.images.svg ? ` · <a href="${resource.images.svg}">Vector image (SVG)</a>` : ""}</p>${resource.experiment ? `<p><strong>Predict first.</strong> ${escapeHtml(resource.experiment.predict)}</p>` : ""}</li>`).join("")}</ul></details>
   <h3>Follow the idea</h3>
+  ${activities.length ? `<details class="concept-learning-resources"><summary>Explore through a course task (${activities.length})</summary><ul>${activities.map((activity) => `<li><a href="${explorationUrl(activity.id)}">${escapeHtml(activity.title)}</a><p>${escapeHtml(activity.summary)}</p></li>`).join("")}</ul></details>` : ""}
   <ul class="concept-contexts">${concept.contexts.map((context) => `<li><a href="${escapeAttribute(context.href)}">${escapeHtml(context.label)}</a><p>${escapeHtml(context.description)}</p></li>`).join("")}</ul>
   <h3>Connect the concepts</h3>
   <ul class="concept-relationships">${related
@@ -128,7 +133,7 @@ export function renderConceptPage(
   <header class="concept-reference-header"><p class="eyebrow">Ideas across the book</p><h1>Concepts that connect</h1><p>Follow an idea through the book, or bring your own question and agent to the knowledge graph.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections. Read an arrow as a statement from its source, through the label, to its target. The label and explanation establish the meaning; an arrow alone does not establish causation or a prerequisite. Comparisons and associations use plain lines. Each connection links back to the reading.</p></details></header>
   <form class="concept-lookup" role="search" aria-label="Concept lookup" data-concept-lookup hidden><label for="concept-lookup">Find a concept</label><div><input id="concept-lookup" type="search" placeholder="Retry, review, latency" data-concept-lookup-input><button type="submit">Search</button></div></form>
   <section class="concept-agent" aria-labelledby="concept-agent-title">
-    <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-title">Explore with your own agent</h2><p>Give your agent the guide to get started. Explore your current reading, connect two ideas, or try a short prediction experiment. Bring a question of your own whenever you have one, and check the explanation against the book.</p></div>
+    <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-title">Explore with your own agent</h2><p>Start from your course task, current reading, or a question of your own. <a href="/explore/">Choose a task starting point</a>, or give your agent the guide below to explore ideas and experiments through the graph.</p></div>
     <div class="concept-agent-access"><label for="concept-agent-guide-url">Give your agent this guide</label><div class="concept-agent-copy"><input id="concept-agent-guide-url" type="text" inputmode="url" value="${escapeAttribute(guideUrl)}" readonly data-concept-agent-url><button type="button" data-concept-agent-copy hidden>Copy URL</button></div><p class="concept-agent-status" data-concept-agent-status role="status"></p><p class="concept-agent-files"><a href="/concepts/agent-guide.md">Read the guide</a><a href="/concepts/graph.json">Graph as JSON</a><a href="/concepts/graph.md">Graph as Markdown</a></p></div>
     <details class="concept-agent-setup"><summary>Connect it, then check it</summary><ol><li><strong>Connect your tools.</strong> Use an agent that can fetch URLs. If it works with files instead, download the guide and either graph format and add them to its context. The guide describes the data and how to follow connections.</li><li><strong>Pick a starting point.</strong> If you are unsure, ask “Read this guide and help me get started.” Choose one of the suggested activities, or bring your own question. State a guess or prediction before asking for an explanation.</li><li><strong>Check the explanation.</strong> Follow a citation yourself. Compare the answer with the passage and its assumptions, and distinguish the book’s connections from connections your agent proposes. Keep a short record of what you accepted, challenged, or could not verify.</li></ol><p>Connecting the graph and judging what your agent retrieves are part of the learning. You can also explore it directly below.</p></details>
   </section>

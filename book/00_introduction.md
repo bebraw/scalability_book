@@ -100,4 +100,6 @@ The [common project specification](/project/) and current phase specification pr
 9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) synthesizes a justified target architecture and development workflow from the three builds.
 
 The main chapters provide the shortest path through the argument.
+Let your current task or question guide deeper exploration through the [concept graph](/concepts/) and [curated starting points](/explore/).
+Each starting point has a URL you can give directly to your agent, with a scenario to investigate one question at a time; you can also work through it yourself.
 The [appendices](/parts/appendices/) preserve deeper evaluation methods, implementation details, security controls, and formal models for readers who need them.

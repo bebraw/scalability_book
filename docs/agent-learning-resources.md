@@ -1,5 +1,25 @@
 # Graphics and experiments for agents
 
+Chapters carry a concise narrative; course tasks motivate deeper exploration through a student's agent and the graph.
+Optional activities are discoverable from short chapter invitations, task-based starting points at `/explore/`, and the relevant concept cards.
+
+`shared/explorations.ts` owns stable activity IDs, course-task connections, reading context, and concept membership.
+The scenario and prompts live in `explorations/<id>.md`; worked reasoning lives separately in `explorations/<id>.discussion.md`.
+The build generates one student page and two Markdown resources per activity:
+
+- `/explore/<id>/`: a copyable starting URL, task and graph links, and closed disclosures for independent study and worked reasoning.
+- `/explore/<id>/agent.md`: self-contained conversation guidance, the scenario, prompts, and absolute source links, with no worked answer.
+- `/explore/<id>/discussion.md`: authored worked reasoning, retrieved after the student's attempt or explicit request.
+
+Students can give an activity URL directly to their agent without first using the general guide.
+The guide and both graph formats link to the catalog; concepts carry `explorationIds`.
+The first response introduces the chosen scenario and asks one relevant question, then waits.
+Hints, evidence checks, and changed assumptions support the student's reasoning; agreement with the discussion is not a grade.
+Trials must actually be performed within granted scope, and an agent must distinguish plans from observations.
+These instructions guide the student's external agent; client behavior needs test drives and is not enforced by the site.
+The resources are public, and separation of the discussion supports pacing rather than concealing answers.
+Activities add no required course deliverables or new saved-progress system.
+
 The concept JSON and Markdown include a curated learning-resource catalog.
 Each concept's `resourceIds` refer to entries in `learningResources`.
 The catalog includes a labelled neighborhood image for every concept, the complete graph, the five book diagrams, and all gallery demos.

@@ -69,6 +69,7 @@ The template is a distribution artifact, not the finished architecture of the pr
 
 Record the comparable evidence fields in the common submission bundle while the work is happening.
 Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
+For optional practice in checking explanations and ownership, choose an [Establish exploration starting point](/explore/#phase-establish).
 
 ### 3.3 Record the stack hypothesis
 

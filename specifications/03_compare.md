@@ -158,6 +158,7 @@ This is a small task, not a fourth application or a requirement to repeat a whol
 If matched access or accounting is unavailable, use instructor-supplied paired traces with the same metadata and checks; identify their provenance and missing evidence.
 An unmatched pair may still be analyzed descriptively, but cannot establish an orchestration effect.
 Link the pair and its limits in the fleet evidence bundle rather than adding a separate report.
+To investigate unfinished work or routing decisions further, choose an optional [Compare exploration starting point](/explore/#phase-compare).
 
 ### 5.5 Analyze the three applications
 

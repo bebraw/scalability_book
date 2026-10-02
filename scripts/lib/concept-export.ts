@@ -3,6 +3,7 @@ import { concepts } from "../../shared/concepts.ts";
 import { conceptPages } from "../../shared/concept-pages.ts";
 import { conceptRelationships } from "../../shared/concept-relationships.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
+import { explorations, exportExplorations } from "../../shared/explorations.ts";
 
 export function exportConceptGraph(siteUrl: string, title: string) {
   const absolute = (href: string) => new URL(href, siteUrl).href;
@@ -21,6 +22,7 @@ export function exportConceptGraph(siteUrl: string, title: string) {
           conceptRelationships,
           conceptPages,
           learningResources,
+          explorations,
         }),
       )
       .digest("hex"),
@@ -30,6 +32,8 @@ export function exportConceptGraph(siteUrl: string, title: string) {
       guide: absolute("/concepts/agent-guide.md"),
       json: absolute("/concepts/graph.json"),
       markdown: absolute("/concepts/graph.md"),
+      explorations: absolute("/explore/index.json"),
+      explorationIndex: absolute("/explore/"),
     },
     semantics: {
       relationships:
@@ -42,6 +46,8 @@ export function exportConceptGraph(siteUrl: string, title: string) {
         "A curated guide to the book, not an exhaustive account of possible connections.",
       learningResources:
         "Curated concept-to-resource mappings, not new graph edges. Graphics are authored illustrations. Demo PNGs are static previews of default views, not live execution or measured evidence; current behavior and saved input state can differ. Prediction prompts deliberately omit a model answer.",
+      explorations:
+        "Optional task-led activities linked to concepts, not new graph edges or required deliverables. The catalog contains starting URLs; authored scenarios and worked reasoning are separate resources.",
     },
     concepts: concepts.map((concept) => ({
       ...concept,
@@ -75,8 +81,12 @@ export function exportConceptGraph(siteUrl: string, title: string) {
             resource.conceptIds.includes(concept.id),
         )
         .map(({ id }) => id),
+      explorationIds: explorations
+        .filter((activity) => activity.conceptIds.includes(concept.id))
+        .map(({ id }) => id),
     })),
     relationships: conceptRelationships,
+    explorations: exportExplorations(siteUrl),
     readings,
     learningResources: learningResources.map((resource) => ({
       ...resource,
@@ -100,13 +110,14 @@ export function renderConceptAgentGuide(graph: ExportedGraph): string {
   )!;
   return `# Exploring ${graph.title} with your own agent
 
-Choose your own question or start with one of the activities below. Use your agent to investigate through the book's knowledge graph. Connecting the data, inspecting retrieval, and evaluating the explanation are part of the learning.
+Choose your own question or start with one of the activities below. The chapters offer a concise narrative; course tasks motivate deeper exploration through your agent and the knowledge graph. Connecting the data, inspecting retrieval, and evaluating the explanation are part of the learning.
 
 ## Connect
 
 - [Structured graph (JSON)](${graph.resources.json}): definitions, assumptions, examples, usage notes, explained connections, reading locations, graphics, and demo experiments.
 - [Text graph (Markdown)](${graph.resources.markdown}): the same authored content for agents that read text more readily than JSON.
 - [Visual explorer](${graph.url}): follow concepts and connections yourself.
+- [Course-task starting points](${graph.resources.explorationIndex}): choose an optional investigation and give its starting URL directly to your agent.
 
 Use an agent with an HTTP retrieval tool, or download this guide and either graph file and give them to an agent that reads local files. File-only agents can inspect the graph but need the linked reading pages supplied separately to verify the full argument. A chat assistant with no retrieval or file access cannot query these resources simply by being given a URL.
 
@@ -130,6 +141,10 @@ Adapt the acknowledgement to the material you actually read. If retrieval fails,
 
 Once they choose, retrieve the relevant concept, teaching passage, and resource. Take one step at a time. Ask for their own explanation or prediction before revealing a connection label, model answer, or demo result. For the experiment, use the resource's exact \`experiment.predict\` prompt and assumptions, wait for their prediction, then guide the \`try\`, \`observe\`, and \`reflect\` steps. Finish by checking a cited passage and inviting them to revise their explanation.
 
+## Start from a course task
+
+For a course task, find a relevant activity in the [exploration catalog](${graph.resources.explorations}) or a concept's \`explorationIds\`. Retrieve its \`agentUrl\` and follow that activity's conversation guidance: present the scenario, ask the first relevant question, and wait. A student supplying an activity URL can start directly there without this setup menu. Keep its \`discussionUrl\` for after an attempted answer or an explicit request for worked reasoning. Help conduct real trials only within granted scope, and distinguish planned work from observed results.
+
 ## Data contract
 
 The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SHA-256 hash of the authored graph content. Record it when keeping a retrieval trace; URLs identify the current publication, not an archived copy of that revision. Version 2 adds an explicit relationship direction and reviews the endpoint order and linking phrases; version 1 treated every connection as undirected.
@@ -137,9 +152,10 @@ The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SH
 - \`concepts\`: stable \`id\`, \`title\`, \`group\`, \`definition\`, \`assumptions\`, \`example\`, \`misconception\`, and a \`url\` for citation. Optional \`usage\` notes explain vocabulary choices, with sources where available. \`contexts\` link to specific teaching passages. \`readings\` lists the broader reading locations.
 - \`relationships\`: \`source\` and \`target\` concept IDs, \`direction\` (\`directed\` or \`undirected\`), a short \`label\`, and an authored \`explanation\`. Read a directed connection as source → label → target. Comparisons and associations remain undirected. Preserve qualifications such as “can” and the conditions in the explanation; an arrow alone does not establish causation or a prerequisite.
 - \`readings\`: \`url\`, \`title\`, and \`concepts\` discussed there. Two concepts appearing in the same reading are not necessarily connected by an authored edge.
-- \`resources\`: the guide and both graph formats. All resource and citation URLs are absolute, including on a local preview.
+- \`resources\`: the guide, both graph formats, and the exploration index and catalog. All resource and citation URLs are absolute, including on a local preview.
 - \`concepts[].resourceIds\`: IDs to look up in \`learningResources\`. These are curated teaching aids, not additional concept relationships.
 - \`learningResources\`: stable \`id\`, \`kind\` (\`graphic\` or \`demo\`), \`title\`, \`conceptIds\`, \`url\`, \`caption\`, \`assumptions\`, and \`images\`. Every image has a PNG URL and alt text; graphics also have a standalone SVG. Demos include \`controls\` and an \`experiment\` with \`predict\`, \`try\`, \`observe\`, and \`reflect\` prompts. These fields are additive to version 2.
+- \`explorations\`: optional activities with stable \`id\`, \`phase\`, \`title\`, \`summary\`, \`conceptIds\`, course \`task\`, \`reading\`, \`graphUrl\`, \`url\` for independent study, \`agentUrl\` for starting a conversation, and separate \`discussionUrl\` for worked reasoning. Concepts carry matching \`explorationIds\`. These fields are additive to version 2; the catalog deliberately omits worked answers.
 
 Definitions and examples use the book's declared assumptions. Some vocabulary is still developing; preserve the usage notes when interpreting it. Example rates are illustrative unless the reading identifies them as measurements.
 
@@ -241,7 +257,17 @@ ${graph.readings
 
 **Graphics and experiments:**
 
-${concept.resourceIds.map(resourceLink).join("\n")}`,
+${concept.resourceIds.map(resourceLink).join("\n")}
+${
+  concept.explorationIds.length
+    ? `\n**Task-led explorations:**\n\n${concept.explorationIds
+        .map((id) => {
+          const activity = graph.explorations.find((item) => item.id === id)!;
+          return `- [${activity.title}](${activity.agentUrl}): ${activity.summary}`;
+        })
+        .join("\n")}`
+    : ""
+}`,
   )
   .join("\n\n")}
 
@@ -285,6 +311,12 @@ ${
 }`,
   )
   .join("\n")}
+
+## Course-task starting points
+
+These optional activities connect a course decision to the graph. Retrieve a starting point to investigate one question at a time; worked reasoning is separate.
+
+${graph.explorations.map((activity) => `- **${activity.phase}: [${activity.title}](${activity.agentUrl})** — ${activity.summary} Use with [${activity.task.title}](${activity.task.href}); [read without an agent](${activity.url}).`).join("\n")}
 `;
 }
 
@@ -301,5 +333,10 @@ The knowledge graph provides curated definitions, assumptions, examples, and exp
 - [Graph as Markdown](${graph.resources.markdown}): the complete authored reference, connections, graphics, and prediction-led demo experiments.
 - [Graph as JSON](${graph.resources.json}): structured data for searching concepts, following edges, locating readings, and selecting visual resources.
 - [Complete graph image](${graph.learningResources.find((resource) => resource.id === "graph-complete")!.images.png}): labelled overview; each concept also has its own neighborhood image in the graph data.
+
+## Optional exploration from course tasks
+
+- [Choose a starting point](${graph.resources.explorationIndex}): short activity pages with a URL to give directly to an agent, or an independent reading path.
+- [Exploration catalog (JSON)](${graph.resources.explorations}): course-task connections, concept IDs, and starting URLs. Worked reasoning is separate from the starting material.
 `;
 }

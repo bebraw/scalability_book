@@ -108,6 +108,7 @@ At this phase the response may remain a design hypothesis, but name the new corr
 
 Complete the chapter's documented-case transfer and pressure map as part of this cumulative pressure record.
 Link the selected source, separate reported facts from interpretation and project transfer, trace the failure across the relevant web boundaries, and identify the assumption, amplification path, user-visible effect, first useful signal, recovery mode, and evidence that recovery is complete.
+For an optional recovery investigation, choose a [Challenge exploration starting point](/explore/#phase-challenge).
 
 ---
 

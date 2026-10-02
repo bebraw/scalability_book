@@ -95,12 +95,18 @@ Co-occurrence does not create a conceptual edge.
 
 The site build generates `/concepts/graph.json`, `/concepts/graph.md`, `/concepts/agent-guide.md`, and a short `/llms.txt` discovery index from these registries.
 Both graph formats include the complete authored definitions, qualifications, relationship explanations, and reading locations.
-The JSON contract has `schemaVersion: 1` and a deterministic content revision; resource and citation URLs use the publication origin or the local preview origin.
+The JSON contract has `schemaVersion: 2` and a deterministic content revision; resource and citation URLs use the publication origin or the local preview origin.
 The revision identifies authored content, not an archived reading snapshot.
 These are read-only HTTP and downloadable file resources; the site does not expose an MCP server endpoint.
 The guide describes search, undirected neighbor traversal, and reading retrieval so students can use existing retrieval tools or build their own integration.
 Students choose a question, state an initial explanation, inspect retrieved passages, and record what they accepted or challenged.
 Agents should cite actual retrieved material, preserve usage notes and assumptions, and distinguish the book's authored connections from their own inferences.
+
+The chapters provide the narrative path; optional investigations now have task-based starting points at `/explore/`.
+Five recent activities live outside the reading flow, with brief invitations in their original passages and links from course tasks and relevant concepts.
+Each provides a self-contained `/explore/<id>/agent.md` URL, a direct reading page, and separately retrievable worked reasoning.
+The graph carries `explorations` and concept-level `explorationIds` without adding relationships or required deliverables.
+See [agent learning resources](agent-learning-resources.md) for the source and conversation contract.
 
 The complete graph supports topic search, reading and theme filters, neighborhood focus, zoom, and panning.
 Every connection has a short authored label alongside its explanation.
