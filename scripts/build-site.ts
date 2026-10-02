@@ -14,6 +14,12 @@ import {
   renderConceptLibrary,
   renderConceptPage,
 } from "./lib/concept-html.ts";
+import {
+  exportConceptGraph,
+  renderConceptAgentGuide,
+  renderConceptAgentIndex,
+  renderConceptGraphMarkdown,
+} from "./lib/concept-export.ts";
 import { buildStudy } from "./lib/study-build.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -52,6 +58,9 @@ const bibliographySource = await readFile(
 const config = parseJsonc(
   await readFile(path.join(root, "site.config.jsonc"), "utf8"),
 );
+const siteUrl = includeEditor
+  ? `http://127.0.0.1:${Number(process.env.PORT || 3000)}/`
+  : `https://${config.domain}/`;
 const templates = await loadTemplates({
   baseLayout: "layouts/BaseLayout.html",
   bookNavigation: "components/BookNavigation.html",
@@ -445,11 +454,22 @@ await writePage(
       "Explore concepts across the whole book: definitions, assumptions, examples, and explained connections.",
     currentUrl: "/concepts/",
     scripts: ["/concepts.js", ...developmentScripts],
-    children: renderConceptPage(),
+    children: renderConceptPage(siteUrl),
   }),
 );
 
 await writePage("concepts/library.html", renderConceptLibrary());
+const exportedGraph = exportConceptGraph(siteUrl, config.title);
+await writePage(
+  "concepts/graph.json",
+  JSON.stringify(exportedGraph, null, 2) + "\n",
+);
+await writePage("concepts/graph.md", renderConceptGraphMarkdown(exportedGraph));
+await writePage(
+  "concepts/agent-guide.md",
+  renderConceptAgentGuide(exportedGraph),
+);
+await writePage("llms.txt", renderConceptAgentIndex(exportedGraph));
 
 await writePage(
   "index.html",

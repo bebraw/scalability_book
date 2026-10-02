@@ -81,6 +81,8 @@ Links return to each exercise in its chapter.
 ## Concepts across the book
 
 The book's concept reference is published at `/concepts/` and linked from the main navigation.
+Its entry page offers concept lookup and encourages students to choose their own question and connect their own agent to the knowledge graph.
+The complete visual graph and compact concept directory are behind “Explore the whole book”; scoped reading links, searches, and concept fragments open the relevant view directly.
 Every published chapter, appendix, part introduction, case study, and project brief has a scoped “Follow an idea” index.
 Chapter indexes include an ungraded connection prompt; selected terms in the prose also open the reference.
 The nine self-study modules link to the matching view of the complete graph.
@@ -91,11 +93,20 @@ They are not inferred prerequisites or causal claims.
 `shared/concept-pages.ts` separately records where ideas are discussed and the chapter connection prompts.
 Co-occurrence does not create a conceptual edge.
 
+The site build generates `/concepts/graph.json`, `/concepts/graph.md`, `/concepts/agent-guide.md`, and a short `/llms.txt` discovery index from these registries.
+Both graph formats include the complete authored definitions, qualifications, relationship explanations, and reading locations.
+The JSON contract has `schemaVersion: 1` and a deterministic content revision; resource and citation URLs use the publication origin or the local preview origin.
+The revision identifies authored content, not an archived reading snapshot.
+These are read-only HTTP and downloadable file resources; the site does not expose an MCP server endpoint.
+The guide describes search, undirected neighbor traversal, and reading retrieval so students can use existing retrieval tools or build their own integration.
+Students choose a question, state an initial explanation, inspect retrieved passages, and record what they accepted or challenged.
+Agents should cite actual retrieved material, preserve usage notes and assumptions, and distinguish the book's authored connections from their own inferences.
+
 The complete graph supports topic search, reading and theme filters, neighborhood focus, zoom, and panning.
 Every connection has a short authored label alongside its explanation.
-“Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and remembers the reader's choice in local storage.
+“Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and affects only the graph where it is toggled.
 Labeled views make additional room for captions without covering concept nodes.
-Its view can be shared through the query parameters `q`, `reading`, `theme`, and `topic`.
+Its view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `group-view`, and `view=all`.
 A deterministic layout is generated from the registry by `shared/concept-graph.ts`; no per-concept coordinates need maintenance.
 The filtered text list and relationship explanations provide the same navigation without relying on the diagram.
 Static SVG links, reference passages, and relationship text remain available without JavaScript.
@@ -111,7 +122,7 @@ Use ordinary Markdown links such as `[idempotency](/concepts/#idempotency)` at u
 Build-time integration inserts the scoped index before the first second-level heading without changing source offsets used by paragraph feedback.
 Concept reference links are excluded from paragraph identity hashes so adding these reading aids preserves existing feedback targets.
 The registry tests check published-page coverage, relationship integrity, and caption spacing in overview, focused, and scoped layouts.
-Browser checks verify every curated teaching anchor, search and navigation, the label toggle and persistence, contrast in all themes, mobile overflow, accessibility, keyboard dismissal, and the static fallback.
+Browser checks verify every curated teaching anchor, agent resources and retrieval, search and navigation, local label toggles, contrast in all themes, mobile overflow, accessibility, keyboard dismissal, and the static fallback.
 
 The `measurement-transfer` and `scaling-model-choice` exercises reuse the existing checking and private-save system.
 Their adjacent explanation prompts are ungraded: a correct calculation is not evidence that the learner can justify a boundary or choose an intervention.

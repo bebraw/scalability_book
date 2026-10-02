@@ -7,6 +7,28 @@ import {
 } from "../../shared/concept-graph.ts";
 
 (() => {
+  const agentUrl = document.querySelector<HTMLInputElement>(
+    "[data-concept-agent-url]",
+  );
+  const copyGuide = document.querySelector<HTMLButtonElement>(
+    "[data-concept-agent-copy]",
+  );
+  const copyStatus = document.querySelector<HTMLElement>(
+    "[data-concept-agent-status]",
+  );
+  if (agentUrl && copyGuide && copyStatus) {
+    copyGuide.hidden = false;
+    copyGuide.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(agentUrl.value);
+        copyStatus.textContent = "Guide URL copied. Give it to your agent.";
+      } catch {
+        agentUrl.focus();
+        agentUrl.select();
+        copyStatus.textContent = "The URL is selected. Copy it to your agent.";
+      }
+    });
+  }
   function initializeGraph(map: HTMLElement) {
     const complete = map.dataset.complete === "true";
     const fixedFocus = map.dataset.focus || "";
@@ -41,6 +63,24 @@ import {
     const groupHelp = map.querySelector<HTMLElement>(
       "[data-concept-group-help]",
     );
+    const page = complete
+      ? map.closest<HTMLElement>(".concept-reference")
+      : null;
+    const explorer = page?.querySelector<HTMLDetailsElement>(
+      "[data-concept-explorer]",
+    );
+    const tools = map.querySelector<HTMLDetailsElement>(
+      "[data-concept-map-tools]",
+    );
+    if (tools) tools.hidden = false;
+    const lookup = page?.querySelector<HTMLFormElement>(
+      "[data-concept-lookup]",
+    );
+    const lookupInput = lookup?.querySelector<HTMLInputElement>(
+      "[data-concept-lookup-input]",
+    );
+    if (lookup) lookup.hidden = false;
+    const params = complete ? new URLSearchParams(location.search) : null;
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
     const nodes = [...map.querySelectorAll<SVGAElement>("[data-concept-node]")];
@@ -70,6 +110,77 @@ import {
       context: string;
     } | null = null;
 
+    function updateContext(size: number) {
+      if (!page || !explorer) return;
+      const context = page.querySelector<HTMLElement>(
+        "[data-concept-context]",
+      )!;
+      const title = context.querySelector<HTMLElement>(
+        "[data-concept-context-title]",
+      )!;
+      const label = context.querySelector<HTMLElement>(
+        "[data-concept-context-label]",
+      )!;
+      const prompt = context.querySelector<HTMLElement>(
+        "[data-concept-context-prompt]",
+      )!;
+      const link = context.querySelector<HTMLAnchorElement>(
+        "[data-concept-context-reading]",
+      )!;
+      const query = search?.value.trim() || "";
+      const readingTitle = reading?.value
+        ? reading.selectedOptions[0]!.textContent!
+        : "";
+      const focusedTitle = select?.selectedOptions[0]?.textContent || "";
+      context.hidden = !(
+        query ||
+        readingTitle ||
+        select?.value ||
+        group?.value
+      );
+      label.textContent = readingTitle
+        ? "From your reading"
+        : "Your exploration";
+      title.textContent =
+        readingTitle ||
+        (query
+          ? `Results for “${query}”`
+          : select?.value
+            ? focusedTitle
+            : group?.value || "");
+      const reflection = readingTitle
+        ? reading!.selectedOptions[0]!.dataset.prompt
+        : "";
+      prompt.textContent = reflection
+        ? `Before you explore: ${reflection}`
+        : "";
+      prompt.hidden = !reflection;
+      link.hidden = !readingTitle;
+      link.href = reading?.value || "/concepts/";
+      link.textContent = `Continue in ${readingTitle} →`;
+      page.querySelector<HTMLElement>(
+        "[data-concept-explorer-title]",
+      )!.textContent = readingTitle
+        ? "Explore this reading"
+        : context.hidden
+          ? "Explore the whole book"
+          : "Explore these concepts";
+      page.querySelector<HTMLElement>(
+        "[data-concept-explorer-description]",
+      )!.textContent =
+        `${size} concepts${context.hidden ? " and their connections" : " in this view"}`;
+      map.querySelector<HTMLElement>(".concept-map-heading h2")!.textContent =
+        readingTitle
+          ? "Connections in this reading"
+          : "The complete concept graph";
+      if (lookupInput) lookupInput.value = search?.value || "";
+    }
+    function clearFilters() {
+      for (const control of [select, search, reading, group])
+        if (control) control.value = "";
+      groupViewport = null;
+      isolatingGroup = false;
+    }
     function zoom(width: number) {
       zoomWidth = Math.max(240, Math.min(5000, width));
       svg.style.width = `${zoomWidth}px`;
@@ -274,6 +385,7 @@ import {
         "[data-concept-empty]",
       );
       if (empty) empty.hidden = visible.size !== 0;
+      updateContext(visible.size);
       svg.setAttribute(
         "viewBox",
         `0 0 ${layout?.width ?? svg.dataset.width} ${layout?.height ?? svg.dataset.height}`,
@@ -337,6 +449,17 @@ import {
       if (complete) {
         const url = new URL(location.href);
         for (const [key, value] of [
+          [
+            "view",
+            explorer?.open &&
+            !focus &&
+            !query &&
+            !reading?.value &&
+            !groupName &&
+            !location.hash
+              ? "all"
+              : "",
+          ],
           ["topic", focus],
           ["q", query],
           ["reading", reading?.value],
@@ -350,7 +473,6 @@ import {
       }
     }
     labels.addEventListener("change", () => update(true));
-    const params = complete ? new URLSearchParams(location.search) : null;
     if (search) search.value = params?.get("q") || "";
     for (const [control, parameter] of [
       [select, "topic"],
@@ -367,6 +489,51 @@ import {
     }
     if (params?.get("group-view") === "only" && groupModes[1])
       groupModes[1].checked = true;
+    if (explorer) {
+      const target = location.hash
+        ? document.getElementById(location.hash.slice(1))
+        : null;
+      explorer.open = Boolean(
+        search?.value ||
+        select?.value ||
+        reading?.value ||
+        group?.value ||
+        params?.get("view") === "all" ||
+        (target && explorer.contains(target)),
+      );
+      if (tools) tools.open = !(reading?.value || search?.value);
+      explorer.addEventListener("toggle", () => {
+        if (!explorer.open) clearFilters();
+        update();
+      });
+      page!
+        .querySelector("[data-concept-all]")
+        ?.addEventListener("click", () => {
+          clearFilters();
+          if (tools) tools.open = true;
+          update();
+          map
+            .querySelector<HTMLElement>(".concept-map-heading h2")!
+            .setAttribute("tabindex", "-1");
+          map
+            .querySelector<HTMLElement>(".concept-map-heading h2")!
+            .focus({ preventScroll: true });
+        });
+      const lookupConcepts = () => {
+        const query = lookupInput?.value || "";
+        clearFilters();
+        if (search) search.value = query;
+        explorer.open = Boolean(query.trim());
+        if (tools) tools.open = false;
+        update();
+      };
+      lookupInput?.addEventListener("input", lookupConcepts);
+      lookup?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        lookupConcepts();
+        if (explorer.open) explorer.scrollIntoView({ block: "start" });
+      });
+    }
     select?.addEventListener("change", () => {
       if (select.value) {
         if (search) search.value = "";
@@ -390,12 +557,7 @@ import {
     for (const mode of groupModes)
       mode.addEventListener("change", () => update());
     map.querySelector("[data-concept-reset]")?.addEventListener("click", () => {
-      if (select) select.value = "";
-      if (search) search.value = "";
-      if (reading) reading.value = "";
-      if (group) group.value = "";
-      groupViewport = null;
-      isolatingGroup = false;
+      clearFilters();
       update();
     });
     for (const button of map.querySelectorAll<HTMLElement>(

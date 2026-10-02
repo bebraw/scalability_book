@@ -2,10 +2,188 @@ import { test, expect, type Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { conceptPages } from "../../shared/concept-pages.ts";
 
-test("group highlighting preserves context before an explicit group-only view", async ({
+test("the entry page offers agent access and lookup before the complete graph", async ({
   page,
 }) => {
   await page.goto("/concepts/");
+  const explorer = page.locator("[data-concept-explorer]");
+  await expect(
+    page.getByRole("search", { name: "Concept lookup" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Explore with your own agent" }),
+  ).toBeVisible();
+  await expect(page.locator("[data-concept-question]")).toHaveCount(0);
+  await expect(explorer).not.toHaveAttribute("open", "");
+  await expect(page.locator("[data-concept-node]:visible")).toHaveCount(0);
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(0);
+  expect(
+    (await new AxeBuilder({ page }).include(".concept-reference").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.screenshot({
+    path: test.info().outputPath("concept-agent-desktop.png"),
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("[data-theme-picker]").selectOption("dark");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(
+    (await new AxeBuilder({ page }).include(".concept-reference").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.screenshot({
+    path: test.info().outputPath("concept-agent-mobile.png"),
+    fullPage: true,
+  });
+  const lookup = page.getByRole("search", { name: "Concept lookup" });
+  await lookup.getByLabel("Find a concept").fill("retry");
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(1);
+  await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
+    "open",
+    "",
+  );
+  await expect(page).toHaveURL(/q=retry/);
+  await page.reload();
+  await expect(lookup.getByLabel("Find a concept")).toHaveValue("retry");
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(1);
+  await lookup.getByLabel("Find a concept").fill("nonexistent-topic");
+  await expect(page.locator("[data-concept-empty]")).toBeVisible();
+  await lookup.getByLabel("Find a concept").fill("");
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(0);
+  await expect(page).toHaveURL(/\/concepts\/$/);
+  await explorer.locator(":scope > summary").click();
+  await expect(
+    page.locator("#concept-graph [data-concept-node]:visible"),
+  ).toHaveCount(45);
+  await expect(page).toHaveURL(/view=all/);
+  await page.reload();
+  await expect(
+    page.locator("#concept-graph [data-concept-node]:visible"),
+  ).toHaveCount(45);
+});
+
+test("students can retrieve the graph and check its evidence with their own tools", async ({
+  page,
+  context,
+  request,
+  baseURL,
+}) => {
+  await page.goto("/concepts/");
+  const guideUrl = new URL("/concepts/agent-guide.md", baseURL).href;
+  await expect(page.getByLabel("Give your agent this guide")).toHaveValue(
+    guideUrl,
+  );
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("button", { name: "Copy URL", exact: true }).click();
+  await expect(page.locator("[data-concept-agent-status]")).toContainText(
+    "copied",
+  );
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    guideUrl,
+  );
+
+  const guideResponse = await request.get(guideUrl);
+  expect(guideResponse.ok()).toBe(true);
+  expect(guideResponse.headers()["content-type"]).toContain("text/markdown");
+  const guide = await guideResponse.text();
+  expect(guide).toContain("Choose your own question");
+  expect(guide).toContain("not an MCP server endpoint");
+  expect(guide).toContain(new URL("/concepts/graph.json", baseURL).href);
+  const index = await request.get("/llms.txt");
+  expect(index.ok()).toBe(true);
+  expect(await index.text()).toContain(guideUrl);
+
+  const dataResponse = await request.get("/concepts/graph.json");
+  expect(dataResponse.ok()).toBe(true);
+  expect(dataResponse.headers()["content-type"]).toContain("application/json");
+  const graph = await dataResponse.json();
+  expect(graph.schemaVersion).toBe(1);
+  expect(graph.revision).toMatch(/^[a-f0-9]{64}$/);
+  expect(graph.concepts).toHaveLength(45);
+  expect(graph.relationships).toHaveLength(102);
+  expect(graph.readings).toHaveLength(conceptPages.length);
+  expect(graph.semantics.relationships).toContain("undirected");
+  const markdown = await request.get(graph.resources.markdown);
+  expect(markdown.ok()).toBe(true);
+  expect(await markdown.text()).toContain(graph.revision);
+
+  // A file/HTTP retrieval tool follows either endpoint and carries its evidence.
+  const queueEdges = graph.relationships.filter(
+    (edge: { source: string; target: string }) =>
+      edge.source === "queue" || edge.target === "queue",
+  );
+  const reviewEdge = queueEdges.find(
+    (edge: { source: string; target: string }) =>
+      edge.source === "review-budget" || edge.target === "review-budget",
+  );
+  expect(reviewEdge.explanation.length).toBeGreaterThan(0);
+  const review = graph.concepts.find(
+    (concept: { id: string }) => concept.id === "review-budget",
+  );
+  await page.goto(review.url);
+  await expect(page.locator("#review-budget")).toBeVisible();
+  await expect(page.locator("#review-budget")).toContainText(review.definition);
+  const passageUrl = new URL(review.contexts[0].href);
+  const passage = await request.get(passageUrl.href);
+  expect(passage.ok()).toBe(true);
+  expect(await passage.text()).toContain(`id="${passageUrl.hash.slice(1)}"`);
+});
+
+test("copying the guide still works when clipboard access is unavailable", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: () => Promise.reject(new Error("Clipboard unavailable")),
+      },
+      configurable: true,
+    });
+  });
+  await page.goto("/concepts/");
+  await page.getByRole("button", { name: "Copy URL", exact: true }).click();
+  const input = page.getByLabel("Give your agent this guide");
+  await expect(input).toBeFocused();
+  await expect(page.locator("[data-concept-agent-status]")).toContainText(
+    "selected",
+  );
+  expect(
+    await input.evaluate(
+      (element: HTMLInputElement) =>
+        element.selectionEnd! - element.selectionStart!,
+    ),
+  ).toBe((await input.inputValue()).length);
+});
+
+test("reading links open their concepts and reflection without a new choice", async ({
+  page,
+}) => {
+  await page.goto("/chapters/benchmarking/");
+  await page.locator(".concept-reference-link").click();
+  await expect(page).toHaveURL(/reading=/);
+  const context = page.locator("[data-concept-context]");
+  await expect(
+    context.getByRole("heading", { name: "3 · Measurement", exact: true }),
+  ).toBeVisible();
+  await expect(context.locator("[data-concept-context-prompt]")).toContainText(
+    "Which quantities transfer through Little's Law",
+  );
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(10);
+  await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
+    "open",
+    "",
+  );
+});
+
+test("group highlighting preserves context before an explicit group-only view", async ({
+  page,
+}) => {
+  await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const group = map.getByRole("combobox", { name: "Topic group", exact: true });
   const highlight = map.getByRole("radio", { name: "Highlight", exact: true });
@@ -112,7 +290,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   await expect(group).toHaveValue("");
   await expect(highlight).toBeChecked();
   await expect(highlight).toBeDisabled();
-  await expect(page).toHaveURL(/\/concepts\/$/);
+  await expect(page).toHaveURL(/\/concepts\/\?view=all$/);
   await group.selectOption("Development");
   await map.getByLabel("Focus on").selectOption("authority");
   await expect(group).toHaveValue("");
@@ -168,7 +346,7 @@ test("connection labels stay local while following concepts across graph views",
   await page.addInitScript(() =>
     localStorage.setItem("concept-connection-labels", "true"),
   );
-  await page.goto("/concepts/");
+  await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
   await expect(toggle).not.toBeChecked();
@@ -491,7 +669,7 @@ test("graph labels have breathing room in both themes and viewport sizes", async
   ]) {
     await page.setViewportSize(viewport);
     for (const theme of ["light", "dark"]) {
-      await page.goto("/concepts/");
+      await page.goto("/concepts/?view=all");
       await page.locator("[data-theme-picker]").selectOption(theme);
       await page.evaluate(() => document.fonts.ready);
       const assertPadding = async (selector: string) => {
@@ -551,7 +729,7 @@ test("graph labels have breathing room in both themes and viewport sizes", async
 test("the compact directory opens concepts without losing the browsing position", async ({
   page,
 }) => {
-  await page.goto("/concepts/");
+  await page.goto("/concepts/?view=all");
   const directory = page.locator(".concept-directory");
   await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
     45,
@@ -574,7 +752,7 @@ test("the compact directory opens concepts without losing the browsing position"
   await expect(directory.locator(".concept-directory-item[open]")).toHaveCount(
     0,
   );
-  await expect(page).toHaveURL(/concepts\/$/);
+  await expect(page).toHaveURL(/concepts\/\?view=all$/);
   await page.keyboard.press("Escape");
   await expect(summary).toBeFocused();
   expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scroll, 0);
@@ -617,7 +795,7 @@ test("the compact directory opens concepts without losing the browsing position"
 test("the complete map supports discovery, filtering, zoom, and shared views", async ({
   page,
 }) => {
-  await page.goto("/concepts/");
+  await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const status = map.locator("[data-concept-map-status]");
   await expect(status).toHaveText("45 concepts · 102 connections");
@@ -727,6 +905,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await expect(status).toContainText("4 · Architecture");
   await assertDirectoryMatches();
   await page.reload();
+  await map.getByText("Adjust the graph and filters", { exact: true }).click();
   await expect(
     map.getByRole("combobox", { name: "Reading", exact: true }),
   ).toHaveValue("/chapters/architecture/");
@@ -872,7 +1051,7 @@ test("mobile graph, relationships, focus, and reference work in dark mode", asyn
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/concepts/");
+  await page.goto("/concepts/?view=all");
   await page.locator("[data-theme-picker]").selectOption("dark");
   const map = page.locator("#concept-graph");
   await map.getByLabel("Focus on").selectOption("queue");
@@ -926,6 +1105,18 @@ test("static graph and curated chapter links remain usable without JavaScript", 
     viewport: { width: 320, height: 800 },
   });
   const page = await context.newPage();
+  await page.goto("/concepts/");
+  await expect(page.locator("[data-concept-node]:visible")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Read the guide", exact: true }),
+  ).toHaveAttribute("href", "/concepts/agent-guide.md");
+  await page.getByText("Connect it, then check it", { exact: true }).click();
+  await expect(page.locator(".concept-agent-setup")).toContainText(
+    "download the guide",
+  );
+  await expect(
+    page.getByRole("button", { name: "Copy URL", exact: true }),
+  ).not.toBeVisible();
   await page.goto("/chapters/scaling/");
   const index = page.getByRole("navigation", {
     name: "Concepts in this reading",

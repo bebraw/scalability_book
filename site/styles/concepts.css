@@ -44,6 +44,9 @@
   max-width: 76rem;
   padding: clamp(1rem, 4vw, 3rem);
 }
+.concept-reference [hidden] {
+  display: none;
+}
 .concept-reference-header {
   max-width: 46rem;
   margin-bottom: 2rem;
@@ -65,6 +68,205 @@
 }
 .concept-reference-notes p {
   margin-block: 0.6rem;
+}
+.concept-lookup {
+  max-width: 35rem;
+  margin-block: 1.5rem 2rem;
+  font: 600 0.85rem/1.5 var(--font-ui);
+}
+.concept-lookup > label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.concept-lookup > div {
+  display: flex;
+  gap: 0.5rem;
+}
+.concept-lookup input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  flex: 1;
+  font: 400 1rem/1.5 var(--font-ui);
+  min-width: 0;
+  padding: 0.75rem;
+}
+.concept-lookup button {
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.75rem 1.1rem;
+}
+.concept-agent {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-strong);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+.concept-agent h2 {
+  font: 500 1.75rem/1.3 var(--font-serif);
+  margin: 0 0 0.8rem;
+}
+.concept-agent-introduction > p:last-child {
+  color: var(--muted);
+  font: 1rem/1.65 var(--font-serif);
+  margin: 0;
+}
+.concept-agent-access {
+  align-self: center;
+  min-width: 0;
+}
+.concept-agent-access > label {
+  display: block;
+  font: 650 0.85rem/1.5 var(--font-ui);
+  margin-bottom: 0.6rem;
+}
+.concept-agent-copy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.concept-agent-copy input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  flex: 1 1 15rem;
+  font: 400 0.8rem/1.5 var(--font-ui);
+  min-width: 0;
+  padding: 0.7rem;
+}
+.concept-agent-copy button {
+  background: var(--panel);
+  border: 1px solid var(--accent-strong);
+  color: var(--accent-strong);
+  cursor: pointer;
+  font: 650 0.8rem/1.5 var(--font-ui);
+  padding: 0.65rem 1rem;
+}
+.concept-agent-status {
+  color: var(--muted);
+  font: 0.8rem/1.5 var(--font-ui);
+  margin: 0.5rem 0;
+}
+.concept-agent-status:empty {
+  display: none;
+}
+.concept-agent-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font: 600 0.8rem/1.5 var(--font-ui);
+  margin: 0.8rem 0 0;
+}
+.concept-agent-setup {
+  border-top: 1px solid var(--border);
+  grid-column: 1 / -1;
+  font: 0.85rem/1.65 var(--font-ui);
+  padding-top: 0.75rem;
+}
+.concept-agent-setup summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding-block: 0.25rem;
+}
+.concept-agent-setup ol {
+  max-width: 54rem;
+  padding-left: 1.25rem;
+}
+.concept-agent-setup li + li {
+  margin-top: 0.65rem;
+}
+.concept-agent-setup > p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+.concept-explorer {
+  border-block: 1px solid var(--border);
+  margin-block: 2rem;
+  scroll-margin-top: 7rem;
+}
+.concept-explorer > summary {
+  cursor: pointer;
+  font: 650 1rem/1.5 var(--font-ui);
+  padding-block: 1.25rem;
+}
+.concept-explorer > summary::marker {
+  color: var(--accent-strong);
+}
+.concept-explorer-description {
+  color: var(--muted);
+  font: 400 0.8rem/1.5 var(--font-ui);
+  margin-left: 1rem;
+}
+.concept-exploration-context {
+  margin-block: 1.5rem 2rem;
+}
+.concept-exploration-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.concept-exploration-heading h2 {
+  font: 500 2rem/1.25 var(--font-serif);
+  max-width: 46rem;
+  margin: 0;
+  scroll-margin-top: 7rem;
+}
+.concept-context-label {
+  color: var(--accent-strong);
+  font: 650 0.75rem/1.5 var(--font-ui);
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+.concept-exploration-heading button {
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  cursor: pointer;
+  font: 600 0.8rem/1.5 var(--font-ui);
+  padding: 0.3rem 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.concept-exploration-context > p {
+  font: 1.1rem/1.7 var(--font-serif);
+  max-width: 52rem;
+}
+.concept-exploration-context > .concept-prediction {
+  background: var(--panel);
+  border-left: 2px solid var(--accent-strong);
+  font: 0.95rem/1.7 var(--font-ui);
+  padding: 1rem 1.2rem;
+}
+.concept-exploration-context > a {
+  font: 600 0.85rem/1.5 var(--font-ui);
+}
+.concept-map-tools > summary {
+  cursor: pointer;
+  font: 600 0.8rem/1.5 var(--font-ui);
+  padding-top: 0.75rem;
+}
+.concept-lookup input:focus-visible,
+.concept-lookup button:focus-visible,
+.concept-agent a:focus-visible,
+.concept-agent-copy input:focus-visible,
+.concept-agent-copy button:focus-visible,
+.concept-agent-setup summary:focus-visible,
+.concept-explorer > summary:focus-visible,
+.concept-exploration-heading h2:focus-visible,
+.concept-exploration-heading button:focus-visible,
+.concept-exploration-context > a:focus-visible,
+.concept-map-tools > summary:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 4px;
 }
 .concept-card {
   border-bottom: 1px solid var(--border);
@@ -694,6 +896,14 @@
   outline-offset: 3px;
 }
 @media (max-width: 760px) {
+  .concept-agent {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .concept-explorer-description {
+    display: block;
+    margin: 0.35rem 0 0 1rem;
+  }
   .concept-map-group-controls > label {
     flex: 1 1 100%;
   }
