@@ -354,6 +354,11 @@
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
 }
+/* Preserve the header's layout while removing the graph-only action from use. */
+.concept-map-complete.is-list-view [data-concept-expand][hidden] {
+  display: block;
+  visibility: hidden;
+}
 .concept-view-switch {
   border: 1px solid var(--border);
   border-radius: 0.25rem;

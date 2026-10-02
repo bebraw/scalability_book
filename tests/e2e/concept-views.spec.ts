@@ -19,6 +19,38 @@ test("graph and list share one search, filters, and a persistent camera", async 
   );
   await expect(graph).toHaveAttribute("aria-selected", "true");
   await expect(directory).not.toBeVisible();
+  // Hiding the graph-only action must keep the view selector in place.
+  for (const width of [1280, 760, 620, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const position = () =>
+      map.locator("[data-concept-view-switch]").evaluate((element) => {
+        const box = element.getBoundingClientRect();
+        const header = element
+          .closest(".concept-map-heading")!
+          .getBoundingClientRect();
+        return {
+          x: box.x - header.x,
+          y: box.y - header.y,
+          width: header.width,
+          height: header.height,
+        };
+      });
+    const before = await position();
+    await list.click();
+    const after = await position();
+    for (const key of ["x", "y", "width", "height"] as const)
+      expect(after[key], `${width}px: ${key}`).toBeCloseTo(before[key], 1);
+    await expect(map.locator("[data-concept-expand]")).not.toBeVisible();
+    await graph.click();
+    expect(await position()).toEqual(before);
+    expect(
+      await map
+        .locator(".concept-map-heading")
+        .evaluate((element) => element.scrollWidth <= element.clientWidth + 1),
+      `${width}px: header controls fit`,
+    ).toBe(true);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
   await graphic.focus();
   await graphic.press("ArrowRight");
   await graphic.press("ArrowDown");
