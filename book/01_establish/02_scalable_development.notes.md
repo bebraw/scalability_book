@@ -44,6 +44,7 @@ After this chapter, students should be able to:
 - Use composition to manage complexity without hiding important system behavior.
 - Evaluate AI-assisted code as maintainable software rather than as a one-time output.
 - Test explanation claims through predicted behavior, state ownership, and independent checks; use the optional Appendix A fixture before revealing its worked reasoning.
+- Distinguish course evidence requirements from a receiving project's contribution and disclosure rules while preserving truthful provenance and accountable ownership.
 - Connect development practices to implementations A, B, and C and the development setup used for each.
 
 ## Notes for further development

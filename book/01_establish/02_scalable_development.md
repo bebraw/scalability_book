@@ -114,6 +114,20 @@ The [Agent Fleets chapter](/chapters/agent-fleets/#map-authority-and-acceptance)
 Record material assistance and human corrections in the AI-use log, and bind the checks and known limits to the submitted revision.
 Perceived effort can influence quality judgments :citep[kruger2004effort], but time spent and disclosed AI use do not establish correctness.
 
+### Course records and external contribution policies
+
+The course's [common evidence bundle](/project/#9-common-submission-bundle-and-comparable-evidence) records material assistance, human corrections, and checks so others can assess the work and compare workflows.
+For an external issue or pull request, also follow the receiving project's applicable contribution and AI policies.
+Read them before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
+
+For example, the [Human Responsible policy template, version 1.0.0](https://ai-policy.dev/policies/human-responsible/1.0.0), permits private tooling while requiring public text written and posted by the contributor, understood and tested changes, and human follow-up.
+It prohibits AI-disclosure notes and submissions from automated accounts.
+These are requirements for projects that adopt the template.
+
+Under that policy, a student can record private agent assistance in the course evidence while personally writing and posting the reviewed contribution text and owning the change.
+Answer provenance questions truthfully, avoid false claims of human-only production, and respect a project's refusal of particular assistance or submissions.
+Disclosure does not make a prohibited contribution acceptable; an external disclosure rule does not remove the course's evidence requirements.
+
 ### Sustainable throughput requires ownership
 
 The ownership standard should follow the work's consequences and expected lifetime.
