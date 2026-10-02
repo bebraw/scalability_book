@@ -4,6 +4,8 @@ import { conceptPages } from "../../shared/concept-pages.ts";
 import { conceptRelationships } from "../../shared/concept-relationships.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
 import { explorations, exportExplorations } from "../../shared/explorations.ts";
+import { agentPresentation } from "../../shared/agent-presentation.ts";
+import { renderInteractiveLearningGuidance } from "./agent-presentation.ts";
 
 export function exportConceptGraph(siteUrl: string, title: string) {
   const absolute = (href: string) => new URL(href, siteUrl).href;
@@ -23,6 +25,7 @@ export function exportConceptGraph(siteUrl: string, title: string) {
           conceptPages,
           learningResources,
           explorations,
+          agentPresentation,
         }),
       )
       .digest("hex"),
@@ -48,7 +51,10 @@ export function exportConceptGraph(siteUrl: string, title: string) {
         "Curated concept-to-resource mappings, not new graph edges. Graphics are authored illustrations. Demo PNGs are static previews of default views, not live execution or measured evidence; current behavior and saved input state can differ. Prediction prompts deliberately omit a model answer.",
       explorations:
         "Optional task-led activities linked to concepts, not new graph edges or required deliverables. The catalog contains starting URLs; authored scenarios and worked reasoning are separate resources.",
+      agentPresentation:
+        "Optional guidance for the student's agent, not site-enforced behavior or an advertisement of client rendering capabilities. The authored material remains the reference for agent-created adaptations.",
     },
+    agentPresentation,
     concepts: concepts.map((concept) => ({
       ...concept,
       url: absolute(`/concepts/#${concept.id}`),
@@ -156,6 +162,7 @@ The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SH
 - \`concepts[].resourceIds\`: IDs to look up in \`learningResources\`. These are curated teaching aids, not additional concept relationships.
 - \`learningResources\`: stable \`id\`, \`kind\` (\`graphic\` or \`demo\`), \`title\`, \`conceptIds\`, \`url\`, \`caption\`, \`assumptions\`, and \`images\`. Every image has a PNG URL and alt text; graphics also have a standalone SVG. Demos include \`controls\` and an \`experiment\` with \`predict\`, \`try\`, \`observe\`, and \`reflect\` prompts. These fields are additive to version 2.
 - \`explorations\`: optional activities with stable \`id\`, \`phase\`, \`title\`, \`summary\`, \`conceptIds\`, course \`task\`, \`reading\`, \`graphUrl\`, \`url\` for independent study, \`agentUrl\` for starting a conversation, and separate \`discussionUrl\` for worked reasoning. Concepts carry matching \`explorationIds\`. These fields are additive to version 2; the catalog deliberately omits worked answers.
+- \`agentPresentation\`: optional predict → interact → explain guidance, with client capability checks, pacing, source fidelity, observation handling, and a browser or conversational fallback. It guides an external agent rather than declaring a supported rendering capability. This field is additive to version 2.
 
 Definitions and examples use the book's declared assumptions. Some vocabulary is still developing; preserve the usage notes when interpreting it. Example rates are illustrative unless the reading identifies them as measurements.
 
@@ -195,6 +202,8 @@ Return the image URL with its alt text, caption, assumptions, and source URL. Fo
 For a demo, show the \`experiment.predict\` prompt first and let the student state a prediction. Then provide the demo URL, \`controls\`, and \`try\`, \`observe\`, and \`reflect\` prompts. The PNG is a static preview of the default view, not a recorded result of the student's experiment. Current UI and saved input state can differ. Open the actual demo to check behavior. These links are browser interfaces, not simulation API endpoints; an HTTP fetch does not run their JavaScript. With browser tools, an agent can operate the demo and report the chosen controls and observed output. Without browser tools, ask the student to operate it and bring back observations.
 
 For example, retrieve \`little-law\` and \`demo-queue-balance-lab\`. Present its graph image and ask: “Arrival rate stays at 20 events/s. Average time doubles from 0.5 to 1 second. What average work in progress would make the measurements agree?” Let the student predict before opening the lab. Compare the result with the book's stable-average and shared-boundary assumptions. Do not treat an illustrative simulator result as a capacity measurement of a real system.
+
+${renderInteractiveLearningGuidance(graph.url)}
 
 ## Keep the investigation inspectable
 
@@ -274,6 +283,8 @@ ${
 ## Connections
 
 ${graph.relationships.map((edge) => (edge.direction === "directed" ? `- ${link(edge.source)} **${edge.label}** → ${link(edge.target)} — ${edge.explanation}` : `- ${link(edge.source)} — ${link(edge.target)} — **${edge.label}:** ${edge.explanation}`)).join("\n")}
+
+${renderInteractiveLearningGuidance(graph.url)}
 
 ## Graphics and experiments
 

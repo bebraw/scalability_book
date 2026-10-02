@@ -53,6 +53,23 @@ Normal site builds copy the committed previews and do not require a browser.
 Opening a demo URL with an HTTP client retrieves its page but does not run the JavaScript.
 Browser-equipped agents can operate the real demo; other agents should return the link and ask the learner to report observations.
 
+Interactive answers are an optional presentation layer over the authored material.
+`shared/agent-presentation.ts` owns common predict → interact → explain guidance, exported as `agentPresentation` in the graph JSON and rendered in the general guide, graph Markdown, and every activity's agent starting point.
+Agents should use their client's supported rendering mechanism when one is available and a focused interaction helps the current question.
+HTML retrieval, a browser tool, and an inline renderer are distinct capabilities; our URLs do not automatically embed the site in a conversation.
+The guidance uses no client-specific output syntax or promise of universal rendering support.
+
+An agent-created view must cite its source, preserve the fixture's quantities and assumptions, and identify changed assumptions.
+Reproducing a simulator requires inspecting its implementation and checking representative inputs against the actual demo; otherwise a qualitative diagram or supplied fixture is preferable.
+The original demo or activity link stays available, and images, links, and one-question conversation provide the fallback.
+An agent must ask for the student's observations when interaction state is not exposed to it.
+Generated results are illustrative; they do not become measured project evidence or additional course requirements.
+The guidance preserves the first-question pause and separate worked reasoning.
+
+For example, an agent can help investigate work in progress with the queue balance lab, trace the recorder fixture across restart, or compare reported confidence with reference agreement after a prediction.
+No MCP UI server or hosted conversational client is introduced by this guidance.
+Client behavior should be tested with both an interactive-capable client and a text-only client.
+
 Resource fields are additive to graph schema version 2.
-The content revision includes the authored resource metadata; image URLs still identify the current publication rather than immutable archived artifacts.
+The content revision includes the authored resource metadata and presentation guidance; image URLs still identify the current publication rather than immutable archived artifacts.
 Production responses revalidate `/concepts/visuals/` images so a stable URL can reflect a newly published diagram or refreshed preview.

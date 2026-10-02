@@ -1,6 +1,7 @@
 import { concepts } from "../../shared/concepts.ts";
 import { exportExplorations } from "../../shared/explorations.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
+import { renderInteractiveLearningGuidance } from "./agent-presentation.ts";
 
 type ExportedExploration = ReturnType<typeof exportExplorations>[number];
 const conceptTitles = new Map(concepts.map(({ id, title }) => [id, title]));
@@ -75,6 +76,8 @@ Keep worked reasoning separate from the opening conversation. Retrieve the [auth
 For an activity involving a trial, help plan it and ask the student to bring back observed evidence. Do not invent execution, measurements, permissions, or completion. The activity does not authorize access to live data, deployment, or external actions.
 
 Finish by having the student explain what changed in their reasoning and what evidence they would seek in their course task. Suggest one changed-assumption question for a later unaided attempt. Do not make another exploration a prerequisite for finishing this one.
+
+${renderInteractiveLearningGuidance(siteUrl, false)}
 
 ## Connect to the course and graph
 
