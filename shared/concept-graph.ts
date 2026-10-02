@@ -196,19 +196,21 @@ export function layoutEdgeLabels(
 // manually maintained coordinates are needed as the reference grows.
 export function layoutOverview(
   nodes: { id: string; group: string }[],
-  edges: readonly GraphEdge[],
+  edges: readonly (GraphEdge & { label?: string })[],
   groups: readonly string[],
 ) {
-  const width = 1400,
-    height = 1100;
+  const width = 1800,
+    height = 1400;
+  const separationX = 240,
+    separationY = 108;
   const points = nodes.map((node, index) => {
     const group = groups.indexOf(node.group);
     const angle = -Math.PI / 2 + (group * Math.PI * 2) / groups.length;
     const offset = index * 2.399963;
     return {
       id: node.id,
-      x: width / 2 + 360 * Math.cos(angle) + 140 * Math.cos(offset),
-      y: height / 2 + 300 * Math.sin(angle) + 140 * Math.sin(offset),
+      x: width / 2 + 480 * Math.cos(angle) + 170 * Math.cos(offset),
+      y: height / 2 + 390 * Math.sin(angle) + 170 * Math.sin(offset),
       group,
       vx: 0,
       vy: 0,
@@ -228,15 +230,15 @@ export function layoutOverview(
         a.vy += (dy / distance) * force;
         b.vx -= (dx / distance) * force;
         b.vy -= (dy / distance) * force;
-        if (Math.abs(dx) < 205 && Math.abs(dy) < 76) {
-          const sx = (205 - Math.abs(dx)) / 205;
-          const sy = (76 - Math.abs(dy)) / 76;
+        if (Math.abs(dx) < separationX && Math.abs(dy) < separationY) {
+          const sx = (separationX - Math.abs(dx)) / separationX;
+          const sy = (separationY - Math.abs(dy)) / separationY;
           if (sx < sy) {
-            const push = Math.sign(dx) * (205 - Math.abs(dx)) * 0.15;
+            const push = Math.sign(dx) * (separationX - Math.abs(dx)) * 0.15;
             a.vx += push;
             b.vx -= push;
           } else {
-            const push = Math.sign(dy) * (76 - Math.abs(dy)) * 0.15;
+            const push = Math.sign(dy) * (separationY - Math.abs(dy)) * 0.15;
             a.vy += push;
             b.vy -= push;
           }
@@ -250,7 +252,12 @@ export function layoutOverview(
       const dx = b.x - a.x,
         dy = b.y - a.y;
       const distance = Math.max(1, Math.hypot(dx, dy));
-      const force = (distance - 250) * 0.003;
+      // Account for the node widths and the linking phrase between them.
+      const preferredLength = Math.max(
+        360,
+        190 + (edge.label?.length ?? 0) * 7 + 64,
+      );
+      const force = (distance - preferredLength) * 0.003;
       a.vx += (dx / distance) * force;
       a.vy += (dy / distance) * force;
       b.vx -= (dx / distance) * force;
@@ -258,8 +265,8 @@ export function layoutOverview(
     }
     for (const point of points) {
       const angle = -Math.PI / 2 + (point.group * Math.PI * 2) / groups.length;
-      point.vx += (width / 2 + 390 * Math.cos(angle) - point.x) * 0.003;
-      point.vy += (height / 2 + 310 * Math.sin(angle) - point.y) * 0.003;
+      point.vx += (width / 2 + 510 * Math.cos(angle) - point.x) * 0.0025;
+      point.vy += (height / 2 + 420 * Math.sin(angle) - point.y) * 0.0025;
       point.vx *= 0.65;
       point.vy *= 0.65;
       point.x = Math.max(110, Math.min(width - 110, point.x + point.vx));
@@ -275,8 +282,8 @@ export function layoutOverview(
         const b = points[j]!;
         const dx = a.x - b.x || 0.1,
           dy = a.y - b.y || 0.1;
-        const overlapX = 205 - Math.abs(dx),
-          overlapY = 76 - Math.abs(dy);
+        const overlapX = separationX - Math.abs(dx),
+          overlapY = separationY - Math.abs(dy);
         if (overlapX <= 0 || overlapY <= 0) continue;
         if (overlapX < overlapY) {
           const push = (Math.sign(dx) * (overlapX + 0.5)) / 2;

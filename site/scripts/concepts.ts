@@ -2,10 +2,10 @@ import {
   layoutNeighborhood,
   layoutEdgeLabels,
   layoutLabeledOverview,
-  labeledOverviewScale,
   layoutConnection,
   neighborhood,
 } from "../../shared/concept-graph.ts";
+import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
 
 (() => {
   const agentUrl = document.querySelector<HTMLInputElement>(
@@ -84,6 +84,15 @@ import {
     const params = complete ? new URLSearchParams(location.search) : null;
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
+    const viewport = complete ? new ConceptViewport(graphic, svg) : null;
+    const navigation = map.querySelector<HTMLElement>(
+      "[data-concept-navigation]",
+    );
+    if (navigation) navigation.hidden = false;
+    let bounds = {
+      width: Number(svg.dataset.width),
+      height: Number(svg.dataset.height),
+    };
     const expand = map.querySelector<HTMLButtonElement>(
       "[data-concept-expand]",
     );
@@ -105,20 +114,13 @@ import {
     const status = map.querySelector<HTMLElement>("[data-concept-map-status]")!;
     let overviewVisible = complete;
     let labeledOverview = false;
-    let zoomWidth = 0;
     let isolatingGroup = false;
-    let groupViewport: {
-      width: number;
-      left: number;
-      top: number;
-      viewWidth: number;
-      viewHeight: number;
-      context: string;
-    } | null = null;
+    let groupViewport: (ViewportState & { context: string }) | null = null;
     let graphPoints: { id: string; x: number; y: number }[] = [];
     let activeRelationships: typeof relationships = [];
     let hoveredNode = "";
     let focusedNode = "";
+    let selectedNode = "";
     const practice = map.querySelector<HTMLDetailsElement>(
       ".concept-connection-practice",
     )!;
@@ -154,7 +156,12 @@ import {
 
     function previewConnections() {
       if (!complete) return;
-      const id = focusedNode || hoveredNode;
+      for (const node of nodes)
+        node.classList.toggle(
+          "is-selected",
+          node.dataset.conceptNode === selectedNode,
+        );
+      const id = focusedNode || hoveredNode || selectedNode;
       const incident =
         labels.checked || practice.open
           ? []
@@ -165,9 +172,7 @@ import {
         incident.map((relation) => `${relation.source} ${relation.target}`),
       );
       if (incident.length)
-        placeCaptions(
-          layoutEdgeLabels(graphPoints, incident, svg.viewBox.baseVal),
-        );
+        placeCaptions(layoutEdgeLabels(graphPoints, incident, bounds));
       for (const [index, edge] of edges.entries()) {
         const previewed = shown.has(edge.dataset.conceptEdge!);
         edge.classList.toggle("is-previewed", previewed);
@@ -187,10 +192,16 @@ import {
         });
         node.addEventListener("focus", () => {
           focusedNode = id;
+          const point = graphPoints.find((point) => point.id === id);
+          if (point) viewport?.reveal(point);
           previewConnections();
         });
         node.addEventListener("blur", () => {
           focusedNode = "";
+          previewConnections();
+        });
+        node.addEventListener("click", () => {
+          selectedNode = id;
           previewConnections();
         });
       }
@@ -265,35 +276,21 @@ import {
         if (control) control.value = "";
       groupViewport = null;
       isolatingGroup = false;
+      selectedNode = "";
     }
     function zoom(width: number) {
-      zoomWidth = Math.max(240, Math.min(5000, width));
-      svg.style.width = `${zoomWidth}px`;
+      viewport?.zoom(width);
     }
     function fit() {
       if (!complete) return;
-      const bounds = svg.viewBox.baseVal;
-      zoom(
-        Math.max(
-          Math.min(
-            graphic.clientWidth || 440,
-            (graphic.clientHeight * bounds.width) / bounds.height,
-            overviewVisible ? 5000 : 640,
-          ),
-          overviewVisible ? 240 : Math.min(graphic.clientWidth || 440, 440),
-        ),
-      );
+      viewport?.fit(overviewVisible ? Infinity : 640);
     }
     expand?.addEventListener("click", () => {
       const expanded = map.classList.toggle("is-expanded");
       expand.setAttribute("aria-pressed", String(expanded));
       expand.textContent = expanded ? "Restore graph size" : "Expand graph";
-      // Use the extra width for readable nodes; Fit still shows the whole map.
-      // Changing display size does not change the learner's selected context.
-      if (expanded && overviewVisible) zoom(graphic.clientWidth);
-      else fit();
-      graphic.scrollLeft = 0;
-      graphic.scrollTop = 0;
+      // Expansion reveals more of the same view without losing its location.
+      viewport?.render();
     });
     function update(preserveViewport = false) {
       const focus = select?.value || fixedFocus;
@@ -309,13 +306,9 @@ import {
         isolatingGroup && !onlyGroup && groupViewport?.context === context
           ? groupViewport
           : null;
-      if (onlyGroup && !isolatingGroup && zoomWidth) {
+      if (onlyGroup && !isolatingGroup && viewport) {
         groupViewport = {
-          width: zoomWidth,
-          left: graphic.scrollLeft,
-          top: graphic.scrollTop,
-          viewWidth: svg.viewBox.baseVal.width,
-          viewHeight: svg.viewBox.baseVal.height,
+          ...viewport.snapshot(),
           context,
         };
       }
@@ -336,6 +329,7 @@ import {
       const visible = new Set(
         visibleNodes.map((node) => node.dataset.conceptNode!),
       );
+      if (!visible.has(selectedNode)) selectedNode = "";
       const members = new Set(
         visibleNodes
           .filter((node) => node.dataset.group === groupName)
@@ -343,7 +337,6 @@ import {
       );
       overviewVisible =
         complete && !focus && !query && !reading?.value && !onlyGroup;
-      const wasLabeledOverview = labeledOverview;
       labeledOverview = overviewVisible && labels.checked;
       map.classList.toggle("has-connection-labels", labels.checked);
       practiceLabels.textContent = labels.checked
@@ -484,12 +477,15 @@ import {
       );
       if (empty) empty.hidden = visible.size !== 0;
       updateContext(visible.size);
-      svg.setAttribute(
-        "viewBox",
-        `0 0 ${layout?.width ?? svg.dataset.width} ${layout?.height ?? svg.dataset.height}`,
-      );
+      bounds = {
+        width: layout?.width ?? Number(svg.dataset.width),
+        height: layout?.height ?? Number(svg.dataset.height),
+      };
+      if (viewport) viewport.setBounds(bounds);
+      else svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
       previewConnections();
       graphic.hidden = visible.size === 0;
+      if (navigation) navigation.hidden = visible.size === 0;
       if (groupHelp)
         groupHelp.textContent = !groupName
           ? "Choose a group to highlight its members in context."
@@ -504,46 +500,15 @@ import {
           : focus
             ? `${nodes.find((node) => node.dataset.conceptNode === focus)!.dataset.title} · ${count} connections`
             : `${visible.size} concepts · ${count} connections${groupName ? ` · ${onlyGroup ? `${groupName} only` : `${members.size} ${groupName} highlighted`}` : ""}${reading?.value ? ` · ${reading.selectedOptions[0]!.textContent}` : ""}`;
-      if (
-        complete &&
-        preserveViewport &&
-        labeledOverview !== wasLabeledOverview
-      ) {
-        const scale = labeledOverview
-          ? labeledOverviewScale
-          : 1 / labeledOverviewScale;
-        const left =
-          (graphic.scrollLeft + graphic.clientWidth / 2) * scale -
-          graphic.clientWidth / 2;
-        const top =
-          (graphic.scrollTop + graphic.clientHeight / 2) * scale -
-          graphic.clientHeight / 2;
-        zoom(zoomWidth * scale);
-        graphic.scrollLeft = left;
-        graphic.scrollTop = top;
-      }
       if (complete && restoreGroupViewport) {
-        const saved = restoreGroupViewport;
-        const bounds = svg.viewBox.baseVal;
-        zoom((saved.width * bounds.width) / saved.viewWidth);
-        graphic.scrollLeft =
-          ((saved.left + graphic.clientWidth / 2) * zoomWidth) / saved.width -
-          graphic.clientWidth / 2;
-        const oldHeight = (saved.width * saved.viewHeight) / saved.viewWidth;
-        const newHeight = (zoomWidth * bounds.height) / bounds.width;
-        graphic.scrollTop =
-          ((saved.top + graphic.clientHeight / 2) * newHeight) / oldHeight -
-          graphic.clientHeight / 2;
+        viewport!.restore(restoreGroupViewport);
         groupViewport = null;
       } else if (complete && !preserveViewport) {
-        graphic.scrollTop = 0;
-        graphic.scrollLeft = 0;
-        if (overviewVisible)
-          zoom(
-            Math.max(graphic.clientWidth, 1000) *
-              (labeledOverview ? labeledOverviewScale : 1),
-          );
-        else fit();
+        if (overviewVisible) {
+          viewport!.x = bounds.width / 2;
+          viewport!.y = bounds.height / 2;
+          viewport!.readable();
+        } else fit();
       }
       if (complete) {
         const url = new URL(location.href);
@@ -665,38 +630,17 @@ import {
       button.addEventListener("click", () => {
         const action = button.dataset.conceptZoom;
         if (action === "fit") fit();
-        else zoom(zoomWidth * (action === "in" ? 1.25 : 0.8));
+        else if (action === "readable") viewport?.readable();
+        else zoom(viewport!.width * (action === "in" ? 1.25 : 0.8));
       });
-    let drag: { x: number; y: number; left: number; top: number } | null = null;
-    graphic.addEventListener("pointerdown", (event) => {
-      if (
-        !complete ||
-        event.pointerType !== "mouse" ||
-        event.button !== 0 ||
-        (event.target instanceof Element && event.target.closest("a"))
-      )
-        return;
-      drag = {
-        x: event.clientX,
-        y: event.clientY,
-        left: graphic.scrollLeft,
-        top: graphic.scrollTop,
-      };
-      graphic.setPointerCapture(event.pointerId);
-      graphic.classList.add("is-dragging");
+    graphic.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        selectedNode = "";
+        focusedNode = "";
+        hoveredNode = "";
+        previewConnections();
+      }
     });
-    graphic.addEventListener("pointermove", (event) => {
-      if (!drag) return;
-      graphic.scrollLeft = drag.left - (event.clientX - drag.x);
-      graphic.scrollTop = drag.top - (event.clientY - drag.y);
-    });
-    const stopDrag = () => {
-      drag = null;
-      graphic.classList.remove("is-dragging");
-    };
-    graphic.addEventListener("pointerup", stopDrag);
-    graphic.addEventListener("pointercancel", stopDrag);
-    graphic.addEventListener("lostpointercapture", stopDrag);
     update();
   }
 

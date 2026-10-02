@@ -122,7 +122,7 @@ test("reading membership covers the published book, parts, cases, and project", 
   }
 });
 
-test("the complete overview fits all labels without overlapping nodes", () => {
+test("the complete overview reserves breathing room between concept cards", () => {
   const layout = layoutOverview(concepts, conceptRelationships, conceptGroups);
   for (const point of layout.points) {
     assert.ok(point.x >= 95 && point.x <= layout.width - 95, point.id);
@@ -133,8 +133,8 @@ test("the complete overview fits all labels without overlapping nodes", () => {
       const a = layout.points[i]!,
         b = layout.points[j]!;
       assert.ok(
-        Math.abs(a.x - b.x) >= 195 || Math.abs(a.y - b.y) >= 66,
-        `${a.id} overlaps ${b.id}`,
+        Math.abs(a.x - b.x) >= 238 || Math.abs(a.y - b.y) >= 106,
+        `${a.id} crowds ${b.id}`,
       );
     }
   }

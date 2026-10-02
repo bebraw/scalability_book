@@ -264,6 +264,7 @@ test("the graph expands into the display without changing the exploration", asyn
   await labels.check();
   const regular = (await map.boundingBox())!;
   const regularCanvas = (await graphic.boundingBox())!;
+  const camera = await graphic.getAttribute("data-camera");
   const contextUrl = page.url();
   const expand = map.getByRole("button", { name: "Expand graph", exact: true });
   await expand.focus();
@@ -279,6 +280,7 @@ test("the graph expands into the display without changing the exploration", asyn
   expect(wide.width).toBeGreaterThan(2560 * 0.9);
   expect(wide.width).toBeGreaterThan(regular.width * 1.8);
   expect(wideCanvas.height).toBeGreaterThan(regularCanvas.height * 1.7);
+  await expect(graphic).toHaveAttribute("data-camera", camera!);
   await expect(map.getByRole("combobox", { name: "Topic group" })).toHaveValue(
     "Development",
   );
@@ -296,10 +298,13 @@ test("the graph expands into the display without changing the exploration", asyn
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   expect(
     await graphic.evaluate((element) => {
-      const svg = element.querySelector("svg")!.getBoundingClientRect();
+      const svg = element.querySelector("svg")!;
+      const view = svg.viewBox.baseVal;
       return (
-        svg.width <= element.clientWidth + 1 &&
-        svg.height <= element.clientHeight + 1
+        view.x <= 0 &&
+        view.y <= 0 &&
+        view.x + view.width >= Number(svg.dataset.width) * 1.7 &&
+        view.y + view.height >= Number(svg.dataset.height) * 1.7
       );
     }),
   ).toBe(true);
@@ -334,9 +339,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   const graphic = map.locator(".concept-map-graphic");
   const viewport = () =>
     graphic.evaluate((element) => ({
-      width: element.querySelector("svg")!.getBoundingClientRect().width,
-      left: element.scrollLeft,
-      top: element.scrollTop,
+      camera: element.getAttribute("data-camera"),
       positions: [...element.querySelectorAll("[data-concept-node] g")].map(
         (node) => node.getAttribute("transform"),
       ),
@@ -345,10 +348,9 @@ test("group highlighting preserves context before an explicit group-only view", 
   await expect(highlight).toBeDisabled();
   await expect(only).toBeDisabled();
   await map.getByRole("button", { name: "Zoom in", exact: true }).click();
-  await graphic.evaluate((element) => {
-    element.scrollLeft = 100;
-    element.scrollTop = 140;
-  });
+  await graphic.focus();
+  await graphic.press("ArrowRight");
+  await graphic.press("ArrowDown");
   const before = await viewport();
   await group.selectOption("Models");
   await expect(nodes).toHaveCount(45);
@@ -816,6 +818,8 @@ test("graph labels keep contrast during hover and keyboard focus in every theme"
       await map
         .getByRole("checkbox", { name: "Show connection labels" })
         .check();
+      const fit = map.getByRole("button", { name: "Fit", exact: true });
+      if (await fit.count()) await fit.click();
       await measure(
         map.locator(".concept-edge-label:visible").first(),
         context,
@@ -1056,26 +1060,25 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
       directory.locator("[data-concept-directory-count]"),
     ).toHaveText(`${ids.length} of 45 topics in this view`);
   };
-  const svg = graphic.locator("svg");
-  const before = await svg.evaluate(
-    (element) => element.getBoundingClientRect().width,
-  );
+  const camera = () =>
+    graphic.evaluate((element) => JSON.parse(element.dataset.camera!));
+  const before = await camera();
   await map.getByRole("button", { name: "Zoom in", exact: true }).click();
-  expect(
-    await svg.evaluate((element) => element.getBoundingClientRect().width),
-  ).toBeGreaterThan(before);
-  await graphic.evaluate((element) => {
-    element.scrollLeft = 150;
-    element.scrollTop = 150;
-  });
+  expect((await camera()).scale).toBeGreaterThan(before.scale);
   await graphic.scrollIntoViewIfNeeded();
   const box = (await graphic.boundingBox())!;
+  const beforeDrag = await camera();
   await page.mouse.move(box.x + 30, box.y + 30);
   await page.mouse.down();
   await page.mouse.move(box.x + 90, box.y + 70, { steps: 5 });
   await page.mouse.up();
-  expect(await graphic.evaluate((element) => element.scrollLeft)).toBeLessThan(
-    150,
+  expect((await camera()).x).toBeCloseTo(
+    beforeDrag.x - 60 / beforeDrag.scale,
+    1,
+  );
+  expect((await camera()).y).toBeCloseTo(
+    beforeDrag.y - 40 / beforeDrag.scale,
+    1,
   );
   await map.getByLabel("Search topics").fill("change probe");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
