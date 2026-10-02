@@ -44,6 +44,25 @@ The interface and data branches may run together because both depend on the same
 The contract itself, integration, and end-to-end [acceptance](/concepts/#acceptance-criteria) remain sequential.
 If both branches need to reinterpret the lifecycle, edit the same schema, or wait for the same person, their apparent parallelism merely moves waiting and conflict downstream.
 
+### Separate agent concurrency from human work in progress
+
+**Agent concurrency** counts agents executing at the same time.
+For one integration owner, count **human work in progress** as started changes still awaiting that person's acceptance, including changes waiting for review or correction.
+Define what counts as one change before comparing these quantities: interface and data tasks can contribute to the same accepted feature.
+
+Two agents implementing the interface and data path for a CSV export can serve one unfinished change.
+If the same two agents move on to a feed filter and a lifecycle change while the export waits for review, the owner now supervises three unfinished changes.
+The worker count stayed at two, while human work in progress increased.
+Neither count alone establishes accepted throughput, attention cost, or quality.
+
+A worker limit bounds simultaneous execution; a work-in-progress limit bounds how many changes may start before earlier ones are accepted or explicitly abandoned.
+An owner can keep several workers on one change, or admit several changes while only some workers execute.
+Record both quantities alongside the [review queue](/concepts/#queue) and [review capacity](/concepts/#review-budget).
+
+In a practitioner essay, :citet[snyder2026feweragents] proposes improving the human feedback loop before hiding model latency with more concurrent tasks.
+He explicitly reports that one or two agents have not yet matched his many-agent net throughput.
+This motivates a local comparison, rather than establishing that fewer agents or a lower work-in-progress limit always improve results.
+
 ### Amdahl's Law and the sequential bottleneck
 
 [Amdahl's Law](/concepts/#amdahl-law) gives a simple upper bound on speedup when only part of the work can run in parallel :citep[amdahl1967validity].
@@ -269,6 +288,26 @@ Use the application to inspect the workflow that built it.
 
 To investigate a specific boundary further, use Appendix D's exercises on [retrieving changed guidance](/appendices/agent-system-security/#retrieve-guidance-after-a-contract-changes), [checking contract completeness](/appendices/agent-system-security/#check-a-contract-against-its-consumers), or [testing a human review gate](/appendices/agent-system-security/#test-a-human-review-gate).
 The walkthrough above provides the required path from decomposition through correction and measured coordination cost.
+
+### Optional exercise — Vary human work in progress
+
+Use this extension when the fleet trace suggests that waiting or competing review requests limit the workflow.
+Keep its findings in the existing fleet evidence.
+
+1. Choose three small changes that can each be accepted separately.
+   Freeze their briefs, contracts, acceptance checks, and starting revision; use fresh copies for both trials with the same model, tools, reviewer, and aggregate resource budget.
+2. Compare admitting one unfinished change at a time with admitting up to three.
+   Both conditions permit at most two executing agents, with the same delegation and integration rules.
+   Before running either, predict when overlapping work could reduce waiting and when competing requests could increase review or correction effort.
+3. Record change start and acceptance or abandonment times, actual agent concurrency, unfinished changes, review waiting, interruptions, active human review and correction time, and total cost.
+   Count accepted changes over the full trial window and preserve failed or abandoned attempts in the effort and cost records.
+4. Explain whether the traces support your prediction.
+   A shared worker limit does not guarantee equal observed concurrency; use the trace to show which workers were active or waiting.
+   Would the evidence support changing admission, worker capacity, or the feedback interface?
+   Keep a faster model or a different interface as a separate intervention.
+
+One pair is a workflow diagnostic: task order, practice, and execution variation can explain a difference.
+Report unfinished work at the cutoff and avoid treating a quieter workflow or a larger completion count as proof of better overall performance.
 
 ## Project artifact
 

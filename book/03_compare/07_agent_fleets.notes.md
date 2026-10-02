@@ -10,6 +10,7 @@ This chapter follows one practical progression:
 
 Use Chapter 2’s constrain–generate–validate–revise loop throughout; task-graph dependencies are an instance of the loop, not another stage vocabulary.
 Keep Amdahl’s Law, integration failure, correction, and measured coordination on the main path.
+Distinguish executing agents from started changes awaiting human acceptance; the optional work-in-progress comparison varies admission while keeping the worker limit fixed and records actual concurrency separately.
 The memory, contract-completeness, and human review-gate exercises are linked extensions in Appendix D.
 
 ## Notes for further development
