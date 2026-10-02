@@ -63,8 +63,8 @@ test("group highlighting preserves context before an explicit group-only view", 
       .locator("[data-concept-edge].is-group-bridge:not(.is-hidden)")
       .count(),
   ).toBeGreaterThan(0);
-  await expect(map.locator("[data-concept-group-tag]:visible")).toHaveCount(5);
-  await expect(map.locator("[data-concept-result]:visible")).toHaveCount(45);
+  await expect(page.locator("[data-concept-group-tag]:visible")).toHaveCount(5);
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(45);
   await expect(page).toHaveURL(/group-view=highlight/);
 
   await map.getByRole("checkbox", { name: "Show connection labels" }).check();
@@ -72,7 +72,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   const labeledViewport = await viewport();
   await only.check();
   await expect(nodes).toHaveCount(5);
-  await expect(map.locator("[data-concept-result]:visible")).toHaveCount(5);
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(5);
   await expect(
     map.locator("[data-concept-edge].is-group-bridge:not(.is-hidden)"),
   ).toHaveCount(0);
@@ -548,6 +548,72 @@ test("graph labels have breathing room in both themes and viewport sizes", async
   }
 });
 
+test("the compact directory opens concepts without losing the browsing position", async ({
+  page,
+}) => {
+  await page.goto("/concepts/");
+  const directory = page.locator(".concept-directory");
+  await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
+    45,
+  );
+  await expect(directory.locator("[data-concept-card]:visible")).toHaveCount(0);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollHeight),
+  ).toBeLessThan(8000);
+  await expect(directory.locator("[data-concept-directory-count]")).toHaveText(
+    "45 of 45 topics in this view",
+  );
+  const summary = directory.locator('[data-concept-select="queue"]');
+  await summary.scrollIntoViewIfNeeded();
+  await summary.focus();
+  const scroll = await page.evaluate(() => window.scrollY);
+  await summary.press("Enter");
+  const pane = page.getByRole("dialog", { name: "Queue", exact: true });
+  await expect(pane).toBeVisible();
+  await expect(pane).toContainText("Worked example");
+  await expect(directory.locator(".concept-directory-item[open]")).toHaveCount(
+    0,
+  );
+  await expect(page).toHaveURL(/concepts\/$/);
+  await page.keyboard.press("Escape");
+  await expect(summary).toBeFocused();
+  expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scroll, 0);
+  await directory
+    .getByRole("heading", { name: "Browse concepts" })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: test.info().outputPath("concept-directory-desktop.png"),
+  });
+  expect(
+    (await new AxeBuilder({ page }).include(".concept-directory").analyze())
+      .violations,
+  ).toEqual([]);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("[data-theme-picker]").selectOption("dark");
+  await summary.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: test.info().outputPath("concept-directory-mobile.png"),
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(
+    (await new AxeBuilder({ page }).include(".concept-directory").analyze())
+      .violations,
+  ).toEqual([]);
+  await summary.press("Space");
+  await expect(pane).toBeVisible();
+  await pane.getByRole("link", { name: "Open reference page" }).click();
+  await expect(pane).not.toBeVisible();
+  await expect(page.locator("#queue")).toBeVisible();
+  await expect(directory.locator(".concept-directory-item[open]")).toHaveCount(
+    1,
+  );
+});
+
 test("the complete map supports discovery, filtering, zoom, and shared views", async ({
   page,
 }) => {
@@ -556,6 +622,24 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   const status = map.locator("[data-concept-map-status]");
   await expect(status).toHaveText("45 concepts · 102 connections");
   const graphic = map.locator(".concept-map-graphic");
+  const directory = page.locator(".concept-directory");
+  const assertDirectoryMatches = async () => {
+    const ids = await map
+      .locator("[data-concept-node]:visible")
+      .evaluateAll((items) =>
+        items.map((item) => item.getAttribute("data-concept-node")).sort(),
+      );
+    expect(
+      await directory
+        .locator("[data-concept-result]:visible")
+        .evaluateAll((items) =>
+          items.map((item) => item.getAttribute("data-concept-result")).sort(),
+        ),
+    ).toEqual(ids);
+    await expect(
+      directory.locator("[data-concept-directory-count]"),
+    ).toHaveText(`${ids.length} of 45 topics in this view`);
+  };
   const svg = graphic.locator("svg");
   const before = await svg.evaluate(
     (element) => element.getBoundingClientRect().width,
@@ -579,6 +663,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   );
   await map.getByLabel("Search topics").fill("change probe");
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(1);
+  await assertDirectoryMatches();
   await map
     .getByRole("link", {
       name: "Explore Maintainability assessment",
@@ -627,6 +712,8 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await map.getByLabel("Search topics").fill("nonexistent-topic");
   await expect(status).toContainText("No topics match");
   await expect(graphic).not.toBeVisible();
+  await assertDirectoryMatches();
+  await expect(directory.locator("[data-concept-empty]")).toBeVisible();
   await map.getByRole("button", { name: "Reset view" }).click();
   await map
     .getByRole("combobox", { name: "Reading", exact: true })
@@ -638,10 +725,12 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     map.getByRole("link", { name: "Explore Coding agent", exact: true }),
   ).not.toBeVisible();
   await expect(status).toContainText("4 · Architecture");
+  await assertDirectoryMatches();
   await page.reload();
   await expect(
     map.getByRole("combobox", { name: "Reading", exact: true }),
   ).toHaveValue("/chapters/architecture/");
+  await assertDirectoryMatches();
   await map.getByLabel("Focus on").selectOption("idempotency");
   await expect(
     map.getByRole("link", { name: "Explore Retry policy", exact: true }),
@@ -650,6 +739,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     map.getByRole("combobox", { name: "Reading", exact: true }),
   ).toHaveValue("");
   await expect(page).toHaveURL(/topic=idempotency/);
+  await assertDirectoryMatches();
   await map.getByText("Read the relationships", { exact: true }).click();
   const visibleRelations = map.locator("[data-concept-relation]:visible");
   await expect(visibleRelations).toHaveCount(4);
@@ -673,6 +763,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     .getByRole("combobox", { name: "Topic group", exact: true })
     .selectOption("Models");
   await map.getByRole("radio", { name: "Show only", exact: true }).check();
+  await assertDirectoryMatches();
   await expect(
     map.getByRole("link", { name: "Explore Amdahl's Law", exact: true }),
   ).toBeVisible();
@@ -727,6 +818,7 @@ test("a failed lazy library request falls back to the static reference", async (
     .click();
   await expect(page).toHaveURL(/concepts\/#cache$/);
   await expect(page.locator("#cache")).toContainText("controlled copy");
+  await expect(page.locator("#cache")).toBeVisible();
 });
 
 test("a topic leads through the graph and returns to the reading position", async ({
@@ -829,6 +921,8 @@ test("static graph and curated chapter links remain usable without JavaScript", 
   const context = await browser.newContext({
     baseURL,
     javaScriptEnabled: false,
+    // Native fragment scrolling must settle before testing another entry.
+    reducedMotion: "reduce",
     viewport: { width: 320, height: 800 },
   });
   const page = await context.newPage();
@@ -843,9 +937,13 @@ test("static graph and curated chapter links remain usable without JavaScript", 
     .click();
   await expect(page).toHaveURL(/concepts\/#queue$/);
   await expect(page.locator("[data-concept-card]")).toHaveCount(45);
+  await expect(page.locator("[data-concept-card]:visible")).toHaveCount(1);
+  await expect(page.locator("#queue")).toBeVisible();
   await expect(page.locator("#queue")).toContainText(
     "Adding a queue creates processing capacity",
   );
+  await page.locator('[data-concept-select="agent"]').click();
+  await expect(page.locator("#agent")).toBeVisible();
   await expect(page.locator("#agent [data-concept-usage]")).toContainText(
     "LLM practitioners vary",
   );

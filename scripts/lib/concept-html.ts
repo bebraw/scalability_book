@@ -85,22 +85,31 @@ export function renderConceptLibrary(): string {
   return `<template data-concept-library>${concepts.map(renderConceptCard).join("\n")}</template>`;
 }
 
+function renderConceptSummary(concept: Concept): string {
+  const description = concept.definition.split(/(?<=\.)\s/)[0]!;
+  return `<li data-concept-result="${concept.id}"><details class="concept-directory-item">
+  <summary data-concept-select="${concept.id}" aria-labelledby="summary-${concept.id}-title" aria-describedby="summary-${concept.id}-description">
+    <span class="concept-summary-heading"><span class="concept-summary-title" id="summary-${concept.id}-title">${escapeHtml(concept.title)}</span><span class="concept-summary-group">${concept.group}</span></span>
+    <span class="concept-summary-description" id="summary-${concept.id}-description">${escapeHtml(description)}</span>
+    <span class="concept-summary-action">Explore concept <span aria-hidden="true">→</span><span class="concept-group-tag" data-concept-group-tag hidden>Group member</span></span>
+  </summary>
+  ${renderConceptCard(concept)}
+  </details></li>`;
+}
+
 export function renderConceptPage(): string {
   return `<main class="concept-reference" id="content">
-  <header class="concept-reference-header"><p class="eyebrow">The whole book · ${concepts.length} connected ideas</p><h1>Concepts that connect</h1><p>Start with an idea and discover where it leads. Follow a connection across application behavior, development work, and the evidence that lets you compare them.</p><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections, not prerequisites or proof of causation. Each has an explanation and links back to the reading.</p></header>
+  <header class="concept-reference-header"><p class="eyebrow">The whole book · ${concepts.length} connected ideas</p><h1>Concepts that connect</h1><p>Start with an idea and discover where it leads. Follow a connection across application behavior, development work, and the evidence that lets you compare them.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections, not prerequisites or proof of causation. Each has an explanation and links back to the reading.</p></details></header>
   <section id="concept-graph" aria-label="Explore concept connections">${renderConceptGraph("reference-concepts")}</section>
-  <div class="concept-reference-layout"><nav class="concept-directory" aria-label="Concept reference"><p class="concept-index-label">Definitions and examples</p>${conceptGroups
-    .map(
-      (group) =>
-        `<details open><summary>${group}</summary><ul>${concepts
-          .filter((concept) => concept.group === group)
-          .sort((a, b) => a.title.localeCompare(b.title))
-          .map((concept) => `<li>${conceptLink(concept)}</li>`)
-          .join("")}</ul></details>`,
-    )
-    .join(
-      "",
-    )}</nav><div>${concepts.map(renderConceptCard).join("\n")}</div></div>
+  <section class="concept-directory" id="concept-directory" aria-labelledby="concept-directory-title">
+    <header class="concept-directory-heading"><div><h2 id="concept-directory-title">Browse concepts</h2><p data-concept-directory-count>${concepts.length} topics</p></div><a href="#reference-concepts-search" data-concept-refine hidden>Refine topics ↑</a></header>
+    <p class="concept-directory-help">Choose an idea for its definition, examples, and connections.</p>
+    <p class="concept-directory-empty" data-concept-empty hidden>No topics match. Clear the search or reset the view above.</p>
+    <ul class="concept-directory-list">${[...concepts]
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map(renderConceptSummary)
+      .join("\n")}</ul>
+  </section>
 </main>`;
 }
 
@@ -148,7 +157,7 @@ export function renderConceptGraph(
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : ""}" data-concept-map data-focus="${focus}" data-complete="${complete}">
-  <div class="concept-map-heading"><h2>${complete ? "The complete concept graph" : "Explore the connections"}</h2>${complete ? `<a href="#concept-${concepts[0]!.id}-title">Read the reference ↓</a>` : ""}</div>
+  <div class="concept-map-heading"><h2>${complete ? "The complete concept graph" : "Explore the connections"}</h2>${complete ? `<a href="#concept-directory">Browse concepts ↓</a>` : ""}</div>
   <div class="concept-map-controls" hidden data-concept-controls>
     ${complete ? `<label for="${prefix}-search">Search topics<input id="${prefix}-search" type="search" data-concept-search placeholder="Retry, review, latency"></label><label for="${prefix}-reading">Reading<select id="${prefix}-reading" data-concept-reading><option value="">Whole book</option>${conceptPages.map((page) => `<option value="${page.url}" data-ids="${page.concepts.join(" ")}">${escapeHtml(page.title)}</option>`).join("")}</select></label>` : ""}
     ${!focus ? `<label for="${prefix}-focus">Focus on<select id="${prefix}-focus" data-concept-focus><option value="">${complete ? "Complete graph" : "All connections"}</option>${items.map((concept) => `<option value="${concept.id}">${escapeHtml(concept.title)}</option>`).join("")}</select></label>` : ""}
@@ -156,11 +165,10 @@ export function renderConceptGraph(
     ${complete ? `<div class="concept-map-group-controls"><label for="${prefix}-group">Topic group<select id="${prefix}-group" data-concept-group><option value="">All groups</option>${conceptGroups.map((group) => `<option>${group}</option>`).join("")}</select></label><fieldset class="concept-group-view" data-concept-group-controls disabled aria-describedby="${prefix}-group-help"><legend>Group view</legend><div><label><input type="radio" name="${prefix}-group-view" value="highlight" data-concept-group-mode checked><span>Highlight</span></label><label><input type="radio" name="${prefix}-group-view" value="only" data-concept-group-mode><span>Show only</span></label></div></fieldset><p class="concept-group-help" id="${prefix}-group-help" data-concept-group-help>Choose a group to highlight its members in context.</p></div>` : ""}
     <label class="concept-map-label-toggle"><input type="checkbox" data-concept-labels>Show connection labels</label>
   </div>
-  <p>${complete ? "Search or choose a reading to narrow the map. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
+  <p>${complete ? "Search or choose a reading to narrow the graph and directory. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
   <div class="concept-map-graphic"${complete ? ' tabindex="0" role="region" aria-label="Scrollable concept graph"' : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${edges}${captions}${nodes}</svg></div>
   ${complete ? `<p class="concept-map-help">Scroll the map to pan, or drag its background. Use + and − to zoom. Every topic and connection is also available as text below.</p>` : ""}
   <p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>
-  ${complete ? `<ul class="concept-map-results" aria-label="Topics in this view">${items.map((concept) => `<li data-concept-result="${concept.id}">${conceptLink(concept)}<span class="concept-group-tag" data-concept-group-tag hidden>Group member</span></li>`).join("")}</ul>` : ""}
   <details class="concept-map-relationships"><summary>Read the relationships</summary><ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${conceptLink(byId.get(relation.source)!)} · ${conceptLink(byId.get(relation.target)!)}</strong> <span class="concept-relationship-label">${escapeHtml(relation.label)}</span><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
   </div>`;
 }

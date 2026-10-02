@@ -10,6 +10,15 @@ import {
   function initializeGraph(map: HTMLElement) {
     const complete = map.dataset.complete === "true";
     const fixedFocus = map.dataset.focus || "";
+    const directory = complete
+      ? map
+          .closest(".concept-reference")
+          ?.querySelector<HTMLElement>(".concept-directory")
+      : null;
+    const refine = directory?.querySelector<HTMLElement>(
+      "[data-concept-refine]",
+    );
+    if (refine) refine.hidden = false;
     const controls = map.querySelector<HTMLElement>("[data-concept-controls]")!;
     controls.hidden = false;
     const labels = map.querySelector<HTMLInputElement>(
@@ -247,15 +256,24 @@ import {
           !ids.every((id) => visible.has(id)) ||
           Boolean(focus && !ids.includes(focus));
       }
-      for (const row of map.querySelectorAll<HTMLElement>(
+      for (const row of directory?.querySelectorAll<HTMLElement>(
         "[data-concept-result]",
-      )) {
+      ) || []) {
         const id = row.dataset.conceptResult!;
         row.hidden = !visible.has(id);
         row.classList.toggle("is-group-member", members.has(id));
         const tag = row.querySelector<HTMLElement>("[data-concept-group-tag]");
         if (tag) tag.hidden = !highlightingGroup || !members.has(id);
       }
+      const directoryCount = directory?.querySelector<HTMLElement>(
+        "[data-concept-directory-count]",
+      );
+      if (directoryCount)
+        directoryCount.textContent = `${visible.size} of ${nodes.length} topics in this view`;
+      const empty = directory?.querySelector<HTMLElement>(
+        "[data-concept-empty]",
+      );
+      if (empty) empty.hidden = visible.size !== 0;
       svg.setAttribute(
         "viewBox",
         `0 0 ${layout?.width ?? svg.dataset.width} ${layout?.height ?? svg.dataset.height}`,
@@ -435,7 +453,7 @@ import {
   const reference = pane.querySelector<HTMLAnchorElement>(
     "[data-concept-page]",
   )!;
-  let opener: HTMLAnchorElement | SVGAElement | null = null;
+  let opener: HTMLElement | SVGAElement | null = null;
   let previousOverflow = "";
   let libraryPromise: Promise<DocumentFragment> | undefined;
   let request = 0;
@@ -444,7 +462,7 @@ import {
     if (document.querySelector(".concept-reference")) {
       const fragment = document.createDocumentFragment();
       for (const card of document.querySelectorAll(
-        ".concept-reference-layout [data-concept-card]",
+        ".concept-directory [data-concept-card]",
       ))
         fragment.append(card.cloneNode(true));
       return Promise.resolve(fragment);
@@ -472,6 +490,8 @@ import {
     link.classList.add("concept-link");
     link.setAttribute("aria-haspopup", "dialog");
   }
+  for (const summary of document.querySelectorAll("[data-concept-select]"))
+    summary.setAttribute("aria-haspopup", "dialog");
   document.addEventListener("click", async (event) => {
     if (
       event.defaultPrevented ||
@@ -484,7 +504,9 @@ import {
       return;
     const link =
       event.target instanceof Element
-        ? event.target.closest<HTMLAnchorElement | SVGAElement>("a")
+        ? event.target.closest<HTMLElement | SVGAElement>(
+            "[data-concept-select], a",
+          )
         : null;
     if (
       !link ||
@@ -497,7 +519,9 @@ import {
       return;
     }
     if (!link.closest(surface)) return;
-    const href = link.getAttribute("href");
+    const href = link.hasAttribute("data-concept-select")
+      ? `/concepts/#${link.dataset.conceptSelect}`
+      : link.getAttribute("href");
     if (!href) return;
     const url = new URL(href, location.href);
     const id =

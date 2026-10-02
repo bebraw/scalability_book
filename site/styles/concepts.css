@@ -55,19 +55,16 @@
 .concept-reference-header > p:not(.eyebrow) {
   font: 1.1rem/1.7 var(--font-serif);
 }
-.concept-reference-layout {
-  display: grid;
-  grid-template-columns: 15rem minmax(0, 1fr);
-  gap: 3rem;
-  align-items: start;
+.concept-reference-notes {
+  color: var(--muted);
+  font: 0.85rem/1.6 var(--font-ui);
 }
-.concept-reference-layout > .concept-index {
-  position: sticky;
-  top: 6rem;
-  margin: 0;
+.concept-reference-notes > summary {
+  cursor: pointer;
+  padding-block: 0.4rem;
 }
-.concept-reference-layout > .concept-index ul {
-  display: block;
+.concept-reference-notes p {
+  margin-block: 0.6rem;
 }
 .concept-card {
   border-bottom: 1px solid var(--border);
@@ -355,18 +352,6 @@
   outline: 2px solid var(--accent-strong);
   outline-offset: 4px;
 }
-@media (max-width: 760px) {
-  .concept-reference-layout {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
-  }
-  .concept-reference-layout > .concept-index {
-    position: static;
-  }
-  .concept-reference-layout > .concept-index ul {
-    display: flex;
-  }
-}
 @media (max-width: 480px) {
   .concept-map {
     padding: 0.7rem;
@@ -378,12 +363,6 @@
   }
   .concept-pane {
     display: none !important;
-  }
-  .concept-reference-layout {
-    display: block;
-  }
-  .concept-reference-layout > .concept-index {
-    position: static;
   }
 }
 
@@ -397,34 +376,114 @@
   margin: 0 0 0.5rem;
 }
 .concept-directory {
-  position: sticky;
-  top: 6rem;
-  max-height: calc(100dvh - 7rem);
-  overflow: auto;
-  font: 0.85rem/1.6 var(--font-ui);
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
+  margin-top: 2.5rem;
+  scroll-margin-top: 7rem;
 }
-.concept-directory .concept-index-label {
-  margin-top: 0;
+.concept-directory-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.concept-directory-heading h2 {
+  font: 500 2rem/1.2 var(--font-serif);
+  margin: 0;
+}
+.concept-directory-heading p {
   color: var(--muted);
-  font-size: 0.75rem;
+  font: 0.8rem/1.5 var(--font-ui);
+  margin: 0.4rem 0 0;
 }
-.concept-directory summary,
+.concept-directory-heading > a {
+  font: 0.8rem/1.5 var(--font-ui);
+}
+.concept-directory-help,
+.concept-directory-empty {
+  color: var(--muted);
+  font: 0.9rem/1.6 var(--font-ui);
+  margin-block: 0.8rem 1.5rem;
+}
+.concept-directory-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.concept-directory-list > li {
+  min-width: 0;
+}
+.concept-directory-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  height: 100%;
+}
+.concept-directory-item > summary {
+  cursor: pointer;
+  display: grid;
+  gap: 0.75rem;
+  height: 100%;
+  list-style: none;
+  padding: 1.25rem;
+}
+.concept-directory-item > summary::-webkit-details-marker {
+  display: none;
+}
+.concept-directory-item > summary:hover {
+  background: var(--bg);
+}
+.concept-summary-heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+  justify-content: space-between;
+}
+.concept-summary-title {
+  font: 500 1.35rem/1.3 var(--font-serif);
+}
+.concept-summary-group {
+  color: var(--muted);
+  font: 600 0.7rem/1.5 var(--font-ui);
+}
+.concept-summary-description {
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font: 0.9rem/1.6 var(--font-ui);
+}
+.concept-summary-action {
+  color: var(--accent-strong);
+  font: 650 0.75rem/1.5 var(--font-ui);
+  align-self: end;
+}
+.concept-directory-list > .is-group-member .concept-directory-item {
+  border-color: var(--accent-strong);
+}
+.concept-directory-list > li:has(> details[open]) {
+  grid-column: 1 / -1;
+}
+.concept-directory-item[open] > summary {
+  border-bottom: 1px solid var(--border);
+  height: auto;
+}
+.concept-directory-item[open] .concept-summary-description {
+  display: block;
+}
+.concept-directory-item > .concept-card {
+  border: 0;
+  margin: 0;
+  padding: 1.5rem;
+}
 .concept-neighborhood summary,
 .concept-reading-locations summary {
   cursor: pointer;
   font: 600 0.85rem/1.6 var(--font-ui);
   padding-block: 0.5rem;
-}
-.concept-directory ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.3rem 0 1rem;
-}
-.concept-directory a {
-  display: inline-block;
-  padding-block: 0.2rem;
 }
 .concept-neighborhood {
   margin-block: 1rem;
@@ -457,6 +516,9 @@
   color: var(--text);
   padding: 0.55rem;
   font: 400 0.85rem/1.5 var(--font-ui);
+}
+.concept-map-controls input[type="search"] {
+  scroll-margin-top: 7rem;
 }
 .concept-map-actions {
   display: flex;
@@ -601,21 +663,9 @@
 .concept-map-heading > a {
   font: 0.75rem/1.5 var(--font-ui);
 }
-.concept-map-results {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1rem;
-  padding: 0;
-  list-style: none;
-  font: 0.8rem/1.5 var(--font-ui);
-}
-.concept-map-results li[hidden],
-.concept-map-results .concept-group-tag[hidden],
+.concept-directory [hidden],
 .concept-map-controls[hidden] {
   display: none;
-}
-.concept-map-results .is-group-member > a {
-  font-weight: 750;
 }
 .concept-group-tag {
   border: 1px solid var(--accent-strong);
@@ -637,6 +687,7 @@
 .concept-map-graphic:focus-visible,
 .concept-directory a:focus-visible,
 .concept-directory summary:focus-visible,
+.concept-reference-notes summary:focus-visible,
 .concept-neighborhood summary:focus-visible,
 .concept-reading-locations summary:focus-visible {
   outline: 2px solid var(--accent-strong);
@@ -646,17 +697,17 @@
   .concept-map-group-controls > label {
     flex: 1 1 100%;
   }
-  .concept-directory {
-    position: static;
-    max-height: none;
+  .concept-directory-list {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .concept-directory details:not(:first-of-type) {
-    border-top: 1px solid var(--border);
+  .concept-directory-item > summary {
+    padding: 1rem;
   }
-  .concept-directory ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.2rem 1rem;
+  .concept-directory-item > .concept-card {
+    padding: 1.25rem 1rem;
+  }
+  .concept-summary-description {
+    -webkit-line-clamp: 3;
   }
   .concept-map-complete .concept-map-graphic {
     height: 28rem;
@@ -674,8 +725,10 @@
   .concept-map-complete .concept-map-graphic svg {
     width: 100% !important;
   }
-  .concept-directory {
-    position: static;
-    max-height: none;
+  .concept-directory-list {
+    display: block;
+  }
+  .concept-directory-item {
+    margin-bottom: 1rem;
   }
 }
