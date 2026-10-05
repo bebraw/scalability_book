@@ -168,14 +168,22 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
   expect(
     students.every((s: any) => s.email.endsWith(".invalid") && !s.login),
   ).toBe(true);
+  async function reloadAfter(button: Locator) {
+    const navigated = page.waitForEvent(
+      "framenavigated",
+      (frame) => frame === page.mainFrame(),
+    );
+    await button.click();
+    await navigated;
+  }
   async function role(name: string) {
     await teacherControls();
     await banner
       .getByRole("combobox", { name: "Rehearsal role", exact: true })
       .selectOption({ label: name });
-    await banner
-      .getByRole("button", { name: "Switch role", exact: true })
-      .click();
+    await reloadAfter(
+      banner.getByRole("button", { name: "Switch role", exact: true }),
+    );
     await expect(
       page.getByRole("heading", {
         name:
@@ -389,9 +397,9 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
     }),
     "/working-agreement/establish/group-01",
   );
-  await page
-    .getByRole("button", { name: "Return to instructor", exact: true })
-    .click();
+  await reloadAfter(
+    page.getByRole("button", { name: "Return to instructor", exact: true }),
+  );
   await expect(
     page.getByRole("heading", { name: "Establish review queue", exact: true }),
   ).toBeVisible();
@@ -406,9 +414,9 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
     await banner
       .getByLabel("Advance simulation time", { exact: true })
       .fill(value);
-    await banner
-      .getByRole("button", { name: "Advance clock", exact: true })
-      .click();
+    await reloadAfter(
+      banner.getByRole("button", { name: "Advance clock", exact: true }),
+    );
     await expect(
       page.getByRole("heading", {
         name: "Establish review queue",

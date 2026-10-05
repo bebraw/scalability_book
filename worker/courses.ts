@@ -474,16 +474,18 @@ export async function handleCourses(
             }
           : {}),
         ...visible,
-        agreements: records.filter(
-          (r) =>
-            r.kind === "working-agreement" &&
-            (staff ||
-              course.phases[(r.value as WorkingAgreement).phase].groups.some(
-                (g) =>
-                  g.id === (r.value as WorkingAgreement).group &&
-                  g.members.includes(user.id),
-              )),
-        ),
+        agreements: records.filter((r) => {
+          if (r.kind !== "working-agreement") return false;
+          if (staff) return true;
+          const agreement = r.value as WorkingAgreement,
+            schedule = course.phases[agreement.phase];
+          return (
+            (!schedule.formation || Boolean(schedule.formation.publishedAt)) &&
+            schedule.groups.some(
+              (g) => g.id === agreement.group && g.members.includes(user.id),
+            )
+          );
+        }),
         results,
       });
     }
@@ -710,6 +712,7 @@ export async function handleCourses(
         "Group member or staff access required.",
         403,
       );
+      team(course, phase, subject);
       const body = await boundedJson(request);
       const value: WorkingAgreement = {
         phase,

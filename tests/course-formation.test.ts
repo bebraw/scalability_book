@@ -272,6 +272,105 @@ test("partial proposals require every member's confirmation; allocation, publica
     403,
   );
 });
+test("working agreements require an existing group and stay private until its allocation is published", async (t) => {
+  const f = await fixture(t);
+  const invalidKey = recordKey(
+    f.id,
+    "working-agreement",
+    "establish",
+    "group-99",
+  );
+  const before = await f.good(`/${f.id}`);
+  const invalid = await f.request(
+    `/${f.id}/working-agreement/establish/group-99`,
+    { expected: null, text: "This group does not exist." },
+  );
+  assert.equal(invalid.status, 404);
+  assert.equal(await f.store.get(invalidKey), null);
+  assert.deepEqual(await f.store.history(invalidKey), []);
+  assert.deepEqual((await f.good(`/${f.id}`)).config, before.config);
+
+  await f.open();
+  await f.groups("establish", [
+    { id: "", members: students.slice(0, 3).map((s) => s.id) },
+    {
+      id: "",
+      members: students.slice(3).map((s) => s.id),
+      exception: "Approve four for the synthetic cohort remainder",
+    },
+  ]);
+  const agreement = await f.good(
+    `/${f.id}/working-agreement/establish/group-01`,
+    {
+      expected: null,
+      text: "PRIVATE TEAM PLAN: discuss availability together.",
+    },
+  );
+  assert.equal((await f.good(`/${f.id}`)).agreements.length, 1);
+  const unpublished = await f.good(`/${f.id}`, undefined, students[0]!);
+  assert.deepEqual(unpublished.agreements, []);
+  assert.equal(
+    JSON.stringify(unpublished).includes("PRIVATE TEAM PLAN"),
+    false,
+  );
+  assert.equal(
+    (
+      await f.request(
+        `/${f.id}/working-agreement/establish/group-01`,
+        {
+          expected: agreement.revision,
+          text: "Cannot edit before publication",
+        },
+        students[0]!,
+      )
+    ).status,
+    403,
+  );
+
+  await f.open("establish", true);
+  assert.equal(
+    (await f.good(`/${f.id}`, undefined, students[0]!)).agreements[0].value
+      .text,
+    agreement.value.text,
+  );
+  assert.deepEqual(
+    (await f.good(`/${f.id}`, undefined, students[3]!)).agreements,
+    [],
+  );
+  const edited = await f.good(
+    `/${f.id}/working-agreement/establish/group-01`,
+    {
+      expected: agreement.revision,
+      text: "Published members agree to meet weekly.",
+    },
+    students[0]!,
+  );
+  assert.equal(
+    (await f.good(`/${f.id}`, undefined, students[1]!)).agreements[0].revision,
+    edited.revision,
+  );
+  // An ungraded agreement can outlive an unused allocation. Its history remains
+  // available to staff, but no student inherits access to an absent group.
+  const allocated = (await f.good(`/${f.id}`)).config.value.phases.establish
+    .groups;
+  await f.groups("establish", [allocated[1]]);
+  assert.deepEqual(
+    (await f.good(`/${f.id}`, undefined, students[0]!)).agreements,
+    [],
+  );
+  assert.equal(
+    (await f.good(`/${f.id}`)).agreements[0].revision,
+    edited.revision,
+  );
+  assert.equal(
+    (
+      await f.store.history(
+        recordKey(f.id, "working-agreement", "establish", "group-01"),
+      )
+    ).length,
+    2,
+  );
+});
 test("private matching constraints and unrelated invitations stay private; edits re-request consent and close at the deadline", async (t) => {
   const f = await fixture(t);
   await f.open();

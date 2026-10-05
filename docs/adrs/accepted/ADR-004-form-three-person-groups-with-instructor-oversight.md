@@ -80,9 +80,12 @@ Three members is the default; new/changed groups are limited to four, with an ex
 Stable generated IDs and optional display names can be reused across phases.
 Later-phase transfers preserve frozen membership and assessment history.
 Shared working agreements are private group records and are not graded.
+Their API requires an existing group even for staff saves; student reads and writes require published membership.
+Removing an unused allocation retains the staff-visible agreement history without granting students access to an absent group.
 Student mutation responses acknowledge a save without exposing the private course snapshot.
 
 API/browser checks cover a confirmed pair completed into a trio, a four-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, privacy, publication/access separation, working agreements and retained frozen evidence/grades after transfers.
+Agreement API regression checks verify unknown-group rejection without records/history, unpublished read/write denial, published-team access and retained staff history after an unused allocation is removed.
 The [project introduction](../../../specifications/00_introduction.md#shared-work-and-individual-assessment) and [operating guide](../../course-system.md#instructor-group-allocation) describe the workflow.
 
 New arrivals after formation or frozen work have recorded enrollment dates and a late-arrival flag, enter the unassigned queue, and receive a staff review task until a catch-up plan is recorded.

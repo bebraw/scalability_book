@@ -169,6 +169,9 @@ Clear audit assignments before removing an unused group.
 Groups with saved submissions, audits or assessments cannot be removed.
 Approved members can save a short shared working agreement in the student Groups view.
 Agreement revisions use the course store/history, are private to the group and staff, and contribute no rubric points.
+Agreement saves require an existing group, including staff saves; a nonexistent identifier creates neither a record nor history.
+Students can read and edit agreements only for their published allocation.
+If staff removes an unused allocation, its agreement history remains available to staff without granting student access to the absent group.
 Late imports reach the unassigned queue and the [catch-up workflow](#late-arrivals-and-catch-up); withdrawal actions remain pending in ADR-004.
 The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
@@ -537,6 +540,7 @@ npm run validate
 The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
 The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
 Formation browser/API checks cover a confirmed pair completed into a trio, a fourth-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, private read/write responses, publication/access separation, working agreements, mobile/accessibility and later-phase transfers retaining frozen work and grade history.
+Agreement API checks reject unknown groups without writes, hide unpublished allocations from their prospective members, retain published-team privacy, and preserve staff history when an unused allocation is removed.
 Catch-up checks cover automatic late-arrival flags after publication/frozen work, the staff review task, private student plans, incremental corrections, stale/unauthorized saves, unknown historical dates and unchanged frozen evidence, grades and passing requirements.
 Evidence checks cover incomplete work, optional repository links, archived requirement links/drift rejection, private drafts, technical attachments versus private portfolios, retained frozen fields/history, stale assessments, late corrections and earlier A/B references without duplicate archives.
 The controlled source fixture is unpacked into a clean temporary directory, installs from its lockfile offline, initializes synthetic data and runs validation/readiness commands; this verification never executes student uploads.
