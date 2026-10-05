@@ -375,6 +375,19 @@ export const conceptPages: ConceptPage[] = [
     ],
   },
   {
+    url: "/case-studies/temper/",
+    title: "Case · Temper",
+    concepts: [
+      "contract",
+      "invariant",
+      "authority",
+      "acceptance-criteria",
+      "review-budget",
+      "throughput",
+      "durable-workflow",
+    ],
+  },
+  {
     url: "/case-studies/elements-of-scalable-web-development/",
     title: "Case · This book",
     concepts: [

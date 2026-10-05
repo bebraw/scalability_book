@@ -64,6 +64,12 @@
       "summary": "How fast-changing web-platform knowledge can become a retrieved, versioned, and task-evaluated development dependency.",
     },
     {
+      "file": "case-studies/temper.md",
+      "slug": "temper",
+      "repositoryUrl": "https://github.com/nerdsane/temper",
+      "summary": "How agent-authored behavioral contracts can make verification tractable while leaving specification completeness and external effects to be checked.",
+    },
+    {
       "file": "case-studies/elements-of-scalable-web-development.md",
       "slug": "elements-of-scalable-web-development",
       "repositoryUrl": "https://github.com/bebraw/scalability_book",

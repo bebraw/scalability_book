@@ -176,6 +176,11 @@ const groups = [
         "build/case-studies/modern-web-guidance/index.html",
       ),
       entry(
+        "Temper - Making behavior an executable contract",
+        "case-studies/temper",
+        "build/case-studies/temper/index.html",
+      ),
+      entry(
         "Elements of Scalable Web Development - When a book became a web project",
         "case-studies/elements-of-scalable-web-development",
         "build/case-studies/elements-of-scalable-web-development/index.html",

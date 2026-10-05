@@ -23,7 +23,7 @@ test.describe("case studies", () => {
     await expect(
       page.getByRole("heading", { name: "Case studies" }),
     ).toBeVisible();
-    await expect(page.locator(".home-case-study-list > li")).toHaveCount(6);
+    await expect(page.locator(".home-case-study-list > li")).toHaveCount(7);
     await expect(
       page.getByRole("link", {
         name: /Slideotter – Learning faster than the product converged/,
@@ -36,7 +36,10 @@ test.describe("case studies", () => {
     await page.goto("/chapters/scalable-development/");
 
     await expect(
-      page.getByRole("link", { name: "case studies" }),
+      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+        name: "Cases",
+        exact: true,
+      }),
     ).toHaveAttribute("href", "/case-studies/");
     await expect(
       page.getByRole("link", { name: "Slideotter" }).first(),
@@ -47,6 +50,10 @@ test.describe("case studies", () => {
     await expect(
       page.getByRole("link", { name: "Modern Web Guidance" }).first(),
     ).toHaveAttribute("href", "/case-studies/modern-web-guidance/");
+
+    await expect(
+      page.getByRole("link", { name: "Temper case study" }),
+    ).toHaveAttribute("href", "/case-studies/temper/");
 
     await page.goto("/case-studies/");
     await expect(
@@ -77,6 +84,11 @@ test.describe("case studies", () => {
         name: /Modern Web Guidance – Treating current knowledge as a tested dependency/,
       }),
     ).toHaveAttribute("href", "/case-studies/modern-web-guidance/");
+    await expect(
+      page.getByRole("link", {
+        name: /Temper – Making behavior an executable contract/,
+      }),
+    ).toHaveAttribute("href", "/case-studies/temper/");
     await expect(
       page.getByRole("link", {
         name: /Elements of Scalable Web Development – When a book became a web project/,
@@ -155,6 +167,16 @@ test.describe("case studies", () => {
       "href",
       "https://github.com/GoogleChrome/modern-web-guidance-src",
     );
+
+    await page.goto("/case-studies/temper/");
+    await expect(
+      page.getByRole("heading", {
+        name: "Temper – Making behavior an executable contract",
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "View source project" }),
+    ).toHaveAttribute("href", "https://github.com/nerdsane/temper");
 
     await page.goto("/case-studies/elements-of-scalable-web-development/");
     await expect(

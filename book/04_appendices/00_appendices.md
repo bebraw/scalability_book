@@ -13,3 +13,4 @@ Use them selectively:
 - [**Durable workflows**](/appendices/durable-workflows/) examines retry-safe external effects and recovery across process failure.
 
 Each appendix states the question it helps answer and links its method back to the relevant chapter or project decision.
+The [case studies](/case-studies/) provide further optional readings, including [Temper's approach to executable behavioral contracts](/case-studies/temper/).

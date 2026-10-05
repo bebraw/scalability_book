@@ -188,6 +188,8 @@ The statechart restricts the available routes; the checks and reviewer still det
 Deterministic controls can encode a wrong or incomplete rule.
 The [Architecture chapter](/chapters/architecture/) develops the related controls around data representation and durable state changes.
 
+The [Temper case study](/case-studies/temper/) extends this pattern to agent-authored state machines and examines the limits of their verification.
+
 ### Reuse practices without cloning the whole project harness
 
 Copying a complete starter repository into an existing project is usually too coarse.
