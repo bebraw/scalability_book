@@ -45,6 +45,8 @@ import {
   type WorkingAgreement,
 } from "../shared/course-formation.ts";
 import { configureFormation, updateFormation } from "./course-formation.ts";
+import { updateEnrollment } from "./course-enrollment.ts";
+import { studentEnrollment } from "../shared/course-enrollment.ts";
 export interface CourseUser {
   id: string;
   login: string;
@@ -386,7 +388,7 @@ export async function handleCourses(
       const students = staff
         ? course.students
         : course.students.map((s) => ({
-            ...s,
+            ...studentEnrollment(s, user.id),
             number: s.id === user.id ? s.number : "",
             ...(s.email ? { email: s.id === user.id ? s.email : "" } : {}),
           }));
@@ -587,6 +589,31 @@ export async function handleCourses(
           next,
           body.expected,
           text(body.reason, "Change reason", 2000, true),
+        ),
+      );
+    }
+    if (action === "enrollment") {
+      requireThat(
+        staff && request.method === "PUT",
+        "Staff access required.",
+        403,
+      );
+      requireThat(!phaseText && !subject, "Unknown enrollment route.", 404);
+      const body = await boundedJson(request);
+      requireThat(
+        body.expected === administrationRevisions(course).students,
+        "The roster or enrollment arrangement changed. Reload before saving; your text has not been saved.",
+        409,
+      );
+      const next = updateEnrollment(course, body, now);
+      return reply(
+        await save(
+          "course",
+          "",
+          "",
+          next,
+          config.revision,
+          text(body.reason, "Enrollment arrangement reason", 2000, true),
         ),
       );
     }

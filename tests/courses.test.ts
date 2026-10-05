@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { AdministrationRevisions } from "../shared/course-administration.ts";
+import { pendingCatchUps } from "../shared/course-enrollment.ts";
 import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import {
   handleCourses,
@@ -22,6 +23,7 @@ import {
   type Portfolio,
   type Grade,
   type CourseFile,
+  type Student,
 } from "../shared/course.ts";
 const admin = { id: "github:1", login: "instructor" };
 const alice = { id: "github:2", login: "alice" };
@@ -203,7 +205,10 @@ test("focused administration preserves other workflows and rejects conflicts in 
     reason: "Correct course name",
   });
   assert.equal(settings.value.students.length, 4);
-  assert.deepEqual(settings.value.students.at(-1), extra);
+  assert.deepEqual(settings.value.students.at(-1), {
+    ...extra,
+    enrollment: { enrolledAt: before, lateAt: null, catchUp: "", reason: "" },
+  });
   assert.equal(settings.value.name, "Renamed course");
   const conflict = await f.request(`/${id}/settings`, "PUT", {
     expected: initial.administration.settings,
@@ -218,6 +223,245 @@ test("focused administration preserves other workflows and rejects conflicts in 
   );
   assert.ok(history.history.some((r) => r.reason === "Late enrollment"));
   assert.ok(history.history.some((r) => r.reason === "Correct course name"));
+});
+test("late enrollment records a private catch-up plan without changing frozen work, grades or requirements", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const id = record.value.id;
+  const frozen = await f.submit(id, "establish", "red", alice);
+  const addedAt = "2026-01-02T00:00:00.000Z";
+  type View = {
+    config: Envelope<Course>;
+    administration: AdministrationRevisions;
+    submissions: Envelope<Submission>[];
+    projects: Envelope<Grade>[];
+    results: { student: Student; result: Result }[];
+  };
+  const initial = await f.good<View>(`/${id}`);
+  const roster = await f.good<Envelope<Course>>(
+    `/${id}/students`,
+    "PUT",
+    {
+      expected: initial.administration.students,
+      format: "institutional",
+      students: [
+        {
+          number: "S4",
+          firstName: "Dan",
+          lastName: "Example",
+          email: "dan@example.edu",
+        },
+      ],
+      reason: "Late institutional enrollment",
+    },
+    admin,
+    addedAt,
+  );
+  const dan = roster.value.students.at(-1)!;
+  assert.deepEqual(dan.enrollment, {
+    enrolledAt: addedAt,
+    lateAt: addedAt,
+    catchUp: "",
+    reason: "",
+  });
+  assert.deepEqual(
+    pendingCatchUps(roster.value).map((s) => s.id),
+    [dan.id],
+  );
+  const grade = await f.good<Envelope<Grade>>(
+    `/${id}/project-grade/establish/red`,
+    "PUT",
+    {
+      expected: null,
+      scores: projectScores,
+      feedback: "Frozen implementation evidence",
+      missing: false,
+      reason: "Initial project assessment",
+    },
+    admin,
+    after,
+  );
+  const previous = await f.good<View>(`/${id}`, "GET", undefined, admin, after);
+  const arrangement = {
+    expected: previous.administration.students,
+    student: dan.id,
+    late: true,
+    catchUp:
+      "Agree allocation with staff; complete the missed activities and assessment by the published evidence deadline.",
+    reason: "PRIVATE instructor enrollment note",
+  };
+  assert.equal(
+    (await f.request(`/${id}/enrollment`, "PUT", arrangement, alice, after))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await f.request(`/${id}/enrollment`, "GET", undefined, admin, after))
+      .status,
+    403,
+  );
+  assert.equal(
+    (
+      await f.request(
+        `/${id}/enrollment`,
+        "PUT",
+        { ...arrangement, reason: "" },
+        admin,
+        after,
+      )
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await f.request(
+        `/${id}/enrollment`,
+        "PUT",
+        { ...arrangement, student: "github:999" },
+        admin,
+        after,
+      )
+    ).status,
+    404,
+  );
+  // A settings change uses a separate fingerprint and cannot discard this plan.
+  await f.good(
+    `/${id}/settings`,
+    "PUT",
+    {
+      expected: previous.administration.settings,
+      name: "Renamed run",
+      staff: [admin.id],
+      rubric: rubricVersion,
+      reason: "Correct run name",
+    },
+    admin,
+    after,
+  );
+  const saved = await f.good<Envelope<Course>>(
+    `/${id}/enrollment`,
+    "PUT",
+    arrangement,
+    admin,
+    after,
+  );
+  assert.equal(saved.value.name, "Renamed run");
+  assert.equal(saved.value.students.at(-1)!.enrollment!.lateAt, addedAt);
+  assert.deepEqual(pendingCatchUps(saved.value), []);
+  assert.deepEqual(saved.value.phases, previous.config.value.phases);
+  assert.deepEqual(saved.value.adjustments, previous.config.value.adjustments);
+  const next = await f.good<View>(`/${id}`, "GET", undefined, admin, after);
+  assert.deepEqual(
+    next.submissions.find((s) => s.key === frozen.key),
+    frozen,
+  );
+  assert.deepEqual(
+    next.projects.find((g) => g.key === grade.key),
+    grade,
+  );
+  assert.deepEqual(
+    next.results,
+    previous.results.map((r) => ({
+      ...r,
+      student: saved.value.students.find((s) => s.id === r.student.id)!,
+    })),
+  );
+  assert.equal(
+    (await f.request(`/${id}/enrollment`, "PUT", arrangement, admin, after))
+      .status,
+    409,
+  );
+  const other = await f.good<View>(`/${id}`, "GET", undefined, alice, after);
+  assert.equal(
+    other.config.value.students.find((s) => s.id === dan.id)!.enrollment,
+    undefined,
+  );
+  assert.ok(!JSON.stringify(other).includes(arrangement.reason));
+  const own = await f.good<View>(
+    `/${id}`,
+    "GET",
+    undefined,
+    { id: dan.id, login: "", courseId: id, provider: "email" },
+    after,
+  );
+  assert.equal(
+    own.config.value.students.find((s) => s.id === dan.id)!.enrollment!.catchUp,
+    arrangement.catchUp,
+  );
+  assert.ok(!JSON.stringify(own).includes(arrangement.reason));
+  const corrected = await f.good<Envelope<Course>>(
+    `/${id}/students`,
+    "PUT",
+    {
+      expected: next.administration.students,
+      format: "institutional",
+      students: [
+        {
+          id: dan.id,
+          number: "S4-corrected",
+          firstName: "Daniel",
+          lastName: "Example",
+          email: "dan@example.edu",
+        },
+      ],
+      reason: "Correct the institutional record",
+    },
+    admin,
+    after,
+  );
+  assert.equal(corrected.value.students.at(-1)!.id, dan.id);
+  assert.deepEqual(
+    corrected.value.students.at(-1)!.enrollment,
+    saved.value.students.at(-1)!.enrollment,
+  );
+  const history = await f.store.history(record.key);
+  assert.ok(history.some((h) => h.reason === arrangement.reason));
+  const historical = await f.store.history(record.key, saved.revision);
+  assert.equal(
+    (historical[0]!.value as Course).students.at(-1)!.enrollment!.catchUp,
+    arrangement.catchUp,
+  );
+});
+
+test("old rosters retain unknown arrival dates and staff can correct the late-arrival flag with a reason", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const legacy = structuredClone(record);
+  for (const s of legacy.value.students) delete s.enrollment;
+  legacy.revision = crypto.randomUUID();
+  assert.equal(
+    await f.store.save(legacy, record.revision, "Historical roster fixture"),
+    true,
+  );
+  const id = record.value.id;
+  const view = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  const marked = await f.good<Envelope<Course>>(`/${id}/enrollment`, "PUT", {
+    expected: view.administration.students,
+    student: alice.id,
+    late: true,
+    catchUp: "",
+    reason: "Record an earlier late arrival",
+  });
+  assert.equal(marked.value.students[0]!.enrollment!.enrolledAt, null);
+  assert.deepEqual(
+    pendingCatchUps(marked.value).map((s) => s.id),
+    [alice.id],
+  );
+  const current = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  const restored = await f.good<Envelope<Course>>(`/${id}/enrollment`, "PUT", {
+    expected: current.administration.students,
+    student: alice.id,
+    late: false,
+    catchUp: "",
+    reason: "Correct the late-arrival designation",
+  });
+  assert.equal(restored.value.students[0]!.enrollment!.lateAt, null);
+  assert.deepEqual(pendingCatchUps(restored.value), []);
+  assert.equal(restored.value.students[1]!.enrollment, undefined);
 });
 test("phase administration saves only the selected phase", async (t) => {
   const f = fixture(t);

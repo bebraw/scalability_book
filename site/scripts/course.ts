@@ -2,6 +2,11 @@ import { e, option, field, input, localDate } from "./course-ui.ts";
 import { courseSignIn } from "./course-signin.ts";
 import { studentGroups } from "./course-formation.ts";
 import {
+  catchUpQueue,
+  loadEnrollment,
+  ownEnrollment,
+} from "./course-enrollment.ts";
+import {
   groupLabel,
   type WorkingAgreement,
 } from "../../shared/course-formation.ts";
@@ -221,7 +226,7 @@ function overview() {
     schedule = course.phases[phase];
   if (!v.staff) {
     const r = v.results[0];
-    return `<section class="course-section"><h3>My course progress</h3>${r ? resultMarkup(r.result) : "<p>Your instructor has not added your assessment record.</p>"}${course.adjustments
+    return `<section class="course-section"><h3>My course progress</h3>${ownEnrollment(course.students.find((s) => s.id === v.user.id))}${r ? resultMarkup(r.result) : "<p>Your instructor has not added your assessment record.</p>"}${course.adjustments
       .filter((a) => a.student === v.user.id)
       .map(
         (a) =>
@@ -244,6 +249,7 @@ function overview() {
   <div class="course-metrics"><div><strong>${frozen}<span> / ${schedule.groups.length}</span></strong><p>Implementations frozen</p></div><div><strong>${submitted}<span> / ${course.students.length}</span></strong><p>Private portfolios submitted</p></div><div><strong>${graded}<span> / ${schedule.groups.length + course.students.length}</span></strong><p>Assessments recorded</p></div></div>
   <div class="course-deadlines"><p><strong>Implementation</strong>${when(schedule.freezeAt)}</p><p><strong>Audit closes / class access opens</strong>${when(schedule.auditAt)}</p><p><strong>Evidence & portfolios</strong>${when(schedule.evidenceAt)}</p></div>
   ${!course.students.length ? '<aside class="course-note">Start in Students: import the roster, then form groups and prepare phase deadlines and audits.</aside>' : ""}
+  ${catchUpQueue(course)}
   ${
     course.students.some(
       (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
@@ -508,6 +514,11 @@ function render() {
 content.addEventListener("input", (event) => {
   const target = event.target as HTMLElement;
   if (target.closest("form")) dirty = true;
+  const enrollmentForm = target.closest<HTMLFormElement>(
+    'form[data-form="enrollment"]',
+  );
+  if (enrollmentForm && !target.matches("[data-enrollment-select]"))
+    enrollmentForm.dataset.dirty = "true";
   if (target.matches('[name="roster"],[name^="map-"]')) {
     const preview = target
       .closest("form")
@@ -525,6 +536,16 @@ content.addEventListener("change", async (event) => {
   const el = event.target as HTMLInputElement;
   let ownsPending = false;
   try {
+    if (el.matches("[data-enrollment-select]")) {
+      const form = el.closest("form")!;
+      if (
+        form.dataset.dirty &&
+        !confirm("Discard the unsaved enrollment arrangement?")
+      )
+        el.value = form.dataset.currentStudent!;
+      else loadEnrollment(form, view!.config.value, el.value);
+      return;
+    }
     if (el.matches("[data-course-select]")) {
       if (allowNavigation()) await openCourse(el.value);
       else el.value = view!.config.value.id;
@@ -646,6 +667,28 @@ content.addEventListener("click", async (event) => {
       );
       form.querySelector("[data-roster-preview]")!.textContent = "";
       dirty = true;
+      return;
+    }
+    if (button.dataset.enrollmentStudent) {
+      if (tab !== "students") {
+        if (!allowNavigation()) return;
+        tab = "students";
+        dirty = false;
+        render();
+      }
+      const form = content.querySelector<HTMLFormElement>(
+        'form[data-form="enrollment"]',
+      )!;
+      if (
+        form.dataset.dirty &&
+        !confirm("Discard the unsaved enrollment arrangement?")
+      )
+        return;
+      loadEnrollment(
+        form,
+        view!.config.value,
+        button.dataset.enrollmentStudent,
+      );
       return;
     }
     if (button.dataset.editStudent) {
@@ -917,6 +960,14 @@ content.addEventListener("submit", async (event) => {
       await api(route(kind, val("group")), "PUT", {
         expected: val("expected") || null,
         text: val("text"),
+      });
+    } else if (kind === "enrollment") {
+      await api(`/api/courses/${course.id}/enrollment`, "PUT", {
+        expected: v.administration!.students,
+        student: val("student"),
+        late: values.has("late"),
+        catchUp: val("catchUp"),
+        reason: val("reason"),
       });
     } else if (kind === "student") {
       await api(`/api/courses/${course.id}/students`, "PUT", {

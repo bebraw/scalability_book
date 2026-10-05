@@ -23,6 +23,7 @@ import {
 import { e, input, field, localDate } from "./course-ui.ts";
 import { groupLabel } from "../../shared/course-formation.ts";
 import { staffFormation } from "./course-formation.ts";
+import { enrollmentStatus, staffEnrollment } from "./course-enrollment.ts";
 
 const labels: Record<AdministrationSection, string> = {
   students: "Students",
@@ -56,15 +57,15 @@ export function renderAdministration(
     `${reason()}<div class="course-form-actions"><button type="submit">${label}</button>${history(record)}</div>`;
   if (section === "students") {
     const source = "student_id,first_name,last_name,email\n";
-    return `<section class="course-section"><h3>Students</h3><p>Import your institutional roster before students sign in. Form groups separately; omitted rows remain enrolled.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Course roster"><table class="course-table"><caption>Enrolled students · private to staff</caption><thead><tr><th>Name</th><th>Student ID</th><th>Institutional email</th><th>Sign-in status</th><th>Correction</th></tr></thead><tbody>${course.students
+    return `<section class="course-section"><h3>Students</h3><p>Import your institutional roster before students sign in. Form groups separately; omitted rows remain enrolled.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Course roster"><table class="course-table"><caption>Enrolled students · private to staff</caption><thead><tr><th>Name</th><th>Student ID</th><th>Institutional email</th><th>Sign-in status</th><th>Enrollment</th><th>Actions</th></tr></thead><tbody>${course.students
       .map((s) => {
         const activity = access.find((a) => a.student === s.id);
-        return `<tr><th>${e(s.name)}</th><td>${e(s.number)}</td><td>${e(s.email || "Institutional details needed")}</td><td>${activity ? `Last sign-in ${e(new Date(activity.lastSignIn).toLocaleString())}` : s.email ? "Imported · awaiting first sign-in" : "Legacy GitHub access"}</td><td><button type="button" class="course-quiet" data-edit-student="${e(s.id)}">Correct student</button></td></tr>`;
+        return `<tr><th>${e(s.name)}</th><td>${e(s.number)}</td><td>${e(s.email || "Institutional details needed")}</td><td>${activity ? `Last sign-in ${e(new Date(activity.lastSignIn).toLocaleString())}` : s.email ? "Imported · awaiting first sign-in" : "Legacy GitHub access"}</td><td>${e(enrollmentStatus(s))}</td><td><button type="button" class="course-quiet" data-edit-student="${e(s.id)}">Correct student</button><button type="button" class="course-quiet" data-enrollment-student="${e(s.id)}">Catch-up arrangement</button></td></tr>`;
       })
       .join("")}</tbody></table></div>
     <form data-form="students"><h4>Import institutional CSV</h4>${field("roster", "Roster CSV", source, 64000, true)}<button type="button" data-roster-columns class="course-quiet">Read CSV columns</button><div data-roster-mapping class="course-roster-mapping">${mappingMarkup(rosterHeaders(source))}</div><p class="course-muted">Imports match existing student IDs in this course. A matching legacy student keeps their existing submissions and grades. Duplicate IDs or emails need correction before import.</p><button type="submit" value="preview" class="course-quiet" formnovalidate>Preview roster changes</button><div data-roster-preview aria-live="polite"></div>${actions("Save roster")}</form>
     <details><summary>Add or correct one student</summary><form data-form="student"><input type="hidden" name="identity" value=""><p data-student-edit-label>New student</p>${input("number", "Institutional student ID", "")}${input("firstName", "First name", "")}${input("lastName", "Last name", "")}${input("email", "Institutional email", "", true, "email")}${input("login", "GitHub login (optional profile information)", "", false)}${actions("Save student")}</form></details>
-    <aside class="course-note"><strong>Student sign-in</strong><p>Students open <a href="/course/?course=${e(course.id)}">this course workspace</a> and request a link using their imported institutional email. The link signs them in; it does not register a new student.</p>${local ? '<button type="button" data-mock-inbox class="course-quiet">Open local mock inbox</button><div data-mock-messages></div>' : ""}</aside></section>`;
+    ${staffEnrollment(course)}<aside class="course-note"><strong>Student sign-in</strong><p>Students open <a href="/course/?course=${e(course.id)}">this course workspace</a> and request a link using their imported institutional email. The link signs them in; it does not register a new student.</p>${local ? '<button type="button" data-mock-inbox class="course-quiet">Open local mock inbox</button><div data-mock-messages></div>' : ""}</aside></section>`;
   }
   if (section === "groups") {
     const unassigned = course.students.filter(

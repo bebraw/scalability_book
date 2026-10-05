@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { enrollStudents } from "./course-enrollment.ts";
 import {
   phases,
   rubricVersion,
@@ -354,12 +355,19 @@ export function updateAdministration(
         ? importInstitutionalStudents(course, body.students)
         : parseStudents(body.students);
     const updates = new Map(imported.map((s) => [s.id, s]));
-    next.students = validateRoster([
-      ...course.students.map((s) => ({ ...s, ...updates.get(s.id) })),
-      ...imported.filter(
-        (s) => !course.students.some((old) => old.id === s.id),
+    next.students = validateRoster(
+      enrollStudents(
+        course,
+        [
+          ...course.students.map((s) => ({ ...s, ...updates.get(s.id) })),
+          ...imported.filter(
+            (s) => !course.students.some((old) => old.id === s.id),
+          ),
+        ],
+        records,
+        now,
       ),
-    ]);
+    );
   } else if (section === "groups") {
     requireThat(
       course.phases[phase].formation ||
@@ -459,10 +467,15 @@ export function updateLegacySetup(
 ): Course {
   const next = structuredClone(course);
   next.students = validateRoster(
-    parseStudents(body.students).map((student) => ({
-      ...course.students.find((s) => s.id === student.id),
-      ...student,
-    })),
+    enrollStudents(
+      course,
+      parseStudents(body.students).map((student) => ({
+        ...course.students.find((s) => s.id === student.id),
+        ...student,
+      })),
+      records,
+      now,
+    ),
   );
   settings(next, { ...body, rubric: body.rubric ?? course.rubric }, actor);
   const configurations = obj(body.phases);

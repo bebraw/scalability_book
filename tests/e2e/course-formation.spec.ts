@@ -141,6 +141,81 @@ test("students confirm a pair; teacher completes a trio, approves a fourth membe
     .getByRole("button", { name: "Publish approved groups", exact: true })
     .click();
   await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await page.getByRole("button", { name: "Students", exact: true }).click();
+  await roster
+    .getByRole("textbox", { name: "Roster CSV", exact: true })
+    .fill(
+      "student_number,name,github_id,github_login\nTEST7,Hector Example,9,student9",
+    );
+  await roster
+    .getByRole("textbox", { name: "Reason for change", exact: true })
+    .fill("Late synthetic enrollment after group publication");
+  await roster
+    .getByRole("button", { name: "Save roster", exact: true })
+    .click();
+  await expect(page.getByRole("table")).toContainText(
+    "Late arrival · catch-up required",
+  );
+  await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: "Record catch-up for Hector Example",
+      exact: true,
+    })
+    .click();
+  const catchUp = page.locator('form[data-form="enrollment"]');
+  await expect(
+    catchUp.getByRole("checkbox", { name: "Late arrival", exact: true }),
+  ).toBeChecked();
+  await catchUp
+    .getByRole("textbox", {
+      name: "Agreed catch-up arrangement (visible to this student)",
+      exact: true,
+    })
+    .fill(
+      "Agree group allocation with staff and complete the missed lecture activities by the evidence deadline.",
+    );
+  await catchUp
+    .getByRole("textbox", {
+      name: "Enrollment arrangement reason (private to staff)",
+      exact: true,
+    })
+    .fill("PRIVATE late-arrival instructor note");
+  await catchUp
+    .getByRole("button", { name: "Save enrollment arrangement", exact: true })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await expect(page.getByRole("table")).toContainText(
+    "Late arrival · catch-up recorded",
+  );
+  await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await expect(page.locator("[data-course-content]")).not.toContainText(
+    "Catch-up arrangements required",
+  );
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "Hector Example",
+  );
+  await page
+    .getByRole("button", { name: "Allocate groups", exact: true })
+    .click();
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "1 students awaiting allocation",
+  );
+  const lateContext = await browser.newContext({
+    extraHTTPHeaders: { "x-course-test-user": "9" },
+  });
+  const lateStudent = await lateContext.newPage();
+  await lateStudent.goto(`/course/?course=${id}`);
+  await expect(lateStudent.locator("[data-course-content]")).toContainText(
+    "My catch-up arrangement",
+  );
+  await expect(lateStudent.locator("[data-course-content]")).toContainText(
+    "complete the missed lecture activities",
+  );
+  await expect(lateStudent.locator("[data-course-content]")).not.toContainText(
+    "PRIVATE",
+  );
+  await lateContext.close();
   await alice!
     .getByRole("button", { name: "Refresh records", exact: true })
     .click();
@@ -152,6 +227,9 @@ test("students confirm a pair; teacher completes a trio, approves a fourth membe
   );
   await expect(alice!.locator("[data-course-content]")).not.toContainText(
     "PRIVATE",
+  );
+  await expect(alice!.locator("[data-course-content]")).not.toContainText(
+    "complete the missed lecture activities",
   );
   const agreement = alice!.locator('form[data-form="working-agreement"]');
   await agreement

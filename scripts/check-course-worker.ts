@@ -230,6 +230,22 @@ config = await call(`/${id}/students`, "PUT", {
   reason: "Synthetic email enrollment",
 });
 const emailStudent = config.value.students.find((s) => s.number === "T003")!;
+assert.ok(emailStudent.enrollment?.enrolledAt);
+assert.equal(
+  emailStudent.enrollment.lateAt,
+  emailStudent.enrollment.enrolledAt,
+);
+const enrollmentView = await call<{ administration: AdministrationRevisions }>(
+  `/${id}`,
+);
+config = await call(`/${id}/enrollment`, "PUT", {
+  expected: enrollmentView.administration.students,
+  student: emailStudent.id,
+  late: true,
+  catchUp:
+    "Synthetic catch-up plan: agree the future-phase allocation and complete missed individual activities.",
+  reason: "PRIVATE synthetic enrollment reason",
+});
 const token = crypto.randomUUID().replaceAll("-", "") + "01234567890";
 const expires = new Date(Date.now() + 900_000).toISOString();
 assert.match(id, /^[a-f0-9-]{36}$/);
@@ -265,14 +281,20 @@ const verify = (credential: string) =>
 const signed = await verify(token);
 assert.equal(signed.status, 200, await signed.clone().text());
 const emailCookie = signed.headers.get("set-cookie")!.split(";")[0]!;
-const emailView = await call<{ staff: boolean; user: { id: string } }>(
-  `/${id}`,
-  "GET",
-  undefined,
-  emailCookie,
-);
+const emailView = await call<{
+  config: Envelope<Course>;
+  staff: boolean;
+  user: { id: string };
+}>(`/${id}`, "GET", undefined, emailCookie);
 assert.equal(emailView.staff, false);
 assert.equal(emailView.user.id, emailStudent.id);
+assert.equal(
+  emailView.config.value.students.find((s) => s.id === emailStudent.id)!
+    .enrollment!.catchUp,
+  config.value.students.find((s) => s.id === emailStudent.id)!.enrollment!
+    .catchUp,
+);
+assert.equal(JSON.stringify(emailView).includes("PRIVATE"), false);
 assert.equal((await verify(token)).status, 400);
 let formationView = await call<{
   config: Envelope<Course>;
@@ -339,6 +361,11 @@ const otherView = await call<{ config: Envelope<Course> }>(
   student,
 );
 assert.equal(JSON.stringify(otherView).includes("PRIVATE"), false);
+assert.equal(
+  otherView.config.value.students.find((s) => s.id === emailStudent.id)!
+    .enrollment,
+  undefined,
+);
 assert.equal(otherView.config.value.phases.challenge.groups.length, 0);
 formationView = await call(`/${id}`);
 await call(`/${id}/schedule/challenge`, "PUT", {
@@ -408,5 +435,5 @@ assert.equal(
   401,
 );
 console.log(
-  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment, consent/publication and private matching, working agreement, guarded history, streamed R2 files, immutable snapshots and access isolation.",
+  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment and private catch-up, consent/publication and private matching, working agreement, guarded history, streamed R2 files, immutable snapshots and access isolation.",
 );

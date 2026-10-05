@@ -32,6 +32,8 @@ Send meeting availability and relevant support constraints privately to the inst
 Agree briefly on availability, communication and handling missed commitments.
 This working agreement helps the group operate and is not an additional graded deliverable.
 Contact the instructor for a late-arrival catch-up arrangement or withdrawal; neither should erase submitted work or silently waive passing requirements.
+Your recorded catch-up plan appears privately in **My progress** in the course workspace.
+It does not change deadlines or passing requirements unless the instructor separately records an approved arrangement.
 
 Keep the group stable across Establish, Challenge, and Compare where practical; agree membership changes with the teaching staff and record which group each student belongs to for the affected phase.
 One member submits the group bundle on behalf of the registered group, and every member remains responsible for understanding and accepting its work.

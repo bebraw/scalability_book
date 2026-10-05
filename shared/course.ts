@@ -50,6 +50,13 @@ export interface Student {
   firstName?: string;
   lastName?: string;
   email?: string;
+  enrollment?: Enrollment;
+}
+export interface Enrollment {
+  enrolledAt: string | null;
+  lateAt: string | null;
+  catchUp: string;
+  reason: string;
 }
 export interface Group {
   id: string;

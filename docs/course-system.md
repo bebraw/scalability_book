@@ -11,7 +11,8 @@ This guide describes the course workspace with four focused administration forms
 The [ADRs](adrs/README.md) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
 Institutional imports, corrections, account activity and the magic-link flow work with local mock mail and a gated Cloudflare mail adapter.
 Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
-Production email provisioning, recorded late-arrival catch-up/withdrawal workflows, phase checklists and teacher simulation remain pending.
+Late arrivals have recorded catch-up plans and review tasks.
+Production email provisioning, withdrawal workflows, phase checklists and teacher simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -31,6 +32,7 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
   Duplicate identities, student IDs, emails and optional GitHub logins are rejected before saving.
   **Add or correct one student** handles later individual enrollment and identifier corrections.
   The roster shows whether email access is ready and the last successful email sign-in.
+  **Late arrivals and catch-up arrangements** records a private plan for an enrolled student.
 - **Groups** allocates students for the selected phase and lists those awaiting allocation.
   Open the proposal period, review confirmations and private matching notes, save the allocation, then publish approved groups.
   Add group cards and select their members.
@@ -39,7 +41,7 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
 - **Phase administration** edits only the selected phase's deadlines and audit assignments.
 - **Course settings** edits the run name and staff access and displays the retained published rubric.
 
-The review queue links students awaiting allocation and incomplete audit arrangements to the relevant workflow.
+The review queue links students awaiting allocation, missing catch-up plans and incomplete audit arrangements to the relevant workflow.
 Course creation, roster import and group allocation are separate operations.
 The local instructor identity is `github:1` / `local-editor`.
 Data persists in `.local/course.sqlite` and `.local/course-files/`; restarting the server preserves it.
@@ -101,6 +103,27 @@ The inbox is staff-only, retains the latest 1,000 messages locally, and is unava
 The deployed request route reports that email is not configured until both the `COURSE_MAIL` binding and `COURSE_EMAIL_ENABLED: "true"` are present; it never uses the local mock inbox as a fallback.
 This local flow is not yet the isolated teacher simulation in ADR-007.
 
+## Late arrivals and catch-up
+
+New students receive a recorded enrollment timestamp.
+They are flagged as late when imported after a formation deadline or publication, after any implementation has frozen, or after the Establish implementation deadline.
+They remain in the selected phase's unassigned queue until staff allocate them.
+Existing identities keep their enrollment metadata through roster corrections; historical rosters without an arrival timestamp retain an unknown date.
+
+The review queue lists late arrivals without a recorded plan.
+Select **Record catch-up for …** to open that student's arrangement in **Students**, agree the plan with the student, and save it with a private staff reason.
+The roster's **Catch-up arrangement** action opens the same form.
+Staff can also mark an earlier late arrival or correct that flag with a reason.
+An empty plan leaves a late arrival in the review queue.
+Successful saves retain the prior course snapshot, actor, timestamp and reason; stale roster/arrangement edits conflict and preserve the browser's text.
+Settings and group changes use their separate administration fingerprints.
+
+The student sees their plan in **My progress**.
+Other students cannot read enrollment dates, the late-arrival flag or catch-up plans; staff reasons remain private even from the affected student's view.
+Recording a plan does not alter groups, deadlines, frozen evidence, assessment freshness or passing requirements.
+Allocate students in an unfrozen phase and record any approved replacement activity separately in the gradebook.
+Withdrawals and their institutional grade-export handling still await the decision recorded in ADR-004.
+
 ## Instructor group allocation
 
 In **Groups**, set the formation deadline and the end of its correction window, and select **Open group formation**.
@@ -142,7 +165,7 @@ Clear audit assignments before removing an unused group.
 Groups with saved submissions, audits or assessments cannot be removed.
 Approved members can save a short shared working agreement in the student Groups view.
 Agreement revisions use the course store/history, are private to the group and staff, and contribute no rubric points.
-Late imports reach the unassigned queue; dedicated recorded catch-up arrangements and withdrawal actions remain pending in ADR-004.
+Late imports reach the unassigned queue and the [catch-up workflow](#late-arrivals-and-catch-up); withdrawal actions remain pending in ADR-004.
 The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
 With only one group or a missing frozen implementation, staff arrange and record a fallback audit.
@@ -313,6 +336,7 @@ npm run validate
 The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
 The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
 Formation browser/API checks cover a confirmed pair completed into a trio, a fourth-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, private read/write responses, publication/access separation, working agreements, mobile/accessibility and later-phase transfers retaining frozen work and grade history.
+Catch-up checks cover automatic late-arrival flags after publication/frozen work, the staff review task, private student plans, incremental corrections, stale/unauthorized saves, unknown historical dates and unchanged frozen evidence, grades and passing requirements.
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 The mail tests exercise the actual Worker adapter with a mocked Cloudflare binding, checking the enablement boundary, `waitUntil`, pending-link safety, provider failures, fixed sender, escaped templates and absence of a deployed mock inbox.
 They do not send real email.
@@ -327,7 +351,7 @@ npx wrangler dev --config wrangler.course.jsonc --local --ip 127.0.0.1 --port 87
 In another terminal, run `node scripts/check-course-worker.ts`.
 The credential above is a public test-only value for the loopback instance; it must never be used for a deployed session secret.
 The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
-It also imports a synthetic institutional student, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
+It also imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
 Stop the local Worker afterwards.
 The local configuration deliberately matches the pinned book runtime's compatibility date; upgrade the runtime and both configurations together.

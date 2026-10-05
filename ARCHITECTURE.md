@@ -40,6 +40,11 @@ Phase formation state lives in the course snapshot, with history and atomic cour
 Staff Groups fingerprints cover allocation and formation responses; student actions also check their own preference/proposal revision.
 Working agreements are separate ungraded records, private to their group and staff.
 
+Enrollment arrangements enter through staff-only `/api/courses/:course/enrollment` and the Students/review-queue interface.
+`shared/course-enrollment.ts` owns enrollment projection and pending catch-up tasks; `worker/course-enrollment.ts` records new arrivals and validates staff plans; `site/scripts/course-enrollment.ts` renders the workflow.
+Enrollment metadata lives on the student's stable course identity in the course snapshot, guarded by the Students fingerprint and final whole-record revision check.
+Students receive only their own plan and dates, with the staff reason removed; enrollment arrangements do not change grading or frozen membership.
+
 ## State and access
 
 | Data                                   | Local storage                       | Production storage                      |
@@ -95,7 +100,7 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication and working agreements are implemented; recorded late-arrival catch-up and withdrawal tasks remain.
+- [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication, working agreements and recorded late-arrival catch-up are implemented; withdrawal tasks and their institutional export handling remain.
 - [Submission expectations](docs/adrs/accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md): small reproducible bundles and clear phase requirements.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration is implemented; domain setup, verified Gmail forwarding, live delivery verification and the teacher simulation's mock-mail boundary remain outstanding.
 - [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated mock workflows in both the instructor website and local development.

@@ -85,7 +85,13 @@ Student mutation responses acknowledge a save without exposing the private cours
 API/browser checks cover a confirmed pair completed into a trio, a four-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, privacy, publication/access separation, working agreements and retained frozen evidence/grades after transfers.
 The [project introduction](../../../specifications/00_introduction.md#shared-work-and-individual-assessment) and [operating guide](../../course-system.md#instructor-group-allocation) describe the workflow.
 
-This ADR remains Accepted: later imports reach the unassigned queue, but dedicated catch-up arrangements, withdrawal actions and their review tasks remain outstanding.
+New arrivals after formation or frozen work have recorded enrollment dates and a late-arrival flag, enter the unassigned queue, and receive a staff review task until a catch-up plan is recorded.
+The instructor records the agreed plan with a private reason; the student sees only their own plan.
+Roster corrections retain this metadata, while unknown historical arrival dates remain unknown.
+API/browser checks verify late-arrival detection, review tasks, plan privacy, stale and unauthorized saves, retained history and unchanged frozen work, grades, deadlines and passing requirements.
+The [catch-up operating guide](../../course-system.md#late-arrivals-and-catch-up) describes the implemented workflow.
+
+This ADR remains Accepted: withdrawal actions and their review tasks remain outstanding.
 Withdrawal/export handling needs instructor confirmation before defining that action.
 
 ## Open questions
