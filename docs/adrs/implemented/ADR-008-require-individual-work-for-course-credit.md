@@ -77,3 +77,8 @@ The [published grading contract](../../../specifications/grading.md), [shared ru
 [Course API tests](../../../tests/courses.test.ts) cover mandatory minima, pending/released results, and approved arrangements; the [course browser test](../../../tests/e2e/course-workspace.spec.ts) covers scoring, release, and CSV export.
 The [course-system guide](../../course-system.md) documents the current workflow.
 Implemented status describes repository behavior, not confirmation of production course bindings or an institutional grade integration.
+
+## Historical evidence
+
+- [2026-10-05: publish staged submissions and mandatory individual assessment](https://github.com/bebraw/scalability_book/commit/18adbaddc44a130aa06a4911316030760e771c54).
+- [2026-10-05: implement the rubric, gradebook, release checks, and export](https://github.com/bebraw/scalability_book/commit/e8e48c02766ace4525d6c645a285ec4a2f4c15d7).

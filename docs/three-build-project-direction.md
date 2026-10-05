@@ -2,6 +2,10 @@
 
 ## Status
 
+This is the historical direction note introduced during the July project redesign.
+The implemented comparison design is now recorded in [ADR-021](adrs/implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md); the current [Common Contract](../specifications/00_common_project.md) and phase briefs own the exact requirements and transfer rules.
+The follow-up list below preserves that planning context and is not a list of new commitments or proof that every operational assignment has been settled.
+
 This note records the intended direction for the course projects.
 It supersedes the earlier idea that groups would primarily extend, hand over, and later receive back one implementation.
 A first group-facing draft now lives in [`specifications/00_common_project.md`](../specifications/00_common_project.md) with phase overlays in the same folder.

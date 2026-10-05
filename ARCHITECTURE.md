@@ -8,14 +8,18 @@ The [ADR index](docs/adrs/README.md) distinguishes this baseline from accepted c
 The repository combines a course book, interactive learning material, reader feedback, and a course submission and assessment workspace.
 It uses npm and the Node version range in [package.json](package.json).
 
-| Surface              | Entry point                                                                                                    | Responsibility                                                                                                        |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Static website       | [scripts/build-site.ts](scripts/build-site.ts), [site.config.jsonc](site.config.jsonc)                         | Render selected book chapters, appendices, case studies, course briefs, and interactive assets into `build/`.         |
-| Local development    | [scripts/dev-site.ts](scripts/dev-site.ts)                                                                     | Serve and rebuild local output, expose local editing, and adapt local persistence to the application APIs.            |
-| Deployed application | [worker/index.ts](worker/index.ts), [wrangler.jsonc](wrangler.jsonc)                                           | Serve static assets and authenticated APIs on Cloudflare Workers.                                                     |
-| Course domain        | [shared/course.ts](shared/course.ts), [worker/courses.ts](worker/courses.ts)                                   | Define course records and rubric calculations; enforce authorization, submission windows, revisions, and assessments. |
-| Course persistence   | [worker/course-store.ts](worker/course-store.ts), [scripts/lib/local-courses.ts](scripts/lib/local-courses.ts) | Provide record/history and file storage with production and local adapters.                                           |
-| Course interface     | [site/scripts/course.ts](site/scripts/course.ts)                                                               | Present student workflows at `/course/` and staff workflows at `/admin/courses/`.                                     |
+| Surface                      | Entry point                                                                                                      | Responsibility                                                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Static website               | [scripts/build-site.ts](scripts/build-site.ts), [site.config.jsonc](site.config.jsonc)                           | Render selected book chapters, appendices, case studies, course briefs, and interactive assets into `build/`.         |
+| Local development            | [scripts/dev-site.ts](scripts/dev-site.ts)                                                                       | Serve and rebuild local output, expose local editing, and adapt local persistence to the application APIs.            |
+| Deployed application         | [worker/index.ts](worker/index.ts), [wrangler.jsonc](wrangler.jsonc)                                             | Serve static assets and authenticated APIs on Cloudflare Workers.                                                     |
+| Course domain                | [shared/course.ts](shared/course.ts), [worker/courses.ts](worker/courses.ts)                                     | Define course records and rubric calculations; enforce authorization, submission windows, revisions, and assessments. |
+| Course persistence           | [worker/course-store.ts](worker/course-store.ts), [scripts/lib/local-courses.ts](scripts/lib/local-courses.ts)   | Provide record/history and file storage with production and local adapters.                                           |
+| Course interface             | [site/scripts/course.ts](site/scripts/course.ts)                                                                 | Present student workflows at `/course/` and staff workflows at `/admin/courses/`.                                     |
+| Formative exercises          | [shared/exercises.ts](shared/exercises.ts), [worker/learning.ts](worker/learning.ts)                             | Render versioned canonical questions and privately persist checked answers independently of course grades.            |
+| Concepts and agent resources | [scripts/lib/concept-export.ts](scripts/lib/concept-export.ts), [shared/explorations.ts](shared/explorations.ts) | Publish authored concept connections, visuals, and optional activity resources for readers and external agents.       |
+| Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                              | Build pinned public learning bundles without hosting the authoring service.                                           |
+| Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
 Runtime adapters depend on shared domain contracts, while shared domain calculations remain independent of browser rendering and storage providers.
@@ -23,12 +27,12 @@ New course capabilities should preserve this direction and use the same domain r
 
 ## State and access
 
-| Data                                   | Local storage                 | Production storage                      |
-| -------------------------------------- | ----------------------------- | --------------------------------------- |
-| Course records and revision history    | `.local/course.sqlite`        | Dedicated `COURSE_DB` D1 binding        |
-| Course source archives and attachments | `.local/course-files/`        | Private `COURSE_FILES` R2 binding       |
-| Reader feedback                        | `.local/comments.json`        | `COMMENTS_KV`                           |
-| Chapter exercise answers               | Separate local answer storage | Separate optional `LEARNING_DB` binding |
+| Data                                   | Local storage                       | Production storage                      |
+| -------------------------------------- | ----------------------------------- | --------------------------------------- |
+| Course records and revision history    | `.local/course.sqlite`              | Dedicated `COURSE_DB` D1 binding        |
+| Course source archives and attachments | `.local/course-files/`              | Private `COURSE_FILES` R2 binding       |
+| Reader feedback                        | `.local/comments.json`              | `COMMENTS_KV`                           |
+| Chapter exercise answers               | `.local/learning.sqlite` by default | Separate optional `LEARNING_DB` binding |
 
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
@@ -45,20 +49,28 @@ The existing [grading decision](docs/adrs/implemented/ADR-008-require-individual
 
 ## Documentation ownership
 
-| Document                                                         | Owns                                                                       |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [README.md](README.md)                                           | Discovery and common entry points                                          |
-| This file                                                        | Current system composition and global boundaries                           |
-| [AGENTS.md](AGENTS.md)                                           | Concise navigation and development expectations for coding agents          |
-| [docs/development.md](docs/development.md)                       | Commands, generated output, and verification                               |
-| [docs/course-system.md](docs/course-system.md)                   | Implemented course behavior and operating instructions                     |
-| [docs/adrs/](docs/adrs/README.md)                                | Decision rationale, alternatives, accepted future constraints, and history |
-| [specifications/](specifications/README.md)                      | Published student project and assessment contracts                         |
-| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc) | Reading content and its published organization                             |
+| Document                                                                                                                     | Owns                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [README.md](README.md)                                                                                                       | Discovery and common entry points                                                 |
+| This file                                                                                                                    | Current system composition and global boundaries                                  |
+| [AGENTS.md](AGENTS.md)                                                                                                       | Concise navigation and development expectations for coding agents                 |
+| [docs/development.md](docs/development.md)                                                                                   | Commands, generated output, and verification                                      |
+| [docs/course-system.md](docs/course-system.md)                                                                               | Implemented course behavior and operating instructions                            |
+| [docs/adrs/](docs/adrs/README.md)                                                                                            | Decision rationale, alternatives, accepted future constraints, and history        |
+| [specifications/](specifications/README.md)                                                                                  | Published student project and assessment contracts                                |
+| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc)                                                             | Reading content and its published organization                                    |
+| [docs/chapter-exercises.md](docs/chapter-exercises.md), [docs/agent-learning-resources.md](docs/agent-learning-resources.md) | Formative exercise, concept discovery, and external-agent resource contracts      |
+| [study/README.md](study/README.md), [slides/README.md](slides/README.md)                                                     | Versioned self-study and lecture sources, export behavior, and publication limits |
 
 Keep each fact in its owning document and link to it from other entry points.
 Update behavior documentation and the student-facing contract together when a course change affects both.
 ADRs explain the reason for a decision; they do not replace setup instructions or duplicate entire phase briefs.
+
+## Recovered historical decisions
+
+The [retrospective ADRs](docs/adrs/README.md#retrospective-records) explain the publishing pipeline, rendering trust boundary, feedback privacy, local preview lifecycle, typed demos, learning resources, portable editions, course comparison design, evidence protocols, and prose review.
+Each links historical commits and current implementation evidence.
+Their implemented status identifies repository behavior or published course contracts, with operational limits stated in the record.
 
 ## Accepted course revision
 

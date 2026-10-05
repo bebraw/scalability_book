@@ -70,3 +70,11 @@ The [project introduction](../../../specifications/00_introduction.md) precedes 
 The consolidated [Temper](../../../case-studies/temper.md), revised [Kirjolab](../../../case-studies/kirjolab.md), and revised [Slideotter](../../../case-studies/slideotter.md) records establish the case-study changes.
 The book's own case study is absent from the publication list.
 Future moves should verify links and rendered publication order with the site build and validation commands.
+
+## Historical evidence
+
+- [2026-10-05: move supporting procedures from core chapters](https://github.com/bebraw/scalability_book/commit/4eff45945f15f274bc7e86f7b06152474aff3b7e).
+- [2026-10-05: relocate Navigator](https://github.com/bebraw/scalability_book/commit/530e6c6ea2f2f461052e7bc17047d642ad7d691d) and [the CAP proof/lab](https://github.com/bebraw/scalability_book/commit/25d7daaeb4d35bd1274f03e14ca9a2f7d820a919).
+- [2026-10-05: centralize course guidelines](https://github.com/bebraw/scalability_book/commit/7afd87b0c9b6ea4dbe14385b6a22efd5eda1ade5).
+- [2026-10-05: consolidate Datadog evidence in Temper](https://github.com/bebraw/scalability_book/commit/04a10272075cedaf904bdb7cc88f67e7b01ef0b7).
+- [2026-10-05: sharpen cases and remove the book retrospective](https://github.com/bebraw/scalability_book/commit/9dde48ff98455e24769627c2e4aefca89333d08f).

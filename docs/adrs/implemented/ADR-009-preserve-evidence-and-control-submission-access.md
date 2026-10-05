@@ -74,6 +74,11 @@ The [course API](../../../worker/courses.ts), [storage/history adapters](../../.
 The [project introduction](../../../specifications/00_introduction.md) and [course-system guide](../../course-system.md) explain the student and staff workflows.
 Implemented status does not mean production storage has been provisioned.
 
+## Historical evidence
+
+- [2026-10-05: define staged submission and class-access policy](https://github.com/bebraw/scalability_book/commit/18adbaddc44a130aa06a4911316030760e771c54).
+- [2026-10-05: implement storage history, guarded access, and frozen assessment records](https://github.com/bebraw/scalability_book/commit/e8e48c02766ace4525d6c645a285ec4a2f4c15d7).
+
 ## References
 
 - [ADR-004: future group formation and membership changes](../accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md).

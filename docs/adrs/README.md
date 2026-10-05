@@ -24,6 +24,17 @@ Never reuse or renumber an assigned ID.
 Dates identify when a record was written or accepted.
 The initial records dated 2026-10-05 capture earlier discussion; their implementation evidence distinguishes existing behavior from planned work.
 
+## Retrospective records
+
+ADRs 011–024 recover significant prior work from version history and current contracts.
+Their date is the recording date, and each names its historical introduction and links the supporting commits.
+They document the implemented outcome rather than invent an earlier formal approval event.
+Unless an original source explicitly discusses alternatives, the alternatives and trade-offs are retrospective analysis of the chosen design, not a claim about conversations that Git cannot establish.
+Implemented status may describe a published course protocol or software capability; it does not establish production provisioning, a completed course run, or external-client compliance.
+
+Related historical notes remain available as rationale.
+Current behavior belongs in the owning contract and operating guide; old follow-up lists do not independently authorize or require new features.
+
 ## Proposed
 
 | ADR                                     | Summary                                    |
@@ -43,18 +54,32 @@ The initial records dated 2026-10-05 capture earlier discussion; their implement
 
 ## Implemented
 
-| ADR                                                                               | Summary                                                                                                |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| [ADR-001](implemented/ADR-001-record-decisions-and-retain-development-context.md) | Adopt the ADR lifecycle, clear documentation ownership, and focused verification.                      |
-| [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)       | Require individual participation and assessments alongside shared project scores.                      |
-| [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md) | Preserve assessment evidence and history; stage class access while keeping individual records private. |
-| [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                      | Keep course policies, optional depth, and supporting case studies outside the main reading argument.   |
+| ADR                                                                                                | Summary                                                                                                |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [ADR-001](implemented/ADR-001-record-decisions-and-retain-development-context.md)                  | Adopt the ADR lifecycle, clear documentation ownership, and focused verification.                      |
+| [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)                        | Require individual participation and assessments alongside shared project scores.                      |
+| [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md)                  | Preserve assessment evidence and history; stage class access while keeping individual records private. |
+| [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                                       | Keep course policies, optional depth, and supporting case studies outside the main reading argument.   |
+| [ADR-011](implemented/ADR-011-publish-markdown-through-a-static-worker-site.md)                    | Publish repository Markdown through a static site with Worker application APIs.                        |
+| [ADR-012](implemented/ADR-012-use-scholarmark-with-trusted-host-extensions.md)                     | Use ScholarMark semantics and sanitization with explicit trusted host extensions.                      |
+| [ADR-013](implemented/ADR-013-keep-reader-feedback-private-and-sync-moderation-explicitly.md)      | Keep reader feedback private and synchronize moderation through explicit commands.                     |
+| [ADR-014](implemented/ADR-014-isolate-and-atomically-rebuild-local-previews.md)                    | Isolate draft previews, preserve complete builds, and recover interrupted swaps.                       |
+| [ADR-015](implemented/ADR-015-use-typed-client-modules-and-load-demos-on-demand.md)                | Use typed browser modules, scoped demo loading, and compatibility checks.                              |
+| [ADR-016](implemented/ADR-016-version-formative-exercises-and-save-private-answers.md)             | Version canonical formative questions and keep saved answers private and separate from grading.        |
+| [ADR-017](implemented/ADR-017-export-an-authored-concept-graph-for-reader-agents.md)               | Publish authored concept navigation and read-only resources for students' own agents.                  |
+| [ADR-018](implemented/ADR-018-offer-optional-agent-explorations-with-separate-worked-reasoning.md) | Offer task-based optional explorations, prediction-led guidance, and separate worked reasoning.        |
+| [ADR-019](implemented/ADR-019-publish-self-study-through-a-pinned-public-exporter.md)              | Build public self-study modules through a pinned exporter without hosting its authoring service.       |
+| [ADR-020](implemented/ADR-020-generate-reading-and-lecture-pdfs-from-versioned-sources.md)         | Regenerate portable reading and lecture artifacts from reviewed sources.                               |
+| [ADR-021](implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)             | Compare fresh local-model, comparison-model, and fleet builds of a stable application brief.           |
+| [ADR-022](implemented/ADR-022-use-a-shared-runtime-protocol-and-bounded-pressure-experiments.md)   | Use a shared measurement protocol and bounded, cumulative pressure experiments.                        |
+| [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)               | Test setup and change friction through equivalent, time-bounded cross-team audits.                     |
+| [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)          | Keep prose changes inspectable and derive publication dates from complete source history.              |
 
 ## Authoring and maintenance
 
 1. Read the owning contract and relevant existing ADRs before drafting a lasting decision.
 2. Copy [ADR-000](proposed/ADR-000-template.md) to `proposed/ADR-NNN-short-title.md`, using the next unused sequential ID.
-   The next ID after this initial set is **ADR-011**.
+   Find the highest assigned ID across all lifecycle directories rather than keeping a separate next-ID counter.
 3. Describe the concrete problem, decision, trigger, consequences, and credible alternatives.
    Separate agreed constraints from unresolved implementation questions.
 4. Move an approved decision to `accepted/` and update the index.
