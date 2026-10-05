@@ -43,20 +43,20 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-| ADR                                                                               | Summary                                                                                              |
-| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| [ADR-002](accepted/ADR-002-separate-course-administration-workflows.md)           | Separate students, groups, phase administration, and course settings.                                |
-| [ADR-003](accepted/ADR-003-import-students-and-use-email-magic-links.md)          | Import institutional rosters, allow later additions, and use email magic links without registration. |
-| [ADR-004](accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md) | Combine student proposals with instructor allocation; target three members and allow up to four.     |
-| [ADR-005](accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md)   | Submit minimal reproducible source and display the common and phase-specific requirements.           |
-| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md)                    | Send course login mail through Cloudflare and forward incoming mail to Gmail.                        |
-| [ADR-007](accepted/ADR-007-provide-an-isolated-teacher-simulation.md)             | Exercise real workflows using isolated mock students in the website and local development.           |
+| ADR                                                                               | Summary                                                                                          |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [ADR-002](accepted/ADR-002-separate-course-administration-workflows.md)           | Separate students, groups, phase administration, and course settings.                            |
+| [ADR-004](accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md) | Combine student proposals with instructor allocation; target three members and allow up to four. |
+| [ADR-005](accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md)   | Submit minimal reproducible source and display the common and phase-specific requirements.       |
+| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md)                    | Send course login mail through Cloudflare and forward incoming mail to Gmail.                    |
+| [ADR-007](accepted/ADR-007-provide-an-isolated-teacher-simulation.md)             | Exercise real workflows using isolated mock students in the website and local development.       |
 
 ## Implemented
 
 | ADR                                                                                                | Summary                                                                                                |
 | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | [ADR-001](implemented/ADR-001-record-decisions-and-retain-development-context.md)                  | Adopt the ADR lifecycle, clear documentation ownership, and focused verification.                      |
+| [ADR-003](implemented/ADR-003-import-students-and-use-email-magic-links.md)                        | Import institutional rosters, preserve record ownership and use course-scoped email sessions.          |
 | [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)                        | Require individual participation and assessments alongside shared project scores.                      |
 | [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md)                  | Preserve assessment evidence and history; stage class access while keeping individual records private. |
 | [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                                       | Keep course policies, optional depth, and supporting case studies outside the main reading argument.   |

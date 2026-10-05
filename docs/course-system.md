@@ -9,8 +9,8 @@ Book feedback moderators do not automatically have access to course records.
 
 This guide describes the course workspace with four focused administration forms, institutional enrollment and email sessions, and retained GitHub staff access.
 The [accepted ADRs](adrs/README.md#accepted) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
-Institutional imports, corrections, account activity and the magic-link flow work with local mock mail.
-Production email delivery, student group proposals and approvals, phase checklists and teacher simulation remain pending.
+Institutional imports, corrections, account activity and the magic-link flow work with local mock mail and a gated Cloudflare mail adapter.
+Production email provisioning, student group proposals and approvals, phase checklists and teacher simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -96,7 +96,7 @@ Auth records live in dedicated tables from `course-migrations/0002_course_auth.s
 Local development always uses mock mail.
 Request a link in the anonymous browser, then use **Open local mock inbox** from the instructor's Students view and follow its link in that browser.
 The inbox is staff-only, retains the latest 1,000 messages locally, and is unavailable in the production Worker.
-The deployed request route reports that email is not configured until the production adapter in ADR-006 is enabled; it never uses the local mock inbox as a fallback.
+The deployed request route reports that email is not configured until both the `COURSE_MAIL` binding and `COURSE_EMAIL_ENABLED: "true"` are present; it never uses the local mock inbox as a fallback.
 This local flow is not yet the isolated teacher simulation in ADR-007.
 
 ## Instructor group allocation
@@ -209,8 +209,60 @@ The book can still deploy without course bindings, in which case the course API 
 Keep R2 public access disabled.
 Choose the institution's required storage location, retention and backup arrangements before collecting student records.
 Back up the D1 database and R2 bucket together; grade CSV exports alone do not preserve portfolios, source archives or assessment history.
-Production email delivery still needs ADR-006 and verified sender configuration.
+Production email delivery needs the separate mail setup below.
 Automatic repository cloning, AI grading, self-enrollment and institutional single sign-on are not included.
+
+### Course mail setup
+
+`worker/course-mail.ts` uses the native Cloudflare Email Sending binding with a fixed sender and reply-to of `info@scalableweb.dev`.
+Messages contain plain text and escaped HTML, the course name, an explicit confirmation instruction and UTC expiry.
+The transport accepts only sign-in links for `https://scalableweb.dev/course/`.
+No SMTP password or Email Sending API token is needed by the Worker.
+Application logs contain a `course_login_delivery_failed` event and course ID on failure, without the address, credential or provider error body.
+Cloudflare accepting a send is not proof that it arrived in the student's inbox; use the provider's email logs for delivery/bounce diagnosis.
+
+The read-only account check on 2026-10-05 did not list `scalableweb.dev` as an enabled sending domain.
+The Gmail forwarding destination has not yet been supplied or verified.
+No domain was onboarded, DNS changed, paid plan upgraded, real mail sent or Worker deployed by the implementation checks.
+
+Before live course access:
+
+1. Recheck [Email Sending availability and pricing](https://developers.cloudflare.com/email-service/platform/pricing/) for the selected account.
+   Sending to arbitrary institutional recipients requires Workers Paid; a successful send to a verified address alone does not establish that eligibility.
+   `npx wrangler email sending list` is a read-only domain inventory.
+2. Onboard `scalableweb.dev` under **Compute → Email Service → Email Sending** and review the provider's generated DNS records before applying them.
+   Verify sending MX/SPF on `cf-bounce`, sending DKIM and the domain's DMARC setup through the [domain configuration guide](https://developers.cloudflare.com/email-service/configuration/domains/).
+   Preserve any existing mail arrangements when reviewing DNS changes.
+3. Configure **Email Routing** separately: verify the instructor's existing Gmail destination, then create the exact rule `info@scalableweb.dev` → **Send to an email** → that verified destination.
+   Check Routing's own root-domain MX/SPF/DKIM records and the rule's active status.
+   Use the [routing-address guide](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/); a Worker email handler or catch-all rule is unnecessary for this forwarding arrangement.
+4. Add this binding to the production `wrangler.jsonc`, retaining the existing course and book bindings:
+
+   ```jsonc
+   "send_email": [{
+     "name": "COURSE_MAIL",
+     "allowed_sender_addresses": ["info@scalableweb.dev"]
+   }]
+   ```
+
+   Merge `COURSE_EMAIL_ENABLED: "true"` into the production `vars` only after domain setup is verified and a controlled delivery check is authorized.
+   For that first check, temporarily add `allowed_destination_addresses` containing only the instructor-controlled recipient and enroll that address in a test run.
+   The public request route still sends only to enrolled addresses.
+
+5. With explicit authorization to send the test message, request a link through the normal course sign-in form, inspect its sender and inbox delivery, confirm sign-in, and verify reuse rejection.
+   Test an incoming question to `info@scalableweb.dev` and confirm forwarding to Gmail.
+   Record results without saving a credential or full magic-link URL in reports.
+   Remove the temporary recipient restriction only when starting institutional delivery; retain the fixed sender restriction.
+
+Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploying the configuration if a sender or service problem occurs.
+Check enrollment/address corrections and Cloudflare delivery, bounce and suppression logs before asking a student to request another link.
+Requests remain bounded by the application limits above; there is no automatic retry or staff endpoint that reveals a production login credential.
+Forwarding does not provide branded human replies from Gmail; reply from the existing inbox unless a separate reply arrangement is agreed.
+The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks the remaining setup and simulation boundary.
+
+`wrangler.course.jsonc` includes a local-only email binding shape with delivery disabled for validation.
+Do not use `remote: true` for that binding or enable live email for development or teacher rehearsals.
+The application development server uses its own mock inbox independently of these production settings.
 
 ## Verification
 
@@ -224,6 +276,8 @@ npm run validate
 The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
 The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
+The mail tests exercise the actual Worker adapter with a mocked Cloudflare binding, checking the enablement boundary, `waitUntil`, pending-link safety, provider failures, fixed sender, escaped templates and absence of a deployed mock inbox.
+They do not send real email.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 

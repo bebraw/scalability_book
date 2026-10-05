@@ -65,14 +65,24 @@ Inbound forwarding and transactional sending are distinct Cloudflare services; r
 
 ## Implementation and verification
 
-There is no course email delivery or magic-link flow in the current application.
-Before production use, verify the domain and sender, configure forwarding to the verified Gmail destination, and exercise delivery to an instructor-controlled address under explicit send authorization.
-Then verify failures do not produce usable sessions or leak credentials.
-Record the actual bindings, secrets, DNS prerequisites, and support workflow in the course-system operating guide.
+The magic-link flow and `worker/course-mail.ts` implement native Cloudflare Email Sending through `COURSE_MAIL`, using the fixed sender and reply-to `info@scalableweb.dev`.
+Both the binding and `COURSE_EMAIL_ENABLED: "true"` are required to select this transport.
+Production configuration contains a commented sender-restricted binding example; the isolated local Worker configuration validates its shape with delivery disabled.
+Local application development uses the staff-only mock inbox and never selects production mail as a fallback.
+The teacher simulation's equivalent boundary remains dependent on ADR-007.
+
+Worker tests with a mocked binding verify `waitUntil` delivery, unusable pending links, activation after provider acceptance, discarded links on failure, fixed sender, plain text/escaped HTML and credential-free responses/logs.
+The typed build and Worker dry run check the pinned binding/runtime integration; no actual email is sent by these checks.
+
+This ADR remains Accepted because the full recorded decision includes the simulation mail boundary and external setup still outstanding.
+The 2026-10-05 read-only domain inventory did not show `scalableweb.dev` enabled for sending; the Gmail destination is not yet supplied or verified.
+Before production use, verify account eligibility, domain and sender, configure forwarding to the verified Gmail destination, and exercise delivery to an instructor-controlled address under explicit send authorization.
+The [course-system operating guide](../../course-system.md#course-mail-setup) records the binding/enablement, DNS prerequisites, controlled-delivery procedure and support workflow.
 
 ## Open questions
 
-- Confirm Cloudflare account eligibility and current Email Sending availability before building around a production binding.
+- Confirm account eligibility and onboard/verify `scalableweb.dev` before enabling production delivery; a test to a verified address alone does not establish arbitrary-recipient eligibility.
+- Supply and verify the Gmail destination, then perform the authorized outbound and incoming-forwarding checks.
 - Select a human-reply arrangement only if replies need to use `info@scalableweb.dev`; forwarding alone does not settle it.
 
 ## References
@@ -82,4 +92,4 @@ Record the actual bindings, secrets, DNS prerequisites, and support workflow in 
 - [Email Routing setup](https://developers.cloudflare.com/email-service/get-started/route-emails/).
 - [Cloudflare magic-link example](https://developers.cloudflare.com/email-service/examples/email-sending/magic-link/).
 - [Google's third-party sending change](https://support.google.com/mail/answer/17101213?hl=en).
-- [ADR-003: magic-link authentication](ADR-003-import-students-and-use-email-magic-links.md).
+- [ADR-003: magic-link authentication](../implemented/ADR-003-import-students-and-use-email-magic-links.md).

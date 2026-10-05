@@ -6,6 +6,7 @@ import { studyHeaders } from "../shared/study-headers.ts";
 import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
 import { d1CourseAuthStore } from "./course-auth-store.ts";
+import { cloudflareCourseMail } from "./course-mail.ts";
 import { d1CourseStore, r2FileStore } from "./course-store.ts";
 
 type Fetcher = {
@@ -51,6 +52,8 @@ type Env = {
   COURSE_ADMIN_GITHUB_LOGINS?: string;
   COURSE_DB?: CourseBindings["COURSE_DB"];
   COURSE_FILES?: CourseBindings["COURSE_FILES"];
+  COURSE_MAIL?: CourseBindings["COURSE_MAIL"];
+  COURSE_EMAIL_ENABLED?: string;
 };
 
 const immutableAssetPattern =
@@ -127,9 +130,14 @@ export default {
           : {}),
         ...(env.COURSE_FILES ? { files: r2FileStore(env.COURSE_FILES) } : {}),
       };
-      if (url.pathname.startsWith("/api/course-auth/"))
+      if (url.pathname.startsWith("/api/course-auth/")) {
+        const mail = cloudflareCourseMail(
+          env.COURSE_MAIL,
+          env.COURSE_EMAIL_ENABLED,
+        );
         return handleCourseAuth(request, {
           ...storage,
+          ...(mail ? { mail } : {}),
           githubUser,
           admins,
           githubLoginUrl: oauthConfigured(env)
@@ -140,6 +148,7 @@ export default {
             ? { defer: (task: Promise<void>) => ctx.waitUntil(task) }
             : {}),
         });
+      }
       return handleCourses(request, {
         ...storage,
         admins,

@@ -24,5 +24,14 @@
       "bucket_name": "scalability-book-course-files",
     },
   ],
+  // Native binding shape is checked here, but local login uses the app's mock
+  // inbox. Do not enable remote mail in development or teacher simulations.
+  "send_email": [
+    {
+      "name": "COURSE_MAIL",
+      "allowed_sender_addresses": ["info@scalableweb.dev"],
+    },
+  ],
+  "vars": { "COURSE_EMAIL_ENABLED": "false" },
   "observability": { "enabled": true },
 }

@@ -79,5 +79,5 @@ Update [course-system.md](../../course-system.md) when the new workflows exist.
 
 ## References
 
-- [ADR-003: enrollment and identity](ADR-003-import-students-and-use-email-magic-links.md).
+- [ADR-003: enrollment and identity](../implemented/ADR-003-import-students-and-use-email-magic-links.md).
 - [ADR-004: group formation](ADR-004-form-three-person-groups-with-instructor-oversight.md).

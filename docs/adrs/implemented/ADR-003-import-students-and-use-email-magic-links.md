@@ -1,6 +1,6 @@
 # ADR-003: Import students and use email magic links
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -79,8 +79,9 @@ Addresses can change; using them as record keys would complicate historical owne
 ## Implementation and verification
 
 Institutional CSV mapping, incremental imports, preview, manual additions/corrections, stable internal identities and the email token/session flow are implemented.
-The local server uses a staff-only mock inbox; the Worker has D1 auth and session adapters.
-Production mail wiring remains outstanding in ADR-006, so this ADR remains Accepted until that delivery boundary is integrated.
+The local server uses a staff-only mock inbox; the Worker has D1 auth/session adapters and a native Cloudflare mail adapter gated by its binding and an explicit enablement variable.
+Repository behavior is implemented and verified; this status does not establish production deployment or delivery.
+The domain, verified Gmail forwarding and instructor-authorized live delivery check remain operational dependencies in ADR-006.
 
 `worker/course-administration.ts` matches imports by institutional student ID within a run.
 Existing GitHub-keyed records retain their keys; new enrollments receive opaque UUID identities.
@@ -95,6 +96,7 @@ Staff authentication remains GitHub-based; an email session never receives staff
 Other students' institutional addresses and student IDs are redacted.
 
 API tests cover migration/record preservation, conflict rejection, privacy, concurrent reuse, exact expiry boundaries, session scope/logout, request limits and delivery failure.
+Worker mail tests cover deferred sending, pending-link rejection, successful activation, setup gating and credential-free failures using a mocked Cloudflare binding.
 The browser email flow covers column mapping, import preview, late enrollment, mock mail, first sign-in status, reuse rejection and correction.
 See [course-system.md](../../course-system.md#institutional-enrollment-and-sign-in) for the operating flow and migration procedure.
 
@@ -109,6 +111,6 @@ See [course-system.md](../../course-system.md#institutional-enrollment-and-sign-
 
 ## References
 
-- [ADR-006: course email delivery](ADR-006-use-cloudflare-for-course-email.md).
-- [ADR-007: simulation and mock email](ADR-007-provide-an-isolated-teacher-simulation.md).
+- [ADR-006: course email delivery](../accepted/ADR-006-use-cloudflare-for-course-email.md).
+- [ADR-007: simulation and mock email](../accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
 - [OWASP email verification guidance](https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html).
