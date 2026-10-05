@@ -103,8 +103,13 @@ Four preset tests verify both sizes, consent/allocation/privacy, late enrollment
 A second browser flow covers both presets and the teacher's stale-assessment review/release, followed by the student's failing requirement view.
 The local D1/R2 check exercises the larger grading preset and verifies frozen history/files and release/gates against actual bindings.
 
-This ADR remains Accepted: a complete teacher walkthrough from creation through grouping, source freezing, audit/portfolio submission, assessment and release still needs verification as one simulation browser flow; the withdrawal case remains outstanding.
-Verify pending or missing mandatory work prevents a passing grade in those scenarios.
+The [complete browser walkthrough](../../../tests/e2e/course-simulation-walkthrough.spec.ts) creates a course and imports six synthetic students, confirms a proposed trio, allocates/publishes both groups, retains their identifiers across phases, follows a mock magic link and saves a working agreement.
+It freezes actual archives, downloads assigned audit targets, submits reciprocal audits and private portfolios, attaches final technical evidence with Compare's frozen A/B references, records current assessments, releases all three phases and exports marked final grades through the shared interface.
+Release fails before assessment; one incomplete Challenge participation requirement produces grade 0 despite sufficient overall points, while the other five students pass.
+It checks retained frozen fields/audit revisions, individual privacy, mobile accessibility, no live request escape and delayed-save/refresh input protection.
+The interface captures form values before disabling controls and keeps replacement forms paused until the owning request finishes; selecting the current phase preserves unsaved input.
+
+This ADR remains Accepted: the withdrawal case is still outstanding.
 The withdrawal scenario depends on ADR-004's institutional handling decision.
 
 ## Implementation choices

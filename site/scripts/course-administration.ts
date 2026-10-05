@@ -104,12 +104,12 @@ function roster(source: string): Student[] {
 
 export function administrationPayload(
   form: HTMLFormElement,
+  values: FormData,
   course: Course,
   phase: Phase,
   section: AdministrationSection,
   revisions: AdministrationRevisions,
 ) {
-  const values = new FormData(form);
   const val = (key: string) => String(values.get(key) ?? "");
   const expected =
     section === "groups" || section === "schedule"

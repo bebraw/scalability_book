@@ -142,7 +142,8 @@ Published requirements are pinned by run; use [requirements/README.md](../requir
 The build rejects drift from the current archived requirement edition.
 Teacher simulation uses the shared interface with separate adapters and a persistent indicator; local records live in `.local/course-simulation/`.
 See [the simulation guide](course-system.md#teacher-simulation) for manual controls, scoped mock login/clock/reset, Worker resource markers and the dedicated local binding check.
-Compact/larger preparation and grading-review presets use versioned synthetic fixtures; see the guide for expected outcomes, interrupted preparation, and the remaining full walkthrough/withdrawal verification.
+Compact/larger preparation and grading-review presets use versioned synthetic fixtures; see the guide for expected outcomes, interrupted preparation, the complete three-phase teaching walkthrough and the remaining withdrawal scenario.
+Run `npx playwright test tests/e2e/course-simulation-walkthrough.spec.ts --project=chromium` to verify creation, grouping, all submission/audit/portfolio phases, assessment, release and marked final export through the instructor/student interface.
 
 ## Feedback Review
 

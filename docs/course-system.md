@@ -13,7 +13,7 @@ Institutional imports, corrections, account activity and the magic-link flow wor
 Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
 Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
-Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes; the complete teaching walkthrough and withdrawal scenario remain pending.
+Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes, plus a verified browser walkthrough of all three teaching phases.
 Production email provisioning and withdrawal workflows also remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
@@ -45,6 +45,8 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
 
 The review queue links students awaiting allocation, missing catch-up plans and incomplete audit arrangements to the relevant workflow.
 Course creation, roster import and group allocation are separate operations.
+Forms and navigation controls pause during a save or course refresh, preventing edits to a form that the response will replace.
+Selecting the current phase preserves the open form and its unsaved values.
 The local instructor identity is `github:1` / `local-editor`.
 Data persists in `.local/course.sqlite` and `.local/course-files/`; restarting the server preserves it.
 These records are separate from chapter exercise answers and reader feedback.
@@ -389,15 +391,11 @@ The default is **Course preparation** with 10 mock students; **Larger** supplies
 All emails use the reserved `.invalid` domain and all institutional numbers start with `SIM`.
 The names, evidence and scores are authored fixtures, never copied from a live course.
 
-| Scenario           | Starting state                                                                    | What to inspect                                                               |
-| ------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Course preparation | Roster imported; Establish formation open; one confirmed trio allocated privately | A confirmed four-person request needs instructor allocation and an exception. |
-
-A two-person invitation awaits the other student's consent.
-Remaining students request allocation with private matching notes.
-Group publication fails until everyone is assigned. |
-| Grading review | Three phases of frozen source, audit reports, technical responses, private portfolios and assessments; A/B released, C private | Late enrollment, explicit missing work, a stale assessment, and full project scores that still fail individual minima. |
-| Empty rehearsal | No courses or students | Walk through creation/import using the downloadable mock CSV and source in Teacher controls. |
+| Scenario           | Starting state                                                                                                                 | What to inspect                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Course preparation | Roster imported; Establish formation open; one confirmed trio allocated privately                                              | A four-person request needs allocation and an exception; a pair awaits consent; remaining students request allocation privately; publication requires everyone assigned. |
+| Grading review     | Three phases of frozen source, audit reports, technical responses, private portfolios and assessments; A/B released, C private | Late enrollment, explicit missing work, a stale assessment, and full project scores that still fail individual minima.                                                   |
+| Empty rehearsal    | No courses or students                                                                                                         | Walk through creation/import using the downloadable mock CSV and source in Teacher controls.                                                                             |
 
 Fixture edition `2026-10-v1` identifies the starting data and scenario construction.
 Restart regenerates identities/revisions but retains the edition's authored content, deadlines and expected outcomes.
@@ -458,7 +456,39 @@ The evidence index names actual fixture files and explicitly marks missing perfo
 6. Switch to Ben and confirm the released failing requirement is visible in **My course progress**; other students' individual evidence remains private.
    Return to instructor and export: every row is marked `Simulation`, Ben/Cora have grade 0, and the filename starts with `SIMULATION`.
 
-[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted: the complete teacher walkthrough from creation through audit/portfolio submission still needs verification as one simulation browser flow, and withdrawal behavior awaits ADR-004's institutional policy decision.
+### Complete teaching walkthrough
+
+Start **Empty rehearsal** to exercise the entire workflow from course creation.
+The [browser walkthrough](../tests/e2e/course-simulation-walkthrough.spec.ts) follows these steps using only synthetic fixtures; course mutations go through the visible forms.
+
+1. Download the mock roster and tiny source fixture from **Teacher controls**.
+   Create a course, import the first six students through **Students**, preview the additions, and save with a reason.
+2. Open Establish formation.
+   As Ada, propose a trio with Ben and Cora; switch to each invited student to confirm.
+   As instructor, allocate the confirmed proposal and a second trio of Dara, Eli and Finn, then publish.
+   Reuse those groups in Challenge and Compare, publish each phase, and fill circular audit assignments in **Phase administration**.
+3. Request Ada's mock email link and confirm it through the inbox.
+   Save the team's working agreement, then **Return to instructor**.
+4. Before each phase's implementation deadline, switch to Ada and Dara to upload and freeze each group's source, setup instructions, initial evidence and checklist.
+   Identify the fixture's limited scope and mark missing measurement evidence honestly.
+   Class access remains closed during the audit window.
+5. Advance the clock past implementation freeze but before the audit deadline.
+   As each group's representative, download the assigned team's frozen source and submit an audit.
+   As every student, submit a private portfolio with two complete live or equivalent remote lecture activities; leave Ben with only one in Challenge to inspect the mandatory minimum.
+6. Advance past the audit deadline but before final evidence closes.
+   Inspect **Class submissions** and the incoming audit, then attach final technical evidence and submit the response.
+   Compare should reference each group's earlier A/B frozen submissions.
+   The class catalogue exposes technical work, while peer feedback remains private.
+7. As instructor, attempt release before assessment and inspect the rejection.
+   Record current project and individual assessments, then release the phase with a reason.
+   Repeat steps 4–7 for all three phases, advancing the clock to each phase's windows.
+8. Export released grades and switch to Ben to inspect his failing requirement.
+   The automated walkthrough uses 12/30 project points and 18/21 individual points per phase, with 15/21 for Ben's Challenge portfolio.
+   Five students receive grade 1; Ben receives grade 0 despite exceeding the overall points threshold because Challenge has only one completed lecture activity.
+   Exports are marked `Simulation`; frozen archives, membership and audit target revisions remain intact.
+
+The browser flow also checks delayed-save/refresh behavior, mobile layout, accessibility and the absence of escaped live course/auth requests.
+[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted because the withdrawal scenario awaits ADR-004's institutional policy decision.
 
 ### Separate Worker resources
 
@@ -499,7 +529,7 @@ Stop that Worker afterwards.
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts tests/e2e/course-simulation.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts tests/e2e/course-simulation.spec.ts tests/e2e/course-simulation-walkthrough.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
@@ -516,6 +546,8 @@ They do not send real email.
 Simulation checks cover teacher/student permissions, live sentinels, teacher and reset-generation isolation, scoped expiry/quotas/inbox retention, immutable history, clock, export labels and malformed context.
 Worker adapter tests reject missing/wrong markers, distinct binding objects aliasing the same resources, live-file/database aliases and forged test identities, and prove simulation selects no live mail even when delivery is enabled.
 The simulation browser checks cover synthetic roster import, mock login, role switching, clock, export, reset, both presets, stale-release rejection/reassessment, failing individual outcomes, mobile/accessibility and the absence of escaped live course/auth requests.
+The complete teaching flow creates two consented/allocated trios, retains their phase identifiers, and submits all three phases through the interface: source freezing, assigned audits, private portfolios, final evidence, current assessments, release and a marked final export.
+It verifies that missing mandatory participation fails despite sufficient overall points, and that delayed saves/refreshes cannot accept edits that would be discarded.
 Preset API checks exercise both cohort sizes, real frozen history/A–B references, late enrollment, explicit zeros, mandatory minima, interrupted/concurrent preparation, isolation and reproducible source download.
 
 To check real local D1/R2 bindings, use the separate local configuration:

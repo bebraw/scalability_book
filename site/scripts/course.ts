@@ -97,6 +97,36 @@ let selectedStudent = "";
 let referenceGroup = "";
 let dirty = false;
 let pending = false;
+type Control =
+  | HTMLButtonElement
+  | HTMLInputElement
+  | HTMLSelectElement
+  | HTMLTextAreaElement;
+let contentLocks = 0;
+const disabledControls = new Map<Control, boolean>();
+function applyContentLock() {
+  if (!contentLocks) return;
+  content
+    .querySelectorAll<Control>("button,input,select,textarea")
+    .forEach((control) => {
+      if (!disabledControls.has(control))
+        disabledControls.set(control, control.disabled);
+      control.disabled = true;
+    });
+}
+function lockContent() {
+  contentLocks++;
+  content.setAttribute("aria-busy", "true");
+  applyContentLock();
+  return () => {
+    if (--contentLocks) return;
+    disabledControls.forEach((wasDisabled, control) => {
+      control.disabled = wasDisabled;
+    });
+    disabledControls.clear();
+    content.removeAttribute("aria-busy");
+  };
+}
 let local = false;
 let githubLoginUrl: string | null = null;
 let loginToken = new URLSearchParams(location.hash.slice(1)).get("login");
@@ -160,29 +190,37 @@ function allowNavigation() {
   return !dirty || window.confirm("You have unsaved changes. Leave this form?");
 }
 async function openCourse(id: string) {
-  view = await api<View>(`/api/courses/${id}`);
-  const listed = listing.courses.find((course) => course.id === id);
-  if (listed) listed.name = view.config.value.name;
-  const url = new URL(location.href);
-  url.searchParams.set("course", id);
-  history.replaceState(null, "", url);
-  const config = view.config.value;
-  const myGroup = config.phases[phase].groups.find((g) =>
-    g.members.includes(view!.user.id),
-  );
-  if (!view.staff) selectedGroup = myGroup?.id ?? "";
-  else if (!config.phases[phase].groups.some((g) => g.id === selectedGroup))
-    selectedGroup =
-      (view.staff ? config.phases[phase].groups[0] : myGroup)?.id ?? "";
-  if (!view.staff) selectedStudent = view.user.id;
-  else if (!config.students.some((s) => s.id === selectedStudent))
-    selectedStudent =
-      (view.staff ? config.students[0]?.id : view.user.id) ?? "";
-  dirty = false;
-  render();
-  await refreshSimulation(
-    view.staff ? null : { course: config.id, student: view.user.id },
-  );
+  const ownsPending = !pending;
+  pending = true;
+  const unlock = lockContent();
+  try {
+    view = await api<View>(`/api/courses/${id}`);
+    const listed = listing.courses.find((course) => course.id === id);
+    if (listed) listed.name = view.config.value.name;
+    const url = new URL(location.href);
+    url.searchParams.set("course", id);
+    history.replaceState(null, "", url);
+    const config = view.config.value;
+    const myGroup = config.phases[phase].groups.find((g) =>
+      g.members.includes(view!.user.id),
+    );
+    if (!view.staff) selectedGroup = myGroup?.id ?? "";
+    else if (!config.phases[phase].groups.some((g) => g.id === selectedGroup))
+      selectedGroup =
+        (view.staff ? config.phases[phase].groups[0] : myGroup)?.id ?? "";
+    if (!view.staff) selectedStudent = view.user.id;
+    else if (!config.students.some((s) => s.id === selectedStudent))
+      selectedStudent =
+        (view.staff ? config.students[0]?.id : view.user.id) ?? "";
+    dirty = false;
+    render();
+    await refreshSimulation(
+      view.staff ? null : { course: config.id, student: view.user.id },
+    );
+  } finally {
+    unlock();
+    if (ownsPending) pending = false;
+  }
 }
 function header() {
   const course = view!.config.value;
@@ -519,6 +557,10 @@ function gradebook() {
   ${studentPicker()}${selected ? `<h4>${e(selected.student.name)}: points and passing requirements</h4>${resultMarkup(selected.result)}<details><summary>Approved individual arrangement for ${title(phase)}</summary><form data-form="adjustment"><p>Document the approved replacement activity or adjusted requirement. Changes and reasons remain in the private history.</p>${input("lectureMinimum", "Required complete lecture activities (0–3)", String(adjustment?.lectureMinimum ?? 2), true, "number")}${input("assessmentMinimum", "Self/peer minimum (0–12)", String(adjustment?.assessmentMinimum ?? 6), true, "number")}${input("contributionMinimum", "Contribution minimum (0–3)", String(adjustment?.contributionMinimum ?? 1), true, "number")}${input("availablePoints", "Available individual points this phase (1–21)", String(adjustment?.availablePoints ?? 21), true, "number")}${field("reason", "Approved arrangement, replacement activity and reason", adjustment?.reason ?? "", 2000, true)}<button type="submit">Save private arrangement</button></form></details>` : ""}</section>`;
 }
 function render() {
+  renderContent();
+  applyContentLock();
+}
+function renderContent() {
   if (!view) {
     const identity =
       listing.user && !listing.courses.length && !listing.canCreate
@@ -872,6 +914,7 @@ content.addEventListener("click", async (event) => {
       )
     )
       return;
+    if (button.dataset.phase === phase) return;
     if (!allowNavigation()) return;
     dirty = false;
     if (button.hasAttribute("data-email-login")) {
@@ -953,10 +996,9 @@ content.addEventListener("submit", async (event) => {
   const values = new FormData(form);
   const val = (key: string) => String(values.get(key) ?? "");
   const submit = (event as SubmitEvent).submitter as HTMLButtonElement | null;
-  const buttons = form.querySelectorAll<HTMLButtonElement>(
-    'button[type="submit"]',
-  );
-  buttons.forEach((b) => (b.disabled = true));
+  // Capture successful controls before disabling them; nested refreshes keep
+  // the replacement form locked until this save has finished as well.
+  const unlock = lockContent();
   try {
     if (kind === "email-request") {
       const data = await api<{ message: string }>(
@@ -1070,6 +1112,7 @@ content.addEventListener("submit", async (event) => {
       const section = kind as (typeof administrationSections)[number];
       const payload = administrationPayload(
         form,
+        values,
         v.config.value,
         phase,
         section,
@@ -1190,10 +1233,9 @@ content.addEventListener("submit", async (event) => {
     tell("Saved. The record history retains this revision and its reason.");
   } catch (error) {
     tell((error as Error).message, true);
-    buttons.forEach((b) => (b.disabled = false));
   } finally {
     pending = false;
-    buttons.forEach((b) => (b.disabled = false));
+    unlock();
   }
 });
 async function start() {
