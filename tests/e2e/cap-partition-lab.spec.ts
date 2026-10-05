@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test.describe("CAP partition lab", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/chapters/scaling/#demo-cap-partition-lab");
+    await page.goto(
+      "/appendices/advanced-web-boundaries/#demo-cap-partition-lab",
+    );
     await expect(page.locator("[data-cap-lab]")).toBeVisible();
   });
 

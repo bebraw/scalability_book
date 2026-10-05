@@ -820,6 +820,11 @@ export const bookConcepts: Concept[] = [
         "Explain the consequences for the tracker.",
       ],
       [
+        "Appendix C: partition proof and lab",
+        "/appendices/advanced-web-boundaries/#partitions-and-replicated-state",
+        "Examine the guarantees and compare two partition policies.",
+      ],
+      [
         "Pressure: documented incidents",
         "/chapters/reality/#what-documented-web-incidents-reveal",
         "Follow divergent histories during a real partition.",
@@ -839,6 +844,11 @@ export const bookConcepts: Concept[] = [
         "Scaling: geography and latency",
         "/chapters/scaling/#latency-and-geography",
         "Connect distance with observation guarantees.",
+      ],
+      [
+        "Appendix C: partition proof and lab",
+        "/appendices/advanced-web-boundaries/#partitions-and-replicated-state",
+        "Distinguish operation ordering from transaction atomicity.",
       ],
       [
         "Architecture: data authority",

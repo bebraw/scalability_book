@@ -216,6 +216,8 @@ export const conceptPages: ConceptPage[] = [
       "state-authority",
       "transaction",
       "invariant",
+      "partition",
+      "consistency",
       "rendering",
       "cache",
       "idempotency",

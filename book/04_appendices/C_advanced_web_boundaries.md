@@ -1,7 +1,8 @@
 # Advanced control boundaries in web applications
 
-Use this appendix when a design depends on state continuity across requests, HTTP method semantics, transactional [invariants](/concepts/#invariant), client activation, runtime-generated interfaces, a detailed application contract, event-view rebuilding, or endpoint and cache policy.
+Use this appendix when a design depends on state continuity across requests, HTTP method semantics, transactional [invariants](/concepts/#invariant), replicated state during network partitions, client activation, runtime-generated interfaces, a detailed application contract, event-view rebuilding, or endpoint and cache policy.
 The [Architecture chapter](/chapters/architecture/) keeps the decisions that every project must recognize; the sections below develop implementation choices and audits that are useful only when those boundaries are present.
+The [Scaling chapter](/chapters/scaling/#partitions-force-an-operational-choice) introduces the operational choice when replicas cannot communicate; the [CAP proof and lab](#partitions-and-replicated-state) develop that case.
 
 ## Stateless requests still depend on state
 
@@ -98,6 +99,47 @@ Then introduce a database transaction and, for concurrent requests, compare read
 
 The simulation does not imply that every database implements an isolation level or durable commit in the same way.
 For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+
+## Partitions and replicated state
+
+Use this section when a design replicates authoritative reads or writes across nodes that may lose contact.
+The CAP result is narrower than a general slogan about balancing consistency and availability.
+For a distributed read-write object in an asynchronous network, a network [partition](/concepts/#partition) can prevent a design from guaranteeing both atomic consistency and an available response from every non-failing node :citep[gilbert2002brewer].
+Here **atomic consistency**, or **linearizability**, means each operation appears to take effect at one instant between its invocation and response, in an order that respects real time.
+If a write completes before a read begins, that read must see the written value or a later write in that order.
+**Availability** means every request to a non-failing node eventually completes with a response allowed by the object's contract; this guarantee does not impose a latency bound.
+The partition is the condition that makes those guarantees collide; it is not a feature that an application can disable after communication has already failed.
+
+### A register proof
+
+Consider a register initially holding `0`, replicated at nodes L and R, with communication between them partitioned:
+
+1. In execution A, no write occurs and a client reads at R.
+   A valid read returns `0`.
+2. In execution B, a client writes `1` at L and receives success, then another client begins a read at R.
+   Linearizability requires `1`, since no later write occurs.
+3. R has received no message about the write, so its local observations can be identical in A and B.
+   Returning `0` violates B; guessing `1` violates A.
+   Waiting indefinitely for communication sacrifices availability, and refusing the read does not fulfill the register's read contract.
+
+Requiring L to wait before acknowledging the write moves the availability loss to the write; it does not remove the conflict.
+This is the indistinguishability argument behind the impossibility result :citep[gilbert2002brewer].
+
+A system that requires a majority quorum may preserve one history by rejecting or delaying a request that reaches an isolated minority.
+A system that accepts writes on both sides may keep responding, but the replicas can diverge and later need domain-specific reconciliation.
+Neither label chooses the right policy on its own.
+The decision depends on which operations may be stale, rejected, delayed, merged, compensated, or repaired without violating the domain.
+
+### CAP partition lab
+
+Split one region from a two-region majority and apply the same two work-item transitions under both policies.
+Inspect the replies before healing the network: reconciliation can change stored state, but it cannot retract a success that a user already observed.
+
+{{ import "site/includes/cap-partition-lab.html" }}
+
+The lab models one write invariant and a fixed topology; preserving that invariant alone does not establish linearizability for every read and write.
+Linearizability's real-time ordering is also distinct from **ACID atomicity**, which concerns a transaction taking effect entirely or not at all.
+Real systems need explicit definitions for reads as well as writes, failure detection and timeouts, quorum membership, leases, conflict resolution, and the consistency guarantee exposed to clients.
 
 ## Rebuild a view without repeating its effects
 

@@ -176,7 +176,7 @@ export const demoCatalog = [
   },
   {
     title: "CAP partition lab",
-    chapter: "Scaling",
+    chapter: "Appendix C: Advanced web boundaries",
     include: "site/includes/cap-partition-lab.html",
     script: "/cap-partition-lab.js",
   },
