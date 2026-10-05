@@ -9,6 +9,7 @@ Begin with representative tasks, checked outcomes, preserved failures, and a dec
 Read [evaluation anatomy](#anatomy-of-an-agent-evaluation), [task selection](#capability-and-regression-evals), and [grader design](#the-eval-suite-is-also-software) for that minimal path.
 Add other sections when the decision requires them:
 
+- [Retained competence](#evaluate-assistance-and-retained-competence) for comparing assistance modes when learning is part of the task's purpose.
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
 - [Cost denominators](#read-a-harness-benchmark-s-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
@@ -101,6 +102,37 @@ Checkpoints depend on earlier work; repeat fresh trajectories to study variation
 
 This optional design studies successive changes within one implementation.
 The course's A–B–C builds start fresh, while [cross-team probes](/concepts/#change-probe) examine another group's ability to understand and change each build.
+
+## Evaluate assistance and retained competence
+
+Use this optional comparison when learning or retaining a skill is part of the task's purpose.
+The [Scalable Development chapter](/chapters/scalable-development/#choose-what-to-participate-in) distinguishes accepted output, retained competence, and valued participation.
+Evaluate these outcomes separately: a behavioral check cannot establish what the person can do unaided or which activities they want to retain.
+
+In a personal essay, :citet[stewart2026alienation] describes missing the investigation and decisions involved in implementation even when the result passes his checks.
+:citet[mollick2026overhang] offers a complementary perspective: human knowledge, taste, and initiative can turn agent capability into projects a person would otherwise struggle to attempt.
+These accounts motivate choices about delegation; they do not establish a universal effect on skill or well-being.
+
+### Optional exercise — Write with an agent as navigator
+
+The [Navigator Agent pattern](https://arsctx.com/blog/navigator-agent/) assigns implementation to the human while the agent provides guidance.
+It is a practitioner proposal, not evidence that typing suggested code preserves understanding.
+Use it to explore which assistance helps you retain a skill you need to own.
+
+1. Choose two small, comparable tasks involving an unfamiliar part of the stack, such as parsing an API response or enforcing a lifecycle transition.
+   State the required behavior and give each task the same time budget.
+2. For one task, write the code yourself while the agent offers hints, explanations, and critique.
+   Predict the next step before requesting a hint, and record where guidance changed your reasoning.
+3. For the other task, let the agent implement the change and use the remaining time to review and correct it.
+   Apply the same kinds of acceptance checks to both results.
+4. In a later session, without the agent or transcript, explain each implementation's invariant and repair a small, previously unseen fault.
+   Record correctness, explanation quality, time, and assistance needed during the original work.
+
+Compare accepted output with later unaided performance; code volume and keystrokes measure neither understanding nor retained judgment.
+Task differences and practice order can explain a result from one pair, so use this as a learning diagnostic rather than a causal study.
+
+As an optional reflection in your learning diary or discussion, name an activity you wanted to retain, whether the assistance mode preserved it, and what mode you would choose next time.
+Your preference is separate from the behavioral checks and later unaided performance.
 
 ## The eval suite is also software
 

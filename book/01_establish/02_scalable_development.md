@@ -252,9 +252,7 @@ The case study records the development history and the structural feedback I car
 ### Choose what to participate in
 
 A workflow can produce acceptable software and leave its owner able to explain it, while removing an activity they wanted to experience.
-In a personal essay, :citet[stewart2026alienation] describes missing the investigation and decisions involved in implementation even when the result passes his checks.
-:citet[mollick2026overhang] offers a complementary perspective: human knowledge, taste, and initiative can turn agent capability into projects a person would otherwise struggle to attempt.
-These accounts motivate choices about delegation; they do not establish a universal effect on skill or well-being.
+Choose assistance according to the result you need, the skills you need to retain, and the activities you want to take part in.
 
 :ref[table:assistance-outcomes]{text="The table below"} separates three outcomes when choosing an assistance mode.
 
@@ -272,26 +270,7 @@ Choose what to delegate in light of those purposes as well as the result's quali
 Manual work, agent critique, supervised implementation, and delegation can each fit a different task.
 Finishing the agreed work can be a reason to stop, even when the agent has capacity for another task.
 
-### Optional exercise — Write with an agent as navigator
-
-The [Navigator Agent pattern](https://arsctx.com/blog/navigator-agent/) assigns implementation to the human while the agent provides guidance.
-It is a practitioner proposal, not evidence that typing suggested code preserves understanding.
-Use it to explore which assistance helps you retain a skill you need to own.
-
-1. Choose two small, comparable tasks involving an unfamiliar part of the stack, such as parsing an API response or enforcing a lifecycle transition.
-   State the required behavior and give each task the same time budget.
-2. For one task, write the code yourself while the agent offers hints, explanations, and critique.
-   Predict the next step before requesting a hint, and record where guidance changed your reasoning.
-3. For the other task, let the agent implement the change and use the remaining time to review and correct it.
-   Apply the same kinds of acceptance checks to both results.
-4. In a later session, without the agent or transcript, explain each implementation's invariant and repair a small, previously unseen fault.
-   Record correctness, explanation quality, time, and assistance needed during the original work.
-
-Compare accepted output with later unaided performance; code volume and keystrokes measure neither understanding nor retained judgment.
-Task differences and practice order can explain a result from one pair, so use this as a learning diagnostic rather than a causal study.
-
-As an optional reflection in your learning diary or discussion, name an activity you wanted to retain, whether the assistance mode preserved it, and what mode you would choose next time.
-Your preference is separate from the behavioral checks and later unaided performance.
+[Appendix A's optional Navigator exercise](/appendices/evaluating-agentic-workflows/#optional-exercise-write-with-an-agent-as-navigator) compares agent guidance with delegated implementation, then checks later unaided explanation and repair.
 
 ## Project artifact
 
