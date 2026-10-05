@@ -25,6 +25,8 @@ import {
   slug,
   date,
   unique,
+  githubId,
+  institutionalEmail,
 } from "./course-validation.ts";
 
 export function parseStudents(value: unknown): Student[] {
@@ -34,20 +36,21 @@ export function parseStudents(value: unknown): Student[] {
       id: studentId(s.id),
       number: text(s.number, "Student number", 50, true),
       name: text(s.name, "Student name", 120, true),
-      login: text(s.login, "GitHub login", 39, true).toLowerCase(),
+      login: text(s.login ?? "", "GitHub login", 39, !s.email).toLowerCase(),
+      ...(s.firstName !== undefined
+        ? { firstName: text(s.firstName, "First name", 60, true) }
+        : {}),
+      ...(s.lastName !== undefined
+        ? { lastName: text(s.lastName, "Last name", 60, true) }
+        : {}),
+      ...(s.email !== undefined ? { email: institutionalEmail(s.email) } : {}),
     };
   });
   requireThat(
-    students.every((s) => /^[a-z0-9-]+$/.test(s.login)),
+    students.every((s) => !s.login || /^[a-z0-9-]+$/.test(s.login)),
     "Invalid GitHub login.",
   );
-  requireThat(
-    unique(students.map((s) => s.id)) &&
-      unique(students.map((s) => s.number)) &&
-      unique(students.map((s) => s.login)),
-    "Student IDs, numbers and logins must be unique.",
-  );
-  return students;
+  return validateRoster(students);
 }
 export function parseGroups(value: unknown, course: Course): Group[] {
   const groups = array(value, 50).map((item) => {
@@ -119,7 +122,7 @@ function settings(
 ) {
   course.name = text(body.name, "Course name", 120, true);
   const staff = array(body.staff, 10).map((value) =>
-    value === actor ? actor : studentId(value),
+    value === actor ? actor : githubId(value),
   );
   requireThat(
     staff.length && unique(staff) && staff.includes(actor),
@@ -295,10 +298,13 @@ export function updateAdministration(
   const next = structuredClone(course);
   if (section === "settings") settings(next, body, actor);
   else if (section === "students") {
-    const imported = parseStudents(body.students);
+    const imported =
+      body.format === "institutional"
+        ? importInstitutionalStudents(course, body.students)
+        : parseStudents(body.students);
     const updates = new Map(imported.map((s) => [s.id, s]));
-    next.students = parseStudents([
-      ...course.students.map((s) => updates.get(s.id) ?? s),
+    next.students = validateRoster([
+      ...course.students.map((s) => ({ ...s, ...updates.get(s.id) })),
       ...imported.filter(
         (s) => !course.students.some((old) => old.id === s.id),
       ),
@@ -310,6 +316,82 @@ export function updateAdministration(
   return next;
 }
 
+export function validateRoster(students: Student[]) {
+  requireThat(
+    students.length <= 100,
+    "A course can enroll at most 100 students.",
+  );
+  const conflicts: string[] = [];
+  for (const [label, values] of [
+    ["identity", students.map((s) => s.id)],
+    ["student ID", students.map((s) => s.number)],
+    ["email", students.filter((s) => s.email).map((s) => s.email!)],
+    ["GitHub login", students.filter((s) => s.login).map((s) => s.login)],
+  ] as const) {
+    const seen = new Set<string>(),
+      duplicates = new Set<string>();
+    for (const value of values) {
+      if (seen.has(value)) duplicates.add(value);
+      seen.add(value);
+    }
+    for (const value of duplicates) conflicts.push(`${label}: ${value}`);
+  }
+  requireThat(
+    !conflicts.length,
+    `Enrollment values must be unique. Resolve these conflicts before importing: ${conflicts.slice(0, 10).join("; ")}.`,
+  );
+  return students;
+}
+
+function importInstitutionalStudents(
+  course: Course,
+  value: unknown,
+): Student[] {
+  const students = array(value, 100).map((item) => {
+    const s = obj(item);
+    const number = text(s.number, "Institutional student ID", 50, true);
+    const firstName = text(s.firstName, "First name", 60, true),
+      lastName = text(s.lastName, "Last name", 60, true);
+    const email = institutionalEmail(s.email);
+    const matches = course.students.filter(
+      (student) => student.number === number,
+    );
+    requireThat(
+      matches.length <= 1,
+      "Ambiguous student ID. Correct the roster before importing.",
+    );
+    const existing = s.id
+      ? course.students.find((student) => student.id === studentId(s.id))
+      : matches[0];
+    requireThat(
+      !s.id || existing,
+      "Select an existing student to correct their institutional ID.",
+    );
+    requireThat(
+      !existing || !matches.length || matches[0]!.id === existing.id,
+      "This student ID belongs to another record. Resolve the conflict before saving.",
+    );
+    return {
+      ...existing,
+      id: existing?.id ?? `student:${crypto.randomUUID()}`,
+      number,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`,
+      email,
+      login:
+        s.login === undefined
+          ? (existing?.login ?? "")
+          : text(s.login, "Optional GitHub login", 39).toLowerCase(),
+    };
+  });
+  requireThat(
+    students.every((s) => !s.login || /^[a-z0-9-]+$/.test(s.login)),
+    "Invalid GitHub login.",
+  );
+  return validateRoster(students);
+}
+
 // Retain the existing integration endpoint, using the same cross-workflow rules.
 export function updateLegacySetup(
   course: Course,
@@ -319,7 +401,12 @@ export function updateLegacySetup(
   now: string,
 ): Course {
   const next = structuredClone(course);
-  next.students = parseStudents(body.students);
+  next.students = validateRoster(
+    parseStudents(body.students).map((student) => ({
+      ...course.students.find((s) => s.id === student.id),
+      ...student,
+    })),
+  );
   settings(next, { ...body, rubric: body.rubric ?? course.rubric }, actor);
   const configurations = obj(body.phases);
   for (const phase of phases) {

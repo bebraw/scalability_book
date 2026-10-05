@@ -1,8 +1,11 @@
 import { e, option, field, input } from "./course-ui.ts";
+import { courseSignIn } from "./course-signin.ts";
+import { rosterHeaders } from "../../shared/course-roster.ts";
 import {
   administrationSections,
   type AdministrationRevisions,
   type RosterPreview,
+  type AccessActivity,
 } from "../../shared/course-administration.ts";
 import {
   administrationNavigation,
@@ -10,6 +13,7 @@ import {
   administrationPayload,
   groupRow,
   previewMarkup,
+  mappingMarkup,
 } from "./course-administration.ts";
 import {
   phases,
@@ -32,6 +36,7 @@ import {
 interface View {
   config: Envelope<Course>;
   administration?: AdministrationRevisions;
+  access?: AccessActivity[];
   staff: boolean;
   user: { id: string; login: string };
   now: string;
@@ -60,6 +65,10 @@ let selectedStudent = "";
 let dirty = false;
 let pending = false;
 let local = false;
+let githubLoginUrl: string | null = null;
+let loginToken = new URLSearchParams(location.hash.slice(1)).get("login");
+if (loginToken)
+  history.replaceState(null, "", location.pathname + location.search);
 const when = (date: string) =>
   new Date(date).toLocaleString(undefined, {
     dateStyle: "medium",
@@ -78,6 +87,21 @@ function tell(message: string, error = false) {
   notice.textContent = message;
   notice.classList.toggle("course-error", error);
 }
+window.addEventListener("hashchange", () => {
+  const token = new URLSearchParams(location.hash.slice(1)).get("login");
+  if (!token) return;
+  loginToken = token;
+  history.replaceState(null, "", location.pathname + location.search);
+  if (!allowNavigation()) {
+    tell(
+      "The sign-in link is ready. Finish your changes, then choose Email sign-in.",
+    );
+    return;
+  }
+  dirty = false;
+  content.innerHTML = courseSignIn("", githubLoginUrl, local, loginToken);
+  tell("Confirm the sign-in link to open your course.");
+});
 async function api<T>(url: string, method = "GET", body?: unknown): Promise<T> {
   const response = await fetch(url, {
     method,
@@ -122,7 +146,7 @@ async function openCourse(id: string) {
 }
 function header() {
   const course = view!.config.value;
-  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="/project/introduction/">Project guide ↗</a><a href="/project/grading/">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button></div>
+  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="/project/introduction/">Project guide ↗</a><a href="/project/grading/">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button><button type="button" class="course-quiet" data-email-login>Email sign-in</button><button type="button" class="course-quiet" data-course-logout>Sign out</button></div>
   <div class="course-heading"><div><p class="course-eyebrow">${view!.staff ? "Instructor workspace" : "Student workspace"}${local ? " · Local development" : ""}</p><h2>${e(course.name)}</h2></div><p class="course-identity">Signed in as <strong>${e(view!.user.login)}</strong></p></div>
   <div class="course-phases" role="group" aria-label="Project phase">${phases.map((p, i) => `<button type="button" data-phase="${p}" aria-pressed="${phase === p}"><span>0${i + 1}</span> ${title(p)} <small>${course.phases[p].published ? "Results released" : "Results pending"}</small></button>`).join("")}</div>
   <nav class="course-tabs" aria-label="Course workspace">${[
@@ -436,7 +460,14 @@ function render() {
     ...Object.fromEntries(
       administrationSections.map((section) => [
         section,
-        () => renderAdministration(view!.config, phase, section),
+        () =>
+          renderAdministration(
+            view!.config,
+            phase,
+            section,
+            view!.access,
+            local,
+          ),
       ]),
     ),
   };
@@ -459,7 +490,7 @@ function render() {
 content.addEventListener("input", (event) => {
   const target = event.target as HTMLElement;
   if (target.closest("form")) dirty = true;
-  if (target.matches('[name="roster"]')) {
+  if (target.matches('[name="roster"],[name^="map-"]')) {
     const preview = target
       .closest("form")
       ?.querySelector("[data-roster-preview]");
@@ -588,6 +619,55 @@ content.addEventListener("click", async (event) => {
       dialog.showModal();
       return;
     }
+    if (button.hasAttribute("data-roster-columns")) {
+      const form = button.closest("form")!;
+      const source = (form.elements.namedItem("roster") as HTMLTextAreaElement)
+        .value;
+      form.querySelector("[data-roster-mapping]")!.innerHTML = mappingMarkup(
+        rosterHeaders(source),
+      );
+      form.querySelector("[data-roster-preview]")!.textContent = "";
+      dirty = true;
+      return;
+    }
+    if (button.dataset.editStudent) {
+      const student = view!.config.value.students.find(
+        (s) => s.id === button.dataset.editStudent,
+      )!;
+      const form = content.querySelector<HTMLFormElement>(
+        'form[data-form="student"]',
+      )!;
+      const fields = {
+        identity: student.id,
+        number: student.number,
+        firstName: student.firstName ?? "",
+        lastName: student.lastName ?? "",
+        email: student.email ?? "",
+        login: student.login,
+      };
+      for (const [key, value] of Object.entries(fields))
+        (form.elements.namedItem(key) as HTMLInputElement).value = value;
+      form.closest("details")!.open = true;
+      form.querySelector("[data-student-edit-label]")!.textContent =
+        `Correcting ${student.name}. Existing submissions and grades remain attached.`;
+      (form.elements.namedItem("number") as HTMLInputElement).focus();
+      return;
+    }
+    if (button.hasAttribute("data-mock-inbox")) {
+      const data = await api<{
+        messages: { to: string; url: string; expiresAt: string }[];
+      }>(`/api/course-auth/mock-inbox?course=${view!.config.value.id}`);
+      content.querySelector("[data-mock-messages]")!.innerHTML = data.messages
+        .length
+        ? data.messages
+            .map(
+              (m) =>
+                `<p><strong>${e(m.to)}</strong> · expires ${e(when(m.expiresAt))}<br><a href="${e(m.url)}" target="_blank" rel="noopener noreferrer">Follow mock sign-in link</a></p>`,
+            )
+            .join("")
+        : "<p>No mock messages yet. Request a student sign-in link first.</p>";
+      return;
+    }
     if (button.hasAttribute("data-add-group")) {
       const form = button.closest("form")!;
       const list = form.querySelector<HTMLElement>("[data-group-rows]")!;
@@ -629,12 +709,27 @@ content.addEventListener("click", async (event) => {
     }
     if (
       !button.matches(
-        "[data-tab],[data-phase],[data-open],[data-back],[data-refresh],[data-review-group],[data-review-student],[data-grade-student]",
+        "[data-tab],[data-phase],[data-open],[data-back],[data-refresh],[data-review-group],[data-review-student],[data-grade-student],[data-email-login],[data-course-logout]",
       )
     )
       return;
     if (!allowNavigation()) return;
     dirty = false;
+    if (button.hasAttribute("data-email-login")) {
+      content.innerHTML = courseSignIn(
+        view!.config.value.id,
+        githubLoginUrl,
+        local,
+        loginToken,
+      );
+      return;
+    }
+    if (button.hasAttribute("data-course-logout")) {
+      await api("/api/course-auth/logout", "POST", {});
+      await api("/api/auth/logout", "POST", {});
+      location.reload();
+      return;
+    }
     if (button.hasAttribute("data-refresh")) {
       await openCourse(view!.config.value.id);
       tell("Course records refreshed.");
@@ -699,6 +794,29 @@ content.addEventListener("submit", async (event) => {
   );
   buttons.forEach((b) => (b.disabled = true));
   try {
+    if (kind === "email-request") {
+      const data = await api<{ message: string }>(
+        "/api/course-auth/request",
+        "POST",
+        { course: val("course"), email: val("email") },
+      );
+      dirty = false;
+      tell(data.message);
+      return;
+    }
+    if (kind === "email-verify") {
+      const data = await api<{ course: string }>(
+        "/api/course-auth/verify",
+        "POST",
+        { token: loginToken },
+      );
+      loginToken = null;
+      listing = await api<Listing>("/api/courses");
+      tab = "overview";
+      await openCourse(data.course);
+      tell("Signed in to your course.");
+      return;
+    }
     if (kind === "create") {
       const record = await api<Envelope<Course>>("/api/courses", "POST", {
         name: val("name"),
@@ -712,7 +830,23 @@ content.addEventListener("submit", async (event) => {
     }
     const v = view!,
       course = v.config.value;
-    if (
+    if (kind === "student") {
+      await api(`/api/courses/${course.id}/students`, "PUT", {
+        expected: v.administration!.students,
+        format: "institutional",
+        reason: val("reason"),
+        students: [
+          {
+            ...(val("identity") ? { id: val("identity") } : {}),
+            number: val("number"),
+            firstName: val("firstName"),
+            lastName: val("lastName"),
+            email: val("email"),
+            login: val("login"),
+          },
+        ],
+      });
+    } else if (
       administrationSections.includes(
         kind as (typeof administrationSections)[number],
       )
@@ -840,15 +974,23 @@ async function start() {
       authenticated: boolean;
       local: boolean;
       loginUrl: string | null;
-    }>("/api/auth/status");
+    }>("/api/course-auth/status");
     local = auth.local;
+    githubLoginUrl = auth.loginUrl;
+    if (loginToken) {
+      content.innerHTML = courseSignIn("", githubLoginUrl, local, loginToken);
+      tell("Confirm the sign-in link to open your course.");
+      return;
+    }
     if (!auth.authenticated) {
       tell(
         "Sign in to see your course. Your instructor must add you to the roster.",
       );
-      content.innerHTML = auth.loginUrl
-        ? `<a class="course-button" href="${e(auth.loginUrl)}?returnTo=${encodeURIComponent(location.pathname)}">Sign in with GitHub</a>`
-        : "<p>GitHub sign-in has not been configured.</p>";
+      content.innerHTML = courseSignIn(
+        new URLSearchParams(location.search).get("course") ?? "",
+        githubLoginUrl,
+        local,
+      );
       return;
     }
     listing = await api<Listing>("/api/courses");

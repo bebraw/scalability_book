@@ -1,5 +1,8 @@
 // Run against an isolated `wrangler dev --local` instance, never a live course.
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { authHash } from "../worker/course-auth.ts";
+import type { AdministrationRevisions } from "../shared/course-administration.ts";
 import type {
   Course,
   Envelope,
@@ -200,6 +203,90 @@ const forged = await fetch(new URL(`/api/courses/${id}`, base), {
   },
 });
 assert.equal(forged.status, 401);
+const view = await call<{ administration: AdministrationRevisions }>(`/${id}`);
+config = await call(`/${id}/students`, "PUT", {
+  expected: view.administration.students,
+  format: "institutional",
+  students: [
+    {
+      number: "T003",
+      firstName: "Email",
+      lastName: "Student",
+      email: "worker-test@example.edu",
+    },
+  ],
+  reason: "Synthetic email enrollment",
+});
+const emailStudent = config.value.students.find((s) => s.number === "T003")!;
+const token = crypto.randomUUID().replaceAll("-", "") + "01234567890";
+const expires = new Date(Date.now() + 900_000).toISOString();
+assert.match(id, /^[a-f0-9-]{36}$/);
+assert.match(emailStudent.id, /^student:[a-f0-9-]{36}$/);
+// Seed only a synthetic credential into the isolated local D1 database. No mail
+// delivery or test-auth endpoint is enabled in the deployed Worker.
+const seed = spawnSync(
+  "rtk",
+  [
+    "proxy",
+    "npx",
+    "wrangler",
+    "d1",
+    "execute",
+    "COURSE_DB",
+    "--config",
+    "wrangler.course.jsonc",
+    "--local",
+    "--persist-to",
+    process.env.COURSE_SMOKE_D1_STATE ?? "/tmp/course-worker-state",
+    "--command",
+    `INSERT INTO course_login_links(token_hash, course_id, student_id, email, expires_at, ready) VALUES('${authHash(token)}', '${id}', '${emailStudent.id}', 'worker-test@example.edu', '${expires}', 1)`,
+  ],
+  { encoding: "utf8" },
+);
+assert.equal(seed.status, 0, seed.stderr);
+const verify = (credential: string) =>
+  fetch(new URL("/api/course-auth/verify", base), {
+    method: "POST",
+    headers: { Origin: base.origin, "Content-Type": "application/json" },
+    body: JSON.stringify({ token: credential }),
+  });
+const signed = await verify(token);
+assert.equal(signed.status, 200, await signed.clone().text());
+const emailCookie = signed.headers.get("set-cookie")!.split(";")[0]!;
+const emailView = await call<{ staff: boolean; user: { id: string } }>(
+  `/${id}`,
+  "GET",
+  undefined,
+  emailCookie,
+);
+assert.equal(emailView.staff, false);
+assert.equal(emailView.user.id, emailStudent.id);
+assert.equal((await verify(token)).status, 400);
+assert.equal(
+  (
+    await fetch(new URL(`/api/course-auth/mock-inbox?course=${id}`, base), {
+      headers: { Cookie: admin },
+    })
+  ).status,
+  404,
+);
+assert.equal(
+  (
+    await fetch(new URL("/api/course-auth/logout", base), {
+      method: "POST",
+      headers: { Origin: base.origin, Cookie: emailCookie },
+    })
+  ).status,
+  200,
+);
+assert.equal(
+  (
+    await fetch(new URL(`/api/courses/${id}`, base), {
+      headers: { Cookie: emailCookie },
+    })
+  ).status,
+  401,
+);
 console.log(
-  "Local Worker check passed: verified sessions, D1 guarded writes/history, streamed R2 uploads/downloads, immutable snapshots, audit binding and access isolation.",
+  "Local Worker check passed: GitHub and email sessions, single-use D1 links, institutional enrollment, guarded history, streamed R2 files, immutable snapshots, audit binding and access isolation.",
 );

@@ -59,10 +59,29 @@ export function slug(value: unknown) {
   return s;
 }
 export function studentId(value: unknown) {
+  const s = text(value, "Student identity", 48, true);
+  requireThat(
+    /^github:[1-9][0-9]{0,19}$/.test(s) ||
+      /^student:[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(
+        s,
+      ),
+    "Unknown student identity.",
+  );
+  return s;
+}
+export function githubId(value: unknown) {
   const s = text(value, "GitHub numeric ID", 40, true);
   requireThat(
     /^github:[1-9][0-9]{0,19}$/.test(s),
     "Use a stable numeric GitHub ID, prefixed with github:.",
+  );
+  return s;
+}
+export function institutionalEmail(value: unknown) {
+  const s = text(value, "Institutional email", 254, true).toLowerCase();
+  requireThat(
+    /^[^\s@<>]+@[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,63}$/.test(s),
+    "Enter a valid institutional email address.",
   );
   return s;
 }

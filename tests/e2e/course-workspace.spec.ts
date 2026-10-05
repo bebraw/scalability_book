@@ -26,7 +26,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
   ).toBeVisible();
   const roster = page.locator('form[data-form="students"]');
   await roster
-    .getByLabel("Roster CSV:", { exact: false })
+    .getByRole("textbox", { name: "Roster CSV", exact: true })
     .fill(
       "student_number,name,github_id,github_login\nS001,Alice Example,2,alice\nS002,Bob Example,3,bob",
     );

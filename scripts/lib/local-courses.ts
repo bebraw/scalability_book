@@ -21,9 +21,21 @@ import {
   type FileStore,
 } from "../../worker/course-store.ts";
 import type { Envelope } from "../../shared/course.ts";
+import {
+  courseAuthStore,
+  type CourseAuthStore,
+  type AuthDatabase,
+} from "../../worker/course-auth-store.ts";
+import {
+  mockMailStore,
+  mockMailSchema,
+  type MockMailStore,
+} from "../../worker/course-mock-mail.ts";
 export function localCourseStores(directory: string): {
   store: CourseStore;
   files: FileStore;
+  auth: CourseAuthStore;
+  mail: MockMailStore;
   close(): void;
 } {
   const filesDirectory = path.join(directory, "course-files");
@@ -39,6 +51,26 @@ export function localCourseStores(directory: string): {
     ),
   );
   db.exec("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;");
+  db.exec(
+    readFileSync(
+      new URL("../../course-migrations/0002_course_auth.sql", import.meta.url),
+      "utf8",
+    ),
+  );
+  db.exec(mockMailSchema);
+  const authDatabase: AuthDatabase = {
+    async first(sql, values) {
+      return db.prepare(sql).get(...values) ?? null;
+    },
+    async all(sql, values) {
+      return db.prepare(sql).all(...values);
+    },
+    async run(sql, values) {
+      db.prepare(sql).run(...values);
+    },
+  };
+  const auth = courseAuthStore(authDatabase),
+    mail = mockMailStore(authDatabase);
   const store: CourseStore = {
     async get<T>(key: string) {
       const row = db.prepare(`${readRecordSql} WHERE key = ?`).get(key);
@@ -127,5 +159,5 @@ export function localCourseStores(directory: string): {
       });
     },
   };
-  return { store, files, close: () => db.close() };
+  return { store, files, auth, mail, close: () => db.close() };
 }

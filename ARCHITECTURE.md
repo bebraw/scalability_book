@@ -28,6 +28,11 @@ Staff-only fingerprints expose the fields owned by each form, while the store's 
 Runtime adapters depend on shared domain contracts, while shared domain calculations remain independent of browser rendering and storage providers.
 New course capabilities should preserve this direction and use the same domain rules locally and in the Worker.
 
+Course sign-in enters through `/api/course-auth/` in both adapters.
+`worker/course-auth.ts` owns token/session and mail-delivery rules; `worker/course-auth-store.ts` shares atomic SQL through the D1 and local SQLite ports.
+`shared/course-roster.ts` owns CSV parsing and mapping, while the administration domain validates identities and merges enrollment into the current course snapshot.
+`site/scripts/course-signin.ts` renders the email request and explicit link-confirmation flow.
+
 ## State and access
 
 | Data                                   | Local storage                       | Production storage                      |
@@ -41,7 +46,11 @@ The course bindings remain commented configuration examples in `wrangler.jsonc`;
 The book can run without course storage.
 See [course-system.md](docs/course-system.md) and [chapter-exercises.md](docs/chapter-exercises.md) for configuration and state details.
 
-Current deployed authentication uses GitHub OAuth with a verified numeric GitHub identity.
+Staff authentication uses GitHub OAuth with a verified numeric GitHub identity.
+The course domain also supports institutional roster identities and course-scoped email sessions.
+Auth tokens, sessions, rate counters and access activity use dedicated tables in the course database, outside submission records and grade history.
+Local development uses mock mail; production mail integration remains pending in ADR-006.
+Existing GitHub-keyed student records retain their keys during migration to preserve historical ownership.
 Course staff permissions are separate from reader-feedback moderation permissions.
 Development-only local identities and explicitly enabled browser-test headers are not deployed authentication methods.
 
@@ -79,8 +88,8 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Focused administration](docs/adrs/accepted/ADR-002-separate-course-administration-workflows.md): the four forms and independent save boundaries are implemented; account status and student proposals/approvals await the identity and group revisions.
-- [Imported identities and magic links](docs/adrs/accepted/ADR-003-import-students-and-use-email-magic-links.md): roster-provisioned accounts without required GitHub accounts or registration.
+- [Focused administration](docs/adrs/accepted/ADR-002-separate-course-administration-workflows.md): the four forms and independent save boundaries are implemented; account status and institutional enrollment are implemented; student proposals/approvals await the group revision.
+- [Imported identities and magic links](docs/adrs/accepted/ADR-003-import-students-and-use-email-magic-links.md): institutional enrollment and local mock-email access are implemented; production mail wiring awaits ADR-006.
 - [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): student proposals and instructor allocation, normally three members and at most four.
 - [Submission expectations](docs/adrs/accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md): small reproducible bundles and clear phase requirements.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): Cloudflare sends magic links from `info@scalableweb.dev`; incoming mail forwards to Gmail.

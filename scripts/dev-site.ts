@@ -10,6 +10,7 @@ import { handleLearning } from "../worker/learning.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
 import { handleCourses } from "../worker/courses.ts";
+import { courseSessionUser, handleCourseAuth } from "../worker/course-auth.ts";
 import {
   developmentBuildPaths,
   rebuildDevelopmentSite,
@@ -76,7 +77,8 @@ const server = createServer(async (request, response) => {
 
     if (
       url.pathname === "/api/courses" ||
-      url.pathname.startsWith("/api/courses/")
+      url.pathname.startsWith("/api/courses/") ||
+      url.pathname.startsWith("/api/course-auth/")
     ) {
       const headers = new Headers();
       for (const [key, value] of Object.entries(request.headers)) {
@@ -98,16 +100,34 @@ const server = createServer(async (request, response) => {
           ? headers.get("x-course-test-user")
           : null;
       const localId = testId || process.env.COURSE_LOCAL_USER_ID || "1";
-      if (!/^[1-9][0-9]{0,14}$/.test(localId))
+      if (
+        localId !== "anonymous" &&
+        localId !== "0" &&
+        !/^[1-9][0-9]{0,14}$/.test(localId)
+      )
         throw new Error("Invalid local course identity");
-      const result = await handleCourses(webRequest, {
-        user: {
-          id: `github:${localId}`,
-          login: localId === "1" ? "local-editor" : `local-student-${localId}`,
-        },
-        admins: ["local-editor"],
+      const githubUser =
+        localId === "anonymous" || localId === "0"
+          ? null
+          : {
+              id: `github:${localId}`,
+              login:
+                localId === "1" ? "local-editor" : `local-student-${localId}`,
+            };
+      const context = {
         ...courses,
-      });
+        githubUser,
+        admins: ["local-editor"],
+        local: true,
+        mockInbox: courses.mail,
+      };
+      const result = url.pathname.startsWith("/api/course-auth/")
+        ? await handleCourseAuth(webRequest, context)
+        : await handleCourses(webRequest, {
+            ...courses,
+            user: (await courseSessionUser(webRequest, courses)) ?? githubUser,
+            admins: ["local-editor"],
+          });
       response.writeHead(result.status, Object.fromEntries(result.headers));
       if (result.body)
         for await (const chunk of result.body) {

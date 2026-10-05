@@ -71,8 +71,8 @@ Group allocation generates identifiers and can reuse established groups in later
 The review queue links unassigned students and missing audit arrangements.
 The combined setup API remains available for existing integrations but is no longer the browser interface.
 
-The ADR remains Accepted: institutional CSV mapping, manual enrollment and sign-in status depend on ADR-003; student proposals, confirmations and approval depend on ADR-004.
-The existing GitHub CSV and instructor allocation remain the current workflows until those decisions are implemented.
+Institutional CSV mapping, manual enrollment and sign-in status are now implemented with ADR-003's local mock-email flow.
+The ADR remains Accepted: student proposals, confirmations and approval still depend on ADR-004.
 API tests verify unrelated concurrent saves survive, edits to the same form conflict, previews do not write, student access cannot invoke staff operations and frozen membership/deadline locks remain enforced.
 The course browser test exercises the four forms alongside submission, assessment and release.
 Update [course-system.md](../../course-system.md) when the new workflows exist.

@@ -19,3 +19,8 @@ export interface RosterPreview {
   unchanged: number;
   retained: number;
 }
+export interface AccessActivity {
+  student: string;
+  firstSignIn: string;
+  lastSignIn: string;
+}

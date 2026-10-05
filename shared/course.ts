@@ -46,6 +46,9 @@ export interface Student {
   number: string;
   name: string;
   login: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 }
 export interface Group {
   id: string;

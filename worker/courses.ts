@@ -37,10 +37,14 @@ import {
   administrationSections,
   type AdministrationSection,
 } from "../shared/course-administration.ts";
+import { boundedJson, sameOrigin } from "./course-http.ts";
+import type { CourseAuthStore } from "./course-auth-store.ts";
 import type { CourseStore, FileStore } from "./course-store.ts";
 export interface CourseUser {
   id: string;
   login: string;
+  provider?: "github" | "email";
+  courseId?: string;
 }
 export interface CourseContext {
   user: CourseUser | null;
@@ -48,6 +52,7 @@ export interface CourseContext {
   files?: FileStore;
   admins: string[];
   now?: string;
+  auth?: CourseAuthStore;
 }
 export const maxCourseFileBytes = 20 * 1024 * 1024;
 const privateHeaders = {
@@ -57,9 +62,15 @@ const privateHeaders = {
 };
 const reply = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: privateHeaders });
-function staffAllowed(course: Course, user: CourseUser, admins: string[]) {
+export function staffAllowed(
+  course: Course,
+  user: CourseUser,
+  admins: string[],
+) {
   return (
-    course.staff.includes(user.id) || admins.includes(user.login.toLowerCase())
+    user.provider !== "email" &&
+    (course.staff.includes(user.id) ||
+      admins.includes(user.login.toLowerCase()))
   );
 }
 function team(course: Course, phase: Phase, group: string) {
@@ -69,50 +80,6 @@ function team(course: Course, phase: Phase, group: string) {
 }
 function inTeam(course: Course, phase: Phase, group: string, user: CourseUser) {
   return team(course, phase, group).members.includes(user.id);
-}
-function sameOrigin(request: Request) {
-  requireThat(
-    request.headers.get("origin") === new URL(request.url).origin,
-    "Use the course page to make changes.",
-    403,
-  );
-}
-async function boundedJson(request: Request) {
-  requireThat(
-    request.headers.get("content-type")?.split(";")[0] === "application/json",
-    "Send JSON.",
-    415,
-  );
-  requireThat(request.body, "Missing request body.");
-  const reader = request.body.getReader();
-  let size = 0;
-  const chunks: Uint8Array[] = [];
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > 96_000) {
-        await reader.cancel();
-        throw new Problem("Request is too large.", 413);
-      }
-      chunks.push(value);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-  const bytes = new Uint8Array(size);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  }
-  try {
-    return obj(JSON.parse(new TextDecoder().decode(bytes)));
-  } catch (error) {
-    if (error instanceof Problem) throw error;
-    throw new Problem("Invalid JSON.");
-  }
 }
 function parseAdjustment(value: unknown, course: Course): Adjustment {
   const a = obj(value);
@@ -243,13 +210,13 @@ export async function handleCourses(
   context: CourseContext,
 ): Promise<Response> {
   const { user, store, files, admins } = context;
-  if (!user)
-    return reply({ message: "Sign in with GitHub to open your course." }, 401);
+  if (!user) return reply({ message: "Sign in to open your course." }, 401);
   if (!store)
     return reply({ message: "Course storage is not configured yet." }, 503);
   const now = context.now ?? new Date().toISOString();
   const url = new URL(request.url);
-  const bootstrap = admins.includes(user.login.toLowerCase());
+  const bootstrap =
+    user.provider !== "email" && admins.includes(user.login.toLowerCase());
   try {
     const parts = url.pathname
       .replace(/^\/api\/courses\/?/, "")
@@ -274,8 +241,9 @@ export async function handleCourses(
           courses: all
             .filter(
               (r) =>
-                staffAllowed(r.value, user, admins) ||
-                r.value.students.some((s) => s.id === user.id),
+                (user.provider !== "email" || user.courseId === r.value.id) &&
+                (staffAllowed(r.value, user, admins) ||
+                  r.value.students.some((s) => s.id === user.id)),
             )
             .map((r) => ({
               id: r.value.id,
@@ -332,6 +300,11 @@ export async function handleCourses(
       );
       return reply(record, 201);
     }
+    requireThat(
+      user.provider !== "email" || user.courseId === id,
+      "You are not enrolled in this course.",
+      403,
+    );
     const config = await store.get<Course>(recordKey(id, "course"));
     requireThat(config, "Course not found.", 404);
     const course = config.value;
@@ -406,6 +379,7 @@ export async function handleCourses(
         : course.students.map((s) => ({
             ...s,
             number: s.id === user.id ? s.number : "",
+            ...(s.email ? { email: s.id === user.id ? s.email : "" } : {}),
           }));
       const displayedCourse = staff
         ? course
@@ -436,7 +410,12 @@ export async function handleCourses(
         staff,
         user,
         now,
-        ...(staff ? { administration: administrationRevisions(course) } : {}),
+        ...(staff
+          ? {
+              administration: administrationRevisions(course),
+              access: context.auth ? await context.auth.activity(id) : [],
+            }
+          : {}),
         ...visible,
         results,
       });
@@ -466,7 +445,7 @@ export async function handleCourses(
         [
           "student_number",
           "name",
-          "github_id",
+          "identity_id",
           "earned",
           "available",
           "percent",

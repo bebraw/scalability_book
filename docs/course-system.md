@@ -7,9 +7,10 @@ Book feedback moderators do not automatically have access to course records.
 
 ## Agreed revision and current behavior
 
-This guide describes the currently implemented GitHub-based workspace with four focused administration forms.
+This guide describes the course workspace with four focused administration forms, institutional enrollment and email sessions, and retained GitHub staff access.
 The [accepted ADRs](adrs/README.md#accepted) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
-The administration split is in place; institutional identities, account activity, student group proposals and approvals, checklists, email delivery and simulation remain pending.
+Institutional imports, corrections, account activity and the magic-link flow work with local mock mail.
+Production email delivery, student group proposals and approvals, phase checklists and teacher simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -26,7 +27,9 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
   Import all students initially, or paste just later additions and corrections.
   Omitted rows remain enrolled; imports cannot remove students.
   Existing records retain their stable identity when names, student numbers or logins are corrected.
-  Duplicate identities, student numbers and logins are rejected before saving.
+  Duplicate identities, student IDs, emails and optional GitHub logins are rejected before saving.
+  **Add or correct one student** handles later individual enrollment and identifier corrections.
+  The roster shows whether email access is ready and the last successful email sign-in.
 - **Groups** allocates students for the selected phase and lists those awaiting allocation.
   Add group cards and select their members.
   New identifiers are generated automatically, starting at `group-01`; generated numbers are not reused after removing an unused group.
@@ -39,24 +42,64 @@ Course creation, roster import and group allocation are separate operations.
 The local instructor identity is `github:1` / `local-editor`.
 Data persists in `.local/course.sqlite` and `.local/course-files/`; restarting the server preserves it.
 These records are separate from chapter exercise answers and reader feedback.
-To use a different local student identity, start a second server with `PORT=3001 COURSE_LOCAL_USER_ID=2 npm run dev` and enrol numeric ID `2` in the roster.
+For legacy GitHub testing, start a second server with `PORT=3001 COURSE_LOCAL_USER_ID=2 npm run dev` and enroll numeric ID `2`.
+For an anonymous browser that exercises email sign-in, use `PORT=3001 COURSE_LOCAL_USER_ID=0 npm run dev` against the same local data directory.
 The development server is restricted to loopback; its local identities are not an authentication method for deployment.
 The browser tests explicitly enable `COURSE_TEST_IDENTITIES=1`; the deployed Worker ignores the test identity header.
 
-The roster CSV has four columns:
+## Institutional enrollment and sign-in
+
+The canonical institutional CSV has four columns:
 
 ```csv
-student_number,name,github_id,github_login
-S001,Alice Example,123456,alice
-S002,Bob Example,234567,bob
+student_id,first_name,last_name,email
+S001,Alice,Example,alice@example.edu
+S002,Bob,Example,bob@example.edu
 ```
 
-`github_id` is the stable numeric user ID, not a username or student number.
-Students who sign in at `/course/` before enrolment can read their numeric ID and share it with the instructor for the roster.
-Find it in the GitHub user API response at `https://api.github.com/users/<login>`.
-Access follows the numeric ID in the verified GitHub session, so a renamed username does not change course membership.
-Enter staff as `github:<numeric-id>`, one per line.
-Check the imported roster before releasing the course to students.
+Paste an institutional export, select **Read CSV columns**, and map its columns to these four fields.
+Extra columns are ignored.
+Use **Preview roster changes** to inspect additions and corrections before saving.
+Imports match the institutional student ID within the current course run, rather than sharing identities across institutions or runs.
+New records receive an opaque `student:<UUID>` identity, separate from student ID, email, names and group allocation.
+GitHub login is optional profile information and cannot grant access to a new institutional account.
+
+To migrate an existing GitHub roster, import institutional details with the same student IDs already stored as student numbers.
+Review the corrections in the preview: the existing internal `github:<numeric-id>` keys are retained as opaque historical identities.
+Existing submissions, frozen membership, portfolios, grades and history are not rewritten.
+If a student ID needs correction, use **Correct student** on that existing row before importing more records.
+The manual form pins the internal identity; it does not merge records based on a reused email or name.
+Conflicting IDs/emails are rejected for instructor resolution.
+The legacy `student_number,name,github_id,github_login` CSV and setup API remain supported for existing integrations.
+Legacy imports preserve previously added institutional details.
+Staff continue to sign in with GitHub and are entered as `github:<numeric-id>` in **Course settings**.
+
+Give students the course workspace URL shown in **Students**.
+Students request a magic link using their imported institutional email; there is no registration or self-enrollment flow.
+Valid, unknown and per-address-throttled requests have the same public response.
+A link expires after 15 minutes and can be consumed once, including under concurrent verification attempts.
+Opening the link displays a confirmation button rather than consuming it on a GET, so ordinary link prefetching does not sign the student in.
+The credential is in the URL fragment, is removed from the displayed URL, and is never included in HTTP request URLs.
+Verification sends it in a bounded POST body and creates a seven-day HttpOnly, SameSite=Lax session; deployed cookies also require HTTPS.
+Email sessions grant student access only in that course, even when a historical identity is also listed as staff.
+Institutional email and student ID are hidden from other students' directory records.
+An email correction revokes links and sessions for the former address while keeping academic record ownership.
+
+Request limits are three links per address/course and 30 requests per client IP in a ten-minute window; verification permits 15 attempts per IP in that window.
+Counters and token consumption use atomic SQL operations in both local SQLite and D1.
+Production delivery is deferred through Worker `waitUntil`; a link becomes usable only after the mail adapter accepts delivery.
+A delivery error discards the pending link, logs a credential-free event and retains the generic public response.
+There is no automatic mail retry; students can retry within the same bounded limits.
+Expired credentials and counters are removed when processing new link requests.
+Auth records live in dedicated tables from `course-migrations/0002_course_auth.sql`, outside submission records and revision history.
+
+Local development always uses mock mail.
+Request a link in the anonymous browser, then use **Open local mock inbox** from the instructor's Students view and follow its link in that browser.
+The inbox is staff-only, retains the latest 1,000 messages locally, and is unavailable in the production Worker.
+The deployed request route reports that email is not configured until the production adapter in ADR-006 is enabled; it never uses the local mock inbox as a fallback.
+This local flow is not yet the isolated teacher simulation in ADR-007.
+
+## Instructor group allocation
 
 Group cards display the saved identifier and a multiple selection of enrolled students.
 Each student belongs to one group per phase.
@@ -166,19 +209,21 @@ The book can still deploy without course bindings, in which case the course API 
 Keep R2 public access disabled.
 Choose the institution's required storage location, retention and backup arrangements before collecting student records.
 Back up the D1 database and R2 bucket together; grade CSV exports alone do not preserve portfolios, source archives or assessment history.
-No email delivery, automatic repository cloning, AI grading, self-enrolment or institutional identity integration is included.
+Production email delivery still needs ADR-006 and verified sender configuration.
+Automatic repository cloning, AI grading, self-enrollment and institutional single sign-on are not included.
 
 ## Verification
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
 
 The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
-API tests cover independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
+The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
+API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 
@@ -189,7 +234,9 @@ npx wrangler dev --config wrangler.course.jsonc --local --ip 127.0.0.1 --port 87
 
 In another terminal, run `node scripts/check-course-worker.ts`.
 The credential above is a public test-only value for the loopback instance; it must never be used for a deployed session secret.
-The check only accepts a loopback URL and verifies signed sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
+The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
+It also imports a synthetic institutional student, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
+If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
 Stop the local Worker afterwards.
 The local configuration deliberately matches the pinned book runtime's compatibility date; upgrade the runtime and both configurations together.
 

@@ -78,15 +78,34 @@ Addresses can change; using them as record keys would complicate historical owne
 
 ## Implementation and verification
 
-Current course authentication and roster import still use GitHub IDs.
-Implementation must prove imported and later-added students can sign in, unknown emails cannot enroll, expired or reused links fail, and corrections preserve record ownership.
-Mock-email checks should cover this flow without sending mail to real students.
-Publish the new CSV and sign-in instructions only alongside the implemented migration and access behavior.
+Institutional CSV mapping, incremental imports, preview, manual additions/corrections, stable internal identities and the email token/session flow are implemented.
+The local server uses a staff-only mock inbox; the Worker has D1 auth and session adapters.
+Production mail wiring remains outstanding in ADR-006, so this ADR remains Accepted until that delivery boundary is integrated.
 
-## Open questions
+`worker/course-administration.ts` matches imports by institutional student ID within a run.
+Existing GitHub-keyed records retain their keys; new enrollments receive opaque UUID identities.
+Explicit manual corrections pin the internal record, and conflicting IDs/emails are rejected rather than merged.
+Email/name/student-ID corrections preserve group, portfolio and grade ownership and history.
+Legacy imports retain institutional details added earlier.
 
-- Define the migration and conflict-resolution procedure for existing GitHub-keyed course records before changing identity keys.
-- Choose token expiry, session duration, and bounded retry behavior during implementation; these are not yet fixed values.
+`worker/course-auth.ts` provides 15-minute single-use links and seven-day course-scoped student sessions.
+SQL token consumption and rate counters are atomic in D1 and local SQLite.
+Unknown and per-address-throttled emails receive the same response, failed delivery leaves no usable link, and email corrections revoke former-address credentials.
+Staff authentication remains GitHub-based; an email session never receives staff permissions.
+Other students' institutional addresses and student IDs are redacted.
+
+API tests cover migration/record preservation, conflict rejection, privacy, concurrent reuse, exact expiry boundaries, session scope/logout, request limits and delivery failure.
+The browser email flow covers column mapping, import preview, late enrollment, mock mail, first sign-in status, reuse rejection and correction.
+See [course-system.md](../../course-system.md#institutional-enrollment-and-sign-in) for the operating flow and migration procedure.
+
+## Resolved implementation details
+
+- Student IDs match only within the course enrollment context; they are never login credentials.
+- Existing numeric GitHub keys remain opaque internal identities to avoid rewriting historical references.
+- Three link requests per address/course and 30 per IP are allowed per ten minutes; verification permits 15 attempts per IP.
+- Tokens use 32 random bytes and are stored only as SHA-256 hashes in auth tables.
+- URL fragments and an explicit verification POST avoid query-log disclosure and consumption by a simple link-prefetch GET.
+- Successful email access timestamps live separately from the roster, so signing in does not invalidate an instructor's pending import.
 
 ## References
 

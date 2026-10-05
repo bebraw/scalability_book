@@ -1,9 +1,11 @@
-import type { D1Database } from "@cloudflare/workers-types";
+import type { D1Database, ExecutionContext } from "@cloudflare/workers-types";
 import { handleLearning, d1AnswerStore } from "./learning.ts";
 import { safeReturnTo } from "../shared/exercises.ts";
 import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { handleCourses } from "./courses.ts";
+import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
+import { d1CourseAuthStore } from "./course-auth-store.ts";
 import { d1CourseStore, r2FileStore } from "./course-store.ts";
 
 type Fetcher = {
@@ -79,7 +81,11 @@ const feedbackRateLimits = [
 ] as const;
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx?: Pick<ExecutionContext, "waitUntil">,
+  ): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/__worker/health") {
@@ -100,20 +106,44 @@ export default {
 
     if (
       url.pathname === "/api/courses" ||
-      url.pathname.startsWith("/api/courses/")
+      url.pathname.startsWith("/api/courses/") ||
+      url.pathname.startsWith("/api/course-auth/")
     ) {
-      const user = await getSessionUser(request, env);
-      return handleCourses(request, {
-        user:
-          user?.id && Number.isSafeInteger(user.id)
-            ? { id: `github:${user.id}`, login: user.login }
-            : null,
-        admins: (env.COURSE_ADMIN_GITHUB_LOGINS ?? "")
-          .split(",")
-          .map((s) => s.trim().toLowerCase())
-          .filter(Boolean),
-        ...(env.COURSE_DB ? { store: d1CourseStore(env.COURSE_DB) } : {}),
+      const github = await getSessionUser(request, env);
+      const githubUser =
+        github?.id && Number.isSafeInteger(github.id)
+          ? { id: `github:${github.id}`, login: github.login }
+          : null;
+      const admins = (env.COURSE_ADMIN_GITHUB_LOGINS ?? "")
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
+      const storage = {
+        ...(env.COURSE_DB
+          ? {
+              store: d1CourseStore(env.COURSE_DB),
+              auth: d1CourseAuthStore(env.COURSE_DB),
+            }
+          : {}),
         ...(env.COURSE_FILES ? { files: r2FileStore(env.COURSE_FILES) } : {}),
+      };
+      if (url.pathname.startsWith("/api/course-auth/"))
+        return handleCourseAuth(request, {
+          ...storage,
+          githubUser,
+          admins,
+          githubLoginUrl: oauthConfigured(env)
+            ? "/api/auth/github/start"
+            : null,
+          loginOrigin: "https://scalableweb.dev",
+          ...(ctx
+            ? { defer: (task: Promise<void>) => ctx.waitUntil(task) }
+            : {}),
+        });
+      return handleCourses(request, {
+        ...storage,
+        admins,
+        user: (await courseSessionUser(request, storage)) ?? githubUser,
       });
     }
 
