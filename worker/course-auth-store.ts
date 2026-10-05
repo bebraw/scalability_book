@@ -27,10 +27,13 @@ export interface AuthDatabase {
   all(sql: string, values: SqlValue[]): Promise<Record<string, unknown>[]>;
   run(sql: string, values: SqlValue[]): Promise<void>;
 }
-const grant = (row: Record<string, unknown> | null): AuthGrant | null =>
-  row
+const grant = (
+  row: Record<string, unknown> | null,
+  namespace: string,
+): AuthGrant | null =>
+  row && String(row.course_id).startsWith(namespace)
     ? {
-        course: String(row.course_id),
+        course: String(row.course_id).slice(namespace.length),
         student: String(row.student_id),
         email: String(row.email),
         expiresAt: String(row.expires_at),
@@ -38,69 +41,88 @@ const grant = (row: Record<string, unknown> | null): AuthGrant | null =>
     : null;
 
 // Every token consume and quota increment is one atomic SQL statement in both adapters.
-export function courseAuthStore(db: AuthDatabase): CourseAuthStore {
+export function courseAuthStore(
+  db: AuthDatabase,
+  namespace = "",
+): CourseAuthStore {
   return {
     issue(hash, value) {
       return db.run(
         "INSERT INTO course_login_links(token_hash, course_id, student_id, email, expires_at) VALUES(?, ?, ?, ?, ?)",
-        [hash, value.course, value.student, value.email, value.expiresAt],
+        [
+          namespace + hash,
+          namespace + value.course,
+          value.student,
+          value.email,
+          value.expiresAt,
+        ],
       );
     },
     ready(hash) {
       return db.run(
         "UPDATE course_login_links SET ready = 1 WHERE token_hash = ?",
-        [hash],
+        [namespace + hash],
       );
     },
     discard(hash) {
       return db.run("DELETE FROM course_login_links WHERE token_hash = ?", [
-        hash,
+        namespace + hash,
       ]);
     },
     async consume(hash, now) {
       return grant(
         await db.first(
           "DELETE FROM course_login_links WHERE token_hash = ? AND expires_at > ? AND ready = 1 RETURNING course_id, student_id, email, expires_at",
-          [hash, now],
+          [namespace + hash, now],
         ),
+        namespace,
       );
     },
     async session(hash, now) {
       return grant(
         await db.first(
           "SELECT course_id, student_id, email, expires_at FROM course_sessions WHERE token_hash = ? AND expires_at > ?",
-          [hash, now],
+          [namespace + hash, now],
         ),
+        namespace,
       );
     },
     saveSession(hash, value) {
       return db.run(
         "INSERT INTO course_sessions(token_hash, course_id, student_id, email, expires_at) VALUES(?, ?, ?, ?, ?)",
-        [hash, value.course, value.student, value.email, value.expiresAt],
+        [
+          namespace + hash,
+          namespace + value.course,
+          value.student,
+          value.email,
+          value.expiresAt,
+        ],
       );
     },
     deleteSession(hash) {
-      return db.run("DELETE FROM course_sessions WHERE token_hash = ?", [hash]);
+      return db.run("DELETE FROM course_sessions WHERE token_hash = ?", [
+        namespace + hash,
+      ]);
     },
     async quota(key, maximum, expiresAt) {
       return Boolean(
         await db.first(
           "INSERT INTO course_auth_attempts(key, count, expires_at) VALUES(?, 1, ?) ON CONFLICT(key) DO UPDATE SET count = count + 1 WHERE count < ? RETURNING count",
-          [key, expiresAt, maximum],
+          [namespace + key, expiresAt, maximum],
         ),
       );
     },
     recordAccess(course, student, now) {
       return db.run(
         "INSERT INTO course_access_activity(course_id, student_id, first_sign_in, last_sign_in) VALUES(?, ?, ?, ?) ON CONFLICT(course_id, student_id) DO UPDATE SET last_sign_in = excluded.last_sign_in",
-        [course, student, now, now],
+        [namespace + course, student, now, now],
       );
     },
     async activity(course) {
       return (
         await db.all(
           "SELECT student_id, first_sign_in, last_sign_in FROM course_access_activity WHERE course_id = ? ORDER BY student_id",
-          [course],
+          [namespace + course],
         )
       ).map((row) => ({
         student: String(row.student_id),
@@ -109,13 +131,22 @@ export function courseAuthStore(db: AuthDatabase): CourseAuthStore {
       }));
     },
     async cleanup(now) {
-      await db.run("DELETE FROM course_login_links WHERE expires_at <= ?", [
-        now,
-      ]);
-      await db.run("DELETE FROM course_sessions WHERE expires_at <= ?", [now]);
-      await db.run("DELETE FROM course_auth_attempts WHERE expires_at <= ?", [
-        now,
-      ]);
+      const scoped = namespace ? " AND substr(course_id, 1, ?) = ?" : "";
+      const courseValues = namespace
+        ? [now, namespace.length, namespace]
+        : [now];
+      await db.run(
+        `DELETE FROM course_login_links WHERE expires_at <= ?${scoped}`,
+        courseValues,
+      );
+      await db.run(
+        `DELETE FROM course_sessions WHERE expires_at <= ?${scoped}`,
+        courseValues,
+      );
+      await db.run(
+        `DELETE FROM course_auth_attempts WHERE expires_at <= ?${namespace ? " AND substr(key, 1, ?) = ?" : ""}`,
+        courseValues,
+      );
     },
   };
 }

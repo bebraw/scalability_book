@@ -65,6 +65,7 @@ export interface CourseContext {
   admins: string[];
   now?: string;
   auth?: CourseAuthStore;
+  exportEnvironment?: "simulation";
 }
 export const maxCourseFileBytes = 20 * 1024 * 1024;
 const privateHeaders = {
@@ -509,6 +510,7 @@ export async function handleCourses(
       );
       const lines = [
         [
+          ...(context.exportEnvironment ? ["environment"] : []),
           "student_number",
           "name",
           "identity_id",
@@ -535,6 +537,7 @@ export async function handleCourses(
         );
         lines.push(
           [
+            ...(context.exportEnvironment ? ["Simulation"] : []),
             student.number,
             student.name,
             student.id,

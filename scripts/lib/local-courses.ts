@@ -11,6 +11,7 @@ import { pipeline } from "node:stream/promises";
 import path from "node:path";
 import {
   decodeRecord,
+  decodeHistory,
   readRecordSql,
   saveRecordSql,
   historySql,
@@ -20,7 +21,6 @@ import {
   type CourseStore,
   type FileStore,
 } from "../../worker/course-store.ts";
-import type { Envelope } from "../../shared/course.ts";
 import {
   courseAuthStore,
   type CourseAuthStore,
@@ -36,6 +36,7 @@ export function localCourseStores(directory: string): {
   files: FileStore;
   auth: CourseAuthStore;
   mail: MockMailStore;
+  database: AuthDatabase;
   close(): void;
 } {
   const filesDirectory = path.join(directory, "course-files");
@@ -84,10 +85,12 @@ export function localCourseStores(directory: string): {
         .all(...(kind ? [course, kind] : [course]))
         .map((row) => decodeRecord<T>(row));
     },
-    async courses() {
+    async courses(prefix) {
       return db
-        .prepare(`${readRecordSql} WHERE kind = 'course' ORDER BY key`)
-        .all()
+        .prepare(
+          `${readRecordSql} WHERE kind = 'course'${prefix ? " AND substr(course_id, 1, ?) = ?" : ""} ORDER BY key`,
+        )
+        .all(...(prefix ? [prefix.length, prefix] : []))
         .map((row) => decodeRecord(row));
     },
     async save(record, expected, reason, guard) {
@@ -111,7 +114,7 @@ export function localCourseStores(directory: string): {
       const history = db
         .prepare(revision ? readHistorySql : readHistoryMetadataSql)
         .all(...(revision ? [key, revision] : [key]))
-        .map((row) => decodeRecord(row) as Envelope & { reason: string });
+        .map(decodeHistory);
       return revision ? history : history.reverse();
     },
   };
@@ -159,5 +162,12 @@ export function localCourseStores(directory: string): {
       });
     },
   };
-  return { store, files, auth, mail, close: () => db.close() };
+  return {
+    store,
+    files,
+    auth,
+    mail,
+    database: authDatabase,
+    close: () => db.close(),
+  };
 }

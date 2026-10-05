@@ -73,14 +73,37 @@ It could appear to work while the actual submission and grading rules behave dif
 
 ## Implementation and verification
 
-Teacher simulation is not implemented.
-Verify a teacher can import a mock roster, approve groups, follow a mock login, freeze source, complete audits and portfolios, advance deadlines, assess, release, and export results.
-Verify student views expose only the correct records and pending or missing mandatory work prevents a passing grade.
-Verify reset, role switching, clock changes, file access, and mail requests cannot affect a live course, including deliberately mismatched environment identifiers.
-Document the rehearsal steps and expected outcomes in the course-system guide when available.
+The isolation boundary and manual teacher controls are implemented in both runtime adapters.
+The [simulation router](../../../worker/course-simulation.ts) authorizes the verified instructor before selecting a simulated role, then passes the scoped adapters and clock to the existing course and magic-link handlers.
+Mock student roles use course-scoped student permissions; expired mock email sessions cannot inherit the controller's staff access.
+The [browser adapter](../../../site/scripts/course-simulation.ts) retains simulation context on requests, uploads, downloads and exports, and shows a persistent Simulation indicator, role control, mock inbox, clock and reset.
+
+The [environment adapter](../../../worker/course-simulation-environment.ts) requires separately marked D1/R2 resources whose identifiers match the configured simulation environment.
+Live routing rejects simulation-marked resources; independent backing-resource checks reject aliases even when bindings are different objects.
+The [local adapter](../../../scripts/lib/local-course-simulation.ts) uses a separate directory, inspects existing databases read-only before initialization, and rejects existing academic records and filesystem aliases.
+Each instructor and reset generation has separate record/file/auth/mail scopes within the dedicated simulation resources.
+Reset selects a new generation and clears its login; stale-generation requests fail instead of falling through to live records.
+Old synthetic generations remain unreachable through the application rather than requiring destructive deletion during reset.
+Clock changes use revision checks and do not change live schedules or another instructor's session quotas, expiry or inbox retention.
+Simulation CSVs retain the grade calculation and add a synthetic environment column and filename.
+
+Eight unit tests cover live sentinels, teacher/generation isolation, actual source freezing and streamed files, immutable history, student permissions, mock link expiry/reuse, scoped cleanup, initializer safety and mismatched environment/binding/path identities.
+The browser check covers synthetic roster import through the shared interface, mock login, role switching, clock, export, reset, mobile layout and accessibility, and rejects any escaped live course/auth request.
+The [local Worker check](../../../scripts/check-course-simulation.ts) verifies actual D1/R2 records and streaming, frozen history, mock authentication, clock and exports while retaining a live sentinel.
+The [operating guide](../../course-system.md#teacher-simulation) documents the implemented manual rehearsal and resource setup.
+No production resources have been provisioned or deployed by this work.
+
+This ADR remains Accepted: the compact/larger preparation and grading-review presets, realistic scenario evidence, all named edge cases, and a complete teacher walkthrough through audits, portfolios, assessment and release remain outstanding.
+Verify pending or missing mandatory work prevents a passing grade in those scenarios.
+The withdrawal scenario depends on ADR-004's institutional handling decision.
 
 ## Open questions
 
-- Choose the deployed storage and routing arrangement that enforces simulation isolation before implementation.
-  Separate backing resources are preferable where a shared resource cannot provide a reliable boundary.
 - Choose fixture/reset versioning so a teacher can repeat a scenario after application changes.
+
+## Implementation choices
+
+- Use dedicated D1/R2 bindings with positive environment markers and reciprocal live-resource rejection rather than selecting a course in live storage by a client flag.
+- Scope records, files and authentication by verified instructor and reset generation; select a new generation for reset instead of deleting resources or rewriting a live course.
+- Keep the verified controller identity separate from the student identity supplied to the existing domain handlers.
+  Role switching is a teacher control, not a deployed test header or a student impersonation privilege.

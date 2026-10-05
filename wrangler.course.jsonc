@@ -17,11 +17,21 @@
       "database_id": "00000000-0000-0000-0000-000000000001",
       "migrations_dir": "course-migrations",
     },
+    {
+      "binding": "COURSE_SIMULATION_DB",
+      "database_name": "scalability-book-course-simulation",
+      "database_id": "00000000-0000-0000-0000-000000000007",
+      "migrations_dir": "course-migrations",
+    },
   ],
   "r2_buckets": [
     {
       "binding": "COURSE_FILES",
       "bucket_name": "scalability-book-course-files",
+    },
+    {
+      "binding": "COURSE_SIMULATION_FILES",
+      "bucket_name": "scalability-book-course-simulation-files",
     },
   ],
   // Native binding shape is checked here, but local login uses the app's mock
@@ -32,6 +42,9 @@
       "allowed_sender_addresses": ["info@scalableweb.dev"],
     },
   ],
-  "vars": { "COURSE_EMAIL_ENABLED": "false" },
+  "vars": {
+    "COURSE_EMAIL_ENABLED": "false",
+    "COURSE_SIMULATION_ID": "course-simulation-local-v1",
+  },
   "observability": { "enabled": true },
 }

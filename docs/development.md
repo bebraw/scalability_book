@@ -140,6 +140,9 @@ Local records persist separately in `.local/course.sqlite` and `.local/course-fi
 See [course-system.md](course-system.md) for the instructor workflow, access rules, production bindings and verification commands.
 Published requirements are pinned by run; use [requirements/README.md](../requirements/README.md) when changing course briefs or the authored submission checklist.
 The build rejects drift from the current archived requirement edition.
+Teacher simulation uses the shared interface with separate adapters and a persistent indicator; local records live in `.local/course-simulation/`.
+See [the simulation guide](course-system.md#teacher-simulation) for manual controls, scoped mock login/clock/reset, Worker resource markers and the dedicated local binding check.
+Scenario presets remain outstanding; an empty rehearsal is not evidence of complete scenario coverage.
 
 ## Feedback Review
 

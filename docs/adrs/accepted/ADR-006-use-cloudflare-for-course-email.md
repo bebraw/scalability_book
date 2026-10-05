@@ -69,12 +69,13 @@ The magic-link flow and `worker/course-mail.ts` implement native Cloudflare Emai
 Both the binding and `COURSE_EMAIL_ENABLED: "true"` are required to select this transport.
 Production configuration contains a commented sender-restricted binding example; the isolated local Worker configuration validates its shape with delivery disabled.
 Local application development uses the staff-only mock inbox and never selects production mail as a fallback.
-The teacher simulation's equivalent boundary remains dependent on ADR-007.
+Teacher simulation also selects a scoped mock inbox explicitly and never receives the live Cloudflare mail transport.
+Its browser/local Worker checks exercise login through the mock inbox; Worker tests verify that simulation sends no mail even when the live binding and delivery flag are enabled.
 
 Worker tests with a mocked binding verify `waitUntil` delivery, unusable pending links, activation after provider acceptance, discarded links on failure, fixed sender, plain text/escaped HTML and credential-free responses/logs.
 The typed build and Worker dry run check the pinned binding/runtime integration; no actual email is sent by these checks.
 
-This ADR remains Accepted because the full recorded decision includes the simulation mail boundary and external setup still outstanding.
+This ADR remains Accepted because external setup and actual delivery verification are still outstanding.
 The 2026-10-05 read-only domain inventory did not show `scalableweb.dev` enabled for sending; the Gmail destination is not yet supplied or verified.
 Before production use, verify account eligibility, domain and sender, configure forwarding to the verified Gmail destination, and exercise delivery to an instructor-controlled address under explicit send authorization.
 The [course-system operating guide](../../course-system.md#course-mail-setup) records the binding/enablement, DNS prerequisites, controlled-delivery procedure and support workflow.

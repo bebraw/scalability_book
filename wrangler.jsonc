@@ -15,6 +15,10 @@
   //   "allowed_sender_addresses": ["info@scalableweb.dev"] }],
   // Merge COURSE_EMAIL_ENABLED: "true" into vars only after the mail setup in
   // docs/course-system.md. A binding alone does not enable login delivery.
+  // Teacher simulation requires separate COURSE_SIMULATION_DB and
+  // COURSE_SIMULATION_FILES resources and COURSE_SIMULATION_ID. Initialize
+  // their matching markers with docs/course-system.md; never alias live bindings.
+  // Simulation always uses mock mail, regardless of COURSE_EMAIL_ENABLED.
   // Private exercise answers use a separate D1 database. Provision and migrate
   // it before enabling production saves; see docs/chapter-exercises.md.
   // "d1_databases": [{

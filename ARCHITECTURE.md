@@ -53,14 +53,25 @@ Final evidence lives on new submission revisions; frozen source/setup/initial ev
 Private draft redaction and file authorization stay in `worker/courses.ts`; submitted final evidence changes assessment freshness using the existing revision boundary.
 The [submission decision](docs/adrs/implemented/ADR-005-submit-reproducible-source-with-phase-checklists.md) records this extension and its verification.
 
+Teacher rehearsal enters through instructor-only `/api/simulation/` and the shared course interface's simulation context.
+`worker/course-simulation.ts` separates the verified controller from the selected mock student and invokes the existing course/auth handlers.
+`worker/course-simulation-store.ts` scopes records, files, login credentials, quotas and mock mail by instructor and reset generation; `shared/course-simulation.ts` owns the browser/control state contract.
+Simulation state is a revision-checked record in dedicated storage, including its clock and selected role; requests retain their generation and cannot fall through to live adapters.
+`worker/course-simulation-environment.ts` checks positive D1/R2 environment markers and rejects aliases to live resources; `scripts/lib/local-course-simulation.ts` provides a separate local directory with read-only initialization checks.
+`site/scripts/course-simulation.ts` owns teacher controls, persistent indication and request/download context; ordinary forms and grade calculations remain shared.
+Reset selects a new namespace and clears its login without deleting backing resources; old synthetic generations remain inaccessible through the course API.
+Preset fixtures and the complete teacher scenario walkthrough remain outstanding in [ADR-007](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
+
 ## State and access
 
-| Data                                   | Local storage                       | Production storage                      |
-| -------------------------------------- | ----------------------------------- | --------------------------------------- |
-| Course records and revision history    | `.local/course.sqlite`              | Dedicated `COURSE_DB` D1 binding        |
-| Course source archives and attachments | `.local/course-files/`              | Private `COURSE_FILES` R2 binding       |
-| Reader feedback                        | `.local/comments.json`              | `COMMENTS_KV`                           |
-| Chapter exercise answers               | `.local/learning.sqlite` by default | Separate optional `LEARNING_DB` binding |
+| Data                                    | Local storage                            | Production storage                            |
+| --------------------------------------- | ---------------------------------------- | --------------------------------------------- |
+| Course records and revision history     | `.local/course.sqlite`                   | Dedicated `COURSE_DB` D1 binding              |
+| Course source archives and attachments  | `.local/course-files/`                   | Private `COURSE_FILES` R2 binding             |
+| Teacher simulation and revision history | `.local/course-simulation/course.sqlite` | Separate `COURSE_SIMULATION_DB` D1 binding    |
+| Simulation archives and attachments     | `.local/course-simulation/course-files/` | Separate `COURSE_SIMULATION_FILES` R2 binding |
+| Reader feedback                         | `.local/comments.json`                   | `COMMENTS_KV`                                 |
+| Chapter exercise answers                | `.local/learning.sqlite` by default      | Separate optional `LEARNING_DB` binding       |
 
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
@@ -69,7 +80,7 @@ See [course-system.md](docs/course-system.md) and [chapter-exercises.md](docs/ch
 Staff authentication uses GitHub OAuth with a verified numeric GitHub identity.
 The course domain also supports institutional roster identities and course-scoped email sessions.
 Auth tokens, sessions, rate counters and access activity use dedicated tables in the course database, outside submission records and grade history.
-Local development uses mock mail; production uses a gated native Cloudflare binding whose domain, incoming forwarding and live delivery check still need external setup.
+Local development and teacher simulation use explicit mock mail; production uses a gated native Cloudflare binding whose domain, incoming forwarding and live delivery check still need external setup.
 Existing GitHub-keyed student records retain their keys during migration to preserve historical ownership.
 Course staff permissions are separate from reader-feedback moderation permissions.
 Development-only local identities and explicitly enabled browser-test headers are not deployed authentication methods.
@@ -110,8 +121,8 @@ Their implemented status identifies repository behavior or published course cont
 The following decisions have implementation work outstanding in the current course workspace:
 
 - [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication, working agreements and recorded late-arrival catch-up are implemented; withdrawal tasks and their institutional export handling remain.
-- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration is implemented; domain setup, verified Gmail forwarding, live delivery verification and the teacher simulation's mock-mail boundary remain outstanding.
-- [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated mock workflows in both the instructor website and local development.
+- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified Gmail forwarding and live delivery verification remain outstanding.
+- [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated adapters and manual teacher controls are implemented in both runtimes; preparation/review presets and the complete teacher scenario walkthrough remain.
 
 Implement these in bounded changes that retain historical identities, frozen membership, assessment provenance, and privacy.
 Record the implementation evidence before moving each ADR to `implemented/`.

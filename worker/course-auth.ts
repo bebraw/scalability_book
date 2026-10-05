@@ -39,6 +39,7 @@ export interface AuthContext {
   admins?: string[];
   defer?: (task: Promise<void>) => void;
   loginOrigin?: string;
+  loginParameters?: Record<string, string>;
 }
 const headers = {
   "Cache-Control": "private, no-store",
@@ -218,6 +219,10 @@ export async function handleCourseAuth(
               context.loginOrigin ?? url.origin,
             );
             loginUrl.searchParams.set("course", courseId);
+            for (const [key, value] of Object.entries(
+              context.loginParameters ?? {},
+            ))
+              loginUrl.searchParams.set(key, value);
             loginUrl.hash = `login=${token}`;
             await mail.send({
               course: courseId,

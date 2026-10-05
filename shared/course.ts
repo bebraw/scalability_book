@@ -107,6 +107,10 @@ export interface Envelope<T = unknown> {
   updatedAt: string;
   actor: string;
 }
+export type RecordHistory = Pick<
+  Envelope,
+  "key" | "value" | "revision" | "updatedAt" | "actor"
+> & { reason: string };
 export interface Submission {
   requirements?: string;
   checklist?: EvidenceCheckpoint[];

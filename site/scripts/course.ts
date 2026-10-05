@@ -4,6 +4,14 @@ import {
   requirementsFor,
 } from "../../shared/course-requirements.ts";
 import { courseSignIn } from "./course-signin.ts";
+import {
+  courseApiUrl,
+  initializeSimulation,
+  offerSimulation,
+  refreshSimulation,
+  returnToSimulationInstructor,
+  simulationMode,
+} from "./course-simulation.ts";
 import { studentGroups } from "./course-formation.ts";
 import {
   sourceGuidance,
@@ -47,6 +55,7 @@ import {
   type Phase,
   type Course,
   type Envelope,
+  type RecordHistory,
   type Submission,
   type Portfolio,
   type Audit,
@@ -99,7 +108,9 @@ const when = (date: string) =>
     timeStyle: "short",
   });
 const route = (action: string, subject = "") =>
-  `/api/courses/${view!.config.value.id}/${action}/${phase}${subject ? `/${encodeURIComponent(subject)}` : ""}`;
+  courseApiUrl(
+    `/api/courses/${view!.config.value.id}/${action}/${phase}${subject ? `/${encodeURIComponent(subject)}` : ""}`,
+  );
 const revision = (r?: Envelope) => r?.revision ?? null;
 const fileLink = (f: CourseFile) =>
   `<a href="${route("files", f.id)}">${e(f.name)}</a> <small>${(f.bytes / 1024).toFixed(0)} KiB · SHA-256 <code>${e(f.sha256)}</code></small>`;
@@ -127,7 +138,7 @@ window.addEventListener("hashchange", () => {
   tell("Confirm the sign-in link to open your course.");
 });
 async function api<T>(url: string, method = "GET", body?: unknown): Promise<T> {
-  const response = await fetch(url, {
+  const response = await fetch(courseApiUrl(url), {
     method,
     credentials: "same-origin",
     ...(body
@@ -169,11 +180,14 @@ async function openCourse(id: string) {
       (view.staff ? config.students[0]?.id : view.user.id) ?? "";
   dirty = false;
   render();
+  await refreshSimulation(
+    view.staff ? null : { course: config.id, student: view.user.id },
+  );
 }
 function header() {
   const course = view!.config.value;
   const edition = requirementsFor(course);
-  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="${requirementUrl(edition.version, "introduction")}">Project guide ↗</a><a href="${requirementUrl(edition.version, "grading")}">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button><button type="button" class="course-quiet" data-email-login>Email sign-in</button><button type="button" class="course-quiet" data-course-logout>Sign out</button></div>
+  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="${requirementUrl(edition.version, "introduction")}">Project guide ↗</a><a href="${requirementUrl(edition.version, "grading")}">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button><button type="button" class="course-quiet" data-email-login>Email sign-in</button><button type="button" class="course-quiet" data-course-logout>${simulationMode ? "Return to instructor" : "Sign out"}</button></div>
   <div class="course-heading"><div><p class="course-eyebrow">${view!.staff ? "Instructor workspace" : "Student workspace"}${local ? " · Local development" : ""}</p><h2>${e(course.name)}</h2></div><p class="course-identity">Signed in as <strong>${e(view!.user.login)}</strong></p></div>
   <div class="course-phases" role="group" aria-label="Project phase">${phases.map((p, i) => `<button type="button" data-phase="${p}" aria-pressed="${phase === p}"><span>0${i + 1}</span> ${title(p)} <small>${course.phases[p].published ? "Results released" : "Results pending"}</small></button>`).join("")}</div>
   <nav class="course-tabs" aria-label="Course workspace">${[
@@ -500,7 +514,7 @@ function gradebook() {
   const adjustment = course.adjustments.find(
     (a) => a.student === selectedStudent && a.phase === phase,
   );
-  return `<section class="course-section"><div class="course-section-heading"><h3>Course gradebook</h3><a class="course-button" href="/api/courses/${course.id}/export">Export released grades (CSV)</a></div><p>Instructor view includes provisional scores. Exports use released assessments; pending work has a blank final grade. Missing work must be explicitly assessed.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Instructor totals · provisional until release</caption><thead><tr><th>Student</th><th>Points</th><th>Percentage</th><th>Result</th><th>Requirements</th></tr></thead><tbody>${v.results.map(({ student, result }) => `<tr><th><button type="button" data-grade-student="${e(student.id)}">${e(student.name)}</button><small>${e(student.number)}</small></th><td>${result.earned}/${result.available}</td><td>${result.percentage.toFixed(1)}%</td><td>${result.grade === null ? "Pending" : result.grade === 0 ? "Fail" : `Grade ${result.grade}`}</td><td>${e([...result.pending, ...result.unmet].join("; ") || "All met")}</td></tr>`).join("")}</tbody></table></div>
+  return `<section class="course-section"><div class="course-section-heading"><h3>Course gradebook</h3><a class="course-button" href="${courseApiUrl(`/api/courses/${course.id}/export`)}">Export released grades (CSV)</a></div><p>Instructor view includes provisional scores. Exports use released assessments; pending work has a blank final grade. Missing work must be explicitly assessed.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Instructor totals · provisional until release</caption><thead><tr><th>Student</th><th>Points</th><th>Percentage</th><th>Result</th><th>Requirements</th></tr></thead><tbody>${v.results.map(({ student, result }) => `<tr><th><button type="button" data-grade-student="${e(student.id)}">${e(student.name)}</button><small>${e(student.number)}</small></th><td>${result.earned}/${result.available}</td><td>${result.percentage.toFixed(1)}%</td><td>${result.grade === null ? "Pending" : result.grade === 0 ? "Fail" : `Grade ${result.grade}`}</td><td>${e([...result.pending, ...result.unmet].join("; ") || "All met")}</td></tr>`).join("")}</tbody></table></div>
   <form data-form="publish" class="course-note"><h4>${title(phase)} results: ${schedule.published ? "released" : "private drafts"}</h4><p>All groups and students need assessment records before release. Record zero scores for missing work, with reasons.</p>${input("reason", "Reason for releasing or withdrawing results", "")}<button type="submit">${schedule.published ? "Withdraw phase results" : "Release phase results"}</button></form>
   ${studentPicker()}${selected ? `<h4>${e(selected.student.name)}: points and passing requirements</h4>${resultMarkup(selected.result)}<details><summary>Approved individual arrangement for ${title(phase)}</summary><form data-form="adjustment"><p>Document the approved replacement activity or adjusted requirement. Changes and reasons remain in the private history.</p>${input("lectureMinimum", "Required complete lecture activities (0–3)", String(adjustment?.lectureMinimum ?? 2), true, "number")}${input("assessmentMinimum", "Self/peer minimum (0–12)", String(adjustment?.assessmentMinimum ?? 6), true, "number")}${input("contributionMinimum", "Contribution minimum (0–3)", String(adjustment?.contributionMinimum ?? 1), true, "number")}${input("availablePoints", "Available individual points this phase (1–21)", String(adjustment?.availablePoints ?? 21), true, "number")}${field("reason", "Approved arrangement, replacement activity and reason", adjustment?.reason ?? "", 2000, true)}<button type="submit">Save private arrangement</button></form></details>` : ""}</section>`;
 }
@@ -692,7 +706,7 @@ content.addEventListener("click", async (event) => {
       return;
     }
     if (button.dataset.version && button.dataset.history) {
-      const data = await api<{ history: Envelope[] }>(
+      const data = await api<{ history: RecordHistory[] }>(
         `/api/courses/${view!.config.value.id}/history?key=${encodeURIComponent(button.dataset.history)}&revision=${encodeURIComponent(button.dataset.version)}`,
       );
       const pre = document.createElement("pre");
@@ -701,7 +715,7 @@ content.addEventListener("click", async (event) => {
       return;
     }
     if (button.dataset.history) {
-      const data = await api<{ history: (Envelope & { reason: string })[] }>(
+      const data = await api<{ history: RecordHistory[] }>(
         `/api/courses/${view!.config.value.id}/history?key=${encodeURIComponent(button.dataset.history)}`,
       );
       const dialog = content.querySelector<HTMLDialogElement>(
@@ -870,6 +884,11 @@ content.addEventListener("click", async (event) => {
       return;
     }
     if (button.hasAttribute("data-course-logout")) {
+      if (simulationMode) {
+        await returnToSimulationInstructor();
+        location.reload();
+        return;
+      }
       await api("/api/course-auth/logout", "POST", {});
       await api("/api/auth/logout", "POST", {});
       location.reload();
@@ -1179,6 +1198,21 @@ content.addEventListener("submit", async (event) => {
 });
 async function start() {
   try {
+    if (
+      !(await initializeSimulation(
+        root,
+        () => {
+          if (!allowNavigation()) return false;
+          dirty = false;
+          return true;
+        },
+        tell,
+      ))
+    ) {
+      content.innerHTML =
+        "<p>Use Teacher controls to start your synthetic rehearsal.</p>";
+      return;
+    }
     const auth = await api<{
       authenticated: boolean;
       local: boolean;
@@ -1203,6 +1237,8 @@ async function start() {
       return;
     }
     listing = await api<Listing>("/api/courses");
+    if (listing.canCreate || listing.courses.some((course) => course.staff))
+      await offerSimulation(root);
     const query = new URLSearchParams(location.search).get("course");
     if (query && listing.courses.some((c) => c.id === query))
       await openCourse(query);
@@ -1210,9 +1246,11 @@ async function start() {
       await openCourse(listing.courses[0]!.id);
     else render();
     tell(
-      local
-        ? "Local workspace · data is stored on this computer. Production course records use separate storage."
-        : "Course records loaded. Private portfolios and grades are visible only to their owners and course staff.",
+      simulationMode
+        ? "Simulation workspace · changes apply only to your rehearsal."
+        : local
+          ? "Local workspace · data is stored on this computer. Production course records use separate storage."
+          : "Course records loaded. Private portfolios and grades are visible only to their owners and course staff.",
     );
   } catch (error) {
     tell((error as Error).message, true);

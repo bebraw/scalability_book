@@ -1,18 +1,15 @@
-import type { Envelope } from "../shared/course.ts";
+import type { Envelope, RecordHistory } from "../shared/course.ts";
 export interface CourseStore {
   get<T>(key: string): Promise<Envelope<T> | null>;
   list<T>(course: string, kind?: string): Promise<Envelope<T>[]>;
-  courses(): Promise<Envelope[]>;
+  courses(prefix?: string): Promise<Envelope[]>;
   save(
     record: Envelope,
     expected: string | null,
     reason: string,
     guard?: { key: string; revision: string },
   ): Promise<boolean>;
-  history(
-    key: string,
-    revision?: string,
-  ): Promise<(Envelope & { reason: string })[]>;
+  history(key: string, revision?: string): Promise<RecordHistory[]>;
 }
 export interface FileStore {
   put(
@@ -59,8 +56,14 @@ export function decodeRecord<T>(row: unknown): Envelope<T> {
   const { body, ...rest } = row as Envelope & { body: string };
   return { ...rest, value: JSON.parse(body) } as Envelope<T>;
 }
+export function decodeHistory(row: unknown): RecordHistory {
+  const { body, ...rest } = row as Omit<RecordHistory, "value"> & {
+    body: string;
+  };
+  return { ...rest, value: JSON.parse(body) };
+}
 export function d1CourseStore(db: CourseBindings["COURSE_DB"]): CourseStore {
-  async function list<T>(clause: string, bindings: string[]) {
+  async function list<T>(clause: string, bindings: (string | number)[]) {
     const rows: Envelope<T>[] = [];
     let cursor = "";
     for (;;) {
@@ -89,8 +92,11 @@ export function d1CourseStore(db: CourseBindings["COURSE_DB"]): CourseStore {
         kind ? [course, kind] : [course],
       );
     },
-    courses() {
-      return list("kind = ?", ["course"]);
+    courses(prefix) {
+      return list(
+        prefix ? "kind = ? AND substr(course_id, 1, ?) = ?" : "kind = ?",
+        prefix ? ["course", prefix.length, prefix] : ["course"],
+      );
     },
     async save(record, expected, reason, guard) {
       const result = await db.batch([
@@ -106,9 +112,7 @@ export function d1CourseStore(db: CourseBindings["COURSE_DB"]): CourseStore {
         .prepare(revision ? readHistorySql : readHistoryMetadataSql)
         .bind(...(revision ? [key, revision] : [key]))
         .all();
-      const history = result.results.map(
-        (row) => decodeRecord(row) as Envelope & { reason: string },
-      );
+      const history = result.results.map(decodeHistory);
       return revision ? history : history.reverse();
     },
   };

@@ -13,7 +13,8 @@ Institutional imports, corrections, account activity and the magic-link flow wor
 Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
 Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
-Production email provisioning, withdrawal workflows and teacher simulation remain pending.
+Teacher simulation has isolated storage and manual controls in both runtimes; scenario presets and the complete teaching walkthrough remain pending.
+Production email provisioning and withdrawal workflows also remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -348,17 +349,82 @@ Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploy
 Check enrollment/address corrections and Cloudflare delivery, bounce and suppression logs before asking a student to request another link.
 Requests remain bounded by the application limits above; there is no automatic retry or staff endpoint that reveals a production login credential.
 Forwarding does not provide branded human replies from Gmail; reply from the existing inbox unless a separate reply arrangement is agreed.
-The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks the remaining setup and simulation boundary.
+The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks the remaining external setup and actual delivery verification.
 
 `wrangler.course.jsonc` includes a local-only email binding shape with delivery disabled for validation.
 Do not use `remote: true` for that binding or enable live email for development or teacher rehearsals.
 The application development server uses its own mock inbox independently of these production settings.
 
+## Teacher simulation
+
+In the instructor workspace, choose **Open teacher simulation** when its resources are configured.
+Local application development initializes a separate `.local/course-simulation/` directory automatically; deployed/local Worker use requires the explicit setup below.
+Only a verified GitHub course administrator or instructor can open simulation or use its controls.
+Development uses the existing loopback instructor identity; production ignores test identity headers.
+An institutional student session alone does not authorize simulation.
+
+The persistent **Simulation** banner identifies the rehearsal and its clock.
+**Teacher controls** can start an empty rehearsal, switch between instructor and enrolled mock students, advance time, open a mock inbox, or reset to an empty rehearsal.
+Create a course through the ordinary form and import a synthetic institutional CSV through **Students**.
+The group, submission, audit, portfolio and grading forms use the existing authorization and domain handlers.
+Role switching retains student permissions; **Return to instructor** restores the teacher role and revokes the current simulated email login while retaining the real GitHub session.
+Use **Email sign-in**, request a mock student's link, then follow **Confirm mock sign-in** from the banner's inbox to test the actual single-use login flow.
+Advancing the clock controls course windows and mock credential expiry; it does not change saved schedules or real time.
+The clock only moves forward; reset restores `2026-10-05T08:00:00.000Z`.
+Role and clock controls are shared by this instructor's browser tabs and use revision checks.
+
+Each instructor has their own record/file/auth/mail namespace.
+Reset selects a new generation and clears its simulated login; old-generation requests fail.
+It does not delete or reset any backing resource or live course.
+Old synthetic generations remain stored but are inaccessible through the application; resource cleanup is a separate operator task.
+The simulations do not load real rosters as presets or select live mail as a fallback.
+CSV exports add an `environment` column containing `Simulation` and use `SIMULATION-course-grades.csv`; numerical grading is unchanged.
+**Leave simulation** returns to the live workspace and retains the instructor's real GitHub session.
+Malformed environment/generation context is rejected; course requests, file links and exports do not default to live routes.
+
+Preparation/grading-review presets and their complete teacher walkthrough are still being implemented under [ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
+The current empty rehearsal does not yet supply the accepted scenario cohorts or establish coverage of every named grading/administration edge case.
+
+### Separate Worker resources
+
+Provision a new empty D1 database and a new empty private R2 bucket solely for teacher simulation.
+Add `COURSE_SIMULATION_DB` with `migrations_dir: "course-migrations"`, `COURSE_SIMULATION_FILES`, and a `COURSE_SIMULATION_ID` of 3–64 lowercase letters/digits/hyphens to the production configuration, retaining the independent live bindings.
+Do not reuse existing academic resources or enable remote bindings for local rehearsals.
+Apply the course migrations to the simulation D1 binding, including `0003_simulation_mail.sql`.
+Generate matching initialization files in a new directory:
+
+```bash
+node scripts/prepare-course-simulation.ts teacher-v1 .local/simulation-provisioning/teacher-v1
+```
+
+Apply `environment.sql` only to the new simulation database; it inserts a marker only when the record, history, credential, quota, activity and mock-mail tables are empty.
+Confirm its final query returns `simulation-environment`, `simulation`, and the exact configured identifier.
+Upload `environment.json` only to the new simulation bucket at the key `simulation/environment.json`.
+The initializer does not overwrite another marker, and the Worker checks both resource markers before opening controls or data.
+Live routing also rejects marked resources, so aliasing bindings to the same backing resources fails rather than sharing them.
+Do not remove or change markers to bypass a failed isolation check; correct the bindings.
+This repository support does not provision production resources or deploy the Worker.
+
+For the separate local Worker configuration, use fresh isolated temporary resources:
+
+```bash
+node scripts/prepare-course-simulation.ts course-simulation-local-v1 /tmp/course-simulation-markers
+npx wrangler d1 migrations apply COURSE_DB --config wrangler.course.jsonc --local --persist-to /tmp/course-worker-state
+npx wrangler d1 migrations apply COURSE_SIMULATION_DB --config wrangler.course.jsonc --local --persist-to /tmp/course-worker-state
+npx wrangler d1 execute COURSE_SIMULATION_DB --config wrangler.course.jsonc --local --persist-to /tmp/course-worker-state --file /tmp/course-simulation-markers/environment.sql
+npx wrangler r2 object put scalability-book-course-simulation-files/simulation/environment.json --config wrangler.course.jsonc --local --persist-to /tmp/course-worker-state --file /tmp/course-simulation-markers/environment.json
+```
+
+Then start the loopback Worker using the command below and run `node scripts/check-course-simulation.ts` in another terminal.
+The check only accepts loopback and writes synthetic records to those local resources.
+It verifies actual D1/R2 isolation and streaming, a frozen student-owned archive/history, student visibility, mock login/reuse/expiry, clock, marked export and reset, while retaining a live sentinel.
+Stop that Worker afterwards.
+
 ## Verification
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts tests/e2e/course-simulation.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
@@ -372,6 +438,9 @@ The controlled source fixture is unpacked into a clean temporary directory, inst
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 The mail tests exercise the actual Worker adapter with a mocked Cloudflare binding, checking the enablement boundary, `waitUntil`, pending-link safety, provider failures, fixed sender, escaped templates and absence of a deployed mock inbox.
 They do not send real email.
+Simulation checks cover teacher/student permissions, live sentinels, teacher and reset-generation isolation, scoped expiry/quotas/inbox retention, immutable history, clock, export labels and malformed context.
+Worker adapter tests reject missing/wrong markers, distinct binding objects aliasing the same resources, live-file/database aliases and forged test identities, and prove simulation selects no live mail even when delivery is enabled.
+The simulation browser check covers synthetic roster import, mock login, role switching, clock, export, reset, mobile/accessibility and the absence of escaped live course/auth requests.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 

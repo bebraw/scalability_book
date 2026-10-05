@@ -9,6 +9,12 @@ import { localAnswerStore } from "./lib/local-answers.ts";
 import { handleLearning } from "../worker/learning.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
+import { localCourseSimulation } from "./lib/local-course-simulation.ts";
+import {
+  handleSimulation,
+  simulationTeacherAllowed,
+} from "../worker/course-simulation.ts";
+import { assertLiveCourseStorage } from "../worker/course-simulation-environment.ts";
 import { handleCourses } from "../worker/courses.ts";
 import { courseSessionUser, handleCourseAuth } from "../worker/course-auth.ts";
 import {
@@ -23,6 +29,7 @@ const buildDir = buildPaths.current;
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const answers = localAnswerStore(dataDir);
 const courses = localCourseStores(dataDir);
+const simulation = await localCourseSimulation(dataDir);
 const commentsPath = path.join(dataDir, "comments.json");
 const configPath = path.join(root, "site.config.jsonc");
 const sourceRebuildDebounce = 250;
@@ -78,7 +85,8 @@ const server = createServer(async (request, response) => {
     if (
       url.pathname === "/api/courses" ||
       url.pathname.startsWith("/api/courses/") ||
-      url.pathname.startsWith("/api/course-auth/")
+      url.pathname.startsWith("/api/course-auth/") ||
+      url.pathname.startsWith("/api/simulation/")
     ) {
       const headers = new Headers();
       for (const [key, value] of Object.entries(request.headers)) {
@@ -121,13 +129,26 @@ const server = createServer(async (request, response) => {
         local: true,
         mockInbox: courses.mail,
       };
-      const result = url.pathname.startsWith("/api/course-auth/")
-        ? await handleCourseAuth(webRequest, context)
-        : await handleCourses(webRequest, {
-            ...courses,
-            user: (await courseSessionUser(webRequest, courses)) ?? githubUser,
-            admins: ["local-editor"],
-          });
+      await assertLiveCourseStorage(courses.store);
+      const result = url.pathname.startsWith("/api/simulation/")
+        ? await handleSimulation(webRequest, {
+            environment: simulation,
+            teacher: githubUser,
+            local: true,
+            authorized: await simulationTeacherAllowed(
+              githubUser,
+              ["local-editor"],
+              courses.store,
+            ),
+          })
+        : url.pathname.startsWith("/api/course-auth/")
+          ? await handleCourseAuth(webRequest, context)
+          : await handleCourses(webRequest, {
+              ...courses,
+              user:
+                (await courseSessionUser(webRequest, courses)) ?? githubUser,
+              admins: ["local-editor"],
+            });
       response.writeHead(result.status, Object.fromEntries(result.headers));
       if (result.body)
         for await (const chunk of result.body) {

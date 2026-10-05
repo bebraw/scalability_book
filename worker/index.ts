@@ -8,6 +8,14 @@ import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
 import { d1CourseAuthStore } from "./course-auth-store.ts";
 import { cloudflareCourseMail } from "./course-mail.ts";
 import { d1CourseStore, r2FileStore } from "./course-store.ts";
+import {
+  handleSimulation,
+  simulationTeacherAllowed,
+} from "./course-simulation.ts";
+import {
+  assertLiveCourseStorage,
+  d1SimulationEnvironment,
+} from "./course-simulation-environment.ts";
 
 type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
@@ -54,6 +62,9 @@ type Env = {
   COURSE_FILES?: CourseBindings["COURSE_FILES"];
   COURSE_MAIL?: CourseBindings["COURSE_MAIL"];
   COURSE_EMAIL_ENABLED?: string;
+  COURSE_SIMULATION_DB?: CourseBindings["COURSE_SIMULATION_DB"];
+  COURSE_SIMULATION_FILES?: CourseBindings["COURSE_SIMULATION_FILES"];
+  COURSE_SIMULATION_ID?: string;
 };
 
 const immutableAssetPattern =
@@ -110,7 +121,8 @@ export default {
     if (
       url.pathname === "/api/courses" ||
       url.pathname.startsWith("/api/courses/") ||
-      url.pathname.startsWith("/api/course-auth/")
+      url.pathname.startsWith("/api/course-auth/") ||
+      url.pathname.startsWith("/api/simulation/")
     ) {
       const github = await getSessionUser(request, env);
       const githubUser =
@@ -130,6 +142,37 @@ export default {
           : {}),
         ...(env.COURSE_FILES ? { files: r2FileStore(env.COURSE_FILES) } : {}),
       };
+      try {
+        await assertLiveCourseStorage(storage.store, env.COURSE_FILES);
+        if (url.pathname.startsWith("/api/simulation/")) {
+          return handleSimulation(request, {
+            teacher: githubUser,
+            authorized: await simulationTeacherAllowed(
+              githubUser,
+              admins,
+              storage.store,
+            ),
+            ...(env.COURSE_SIMULATION_ID &&
+            env.COURSE_SIMULATION_DB &&
+            env.COURSE_SIMULATION_FILES
+              ? {
+                  environment: d1SimulationEnvironment(
+                    env.COURSE_SIMULATION_ID,
+                    env.COURSE_SIMULATION_DB,
+                    env.COURSE_SIMULATION_FILES,
+                    storage.store,
+                    env.COURSE_FILES,
+                  ),
+                }
+              : {}),
+          });
+        }
+      } catch {
+        return Response.json(
+          { message: "Course storage isolation could not be verified." },
+          { status: 503, headers: { "Cache-Control": "private, no-store" } },
+        );
+      }
       if (url.pathname.startsWith("/api/course-auth/")) {
         const mail = cloudflareCourseMail(
           env.COURSE_MAIL,
