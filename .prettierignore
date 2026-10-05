@@ -1,2 +1,4 @@
 node_modules/
 build/
+# Keep Wrangler's generated format for its --check command.
+worker/course-env.d.ts

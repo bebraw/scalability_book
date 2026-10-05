@@ -371,6 +371,29 @@ await writePage(
   }),
 );
 
+for (const [destination, admin] of [
+  ["course", false],
+  ["admin/courses", true],
+]) {
+  await writePage(
+    `${destination}/index.html`,
+    renderer.renderLayout({
+      title: `${admin ? "Course administration" : "My course"} - ${config.title}`,
+      description:
+        "Course submissions, audit assignments, private portfolios and assessment.",
+      currentUrl: `/${destination}/`,
+      stylesheets: ["/styles/course.css"],
+      scripts: ["/course.js", ...developmentScripts],
+      children: `<main id="content" class="course-shell" data-course-app data-admin="${admin}">
+      <div class="course-masthead"><p class="course-eyebrow">Elements of Scalable Web Development · Course workspace</p>
+      <h1>${admin ? "Course administration" : "My course"}</h1><p>Shared project evidence. Private individual assessment.</p></div>
+      <p data-course-notice role="status" aria-live="polite">Opening your course…</p>
+      <div data-course-content></div><noscript>Enable JavaScript to use the course workspace.</noscript>
+    </main>`,
+    }),
+  );
+}
+
 for (let index = 0; index < projectSpecifications.length; index++) {
   const specification = projectSpecifications[index];
   const rendered = renderMarkdown(
@@ -477,6 +500,13 @@ await compileSiteStylesheet("styles/case-studies.css");
 await compileSiteStylesheet("styles/demos.css");
 await compileSiteStylesheet("styles/feedback-admin.css");
 await compileSiteStylesheet("styles/project.css");
+await compileSiteStylesheet("styles/course.css");
+await compileSiteBundle(
+  "scripts/course.ts",
+  "course.js",
+  "CourseWorkspace",
+  "es2022",
+);
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteBundle(

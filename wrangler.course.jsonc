@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "scalability-book-course-local",
+  "main": "worker/index.ts",
+  // Match the book Worker and the pinned local runtime; upgrade both together.
+  "compatibility_date": "2026-05-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./build",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+  },
+  "d1_databases": [
+    {
+      "binding": "COURSE_DB",
+      "database_name": "scalability-book-course",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "course-migrations",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "COURSE_FILES",
+      "bucket_name": "scalability-book-course-files",
+    },
+  ],
+  "observability": { "enabled": true },
+}

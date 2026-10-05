@@ -98,6 +98,13 @@ Run browser-level checks with:
 npm run e2e
 ```
 
+## Course workspace
+
+The course submission and assessment workspace runs at `/course/` and `/admin/courses/`.
+It includes course rosters, phase groups, frozen source archives, assigned audits, private portfolios, rubric assessment and grade export.
+Local records persist separately in `.local/course.sqlite` and `.local/course-files/`.
+See [course-system.md](course-system.md) for the instructor workflow, access rules, production bindings and verification commands.
+
 ## Feedback Review
 
 The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured.

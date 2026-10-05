@@ -3,6 +3,8 @@ import { handleLearning, d1AnswerStore } from "./learning.ts";
 import { safeReturnTo } from "../shared/exercises.ts";
 import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { handleCourses } from "./courses.ts";
+import { d1CourseStore, r2FileStore } from "./course-store.ts";
 
 type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
@@ -44,6 +46,9 @@ type Env = {
   GITHUB_CLIENT_SECRET?: string;
   SESSION_SECRET?: string;
   ADMIN_GITHUB_LOGINS?: string;
+  COURSE_ADMIN_GITHUB_LOGINS?: string;
+  COURSE_DB?: CourseBindings["COURSE_DB"];
+  COURSE_FILES?: CourseBindings["COURSE_FILES"];
 };
 
 const immutableAssetPattern =
@@ -91,6 +96,25 @@ export default {
         user?.id && Number.isSafeInteger(user.id) ? `github:${user.id}` : null,
         env.LEARNING_DB ? d1AnswerStore(env.LEARNING_DB) : undefined,
       );
+    }
+
+    if (
+      url.pathname === "/api/courses" ||
+      url.pathname.startsWith("/api/courses/")
+    ) {
+      const user = await getSessionUser(request, env);
+      return handleCourses(request, {
+        user:
+          user?.id && Number.isSafeInteger(user.id)
+            ? { id: `github:${user.id}`, login: user.login }
+            : null,
+        admins: (env.COURSE_ADMIN_GITHUB_LOGINS ?? "")
+          .split(",")
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean),
+        ...(env.COURSE_DB ? { store: d1CourseStore(env.COURSE_DB) } : {}),
+        ...(env.COURSE_FILES ? { files: r2FileStore(env.COURSE_FILES) } : {}),
+      });
     }
 
     if (url.pathname.startsWith("/api/auth/")) {
@@ -153,7 +177,12 @@ export default {
     headers.set("X-Content-Type-Options", "nosniff");
     headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
-    if (response.ok && url.pathname.startsWith("/concepts/visuals/")) {
+    if (
+      response.ok &&
+      (url.pathname.startsWith("/concepts/visuals/") ||
+        url.pathname === "/course.js" ||
+        url.pathname === "/styles/course.css")
+    ) {
       // These stable resource URLs change with the authored graph and previews.
       headers.set("Cache-Control", "public, max-age=0, must-revalidate");
     } else if (response.ok && immutableAssetPattern.test(url.pathname)) {

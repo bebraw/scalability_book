@@ -8,6 +8,8 @@ import { spawn } from "node:child_process";
 import { localAnswerStore } from "./lib/local-answers.ts";
 import { handleLearning } from "../worker/learning.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { localCourseStores } from "./lib/local-courses.ts";
+import { handleCourses } from "../worker/courses.ts";
 import {
   developmentBuildPaths,
   rebuildDevelopmentSite,
@@ -19,6 +21,7 @@ const buildPaths = developmentBuildPaths(root, port, process.env.BUILD_DIR);
 const buildDir = buildPaths.current;
 const dataDir = path.resolve(root, process.env.LOCAL_DATA_DIR || ".local");
 const answers = localAnswerStore(dataDir);
+const courses = localCourseStores(dataDir);
 const commentsPath = path.join(dataDir, "comments.json");
 const configPath = path.join(root, "site.config.jsonc");
 const sourceRebuildDebounce = 250;
@@ -70,6 +73,49 @@ if (process.env.RESET_LOCAL_COMMENTS === "1" && process.env.LOCAL_DATA_DIR) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || "/", `http://${host}:${port}`);
+
+    if (
+      url.pathname === "/api/courses" ||
+      url.pathname.startsWith("/api/courses/")
+    ) {
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(request.headers)) {
+        if (value)
+          headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+      }
+      const method = request.method || "GET";
+      const webRequest = new Request(url, {
+        method,
+        headers,
+        ...(method !== "GET" && method !== "HEAD"
+          ? { body: request, duplex: "half" }
+          : {}),
+      });
+      // Identity overrides exist only in the loopback development server and only
+      // when explicitly enabled by tests. The production Worker ignores this header.
+      const testId =
+        process.env.COURSE_TEST_IDENTITIES === "1"
+          ? headers.get("x-course-test-user")
+          : null;
+      const localId = testId || process.env.COURSE_LOCAL_USER_ID || "1";
+      if (!/^[1-9][0-9]{0,14}$/.test(localId))
+        throw new Error("Invalid local course identity");
+      const result = await handleCourses(webRequest, {
+        user: {
+          id: `github:${localId}`,
+          login: localId === "1" ? "local-editor" : `local-student-${localId}`,
+        },
+        admins: ["local-editor"],
+        ...courses,
+      });
+      response.writeHead(result.status, Object.fromEntries(result.headers));
+      if (result.body)
+        for await (const chunk of result.body) {
+          if (!response.write(chunk))
+            await new Promise((resolve) => response.once("drain", resolve));
+        }
+      return response.end();
+    }
 
     if (url.pathname.startsWith("/api/learning/")) {
       const headers = new Headers();

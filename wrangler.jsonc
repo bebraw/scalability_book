@@ -4,6 +4,12 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-05-02",
   "compatibility_flags": ["nodejs_compat"],
+  // Course portal bindings are separate from private chapter exercises.
+  // Provision COURSE_DB and COURSE_FILES using docs/course-system.md before enabling.
+  // "d1_databases": [{ "binding": "COURSE_DB", "database_name": "scalability-book-course",
+  //   "database_id": "<created-database-id>", "migrations_dir": "course-migrations" }],
+  // "r2_buckets": [{ "binding": "COURSE_FILES", "bucket_name": "scalability-book-course-files" }],
+  // COURSE_ADMIN_GITHUB_LOGINS grants course administration separately from book moderation.
   // Private exercise answers use a separate D1 database. Provision and migrate
   // it before enabling production saves; see docs/chapter-exercises.md.
   // "d1_databases": [{
