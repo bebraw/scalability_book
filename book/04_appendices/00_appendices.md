@@ -6,9 +6,9 @@ The appendices preserve deeper methods, implementation details, and research cas
 Use them selectively:
 
 - [**Evaluating agentic workflows**](/appendices/evaluating-agentic-workflows/) develops the evaluation vocabulary, experimental discipline, graders, uncertainty, and routing questions introduced briefly in the [Benchmarking chapter](/chapters/benchmarking/).
-- [**Reproducible environments**](/appendices/reproducible-environments/) distinguishes repeatable setup, declared environments, hermetic execution, and reproducible builds.
+- [**Reproducible environments**](/appendices/reproducible-environments/) distinguishes repeatable setup, declared environments, hermetic execution, and reproducible builds, and provides optional browser measurement procedures.
 - [**Advanced web boundaries**](/appendices/advanced-web-boundaries/) examines state continuity, transactions, client activation, constructive invariants, runtime-generated interfaces, interaction styles, executable HTTP contracts, event-view rebuilding, and endpoint/cache policy.
-- [**Agent-system security**](/appendices/agent-system-security/) develops control planes, enforcement, traceability, imported capabilities, cross-run state, and optional exercises on memory, contract completeness, and human review gates.
+- [**Agent-system security**](/appendices/agent-system-security/) develops control planes, enforcement, traceability, imported capabilities, cross-run state, contribution-policy examples, and optional exercises on memory, contract completeness, and human review gates.
 - [**Scalability models**](/appendices/scalability-models/) gives a deeper treatment of workflow reliability and contention models.
 - [**Durable workflows**](/appendices/durable-workflows/) examines retry-safe external effects and recovery across process failure.
 

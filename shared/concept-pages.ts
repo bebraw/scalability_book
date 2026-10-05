@@ -204,6 +204,7 @@ export const conceptPages: ConceptPage[] = [
       "harness",
       "feedback-loop",
       "benchmark",
+      "measurement-boundary",
       "change-probe",
     ],
   },

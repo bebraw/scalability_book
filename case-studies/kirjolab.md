@@ -4,6 +4,10 @@
 It connects portable Markdown manuscripts with references, PDF annotations, evidence, and reviewable local-model suggestions.
 I developed the project rapidly with Codex during July 2026.
 
+When GPT-5.6 became available, I decided to revisit one of my long-standing ideas.
+I wanted to combine some of the better features of [Zotero](https://www.zotero.org/), [Parsifal](https://www.parsifal.com.br/), and [Overleaf](https://www.overleaf.com/) in one service.
+Within a few days of exploratory prompting, I had a working prototype.
+
 The result was a technical success in an important sense: I reached a scope and level of integration that I could not have achieved alone in the same time.
 The repository also needed substantial refactoring almost immediately.
 That combination makes Kirjolab useful as a case study.
@@ -152,6 +156,10 @@ This is the “revise” step of the [constrain, generate, validate, revise loop
 Implementation exposed the actual domains and change patterns.
 Refactoring converted that evidence into new constraints for subsequent work.
 The expensive part was that the structural feedback arrived later than the functional feedback.
+
+I carried those lessons back to my project template so that structural feedback would arrive earlier.
+I also found that [mutation testing with Stryker](https://stryker-mutator.io/) and [cognitive-complexity analysis with Fallow](https://fallow.tools/docs/explanations/health/) complement one another: one challenges whether tests detect behavioral changes, while the other identifies code that is becoming difficult to reason about.
+Agents tend to follow the patterns already present in a codebase, so the project should establish and reinforce the direction it wants future changes to take.
 
 ## What I would do differently
 

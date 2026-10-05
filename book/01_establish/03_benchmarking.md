@@ -103,39 +103,8 @@ For the event tracker, define a milestone such as the event list becoming visibl
 Choose the signal from the product question, name its collection rule, and record the browsers and users represented.
 Paint evidence alone cannot establish that a region is interactive or correct.
 
-#### Audit a representative page
-
-Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
-It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
-
-1. Choose one representative public route and state why it matters to a user.
-2. Select the mobile profile and run the same URL five times without changing the application.
-3. Record LCP, TBT, CLS, transferred bytes, and the overall performance score for every run.
-4. Report the median and the fastest-to-slowest range for each time-based metric.
-5. Select one Lighthouse diagnostic, make one change, deploy it, and repeat the five runs under the same conditions.
-6. State the narrow conclusion supported by the comparison and at least one factor it does not control.
-
-The PageSpeed Insights result can include Lighthouse lab data and, for sufficiently popular public pages, field data derived from real Chrome visits.
-Keep those sources separate: lab and field measurements use different populations and conditions.
-
-If the application is not public, open it in Chrome, select **Developer Tools → Lighthouse**, choose the mobile profile, and generate a report locally.
-Close unrelated applications where practical, do not run audits concurrently, and keep the browser version, profile, URL, application version, and machine consistent.
-
-Performance values vary even when the application has not changed because the browser, client hardware, resource contention, network, and server introduce noise.
-:citet[hericko2021representative] found that five consecutive Lighthouse runs aggregated with the median greatly reduced variability in their experiment.
-
-#### Study a repeatable Playwright journey
-
-PageSpeed Insights is convenient for navigation audits, but it cannot exercise a private or multi-step project flow.
-The standalone Playwright lab separates a small event-filter fixture from the browser journey that exercises it, so you can inspect locators, interaction, assertions, and trace collection without first adapting the example to a framework.
-[Study the source](https://github.com/bebraw/scalability_book/tree/main/labs/playwright-journey) or [download the standalone lab](/downloads/labs/playwright-journey.zip).
-
-The example establishes that filtering produces the expected visible row.
-It does not measure application loading, network behavior, or Web Vitals because it opens a local fixture.
-After it passes, replace the fixture URL with the project's real route and adapt the accessible names while preserving the same user-visible contract.
-Inspect the trace to verify what was acted on and rendered, then use Lighthouse or another suitable performance tool separately; the flow can be correct but slow, or appear fast because it failed to perform the intended work.
-
-For a repeatable CI gate, [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) can collect runs and assert a budget; measure the runner's normal variation before choosing its threshold.
+Use [Appendix B's browser measurement procedures](/appendices/reproducible-environments/#reproduce-browser-measurements) for repeatable page audits and a standalone Playwright journey.
+Choose the procedure that answers the product question and report the conditions and limits of its evidence.
 
 ### Check measurements against a model
 

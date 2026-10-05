@@ -11,10 +11,10 @@ These responsibilities can share a platform or span several services, but their 
 
 :ref[table:fleet-control-boundaries]{text="The table below"} separates task-level orchestration from request-level resource access.
 
-| Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                |
-| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Session and task orchestration | Run, delegated task, workspace | Agent-harness selection, [task graph](/concepts/#task-graph), session history, collaboration, delegated tool authority, sandbox choice, and task-level policy    |
-| Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry |
+| Control boundary               | Primary unit                   | Typical responsibilities                                                                                                                                      |
+| ------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Session and task orchestration | Run, delegated task, workspace | Agent-harness selection, [task graph](/concepts/#task-graph), session history, collaboration, delegated tool authority, sandbox choice, and task-level policy |
+| Model and tool access          | Model or tool request          | Permitted services and credentials, request routing and fallback, rate and spend limits, request guardrails, and shared usage telemetry                       |
 
 ::caption[Control boundaries for agent orchestration and model or tool access.]
 ::label[table:fleet-control-boundaries]
@@ -176,6 +176,20 @@ I accept that trade-off only when the experiment is disposable enough that I can
 The same permission should not transfer automatically to another project.
 As financial exposure, consequences, or recovery difficulty increase, the agent's role should narrow from executing the action to preparing a reviewed change.
 Authority should follow the expected loss and recovery path, not the mere fact that an agent successfully performed a similar action elsewhere.
+
+## External contribution policies
+
+Use this example when preparing an external issue or pull request.
+The [course evidence rule](/chapters/scalable-development/#course-records-and-external-contribution-policies) records material assistance, human corrections, and checks; a receiving project's contribution and AI policies also govern what may be submitted there.
+Read those policies before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
+
+For example, the [Human Responsible policy template, version 1.0.0](https://ai-policy.dev/policies/human-responsible/1.0.0), permits private tooling while requiring public text written and posted by the contributor, understood and tested changes, and human follow-up.
+It prohibits AI-disclosure notes and submissions from automated accounts.
+These are requirements for projects that adopt the template.
+
+Under that policy, a student can record private agent assistance in the course evidence while personally writing and posting the reviewed contribution text and owning the change.
+Answer provenance questions truthfully, avoid false claims of human-only production, and respect a project's refusal of particular assistance or submissions.
+Disclosure does not make a prohibited contribution acceptable; an external disclosure rule does not remove the course's evidence requirements.
 
 ## Choose a delegation environment
 

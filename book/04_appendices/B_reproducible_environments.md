@@ -2,6 +2,7 @@
 
 Use this appendix when setup failures, hidden host state, inconsistent resource limits, or environmental drift make a project difficult to run or evaluate.
 The [Friction chapter](/chapters/friction/) keeps the essential project rule—declare the supported environment and test it from a fresh checkout—while this appendix develops the distinctions and audit procedure in depth.
+The [browser measurement procedures](#reproduce-browser-measurements) support the measurement principles introduced in the [Benchmarking chapter](/chapters/benchmarking/).
 
 ## Treat the environment as a versioned input
 
@@ -72,3 +73,43 @@ Affected validation introduces its own obligation: the selector must recognize c
 A fast loop is only useful when it fails conservatively instead of silently excluding relevant work.
 
 Give agents fast, trustworthy local feedback, and widen validation when the change's risk or scope requires it.
+
+## Reproduce browser measurements
+
+Use these optional procedures when a browser journey is part of the project's benchmark.
+State the journey, workload, environment, metric, and acceptance condition before choosing a tool.
+Reuse the results in the existing benchmark evidence.
+
+### Audit a representative page
+
+Use [PageSpeed Insights](https://pagespeed.web.dev/) for the lowest-setup version of the exercise.
+It runs Lighthouse remotely, so the target page must be deployed at a publicly reachable URL; a development server at `localhost` is not reachable by the service.
+
+1. Choose one representative public route and state why it matters to a user.
+2. Select the mobile profile and run the same URL five times without changing the application.
+3. Record LCP, TBT, CLS, transferred bytes, and the overall performance score for every run.
+4. Report the median and the fastest-to-slowest range for each time-based metric.
+5. Select one Lighthouse diagnostic, make one change, deploy it, and repeat the five runs under the same conditions.
+6. State the narrow conclusion supported by the comparison and at least one factor it does not control.
+
+The PageSpeed Insights result can include Lighthouse lab data and, for sufficiently popular public pages, field data derived from real Chrome visits.
+Keep those sources separate: lab and field measurements use different populations and conditions.
+
+If the application is not public, open it in Chrome, select **Developer Tools → Lighthouse**, choose the mobile profile, and generate a report locally.
+Close unrelated applications where practical, do not run audits concurrently, and keep the browser version, profile, URL, application version, and machine consistent.
+
+Performance values vary even when the application has not changed because the browser, client hardware, resource contention, network, and server introduce noise.
+:citet[hericko2021representative] found that five consecutive Lighthouse runs aggregated with the median greatly reduced variability in their experiment.
+
+### Study a repeatable Playwright journey
+
+PageSpeed Insights is convenient for navigation audits, but it cannot exercise a private or multi-step project flow.
+The standalone Playwright lab separates a small event-filter fixture from the browser journey that exercises it, so you can inspect locators, interaction, assertions, and trace collection without first adapting the example to a framework.
+[Study the source](https://github.com/bebraw/scalability_book/tree/main/labs/playwright-journey) or [download the standalone lab](/downloads/labs/playwright-journey.zip).
+
+The example establishes that filtering produces the expected visible row.
+It does not measure application loading, network behavior, or Web Vitals because it opens a local fixture.
+After it passes, replace the fixture URL with the project's real route and adapt the accessible names while preserving the same user-visible contract.
+Inspect the trace to verify what was acted on and rendered, then use Lighthouse or another suitable performance tool separately; the flow can be correct but slow, or appear fast because it failed to perform the intended work.
+
+For a repeatable CI gate, [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) can collect runs and assert a budget; measure the runner's normal variation before choosing its threshold.

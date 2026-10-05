@@ -120,13 +120,8 @@ The course's [common evidence bundle](/project/#9-common-submission-bundle-and-c
 For an external issue or pull request, also follow the receiving project's applicable contribution and AI policies.
 Read them before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
 
-For example, the [Human Responsible policy template, version 1.0.0](https://ai-policy.dev/policies/human-responsible/1.0.0), permits private tooling while requiring public text written and posted by the contributor, understood and tested changes, and human follow-up.
-It prohibits AI-disclosure notes and submissions from automated accounts.
-These are requirements for projects that adopt the template.
-
-Under that policy, a student can record private agent assistance in the course evidence while personally writing and posting the reviewed contribution text and owning the change.
-Answer provenance questions truthfully, avoid false claims of human-only production, and respect a project's refusal of particular assistance or submissions.
-Disclosure does not make a prohibited contribution acceptable; an external disclosure rule does not remove the course's evidence requirements.
+Preserve truthful provenance and accountable ownership; an external disclosure rule does not remove the course's evidence requirements.
+[Appendix D's contribution-policy example](/appendices/agent-system-security/#external-contribution-policies) examines how private tooling, public authorship, and disclosure can be governed differently.
 
 ### Sustainable throughput requires ownership
 
@@ -250,21 +245,9 @@ The [optional explanation challenge](/explore/challenge-an-explanation/) uses a 
 
 ### Field note — Kirjolab
 
-When GPT-5.6 became available, I decided to revisit one of my long-standing ideas.
-I wanted to combine some of the better features of [Zotero](https://www.zotero.org/), [Parsifal](https://www.parsifal.com.br/), and [Overleaf](https://www.overleaf.com/) in one service.
-[Kirjolab](/case-studies/kirjolab/) grew from that experiment: a web application for storing, reviewing, and working with research papers, references, evidence, and writing in one place.
-Within a few days of exploratory prompting, I had a working prototype.
-That was a real success: agents helped me reach a degree of scope and integration I would not have attempted alone.
-
-The speed also exposed a limit.
-Functional gates continued to protect behavior, but they did not initially constrain structural ownership.
-By 25 July, `src/client/app.ts` had reached 12,495 lines and combined an element registry, event binding, rendering, and feature orchestration.
-The source structure eventually required extensive refactoring.
-Existing tests made that repair safer, but they had not prevented the architecture from becoming difficult to navigate.
-
-I carried those lessons back to my project template so that structural feedback would arrive earlier.
-I also found that [mutation testing with Stryker](https://stryker-mutator.io/) and [cognitive-complexity analysis with Fallow](https://fallow.tools/docs/explanations/health/) complement one another: one challenges whether tests detect behavioral changes, while the other identifies code that is becoming difficult to reason about.
-Agents tend to follow the patterns already present in a codebase, so the project should establish and reinforce the direction it wants future changes to take.
+In [Kirjolab](/case-studies/kirjolab/), agents helped me reach a scope and level of integration I would not have attempted alone.
+Functional checks made later refactoring safer, but they had not prevented unclear ownership and difficult navigation.
+The case study records the development history and the structural feedback I carried into subsequent work.
 
 ### Choose what to participate in
 
