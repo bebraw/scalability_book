@@ -16,6 +16,7 @@ The purpose is to compare how different development systems approach the same bo
 
 The phase specifications define additional constraints and deliverables.
 This common specification applies to all three phases.
+Read the [project introduction](00_introduction.md#guidelines-for-course-work) before starting work; it explains submission checkpoints, evidence records, external contributions, and learning expectations.
 
 ## Shared engineering sessions
 

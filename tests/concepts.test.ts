@@ -112,7 +112,14 @@ test("reading membership covers the published book, parts, cases, and project", 
     );
   for (const item of config.caseStudies)
     assert.ok(urls.has(`/case-studies/${item.slug}/`), item.slug);
-  for (const suffix of ["", "establish/", "challenge/", "compare/", "grading/"])
+  for (const suffix of [
+    "introduction/",
+    "",
+    "establish/",
+    "challenge/",
+    "compare/",
+    "grading/",
+  ])
     assert.ok(urls.has(`/project/${suffix}`));
   assert.equal(urls.size, conceptPages.length);
   for (const page of conceptPages) {

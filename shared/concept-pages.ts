@@ -402,6 +402,18 @@ export const conceptPages: ConceptPage[] = [
     ],
   },
   {
+    url: "/project/introduction/",
+    title: "Project · Introduction",
+    concepts: [
+      "agent",
+      "agent-fleet",
+      "authority",
+      "acceptance-criteria",
+      "decision-log",
+      "measurement-boundary",
+    ],
+  },
+  {
     url: "/project/",
     title: "Project · Common contract",
     concepts: [

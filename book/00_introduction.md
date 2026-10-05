@@ -48,7 +48,7 @@ The online edition remains a living book whose feedback tools support continuing
 
 ## One application, three development systems
 
-The course project implements the same [Work Activity Tracker specification](/project/) three times.
+The [course project](/project/introduction/) implements the same [Work Activity Tracker specification](/project/) three times.
 The required browser-visible behavior remains substantially stable while product interpretation, stack, rendering, storage, interfaces, and architecture remain open to justified choices.
 
 Each phase begins from a fresh implementation and changes the development setup deliberately:
@@ -67,17 +67,6 @@ Neither hosting location nor model size establishes which workflow will perform 
 The comparison is bounded rather than perfectly controlled.
 You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.
 The shared specification, acceptance material, pressures, and reporting categories make those differences discussable without pretending that the course establishes a universal ranking.
-
-Each main chapter ends with a **Project artifact** section.
-These sections are staged checkpoints for building the current phase's evidence; they do not silently create separate submissions.
-The [common project specification](/project/) and current phase specification provide the authoritative deliverable checklist, and one clearly structured artifact may satisfy several chapter checkpoints.
-
-> **Protect learning, not only output**
->
-> Immediate task performance is not the only outcome worth protecting.
-> Across three randomized experiments involving short arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence.
-> In a cross-sectional subgroup analysis of the second experiment, participants who reported using AI for direct answers later performed worse and skipped more than both the control group and those who reported using it for hints :citep[liu2026assistance].
-> These tasks do not establish the long-term effect on professional programming, but they support a practical course rule: use agents for hints, critique, and verification when the underlying skill must remain yours.
 
 ## How the argument develops
 

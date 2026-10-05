@@ -44,13 +44,14 @@ After this chapter, students should be able to:
 - Use composition to manage complexity without hiding important system behavior.
 - Evaluate AI-assisted code as maintainable software rather than as a one-time output.
 - Test explanation claims through predicted behavior, state ownership, and independent checks; use the task-linked exploration starting point before revealing its worked reasoning.
-- Distinguish course evidence requirements from a receiving project's contribution and disclosure rules while preserving truthful provenance and accountable ownership.
+- Distinguish provenance, endorsement, accountability, and evidence when accepting and owning a change.
 - Separate a prototype's demonstrated behavior from the data access, deployment authority, recovery, and support obligations of shared use; use the optional exploration without adding required project scope.
 - Connect development practices to implementations A, B, and C and the development setup used for each.
 
 ## Notes for further development
 
 - The full development-approaches chronology is archived below; the chapter now compares three composable control patterns.
+  Place that comparison immediately after the agent definition so it frames the development loop, authority, and project-harness sections that follow.
   If the chronology is reused, preserve representative milestones and source qualifications rather than presenting a maturity ladder.
 - Add a short distinction between transferable knowledge and transferable code.
   Good specifications, tests, examples, and validation practices should improve across phases without allowing the later implementation to become a fork of the first.

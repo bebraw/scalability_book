@@ -4,7 +4,8 @@
 2. Treat the web application and its development system as connected objects of analysis.
 3. State the agentic-web thesis before author context: coding agents raise implementation capacity and shift human attention toward intent, constraints, validation, integration, and ownership.
 4. Explain the three fresh implementations as a bounded comparison rather than a universal model ranking.
-5. Map each chapter to the evidence or decision it contributes to the final synthesis.
+5. Point course participants to the project introduction, which centralizes submission checkpoints, assistance and acceptance evidence, external contributions, and retained learning outside the main book content.
+6. Map each chapter to the evidence or decision it contributes to the final synthesis.
 
 ## Project artifacts
 

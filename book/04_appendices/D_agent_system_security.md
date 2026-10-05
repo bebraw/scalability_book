@@ -180,8 +180,8 @@ Authority should follow the expected loss and recovery path, not the mere fact t
 ## External contribution policies
 
 Use this example when preparing an external issue or pull request.
-The [course evidence rule](/chapters/scalable-development/#course-records-and-external-contribution-policies) records material assistance, human corrections, and checks; a receiving project's contribution and AI policies also govern what may be submitted there.
-Read those policies before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
+The [shared course guidelines](/project/introduction/#guidelines-for-course-work) distinguish course evidence from a receiving project's submission rules.
+The example below illustrates how private tooling, public authorship, and disclosure can be governed differently.
 
 For example, the [Human Responsible policy template, version 1.0.0](https://ai-policy.dev/policies/human-responsible/1.0.0), permits private tooling while requiring public text written and posted by the contributor, understood and tested changes, and human follow-up.
 It prohibits AI-disclosure notes and submissions from automated accounts.

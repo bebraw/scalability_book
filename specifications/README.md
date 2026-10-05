@@ -2,15 +2,16 @@
 
 The course uses one common application contract and three phase-specific development setups:
 
-1. [Common project specification](00_common_project.md) — required behavior, technical freedom, acceptance scenarios, shared runtime workload, transfer policy, evidence, and cross-team audit.
-2. [Establish](01_establish.md) — implementation A with a locally hosted single agent.
-3. [Challenge](02_challenge.md) — implementation B with a comparison-model single agent.
-4. [Compare](03_compare.md) — implementation C with an agent fleet, a trace-based debugging view of the fleet itself, and the final comparison.
+1. [Project introduction](00_introduction.md) — the three projects and their shared submission, evidence, contribution, and learning guidelines.
+2. [Common project specification](00_common_project.md) — required behavior, technical freedom, acceptance scenarios, shared runtime workload, transfer policy, evidence, and cross-team audit.
+3. [Establish](01_establish.md) — implementation A with a locally hosted single agent.
+4. [Challenge](02_challenge.md) — implementation B with a comparison-model single agent.
+5. [Compare](03_compare.md) — implementation C with an agent fleet, a trace-based debugging view of the fleet itself, and the final comparison.
 
 The [course environment sheet](course_environment.md) defines the model, harness, access, budget, privacy, and fallback assignments for the current course run.
 The [assessment rubric](grading.md) defines the project, participation, learning-diary, and self- and peer-assessment scoring.
 
-Read the common specification together with the current phase specification.
+Begin with the project introduction, then read the common specification together with the current phase specification.
 Every phase includes a shared engineering session with rotating responsibilities.
 
 ## How chapter artifacts become submissions

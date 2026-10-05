@@ -86,6 +86,14 @@ const editorScripts = ["/vendor/easymde/easymde.min.js", "/editor.js"];
 const developmentScripts = includeEditor ? ["/dev-reload.js"] : [];
 const projectSpecificationDefinitions = [
   {
+    file: "specifications/00_introduction.md",
+    label: "Introduction",
+    phase: "introduction",
+    sequence: "Intro",
+    slug: "introduction",
+    summary: "Three projects and shared course guidelines.",
+  },
+  {
     file: "specifications/00_common_project.md",
     label: "Common contract",
     phase: "common",

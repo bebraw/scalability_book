@@ -38,7 +38,7 @@ Suggested sequence:
 
 Specific cuts and moves:
 
-- Condense [the historical comparison](../book/01_establish/02_scalable_development.md#how-did-development-control-change-before-and-after-agents) around a few durable contrasts: human implementation, deterministic generation, and agent execution under maintained constraints.
+- Condense [the historical comparison](../book/01_establish/02_scalable_development.md#what-changes-when-agents-implement-code) around a few durable contrasts: human implementation, deterministic generation, and agent execution under maintained constraints.
   Preserve the point that specifications and feedback predate agents.
   Move the full chronology and newer named approaches into optional reference material; they should not read as successive generations that replace one another.
 - Merge the general acceptance discussion in “When generation outruns comprehension” with the opening of “Sustainable throughput requires ownership.”

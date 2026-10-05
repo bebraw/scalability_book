@@ -31,19 +31,39 @@ test.describe("project specification", () => {
     expect(await source.text()).toContain("## Passing and final grade");
   });
 
-  test("publishes the common contract and phase briefs from the site navigation", async ({
+  test("introduces the course before the common contract and phase briefs", async ({
     page,
+    request,
   }) => {
     await page.goto("/");
 
     await expect(
       page.getByRole("link", { name: "Project", exact: true }),
-    ).toHaveAttribute("href", "/project/");
+    ).toHaveAttribute("href", "/project/introduction/");
     await expect(
-      page.getByRole("link", { name: /Open the specification/ }),
-    ).toHaveAttribute("href", "/project/");
+      page.getByRole("link", { name: /Start the course project/ }),
+    ).toHaveAttribute("href", "/project/introduction/");
 
-    await page.goto("/project/");
+    await page.getByRole("link", { name: "Project", exact: true }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Course Project Introduction" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Guidelines for course work" }),
+    ).toBeVisible();
+    const projectNavigation = page.locator(".project-index ol a");
+    await expect(projectNavigation.nth(0)).toHaveAttribute(
+      "href",
+      "/project/introduction/",
+    );
+    await expect(projectNavigation.nth(1)).toHaveAttribute("href", "/project/");
+
+    const source = await request.get("/project/source/introduction.md");
+    expect(source.status()).toBe(200);
+    expect(await source.text()).toContain("## Guidelines for course work");
+
+    await page.locator('.project-pagination a[href="/project/"]').click();
 
     await expect(
       page.getByRole("heading", { name: "Common Project Specification" }),

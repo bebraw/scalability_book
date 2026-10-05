@@ -192,6 +192,11 @@ const groups = [
     divider: true,
     entries: [
       entry(
+        "Course project introduction",
+        "project/introduction",
+        "build/project/introduction/index.html",
+      ),
+      entry(
         "Common project specification",
         "project",
         "build/project/index.html",

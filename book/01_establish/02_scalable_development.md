@@ -30,6 +30,25 @@ Software-engineering agent research describes related perception, memory, and ac
 Observations can be incomplete, tools can fail, and the stated goal can omit something the user needs.
 Improving an agent therefore involves its environment and feedback as well as its model and prompt.
 
+## What changes when agents implement code?
+
+Specifications, executable tests, and iterative feedback predate coding agents.
+The change is that a probabilistic tool-using system can perform more of the implementation loop.
+:ref[table:development-approaches-history]{text="The table below"} compares three composable patterns, not stages in a maturity ladder.
+
+| Pattern                  | How implementation proceeds                                                        | Where control lives                                                     |
+| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Human implementation     | People translate requirements into code through planned stages or short iterations | Design decisions, executable examples, and review                       |
+| Deterministic generation | Generators transform declared models into implementation artifacts                 | Model definitions, transformation rules, and supported escape paths     |
+| Agent execution          | A model interprets context and chooses tool actions through a harness              | Maintained instructions, scoped tools, checks, and acceptance decisions |
+
+::caption[Three development patterns that can coexist in one project.]
+::label[table:development-approaches-history]
+
+[Iterative development](https://agilemanifesto.org/), [model-driven generation](https://www.omg.org/mda/), and [executable behavior examples](https://dannorth.net/introducing-bdd/) can all contribute to an agent-assisted workflow.
+The event tracker could use BDD scenarios to define acceptance, generate an API client from a schema, and delegate implementation to an agent.
+Across these patterns, a requested outcome still has to become a checked change someone can maintain.
+
 ## Constrain, generate, validate, revise
 
 Agentic development follows a [repeated loop](/concepts/#feedback-loop): constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
@@ -111,17 +130,8 @@ The [Agent Fleets chapter](/chapters/agent-fleets/#map-authority-and-acceptance)
 ::caption[Questions that separate an artifact's origin, endorsement, accountability, and evidence.]
 ::label[table:trust-questions]
 
-Record material assistance and human corrections in the AI-use log, and bind the checks and known limits to the submitted revision.
-Perceived effort can influence quality judgments :citep[kruger2004effort], but time spent and disclosed AI use do not establish correctness.
-
-### Course records and external contribution policies
-
-The course's [common evidence bundle](/project/#9-common-submission-bundle-and-comparable-evidence) records material assistance, human corrections, and checks so others can assess the work and compare workflows.
-For an external issue or pull request, also follow the receiving project's applicable contribution and AI policies.
-Read them before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
-
-Preserve truthful provenance and accountable ownership; an external disclosure rule does not remove the course's evidence requirements.
-[Appendix D's contribution-policy example](/appendices/agent-system-security/#external-contribution-policies) examines how private tooling, public authorship, and disclosure can be governed differently.
+Bind acceptance decisions, checks, and known limits to the revision they concern.
+Perceived effort can influence quality judgments :citep[kruger2004effort], but time spent does not establish correctness.
 
 ### Sustainable throughput requires ownership
 
@@ -193,25 +203,6 @@ Package a reusable capability with its fit criteria, files, dependencies, integr
 [Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
 Imported capabilities also create a trust boundary because instructions or bundled code may influence tools operating with the agent's authority.
 The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
-
-## How did development control change before and after agents?
-
-Specifications, executable tests, and iterative feedback predate coding agents.
-The change is that a probabilistic tool-using system can perform more of the implementation loop.
-:ref[table:development-approaches-history]{text="The table below"} compares three composable patterns, not stages in a maturity ladder.
-
-| Pattern                  | How implementation proceeds                                                        | Where control lives                                                     |
-| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Human implementation     | People translate requirements into code through planned stages or short iterations | Design decisions, executable examples, and review                       |
-| Deterministic generation | Generators transform declared models into implementation artifacts                 | Model definitions, transformation rules, and supported escape paths     |
-| Agent execution          | A model interprets context and chooses tool actions through a harness              | Maintained instructions, scoped tools, checks, and acceptance decisions |
-
-::caption[Three development patterns that can coexist in one project.]
-::label[table:development-approaches-history]
-
-[Iterative development](https://agilemanifesto.org/), [model-driven generation](https://www.omg.org/mda/), and [executable behavior examples](https://dannorth.net/introducing-bdd/) can all contribute to an agent-assisted workflow.
-The event tracker could use BDD scenarios to define acceptance, generate an API client from a schema, and delegate implementation to an agent.
-The A–B–C phases vary the agent setup while preserving the required application behavior.
 
 ## When generation outruns comprehension
 
