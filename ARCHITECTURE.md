@@ -8,20 +8,23 @@ The [ADR index](docs/adrs/README.md) distinguishes this baseline from accepted c
 The repository combines a course book, interactive learning material, reader feedback, and a course submission and assessment workspace.
 It uses npm and the Node version range in [package.json](package.json).
 
-| Surface                      | Entry point                                                                                                      | Responsibility                                                                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Static website               | [scripts/build-site.ts](scripts/build-site.ts), [site.config.jsonc](site.config.jsonc)                           | Render selected book chapters, appendices, case studies, course briefs, and interactive assets into `build/`.         |
-| Local development            | [scripts/dev-site.ts](scripts/dev-site.ts)                                                                       | Serve and rebuild local output, expose local editing, and adapt local persistence to the application APIs.            |
-| Deployed application         | [worker/index.ts](worker/index.ts), [wrangler.jsonc](wrangler.jsonc)                                             | Serve static assets and authenticated APIs on Cloudflare Workers.                                                     |
-| Course domain                | [shared/course.ts](shared/course.ts), [worker/courses.ts](worker/courses.ts)                                     | Define course records and rubric calculations; enforce authorization, submission windows, revisions, and assessments. |
-| Course persistence           | [worker/course-store.ts](worker/course-store.ts), [scripts/lib/local-courses.ts](scripts/lib/local-courses.ts)   | Provide record/history and file storage with production and local adapters.                                           |
-| Course interface             | [site/scripts/course.ts](site/scripts/course.ts)                                                                 | Present student workflows at `/course/` and staff workflows at `/admin/courses/`.                                     |
-| Formative exercises          | [shared/exercises.ts](shared/exercises.ts), [worker/learning.ts](worker/learning.ts)                             | Render versioned canonical questions and privately persist checked answers independently of course grades.            |
-| Concepts and agent resources | [scripts/lib/concept-export.ts](scripts/lib/concept-export.ts), [shared/explorations.ts](shared/explorations.ts) | Publish authored concept connections, visuals, and optional activity resources for readers and external agents.       |
-| Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                              | Build pinned public learning bundles without hosting the authoring service.                                           |
-| Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)     | Generate reading and lecture PDFs from versioned content.                                                             |
+| Surface                      | Entry point                                                                                                                                      | Responsibility                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Static website               | [scripts/build-site.ts](scripts/build-site.ts), [site.config.jsonc](site.config.jsonc)                                                           | Render selected book chapters, appendices, case studies, course briefs, and interactive assets into `build/`.         |
+| Local development            | [scripts/dev-site.ts](scripts/dev-site.ts)                                                                                                       | Serve and rebuild local output, expose local editing, and adapt local persistence to the application APIs.            |
+| Deployed application         | [worker/index.ts](worker/index.ts), [wrangler.jsonc](wrangler.jsonc)                                                                             | Serve static assets and authenticated APIs on Cloudflare Workers.                                                     |
+| Course domain                | [shared/course.ts](shared/course.ts), [worker/courses.ts](worker/courses.ts), [worker/course-administration.ts](worker/course-administration.ts) | Define course records and rubric calculations; enforce authorization, submission windows, revisions, and assessments. |
+| Course persistence           | [worker/course-store.ts](worker/course-store.ts), [scripts/lib/local-courses.ts](scripts/lib/local-courses.ts)                                   | Provide record/history and file storage with production and local adapters.                                           |
+| Course interface             | [site/scripts/course.ts](site/scripts/course.ts)                                                                                                 | Present student workflows at `/course/` and staff workflows at `/admin/courses/`.                                     |
+| Formative exercises          | [shared/exercises.ts](shared/exercises.ts), [worker/learning.ts](worker/learning.ts)                                                             | Render versioned canonical questions and privately persist checked answers independently of course grades.            |
+| Concepts and agent resources | [scripts/lib/concept-export.ts](scripts/lib/concept-export.ts), [shared/explorations.ts](shared/explorations.ts)                                 | Publish authored concept connections, visuals, and optional activity resources for readers and external agents.       |
+| Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                                                              | Build pinned public learning bundles without hosting the authoring service.                                           |
+| Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
+`site/scripts/course-administration.ts` owns the focused staff forms, while `site/scripts/course.ts` coordinates navigation, requests and student/review workflows.
+`worker/course-administration.ts` validates configuration updates against the latest course snapshot; `worker/courses.ts` authorizes and persists them.
+Staff-only fingerprints expose the fields owned by each form, while the store's whole-record compare-and-swap remains the final concurrency boundary.
 Runtime adapters depend on shared domain contracts, while shared domain calculations remain independent of browser rendering and storage providers.
 New course capabilities should preserve this direction and use the same domain rules locally and in the Worker.
 
@@ -74,9 +77,9 @@ Their implemented status identifies repository behavior or published course cont
 
 ## Accepted course revision
 
-The following decisions are agreed but are not implemented by the current course workspace:
+The following decisions have implementation work outstanding in the current course workspace:
 
-- [Focused administration](docs/adrs/accepted/ADR-002-separate-course-administration-workflows.md): independent student, group, phase, and course-setting workflows.
+- [Focused administration](docs/adrs/accepted/ADR-002-separate-course-administration-workflows.md): the four forms and independent save boundaries are implemented; account status and student proposals/approvals await the identity and group revisions.
 - [Imported identities and magic links](docs/adrs/accepted/ADR-003-import-students-and-use-email-magic-links.md): roster-provisioned accounts without required GitHub accounts or registration.
 - [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): student proposals and instructor allocation, normally three members and at most four.
 - [Submission expectations](docs/adrs/accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md): small reproducible bundles and clear phase requirements.

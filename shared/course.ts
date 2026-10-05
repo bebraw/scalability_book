@@ -69,6 +69,7 @@ export interface Adjustment {
   reason: string;
 }
 export interface Course {
+  nextGroupNumber?: number;
   id: string;
   name: string;
   rubric: typeof rubricVersion;

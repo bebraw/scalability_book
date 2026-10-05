@@ -1,3 +1,16 @@
+import { e, option, field, input } from "./course-ui.ts";
+import {
+  administrationSections,
+  type AdministrationRevisions,
+  type RosterPreview,
+} from "../../shared/course-administration.ts";
+import {
+  administrationNavigation,
+  renderAdministration,
+  administrationPayload,
+  groupRow,
+  previewMarkup,
+} from "./course-administration.ts";
 import {
   phases,
   title,
@@ -18,6 +31,7 @@ import {
 } from "../../shared/course.ts";
 interface View {
   config: Envelope<Course>;
+  administration?: AdministrationRevisions;
   staff: boolean;
   user: { id: string; login: string };
   now: string;
@@ -46,15 +60,6 @@ let selectedStudent = "";
 let dirty = false;
 let pending = false;
 let local = false;
-const rosterCell = (value: string) => `"${value.replaceAll('"', '""')}"`;
-const e = (s: unknown) =>
-  String(s ?? "").replace(
-    /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        c
-      ]!,
-  );
 const when = (date: string) =>
   new Date(date).toLocaleString(undefined, {
     dateStyle: "medium",
@@ -62,24 +67,6 @@ const when = (date: string) =>
   });
 const route = (action: string, subject = "") =>
   `/api/courses/${view!.config.value.id}/${action}/${phase}${subject ? `/${encodeURIComponent(subject)}` : ""}`;
-const option = (value: string, label: string, current: string) =>
-  `<option value="${e(value)}" ${value === current ? "selected" : ""}>${e(label)}</option>`;
-const field = (
-  name: string,
-  label: string,
-  value: string,
-  max = 8000,
-  required = false,
-) =>
-  `<label class="course-field">${e(label)}<textarea name="${e(name)}" maxlength="${max}" rows="4" ${required ? "required" : ""}>${e(value)}</textarea></label>`;
-const input = (
-  name: string,
-  label: string,
-  value: string,
-  required = true,
-  type = "text",
-) =>
-  `<label class="course-field">${e(label)}<input name="${e(name)}" type="${type}" value="${e(value)}" ${required ? "required" : ""}></label>`;
 const revision = (r?: Envelope) => r?.revision ?? null;
 const fileLink = (f: CourseFile) =>
   `<a href="${route("files", f.id)}">${e(f.name)}</a> <small>${(f.bytes / 1024).toFixed(0)} KiB · SHA-256 <code>${e(f.sha256)}</code></small>`;
@@ -147,15 +134,17 @@ function header() {
     ...(view!.staff
       ? [
           ["gradebook", "Gradebook"],
-          ["setup", "Course setup"],
+          ["students", "Administration"],
         ]
       : []),
   ]
     .map(
       ([id, label]) =>
-        `<button type="button" data-tab="${id}" ${tab === id ? 'aria-current="page"' : ""}>${label}</button>`,
+        `<button type="button" data-tab="${id}" ${tab === id || (id === "students" && administrationSections.includes(tab as (typeof administrationSections)[number])) ? 'aria-current="page"' : ""}>${label}</button>`,
     )
-    .join("")}</nav>`;
+    .join(
+      "",
+    )}</nav>${view!.staff && administrationSections.includes(tab as (typeof administrationSections)[number]) ? administrationNavigation(tab) : ""}`;
 }
 function resultMarkup(result: Result) {
   return `<div class="course-result"><div><span class="course-score">${result.earned}<small> / ${result.available}</small></span><p>${result.percentage.toFixed(1)}% · ${result.status === "pending" ? "Assessment pending" : result.status === "fail" ? "Passing requirements unmet" : `Grade ${result.grade}`}</p></div><div><p><strong>Each phase requires</strong> 10 project points, two complete lecture activities, a submitted self/peer assessment earning 6 points, and 1 contribution point. Approved arrangements appear below.</p>${result.pending.length ? `<p class="course-muted">Pending: ${e(result.pending.join("; "))}.</p>` : ""}${result.unmet.length ? `<ul class="course-unmet">${result.unmet.map((s) => `<li>${e(s)}</li>`).join("")}</ul>` : ""}</div></div>
@@ -218,10 +207,25 @@ function overview() {
   const graded =
     v.projects.filter((r) => r.value.phase === phase).length +
     v.individuals.filter((r) => r.value.phase === phase).length;
-  return `<section class="course-section"><div class="course-section-heading"><h3>${title(phase)} review queue</h3><button type="button" data-tab="setup" class="course-quiet">Manage roster & deadlines</button></div>
+  return `<section class="course-section"><div class="course-section-heading"><h3>${title(phase)} review queue</h3><button type="button" data-tab="schedule" class="course-quiet">Manage this phase</button></div>
   <div class="course-metrics"><div><strong>${frozen}<span> / ${schedule.groups.length}</span></strong><p>Implementations frozen</p></div><div><strong>${submitted}<span> / ${course.students.length}</span></strong><p>Private portfolios submitted</p></div><div><strong>${graded}<span> / ${schedule.groups.length + course.students.length}</span></strong><p>Assessments recorded</p></div></div>
   <div class="course-deadlines"><p><strong>Implementation</strong>${when(schedule.freezeAt)}</p><p><strong>Audit closes / class access opens</strong>${when(schedule.auditAt)}</p><p><strong>Evidence & portfolios</strong>${when(schedule.evidenceAt)}</p></div>
-  ${!course.students.length ? '<aside class="course-note">Start in Course setup: add students, phase groups, deadlines and audit assignments.</aside>' : ""}
+  ${!course.students.length ? '<aside class="course-note">Start in Students: import the roster, then form groups and prepare phase deadlines and audits.</aside>' : ""}
+  ${
+    course.students.some(
+      (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
+    )
+      ? `<aside class="course-note"><strong>Students awaiting a group</strong><p>${e(
+          course.students
+            .filter(
+              (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
+            )
+            .map((s) => s.name)
+            .join(", "),
+        )}</p><button type="button" data-tab="groups" class="course-quiet">Allocate groups</button></aside>`
+      : ""
+  }
+  ${schedule.groups.some((g) => !schedule.audits.some((a) => a.from === g.id) || !schedule.audits.some((a) => a.to === g.id)) ? '<aside class="course-note"><strong>Audit arrangements incomplete</strong><p>Each group needs an incoming and outgoing audit, or a staff-arranged fallback.</p><button type="button" data-tab="schedule" class="course-quiet">Arrange audits</button></aside>' : ""}
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Group review status</caption><thead><tr><th>Group</th><th>Implementation</th><th>Incoming audit</th><th>Author response</th><th>Assessment</th><th>Review</th></tr></thead><tbody>${schedule.groups
     .map((g) => {
       const s = v.submissions.find(
@@ -412,52 +416,6 @@ function gradebook() {
   <form data-form="publish" class="course-note"><h4>${title(phase)} results: ${schedule.published ? "released" : "private drafts"}</h4><p>All groups and students need assessment records before release. Record zero scores for missing work, with reasons.</p>${input("reason", "Reason for releasing or withdrawing results", "")}<button type="submit">${schedule.published ? "Withdraw phase results" : "Release phase results"}</button></form>
   ${studentPicker()}${selected ? `<h4>${e(selected.student.name)}: points and passing requirements</h4>${resultMarkup(selected.result)}<details><summary>Approved individual arrangement for ${title(phase)}</summary><form data-form="adjustment"><p>Document the approved replacement activity or adjusted requirement. Changes and reasons remain in the private history.</p>${input("lectureMinimum", "Required complete lecture activities (0–3)", String(adjustment?.lectureMinimum ?? 2), true, "number")}${input("assessmentMinimum", "Self/peer minimum (0–12)", String(adjustment?.assessmentMinimum ?? 6), true, "number")}${input("contributionMinimum", "Contribution minimum (0–3)", String(adjustment?.contributionMinimum ?? 1), true, "number")}${input("availablePoints", "Available individual points this phase (1–21)", String(adjustment?.availablePoints ?? 21), true, "number")}${field("reason", "Approved arrangement, replacement activity and reason", adjustment?.reason ?? "", 2000, true)}<button type="submit">Save private arrangement</button></form></details>` : ""}</section>`;
 }
-function csvRows(source: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [],
-    cell = "",
-    quoted = false;
-  for (let i = 0; i < source.length; i++) {
-    const c = source[i]!;
-    if (c === '"') {
-      if (quoted && source[i + 1] === '"') {
-        cell += '"';
-        i++;
-      } else quoted = !quoted;
-    } else if (!quoted && c === ",") {
-      row.push(cell);
-      cell = "";
-    } else if (!quoted && c === "\n") {
-      row.push(cell.replace(/\r$/, ""));
-      rows.push(row);
-      row = [];
-      cell = "";
-    } else cell += c;
-  }
-  if (quoted) throw new Error("The roster CSV contains an unclosed quote.");
-  row.push(cell.replace(/\r$/, ""));
-  if (row.some((s) => s.trim())) rows.push(row);
-  return rows.filter((row) => row.some((s) => s.trim()));
-}
-function setup() {
-  const course = view!.config.value;
-  return `<section class="course-section"><h3>Course setup</h3><p>One published rubric for this run: <code>${e(course.rubric)}</code>. Maximum 100 students, 50 groups and 10 members per group.</p><form data-form="setup">${input("name", "Course run name", course.name)}${field("staff", "Course staff: numeric GitHub IDs, one per line", course.staff.join("\n"), 500, true)}
-  ${field("roster", "Roster CSV: student_number,name,github_id,github_login", [["student_number", "name", "github_id", "github_login"].join(","), ...course.students.map((s) => [s.number, s.name, s.id.replace("github:", ""), s.login].map(rosterCell).join(","))].join("\n"), 24000, true)}<p class="course-muted">Use stable numeric GitHub user IDs. A username alone cannot grant access. For local testing, the signed-in instructor ID is github:1. Frozen phase membership is retained.</p>
-  ${phases
-    .map((p) => {
-      const s = course.phases[p];
-      const localDate = (date: string) => {
-        const d = new Date(date);
-        return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-          .toISOString()
-          .slice(0, 16);
-      };
-      return `<fieldset class="course-phase-setup"><legend>${title(p)}</legend><div class="course-deadline-inputs">${input(`${p}-freezeAt`, "Implementation deadline", localDate(s.freezeAt), true, "datetime-local")}${input(`${p}-auditAt`, "Audit closes / class access opens", localDate(s.auditAt), true, "datetime-local")}${input(`${p}-evidenceAt`, "Evidence and portfolio deadline", localDate(s.evidenceAt), true, "datetime-local")}</div>${field(`${p}-groups`, "Groups: group-id: github-login, github-login (one group per line)", s.groups.map((g) => `${g.id}: ${g.members.map((id) => course.students.find((student) => student.id === id)?.login ?? id).join(", ")}`).join("\n"), 10000)}${field(`${p}-audits`, "Audit assignments: auditor-group > target-group (one per line)", s.audits.map((a) => `${a.from} > ${a.to}`).join("\n"), 5000)}<button type="button" data-match="${p}" class="course-quiet">Fill circular audit assignments</button></fieldset>`;
-    })
-    .join(
-      "",
-    )}${input("reason", "Reason for setup change", "")}<div class="course-form-actions"><button type="submit">Save course setup</button>${historyButton(view!.config)}</div></form></section>`;
-}
 function render() {
   if (!view) {
     const identity =
@@ -475,9 +433,15 @@ function render() {
     audit,
     gallery,
     gradebook,
-    setup,
+    ...Object.fromEntries(
+      administrationSections.map((section) => [
+        section,
+        () => renderAdministration(view!.config, phase, section),
+      ]),
+    ),
   };
-  if (!view.staff && ["gradebook", "setup"].includes(tab)) tab = "overview";
+  if (!view.staff && ["gradebook", ...administrationSections].includes(tab))
+    tab = "overview";
   content.innerHTML =
     header() +
     (screens[tab] ?? overview)() +
@@ -493,7 +457,14 @@ function render() {
   }
 }
 content.addEventListener("input", (event) => {
-  if ((event.target as HTMLElement).closest("form")) dirty = true;
+  const target = event.target as HTMLElement;
+  if (target.closest("form")) dirty = true;
+  if (target.matches('[name="roster"]')) {
+    const preview = target
+      .closest("form")
+      ?.querySelector("[data-roster-preview]");
+    if (preview) preview.textContent = "";
+  }
 });
 window.addEventListener("beforeunload", (event) => {
   if (dirty) {
@@ -582,6 +553,15 @@ content.addEventListener("click", async (event) => {
     "button",
   );
   if (!button) return;
+  if (
+    pending &&
+    button.matches(
+      "[data-add-group],[data-remove-group],[data-reuse-groups],[data-match]",
+    )
+  ) {
+    tell("Wait for the current save or upload to finish.");
+    return;
+  }
   try {
     if (button.dataset.version && button.dataset.history) {
       const data = await api<{ history: Envelope[] }>(
@@ -608,22 +588,42 @@ content.addEventListener("click", async (event) => {
       dialog.showModal();
       return;
     }
-    if (button.dataset.match) {
-      const p = button.dataset.match;
+    if (button.hasAttribute("data-add-group")) {
       const form = button.closest("form")!;
-      const source = (
-        form.elements.namedItem(`${p}-groups`) as HTMLTextAreaElement
-      ).value;
-      const groups = source
-        .split("\n")
-        .filter((s) => s.trim())
-        .map((s) => s.split(":")[0]!.trim());
+      const list = form.querySelector<HTMLElement>("[data-group-rows]")!;
+      const index = Number(form.dataset.nextGroup ?? "0");
+      list.insertAdjacentHTML(
+        "beforeend",
+        groupRow(view!.config.value, { id: "", members: [] }, index),
+      );
+      form.dataset.nextGroup = String(index + 1);
+      dirty = true;
+      return;
+    }
+    if (button.hasAttribute("data-remove-group")) {
+      button.closest("[data-group-row]")!.remove();
+      dirty = true;
+      return;
+    }
+    if (button.hasAttribute("data-reuse-groups")) {
+      const form = button.closest("form")!;
+      const list = form.querySelector<HTMLElement>("[data-group-rows]")!;
+      const groups = view!.config.value.phases.establish.groups;
+      list.innerHTML = groups
+        .map((g, i) => groupRow(view!.config.value, g, i))
+        .join("");
+      form.dataset.nextGroup = String(groups.length);
+      dirty = true;
+      return;
+    }
+    if (button.dataset.match) {
+      const form = button.closest("form")!;
+      const groups = view!.config.value.phases[phase].groups.map((g) => g.id);
       if (groups.length < 2)
-        throw new Error("Create at least two groups before assigning audits.");
-      (form.elements.namedItem(`${p}-audits`) as HTMLTextAreaElement).value =
-        groups
-          .map((g, i) => `${g} > ${groups[(i + 1) % groups.length]}`)
-          .join("\n");
+        throw new Error("Save at least two groups before assigning audits.");
+      (form.elements.namedItem("audits") as HTMLTextAreaElement).value = groups
+        .map((g, i) => `${g} > ${groups[(i + 1) % groups.length]}`)
+        .join("\n");
       dirty = true;
       return;
     }
@@ -705,94 +705,36 @@ content.addEventListener("submit", async (event) => {
       });
       listing = await api<Listing>("/api/courses");
       await openCourse(record.value.id);
-      tab = "setup";
+      tab = "students";
       render();
       tell("Course created. Add the roster and phase groups.");
       return;
     }
     const v = view!,
       course = v.config.value;
-    if (kind === "setup") {
-      const rows = csvRows(val("roster"));
-      requireHeader(rows.shift());
-      const students = rows.map((row) => {
-        if (row.length !== 4)
-          throw new Error("Each roster row needs four columns.");
-        return {
-          number: row[0]!.trim(),
-          name: row[1]!.trim(),
-          id: `github:${row[2]!.trim().replace(/^github:/, "")}`,
-          login: row[3]!.trim().toLowerCase(),
-        };
-      });
-      const setups = Object.fromEntries(
-        phases.map((p) => {
-          const groups = val(`${p}-groups`)
-            .split("\n")
-            .filter((s) => s.trim())
-            .map((line) => {
-              const [id, ...rest] = line.split(":");
-              if (!rest.length)
-                throw new Error(
-                  "Write each group as group-id: github-login, github-login.",
-                );
-              const members = rest
-                .join(":")
-                .split(",")
-                .map((login) => {
-                  const s = students.find(
-                    (s) => s.login === login.trim().toLowerCase(),
-                  );
-                  if (!s)
-                    throw new Error(`Unknown roster login: ${login.trim()}`);
-                  return s.id;
-                });
-              return { id: id!.trim(), members };
-            });
-          const audits = val(`${p}-audits`)
-            .split("\n")
-            .filter((s) => s.trim())
-            .map((line) => {
-              const pair = line.split(">");
-              if (pair.length !== 2)
-                throw new Error(
-                  "Write each audit as auditor-group > target-group.",
-                );
-              return { from: pair[0]!.trim(), to: pair[1]!.trim() };
-            });
-          const deadlines = Object.fromEntries(
-            ["freezeAt", "auditAt", "evidenceAt"].map((k) => {
-              const inputValue = val(`${p}-${k}`);
-              const original =
-                course.phases[p][k as "freezeAt" | "auditAt" | "evidenceAt"];
-              const d = new Date(original);
-              const originalLocal = new Date(
-                d.getTime() - d.getTimezoneOffset() * 60000,
-              )
-                .toISOString()
-                .slice(0, 16);
-              return [
-                k,
-                inputValue === originalLocal
-                  ? original
-                  : new Date(inputValue).toISOString(),
-              ];
-            }),
-          );
-          return [p, { ...deadlines, groups, audits }];
-        }),
+    if (
+      administrationSections.includes(
+        kind as (typeof administrationSections)[number],
+      )
+    ) {
+      const section = kind as (typeof administrationSections)[number];
+      const payload = administrationPayload(
+        form,
+        v.config.value,
+        phase,
+        section,
+        v.administration!,
       );
-      await api(`/api/courses/${course.id}/setup`, "PUT", {
-        expected: v.config.revision,
-        name: val("name"),
-        students,
-        staff: val("staff")
-          .split("\n")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        phases: setups,
-        reason: val("reason"),
-      });
+      const perPhase = section === "groups" || section === "schedule";
+      const url = `/api/courses/${course.id}/${section}${perPhase ? `/${phase}` : ""}`;
+      if (section === "students" && submit?.value === "preview") {
+        const preview = await api<RosterPreview>(url, "POST", payload);
+        form.querySelector<HTMLElement>("[data-roster-preview]")!.innerHTML =
+          previewMarkup(preview);
+        tell("Preview ready. Review the changes, then save the roster.");
+        return;
+      }
+      await api(url, "PUT", payload);
     } else if (kind === "submission" || kind === "evidence") {
       const old = v.submissions.find(
         (r) => r.value.phase === phase && r.value.group === selectedGroup,
@@ -889,14 +831,9 @@ content.addEventListener("submit", async (event) => {
     buttons.forEach((b) => (b.disabled = false));
   } finally {
     pending = false;
+    buttons.forEach((b) => (b.disabled = false));
   }
 });
-function requireHeader(row?: string[]) {
-  if (row?.join(",") !== "student_number,name,github_id,github_login")
-    throw new Error(
-      "Keep the roster CSV header: student_number,name,github_id,github_login.",
-    );
-}
 async function start() {
   try {
     const auth = await api<{

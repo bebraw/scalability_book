@@ -157,6 +157,31 @@
   border: 1px solid var(--border);
   overflow-wrap: anywhere;
 }
+.course-administration-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0 1.5rem;
+}
+.course-administration-nav > span {
+  margin-right: 0.5rem;
+}
+.course-administration-nav button[aria-current] {
+  color: var(--text);
+  background: var(--panel);
+  border-color: var(--accent);
+}
+.course-group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+}
+.course-group-row {
+  border: 1px solid var(--border);
+  padding: 0.5rem 1.2rem 1.2rem;
+  min-width: 0;
+}
 .course-section h3 {
   margin: 0 0 1rem;
   font: 400 1.6rem/1.25 var(--font-serif);

@@ -8,8 +8,6 @@ import {
   recordKey,
   type Phase,
   type Course,
-  type Student,
-  type Group,
   type Envelope,
   type Submission,
   type Portfolio,
@@ -18,6 +16,27 @@ import {
   type CourseFile,
   type Adjustment,
 } from "../shared/course.ts";
+import {
+  Problem,
+  requireThat,
+  obj,
+  text,
+  integer,
+  array,
+  studentId,
+  scores,
+  unique,
+} from "./course-validation.ts";
+import {
+  administrationRevisions,
+  updateAdministration,
+  updateLegacySetup,
+  rosterPreview,
+} from "./course-administration.ts";
+import {
+  administrationSections,
+  type AdministrationSection,
+} from "../shared/course-administration.ts";
 import type { CourseStore, FileStore } from "./course-store.ts";
 export interface CourseUser {
   id: string;
@@ -38,80 +57,6 @@ const privateHeaders = {
 };
 const reply = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: privateHeaders });
-class Problem extends Error {
-  status: number;
-  constructor(message: string, status = 400) {
-    super(message);
-    this.status = status;
-  }
-}
-function requireThat(
-  condition: unknown,
-  message: string,
-  status = 400,
-): asserts condition {
-  if (!condition) throw new Problem(message, status);
-}
-function obj(value: unknown): Record<string, unknown> {
-  requireThat(
-    value && typeof value === "object" && !Array.isArray(value),
-    "Expected an object.",
-  );
-  return value as Record<string, unknown>;
-}
-function text(value: unknown, label: string, max = 8000, required = false) {
-  requireThat(
-    typeof value === "string" &&
-      value.length <= max &&
-      (!required || value.trim()),
-    `${label} is required or too long (maximum ${max} characters).`,
-  );
-  return value.trim();
-}
-function integer(value: unknown, min: number, max: number) {
-  requireThat(
-    typeof value === "number" &&
-      Number.isInteger(value) &&
-      value >= min &&
-      value <= max,
-    `Expected an integer from ${min} to ${max}.`,
-  );
-  return value;
-}
-function array(value: unknown, max: number) {
-  requireThat(
-    Array.isArray(value) && value.length <= max,
-    `Expected a list with at most ${max} items.`,
-  );
-  return value as unknown[];
-}
-function slug(value: unknown) {
-  const s = text(value, "Identifier", 48, true);
-  requireThat(
-    /^[a-z0-9][a-z0-9-]*$/.test(s),
-    "Identifiers use lowercase letters, numbers and hyphens.",
-  );
-  return s;
-}
-function studentId(value: unknown) {
-  const s = text(value, "GitHub numeric ID", 40, true);
-  requireThat(
-    /^github:[1-9][0-9]{0,19}$/.test(s),
-    "Use a stable numeric GitHub ID, prefixed with github:.",
-  );
-  return s;
-}
-function date(value: unknown) {
-  const s = text(value, "Deadline", 40, true);
-  requireThat(Number.isFinite(Date.parse(s)), "Enter a valid deadline.");
-  return new Date(s).toISOString();
-}
-function scores(value: unknown, maxima: number[]) {
-  const items = array(value, maxima.length);
-  requireThat(items.length === maxima.length, "Every criterion needs a score.");
-  return items.map((s, i) => integer(s, 0, maxima[i]!));
-}
-const unique = (items: string[]) => new Set(items).size === items.length;
 function staffAllowed(course: Course, user: CourseUser, admins: string[]) {
   return (
     course.staff.includes(user.id) || admins.includes(user.login.toLowerCase())
@@ -168,44 +113,6 @@ async function boundedJson(request: Request) {
     if (error instanceof Problem) throw error;
     throw new Problem("Invalid JSON.");
   }
-}
-function parseStudents(value: unknown): Student[] {
-  const students = array(value, 100).map((item) => {
-    const s = obj(item);
-    return {
-      id: studentId(s.id),
-      number: text(s.number, "Student number", 50, true),
-      name: text(s.name, "Student name", 120, true),
-      login: text(s.login, "GitHub login", 39, true).toLowerCase(),
-    };
-  });
-  requireThat(
-    students.every((s) => /^[a-z0-9-]+$/.test(s.login)),
-    "Invalid GitHub login.",
-  );
-  requireThat(
-    unique(students.map((s) => s.id)) &&
-      unique(students.map((s) => s.number)) &&
-      unique(students.map((s) => s.login)),
-    "Student IDs, numbers and logins must be unique.",
-  );
-  return students;
-}
-function parseGroups(value: unknown, course: Course): Group[] {
-  const groups = array(value, 50).map((item) => {
-    const g = obj(item);
-    const members = array(g.members, 10).map(studentId);
-    requireThat(members.length > 0, "Every group needs a member.");
-    return { id: slug(g.id), members };
-  });
-  requireThat(unique(groups.map((g) => g.id)), "Group IDs must be unique.");
-  const members = groups.flatMap((g) => g.members);
-  requireThat(unique(members), "A student can belong to one group in a phase.");
-  requireThat(
-    members.every((id) => course.students.some((s) => s.id === id)),
-    "Group members must be on the roster.",
-  );
-  return groups;
 }
 function parseAdjustment(value: unknown, course: Course): Adjustment {
   const a = obj(value);
@@ -529,6 +436,7 @@ export async function handleCourses(
         staff,
         user,
         now,
+        ...(staff ? { administration: administrationRevisions(course) } : {}),
         ...visible,
         results,
       });
@@ -605,6 +513,37 @@ export async function handleCourses(
         },
       });
     }
+    if (administrationSections.includes(action as AdministrationSection)) {
+      requireThat(
+        staff &&
+          (request.method === "PUT" ||
+            (action === "students" && request.method === "POST")),
+        "Staff access required.",
+        403,
+      );
+      requireThat(!subject, "Unknown administration route.", 404);
+      const body = await boundedJson(request);
+      const next = updateAdministration(
+        course,
+        records,
+        action as AdministrationSection,
+        phaseText,
+        body,
+        user.id,
+        now,
+      );
+      if (request.method === "POST") return reply(rosterPreview(course, next));
+      return reply(
+        await save(
+          "course",
+          "",
+          "",
+          next,
+          config.revision,
+          text(body.reason, "Change reason", 2000, true),
+        ),
+      );
+    }
     if (action === "setup") {
       requireThat(
         staff && request.method === "PUT",
@@ -612,99 +551,17 @@ export async function handleCourses(
         403,
       );
       const body = await boundedJson(request);
-      const reason = text(body.reason, "Change reason", 2000, true);
-      const next = structuredClone(course);
-      next.name = text(body.name, "Course name", 120, true);
-      next.students = parseStudents(body.students);
-      const staffIds = array(body.staff, 10).map((value) =>
-        value === user.id ? user.id : studentId(value),
-      );
-      requireThat(
-        staffIds.length && unique(staffIds) && staffIds.includes(user.id),
-        "Keep yourself as course staff.",
-      );
-      next.staff = staffIds;
-      const phaseConfigs = obj(body.phases);
-      for (const phase of phases) {
-        const input = obj(phaseConfigs[phase]);
-        const groups = parseGroups(input.groups, next);
-        const frozen = values<Submission>("submission").filter(
-          (s) => s.phase === phase && s.frozenAt,
-        );
-        requireThat(
-          frozen.every((s) =>
-            groups.some(
-              (g) =>
-                g.id === s.group &&
-                JSON.stringify([...g.members].sort()) ===
-                  JSON.stringify([...s.members].sort()),
-            ),
-          ),
-          "Frozen group membership is preserved. Change groups in a later phase.",
-        );
-        const freezeAt = date(input.freezeAt),
-          auditAt = date(input.auditAt),
-          evidenceAt = date(input.evidenceAt);
-        requireThat(
-          freezeAt < auditAt && auditAt <= evidenceAt,
-          "Deadlines must run implementation → audit → evidence.",
-        );
-        if (now >= course.phases[phase].freezeAt || frozen.length)
-          requireThat(
-            freezeAt === course.phases[phase].freezeAt,
-            "The implementation deadline is locked once work freezes or the audit opens.",
-          );
-        if (now >= course.phases[phase].auditAt)
-          requireThat(
-            auditAt === course.phases[phase].auditAt,
-            "The closed audit window cannot be moved; class access has already opened.",
-          );
-        const audits = array(input.audits, 50).map((value) => {
-          const a = obj(value);
-          return { from: slug(a.from), to: slug(a.to) };
-        });
-        requireThat(
-          audits.every(
-            (a) =>
-              a.from !== a.to &&
-              groups.some((g) => g.id === a.from) &&
-              groups.some((g) => g.id === a.to),
-          ) &&
-            unique(audits.map((a) => a.from)) &&
-            unique(audits.map((a) => a.to)),
-          "Audits need distinct existing groups and one incoming/outgoing assignment per group.",
-        );
-        if (values<Audit>("audit").some((a) => a.phase === phase))
-          requireThat(
-            JSON.stringify(audits) ===
-              JSON.stringify(course.phases[phase].audits),
-            "Assignments with submitted audits are retained.",
-          );
-        next.phases[phase] = {
-          ...course.phases[phase],
-          freezeAt,
-          auditAt,
-          evidenceAt,
-          groups,
-          audits,
-        };
-      }
-      const retained = new Set(next.students.map((s) => s.id));
-      requireThat(
-        course.students.every(
-          (s) =>
-            retained.has(s.id) ||
-            !records.some(
-              (r) =>
-                (r.value as { student?: string; subject?: string }).student ===
-                  s.id ||
-                (r.kind === "individual-grade" &&
-                  (r.value as Grade).subject === s.id),
-            ),
+      const next = updateLegacySetup(course, records, body, user.id, now);
+      return reply(
+        await save(
+          "course",
+          "",
+          "",
+          next,
+          body.expected,
+          text(body.reason, "Change reason", 2000, true),
         ),
-        "Students with assessment records must remain on the roster.",
       );
-      return reply(await save("course", "", "", next, body.expected, reason));
     }
     if (action === "adjustment") {
       requireThat(

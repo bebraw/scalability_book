@@ -7,9 +7,9 @@ Book feedback moderators do not automatically have access to course records.
 
 ## Agreed revision and current behavior
 
-This guide describes the currently implemented GitHub-based workspace, including its combined **Course setup** form.
+This guide describes the currently implemented GitHub-based workspace with four focused administration forms.
 The [accepted ADRs](adrs/README.md#accepted) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
-Those features are not implemented by adding their decision records.
+The administration split is in place; institutional identities, account activity, student group proposals and approvals, checklists, email delivery and simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -19,7 +19,23 @@ Update this guide as each decision is implemented.
 npm run dev
 ```
 
-Open `http://127.0.0.1:3000/admin/courses/`, create a run, and use **Course setup** to add the roster, phase groups, implementation/audit/evidence deadlines and assignments.
+Open `http://127.0.0.1:3000/admin/courses/` and create a run.
+**Administration** has four workflows, each with its own save and change reason:
+
+- **Students** imports and previews the roster.
+  Import all students initially, or paste just later additions and corrections.
+  Omitted rows remain enrolled; imports cannot remove students.
+  Existing records retain their stable identity when names, student numbers or logins are corrected.
+  Duplicate identities, student numbers and logins are rejected before saving.
+- **Groups** allocates students for the selected phase and lists those awaiting allocation.
+  Add group cards and select their members.
+  New identifiers are generated automatically, starting at `group-01`; generated numbers are not reused after removing an unused group.
+  Later phases can reuse Establish groups and their identifiers.
+- **Phase administration** edits only the selected phase's deadlines and audit assignments.
+- **Course settings** edits the run name and staff access and displays the retained published rubric.
+
+The review queue links students awaiting allocation and incomplete audit arrangements to the relevant workflow.
+Course creation, roster import and group allocation are separate operations.
 The local instructor identity is `github:1` / `local-editor`.
 Data persists in `.local/course.sqlite` and `.local/course-files/`; restarting the server preserves it.
 These records are separate from chapter exercise answers and reader feedback.
@@ -42,9 +58,11 @@ Access follows the numeric ID in the verified GitHub session, so a renamed usern
 Enter staff as `github:<numeric-id>`, one per line.
 Check the imported roster before releasing the course to students.
 
-Group input uses one line per group, such as `group-01: alice, bob`.
+Group cards display the saved identifier and a multiple selection of enrolled students.
 Each student belongs to one group per phase.
-Reuse the same group ID across phases when membership is stable; future-phase groups can change.
+Use **Reuse Establish groups** when membership is stable; future-phase membership can change.
+Clear audit assignments before removing an unused group.
+Groups with saved submissions, audits or assessments cannot be removed.
 The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
 With only one group or a missing frozen implementation, staff arrange and record a fallback audit.
@@ -99,7 +117,13 @@ Restoring the standard requirements uses the same form and records another reaso
 The self/peer submission itself remains required, including when a replacement activity is used.
 
 Every saved revision records its actor, timestamp and reason.
-Concurrent saves use revision checks; a stale browser tab cannot overwrite another submission or changed course setup.
+Concurrent saves use revision checks; a stale browser tab cannot overwrite another submission.
+Administration checks the fields owned by each workflow, with groups and schedules checked separately for each phase.
+A settings form opened before a roster addition can still save without losing that addition.
+Two edits to the same settings form conflict; the rejected form retains its text until the instructor reloads.
+The final database write also checks the current whole-course revision, so a change made while the server is processing a save produces a conflict.
+Every successful administration save retains a complete course snapshot in history.
+The legacy staff-only `PUT /api/courses/:id/setup` endpoint remains for existing integrations and local Worker verification; it uses the same validation rules and requires the whole-course revision.
 Changed evidence makes its old assessment stale and returns that component to pending until staff reassess it.
 The previous score and evidence remain available in **Record history**.
 History lists revision metadata first and loads a chosen snapshot on demand; the latest 1,000 entries appear in the dialog, while all snapshots remain stored and are retrievable by revision ID.
@@ -153,8 +177,8 @@ npm run build
 npm run validate
 ```
 
-The browser test covers roster/group setup, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
-API tests cover three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
+The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
+API tests cover independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 

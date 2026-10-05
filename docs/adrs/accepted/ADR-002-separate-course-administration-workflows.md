@@ -63,9 +63,18 @@ This would split group, deadline, access, and grading state across systems and m
 
 ## Implementation and verification
 
-The current combined setup form remains implemented; the split is pending.
-Verify that an instructor can import students, form groups later, and edit one phase independently without losing another saved change.
-Verify student access cannot invoke any staff operation.
+The four forms and independent API saves are implemented in `site/scripts/course-administration.ts` and `worker/course-administration.ts`.
+Staff-only fingerprints check each workflow's owned fields, with phase-specific checks for groups and schedules.
+The API overlays a validated change onto the latest course snapshot and retains the existing whole-record compare-and-swap and full revision history.
+Incremental roster imports have a read-only preview, preserve omitted students and reject identity conflicts.
+Group allocation generates identifiers and can reuse established groups in later phases.
+The review queue links unassigned students and missing audit arrangements.
+The combined setup API remains available for existing integrations but is no longer the browser interface.
+
+The ADR remains Accepted: institutional CSV mapping, manual enrollment and sign-in status depend on ADR-003; student proposals, confirmations and approval depend on ADR-004.
+The existing GitHub CSV and instructor allocation remain the current workflows until those decisions are implemented.
+API tests verify unrelated concurrent saves survive, edits to the same form conflict, previews do not write, student access cannot invoke staff operations and frozen membership/deadline locks remain enforced.
+The course browser test exercises the four forms alongside submission, assessment and release.
 Update [course-system.md](../../course-system.md) when the new workflows exist.
 
 ## References

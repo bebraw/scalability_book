@@ -22,28 +22,83 @@ test("instructor manages a run; student submits privately; rubric grading and re
     .getByRole("button", { name: "Create course", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Course setup", exact: true }),
+    page.getByRole("heading", { name: "Students", exact: true }),
   ).toBeVisible();
-  const setup = page.locator('form[data-form="setup"]');
-  await setup
+  const roster = page.locator('form[data-form="students"]');
+  await roster
     .getByLabel("Roster CSV:", { exact: false })
     .fill(
       "student_number,name,github_id,github_login\nS001,Alice Example,2,alice\nS002,Bob Example,3,bob",
     );
+  await roster.getByRole("button", { name: "Preview roster changes" }).click();
+  await expect(roster.locator("[data-roster-preview]")).toContainText(
+    "2 additions",
+  );
+  await roster
+    .getByLabel("Reason for change")
+    .fill("Imported the initial roster");
+  await roster
+    .getByRole("button", { name: "Save roster", exact: true })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "Students awaiting a group",
+  );
+  await page
+    .getByRole("button", { name: "Allocate groups", exact: true })
+    .click();
   for (const phase of ["Establish", "Challenge", "Compare"]) {
-    const fieldset = setup.getByRole("group", { name: phase, exact: true });
-    await fieldset
-      .getByLabel("Groups:", { exact: false })
-      .fill("red: alice\nblue: bob");
-    await fieldset
+    if (phase !== "Establish")
+      await page
+        .getByRole("button", { name: new RegExp(`0[23] ${phase}`) })
+        .click();
+    await expect(
+      page.getByRole("heading", { name: `${phase} groups`, exact: true }),
+    ).toBeVisible();
+    const groups = page.locator('form[data-form="groups"]');
+    if (phase === "Establish") {
+      await groups
+        .getByRole("button", { name: "Add a group", exact: true })
+        .click();
+      await groups.locator('[name="members-0"]').selectOption(["github:2"]);
+      await groups
+        .getByRole("button", { name: "Add a group", exact: true })
+        .click();
+      await groups.locator('[name="members-1"]').selectOption(["github:3"]);
+    } else
+      await groups
+        .getByRole("button", { name: "Reuse Establish groups", exact: true })
+        .click();
+    await groups
+      .getByLabel("Reason for change")
+      .fill("Initial allocation for this phase");
+    await groups
+      .getByRole("button", { name: "Save groups", exact: true })
+      .click();
+    await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+    await expect(groups.getByRole("group").first()).toContainText("group-01");
+    await page
+      .getByRole("button", { name: "Phase administration", exact: true })
+      .click();
+    const schedule = page.locator('form[data-form="schedule"]');
+    await schedule
       .getByRole("button", { name: "Fill circular audit assignments" })
       .click();
+    await expect(
+      schedule.getByLabel("Audit assignments:", { exact: false }),
+    ).toHaveValue("group-01 > group-02\ngroup-02 > group-01");
+    await schedule
+      .getByLabel("Reason for change")
+      .fill("Arrange reciprocal audits");
+    await schedule
+      .getByRole("button", { name: "Save phase administration", exact: true })
+      .click();
+    await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+    if (phase !== "Compare")
+      await page.getByRole("button", { name: "Groups", exact: true }).click();
   }
-  await setup
-    .getByLabel("Reason for setup change")
-    .fill("Published roster, phase groups and reciprocal audits");
-  await setup.getByRole("button", { name: "Save course setup" }).click();
-  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await page.getByRole("button", { name: /01 Establish/ }).click();
   const courseId = await page.locator("[data-course-select]").inputValue();
   await page.getByRole("button", { name: "Review queue", exact: true }).click();
   await expect(
@@ -220,7 +275,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
   await page
     .getByRole("button", { name: "Group submission", exact: true })
     .click();
-  await page.locator("[data-group-select]").selectOption("blue");
+  await page.locator("[data-group-select]").selectOption("group-02");
   const missingProject = page.locator('form[data-form="project-grade"]');
   for (let i = 0; i < 8; i++)
     await missingProject.locator(`[name="score-${i}"]`).fill("0");
@@ -279,7 +334,12 @@ test("instructor manages a run; student submits privately; rubric grading and re
   await student
     .getByText("Establish private assessment", { exact: true })
     .click();
-  await page.getByRole("button", { name: "Course setup", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Administration", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Course settings", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Record history", exact: true })
     .click();
@@ -291,6 +351,21 @@ test("instructor manages a run; student submits privately; rubric grading and re
     .click();
   await expect(dialog.locator("pre")).toContainText(courseName);
   await dialog.getByRole("button", { name: "Close history" }).click();
+  expect(
+    (await new AxeBuilder({ page }).include(".course-shell").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "test-results/course-settings-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.getByRole("button", { name: "Gradebook", exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await page

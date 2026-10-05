@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import type { AdministrationRevisions } from "../shared/course-administration.ts";
 import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import {
   handleCourses,
@@ -164,6 +165,220 @@ function fixture(t: test.TestContext) {
   }
   return { ...stores, request, good, create, upload, submit };
 }
+test("focused administration preserves other workflows and rejects conflicts in the same workflow", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const id = record.value.id;
+  const initial = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  const extra = {
+    id: "github:5",
+    login: "dan",
+    name: "Dan Example",
+    number: "S4",
+  };
+  await f.good(`/${id}/students`, "PUT", {
+    expected: initial.administration.students,
+    students: [extra],
+    reason: "Late enrollment",
+  });
+  const settings = await f.good<Envelope<Course>>(`/${id}/settings`, "PUT", {
+    expected: initial.administration.settings,
+    name: "Renamed course",
+    staff: [admin.id],
+    rubric: rubricVersion,
+    reason: "Correct course name",
+  });
+  assert.equal(settings.value.students.length, 4);
+  assert.deepEqual(settings.value.students.at(-1), extra);
+  assert.equal(settings.value.name, "Renamed course");
+  const conflict = await f.request(`/${id}/settings`, "PUT", {
+    expected: initial.administration.settings,
+    name: "Stale name",
+    staff: [admin.id],
+    rubric: rubricVersion,
+    reason: "Another name change",
+  });
+  assert.equal(conflict.status, 409);
+  const history = await f.good<{ history: { reason: string }[] }>(
+    `/${id}/history?key=${encodeURIComponent(record.key)}`,
+  );
+  assert.ok(history.history.some((r) => r.reason === "Late enrollment"));
+  assert.ok(history.history.some((r) => r.reason === "Correct course name"));
+});
+test("phase administration saves only the selected phase", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const id = record.value.id;
+  const view = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  const schedule = { ...record.value.phases.establish, evidenceAt: after };
+  await f.good(`/${id}/schedule/establish`, "PUT", {
+    expected: view.administration.schedule.establish,
+    ...schedule,
+    reason: "Extend Establish evidence",
+  });
+  const next = await f.good<Envelope<Course>>(
+    `/${id}/schedule/challenge`,
+    "PUT",
+    {
+      expected: view.administration.schedule.challenge,
+      ...record.value.phases.challenge,
+      evidenceAt: "2026-01-09T00:00:00.000Z",
+      reason: "Extend Challenge evidence",
+    },
+  );
+  assert.equal(next.value.phases.establish.evidenceAt, after);
+  assert.equal(
+    next.value.phases.challenge.evidenceAt,
+    "2026-01-09T00:00:00.000Z",
+  );
+  assert.deepEqual(next.value.phases.compare, record.value.phases.compare);
+  const stale = await f.request(`/${id}/schedule/establish`, "PUT", {
+    expected: view.administration.schedule.establish,
+    ...schedule,
+    reason: "Stale schedule",
+  });
+  assert.equal(stale.status, 409);
+});
+test("roster preview validates incremental imports without writing or removing omitted students", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const id = record.value.id;
+  const view = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  const corrected = { ...record.value.students[0]!, name: "Alice Corrected" };
+  const body = {
+    expected: view.administration.students,
+    students: [corrected],
+    reason: "Name correction",
+  };
+  const preview = await f.good<{
+    added: unknown[];
+    updated: unknown[];
+    unchanged: number;
+  }>(`/${id}/students`, "POST", body);
+  assert.deepEqual(preview.added, []);
+  assert.deepEqual(preview.updated, [corrected]);
+  assert.equal(preview.unchanged, 2);
+  const untouched = await f.store.get<Course>(record.key);
+  assert.equal(untouched!.revision, record.revision);
+  const conflict = await f.request(`/${id}/students`, "POST", {
+    ...body,
+    students: [
+      {
+        id: "github:99",
+        login: "new",
+        number: corrected.number,
+        name: "Different student",
+      },
+    ],
+  });
+  assert.equal(conflict.status, 400);
+  const saved = await f.good<Envelope<Course>>(`/${id}/students`, "PUT", body);
+  assert.equal(saved.value.students.length, 3);
+  assert.equal(saved.value.students[0]!.id, alice.id);
+  assert.equal(saved.value.students[0]!.name, "Alice Corrected");
+  assert.deepEqual(saved.value.phases, record.value.phases);
+});
+test("focused administration is staff-only and retains frozen groups and deadline locks", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const id = record.value.id;
+  const studentView = await f.good<Record<string, unknown>>(
+    `/${id}`,
+    "GET",
+    undefined,
+    alice,
+  );
+  assert.equal(studentView.administration, undefined);
+  for (const action of [
+    "students",
+    "settings",
+    "groups/establish",
+    "schedule/establish",
+  ])
+    assert.equal(
+      (await f.request(`/${id}/${action}`, "PUT", {}, alice)).status,
+      403,
+    );
+  await f.submit(id, "establish", "red", alice);
+  const v = await f.good<{ administration: AdministrationRevisions }>(`/${id}`);
+  const groups = structuredClone(record.value.phases.establish.groups);
+  groups[0]!.members = [carol.id];
+  groups[2]!.members = [alice.id];
+  assert.equal(
+    (
+      await f.request(`/${id}/groups/establish`, "PUT", {
+        expected: v.administration.groups.establish,
+        groups,
+        reason: "Attempt frozen membership change",
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await f.request(`/${id}/schedule/establish`, "PUT", {
+        expected: v.administration.schedule.establish,
+        ...record.value.phases.establish,
+        freezeAt: "2026-01-04T00:00:00.000Z",
+        reason: "Attempt to move frozen implementation deadline",
+      })
+    ).status,
+    400,
+  );
+});
+test("group allocation generates identifiers and retains established IDs across phases", async (t) => {
+  const f = fixture(t);
+  const record = await f.good<Envelope<Course>>("", "POST", {
+    name: "New cohort",
+  });
+  const id = record.value.id;
+  let view = await f.good<{ administration: AdministrationRevisions }>(
+    `/${id}`,
+  );
+  await f.good(`/${id}/students`, "PUT", {
+    expected: view.administration.students,
+    students: [{ ...alice, name: "Alice Example", number: "S1" }],
+    reason: "Import roster",
+  });
+  view = await f.good(`/${id}`);
+  const allocated = await f.good<Envelope<Course>>(
+    `/${id}/groups/establish`,
+    "PUT",
+    {
+      expected: view.administration.groups.establish,
+      groups: [{ id: "", members: [alice.id] }],
+      reason: "Initial allocation",
+    },
+  );
+  assert.deepEqual(allocated.value.phases.establish.groups, [
+    { id: "group-01", members: [alice.id] },
+  ]);
+  const next = await f.good<Envelope<Course>>(
+    `/${id}/groups/challenge`,
+    "PUT",
+    {
+      expected: view.administration.groups.challenge,
+      groups: allocated.value.phases.establish.groups,
+      reason: "Retain groups",
+    },
+  );
+  assert.deepEqual(
+    next.value.phases.challenge.groups,
+    allocated.value.phases.establish.groups,
+  );
+  const arbitrary = await f.request(`/${id}/groups/compare`, "PUT", {
+    expected: view.administration.groups.compare,
+    groups: [{ id: "made-up", members: [alice.id] }],
+    reason: "Manual ID",
+  });
+  assert.equal(arbitrary.status, 400);
+});
 test("scores cannot bypass phase hurdles; pending differs from explicitly assessed zero", () => {
   const course: Course = {
     id: "x",
