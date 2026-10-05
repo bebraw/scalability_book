@@ -18,6 +18,7 @@ export const conceptPages: ConceptPage[] = [
       "harness",
       "benchmark",
       "trade-off",
+      "review-budget",
     ],
   },
   {
@@ -388,17 +389,6 @@ export const conceptPages: ConceptPage[] = [
       "review-budget",
       "throughput",
       "durable-workflow",
-    ],
-  },
-  {
-    url: "/case-studies/elements-of-scalable-web-development/",
-    title: "Case · This book",
-    concepts: [
-      "harness",
-      "review-budget",
-      "acceptance-criteria",
-      "feedback-loop",
-      "technical-debt",
     ],
   },
   {

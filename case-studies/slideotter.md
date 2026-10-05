@@ -2,128 +2,82 @@
 
 [Slideotter](https://github.com/bebraw/slideotter) is a local, structured workbench for creating and reviewing presentations with language models.
 I developed it with coding agents between April and June 2026, before beginning Kirjolab.
-It is the less successful product of the two, but it was an important development-system experiment.
-
-Slideotter produced a capable application, a strong [validation harness](/concepts/#harness), and several ideas that carried into later work.
-It did not reach the same clarity about its first production use.
-The case is therefore not a story of technical failure.
-It is a story of learning rapidly while the product, architecture, and deployment target were all still moving.
-
-The commit counts below describe the shape of the history, not developer productivity.
-A mechanical extraction and a difficult product decision are not comparable units of work.
+It produced a capable application and reusable rendering and review controls, but did not establish a clear first production use.
+The case asks how a project can validate its artifacts thoroughly while learning too little about which product people would repeatedly use.
 
 ## Case at a glance
 
-| Evidence                                                      | Observation                                               |
-| ------------------------------------------------------------- | --------------------------------------------------------- |
-| Development interval reviewed                                 | 19 April–24 June 2026                                     |
-| Repository history                                            | 1,606 commits                                             |
-| Commits made by 15 May                                        | 1,444, about 90% of the history                           |
-| Structurally named commit subjects                            | 457, about 28% of the history                             |
-| TypeScript files                                              | 0 in the initial README-only commit; 517 at reviewed head |
-| TypeScript test or specification files                        | 49                                                        |
-| TypeScript and JavaScript lines in application and test areas | About 98,000                                              |
-| Implemented architecture decision records                     | 58                                                        |
-| Public product status at review                               | Alpha                                                     |
+:ref[table:slideotter-snapshot]{text="The table below"} records the reviewed interval and the early concentration of development.
 
-## What worked
+| Evidence                        | Observation                     |
+| ------------------------------- | ------------------------------- |
+| Development interval reviewed   | 19 April–24 June 2026           |
+| Repository history              | 1,606 commits                   |
+| Commits made by 15 May          | 1,444, about 90% of the history |
+| Public product status at review | Alpha                           |
+
+::caption[Repository evidence from the reviewed Slideotter snapshot.]
+::label[table:slideotter-snapshot]
+
+Commit counts describe activity rather than productivity or product value.
+Most of the history accumulated before repeated use had established the first delivery target.
+
+## Validate the rendered artifact
 
 ### The project found durable authority boundaries
 
-Slideotter changed its implementation direction very early.
 The first generator produced PowerPoint files, but two days after the initial commit the project [replaced that path with PDF generation](https://github.com/bebraw/slideotter/commit/1c52f32b9c356523dbe6bde4095510efad529dd1).
-Two days later the repository began a browser studio and then migrated preview, export, and validation to a shared DOM renderer.
+Two days later it began a browser studio, then moved preview, export, and validation to a shared DOM renderer.
 
-The replacement was expensive, but it exposed a durable principle: preview and exported output should use the same rendering authority.
-The current [architecture](https://github.com/bebraw/slideotter/blob/main/docs/ARCHITECTURE.md) keeps structured slide specifications as content, the shared DOM runtime as the rendering authority, and the server as the file-write boundary.
+The replacement exposed a durable rule: preview and exported output should use the same rendering authority.
+The [architecture](https://github.com/bebraw/slideotter/blob/main/docs/ARCHITECTURE.md) keeps structured slide specifications as content, the DOM runtime as rendering authority, and the server as the file-write boundary.
 Generated changes remain candidates until the author applies them.
-
-Those are useful product constraints, not only code organization.
-They reduce the chance that an agent silently changes canonical work or that preview behavior drifts from the published artifact.
 
 ### Validation treated the artifact as more than source code
 
-Slide software can typecheck while still producing unreadable slides.
-The project therefore validates geometry, text fit, media, visible-text quality, browser workflows, rendered baselines, and PDF output in addition to types and tests.
-Its [repository instructions](https://github.com/bebraw/slideotter/blob/main/AGENTS.md) require visual changes to be checked in the rendered artifact rather than inferred from source coordinates.
+Slide software can typecheck while producing unreadable slides.
+Slideotter therefore checks geometry, text fit, media, visible-text quality, browser workflows, rendered baselines, and PDF output.
+Its [repository instructions](https://github.com/bebraw/slideotter/blob/main/AGENTS.md) require visual changes to be inspected in the rendered artifact.
 
-Layout rules were established early so generated slides had explicit limits for overlap, clipping, margins, and text fit.
-Those rules narrowed the model's search space and turned several obvious visual defects into machine-checkable failures before review.
-They could not establish whether a slide communicated well, so rendered inspection and editorial judgment remained separate [acceptance steps](/concepts/#acceptance-criteria).
+Rules for overlap, clipping, margins, and text fit turn named defects into machine-checkable failures.
+They cannot establish whether a slide communicates well.
+Rendered inspection and editorial judgment remain separate [acceptance steps](/concepts/#acceptance-criteria).
 
-That practice carried an important lesson into later projects: validation should inspect the thing the user consumes.
-For a presentation tool, the PDF is part of the behavior.
+This gives the case its validation lesson: inspect what the author and audience will consume.
+A successful source build leaves the quality of the presentation unresolved.
 
-### The history retained decisions and reversals
+## Capability breadth arrived before a stable first use
 
-The repository contains a roadmap, a current-status document, architecture guides, manual test notes, competitive comparisons, and implemented or proposed [architecture decision records](/concepts/#decision-log).
-This made the rapid development legible after the fact.
+The first month covered structured slide specifications, multiple model providers, outline and theme generation, variants, deck restructuring, media workflows, presentation mode, PDF and PowerPoint export, an Electron wrapper, and cloud hosting.
 
-The documentation also became a coordination surface for agents.
-The [roadmap](https://github.com/bebraw/slideotter/blob/main/ROADMAP.md) distinguishes durable direction from the next practical slice, while the status document records the live implementation.
-That separation is more useful than one ever-growing backlog because it tells a future agent both why the system has its current shape and what remains uncertain.
+These capabilities pursued one broad vision while testing many product assumptions at once.
+Repeated use had not yet shown which workflow deserved priority.
+The [roadmap](https://github.com/bebraw/slideotter/blob/main/ROADMAP.md) subsequently made real studio usage the source of future work, after a large solution surface already existed.
 
-## Why the product was less successful
+The harness grew with that surface: fixtures, baselines, validators, build paths, and agent instructions all needed maintenance.
+Making the checks more precise could improve an implementation without resolving whether its workflow was worth expanding.
 
-### Capability breadth arrived before a stable first use
+## Packaging and hosting multiplied the system boundaries
 
-Within the first month, Slideotter accumulated most of its history.
-The work covered structured slide specifications, multiple model providers, outline and theme generation, variants, deck restructuring, media workflows, browser presentation mode, PDF and PowerPoint export, an Electron wrapper, and a Cloudflare hosting direction.
+Local filesystem use, a command-line package, a browser studio, a macOS wrapper, and a cloud deployment each introduce different storage, authentication, rendering, and release requirements.
+Supporting them together broadened the operating model before one delivery path had settled.
 
-These capabilities support the same broad vision, but they do not form one small hypothesis.
-The project learned about many parts of presentation authoring at once before repeated real use had shown which problems mattered most.
-Its current roadmap appropriately says that the next work should come from real studio usage, but that constraint arrived after a large solution surface already existed.
-
-### Packaging and hosting multiplied the system boundaries
-
-The repository supports local filesystem-backed use, a command-line package, a browser studio, a macOS wrapper, and a cloud proof path.
-Each target is plausible in isolation.
-Together they introduce several storage, authentication, rendering, and release models.
-
-The [cloud setup guide](https://github.com/bebraw/slideotter/blob/main/docs/GETTING_STARTED.md#current-limits) still identifies production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
-The Electron path likewise still needs production packaging work.
-Technical breadth should not be confused with a finished delivery path.
-
-### Architecture kept learning behind implementation
-
-The repository contains 457 commit subjects beginning with terms such as `split`, `extract`, `move`, `reduce`, or `refactor`.
-On 17 June alone, 48 commits had that structural form.
-At the reviewed head, application services and workbenches still include several modules above one thousand lines.
-
-The later extraction work improved navigability and produced explicit client, server, rendering, storage, and workflow boundaries.
-It also shows that feature throughput repeatedly ran ahead of ownership design.
-Static health scores helped direct cleanup, but they could not decide which product surfaces should exist.
-
-### The harness became a substantial product of its own
-
-Slideotter has focused checks for many artifact and workflow properties.
-That makes ambitious refactoring safer.
-It also creates a large maintenance surface of fixtures, baselines, validators, build paths, and project instructions.
-
-This is a development-system waterbed effect.
-Moving uncertainty out of generated code and into deterministic checks improves control, but the checking system itself must remain understandable and proportional to the product evidence it protects.
-Without real usage, it is possible to make the harness increasingly precise around the wrong workflow.
+At the reviewed point, the [cloud setup guide](https://github.com/bebraw/slideotter/blob/main/docs/GETTING_STARTED.md#current-limits) identified production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
+The Electron path also needed production packaging work.
+A functioning authoring workflow and a dependable delivery path required different evidence.
 
 ## What transferred to Kirjolab
 
-Slideotter preceded Kirjolab and changed how I approached it.
-Several useful practices transferred directly or conceptually:
+Canonical artifacts, explicit approval, rendered validation, and preserved decisions carried into later work.
+[Kirjolab](/case-studies/kirjolab/) examines the subsequent architectural problem: behavioral checks made correction possible while responsibility boundaries lagged behind feature growth.
 
-- establish canonical artifacts and explicit write boundaries;
-- keep model output reviewable until a human applies it;
-- validate rendered or operational behavior, not only code;
-- preserve architecture decisions and current project state in the repository;
-- use small semantic commits so rapid work remains inspectable; and
-- add structural feedback when tests alone cannot constrain code shape.
-
-The warning transferred too.
-Kirjolab began with a stronger development harness, but it repeated the tendency to broaden capability faster than the architecture consolidated.
-Slideotter helped make the later refactoring possible; it did not by itself prevent the need for it.
+Slideotter's distinctive unresolved question was product fit.
+Its rendering controls could be reused, but they did not identify the smallest presentation workflow worth operating.
 
 ## What I would do differently
 
-I would use the [shared knowledge-base design described in the Kirjolab case](/case-studies/kirjolab/#what-i-would-do-differently).
-Slideotter would own presentation metadata, outline variants, slide definitions, themes, and approval state while referencing the shared source material.
+I would begin with the local browser studio and use real decks to establish one complete authoring loop before adding desktop or cloud delivery.
+With the [shared knowledge-base boundary described in the Kirjolab case](/case-studies/kirjolab/#what-i-would-do-differently), Slideotter would own presentation metadata, outline variants, slide definitions, themes, and approval state while referencing reusable source material.
 
 The first product loop would be:
 
@@ -132,15 +86,12 @@ The first product loop would be:
 3. Generate and review the slides, including their layout and rendered output.
 4. Bind approval to a reviewed version; later changes produce a new candidate.
 
-I would begin with the local browser studio and defer desktop and cloud delivery until repeated use justified them.
-Real decks would guide layout, retrieval, and editing work.
 Time to an approved deck, corrections, outline revisions, regeneration, and repeated use would test product value separately from repository checks.
-
 Keep the harness focused on provenance, approval state, slide validity, and rendering.
-Review module ownership and dependencies as the loop grows.
+New delivery targets should follow evidence that this loop is useful.
 
 ## What Slideotter teaches
 
-Slideotter taught me how an agent-assisted presentation workbench could be built, especially its rendering and review controls.
-It provided less evidence for the smallest version that people would repeatedly use.
-The next product decision needs that usage evidence before another expansion of capability.
+Slideotter established useful controls for generating and inspecting presentations.
+Its next product decision needed evidence from repeated authoring and use.
+Artifact correctness and product convergence require different feedback, even when the same agents help implement both.

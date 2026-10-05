@@ -37,7 +37,7 @@
       "file": "case-studies/slideotter.md",
       "slug": "slideotter",
       "repositoryUrl": "https://github.com/bebraw/slideotter",
-      "summary": "How a technically ambitious precursor generated durable lessons faster than it established a production path.",
+      "summary": "How checks on rendered slides made the artifact inspectable while product breadth and delivery choices outran evidence of repeated use.",
     },
     {
       "file": "case-studies/thesis-journey-tracker.md",
@@ -49,7 +49,7 @@
       "file": "case-studies/kirjolab.md",
       "slug": "kirjolab",
       "repositoryUrl": "https://github.com/bebraw/kirjolab",
-      "summary": "How a strong development harness enabled exceptional delivery speed while architectural understanding struggled to keep up.",
+      "summary": "How behavioral checks kept rapid development repairable while delayed feedback about ownership and dependencies made architectural consolidation expensive.",
     },
     {
       "file": "case-studies/webernetes.md",
@@ -68,12 +68,6 @@
       "slug": "temper",
       "repositoryUrl": "https://github.com/nerdsane/temper",
       "summary": "How Datadog connects system verification, agent-authored behavioral contracts, and bounded live optimization to explicit acceptance evidence.",
-    },
-    {
-      "file": "case-studies/elements-of-scalable-web-development.md",
-      "slug": "elements-of-scalable-web-development",
-      "repositoryUrl": "https://github.com/bebraw/scalability_book",
-      "summary": "How an agent-assisted manuscript became a tested publishing system and made editorial judgment the limiting resource.",
     },
   ],
 

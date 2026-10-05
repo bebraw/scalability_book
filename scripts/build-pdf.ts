@@ -161,7 +161,7 @@ const groups = [
         "build/case-studies/thesis-journey-tracker/index.html",
       ),
       entry(
-        "Kirjolab - Exceptional speed, incomplete architectural understanding",
+        "Kirjolab - When code production scaled faster than architecture",
         "case-studies/kirjolab",
         "build/case-studies/kirjolab/index.html",
       ),
@@ -176,14 +176,9 @@ const groups = [
         "build/case-studies/modern-web-guidance/index.html",
       ),
       entry(
-        "Temper - Making behavior an executable contract",
+        "Temper - Contracts, verification, and bounded autonomy",
         "case-studies/temper",
         "build/case-studies/temper/index.html",
-      ),
-      entry(
-        "Elements of Scalable Web Development - When a book became a web project",
-        "case-studies/elements-of-scalable-web-development",
-        "build/case-studies/elements-of-scalable-web-development/index.html",
       ),
     ],
   },
@@ -257,7 +252,11 @@ async function main() {
       path.join(buildDir, "assets", "book-cover.svg"),
       "utf8",
     );
-    const bodyHtml = renderBody(groups, documents, coverSvg);
+    const figureCss = await readFile(
+      path.join(root, "site", "styles", "figures.css"),
+      "utf8",
+    );
+    const bodyHtml = renderBody(groups, documents, coverSvg, figureCss);
     const bodyHtmlPath = path.join(tempDir, "body.html");
     const mergedPdfPath = path.join(tempDir, "book.pdf");
     await writeFile(bodyHtmlPath, bodyHtml);
@@ -311,16 +310,65 @@ async function printBody(browser, htmlPath, pdfPath) {
         const target = link.getAttribute("href").slice(1);
         if (ids.has(target)) link.setAttribute("href", `#${ids.get(target)}`);
       }
+      for (const element of article.querySelectorAll(
+        "svg, svg *, [aria-labelledby], [aria-describedby]",
+      )) {
+        for (const attribute of ["aria-labelledby", "aria-describedby"]) {
+          const references = element.getAttribute(attribute);
+          if (references)
+            element.setAttribute(
+              attribute,
+              references
+                .split(/\s+/)
+                .map((id) => ids.get(id) || id)
+                .join(" "),
+            );
+        }
+        for (const attribute of [
+          "marker-start",
+          "marker-mid",
+          "marker-end",
+          "clip-path",
+          "mask",
+          "filter",
+          "fill",
+          "stroke",
+        ]) {
+          const reference = element
+            .getAttribute(attribute)
+            ?.match(/^url\(#(.+)\)$/);
+          if (reference && ids.has(reference[1]))
+            element.setAttribute(attribute, `url(#${ids.get(reference[1])})`);
+        }
+      }
     }
 
-    for (const demo of document.querySelectorAll("[data-demo-anchor]")) {
+    for (const demo of document.querySelectorAll(
+      "[data-demo-anchor], .concept-index",
+    )) {
       const article = demo.closest(".document");
-      const url = article?.getAttribute("data-url") || siteUrl;
+      const concepts = demo.matches(".concept-index");
+      const conceptHref = demo
+        .querySelector(".concept-reference-link")
+        ?.getAttribute("href");
+      const url =
+        concepts && conceptHref
+          ? new URL(conceptHref, siteUrl).href
+          : article?.getAttribute("data-url") || siteUrl;
       const callout = document.createElement("aside");
       callout.className = "interactive-note";
-      callout.innerHTML =
-        "<strong>Interactive lab</strong><span>This activity is available in the web edition.</span>" +
-        `<a href="${url}">${url.replace(/^https:\/\//, "")}</a>`;
+      const title = document.createElement("strong");
+      title.textContent = concepts ? "Concept connections" : "Interactive lab";
+      const description = document.createElement("span");
+      description.textContent = concepts
+        ? "Explore definitions and connections in the web edition."
+        : "This activity is available in the web edition.";
+      const link = document.createElement("a");
+      link.href = url;
+      link.textContent = concepts
+        ? "Explore this reading's concepts"
+        : url.replace(/^https:\/\//, "");
+      callout.append(title, description, link);
       demo.replaceWith(callout);
     }
 
@@ -346,7 +394,7 @@ async function printBody(browser, htmlPath, pdfPath) {
   await page.close();
 }
 
-function renderBody(groupDefinitions, documents, coverSvg) {
+function renderBody(groupDefinitions, documents, coverSvg, figureCss) {
   const documentsByKey = new Map(documents.map((item) => [item.key, item]));
   const toc = groupDefinitions
     .map(
@@ -387,7 +435,7 @@ function renderBody(groupDefinitions, documents, coverSvg) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Elements of Scalable Web Development</title>
-    <style>${printCss}</style>
+    <style>${figureCss}\n${printCss}</style>
   </head>
   <body>
     <section class="cover-page" aria-label="Book cover">${coverSvg}</section>
@@ -397,7 +445,7 @@ function renderBody(groupDefinitions, documents, coverSvg) {
       <p class="subtitle">Architecture, measurement, scaling pressure, and agentic workflows</p>
       <div class="title-meta">
         <strong>Juho Vepsäläinen</strong>
-        <span>Travel edition - 28 August 2026</span>
+        <span>Travel edition - 5 October 2026</span>
         <a href="${website}">scalableweb.dev</a>
       </div>
     </section>
@@ -454,6 +502,15 @@ const printCss = String.raw`
   }
 
   :root {
+    --text: #17201d;
+    --muted: #52635d;
+    --panel: #f6f8f7;
+    --bg: #fff;
+    --border: #aab8b3;
+    --accent: #0f766e;
+    --accent-strong: #0b6f67;
+    --font-ui: Arial, Helvetica, sans-serif;
+    --font-serif: Georgia, Cambria, "Times New Roman", serif;
     color: #17201d;
     font-family: Georgia, Cambria, "Times New Roman", serif;
     font-size: 10.7pt;
@@ -494,6 +551,8 @@ const printCss = String.raw`
   hr { border: 0; border-top: 1px solid #b8c6c1; margin: 1.4em 0; }
   img, svg { height: auto; max-width: 100%; }
   figure { break-inside: avoid; margin: 1em 0; }
+  .book-diagram-figure { inline-size: 100%; margin: 1em 0; max-width: 100%; }
+  .book-diagram-canvas { background: #f6f8f7; overflow: visible; padding: 0.5em; }
   figcaption, caption { color: #52635d; font-size: 8.6pt; line-height: 1.35; }
   table { border-collapse: collapse; font-family: Arial, Helvetica, sans-serif; font-size: 7.75pt; line-height: 1.3; margin: 0.9em 0; width: 100%; }
   thead { display: table-header-group; }

@@ -23,7 +23,7 @@ test.describe("case studies", () => {
     await expect(
       page.getByRole("heading", { name: "Case studies" }),
     ).toBeVisible();
-    await expect(page.locator(".home-case-study-list > li")).toHaveCount(7);
+    await expect(page.locator(".home-case-study-list > li")).toHaveCount(6);
     await expect(
       page.getByRole("link", {
         name: /Slideotter – Learning faster than the product converged/,
@@ -89,14 +89,6 @@ test.describe("case studies", () => {
         name: /Temper – Contracts, verification, and bounded autonomy/,
       }),
     ).toHaveAttribute("href", "/case-studies/temper/");
-    await expect(
-      page.getByRole("link", {
-        name: /Elements of Scalable Web Development – When a book became a web project/,
-      }),
-    ).toHaveAttribute(
-      "href",
-      "/case-studies/elements-of-scalable-web-development/",
-    );
     const cardHeights = await page
       .locator(".case-study-grid a")
       .evaluateAll((cards) =>
@@ -177,16 +169,5 @@ test.describe("case studies", () => {
     await expect(
       page.getByRole("link", { name: "View source project" }),
     ).toHaveAttribute("href", "https://github.com/nerdsane/temper");
-
-    await page.goto("/case-studies/elements-of-scalable-web-development/");
-    await expect(
-      page.getByRole("heading", {
-        name: "Elements of Scalable Web Development – When a book became a web project",
-      }),
-    ).toBeVisible();
-    await expect(page.getByText("379 commits")).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View source project" }),
-    ).toHaveAttribute("href", "https://github.com/bebraw/scalability_book");
   });
 });

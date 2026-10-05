@@ -573,9 +573,9 @@ export const bookConcepts: Concept[] = [
         "Locate the human constraint.",
       ],
       [
-        "Book case: coherence bottleneck",
-        "/case-studies/elements-of-scalable-web-development/#coherence-became-the-bottleneck",
-        "See editorial judgment limit delivery.",
+        "Introduction: editorial acceptance",
+        "/chapters/introduction/#how-this-book-was-made",
+        "Separate publishing checks from editorial judgment.",
       ],
     ],
     {
@@ -872,9 +872,9 @@ export const bookConcepts: Concept[] = [
         "Separate durable coordination from effect semantics.",
       ],
       [
-        "Slideotter: durable boundaries",
+        "Slideotter: artifact authority",
         "/case-studies/slideotter/#the-project-found-durable-authority-boundaries",
-        "Follow resumable work and artifact authority.",
+        "Locate the artifact that generation may replace.",
       ],
     ],
   ),
