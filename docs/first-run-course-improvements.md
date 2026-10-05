@@ -17,6 +17,12 @@ It should show:
 - the assigned model, harness, access path, budget, privacy rules, and fallback;
 - project-card submissions and the presentation schedule.
 
+The [project introduction](../specifications/00_introduction.md#groups-submissions-and-access) now defines group and individual responsibilities, staged submissions, and course-only browsing.
+Implement those rules in the course platform: one group record per phase, one private individual portfolio per student and phase, and a class submission index linked to frozen technical bundles after the audit window.
+Give assigned auditors access after the implementation deadline and record any prior inspection; open general class browsing after the audit so preparation remains visible in the audit evidence.
+Test source and evidence access as a classmate; a list of repository links alone does not establish that students can inspect the submitted revisions.
+Keep scores, diaries, and confidential assessment reports in the private course records.
+
 Before the course begins, replace every **To be announced** field in the [course environment sheet](../specifications/course_environment.md).
 Pair this with a small technical preflight in which every student or team reaches the assigned model, runs the harness, completes one bounded change, and executes the supported validation path.
 This should expose access, hardware, account, and environment problems before Establish begins.
@@ -80,6 +86,11 @@ Before launch:
 - reserve qualitative instructor feedback for the most consequential reasoning, evidence, or collaboration issue.
 
 The goal is to preserve formative assessment while preventing bookkeeping from displacing discussion and feedback.
+
+The [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md) examines how published courses require individual work alongside shared project marks.
+The revised rubric requires two completed lecture activities and at least six self- and peer-assessment points per phase, including contribution credit, using already-assessed evidence.
+This closes the earlier case in which 90 shared project points alone could earn grade 1.
+Show the individual requirements alongside total points in the student scoring record and publish any completion or approved absence arrangements before the affected work begins.
 
 ## Suggested priority
 

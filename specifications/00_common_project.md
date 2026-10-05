@@ -446,6 +446,10 @@ The [bounded paired task](03_compare.md#5-4-compare-one-agent-with-the-fleet) is
 When uncertain, disclose the reuse in the evidence package.
 The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.
 
+The same restriction applies to other groups' submissions.
+Learn from their evidence and engineering decisions, but do not copy their application source, implementation-specific tests, or implementation-specific configuration into your own build.
+Acknowledge ideas that materially inform your decisions.
+
 Third-party libraries, public starter templates, framework generators, and generic personal scaffolds are allowed if their use is documented and permitted by the course's normal rules.
 
 ---
@@ -462,6 +466,10 @@ After every phase, submit one common bundle containing:
 A listed requirement does not automatically require a separate file.
 One clearly structured artifact may satisfy several fields, and the phase specifications name only additions to this common bundle.
 Use the same evidence categories after every phase so later comparisons can refer to the earlier package rather than reconstruct it.
+
+Submit the frozen implementation and initial evidence first, then attach the audit report and authors' response to the same record at the evidence deadline.
+The [project introduction](00_introduction.md#submit-each-phase-in-stages) defines these stages and [class access](00_introduction.md#browse-other-groups-submissions).
+Identify the group and phase in the evidence index, link the submitted revision and each required artifact, and keep private individual portfolios outside the technical bundle.
 
 ### 9.1 Development setup
 
@@ -519,6 +527,13 @@ Preserve enough task, prompt, trace, and review information to explain consequen
 After each phase, another group will inspect the implementation for a limited period using only the repository and submitted instructions.
 Use the same audit tool policy in every phase and, where scheduling allows, the same auditing group.
 Record unavoidable changes in auditors or tools as comparison limitations.
+
+The instructor assigns the auditing group and ensures it can read and check out the frozen implementation and access the submitted technical evidence.
+Use the link supplied with the audit assignment to locate that revision; work on a disposable checkout and record access problems and any prior inspection before attempting the probe.
+The [course submission index](00_introduction.md#browse-other-groups-submissions) opens for general class browsing after the audit window closes.
+Return the report to the authors and teaching staff, then link it from the authors' phase bundle together with their response.
+Auditors provide evidence for assessment; the instructor awards the project score.
+Your work on an assigned audit may also support your own individual contribution evidence.
 
 The auditing group will:
 

@@ -6,6 +6,9 @@ The findings below describe that reviewed revision; their original line referenc
 Five primary revisions and the four smaller corrections have been applied in the working tree for review.
 The additional pass requirements proposed in finding 2 were withdrawn after review to keep grading manageable with a large cohort and limited teaching resources.
 
+Follow-up on 5 October: the [current rubric](../specifications/grading.md#mandatory-individual-work) adds mandatory individual engagement using already-scored lecture activities and phase assessments.
+The earlier oral check and separate essential-outcome assessment remain withdrawn; the [course comparison and rationale](individual-assessment-requirements-2026-10-05.md) explain the later change.
+
 ## Implementation record
 
 - Replaced the friction demo's invented coefficients and risk predictions with entered stage observations, missing-data handling, acceptance status, intervention cost, and an evidence export.

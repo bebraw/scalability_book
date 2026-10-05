@@ -131,7 +131,7 @@ const projectSpecificationDefinitions = [
     phase: "grading",
     sequence: "04",
     slug: "grading",
-    summary: "Scoring, essential learning outcomes, and reassessment.",
+    summary: "Scoring, mandatory individual work, and final grade.",
   },
 ];
 const demoScriptIncludes = demoCatalog;

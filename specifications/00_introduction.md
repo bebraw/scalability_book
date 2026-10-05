@@ -12,6 +12,60 @@ Begin here for the guidelines shared by all three projects, then read the [Commo
 The required behavior remains substantially stable while the development setup changes.
 Each later phase also benefits from your growing domain knowledge, so the comparison supports a conditional engineering judgment rather than a universal model ranking.
 
+## Groups, submissions, and access
+
+### Shared work and individual assessment
+
+Register one group identifier and its membership with the course.
+Keep the group stable across Establish, Challenge, and Compare where practical; agree membership changes with the teaching staff and record which group each student belongs to for the affected phase.
+One member submits the group bundle on behalf of the registered group, and every member remains responsible for understanding and accepting its work.
+
+Each group receives one project score per phase, which every registered member receives.
+Individual contribution is assessed through the self- and peer-assessment criteria, while participation and learning diaries are also scored individually.
+
+| Work                                         | Submitted by | Maximum per student across the course |
+| -------------------------------------------- | ------------ | ------------------------------------- |
+| Three project bundles                        | Group        | 90 points                             |
+| Nine lecture participation and diary records | Individual   | 27 points                             |
+| Three self- and peer-assessments             | Individual   | 36 points                             |
+
+Submit one private individual portfolio per phase containing the relevant lecture diary entries and self- and peer-assessment.
+Label entries by lecture so the instructor can apply the existing three-point lecture criteria.
+The [assessment rubric](grading.md) defines the criteria, passing requirements, and grade thresholds.
+To pass, each student must also complete the [mandatory lecture activities and individual assessments](grading.md#mandatory-individual-work) in every phase.
+
+### Submit each phase in stages
+
+Use one group submission record per phase, identified by the group, phase, implementation revision, and evidence index.
+The course instructions publish the deadlines and submission locations before work begins.
+
+1. **Freeze the implementation:** submit the implementation revision, setup and validation instructions, and the available common and phase-specific evidence.
+2. **Audit:** after the implementation deadline, the assigned group inspects that frozen revision and returns the bounded audit report.
+3. **Complete the evidence:** attach the audit and the authors' response to the same group submission record, preserving the original implementation and evidence.
+   Each student also submits the private individual portfolio by its published deadline.
+4. **Assessment:** the instructor records the group project score and each student's individual scores, with criterion-level reasons and any missing evidence.
+
+Label later code corrections separately; they become assessed revisions only when the announced correction policy permits them.
+Report a missing audit or access problem to the teaching staff so they can arrange and record a fallback.
+The [Common Contract](00_common_project.md#9-common-submission-bundle-and-comparable-evidence) defines the completed technical bundle and audit protocol.
+
+### Browse other groups' submissions
+
+After the phase's common implementation deadline, the assigned auditors receive access to the frozen technical bundles.
+The instructor opens a course-only submission index for general class browsing after the audit window closes, so preparation outside the audit does not silently disappear from the recorded effort.
+Each entry identifies the group and phase and links the frozen implementation revision, setup and validation instructions, evidence index, and audit report with the authors' response when available.
+Classmates receive read access to the submitted source and technical evidence, so browsing supports learning beyond the assigned audit.
+Course access is sufficient; public publication is optional.
+
+Run checks or try changes in your own checkout, following the announced course tool policy.
+Use synthetic demonstration data and provide access without sharing personal accounts or credentials.
+For an assigned audit, declare any prior inspection of the implementation and follow the audit timing protocol.
+Looking at another submission does not authorize copying its implementation; follow the [transfer policy](00_common_project.md#8-permitted-transfer-between-implementations) and acknowledge ideas that materially inform your decisions.
+
+Keep learning diaries, self- and peer-assessment reports, personal support information, and scoring records in the private course submission channel.
+Share useful feedback with teammates, while confidential assessment reports go to the teaching staff.
+Each group can see its project score and feedback; each student can see their individual score breakdown, completed lecture activities, phase assessment results, total, and any unmet passing requirement.
+
 ## Guidelines for course work
 
 These guidelines apply across all three implementations.

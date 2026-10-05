@@ -28,6 +28,25 @@ The instructor should publish one filled table per course run with the following
 | Fallback when the assigned service is unavailable | To be announced | To be announced | To be announced |
 | Support and exception path                        | To be announced | To be announced | To be announced |
 
+## Publish the course workflow
+
+Before each phase begins, publish the operational details for the [group and submission workflow](00_introduction.md#groups-submissions-and-access).
+Use one group record per phase and one private individual portfolio per student and phase.
+
+| Detail         | Required course-run decision                                                                                                                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Groups         | Registration location, group identifiers and membership, formation deadline, and route for membership changes.                                                                                                          |
+| Submissions    | Locations and deadlines for the frozen implementation, audit report, completed evidence bundle, and private individual portfolio; late-work and correction rules.                                                       |
+| Class browsing | Assigned-auditor access after the implementation deadline, course-only submission index opening after the audit window, source and evidence access, and handling of approved exceptions.                                |
+| Audits         | Assigned auditing groups, setup and probe time boxes, common tool policy, report destination, and fallback for missing reports or access.                                                                               |
+| Assessment     | Published rubric version, feedback timing, group and individual score breakdowns, completed lecture activities, phase assessment and contribution minima, total and passing-status calculation, and correction history. |
+
+Keep the class browsing index focused on technical submissions.
+Give teaching staff access to the private records needed for assessment and each student access to their own results.
+Publish the live and remote participation paths and the completion and correction arrangements for [mandatory individual work](grading.md#mandatory-individual-work).
+Record approved changes to an individual requirement alongside any points adjustment.
+Before launch, test the access paths as an author, a classmate, and an instructor, including access to a frozen source revision.
+
 ## Verify the assigned workflow
 
 Before launch, run one small task with the published configuration and retain its trace.

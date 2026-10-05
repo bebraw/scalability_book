@@ -2,7 +2,7 @@
 
 The course uses one common application contract and three phase-specific development setups:
 
-1. [Project introduction](00_introduction.md) — the three projects and their shared submission, evidence, contribution, and learning guidelines.
+1. [Project introduction](00_introduction.md) — the three projects, group and individual responsibilities, staged submissions, class access, and shared course guidelines.
 2. [Common project specification](00_common_project.md) — required behavior, technical freedom, acceptance scenarios, shared runtime workload, transfer policy, evidence, and cross-team audit.
 3. [Establish](01_establish.md) — implementation A with a locally hosted single agent.
 4. [Challenge](02_challenge.md) — implementation B with a comparison-model single agent.
@@ -29,4 +29,4 @@ One clearly structured evidence document may satisfy several checkpoints when it
 When a chapter suggests an optional lab or advanced appendix exercise, it becomes required only if the common or phase specification names it or the instructor announces it before the relevant phase begins.
 
 The behavioral and assessment contracts are defined here.
-Before a course run begins, the instructor still has to replace the **To be announced** fields in the course environment sheet with the supported assignments for that run.
+Before a course run begins, the instructor still has to replace the **To be announced** fields in the course environment sheet with the supported assignments and publish the course workflow details for that run.

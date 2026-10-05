@@ -100,7 +100,8 @@ Each phase includes one approximately 30-minute [shared engineering session](spe
 Each student predicts first, the group investigates with the agent, and a student other than the operator explains the acceptance decision.
 The record belongs in the existing decision record or AI-use log.
 
-The students are expected to perform self- and peer-assessment after each phase of the project so feedback may be shared with the project group and the students can reflect on their groupworking.
+Each student must submit self- and peer-assessment after every phase so useful feedback can be shared with the group and the student can reflect on their collaboration.
+Collect this assessment and the phase's lecture diary entries in one private individual portfolio, following the [course submission workflow](specifications/00_introduction.md#groups-submissions-and-access).
 
 ## Course learning diary
 
@@ -113,14 +114,19 @@ Note that the entries don't have to be written but can also be provided in an au
 The grading for the course is formative and follows the student-facing [course assessment rubric](specifications/grading.md).
 It is derived from the following factors:
 
-1. Completion of the course projects within groups - up to 30 points are available per project (total: 90), 10 points from each project needed
-2. Participation to the lectures (either live or remote) and learning diaries - 3 points are gained per participation (total: 27)
-3. Self- and peer-assessment for project stages and for other students - up to 12 points per project (total: 36).
+1. Group course projects - up to 30 points per project, shared by the registered members (total: 90), with at least 10 points from each project needed.
+2. Individual lecture participation, either live or through the announced remote equivalent, and learning diaries - up to 3 points per lecture under the separate participation and diary criteria (total: 27).
+3. Individual self- and peer-assessment after every project phase - up to 12 points per phase (total: 36).
 
 There's slight bias towards project work in the point system so you cannot complete the course by participation alone.
 
-Half of the total points and at least 10 points from every project are required to pass the course.
-The grades are scaled from the percentage of available points as follows:
+Passing requires at least half the available total points, at least 10 points from every project, and the [mandatory individual work](specifications/grading.md#mandatory-individual-work):
+
+- two of three lecture activities in each phase, each earning its participation point and both diary points; and
+- at least 6 of 12 self- and peer-assessment points in each phase, including at least 1 point for reliable contribution and shared ownership.
+
+Approved absence and support arrangements specify any replacement activity or adjusted requirement alongside any points adjustment.
+Once all passing requirements are met, the grades are scaled from the percentage of available points as follows:
 
 - 50% - 1
 - 60% - 2
