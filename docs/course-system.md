@@ -5,6 +5,14 @@ Open `/admin/courses/` to manage runs and `/course/` as a student.
 Both pages use the same API; staff membership controls administration, rather than the URL.
 Book feedback moderators do not automatically have access to course records.
 
+## Agreed revision and current behavior
+
+This guide describes the currently implemented GitHub-based workspace, including its combined **Course setup** form.
+The [accepted ADRs](adrs/README.md#accepted) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
+Those features are not implemented by adding their decision records.
+Use the ADRs for the intended design and this guide for commands and workflows that work today.
+Update this guide as each decision is implemented.
+
 ## First run locally
 
 ```bash

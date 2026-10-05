@@ -2,6 +2,40 @@
 
 This document covers local website development, preview, feedback review, and deployment for the course book.
 
+## Development contracts and decisions
+
+Use [ARCHITECTURE.md](../ARCHITECTURE.md) to find runtime and state owners and [the ADR index](adrs/README.md) for lasting decisions.
+Accepted ADRs describe agreed changes awaiting implementation; current course behavior is documented in [course-system.md](course-system.md).
+The student-facing contracts in [specifications/](../specifications/README.md) own course requirements.
+Update the owning documents in the same change as behavior, and record meaningful architectural choices using the [ADR workflow](adrs/README.md#authoring-and-maintenance).
+
+Before materially expanding a capability, identify its entry point, state authority, public contract, and dependency direction.
+Review correctness against a concrete user action and outcome, including relevant failure cases.
+For bugs, reproduce and minimize the trigger before fixing the cause; add a regression test when a stable boundary makes it useful.
+Prefer tests of observable behavior over checks that repeat private implementation details.
+
+## Verification by change
+
+Use targeted checks during iteration, then verify the affected surface before declaring the change ready.
+The following commands use the existing repository tools; they are not new automatic gates.
+
+| Change                                           | Relevant verification                                                                                                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Internal Markdown documentation and ADRs         | Prettier on changed files; inspect relative links, ADR IDs/status/index, and `git diff --check`.                                                                                     |
+| Published book, course briefs, or site templates | `npm run build` followed by `npm run validate`; inspect the affected rendered pages.                                                                                                 |
+| TypeScript behavior                              | `npm run types:check` and relevant unit tests, such as `node --test tests/courses.test.ts`; run `npm run test:unit` when shared behavior or a broad change affects multiple suites.  |
+| Browser interactions                             | The affected Playwright test, such as `npx playwright test tests/e2e/course-workspace.spec.ts --project=chromium`; include other configured browsers when compatibility is affected. |
+| Course persistence or Worker bindings            | The course verification and local Worker checks in [course-system.md](course-system.md#verification).                                                                                |
+| Review report tooling                            | `npm run test:review`.                                                                                                                                                               |
+| PDF layout or publication ordering               | `npm run pdf` and inspection of the affected exported pages.                                                                                                                         |
+
+Check formatting with `npx prettier --check <changed-files>` and apply it with `npx prettier --write <changed-files>`.
+Use `npm run format:check` for a repository-wide formatting check when appropriate.
+Broaden verification when a new failure, dependency, or unresolved concern justifies it; a passing check does not replace reviewing the changed contract.
+Record which checks ran and any material limitations in the change description.
+
+Coding agents must prefix shell commands with `rtk` as specified in [AGENTS.md](../AGENTS.md); use `rtk proxy` when a command needs unfiltered output.
+
 ## Website Configuration
 
 The book website is configured through [site.config.jsonc](../site.config.jsonc).
