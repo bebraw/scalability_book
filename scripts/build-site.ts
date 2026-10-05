@@ -47,6 +47,10 @@ import { createSiteRenderer } from "./lib/site-renderer.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import {
+  readRequirementEditions,
+  rewriteRequirementLinks,
+} from "./lib/course-requirements.ts";
+import {
   chapterNumberFromFilename,
   escapeAttribute,
   escapeHtml,
@@ -56,6 +60,7 @@ import {
 } from "./lib/text.ts";
 
 const root = process.cwd();
+const archivedRequirements = await readRequirementEditions(root);
 const buildDir = path.resolve(root, process.env.BUILD_DIR || "build");
 const siteDir = path.join(root, "site");
 const includeAllChapters = process.argv.includes("--all-chapters");
@@ -424,6 +429,46 @@ for (let index = 0; index < projectSpecifications.length; index++) {
       }),
     }),
   );
+}
+
+for (const edition of archivedRequirements) {
+  const specifications = edition.documents.map((document) => ({
+    ...projectSpecificationDefinitions.find((d) => d.file === document.file)!,
+    ...document,
+    title: document.source.match(/^#\s+(.+)$/m)?.[1] ?? document.document,
+    downloadUrl: `${document.url}source.md`,
+  }));
+  for (let index = 0; index < specifications.length; index++) {
+    const specification = specifications[index]!;
+    const rendered = renderMarkdown(
+      rewriteRequirementLinks(specification.source, edition.version),
+      { number: "" },
+      bibliographySource,
+    );
+    await writePage(
+      `${specification.url.slice(1)}source.md`,
+      specification.source,
+    );
+    await writePage(
+      `${specification.url.slice(1)}index.html`,
+      renderer.renderLayout({
+        title: `${specification.title} · requirements ${edition.version} - ${config.title}`,
+        description: `Archived course requirements ${edition.version}.`,
+        currentUrl: specification.url,
+        stylesheets: ["/styles/project.css"],
+        scripts: ["/toc-highlight.js"],
+        children: renderProjectPage({
+          content: rendered.content,
+          specification,
+          tableOfContents: rendered.tableOfContents,
+          previous: specifications[index - 1],
+          next: specifications[index + 1],
+          navigation: specifications,
+          status: `Archived requirements ${edition.version}`,
+        }),
+      }),
+    );
+  }
 }
 
 await writePage(
@@ -860,13 +905,17 @@ function renderProjectPage({
   previous,
   specification,
   tableOfContents,
+  navigation = projectSpecifications,
+  status = "Canonical brief",
 }) {
   return renderHtmlisp(templates.projectPage, {
     content,
     downloadUrl: specification.downloadUrl,
     nextLink: renderProjectPaginationLink(next, "Next brief"),
     phase: specification.phase,
-    projectNavigation: renderProjectNavigation(specification),
+    projectNavigation: renderProjectNavigation(specification, navigation),
+    projectStatus: status,
+    projectHomeUrl: navigation[0]?.url ?? "/project/introduction/",
     projectSequence: specification.sequence,
     projectSummary: specification.summary,
     projectTitle: specification.label,
@@ -899,8 +948,11 @@ function renderCaseStudyPage(caseStudy, rendered) {
   });
 }
 
-function renderProjectNavigation(current) {
-  return projectSpecifications
+function renderProjectNavigation(
+  current,
+  specifications = projectSpecifications,
+) {
+  return specifications
     .map((specification) => {
       const ariaCurrent =
         specification.url === current.url ? ' aria-current="page"' : "";

@@ -2,7 +2,7 @@
   <aside class="project-index" aria-label="Project specifications">
     <div class="project-index-heading">
       <p>Course file</p>
-      <a href="/project/introduction/">Work Activity Tracker</a>
+      <a &href="(resolve projectHomeUrl)">Work Activity Tracker</a>
     </div>
     <ol>
       <Raw &html="(resolve projectNavigation)"></Raw>
@@ -20,7 +20,10 @@
       <dl>
         <div>
           <dt>Status</dt>
-          <dd><i aria-hidden="true"></i> Canonical brief</dd>
+          <dd>
+            <i aria-hidden="true"></i>
+            <span &children="(resolve projectStatus)"></span>
+          </dd>
         </div>
         <div>
           <dt>Application</dt>

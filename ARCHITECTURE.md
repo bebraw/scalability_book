@@ -45,6 +45,14 @@ Enrollment arrangements enter through staff-only `/api/courses/:course/enrollmen
 Enrollment metadata lives on the student's stable course identity in the course snapshot, guarded by the Students fingerprint and final whole-record revision check.
 Students receive only their own plan and dates, with the staff reason removed; enrollment arrangements do not change grading or frozen membership.
 
+Submission checklists enter through the shared course submission API and `site/scripts/course-evidence.ts`.
+`shared/course-requirements.ts` owns versioned evidence-index entries; each run pins an edition, and `requirements/` retains the corresponding owner documents and digests.
+`scripts/lib/course-requirements.ts` rejects source/checklist drift and the site build publishes archived readable briefs and downloads.
+`worker/course-submission.ts` validates indexed/missing evidence, technical attachments and earlier A/B references.
+Final evidence lives on new submission revisions; frozen source/setup/initial evidence/checklist/membership remain unchanged.
+Private draft redaction and file authorization stay in `worker/courses.ts`; submitted final evidence changes assessment freshness using the existing revision boundary.
+The [submission decision](docs/adrs/implemented/ADR-005-submit-reproducible-source-with-phase-checklists.md) records this extension and its verification.
+
 ## State and access
 
 | Data                                   | Local storage                       | Production storage                      |
@@ -73,18 +81,19 @@ The existing [grading decision](docs/adrs/implemented/ADR-008-require-individual
 
 ## Documentation ownership
 
-| Document                                                                                                                     | Owns                                                                              |
-| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [README.md](README.md)                                                                                                       | Discovery and common entry points                                                 |
-| This file                                                                                                                    | Current system composition and global boundaries                                  |
-| [AGENTS.md](AGENTS.md)                                                                                                       | Concise navigation and development expectations for coding agents                 |
-| [docs/development.md](docs/development.md)                                                                                   | Commands, generated output, and verification                                      |
-| [docs/course-system.md](docs/course-system.md)                                                                               | Implemented course behavior and operating instructions                            |
-| [docs/adrs/](docs/adrs/README.md)                                                                                            | Decision rationale, alternatives, accepted future constraints, and history        |
-| [specifications/](specifications/README.md)                                                                                  | Published student project and assessment contracts                                |
-| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc)                                                             | Reading content and its published organization                                    |
-| [docs/chapter-exercises.md](docs/chapter-exercises.md), [docs/agent-learning-resources.md](docs/agent-learning-resources.md) | Formative exercise, concept discovery, and external-agent resource contracts      |
-| [study/README.md](study/README.md), [slides/README.md](slides/README.md)                                                     | Versioned self-study and lecture sources, export behavior, and publication limits |
+| Document                                                                                                                     | Owns                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [README.md](README.md)                                                                                                       | Discovery and common entry points                                                           |
+| This file                                                                                                                    | Current system composition and global boundaries                                            |
+| [AGENTS.md](AGENTS.md)                                                                                                       | Concise navigation and development expectations for coding agents                           |
+| [docs/development.md](docs/development.md)                                                                                   | Commands, generated output, and verification                                                |
+| [docs/course-system.md](docs/course-system.md)                                                                               | Implemented course behavior and operating instructions                                      |
+| [docs/adrs/](docs/adrs/README.md)                                                                                            | Decision rationale, alternatives, accepted future constraints, and history                  |
+| [specifications/](specifications/README.md)                                                                                  | Published student project and assessment contracts                                          |
+| [requirements/](requirements/README.md)                                                                                      | Immutable run requirement editions, archived owner documents and their publication workflow |
+| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc)                                                             | Reading content and its published organization                                              |
+| [docs/chapter-exercises.md](docs/chapter-exercises.md), [docs/agent-learning-resources.md](docs/agent-learning-resources.md) | Formative exercise, concept discovery, and external-agent resource contracts                |
+| [study/README.md](study/README.md), [slides/README.md](slides/README.md)                                                     | Versioned self-study and lecture sources, export behavior, and publication limits           |
 
 Keep each fact in its owning document and link to it from other entry points.
 Update behavior documentation and the student-facing contract together when a course change affects both.
@@ -101,7 +110,6 @@ Their implemented status identifies repository behavior or published course cont
 The following decisions have implementation work outstanding in the current course workspace:
 
 - [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication, working agreements and recorded late-arrival catch-up are implemented; withdrawal tasks and their institutional export handling remain.
-- [Submission expectations](docs/adrs/accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md): small reproducible bundles and clear phase requirements.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration is implemented; domain setup, verified Gmail forwarding, live delivery verification and the teacher simulation's mock-mail boundary remain outstanding.
 - [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated mock workflows in both the instructor website and local development.
 

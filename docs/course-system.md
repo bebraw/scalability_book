@@ -12,7 +12,8 @@ The [ADRs](adrs/README.md) record the agreed revision: separate administration w
 Institutional imports, corrections, account activity and the magic-link flow work with local mock mail and a gated Cloudflare mail adapter.
 Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
 Late arrivals have recorded catch-up plans and review tasks.
-Production email provisioning, withdrawal workflows, phase checklists and teacher simulation remain pending.
+Submission forms include versioned common/phase checklists and staged technical evidence.
+Production email provisioning, withdrawal workflows and teacher simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -173,12 +174,19 @@ With only one group or a missing frozen implementation, staff arrange and record
 ## Submission and access flow
 
 1. A group member uploads a source archive, supplies the full commit hash, supported setup/validation and initial evidence, then freezes the implementation.
+   Submit the smallest complete reproducible bundle: source, relevant tests, synthetic fixtures, manifests/lockfiles, migrations, setup scripts, example configuration and curated technical evidence.
+   Exclude installed dependencies, `.git`, caches, reproducible output, model weights, secrets and personal data; document necessary vendored/generated exceptions.
+   Inspect the file listing and reproduce the supported unpack/install/initialize/run/validate path in a clean directory.
    The archive SHA-256, timestamp and registered phase membership are retained.
    The uploader attests that the archive matches the revision; the system does not clone or execute submitted code to verify that claim.
 2. After the implementation deadline, assigned auditors can download the target's frozen archive and inspect setup/evidence.
    Their report identifies the frozen record revision and records setup time, prior inspection, tools, change-probe timing and findings.
-3. Authors submit an audit response by the evidence deadline.
-   The response appends to the record while preserving the frozen source, setup and initial evidence.
+3. Authors complete the technical evidence index, checklist and audit response by the evidence deadline.
+   Upload final technical attachments using **Attach final technical evidence**, select the files to attach, and save a private evidence draft or submit the completed evidence and response.
+   The revision preserves the frozen source, setup, initial evidence, initial checklist and membership.
+   Evidence drafts and unattached files remain private to the group and staff; submitted attachments follow the same auditor/class access as the frozen record.
+   Private portfolio files cannot be attached to technical evidence.
+   Compare selects existing frozen A and B records; the references retain their frozen revision and open a read-only technical view without duplicate archive uploads.
    A source correction remains a separate branch/artifact; staff decide whether a late response or portfolio correction is accepted and record a reason.
    For a permitted late initial archive, staff must enter a reason before uploading and freezing it; a frozen archive cannot be replaced.
 4. Classmates can browse technical submissions after the audit window closes, even while grading remains unfinished.
@@ -190,11 +198,33 @@ Private portfolios and attachments are available only to their owner and course 
 Students see their own group feedback and individual scores after release.
 All file downloads go through the authorised API and use attachment responses; there are no public bucket links.
 GitHub OAuth requests identity access, not access to private repositories.
-The uploaded archive supplies a stable course copy for auditors and classmates.
+The uploaded archive supplies a stable course copy for auditors and classmates; a public repository or personal credentials are not required.
+An optional HTTPS repository URL supplies context and does not replace the course archive.
+The read-only `GET /api/courses/:id/submission/:phase/:group` route enforces the same timed access and draft redaction; `frozenRevision` may pin the implementation identity while the response includes currently submitted final evidence.
 
-The initial limits are 100 students per run, 50 groups per phase, 10 members per group, 20 MiB per file and 12 uploads per owner/phase.
+The limits are 100 students per run, 50 groups per phase, four members for new/changed allocations, 20 MiB per file and 12 uploads per owner/phase.
+Unchanged historical larger groups are retained.
+Source and final evidence share the upload count; submission records allow 64,000 serialized characters, and JSON request bodies remain bounded at 96 KiB.
 Keep technical evidence inside the source archive when practical and compress large media before uploading.
 Staff must manage storage cleanup outside the UI; no destructive removal of original evidence is exposed in this version.
+
+## Run requirements and evidence checklists
+
+New runs retain the current requirement edition (`2026-10-v1` initially); historical runs without that field use the fixed first edition.
+The workspace's project guide, rubric and checklist links open the archived documents for that edition.
+**Course settings** shows the edition; ordinary administration cannot replace it on an existing run.
+See [requirements/README.md](../requirements/README.md) for publication/versioning.
+
+Common and selected phase entries appear beside preparation/final-evidence forms and in technical review views.
+Choose **Evidence located** with a path, link or index reference, **Missing / incomplete** with an explanation, or leave **Not indexed**.
+One artifact can serve several entries; entries do not require separate uploads and presence does not award points or establish quality.
+Students can freeze honestly incomplete work and submit later evidence with declared gaps.
+The server does not execute source or infer safety/completeness from archive filenames.
+
+The checklist indexes the complete common evidence categories, A's local workflow/claims, B's pressures/case transfer/Little's Law, and C's fleet/trace/paired contrast, separate application/workflow models, scaling/deployment and conditional decision.
+The detailed archived briefs and retained rubric remain the requirements; private individual portfolios have their separate workflow.
+Freezing retains the initial checklist; final evidence stores its own checklist without replacing the original.
+Changing final evidence creates another revision and makes prior project assessments stale until reviewed.
 
 ## Review and grading
 
@@ -328,7 +358,7 @@ The application development server uses its own mock inbox independently of thes
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
@@ -337,6 +367,8 @@ The browser test covers roster preview and incremental enrollment, separate grou
 The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
 Formation browser/API checks cover a confirmed pair completed into a trio, a fourth-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, private read/write responses, publication/access separation, working agreements, mobile/accessibility and later-phase transfers retaining frozen work and grade history.
 Catch-up checks cover automatic late-arrival flags after publication/frozen work, the staff review task, private student plans, incremental corrections, stale/unauthorized saves, unknown historical dates and unchanged frozen evidence, grades and passing requirements.
+Evidence checks cover incomplete work, optional repository links, archived requirement links/drift rejection, private drafts, technical attachments versus private portfolios, retained frozen fields/history, stale assessments, late corrections and earlier A/B references without duplicate archives.
+The controlled source fixture is unpacked into a clean temporary directory, installs from its lockfile offline, initializes synthetic data and runs validation/readiness commands; this verification never executes student uploads.
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 The mail tests exercise the actual Worker adapter with a mocked Cloudflare binding, checking the enablement boundary, `waitUntil`, pending-link safety, provider failures, fixed sender, escaped templates and absence of a deployed mock inbox.
 They do not send real email.
@@ -351,7 +383,7 @@ npx wrangler dev --config wrangler.course.jsonc --local --ip 127.0.0.1 --port 87
 In another terminal, run `node scripts/check-course-worker.ts`.
 The credential above is a public test-only value for the loopback instance; it must never be used for a deployed session secret.
 The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
-It also imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
+It also streams and attaches final technical evidence while retaining the frozen source/checklist, checks a read-only frozen reference, imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
 Stop the local Worker afterwards.
 The local configuration deliberately matches the pinned book runtime's compatibility date; upgrade the runtime and both configurations together.

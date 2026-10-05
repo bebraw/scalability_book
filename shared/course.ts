@@ -1,4 +1,8 @@
 import type { GroupFormation } from "./course-formation.ts";
+import type {
+  EvidenceCheckpoint,
+  PhaseReference,
+} from "./course-requirements.ts";
 // Published rubric v1. Keep historical runs on this version when adding rubrics.
 export const phases = ["establish", "challenge", "compare"] as const;
 export type Phase = (typeof phases)[number];
@@ -84,6 +88,7 @@ export interface Adjustment {
   reason: string;
 }
 export interface Course {
+  requirements?: string;
   nextGroupNumber?: number;
   id: string;
   name: string;
@@ -103,6 +108,14 @@ export interface Envelope<T = unknown> {
   actor: string;
 }
 export interface Submission {
+  requirements?: string;
+  checklist?: EvidenceCheckpoint[];
+  finalEvidence?: {
+    index: string;
+    files: string[];
+    checklist: EvidenceCheckpoint[];
+    references: PhaseReference[];
+  };
   phase: Phase;
   group: string;
   members: string[];
@@ -150,6 +163,7 @@ export interface Grade {
   reason?: string;
 }
 export interface CourseFile {
+  purpose?: "source" | "evidence";
   id: string;
   phase: Phase;
   scope: "technical" | "private";

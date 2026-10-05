@@ -1,6 +1,6 @@
 # ADR-005: Submit reproducible source with phase checklists
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -87,12 +87,35 @@ This multiplies submissions and duplicates evidence that the course explicitly a
 
 ## Implementation and verification
 
-Archive freezing and staged audit access already exist, but source exclusions, phase checklists, and completion of technical evidence beyond the author response remain pending.
-Verify a representative minimal bundle can be reproduced from its instructions and a checklist can locate all common and phase-specific evidence.
-Verify final evidence cannot replace the frozen implementation and cannot expose a private portfolio.
-Before implementation is complete, update student instructions and course-system documentation together.
+The [common contract's packaging instructions](../../../specifications/00_common_project.md#9-5-package-the-source) and submission interface ask for a small complete archive, document exclusions and necessary artifact exceptions, and require a supported unpack/install/initialize/run/validate path.
+Repository URLs are optional; archive integrity and the full implementation revision remain recorded.
+The server stores and streams uploads without executing them.
 
-## Open questions
+The [shared checklist](../../../shared/course-requirements.ts) indexes the full common evidence categories and each phase's distinct requirements beside preparation/final-evidence forms and technical review.
+Students locate evidence, explicitly declare missing work or leave entries unindexed; these markers do not award points.
+New runs pin an edition; legacy runs without a pin retain the fixed first edition.
+The [versioning workflow](../../../requirements/README.md) retains archived readable briefs/downloads and checks document/checklist digests during builds, rejecting silent drift.
 
-- Choose how the interface derives and versions checklist entries so they cannot silently drift from a course run's published requirements.
-- Define archive warnings and any packaging helper without treating a filename heuristic as proof of safety or correctness.
+The [submission domain](../../../worker/course-submission.ts) validates staged technical evidence, attachments and A/B record references.
+Evidence drafts remain private to the group and staff.
+Submitted final evidence follows timed auditor/class access while preserving frozen source, setup, initial evidence/checklist and membership.
+Private portfolio files cannot be attached; later revisions make prior assessments stale until reviewed.
+Compare links the existing A and B frozen records and opens read-only technical views instead of requiring duplicate archives.
+All revision snapshots and reasons remain stored.
+
+API checks verify incomplete submissions, optional repository links, private draft/file access, rejected private attachments, deadline/correction rules, immutable frozen fields/history, stale assessments and exact earlier references without duplicate archives.
+Requirement checks resolve every checklist link to its archived owner and reject changed live sources, archived sources and checklist digests.
+The controlled [source fixture](../../../tests/fixtures/course-source/README.md) is ZIP-packaged, unpacked cleanly, installed offline, initialized and validated; its documented HTTP path and restart persistence were also checked locally.
+It is a limited synthetic fixture, not a complete assessed project.
+The three-phase browser flow verifies indexed/missing evidence, technical drafts/attachments, separate Compare models, A/B navigation, archived pages, mobile layout and accessibility.
+The local D1/R2 Worker check verifies streamed final attachments, retained initial checklists/source, read-only records and existing authorization/history.
+
+The [operating guide](../../course-system.md#run-requirements-and-evidence-checklists) and student instructions describe the implemented workflow.
+Verification passed: 93 unit tests, four course browser tests, type checking, site build/HTML validation and the local Worker check.
+This status records repository behavior; it does not claim production deployment or that student work has been judged complete by automated presence checks.
+
+## Implementation choices
+
+- Author and review concise checklist entries against the detailed requirement owners, retain immutable editions and reject digest drift; do not try to infer every obligation from Markdown headings.
+- Provide packaging guidance using ordinary archive tools and a clean-directory check rather than a filename-based safety or correctness verdict.
+  Installed or generated exceptions remain documented instructor judgments.

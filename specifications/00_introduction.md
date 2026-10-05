@@ -59,7 +59,9 @@ The course instructions publish the deadlines and submission locations before wo
 
 1. **Freeze the implementation:** submit the implementation revision, setup and validation instructions, and the available common and phase-specific evidence.
 2. **Audit:** after the implementation deadline, the assigned group inspects that frozen revision and returns the bounded audit report.
-3. **Complete the evidence:** attach the audit and the authors' response to the same group submission record, preserving the original implementation and evidence.
+3. **Complete the evidence:** add the completed technical evidence index, technical attachments and the authors' response to the same group submission record, preserving the original implementation, setup, initial evidence, checklist and membership.
+   Evidence drafts remain private to the group and staff until submitted.
+   Use the checklist to locate artifacts or declare missing work; it does not assess quality or award points.
    Each student also submits the private individual portfolio by its published deadline.
 4. **Assessment:** the instructor records the group project score and each student's individual scores, with criterion-level reasons and any missing evidence.
 

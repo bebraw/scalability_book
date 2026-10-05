@@ -148,16 +148,76 @@ assert.equal(
   (audit.value as { targetRevision: string }).targetRevision,
   frozen.revision,
 );
+const technicalBytes = new TextEncoder().encode(
+  "operation,result\ntransition,passed\n",
+);
+const technicalUpload = await fetch(
+  new URL(
+    `/api/courses/${id}/files/establish/blue?scope=technical&purpose=evidence&name=results.csv`,
+    base,
+  ),
+  {
+    method: "POST",
+    body: technicalBytes,
+    headers: {
+      Cookie: student,
+      Origin: base.origin,
+      "Content-Length": String(technicalBytes.length),
+    },
+  },
+);
+assert.equal(technicalUpload.status, 201, await technicalUpload.clone().text());
+const technicalFile = (await technicalUpload.json()) as Envelope<CourseFile>;
 const response = await call<Envelope<Submission>>(
   `/${id}/submission/establish/blue`,
   "PUT",
   {
     expected: frozen.revision,
     stage: "evidence",
-    value: { response: "Responded to audit; source revision retained" },
+    value: {
+      response: "Responded to audit; source revision retained",
+      finalEvidence: {
+        index:
+          "Technical lifecycle results; shared baseline remains incomplete.",
+        files: [technicalFile.value.id],
+        checklist: [
+          {
+            id: "harness",
+            status: "located",
+            location: "README.md and results.csv",
+          },
+          {
+            id: "baseline",
+            status: "missing",
+            location:
+              "Synthetic fixture does not contain full measured profiles.",
+          },
+        ],
+        references: [],
+      },
+    },
   },
   student,
 );
+assert.equal(response.value.archive, frozen.value.archive);
+assert.equal(response.value.frozenRevision, frozen.value.frozenRevision);
+assert.deepEqual(response.value.checklist, frozen.value.checklist);
+const technicalDownload = await fetch(
+  new URL(`/api/courses/${id}/files/establish/${technicalFile.value.id}`, base),
+  { headers: { Cookie: student } },
+);
+assert.equal(technicalDownload.status, 200);
+assert.deepEqual(
+  new Uint8Array(await technicalDownload.arrayBuffer()),
+  technicalBytes,
+);
+const readOnly = await call<Envelope<Submission>>(
+  `/${id}/submission/establish/blue?frozenRevision=${frozen.value.frozenRevision}`,
+  "GET",
+  undefined,
+  student,
+);
+assert.equal(readOnly.value.finalEvidence!.files[0], technicalFile.value.id);
 const stale = await fetch(
   new URL(`/api/courses/${id}/submission/establish/blue`, base),
   {
@@ -435,5 +495,5 @@ assert.equal(
   401,
 );
 console.log(
-  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment and private catch-up, consent/publication and private matching, working agreement, guarded history, streamed R2 files, immutable snapshots and access isolation.",
+  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment and private catch-up, consent/publication and private matching, working agreement, guarded history, streamed R2 source/technical evidence, retained checklists and immutable snapshots, read-only submission and access isolation.",
 );

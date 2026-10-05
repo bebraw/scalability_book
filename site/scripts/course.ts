@@ -1,6 +1,18 @@
 import { e, option, field, input, localDate } from "./course-ui.ts";
+import {
+  requirementUrl,
+  requirementsFor,
+} from "../../shared/course-requirements.ts";
 import { courseSignIn } from "./course-signin.ts";
 import { studentGroups } from "./course-formation.ts";
+import {
+  sourceGuidance,
+  checklistMarkup,
+  checklistPayload,
+  earlierReferences,
+  referencePayload,
+  referenceLinks,
+} from "./course-evidence.ts";
 import {
   catchUpQueue,
   loadEnrollment,
@@ -73,6 +85,7 @@ let phase: Phase = "establish";
 let tab = "overview";
 let selectedGroup = "";
 let selectedStudent = "";
+let referenceGroup = "";
 let dirty = false;
 let pending = false;
 let local = false;
@@ -159,7 +172,8 @@ async function openCourse(id: string) {
 }
 function header() {
   const course = view!.config.value;
-  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="/project/introduction/">Project guide ↗</a><a href="/project/grading/">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button><button type="button" class="course-quiet" data-email-login>Email sign-in</button><button type="button" class="course-quiet" data-course-logout>Sign out</button></div>
+  const edition = requirementsFor(course);
+  return `<div class="course-toolbar"><label>Course run <select data-course-select>${listing.courses.map((c) => option(c.id, c.name, course.id)).join("")}</select></label><a href="${requirementUrl(edition.version, "introduction")}">Project guide ↗</a><a href="${requirementUrl(edition.version, "grading")}">Published rubric ↗</a><button type="button" class="course-quiet" data-refresh>Refresh records</button><button type="button" class="course-quiet" data-back>All courses</button><button type="button" class="course-quiet" data-email-login>Email sign-in</button><button type="button" class="course-quiet" data-course-logout>Sign out</button></div>
   <div class="course-heading"><div><p class="course-eyebrow">${view!.staff ? "Instructor workspace" : "Student workspace"}${local ? " · Local development" : ""}</p><h2>${e(course.name)}</h2></div><p class="course-identity">Signed in as <strong>${e(view!.user.login)}</strong></p></div>
   <div class="course-phases" role="group" aria-label="Project phase">${phases.map((p, i) => `<button type="button" data-phase="${p}" aria-pressed="${phase === p}"><span>0${i + 1}</span> ${title(p)} <small>${course.phases[p].published ? "Results released" : "Results pending"}</small></button>`).join("")}</div>
   <nav class="course-tabs" aria-label="Course workspace">${[
@@ -302,8 +316,18 @@ function studentPicker() {
     ? `<label class="course-inline-field">Student <select data-student-select>${view!.config.value.students.map((s) => option(s.id, `${s.name} · ${s.number}`, selectedStudent)).join("")}</select></label>`
     : "";
 }
-function upload(scope: "private" | "technical") {
-  return `<label class="course-field">${scope === "private" ? "Attach written, audio or video evidence" : "Upload source archive"}<input type="file" data-upload="${scope}" ${scope === "technical" ? 'accept=".zip,.tar,.tgz,.gz"' : ""}><small>Maximum 20 MiB per file. ${scope === "private" ? "Visible only to you and course staff." : "Archive should match the full commit hash; include setup and evidence."} Upload first, then save the form.</small></label>`;
+function upload(
+  scope: "private" | "technical",
+  purpose: "source" | "evidence" = "source",
+) {
+  const label =
+    scope === "private"
+      ? "Attach written, audio or video evidence"
+      : purpose === "evidence"
+        ? "Attach final technical evidence"
+        : "Upload source archive";
+  const hint = `course-upload-${scope}-${purpose}`;
+  return `<label class="course-field">${label}<input type="file" aria-label="${label}" aria-describedby="${hint}" data-upload="${scope}" data-purpose="${purpose}" ${scope === "technical" && purpose === "source" ? 'accept=".zip,.tar,.tgz,.gz"' : ""}><small id="${hint}">Maximum 20 MiB per file. ${scope === "private" ? "Visible only to you and course staff." : purpose === "evidence" ? "Technical work only. Submitted attachments follow audit/class access; exclude private portfolios and peer reports." : "Archive should match the full commit hash; include setup and evidence."} Upload first, then save the form.</small></label>`;
 }
 function gradeForm(
   kind: "project-grade" | "individual-grade",
@@ -341,15 +365,28 @@ function submission() {
   return `<section class="course-section">${groupPicker()}<div class="course-section-heading"><h3>${s?.frozenAt ? "Frozen implementation" : "Prepare implementation"}</h3>${historyButton(record)}</div><p>Implementation deadline: ${when(v.config.value.phases[phase].freezeAt)}. One member submits for the whole group.</p>
   ${
     s?.frozenAt
-      ? `<aside class="course-note">Frozen ${when(s.frozenAt)} · <code>${e(s.commit)}</code><p>Registered members: ${s.members.map((id) => e(v.config.value.students.find((x) => x.id === id)?.name ?? id)).join(", ")}</p></aside><p><a href="${e(s.repository)}" target="_blank" rel="noopener noreferrer">Repository ↗</a></p><p>${archives
+      ? `<aside class="course-note">Frozen ${when(s.frozenAt)} · <code>${e(s.commit)}</code><p>Registered members: ${s.members.map((id) => e(v.config.value.students.find((x) => x.id === id)?.name ?? id)).join(", ")}</p></aside>${s.repository ? `<p><a href="${e(s.repository)}" target="_blank" rel="noopener noreferrer">Repository ↗</a></p>` : ""}<p>${archives
           .filter((f) => f.value.id === s.archive)
           .map((f) => fileLink(f.value))
           .join(
             "",
-          )}</p><h4>Setup and validation</h4><p class="course-evidence">${e(s.setup)}</p><h4>Initial evidence and limitations</h4><p class="course-evidence">${e(s.evidence)}</p>
+          )}</p><h4>Setup and validation</h4><p class="course-evidence">${e(s.setup)}</p><h4>Initial evidence and limitations</h4><p class="course-evidence">${e(s.evidence)}</p><details><summary>Frozen initial checklist</summary>${checklistMarkup(v.config.value, phase, s.checklist)}</details>
   <h4>Incoming audit</h4>${incoming ? `<p class="course-evidence">${e(incoming.value.report)}</p>` : '<p class="course-muted">No audit submitted yet. Contact staff if a fallback is needed.</p>'}
-  <form data-form="evidence">${field("response", "Author response: findings, corrections and evidence links", s.response, 8000, true)}${v.staff ? input("reason", "Staff submission reason", "") : ""}<div class="course-form-actions"><button type="submit">${s.submittedAt ? "Resubmit author response" : "Submit author response"}</button><small>Initial source, setup and evidence remain frozen.</small></div></form>`
-      : `<form data-form="submission">${input("repository", "Repository URL (HTTPS)", s?.repository ?? "", true, "url")}${input("commit", "Full implementation commit hash", s?.commit ?? "")}${upload("technical")}<label class="course-field">Source archive<select name="archive">${option("", "Choose an uploaded archive", s?.archive ?? "")}${archives.map((f) => option(f.value.id, f.value.name, s?.archive ?? "")).join("")}</select></label>${field("setup", "Supported setup, demo data and validation commands", s?.setup ?? "", 8000, true)}${field("evidence", "Initial evidence, conditions and known limitations", s?.evidence ?? "", 8000, true)}${v.staff ? input("reason", "Staff submission reason", "") : ""}<div class="course-form-actions"><button type="submit" name="stage" value="draft" class="course-secondary">Save draft</button><button type="submit" name="stage" value="freeze">Freeze implementation</button></div><p class="course-muted">Freezing preserves this archive, commit, setup, initial evidence and membership. The system records an archive hash; you attest that it matches the commit.</p></form>`
+  <h4>Complete technical evidence</h4><p>Evidence deadline: ${when(v.config.value.phases[phase].evidenceAt)}. ${s.submittedAt ? `Submitted ${when(s.submittedAt)}.` : "Final evidence is private to the group and staff until submitted."}</p><form data-form="evidence"><div class="course-evidence-layout"><div>${field("finalIndex", "Completed technical evidence index and limitations", s.finalEvidence?.index ?? "", 8000)}${field("response", "Author response: findings, corrections and evidence links", s.response, 8000, true)}${upload("technical", "evidence")}${archives
+    .filter((f) => f.value.purpose === "evidence")
+    .map(
+      (f) =>
+        `<label class="course-check"><input type="checkbox" name="evidence-file" value="${e(f.value.id)}" ${s.finalEvidence?.files.includes(f.value.id) ? "checked" : ""}> ${e(f.value.name)}</label>`,
+    )
+    .join(
+      "",
+    )}${earlierReferences(phase, v.submissions, s.finalEvidence?.references)}${referenceLinks(s.finalEvidence?.references)}${v.staff ? input("reason", "Staff submission reason", "") : ""}</div>${checklistMarkup(v.config.value, phase, s.finalEvidence?.checklist ?? s.checklist, true)}</div><div class="course-form-actions"><button type="submit" value="evidence-draft" class="course-secondary" formnovalidate>Save evidence draft</button><button type="submit" value="evidence">${s.submittedAt ? "Resubmit technical evidence and response" : "Submit technical evidence and response"}</button><small>Initial source, setup, evidence, checklist and membership remain frozen. Drafts and submissions are retained as revisions.</small></div></form>`
+      : `${sourceGuidance()}<form data-form="submission"><div class="course-evidence-layout"><div>${input("repository", "Repository URL (optional HTTPS context)", s?.repository ?? "", false, "url")}${input("commit", "Full implementation commit hash", s?.commit ?? "")}${upload("technical")}<label class="course-field">Source archive<select name="archive">${option("", "Choose an uploaded archive", s?.archive ?? "")}${archives
+          .filter((f) => f.value.purpose !== "evidence")
+          .map((f) => option(f.value.id, f.value.name, s?.archive ?? ""))
+          .join(
+            "",
+          )}</select></label>${field("setup", "Supported setup, demo data and validation commands", s?.setup ?? "", 8000, true)}${field("evidence", "Initial evidence, conditions and known limitations", s?.evidence ?? "", 8000, true)}${v.staff ? input("reason", "Staff submission reason", "") : ""}</div>${checklistMarkup(v.config.value, phase, s?.checklist, true)}</div><div class="course-form-actions"><button type="submit" name="stage" value="draft" class="course-secondary">Save draft</button><button type="submit" name="stage" value="freeze">Freeze implementation</button></div><p class="course-muted">Freezing preserves this archive, commit, setup, initial evidence, checklist and membership. The system records an archive hash; you attest that it matches the commit. A repository link is optional; the archive is the course copy.</p></form>`
   }
   ${v.staff ? gradeForm("project-grade", selectedGroup) : ""}</section>`;
 }
@@ -413,10 +450,33 @@ function audit() {
           .map((f) => `<p>${fileLink(f.value)}</p>`)
           .join(
             "",
-          )}<p class="course-evidence">${e(target.value.setup)}</p><p class="course-evidence">${e(target.value.evidence)}</p></details>`
+          )}<p class="course-evidence">${e(target.value.setup)}</p><p class="course-evidence">${e(target.value.evidence)}</p>${checklistMarkup(v.config.value, phase, target.value.checklist)}</details>`
       : '<aside class="course-note">The frozen implementation will be available when the audit window opens. If it is missing during the window, ask staff for a fallback.</aside>'
   }
   ${assignment ? `<form data-form="audit">${field("report", "Audit report: setup, timing, prior inspection, change probe, findings and evidence", record?.value.report ?? "", 10000, true)}${v.staff ? input("reason", "Staff audit reason", "") : ""}<div class="course-form-actions"><button type="submit" ${!target ? "disabled" : ""}>${record ? "Resubmit audit" : "Submit assigned audit"}</button>${historyButton(record)}</div></form>` : ""}</section>`;
+}
+function technicalCard(record: Envelope<Submission>) {
+  const v = view!,
+    s = record.value;
+  const audit = v.audits.find(
+    (r) => r.value.phase === s.phase && r.value.to === s.group,
+  );
+  const fileIds = [s.archive, ...(s.finalEvidence?.files ?? [])];
+  return `<article><p class="course-eyebrow">${title(s.phase)} · ${e(s.group)}</p><h4>${e(s.group)} implementation</h4>${s.repository ? `<p><a href="${e(s.repository)}" target="_blank" rel="noopener noreferrer">Repository context ↗</a></p>` : ""}<p><code>${e(s.commit)}</code></p><p class="course-muted">Frozen revision ${e(s.frozenRevision)}</p>${v.files
+    .filter((f) => fileIds.includes(f.value.id))
+    .map((f) => `<p>${fileLink(f.value)}</p>`)
+    .join(
+      "",
+    )}<details><summary>Setup & validation</summary><p class="course-evidence">${e(s.setup)}</p></details><details><summary>Initial evidence</summary><p class="course-evidence">${e(s.evidence)}</p>${checklistMarkup(v.config.value, s.phase, s.checklist)}</details><details><summary>Completed technical evidence</summary><p class="course-evidence">${e(s.finalEvidence?.index || "Final evidence pending")}</p>${s.finalEvidence ? checklistMarkup(v.config.value, s.phase, s.finalEvidence.checklist) : ""}${referenceLinks(s.finalEvidence?.references)}</details><details><summary>Audit & author response</summary><p class="course-evidence">${e(audit?.value.report ?? "Audit pending")}</p><p class="course-evidence">${e(s.response || "Author response pending")}</p></details></article>`;
+}
+function referencedSubmission() {
+  const record = view!.submissions.find(
+    (r) =>
+      r.value.phase === phase &&
+      r.value.group === referenceGroup &&
+      r.value.frozenAt,
+  );
+  return `<section class="course-section"><h3>Earlier ${phase === "establish" ? "A" : "B"} submission</h3>${record ? technicalCard(record) : "<p>This frozen record is not available to your account yet.</p>"}<button type="button" data-tab="gallery" class="course-quiet">Open class catalogue</button></section>`;
 }
 function gallery() {
   const v = view!,
@@ -427,18 +487,7 @@ function gallery() {
       : `${!open ? '<aside class="course-note">Staff preview. Students cannot browse this catalogue until the audit window closes.</aside>' : ""}<div class="course-gallery">${
           v.submissions
             .filter((r) => r.value.phase === phase && r.value.frozenAt)
-            .map((r) => {
-              const s = r.value,
-                a = v.audits.find(
-                  (r) => r.value.phase === phase && r.value.to === s.group,
-                );
-              return `<article><p class="course-eyebrow">${title(phase)} · ${e(s.group)}</p><h4><a href="${e(s.repository)}" target="_blank" rel="noopener noreferrer">${e(s.group)} implementation ↗</a></h4><p><code>${e(s.commit)}</code></p>${v.files
-                .filter((f) => f.value.id === s.archive)
-                .map((f) => `<p>${fileLink(f.value)}</p>`)
-                .join(
-                  "",
-                )}<details><summary>Setup & validation</summary><p class="course-evidence">${e(s.setup)}</p></details><details><summary>Initial evidence</summary><p class="course-evidence">${e(s.evidence)}</p></details><details><summary>Audit & author response</summary><p class="course-evidence">${e(a?.value.report ?? "Audit pending")}</p><p class="course-evidence">${e(s.response || "Author response pending")}</p></details></article>`;
-            })
+            .map(technicalCard)
             .join("") || "<p>No frozen submissions yet.</p>"
         }</div>`
   }</section>`;
@@ -479,6 +528,7 @@ function render() {
     portfolio,
     audit,
     gallery,
+    reference: referencedSubmission,
     gradebook,
     ...Object.fromEntries(
       administrationSections.map((section) => [
@@ -584,14 +634,14 @@ content.addEventListener("change", async (event) => {
       pending = true;
       ownsPending = true;
       const response = await fetch(
-        `${route("files", owner)}?scope=${scope}&name=${encodeURIComponent(file.name)}&reason=${encodeURIComponent(reason)}`,
+        `${route("files", owner)}?scope=${scope}&purpose=${el.dataset.purpose ?? "source"}&name=${encodeURIComponent(file.name)}&reason=${encodeURIComponent(reason)}`,
         { method: "POST", body: file, credentials: "same-origin" },
       );
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       const record = data as Envelope<CourseFile>;
       view!.files.push(record);
-      if (scope === "technical") {
+      if (scope === "technical" && el.dataset.purpose !== "evidence") {
         const select = content.querySelector<HTMLSelectElement>(
           'select[name="archive"]',
         )!;
@@ -601,7 +651,7 @@ content.addEventListener("change", async (event) => {
         label.className = "course-check";
         const check = document.createElement("input");
         check.type = "checkbox";
-        check.name = "file";
+        check.name = scope === "technical" ? "evidence-file" : "file";
         check.value = record.value.id;
         check.checked = true;
         label.append(check, document.createTextNode(" " + file.name));
@@ -633,6 +683,14 @@ content.addEventListener("click", async (event) => {
     return;
   }
   try {
+    if (button.dataset.referencePhase && button.dataset.referenceGroup) {
+      if (!allowNavigation()) return;
+      phase = button.dataset.referencePhase as Phase;
+      referenceGroup = button.dataset.referenceGroup;
+      tab = "reference";
+      await openCourse(view!.config.value.id);
+      return;
+    }
     if (button.dataset.version && button.dataset.history) {
       const data = await api<{ history: Envelope[] }>(
         `/api/courses/${view!.config.value.id}/history?key=${encodeURIComponent(button.dataset.history)}&revision=${encodeURIComponent(button.dataset.version)}`,
@@ -1014,16 +1072,28 @@ content.addEventListener("submit", async (event) => {
       );
       await api(route("submission", selectedGroup), "PUT", {
         expected: revision(old),
-        stage: kind === "evidence" ? "evidence" : (submit?.value ?? "draft"),
+        stage:
+          kind === "evidence"
+            ? (submit?.value ?? "evidence")
+            : (submit?.value ?? "draft"),
         value:
           kind === "evidence"
-            ? { response: val("response") }
+            ? {
+                response: val("response"),
+                finalEvidence: {
+                  index: val("finalIndex"),
+                  files: values.getAll("evidence-file").map(String),
+                  checklist: checklistPayload(course, phase, values),
+                  references: referencePayload(values, v.submissions),
+                },
+              }
             : {
                 repository: val("repository"),
                 commit: val("commit"),
                 archive: val("archive"),
                 setup: val("setup"),
                 evidence: val("evidence"),
+                checklist: checklistPayload(course, phase, values),
               },
         reason: val("reason"),
       });

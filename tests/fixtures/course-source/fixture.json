@@ -1,0 +1,5 @@
+{
+  "workspaces": [{ "id": "sample", "name": "Synthetic workspace" }],
+  "items": [],
+  "events": []
+}

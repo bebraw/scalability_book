@@ -522,6 +522,40 @@ Preserve enough task, prompt, trace, and review information to explain consequen
 
 ---
 
+### 9.5 Package the source
+
+Submit the smallest complete source bundle that another group can reproduce without your personal repository credentials.
+Include application source, relevant tests, small synthetic fixtures, dependency manifests and lockfiles, migrations, setup scripts, example configuration and curated technical evidence.
+Exclude installed dependencies such as `node_modules` and `.venv`, `.git`, caches, reproducible build output, model weights, secrets and personal data.
+If a vendored dependency or generated artifact is necessary to run the supported path, include it and explain the exception; this is not a source-file-only restriction.
+
+Write instructions for unpacking the archive, installing the declared dependencies, initializing fixtures, running the application and executing validation.
+Retain the full implementation commit hash.
+The course workspace records the archive's size and SHA-256 digest and retains that copy; a repository URL is optional context.
+An archive or hash alone does not prove it matches the declared commit or that the application works.
+
+For a Git project, one starting point is:
+
+```bash
+git archive --format=zip --output=../source.zip <full-commit-hash>
+unzip -l ../source.zip
+```
+
+This packages committed files only and does not include `.git` or untracked dependencies.
+It still includes unwanted files that were committed; review the contents and use versioned `.gitattributes` `export-ignore` rules for reproducible output or other exclusions where appropriate.
+Inspect configuration and evidence for secrets or personal data.
+Unpack into a clean directory and follow the documented setup and validation path before submission.
+For other archive tools, inspect their file listing and perform the same clean-directory check.
+The course server does not execute uploaded code or treat filenames as proof of safety or completeness.
+
+Use the workspace's common and selected phase checklist to index evidence locations and declare missing or incomplete work.
+One artifact may satisfy several entries; checking an entry does not award points.
+Each run retains an archived requirement edition rather than silently following later edits to these briefs.
+Complete technical evidence and the author response in the later evidence stage; do not replace the original archive, setup or initial evidence.
+Compare links the existing A and B submission records instead of uploading their archives again.
+
+---
+
 ## 10. Bounded Cross-Team Audit
 
 After each phase, another group will inspect the implementation for a limited period using only the repository and submitted instructions.

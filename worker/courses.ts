@@ -47,6 +47,11 @@ import {
 import { configureFormation, updateFormation } from "./course-formation.ts";
 import { updateEnrollment } from "./course-enrollment.ts";
 import { studentEnrollment } from "../shared/course-enrollment.ts";
+import {
+  requirementVersion,
+  requirementsFor,
+} from "../shared/course-requirements.ts";
+import { parseChecklist, parseFinalEvidence } from "./course-submission.ts";
 export interface CourseUser {
   id: string;
   login: string;
@@ -154,13 +159,17 @@ function visibleRecords(
     );
   const visibleSubs = subs
     .filter((r) => canRead(r.value))
-    .map((r) =>
-      staff ||
-      ownGroups.has(`${r.value.phase}:${r.value.group}`) ||
-      r.value.submittedAt
-        ? r
-        : { ...r, value: { ...r.value, response: "" } },
-    );
+    .map((r) => {
+      if (
+        staff ||
+        ownGroups.has(`${r.value.phase}:${r.value.group}`) ||
+        r.value.submittedAt
+      )
+        return r;
+      const value = { ...r.value, response: "" };
+      delete value.finalEvidence;
+      return { ...r, value };
+    });
   const portfolios = records.filter(
     (r) =>
       r.kind === "portfolio" &&
@@ -194,6 +203,7 @@ function visibleRecords(
   ) as Envelope<Grade>[];
   const attached = new Set([
     ...visibleSubs.map((r) => r.value.archive),
+    ...visibleSubs.flatMap((r) => r.value.finalEvidence?.files ?? []),
     ...portfolios.flatMap((r) => r.value.files),
   ]);
   const files = records.filter(
@@ -283,6 +293,7 @@ export async function handleCourses(
         };
       };
       const course: Course = {
+        requirements: requirementVersion,
         id: courseId,
         name: text(body.name, "Course name", 120, true),
         rubric: rubricVersion,
@@ -364,7 +375,12 @@ export async function handleCourses(
           submission.frozenRevision = record.revision;
       }
       requireThat(
-        JSON.stringify(value).length <= (kind === "course" ? 900_000 : 30_000),
+        JSON.stringify(value).length <=
+          (kind === "course"
+            ? 900_000
+            : kind === "submission"
+              ? 64_000
+              : 30_000),
         "Record is too large.",
         413,
       );
@@ -755,6 +771,27 @@ export async function handleCourses(
       );
     }
     requireThat(subject, "Missing group or student identifier.", 404);
+    if (action === "submission" && request.method === "GET") {
+      const visible = visibleRecords(course, records, user, staff, now);
+      const submission = visible.submissions.find(
+        (r) =>
+          r.value.phase === phase &&
+          r.value.group === subject &&
+          r.value.frozenAt,
+      );
+      requireThat(
+        submission,
+        "Frozen submission not found or access has not opened.",
+        404,
+      );
+      const pinned = url.searchParams.get("frozenRevision");
+      requireThat(
+        !pinned || pinned === submission.value.frozenRevision,
+        "The referenced frozen revision does not match.",
+        409,
+      );
+      return reply(submission);
+    }
     if (action === "files") {
       requireThat(files, "File storage is not configured yet.", 503);
       if (request.method === "GET") {
@@ -778,6 +815,15 @@ export async function handleCourses(
       }
       requireThat(request.method === "POST", "Method not allowed.", 405);
       const scope = url.searchParams.get("scope");
+      const purpose = url.searchParams.get("purpose") ?? "source";
+      requireThat(
+        purpose === "source" || purpose === "evidence",
+        "Choose a source archive or technical evidence attachment.",
+      );
+      const lateUpload =
+        purpose === "evidence"
+          ? now > schedule.evidenceAt
+          : now >= schedule.freezeAt;
       requireThat(
         scope === "technical" || scope === "private",
         "Specify file visibility.",
@@ -792,12 +838,24 @@ export async function handleCourses(
         const existing = values<Submission>("submission").find(
           (s) => s.phase === phase && s.group === subject,
         );
-        requireThat(
-          !existing?.frozenAt && (now < schedule.freezeAt || staff),
-          "The source snapshot is frozen.",
-          409,
-        );
-        if (now >= schedule.freezeAt)
+        if (purpose === "evidence") {
+          requireThat(
+            existing?.frozenAt,
+            "Freeze the implementation before attaching final technical evidence.",
+            409,
+          );
+          requireThat(
+            now <= schedule.evidenceAt || staff,
+            "The evidence deadline has passed. Ask staff about a correction.",
+            409,
+          );
+        } else
+          requireThat(
+            !existing?.frozenAt && (now < schedule.freezeAt || staff),
+            "The source snapshot is frozen.",
+            409,
+          );
+        if (lateUpload)
           text(
             url.searchParams.get("reason"),
             "Staff late-upload reason",
@@ -831,7 +889,7 @@ export async function handleCourses(
         409,
       );
       const name = text(url.searchParams.get("name"), "File name", 150, true);
-      if (scope === "technical")
+      if (scope === "technical" && purpose === "source")
         requireThat(
           /\.(zip|tar|tgz|tar\.gz)$/i.test(name),
           "Upload a source archive (.zip, .tar, .tgz or .tar.gz).",
@@ -865,6 +923,7 @@ export async function handleCourses(
           bytes: length,
           sha256: hash.digest("hex"),
           uploadedAt: now,
+          ...(scope === "technical" ? { purpose } : {}),
         };
         return reply(
           await save(
@@ -873,7 +932,7 @@ export async function handleCourses(
             fileId,
             value,
             null,
-            now >= schedule.freezeAt && scope === "technical"
+            lateUpload && scope === "technical"
               ? `Staff late upload: ${url.searchParams.get("reason")}`
               : "File uploaded",
           ),
@@ -907,14 +966,27 @@ export async function handleCourses(
           409,
         );
         requireThat(
-          body.stage === "evidence",
+          body.stage === "evidence" || body.stage === "evidence-draft",
           "Frozen code, setup and initial evidence are preserved.",
           409,
         );
         value = {
           ...old.value,
-          response: text(data.response, "Author response", 8000, true),
-          submittedAt: now,
+          response: text(
+            data.response ?? old.value.response,
+            "Author response",
+            8000,
+            body.stage === "evidence",
+          ),
+          finalEvidence: parseFinalEvidence(
+            course,
+            phase,
+            subject,
+            data,
+            records,
+            old.value,
+          ),
+          submittedAt: body.stage === "evidence" ? now : null,
         };
       } else {
         requireThat(
@@ -922,16 +994,17 @@ export async function handleCourses(
           "The implementation deadline has passed. Ask staff about a late submission.",
           409,
         );
-        const repository = text(data.repository, "Repository URL", 500, true);
-        try {
-          const u = new URL(repository);
-          requireThat(
-            u.protocol === "https:" && !u.username && !u.password,
-            "Use an HTTPS repository URL without credentials.",
-          );
-        } catch {
-          throw new Problem("Use a valid HTTPS repository URL.");
-        }
+        const repository = text(data.repository ?? "", "Repository URL", 500);
+        if (repository)
+          try {
+            const u = new URL(repository);
+            requireThat(
+              u.protocol === "https:" && !u.username && !u.password,
+              "Use an HTTPS repository URL without credentials.",
+            );
+          } catch {
+            throw new Problem("Use a valid HTTPS repository URL.");
+          }
         const commit = text(data.commit, "Full commit hash", 64, true);
         requireThat(
           /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/i.test(commit),
@@ -949,6 +1022,7 @@ export async function handleCourses(
               (f) =>
                 f.id === archive &&
                 f.scope === "technical" &&
+                f.purpose !== "evidence" &&
                 f.owner === subject &&
                 f.phase === phase,
             ),
@@ -959,6 +1033,13 @@ export async function handleCourses(
           "Choose save draft or freeze implementation.",
         );
         value = {
+          requirements: requirementsFor(course).version,
+          checklist: parseChecklist(
+            course,
+            phase,
+            data.checklist,
+            old?.value.checklist,
+          ),
           phase,
           group: subject,
           members: [...group.members],

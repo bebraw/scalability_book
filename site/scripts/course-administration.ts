@@ -24,6 +24,10 @@ import { e, input, field, localDate } from "./course-ui.ts";
 import { groupLabel } from "../../shared/course-formation.ts";
 import { staffFormation } from "./course-formation.ts";
 import { enrollmentStatus, staffEnrollment } from "./course-enrollment.ts";
+import {
+  requirementUrl,
+  requirementsFor,
+} from "../../shared/course-requirements.ts";
 
 const labels: Record<AdministrationSection, string> = {
   students: "Students",
@@ -76,7 +80,8 @@ export function renderAdministration(
   if (section === "schedule") {
     return `<section class="course-section"><h3>${title(phase)} administration</h3><p>Prepare deadlines and audit assignments for this phase. Save groups before arranging their audits.</p><form data-form="schedule"><div class="course-deadline-inputs">${input("freezeAt", "Implementation deadline", localDate(schedule.freezeAt), true, "datetime-local")}${input("auditAt", "Audit closes / class access opens", localDate(schedule.auditAt), true, "datetime-local")}${input("evidenceAt", "Evidence and portfolio deadline", localDate(schedule.evidenceAt), true, "datetime-local")}</div><p>Saved groups: ${e(schedule.groups.map((g) => g.id).join(", ") || "none yet")}.</p>${field("audits", "Audit assignments: auditor-group > target-group (one per line)", schedule.audits.map((a) => `${a.from} > ${a.to}`).join("\n"), 5000)}<button type="button" data-match="${phase}" class="course-quiet">Fill circular audit assignments</button>${actions("Save phase administration")}</form></section>`;
   }
-  return `<section class="course-section"><h3>Course settings</h3><p>Course identity, staff access and the published rubric used for this run.</p><p class="course-muted">Run identifier: <code>${e(course.id)}</code>.</p><form data-form="settings">${input("name", "Course run name", course.name)}${field("staff", "Course staff: numeric GitHub IDs, one per line", course.staff.join("\n"), 500, true)}<label class="course-field">Published rubric<select name="rubric"><option value="${e(course.rubric)}">${e(course.rubric)}</option></select><small>The run retains its rubric version for historical assessments.</small></label>${actions("Save course settings")}</form></section>`;
+  const edition = requirementsFor(course);
+  return `<section class="course-section"><h3>Course settings</h3><p>Course identity, staff access and the published rubric used for this run.</p><p class="course-muted">Run identifier: <code>${e(course.id)}</code>. Requirements edition: <a href="${requirementUrl(edition.version, "common")}">${e(edition.version)}</a>; retained for this run.</p><form data-form="settings">${input("name", "Course run name", course.name)}${field("staff", "Course staff: numeric GitHub IDs, one per line", course.staff.join("\n"), 500, true)}<label class="course-field">Published rubric<select name="rubric"><option value="${e(course.rubric)}">${e(course.rubric)}</option></select><small>The run retains its rubric version for historical assessments.</small></label>${actions("Save course settings")}</form></section>`;
 }
 
 function roster(source: string): Student[] {

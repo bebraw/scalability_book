@@ -587,3 +587,33 @@
     flex-wrap: wrap;
   }
 }
+.course-evidence-layout {
+  display: grid;
+  gap: 1.6rem;
+  align-items: start;
+}
+.course-evidence-layout > * {
+  min-width: 0;
+}
+.course-checklist {
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+.course-checkpoint {
+  margin: 1rem 0;
+  padding: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.course-checkpoint legend,
+.course-checkpoint h5 {
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+.course-checkpoint p {
+  font-size: 0.84rem;
+}
+@media (min-width: 960px) {
+  .course-evidence-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  }
+}

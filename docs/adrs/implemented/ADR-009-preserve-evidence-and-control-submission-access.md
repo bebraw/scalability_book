@@ -51,7 +51,7 @@ The instructor requested a submission system connected to grading and emphasized
 **Neutral:**
 
 - Public repository publication remains optional for class browsing.
-- Final technical-evidence completion beyond the existing author-response field is separate accepted work in ADR-005.
+- Final technical-evidence completion extends this baseline through implemented ADR-005 while retaining frozen source and private portfolios.
 
 ## Alternatives considered
 
@@ -82,5 +82,5 @@ Implemented status does not mean production storage has been provisioned.
 ## References
 
 - [ADR-004: future group formation and membership changes](../accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md).
-- [ADR-005: final technical evidence](../accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md).
+- [ADR-005: final technical evidence](ADR-005-submit-reproducible-source-with-phase-checklists.md).
 - [ADR-008: grading and release](ADR-008-require-individual-work-for-course-credit.md).

@@ -140,7 +140,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
     .click();
   const submission = student.locator('form[data-form="submission"]');
   await submission
-    .getByLabel("Repository URL (HTTPS)")
+    .getByLabel("Repository URL (optional HTTPS context)")
     .fill("https://github.com/example/project");
   await submission
     .getByLabel("Full implementation commit hash")
@@ -153,14 +153,14 @@ test("instructor manages a run; student submits privately; rubric grading and re
   await expect(student.locator("[data-course-notice]")).toContainText(
     "File uploaded.",
   );
-  await expect(submission.getByLabel("Repository URL (HTTPS)")).toHaveValue(
-    "https://github.com/example/project",
-  );
+  await expect(
+    submission.getByLabel("Repository URL (optional HTTPS context)"),
+  ).toHaveValue("https://github.com/example/project");
   student.once("dialog", (dialog) => dialog.dismiss());
   await student.getByRole("button", { name: /02 Challenge/ }).click();
-  await expect(submission.getByLabel("Repository URL (HTTPS)")).toHaveValue(
-    "https://github.com/example/project",
-  );
+  await expect(
+    submission.getByLabel("Repository URL (optional HTTPS context)"),
+  ).toHaveValue("https://github.com/example/project");
   await submission
     .getByLabel("Supported setup, demo data and validation commands")
     .fill("Install, seed data, run tests, start the application.");
