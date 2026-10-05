@@ -52,12 +52,52 @@ export function parseStudents(value: unknown): Student[] {
   );
   return validateRoster(students);
 }
-export function parseGroups(value: unknown, course: Course): Group[] {
+export function parseGroups(
+  value: unknown,
+  course: Course,
+  phase: Phase,
+): Group[] {
   const groups = array(value, 50).map((item) => {
     const g = obj(item);
     const members = array(g.members, 10).map(studentId);
     requireThat(members.length > 0, "Every group needs a member.");
-    return { id: slug(g.id), members };
+    const id = slug(g.id);
+    const prior = course.phases[phase].groups.find((old) => old.id === id);
+    const retained =
+      prior &&
+      JSON.stringify([...prior.members].sort()) ===
+        JSON.stringify([...members].sort());
+    const name = text(g.name ?? "", "Optional group name", 80);
+    const exception = text(g.exception ?? "", "Group size exception", 2000);
+    requireThat(
+      members.length <= 4 || retained,
+      "New or changed groups have at most four members.",
+    );
+    requireThat(
+      members.length === 3 || exception || retained,
+      "Three members is the default. Explain instructor approval for a fourth member or a smaller group.",
+    );
+    const proposal = text(g.proposal ?? "", "Group proposal", 48);
+    if (proposal) {
+      const source = course.phases[phase].formation?.proposals.find(
+        (p) => p.id === proposal,
+      );
+      requireThat(
+        source &&
+          !source.closed &&
+          source.members.every(
+            (s) => source.confirmed.includes(s) && members.includes(s),
+          ),
+        "Every proposed member must confirm before the proposal can be allocated.",
+      );
+    }
+    return {
+      id,
+      members,
+      ...(name ? { name } : {}),
+      ...(exception ? { exception } : {}),
+      ...(proposal ? { proposal } : {}),
+    };
   });
   requireThat(unique(groups.map((g) => g.id)), "Group IDs must be unique.");
   const members = groups.flatMap((g) => g.members);
@@ -95,7 +135,10 @@ export function administrationRevisions(
   for (const phase of phases) {
     const { groups, freezeAt, auditAt, evidenceAt, audits } =
       course.phases[phase];
-    groupRevisions[phase] = fingerprint(groups);
+    groupRevisions[phase] = fingerprint({
+      groups,
+      formation: course.phases[phase].formation,
+    });
     scheduleRevisions[phase] = fingerprint({
       freezeAt,
       auditAt,
@@ -168,7 +211,7 @@ function setGroups(
   phase: Phase,
   value: unknown,
 ) {
-  const groups = parseGroups(value, next);
+  const groups = parseGroups(value, next, phase);
   requireThat(
     frozenSubmissions(records, phase).every((s) =>
       groups.some(
@@ -218,6 +261,11 @@ function setSchedule(
     freezeAt < auditAt && auditAt <= evidenceAt,
     "Deadlines must run implementation → audit → evidence.",
   );
+  requireThat(
+    !next.phases[phase].formation ||
+      next.phases[phase].formation!.correctionUntil < freezeAt,
+    "The group correction window must end before implementation freezes.",
+  );
   if (
     now >= old.phases[phase].freezeAt ||
     frozenSubmissions(records, phase).length
@@ -265,6 +313,9 @@ function allocateGroups(course: Course, value: unknown) {
     return {
       id: id || `group-${String(nextNumber++).padStart(2, "0")}`,
       members: g.members,
+      name: g.name,
+      exception: g.exception,
+      proposal: g.proposal,
     };
   });
   course.nextGroupNumber = nextNumber;
@@ -310,6 +361,12 @@ export function updateAdministration(
       ),
     ]);
   } else if (section === "groups") {
+    requireThat(
+      course.phases[phase].formation ||
+        course.phases[phase].groups.length ||
+        !array(body.groups, 50).length,
+      "Open group formation before creating the initial allocation.",
+    );
     setGroups(next, course, records, phase, allocateGroups(next, body.groups));
     validateAudits(next.phases[phase].audits, next.phases[phase].groups);
   } else setSchedule(next, course, records, phase, body, now);

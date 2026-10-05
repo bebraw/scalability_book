@@ -1,3 +1,4 @@
+import type { GroupFormation } from "./course-formation.ts";
 // Published rubric v1. Keep historical runs on this version when adding rubrics.
 export const phases = ["establish", "challenge", "compare"] as const;
 export type Phase = (typeof phases)[number];
@@ -53,6 +54,9 @@ export interface Student {
 export interface Group {
   id: string;
   members: string[];
+  name?: string;
+  exception?: string;
+  proposal?: string;
 }
 export interface PhaseSetup {
   freezeAt: string;
@@ -61,6 +65,7 @@ export interface PhaseSetup {
   groups: Group[];
   audits: { from: string; to: string }[];
   published: boolean;
+  formation?: GroupFormation;
 }
 export interface Adjustment {
   student: string;

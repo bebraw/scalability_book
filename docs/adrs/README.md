@@ -45,7 +45,6 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 | ADR                                                                               | Summary                                                                                          |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [ADR-002](accepted/ADR-002-separate-course-administration-workflows.md)           | Separate students, groups, phase administration, and course settings.                            |
 | [ADR-004](accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md) | Combine student proposals with instructor allocation; target three members and allow up to four. |
 | [ADR-005](accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md)   | Submit minimal reproducible source and display the common and phase-specific requirements.       |
 | [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md)                    | Send course login mail through Cloudflare and forward incoming mail to Gmail.                    |
@@ -53,27 +52,28 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Implemented
 
-| ADR                                                                                                | Summary                                                                                                |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| [ADR-001](implemented/ADR-001-record-decisions-and-retain-development-context.md)                  | Adopt the ADR lifecycle, clear documentation ownership, and focused verification.                      |
-| [ADR-003](implemented/ADR-003-import-students-and-use-email-magic-links.md)                        | Import institutional rosters, preserve record ownership and use course-scoped email sessions.          |
-| [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)                        | Require individual participation and assessments alongside shared project scores.                      |
-| [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md)                  | Preserve assessment evidence and history; stage class access while keeping individual records private. |
-| [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                                       | Keep course policies, optional depth, and supporting case studies outside the main reading argument.   |
-| [ADR-011](implemented/ADR-011-publish-markdown-through-a-static-worker-site.md)                    | Publish repository Markdown through a static site with Worker application APIs.                        |
-| [ADR-012](implemented/ADR-012-use-scholarmark-with-trusted-host-extensions.md)                     | Use ScholarMark semantics and sanitization with explicit trusted host extensions.                      |
-| [ADR-013](implemented/ADR-013-keep-reader-feedback-private-and-sync-moderation-explicitly.md)      | Keep reader feedback private and synchronize moderation through explicit commands.                     |
-| [ADR-014](implemented/ADR-014-isolate-and-atomically-rebuild-local-previews.md)                    | Isolate draft previews, preserve complete builds, and recover interrupted swaps.                       |
-| [ADR-015](implemented/ADR-015-use-typed-client-modules-and-load-demos-on-demand.md)                | Use typed browser modules, scoped demo loading, and compatibility checks.                              |
-| [ADR-016](implemented/ADR-016-version-formative-exercises-and-save-private-answers.md)             | Version canonical formative questions and keep saved answers private and separate from grading.        |
-| [ADR-017](implemented/ADR-017-export-an-authored-concept-graph-for-reader-agents.md)               | Publish authored concept navigation and read-only resources for students' own agents.                  |
-| [ADR-018](implemented/ADR-018-offer-optional-agent-explorations-with-separate-worked-reasoning.md) | Offer task-based optional explorations, prediction-led guidance, and separate worked reasoning.        |
-| [ADR-019](implemented/ADR-019-publish-self-study-through-a-pinned-public-exporter.md)              | Build public self-study modules through a pinned exporter without hosting its authoring service.       |
-| [ADR-020](implemented/ADR-020-generate-reading-and-lecture-pdfs-from-versioned-sources.md)         | Regenerate portable reading and lecture artifacts from reviewed sources.                               |
-| [ADR-021](implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)             | Compare fresh local-model, comparison-model, and fleet builds of a stable application brief.           |
-| [ADR-022](implemented/ADR-022-use-a-shared-runtime-protocol-and-bounded-pressure-experiments.md)   | Use a shared measurement protocol and bounded, cumulative pressure experiments.                        |
-| [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)               | Test setup and change friction through equivalent, time-bounded cross-team audits.                     |
-| [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)          | Keep prose changes inspectable and derive publication dates from complete source history.              |
+| ADR                                                                                                | Summary                                                                                                  |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [ADR-001](implemented/ADR-001-record-decisions-and-retain-development-context.md)                  | Adopt the ADR lifecycle, clear documentation ownership, and focused verification.                        |
+| [ADR-002](implemented/ADR-002-separate-course-administration-workflows.md)                         | Separate enrollment, group consent/allocation, phase administration and settings with independent saves. |
+| [ADR-003](implemented/ADR-003-import-students-and-use-email-magic-links.md)                        | Import institutional rosters, preserve record ownership and use course-scoped email sessions.            |
+| [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)                        | Require individual participation and assessments alongside shared project scores.                        |
+| [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md)                  | Preserve assessment evidence and history; stage class access while keeping individual records private.   |
+| [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                                       | Keep course policies, optional depth, and supporting case studies outside the main reading argument.     |
+| [ADR-011](implemented/ADR-011-publish-markdown-through-a-static-worker-site.md)                    | Publish repository Markdown through a static site with Worker application APIs.                          |
+| [ADR-012](implemented/ADR-012-use-scholarmark-with-trusted-host-extensions.md)                     | Use ScholarMark semantics and sanitization with explicit trusted host extensions.                        |
+| [ADR-013](implemented/ADR-013-keep-reader-feedback-private-and-sync-moderation-explicitly.md)      | Keep reader feedback private and synchronize moderation through explicit commands.                       |
+| [ADR-014](implemented/ADR-014-isolate-and-atomically-rebuild-local-previews.md)                    | Isolate draft previews, preserve complete builds, and recover interrupted swaps.                         |
+| [ADR-015](implemented/ADR-015-use-typed-client-modules-and-load-demos-on-demand.md)                | Use typed browser modules, scoped demo loading, and compatibility checks.                                |
+| [ADR-016](implemented/ADR-016-version-formative-exercises-and-save-private-answers.md)             | Version canonical formative questions and keep saved answers private and separate from grading.          |
+| [ADR-017](implemented/ADR-017-export-an-authored-concept-graph-for-reader-agents.md)               | Publish authored concept navigation and read-only resources for students' own agents.                    |
+| [ADR-018](implemented/ADR-018-offer-optional-agent-explorations-with-separate-worked-reasoning.md) | Offer task-based optional explorations, prediction-led guidance, and separate worked reasoning.          |
+| [ADR-019](implemented/ADR-019-publish-self-study-through-a-pinned-public-exporter.md)              | Build public self-study modules through a pinned exporter without hosting its authoring service.         |
+| [ADR-020](implemented/ADR-020-generate-reading-and-lecture-pdfs-from-versioned-sources.md)         | Regenerate portable reading and lecture artifacts from reviewed sources.                                 |
+| [ADR-021](implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)             | Compare fresh local-model, comparison-model, and fleet builds of a stable application brief.             |
+| [ADR-022](implemented/ADR-022-use-a-shared-runtime-protocol-and-bounded-pressure-experiments.md)   | Use a shared measurement protocol and bounded, cumulative pressure experiments.                          |
+| [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)               | Test setup and change friction through equivalent, time-bounded cross-team audits.                       |
+| [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)          | Keep prose changes inspectable and derive publication dates from complete source history.                |
 
 ## Authoring and maintenance
 

@@ -56,6 +56,14 @@ test("instructor manages a run; student submits privately; rubric grading and re
     await expect(
       page.getByRole("heading", { name: `${phase} groups`, exact: true }),
     ).toBeVisible();
+    const formation = page.locator('form[data-form="formation"]');
+    await formation
+      .getByLabel("Formation change reason", { exact: true })
+      .fill("Open the synthetic formation period");
+    await formation
+      .getByRole("button", { name: "Open group formation", exact: true })
+      .click();
+    await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
     const groups = page.locator('form[data-form="groups"]');
     if (phase === "Establish") {
       await groups
@@ -66,6 +74,10 @@ test("instructor manages a run; student submits privately; rubric grading and re
         .getByRole("button", { name: "Add a group", exact: true })
         .click();
       await groups.locator('[name="members-1"]').selectOption(["github:3"]);
+      for (const index of [0, 1])
+        await groups
+          .locator(`[name="exception-${index}"]`)
+          .fill("Approved small synthetic test cohort");
     } else
       await groups
         .getByRole("button", { name: "Reuse Establish groups", exact: true })
@@ -78,6 +90,13 @@ test("instructor manages a run; student submits privately; rubric grading and re
       .click();
     await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
     await expect(groups.getByRole("group").first()).toContainText("group-01");
+    await formation
+      .getByLabel("Formation change reason", { exact: true })
+      .fill("Publish the completed allocation");
+    await formation
+      .getByRole("button", { name: "Publish approved groups", exact: true })
+      .click();
+    await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
     await page
       .getByRole("button", { name: "Phase administration", exact: true })
       .click();

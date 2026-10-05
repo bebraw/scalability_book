@@ -4,6 +4,10 @@ import { spawnSync } from "node:child_process";
 import { authHash } from "../worker/course-auth.ts";
 import type { AdministrationRevisions } from "../shared/course-administration.ts";
 import type {
+  GroupProposal,
+  WorkingAgreement,
+} from "../shared/course-formation.ts";
+import type {
   Course,
   Envelope,
   CourseFile,
@@ -77,8 +81,16 @@ course.students = [
 ];
 for (const phase of Object.values(course.phases)) {
   phase.groups = [
-    { id: "red", members: ["github:1"] },
-    { id: "blue", members: ["github:2"] },
+    {
+      id: "red",
+      members: ["github:1"],
+      exception: "Approved small synthetic fixture",
+    },
+    {
+      id: "blue",
+      members: ["github:2"],
+      exception: "Approved small synthetic fixture",
+    },
   ];
   phase.audits = [
     { from: "red", to: "blue" },
@@ -262,6 +274,114 @@ const emailView = await call<{ staff: boolean; user: { id: string } }>(
 assert.equal(emailView.staff, false);
 assert.equal(emailView.user.id, emailStudent.id);
 assert.equal((await verify(token)).status, 400);
+let formationView = await call<{
+  config: Envelope<Course>;
+  administration: AdministrationRevisions;
+}>(`/${id}`);
+const formationDates = {
+  deadline: new Date(Date.now() + 3 * 86400000).toISOString(),
+  correctionUntil: new Date(Date.now() + 5 * 86400000).toISOString(),
+};
+await call(`/${id}/formation/challenge`, "PUT", {
+  expected: formationView.administration.groups.challenge,
+  ...formationDates,
+  reason: "Open synthetic formation in D1",
+});
+assert.deepEqual(
+  await call(
+    `/${id}/group-preference/challenge`,
+    "PUT",
+    {
+      expected: null,
+      request: "assign",
+      available: true,
+      availability: "PRIVATE synthetic availability",
+      support: "PRIVATE synthetic matching constraint",
+    },
+    emailCookie,
+  ),
+  { ok: true },
+);
+assert.deepEqual(
+  await call(
+    `/${id}/group-proposal/challenge`,
+    "PUT",
+    {
+      expected: null,
+      members: [emailStudent.id, "github:2"],
+      name: "Worker pair",
+    },
+    emailCookie,
+  ),
+  { ok: true },
+);
+const proposed = await call<{ config: Envelope<Course> }>(
+  `/${id}`,
+  "GET",
+  undefined,
+  emailCookie,
+);
+const proposal = proposed.config.value.phases.challenge.formation!
+  .proposals[0] as GroupProposal;
+assert.deepEqual(
+  await call(
+    `/${id}/group-confirmation/challenge/${proposal.id}`,
+    "PUT",
+    { expected: proposal.revision, confirm: true },
+    student,
+  ),
+  { ok: true },
+);
+const otherView = await call<{ config: Envelope<Course> }>(
+  `/${id}`,
+  "GET",
+  undefined,
+  student,
+);
+assert.equal(JSON.stringify(otherView).includes("PRIVATE"), false);
+assert.equal(otherView.config.value.phases.challenge.groups.length, 0);
+formationView = await call(`/${id}`);
+await call(`/${id}/schedule/challenge`, "PUT", {
+  expected: formationView.administration.schedule.challenge,
+  ...formationView.config.value.phases.challenge,
+  audits: [],
+  reason: "Clear unused future audit allocation",
+});
+formationView = await call(`/${id}`);
+await call(`/${id}/groups/challenge`, "PUT", {
+  expected: formationView.administration.groups.challenge,
+  groups: [
+    {
+      id: "blue",
+      members: ["github:1", "github:2", emailStudent.id],
+      proposal: proposal.id,
+      name: "Worker trio",
+    },
+  ],
+  reason: "Approve confirmed pair with instructor-allocated third member",
+});
+formationView = await call(`/${id}`);
+await call(`/${id}/formation/challenge`, "PUT", {
+  expected: formationView.administration.groups.challenge,
+  ...formationDates,
+  publish: true,
+  reason: "Publish synthetic approved groups",
+});
+const agreement = await call<Envelope<WorkingAgreement>>(
+  `/${id}/working-agreement/challenge/blue`,
+  "PUT",
+  {
+    expected: null,
+    text: "Synthetic weekly meeting, shared review and missed-commitment agreement.",
+  },
+  emailCookie,
+);
+assert.equal(agreement.value.group, "blue");
+assert.deepEqual(
+  (await call<{ config: Envelope<Course> }>(`/${id}`)).config.value.phases
+    .establish.groups,
+  course.phases.establish.groups,
+);
 assert.equal(
   (
     await fetch(new URL(`/api/course-auth/mock-inbox?course=${id}`, base), {
@@ -288,5 +408,5 @@ assert.equal(
   401,
 );
 console.log(
-  "Local Worker check passed: GitHub and email sessions, single-use D1 links, institutional enrollment, guarded history, streamed R2 files, immutable snapshots, audit binding and access isolation.",
+  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment, consent/publication and private matching, working agreement, guarded history, streamed R2 files, immutable snapshots and access isolation.",
 );

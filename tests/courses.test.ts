@@ -91,9 +91,21 @@ function fixture(t: test.TestContext) {
         auditAt: auditClose,
         evidenceAt: "2026-01-07T00:00:00.000Z",
         groups: [
-          { id: "red", members: [alice.id] },
-          { id: "blue", members: [bob.id] },
-          { id: "green", members: [carol.id] },
+          {
+            id: "red",
+            members: [alice.id],
+            exception: "Approved small synthetic fixture",
+          },
+          {
+            id: "blue",
+            members: [bob.id],
+            exception: "Approved small synthetic fixture",
+          },
+          {
+            id: "green",
+            members: [carol.id],
+            exception: "Approved small synthetic fixture",
+          },
         ],
         audits: [
           { from: "red", to: "blue" },
@@ -338,6 +350,17 @@ test("group allocation generates identifiers and retains established IDs across 
     name: "New cohort",
   });
   const id = record.value.id;
+  for (const phase of ["establish", "challenge"] as const) {
+    const state = await f.good<{ administration: AdministrationRevisions }>(
+      `/${id}`,
+    );
+    await f.good(`/${id}/formation/${phase}`, "PUT", {
+      expected: state.administration.groups[phase],
+      deadline: "2026-01-02T00:00:00.000Z",
+      correctionUntil: "2026-01-03T00:00:00.000Z",
+      reason: "Open synthetic group formation",
+    });
+  }
   let view = await f.good<{ administration: AdministrationRevisions }>(
     `/${id}`,
   );
@@ -352,12 +375,22 @@ test("group allocation generates identifiers and retains established IDs across 
     "PUT",
     {
       expected: view.administration.groups.establish,
-      groups: [{ id: "", members: [alice.id] }],
+      groups: [
+        {
+          id: "",
+          members: [alice.id],
+          exception: "Approved small synthetic fixture",
+        },
+      ],
       reason: "Initial allocation",
     },
   );
   assert.deepEqual(allocated.value.phases.establish.groups, [
-    { id: "group-01", members: [alice.id] },
+    {
+      id: "group-01",
+      members: [alice.id],
+      exception: "Approved small synthetic fixture",
+    },
   ]);
   const next = await f.good<Envelope<Course>>(
     `/${id}/groups/challenge`,
@@ -394,7 +427,13 @@ test("scores cannot bypass phase hurdles; pending differs from explicitly assess
           freezeAt: freeze,
           auditAt: auditClose,
           evidenceAt: after,
-          groups: [{ id: "red", members: [alice.id] }],
+          groups: [
+            {
+              id: "red",
+              members: [alice.id],
+              exception: "Approved small synthetic fixture",
+            },
+          ],
           audits: [],
           published: true,
         },

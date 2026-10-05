@@ -8,9 +8,10 @@ Book feedback moderators do not automatically have access to course records.
 ## Agreed revision and current behavior
 
 This guide describes the course workspace with four focused administration forms, institutional enrollment and email sessions, and retained GitHub staff access.
-The [accepted ADRs](adrs/README.md#accepted) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
+The [ADRs](adrs/README.md) record the agreed revision: separate administration workflows, institutional roster import and email magic links, three-person group formation, phase checklists, Cloudflare course email, and an isolated teacher simulation available in the website and local development.
 Institutional imports, corrections, account activity and the magic-link flow work with local mock mail and a gated Cloudflare mail adapter.
-Production email provisioning, student group proposals and approvals, phase checklists and teacher simulation remain pending.
+Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
+Production email provisioning, recorded late-arrival catch-up/withdrawal workflows, phase checklists and teacher simulation remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -31,6 +32,7 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
   **Add or correct one student** handles later individual enrollment and identifier corrections.
   The roster shows whether email access is ready and the last successful email sign-in.
 - **Groups** allocates students for the selected phase and lists those awaiting allocation.
+  Open the proposal period, review confirmations and private matching notes, save the allocation, then publish approved groups.
   Add group cards and select their members.
   New identifiers are generated automatically, starting at `group-01`; generated numbers are not reused after removing an unused group.
   Later phases can reuse Establish groups and their identifiers.
@@ -101,11 +103,46 @@ This local flow is not yet the isolated teacher simulation in ADR-007.
 
 ## Instructor group allocation
 
+In **Groups**, set the formation deadline and the end of its correction window, and select **Open group formation**.
+Both dates must precede the phase's implementation deadline.
+The student **Groups** tab offers **Propose a group** and **Assign me a group**, accepting partial proposals.
+The proposer confirms their own participation; every invited member confirms separately.
+Editing a proposal resets confirmations, and a student can confirm only one pending proposal at a time.
+Each preference/proposal carries a revision; stale responses conflict without silently overwriting another response.
+Student changes update only their own preference or an authorized proposal on the latest snapshot, retaining course history.
+
+Students may opt in to show their name as available to join.
+Meeting availability and support constraints are private to that student and staff; other students see only the name/opt-in signal.
+Invitations are visible only to their proposed members and staff.
+Student mutation responses acknowledge a save without exposing the private course snapshot.
+
+Use **Add proposal to allocation** after all proposed members have confirmed.
+A confirmed pair can be completed with an instructor-allocated third member.
+Allocate others through group cards, reviewing **Private matching notes and allocation requests** as needed.
 Group cards display the saved identifier and a multiple selection of enrolled students.
 Each student belongs to one group per phase.
+Three members is the default; a fourth or smaller group needs an explicit instructor exception recorded with the allocation.
+New or changed groups cannot exceed four members, including through the legacy setup API.
+Unchanged historical larger groups retain their frozen evidence; use later phases to bring new allocations within policy.
+An optional display name does not change the generated identifier (`group-01`, shown as **Group 01**).
+
+After saving, enter a formation change reason and select **Publish approved groups**.
+Every enrolled student needs an allocation, and size exceptions need recorded approval before publication.
+Publication closes student proposals and announces approved groups and the correction window.
+Provisional allocation in this flow does not grant submission/upload access and is hidden from students until published.
+Initial allocations through the focused Groups API require opening formation first.
+Retained legacy setup integrations remain staff-approved allocations without a proposal period; they enforce size rules and immutable membership/history constraints.
+
 Use **Reuse Establish groups** when membership is stable; future-phase membership can change.
+Open and publish formation for each later phase when using the focused workflow.
+Reused identifiers, display names and exceptions remain; earlier proposals do not become new invitations.
+Once a submission freezes, change its membership in a later phase to retain original submission and assessment ownership.
+Unfrozen allocations can be corrected by staff with a recorded reason; announced correction dates remain in history.
 Clear audit assignments before removing an unused group.
 Groups with saved submissions, audits or assessments cannot be removed.
+Approved members can save a short shared working agreement in the student Groups view.
+Agreement revisions use the course store/history, are private to the group and staff, and contribute no rubric points.
+Late imports reach the unassigned queue; dedicated recorded catch-up arrangements and withdrawal actions remain pending in ADR-004.
 The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
 With only one group or a missing frozen implementation, staff arrange and record a fallback audit.
@@ -268,13 +305,14 @@ The application development server uses its own mock inbox independently of thes
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
 
 The browser test covers roster preview and incremental enrollment, separate group allocation and phase administration, student archive freezing, private portfolio submission, staff scoring, missing-work assessments, incomplete release rejection, phase release, CSV download, mobile layout and accessibility.
 The email browser test covers mapped CSV import, manual late enrollment, account status, mock-inbox login, reuse rejection, email correction, privacy and accessibility.
+Formation browser/API checks cover a confirmed pair completed into a trio, a fourth-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, private read/write responses, publication/access separation, working agreements, mobile/accessibility and later-phase transfers retaining frozen work and grade history.
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
 The mail tests exercise the actual Worker adapter with a mocked Cloudflare binding, checking the enablement boundary, `waitUntil`, pending-link safety, provider failures, fixed sender, escaped templates and absence of a deployed mock inbox.
 They do not send real email.

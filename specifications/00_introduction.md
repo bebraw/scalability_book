@@ -16,7 +16,23 @@ Each later phase also benefits from your growing domain knowledge, so the compar
 
 ### Shared work and individual assessment
 
-Register one group identifier and its membership with the course.
+Groups normally have three members.
+A fourth member needs instructor approval; four is the maximum for new groups.
+An explicitly approved smaller group may continue after a withdrawal when transferring members would be impractical.
+
+Use the announced formation period to **Propose a group** or request **Assign me a group**.
+A pair can propose together while awaiting a third member.
+Every proposed member confirms participation; the proposer is not a permanent group leader.
+The instructor reviews proposals, allocates unassigned students and publishes approved groups with a correction window.
+The system assigns a stable course identifier such as **Group 01**; an optional display name does not replace it.
+Only approved membership grants access to a group submission.
+
+You may opt in to show your name as available to join a group.
+Send meeting availability and relevant support constraints privately to the instructor; do not put institutional emails, student IDs or personal constraints in a class directory or technical bundle.
+Agree briefly on availability, communication and handling missed commitments.
+This working agreement helps the group operate and is not an additional graded deliverable.
+Contact the instructor for a late-arrival catch-up arrangement or withdrawal; neither should erase submitted work or silently waive passing requirements.
+
 Keep the group stable across Establish, Challenge, and Compare where practical; agree membership changes with the teaching staff and record which group each student belongs to for the affected phase.
 One member submits the group bundle on behalf of the registered group, and every member remains responsible for understanding and accepting its work.
 

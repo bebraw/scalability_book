@@ -75,10 +75,18 @@ This cannot handle every cohort size or later withdrawal without unnecessary dis
 
 ## Implementation and verification
 
-Group proposals, confirmation, generated IDs, and the three/four-member policy are pending.
-Verify a full trio, a pair awaiting allocation, an unassigned student, an approved fourth member, and a late arrival.
-Verify phase transfers preserve the frozen membership and grade history of earlier work.
-Update the [course project introduction](../../../specifications/00_introduction.md) and course-system guide when the workflow is available.
+The formation API and staff/student interface implement deadlines, partial proposals, individual confirmations, assignment requests, opt-in names, private matching notes, instructor allocation and publication/correction dates.
+Three members is the default; new/changed groups are limited to four, with an explicit instructor exception for any other size.
+Stable generated IDs and optional display names can be reused across phases.
+Later-phase transfers preserve frozen membership and assessment history.
+Shared working agreements are private group records and are not graded.
+Student mutation responses acknowledge a save without exposing the private course snapshot.
+
+API/browser checks cover a confirmed pair completed into a trio, a four-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, privacy, publication/access separation, working agreements and retained frozen evidence/grades after transfers.
+The [project introduction](../../../specifications/00_introduction.md#shared-work-and-individual-assessment) and [operating guide](../../course-system.md#instructor-group-allocation) describe the workflow.
+
+This ADR remains Accepted: later imports reach the unassigned queue, but dedicated catch-up arrangements, withdrawal actions and their review tasks remain outstanding.
+Withdrawal/export handling needs instructor confirmation before defining that action.
 
 ## Open questions
 
@@ -87,5 +95,5 @@ Update the [course project introduction](../../../specifications/00_introduction
 
 ## References
 
-- [ADR-002: focused administration](ADR-002-separate-course-administration-workflows.md).
+- [ADR-002: focused administration](../implemented/ADR-002-separate-course-administration-workflows.md).
 - [ADR-009: frozen membership and evidence history](../implemented/ADR-009-preserve-evidence-and-control-submission-access.md).

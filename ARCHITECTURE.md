@@ -34,6 +34,12 @@ Course sign-in enters through `/api/course-auth/` in both adapters.
 `site/scripts/course-signin.ts` renders the email request and explicit link-confirmation flow.
 `worker/course-mail.ts` adapts login messages to Cloudflare Email Sending with a fixed course sender; the Worker selects it only when its binding and explicit enablement variable are present.
 
+Group formation enters through `/api/courses/:course/formation/:phase`, student preference/proposal/confirmation routes and the existing staff Groups save.
+`shared/course-formation.ts` owns types and public projection; `worker/course-formation.ts` owns validation and consent changes; `site/scripts/course-formation.ts` renders the staff/student flow.
+Phase formation state lives in the course snapshot, with history and atomic course revision checks.
+Staff Groups fingerprints cover allocation and formation responses; student actions also check their own preference/proposal revision.
+Working agreements are separate ungraded records, private to their group and staff.
+
 ## State and access
 
 | Data                                   | Local storage                       | Production storage                      |
@@ -89,8 +95,7 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Focused administration](docs/adrs/accepted/ADR-002-separate-course-administration-workflows.md): the four forms and independent save boundaries are implemented; account status and institutional enrollment are implemented; student proposals/approvals await the group revision.
-- [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): student proposals and instructor allocation, normally three members and at most four.
+- [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication and working agreements are implemented; recorded late-arrival catch-up and withdrawal tasks remain.
 - [Submission expectations](docs/adrs/accepted/ADR-005-submit-reproducible-source-with-phase-checklists.md): small reproducible bundles and clear phase requirements.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration is implemented; domain setup, verified Gmail forwarding, live delivery verification and the teacher simulation's mock-mail boundary remain outstanding.
 - [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated mock workflows in both the instructor website and local development.

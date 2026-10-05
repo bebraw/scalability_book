@@ -40,6 +40,11 @@ import {
 import { boundedJson, sameOrigin } from "./course-http.ts";
 import type { CourseAuthStore } from "./course-auth-store.ts";
 import type { CourseStore, FileStore } from "./course-store.ts";
+import {
+  studentFormation,
+  type WorkingAgreement,
+} from "../shared/course-formation.ts";
+import { configureFormation, updateFormation } from "./course-formation.ts";
 export interface CourseUser {
   id: string;
   login: string;
@@ -79,7 +84,11 @@ function team(course: Course, phase: Phase, group: string) {
   return result;
 }
 function inTeam(course: Course, phase: Phase, group: string, user: CourseUser) {
-  return team(course, phase, group).members.includes(user.id);
+  return (
+    (!course.phases[phase].formation ||
+      Boolean(course.phases[phase].formation?.publishedAt)) &&
+    team(course, phase, group).members.includes(user.id)
+  );
 }
 function parseAdjustment(value: unknown, course: Course): Adjustment {
   const a = obj(value);
@@ -128,7 +137,7 @@ function visibleRecords(
   );
   for (const phase of phases)
     for (const group of course.phases[phase].groups)
-      if (group.members.includes(user.id))
+      if (inTeam(course, phase, group.id, user))
         ownGroups.add(`${phase}:${group.id}`);
   const canRead = (s: Submission) =>
     staff ||
@@ -390,6 +399,35 @@ export async function handleCourses(
             adjustments: course.adjustments.filter(
               (a) => a.student === user.id,
             ),
+            phases: Object.fromEntries(
+              phases.map((phase) => [
+                phase,
+                {
+                  ...course.phases[phase],
+                  groups:
+                    course.phases[phase].formation &&
+                    !course.phases[phase].formation!.publishedAt
+                      ? []
+                      : course.phases[phase].groups.map((g) => ({
+                          ...g,
+                          ...(g.exception
+                            ? {
+                                exception:
+                                  "Instructor-approved group size exception.",
+                              }
+                            : {}),
+                        })),
+                  ...(course.phases[phase].formation
+                    ? {
+                        formation: studentFormation(
+                          course.phases[phase].formation!,
+                          user.id,
+                        ),
+                      }
+                    : {}),
+                },
+              ]),
+            ) as Course["phases"],
           };
       const results = (
         staff ? students : students.filter((s) => s.id === user.id)
@@ -417,6 +455,16 @@ export async function handleCourses(
             }
           : {}),
         ...visible,
+        agreements: records.filter(
+          (r) =>
+            r.kind === "working-agreement" &&
+            (staff ||
+              course.phases[(r.value as WorkingAgreement).phase].groups.some(
+                (g) =>
+                  g.id === (r.value as WorkingAgreement).group &&
+                  g.members.includes(user.id),
+              )),
+        ),
         results,
       });
     }
@@ -571,6 +619,68 @@ export async function handleCourses(
     requireThat(phases.includes(phaseText as Phase), "Unknown phase.", 404);
     const phase = phaseText as Phase;
     const schedule = course.phases[phase];
+    if (
+      [
+        "formation",
+        "group-preference",
+        "group-proposal",
+        "group-confirmation",
+      ].includes(action)
+    ) {
+      requireThat(request.method === "PUT", "Method not allowed.", 405);
+      const body = await boundedJson(request);
+      if (action === "formation" && !schedule.formation)
+        requireThat(
+          !schedule.published &&
+            now < schedule.freezeAt &&
+            !values<Submission>("submission").some(
+              (s) => s.phase === phase && s.frozenAt,
+            ),
+          "Open formation before work freezes. Existing frozen membership must be retained.",
+          409,
+        );
+      const next =
+        action === "formation"
+          ? (requireThat(staff && !subject, "Staff access required.", 403),
+            configureFormation(course, phase, body, now))
+          : updateFormation(course, phase, action, subject, body, user.id, now);
+      const saved = await save(
+        "course",
+        "",
+        "",
+        next,
+        config.revision,
+        action === "formation"
+          ? text(body.reason, "Formation change reason", 2000, true)
+          : "Student group formation response",
+      );
+      return reply(action === "formation" ? saved : { ok: true });
+    }
+    if (action === "working-agreement") {
+      requireThat(
+        subject &&
+          request.method === "PUT" &&
+          (staff || inTeam(course, phase, subject, user)),
+        "Group member or staff access required.",
+        403,
+      );
+      const body = await boundedJson(request);
+      const value: WorkingAgreement = {
+        phase,
+        group: subject,
+        text: text(body.text, "Working agreement", 2000, true),
+      };
+      return reply(
+        await save(
+          "working-agreement",
+          phase,
+          subject,
+          value,
+          body.expected,
+          "Group working agreement updated",
+        ),
+      );
+    }
     if (action === "publish") {
       requireThat(
         staff && request.method === "POST",
@@ -756,7 +866,7 @@ export async function handleCourses(
     if (action === "submission") {
       const group = team(course, phase, subject);
       requireThat(
-        staff || group.members.includes(user.id),
+        staff || inTeam(course, phase, group.id, user),
         "Group access required.",
         403,
       );

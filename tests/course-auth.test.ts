@@ -134,7 +134,13 @@ test("institutional imports and corrections preserve legacy ownership, groups an
     ],
   };
   for (const phase of phases)
-    legacy.phases[phase].groups = [{ id: "red", members: ["github:2"] }];
+    legacy.phases[phase].groups = [
+      {
+        id: "red",
+        members: ["github:2"],
+        exception: "Retained historical group",
+      },
+    ];
   await f.course(`/${id}/setup`, "PUT", {
     ...legacy,
     expected: initial.revision,

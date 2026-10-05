@@ -21,6 +21,8 @@ import {
   type RosterPreview,
 } from "../../shared/course-administration.ts";
 import { e, input, field, localDate } from "./course-ui.ts";
+import { groupLabel } from "../../shared/course-formation.ts";
+import { staffFormation } from "./course-formation.ts";
 
 const labels: Record<AdministrationSection, string> = {
   students: "Students",
@@ -37,7 +39,7 @@ export function administrationNavigation(current: string) {
 }
 
 export function groupRow(course: Course, group: Group, index: number) {
-  return `<fieldset class="course-group-row" data-group-row="${index}"><legend>${e(group.id || "New group")}</legend><input type="hidden" name="id-${index}" value="${e(group.id)}"><label class="course-field">Members<select multiple name="members-${index}" size="4">${course.students.map((s) => `<option value="${e(s.id)}" ${group.members.includes(s.id) ? "selected" : ""}>${e(s.name)}${s.login ? ` (${e(s.login)})` : ""}</option>`).join("")}</select><small>Choose multiple names with Command/Ctrl-click. Every student can belong to one group in a phase.</small></label><button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
+  return `<fieldset class="course-group-row" data-group-row="${index}"><legend>${e(group.id ? groupLabel(group) : "New group")}</legend><p class="course-muted">${e(group.id || "Identifier assigned on save")}</p><input type="hidden" name="id-${index}" value="${e(group.id)}"><input type="hidden" name="proposal-${index}" value="${e(group.proposal || "")}">${input(`name-${index}`, "Group display name (optional)", group.name ?? "", false)}<label class="course-field">Members<select multiple name="members-${index}" size="4">${course.students.map((s) => `<option value="${e(s.id)}" ${group.members.includes(s.id) ? "selected" : ""}>${e(s.name)}${s.login ? ` (${e(s.login)})` : ""}</option>`).join("")}</select><small>Choose three members normally; four is the maximum for new allocations. Every student can belong to one group in a phase.</small></label>${field(`exception-${index}`, "Instructor group size exception (required unless three members)", group.exception ?? "", 2000)}<button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
 }
 
 export function renderAdministration(
@@ -46,6 +48,7 @@ export function renderAdministration(
   section: AdministrationSection,
   access: AccessActivity[] = [],
   local = false,
+  now = new Date().toISOString(),
 ) {
   const course = record.value,
     schedule = course.phases[phase];
@@ -67,7 +70,7 @@ export function renderAdministration(
     const unassigned = course.students.filter(
       (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
     );
-    return `<section class="course-section"><h3>${title(phase)} groups</h3><p>Allocate enrolled students to groups. New groups receive a course identifier when saved. Reuse Establish groups in later phases to keep their identifiers.</p><aside class="course-note"><strong>${unassigned.length} students awaiting allocation</strong><p>${e(unassigned.map((s) => s.name).join(", ") || "Everyone is assigned.")}</p></aside><form data-form="groups" data-next-group="${schedule.groups.length}"><div data-group-rows class="course-group-grid">${schedule.groups.map((g, i) => groupRow(course, g, i)).join("")}</div><div class="course-form-actions"><button type="button" data-add-group class="course-quiet" ${!course.students.length ? "disabled" : ""}>Add a group</button>${phase !== "establish" ? '<button type="button" data-reuse-groups class="course-quiet">Reuse Establish groups</button>' : ""}</div><p class="course-muted">Frozen membership and groups with saved evidence are retained. Clear any audit assignments before removing an unused group.</p>${actions("Save groups")}</form></section>`;
+    return `<section class="course-section"><h3>${title(phase)} groups</h3><p>Allocate enrolled students to groups. New groups receive a course identifier when saved. Reuse Establish groups in later phases to keep their identifiers.</p>${staffFormation(course, phase, now)}<aside class="course-note"><strong>${unassigned.length} students awaiting allocation</strong><p>${e(unassigned.map((s) => s.name).join(", ") || "Everyone is assigned.")}</p></aside><form data-form="groups" data-next-group="${schedule.groups.length}"><div data-group-rows class="course-group-grid">${schedule.groups.map((g, i) => groupRow(course, g, i)).join("")}</div><div class="course-form-actions"><button type="button" data-add-group class="course-quiet" ${!course.students.length ? "disabled" : ""}>Add a group</button>${phase !== "establish" ? '<button type="button" data-reuse-groups class="course-quiet">Reuse Establish groups</button>' : ""}</div><p class="course-muted">Frozen membership and groups with saved evidence are retained. Clear any audit assignments before removing an unused group.</p>${actions("Save groups")}</form></section>`;
   }
   if (section === "schedule") {
     return `<section class="course-section"><h3>${title(phase)} administration</h3><p>Prepare deadlines and audit assignments for this phase. Save groups before arranging their audits.</p><form data-form="schedule"><div class="course-deadline-inputs">${input("freezeAt", "Implementation deadline", localDate(schedule.freezeAt), true, "datetime-local")}${input("auditAt", "Audit closes / class access opens", localDate(schedule.auditAt), true, "datetime-local")}${input("evidenceAt", "Evidence and portfolio deadline", localDate(schedule.evidenceAt), true, "datetime-local")}</div><p>Saved groups: ${e(schedule.groups.map((g) => g.id).join(", ") || "none yet")}.</p>${field("audits", "Audit assignments: auditor-group > target-group (one per line)", schedule.audits.map((a) => `${a.from} > ${a.to}`).join("\n"), 5000)}<button type="button" data-match="${phase}" class="course-quiet">Fill circular audit assignments</button>${actions("Save phase administration")}</form></section>`;
@@ -143,6 +146,9 @@ export function administrationPayload(
         return {
           id: val(`id-${index}`),
           members: values.getAll(`members-${index}`).map(String),
+          name: val(`name-${index}`),
+          exception: val(`exception-${index}`),
+          proposal: val(`proposal-${index}`),
         };
       }),
     };

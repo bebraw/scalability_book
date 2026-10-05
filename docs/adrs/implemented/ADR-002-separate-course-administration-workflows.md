@@ -1,6 +1,6 @@
 # ADR-002: Separate course administration workflows
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -71,13 +71,16 @@ Group allocation generates identifiers and can reuse established groups in later
 The review queue links unassigned students and missing audit arrangements.
 The combined setup API remains available for existing integrations but is no longer the browser interface.
 
-Institutional CSV mapping, manual enrollment and sign-in status are now implemented with ADR-003's local mock-email flow.
-The ADR remains Accepted: student proposals, confirmations and approval still depend on ADR-004.
+Institutional CSV mapping, manual enrollment and sign-in status are implemented with ADR-003's email flow.
+Groups now includes student proposals/confirmations, private matching notes, allocation, size exceptions and publication.
+The group fingerprint covers formation responses; proposals do not grant submission access and unpublished allocation is hidden from students.
+The focused workflows recorded here are implemented; ADR-004 retains the remaining enrollment-lifecycle work.
 API tests verify unrelated concurrent saves survive, edits to the same form conflict, previews do not write, student access cannot invoke staff operations and frozen membership/deadline locks remain enforced.
 The course browser test exercises the four forms alongside submission, assessment and release.
-Update [course-system.md](../../course-system.md) when the new workflows exist.
+Formation browser/API checks cover consent, publication, privacy, correction dates and working agreements.
+See [course-system.md](../../course-system.md) for operating instructions and remaining boundaries.
 
 ## References
 
-- [ADR-003: enrollment and identity](../implemented/ADR-003-import-students-and-use-email-magic-links.md).
-- [ADR-004: group formation](ADR-004-form-three-person-groups-with-instructor-oversight.md).
+- [ADR-003: enrollment and identity](ADR-003-import-students-and-use-email-magic-links.md).
+- [ADR-004: group formation](../accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md).

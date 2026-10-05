@@ -1,5 +1,10 @@
-import { e, option, field, input } from "./course-ui.ts";
+import { e, option, field, input, localDate } from "./course-ui.ts";
 import { courseSignIn } from "./course-signin.ts";
+import { studentGroups } from "./course-formation.ts";
+import {
+  groupLabel,
+  type WorkingAgreement,
+} from "../../shared/course-formation.ts";
 import { rosterHeaders } from "../../shared/course-roster.ts";
 import {
   administrationSections,
@@ -46,6 +51,7 @@ interface View {
   projects: Envelope<Grade>[];
   individuals: Envelope<Grade>[];
   files: Envelope<CourseFile>[];
+  agreements: Envelope<WorkingAgreement>[];
   results: { student: Student; result: Result }[];
 }
 interface Listing {
@@ -135,10 +141,12 @@ async function openCourse(id: string) {
   const myGroup = config.phases[phase].groups.find((g) =>
     g.members.includes(view!.user.id),
   );
-  if (!config.phases[phase].groups.some((g) => g.id === selectedGroup))
+  if (!view.staff) selectedGroup = myGroup?.id ?? "";
+  else if (!config.phases[phase].groups.some((g) => g.id === selectedGroup))
     selectedGroup =
       (view.staff ? config.phases[phase].groups[0] : myGroup)?.id ?? "";
-  if (!config.students.some((s) => s.id === selectedStudent))
+  if (!view.staff) selectedStudent = view.user.id;
+  else if (!config.students.some((s) => s.id === selectedStudent))
     selectedStudent =
       (view.staff ? config.students[0]?.id : view.user.id) ?? "";
   dirty = false;
@@ -151,6 +159,7 @@ function header() {
   <div class="course-phases" role="group" aria-label="Project phase">${phases.map((p, i) => `<button type="button" data-phase="${p}" aria-pressed="${phase === p}"><span>0${i + 1}</span> ${title(p)} <small>${course.phases[p].published ? "Results released" : "Results pending"}</small></button>`).join("")}</div>
   <nav class="course-tabs" aria-label="Course workspace">${[
     ["overview", view!.staff ? "Review queue" : "My progress"],
+    ...(!view!.staff ? [["formation", "Groups"]] : []),
     ["submission", "Group submission"],
     ["portfolio", view!.staff ? "Private portfolios" : "My portfolio"],
     ["audit", "Assigned audit"],
@@ -279,7 +288,7 @@ function overview() {
 }
 function groupPicker() {
   return view!.staff
-    ? `<label class="course-inline-field">Group <select data-group-select>${view!.config.value.phases[phase].groups.map((g) => option(g.id, g.id, selectedGroup)).join("")}</select></label>`
+    ? `<label class="course-inline-field">Group <select data-group-select>${view!.config.value.phases[phase].groups.map((g) => option(g.id, groupLabel(g), selectedGroup)).join("")}</select></label>`
     : `<p class="course-eyebrow">Group ${e(selectedGroup)}</p>`;
 }
 function studentPicker() {
@@ -452,6 +461,14 @@ function render() {
   }
   const screens: Record<string, () => string> = {
     overview,
+    formation: () =>
+      studentGroups(
+        view!.config.value,
+        phase,
+        view!.user.id,
+        view!.now,
+        view!.agreements,
+      ),
     submission,
     portfolio,
     audit,
@@ -467,6 +484,7 @@ function render() {
             section,
             view!.access,
             local,
+            view!.now,
           ),
       ]),
     ),
@@ -587,7 +605,7 @@ content.addEventListener("click", async (event) => {
   if (
     pending &&
     button.matches(
-      "[data-add-group],[data-remove-group],[data-reuse-groups],[data-match]",
+      "[data-add-group],[data-remove-group],[data-reuse-groups],[data-match],[data-allocate-proposal]",
     )
   ) {
     tell("Wait for the current save or upload to finish.");
@@ -680,6 +698,32 @@ content.addEventListener("click", async (event) => {
       dirty = true;
       return;
     }
+    if (button.dataset.allocateProposal) {
+      const p = view!.config.value.phases[phase].formation!.proposals.find(
+        (p) => p.id === button.dataset.allocateProposal,
+      )!;
+      const form = content.querySelector<HTMLFormElement>(
+        'form[data-form="groups"]',
+      )!;
+      const index = Number(form.dataset.nextGroup ?? "0");
+      form
+        .querySelector("[data-group-rows]")!
+        .insertAdjacentHTML(
+          "beforeend",
+          groupRow(
+            view!.config.value,
+            { id: "", members: p.members, name: p.name, proposal: p.id },
+            index,
+          ),
+        );
+      form.dataset.nextGroup = String(index + 1);
+      button.disabled = true;
+      dirty = true;
+      tell(
+        "Proposal added to this unsaved allocation. Complete any partial group, then save and publish.",
+      );
+      return;
+    }
     if (button.hasAttribute("data-remove-group")) {
       button.closest("[data-group-row]")!.remove();
       dirty = true;
@@ -690,7 +734,7 @@ content.addEventListener("click", async (event) => {
       const list = form.querySelector<HTMLElement>("[data-group-rows]")!;
       const groups = view!.config.value.phases.establish.groups;
       list.innerHTML = groups
-        .map((g, i) => groupRow(view!.config.value, g, i))
+        .map((g, i) => groupRow(view!.config.value, { ...g, proposal: "" }, i))
         .join("");
       form.dataset.nextGroup = String(groups.length);
       dirty = true;
@@ -830,7 +874,51 @@ content.addEventListener("submit", async (event) => {
     }
     const v = view!,
       course = v.config.value;
-    if (kind === "student") {
+    if (kind === "formation") {
+      const previous = course.phases[phase].formation;
+      const dates = Object.fromEntries(
+        ["deadline", "correctionUntil"].map((key) => {
+          const old = previous?.[key as "deadline" | "correctionUntil"];
+          return [
+            key,
+            old && val(key) === localDate(old)
+              ? old
+              : new Date(val(key)).toISOString(),
+          ];
+        }),
+      );
+      await api(route("formation"), "PUT", {
+        expected: v.administration!.groups[phase],
+        ...dates,
+        publish: submit?.value === "publish",
+        reason: val("reason"),
+      });
+    } else if (kind === "group-preference") {
+      await api(route(kind), "PUT", {
+        expected: val("expected") || null,
+        request: val("request"),
+        available: values.has("available"),
+        availability: val("availability"),
+        support: val("support"),
+      });
+    } else if (kind === "group-proposal") {
+      await api(route(kind, val("proposal")), "PUT", {
+        expected: val("expected") || null,
+        name: val("name"),
+        members: [v.user.id, ...values.getAll("members").map(String)],
+        close: submit?.value === "close",
+      });
+    } else if (kind === "group-confirmation") {
+      await api(route(kind, val("proposal")), "PUT", {
+        expected: val("expected"),
+        confirm: submit?.value === "confirm",
+      });
+    } else if (kind === "working-agreement") {
+      await api(route(kind, val("group")), "PUT", {
+        expected: val("expected") || null,
+        text: val("text"),
+      });
+    } else if (kind === "student") {
       await api(`/api/courses/${course.id}/students`, "PUT", {
         expected: v.administration!.students,
         format: "institutional",
