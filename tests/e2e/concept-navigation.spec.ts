@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { devices, expect, test, type Locator } from "@playwright/test";
 
 const camera = (graphic: Locator) =>
   graphic.evaluate(
@@ -133,82 +133,139 @@ test("wheel, keyboard, resize, and expansion preserve a useful camera location",
   await expect(graphic.locator("svg")).toHaveAttribute("viewBox", beforePrint!);
 });
 
-test("touch dragging and pinching work while taps still open references", async ({
-  browser,
-  baseURL,
-}) => {
-  const context = await browser.newContext({
+for (const device of ["iPhone 13", "iPad (gen 7)"])
+  test(`touch dragging and pinching work on ${device}`, async ({
+    browser,
+    browserName,
     baseURL,
-    hasTouch: true,
-    isMobile: true,
-    viewport: { width: 390, height: 844 },
+  }) => {
+    test.skip(browserName !== "chromium", "Native multi-touch input uses CDP.");
+    const context = await browser.newContext({
+      ...devices[device],
+      baseURL,
+    });
+    const page = await context.newPage();
+    await page.goto("/concepts/?view=all");
+    const map = page.locator("#concept-graph");
+    const graphic = map.locator(".concept-map-graphic");
+    await map.getByRole("button", { name: "Fit", exact: true }).tap();
+    await graphic.scrollIntoViewIfNeeded();
+    const box = (await graphic.boundingBox())!;
+    const x = box.x + box.width / 2,
+      y = box.y + box.height / 2;
+    const client = await context.newCDPSession(page);
+    const before = await camera(graphic);
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [
+        { id: 1, x: x - 40, y },
+        { id: 2, x: x + 40, y },
+      ],
+    });
+    // Several moves exercise the transfer of implicit SVG capture to the graph.
+    for (let step = 1; step <= 4; step++)
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [
+          { id: 1, x: x - 40 - 5 * step, y: y + 7.5 * step },
+          { id: 2, x: x + 40 + 15 * step, y: y + 7.5 * step },
+        ],
+      });
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect
+      .poll(async () => (await camera(graphic)).scale)
+      .toBeCloseTo(before.scale * 2, 1);
+    const zoomed = await camera(graphic);
+    sameScreenPosition(zoomed.x, before.x - 20 / zoomed.scale, zoomed.scale);
+    sameScreenPosition(zoomed.y, before.y - 30 / zoomed.scale, zoomed.scale);
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ id: 1, x, y }],
+    });
+    for (let step = 1; step <= 5; step++)
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ id: 1, x: x - 10 * step, y: y - 8 * step }],
+      });
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    expect((await camera(graphic)).x).toBeCloseTo(
+      zoomed.x + 50 / zoomed.scale,
+      1,
+    );
+    expect((await camera(graphic)).y).toBeCloseTo(
+      zoomed.y + 40 / zoomed.scale,
+      1,
+    );
+    await expect(page.locator(".concept-pane")).not.toBeVisible();
+    await map.getByLabel("Focus on").selectOption("queue");
+    const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
+    const nodeBox = (await queue.boundingBox())!;
+    const nodeX = nodeBox.x + nodeBox.width / 2,
+      nodeY = nodeBox.y + nodeBox.height / 2;
+    const focused = await camera(graphic);
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ id: 1, x: nodeX, y: nodeY }],
+    });
+    for (let step = 1; step <= 5; step++)
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ id: 1, x: nodeX + 10 * step, y: nodeY + 8 * step }],
+      });
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    expect((await camera(graphic)).x).toBeCloseTo(
+      focused.x - 50 / focused.scale,
+      1,
+    );
+    expect((await camera(graphic)).y).toBeCloseTo(
+      focused.y - 40 / focused.scale,
+      1,
+    );
+    await expect(page.locator(".concept-pane")).not.toBeVisible();
+    await expect(graphic).not.toHaveClass(/is-dragging/);
+    await queue.focus();
+    await queue.press("Enter");
+    const pane = page.getByRole("dialog", { name: "Queue", exact: true });
+    await expect(pane).toBeVisible();
+    await pane.getByRole("button", { name: "Close concept reference" }).click();
+    await map.getByRole("link", { name: "Explore Queue", exact: true }).tap();
+    await expect(
+      page.getByRole("dialog", { name: "Queue", exact: true }),
+    ).toBeVisible();
+    await context.close();
   });
-  const page = await context.newPage();
-  await page.goto("/concepts/?view=all");
-  const map = page.locator("#concept-graph");
-  const graphic = map.locator(".concept-map-graphic");
-  await map.getByRole("button", { name: "Fit", exact: true }).tap();
-  await graphic.scrollIntoViewIfNeeded();
-  const box = (await graphic.boundingBox())!;
-  const x = box.x + box.width / 2,
-    y = box.y + box.height / 2;
-  const client = await context.newCDPSession(page);
-  const before = await camera(graphic);
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchStart",
-    touchPoints: [
-      { id: 1, x: x - 40, y },
-      { id: 2, x: x + 40, y },
-    ],
+
+for (const device of ["iPhone 13", "iPad (gen 7)"])
+  test(`a single touch tap opens a concept reference on ${device}`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ ...devices[device], baseURL });
+    const page = await context.newPage();
+    await page.goto("/concepts/?view=all");
+    const map = page.locator("#concept-graph");
+    const graphic = map.locator(".concept-map-graphic");
+    await map.getByLabel("Focus on").selectOption("queue");
+    const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
+    await queue.scrollIntoViewIfNeeded();
+    const before = await camera(graphic);
+    // Tap without a preceding keyboard focus or mouse click.
+    await queue.tap();
+    const pane = page.getByRole("dialog", { name: "Queue", exact: true });
+    await expect(pane).toBeVisible();
+    await pane.getByRole("button", { name: "Close concept reference" }).tap();
+    await expect(pane).not.toBeVisible();
+    expect(await camera(graphic)).toEqual(before);
+    await queue.tap();
+    await expect(pane).toBeVisible();
+    await context.close();
   });
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchMove",
-    touchPoints: [
-      { id: 1, x: x - 60, y: y + 30 },
-      { id: 2, x: x + 100, y: y + 30 },
-    ],
-  });
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchEnd",
-    touchPoints: [],
-  });
-  await expect
-    .poll(async () => (await camera(graphic)).scale)
-    .toBeCloseTo(before.scale * 2, 1);
-  const zoomed = await camera(graphic);
-  sameScreenPosition(zoomed.x, before.x - 20 / zoomed.scale, zoomed.scale);
-  sameScreenPosition(zoomed.y, before.y - 30 / zoomed.scale, zoomed.scale);
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchStart",
-    touchPoints: [{ id: 1, x, y }],
-  });
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchMove",
-    touchPoints: [{ id: 1, x: x - 50, y: y - 40 }],
-  });
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchEnd",
-    touchPoints: [],
-  });
-  expect((await camera(graphic)).x).toBeCloseTo(
-    zoomed.x + 50 / zoomed.scale,
-    1,
-  );
-  expect((await camera(graphic)).y).toBeCloseTo(
-    zoomed.y + 40 / zoomed.scale,
-    1,
-  );
-  await expect(page.locator(".concept-pane")).not.toBeVisible();
-  await map.getByLabel("Focus on").selectOption("queue");
-  const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
-  await queue.focus();
-  await queue.press("Enter");
-  const pane = page.getByRole("dialog", { name: "Queue", exact: true });
-  await expect(pane).toBeVisible();
-  await pane.getByRole("button", { name: "Close concept reference" }).click();
-  await map.getByRole("link", { name: "Explore Queue", exact: true }).tap();
-  await expect(
-    page.getByRole("dialog", { name: "Queue", exact: true }),
-  ).toBeVisible();
-  await context.close();
-});

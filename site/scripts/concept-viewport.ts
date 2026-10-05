@@ -68,7 +68,9 @@ export class ConceptViewport {
         event.altKey
       )
         return;
-      event.preventDefault();
+      // Safari suppresses the tap's click when touch pointerdown is cancelled.
+      // touch-action: none handles native scrolling and zooming on this surface.
+      if (event.pointerType !== "touch") event.preventDefault();
       this.suppressClick = false;
       this.pointers.set(event.pointerId, this.local(event));
       this.beginGesture();
@@ -123,7 +125,10 @@ export class ConceptViewport {
       if (this.pointers.has(event.pointerId)) end(event);
     });
     graphic.addEventListener("lostpointercapture", (event) => {
-      if (this.pointers.has(event.pointerId)) end(event);
+      // A touch starts with implicit capture on an SVG child. Its loss bubbles
+      // here when capture moves to the graphic; that transfer is not an end.
+      if (event.target === graphic && this.pointers.has(event.pointerId))
+        end(event);
     });
     graphic.addEventListener("dragstart", (event) => event.preventDefault());
     graphic.addEventListener(

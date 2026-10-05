@@ -26,6 +26,11 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "webkit",
+      testMatch: "concept-navigation.spec.ts",
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
   webServer: {
     command: `PORT=${port} BUILD_DIR=${buildDir} LOCAL_DATA_DIR=${localDataDir} RESET_LOCAL_COMMENTS=1 SOURCE_WATCHING=manual npm run dev`,
