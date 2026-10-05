@@ -67,7 +67,7 @@
       "file": "case-studies/temper.md",
       "slug": "temper",
       "repositoryUrl": "https://github.com/nerdsane/temper",
-      "summary": "How agent-authored behavioral contracts can make verification tractable while leaving specification completeness and external effects to be checked.",
+      "summary": "How Datadog connects system verification, agent-authored behavioral contracts, and bounded live optimization to explicit acceptance evidence.",
     },
     {
       "file": "case-studies/elements-of-scalable-web-development.md",

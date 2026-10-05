@@ -86,7 +86,7 @@ test.describe("case studies", () => {
     ).toHaveAttribute("href", "/case-studies/modern-web-guidance/");
     await expect(
       page.getByRole("link", {
-        name: /Temper – Making behavior an executable contract/,
+        name: /Temper – Contracts, verification, and bounded autonomy/,
       }),
     ).toHaveAttribute("href", "/case-studies/temper/");
     await expect(
@@ -171,7 +171,7 @@ test.describe("case studies", () => {
     await page.goto("/case-studies/temper/");
     await expect(
       page.getByRole("heading", {
-        name: "Temper – Making behavior an executable contract",
+        name: "Temper – Contracts, verification, and bounded autonomy",
       }),
     ).toBeVisible();
     await expect(
