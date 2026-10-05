@@ -142,7 +142,7 @@ Published requirements are pinned by run; use [requirements/README.md](../requir
 The build rejects drift from the current archived requirement edition.
 Teacher simulation uses the shared interface with separate adapters and a persistent indicator; local records live in `.local/course-simulation/`.
 See [the simulation guide](course-system.md#teacher-simulation) for manual controls, scoped mock login/clock/reset, Worker resource markers and the dedicated local binding check.
-Scenario presets remain outstanding; an empty rehearsal is not evidence of complete scenario coverage.
+Compact/larger preparation and grading-review presets use versioned synthetic fixtures; see the guide for expected outcomes, interrupted preparation, and the remaining full walkthrough/withdrawal verification.
 
 ## Feedback Review
 

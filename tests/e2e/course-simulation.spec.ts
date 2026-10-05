@@ -23,6 +23,7 @@ test("teacher controls keep the shared workspace, mock login, student permission
   const previous = await (await request.get(`${control}/status`)).json();
   const initialized = await (
     await post(`${control}/reset`, {
+      preset: "empty",
       expected: previous.state?.revision ?? null,
     })
   ).json();
@@ -200,5 +201,151 @@ test("teacher controls keep the shared workspace, mock login, student permission
   await expect(page.locator("[data-course-notice]")).toContainText(
     "does not match",
   );
+  expect(escaped).toEqual([]);
+});
+
+test("teachers can load both presets, refresh a stale assessment and release visible failing individual outcomes", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(120_000);
+  page.setDefaultTimeout(15_000);
+  page.on("dialog", (dialog) => dialog.accept());
+  const discovery = await (await request.get("/api/simulation/status")).json();
+  const control = `/api/simulation/${discovery.environment}/control`;
+  const previous = await (await request.get(`${control}/status`)).json();
+  const reset = await request.post(`${control}/reset`, {
+    headers: { Origin: String(test.info().project.use.baseURL) },
+    data: { expected: previous.state?.revision ?? null, preset: "empty" },
+  });
+  expect(reset.ok()).toBe(true);
+  await page.goto(`/admin/courses/?simulation=${discovery.environment}`);
+  const banner = page.getByRole("complementary", {
+    name: "Simulation environment",
+  });
+  const escaped: string[] = [];
+  page.on("request", (req) => {
+    if (/^\/api\/(courses|course-auth)(\/|$)/.test(new URL(req.url()).pathname))
+      escaped.push(req.url());
+  });
+  await banner.getByText("Teacher controls", { exact: true }).click();
+  await banner.getByText("Choose a starting scenario", { exact: true }).click();
+  await banner
+    .getByRole("combobox", { name: "Starting scenario", exact: true })
+    .selectOption("preparation");
+  await banner
+    .getByRole("button", { name: "Restart selected scenario", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Establish review queue", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Administration", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Groups", exact: true }).click();
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "Invitation awaiting consent",
+  );
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "Four-person request",
+  );
+  await banner.getByText("Teacher controls", { exact: true }).click();
+  await banner.getByText("Choose a starting scenario", { exact: true }).click();
+  await banner
+    .getByRole("combobox", { name: "Starting scenario", exact: true })
+    .selectOption("grading-review");
+  await banner
+    .getByRole("button", { name: "Restart selected scenario", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Establish review queue", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /03 Compare/ }).click();
+  await page.getByRole("button", { name: "Gradebook", exact: true }).click();
+  const rows = page.locator("table").first();
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Ben Example" }),
+  ).toContainText("Fail");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Eli Example" }),
+  ).toContainText("Pending");
+  const release = page.locator('form[data-form="publish"]');
+  await release
+    .getByLabel("Reason for releasing or withdrawing results")
+    .fill("Check stale synthetic assessment");
+  await release
+    .getByRole("button", { name: "Release phase results", exact: true })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText(
+    "Assess every group and student",
+  );
+  await page
+    .getByRole("button", { name: "Private portfolios", exact: true })
+    .click();
+  await page
+    .locator("[data-student-select]")
+    .selectOption({ label: "Eli Example · SIM005" });
+  await expect(page.locator(".course-portfolio-read")).toContainText(
+    "Correction:",
+  );
+  const grade = page.locator('form[data-form="individual-grade"]');
+  await grade
+    .getByLabel("Criterion reasons, feedback and missing evidence")
+    .fill(
+      "Checked the corrected synthetic reflection against current evidence.",
+    );
+  await grade
+    .getByLabel("Reason for this assessment correction")
+    .fill("Refresh stale simulation assessment");
+  await grade
+    .getByRole("button", { name: "Save corrected assessment", exact: true })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await page.getByRole("button", { name: "Gradebook", exact: true }).click();
+  await release
+    .getByLabel("Reason for releasing or withdrawing results")
+    .fill("Release current synthetic assessments");
+  await release
+    .getByRole("button", { name: "Release phase results", exact: true })
+    .click();
+  await expect(release).toContainText("Compare results: released");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Ben Example" }),
+  ).toContainText("1/3 completed lecture");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Cora Example" }),
+  ).toContainText("self/peer assessment");
+  await banner.getByText("Teacher controls", { exact: true }).click();
+  await banner
+    .getByRole("combobox", { name: "Rehearsal role", exact: true })
+    .selectOption({ label: "Ben Example" });
+  await banner
+    .getByRole("button", { name: "Switch role", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "My course progress", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("[data-course-content]")).toContainText(
+    "1/3 completed lecture",
+  );
+  await expect(
+    page.getByRole("button", { name: "Gradebook", exact: true }),
+  ).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await banner.getByText("Teacher controls", { exact: true }).click();
+  await banner.getByText("Choose a starting scenario", { exact: true }).click();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+  ).toBe(false);
+  expect(
+    (await new AxeBuilder({ page }).include("[data-course-app]").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.screenshot({
+    path: "test-results/course-simulation-preset-mobile.png",
+    fullPage: true,
+  });
   expect(escaped).toEqual([]);
 });

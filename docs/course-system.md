@@ -13,7 +13,7 @@ Institutional imports, corrections, account activity and the magic-link flow wor
 Student proposals, confirmations, instructor allocation and publication now share the real course workspace.
 Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
-Teacher simulation has isolated storage and manual controls in both runtimes; scenario presets and the complete teaching walkthrough remain pending.
+Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes; the complete teaching walkthrough and withdrawal scenario remain pending.
 Production email provisioning and withdrawal workflows also remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
@@ -364,13 +364,14 @@ Development uses the existing loopback instructor identity; production ignores t
 An institutional student session alone does not authorize simulation.
 
 The persistent **Simulation** banner identifies the rehearsal and its clock.
-**Teacher controls** can start an empty rehearsal, switch between instructor and enrolled mock students, advance time, open a mock inbox, or reset to an empty rehearsal.
+**Teacher controls** can start a preparation or grading-review scenario, choose a compact or larger cohort, start an empty rehearsal, switch between instructor and enrolled mock students, advance time, and open a mock inbox.
 Create a course through the ordinary form and import a synthetic institutional CSV through **Students**.
 The group, submission, audit, portfolio and grading forms use the existing authorization and domain handlers.
 Role switching retains student permissions; **Return to instructor** restores the teacher role and revokes the current simulated email login while retaining the real GitHub session.
 Use **Email sign-in**, request a mock student's link, then follow **Confirm mock sign-in** from the banner's inbox to test the actual single-use login flow.
 Advancing the clock controls course windows and mock credential expiry; it does not change saved schedules or real time.
-The clock only moves forward; reset restores `2026-10-05T08:00:00.000Z`.
+The clock only moves forward; restart selects the chosen scenario's starting time.
+Empty/preparation rehearsals start at `2026-10-05T08:00:00.000Z`; grading review starts at `2026-12-13T08:00:00.000Z`.
 Role and clock controls are shared by this instructor's browser tabs and use revision checks.
 
 Each instructor has their own record/file/auth/mail namespace.
@@ -382,8 +383,82 @@ CSV exports add an `environment` column containing `Simulation` and use `SIMULAT
 **Leave simulation** returns to the live workspace and retains the instructor's real GitHub session.
 Malformed environment/generation context is rejected; course requests, file links and exports do not default to live routes.
 
-Preparation/grading-review presets and their complete teacher walkthrough are still being implemented under [ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
-The current empty rehearsal does not yet supply the accepted scenario cohorts or establish coverage of every named grading/administration edge case.
+### Starting scenarios
+
+The default is **Course preparation** with 10 mock students; **Larger** supplies 31.
+All emails use the reserved `.invalid` domain and all institutional numbers start with `SIM`.
+The names, evidence and scores are authored fixtures, never copied from a live course.
+
+| Scenario           | Starting state                                                                    | What to inspect                                                               |
+| ------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Course preparation | Roster imported; Establish formation open; one confirmed trio allocated privately | A confirmed four-person request needs instructor allocation and an exception. |
+
+A two-person invitation awaits the other student's consent.
+Remaining students request allocation with private matching notes.
+Group publication fails until everyone is assigned. |
+| Grading review | Three phases of frozen source, audit reports, technical responses, private portfolios and assessments; A/B released, C private | Late enrollment, explicit missing work, a stale assessment, and full project scores that still fail individual minima. |
+| Empty rehearsal | No courses or students | Walk through creation/import using the downloadable mock CSV and source in Teacher controls. |
+
+Fixture edition `2026-10-v1` identifies the starting data and scenario construction.
+Restart regenerates identities/revisions but retains the edition's authored content, deadlines and expected outcomes.
+When those meanings change, bump the fixture edition; an unfinished preparation from an older edition must be restarted.
+Preparation uses the existing course handlers with an in-memory adapter to validate every change, then replays their accepted writes/history into a private generation in six-operation batches.
+Records become available only when all batches finish.
+If preparation is interrupted, reopen Teacher controls and choose **Continue preparation**; accepted writes are reused, not duplicated.
+A concurrent reset invalidates the old control revision and keeps staged records inaccessible.
+This bounded persistence does not make scenario construction compatible with the Free plan's CPU budget; deployed presets require a Workers Paid CPU allowance.
+See [Workers CPU limits](https://developers.cloudflare.com/workers/platform/limits/#cpu-time) and [D1 invocation limits](https://developers.cloudflare.com/d1/platform/limits/).
+Local simulation does not require paid infrastructure.
+
+The source download contains a tiny dependency-free Node project with a lockfile, tests and a reproducible demo.
+Unpack it, run `npm ci --ignore-scripts --offline`, `npm test`, and `npm run demo` with Node 24 or later.
+The README states what the fixture lacks; it is not a complete project submission.
+Rehearsal audit timings are illustrative, not collected benchmarks.
+Project scores are authored outcomes for an imagined assessed project, not a quality judgment supported by the tiny source archive.
+The evidence index names actual fixture files and explicitly marks missing performance measurements.
+
+### Preparation review
+
+1. Start **Course preparation**.
+   Open **Administration → Groups** for Establish.
+   The trio is allocated but students cannot use unpublished groups.
+   The other proposals and allocation requests remain visible to staff.
+2. Switch to Iris Example, open **Groups**, and confirm the pending invitation from Hugo Example.
+   Student views expose only their own proposal and matching notes.
+   Return to instructor.
+3. Allocate the confirmed four-person proposal and record its size exception.
+   Complete the confirmed pair with the remaining student and allocate any larger-cohort remainder into trios.
+   Group identifiers are generated by the normal allocation form.
+4. Publish formation only after saving all allocations.
+   Switch to a student and verify that the published group and submission controls are available.
+   The instructor's private matching notes remain hidden.
+5. For a creation/import rehearsal, choose **Empty rehearsal** and use the banner's mock CSV download in **Students**.
+   Read columns, preview additions, record a reason, and save.
+   Reimporting the same CSV retains course identities.
+
+### Grading review
+
+1. Start **Grading review** and inspect the Establish queue.
+   Jules Late joined on October 27 after A froze, has a pending catch-up arrangement, and has explicit missing A scores.
+   Later phases place Jules in an approved four-person group.
+   Frozen A memberships remain intact.
+2. Open **Class submissions**, **Assigned audit**, **Group submission**, and **Private portfolios** across the phases.
+   Downloads contain valid small source/evidence files; audit targets and Compare's A/B references retain frozen revisions.
+3. Open **Compare → Gradebook**.
+   Ada Example has a passing provisional result.
+   Ben Example has only one completed Challenge lecture activity, despite 90 project points.
+   Cora Example has no Compare portfolio and explicit zeros.
+   Eli Example is pending because a portfolio correction made its assessment stale.
+4. Try **Release phase results** with a reason: release fails while Eli's assessment is stale.
+   Open **Private portfolios**, select Eli, inspect the correction and stale record, then record the reviewed assessment with a reason.
+5. Release Compare again.
+   Ada receives grade 5; Ben fails the lecture minimum and Cora fails mandatory portfolio/individual requirements despite a high total.
+   Eli's result now passes.
+   Jules retains the missing A outcome until any approved course response is documented and assessed through the ordinary workflow.
+6. Switch to Ben and confirm the released failing requirement is visible in **My course progress**; other students' individual evidence remains private.
+   Return to instructor and export: every row is marked `Simulation`, Ben/Cora have grade 0, and the filename starts with `SIMULATION`.
+
+[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted: the complete teacher walkthrough from creation through audit/portfolio submission still needs verification as one simulation browser flow, and withdrawal behavior awaits ADR-004's institutional policy decision.
 
 ### Separate Worker resources
 
@@ -440,7 +515,8 @@ The mail tests exercise the actual Worker adapter with a mocked Cloudflare bindi
 They do not send real email.
 Simulation checks cover teacher/student permissions, live sentinels, teacher and reset-generation isolation, scoped expiry/quotas/inbox retention, immutable history, clock, export labels and malformed context.
 Worker adapter tests reject missing/wrong markers, distinct binding objects aliasing the same resources, live-file/database aliases and forged test identities, and prove simulation selects no live mail even when delivery is enabled.
-The simulation browser check covers synthetic roster import, mock login, role switching, clock, export, reset, mobile/accessibility and the absence of escaped live course/auth requests.
+The simulation browser checks cover synthetic roster import, mock login, role switching, clock, export, reset, both presets, stale-release rejection/reassessment, failing individual outcomes, mobile/accessibility and the absence of escaped live course/auth requests.
+Preset API checks exercise both cohort sizes, real frozen history/A–B references, late enrollment, explicit zeros, mandatory minima, interrupted/concurrent preparation, isolation and reproducible source download.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 
@@ -454,6 +530,7 @@ The credential above is a public test-only value for the loopback instance; it m
 The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
 It also streams and attaches final technical evidence while retaining the frozen source/checklist, checks a read-only frozen reference, imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
+The dedicated simulation check also loads the larger grading-review preset, verifies frozen files/history, rejects stale release, refreshes the assessment and checks mandatory minima after release.
 Stop the local Worker afterwards.
 The local configuration deliberately matches the pinned book runtime's compatibility date; upgrade the runtime and both configurations together.
 

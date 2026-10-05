@@ -93,13 +93,19 @@ The [local Worker check](../../../scripts/check-course-simulation.ts) verifies a
 The [operating guide](../../course-system.md#teacher-simulation) documents the implemented manual rehearsal and resource setup.
 No production resources have been provisioned or deployed by this work.
 
-This ADR remains Accepted: the compact/larger preparation and grading-review presets, realistic scenario evidence, all named edge cases, and a complete teacher walkthrough through audits, portfolios, assessment and release remain outstanding.
+Compact (10-student) and larger (31-student) preparation/grading-review presets are implemented through the shared course handlers.
+The [fixture owner](../../../worker/course-simulation-fixtures.ts) supplies only authored synthetic names, reserved-domain emails, a valid dependency-free source archive, reproducible checks/demo, audit reports, indexed technical responses and private evidence.
+Scores and audit timings are explicitly illustrative; the small archive does not claim to satisfy the complete project briefs.
+The [preset builder](../../../worker/course-simulation-seed.ts) validates the entire scenario in memory before persisting its accepted operations/history into a private generation.
+Revision-guarded six-operation batches resume without duplicate histories; only the final control revision publishes the prepared generation.
+The fixture edition is retained in control state; incomplete preparations from another edition require restart.
+Four preset tests verify both sizes, consent/allocation/privacy, late enrollment and retained frozen membership, missing-work zeros, stale release/reassessment, mandatory minima despite high totals, interrupted/concurrent/reset preparation and unpacked offline source reproduction.
+A second browser flow covers both presets and the teacher's stale-assessment review/release, followed by the student's failing requirement view.
+The local D1/R2 check exercises the larger grading preset and verifies frozen history/files and release/gates against actual bindings.
+
+This ADR remains Accepted: a complete teacher walkthrough from creation through grouping, source freezing, audit/portfolio submission, assessment and release still needs verification as one simulation browser flow; the withdrawal case remains outstanding.
 Verify pending or missing mandatory work prevents a passing grade in those scenarios.
 The withdrawal scenario depends on ADR-004's institutional handling decision.
-
-## Open questions
-
-- Choose fixture/reset versioning so a teacher can repeat a scenario after application changes.
 
 ## Implementation choices
 
@@ -107,3 +113,7 @@ The withdrawal scenario depends on ADR-004's institutional handling decision.
 - Scope records, files and authentication by verified instructor and reset generation; select a new generation for reset instead of deleting resources or rewriting a live course.
 - Keep the verified controller identity separate from the student identity supplied to the existing domain handlers.
   Role switching is a teacher control, not a deployed test header or a student impersonation privilege.
+- Version authored fixture semantics separately from the storage environment and random reset identities.
+  Retain validated operations in a bounded private R2 plan, persist in revision-guarded resumable batches, and expose records only after preparation completes.
+  This preserves shared validation and history without relying on one long database-writing request.
+  Deployed preset construction requires a Workers Paid CPU allowance; local checks do not establish production account provisioning.

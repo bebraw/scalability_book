@@ -60,7 +60,9 @@ Simulation state is a revision-checked record in dedicated storage, including it
 `worker/course-simulation-environment.ts` checks positive D1/R2 environment markers and rejects aliases to live resources; `scripts/lib/local-course-simulation.ts` provides a separate local directory with read-only initialization checks.
 `site/scripts/course-simulation.ts` owns teacher controls, persistent indication and request/download context; ordinary forms and grade calculations remain shared.
 Reset selects a new namespace and clears its login without deleting backing resources; old synthetic generations remain inaccessible through the course API.
-Preset fixtures and the complete teacher scenario walkthrough remain outstanding in [ADR-007](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
+`worker/course-simulation-fixtures.ts` owns versioned synthetic source/evidence; `worker/course-simulation-seed.ts` constructs presets through the shared handlers and replays their validated records/history in resumable batches.
+Control state retains preparation progress, while the staged generation stays inaccessible until complete.
+The complete teacher scenario walkthrough and withdrawal case remain outstanding in [ADR-007](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
 
 ## State and access
 
@@ -122,7 +124,7 @@ The following decisions have implementation work outstanding in the current cour
 
 - [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication, working agreements and recorded late-arrival catch-up are implemented; withdrawal tasks and their institutional export handling remain.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified Gmail forwarding and live delivery verification remain outstanding.
-- [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated adapters and manual teacher controls are implemented in both runtimes; preparation/review presets and the complete teacher scenario walkthrough remain.
+- [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated adapters, teacher controls and compact/larger preparation/review presets are implemented in both runtimes; the complete teacher scenario walkthrough and withdrawal case remain.
 
 Implement these in bounded changes that retain historical identities, frozen membership, assessment provenance, and privacy.
 Record the implementation evidence before moving each ADR to `implemented/`.

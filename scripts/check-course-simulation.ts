@@ -24,7 +24,7 @@ const secret =
 const payload = Buffer.from(
   JSON.stringify({
     user: { id: 1, login: "course-smoke-admin" },
-    exp: Date.now() + 60_000,
+    exp: Date.now() + 5 * 60_000,
   }),
 ).toString("base64url");
 const admin = `scalableweb_session=${payload}.${createHmac("sha256", secret).update(payload).digest("base64url")}`;
@@ -66,7 +66,7 @@ let status = await call<{ state: Envelope<SimulationState> | null }>(
 const initialized = await call<{ state: Envelope<SimulationState> }>(
   `${control}/reset`,
   "POST",
-  { expected: status.state?.revision ?? null },
+  { expected: status.state?.revision ?? null, preset: "empty" },
 );
 const scoped = `/api/simulation/${discovery.environment}/${initialized.state.value.generation}`;
 let config = await call<Envelope<Course>>(`${scoped}/courses`, "POST", {
@@ -269,12 +269,99 @@ assert.equal(
   401,
 );
 status = await call(`${control}/status`);
-await call(`${control}/reset`, "POST", { expected: status.state!.revision });
+await call(`${control}/reset`, "POST", {
+  expected: status.state!.revision,
+  preset: "empty",
+});
 assert.equal(
   (await response(`${scoped}/courses/${config.value.id}`)).status,
   409,
 );
 assert.deepEqual((await call(`/api/courses/${live.value.id}`)).config, live);
+status = await call(`${control}/status`);
+let seeded = await call<{ state: Envelope<SimulationState> }>(
+  `${control}/reset`,
+  "POST",
+  {
+    expected: status.state!.revision,
+    preset: "grading-review",
+    size: "larger",
+  },
+);
+const concurrentPreparation = await Promise.all([
+  response(`${control}/prepare`, "POST", { expected: seeded.state.revision }),
+  response(`${control}/prepare`, "POST", { expected: seeded.state.revision }),
+]);
+assert.deepEqual(
+  concurrentPreparation.map((res) => res.status).sort(),
+  [200, 409],
+);
+seeded = await call(`${control}/status`);
+for (let i = 0; seeded.state.value.preparing && i < 100; i++)
+  seeded = await call(`${control}/prepare`, "POST", {
+    expected: seeded.state.revision,
+  });
+assert.equal(seeded.state.value.preparing, undefined);
+const catalog = await call(`${control}/status`),
+  presetCourse = catalog.courses[0].id;
+const presetBase = `/api/simulation/${discovery.environment}/${seeded.state.value.generation}/courses/${presetCourse}`;
+let presetView = await call(presetBase);
+assert.equal(presetView.config.value.students.length, 31);
+assert.equal(presetView.results[4].result.status, "pending");
+assert.equal(
+  (
+    await response(`${presetBase}/publish/compare`, "POST", {
+      expected: presetView.config.revision,
+      published: true,
+      reason: "Reject stale synthetic release",
+    })
+  ).status,
+  400,
+);
+const changed = presetView.individuals.find(
+  (g: any) =>
+    g.value.phase === "compare" &&
+    g.value.subject === presetView.config.value.students[4].id,
+);
+await call(
+  `${presetBase}/individual-grade/compare/${changed.value.subject}`,
+  "PUT",
+  {
+    expected: changed.revision,
+    missing: false,
+    scores: changed.value.scores,
+    feedback: "Checked current synthetic correction",
+    reason: "Refresh stale rehearsal grade",
+  },
+);
+await call(`${presetBase}/publish/compare`, "POST", {
+  expected: presetView.config.revision,
+  published: true,
+  reason: "Release current simulation grades",
+});
+presetView = await call(presetBase);
+assert.equal(presetView.results[0].result.grade, 5);
+assert.equal(presetView.results[1].result.status, "fail");
+assert.ok(presetView.results[1].result.percentage > 90);
+assert.equal(presetView.results[2].result.status, "fail");
+const sample = presetView.submissions.find(
+  (s: any) => s.value.phase === "compare",
+);
+assert.equal(sample.value.finalEvidence.references.length, 2);
+const sampleArchive = await response(
+  `${presetBase}/files/compare/${sample.value.archive}`,
+);
+assert.equal(sampleArchive.status, 200);
+assert.equal(new Uint8Array(await sampleArchive.arrayBuffer())[0], 0x50);
+const frozenSample = await call(
+  `${presetBase}/history?key=${encodeURIComponent(sample.key)}&revision=${sample.value.frozenRevision}`,
+);
+assert.equal(frozenSample.history[0].value.finalEvidence, undefined);
+assert.match(
+  await (await response(`${presetBase}/export`)).text(),
+  /"SIM002","Ben Example".*"0","fail"/,
+);
+assert.deepEqual((await call(`/api/courses/${live.value.id}`)).config, live);
 console.log(
-  "Local simulation check passed: isolated D1/R2 records and streamed archive, student permissions, frozen history, mock login/reuse/expiry, clock, marked export and generation reset; live sentinel unchanged.",
+  "Local simulation check passed: isolated D1/R2 records and streaming, permissions, frozen history, mock authentication, clock, export and reset; larger grading preset, stale release and mandatory minima verified; live sentinel unchanged.",
 );

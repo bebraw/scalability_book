@@ -254,7 +254,7 @@ async function fixture(t: test.TestContext) {
       await api(
         "control/reset",
         "POST",
-        { expected: current.state?.revision ?? null },
+        { expected: current.state?.revision ?? null, preset: "empty" },
         "",
         controller,
       ),

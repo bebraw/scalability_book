@@ -1,5 +1,10 @@
 import type { Course, Envelope } from "../shared/course.ts";
-import { recordKey } from "../shared/course.ts";
+import { recordKey, csvCell } from "../shared/course.ts";
+import { createStoredZip } from "../shared/zip.ts";
+import {
+  simulationRoster,
+  simulationSource,
+} from "./course-simulation-fixtures.ts";
 import {
   courseSessionUser,
   handleCourseAuth,
@@ -11,6 +16,15 @@ import { staffAllowed } from "./courses.ts";
 import type { CourseStore } from "./course-store.ts";
 import { boundedJson, sameOrigin } from "./course-http.ts";
 import { Problem, requireThat, text } from "./course-validation.ts";
+import {
+  simulationPresets,
+  simulationPresetVersion,
+  type SimulationSelection,
+} from "../shared/course-simulation.ts";
+import {
+  prepareSimulation,
+  advanceSimulationPreparation,
+} from "./course-simulation-seed.ts";
 import {
   simulationCookie,
   simulationInitialTime,
@@ -144,10 +158,65 @@ export async function handleSimulation(
       );
     const control = match[2] === "control";
     const action = match[3];
+    if (
+      control &&
+      request.method === "GET" &&
+      ["/roster", "/source"].includes(action!)
+    ) {
+      if (action === "/source") {
+        const source = createStoredZip(
+          Object.entries(simulationSource).map(([name, data]) => ({
+            name,
+            data: new TextEncoder().encode(data),
+          })),
+        );
+        return new Response(new Uint8Array(source), {
+          headers: {
+            "Cache-Control": "private, no-store",
+            "X-Course-Environment": "simulation",
+            "Content-Type": "application/zip",
+            "Content-Disposition":
+              'attachment; filename="SIMULATION-source.zip"',
+            "X-Content-Type-Options": "nosniff",
+          },
+        });
+      }
+      const size = url.searchParams.get("size") ?? "compact";
+      requireThat(
+        size === "compact" || size === "larger",
+        "Choose a known cohort size.",
+      );
+      const csv =
+        [
+          ["student_id", "first_name", "last_name", "email"],
+          ...simulationRoster(size).map((s) => [
+            s.number,
+            s.firstName,
+            s.lastName,
+            s.email,
+          ]),
+        ]
+          .map((row) => row.map(csvCell).join(","))
+          .join("\r\n") + "\r\n";
+      return new Response(csv, {
+        headers: {
+          "Cache-Control": "private, no-store",
+          "X-Course-Environment": "simulation",
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="SIMULATION-roster.csv"',
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     if (control && action === "/status" && request.method === "GET") {
-      const courses = state
-        ? await simulationStores(environment, teacher.id, state).store.courses()
-        : [];
+      const courses =
+        state && !state.preparing
+          ? await simulationStores(
+              environment,
+              teacher.id,
+              state,
+            ).store.courses()
+          : [];
       return reply({
         environment: environment.id,
         state: current,
@@ -161,7 +230,7 @@ export async function handleSimulation(
     if (
       control &&
       request.method === "POST" &&
-      ["/reset", "/clock", "/role"].includes(action!)
+      ["/reset", "/prepare", "/clock", "/role"].includes(action!)
     ) {
       const body = await boundedJson(request);
       requireThat(
@@ -171,15 +240,47 @@ export async function handleSimulation(
       );
       let next: SimulationState;
       if (action === "/reset") {
+        const preset = body.preset ?? "preparation",
+          size = body.size ?? "compact";
+        requireThat(
+          simulationPresets.includes(preset as SimulationSelection["id"]) &&
+            (size === "compact" || size === "larger"),
+          "Choose a known simulation preset and cohort size.",
+        );
+        const selection: SimulationSelection = {
+          id: preset as SimulationSelection["id"],
+          size,
+          version: simulationPresetVersion,
+        };
         // Reset selects a new inaccessible namespace. It never deletes a resource.
         next = {
           version: 1,
           generation: crypto.randomUUID(),
           now: simulationInitialTime,
           role: null,
+          preset: selection,
         };
+        if (selection.id !== "empty")
+          next.preparing = await prepareSimulation(
+            environment,
+            teacher,
+            next,
+            selection,
+          );
+      } else if (action === "/prepare") {
+        requireThat(current, "Start a simulation before preparing it.", 409);
+        next = await advanceSimulationPreparation(
+          environment,
+          teacher,
+          current,
+        );
       } else {
         requireThat(state, "Start a simulation before changing it.", 409);
+        requireThat(
+          !state.preparing,
+          "Finish preparing the rehearsal before changing its role or clock.",
+          409,
+        );
         next = { ...state };
         if (action === "/clock") {
           const now = text(body.now, "Simulation time", 24, true);
@@ -247,6 +348,11 @@ export async function handleSimulation(
       );
     }
     requireThat(state, "Start a simulation before opening its records.", 409);
+    requireThat(
+      !state.preparing,
+      "Finish preparing the rehearsal before opening its records.",
+      409,
+    );
     const stores = simulationStores(environment, teacher.id, state);
     if (control && action === "/inbox" && request.method === "GET") {
       const course = text(
