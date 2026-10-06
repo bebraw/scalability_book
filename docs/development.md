@@ -126,6 +126,18 @@ npm run serve
 The production build emits a static site to `build/` for `scalableweb.dev`.
 The deployed site remains read-only because the editing API exists only in the local dev server.
 
+### Theme initialization
+
+The shared layout runs [the inline theme bootstrap](../scripts/lib/theme-bootstrap.ts) before loading stylesheets.
+It selects a configured saved theme, or falls back to the system color preference when storage is unavailable or the saved value is invalid.
+It also sets the initial browser color scheme and keeps it through slow stylesheet loads.
+The deferred `theme.js` bundle connects the picker and site tools; changing the picker hands the color scheme back to CSS.
+Keep theme selection ahead of styles and page content so dark readers do not see a light frame while scripts load.
+Both the document root and body use the theme background, including during navigation transitions.
+
+[The theme initialization browser tests](../tests/e2e/theme-initialization.spec.ts) delay the deferred bundle and inspect the first rendered frames in Chromium and WebKit.
+They also delay stylesheets and check link navigation, system defaults, saved overrides, unavailable storage, and picker changes after startup.
+
 ### Asset URLs and caching
 
 Production builds publish compiled site CSS and JavaScript with a content hash in the filename, such as `/styles.0123456789abcdef.css`.

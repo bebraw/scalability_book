@@ -3,6 +3,7 @@
   box-sizing: border-box;
 }
 html {
+  background: var(--bg);
   scroll-behavior: smooth;
 }
 body {

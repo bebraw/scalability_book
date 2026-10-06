@@ -28,7 +28,7 @@ export default defineConfig({
     },
     {
       name: "webkit",
-      testMatch: "concept-navigation.spec.ts",
+      testMatch: ["concept-navigation.spec.ts", "theme-initialization.spec.ts"],
       use: { ...devices["Desktop Safari"] },
     },
   ],

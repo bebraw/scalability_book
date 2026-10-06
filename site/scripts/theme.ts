@@ -7,18 +7,19 @@ const toolsToggle = document.querySelector<HTMLButtonElement>(
 const feedbackAdminLink = document.querySelector<HTMLAnchorElement>(
   "[data-feedback-admin-link]",
 );
-const storedTheme = localStorage.getItem("theme");
-const fallbackTheme = matchMedia("(prefers-color-scheme: dark)").matches
-  ? "dark"
-  : "light";
-const activeTheme = storedTheme || fallbackTheme;
+const activeTheme = root.dataset.theme || "light";
 
-root.dataset.theme = activeTheme;
 if (picker) {
   picker.value = activeTheme;
   picker.addEventListener("change", () => {
     root.dataset.theme = picker.value;
-    localStorage.setItem("theme", picker.value);
+    // Keep the bootstrap scheme through slow CSS loads; CSS owns later choices.
+    root.style.removeProperty("color-scheme");
+    try {
+      localStorage.setItem("theme", picker.value);
+    } catch {
+      // The picker still works when the browser cannot persist the preference.
+    }
   });
 }
 

@@ -1,4 +1,5 @@
 import { renderHtmlisp } from "./htmlisp.ts";
+import { renderThemeBootstrap } from "./theme-bootstrap.ts";
 import { escapeAttribute, escapeHtml, slugify } from "./text.ts";
 import type { RenderedMarkdown, TableOfContentsItem } from "./markdown.ts";
 import {
@@ -13,7 +14,7 @@ type SiteConfig = {
   course: unknown;
   description: string;
   domain: string;
-  themes: unknown;
+  themes: { id: string; label: string }[];
   title: string;
 };
 type CaseStudy = {
@@ -100,6 +101,8 @@ export function createSiteRenderer({
   assetUrl = (url) => url,
   onOpenGraphCard,
 }: CreateSiteRendererOptions) {
+  const themeBootstrap = renderThemeBootstrap(config.themes);
+
   return {
     renderBookPage,
     renderHome,
@@ -171,6 +174,7 @@ export function createSiteRenderer({
       children,
       description,
       mainStylesheetUrl: assetUrl("/styles.css"),
+      themeBootstrap,
       themeScriptUrl: assetUrl("/theme.js"),
       ogImageAlt: imageAlt,
       ogImageUrl: imageUrl,
