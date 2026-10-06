@@ -10,6 +10,11 @@ This site has two feedback modes:
 Resolved local comments are synced back to Cloudflare KV with an explicit command.
 Local editing does not silently write to production.
 
+Course-backed peer inquiry is a separate opt-in surface at **Notebook → Peers**.
+[Its contract](learning-workspace.md#peer-inquiry-contract) uses course membership and explicit group/cohort audiences, without migrating private feedback.
+Public inquiry offers require author consent and course-staff review; reviewed Markdown is handed to the existing book-editor workflow.
+This does not change the visibility or featuring rules for existing feedback.
+
 ## 1. Create GitHub OAuth App
 
 Create a GitHub OAuth App under your GitHub account or organization:

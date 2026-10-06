@@ -1,7 +1,11 @@
 import type { Envelope, RecordHistory } from "../shared/course.ts";
 export interface CourseStore {
   get<T>(key: string): Promise<Envelope<T> | null>;
-  list<T>(course: string, kind?: string): Promise<Envelope<T>[]>;
+  list<T>(
+    course: string,
+    kind?: string,
+    filter?: CourseRecordFilter,
+  ): Promise<Envelope<T>[]>;
   courses(prefix?: string): Promise<Envelope[]>;
   save(
     record: Envelope,
@@ -10,6 +14,30 @@ export interface CourseStore {
     guard?: { key: string; revision: string },
   ): Promise<boolean>;
   history(key: string, revision?: string): Promise<RecordHistory[]>;
+}
+export interface CourseRecordFilter {
+  sourceId?: string;
+  excludeInquiry?: boolean;
+  after?: string;
+  limit?: number;
+}
+export function courseRecordWhere(
+  course: string,
+  kind?: string,
+  filter?: CourseRecordFilter,
+) {
+  const clauses = ["course_id = ?"];
+  const bindings: (string | number)[] = [course];
+  if (kind) {
+    clauses.push("kind = ?");
+    bindings.push(kind);
+  }
+  if (filter?.sourceId) {
+    clauses.push("json_extract(body, '$.sourceId') = ?");
+    bindings.push(filter.sourceId);
+  }
+  if (filter?.excludeInquiry) clauses.push("substr(kind, 1, 8) <> 'inquiry-'");
+  return { clause: clauses.join(" AND "), bindings };
 }
 export interface FileStore {
   put(
@@ -63,18 +91,27 @@ export function decodeHistory(row: unknown): RecordHistory {
   return { ...rest, value: JSON.parse(body) };
 }
 export function d1CourseStore(db: CourseBindings["COURSE_DB"]): CourseStore {
-  async function list<T>(clause: string, bindings: (string | number)[]) {
+  async function list<T>(
+    clause: string,
+    bindings: (string | number)[],
+    filter?: CourseRecordFilter,
+  ) {
     const rows: Envelope<T>[] = [];
-    let cursor = "";
+    let cursor = filter?.after ?? "";
     for (;;) {
+      const take = Math.min(
+        20,
+        filter?.limit === undefined ? 20 : filter.limit - rows.length,
+      );
+      if (take <= 0) return rows;
       const result = await db
         .prepare(
-          `${readRecordSql} WHERE ${clause} AND key > ? ORDER BY key LIMIT 20`,
+          `${readRecordSql} WHERE ${clause} AND key > ? ORDER BY key LIMIT ?`,
         )
-        .bind(...bindings, cursor)
+        .bind(...bindings, cursor, take)
         .all();
       rows.push(...result.results.map((row) => decodeRecord<T>(row)));
-      if (result.results.length < 20) return rows;
+      if (result.results.length < take) return rows;
       cursor = rows.at(-1)!.key;
     }
   }
@@ -86,11 +123,9 @@ export function d1CourseStore(db: CourseBindings["COURSE_DB"]): CourseStore {
         .first();
       return row ? decodeRecord<T>(row) : null;
     },
-    list<T>(course: string, kind?: string) {
-      return list<T>(
-        `course_id = ?${kind ? " AND kind = ?" : ""}`,
-        kind ? [course, kind] : [course],
-      );
+    list<T>(course: string, kind?: string, filter?: CourseRecordFilter) {
+      const query = courseRecordWhere(course, kind, filter);
+      return list<T>(query.clause, query.bindings, filter);
     },
     courses(prefix) {
       return list(

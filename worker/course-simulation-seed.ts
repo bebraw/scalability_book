@@ -21,7 +21,11 @@ import { createStoredZip } from "../shared/zip.ts";
 import { handleCourses, type CourseUser } from "./courses.ts";
 import { administrationRevisions } from "./course-administration.ts";
 import { requireThat } from "./course-validation.ts";
-import type { CourseStore, FileStore } from "./course-store.ts";
+import type {
+  CourseStore,
+  FileStore,
+  CourseRecordFilter,
+} from "./course-store.ts";
 import {
   simulationInitialTime,
   simulationStores,
@@ -80,11 +84,21 @@ export async function buildSimulationPlan(
         (structuredClone(records.get(key)) as Envelope<T> | undefined) ?? null
       );
     },
-    async list<T>(course: string, kind?: string) {
+    async list<T>(course: string, kind?: string, filter?: CourseRecordFilter) {
       return structuredClone(
-        [...records.values()].filter(
-          (r) => r.courseId === course && (!kind || r.kind === kind),
-        ),
+        [...records.values()]
+          .filter(
+            (r) =>
+              r.courseId === course &&
+              (!kind || r.kind === kind) &&
+              (!filter?.excludeInquiry || !r.kind.startsWith("inquiry-")) &&
+              (!filter?.sourceId ||
+                (r.value as { sourceId?: string }).sourceId ===
+                  filter.sourceId) &&
+              (!filter?.after || r.key > filter.after),
+          )
+          .sort((a, b) => a.key.localeCompare(b.key))
+          .slice(0, filter?.limit),
       ) as Envelope<T>[];
     },
     async courses() {

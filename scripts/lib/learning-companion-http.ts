@@ -1,5 +1,6 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { LearningNotebook } from "./learning-notebook.ts";
+import type { LearningConversations } from "./learning-conversations.ts";
 import {
   LearningProblem,
   learningAssert,
@@ -16,6 +17,7 @@ export interface CompanionOptions {
   notebook: LearningNotebook;
   code?: string;
   now?: () => number;
+  conversations?: LearningConversations;
 }
 export function createCompanionHandler(options: CompanionOptions) {
   const now = options.now ?? Date.now;
@@ -132,11 +134,65 @@ export function createCompanionHandler(options: CompanionOptions) {
           401,
         );
         if (url.pathname === "/disconnect" && request.method === "POST") {
+          await options.conversations?.stop(token!);
           sessions.delete(token!);
           return reply({ disconnected: true });
         }
         if (url.pathname === "/status" && request.method === "GET")
-          return reply({ connected: true, version: 1, provider: null });
+          return reply({
+            connected: true,
+            version: 1,
+            provider: options.conversations?.provider ?? null,
+          });
+        if (url.pathname.startsWith("/agent/")) {
+          const conversations = options.conversations;
+          learningAssert(
+            conversations,
+            "Agent conversations are unavailable in this companion.",
+            503,
+          );
+          if (
+            url.pathname === "/agent/conversations" &&
+            request.method === "GET"
+          )
+            return reply(conversations.list());
+          if (
+            url.pathname === "/agent/conversations" &&
+            request.method === "POST"
+          )
+            return reply(conversations.start(await body(request), origin), 201);
+          if (url.pathname === "/agent/stop" && request.method === "POST")
+            return reply(await conversations.stop(token!));
+          if (url.pathname === "/agent/requests" && request.method === "GET")
+            return reply(
+              conversations.requests(
+                token!,
+                learningId(url.searchParams.get("browser")),
+              ),
+            );
+          const conversation = url.pathname.match(
+            /^\/agent\/conversations\/([a-f0-9-]{36})$/,
+          );
+          if (conversation && request.method === "GET")
+            return reply(conversations.get(conversation[1]!));
+          if (conversation && request.method === "POST")
+            return reply(
+              conversations.send(
+                conversation[1]!,
+                await body(request),
+                token!,
+                origin,
+              ),
+              202,
+            );
+          const result = url.pathname.match(
+            /^\/agent\/requests\/([a-f0-9-]{36})$/,
+          );
+          if (result && request.method === "POST")
+            return reply(
+              conversations.respond(result[1]!, await body(request), token!),
+            );
+        }
         if (url.pathname === "/notebook" && request.method === "GET")
           return reply({
             entries: options.notebook.entries(),

@@ -628,6 +628,14 @@ The check only accepts loopback and writes synthetic records to those local reso
 It verifies actual D1/R2 isolation and streaming, a frozen student-owned archive/history, student visibility, mock login/reuse/expiry, clock, marked export and reset, while retaining a live sentinel.
 Stop that Worker afterwards.
 
+## Optional peer inquiry
+
+Optional book inquiry enters through **Notebook → Peers**, using this workspace's course identity and published phase allocations.
+[The learning-workspace guide](learning-workspace.md#peer-inquiry-contract) owns attempt-first disclosure, group/cohort scope, membership corrections, moderation and consented editorial offers.
+Private initial notes stay in the student's companion; shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
+Apply all course migrations, including `0004_learning_inquiry.sql`, to live and simulation course databases before enabling these routes.
+The additive index bounds discovery to the requested source/activity; it does not change existing submission or feedback audiences.
+
 ## Verification
 
 ```bash
@@ -665,6 +673,7 @@ npx wrangler dev --config wrangler.course.jsonc --local --ip 127.0.0.1 --port 87
 In another terminal, run `node scripts/check-course-worker.ts`.
 The credential above is a public test-only value for the loopback instance; it must never be used for a deployed session secret.
 The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
+It also checks private initial-work declarations, source-scoped inquiry discovery, group isolation, exclusion from course responses and stale replies through real local D1 bindings.
 It also streams and attaches final technical evidence while retaining the frozen source/checklist, checks a read-only frozen reference, imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
 It records withdrawal and private review notes, verifies retained frozen history/files and blank withdrawn export fields, rejects new student submissions and inactive assessments, then reinstates the same identity.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.

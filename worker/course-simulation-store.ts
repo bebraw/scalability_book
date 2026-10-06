@@ -4,7 +4,11 @@ import type { SimulationState } from "../shared/course-simulation.ts";
 export type { SimulationState } from "../shared/course-simulation.ts";
 import { courseAuthStore, type AuthDatabase } from "./course-auth-store.ts";
 import { mockMailStore } from "./course-mock-mail.ts";
-import type { CourseStore, FileStore } from "./course-store.ts";
+import type {
+  CourseStore,
+  FileStore,
+  CourseRecordFilter,
+} from "./course-store.ts";
 import { requireThat } from "./course-validation.ts";
 
 export const simulationEnvironmentKey = "simulation:environment";
@@ -60,8 +64,16 @@ export function scopedCourseStore(
       const record = await root.get<T>(namespace + key);
       return record ? decode(record) : null;
     },
-    async list<T>(course: string, kind?: string) {
-      return (await root.list<T>(namespace + course, kind)).map(decode);
+    async list<T>(course: string, kind?: string, filter?: CourseRecordFilter) {
+      return (
+        await root.list<T>(
+          namespace + course,
+          kind,
+          filter?.after
+            ? { ...filter, after: namespace + filter.after }
+            : filter,
+        )
+      ).map(decode);
     },
     async courses() {
       return (await root.courses(namespace))

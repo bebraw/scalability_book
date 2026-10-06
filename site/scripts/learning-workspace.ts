@@ -1,4 +1,11 @@
 import { LearningClient } from "./learning-client.ts";
+import { mountLearningAgent } from "./learning-agent-ui.ts";
+import { mountLearningPeers } from "./learning-peers.ts";
+export {
+  observeLearningDemo,
+  changeLearningDemo,
+  availableLearningDemos,
+} from "./learning-demos.ts";
 import { concepts } from "../../shared/concepts.ts";
 import {
   sourceLink,
@@ -11,7 +18,14 @@ import {
   type NoteKind,
 } from "../../shared/learning-workspace.ts";
 
-type View = "write" | "notes" | "concepts" | "prepare" | "connect";
+type View =
+  | "write"
+  | "notes"
+  | "concepts"
+  | "prepare"
+  | "connect"
+  | "agent"
+  | "peers";
 const client = new LearningClient();
 const panel = document.createElement("dialog");
 panel.className = "learning-workspace";
@@ -29,6 +43,7 @@ let entries: NotebookEntry[] = [];
 let judgments: ConceptJudgment[] = [];
 const selected = new Set<string>();
 let draft = "";
+let acceptedAssistance: string | null = null;
 let editor = {
   id: "",
   expected: "",
@@ -163,6 +178,8 @@ function render() {
     ["write", "Write"],
     ["notes", "Notes"],
     ["concepts", "Concepts"],
+    ["agent", "Agent"],
+    ["peers", "Peers"],
     ["prepare", "Prepare"],
     ["connect", "Connect"],
   ] as const) {
@@ -190,6 +207,82 @@ function render() {
   if (view === "concepts") renderConcepts();
   if (view === "prepare") renderPreparation();
   if (view === "connect") renderConnection();
+  if (view === "peers")
+    mountLearningPeers(container, {
+      source: editor.source,
+      entries,
+      status: (text) => {
+        status.textContent = text;
+      },
+      initial: (source) => {
+        acceptedAssistance = null;
+        editor = {
+          id: "",
+          expected: "",
+          kind: "attempt",
+          title: `Initial thinking: ${source.title}`.slice(0, 300),
+          body: "",
+          relatedIds: [],
+          source,
+        };
+        navigate("write");
+      },
+      reflect: (source, body) => {
+        acceptedAssistance = null;
+        editor = {
+          id: "",
+          expected: "",
+          kind: "reflection",
+          title: `Peer inquiry: ${source.title}`.slice(0, 300),
+          body: body.slice(0, 16000),
+          relatedIds: [],
+          source,
+        };
+        navigate("write");
+        status.textContent =
+          "Compare with your initial explanation and revise this private draft. Choose which material represents your own learning before saving.";
+      },
+    });
+  if (view === "agent")
+    mountLearningAgent(container, {
+      client,
+      source: () => editor.source,
+      selected: () => [...selected],
+      active: () => !panel.hidden && view === "agent",
+      status: (text) => {
+        status.textContent = text;
+      },
+      accept: (text, provenance, source) => {
+        acceptedAssistance = provenance;
+        editor = {
+          id: "",
+          expected: "",
+          kind: "reflection",
+          title: `Reflection: ${source.title}`.slice(0, 300),
+          body: text.slice(0, 16000),
+          relatedIds: [],
+          source,
+        };
+        navigate("write");
+        status.textContent =
+          "Review and revise this agent suggestion, then choose Save note if it represents your thinking.";
+      },
+      initial: (source) => {
+        acceptedAssistance = null;
+        editor = {
+          id: "",
+          expected: "",
+          kind: "attempt",
+          title: `Initial thinking: ${source.title}`.slice(0, 300),
+          body: "",
+          relatedIds: [],
+          source,
+        };
+        navigate("write");
+        status.textContent =
+          "Save your own explanation, prediction or where you are stuck. Select this note in Notes before returning to the agent.";
+      },
+    });
 }
 function renderEditor() {
   const context = node("details", undefined, "learning-context");
@@ -287,6 +380,7 @@ function renderEditor() {
           {
             ...value,
             title: editor.title.trim() || editor.source.title,
+            assistance: acceptedAssistance,
             ...(id ? { expected } : {}),
           },
         );
@@ -306,6 +400,7 @@ function renderEditor() {
   );
   container.append(
     button("New note", () => {
+      acceptedAssistance = null;
       editor = {
         id: "",
         expected: "",
@@ -387,6 +482,8 @@ function renderNotes() {
     }
     card.append(
       button("Edit", () => {
+        acceptedAssistance =
+          entry.history[entry.history.length - 1]?.assistance ?? null;
         editor = {
           id: entry.id,
           expected: entry.revision,
@@ -401,6 +498,7 @@ function renderNotes() {
     );
     card.append(
       button("Revisit", () => {
+        acceptedAssistance = null;
         editor = {
           id: "",
           expected: "",
@@ -683,7 +781,8 @@ document.addEventListener(
           window.confirm(
             "Start a new note on this passage? Choose Cancel to keep working on your unsaved draft.",
           )
-        )
+        ) {
+          acceptedAssistance = null;
           editor = {
             id: "",
             expected: "",
@@ -693,6 +792,7 @@ document.addEventListener(
             relatedIds: [],
             source: pageSource(detail.target),
           };
+        }
       }
       if (client.token && !connected) {
         try {
@@ -702,7 +802,11 @@ document.addEventListener(
             error instanceof Error ? error.message : "Reconnect the companion.";
         }
       }
-      view = connected ? "write" : "connect";
+      view = connected
+        ? new URL(location.href).searchParams.has("inquiry")
+          ? "peers"
+          : "write"
+        : "connect";
       render();
       panel.hidden = false;
       if (!panel.hasAttribute("open")) {

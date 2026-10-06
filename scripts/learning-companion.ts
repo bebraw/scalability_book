@@ -3,12 +3,17 @@ import { parseArgs } from "node:util";
 import path from "node:path";
 import { openLearningNotebook } from "./lib/learning-notebook.ts";
 import { createCompanionHandler } from "./lib/learning-companion-http.ts";
+import { createCodexProvider } from "./lib/learning-codex.ts";
+import { openLearningConversations } from "./lib/learning-conversations.ts";
 
 const { values } = parseArgs({
   options: {
     port: { type: "string", default: "8788" },
     origin: { type: "string", multiple: true },
     directory: { type: "string", default: ".local/learning-companion" },
+    codex: { type: "boolean", default: false },
+    "codex-home": { type: "string" },
+    model: { type: "string" },
   },
 });
 const port = Number(values.port);
@@ -19,7 +24,25 @@ const origins = values.origin ?? [
   "http://127.0.0.1:3000",
 ];
 const notebook = openLearningNotebook(path.resolve(values.directory));
-const companion = createCompanionHandler({ origins, port, notebook });
+const provider = values.codex
+  ? await createCodexProvider({
+      home: path.resolve(
+        values["codex-home"] ?? path.join(values.directory, "codex"),
+      ),
+      ...(values.model ? { model: values.model } : {}),
+    })
+  : null;
+const conversations = openLearningConversations(
+  path.resolve(values.directory),
+  notebook,
+  provider,
+);
+const companion = createCompanionHandler({
+  origins,
+  port,
+  notebook,
+  conversations,
+});
 const server = createServer(async (request, response) => {
   try {
     const headers = new Headers();
@@ -78,6 +101,7 @@ server.listen(port, "127.0.0.1", () => {
 });
 const stop = () =>
   server.close(() => {
+    conversations.close();
     notebook.close();
     process.exit(0);
   });

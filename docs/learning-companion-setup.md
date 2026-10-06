@@ -45,6 +45,59 @@ Download or copy the draft and review it against the course requirements before 
 Preparation does not expose your other notes or submit anything automatically.
 Existing audio/video diary options remain available.
 
+## Connect your agent
+
+The first adapter uses the Codex CLI; it was verified with version 0.154.0.
+Install that version if you do not already have it:
+
+```sh
+npm install -g @openai/codex@0.154.0
+mkdir -p .local/learning-companion/codex
+CODEX_HOME="$PWD/.local/learning-companion/codex" codex login -c cli_auth_credentials_store='"file"'
+```
+
+Stop the notebook-only companion, then start it with your dedicated Codex profile:
+
+```sh
+npm run companion -- --codex
+```
+
+Pair the new code in the book.
+The dedicated profile separates this learning space from your ordinary coding environment.
+It must not contain custom configuration, hooks, plugins, rules or custom skills.
+You can choose a profile with `--codex-home` or a model available to your account with `--model`.
+
+In **Agent**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
+Select notebook entries in **Notes** when you want them included.
+Sending a question shares that source and those selected entries with your model provider.
+You can reopen saved conversations, stop a reply, or keep using the notebook without a model.
+**Use as a notebook draft** lets you review and revise a suggestion before saving it with assistance provenance.
+
+For a demo investigation, select its source and save your **Initial thinking** first.
+Select that note for context, then ask your agent to inspect the demo.
+Proposed changes ask for your approval and report actual browser controls and textual outputs.
+Keep the Agent section open during a tool request.
+A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
+
+## Compare with peers
+
+In **Peers**, sign in using your course account and choose the course run and inquiry activity.
+Save initial thinking for that source, then choose **Reveal peer inquiry**.
+Only a declaration that you saved private work reaches the course API; your initial text remains local.
+A concrete uncertainty is enough to begin.
+
+Review the text and its audience before sharing.
+Group inquiry is scoped to a phase allocation; course-cohort inquiry is visible to active participants in that run after their initial step.
+Replies can preserve disagreement and link evidence or tool provenance.
+**Reflect privately on this inquiry** prepares a local draft for your own revised explanation.
+Only notes you later select enter an agent conversation or submission draft.
+
+New members do not gain older group threads automatically.
+Students who leave a group or withdraw retain read-only access to their own contributions and can remove their text.
+Public review is a separate opt-in copy of the author's reviewed contribution; it does not publish the thread or classmates' replies.
+Course staff review offers, and book editors decide what to publish through the existing Markdown review workflow.
+Optional session prompts support your existing operator/challenger/validator practice; arrange meetings yourselves.
+
 ## Keep your work portable
 
 The notebook is stored on your computer under `.local/learning-companion/` in the repository.
@@ -62,3 +115,8 @@ npm run companion -- --directory .local/another-notebook
 
 Export before moving or removing your repository directory, and keep a backup outside that directory.
 Your course membership does not give teachers or peers access to the private notebook.
+
+Portable notebook archives do not include credentials or raw conversations.
+Conversations are stored separately in `conversations.sqlite`, with provider threads in the dedicated Codex profile.
+To preserve conversation continuity as well, stop the companion and privately back up its directory and any separately configured profile.
+Restoring only the portable notebook lets you start a new conversation from selected notes without depending on an old provider session.

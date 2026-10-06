@@ -18,6 +18,8 @@ import {
   readHistorySql,
   readHistoryMetadataSql,
   recordBindings,
+  courseRecordWhere,
+  type CourseRecordFilter,
   type CourseStore,
   type FileStore,
 } from "../../worker/course-store.ts";
@@ -59,6 +61,15 @@ export function localCourseStores(directory: string): {
     ),
   );
   db.exec(mockMailSchema);
+  db.exec(
+    readFileSync(
+      new URL(
+        "../../course-migrations/0004_learning_inquiry.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
   const authDatabase: AuthDatabase = {
     async first(sql, values) {
       return db.prepare(sql).get(...values) ?? null;
@@ -77,12 +88,13 @@ export function localCourseStores(directory: string): {
       const row = db.prepare(`${readRecordSql} WHERE key = ?`).get(key);
       return row ? decodeRecord<T>(row) : null;
     },
-    async list<T>(course: string, kind?: string) {
+    async list<T>(course: string, kind?: string, filter?: CourseRecordFilter) {
+      const query = courseRecordWhere(course, kind, filter);
       return db
         .prepare(
-          `${readRecordSql} WHERE course_id = ?${kind ? " AND kind = ?" : ""} ORDER BY key`,
+          `${readRecordSql} WHERE ${query.clause} AND key > ? ORDER BY key LIMIT ?`,
         )
-        .all(...(kind ? [course, kind] : [course]))
+        .all(...query.bindings, filter?.after ?? "", filter?.limit ?? -1)
         .map((row) => decodeRecord<T>(row));
     },
     async courses(prefix) {

@@ -32,6 +32,8 @@ export default defineConfig({
         "concept-navigation.spec.ts",
         "theme-initialization.spec.ts",
         "learning-workspace.spec.ts",
+        "learning-demo-bridge.spec.ts",
+        "learning-peer-inquiry.spec.ts",
       ],
       use: { ...devices["Desktop Safari"] },
     },

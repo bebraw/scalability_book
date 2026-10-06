@@ -22,10 +22,14 @@ It uses npm and the Node version range in [package.json](package.json).
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
-The optional [local learning companion](scripts/learning-companion.ts) currently exposes the private notebook API, independently of course storage and model providers.
+The optional [local learning companion](scripts/learning-companion.ts) exposes the private notebook API independently of course storage and model providers.
 [Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and browser pairing.
 The shared book layout exposes a lazy notebook interface through [learning-loader.ts](site/scripts/learning-loader.ts) and [learning-workspace.ts](site/scripts/learning-workspace.ts), including capture, reflection, concept judgments and selective submission drafts.
-Agent/shared-learning integrations remain accepted future work; [the workspace guide](docs/learning-workspace.md) distinguishes current behavior from ADRs 027–029.
+[learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile.
+[learning-demos.ts](site/scripts/learning-demos.ts) exposes actual rendered controls and observations; proposed agent changes require student review in [learning-agent-ui.ts](site/scripts/learning-agent-ui.ts).
+[course-inquiry.ts](shared/course-inquiry.ts) owns peer audiences and historical access, and [the inquiry handler](worker/course-inquiry.ts) enforces them through the existing course API in both local development and the Worker.
+[learning-peers.ts](site/scripts/learning-peers.ts) reveals peer work after a private initial attempt and supports selected shared contributions, individual reflection and separately consented editorial offers.
+[The workspace guide](docs/learning-workspace.md) owns these contracts and their deployment/evaluation limits.
 The static build owns [the compiled asset URL registry](scripts/lib/site-assets.ts): production HTML and lazy loaders reference content-fingerprinted CSS/JS, while editable previews use stable filenames.
 The Worker owns browser cache policy, keeping fingerprinted CSS/JS immutable and revalidating HTML and stable CSS/JS; [the development guide](docs/development.md#asset-urls-and-caching) describes compatibility copies and deployment limits.
 `site/scripts/course-administration.ts` owns the focused staff forms, while `site/scripts/course.ts` coordinates navigation, requests and student/review workflows.
@@ -85,18 +89,23 @@ Versioned grading-review presets also exercise retained work through withdrawal,
 
 ## State and access
 
-| Data                                    | Local storage                               | Production storage                              |
-| --------------------------------------- | ------------------------------------------- | ----------------------------------------------- |
-| Course records and revision history     | `.local/course.sqlite`                      | Dedicated `COURSE_DB` D1 binding                |
-| Course source archives and attachments  | `.local/course-files/`                      | Private `COURSE_FILES` R2 binding               |
-| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`    | Separate `COURSE_SIMULATION_DB` D1 binding      |
-| Simulation archives and attachments     | `.local/course-simulation/course-files/`    | Separate `COURSE_SIMULATION_FILES` R2 binding   |
-| Reader feedback                         | `.local/comments.json`                      | `COMMENTS_KV`                                   |
-| Chapter exercise answers                | `.local/learning.sqlite` by default         | Separate optional `LEARNING_DB` binding         |
-| Private learning notebook               | `.local/learning-companion/notebook.sqlite` | Student's local companion; never Worker storage |
+| Data                                    | Local storage                                    | Production storage                                       |
+| --------------------------------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| Course records and revision history     | `.local/course.sqlite`                           | Dedicated `COURSE_DB` D1 binding                         |
+| Course source archives and attachments  | `.local/course-files/`                           | Private `COURSE_FILES` R2 binding                        |
+| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`         | Separate `COURSE_SIMULATION_DB` D1 binding               |
+| Simulation archives and attachments     | `.local/course-simulation/course-files/`         | Separate `COURSE_SIMULATION_FILES` R2 binding            |
+| Reader feedback                         | `.local/comments.json`                           | `COMMENTS_KV`                                            |
+| Chapter exercise answers                | `.local/learning.sqlite` by default              | Separate optional `LEARNING_DB` binding                  |
+| Private learning notebook               | `.local/learning-companion/notebook.sqlite`      | Student's local companion; never Worker storage          |
+| Private agent conversations             | `.local/learning-companion/conversations.sqlite` | Student's local companion; excluded from notebook export |
+| Shared learning inquiries and offers    | Course record/history store                      | Existing `COURSE_DB`; source-scoped paginated reads      |
 
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
+Inquiry records use the existing course identity and allocation authority, with record revision checks and an atomic course revision guard.
+The ordinary course response excludes inquiry records; their dedicated API owns audience projection and initial-work gating.
+The notebook and provider credentials never enter course persistence.
 See [course-system.md](docs/course-system.md) and [chapter-exercises.md](docs/chapter-exercises.md) for configuration and state details.
 
 Staff authentication uses GitHub OAuth with a verified numeric GitHub identity.

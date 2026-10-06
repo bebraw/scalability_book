@@ -64,6 +64,7 @@ import {
 } from "../shared/course-solo.ts";
 import { parseSoloReview, soloReviewReady } from "./course-solo.ts";
 import { parseChecklist, parseFinalEvidence } from "./course-submission.ts";
+import { handleCourseInquiry } from "./course-inquiry.ts";
 export interface CourseUser {
   id: string;
   login: string;
@@ -377,13 +378,20 @@ export async function handleCourses(
       "You are not enrolled in this course.",
       403,
     );
+    if (action === "inquiry")
+      return handleCourseInquiry(
+        request,
+        { config, store, user, staff, now },
+        phaseText,
+        subject,
+      );
     if (!staff && request.method !== "GET")
       requireThat(
         course.students.some((s) => s.id === user.id && activeStudent(s)),
         "Your enrollment is withdrawn. Saved work remains available to view; contact staff to correct your enrollment.",
         403,
       );
-    const records = await store.list(id);
+    const records = await store.list(id, undefined, { excludeInquiry: true });
     const values = <T>(kind: string) =>
       records.filter((r) => r.kind === kind).map((r) => r.value as T);
     // A changed evidence record needs another assessment. Retain the old score for

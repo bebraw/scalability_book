@@ -179,7 +179,10 @@ Run `npx playwright test tests/e2e/course-simulation-walkthrough.spec.ts --proje
 Run `npm run companion` for the optional local private notebook service.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
 See [the learning-workspace guide](learning-workspace.md) for pairing, exact origins, portability and the current implementation boundary.
-Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts`.
+Use `npm run companion -- --codex` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
+Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/course-inquiry.test.ts`.
+Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, all declared demo controls and course-backed peer flow in Chromium/WebKit.
+The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
 
 ## Feedback Review
 

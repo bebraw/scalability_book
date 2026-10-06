@@ -3,6 +3,11 @@
 Chapters carry a concise narrative; course tasks motivate deeper exploration through a student's agent and the graph.
 Optional activities are discoverable from short chapter invitations, task-based starting points at `/explore/`, and the relevant concept cards.
 
+The optional **Notebook → Agent** interface connects these resources to a student's local companion and their own Codex access.
+[The workspace contract](learning-workspace.md#agent-and-demo-contract) owns its persisted conversation, explicitly selected notes and actual browser observation/action tools.
+[The student setup guide](learning-companion-setup.md) is published at `/notebook/setup/`.
+The public resource guidance below remains usable with ordinary external clients.
+
 `shared/explorations.ts` owns stable activity IDs, course-task connections, reading context, and concept membership.
 The scenario and prompts live in `explorations/<id>.md`; worked reasoning lives separately in `explorations/<id>.discussion.md`.
 The build generates one student page and two Markdown resources per activity:

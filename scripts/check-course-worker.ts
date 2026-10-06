@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { authHash } from "../worker/course-auth.ts";
 import type { AdministrationRevisions } from "../shared/course-administration.ts";
+import type { InquiryThread } from "../shared/course-inquiry.ts";
 import type {
   GroupProposal,
   WorkingAgreement,
@@ -102,6 +103,101 @@ config = await call(`/${id}/setup`, "PUT", {
   expected: config.revision,
   reason: "Smoke test roster and assignments",
 });
+const inquirySource = {
+  url: new URL("/chapters/benchmarking/", base).href,
+  anchor: "p-worker-inquiry-check",
+  title: "Observation intervals",
+  excerpt: "Use a common observation interval.",
+  kind: "passage",
+  revision: "synthetic-worker-check",
+  conceptIds: ["queue"],
+};
+const inquiryQuery = `/${id}/inquiry?source=${encodeURIComponent(JSON.stringify(inquirySource))}&question=reading`;
+assert.equal(
+  (
+    await fetch(new URL(`/api/courses${inquiryQuery}`, base), {
+      headers: { Cookie: student },
+    })
+  ).status,
+  403,
+);
+await call(
+  `/${id}/inquiry/attempts`,
+  "POST",
+  {
+    source: inquirySource,
+    question: "reading",
+    noteId: crypto.randomUUID(),
+    noteRevision: crypto.randomUUID(),
+  },
+  student,
+);
+const inquiry = await call<Envelope<InquiryThread>>(
+  `/${id}/inquiry`,
+  "POST",
+  {
+    source: inquirySource,
+    question: "reading",
+    audience: { kind: "group", phase: "establish", group: "blue" },
+    kind: "question",
+    body: "Synthetic private group inquiry",
+    provenance: "Local binding check",
+    links: [],
+  },
+  student,
+);
+const inquiryPage = await call<{
+  threads: Envelope<InquiryThread>[];
+  next: string | null;
+}>(inquiryQuery, "GET", undefined, student);
+assert.equal(inquiryPage.threads.length, 1);
+assert.equal(inquiryPage.threads[0]!.key, inquiry.key);
+assert.equal(inquiryPage.next, null);
+const courseView = await call(`/${id}`, "GET", undefined, student);
+assert.equal(
+  JSON.stringify(courseView).includes("Synthetic private group inquiry"),
+  false,
+);
+assert.equal(
+  (
+    await fetch(
+      new URL(`/api/courses/${id}/inquiry/${inquiry.value.id}`, base),
+      { headers: { Cookie: outsider } },
+    )
+  ).status,
+  403,
+);
+const inquiryReply = await call<Envelope<InquiryThread>>(
+  `/${id}/inquiry/${inquiry.value.id}/replies`,
+  "POST",
+  {
+    expected: inquiry.revision,
+    kind: "check",
+    body: "Synthetic instructor observation",
+  },
+);
+assert.equal(inquiryReply.value.posts.length, 2);
+assert.equal(
+  (
+    await fetch(
+      new URL(`/api/courses/${id}/inquiry/${inquiry.value.id}/replies`, base),
+      {
+        method: "POST",
+        headers: {
+          Cookie: student,
+          Origin: base.origin,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          expected: inquiry.revision,
+          kind: "question",
+          body: "Stale reply",
+        }),
+      },
+    )
+  ).status,
+  409,
+);
 const source = new TextEncoder().encode("streamed Worker R2 archive bytes");
 const upload = await fetch(
   new URL(
@@ -597,5 +693,5 @@ assert.equal(
   401,
 );
 console.log(
-  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment/catch-up/withdrawal and reinstatement, private review and blank withdrawn grades, consent/publication and private matching, working agreement, guarded history, streamed R2 source/technical evidence, retained checklists and immutable snapshots, read-only submission and access isolation.",
+  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment/catch-up/withdrawal and reinstatement, private review and blank withdrawn grades, consent/publication and private matching, attempt-gated peer inquiry and stale replies, working agreement, guarded history, streamed R2 source/technical evidence, retained checklists and immutable snapshots, read-only submission and access isolation.",
 );
