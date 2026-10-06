@@ -22,11 +22,16 @@ It uses npm and the Node version range in [package.json](package.json).
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
-The optional [local learning companion](scripts/learning-companion.ts) exposes the private notebook API independently of course storage and model providers.
+The optional local learning companion exposes the private notebook API independently of course storage and model providers.
+[learning-cli.ts](scripts/lib/learning-cli.ts) owns setup, authentication entry, startup and local diagnostics for both the repository command and the built [npm package](packages/learning-companion/package.json).
+[learning-storage.ts](scripts/lib/learning-storage.ts) owns stable per-user directories, directory leases and explicit copy migration; [learning-database.ts](scripts/lib/learning-database.ts) validates schemas read-only and backs up atomic upgrades.
+[learning-connection.ts](shared/learning-connection.ts) distinguishes package, browser protocol, storage/archive and compatible-provider versions.
+Package assembly bundles existing state/provider owners and authored resource registries with Node built-ins; the runtime has no website-build or provider-SDK dependency.
 [Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and browser pairing.
 The shared book layout exposes a lazy notebook interface through [learning-loader.ts](site/scripts/learning-loader.ts) and [learning-workspace.ts](site/scripts/learning-workspace.ts), including capture, reflection, concept judgments and selective submission drafts.
 [learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile.
 [learning-demos.ts](site/scripts/learning-demos.ts) exposes actual rendered controls and observations; proposed agent changes require student review in [learning-agent-ui.ts](site/scripts/learning-agent-ui.ts).
+[learning-start.ts](site/scripts/learning-start.ts) offers an optional prediction, actual demo observation and private reflection after pairing.
 [course-inquiry.ts](shared/course-inquiry.ts) owns peer audiences and historical access, and [the inquiry handler](worker/course-inquiry.ts) enforces them through the existing course API in both local development and the Worker.
 [learning-peers.ts](site/scripts/learning-peers.ts) reveals peer work after a private initial attempt and supports selected shared contributions, individual reflection and separately consented editorial offers.
 [The workspace guide](docs/learning-workspace.md) owns these contracts and their deployment/evaluation limits.
@@ -89,23 +94,27 @@ Versioned grading-review presets also exercise retained work through withdrawal,
 
 ## State and access
 
-| Data                                    | Local storage                                    | Production storage                                       |
-| --------------------------------------- | ------------------------------------------------ | -------------------------------------------------------- |
-| Course records and revision history     | `.local/course.sqlite`                           | Dedicated `COURSE_DB` D1 binding                         |
-| Course source archives and attachments  | `.local/course-files/`                           | Private `COURSE_FILES` R2 binding                        |
-| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`         | Separate `COURSE_SIMULATION_DB` D1 binding               |
-| Simulation archives and attachments     | `.local/course-simulation/course-files/`         | Separate `COURSE_SIMULATION_FILES` R2 binding            |
-| Reader feedback                         | `.local/comments.json`                           | `COMMENTS_KV`                                            |
-| Chapter exercise answers                | `.local/learning.sqlite` by default              | Separate optional `LEARNING_DB` binding                  |
-| Private learning notebook               | `.local/learning-companion/notebook.sqlite`      | Student's local companion; never Worker storage          |
-| Private agent conversations             | `.local/learning-companion/conversations.sqlite` | Student's local companion; excluded from notebook export |
-| Shared learning inquiries and offers    | Course record/history store                      | Existing `COURSE_DB`; source-scoped paginated reads      |
+| Data                                    | Local storage                                     | Production storage                                       |
+| --------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
+| Course records and revision history     | `.local/course.sqlite`                            | Dedicated `COURSE_DB` D1 binding                         |
+| Course source archives and attachments  | `.local/course-files/`                            | Private `COURSE_FILES` R2 binding                        |
+| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`          | Separate `COURSE_SIMULATION_DB` D1 binding               |
+| Simulation archives and attachments     | `.local/course-simulation/course-files/`          | Separate `COURSE_SIMULATION_FILES` R2 binding            |
+| Reader feedback                         | `.local/comments.json`                            | `COMMENTS_KV`                                            |
+| Chapter exercise answers                | `.local/learning.sqlite` by default               | Separate optional `LEARNING_DB` binding                  |
+| Private learning notebook               | `notebook.sqlite` in the companion data directory | Student's local companion; never Worker storage          |
+| Private agent conversations             | `conversations.sqlite` in that directory          | Student's local companion; excluded from notebook export |
+| Shared learning inquiries and offers    | Course record/history store                       | Existing `COURSE_DB`; source-scoped paginated reads      |
 
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
 Inquiry records use the existing course identity and allocation authority, with record revision checks and an atomic course revision guard.
 The ordinary course response excludes inquiry records; their dedicated API owns audience projection and initial-work gating.
 The notebook and provider credentials never enter course persistence.
+The packaged companion defaults to `~/Library/Application Support/scalableweb-companion/` on macOS and an absolute `$XDG_DATA_HOME/scalableweb-companion/` or `~/.local/share/scalableweb-companion/` on Linux.
+The repository entry retains `.local/learning-companion/`; an explicit `--directory` takes precedence.
+An optional dedicated `codex/` profile is separate from both databases and portable notebook archives.
+Removing a package does not remove these records; [student setup and recovery](docs/learning-companion-setup.md) owns migration and rollback instructions.
 See [course-system.md](docs/course-system.md) and [chapter-exercises.md](docs/chapter-exercises.md) for configuration and state details.
 
 Staff authentication uses GitHub OAuth with a verified numeric GitHub identity.

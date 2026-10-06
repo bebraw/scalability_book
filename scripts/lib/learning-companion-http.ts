@@ -2,6 +2,10 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 import type { LearningNotebook } from "./learning-notebook.ts";
 import type { LearningConversations } from "./learning-conversations.ts";
 import {
+  companionRelease,
+  type CompanionStatus,
+} from "../../shared/learning-connection.ts";
+import {
   LearningProblem,
   learningAssert,
   learningObject,
@@ -18,6 +22,7 @@ export interface CompanionOptions {
   code?: string;
   now?: () => number;
   conversations?: LearningConversations;
+  metadata?: Pick<CompanionStatus, "release" | "storage" | "schemas">;
 }
 export function createCompanionHandler(options: CompanionOptions) {
   const now = options.now ?? Date.now;
@@ -122,7 +127,7 @@ export function createCompanionHandler(options: CompanionOptions) {
           paired = true;
           const token = randomBytes(32).toString("base64url");
           sessions.set(token, { origin, expires: now() + 12 * 60 * 60_000 });
-          return reply({ token, version: 1 });
+          return reply({ token, version: companionRelease.protocol });
         }
         const token = request.headers
           .get("authorization")
@@ -130,7 +135,9 @@ export function createCompanionHandler(options: CompanionOptions) {
         const session = token ? sessions.get(token) : undefined;
         learningAssert(
           session && session.origin === origin && session.expires > now(),
-          "Connect the companion using its pairing code.",
+          session && session.expires <= now()
+            ? "Your companion session expired."
+            : "Connect the companion using its pairing code.",
           401,
         );
         if (url.pathname === "/disconnect" && request.method === "POST") {
@@ -141,8 +148,9 @@ export function createCompanionHandler(options: CompanionOptions) {
         if (url.pathname === "/status" && request.method === "GET")
           return reply({
             connected: true,
-            version: 1,
+            version: companionRelease.protocol,
             provider: options.conversations?.provider ?? null,
+            ...options.metadata,
           });
         if (url.pathname.startsWith("/agent/")) {
           const conversations = options.conversations;

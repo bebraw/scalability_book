@@ -128,9 +128,19 @@ The present step distributes the existing local companion while preserving stude
 
 ## Implementation and verification
 
-This ADR records accepted future work; no standalone package, per-user default or guided setup is implemented by this change.
-Current repository setup and storage paths remain documented in [the workspace guide](../../learning-workspace.md) and [student instructions](../../learning-companion-setup.md).
-When implementing, update those documents, [ARCHITECTURE.md](../../../ARCHITECTURE.md) and [development guidance](../../development.md) together with the behavior and release workflow.
+The repository now prepares `@scalableweb/companion@0.1.0`, with the `scalableweb-companion` executable and bebraw as publisher in the `scalableweb` npm organization.
+[The CLI](../../../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`; [the package workflow](../../../.github/workflows/learning-companion.yml) verifies its compiled tarball on macOS/Linux with Node 24 and 26.
+The default data paths are `~/Library/Application Support/scalableweb-companion/` on macOS and an absolute `$XDG_DATA_HOME/scalableweb-companion/` or `~/.local/share/scalableweb-companion/` on Linux.
+The repository entry retains its original `.local/learning-companion/` default.
+Package version 0.1.0, browser protocol 1, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
+Windows is not advertised as supported.
+
+Local checks on 2026-10-06 passed clean tarball installation and per-user continuity on macOS with Node 24.21.0 and 26.10.0, all 146 unit tests, type checking and ten notebook/onboarding/demo/peer browser checks in Chromium/WebKit.
+A newly created dedicated profile was signed in through the packaged CLI, and its real Codex browser check passed an actual reply, observed/approved demo change, resumed conversation and reviewed notebook draft.
+Synthetic checks passed copy migration, conflicts/live writers, preserved source history, schema snapshots/restoration, interrupted migration, newer-schema rejection, prerequisite failures and diagnostics without private text/tokens.
+
+This record remains Accepted until the declared matrix and registry publication have been verified.
+Current behavior, recovery instructions and release commands are maintained in [the workspace guide](../../learning-workspace.md), [student instructions](../../learning-companion-setup.md), [ARCHITECTURE.md](../../../ARCHITECTURE.md) and [development guidance](../../development.md).
 
 Before marking Implemented, verify:
 
@@ -148,9 +158,8 @@ Successful onboarding alone does not establish improved learning or completion.
 
 ## Open questions
 
-- Choose an available package name, publisher and release mechanism, and define the first verified runtime/platform matrix.
-- Select per-platform directory names and the exact migration/backup layout while preserving the storage and recovery constraints above.
-- Choose the CLI command names and protocol compatibility reporting format during implementation.
+The implementation choices above resolve the package, storage, command and compatibility questions.
+Independent student/group trials remain open under the evaluation guide; platform/provider checks alone do not answer the learning-outcome question.
 
 ## References
 

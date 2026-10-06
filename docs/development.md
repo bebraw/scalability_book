@@ -180,9 +180,45 @@ Run `npm run companion` for the optional local private notebook service.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
 See [the learning-workspace guide](learning-workspace.md) for pairing, exact origins, portability and the current implementation boundary.
 Use `npm run companion -- --codex` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
-Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/course-inquiry.test.ts`.
-Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, all declared demo controls and course-backed peer flow in Chromium/WebKit.
+The CLI also supports `setup`, `login`, `doctor` and `migrate`; for example, `npm run companion -- setup --codex` creates the development profile before `npm run companion -- login`.
+Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
+Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
+
+### Build and release the standalone package
+
+`packages/learning-companion/` owns `@scalableweb/companion`; its executable is `scalableweb-companion`.
+The package is built from the same CLI, notebook, conversation, provider and authored-resource modules as the repository command.
+Its per-user default is independent of the repository's development directory.
+The package has no runtime dependencies; its `files` allowlist includes only the launcher, compiled module, release metadata, README and license.
+
+```sh
+npm run companion:pack
+npm run companion:check
+```
+
+The first command bundles the runtime and records its Git revision in `packages/learning-companion/dist/release.json`, then writes `.local/companion-release/scalableweb-companion-<version>.tgz`.
+Both generated locations are ignored.
+Dirty builds are marked explicitly and are useful for iteration; publish only from a clean committed revision.
+The checker installs that tarball into a clean temporary directory, uses an isolated per-user home, launches without this checkout's dependencies and verifies retained notes across working directories, pairing and prerequisite failures.
+The onboarding browser check also installs the actual tarball, so pack it before running that test.
+
+[The package workflow](../.github/workflows/learning-companion.yml) runs focused tests, packing and clean installation on macOS/Linux with Node 24/26.
+Wait for all declared matrix jobs to pass before claiming platform support or publishing.
+The verified Codex adapter currently requires CLI 0.154.0; provider verification uses a real separately authenticated profile, while automatic jobs use synthetic records without credentials.
+To verify a freshly installed tarball, set `LEARNING_COMPANION_BIN` to its launcher and `LEARNING_CODEX_HOME` to its dedicated authenticated profile when running the opt-in browser check.
+
+The publisher is bebraw, with access to the `scalableweb` npm organization.
+Authenticate through `npm login --scope=@scalableweb`, then verify `npm whoami` without reading credentials into logs.
+After the artifact, matrix and provider checks pass, publish that exact tarball with public access:
+
+```sh
+npm publish .local/companion-release/scalableweb-companion-0.1.0.tgz --access public
+```
+
+If npm requires a browser/2FA step, complete its own authentication flow and rerun publishing.
+Record the release's source revision, tarball integrity and verification in ADR-030, and remove any pending-publication wording from the student guide only after registry availability is verified.
+Future releases update the package manifest and shared release metadata together, explain compatible protocol/schema/provider changes, and repeat the packed-artifact checks.
 
 ## Feedback Review
 

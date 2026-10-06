@@ -1,4 +1,6 @@
-import { LearningClient } from "./learning-client.ts";
+import { LearningClient, LearningConnectionError } from "./learning-client.ts";
+import { mountLearningStart } from "./learning-start.ts";
+import type { CompanionStatus } from "../../shared/learning-connection.ts";
 import { mountLearningAgent } from "./learning-agent-ui.ts";
 import { mountLearningPeers } from "./learning-peers.ts";
 export {
@@ -26,6 +28,7 @@ type View =
   | "connect"
   | "agent"
   | "peers";
+type NotebookView = View | "start";
 const client = new LearningClient();
 const panel = document.createElement("dialog");
 panel.className = "learning-workspace";
@@ -37,7 +40,8 @@ document.body.append(panel);
 const container = panel.querySelector<HTMLDivElement>(".learning-body")!;
 const tabs = panel.querySelector<HTMLElement>(".learning-tabs")!;
 const status = panel.querySelector<HTMLElement>(".learning-status")!;
-let view: View = "write";
+let view: NotebookView = "write";
+let companionStatus: CompanionStatus | null = null;
 let connected = false;
 let entries: NotebookEntry[] = [];
 let judgments: ConceptJudgment[] = [];
@@ -134,6 +138,13 @@ async function run(action: () => void | Promise<void>) {
   } catch (error) {
     status.textContent =
       error instanceof Error ? error.message : "The notebook action failed.";
+    if (
+      error instanceof LearningConnectionError &&
+      error.reason !== "pairing"
+    ) {
+      connected = false;
+      render();
+    }
   }
 }
 let fieldNumber = 0;
@@ -160,6 +171,7 @@ function download(filename: string, body: string, type = "text/plain") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 async function refresh() {
+  companionStatus = await client.status();
   const data = await client.request<{
     entries: NotebookEntry[];
     judgments: ConceptJudgment[];
@@ -168,7 +180,7 @@ async function refresh() {
   judgments = data.judgments;
   connected = true;
 }
-function navigate(next: View) {
+function navigate(next: NotebookView) {
   view = next;
   render();
 }
@@ -182,6 +194,7 @@ function render() {
     ["peers", "Peers"],
     ["prepare", "Prepare"],
     ["connect", "Connect"],
+    ["start", "Start"],
   ] as const) {
     const tab = button(label, () => navigate(id));
     tab.setAttribute("aria-current", String(view === id));
@@ -207,6 +220,19 @@ function render() {
   if (view === "concepts") renderConcepts();
   if (view === "prepare") renderPreparation();
   if (view === "connect") renderConnection();
+  if (view === "start")
+    mountLearningStart(container, {
+      entries,
+      save: async (kind, title, body, source) => {
+        await client.request("/entries", "POST", { kind, title, body, source });
+        await refresh();
+      },
+      notes: () => navigate("notes"),
+      leave: () => navigate("write"),
+      status: (text) => {
+        status.textContent = text;
+      },
+    });
   if (view === "peers")
     mountLearningPeers(container, {
       source: editor.source,
@@ -685,7 +711,7 @@ function renderConnection() {
     ),
   );
   const command = node("pre");
-  command.append(node("code", "npm run companion"));
+  command.append(node("code", "npx @scalableweb/companion@0.1.0 start"));
   container.append(
     command,
     link("Companion setup and notebook backups", "/notebook/setup/"),
@@ -713,6 +739,32 @@ function renderConnection() {
       ),
     );
   } else {
+    if (companionStatus) {
+      container.append(
+        node(
+          "p",
+          `Companion ${companionStatus.release?.version ?? "legacy"}; protocol ${companionStatus.version}; ${companionStatus.provider ? "Codex enabled" : "notebook-only"}.`,
+          "learning-hint",
+        ),
+      );
+      if (companionStatus.storage)
+        container.append(
+          node(
+            "p",
+            `Your notebook: ${companionStatus.storage}`,
+            "learning-storage-location",
+          ),
+        );
+    }
+    container.append(
+      button("Check connection", async () => {
+        await refresh();
+        status.textContent =
+          "Connection and protocol are available. Local prerequisite checks are available through doctor in your terminal.";
+        render();
+      }),
+      button("Try a first investigation", () => navigate("start")),
+    );
     container.append(
       button("Export notebook backup", async () => {
         const archive = await client.request<unknown>("/export");

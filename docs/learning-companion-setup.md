@@ -6,13 +6,14 @@ Reading the book does not require a companion or a model account.
 
 ## Start on your computer
 
-Install Node.js 24 or newer, then get the book repository and its dependencies:
+The standalone package is `@scalableweb/companion`, maintained by bebraw.
+Its first release is being verified before registry publication; the commands below require version 0.1.0 to be published.
+Use the repository fallback below until then.
+Install Node.js 24 or 26, then set up a notebook without cloning the book:
 
 ```sh
-git clone https://github.com/bebraw/scalability_book.git
-cd scalability_book
-npm ci
-npm run companion
+npx @scalableweb/companion@0.1.0 setup --notebook
+npx @scalableweb/companion@0.1.0 start
 ```
 
 Keep the companion running while you use your notebook.
@@ -25,8 +26,30 @@ The default website is `https://scalableweb.dev`; local book development at `htt
 For another development address, pass its exact origin:
 
 ```sh
-npm run companion -- --origin http://127.0.0.1:3100
+npx @scalableweb/companion@0.1.0 start --origin http://127.0.0.1:3100
 ```
+
+The packaged companion uses a stable directory independently of your current folder and npm's cache:
+
+| System | Default directory                                                                                          |
+| ------ | ---------------------------------------------------------------------------------------------------------- |
+| macOS  | `~/Library/Application Support/scalableweb-companion/`                                                     |
+| Linux  | `$XDG_DATA_HOME/scalableweb-companion/`, or `~/.local/share/scalableweb-companion/` when unset or relative |
+
+The release checks target macOS and Linux with Node 24 and 26.
+Windows support has not been verified.
+The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
+Keep the companion running while using the book; Ctrl+C stops it without removing your work.
+
+### Optional first investigation
+
+After pairing, choose **Connect → Try a first investigation**, or **Start**.
+Open the queue lab using its link and return to **Notebook → Start**.
+Save a prediction or a concrete uncertainty, change the demo's mean time, and record the browser observation.
+Reflect in your own words, then choose **Review my saved notes**.
+Restart the companion, pair its new code and reopen those notes to check continuity.
+You can leave the investigation for your own question at any point.
+This is optional support, with no required answer, minimum length, completion mark or additional course report.
 
 ## Capture and revisit your thinking
 
@@ -52,17 +75,19 @@ Install that version if you do not already have it:
 
 ```sh
 npm install -g @openai/codex@0.154.0
-mkdir -p .local/learning-companion/codex
-CODEX_HOME="$PWD/.local/learning-companion/codex" codex login -c cli_auth_credentials_store='"file"'
+npx @scalableweb/companion@0.1.0 setup --codex
+npx @scalableweb/companion@0.1.0 login
 ```
 
 Stop the notebook-only companion, then start it with your dedicated Codex profile:
 
 ```sh
-npm run companion -- --codex
+npx @scalableweb/companion@0.1.0 start
 ```
 
 Pair the new code in the book.
+Setup creates the dedicated profile before login and retains your provider choice.
+Login uses Codex's own authentication flow; do not send credentials to the website or a support request.
 The dedicated profile separates this learning space from your ordinary coding environment.
 It must not contain custom configuration, hooks, plugins, rules or custom skills.
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
@@ -98,10 +123,36 @@ Public review is a separate opt-in copy of the author's reviewed contribution; i
 Course staff review offers, and book editors decide what to publish through the existing Markdown review workflow.
 Optional session prompts support your existing operator/challenger/validator practice; arrange meetings yourselves.
 
+## Diagnose a connection
+
+Stop the companion, then run the same release and directory/port options with `doctor`:
+
+```sh
+npx @scalableweb/companion@0.1.0 doctor
+```
+
+It checks storage/schema compatibility, the loopback port, and the optional Codex prerequisites.
+Install the displayed verified provider version when it is missing or unsupported; run `login` for missing dedicated-profile authentication.
+An account's access is checked on its first real reply.
+Use `start --notebook` to continue writing without a provider.
+If a port is busy, stop the other process or select `--port 8789` and pair that address.
+For a storage permission error, select a writable private directory; do not reset the database.
+
+In **Connect**, **Check connection** shows the package/protocol versions and storage path after successful pairing.
+A failed or expired code needs a restart and a fresh single-use code.
+An expired companion session needs pairing again; your notebook and unsaved browser draft remain available.
+For an incompatible protocol, use the version shown in this guide and reload the book.
+Browser network errors cannot reliably distinguish a stopped process, an origin mismatch or denied local-network access.
+Check that the companion is running, that its allowed websites include the exact book origin, and that your browser permits local access.
+
+`doctor --json` produces a local report containing versions, paths and check results, without notes, conversations, provider diagnostics, credentials or connection tokens.
+Review its filesystem paths before deliberately sharing it for support.
+Nothing sends the report automatically.
+
 ## Keep your work portable
 
-The notebook is stored on your computer under `.local/learning-companion/` in the repository.
-It is excluded from Git and published website output.
+The packaged notebook lives in the per-user directory printed by the CLI.
+Removing a package or clearing npm's cache does not remove it.
 You can read and edit it without a model connection while the companion is running.
 
 Use **Connect → Export notebook backup** to save a portable JSON archive.
@@ -110,17 +161,56 @@ Identical records are retained once; imports with conflicting existing work are 
 Keep both copies and start a separate notebook if you need to inspect a conflict:
 
 ```sh
-npm run companion -- --directory .local/another-notebook
+npx @scalableweb/companion@0.1.0 start --directory /absolute/path/to/another-notebook
 ```
 
-Export before moving or removing your repository directory, and keep a backup outside that directory.
+Keep a backup outside the companion's directory.
 Your course membership does not give teachers or peers access to the private notebook.
 
-Before updating, export a backup and stop the companion.
-Run `git pull --ff-only` and `npm ci` in the repository, retain `.local/learning-companion/`, then restart and pair again.
+Before updating, export a backup, stop the companion and privately copy its directory.
+Choose a documented newer package version explicitly; retain the same storage directory, then restart and pair again.
+Startup validates database schemas before writing and saves a `.before-schema-1-<id>.backup` snapshot when converting the original unversioned database to schema 1.
+An interrupted conversion can be retried after stopping every writer; the backup remains available.
+Older releases may reject newer schemas.
+To roll back, stop the companion/provider and restore the full pre-update directory copy, retaining the upgraded copy separately; use its compatible release.
+For a single schema conversion, privately retain the current database, copy its matching `.backup` file back as `notebook.sqlite` or `conversations.sqlite`, then use a compatible release.
+Restoring a backup loses subsequent changes in that restored copy; keep exports/current files so you can review and recover them separately.
 Keep the verified Codex version until a newer version has passed the documented provider check.
 
 Portable notebook archives do not include credentials or raw conversations.
 Conversations are stored separately in `conversations.sqlite`, with provider threads in the dedicated Codex profile.
 To preserve conversation continuity as well, stop the companion and privately back up its directory and any separately configured profile.
 Restoring only the portable notebook lets you start a new conversation from selected notes without depending on an old provider session.
+
+### Move an existing repository notebook
+
+Stop the old companion and its Codex process.
+Before running packaged setup in the destination, migrate the old directory:
+
+```sh
+npx @scalableweb/companion@0.1.0 migrate --from /absolute/path/to/scalability_book/.local/learning-companion --confirm-stopped
+```
+
+The command shows source/destination, retains the source, and rejects a nonempty destination.
+Use `--directory /absolute/path/to/new-location` when you need another destination.
+It copies notebook history, conversations and an included dedicated profile without changing record identities.
+After migration, run `setup --notebook`, or `setup --codex` and `doctor` to check the copied profile.
+For a separately located profile, keep it and pass `--codex-home /absolute/path/to/profile` during setup.
+Verify sign-in and resumed conversations before removing any old copy.
+If continuity is unavailable, keep conversations backed up and start a new conversation from selected retained notes.
+
+### Repository development fallback
+
+The book checkout remains usable while the package release is being prepared:
+
+```sh
+git clone https://github.com/bebraw/scalability_book.git
+cd scalability_book
+npm ci
+npm run companion -- setup --notebook
+npm run companion
+```
+
+This development command retains `.local/learning-companion/` as its default.
+Use `npm run companion -- setup --codex`, then `npm run companion -- login` for its dedicated provider profile.
+Export and privately copy that directory/profile before updating with `git pull --ff-only` and `npm ci`, or before removing the checkout.

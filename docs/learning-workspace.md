@@ -10,6 +10,8 @@ The local companion provides an authenticated private notebook API: note capture
 The whole-book Notebook interface loads on demand on reading, concept, exploration and demo pages, with passage capture independent of feedback sign-in.
 The optional Codex adapter provides persisted conversations, bounded browser demo tools and student-reviewed notebook drafts.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
+The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.
+Registry publication and the declared platform/provider evidence are recorded in ADR-030; a built package does not by itself establish registry availability.
 Production availability of peer inquiry depends on the existing course storage and authentication rollout.
 
 The shared contract is [learning-workspace.ts](../shared/learning-workspace.ts).
@@ -19,7 +21,9 @@ The website/Worker never owns this private notebook or provider credentials.
 
 ## Start the companion
 
-Use Node 24 or newer and the repository's installed dependencies:
+The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
+Follow [student setup](learning-companion-setup.md) for version 0.1.0 and its publication status.
+The development entry keeps the repository's installed dependencies and existing default:
 
 ```bash
 npm run companion
@@ -34,6 +38,8 @@ npm run companion -- --origin http://127.0.0.1:3100 --directory .local/learning-
 ```
 
 The private notebook lives at `.local/learning-companion/notebook.sqlite`, outside published output and ignored by Git.
+That path belongs to the repository entry only.
+The packaged entry chooses the per-user macOS/Linux path in the student guide; both accept an explicit `--directory`.
 Use `--directory` to choose another notebook and `--port` for another loopback port.
 Keep the original database when updating the companion; restart it to obtain a new pairing code after disconnect, expiry or a lost browser session.
 
@@ -42,6 +48,35 @@ The resulting bearer session is bound to that origin, expires after twelve hours
 Browser requests use the Authorization header, not URL credentials or cookies.
 CORS preflight is origin-gated, including local-network permission requests.
 The companion does not log notes, provider credentials or session tokens.
+
+### Distribution, diagnostics and storage recovery
+
+[learning-cli.ts](../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`.
+Setup offers notebook-only or optional Codex use, creates required directories before login and stores the chosen provider/profile in `companion-settings.json`.
+Port/origin/model overrides remain explicit command options; repeat them when starting or diagnosing that configuration.
+CLI storage/schema checks occur before opening the writing stores.
+An unavailable port, denied storage permission, unsupported provider version or missing dedicated-profile authentication provides a concrete next step while retaining records.
+The dedicated Codex CLI authentication result is a prerequisite check; a real reply establishes account/provider availability.
+
+Authenticated `/status` returns package/source revision, protocol, provider mode, selected storage path and notebook/conversation/archive schema versions.
+The browser requires protocol 1 before retaining a paired token or accepting status.
+Failed codes and expired sessions lead to ordinary re-pairing; network feedback names the possible process/origin/local-permission causes without pretending to distinguish them.
+`doctor --json` contains only release/path/check metadata; no telemetry or automatic support upload is introduced.
+
+[learning-storage.ts](../scripts/lib/learning-storage.ts) owns per-user path selection, exclusive process leases and explicit migration.
+Migration requires `--from` and `--confirm-stopped`, validates regular files/supported schemas and copies privately through an atomic staged-directory rename.
+It retains the source and rejects occupied destinations or active writers.
+Notebook/conversation identities and histories are copied intact; included provider profiles are copied, while external profiles need an explicit `--codex-home`.
+Setup preferences are not copied because their absolute profile path may identify the old directory; select the mode again after migration.
+Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
+
+[learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
+Package 0.1.0, browser protocol 1, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
+New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
+Interrupted migration retains a recoverable snapshot and can be retried once writers stop.
+Restoration and rollback require stopping the companion/provider, retaining current files separately and restoring a compatible pre-update directory/database; portable archives remain independent of raw conversations and credentials.
+The student guide owns the concrete recovery steps and limits.
 
 ## Notebook and portability
 
@@ -69,12 +104,16 @@ The Write, Notes, Concepts and Prepare sections support capture, revision, recal
 The Connect section handles pairing and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
 Students review drafts and use the ordinary course submission form.
 The published [student setup guide](learning-companion-setup.md) is available at `/notebook/setup/`.
+The optional Start section supports an initial prediction, actual queue-demo observation with authored assumptions, private reflection and reopening saved notes.
+Leaving/skipping has no assessment consequence, and no mastery mark or new submission is generated.
 
 ## Verification
 
 ```bash
-node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/course-inquiry.test.ts
-npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts
+node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts
+npm run companion:pack
+npm run companion:check
+npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts
 npm run types:check
 ```
 

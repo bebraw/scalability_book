@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { openLearningDatabase } from "./learning-database.ts";
 import { chmodSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
@@ -27,11 +27,12 @@ export function openLearningConversations(
   provider: LearningProvider | null,
 ) {
   const filename = path.join(directory, "conversations.sqlite");
-  const db = new DatabaseSync(filename);
-  chmodSync(filename, 0o600);
-  db.exec(
-    "PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS conversations (id TEXT PRIMARY KEY, body TEXT NOT NULL)",
+  const db = openLearningDatabase(
+    filename,
+    "conversations",
+    "CREATE TABLE conversations (id TEXT PRIMARY KEY, body TEXT NOT NULL)",
   );
+  chmodSync(filename, 0o600);
   let closed = false;
   const load = (id: string) => {
     const row = db

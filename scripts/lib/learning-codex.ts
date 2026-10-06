@@ -62,13 +62,16 @@ const toolSpecs = [
     },
   },
 ];
-export async function createCodexProvider(options: {
-  home: string;
-  model?: string;
-  binary?: string;
-}): Promise<LearningProvider> {
-  const home = path.resolve(options.home);
+export async function validateLearningCodexProfile(
+  home: string,
+  requireAuth = true,
+) {
   await mkdir(home, { recursive: true, mode: 0o700 });
+  const directoryState = await lstat(home);
+  learningAssert(
+    directoryState.isDirectory() && !directoryState.isSymbolicLink(),
+    "Use a regular dedicated Codex profile directory.",
+  );
   const exists = async (name: string) =>
     lstat(path.join(home, name)).catch(() => null);
   for (const name of [
@@ -95,10 +98,40 @@ export async function createCodexProvider(options: {
       "Use a dedicated profile without custom skills.",
     );
   const auth = await exists("auth.json");
+  const authenticated = Boolean(auth?.isFile() && !auth.isSymbolicLink());
   learningAssert(
-    auth?.isFile() && !auth.isSymbolicLink(),
+    !requireAuth || authenticated,
     "Sign in to the dedicated Codex profile first; see /notebook/setup/.",
   );
+  return authenticated;
+}
+export function learningCodexEnvironment(home: string) {
+  const env: Record<string, string> = {};
+  for (const name of [
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "TMPDIR",
+    "SYSTEMROOT",
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "NO_PROXY",
+    "SSL_CERT_FILE",
+    "SSL_CERT_DIR",
+    "CODEX_CA_CERTIFICATE",
+    "NODE_EXTRA_CA_CERTS",
+  ])
+    if (process.env[name]) env[name] = process.env[name]!;
+  Object.assign(env, { CODEX_HOME: home, HOME: home, USERPROFILE: home });
+  return env as NodeJS.ProcessEnv;
+}
+export async function createCodexProvider(options: {
+  home: string;
+  model?: string;
+  binary?: string;
+}): Promise<LearningProvider> {
+  const home = path.resolve(options.home);
+  await validateLearningCodexProfile(home);
   const workspace = path.join(home, "book-workspace");
   await mkdir(workspace, { recursive: true, mode: 0o700 });
   learningAssert(
@@ -147,23 +180,7 @@ export async function createCodexProvider(options: {
       ].map((name) => [name, false]),
     ),
   };
-  const env: Record<string, string> = {};
-  for (const name of [
-    "PATH",
-    "LANG",
-    "LC_ALL",
-    "TMPDIR",
-    "SYSTEMROOT",
-    "HTTP_PROXY",
-    "HTTPS_PROXY",
-    "NO_PROXY",
-    "SSL_CERT_FILE",
-    "SSL_CERT_DIR",
-    "CODEX_CA_CERTIFICATE",
-    "NODE_EXTRA_CA_CERTS",
-  ])
-    if (process.env[name]) env[name] = process.env[name]!;
-  Object.assign(env, { CODEX_HOME: home, HOME: home, USERPROFILE: home });
+  const env = learningCodexEnvironment(home);
   let child: ChildProcessWithoutNullStreams | null = null;
   let sequence = 0;
   let ready: Promise<void> | null = null;

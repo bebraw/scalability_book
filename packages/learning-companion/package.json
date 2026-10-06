@@ -1,0 +1,30 @@
+{
+  "name": "@scalableweb/companion",
+  "version": "0.1.0",
+  "description": "Private local notebook and student-agent companion for scalableweb.dev",
+  "type": "module",
+  "license": "MIT",
+  "author": "Juho Vepsäläinen (bebraw)",
+  "homepage": "https://scalableweb.dev/notebook/setup/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bebraw/scalability_book.git",
+    "directory": "packages/learning-companion"
+  },
+  "bin": {
+    "scalableweb-companion": "bin/companion.mjs"
+  },
+  "files": [
+    "bin/companion.mjs",
+    "dist/companion.js",
+    "dist/release.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

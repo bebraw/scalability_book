@@ -47,7 +47,7 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | [ADR-030](accepted/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md) | Distribute a versioned standalone companion with guided setup, stable per-user storage, explicit migration and compatible updates. |
 
-ADR-030 records the next student-onboarding increment; the current repository-based setup remains in effect until it is implemented.
+ADR-030's standalone implementation is undergoing release verification; its record identifies the checks already passed and the pending platform matrix/publication.
 
 ## Implemented
 

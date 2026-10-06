@@ -1,5 +1,5 @@
 import { mkdirSync, chmodSync } from "node:fs";
-import { DatabaseSync } from "node:sqlite";
+import { openLearningDatabase } from "./learning-database.ts";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import {
@@ -24,11 +24,15 @@ import {
 export function openLearningNotebook(directory: string) {
   mkdirSync(directory, { recursive: true, mode: 0o700 });
   const filename = path.join(directory, "notebook.sqlite");
-  const database = new DatabaseSync(filename);
+  const database = openLearningDatabase(
+    filename,
+    "notebook",
+    `
+    CREATE TABLE notebook_records (kind TEXT NOT NULL, id TEXT NOT NULL, revision TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id));
+    CREATE TABLE notebook_judgment_history (revision TEXT PRIMARY KEY, body TEXT NOT NULL);`,
+  );
   chmodSync(filename, 0o600);
-  database.exec(`PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000;
-    CREATE TABLE IF NOT EXISTS notebook_records (kind TEXT NOT NULL, id TEXT NOT NULL, revision TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(kind,id));
-    CREATE TABLE IF NOT EXISTS notebook_judgment_history (revision TEXT PRIMARY KEY, body TEXT NOT NULL);`);
+  database.exec("PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000");
   function records<T>(kind: string): T[] {
     return database
       .prepare("SELECT body FROM notebook_records WHERE kind = ? ORDER BY id")

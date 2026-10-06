@@ -18,10 +18,12 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
   const child = spawn(
     process.execPath,
     [
-      "scripts/learning-companion.ts",
+      process.env.LEARNING_COMPANION_BIN ?? "scripts/learning-companion.ts",
       "--codex",
       "--codex-home",
-      path.resolve(".local/learning-companion/codex"),
+      path.resolve(
+        process.env.LEARNING_CODEX_HOME ?? ".local/learning-companion/codex",
+      ),
       "--directory",
       directory,
       "--port",

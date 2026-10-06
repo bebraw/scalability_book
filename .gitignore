@@ -3,6 +3,7 @@ build/
 .dev-build*/
 worker/generated/
 .local/
+packages/learning-companion/dist/
 .local-e2e/
 playwright-report/
 test-results/
