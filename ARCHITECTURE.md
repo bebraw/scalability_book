@@ -32,7 +32,9 @@ Course sign-in enters through `/api/course-auth/` in both adapters.
 `worker/course-auth.ts` owns token/session and mail-delivery rules; `worker/course-auth-store.ts` shares atomic SQL through the D1 and local SQLite ports.
 `shared/course-roster.ts` owns CSV parsing and mapping, while the administration domain validates identities and merges enrollment into the current course snapshot.
 `site/scripts/course-signin.ts` renders the email request and explicit link-confirmation flow.
-`worker/course-mail.ts` adapts login messages to Cloudflare Email Sending with a fixed course sender; the Worker selects it only when its binding and explicit enablement variable are present.
+`worker/course-mail.ts` adapts login messages to Cloudflare Email Sending with a server-configured sender; the Worker selects it only when its binding, valid `COURSE_EMAIL_FROM` secret and explicit enablement variable are present.
+`worker/course-forwarding.ts` owns incoming mail, invoked by the Worker's `email()` entry point through an exact Email Routing rule.
+It accepts only the configured course inbox and forwards the original message to the verified `COURSE_EMAIL_FORWARD_TO` destination; neither address nor message content is published, stored or logged by the application.
 
 Group formation enters through `/api/courses/:course/formation/:phase`, student preference/proposal/confirmation routes and the existing staff Groups save.
 `shared/course-formation.ts` owns types and public projection; `worker/course-formation.ts` owns validation and consent changes; `site/scripts/course-formation.ts` renders the staff/student flow.
@@ -126,7 +128,7 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified forwarding to the Fastmail-hosted inbox and live delivery verification remain outstanding.
+- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): sending and incoming forwarding use server-only address secrets; live course-login delivery verification remains outstanding.
 
 Implement these in bounded changes that retain historical identities, frozen membership, assessment provenance, and privacy.
 Record the implementation evidence before moving each ADR to `implemented/`.

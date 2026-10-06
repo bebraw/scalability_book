@@ -15,7 +15,7 @@ Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
 Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes, plus a verified browser walkthrough of all three teaching phases.
 Withdrawals retain history, create group-review tasks and receive no final grade.
-Production email provisioning remains pending.
+Production login delivery remains disabled pending external verification; incoming email uses server-only forwarding configuration.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -300,7 +300,7 @@ There is no institutional grade-system integration yet.
 
 ## Production configuration
 
-The implementation is ready for configuration; this change does not provision resources or deploy it.
+Course storage is configured separately from the book and incoming email.
 The book can still deploy without course bindings, in which case the course API reports that storage is unavailable.
 
 1. Create a dedicated D1 database and private R2 bucket:
@@ -335,58 +335,81 @@ Automatic repository cloning, AI grading, self-enrollment and institutional sing
 
 ### Course mail setup
 
-`worker/course-mail.ts` uses the native Cloudflare Email Sending binding with a fixed sender and reply-to of `info@scalableweb.dev`.
+Both mailboxes are server-only configuration: `COURSE_EMAIL_FROM` is the course sender, reply-to and exact incoming recipient; `COURSE_EMAIL_FORWARD_TO` is the instructor's existing Fastmail-hosted destination.
+Keep their actual values out of source, documentation, tests and public website assets.
+Use Worker secrets in production and ignored local environment files when configuring the service.
+The tracked `.dev.vars.example` contains synthetic values only.
+Cloudflare still holds the exact incoming address in its routing rule and the verified destination in its account settings.
+
+On 2026-10-06, both address secrets were configured on the production Worker, the Fastmail destination was verified, and the exact incoming rule was activated with catch-all routing disabled.
+Cloudflare reports Email Routing ready and Email Sending enabled for the course domain.
+Production configuration includes `COURSE_MAIL` with login delivery explicitly disabled.
+An inbox check and the normal course sign-in delivery check are recorded separately; configured routes do not establish delivery.
+
+`worker/course-mail.ts` uses native Cloudflare Email Sending through `COURSE_MAIL`.
+It accepts a configured sender on the course domain and sign-in links for `https://scalableweb.dev/course/`.
 Messages contain plain text and escaped HTML, the course name, an explicit confirmation instruction and UTC expiry.
-The transport accepts only sign-in links for `https://scalableweb.dev/course/`.
+Recipients see the sender and reply-to in their private email messages.
 No SMTP password or Email Sending API token is needed by the Worker.
 Application logs contain a `course_login_delivery_failed` event and course ID on failure, without the address, credential or provider error body.
-Cloudflare accepting a send is not proof that it arrived in the student's inbox; use the provider's email logs for delivery/bounce diagnosis.
+Cloudflare accepting a send is not proof that it arrived in the student's inbox; use provider delivery/bounce logs to diagnose failures.
 
-The read-only account check on 2026-10-05 did not list `scalableweb.dev` as an enabled sending domain.
-The selected forwarding destination is `info@survivejs.com`, hosted by Fastmail (confirmed 2026-10-06); Cloudflare destination verification remains outstanding.
-Fastmail’s role is the receiving inbox, so this selection does not change the Worker’s Cloudflare sender integration.
-No domain was onboarded, DNS changed, paid plan upgraded, real mail sent or Worker deployed by the implementation checks.
+`worker/course-forwarding.ts` handles incoming messages through the Worker's `email()` entry point.
+It checks the configured recipient and forwards the original message stream using `COURSE_EMAIL_FORWARD_TO` without reading, storing or logging message contents.
+Missing or invalid configuration, unknown recipients and a destination equal to the course inbox are rejected.
+Provider errors are replaced with a generic error that cannot contain the destination or message metadata.
+Incoming forwarding does not depend on course databases, student enrollment or the login-delivery flag.
 
-Before live course access:
+Configure the incoming path:
+
+1. Inspect existing MX and authentication records before enabling Email Routing for `scalableweb.dev`; preserve existing mail arrangements.
+   Cloudflare adds Routing's root-domain MX/SPF/DKIM records.
+2. Add the instructor's receiving mailbox as a Cloudflare destination and click its verification email.
+   Destination verification applies to every mailbox provider; Fastmail requires no SMTP integration here.
+3. Configure both private values with interactive secret prompts:
+
+   ```bash
+   npx wrangler secret put COURSE_EMAIL_FROM
+   npx wrangler secret put COURSE_EMAIL_FORWARD_TO
+   ```
+
+   For unattended setup, use `wrangler secret bulk` with an ignored, access-restricted JSON file populated from private environment configuration.
+   Do not put values in command arguments or commit that file.
+
+4. Deploy the Worker with these secrets retained, then create an exact routing rule for the configured course address: **Send to a Worker** → `scalability-book`.
+   Leave catch-all routing disabled; the handler also checks the exact recipient independently.
+5. Send an incoming question from a different account than the forwarding destination and confirm arrival in the instructor's inbox.
+   Cloudflare route status alone does not prove inbox delivery.
+
+Before live course sign-in:
 
 1. Recheck [Email Sending availability and pricing](https://developers.cloudflare.com/email-service/platform/pricing/) for the selected account.
    Sending to arbitrary institutional recipients requires Workers Paid; a successful send to a verified address alone does not establish that eligibility.
    `npx wrangler email sending list` is a read-only domain inventory.
-2. Onboard `scalableweb.dev` under **Compute → Email Service → Email Sending** and review the provider's generated DNS records before applying them.
-   Verify sending MX/SPF on `cf-bounce`, sending DKIM and the domain's DMARC setup through the [domain configuration guide](https://developers.cloudflare.com/email-service/configuration/domains/).
-   Preserve any existing mail arrangements when reviewing DNS changes.
-3. Configure **Email Routing** separately: verify `info@survivejs.com` through the verification message in its Fastmail inbox, then create the exact rule `info@scalableweb.dev` → **Send to an email** → `info@survivejs.com`.
-   Check Routing's own root-domain MX/SPF/DKIM records and the rule's active status.
-   Use the [routing-address guide](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/); a Worker email handler or catch-all rule is unnecessary for this forwarding arrangement.
-4. Add this binding to the production `wrangler.jsonc`, retaining the existing course and book bindings:
+2. Onboard the domain for Email Sending and verify its separate `cf-bounce` MX/SPF, sending DKIM and DMARC records through the [domain configuration guide](https://developers.cloudflare.com/email-service/configuration/domains/).
+3. Retain the transactional binding in production configuration alongside the book and course bindings:
 
    ```jsonc
-   "send_email": [{
-     "name": "COURSE_MAIL",
-     "allowed_sender_addresses": ["info@scalableweb.dev"]
-   }]
+   "send_email": [{ "name": "COURSE_MAIL" }]
    ```
 
-   Merge `COURSE_EMAIL_ENABLED: "true"` into the production `vars` only after domain setup is verified and a controlled delivery check is authorized.
-   For that first check, temporarily add `allowed_destination_addresses` containing only the instructor-controlled recipient and enroll that address in a test run.
-   The public request route still sends only to enrolled addresses.
+   The server chooses the sender exclusively from `COURSE_EMAIL_FROM`; requests cannot override it.
+   For a controlled first check, apply a temporary destination restriction privately in Cloudflare and enroll only the instructor-controlled recipient in a test run.
 
-5. With explicit authorization to send the test message, request a link through the normal course sign-in form, inspect its sender and inbox delivery, confirm sign-in, and verify reuse rejection.
-   Test an incoming question to `info@scalableweb.dev` and confirm forwarding to `info@survivejs.com` in Fastmail.
-   Send the incoming test from a different account than the forwarding destination, as some providers suppress same-account forwarding tests.
-   Record results without saving a credential or full magic-link URL in reports.
-   Remove the temporary recipient restriction only when starting institutional delivery; retain the fixed sender restriction.
+4. Enable `COURSE_EMAIL_ENABLED: "true"` only after mail setup and course storage are ready and a controlled delivery check is authorized.
+   Missing binding or sender configuration leaves sign-in delivery unavailable.
+5. Request a link through the normal sign-in form, inspect its sender and inbox delivery, confirm sign-in and verify reuse rejection.
+   Record results without saving credentials or full magic-link URLs.
+   Remove the temporary recipient restriction only when starting institutional delivery.
 
-Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploying the configuration if a sender or service problem occurs.
-Check enrollment/address corrections and Cloudflare delivery, bounce and suppression logs before asking a student to request another link.
-Requests remain bounded by the application limits above; there is no automatic retry or staff endpoint that reveals a production login credential.
-Human replies use the existing `info@survivejs.com` identity, as agreed with the instructor.
-The required incoming path is `info@scalableweb.dev` → Cloudflare Email Routing → `info@survivejs.com` in Fastmail; no additional Fastmail sending identity is required.
-The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks the remaining external setup and actual delivery verification.
+Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploying if a sender or service problem occurs.
+Check enrollment/address corrections and provider delivery, bounce and suppression logs before asking a student to request another link.
+Requests remain bounded by the application limits above; no automatic retry or staff endpoint reveals production login credentials.
+Human replies use the instructor's existing mailbox identity, as agreed; forwarding does not create an additional Fastmail sending identity.
+The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks external setup and actual delivery verification.
 
-`wrangler.course.jsonc` includes a local-only email binding shape with delivery disabled for validation.
-Do not use `remote: true` for that binding or enable live email for development or teacher rehearsals.
-The application development server uses its own mock inbox independently of these production settings.
+`wrangler.course.jsonc` validates the local email binding with delivery disabled.
+Do not enable remote mail in development or teacher rehearsals; both use their own scoped mock inboxes.
 
 ## Teacher simulation
 

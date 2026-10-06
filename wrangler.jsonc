@@ -10,15 +10,18 @@
   //   "database_id": "<created-database-id>", "migrations_dir": "course-migrations" }],
   // "r2_buckets": [{ "binding": "COURSE_FILES", "bucket_name": "scalability-book-course-files" }],
   // COURSE_ADMIN_GITHUB_LOGINS grants course administration separately from book moderation.
-  // After verifying Email Sending and info@scalableweb.dev -> Gmail routing:
-  // "send_email": [{ "name": "COURSE_MAIL",
-  //   "allowed_sender_addresses": ["info@scalableweb.dev"] }],
+  // Course sender and incoming forwarding destination stay in Worker secrets:
+  // COURSE_EMAIL_FROM and COURSE_EMAIL_FORWARD_TO. The Email Routing rule
+  // matches the configured course inbox and sends to this Worker.
+  // Email Sending is onboarded; requests cannot override the secret sender.
   // Merge COURSE_EMAIL_ENABLED: "true" into vars only after the mail setup in
   // docs/course-system.md. A binding alone does not enable login delivery.
   // Teacher simulation requires separate COURSE_SIMULATION_DB and
   // COURSE_SIMULATION_FILES resources and COURSE_SIMULATION_ID. Initialize
   // their matching markers with docs/course-system.md; never alias live bindings.
   // Simulation always uses mock mail, regardless of COURSE_EMAIL_ENABLED.
+  "send_email": [{ "name": "COURSE_MAIL" }],
+  "vars": { "COURSE_EMAIL_ENABLED": "false" },
   // Private exercise answers use a separate D1 database. Provision and migrate
   // it before enabling production saves; see docs/chapter-exercises.md.
   // "d1_databases": [{

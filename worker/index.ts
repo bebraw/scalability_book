@@ -7,6 +7,7 @@ import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
 import { d1CourseAuthStore } from "./course-auth-store.ts";
 import { cloudflareCourseMail } from "./course-mail.ts";
+import { forwardCourseEmail } from "./course-forwarding.ts";
 import { d1CourseStore, r2FileStore } from "./course-store.ts";
 import {
   handleSimulation,
@@ -62,6 +63,8 @@ type Env = {
   COURSE_FILES?: CourseBindings["COURSE_FILES"];
   COURSE_MAIL?: CourseBindings["COURSE_MAIL"];
   COURSE_EMAIL_ENABLED?: string;
+  COURSE_EMAIL_FROM?: string;
+  COURSE_EMAIL_FORWARD_TO?: string;
   COURSE_SIMULATION_DB?: CourseBindings["COURSE_SIMULATION_DB"];
   COURSE_SIMULATION_FILES?: CourseBindings["COURSE_SIMULATION_FILES"];
   COURSE_SIMULATION_ID?: string;
@@ -95,6 +98,16 @@ const feedbackRateLimits = [
 ] as const;
 
 export default {
+  async email(
+    message: Parameters<typeof forwardCourseEmail>[0],
+    env: Env,
+  ): Promise<void> {
+    await forwardCourseEmail(
+      message,
+      env.COURSE_EMAIL_FORWARD_TO,
+      env.COURSE_EMAIL_FROM,
+    );
+  },
   async fetch(
     request: Request,
     env: Env,
@@ -177,6 +190,7 @@ export default {
         const mail = cloudflareCourseMail(
           env.COURSE_MAIL,
           env.COURSE_EMAIL_ENABLED,
+          env.COURSE_EMAIL_FROM,
         );
         return handleCourseAuth(request, {
           ...storage,

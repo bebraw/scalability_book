@@ -9,6 +9,7 @@ import { handleCourses } from "../worker/courses.ts";
 import { cloudflareCourseMail } from "../worker/course-mail.ts";
 import worker from "../worker/index.ts";
 
+const sender = "course-test@scalableweb.dev";
 const token = "a".repeat(43);
 const message = {
   course: "synthetic-course",
@@ -17,7 +18,7 @@ const message = {
   url: `https://scalableweb.dev/course/?course=synthetic-course#login=${token}`,
   expiresAt: "2026-10-05T12:15:00.000Z",
 };
-test("course mail uses the fixed sender, plain text and escaped HTML; setup must explicitly enable it", async () => {
+test("course mail uses the configured sender, plain text and escaped HTML; setup must explicitly enable it", async () => {
   const sent: Record<string, string>[] = [];
   const binding = {
     async send(value: Record<string, string>) {
@@ -26,16 +27,24 @@ test("course mail uses the fixed sender, plain text and escaped HTML; setup must
     },
   };
   for (const enabled of [undefined, "false", "TRUE", "1"])
-    assert.equal(cloudflareCourseMail(binding, enabled), undefined);
-  assert.equal(cloudflareCourseMail(undefined, "true"), undefined);
-  await cloudflareCourseMail(binding, "true")!.send(message);
+    assert.equal(cloudflareCourseMail(binding, enabled, sender), undefined);
+  assert.equal(cloudflareCourseMail(undefined, "true", sender), undefined);
+  for (const address of [
+    undefined,
+    "",
+    "not-an-address",
+    "teacher@example.invalid",
+    "bad\r\n@scalableweb.dev",
+  ])
+    assert.equal(cloudflareCourseMail(binding, "true", address), undefined);
+  await cloudflareCourseMail(binding, "true", sender)!.send(message);
   assert.equal(sent.length, 1);
   assert.deepEqual(sent[0]!.from, {
-    email: "info@scalableweb.dev",
+    email: "course-test@scalableweb.dev",
     name: "Scalable Web course",
   });
   assert.equal(sent[0]!.to, message.to);
-  assert.equal(sent[0]!.replyTo, "info@scalableweb.dev");
+  assert.equal(sent[0]!.replyTo, "course-test@scalableweb.dev");
   assert.match(sent[0]!.text, /Confirm sign-in/);
   assert.match(sent[0]!.text, /2026-10-05T12:15:00.000Z/);
   assert.match(sent[0]!.html, /&lt;img/);
@@ -49,7 +58,7 @@ test("course mail uses the fixed sender, plain text and escaped HTML; setup must
     message.url.replace("#login=", "?token="),
   ])
     await assert.rejects(
-      cloudflareCourseMail(binding, "true")!.send({ ...message, url }),
+      cloudflareCourseMail(binding, "true", sender)!.send({ ...message, url }),
       /Invalid course sign-in destination/,
     );
   assert.equal(sent.length, 1);
@@ -123,6 +132,7 @@ async function fixture(t: test.TestContext) {
   assert.equal(importResponse.status, 200);
   // SQLite implements the documented D1 statement port for the runtime test.
   const env = {
+    COURSE_EMAIL_FROM: sender,
     ASSETS: { fetch: async () => new Response("not an API") },
     COURSE_DB: {
       prepare(sql: string) {

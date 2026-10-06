@@ -7,59 +7,76 @@
 ## Context
 
 Roster-provisioned magic-link sign-in requires transactional mail to institutional addresses.
-The instructor wants `info@scalableweb.dev` as the course address, Cloudflare infrastructure for sending, and incoming mail forwarded to the existing `info@survivejs.com` inbox hosted by Fastmail.
-The account and domain setup needed for this has not been performed as part of the discussion.
+The instructor selected Cloudflare for sending and an existing Fastmail-hosted inbox for receiving questions.
+Both the course mailbox and its forwarding destination must stay out of source, documentation and public website assets.
 
 ## Decision
 
-Send course magic-link messages from `info@scalableweb.dev` through Cloudflare Email Sending integrated with the Worker.
-Use Cloudflare Email Routing to forward incoming mail for that address to the verified destination `info@survivejs.com`, hosted by Fastmail.
+Send course magic-link messages through Cloudflare Email Sending integrated with the Worker.
+Read the sender and reply-to from the server-only `COURSE_EMAIL_FROM` secret, restricted by the application to the course domain.
+Enable this transport only when the sender, `COURSE_MAIL` binding and `COURSE_EMAIL_ENABLED: "true"` are all configured.
+
+Use an exact Cloudflare Email Routing rule to send the configured course mailbox to the book Worker.
+Its `email()` handler accepts only that recipient and forwards the existing message stream to the verified destination in the `COURSE_EMAIL_FORWARD_TO` secret.
+Reject unknown recipients, absent or invalid configuration, and a destination equal to the course inbox.
+Do not parse, store or log incoming message contents or either address.
+Discard provider error details before reporting forwarding failures.
+Changing the destination requires changing a secret rather than changing source or the routing rule.
+
 Treat outgoing delivery and incoming forwarding as separate configurations.
-Fastmail hosts the instructor’s receiving inbox; Cloudflare remains the provider for automated sign-in mail.
-The destination provider does not change the Worker’s mail integration.
+Fastmail hosts the instructor's receiving inbox; Cloudflare remains the provider for automated sign-in mail.
+Human replies use the instructor's existing mailbox identity, as explicitly accepted; no additional Fastmail sending identity is required.
 
 Complete domain verification and the provider's required DNS/authentication setup before enabling production login delivery.
-As checked when recording this decision, Email Sending is in beta and requires a Workers Paid plan; verify current availability and requirements when provisioning.
-Use the simulation's mock mail transport in development and teacher rehearsals rather than sending real login messages.
+Verify current availability and account eligibility when provisioning; sending to arbitrary institutional recipients requires Workers Paid.
+Use the simulation's mock mail transport in development and teacher rehearsals.
 Do not log raw magic-link credentials or expose them through shared course records.
-
-Incoming forwarding does not configure branded human replies.
-Use the existing `info@survivejs.com` identity for human replies.
-The instructor explicitly accepts that replies use this address as long as mail sent to `info@scalableweb.dev` reaches the inbox.
 
 ## Trigger
 
 The instructor selected Cloudflare for outgoing course mail and forwarding to an existing inbox.
-On 2026-10-06, they replaced the initial Gmail destination preference with `info@survivejs.com` on Fastmail.
+On 2026-10-06, they chose Fastmail instead of the initial Gmail destination and accepted human replies from that existing inbox.
+They subsequently requested environment configuration for both addresses so neither mailbox is exposed in source or scraped from the website.
 
 ## Consequences
 
 **Positive:**
 
-- The Worker and login delivery use the chosen course infrastructure.
 - Incoming student questions reach the instructor's existing inbox.
 - Automated authentication does not depend on Fastmail SMTP credentials.
+- Both addresses remain server-side configuration and can change without a source edit.
 
 **Negative:**
 
-- Domain verification, sender authentication, paid-plan eligibility, and beta availability are external prerequisites.
+- Domain verification, sender authentication and arbitrary-recipient eligibility are external prerequisites.
+- Incoming forwarding now depends on the Worker and two correctly configured secrets.
 - Delivery failures and retry limits need an observable, bounded application flow.
 
 **Neutral:**
 
-- The forwarding destination is supplied; Cloudflare still needs verification of `info@survivejs.com` during setup.
-- Human replies use the existing `info@survivejs.com` identity; no additional Fastmail sending identity is required by this decision.
-- This decision does not provision resources, change DNS, upgrade a plan, or send email.
+- The forwarding destination must be verified with Cloudflare regardless of its mailbox provider.
+- Mail recipients see the sender and reply-to in their messages; hiding them from the website does not make email headers private.
+- Local private configuration is ignored by Git; tracked examples contain synthetic addresses only.
 
 ## Alternatives considered
 
-### Send login messages through the receiving mailbox provider’s SMTP service
+### Forward directly to an address stored in a routing rule
 
-This introduces a separate mail-provider credential and does not follow the instructor's infrastructure preference.
+This avoids Worker execution, but cannot read the destination from the Worker's environment at delivery time.
+The instructor's configuration requirement favors an `email()` handler.
 
-### Adopt Google Workspace immediately
+### Embed or obfuscate the course address in public source
 
-This could supply a branded mailbox and replies, but the instructor chose an existing inbox and did not request a mailbox migration.
+Encoding an address in browser code still exposes it to scrapers.
+Server-side configuration keeps it out of public content while supporting replies to transactional messages.
+
+### Send login messages through the receiving mailbox provider's SMTP service
+
+This introduces a separate credential and does not follow the instructor's infrastructure preference.
+
+### Adopt a new branded mailbox
+
+The instructor chose an existing inbox and accepted its human reply identity, so a mailbox migration is unnecessary.
 
 ### Use Email Routing as the outgoing mail provider
 
@@ -67,32 +84,36 @@ Inbound forwarding and transactional sending are distinct Cloudflare services; r
 
 ## Implementation and verification
 
-The magic-link flow and `worker/course-mail.ts` implement native Cloudflare Email Sending through `COURSE_MAIL`, using the fixed sender and reply-to `info@scalableweb.dev`.
-Both the binding and `COURSE_EMAIL_ENABLED: "true"` are required to select this transport.
-Production configuration contains a commented sender-restricted binding example; the isolated local Worker configuration validates its shape with delivery disabled.
+`worker/course-mail.ts` implements native Email Sending through `COURSE_MAIL`, using the environment sender for both sender and reply-to.
+Missing or invalid sender configuration leaves production login delivery unavailable.
+`worker/course-forwarding.ts` implements the exact-recipient, environment-driven incoming handler exported by `worker/index.ts`.
+Unit tests verify forwarding completion, rejection behavior, no message consumption and provider-error redaction using synthetic addresses.
+
 Local application development uses the staff-only mock inbox and never selects production mail as a fallback.
-Teacher simulation also selects a scoped mock inbox explicitly and never receives the live Cloudflare mail transport.
-Its browser/local Worker checks exercise login through the mock inbox; Worker tests verify that simulation sends no mail even when the live binding and delivery flag are enabled.
+Teacher simulation also selects a scoped mock inbox explicitly and never receives the live Cloudflare mail transport, including when production configuration is present.
+Mail tests verify deferred delivery, unusable pending links, activation after provider acceptance, discarded links on failure, configured sender, escaped HTML and credential-free responses/logs.
+Typed builds and Worker dry runs check the pinned binding/runtime integration without sending email.
 
-Worker tests with a mocked binding verify `waitUntil` delivery, unusable pending links, activation after provider acceptance, discarded links on failure, fixed sender, plain text/escaped HTML and credential-free responses/logs.
-The typed build and Worker dry run check the pinned binding/runtime integration; no actual email is sent by these checks.
+On 2026-10-06, Cloudflare address secrets and the Worker handler were deployed, the receiving destination was verified, and the exact incoming route was enabled with catch-all routing disabled.
+Email Routing reports ready; the current sending-domain API enabled the course domain and supplied its authentication records.
+The pinned CLI's older sending-enable endpoint returned 404, so setup used the current documented sending-subdomain API without changing project dependencies.
+The native sending binding is configured with `COURSE_EMAIL_ENABLED: "false"`; enabling student login remains a separate step after course storage and delivery verification.
 
-This ADR remains Accepted because external setup and actual delivery verification are still outstanding.
-The 2026-10-05 read-only domain inventory did not show `scalableweb.dev` enabled for sending.
-The instructor supplied `info@survivejs.com` on 2026-10-06; its Cloudflare destination verification has not been performed by this work.
-Before production use, verify account eligibility, domain and sender, configure forwarding to the verified Fastmail-hosted destination, and exercise delivery to an instructor-controlled address under explicit send authorization.
-The [course-system operating guide](../../course-system.md#course-mail-setup) records the binding/enablement, DNS prerequisites, controlled-delivery procedure and support workflow.
+This ADR remains Accepted until external setup and actual delivery verification are complete.
+The [course-system operating guide](../../course-system.md#course-mail-setup) owns secret configuration, DNS prerequisites, controlled delivery and the support workflow.
 
 ## Open questions
 
-- Confirm account eligibility and onboard/verify `scalableweb.dev` before enabling production delivery; a test to a verified address alone does not establish arbitrary-recipient eligibility.
-- Verify `info@survivejs.com` as the Cloudflare destination, then perform the authorized outbound and incoming-forwarding checks.
+- Confirm incoming forwarding in the instructor's inbox; the destination is verified.
+- Confirm arbitrary-recipient eligibility and exercise the normal magic-link flow before enabling institutional login delivery.
 
 ## References
 
 - [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
 - [Email Sending setup](https://developers.cloudflare.com/email-service/get-started/send-emails/) and [domain configuration](https://developers.cloudflare.com/email-service/configuration/domains/).
-- [Email Routing setup](https://developers.cloudflare.com/email-service/get-started/route-emails/).
+- [Email Routing setup](https://developers.cloudflare.com/email-service/get-started/route-emails/) and [Worker email handlers](https://developers.cloudflare.com/email-service/api/route-emails/email-handler/).
+- [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/).
+- [Sending-domain onboarding API](https://developers.cloudflare.com/api/resources/email_sending/subresources/subdomains/methods/create/).
 - [Cloudflare magic-link example](https://developers.cloudflare.com/email-service/examples/email-sending/magic-link/).
 - [Cloudflare forwarding and reply-address behavior](https://developers.cloudflare.com/email-service/reference/postmaster/#sending-or-replying-to-an-email-from-your-cloudflare-domain).
 - [ADR-003: magic-link authentication](../implemented/ADR-003-import-students-and-use-email-magic-links.md).

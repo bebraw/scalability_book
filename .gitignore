@@ -10,3 +10,9 @@ output/book-concepts/
 output/concept-pilot/
 .DS_Store
 .wrangler
+/.dev.vars
+/.dev.vars.*
+!/.dev.vars.example
+/.env
+/.env.*
+!/.env.example

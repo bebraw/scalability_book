@@ -1,0 +1,5 @@
+# Private instructor inbox; use a verified Cloudflare destination in .dev.vars.
+# Local course login and teacher simulation continue to use mock mail.
+COURSE_EMAIL_FORWARD_TO=instructor@example.invalid
+# Course sender and exact incoming recipient; supply the real value privately.
+COURSE_EMAIL_FROM=replace-me@scalableweb.dev

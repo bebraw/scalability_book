@@ -39,7 +39,6 @@
   "send_email": [
     {
       "name": "COURSE_MAIL",
-      "allowed_sender_addresses": ["info@scalableweb.dev"],
     },
   ],
   "vars": {

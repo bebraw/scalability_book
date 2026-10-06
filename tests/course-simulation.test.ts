@@ -866,6 +866,7 @@ test("Worker routing requires verified staff, matching markers and separate back
     COURSE_SIMULATION_FILES: simulationBucket,
     COURSE_SIMULATION_ID: f.simulation.id,
     COURSE_EMAIL_ENABLED: "true",
+    COURSE_EMAIL_FROM: "course-test@scalableweb.dev",
     COURSE_MAIL: {
       async send() {
         deliveries++;

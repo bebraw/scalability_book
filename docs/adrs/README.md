@@ -43,9 +43,9 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-| ADR                                                            | Summary                                                                                                  |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md) | Send course login mail through Cloudflare and forward incoming mail to `info@survivejs.com` on Fastmail. |
+| ADR                                                            | Summary                                                                                                       |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md) | Use Cloudflare sending and Worker forwarding with server-only address secrets and an existing Fastmail inbox. |
 
 ## Implemented
 

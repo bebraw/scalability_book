@@ -1,7 +1,14 @@
 import type { SendEmail } from "@cloudflare/workers-types";
 import type { CourseMailTransport } from "./course-auth.ts";
 
-export const courseSender = "info@scalableweb.dev";
+// Configured on the server only; never publish the mailbox in browser assets.
+export function courseEmailAddress(value: string | undefined) {
+  const address = value?.trim();
+  return address &&
+    /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@scalableweb\.dev$/i.test(address)
+    ? address
+    : undefined;
+}
 const escape = (value: string) =>
   value.replace(/[&<>"']/g, (character) => {
     const entities: Record<string, string> = {
@@ -19,8 +26,10 @@ const escape = (value: string) =>
 export function cloudflareCourseMail(
   binding: SendEmail | undefined,
   enabled: string | undefined,
+  configuredSender: string | undefined,
 ): CourseMailTransport | undefined {
-  if (!binding || enabled !== "true") return undefined;
+  const courseSender = courseEmailAddress(configuredSender);
+  if (!binding || enabled !== "true" || !courseSender) return undefined;
   return {
     async send(message) {
       const link = new URL(message.url);
@@ -41,7 +50,7 @@ export function cloudflareCourseMail(
         replyTo: courseSender,
         subject: "Your course sign-in link",
         text,
-        html: `<h1>Sign in to ${escape(message.courseName)}</h1><p><a href="${escape(link.href)}">Open your course sign-in link</a>, then choose <strong>Confirm sign-in</strong>.</p><p>This link can be used once and expires at ${escape(expires)} (UTC), 15 minutes after it was requested. Do not forward it.</p><p>If you did not request a sign-in link, you can ignore this message. For help, contact <a href="mailto:${courseSender}">${courseSender}</a>.</p>`,
+        html: `<h1>Sign in to ${escape(message.courseName)}</h1><p><a href="${escape(link.href)}">Open your course sign-in link</a>, then choose <strong>Confirm sign-in</strong>.</p><p>This link can be used once and expires at ${escape(expires)} (UTC), 15 minutes after it was requested. Do not forward it.</p><p>If you did not request a sign-in link, you can ignore this message. For help, contact <a href="mailto:${escape(courseSender)}">${escape(courseSender)}</a>.</p>`,
       });
     },
   };
