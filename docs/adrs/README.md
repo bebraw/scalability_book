@@ -43,7 +43,14 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-None.
+| ADR                                                                                              | Summary                                                                                                                                       |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ADR-027](accepted/ADR-027-connect-book-learning-to-student-agents-through-a-local-companion.md) | Connect the whole book to students' own agents through a local companion, shared context and bounded demo actions.                            |
+| [ADR-028](accepted/ADR-028-use-a-private-reflection-notebook-to-support-course-learning.md)      | Keep a portable private notebook with supported reflection, revisable concept self-assessment and selected material for existing submissions. |
+| [ADR-029](accepted/ADR-029-support-asynchronous-peer-inquiry-through-opt-in-annotations.md)      | Add opt-in group/cohort inquiry after individual work, preserving private feedback and deliberate public curation.                            |
+
+These records define the agreed learning-space direction and whole-book scope for the first implementation.
+The companion, notebook and peer-sharing behavior remain unimplemented; their open implementation choices and verification boundaries are recorded in each ADR.
 
 ## Implemented
 
