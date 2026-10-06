@@ -112,5 +112,5 @@ See [course-system.md](../../course-system.md#institutional-enrollment-and-sign-
 ## References
 
 - [ADR-006: course email delivery](../accepted/ADR-006-use-cloudflare-for-course-email.md).
-- [ADR-007: simulation and mock email](../accepted/ADR-007-provide-an-isolated-teacher-simulation.md).
+- [ADR-007: simulation and mock email](../implemented/ADR-007-provide-an-isolated-teacher-simulation.md).
 - [OWASP email verification guidance](https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html).

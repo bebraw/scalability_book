@@ -1,6 +1,6 @@
 # ADR-007: Provide an isolated teacher simulation
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -109,8 +109,12 @@ Release fails before assessment; one incomplete Challenge participation requirem
 It checks retained frozen fields/audit revisions, individual privacy, mobile accessibility, no live request escape and delayed-save/refresh input protection.
 The interface captures form values before disabling controls and keeps replacement forms paused until the owning request finishes; selecting the current phase preserves unsaved input.
 
-This ADR remains Accepted: the withdrawal case is still outstanding.
-The withdrawal scenario can now use [ADR-004’s implemented departure/review/reinstatement workflow](../implemented/ADR-004-form-three-person-groups-with-instructor-oversight.md).
+Fixture edition `2026-10-v2` adds Finn Example’s withdrawal on December 12 after submitted evidence and provisional assessments, using [ADR-004’s implemented enrollment handler](ADR-004-form-three-person-groups-with-instructor-oversight.md).
+Both compact and larger grading presets retain all three frozen submissions and individual assessments, expose a private teacher review task and export a marked withdrawn row with blank numerical grade fields.
+API checks for both sizes verify active-student release, private review notes, unchanged evidence/assessment records and the affected mock student’s read-only access.
+The preset browser flow records the review through the teacher form, releases current active assessments, inspects the blank export and switches to Finn’s read-only portfolio without exposing staff reasons.
+The larger local D1/R2 check exercises the same departure/review/export/access behavior while preserving its live sentinel.
+All specified starting cases are implemented; this status describes repository support and verified local adapters, not production resource provisioning or live email delivery.
 
 ## Implementation choices
 

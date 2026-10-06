@@ -12,6 +12,7 @@ import {
   type RecordHistory,
 } from "../shared/course.ts";
 import type { SimulationState } from "../shared/course-simulation.ts";
+import { pendingWithdrawals } from "../shared/course-enrollment.ts";
 
 const base = new URL(process.env.COURSE_WORKER_URL ?? "http://127.0.0.1:8788");
 assert.equal(
@@ -308,6 +309,18 @@ const presetBase = `/api/simulation/${discovery.environment}/${seeded.state.valu
 let presetView = await call(presetBase);
 assert.equal(presetView.config.value.students.length, 31);
 assert.equal(presetView.results[4].result.status, "pending");
+const departed = presetView.config.value.students[5];
+assert.equal(pendingWithdrawals(presetView.config.value)[0]!.id, departed.id);
+assert.equal(presetView.results[5].result.status, "withdrawn");
+assert.equal(presetView.results[5].result.grade, null);
+const departureGrades = presetView.individuals.filter(
+  (g: any) => g.value.subject === departed.id,
+);
+const departureSubmissions = presetView.submissions.filter((s: any) =>
+  s.value.members.includes(departed.id),
+);
+assert.equal(departureGrades.length, 3);
+assert.equal(departureSubmissions.length, 3);
 assert.equal(
   (
     await response(`${presetBase}/publish/compare`, "POST", {
@@ -357,11 +370,56 @@ const frozenSample = await call(
   `${presetBase}/history?key=${encodeURIComponent(sample.key)}&revision=${sample.value.frozenRevision}`,
 );
 assert.equal(frozenSample.history[0].value.finalEvidence, undefined);
-assert.match(
-  await (await response(`${presetBase}/export`)).text(),
-  /"SIM002","Ben Example".*"0","fail"/,
+const presetCsv = await (await response(`${presetBase}/export`)).text();
+assert.match(presetCsv, /"SIM002","Ben Example".*"0","fail"/);
+assert.deepEqual(
+  presetCsv
+    .split("\r\n")
+    .find((line) => line.includes('"SIM006"'))!
+    .split(",")
+    .slice(4),
+  ['""', '""', '""', '""', '"withdrawn"', '""', '""'],
 );
+await call(`${presetBase}/enrollment`, "PUT", {
+  expected: presetView.administration.students,
+  student: departed.id,
+  action: "review-withdrawal",
+  resolution:
+    "PRIVATE rehearsal review: retain frozen members; remaining team and audit fallbacks checked",
+  reason: "Complete the withdrawal task using actual D1 storage",
+});
+const reviewedDeparture = await call(presetBase);
+assert.deepEqual(pendingWithdrawals(reviewedDeparture.config.value), []);
+assert.deepEqual(
+  reviewedDeparture.individuals.filter(
+    (g: any) => g.value.subject === departed.id,
+  ),
+  departureGrades,
+);
+assert.deepEqual(
+  reviewedDeparture.submissions.filter((s: any) =>
+    s.value.members.includes(departed.id),
+  ),
+  departureSubmissions,
+);
+const departureRole = await call(`${control}/role`, "POST", {
+  expected: seeded.state.revision,
+  course: presetCourse,
+  student: departed.id,
+});
+const ownDeparture = await call(presetBase);
+assert.equal(ownDeparture.results[0].result.status, "withdrawn");
+assert.equal(JSON.stringify(ownDeparture).includes("PRIVATE"), false);
+assert.equal(
+  (await response(`${presetBase}/portfolio/compare/${departed.id}`, "PUT", {}))
+    .status,
+  403,
+);
+await call(`${control}/role`, "POST", {
+  expected: departureRole.state.revision,
+  student: null,
+});
 assert.deepEqual((await call(`/api/courses/${live.value.id}`)).config, live);
 console.log(
-  "Local simulation check passed: isolated D1/R2 records and streaming, permissions, frozen history, mock authentication, clock, export and reset; larger grading preset, stale release and mandatory minima verified; live sentinel unchanged.",
+  "Local simulation check passed: isolated D1/R2 records and streaming, permissions, frozen history, mock authentication, clock, export and reset; larger grading preset, private withdrawal review/read-only access/blank grade, stale release and mandatory minima verified; live sentinel unchanged.",
 );

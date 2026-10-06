@@ -574,6 +574,16 @@ export async function buildSimulationPlan(
   }
   // Resubmitting a correction retains the old score but makes its revision stale.
   await submitPortfolio("compare", students[4]!, 4, true);
+  // A departure after evidence and assessment retains those records, creates a
+  // teacher review task and suppresses a final grade through the real handler.
+  now = instant("2026-12-12");
+  await config("enrollment", {
+    expected: administrationRevisions(course.value).students,
+    student: students[5],
+    action: "withdraw",
+    reason:
+      "PRIVATE rehearsal departure after submitted work; review remaining members and audit arrangements",
+  });
   now = instant("2026-12-13");
   return {
     version: simulationPresetVersion,

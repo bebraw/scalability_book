@@ -43,10 +43,9 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-| ADR                                                                   | Summary                                                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md)        | Send course login mail through Cloudflare and forward incoming mail to Gmail.              |
-| [ADR-007](accepted/ADR-007-provide-an-isolated-teacher-simulation.md) | Exercise real workflows using isolated mock students in the website and local development. |
+| ADR                                                            | Summary                                                                       |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [ADR-006](accepted/ADR-006-use-cloudflare-for-course-email.md) | Send course login mail through Cloudflare and forward incoming mail to Gmail. |
 
 ## Implemented
 
@@ -57,6 +56,7 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 | [ADR-003](implemented/ADR-003-import-students-and-use-email-magic-links.md)                        | Import institutional rosters, preserve record ownership and use course-scoped email sessions.                          |
 | [ADR-004](implemented/ADR-004-form-three-person-groups-with-instructor-oversight.md)               | Combine consent and instructor allocation; retain history through late arrival, withdrawal and group corrections.      |
 | [ADR-005](implemented/ADR-005-submit-reproducible-source-with-phase-checklists.md)                 | Retain versioned requirements and indexed/missing evidence, small reproducible source and staged technical completion. |
+| [ADR-007](implemented/ADR-007-provide-an-isolated-teacher-simulation.md)                           | Exercise real workflows using isolated mock students in the website and local development.                             |
 | [ADR-008](implemented/ADR-008-require-individual-work-for-course-credit.md)                        | Require individual participation and assessments alongside shared project scores.                                      |
 | [ADR-009](implemented/ADR-009-preserve-evidence-and-control-submission-access.md)                  | Preserve assessment evidence and history; stage class access while keeping individual records private.                 |
 | [ADR-010](implemented/ADR-010-keep-the-book-core-focused.md)                                       | Keep course policies, optional depth, and supporting case studies outside the main reading argument.                   |

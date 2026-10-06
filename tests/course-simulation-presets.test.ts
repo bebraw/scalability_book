@@ -15,6 +15,7 @@ import {
   type Grade,
 } from "../shared/course.ts";
 import type { SimulationState } from "../shared/course-simulation.ts";
+import { pendingWithdrawals } from "../shared/course-enrollment.ts";
 
 const teacher = { id: "github:1", login: "instructor" },
   origin = "https://book.test";
@@ -184,7 +185,7 @@ test("preparation presets retain pending consent, private matching, a four-perso
   );
 });
 
-test("grading presets exercise frozen evidence, late arrival, stale release, explicit missing work and high totals failing individual minima", async (t) => {
+test("grading presets exercise frozen evidence, late arrival, withdrawal, stale release, explicit missing work and high totals failing individual minima", async (t) => {
   const f = await fixture(t);
   for (const size of ["compact", "larger"]) {
     let state = await f.finish(await f.start("grading-review", size));
@@ -199,6 +200,20 @@ test("grading presets exercise frozen evidence, late arrival, stale release, exp
     const late = course.students.at(-1)!;
     assert.equal(late.enrollment!.lateAt, "2026-10-27T08:00:00.000Z");
     assert.equal(late.enrollment!.catchUp, "");
+    const departed = course.students[5]!;
+    assert.equal(
+      departed.enrollment!.withdrawal!.at,
+      "2026-12-12T08:00:00.000Z",
+    );
+    assert.equal(pendingWithdrawals(course)[0]!.id, departed.id);
+    const departedGrades = view.individuals.filter(
+      (r: Envelope<Grade>) => r.value.subject === departed.id,
+    );
+    assert.equal(departedGrades.length, 3);
+    const departedSubmissions = view.submissions.filter((r: any) =>
+      r.value.members.includes(departed.id),
+    );
+    assert.equal(departedSubmissions.length, 3);
     assert.equal(
       view.portfolios.filter(
         (p: any) =>
@@ -270,6 +285,8 @@ test("grading presets exercise frozen evidence, late arrival, stale release, exp
     assert.ok(result(2).percentage > 80);
     assert.match(result(2).unmet.join(" "), /self\/peer assessment/);
     assert.equal(result(4).status, "pass");
+    assert.equal(result(5).status, "withdrawn");
+    assert.equal(result(5).grade, null);
     assert.equal(result(course.students.length - 1).status, "fail");
     const comparison = view.submissions.find(
       (r: any) => r.value.phase === "compare",
@@ -293,7 +310,65 @@ test("grading presets exercise frozen evidence, late arrival, stale release, exp
     );
     assert.ok(view.audits.length >= 9);
     const csv = await f.api(`${base}/export`);
-    assert.match(await csv.text(), /"SIM002","Ben Example".*"0","fail"/);
+    const exported = await csv.text();
+    assert.match(exported, /"SIM002","Ben Example".*"0","fail"/);
+    assert.deepEqual(
+      exported
+        .split("\r\n")
+        .find((line) => line.includes('"SIM006"'))!
+        .split(",")
+        .slice(4, 11),
+      ['""', '""', '""', '""', '"withdrawn"', '""', '""'],
+    );
+    await json(
+      await f.api(`${base}/enrollment`, "PUT", {
+        expected: view.administration.students,
+        student: departed.id,
+        action: "review-withdrawal",
+        resolution:
+          "PRIVATE review: remaining members completed work; frozen membership and staff audit arrangements retained",
+        reason: "Review the authored departure",
+      }),
+    );
+    const reviewed = await json(await f.api(base));
+    assert.deepEqual(pendingWithdrawals(reviewed.config.value), []);
+    assert.deepEqual(
+      reviewed.individuals.filter(
+        (r: Envelope<Grade>) => r.value.subject === departed.id,
+      ),
+      departedGrades,
+    );
+    assert.deepEqual(
+      reviewed.submissions.filter((r: any) =>
+        r.value.members.includes(departed.id),
+      ),
+      departedSubmissions,
+    );
+    state = (
+      await json(
+        await f.api("control/role", "POST", {
+          expected: state.revision,
+          course: courseId,
+          student: departed.id,
+        }),
+      )
+    ).state;
+    const departedView = await json(await f.api(base));
+    assert.equal(departedView.results[0].result.status, "withdrawn");
+    assert.equal(JSON.stringify(departedView).includes("PRIVATE"), false);
+    assert.equal(
+      (await f.api(`${base}/portfolio/compare/${departed.id}`, "PUT", {}))
+        .status,
+      403,
+    );
+    state = (
+      await json(
+        await f.api("control/role", "POST", {
+          expected: state.revision,
+          student: null,
+        }),
+      )
+    ).state;
     state = (
       await json(
         await f.api("control/role", "POST", {

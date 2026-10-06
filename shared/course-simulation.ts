@@ -1,4 +1,4 @@
-export const simulationPresetVersion = "2026-10-v1";
+export const simulationPresetVersion = "2026-10-v2";
 export const simulationPresets = [
   "empty",
   "preparation",

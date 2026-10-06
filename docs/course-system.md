@@ -15,7 +15,7 @@ Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
 Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes, plus a verified browser walkthrough of all three teaching phases.
 Withdrawals retain history, create group-review tasks and receive no final grade.
-Production email provisioning and the authored withdrawal simulation case remain pending.
+Production email provisioning remains pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -419,13 +419,13 @@ The default is **Course preparation** with 10 mock students; **Larger** supplies
 All emails use the reserved `.invalid` domain and all institutional numbers start with `SIM`.
 The names, evidence and scores are authored fixtures, never copied from a live course.
 
-| Scenario           | Starting state                                                                                                                 | What to inspect                                                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Course preparation | Roster imported; Establish formation open; one confirmed trio allocated privately                                              | A four-person request needs allocation and an exception; a pair awaits consent; remaining students request allocation privately; publication requires everyone assigned. |
-| Grading review     | Three phases of frozen source, audit reports, technical responses, private portfolios and assessments; A/B released, C private | Late enrollment, explicit missing work, a stale assessment, and full project scores that still fail individual minima.                                                   |
-| Empty rehearsal    | No courses or students                                                                                                         | Walk through creation/import using the downloadable mock CSV and source in Teacher controls.                                                                             |
+| Scenario           | Starting state                                                                                                                 | What to inspect                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Course preparation | Roster imported; Establish formation open; one confirmed trio allocated privately                                              | A four-person request needs allocation and an exception; a pair awaits consent; remaining students request allocation privately; publication requires everyone assigned.            |
+| Grading review     | Three phases of frozen source, audit reports, technical responses, private portfolios and assessments; A/B released, C private | Late enrollment, a withdrawal review task with retained work and no final grade, explicit missing work, stale assessment and full project scores that still fail individual minima. |
+| Empty rehearsal    | No courses or students                                                                                                         | Walk through creation/import using the downloadable mock CSV and source in Teacher controls.                                                                                        |
 
-Fixture edition `2026-10-v1` identifies the starting data and scenario construction.
+Fixture edition `2026-10-v2` identifies the starting data and scenario construction, including the grading-review withdrawal case.
 Restart regenerates identities/revisions but retains the edition's authored content, deadlines and expected outcomes.
 When those meanings change, bump the fixture edition; an unfinished preparation from an older edition must be restarted.
 Preparation uses the existing course handlers with an in-memory adapter to validate every change, then replays their accepted writes/history into a private generation in six-operation batches.
@@ -468,6 +468,9 @@ The evidence index names actual fixture files and explicitly marks missing perfo
    Jules Late joined on October 27 after A froze, has a pending catch-up arrangement, and has explicit missing A scores.
    Later phases place Jules in an approved four-person group.
    Frozen A memberships remain intact.
+   Finn Example withdrew on December 12 after submitting evidence and receiving provisional assessments.
+   Open **Review withdrawal for Finn Example**, inspect the retained membership and record the group/audit arrangements with a private reason.
+   Historical scores remain stored, and the review does not assign a final grade or rewrite the groups.
 2. Open **Class submissions**, **Assigned audit**, **Group submission**, and **Private portfolios** across the phases.
    Downloads contain valid small source/evidence files; audit targets and Compare's A/B references retain frozen revisions.
 3. Open **Compare → Gradebook**.
@@ -475,6 +478,7 @@ The evidence index names actual fixture files and explicitly marks missing perfo
    Ben Example has only one completed Challenge lecture activity, despite 90 project points.
    Cora Example has no Compare portfolio and explicit zeros.
    Eli Example is pending because a portfolio correction made its assessment stale.
+   Finn Example shows **Withdrawn** with no final grade or numeric total.
 4. Try **Release phase results** with a reason: release fails while Eli's assessment is stale.
    Open **Private portfolios**, select Eli, inspect the correction and stale record, then record the reviewed assessment with a reason.
 5. Release Compare again.
@@ -483,6 +487,10 @@ The evidence index names actual fixture files and explicitly marks missing perfo
    Jules retains the missing A outcome until any approved course response is documented and assessed through the ordinary workflow.
 6. Switch to Ben and confirm the released failing requirement is visible in **My course progress**; other students' individual evidence remains private.
    Return to instructor and export: every row is marked `Simulation`, Ben/Cora have grade 0, and the filename starts with `SIMULATION`.
+   Finn's row has status `withdrawn` and blank numeric grade fields, preserving the distinction from a failure.
+7. Switch to Finn and inspect retained work.
+   His private departure reason and group-review notes are hidden, and submission/portfolio controls are read-only.
+   **Students → Enrollment, catch-up and withdrawals → Reinstate student** can reverse the departure with a reason and restore the ordinary course requirements while keeping history.
 
 ### Complete teaching walkthrough
 
@@ -516,7 +524,7 @@ The [browser walkthrough](../tests/e2e/course-simulation-walkthrough.spec.ts) fo
    Exports are marked `Simulation`; frozen archives, membership and audit target revisions remain intact.
 
 The browser flow also checks delayed-save/refresh behavior, mobile layout, accessibility and the absence of escaped live course/auth requests.
-[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted until its presets include the implemented withdrawal workflow.
+[ADR-007](adrs/implemented/ADR-007-provide-an-isolated-teacher-simulation.md) records the completed simulation decision and its verification; production resource provisioning remains an operator task.
 
 ### Separate Worker resources
 
@@ -575,10 +583,10 @@ The mail tests exercise the actual Worker adapter with a mocked Cloudflare bindi
 They do not send real email.
 Simulation checks cover teacher/student permissions, live sentinels, teacher and reset-generation isolation, scoped expiry/quotas/inbox retention, immutable history, clock, export labels and malformed context.
 Worker adapter tests reject missing/wrong markers, distinct binding objects aliasing the same resources, live-file/database aliases and forged test identities, and prove simulation selects no live mail even when delivery is enabled.
-The simulation browser checks cover synthetic roster import, mock login, role switching, clock, export, reset, both presets, stale-release rejection/reassessment, failing individual outcomes, mobile/accessibility and the absence of escaped live course/auth requests.
+The simulation browser checks cover synthetic roster import, mock login, role switching, clock, export, reset, both presets, private withdrawal review and read-only student access with a blank exported grade, stale-release rejection/reassessment, failing individual outcomes, mobile/accessibility and the absence of escaped live course/auth requests.
 The complete teaching flow creates two consented/allocated trios, retains their phase identifiers, and submits all three phases through the interface: source freezing, assigned audits, private portfolios, final evidence, current assessments, release and a marked final export.
 It verifies that missing mandatory participation fails despite sufficient overall points, and that delayed saves/refreshes cannot accept edits that would be discarded.
-Preset API checks exercise both cohort sizes, real frozen history/A–B references, late enrollment, explicit zeros, mandatory minima, interrupted/concurrent preparation, isolation and reproducible source download.
+Preset API checks exercise both cohort sizes, real frozen history/A–B references, late enrollment, withdrawal with retained assessments/private review/no grade, explicit zeros, mandatory minima, interrupted/concurrent preparation, isolation and reproducible source download.
 
 To check real local D1/R2 bindings, use the separate local configuration:
 
@@ -593,7 +601,7 @@ The check only accepts a loopback URL and verifies signed GitHub sessions, guard
 It also streams and attaches final technical evidence while retaining the frozen source/checklist, checks a read-only frozen reference, imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
 It records withdrawal and private review notes, verifies retained frozen history/files and blank withdrawn export fields, rejects new student submissions and inactive assessments, then reinstates the same identity.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
-The dedicated simulation check also loads the larger grading-review preset, verifies frozen files/history, rejects stale release, refreshes the assessment and checks mandatory minima after release.
+The dedicated simulation check also loads the larger grading-review preset, verifies frozen files/history, records a private withdrawal review without altering evidence or historical assessments, verifies the student's read-only view and blank final grade, rejects stale release, refreshes the assessment and checks mandatory minima after release.
 Stop the local Worker afterwards.
 The local configuration deliberately matches the pinned book runtime's compatibility date; upgrade the runtime and both configurations together.
 

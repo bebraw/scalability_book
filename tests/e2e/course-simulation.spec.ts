@@ -204,7 +204,7 @@ test("teacher controls keep the shared workspace, mock login, student permission
   expect(escaped).toEqual([]);
 });
 
-test("teachers can load both presets, refresh a stale assessment and release visible failing individual outcomes", async ({
+test("teachers can load both presets, review withdrawal, refresh a stale assessment and release visible individual outcomes", async ({
   page,
   request,
 }) => {
@@ -260,6 +260,37 @@ test("teachers can load both presets, refresh a stale assessment and release vis
   await expect(
     page.getByRole("heading", { name: "Establish review queue", exact: true }),
   ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Review withdrawal for Finn Example",
+      exact: true,
+    })
+    .click();
+  const enrollment = page.locator('form[data-form="enrollment"]');
+  await enrollment
+    .getByLabel(
+      "Group and audit arrangements after withdrawal (private to staff)",
+    )
+    .fill(
+      "PRIVATE rehearsal review: remaining members completed work; retain frozen memberships and existing audit fallbacks",
+    );
+  await enrollment
+    .getByLabel("Enrollment arrangement reason (private to staff)")
+    .fill("Complete the authored withdrawal review");
+  await enrollment
+    .getByRole("button", {
+      name: "Record withdrawal arrangements",
+      exact: true,
+    })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
+  await page.getByRole("button", { name: "Review queue", exact: true }).click();
+  await expect(
+    page.getByRole("button", {
+      name: "Review withdrawal for Finn Example",
+      exact: true,
+    }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: /03 Compare/ }).click();
   await page.getByRole("button", { name: "Gradebook", exact: true }).click();
   const rows = page.locator("table").first();
@@ -269,6 +300,12 @@ test("teachers can load both presets, refresh a stale assessment and release vis
   await expect(
     rows.getByRole("row").filter({ hasText: "Eli Example" }),
   ).toContainText("Pending");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Finn Example" }),
+  ).toContainText("Withdrawn");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Finn Example" }),
+  ).toContainText("No final grade");
   const release = page.locator('form[data-form="publish"]');
   await release
     .getByLabel("Reason for releasing or withdrawing results")
@@ -315,6 +352,52 @@ test("teachers can load both presets, refresh a stale assessment and release vis
   await expect(
     rows.getByRole("row").filter({ hasText: "Cora Example" }),
   ).toContainText("self/peer assessment");
+  const status = await (await request.get(`${control}/status`)).json();
+  const exportUrl = `/api/simulation/${discovery.environment}/${status.state.value.generation}/courses/${status.courses[0].id}/export`;
+  const exported = await (await request.get(exportUrl)).text();
+  expect(
+    exported
+      .split("\r\n")
+      .find((line) => line.includes('"SIM006"'))!
+      .split(",")
+      .slice(4),
+  ).toEqual(['""', '""', '""', '""', '"withdrawn"', '""', '""']);
+  await banner.getByText("Teacher controls", { exact: true }).click();
+  await banner
+    .getByRole("combobox", { name: "Rehearsal role", exact: true })
+    .selectOption({ label: "Finn Example" });
+  const switched = page.waitForEvent(
+    "framenavigated",
+    (frame) => frame === page.mainFrame(),
+  );
+  await banner
+    .getByRole("button", { name: "Switch role", exact: true })
+    .click();
+  await switched;
+  await expect(
+    page.getByText("Withdrawn from this course", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("[data-course-content]")).not.toContainText(
+    "PRIVATE",
+  );
+  await page.getByRole("button", { name: "My portfolio", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Resubmit portfolio", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.locator('form[data-form="portfolio"] textarea').first(),
+  ).toBeDisabled();
+  const returned = page.waitForEvent(
+    "framenavigated",
+    (frame) => frame === page.mainFrame(),
+  );
+  await page
+    .getByRole("button", { name: "Return to instructor", exact: true })
+    .click();
+  await returned;
+  await expect(
+    page.getByRole("heading", { name: "Establish review queue", exact: true }),
+  ).toBeVisible();
   await banner.getByText("Teacher controls", { exact: true }).click();
   await banner
     .getByRole("combobox", { name: "Rehearsal role", exact: true })
