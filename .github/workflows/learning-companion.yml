@@ -20,6 +20,11 @@ on:
       - "package*.json"
       - ".github/workflows/learning-companion.yml"
   workflow_dispatch:
+    inputs:
+      verify-published:
+        description: Verify the published 0.1.0 registry tarball on the same matrix
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -40,3 +45,8 @@ jobs:
       - run: node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts
       - run: npm run companion:pack
       - run: npm run companion:check
+      - if: github.event_name == 'workflow_dispatch' && inputs.verify-published
+        run: |
+          mkdir -p .local/published-companion
+          npm pack @scalableweb/companion@0.1.0 --pack-destination .local/published-companion
+          COMPANION_CHECK_ARTIFACT="$PWD/.local/published-companion/scalableweb-companion-0.1.0.tgz" npm run companion:check

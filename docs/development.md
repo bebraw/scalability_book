@@ -217,6 +217,8 @@ npm publish .local/companion-release/scalableweb-companion-0.1.0.tgz --access pu
 ```
 
 If npm requires a browser/2FA step, complete its own authentication flow and rerun publishing.
+After registry publication, run `gh workflow run learning-companion.yml -f verify-published=true` and confirm that the registry tarball passes the matrix as well.
+Source-built tarballs can have different bytes across build installations; this explicit check verifies the exact distributed artifact.
 Record the release's source revision, tarball integrity and verification in ADR-030, and remove any pending-publication wording from the student guide only after registry availability is verified.
 Future releases update the package manifest and shared release metadata together, explain compatible protocol/schema/provider changes, and repeat the packed-artifact checks.
 
