@@ -142,6 +142,17 @@ This phase emphasizes:
 
 A larger implementation B is not automatically a better implementation.
 
+## Solo route
+
+Build a fresh B under the same transfer policy with the approved comparison model and one-agent boundary.
+Keep the required common behavior, baseline workload and primary-pressure procedure comparable with A.
+Retain the architecture hypothesis, secondary pressure, documented-case transfer, Little's Law check, ownership card, friction audit and A–B interpretation.
+Report growing domain knowledge and solo human review effort as comparison limitations.
+
+For the engineering session, predict two clients' concurrent transition outcome, challenge the relevant consistency assumption, validate it and discuss the result with the instructor.
+Receive an independent audit of B and perform the assigned reference or cross-group audit with the same tool policy and separate setup/probe timings.
+Complete the solo portfolio equivalents and ordinary lecture activities; improvements in personal speed do not establish general model superiority.
+
 ---
 
 ## Instructor Notes

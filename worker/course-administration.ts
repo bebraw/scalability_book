@@ -4,6 +4,7 @@ import { activeStudent } from "../shared/course-enrollment.ts";
 import {
   phases,
   rubricVersion,
+  legacyRubricVersion,
   type Course,
   type Phase,
   type Student,
@@ -13,6 +14,7 @@ import {
   type Audit,
   type Grade,
 } from "../shared/course.ts";
+import { soloSupported } from "../shared/course-solo.ts";
 import type {
   AdministrationRevisions,
   AdministrationSection,
@@ -88,6 +90,15 @@ export function parseGroups(
       "Three members is the default. Explain instructor approval for a fourth member or a smaller group.",
     );
     const proposal = text(g.proposal ?? "", "Group proposal", 48);
+    requireThat(
+      g.route === undefined || g.route === "group" || g.route === "solo",
+      "Choose the group or approved solo route.",
+    );
+    requireThat(
+      g.route !== "solo" ||
+        (soloSupported(course) && members.length === 1 && exception),
+      "The solo route needs one member, instructor approval and a run on the solo requirement/rubric edition.",
+    );
     if (proposal && proposal !== prior?.proposal) {
       const source = course.phases[phase].formation?.proposals.find(
         (p) => p.id === proposal,
@@ -112,6 +123,7 @@ export function parseGroups(
       ...(name ? { name } : {}),
       ...(exception ? { exception } : {}),
       ...(proposal ? { proposal } : {}),
+      ...(g.route === "solo" ? { route: "solo" as const } : {}),
     };
   });
   requireThat(unique(groups.map((g) => g.id)), "Group IDs must be unique.");
@@ -187,7 +199,8 @@ function settings(
     "Keep yourself as course staff.",
   );
   requireThat(
-    body.rubric === course.rubric && body.rubric === rubricVersion,
+    body.rubric === course.rubric &&
+      [rubricVersion, legacyRubricVersion].includes(course.rubric),
     "Keep the published rubric version for this run.",
   );
   course.staff = staff;
@@ -233,12 +246,50 @@ function setGroups(
         (g) =>
           g.id === s.group &&
           JSON.stringify([...g.members].sort()) ===
-            JSON.stringify([...s.members].sort()),
+            JSON.stringify([...s.members].sort()) &&
+          g.route ===
+            old.phases[phase].groups.find((prior) => prior.id === g.id)?.route,
       ),
     ),
     "Frozen group membership is preserved. Change groups in a later phase.",
   );
   const retained = new Set(groups.map((g) => g.id));
+  requireThat(
+    records
+      .filter(
+        (r) =>
+          r.kind === "portfolio" &&
+          (r.value as { phase: string }).phase === phase,
+      )
+      .every((r) => {
+        const student = (r.value as { student: string }).student;
+        return (
+          old.phases[phase].groups.find((g) => g.members.includes(student))
+            ?.route === groups.find((g) => g.members.includes(student))?.route
+        );
+      }),
+    "Retain the student's route once portfolio evidence exists; change it in a later phase.",
+  );
+  requireThat(
+    old.phases[phase].groups.every((prior) => {
+      const nextGroup = groups.find((g) => g.id === prior.id);
+      return (
+        nextGroup?.route === prior.route ||
+        !records.some(
+          (r) =>
+            (r.value as { phase?: string }).phase === phase &&
+            ((r.kind === "solo-review" &&
+              (r.value as { group: string }).group === prior.id) ||
+              (r.kind === "portfolio" &&
+                prior.members.includes(
+                  (r.value as { student: string }).student,
+                )) ||
+              (r.kind === "audit" && (r.value as Audit).from === prior.id)),
+        )
+      );
+    }),
+    "Retain the route once review or portfolio evidence exists; change it in a later phase.",
+  );
   requireThat(
     old.phases[phase].groups.every(
       (g) =>
@@ -250,6 +301,8 @@ function setGroups(
               (r.value as Submission).group === g.id) ||
             (r.kind === "project-grade" &&
               (r.value as Grade).subject === g.id) ||
+            (r.kind === "solo-review" &&
+              (r.value as { group: string }).group === g.id) ||
             (r.kind === "audit" &&
               ((r.value as Audit).from === g.id ||
                 (r.value as Audit).to === g.id))
@@ -331,6 +384,7 @@ function allocateGroups(course: Course, value: unknown) {
       name: g.name,
       exception: g.exception,
       proposal: g.proposal,
+      route: g.route,
     };
   });
   course.nextGroupNumber = nextNumber;

@@ -12,6 +12,14 @@ import {
   returnToSimulationInstructor,
   simulationMode,
 } from "./course-simulation.ts";
+import {
+  soloGroup,
+  soloStudent,
+  soloGradeCurrent,
+  assessmentCriteriaFor,
+  type SoloReview,
+} from "../../shared/course-solo.ts";
+import { soloReviewForm, referenceAudit } from "./course-solo.ts";
 import { studentGroups } from "./course-formation.ts";
 import {
   sourceGuidance,
@@ -55,7 +63,6 @@ import {
   phases,
   title,
   projectCriteria,
-  individualCriteria,
   lectureCriteria,
   emptyPortfolio,
   type Phase,
@@ -80,6 +87,7 @@ interface View {
   submissions: Envelope<Submission>[];
   portfolios: Envelope<Portfolio>[];
   audits: Envelope<Audit>[];
+  soloReviews: Envelope<SoloReview>[];
   projects: Envelope<Grade>[];
   individuals: Envelope<Grade>[];
   files: Envelope<CourseFile>[];
@@ -259,17 +267,21 @@ function header() {
 function resultMarkup(result: Result) {
   if (result.status === "withdrawn")
     return '<aside class="course-note"><strong>Withdrawn · no final grade</strong><p>Saved evidence and assessment history are retained. This enrollment is excluded from grading and result-release requirements.</p></aside>';
-  return `<div class="course-result"><div><span class="course-score">${result.earned}<small> / ${result.available}</small></span><p>${result.percentage.toFixed(1)}% · ${result.status === "pending" ? "Assessment pending" : result.status === "fail" ? "Passing requirements unmet" : `Grade ${result.grade}`}</p></div><div><p><strong>Each phase requires</strong> 10 project points, two complete lecture activities, a submitted self/peer assessment earning 6 points, and 1 contribution point. Approved arrangements appear below.</p>${result.pending.length ? `<p class="course-muted">Pending: ${e(result.pending.join("; "))}.</p>` : ""}${result.unmet.length ? `<ul class="course-unmet">${result.unmet.map((s) => `<li>${e(s)}</li>`).join("")}</ul>` : ""}</div></div>
+  return `<div class="course-result"><div><span class="course-score">${result.earned}<small> / ${result.available}</small></span><p>${result.percentage.toFixed(1)}% · ${result.status === "pending" ? "Assessment pending" : result.status === "fail" ? "Passing requirements unmet" : `Grade ${result.grade}`}</p></div><div><p><strong>Each phase requires</strong> 10 project points, two complete lecture activities, a submitted individual assessment earning 6 points, and 1 contribution point. Approved arrangements appear below.</p>${result.pending.length ? `<p class="course-muted">Pending: ${e(result.pending.join("; "))}.</p>` : ""}${result.unmet.length ? `<ul class="course-unmet">${result.unmet.map((s) => `<li>${e(s)}</li>`).join("")}</ul>` : ""}</div></div>
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Points and mandatory work by phase</caption><thead><tr><th>Phase</th><th>Project /30</th><th>Lecture /9</th><th>Complete /3</th><th>Assessment /12</th><th>Contribution /3</th></tr></thead><tbody>${result.breakdown.map((b) => `<tr><th>${title(b.phase)}${!b.published ? " · unreleased" : ""}</th><td>${b.project ?? "Pending"}</td><td>${b.lecture ?? "Pending"}</td><td>${b.completed ?? "Pending"}</td><td>${b.assessment ?? "Pending"}</td><td>${b.contribution ?? "Pending"}</td></tr>`).join("")}</tbody></table></div>`;
 }
-function assessmentCriteria(phase: Phase, project: boolean) {
+function assessmentCriteria(
+  phase: Phase,
+  project: boolean,
+  student = selectedStudent,
+) {
   return project
     ? projectCriteria(phase)
     : [
         ...[1, 2, 3].flatMap((n) =>
           lectureCriteria.map((c) => [`Lecture ${n}: ${c[0]}`, c[1]] as const),
         ),
-        ...individualCriteria,
+        ...assessmentCriteriaFor(view!.config.value, phase, student),
       ];
 }
 function feedbackCard(record: Envelope<Grade>, project: boolean) {
@@ -281,10 +293,19 @@ function feedbackCard(record: Envelope<Grade>, project: boolean) {
         ? (r.value as Submission).group
         : (r.value as Portfolio).student) === g.subject,
   );
-  const stale = g.evidenceRevision !== (evidence?.revision ?? null);
+  const stale =
+    g.evidenceRevision !== (evidence?.revision ?? null) ||
+    !soloGradeCurrent(
+      view!.config.value,
+      g,
+      project,
+      view!.soloReviews,
+      view!.audits,
+    );
   return `<details><summary>${title(g.phase)} ${project ? "group" : "private"} assessment${stale ? " · previous evidence; reassessment pending" : ""}</summary><p class="course-muted">Assessed ${e(when(record.updatedAt))}. ${g.missing ? "Missing work was explicitly assessed." : ""}</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>${project ? "Project" : "Individual"} criterion scores</caption><thead><tr><th>Criterion</th><th>Score</th></tr></thead><tbody>${assessmentCriteria(
     g.phase,
     project,
+    g.subject,
   )
     .map(
       ([label, max], i) =>
@@ -350,7 +371,22 @@ function overview() {
         )}</p><button type="button" data-tab="groups" class="course-quiet">Allocate groups</button></aside>`
       : ""
   }
-  ${activeGroups(course, phase).some((g) => !schedule.audits.some((a) => a.from === g.id) || !schedule.audits.some((a) => a.to === g.id)) ? '<aside class="course-note"><strong>Audit arrangements incomplete</strong><p>Each group needs an incoming and outgoing audit, or a staff-arranged fallback.</p><button type="button" data-tab="schedule" class="course-quiet">Arrange audits</button></aside>' : ""}
+  ${activeGroups(course, phase).some((g) => !soloGroup(course, phase, g.id) && (!schedule.audits.some((a) => a.from === g.id) || !schedule.audits.some((a) => a.to === g.id))) ? '<aside class="course-note"><strong>Audit arrangements incomplete</strong><p>Each group needs an incoming and outgoing audit, or a staff-arranged fallback.</p><button type="button" data-tab="schedule" class="course-quiet">Arrange audits</button></aside>' : ""}
+  ${
+    activeGroups(course, phase).some((g) => {
+      if (!soloGroup(course, phase, g.id)) return false;
+      const review = v.soloReviews.find(
+        (r) => r.value.phase === phase && r.value.group === g.id,
+      );
+      return (
+        !review ||
+        (!schedule.audits.some((a) => a.from === g.id) &&
+          !review.value.reference.commit)
+      );
+    })
+      ? '<aside class="course-note"><strong>Solo review arrangements incomplete</strong><p>Arrange an independent human reviewer and an outgoing audit of another course group or a supplied reference. Record the plan in Group submission before the phase starts.</p><button type="button" data-tab="submission" class="course-quiet">Arrange solo review</button></aside>'
+      : ""
+  }
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Group review status</caption><thead><tr><th>Group</th><th>Implementation</th><th>Incoming audit</th><th>Author response</th><th>Assessment</th><th>Review</th></tr></thead><tbody>${schedule.groups
     .map((g) => {
       const s = v.submissions.find(
@@ -362,7 +398,7 @@ function overview() {
         grade = v.projects.find(
           (r) => r.value.phase === phase && r.value.subject === g.id,
         );
-      return `<tr><th>${e(g.id)}</th><td>${s?.value.frozenAt ? "Frozen" : s ? "Draft" : "Missing"}</td><td>${a ? "Submitted" : "Missing"}</td><td>${s?.value.submittedAt ? "Submitted" : "Pending"}</td><td>${!requiredGroups.has(g.id) ? "No active students" : grade ? (grade.value.evidenceRevision !== (s?.revision ?? null) ? "Needs reassessment" : `${grade.value.scores.reduce((a, b) => a + b, 0)}/30`) : "Ungraded"}</td><td><button type="button" data-review-group="${e(g.id)}">Review</button></td></tr>`;
+      return `<tr><th>${e(g.id)}</th><td>${s?.value.frozenAt ? "Frozen" : s ? "Draft" : "Missing"}</td><td>${a || v.soloReviews.some((r) => r.value.phase === phase && r.value.group === g.id && r.value.report) ? "Submitted" : "Missing"}</td><td>${s?.value.submittedAt ? "Submitted" : "Pending"}</td><td>${!requiredGroups.has(g.id) ? "No active students" : grade ? (grade.value.evidenceRevision !== (s?.revision ?? null) || !soloGradeCurrent(course, grade.value, true, v.soloReviews, v.audits) ? "Needs reassessment" : `${grade.value.scores.reduce((a, b) => a + b, 0)}/30`) : "Ungraded"}</td><td><button type="button" data-review-group="${e(g.id)}">Review</button></td></tr>`;
     })
     .join("")}</tbody></table></div>
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Individual review status · private to staff</caption><thead><tr><th>Student</th><th>Portfolio</th><th>Assessment</th><th>Course status</th><th>Review</th></tr></thead><tbody>${course.students
@@ -374,7 +410,7 @@ function overview() {
           (r) => r.value.phase === phase && r.value.subject === s.id,
         ),
         r = v.results.find((r) => r.student.id === s.id)?.result;
-      return `<tr><th>${e(s.name)}<small>${e(s.number)}</small></th><td>${p?.value.submittedAt ? "Submitted" : p ? "Draft" : "Missing"}</td><td>${!activeStudent(s) ? "Not required · withdrawn" : g ? (g.value.evidenceRevision !== (p?.revision ?? null) ? "Needs reassessment" : "Recorded") : "Ungraded"}</td><td>${e(r?.status ?? "pending")}</td><td><button type="button" data-review-student="${e(s.id)}">Review</button></td></tr>`;
+      return `<tr><th>${e(s.name)}<small>${e(s.number)}</small></th><td>${p?.value.submittedAt ? "Submitted" : p ? "Draft" : "Missing"}</td><td>${!activeStudent(s) ? "Not required · withdrawn" : g ? (g.value.evidenceRevision !== (p?.revision ?? null) || !soloGradeCurrent(course, g.value, false, v.soloReviews, v.audits) ? "Needs reassessment" : "Recorded") : "Ungraded"}</td><td>${e(r?.status ?? "pending")}</td><td><button type="button" data-review-student="${e(s.id)}">Review</button></td></tr>`;
     })
     .join("")}</tbody></table></div></section>`;
 }
@@ -418,8 +454,8 @@ function gradeForm(
       );
   if (!required)
     return `<aside class="course-note"><strong>${p ? "No active students in this group" : "Withdrawn · no individual assessment"}</strong><p>Historical evidence and feedback are retained; no assessment is required for release.</p>${g ? feedbackCard(g, p) + historyButton(g) : ""}</aside>`;
-  const criteria = assessmentCriteria(phase, p);
-  return `<form data-form="${kind}" class="course-grade-form"><h4>${p ? "Group project assessment" : "Private individual assessment"}</h4><p>Use the <a href="/project/grading/">published rubric</a>. Participation needs recorded live or remote evidence; contribution is an instructor judgment supported by the portfolio and project history.</p>
+  const criteria = assessmentCriteria(phase, p, subject);
+  return `<form data-form="${kind}" class="course-grade-form"><h4>${p ? "Group project assessment" : "Private individual assessment"}</h4><p>Use the <a href="${requirementUrl(requirementsFor(view!.config.value).version, "grading")}">published rubric</a>. Participation needs recorded live or remote evidence; contribution is an instructor judgment supported by the portfolio and project history.</p>
   <fieldset class="course-score-grid"><legend>Criterion scores</legend>${criteria.map(([label, max], i) => `<label>${e(label)}<span><input type="number" name="score-${i}" min="0" max="${max}" step="1" value="${g?.value.scores[i] ?? ""}" required aria-label="${e(label)} score"> / ${max}</span></label>`).join("")}</fieldset>
   <label class="course-check"><input type="checkbox" name="missing" ${g?.value.missing ? "checked" : ""}> Explicitly record missing work (all scores must be zero)</label>
   ${field("feedback", "Criterion reasons, feedback and missing evidence", g?.value.feedback ?? "", 8000, true)}
@@ -434,6 +470,10 @@ function submission() {
       (r) => r.value.phase === phase && r.value.group === selectedGroup,
     ),
     s = record?.value;
+  const solo = soloGroup(v.config.value, phase, selectedGroup);
+  const soloReview = v.soloReviews.find(
+    (r) => r.value.phase === phase && r.value.group === selectedGroup,
+  );
   const incoming = v.audits.find(
     (a) => a.value.phase === phase && a.value.to === selectedGroup,
   );
@@ -443,7 +483,20 @@ function submission() {
       f.value.scope === "technical" &&
       f.value.owner === selectedGroup,
   );
-  return `<section class="course-section">${groupPicker()}<div class="course-section-heading"><h3>${s?.frozenAt ? "Frozen implementation" : "Prepare implementation"}</h3>${historyButton(record)}</div><p>Implementation deadline: ${when(v.config.value.phases[phase].freezeAt)}. One member submits for the whole group.</p>
+  return `<section class="course-section">${groupPicker()}<div class="course-section-heading"><h3>${s?.frozenAt ? "Frozen implementation" : "Prepare implementation"}</h3>${historyButton(record)}</div><p>Implementation deadline: ${when(v.config.value.phases[phase].freezeAt)}. One member submits for the whole group.</p>${
+    solo
+      ? `<aside class="course-note"><strong>Approved solo route</strong><p>Keep the common application and phase evidence. Complete the instructor discussion, incoming independent audit and outgoing audit. <a href="${requirementUrl(requirementsFor(v.config.value).version, phase, "solo-route")}">${title(phase)} solo instructions ↗</a></p></aside>${
+          v.staff
+            ? soloReviewForm(
+                soloReview,
+                v.config.value.phases[phase].audits.some(
+                  (a) => a.from === selectedGroup,
+                ),
+              )
+            : ""
+        }`
+      : ""
+  }
   ${
     s?.frozenAt
       ? `<aside class="course-note">Frozen ${when(s.frozenAt)} · <code>${e(s.commit)}</code><p>Registered members: ${s.members.map((id) => e(v.config.value.students.find((x) => x.id === id)?.name ?? id)).join(", ")}</p></aside>${s.repository ? `<p><a href="${e(s.repository)}" target="_blank" rel="noopener noreferrer">Repository ↗</a></p>` : ""}<p>${archives
@@ -452,7 +505,7 @@ function submission() {
           .join(
             "",
           )}</p><h4>Setup and validation</h4><p class="course-evidence">${e(s.setup)}</p><h4>Initial evidence and limitations</h4><p class="course-evidence">${e(s.evidence)}</p><details><summary>Frozen initial checklist</summary>${checklistMarkup(v.config.value, phase, s.checklist)}</details>
-  <h4>Incoming audit</h4>${incoming ? `<p class="course-evidence">${e(incoming.value.report)}</p>` : '<p class="course-muted">No audit submitted yet. Contact staff if a fallback is needed.</p>'}
+  <h4>Incoming audit</h4>${incoming || soloReview?.value.report ? `<p class="course-evidence">${e(incoming?.value.report ?? soloReview?.value.report ?? "")}</p>` : '<p class="course-muted">No audit submitted yet. Contact staff if a fallback is needed.</p>'}
   <h4>Complete technical evidence</h4><p>Evidence deadline: ${when(v.config.value.phases[phase].evidenceAt)}. ${s.submittedAt ? `Submitted ${when(s.submittedAt)}.` : "Final evidence is private to the group and staff until submitted."}</p><form data-form="evidence"><div class="course-evidence-layout"><div>${field("finalIndex", "Completed technical evidence index and limitations", s.finalEvidence?.index ?? "", 8000)}${field("response", "Author response: findings, corrections and evidence links", s.response, 8000, true)}${upload("technical", "evidence")}${archives
     .filter((f) => f.value.purpose === "evidence")
     .map(
@@ -480,6 +533,7 @@ function portfolio() {
       (r) => r.value.phase === phase && r.value.student === student,
     ),
     p = record?.value ?? emptyPortfolio(phase, student);
+  const solo = soloStudent(v.config.value, phase, student);
   const attachments = v.files.filter(
     (f) =>
       f.value.phase === phase &&
@@ -491,7 +545,12 @@ function portfolio() {
     v.staff
       ? `<div class="course-portfolio-read">${p.lectures.map((l, i) => `<details open><summary>Lecture ${i + 1} · ${e(l.mode)}</summary><h4>Participation evidence</h4><p class="course-evidence">${e(l.participation || "Missing")}</p><h4>Concrete idea</h4><p class="course-evidence">${e(l.idea || "Missing")}</p><h4>Connection</h4><p class="course-evidence">${e(l.connection || "Missing")}</p></details>`).join("")}${[
           ["Self-assessment", p.self],
-          ["Private peer feedback", p.peers],
+          [
+            solo
+              ? "Independent implementation review"
+              : "Private peer feedback",
+            p.peers,
+          ],
           ["Response and reflection", p.reflection],
           ["Decision challenged, tested or reviewed", p.contribution],
         ]
@@ -505,7 +564,7 @@ function portfolio() {
             .map((f) => `<p>${fileLink(f.value)}</p>`)
             .join("") || "<p>None</p>"
         }</div>${gradeForm("individual-grade", student)}`
-      : `<form data-form="portfolio">${p.lectures.map((l, i) => `<fieldset class="course-lecture"><legend>Lecture ${i + 1}</legend><label class="course-field">Participation<select name="mode-${i}" aria-label="Participation">${["missing", "live", "remote"].map((mode) => option(mode, mode === "missing" ? "Not completed" : mode === "live" ? "Live participation" : "Announced remote equivalent", l.mode)).join("")}</select></label>${field(`participation-${i}`, "Participation or equivalent activity evidence", l.participation, 1000)}${field(`idea-${i}`, "One concrete idea, failure, model or trade-off", l.idea, 1800)}${field(`connection-${i}`, "Connection to project evidence, an assumption or a decision", l.connection, 1800)}</fieldset>`).join("")}${field("self", "Self-assessment: contributions, commitments, learning and next improvement", p.self, 2500, true)}${field("peers", "Private peer feedback: specific feedback for each teammate", p.peers, 2500, true)}${field("reflection", "Response to feedback, one adjustment and a groupworking condition", p.reflection, 2500, true)}${field("contribution", "One consequential decision you challenged, tested or reviewed: link evidence and explain the outcome", p.contribution, 2500, true)}${upload("private")}${attachments.map((f) => `<label class="course-check"><input type="checkbox" name="file" value="${e(f.value.id)}" ${p.files.includes(f.value.id) ? "checked" : ""}> ${e(f.value.name)}</label>`).join("")}<div class="course-form-actions"><button type="submit" name="stage" value="draft" class="course-secondary" formnovalidate>Save draft</button><button type="submit" name="stage" value="submit">${p.submittedAt ? "Resubmit portfolio" : "Submit portfolio"}</button></div></form>`
+      : `<form data-form="portfolio">${p.lectures.map((l, i) => `<fieldset class="course-lecture"><legend>Lecture ${i + 1}</legend><label class="course-field">Participation<select name="mode-${i}" aria-label="Participation">${["missing", "live", "remote"].map((mode) => option(mode, mode === "missing" ? "Not completed" : mode === "live" ? "Live participation" : "Announced remote equivalent", l.mode)).join("")}</select></label>${field(`participation-${i}`, "Participation or equivalent activity evidence", l.participation, 1000)}${field(`idea-${i}`, "One concrete idea, failure, model or trade-off", l.idea, 1800)}${field(`connection-${i}`, "Connection to project evidence, an assumption or a decision", l.connection, 1800)}</fieldset>`).join("")}${field("self", "Self-assessment: contributions, commitments, learning and next improvement", p.self, 2500, true)}${field("peers", solo ? "Independent implementation review: evidence, useful feedback and limitations" : "Private peer feedback: specific feedback for each teammate", p.peers, 2500, true)}${field("reflection", solo ? "Response to independent feedback, one adjustment and a solo working condition" : "Response to feedback, one adjustment and a groupworking condition", p.reflection, 2500, true)}${field("contribution", "One consequential decision you challenged, tested or reviewed: link evidence and explain the outcome", p.contribution, 2500, true)}${upload("private")}${attachments.map((f) => `<label class="course-check"><input type="checkbox" name="file" value="${e(f.value.id)}" ${p.files.includes(f.value.id) ? "checked" : ""}> ${e(f.value.name)}</label>`).join("")}<div class="course-form-actions"><button type="submit" name="stage" value="draft" class="course-secondary" formnovalidate>Save draft</button><button type="submit" name="stage" value="submit">${p.submittedAt ? "Resubmit portfolio" : "Submit portfolio"}</button></div></form>`
   }</section>`;
 }
 function audit() {
@@ -516,6 +575,12 @@ function audit() {
   const record = v.audits.find(
     (r) => r.value.phase === phase && r.value.from === selectedGroup,
   );
+  if (!assignment && soloGroup(v.config.value, phase, selectedGroup)) {
+    const review = v.soloReviews.find(
+      (r) => r.value.phase === phase && r.value.group === selectedGroup,
+    );
+    return `<section class="course-section">${groupPicker()}${referenceAudit(review, record?.value.report ?? "", v.staff)}</section>`;
+  }
   const target = v.submissions.find(
     (r) =>
       r.value.phase === phase &&
@@ -548,7 +613,7 @@ function technicalCard(record: Envelope<Submission>) {
     .map((f) => `<p>${fileLink(f.value)}</p>`)
     .join(
       "",
-    )}<details><summary>Setup & validation</summary><p class="course-evidence">${e(s.setup)}</p></details><details><summary>Initial evidence</summary><p class="course-evidence">${e(s.evidence)}</p>${checklistMarkup(v.config.value, s.phase, s.checklist)}</details><details><summary>Completed technical evidence</summary><p class="course-evidence">${e(s.finalEvidence?.index || "Final evidence pending")}</p>${s.finalEvidence ? checklistMarkup(v.config.value, s.phase, s.finalEvidence.checklist) : ""}${referenceLinks(s.finalEvidence?.references)}</details><details><summary>Audit & author response</summary><p class="course-evidence">${e(audit?.value.report ?? "Audit pending")}</p><p class="course-evidence">${e(s.response || "Author response pending")}</p></details></article>`;
+    )}<details><summary>Setup & validation</summary><p class="course-evidence">${e(s.setup)}</p></details><details><summary>Initial evidence</summary><p class="course-evidence">${e(s.evidence)}</p>${checklistMarkup(v.config.value, s.phase, s.checklist)}</details><details><summary>Completed technical evidence</summary><p class="course-evidence">${e(s.finalEvidence?.index || "Final evidence pending")}</p>${s.finalEvidence ? checklistMarkup(v.config.value, s.phase, s.finalEvidence.checklist) : ""}${referenceLinks(s.finalEvidence?.references)}</details><details><summary>Audit & author response</summary><p class="course-evidence">${e(audit?.value.report ?? v.soloReviews.find((r) => r.value.phase === s.phase && r.value.group === s.group)?.value.report ?? "Audit pending")}</p><p class="course-evidence">${e(s.response || "Author response pending")}</p></details></article>`;
 }
 function referencedSubmission() {
   const record = view!.submissions.find(
@@ -1246,6 +1311,25 @@ content.addEventListener("submit", async (event) => {
         expected: revision(old),
         stage: submit?.value ?? "draft",
         value,
+      });
+    } else if (kind === "solo-review") {
+      const old = v.soloReviews.find(
+        (r) => r.value.phase === phase && r.value.group === selectedGroup,
+      );
+      await api(route("solo-review", selectedGroup), "PUT", {
+        expected: revision(old),
+        reason: val("reason"),
+        value: {
+          reviewer: val("reviewer"),
+          checkIn: val("checkIn"),
+          report: val("incomingReport"),
+          reference: {
+            repository: val("referenceRepository"),
+            commit: val("referenceCommit"),
+            setup: val("referenceSetup"),
+            probe: val("referenceProbe"),
+          },
+        },
       });
     } else if (kind === "audit") {
       const old = v.audits.find(

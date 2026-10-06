@@ -44,6 +44,13 @@ Phase formation state lives in the course snapshot, with history and atomic cour
 Staff Groups fingerprints cover allocation and formation responses; student actions also check their own preference/proposal revision.
 Working agreements are separate ungraded records, private to their group and staff.
 
+Solo participation is an explicitly approved one-person allocation on the current requirements/rubric edition, retained per phase.
+`shared/course-solo.ts` owns route detection, equivalent assessment criteria, review records and grading freshness; `worker/course-solo.ts` validates reference assignments and independent review evidence.
+The staff-only solo-review API persists versioned records through the existing store/history, while outgoing reference audits use the existing audit boundary.
+`site/scripts/course-solo.ts` renders review and reference-audit forms; the ordinary submission, portfolio and grade flows remain shared.
+Review corrections invalidate affected assessments, and old runs retain their published editions.
+See [the operating guide](docs/course-system.md#solo-route-across-all-three-phases) for allocation, privacy and assessment boundaries.
+
 Enrollment arrangements enter through staff-only `/api/courses/:course/enrollment` and the Students/review-queue interface.
 `shared/course-enrollment.ts` owns active-student/group projections and pending catch-up/withdrawal tasks; `worker/course-enrollment.ts` records arrivals, departures, private review notes and reinstatement; `site/scripts/course-enrollment.ts` renders the workflow.
 Enrollment metadata lives on the student's stable course identity in the course snapshot, guarded by the Students fingerprint and final whole-record revision check.

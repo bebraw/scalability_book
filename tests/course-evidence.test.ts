@@ -174,7 +174,7 @@ test("final evidence preserves the frozen implementation, hides drafts/attachmen
   const f = await fixture(t),
     frozen = await f.freeze("establish");
   assert.equal(frozen.value.repository, "");
-  assert.equal(frozen.value.requirements, "2026-10-v1");
+  assert.equal(frozen.value.requirements, "2026-10-v2");
   assert.equal(
     frozen.value.checklist!.find((r) => r.id === "baseline")!.status,
     "missing",

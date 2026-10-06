@@ -56,6 +56,13 @@ import {
   requirementVersion,
   requirementsFor,
 } from "../shared/course-requirements.ts";
+import {
+  soloGroup,
+  soloStudent,
+  soloGradeCurrent,
+  type SoloReview,
+} from "../shared/course-solo.ts";
+import { parseSoloReview, soloReviewReady } from "./course-solo.ts";
 import { parseChecklist, parseFinalEvidence } from "./course-submission.ts";
 export interface CourseUser {
   id: string;
@@ -226,6 +233,34 @@ function visibleRecords(
   return {
     submissions: visibleSubs,
     portfolios,
+    soloReviews: records
+      .filter(
+        (r) =>
+          r.kind === "solo-review" &&
+          (staff ||
+            ownGroups.has(
+              `${(r.value as SoloReview).phase}:${(r.value as SoloReview).group}`,
+            ) ||
+            (now >= course.phases[(r.value as SoloReview).phase].auditAt &&
+              Boolean((r.value as SoloReview).report))),
+      )
+      .map((r) => {
+        const review = r as Envelope<SoloReview>;
+        const own = ownGroups.has(
+          `${review.value.phase}:${review.value.group}`,
+        );
+        return staff ||
+          (own && now >= course.phases[review.value.phase].freezeAt)
+          ? review
+          : {
+              ...review,
+              value: {
+                ...review.value,
+                ...(!own ? { checkIn: "" } : {}),
+                reference: { repository: "", commit: "", setup: "", probe: "" },
+              },
+            };
+      }),
     audits,
     projects,
     individuals,
@@ -358,7 +393,18 @@ export async function handleCourses(
         const evidence = records.find(
           (r) => r.key === recordKey(id, evidenceKind, g.phase, g.subject),
         );
-        return g.evidenceRevision === (evidence?.revision ?? null);
+        return (
+          g.evidenceRevision === (evidence?.revision ?? null) &&
+          soloGradeCurrent(
+            course,
+            g,
+            kind === "project-grade",
+            records.filter(
+              (r) => r.kind === "solo-review",
+            ) as Envelope<SoloReview>[],
+            records.filter((r) => r.kind === "audit") as Envelope<Audit>[],
+          )
+        );
       });
     async function save<T>(
       kind: string,
@@ -1095,8 +1141,47 @@ export async function handleCourses(
       const reason = staff
         ? text(body.reason, "Staff submission reason", 2000, true)
         : `Group ${body.stage}`;
+      if (soloGroup(course, phase, subject) && value.frozenAt) {
+        const reference = values<SoloReview>("solo-review").find(
+          (r) => r.phase === phase && r.group === subject,
+        )?.reference;
+        requireThat(
+          !reference?.commit || reference.commit !== value.commit.toLowerCase(),
+          "The solo source and assigned reference must be different implementations.",
+        );
+      }
       return reply(
         await save("submission", phase, subject, value, body.expected, reason),
+      );
+    }
+    if (action === "solo-review") {
+      requireThat(
+        staff,
+        "Only course staff can arrange or record independent solo reviews.",
+        403,
+      );
+      const value = parseSoloReview(
+        course,
+        records,
+        phase,
+        subject,
+        body.value,
+        now,
+      );
+      return reply(
+        await save(
+          "solo-review",
+          phase,
+          subject,
+          value,
+          body.expected,
+          text(
+            body.reason,
+            "Solo review arrangement or correction reason",
+            2000,
+            true,
+          ),
+        ),
       );
     }
     if (action === "portfolio") {
@@ -1154,13 +1239,17 @@ export async function handleCourses(
         self: text(data.self, "Self-assessment", 2500, body.stage === "submit"),
         peers: text(
           data.peers,
-          "Private peer feedback",
+          soloStudent(course, phase, subject)
+            ? "Private independent implementation review"
+            : "Private peer feedback",
           2500,
           body.stage === "submit",
         ),
         reflection: text(
           data.reflection,
-          "Response and group reflection",
+          soloStudent(course, phase, subject)
+            ? "Response to feedback and solo reflection"
+            : "Response and group reflection",
           2500,
           body.stage === "submit",
         ),
@@ -1192,7 +1281,17 @@ export async function handleCourses(
     }
     if (action === "audit") {
       const assignment = schedule.audits.find((a) => a.from === subject);
-      requireThat(assignment, "No audit assigned. Contact staff.", 409);
+      const solo = records.find(
+        (r) =>
+          r.kind === "solo-review" &&
+          (r.value as SoloReview).phase === phase &&
+          (r.value as SoloReview).group === subject,
+      ) as Envelope<SoloReview> | undefined;
+      requireThat(
+        assignment || (soloGroup(course, phase, subject) && solo),
+        "No audit assigned. Contact staff.",
+        409,
+      );
       requireThat(
         staff || inTeam(course, phase, subject, user),
         "Assigned auditor access required.",
@@ -1203,11 +1302,56 @@ export async function handleCourses(
         "The audit window is not open.",
         409,
       );
+      if (!assignment && solo) {
+        requireThat(
+          solo.value.reference.repository &&
+            solo.value.reference.commit &&
+            solo.value.reference.setup &&
+            solo.value.reference.probe,
+          "Staff must arrange a complete reference audit or assign another course group.",
+          409,
+        );
+        requireThat(
+          !values<Submission>("submission").some(
+            (s) =>
+              s.phase === phase &&
+              s.group === subject &&
+              s.commit.toLowerCase() === solo.value.reference.commit,
+          ),
+          "The reference audit must inspect a different implementation.",
+        );
+        const value: Audit = {
+          phase,
+          from: subject,
+          to: `reference-${subject}`,
+          targetRevision: solo.value.reference.commit,
+          reference: solo.value.reference,
+          report: text(
+            body.report,
+            "Setup, timing, prior inspection, tool policy, change probe and findings",
+            10000,
+            true,
+          ),
+          submittedAt: now,
+        };
+        return reply(
+          await save(
+            "audit",
+            phase,
+            subject,
+            value,
+            body.expected,
+            staff
+              ? text(body.reason, "Staff audit reason", 2000, true)
+              : "Reference audit submitted",
+          ),
+        );
+      }
       const target = records.find(
         (r) =>
           r.kind === "submission" &&
           (r.value as Submission).phase === phase &&
-          (r.value as Submission).group === assignment.to,
+          (r.value as Submission).group === assignment!.to,
       ) as Envelope<Submission> | undefined;
       requireThat(
         target?.value.frozenAt,
@@ -1232,7 +1376,7 @@ export async function handleCourses(
       const value: Audit = {
         phase,
         from: subject,
-        to: assignment.to,
+        to: assignment!.to,
         targetRevision: frozen.revision,
         report: text(
           body.report,
@@ -1285,6 +1429,35 @@ export async function handleCourses(
             : (evidence?.value as Portfolio)?.submittedAt),
         "Assess submitted evidence or explicitly record missing work.",
       );
+      const soloSubjectGroup = project
+        ? subject
+        : course.phases[phase].groups.find((g) => g.members.includes(subject))
+            ?.id;
+      const isSolo = Boolean(
+        soloSubjectGroup && soloGroup(course, phase, soloSubjectGroup),
+      );
+      const soloReview = records.find(
+        (r) =>
+          r.kind === "solo-review" &&
+          (r.value as SoloReview).phase === phase &&
+          (r.value as SoloReview).group === soloSubjectGroup,
+      ) as Envelope<SoloReview> | undefined;
+      const outgoing = records.find(
+        (r) =>
+          r.kind === "audit" &&
+          (r.value as Audit).phase === phase &&
+          (r.value as Audit).from === soloSubjectGroup,
+      ) as Envelope<Audit> | undefined;
+      const soloSubmission = values<Submission>("submission").find(
+        (r) => r.phase === phase && r.group === soloSubjectGroup,
+      );
+      requireThat(
+        !isSolo ||
+          body.missing ||
+          soloReviewReady(soloReview?.value, outgoing?.value, soloSubmission),
+        "Complete the solo instructor discussion, incoming independent audit and outgoing audit before assessment, or explicitly assess missing work.",
+        409,
+      );
       const pointScores = scores(
         body.scores,
         project
@@ -1327,6 +1500,12 @@ export async function handleCourses(
           true,
         ),
         evidenceRevision: evidence?.revision ?? null,
+        ...(isSolo
+          ? {
+              reviewRevision: soloReview?.revision ?? null,
+              auditRevision: outgoing?.revision ?? null,
+            }
+          : {}),
         missing: body.missing,
         reason: text(
           body.reason,

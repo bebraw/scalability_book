@@ -5,6 +5,7 @@ The course interface's authored checklist in `shared/course-requirements.ts` sum
 
 Each course run stores a requirement edition on creation.
 Historical runs without that field use the fixed first edition, `2026-10-v1`, rather than the current edition.
+The current `2026-10-v2` edition adds an explicitly approved solo route across all three phases and retains the group route; its `2026-10-solo-equivalence-v2` rubric preserves numeric scoring and passing rules while replacing teammate-specific evidence for solo students.
 The published snapshots below are immutable after publication, including their checklist text.
 The site builds readable archived briefs and Markdown downloads under `/project/requirements/<edition>/<document>/`.
 Links among the briefs stay within their edition; links to supporting book concepts may follow the current book.

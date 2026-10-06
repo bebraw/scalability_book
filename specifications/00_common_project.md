@@ -43,6 +43,16 @@ Link the relevant code or evidence; do not submit another report or a raw chat t
 This session replaces part of ordinary project discussion and reflection within the published time budget.
 Shared work may be remote and does not require a shared personal account.
 
+### Solo engineering session
+
+For an approved solo allocation, keep one approximately 30-minute engineering session per phase within ordinary project work.
+Before agent use, write your prediction and the acceptance check.
+Then act as operator to investigate, as challenger to consider a competing explanation or design and a concrete failure case, and as validator to run checks and explain acceptance or rejection.
+Keep the phase questions above and link the compact record from existing evidence.
+Arrange a short instructor discussion per phase: explain the decision and result, answer an independent challenge, and record what changed or remains uncertain.
+The discussion may be remote; agree its time budget in advance and record it in the existing evidence rather than adding a report.
+The instructor records completed discussion evidence in the workspace.
+
 ---
 
 ## 1. Application Brief
@@ -578,6 +588,22 @@ The auditing group will:
 5. identify one hidden assumption, inconsistency, or comprehension problem;
 6. attempt the small [change probe](/concepts/#change-probe) supplied for that phase;
 7. return a concise friction report.
+
+### Solo audit arrangements
+
+A solo student still needs independent review of each frozen implementation.
+The instructor assigns a human reviewer, who follows the same setup, validation and bounded change-probe protocol and returns a report tied to the frozen revision.
+The instructor records the reviewer, report and revision; the student responds in the existing technical evidence stage.
+Being the sole author does not make self-review independent evidence.
+
+For the outgoing audit, assign another course group where possible.
+Otherwise supply a reproducible reference repository, full commit hash, supported setup/validation, a phase-specific change probe and the common audit tool policy.
+Use synthetic data and ensure the student has legitimate access without receiving another person's credentials or private records.
+Withhold the reference/probe until the audit window opens; retain the assignment after the student's implementation freezes.
+The reference must differ from the student's submitted implementation.
+Record prior exposure and distinguish a supplied reference from a contemporary class submission in comparisons.
+The student returns the same bounded friction report and indexes its useful review evidence in the private portfolio.
+Neither completing a reference audit nor receiving an instructor audit automatically awards points.
 
 ### 10.1 Change-probe protocol
 

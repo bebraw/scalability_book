@@ -12,7 +12,8 @@ The [course environment sheet](course_environment.md) defines the model, harness
 The [assessment rubric](grading.md) defines the project, participation, learning-diary, and self- and peer-assessment scoring.
 
 Begin with the project introduction, then read the common specification together with the current phase specification.
-Every phase includes a shared engineering session with rotating responsibilities.
+Every phase includes an engineering session: rotating responsibilities for groups, or explicit solo passes and an instructor discussion for the [approved solo route](00_introduction.md#approved-solo-route).
+All three phase briefs define the solo equivalents, while the common contract retains independent audits and the rubric preserves points and passing requirements.
 
 ## How chapter artifacts become submissions
 

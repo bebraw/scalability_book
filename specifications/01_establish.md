@@ -126,6 +126,18 @@ This phase emphasizes:
 
 Raw generation speed and feature count are not goals.
 
+## Solo route
+
+For an instructor-approved solo allocation, implement the full common core with the approved local single-agent setup.
+Agree hardware/model access and a realistic schedule first; keep optional extensions deferred.
+Record the same baseline, two bounded scalability claims, ownership card and local-workflow reflection.
+For the contributor/workflow claim, distinguish observed solo work from a projection about a future contributor; use the independent audit as evidence of unfamiliar-reader friction.
+
+In the solo engineering session, predict whether a work-item transition produces exactly the intended activity event, identify a failure case, run the acceptance check and explain the result in the instructor discussion.
+Disclose consequential human corrections and retain the local-model constraint; an instructor discussion does not authorize an unapproved inference route.
+Receive an independent audit of A and audit the assigned frozen reference or other group under the common protocol.
+Complete the solo portfolio equivalents and the ordinary lecture activities.
+
 ---
 
 ## Instructor Notes

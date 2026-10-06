@@ -19,6 +19,7 @@ Each later phase also benefits from your growing domain knowledge, so the compar
 Groups normally have three members.
 A fourth member needs instructor approval; four is the maximum for new groups.
 An explicitly approved smaller group may continue after a withdrawal when transferring members would be impractical.
+The approved solo route below also permits a one-person allocation from the start.
 
 Use the announced formation period to **Propose a group** or request **Assign me a group**.
 A pair can propose together while awaiting a third member.
@@ -51,6 +52,23 @@ Submit one private individual portfolio per phase containing the relevant lectur
 Label entries by lecture so the instructor can apply the existing three-point lecture criteria.
 The [assessment rubric](grading.md) defines the criteria, passing requirements, and grade thresholds.
 To pass, each student must also complete the [mandatory lecture activities and individual assessments](grading.md#mandatory-individual-work) in every phase.
+
+### Approved solo route
+
+An instructor may approve a one-person group for all three phases on a run using the solo requirement and rubric edition.
+Agree the route, realistic time budget, supported model/hardware access, independent reviewer and audit arrangements before work begins.
+Approval is recorded for each phase; it does not reduce application behavior, evidence, points or passing requirements.
+The student completes three fresh implementations and owns their correctness, operation and acceptance.
+Keep optional scope small; the instructor may adjust scheduling explicitly rather than expect one student to supply a three-person team's working hours.
+
+Use the solo instructions in each phase brief.
+Replace rotating human responsibilities with explicit operator, challenger and validator passes, followed by a short instructor discussion in each phase.
+A human reviewer independently audits the student's frozen implementation, and the student audits an assigned group or an instructor-supplied frozen reference implementation.
+An agent can help within the announced phase/audit tool policy; it cannot stand in for the independent human reviewer.
+
+The private portfolio uses the [solo assessment equivalents](grading.md#solo-assessment-equivalents).
+Keep lecture participation and diary obligations; a project check-in does not automatically count as a lecture activity.
+Solo evidence supports conclusions about individual engineering and agent coordination, not claims of practiced human teamwork.
 
 ### Submit each phase in stages
 

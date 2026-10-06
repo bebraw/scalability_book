@@ -202,6 +202,40 @@ The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
 With only one group or a missing frozen implementation, staff arrange and record a fallback audit.
 
+## Solo route across all three phases
+
+New runs use requirements `2026-10-v2` and rubric `2026-10-solo-equivalence-v2`.
+Historical runs keep their pinned requirements and rubric; do not rewrite them to enable this route.
+The [project introduction](../specifications/00_introduction.md#approved-solo-route), all three phase briefs and [solo assessment equivalents](../specifications/grading.md#solo-assessment-equivalents) own the student contract.
+The common application, three fresh implementations, workload, points and passing minima remain required.
+
+1. Agree a realistic workload/schedule, supported environments, a human reviewer and a short instructor discussion for each phase.
+   In **Groups**, allocate exactly one student, select **Approved solo route**, record instructor approval in the size exception and save/publish the allocation.
+   **Reuse Establish groups** retains the solo route for later phases; review and publish each phase normally.
+2. In **Phase administration**, assign the student's outgoing audit to another course group when possible.
+   Otherwise, in **Group submission → Solo route: independent review and reference audit**, supply a legitimate reference repository, full commit hash, setup/validation and a phase-specific change probe with the common tool policy.
+   Reference fields can remain empty when a course group is assigned.
+   Save the human reviewer and arrangement reason before work freezes where practical.
+3. The student freezes source and initial evidence through the usual submission flow.
+   Reference details remain hidden from students until the implementation deadline opens the audit window.
+   Once the student's source freezes, an existing reference assignment is retained; the student cannot audit the same implementation commit.
+4. Conduct the instructor discussion and independent human audit.
+   Record the completed prediction/challenge/check/acceptance discussion and incoming audit in the solo review form.
+   The report is bound to the student's frozen revision.
+   The student submits their outgoing audit in **Assigned audit**, whether it targets another group or the supplied reference, and answers the incoming findings in final technical evidence.
+5. **My portfolio** uses independent implementation review and solo reflection prompts.
+   The private individual assessment uses the four solo equivalents, retaining the twelve-point assessment maximum, contribution minimum and lecture requirements.
+   Ordinary solo assessment requires the completed discussion and incoming/outgoing audits; incomplete work can be explicitly recorded as missing with zero scores and a reason.
+6. Assess, release and export through the existing gradebook.
+   A changed solo review or outgoing audit makes both project and individual assessments stale until reassessed, in addition to the ordinary submission/portfolio revision checks.
+
+Solo review arrangements are staff-written records at `/api/courses/:course/solo-review/:phase/:group`.
+Student audit reports use the existing audit API and preserve the supplied reference metadata and commit.
+The student's instructor discussion and portfolio stay private to that student and staff; incoming technical audit reports become available with class technical work after the audit window closes.
+Route changes are blocked after frozen source or review/portfolio evidence exists; choose a different route in a later phase instead of reinterpreting saved work.
+Recorded human-review evidence establishes what staff attested, rather than automatically establishing a completed learning outcome or awarding points.
+The [solo API walkthrough](../tests/course-solo.test.ts) covers all three phases through grade release/export, and [browser checks](../tests/e2e/course-solo.spec.ts) exercise allocation, review, reference audit and portfolio/assessment prompts.
+
 ## Submission and access flow
 
 1. A group member uploads a source archive, supplies the full commit hash, supported setup/validation and initial evidence, then freezes the implementation.
@@ -266,7 +300,8 @@ One project score applies to every frozen phase member.
 Lecture participation, diaries and self/peer assessments remain individual.
 
 The rubric is versioned per run.
-This first version implements `2026-10-individual-minima-v1`: 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted self/peer assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
+Historical rubric `2026-10-individual-minima-v1` and current rubric `2026-10-solo-equivalence-v2` retain 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted individual assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
+The current version adds explicit solo assessment equivalents without changing the group-route criteria or numeric scoring rules.
 Grades use the published 50/60/70/80/90% thresholds.
 
 An ungraded record is pending, not zero.

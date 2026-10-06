@@ -3,10 +3,11 @@ import type {
   EvidenceCheckpoint,
   PhaseReference,
 } from "./course-requirements.ts";
-// Published rubric v1. Keep historical runs on this version when adding rubrics.
+// Historical runs retain their published rubric and requirements.
 export const phases = ["establish", "challenge", "compare"] as const;
 export type Phase = (typeof phases)[number];
-export const rubricVersion = "2026-10-individual-minima-v1";
+export const legacyRubricVersion = "2026-10-individual-minima-v1";
+export const rubricVersion = "2026-10-solo-equivalence-v2";
 export const commonCriteria = [
   ["Required behavior and correctness", 6],
   ["Reproducible setup and operation", 4],
@@ -73,6 +74,7 @@ export interface Group {
   name?: string;
   exception?: string;
   proposal?: string;
+  route?: "solo";
 }
 export interface PhaseSetup {
   freezeAt: string;
@@ -97,7 +99,7 @@ export interface Course {
   nextGroupNumber?: number;
   id: string;
   name: string;
-  rubric: typeof rubricVersion;
+  rubric: typeof rubricVersion | typeof legacyRubricVersion;
   staff: string[];
   students: Student[];
   phases: Record<Phase, PhaseSetup>;
@@ -161,6 +163,12 @@ export interface Audit {
   targetRevision: string;
   report: string;
   submittedAt: string;
+  reference?: {
+    repository: string;
+    commit: string;
+    setup: string;
+    probe: string;
+  };
 }
 export interface Grade {
   phase: Phase;
@@ -170,6 +178,8 @@ export interface Grade {
   evidenceRevision: string | null;
   missing: boolean;
   reason?: string;
+  reviewRevision?: string | null;
+  auditRevision?: string | null;
 }
 export interface CourseFile {
   purpose?: "source" | "evidence";

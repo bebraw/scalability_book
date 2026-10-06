@@ -1,6 +1,6 @@
 import type { Course, Phase } from "./course.ts";
 
-export const requirementVersion = "2026-10-v1";
+export const requirementVersion = "2026-10-v2";
 // Old runs without a stored edition retain this first edition when new ones are added.
 export const legacyRequirementVersion = "2026-10-v1";
 export type RequirementDocument = "introduction" | "common" | Phase | "grading";
@@ -281,6 +281,40 @@ export const requirementEditions = {
     common,
     phases: phaseEntries,
     rubric: "2026-10-individual-minima-v1",
+  },
+  "2026-10-v2": {
+    common: common.map((item) =>
+      item.id === "shared-session"
+        ? {
+            ...item,
+            title: "Engineering session and independent challenge",
+            detail:
+              "Group route: rotating operator/challenger/validator and non-operator acceptance. Approved solo route: prediction before agent use, explicit operator/challenger/validator passes and an instructor discussion per phase. Index checks, acceptance and remaining uncertainty in the existing evidence.",
+          }
+        : item.id === "audit-response"
+          ? {
+              ...item,
+              detail:
+                "Retain the incoming independent audit and author response. Solo students also audit an instructor-supplied frozen reference or assigned group, with separate setup/probe times, prior exposure, tools, checks and findings. Keep private assessment material outside the technical bundle.",
+            }
+          : item,
+    ),
+    phases: Object.fromEntries(
+      Object.entries(phaseEntries).map(([phase, entries]) => [
+        phase,
+        [
+          ...entries,
+          entry(
+            `${phase}-solo`,
+            "Approved solo route (when allocated)",
+            "If the instructor allocated the solo route, index the phase-specific solo work, instructor check-in, incoming independent audit, outgoing reference audit and portfolio under the published solo equivalents. Group-route students mark this entry as not applicable with their allocation reference.",
+            phase as Phase,
+            "solo-route",
+          ),
+        ],
+      ]),
+    ) as Record<Phase, RequirementEntry[]>,
+    rubric: "2026-10-solo-equivalence-v2",
   },
 } as const;
 export function requirementsFor(course: Pick<Course, "requirements">) {

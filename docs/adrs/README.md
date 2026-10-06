@@ -74,6 +74,7 @@ None.
 | [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)               | Test setup and change friction through equivalent, time-bounded cross-team audits.                                           |
 | [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)          | Keep prose changes inspectable and derive publication dates from complete source history.                                    |
 | [ADR-025](implemented/ADR-025-fingerprint-published-site-css-and-javascript.md)                    | Fingerprint compiled site CSS/JS and revalidate HTML and stable asset URLs.                                                  |
+| [ADR-026](implemented/ADR-026-support-an-approved-solo-course-route.md)                            | Preserve all three phases through an approved solo route with independent review and equivalent assessment evidence.         |
 
 ## Authoring and maintenance
 

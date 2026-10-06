@@ -258,6 +258,19 @@ This phase emphasizes:
 
 Fleet size, transcript length, generated code volume, and architectural complexity do not earn credit by themselves.
 
+## Solo route
+
+A single student may orchestrate the declared agent fleet; the fleet requirement concerns agents rather than the number of human teammates.
+Use the smallest fleet that exposes a real delegation, handoff or integration question, retaining the published fleet, trace, correction and acceptance evidence.
+Build fresh C, retain the bounded single-agent/fleet probe or approved supplied-trace alternative, and distinguish agent coordination from human teamwork.
+Keep the three-way comparison, workflow-model analysis, measured scaling response, realistic deployment, final evidence matrix and conditional engineering decision.
+Reference the already-frozen A and B records.
+
+For the engineering session, predict the selected scaling response's effect and a new failure it could introduce, test it and defend the acceptance decision in the instructor discussion.
+Receive an independent audit of C, perform the assigned reference or cross-group audit, and respond to findings without rewriting frozen source.
+Complete the solo portfolio equivalents and ordinary lecture activities.
+Record the solo operator's review and integration effort; agents within one fleet are not independent experimental trials or human peers.
+
 ---
 
 ## Instructor Notes

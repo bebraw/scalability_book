@@ -95,6 +95,28 @@ Peer ratings are evidence, not automatic votes on another student's grade.
 The instructor resolves unsupported, retaliatory, mutually inflated, or contradictory reports against the project record and may ask for clarification.
 Private circumstances should be handled through the course's ordinary support process rather than disclosed to teammates in detail.
 
+### Solo assessment equivalents
+
+For an explicitly allocated solo route on the solo rubric edition, use the following four criteria in the same score positions and with the same twelve-point maximum:
+
+| Criterion                                       | Points | Full-credit evidence                                                                                                                                                    |
+| ----------------------------------------------- | -----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Evidence-based self-assessment                  |    0–3 | Concrete decisions, completed and missed commitments, learning and next improvement linked to the student's work.                                                       |
+| Useful independent implementation review        |    0–3 | Specific, actionable findings from the outgoing reference or cross-group audit, supported by checks and clear limitations.                                              |
+| Response to feedback and solo reflection        |    0–3 | A considered response to the independent human audit/instructor challenge, one adjustment and a working condition that affected the outcome.                            |
+| Reliable contribution and accountable ownership |    0–3 | Instructor judgment against project history, checks, the portfolio and completed discussion shows that the student understands and accepts responsibility for the work. |
+
+The private portfolio's review field holds independent-implementation review evidence rather than invented feedback to teammates.
+The instructor records a completed discussion and incoming independent audit, and the student submits the outgoing audit before ordinary solo assessment.
+Incomplete work may be explicitly assessed as missing with zero scores and a reason; it does not waive passing requirements.
+A reviewer or agent recommendation is evidence, not an automatic grade.
+
+Keep the three 30-point projects, nine lecture activities, 153-point maximum, grade thresholds and per-phase minima.
+For the solo route, the six-point assessment minimum and one-point contribution minimum apply to these equivalent criteria.
+The individual portfolio itself remains required, and instructor check-ins do not automatically satisfy lecture participation.
+An approved solo route changes the evidence for human collaboration criteria; it does not claim that the student practiced team collaboration.
+Historical runs retain their published rubric and requirements.
+
 ## Mandatory individual work
 
 Individual participation and assessment are required in every phase.

@@ -22,6 +22,7 @@ import {
 } from "../../shared/course-administration.ts";
 import { e, input, field, localDate } from "./course-ui.ts";
 import { groupLabel } from "../../shared/course-formation.ts";
+import { soloSupported } from "../../shared/course-solo.ts";
 import { staffFormation } from "./course-formation.ts";
 import { enrollmentStatus, staffEnrollment } from "./course-enrollment.ts";
 import {
@@ -56,7 +57,7 @@ export function groupRow(course: Course, group: Group, index: number) {
     )
     .join(
       "",
-    )}</select><small>Choose three active members normally; four is the maximum for new allocations. Review withdrawn members before future work; frozen membership is retained.</small></label>${field(`exception-${index}`, "Instructor group size exception (required unless three members)", group.exception ?? "", 2000)}<button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
+    )}</select><small>Choose three active members normally; four is the maximum for new allocations. Review withdrawn members before future work; frozen membership is retained.</small></label>${soloSupported(course) ? `<label class="course-field">Course route<select name="route-${index}" aria-label="Course route" aria-describedby="route-help-${index}"><option value="group" ${!group.route ? "selected" : ""}>Group route</option><option value="solo" ${group.route === "solo" ? "selected" : ""}>Approved solo route</option></select><small id="route-help-${index}">Solo keeps all three projects and passing requirements, with independent review and solo assessment equivalents. Select one member and record approval below.</small></label>` : ""}${field(`exception-${index}`, "Instructor group size exception (required unless three members)", group.exception ?? "", 2000)}<button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
 }
 
 export function renderAdministration(
@@ -167,6 +168,7 @@ export function administrationPayload(
           name: val(`name-${index}`),
           exception: val(`exception-${index}`),
           proposal: val(`proposal-${index}`),
+          route: val(`route-${index}`) || "group",
         };
       }),
     };

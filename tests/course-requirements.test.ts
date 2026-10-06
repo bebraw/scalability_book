@@ -74,12 +74,16 @@ test("build rejects changed live owners, archived briefs and checklist digests r
     directory,
     "requirements/2026-10-v1/03_compare.md",
   );
-  await writeFile(archived, original + "\nAltered historical requirement.\n");
+  const archivedOriginal = await readFile(archived, "utf8");
+  await writeFile(
+    archived,
+    archivedOriginal + "\nAltered historical requirement.\n",
+  );
   await assert.rejects(
     readRequirementEditions(directory),
     /Archived requirement changed/,
   );
-  await writeFile(archived, original);
+  await writeFile(archived, archivedOriginal);
   const manifestFile = path.join(
     directory,
     "requirements/2026-10-v1/manifest.json",
