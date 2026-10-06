@@ -1,6 +1,6 @@
 # ADR-029: Support asynchronous peer inquiry through opt-in annotations
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-06
 
@@ -129,11 +129,12 @@ Student review and contribution provenance preserve ownership of shared conclusi
 
 ## Implementation and verification
 
-Peer replies, group/cohort learning threads and the attempt-first peer view are not implemented by this record.
-[Feedback setup](../../feedback-setup.md) describes current private feedback and curated notes, while [the common project specification](../../../specifications/00_common_project.md#shared-engineering-sessions) owns the existing group practice.
-Update feedback and course operating documentation when the new sharing behavior exists; student-facing assessment changes require the published requirement-edition workflow.
+Peer inquiry is implemented in [7de6ed0](https://github.com/bebraw/scalability_book/commit/7de6ed0d0d55ed5cbb5d8dc50c22a8b5b4ae7d21).
+[The workspace contract](../../learning-workspace.md#peer-inquiry-contract) owns scope, audience snapshots/current allocations, private attempt declarations, revision guards, moderation and consented public editorial offers.
+[The course operating guide](../../course-system.md#optional-peer-inquiry) owns identity, storage and migration rollout; [feedback setup](../../feedback-setup.md) preserves existing feedback visibility.
+[The common project specification](../../../specifications/00_common_project.md#shared-engineering-sessions) continues to own required group practice; the new tools add no assessment obligation.
 
-Before marking this decision Implemented, verify:
+Verification completed on 2026-10-06:
 
 - Anchored thread discovery/replies across all published chapters and appendices, with concept/activity/demo evidence links preserved.
 - Initial private work before relevant peer content reaches either the interface or the agent, including resumed sessions and a student who records uncertainty.
@@ -142,15 +143,24 @@ Before marking this decision Implemented, verify:
 - Private feedback and confidential portfolio/peer records retaining their existing audience.
 - Concurrent replies/edits, source revisions and an understandable path from shared inquiry into individual reflection.
 
-Use synthetic records for automated access checks.
+Synthetic access checks passed in the 141-test unit suite, including paginated source isolation and an allocation change racing an inquiry write.
+Chromium/WebKit journeys used two separate student notebooks: private initial work, a scoped question/reply, individual reflection, own-text public consent and staff editorial export.
+The existing course sign-in, grouping, withdrawal and submission browser journeys passed.
+Real local D1/R2 checks covered attempt-first disclosure, source-filtered reads, stale replies and exclusion from ordinary course responses; migration `0004_learning_inquiry.sql` and Worker dry-run passed.
+Production peer availability still requires provisioned course storage, applied migrations and enabled course authentication under the existing rollout contract.
+No real student records were used.
 Evaluate individual and group learning, course progress and workload through [ADR-028](ADR-028-use-a-private-reflection-notebook-to-support-course-learning.md), including whether a peer contribution helps students revise or support their own explanations.
 Do not evaluate success solely by thread or comment counts.
 
-## Open questions
+## Resolved implementation choices and follow-up
 
-- Define the privacy-preserving representation of the initial-attempt/reveal step and its scope when a passage contains several distinct questions.
-- Specify moderation, notifications, edit/removal behavior and historical group access within the existing course identity lifecycle.
-- Choose shared-record persistence and version/conflict handling without coupling the notebook to the production storage provider.
+The reveal declaration retains a timestamp and local-note revision fingerprint, scoped by course, source path/anchor and reading/prediction/evidence/session activity; initial text stays local.
+Shared records use existing course SQLite/D1 persistence with version conflicts and an atomic course allocation guard.
+Group reads require original and current membership; former members/withdrawn students retain only their own contributions and may remove their text.
+Authors can edit/remove, staff can moderate/close, and wider sharing creates a new reviewed contribution.
+There are no automatic notifications in this release.
+
+Learner evaluation and possible notification support remain future work.
 
 ## References
 

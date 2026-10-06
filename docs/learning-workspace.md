@@ -1,8 +1,8 @@
 # Learning workspace
 
 This document owns the executable learning-workspace contracts and local companion setup.
-[ADRs 027–029](adrs/README.md#accepted) record the agreed whole-book direction.
-Accepted status does not establish that all of that direction is implemented.
+[ADRs 027–029](adrs/README.md#implemented) record the agreed whole-book direction.
+Implemented status identifies verified software behavior; production rollout and learner outcomes have their own evidence.
 
 ## Current implementation
 

@@ -1,6 +1,6 @@
 # ADR-027: Connect book learning to student agents through a local companion
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-06
 
@@ -105,27 +105,36 @@ One initial adapter proves the connection while the domain contracts remain reus
 
 ## Implementation and verification
 
-No local companion or integrated conversation interface is implemented by this record.
-[Agent learning resources](../../agent-learning-resources.md) describes the present guidance-only integration.
-Update that owner document, [ARCHITECTURE.md](../../../ARCHITECTURE.md) and the development guide as executable behavior is added.
+The paired companion and whole-book notebook entered in [ea45d67](https://github.com/bebraw/scalability_book/commit/ea45d6764e1087d532416737531f9ec1addcd3bf) and [f1c116b](https://github.com/bebraw/scalability_book/commit/f1c116b7c1f2df7d07c36ea9cde7cb6e89352706).
+[7de6ed0](https://github.com/bebraw/scalability_book/commit/7de6ed0d0d55ed5cbb5d8dc50c22a8b5b4ae7d21) adds the Codex adapter, persisted conversation, bounded demo bridge and peer integration.
+[The workspace contract](../../learning-workspace.md#agent-and-demo-contract), [student setup](../../learning-companion-setup.md) and [architecture](../../../ARCHITECTURE.md) describe current owners and recovery.
 
-Before marking this decision Implemented, verify:
+Verification completed on 2026-10-06:
 
 - Passage/context navigation and resumable discussion across all published book chapters and appendices, with concept and exploration links retained.
 - Every catalog demo's declared observations/actions against its actual controls, including rejected invalid actions and honest fallback for unavailable operations.
 - The first adapter through real client use, connection interruption/reconnection, and operation without a model connection for reading and notebook work.
 - Pairing and origin/session checks, credential boundaries and selected-context access.
 - Observable agent behavior on representative investigations: initial student thinking, useful assistance, accurate source context and genuine observations.
-- Setup effort, learning and course-progress evaluation using [ADR-028](ADR-028-use-a-private-reflection-notebook-to-support-course-learning.md).
+- A voluntary setup, learning and course-progress evaluation protocol using [ADR-028](ADR-028-use-a-private-reflection-notebook-to-support-course-learning.md), with outcome evidence still to be collected.
+
+The complete unit suite passed 141 tests; focused browser journeys passed in Chromium/WebKit.
+The demo bridge exercised actual enabled controls and rejected forged control IDs in all 32 authored demos.
+Codex CLI 0.154.0 passed a real observation → approved change → actual result → reviewed notebook draft journey and conversation resume.
+Synthetic app-server checks cover denied machine approvals, initialization failure, disconnect and reconnect without exposing provider diagnostics.
+Pairing and notebook checks use synthetic records and require no model; Worker dry-run, site build/validation and local D1/R2 checks also passed.
 
 Whole-book coverage can be delivered through implementation increments and evaluated with a small set of learners.
 A small evaluation group does not restrict the supported content to one chapter.
 
-## Open questions
+## Resolved implementation choices and follow-up
 
-- Select the first supported client/provider adapter and exact transport after reviewing current APIs and the reusable Kirjolab code.
-- Specify the companion installation, update and recovery workflow, and persistable provider-session format.
-- Define/version the context and per-demo contracts without claiming capabilities that a client or demo does not expose.
+The first adapter uses Codex app-server over local stdio after reviewing the current protocol and Kirjolab's dedicated-profile/environment isolation.
+Kirjolab's tool-free adapter disables the local tool host; interactive book callbacks require that host, so the provider integration stays behind a separate adapter.
+Version-1 browser observations expose bounded DOM controls/text and authored assumptions; they do not claim canvas inspection or measured project performance.
+Installation, updates, notebook recovery and provider-thread continuity are documented in the setup guide.
+
+Further provider adapters and learner-outcome evidence remain future work; they do not block this first working adapter or expand its supported capabilities.
 
 ## References
 

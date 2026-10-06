@@ -116,6 +116,10 @@ npm run companion -- --directory .local/another-notebook
 Export before moving or removing your repository directory, and keep a backup outside that directory.
 Your course membership does not give teachers or peers access to the private notebook.
 
+Before updating, export a backup and stop the companion.
+Run `git pull --ff-only` and `npm ci` in the repository, retain `.local/learning-companion/`, then restart and pair again.
+Keep the verified Codex version until a newer version has passed the documented provider check.
+
 Portable notebook archives do not include credentials or raw conversations.
 Conversations are stored separately in `conversations.sqlite`, with provider threads in the dedicated Codex profile.
 To preserve conversation continuity as well, stop the companion and privately back up its directory and any separately configured profile.

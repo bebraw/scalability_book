@@ -1,6 +1,6 @@
 # ADR-028: Use a private reflection notebook to support course learning
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-06
 
@@ -126,13 +126,16 @@ Support short capture and developed reflection, and evaluate any minimum against
 
 ## Implementation and verification
 
-The notebook, concept self-assessment and revisit workflow are not implemented by this ADR.
-Current saved formative answers follow [ADR-016](../implemented/ADR-016-version-formative-exercises-and-save-private-answers.md), and current submissions follow [the course operating guide](../../course-system.md).
-Add implemented notebook contracts and setup guidance to the relevant owner documents as the capability is built.
+The private notebook entered in [ea45d67](https://github.com/bebraw/scalability_book/commit/ea45d6764e1087d532416737531f9ec1addcd3bf), with the whole-book capture, reflection, concept judgment, revisit and selective preparation interface in [f1c116b](https://github.com/bebraw/scalability_book/commit/f1c116b7c1f2df7d07c36ea9cde7cb6e89352706).
+[7de6ed0](https://github.com/bebraw/scalability_book/commit/7de6ed0d0d55ed5cbb5d8dc50c22a8b5b4ae7d21) adds student-reviewed agent drafts, selected peer reflection and the voluntary evaluation guide.
+[The workspace contract](../../learning-workspace.md#notebook-and-portability) owns schema version 1, SQLite storage, revision history, export/import conflicts and recovery.
+Saved formative answers remain under [ADR-016](../implemented/ADR-016-version-formative-exercises-and-save-private-answers.md), and submissions remain under [the course operating guide](../../course-system.md).
 
-Before marking this decision Implemented, verify durable capture/editing across restarts, operation without a model connection, versioned export/import, preserved source context, explicit sharing/context selection and selective submission preparation.
-Exercise privacy at the website/companion and course submission boundaries using synthetic records.
-Verify that private notes do not enter shared APIs, public graph exports or grade calculations by default.
+Verification on 2026-10-06 covered durable capture/editing across restarts, operation without a model connection, versioned export/import, preserved source context, explicit sharing/context selection and selective submission preparation.
+Synthetic API/browser records exercised website/companion privacy and existing course submission boundaries.
+Private notes do not enter shared APIs, public graph exports or grade calculations by default.
+The full unit suite passed 141 tests, notebook and peer journeys passed in Chromium/WebKit, and the real Codex journey retained reviewed assistance provenance.
+The suggested 400-character cue is optional; no hard minimum or new grading obligation was introduced.
 
 Evaluate the first whole-book implementation with individual and group learners on three outcomes:
 
@@ -142,6 +145,8 @@ Evaluate the first whole-book implementation with individual and group learners 
 | Course progress | Progress through existing checkpoints, preparation of existing submissions, completion and reported points of difficulty.                                     |
 | Workload        | Student-reported setup, investigation and reflection effort, including whether notebook reuse reduces submission preparation within the existing time budget. |
 
+[The evaluation guide](../../learning-workspace-evaluation.md) provides a representative queue investigation, independent changed-situation/recall tasks and follow-up at existing phase checkpoints.
+Learner-outcome evidence remains to be collected; Implemented describes the software and evaluation protocol, not an established learning gain.
 Use representative course questions and existing checkpoints where possible rather than adding a parallel assessment programme.
 Collect evaluation evidence deliberately; evaluation does not authorize routine access to private notebooks or full conversation logs.
 A small pilot can establish usability and identify problems but does not by itself prove a causal effect on course completion.
@@ -150,8 +155,7 @@ Report uncertainty and follow actual progress through the course before claiming
 ## Open questions
 
 - Calibrate examples and suggested reflection length, and evaluate whether any hard minimum helps students gather useful material without increasing unnecessary work.
-- Select a portable schema, file layout and recovery flow that retain source context, authorship and accepted revisions.
-- Choose representative independent application tasks and practical evaluation checkpoints within the existing workload.
+- Adapt representative independent application tasks and practical evaluation checkpoints to learner needs within the existing workload.
 
 ## References
 
