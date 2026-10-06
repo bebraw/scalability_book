@@ -22,6 +22,8 @@ It uses npm and the Node version range in [package.json](package.json).
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
+The static build owns [the compiled asset URL registry](scripts/lib/site-assets.ts): production HTML and lazy loaders reference content-fingerprinted CSS/JS, while editable previews use stable filenames.
+The Worker owns browser cache policy, keeping fingerprinted CSS/JS immutable and revalidating HTML and stable CSS/JS; [the development guide](docs/development.md#asset-urls-and-caching) describes compatibility copies and deployment limits.
 `site/scripts/course-administration.ts` owns the focused staff forms, while `site/scripts/course.ts` coordinates navigation, requests and student/review workflows.
 `worker/course-administration.ts` validates configuration updates against the latest course snapshot; `worker/courses.ts` authorizes and persists them.
 Staff-only fingerprints expose the fields owned by each form, while the store's whole-record compare-and-swap remains the final concurrency boundary.

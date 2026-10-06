@@ -71,7 +71,9 @@ type Env = {
 };
 
 const immutableAssetPattern =
-  /\.(?:css|js|mjs|png|jpg|jpeg|gif|svg|webp|avif|ico|woff2?)$/i;
+  /\.(?:png|jpg|jpeg|gif|svg|webp|avif|ico|woff2?)$/i;
+const scriptOrStylesheetPattern = /\.(?:css|js|mjs)$/i;
+const fingerprintedAssetPattern = /\.[a-f0-9]{16}\.(?:css|js|mjs)$/;
 const sessionCookie = "scalableweb_session";
 const oauthStateCookie = "scalableweb_oauth_state";
 const feedbackCategories = new Set([
@@ -273,21 +275,22 @@ export default {
     headers.set("X-Content-Type-Options", "nosniff");
     headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
+    const cacheable = response.ok || response.status === 304;
     if (
-      response.ok &&
+      cacheable &&
       (url.pathname.startsWith("/concepts/visuals/") ||
-        url.pathname === "/course.js" ||
-        url.pathname === "/styles/course.css")
+        (scriptOrStylesheetPattern.test(url.pathname) &&
+          !fingerprintedAssetPattern.test(url.pathname)) ||
+        response.headers.get("content-type")?.includes("text/html"))
     ) {
-      // These stable resource URLs change with the authored graph and previews.
+      // Stable URLs must discover changed bytes and the current asset filenames.
       headers.set("Cache-Control", "public, max-age=0, must-revalidate");
-    } else if (response.ok && immutableAssetPattern.test(url.pathname)) {
-      headers.set("Cache-Control", "public, max-age=31536000, immutable");
     } else if (
-      response.ok &&
-      response.headers.get("content-type")?.includes("text/html")
+      cacheable &&
+      (fingerprintedAssetPattern.test(url.pathname) ||
+        immutableAssetPattern.test(url.pathname))
     ) {
-      headers.set("Cache-Control", "public, max-age=300");
+      headers.set("Cache-Control", "public, max-age=31536000, immutable");
     }
 
     for (const [name, value] of Object.entries(studyHeaders(url.pathname))) {

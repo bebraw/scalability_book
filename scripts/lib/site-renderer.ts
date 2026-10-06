@@ -71,6 +71,7 @@ type CreateSiteRendererOptions = {
   indexPartPages: BookPage[];
   partMetadata: PartMetadataCollection;
   templates: Templates;
+  assetUrl?: (url: string) => string;
   onOpenGraphCard?: (card: OpenGraphCard) => void;
 };
 type RenderBookPageOptions = {
@@ -96,6 +97,7 @@ export function createSiteRenderer({
   indexPartPages,
   partMetadata,
   templates,
+  assetUrl = (url) => url,
   onOpenGraphCard,
 }: CreateSiteRendererOptions) {
   return {
@@ -168,15 +170,21 @@ export function createSiteRenderer({
       canonicalUrl,
       children,
       description,
+      mainStylesheetUrl: assetUrl("/styles.css"),
+      themeScriptUrl: assetUrl("/theme.js"),
       ogImageAlt: imageAlt,
       ogImageUrl: imageUrl,
       scriptTags: scripts
-        .map((src) => `<script src="${escapeAttribute(src)}" defer></script>`)
+        .map(
+          (src) =>
+            `<script src="${escapeAttribute(assetUrl(src))}" defer></script>`,
+        )
         .join("\n"),
       siteTitle: config.title,
       stylesheetTags: stylesheets
         .map(
-          (href) => `<link rel="stylesheet" href="${escapeAttribute(href)}" />`,
+          (href) =>
+            `<link rel="stylesheet" href="${escapeAttribute(assetUrl(href))}" />`,
         )
         .join("\n"),
       themes: config.themes,

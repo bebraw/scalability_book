@@ -44,6 +44,7 @@ import {
 } from "./lib/render-book-diagrams.ts";
 import { renderStatechartDiagram } from "./lib/render-statechart-diagram.ts";
 import { createSiteRenderer } from "./lib/site-renderer.ts";
+import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import {
@@ -65,6 +66,7 @@ const buildDir = path.resolve(root, process.env.BUILD_DIR || "build");
 const siteDir = path.join(root, "site");
 const includeAllChapters = process.argv.includes("--all-chapters");
 const includeEditor = process.argv.includes("--editable");
+const assets = createSiteAssets(buildDir, { fingerprint: !includeEditor });
 const bibliographySource = await readFile(
   path.join(root, "bibliography.bib"),
   "utf8",
@@ -147,6 +149,150 @@ const bookDiagramHtml = renderBookDiagrams();
 
 await rm(buildDir, { recursive: true, force: true });
 await mkdir(buildDir, { recursive: true });
+
+await compileSiteStylesheet("styles.css");
+await compileSiteStylesheet("styles/case-studies.css");
+await compileSiteStylesheet("styles/demos.css");
+await compileSiteStylesheet("styles/feedback-admin.css");
+await compileSiteStylesheet("styles/project.css");
+await compileSiteStylesheet("styles/course.css");
+await compileSiteBundle(
+  "scripts/course.ts",
+  "course.js",
+  "CourseWorkspace",
+  "es2022",
+);
+await compileSiteScript("scripts/theme.ts", "theme.js");
+await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
+await compileSiteBundle(
+  "scripts/concepts.ts",
+  "concepts.js",
+  "BookConcepts",
+  "es2019",
+);
+await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
+await compileSiteScript("scripts/comments.ts", "comments.js");
+await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
+await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
+await compileSiteScript(
+  "scripts/project-fit-checker.ts",
+  "project-fit-checker.js",
+);
+await compileSiteScript(
+  "scripts/constrain-generate-validate-demo.ts",
+  "constrain-generate-validate-demo.js",
+);
+await compileSiteBundle(
+  "scripts/statechart-boundary-demo.ts",
+  "statechart-boundary-demo.js",
+  "StatechartBoundaryDemo",
+  "es2019",
+);
+await compileSiteScript(
+  "scripts/scalability-dimensions-demo.ts",
+  "scalability-dimensions-demo.js",
+);
+await compileSiteScript(
+  "scripts/request-trace-demo.ts",
+  "request-trace-demo.js",
+);
+await compileSiteScript(
+  "scripts/acid-transaction-lab.ts",
+  "acid-transaction-lab.js",
+);
+await compileSiteScript("scripts/cache-control-lab.ts", "cache-control-lab.js");
+await compileSiteScript(
+  "scripts/web-architecture-lens.ts",
+  "web-architecture-lens.js",
+);
+await compileSiteScript(
+  "scripts/client-activation-lens.ts",
+  "client-activation-lens.js",
+);
+await compileSiteScript("scripts/api-contract-lens.ts", "api-contract-lens.js");
+await compileSiteScript(
+  "scripts/benchmark-simulation-demo.ts",
+  "benchmark-simulation-demo.js",
+);
+await compileSiteScript(
+  "scripts/goodhart-challenge-demo.ts",
+  "goodhart-challenge-demo.js",
+);
+await compileSiteScript(
+  "scripts/browser-performance-workbench.ts",
+  "browser-performance-workbench.js",
+);
+await compileSiteScript("scripts/scalability-laws.ts", "scalability-laws.js");
+await compileSiteBundle(
+  "scripts/exercises.ts",
+  "exercises.js",
+  "BookExercises",
+  "es2019",
+);
+await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
+await compileSiteScript(
+  "scripts/observability-signal-demo.ts",
+  "observability-signal-demo.js",
+);
+await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
+await compileSiteScript(
+  "scripts/workflow-loop-demo.ts",
+  "workflow-loop-demo.js",
+);
+await compileSiteScript(
+  "scripts/friction-audit-demo.ts",
+  "friction-audit-demo.js",
+);
+await compileSiteScript("scripts/pressure-map-demo.ts", "pressure-map-demo.js");
+await compileSiteScript(
+  "scripts/fleet-trace-debugger.ts",
+  "fleet-trace-debugger.js",
+);
+await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
+await compileSiteScript(
+  "scripts/scaling-pressure-demo.ts",
+  "scaling-pressure-demo.js",
+);
+await compileSiteScript(
+  "scripts/saturation-boundary-demo.ts",
+  "saturation-boundary-demo.js",
+);
+await compileSiteBundle(
+  "scripts/orchestration-demo.ts",
+  "vendor/orchestration-demo.js",
+  "OrchestrationDemo",
+  // Webernetes models 64-bit Kubernetes values with BigInt.
+  "es2020",
+);
+await compileSiteScript(
+  "scripts/orchestration-demo-loader.ts",
+  "orchestration-demo-loader.js",
+  {
+    __ORCHESTRATION_DEMO_URL__: JSON.stringify(
+      assets.url("/vendor/orchestration-demo.js"),
+    ),
+  },
+);
+await compileSiteScript(
+  "scripts/durable-retry-demo.ts",
+  "durable-retry-demo.js",
+);
+await compileSiteScript("scripts/cap-partition-lab.ts", "cap-partition-lab.js");
+await compileSiteScript(
+  "scripts/latency-budget-demo.ts",
+  "latency-budget-demo.js",
+);
+await compileSiteScript(
+  "scripts/final-reflection-demo.ts",
+  "final-reflection-demo.js",
+);
+if (includeEditor) {
+  await compileSiteScript("scripts/editor.ts", "editor.js");
+  await compileSiteScript("scripts/dev-reload.ts", "dev-reload.js");
+  await copyEditorAssets();
+  await assets.publish("vendor/easymde/easymde.min.css");
+  await assets.publish("vendor/easymde/easymde.min.js");
+}
 
 const allChapterFiles = getAllConfiguredChapterFiles(config);
 const publishedChapterFiles = includeAllChapters
@@ -235,6 +381,7 @@ const renderer = createSiteRenderer({
   indexPartPages,
   partMetadata,
   templates,
+  assetUrl: assets.url,
   onOpenGraphCard: (card) => openGraphCards.push(card),
 });
 
@@ -540,149 +687,11 @@ await writeOpenGraphImages({
   siteTitle: config.title,
 });
 
-await compileSiteStylesheet("styles.css");
-await compileSiteStylesheet("styles/case-studies.css");
-await compileSiteStylesheet("styles/demos.css");
-await compileSiteStylesheet("styles/feedback-admin.css");
-await compileSiteStylesheet("styles/project.css");
-await compileSiteStylesheet("styles/course.css");
-await compileSiteBundle(
-  "scripts/course.ts",
-  "course.js",
-  "CourseWorkspace",
-  "es2022",
-);
-await compileSiteScript("scripts/theme.ts", "theme.js");
-await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
-await compileSiteBundle(
-  "scripts/concepts.ts",
-  "concepts.js",
-  "BookConcepts",
-  "es2019",
-);
-await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
-await compileSiteScript("scripts/comments.ts", "comments.js");
-await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
-await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
-await compileSiteScript(
-  "scripts/project-fit-checker.ts",
-  "project-fit-checker.js",
-);
-await compileSiteScript(
-  "scripts/constrain-generate-validate-demo.ts",
-  "constrain-generate-validate-demo.js",
-);
-await compileSiteBundle(
-  "scripts/statechart-boundary-demo.ts",
-  "statechart-boundary-demo.js",
-  "StatechartBoundaryDemo",
-  "es2019",
-);
-await compileSiteScript(
-  "scripts/scalability-dimensions-demo.ts",
-  "scalability-dimensions-demo.js",
-);
-await compileSiteScript(
-  "scripts/request-trace-demo.ts",
-  "request-trace-demo.js",
-);
-await compileSiteScript(
-  "scripts/acid-transaction-lab.ts",
-  "acid-transaction-lab.js",
-);
-await compileSiteScript("scripts/cache-control-lab.ts", "cache-control-lab.js");
-await compileSiteScript(
-  "scripts/web-architecture-lens.ts",
-  "web-architecture-lens.js",
-);
-await compileSiteScript(
-  "scripts/client-activation-lens.ts",
-  "client-activation-lens.js",
-);
-await compileSiteScript("scripts/api-contract-lens.ts", "api-contract-lens.js");
-await compileSiteScript(
-  "scripts/benchmark-simulation-demo.ts",
-  "benchmark-simulation-demo.js",
-);
-await compileSiteScript(
-  "scripts/goodhart-challenge-demo.ts",
-  "goodhart-challenge-demo.js",
-);
-await compileSiteScript(
-  "scripts/browser-performance-workbench.ts",
-  "browser-performance-workbench.js",
-);
-await compileSiteScript("scripts/scalability-laws.ts", "scalability-laws.js");
-await compileSiteBundle(
-  "scripts/exercises.ts",
-  "exercises.js",
-  "BookExercises",
-  "es2019",
-);
-await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
-await compileSiteScript(
-  "scripts/observability-signal-demo.ts",
-  "observability-signal-demo.js",
-);
-await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
-await compileSiteScript(
-  "scripts/workflow-loop-demo.ts",
-  "workflow-loop-demo.js",
-);
-await compileSiteScript(
-  "scripts/friction-audit-demo.ts",
-  "friction-audit-demo.js",
-);
-await compileSiteScript("scripts/pressure-map-demo.ts", "pressure-map-demo.js");
-await compileSiteScript(
-  "scripts/fleet-trace-debugger.ts",
-  "fleet-trace-debugger.js",
-);
-await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
-await compileSiteScript(
-  "scripts/scaling-pressure-demo.ts",
-  "scaling-pressure-demo.js",
-);
-await compileSiteScript(
-  "scripts/saturation-boundary-demo.ts",
-  "saturation-boundary-demo.js",
-);
-await compileSiteBundle(
-  "scripts/orchestration-demo.ts",
-  "vendor/orchestration-demo.js",
-  "OrchestrationDemo",
-  // Webernetes models 64-bit Kubernetes values with BigInt.
-  "es2020",
-);
-await compileSiteScript(
-  "scripts/orchestration-demo-loader.ts",
-  "orchestration-demo-loader.js",
-);
-await compileSiteScript(
-  "scripts/durable-retry-demo.ts",
-  "durable-retry-demo.js",
-);
-await compileSiteScript("scripts/cap-partition-lab.ts", "cap-partition-lab.js");
-await compileSiteScript(
-  "scripts/latency-budget-demo.ts",
-  "latency-budget-demo.js",
-);
-await compileSiteScript(
-  "scripts/final-reflection-demo.ts",
-  "final-reflection-demo.js",
-);
-if (includeEditor) {
-  await compileSiteScript("scripts/editor.ts", "editor.js");
-  await compileSiteScript("scripts/dev-reload.ts", "dev-reload.js");
-}
 await copyStaticAssets();
 await writeLabDownloads();
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 await buildStudy(root, path.join(buildDir, "learn/pilot"));
-if (includeEditor) {
-  await copyEditorAssets();
-}
 
 async function writePage(relativePath, content) {
   const outputPath = path.join(buildDir, relativePath);
@@ -1011,6 +1020,7 @@ async function compileSiteStylesheet(sourceRelativePath) {
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, source, "utf8");
+  await assets.publish(sourceRelativePath);
 }
 
 async function inlineCssImports(sourcePath, seen = new Set()) {
@@ -1040,18 +1050,24 @@ async function inlineCssImports(sourcePath, seen = new Set()) {
   return lines.join("\n");
 }
 
-async function compileSiteScript(sourceRelativePath, outputRelativePath) {
+async function compileSiteScript(
+  sourceRelativePath,
+  outputRelativePath,
+  define: Record<string, string> = {},
+) {
   const sourcePath = path.join(siteDir, sourceRelativePath);
   const outputPath = path.join(buildDir, outputRelativePath);
   const source = await readFile(sourcePath, "utf8");
   const result = await transformWithOxc(source, sourcePath, {
     lang: "ts",
+    define,
     // Keep this aligned with package.json browserslist Safari/iOS Safari support.
     target: "es2019",
   });
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, result.code, "utf8");
+  await assets.publish(outputRelativePath);
 }
 
 async function compileSiteBundle(
@@ -1076,6 +1092,7 @@ async function compileSiteBundle(
       },
     },
   });
+  await assets.publish(outputRelativePath);
 }
 
 function getAllConfiguredChapterFiles(config) {

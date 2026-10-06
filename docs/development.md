@@ -126,6 +126,23 @@ npm run serve
 The production build emits a static site to `build/` for `scalableweb.dev`.
 The deployed site remains read-only because the editing API exists only in the local dev server.
 
+### Asset URLs and caching
+
+Production builds publish compiled site CSS and JavaScript with a content hash in the filename, such as `/styles.0123456789abcdef.css`.
+The hash uses the first 16 hexadecimal characters of SHA-256 over the emitted bytes; unchanged assets keep the same URL across builds.
+The build resolves base-layout and page-specific references through [the asset registry](../scripts/lib/site-assets.ts), and injects the published orchestration bundle URL into its lazy loader before hashing the loader.
+Compile dependencies before their loaders and register new assets before rendering pages that reference them.
+
+The Worker gives fingerprinted CSS/JS a one-year `immutable` browser cache lifetime.
+HTML and stable CSS/JS URLs use `public, max-age=0, must-revalidate`, retaining ETags for conditional requests.
+Stable asset copies remain available for older HTML and direct links; new pages use the fingerprinted URLs.
+Previously cached stable assets cannot have their old browser headers revoked, but loading current HTML selects the new URLs.
+Each deployment contains its current fingerprints; a page left open across a deployment may need reloading if it subsequently requests a removed lazy bundle.
+
+Editable builds retain stable filenames so CSS hot reload can replace the existing stylesheet URLs.
+The pinned exporter owns `/learn/pilot/` asset names and references; its existing revalidation policy still applies.
+The publishing decision and verification boundaries are recorded in [ADR-025](adrs/implemented/ADR-025-fingerprint-published-site-css-and-javascript.md).
+
 Run browser-level checks with:
 
 ```bash

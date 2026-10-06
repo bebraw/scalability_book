@@ -1,3 +1,6 @@
+// Injected after the dependency is compiled and assigned its published URL.
+declare const __ORCHESTRATION_DEMO_URL__: string;
+
 const roots = document.querySelectorAll<HTMLElement>(
   "[data-orchestration-lab]",
 );
@@ -22,7 +25,7 @@ if (roots.length > 0) {
     }
   } else {
     const script = document.createElement("script");
-    script.src = "/vendor/orchestration-demo.js";
+    script.src = __ORCHESTRATION_DEMO_URL__;
     script.async = true;
     script.addEventListener("error", () => {
       for (const root of roots) {

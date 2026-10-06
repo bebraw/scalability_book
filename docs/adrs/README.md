@@ -73,6 +73,7 @@ None.
 | [ADR-022](implemented/ADR-022-use-a-shared-runtime-protocol-and-bounded-pressure-experiments.md)   | Use a shared measurement protocol and bounded, cumulative pressure experiments.                                              |
 | [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)               | Test setup and change friction through equivalent, time-bounded cross-team audits.                                           |
 | [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)          | Keep prose changes inspectable and derive publication dates from complete source history.                                    |
+| [ADR-025](implemented/ADR-025-fingerprint-published-site-css-and-javascript.md)                    | Fingerprint compiled site CSS/JS and revalidate HTML and stable asset URLs.                                                  |
 
 ## Authoring and maintenance
 
