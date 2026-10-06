@@ -75,6 +75,7 @@ test("whole-book entry points keep the notebook lazy and exclude administrative/
       page.getByRole("button", { name: "Notebook", exact: true }),
     ).toBeVisible();
     await expect(page.locator(".learning-workspace")).toHaveCount(0);
+    await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
     expect(
       await page
         .locator('meta[name="book-content-revision"]')
@@ -89,15 +90,17 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   page,
 }) => {
   await page.goto("/chapters/benchmarking/");
-  await page
-    .getByRole("button", { name: "Add this paragraph to my notebook" })
-    .first()
-    .click();
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "My learning notebook" });
   await expect(panel).toBeVisible();
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
+  await panel.getByRole("button", { name: "Close notebook" }).click();
+  await page
+    .getByRole("button", { name: "Add this paragraph to my notebook" })
+    .first()
+    .click();
   await panel
     .getByLabel("Title", { exact: true })
     .fill("Synthetic queue observation");
@@ -162,6 +165,12 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await panel.getByRole("button", { name: "Save note", exact: true }).click();
   await panel.getByRole("button", { name: "Close notebook" }).click();
   await page.reload();
+  await expect(
+    page
+      .getByRole("button", { name: "Add this paragraph to my notebook" })
+      .first(),
+  ).toBeVisible();
+  await expect(page.locator(".learning-workspace")).toHaveCount(0);
   await page.getByRole("button", { name: "Notebook", exact: true }).click();
   await panel.getByRole("button", { name: "Notes", exact: true }).click();
   await expect(
@@ -191,4 +200,77 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
     path: test.info().outputPath("notebook-mobile-dark.png"),
     fullPage: false,
   });
+  await panel.getByRole("button", { name: "Connect", exact: true }).click();
+  await panel.getByRole("button", { name: "Disconnect", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Add this paragraph to my notebook" }),
+  ).toHaveCount(0);
+});
+
+test("paragraph capture stays out of casual reading and validates restored notebook sessions", async ({
+  page,
+}) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().startsWith(companionAddress))
+      requests.push(request.url());
+  });
+  await page.goto("/chapters/benchmarking/");
+  await expect(
+    page.getByRole("button", { name: "Notebook", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
+  expect(requests).toEqual([]);
+  await page.screenshot({
+    path: test.info().outputPath("casual-reader.png"),
+    fullPage: false,
+  });
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByLabel("Pairing code").fill(code);
+  await panel.getByRole("button", { name: "Pair companion" }).click();
+  await panel.getByRole("button", { name: "Close notebook" }).click();
+  const capture = page
+    .getByRole("button", { name: "Add this paragraph to my notebook" })
+    .first();
+  await expect(capture).toBeVisible();
+  await page.screenshot({
+    path: test.info().outputPath("connected-reader.png"),
+    fullPage: false,
+  });
+
+  await page.goto("/chapters/introduction/");
+  await expect(capture).toBeVisible();
+  await expect(page.locator(".learning-workspace")).toHaveCount(0);
+
+  await page.route(`${companionAddress}/status`, (route) => route.abort());
+  const unavailable = page.waitForEvent("requestfailed", {
+    predicate: (request) => request.url() === `${companionAddress}/status`,
+  });
+  await page.reload();
+  await unavailable;
+  await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
+  await expect(page.locator(".learning-workspace")).toHaveCount(0);
+  await page.unroute(`${companionAddress}/status`);
+  await page.reload();
+  await expect(capture).toBeVisible();
+
+  await page.route(`${companionAddress}/status`, (route) =>
+    route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ message: "Synthetic companion session expired." }),
+    }),
+  );
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  await expect(panel.getByRole("status")).toContainText("session expired");
+  await expect(
+    page.getByRole("button", { name: "Add this paragraph to my notebook" }),
+  ).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("book-learning-connection"),
+    ),
+  ).toBeNull();
 });

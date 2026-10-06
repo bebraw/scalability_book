@@ -128,11 +128,16 @@ export class LearningClient {
     this.clearSession();
   }
   clearSession() {
-    this.token = "";
     try {
-      sessionStorage.removeItem("book-learning-connection");
+      const saved = JSON.parse(
+        sessionStorage.getItem("book-learning-connection") ?? "null",
+      ) as { base: string; token: string } | null;
+      // A delayed restore check must not erase a newly paired session.
+      if (saved?.base === this.base && saved.token === this.token)
+        sessionStorage.removeItem("book-learning-connection");
     } catch {
       /* Memory-only fallback. */
     }
+    this.token = "";
   }
 }

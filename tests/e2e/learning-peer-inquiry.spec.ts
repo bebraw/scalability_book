@@ -100,16 +100,18 @@ test("students save private initial work before group replies, reflect individua
     });
     const page = await context.newPage();
     await page.goto(`${baseURL}/chapters/benchmarking/`);
-    await page
-      .getByRole("button", { name: "Add this paragraph to my notebook" })
-      .first()
-      .click();
+    await page.getByRole("button", { name: "Notebook", exact: true }).click();
     const panel = page.getByRole("dialog", { name: "My learning notebook" });
     await panel
       .getByLabel("Companion address")
       .fill(`http://127.0.0.1:${port}`);
     await panel.getByLabel("Pairing code").fill(code);
     await panel.getByRole("button", { name: "Pair companion" }).click();
+    await panel.getByRole("button", { name: "Close notebook" }).click();
+    await page
+      .getByRole("button", { name: "Add this paragraph to my notebook" })
+      .first()
+      .click();
     return { page, panel };
   }
   async function peers(page: Page) {

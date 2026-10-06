@@ -142,10 +142,16 @@ async function run(action: () => void | Promise<void>) {
       error instanceof LearningConnectionError &&
       error.reason !== "pairing"
     ) {
-      connected = false;
+      setConnected(false);
       render();
     }
   }
+}
+function setConnected(value: boolean) {
+  connected = value;
+  document.dispatchEvent(
+    new CustomEvent("book-learning-connection", { detail: { connected } }),
+  );
 }
 let fieldNumber = 0;
 function field(label: string, input: HTMLElement): HTMLLabelElement {
@@ -178,7 +184,7 @@ async function refresh() {
   }>("/notebook");
   entries = data.entries;
   judgments = data.judgments;
-  connected = true;
+  setConnected(true);
 }
 function navigate(next: NotebookView) {
   view = next;
@@ -800,7 +806,7 @@ function renderConnection() {
       field("Import a portable notebook", file),
       button("Disconnect", async () => {
         await client.disconnect();
-        connected = false;
+        setConnected(false);
         entries = [];
         judgments = [];
         selected.clear();
@@ -850,6 +856,7 @@ document.addEventListener(
         try {
           await refresh();
         } catch (error) {
+          setConnected(false);
           status.textContent =
             error instanceof Error ? error.message : "Reconnect the companion.";
         }

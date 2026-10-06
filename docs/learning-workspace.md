@@ -8,6 +8,9 @@ Implemented status identifies verified software behavior; production rollout and
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
 The whole-book Notebook interface loads on demand on reading, concept, exploration and demo pages, with passage capture independent of feedback sign-in.
+The header's Notebook entry remains available to every reader; paragraph Note buttons appear only after a verified notebook connection.
+On navigation, a saved tab session is checked through the lightweight client without loading the workspace; readers without a saved connection make no companion request.
+Disconnecting or a detected unavailable, incompatible or expired connection hides the paragraph controls until reconnection.
 The optional Codex adapter provides persisted conversations, bounded browser demo tools and student-reviewed notebook drafts.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.

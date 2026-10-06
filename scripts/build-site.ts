@@ -169,11 +169,17 @@ await compileSiteBundle(
   "BookLearningWorkspace",
   "es2019",
 );
-await compileSiteScript("scripts/learning-loader.ts", "learning-loader.js", {
-  __LEARNING_WORKSPACE_URL__: JSON.stringify(
-    assets.url("/learning-workspace.js"),
-  ),
-});
+await compileSiteBundle(
+  "scripts/learning-loader.ts",
+  "learning-loader.js",
+  "BookLearningLoader",
+  "es2019",
+  {
+    __LEARNING_WORKSPACE_URL__: JSON.stringify(
+      assets.url("/learning-workspace.js"),
+    ),
+  },
+);
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteBundle(
   "scripts/concepts.ts",
@@ -1123,10 +1129,12 @@ async function compileSiteBundle(
   outputRelativePath,
   globalName,
   target: "es2019" | "es2020",
+  define: Record<string, string> = {},
 ) {
   await viteBuild({
     configFile: false,
     logLevel: "warn",
+    define,
     build: {
       target,
       outDir: buildDir,

@@ -40,6 +40,31 @@ test("incompatible pairing does not persist a token; expired sessions retain a r
   await client.pair("http://127.0.0.1:8788", "synthetic");
   assert.equal(client.token, token);
   assert.equal(storage.size, 1);
+  const restored = new LearningClient();
+  let finishRestore!: (response: Response) => void;
+  globalThis.fetch = () =>
+    new Promise((resolve) => {
+      finishRestore = resolve;
+    });
+  const expiredRestore = assert.rejects(
+    restored.status(),
+    (error) =>
+      error instanceof LearningConnectionError && error.reason === "session",
+  );
+  const replacement = "b".repeat(43);
+  globalThis.fetch = async () =>
+    Response.json({ token: replacement, version: 1 });
+  await client.pair("http://127.0.0.1:8788", "new synthetic code");
+  finishRestore(
+    Response.json({ message: "Previous session expired." }, { status: 401 }),
+  );
+  await expiredRestore;
+  assert.equal(restored.token, "");
+  assert.equal(client.token, replacement);
+  assert.deepEqual(JSON.parse(storage.get("book-learning-connection")!), {
+    base: client.base,
+    token: replacement,
+  });
   globalThis.fetch = async () =>
     Response.json(
       { message: "Your companion session expired." },

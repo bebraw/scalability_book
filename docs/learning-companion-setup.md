@@ -52,7 +52,8 @@ This is optional support, with no required answer, minimum length, completion ma
 
 ## Capture and revisit your thinking
 
-Use **Note** beside a paragraph to retain its text and source, or open **Notebook** for the current page.
+After connecting your notebook, **Note** buttons appear beside paragraphs to retain their text and source.
+The header's **Notebook** button is always available for connecting or working on the current page.
 Quick notes may be short.
 Developed reflections have prompts and examples to help you capture enough evidence and explanation.
 There is no single correct conclusion: uncertainty, a failed experiment or a better-supported unchanged view can be useful material.
