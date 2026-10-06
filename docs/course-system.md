@@ -344,7 +344,13 @@ Cloudflare still holds the exact incoming address in its routing rule and the ve
 On 2026-10-06, both address secrets were configured on the production Worker, the Fastmail destination was verified, and the exact incoming rule was activated with catch-all routing disabled.
 Cloudflare reports Email Routing ready and Email Sending enabled for the course domain.
 Production configuration includes `COURSE_MAIL` with login delivery explicitly disabled.
-An inbox check and the normal course sign-in delivery check are recorded separately; configured routes do not establish delivery.
+Later that day, public DNS resolution confirmed the required sending records, and the instructor confirmed Workers Paid eligibility and inbox arrival for independent incoming mail and the Cloudflare sending-to-course-inbox check.
+The normal sign-in form was verified with one instructor-controlled enrollment in a temporary isolated D1 database and the sending binding restricted to the instructor's verified destination.
+The instructor confirmed the configured sender and reply-to, inbox delivery, successful explicit confirmation and rejection of link reuse; D1 recorded successful access and consumption of the link.
+No raw credential or full magic-link URL was retained in the verification record.
+The regular Worker configuration was restored with login delivery disabled and no verification database binding.
+The temporary D1 database and local verification enrollment records were removed.
+This check establishes mail readiness; production course storage and institutional delivery still require the rollout steps below.
 
 `worker/course-mail.ts` uses native Cloudflare Email Sending through `COURSE_MAIL`.
 It accepts a configured sender on the course domain and sign-in links for `https://scalableweb.dev/course/`.
@@ -406,7 +412,7 @@ Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploy
 Check enrollment/address corrections and provider delivery, bounce and suppression logs before asking a student to request another link.
 Requests remain bounded by the application limits above; no automatic retry or staff endpoint reveals production login credentials.
 Human replies use the instructor's existing mailbox identity, as agreed; forwarding does not create an additional Fastmail sending identity.
-The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks external setup and actual delivery verification.
+The [mail ADR](adrs/implemented/ADR-006-use-cloudflare-for-course-email.md) records the provider choice, verified integration and rollout boundary.
 
 `wrangler.course.jsonc` validates the local email binding with delivery disabled.
 Do not enable remote mail in development or teacher rehearsals; both use their own scoped mock inboxes.

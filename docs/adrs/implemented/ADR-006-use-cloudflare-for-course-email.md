@@ -1,6 +1,6 @@
 # ADR-006: Use Cloudflare for course email
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -99,13 +99,21 @@ Email Routing reports ready; the current sending-domain API enabled the course d
 The pinned CLI's older sending-enable endpoint returned 404, so setup used the current documented sending-subdomain API without changing project dependencies.
 The native sending binding is configured with `COURSE_EMAIL_ENABLED: "false"`; enabling student login remains a separate step after course storage and delivery verification.
 
-This ADR remains Accepted until external setup and actual delivery verification are complete.
+Later on 2026-10-06, public DNS resolution confirmed all required sending MX, SPF, DKIM and DMARC records.
+The instructor confirmed that an independent incoming message and the Cloudflare sending-to-course-inbox check both arrived in the Fastmail inbox.
+Cloudflare accepted delivery to the course inbox, which was not a verified destination address, and the instructor confirmed the account uses Workers Paid.
+
+The normal sign-in form on `scalableweb.dev` was then exercised with a temporary, isolated D1 database and one instructor-controlled enrollment.
+During this check, the native sending binding was restricted to the instructor's verified destination.
+The instructor confirmed the configured sender and reply-to, inbox delivery, successful explicit sign-in confirmation and rejection of link reuse.
+D1 recorded one successful student sign-in and consumption of the login link; no raw credential or full magic-link URL was recorded.
+
+The regular Worker configuration was restored after verification, with login delivery disabled and no verification database binding.
+The temporary D1 database and local verification enrollment records were removed.
+Incoming forwarding remains active.
+Production course storage and enabling institutional delivery remain separate rollout steps; the controlled mail check does not establish a production course or its data-retention arrangements.
+This ADR is Implemented because the integration, external setup and controlled live delivery checks are complete.
 The [course-system operating guide](../../course-system.md#course-mail-setup) owns secret configuration, DNS prerequisites, controlled delivery and the support workflow.
-
-## Open questions
-
-- Confirm incoming forwarding in the instructor's inbox; the destination is verified.
-- Confirm arbitrary-recipient eligibility and exercise the normal magic-link flow before enabling institutional login delivery.
 
 ## References
 

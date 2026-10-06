@@ -88,7 +88,9 @@ See [course-system.md](docs/course-system.md) and [chapter-exercises.md](docs/ch
 Staff authentication uses GitHub OAuth with a verified numeric GitHub identity.
 The course domain also supports institutional roster identities and course-scoped email sessions.
 Auth tokens, sessions, rate counters and access activity use dedicated tables in the course database, outside submission records and grade history.
-Local development and teacher simulation use explicit mock mail; production uses a gated native Cloudflare binding whose domain, incoming forwarding and live delivery check still need external setup.
+Local development and teacher simulation use explicit mock mail; production uses a gated native Cloudflare binding.
+Domain setup, incoming forwarding and instructor-controlled live sign-in delivery were verified in [ADR-006](docs/adrs/implemented/ADR-006-use-cloudflare-for-course-email.md).
+Live course login remains disabled pending production course storage and institutional rollout.
 Existing GitHub-keyed student records retain their keys during migration to preserve historical ownership.
 Course staff permissions are separate from reader-feedback moderation permissions.
 Development-only local identities and explicitly enabled browser-test headers are not deployed authentication methods.
@@ -123,12 +125,3 @@ ADRs explain the reason for a decision; they do not replace setup instructions o
 The [retrospective ADRs](docs/adrs/README.md#retrospective-records) explain the publishing pipeline, rendering trust boundary, feedback privacy, local preview lifecycle, typed demos, learning resources, portable editions, course comparison design, evidence protocols, and prose review.
 Each links historical commits and current implementation evidence.
 Their implemented status identifies repository behavior or published course contracts, with operational limits stated in the record.
-
-## Accepted course revision
-
-The following decisions have implementation work outstanding in the current course workspace:
-
-- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): sending and incoming forwarding use server-only address secrets; live course-login delivery verification remains outstanding.
-
-Implement these in bounded changes that retain historical identities, frozen membership, assessment provenance, and privacy.
-Record the implementation evidence before moving each ADR to `implemented/`.

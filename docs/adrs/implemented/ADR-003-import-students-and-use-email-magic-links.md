@@ -81,7 +81,8 @@ Addresses can change; using them as record keys would complicate historical owne
 Institutional CSV mapping, incremental imports, preview, manual additions/corrections, stable internal identities and the email token/session flow are implemented.
 The local server uses a staff-only mock inbox; the Worker has D1 auth/session adapters and a native Cloudflare mail adapter gated by its binding and an explicit enablement variable.
 Repository behavior is implemented and verified; this status does not establish production deployment or delivery.
-The domain, verified forwarding to the Fastmail-hosted inbox and instructor-authorized live delivery check remain operational dependencies in ADR-006.
+Domain setup, forwarding to the Fastmail-hosted inbox and instructor-controlled live delivery were verified under [ADR-006](ADR-006-use-cloudflare-for-course-email.md).
+Production course storage and enabling institutional delivery remain separate rollout steps.
 
 `worker/course-administration.ts` matches imports by institutional student ID within a run.
 Existing GitHub-keyed records retain their keys; new enrollments receive opaque UUID identities.
@@ -111,6 +112,6 @@ See [course-system.md](../../course-system.md#institutional-enrollment-and-sign-
 
 ## References
 
-- [ADR-006: course email delivery](../accepted/ADR-006-use-cloudflare-for-course-email.md).
+- [ADR-006: course email delivery](ADR-006-use-cloudflare-for-course-email.md).
 - [ADR-007: simulation and mock email](../implemented/ADR-007-provide-an-isolated-teacher-simulation.md).
 - [OWASP email verification guidance](https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html).
