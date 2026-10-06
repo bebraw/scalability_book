@@ -22,6 +22,9 @@ It uses npm and the Node version range in [package.json](package.json).
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                             |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
+The optional [local learning companion](scripts/learning-companion.ts) currently exposes the private notebook API, independently of course storage and model providers.
+[Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and browser pairing.
+The book interface and agent/shared-learning integrations remain accepted future work; [the workspace guide](docs/learning-workspace.md) distinguishes the implemented foundation from ADRs 027–029.
 The static build owns [the compiled asset URL registry](scripts/lib/site-assets.ts): production HTML and lazy loaders reference content-fingerprinted CSS/JS, while editable previews use stable filenames.
 The Worker owns browser cache policy, keeping fingerprinted CSS/JS immutable and revalidating HTML and stable CSS/JS; [the development guide](docs/development.md#asset-urls-and-caching) describes compatibility copies and deployment limits.
 `site/scripts/course-administration.ts` owns the focused staff forms, while `site/scripts/course.ts` coordinates navigation, requests and student/review workflows.
@@ -81,14 +84,15 @@ Versioned grading-review presets also exercise retained work through withdrawal,
 
 ## State and access
 
-| Data                                    | Local storage                            | Production storage                            |
-| --------------------------------------- | ---------------------------------------- | --------------------------------------------- |
-| Course records and revision history     | `.local/course.sqlite`                   | Dedicated `COURSE_DB` D1 binding              |
-| Course source archives and attachments  | `.local/course-files/`                   | Private `COURSE_FILES` R2 binding             |
-| Teacher simulation and revision history | `.local/course-simulation/course.sqlite` | Separate `COURSE_SIMULATION_DB` D1 binding    |
-| Simulation archives and attachments     | `.local/course-simulation/course-files/` | Separate `COURSE_SIMULATION_FILES` R2 binding |
-| Reader feedback                         | `.local/comments.json`                   | `COMMENTS_KV`                                 |
-| Chapter exercise answers                | `.local/learning.sqlite` by default      | Separate optional `LEARNING_DB` binding       |
+| Data                                    | Local storage                               | Production storage                              |
+| --------------------------------------- | ------------------------------------------- | ----------------------------------------------- |
+| Course records and revision history     | `.local/course.sqlite`                      | Dedicated `COURSE_DB` D1 binding                |
+| Course source archives and attachments  | `.local/course-files/`                      | Private `COURSE_FILES` R2 binding               |
+| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`    | Separate `COURSE_SIMULATION_DB` D1 binding      |
+| Simulation archives and attachments     | `.local/course-simulation/course-files/`    | Separate `COURSE_SIMULATION_FILES` R2 binding   |
+| Reader feedback                         | `.local/comments.json`                      | `COMMENTS_KV`                                   |
+| Chapter exercise answers                | `.local/learning.sqlite` by default         | Separate optional `LEARNING_DB` binding         |
+| Private learning notebook               | `.local/learning-companion/notebook.sqlite` | Student's local companion; never Worker storage |
 
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
@@ -111,19 +115,20 @@ The existing [grading decision](docs/adrs/implemented/ADR-008-require-individual
 
 ## Documentation ownership
 
-| Document                                                                                                                     | Owns                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [README.md](README.md)                                                                                                       | Discovery and common entry points                                                           |
-| This file                                                                                                                    | Current system composition and global boundaries                                            |
-| [AGENTS.md](AGENTS.md)                                                                                                       | Concise navigation and development expectations for coding agents                           |
-| [docs/development.md](docs/development.md)                                                                                   | Commands, generated output, and verification                                                |
-| [docs/course-system.md](docs/course-system.md)                                                                               | Implemented course behavior and operating instructions                                      |
-| [docs/adrs/](docs/adrs/README.md)                                                                                            | Decision rationale, alternatives, accepted future constraints, and history                  |
-| [specifications/](specifications/README.md)                                                                                  | Published student project and assessment contracts                                          |
-| [requirements/](requirements/README.md)                                                                                      | Immutable run requirement editions, archived owner documents and their publication workflow |
-| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc)                                                             | Reading content and its published organization                                              |
-| [docs/chapter-exercises.md](docs/chapter-exercises.md), [docs/agent-learning-resources.md](docs/agent-learning-resources.md) | Formative exercise, concept discovery, and external-agent resource contracts                |
-| [study/README.md](study/README.md), [slides/README.md](slides/README.md)                                                     | Versioned self-study and lecture sources, export behavior, and publication limits           |
+| Document                                                                                                                     | Owns                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [README.md](README.md)                                                                                                       | Discovery and common entry points                                                             |
+| This file                                                                                                                    | Current system composition and global boundaries                                              |
+| [AGENTS.md](AGENTS.md)                                                                                                       | Concise navigation and development expectations for coding agents                             |
+| [docs/development.md](docs/development.md)                                                                                   | Commands, generated output, and verification                                                  |
+| [docs/course-system.md](docs/course-system.md)                                                                               | Implemented course behavior and operating instructions                                        |
+| [docs/learning-workspace.md](docs/learning-workspace.md)                                                                     | Learning workspace, private companion setup, portability and executable integration contracts |
+| [docs/adrs/](docs/adrs/README.md)                                                                                            | Decision rationale, alternatives, accepted future constraints, and history                    |
+| [specifications/](specifications/README.md)                                                                                  | Published student project and assessment contracts                                            |
+| [requirements/](requirements/README.md)                                                                                      | Immutable run requirement editions, archived owner documents and their publication workflow   |
+| `book/`, `case-studies/`, [site.config.jsonc](site.config.jsonc)                                                             | Reading content and its published organization                                                |
+| [docs/chapter-exercises.md](docs/chapter-exercises.md), [docs/agent-learning-resources.md](docs/agent-learning-resources.md) | Formative exercise, concept discovery, and external-agent resource contracts                  |
+| [study/README.md](study/README.md), [slides/README.md](slides/README.md)                                                     | Versioned self-study and lecture sources, export behavior, and publication limits             |
 
 Keep each fact in its owning document and link to it from other entry points.
 Update behavior documentation and the student-facing contract together when a course change affects both.

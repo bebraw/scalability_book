@@ -174,6 +174,13 @@ See [the simulation guide](course-system.md#teacher-simulation) for manual contr
 Compact/larger preparation and grading-review presets use versioned synthetic fixtures; see the guide for expected outcomes, interrupted preparation, the complete three-phase teaching walkthrough and the remaining withdrawal scenario.
 Run `npx playwright test tests/e2e/course-simulation-walkthrough.spec.ts --project=chromium` to verify creation, grouping, all submission/audit/portfolio phases, assessment, release and marked final export through the instructor/student interface.
 
+## Learning companion
+
+Run `npm run companion` for the optional local private notebook service.
+It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
+See [the learning-workspace guide](learning-workspace.md) for pairing, exact origins, portability and the current implementation boundary.
+Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts`.
+
 ## Feedback Review
 
 The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured.

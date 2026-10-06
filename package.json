@@ -11,6 +11,7 @@
     "comments:push": "node scripts/sync-comments.ts push",
     "comments:sync": "node scripts/sync-comments.ts sync",
     "dev": "node scripts/dev-site.ts",
+    "companion": "node scripts/learning-companion.ts",
     "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
