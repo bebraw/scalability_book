@@ -50,7 +50,8 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 | [ADR-029](accepted/ADR-029-support-asynchronous-peer-inquiry-through-opt-in-annotations.md)      | Add opt-in group/cohort inquiry after individual work, preserving private feedback and deliberate public curation.                            |
 
 These records define the agreed learning-space direction and whole-book scope for the first implementation.
-The companion, notebook and peer-sharing behavior remain unimplemented; their open implementation choices and verification boundaries are recorded in each ADR.
+The private notebook and whole-book interface are implemented; provider/demo integration and peer sharing remain outstanding.
+[The workspace guide](../learning-workspace.md) records current behavior; these ADRs remain Accepted until their required implementation and verification are complete.
 
 ## Implemented
 

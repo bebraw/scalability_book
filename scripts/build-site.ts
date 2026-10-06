@@ -163,6 +163,17 @@ await compileSiteBundle(
   "es2022",
 );
 await compileSiteScript("scripts/theme.ts", "theme.js");
+await compileSiteBundle(
+  "scripts/learning-workspace.ts",
+  "learning-workspace.js",
+  "BookLearningWorkspace",
+  "es2019",
+);
+await compileSiteScript("scripts/learning-loader.ts", "learning-loader.js", {
+  __LEARNING_WORKSPACE_URL__: JSON.stringify(
+    assets.url("/learning-workspace.js"),
+  ),
+});
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
 await compileSiteBundle(
   "scripts/concepts.ts",
@@ -382,8 +393,24 @@ const renderer = createSiteRenderer({
   partMetadata,
   templates,
   assetUrl: assets.url,
+  learningScript: "/learning-loader.js",
   onOpenGraphCard: (card) => openGraphCards.push(card),
 });
+
+const notebookSetup = await readFile(
+  path.join(root, "docs/learning-companion-setup.md"),
+  "utf8",
+);
+await writePage(
+  "notebook/setup/index.html",
+  renderer.renderLayout({
+    title: `Set up your learning notebook - ${config.title}`,
+    description:
+      "Connect a private local notebook, capture your thinking, revisit ideas and prepare existing course submissions.",
+    currentUrl: "/notebook/setup/",
+    children: `<main id="content" class="chapter-main"><article class="prose">${renderMarkdown(notebookSetup, { number: "", title: "Set up your learning notebook" }, bibliographySource).content}</article></main>`,
+  }),
+);
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];

@@ -7,7 +7,8 @@ Accepted status does not establish that all of that direction is implemented.
 ## Current implementation
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
-The book interface, model adapter, demo actions and peer threads are still being implemented.
+The whole-book Notebook interface loads on demand on reading, concept, exploration and demo pages, with passage capture independent of feedback sign-in.
+The model adapter, demo actions and peer threads are still being implemented.
 The companion currently reports no connected model provider.
 
 The shared contract is [learning-workspace.ts](../shared/learning-workspace.ts).
@@ -59,16 +60,23 @@ Selected-note preparation produces readable Markdown for review and use in the e
 It sends no notebook record to the course application and includes no unselected notes.
 Students remain responsible for selecting the material and submitting it under the existing course requirements.
 
-Developed written reflections will show a suggested target of 400 characters and representative examples.
+Developed written reflections show a suggested target of 400 characters and representative examples.
 This is guidance, not a minimum or a quality score; short scratch notes and the existing audio/video diary options remain valid.
 Evaluation may change this reversible cue without changing the assessment rubric.
+
+The Write, Notes, Concepts and Prepare sections support capture, revision, recall before rereading, evidence-linked judgments and selected submission material.
+The Connect section handles pairing and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
+Students review drafts and use the ordinary course submission form.
+The published [student setup guide](learning-companion-setup.md) is available at `/notebook/setup/`.
 
 ## Verification
 
 ```bash
 node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts
+npx playwright test tests/e2e/learning-workspace.spec.ts --project=chromium
 npm run types:check
 ```
 
 The checks cover restart persistence, accepted revisions, stale-write rejection, portable restore/import conflicts, selected-note preparation and the pairing/origin/session boundary with synthetic notes.
+Browser checks cover whole-book entry points, lazy loading, capture, revision history, concept judgments, revisit, resumed pairing, accessibility and mobile dark theme.
 They do not establish that a real provider works or that notebook use improves learning or course completion.

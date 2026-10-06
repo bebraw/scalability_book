@@ -24,7 +24,8 @@ It uses npm and the Node version range in [package.json](package.json).
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
 The optional [local learning companion](scripts/learning-companion.ts) currently exposes the private notebook API, independently of course storage and model providers.
 [Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and browser pairing.
-The book interface and agent/shared-learning integrations remain accepted future work; [the workspace guide](docs/learning-workspace.md) distinguishes the implemented foundation from ADRs 027–029.
+The shared book layout exposes a lazy notebook interface through [learning-loader.ts](site/scripts/learning-loader.ts) and [learning-workspace.ts](site/scripts/learning-workspace.ts), including capture, reflection, concept judgments and selective submission drafts.
+Agent/shared-learning integrations remain accepted future work; [the workspace guide](docs/learning-workspace.md) distinguishes current behavior from ADRs 027–029.
 The static build owns [the compiled asset URL registry](scripts/lib/site-assets.ts): production HTML and lazy loaders reference content-fingerprinted CSS/JS, while editable previews use stable filenames.
 The Worker owns browser cache policy, keeping fingerprinted CSS/JS immutable and revalidating HTML and stable CSS/JS; [the development guide](docs/development.md#asset-urls-and-caching) describes compatibility copies and deployment limits.
 `site/scripts/course-administration.ts` owns the focused staff forms, while `site/scripts/course.ts` coordinates navigation, requests and student/review workflows.

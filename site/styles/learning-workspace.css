@@ -1,0 +1,186 @@
+.learning-workspace {
+  position: fixed;
+  inset: 5rem 1rem 1rem auto;
+  margin: 0;
+  width: min(31rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 6rem);
+  max-height: calc(100dvh - 6rem);
+  box-sizing: border-box;
+  padding: 0;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  box-shadow: var(--shadow);
+  z-index: 80;
+  overflow: auto;
+}
+.learning-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding: 1.25rem 1.4rem 0.8rem;
+}
+.learning-heading h2 {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 500;
+  margin: 0.2rem 0;
+}
+.learning-eyebrow {
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.learning-heading button {
+  font-size: 1.4rem;
+  padding: 0.2rem 0.6rem;
+}
+.learning-tabs {
+  display: flex;
+  gap: 0.3rem;
+  overflow-x: auto;
+  padding: 0 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.learning-tabs button {
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.65rem 0.4rem;
+}
+.learning-tabs button[aria-current="true"] {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+.learning-status {
+  padding: 0 1.4rem;
+  color: var(--accent-strong);
+  font-size: 0.85rem;
+}
+.learning-status:empty {
+  display: none;
+}
+.learning-body {
+  padding: 1rem 1.4rem 1.6rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.learning-body > * + * {
+  margin-top: 0.9rem;
+}
+.learning-workspace label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.8rem 0;
+}
+.learning-workspace label.learning-checkbox {
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-between;
+}
+.learning-workspace label > span {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.learning-workspace input:not([type="checkbox"]),
+.learning-workspace select,
+.learning-workspace textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.65rem;
+  font: inherit;
+}
+.learning-workspace textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+.learning-workspace button,
+.paragraph-notebook-button {
+  cursor: pointer;
+  color: var(--accent-strong);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+.learning-workspace button + button,
+.learning-workspace button + a {
+  margin-left: 0.5rem;
+}
+.learning-workspace button.learning-primary {
+  background: var(--accent-strong);
+  color: var(--bg);
+  border-color: var(--accent-strong);
+}
+.learning-workspace button:focus-visible,
+.learning-workspace a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.learning-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.learning-context {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.9rem;
+}
+.learning-workspace summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.learning-workspace blockquote {
+  margin: 1rem 0;
+  color: var(--muted);
+}
+.learning-workspace h3 {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  margin: 0.6rem 0;
+}
+.learning-note {
+  border-top: 1px solid var(--border);
+  padding: 0.8rem 0;
+}
+.learning-note p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.learning-note details {
+  margin: 0.5rem 0;
+}
+.paragraph-notebook-button {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  margin-left: 0.3rem;
+}
+.learning-toggle {
+  background: transparent;
+  color: var(--accent-strong);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.7rem;
+  font: inherit;
+  cursor: pointer;
+}
+@media (max-width: 640px) {
+  .learning-workspace {
+    inset: 0 0 0 auto;
+    width: 100%;
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+  .learning-heading {
+    padding-top: 1rem;
+  }
+  .learning-body {
+    padding: 1rem;
+  }
+}

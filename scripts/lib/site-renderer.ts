@@ -1,4 +1,5 @@
 import { renderHtmlisp } from "./htmlisp.ts";
+import { createHash } from "node:crypto";
 import { renderThemeBootstrap } from "./theme-bootstrap.ts";
 import { escapeAttribute, escapeHtml, slugify } from "./text.ts";
 import type { RenderedMarkdown, TableOfContentsItem } from "./markdown.ts";
@@ -73,6 +74,7 @@ type CreateSiteRendererOptions = {
   partMetadata: PartMetadataCollection;
   templates: Templates;
   assetUrl?: (url: string) => string;
+  learningScript?: string;
   onOpenGraphCard?: (card: OpenGraphCard) => void;
 };
 type RenderBookPageOptions = {
@@ -99,6 +101,7 @@ export function createSiteRenderer({
   partMetadata,
   templates,
   assetUrl = (url) => url,
+  learningScript,
   onOpenGraphCard,
 }: CreateSiteRendererOptions) {
   const themeBootstrap = renderThemeBootstrap(config.themes);
@@ -173,12 +176,25 @@ export function createSiteRenderer({
       canonicalUrl,
       children,
       description,
+      learningRevision: createHash("sha256").update(children).digest("hex"),
       mainStylesheetUrl: assetUrl("/styles.css"),
       themeBootstrap,
       themeScriptUrl: assetUrl("/theme.js"),
       ogImageAlt: imageAlt,
       ogImageUrl: imageUrl,
-      scriptTags: scripts
+      scriptTags: [
+        ...new Set([
+          ...scripts,
+          ...(learningScript &&
+          currentUrl &&
+          (currentUrl === "/" ||
+            /^\/(chapters|appendices|parts|concepts|explore|demos|case-studies|project|notebook)\//.test(
+              currentUrl,
+            ))
+            ? [learningScript]
+            : []),
+        ]),
+      ]
         .map(
           (src) =>
             `<script src="${escapeAttribute(assetUrl(src))}" defer></script>`,

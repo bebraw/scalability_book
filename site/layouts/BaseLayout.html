@@ -6,6 +6,7 @@
     <Raw &html="(resolve themeBootstrap)"></Raw>
     <title &children="(resolve title)"></title>
     <meta name="description" &content="(resolve description)" />
+    <meta name="book-content-revision" &content="(resolve learningRevision)" />
     <link rel="canonical" &href="(resolve canonicalUrl)" />
     <meta property="og:title" &content="(resolve title)" />
     <meta property="og:description" &content="(resolve description)" />
@@ -36,6 +37,14 @@
         ><span &children="(resolve siteTitle)"></span
       ></a>
       <div class="header-actions">
+        <button
+          type="button"
+          class="learning-toggle"
+          data-learning-toggle
+          hidden
+        >
+          Notebook
+        </button>
         <nav aria-label="Primary">
           <a href="/">Contents</a>
           <a href="/project/introduction/">Project</a>
