@@ -25,6 +25,10 @@ import { groupLabel } from "../../shared/course-formation.ts";
 import { staffFormation } from "./course-formation.ts";
 import { enrollmentStatus, staffEnrollment } from "./course-enrollment.ts";
 import {
+  activeStudent,
+  activeStudents,
+} from "../../shared/course-enrollment.ts";
+import {
   requirementUrl,
   requirementsFor,
 } from "../../shared/course-requirements.ts";
@@ -44,7 +48,15 @@ export function administrationNavigation(current: string) {
 }
 
 export function groupRow(course: Course, group: Group, index: number) {
-  return `<fieldset class="course-group-row" data-group-row="${index}"><legend>${e(group.id ? groupLabel(group) : "New group")}</legend><p class="course-muted">${e(group.id || "Identifier assigned on save")}</p><input type="hidden" name="id-${index}" value="${e(group.id)}"><input type="hidden" name="proposal-${index}" value="${e(group.proposal || "")}">${input(`name-${index}`, "Group display name (optional)", group.name ?? "", false)}<label class="course-field">Members<select multiple name="members-${index}" size="4">${course.students.map((s) => `<option value="${e(s.id)}" ${group.members.includes(s.id) ? "selected" : ""}>${e(s.name)}${s.login ? ` (${e(s.login)})` : ""}</option>`).join("")}</select><small>Choose three members normally; four is the maximum for new allocations. Every student can belong to one group in a phase.</small></label>${field(`exception-${index}`, "Instructor group size exception (required unless three members)", group.exception ?? "", 2000)}<button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
+  return `<fieldset class="course-group-row" data-group-row="${index}"><legend>${e(group.id ? groupLabel(group) : "New group")}</legend><p class="course-muted">${e(group.id || "Identifier assigned on save")}</p><input type="hidden" name="id-${index}" value="${e(group.id)}"><input type="hidden" name="proposal-${index}" value="${e(group.proposal || "")}">${input(`name-${index}`, "Group display name (optional)", group.name ?? "", false)}<label class="course-field">Members<select multiple name="members-${index}" size="4">${course.students
+    .filter((s) => activeStudent(s) || group.members.includes(s.id))
+    .map(
+      (s) =>
+        `<option value="${e(s.id)}" ${group.members.includes(s.id) ? "selected" : ""}>${e(s.name)}${!activeStudent(s) ? " · withdrawn (retained membership)" : s.login ? ` (${e(s.login)})` : ""}</option>`,
+    )
+    .join(
+      "",
+    )}</select><small>Choose three active members normally; four is the maximum for new allocations. Review withdrawn members before future work; frozen membership is retained.</small></label>${field(`exception-${index}`, "Instructor group size exception (required unless three members)", group.exception ?? "", 2000)}<button type="button" class="course-quiet" data-remove-group>Remove from this allocation</button></fieldset>`;
 }
 
 export function renderAdministration(
@@ -64,7 +76,7 @@ export function renderAdministration(
     return `<section class="course-section"><h3>Students</h3><p>Import your institutional roster before students sign in. Form groups separately; omitted rows remain enrolled.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Course roster"><table class="course-table"><caption>Enrolled students · private to staff</caption><thead><tr><th>Name</th><th>Student ID</th><th>Institutional email</th><th>Sign-in status</th><th>Enrollment</th><th>Actions</th></tr></thead><tbody>${course.students
       .map((s) => {
         const activity = access.find((a) => a.student === s.id);
-        return `<tr><th>${e(s.name)}</th><td>${e(s.number)}</td><td>${e(s.email || "Institutional details needed")}</td><td>${activity ? `Last sign-in ${e(new Date(activity.lastSignIn).toLocaleString())}` : s.email ? "Imported · awaiting first sign-in" : "Legacy GitHub access"}</td><td>${e(enrollmentStatus(s))}</td><td><button type="button" class="course-quiet" data-edit-student="${e(s.id)}">Correct student</button><button type="button" class="course-quiet" data-enrollment-student="${e(s.id)}">Catch-up arrangement</button></td></tr>`;
+        return `<tr><th>${e(s.name)}</th><td>${e(s.number)}</td><td>${e(s.email || "Institutional details needed")}</td><td>${activity ? `Last sign-in ${e(new Date(activity.lastSignIn).toLocaleString())}` : s.email ? "Imported · awaiting first sign-in" : "Legacy GitHub access"}</td><td>${e(enrollmentStatus(s))}</td><td><button type="button" class="course-quiet" data-edit-student="${e(s.id)}">Correct student</button><button type="button" class="course-quiet" data-enrollment-student="${e(s.id)}">Enrollment arrangement</button></td></tr>`;
       })
       .join("")}</tbody></table></div>
     <form data-form="students"><h4>Import institutional CSV</h4>${field("roster", "Roster CSV", source, 64000, true)}<button type="button" data-roster-columns class="course-quiet">Read CSV columns</button><div data-roster-mapping class="course-roster-mapping">${mappingMarkup(rosterHeaders(source))}</div><p class="course-muted">Imports match existing student IDs in this course. A matching legacy student keeps their existing submissions and grades. Duplicate IDs or emails need correction before import.</p><button type="submit" value="preview" class="course-quiet" formnovalidate>Preview roster changes</button><div data-roster-preview aria-live="polite"></div>${actions("Save roster")}</form>
@@ -72,7 +84,7 @@ export function renderAdministration(
     ${staffEnrollment(course)}<aside class="course-note"><strong>Student sign-in</strong><p>Students open <a href="/course/?course=${e(course.id)}">this course workspace</a> and request a link using their imported institutional email. The link signs them in; it does not register a new student.</p>${local ? '<button type="button" data-mock-inbox class="course-quiet">Open local mock inbox</button><div data-mock-messages></div>' : ""}</aside></section>`;
   }
   if (section === "groups") {
-    const unassigned = course.students.filter(
+    const unassigned = activeStudents(course).filter(
       (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
     );
     return `<section class="course-section"><h3>${title(phase)} groups</h3><p>Allocate enrolled students to groups. New groups receive a course identifier when saved. Reuse Establish groups in later phases to keep their identifiers.</p>${staffFormation(course, phase, now)}<aside class="course-note"><strong>${unassigned.length} students awaiting allocation</strong><p>${e(unassigned.map((s) => s.name).join(", ") || "Everyone is assigned.")}</p></aside><form data-form="groups" data-next-group="${schedule.groups.length}"><div data-group-rows class="course-group-grid">${schedule.groups.map((g, i) => groupRow(course, g, i)).join("")}</div><div class="course-form-actions"><button type="button" data-add-group class="course-quiet" ${!course.students.length ? "disabled" : ""}>Add a group</button>${phase !== "establish" ? '<button type="button" data-reuse-groups class="course-quiet">Reuse Establish groups</button>' : ""}</div><p class="course-muted">Frozen membership and groups with saved evidence are retained. Clear any audit assignments before removing an unused group.</p>${actions("Save groups")}</form></section>`;

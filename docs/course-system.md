@@ -14,7 +14,8 @@ Student proposals, confirmations, instructor allocation and publication now shar
 Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
 Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes, plus a verified browser walkthrough of all three teaching phases.
-Production email provisioning and withdrawal workflows also remain pending.
+Withdrawals retain history, create group-review tasks and receive no final grade.
+Production email provisioning and the authored withdrawal simulation case remain pending.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
@@ -34,7 +35,7 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
   Duplicate identities, student IDs, emails and optional GitHub logins are rejected before saving.
   **Add or correct one student** handles later individual enrollment and identifier corrections.
   The roster shows whether email access is ready and the last successful email sign-in.
-  **Late arrivals and catch-up arrangements** records a private plan for an enrolled student.
+  **Enrollment, catch-up and withdrawals** records catch-up plans, departures and their private group-review notes.
 - **Groups** allocates students for the selected phase and lists those awaiting allocation.
   Open the proposal period, review confirmations and private matching notes, save the allocation, then publish approved groups.
   Add group cards and select their members.
@@ -43,7 +44,7 @@ Open `http://127.0.0.1:3000/admin/courses/` and create a run.
 - **Phase administration** edits only the selected phase's deadlines and audit assignments.
 - **Course settings** edits the run name and staff access and displays the retained published rubric.
 
-The review queue links students awaiting allocation, missing catch-up plans and incomplete audit arrangements to the relevant workflow.
+The review queue links students awaiting allocation, missing catch-up plans, withdrawal arrangements and incomplete audit arrangements to the relevant workflow.
 Course creation, roster import and group allocation are separate operations.
 Forms and navigation controls pause during a save or course refresh, preventing edits to a form that the response will replace.
 Selecting the current phase preserves the open form and its unsaved values.
@@ -116,7 +117,7 @@ Existing identities keep their enrollment metadata through roster corrections; h
 
 The review queue lists late arrivals without a recorded plan.
 Select **Record catch-up for …** to open that student's arrangement in **Students**, agree the plan with the student, and save it with a private staff reason.
-The roster's **Catch-up arrangement** action opens the same form.
+The roster's **Enrollment arrangement** action opens the same form.
 Staff can also mark an earlier late arrival or correct that flag with a reason.
 An empty plan leaves a late arrival in the review queue.
 Successful saves retain the prior course snapshot, actor, timestamp and reason; stale roster/arrangement edits conflict and preserve the browser's text.
@@ -126,7 +127,31 @@ The student sees their plan in **My progress**.
 Other students cannot read enrollment dates, the late-arrival flag or catch-up plans; staff reasons remain private even from the affected student's view.
 Recording a plan does not alter groups, deadlines, frozen evidence, assessment freshness or passing requirements.
 Allocate students in an unfrozen phase and record any approved replacement activity separately in the gradebook.
-Withdrawals and their institutional grade-export handling still await the decision recorded in ADR-004.
+
+## Withdrawals and reinstatement
+
+In **Students**, open **Enrollment, catch-up and withdrawals**, select the student and choose **Mark student withdrawn** with a private reason.
+This records a departure date on their existing identity without deleting submissions, files, portfolios, assessments or history.
+Roster imports and corrections retain the withdrawal; omitting the student from an import does not reactivate them.
+
+Withdrawn students receive no final grade, including when they already have assessment records.
+The gradebook shows **Withdrawn**, and CSV exports retain an explicitly marked row with blank points, percentage and final grade.
+Withdrawal is separate from a failing grade or an exemption from passing requirements.
+Only active students and groups with active members require current assessments for release; staff cannot create new individual assessments for withdrawn students or project assessments for groups with no active members.
+
+The review queue shows **Review withdrawal for …** until you record the group and audit arrangements with a private reason.
+Review remaining members, later-phase allocations and staff audit fallbacks.
+Record the actual group/schedule changes in their respective forms; marking the review complete does not make those changes automatically or block grade release.
+Frozen membership, source and assessment provenance remain intact.
+Correct an unfrozen allocation or approve a smaller continuing group in a later phase when transfer would be impractical.
+**Reuse Establish groups** omits withdrawn members and empty teams; a changed non-three-person allocation needs a new explicit size exception.
+New proposals and allocations cannot add withdrawn students, and invitations containing a withdrawn member cannot gain further confirmations.
+Existing allocated proposals remain historical consent records after approved membership corrections.
+
+The affected student sees their departure status and can read saved work under the existing privacy and access windows, but cannot submit or upload new work.
+Staff reasons and group-review notes stay private; other students cannot read enrollment metadata.
+If the departure was entered incorrectly, choose **Reinstate student** with a reason.
+Reinstatement retains the history and restores ordinary allocation, assessment and passing requirements without changing deadlines or waiving work.
 
 ## Instructor group allocation
 
@@ -154,7 +179,7 @@ Unchanged historical larger groups retain their frozen evidence; use later phase
 An optional display name does not change the generated identifier (`group-01`, shown as **Group 01**).
 
 After saving, enter a formation change reason and select **Publish approved groups**.
-Every enrolled student needs an allocation, and size exceptions need recorded approval before publication.
+Every active student needs an allocation, and size exceptions need recorded approval before publication.
 Publication closes student proposals and announces approved groups and the correction window.
 Provisional allocation in this flow does not grant submission/upload access and is hidden from students until published.
 Initial allocations through the focused Groups API require opening formation first.
@@ -172,7 +197,7 @@ Agreement revisions use the course store/history, are private to the group and s
 Agreement saves require an existing group, including staff saves; a nonexistent identifier creates neither a record nor history.
 Students can read and edit agreements only for their published allocation.
 If staff removes an unused allocation, its agreement history remains available to staff without granting student access to the absent group.
-Late imports reach the unassigned queue and the [catch-up workflow](#late-arrivals-and-catch-up); withdrawal actions remain pending in ADR-004.
+Late imports reach the unassigned queue and the [catch-up workflow](#late-arrivals-and-catch-up); departures use the [withdrawal review workflow](#withdrawals-and-reinstatement).
 The audit field uses `group-01 > group-02`.
 Circular matching produces one incoming and one outgoing assignment per group; the instructor can edit it before audits are submitted.
 With only one group or a missing frozen implementation, staff arrange and record a fallback audit.
@@ -491,7 +516,7 @@ The [browser walkthrough](../tests/e2e/course-simulation-walkthrough.spec.ts) fo
    Exports are marked `Simulation`; frozen archives, membership and audit target revisions remain intact.
 
 The browser flow also checks delayed-save/refresh behavior, mobile layout, accessibility and the absence of escaped live course/auth requests.
-[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted because the withdrawal scenario awaits ADR-004's institutional policy decision.
+[ADR-007](adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md) remains Accepted until its presets include the implemented withdrawal workflow.
 
 ### Separate Worker resources
 
@@ -532,7 +557,7 @@ Stop that Worker afterwards.
 
 ```bash
 npm run test:unit
-npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-evidence.spec.ts tests/e2e/course-simulation.spec.ts tests/e2e/course-simulation-walkthrough.spec.ts --project=chromium
+npx playwright test tests/e2e/course-workspace.spec.ts tests/e2e/course-email-signin.spec.ts tests/e2e/course-formation.spec.ts tests/e2e/course-withdrawal.spec.ts tests/e2e/course-evidence.spec.ts tests/e2e/course-simulation.spec.ts tests/e2e/course-simulation-walkthrough.spec.ts --project=chromium
 npm run build
 npm run validate
 ```
@@ -542,6 +567,7 @@ The email browser test covers mapped CSV import, manual late enrollment, account
 Formation browser/API checks cover a confirmed pair completed into a trio, a fourth-member exception, unassigned students, deadline closure, stale/unauthorized confirmations, private read/write responses, publication/access separation, working agreements, mobile/accessibility and later-phase transfers retaining frozen work and grade history.
 Agreement API checks reject unknown groups without writes, hide unpublished allocations from their prospective members, retain published-team privacy, and preserve staff history when an unused allocation is removed.
 Catch-up checks cover automatic late-arrival flags after publication/frozen work, the staff review task, private student plans, incremental corrections, stale/unauthorized saves, unknown historical dates and unchanged frozen evidence, grades and passing requirements.
+Withdrawal checks cover private review tasks, read-only student access, blank final grades, release for active students without grading inactive groups, retained frozen records/assessments, roster corrections, invitation/allocation constraints, later-phase reuse and reinstatement without waivers.
 Evidence checks cover incomplete work, optional repository links, archived requirement links/drift rejection, private drafts, technical attachments versus private portfolios, retained frozen fields/history, stale assessments, late corrections and earlier A/B references without duplicate archives.
 The controlled source fixture is unpacked into a clean temporary directory, installs from its lockfile offline, initializes synthetic data and runs validation/readiness commands; this verification never executes student uploads.
 API tests cover legacy migration without rewriting evidence or grades, single-use/expired links, session scoping and expiry, request limits, mail failures, conflicting imports, independent administration saves, import preview without writes, conflicts, authorization, generated group identifiers, three-phase grades, mandatory minima, approved arrangements, privacy, timed access, immutable snapshots, optimistic concurrency and corrections.
@@ -565,6 +591,7 @@ In another terminal, run `node scripts/check-course-worker.ts`.
 The credential above is a public test-only value for the loopback instance; it must never be used for a deployed session secret.
 The check only accepts a loopback URL and verifies signed GitHub sessions, guarded D1 writes/history, streamed R2 uploads/downloads, frozen revisions and access isolation.
 It also streams and attaches final technical evidence while retaining the frozen source/checklist, checks a read-only frozen reference, imports a synthetic institutional student, records and checks a private catch-up plan, seeds one test-only link into the local D1 instance and verifies single-use email access, session logout and the absence of a deployed mock inbox.
+It records withdrawal and private review notes, verifies retained frozen history/files and blank withdrawn export fields, rejects new student submissions and inactive assessments, then reinstates the same identity.
 If the Worker uses a different local state directory, set `COURSE_SMOKE_D1_STATE` to that same directory when running the check.
 The dedicated simulation check also loads the larger grading-review preset, verifies frozen files/history, rejects stale release, refreshes the assessment and checks mandatory minima after release.
 Stop the local Worker afterwards.

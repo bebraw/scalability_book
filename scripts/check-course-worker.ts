@@ -469,6 +469,108 @@ assert.deepEqual(
     .establish.groups,
   course.phases.establish.groups,
 );
+const beforeWithdrawal = await call<{
+  config: Envelope<Course>;
+  administration: AdministrationRevisions;
+}>(`/${id}`);
+await call(`/${id}/enrollment`, "PUT", {
+  expected: beforeWithdrawal.administration.students,
+  student: "github:2",
+  action: "withdraw",
+  reason: "PRIVATE synthetic withdrawal reason",
+});
+const withdrawn = await call<{
+  config: Envelope<Course>;
+  administration: AdministrationRevisions;
+  projects: Envelope[];
+  results: {
+    student: { id: string };
+    result: { status: string; grade: number | null };
+  }[];
+}>(`/${id}`);
+assert.equal(
+  withdrawn.results.find((r) => r.student.id === "github:2")!.result.status,
+  "withdrawn",
+);
+assert.equal(
+  withdrawn.results.find((r) => r.student.id === "github:2")!.result.grade,
+  null,
+);
+assert.deepEqual(
+  withdrawn.config.value.phases,
+  beforeWithdrawal.config.value.phases,
+);
+assert.deepEqual(
+  (
+    await call<{ history: Envelope[] }>(
+      `/${id}/history?key=${encodeURIComponent(frozen.key)}`,
+    )
+  ).history,
+  history.history,
+);
+assert.equal(
+  withdrawn.projects.find((p) => p.key === project.key)!.revision,
+  project.revision,
+);
+const retainedArchive = await fetch(
+  new URL(`/api/courses/${id}/files/establish/${file.value.id}`, base),
+  { headers: { Cookie: student } },
+);
+assert.deepEqual(new Uint8Array(await retainedArchive.arrayBuffer()), source);
+for (const [route, cookie, status] of [
+  ["portfolio/establish/github:2", student, 403],
+  ["project-grade/establish/blue", admin, 409],
+  ["individual-grade/establish/github:2", admin, 409],
+] as const) {
+  const denied = await fetch(new URL(`/api/courses/${id}/${route}`, base), {
+    method: "PUT",
+    headers: {
+      Cookie: cookie,
+      Origin: base.origin,
+      "Content-Type": "application/json",
+    },
+    body: "{}",
+  });
+  assert.equal(denied.status, status);
+}
+const withdrawalCsv = await fetch(new URL(`/api/courses/${id}/export`, base), {
+  headers: { Cookie: admin },
+});
+assert.deepEqual(
+  (await withdrawalCsv.text())
+    .split("\r\n")
+    .find((line) => line.includes('"T002"'))!
+    .split(",")
+    .slice(3),
+  ['""', '""', '""', '""', '"withdrawn"', '""', '""'],
+);
+await call(`/${id}/enrollment`, "PUT", {
+  expected: withdrawn.administration.students,
+  student: "github:2",
+  action: "review-withdrawal",
+  resolution:
+    "PRIVATE review: preserve frozen membership; check future allocations and audit fallbacks",
+  reason: "Reviewed synthetic withdrawal",
+});
+const ownWithdrawal = await call(`/${id}`, "GET", undefined, student);
+assert.equal(JSON.stringify(ownWithdrawal).includes("PRIVATE"), false);
+const reviewed = await call<{ administration: AdministrationRevisions }>(
+  `/${id}`,
+);
+await call(`/${id}/enrollment`, "PUT", {
+  expected: reviewed.administration.students,
+  student: "github:2",
+  action: "reinstate",
+  reason: "Correct synthetic mistaken withdrawal",
+});
+assert.deepEqual(
+  (
+    await call<{ history: Envelope[] }>(
+      `/${id}/history?key=${encodeURIComponent(frozen.key)}`,
+    )
+  ).history,
+  history.history,
+);
 assert.equal(
   (
     await fetch(new URL(`/api/course-auth/mock-inbox?course=${id}`, base), {
@@ -495,5 +597,5 @@ assert.equal(
   401,
 );
 console.log(
-  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment and private catch-up, consent/publication and private matching, working agreement, guarded history, streamed R2 source/technical evidence, retained checklists and immutable snapshots, read-only submission and access isolation.",
+  "Local Worker check passed: GitHub/email sessions, single-use D1 links, enrollment/catch-up/withdrawal and reinstatement, private review and blank withdrawn grades, consent/publication and private matching, working agreement, guarded history, streamed R2 source/technical evidence, retained checklists and immutable snapshots, read-only submission and access isolation.",
 );

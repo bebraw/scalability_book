@@ -41,9 +41,12 @@ Staff Groups fingerprints cover allocation and formation responses; student acti
 Working agreements are separate ungraded records, private to their group and staff.
 
 Enrollment arrangements enter through staff-only `/api/courses/:course/enrollment` and the Students/review-queue interface.
-`shared/course-enrollment.ts` owns enrollment projection and pending catch-up tasks; `worker/course-enrollment.ts` records new arrivals and validates staff plans; `site/scripts/course-enrollment.ts` renders the workflow.
+`shared/course-enrollment.ts` owns active-student/group projections and pending catch-up/withdrawal tasks; `worker/course-enrollment.ts` records arrivals, departures, private review notes and reinstatement; `site/scripts/course-enrollment.ts` renders the workflow.
 Enrollment metadata lives on the student's stable course identity in the course snapshot, guarded by the Students fingerprint and final whole-record revision check.
-Students receive only their own plan and dates, with the staff reason removed; enrollment arrangements do not change grading or frozen membership.
+Students receive only their own plan and dates/status, with staff reasons and withdrawal-review notes removed.
+Withdrawal preserves frozen membership, records, files and assessments; the affected student retains read-only access.
+Active projections govern new allocation, assessment and release; withdrawn students receive a blank final grade and marked export row.
+Reinstatement restores ordinary requirements without rewriting evidence or granting waivers.
 
 Submission checklists enter through the shared course submission API and `site/scripts/course-evidence.ts`.
 `shared/course-requirements.ts` owns versioned evidence-index entries; each run pins an edition, and `requirements/` retains the corresponding owner documents and digests.
@@ -123,7 +126,6 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Group formation](docs/adrs/accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md): consent, private matching, allocation, size exceptions, publication, working agreements and recorded late-arrival catch-up are implemented; withdrawal tasks and their institutional export handling remain.
 - [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified Gmail forwarding and live delivery verification remain outstanding.
 - [Teacher simulation](docs/adrs/accepted/ADR-007-provide-an-isolated-teacher-simulation.md): isolated adapters, teacher controls and compact/larger preparation/review presets are implemented in both runtimes, with a complete three-phase browser walkthrough; the withdrawal case remains.
 

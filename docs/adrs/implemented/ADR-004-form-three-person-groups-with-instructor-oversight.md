@@ -1,6 +1,6 @@
 # ADR-004: Form three-person groups with instructor oversight
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-05
 
@@ -34,6 +34,9 @@ Record instructor-approved membership changes for the affected phase; retain the
 
 Late arrivals enter the allocation queue with an agreed catch-up arrangement.
 Withdrawals preserve submitted work and history and become visible administrative tasks rather than deleting evidence.
+Following the instructor’s clarification on 2026-10-06, withdrawn students receive no final grade and do not require assessment before releasing active students’ results.
+Exports retain a clearly marked withdrawn row with blank grade and totals, rather than assigning grade 0.
+The instructor records private group/audit arrangements and can reverse an erroneous withdrawal without waiving ordinary requirements.
 Teams agree briefly on availability, communication, and handling missed commitments; this is a working agreement, not an additional graded deliverable.
 
 ## Trigger
@@ -94,13 +97,16 @@ Roster corrections retain this metadata, while unknown historical arrival dates 
 API/browser checks verify late-arrival detection, review tasks, plan privacy, stale and unauthorized saves, retained history and unchanged frozen work, grades, deadlines and passing requirements.
 The [catch-up operating guide](../../course-system.md#late-arrivals-and-catch-up) describes the implemented workflow.
 
-This ADR remains Accepted: withdrawal actions and their review tasks remain outstanding.
-Withdrawal/export handling needs instructor confirmation before defining that action.
+Withdrawal, private group-review notes and reinstatement use the existing staff enrollment endpoint, Students fingerprint and course history.
+Active-student/group projections govern allocation, new assessments and release; frozen membership and existing evidence/grades remain unchanged.
+Withdrawn students retain read-only access under existing privacy/time rules, and cannot submit or upload new work.
+Roster corrections preserve the state, pending invitations cannot gain new consent, and approved allocation corrections retain their original proposal provenance.
+Later-phase reuse excludes withdrawn members and requires fresh approval for a changed group size.
 
-## Open questions
-
-- Institutional handling of withdrawals and final grade export must be confirmed before defining that administrative action.
-  Withdrawal must not silently waive passing requirements or erase prior work.
+API and browser checks exercise departure/review/reinstatement, retained source and assessment history, no-grade exports, active-only release, privacy, stale/unauthorized changes, future allocation and ordinary requirements after reinstatement.
+The local Worker check verifies this enrollment state and history with actual D1/R2 bindings.
+See the [withdrawal operating guide](../../course-system.md#withdrawals-and-reinstatement).
+This implementation does not provision a production course or establish an institutional records-retention schedule.
 
 ## References
 

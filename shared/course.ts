@@ -61,6 +61,11 @@ export interface Enrollment {
   lateAt: string | null;
   catchUp: string;
   reason: string;
+  withdrawal?: {
+    at: string;
+    resolution: string;
+    reviewedAt: string | null;
+  };
 }
 export interface Group {
   id: string;
@@ -184,7 +189,7 @@ export interface Result {
   pending: string[];
   unmet: string[];
   grade: number | null;
-  status: "pending" | "fail" | "pass";
+  status: "pending" | "fail" | "pass" | "withdrawn";
   breakdown: {
     phase: Phase;
     project: number | null;
@@ -305,6 +310,17 @@ export function calculateResult(
     };
   });
   const percentage = (100 * earned) / available;
+  if (course.students.find((s) => s.id === student)?.enrollment?.withdrawal)
+    return {
+      earned,
+      available,
+      percentage,
+      pending: [],
+      unmet: [],
+      grade: null,
+      status: "withdrawn",
+      breakdown,
+    };
   if (!pending.length && percentage < 50)
     unmet.push("Total below 50% of available points");
   const status = pending.length ? "pending" : unmet.length ? "fail" : "pass";

@@ -110,7 +110,7 @@ It checks retained frozen fields/audit revisions, individual privacy, mobile acc
 The interface captures form values before disabling controls and keeps replacement forms paused until the owning request finishes; selecting the current phase preserves unsaved input.
 
 This ADR remains Accepted: the withdrawal case is still outstanding.
-The withdrawal scenario depends on ADR-004's institutional handling decision.
+The withdrawal scenario can now use [ADR-004’s implemented departure/review/reinstatement workflow](../implemented/ADR-004-form-three-person-groups-with-instructor-oversight.md).
 
 ## Implementation choices
 

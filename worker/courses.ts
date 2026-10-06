@@ -46,7 +46,12 @@ import {
 } from "../shared/course-formation.ts";
 import { configureFormation, updateFormation } from "./course-formation.ts";
 import { updateEnrollment } from "./course-enrollment.ts";
-import { studentEnrollment } from "../shared/course-enrollment.ts";
+import {
+  studentEnrollment,
+  activeStudent,
+  activeStudents,
+  activeGroups,
+} from "../shared/course-enrollment.ts";
 import {
   requirementVersion,
   requirementsFor,
@@ -337,6 +342,12 @@ export async function handleCourses(
       "You are not enrolled in this course.",
       403,
     );
+    if (!staff && request.method !== "GET")
+      requireThat(
+        course.students.some((s) => s.id === user.id && activeStudent(s)),
+        "Your enrollment is withdrawn. Saved work remains available to view; contact staff to correct your enrollment.",
+        403,
+      );
     const records = await store.list(id);
     const values = <T>(kind: string) =>
       records.filter((r) => r.kind === kind).map((r) => r.value as T);
@@ -441,6 +452,7 @@ export async function handleCourses(
                         formation: studentFormation(
                           course.phases[phase].formation!,
                           user.id,
+                          activeStudents(course).map((s) => s.id),
                         ),
                       }
                     : {}),
@@ -543,9 +555,9 @@ export async function handleCourses(
             student.number,
             student.name,
             student.id,
-            r.earned,
-            r.available,
-            r.percentage.toFixed(2),
+            r.status === "withdrawn" ? "" : r.earned,
+            r.status === "withdrawn" ? "" : r.available,
+            r.status === "withdrawn" ? "" : r.percentage.toFixed(2),
             r.grade ?? "",
             r.status,
             r.pending.join("; "),
@@ -646,6 +658,13 @@ export async function handleCourses(
       );
       const body = await boundedJson(request);
       const adjustment = parseAdjustment(body.adjustment, course);
+      requireThat(
+        course.students.some(
+          (s) => s.id === adjustment.student && activeStudent(s),
+        ),
+        "Withdrawn students receive no assessment or final grade. Reinstate enrollment before recording an arrangement.",
+        409,
+      );
       const next = structuredClone(course);
       next.adjustments = next.adjustments.filter(
         (a) =>
@@ -739,20 +758,23 @@ export async function handleCourses(
       const body = await boundedJson(request);
       const next = structuredClone(course);
       if (body.published === true) {
-        requireThat(course.students.length > 0, "Add the roster first.");
         requireThat(
-          course.students.every((s) =>
+          activeStudents(course).length > 0,
+          "Add an active roster first.",
+        );
+        requireThat(
+          activeStudents(course).every((s) =>
             schedule.groups.some((g) => g.members.includes(s.id)),
           ),
           "Every student needs a group for this phase.",
         );
         requireThat(
-          schedule.groups.every((g) =>
+          activeGroups(course, phase).every((g) =>
             currentGrades("project-grade", "submission").some(
               (x) => x.phase === phase && x.subject === g.id,
             ),
           ) &&
-            course.students.every((s) =>
+            activeStudents(course).every((s) =>
               currentGrades("individual-grade", "portfolio").some(
                 (x) => x.phase === phase && x.subject === s.id,
               ),
@@ -1242,6 +1264,13 @@ export async function handleCourses(
           course.students.some((s) => s.id === subject),
           "Unknown student.",
         );
+      requireThat(
+        project
+          ? activeGroups(course, phase).some((g) => g.id === subject)
+          : course.students.some((s) => s.id === subject && activeStudent(s)),
+        "Withdrawn students receive no assessment or final grade. Only groups with active students need project assessment.",
+        409,
+      );
       requireThat(
         typeof body.missing === "boolean",
         "Record whether work is missing.",

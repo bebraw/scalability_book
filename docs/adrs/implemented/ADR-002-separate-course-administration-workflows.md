@@ -83,4 +83,4 @@ See [course-system.md](../../course-system.md) for operating instructions and re
 ## References
 
 - [ADR-003: enrollment and identity](ADR-003-import-students-and-use-email-magic-links.md).
-- [ADR-004: group formation](../accepted/ADR-004-form-three-person-groups-with-instructor-oversight.md).
+- [ADR-004: group formation](../implemented/ADR-004-form-three-person-groups-with-instructor-oversight.md).

@@ -7,6 +7,7 @@ import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import { handleCourses, type CourseUser } from "../worker/courses.ts";
 import { recordKey, type Course, type Envelope } from "../shared/course.ts";
 import type { GroupProposal } from "../shared/course-formation.ts";
+import { proposalAllocation } from "../shared/course-formation.ts";
 const admin = { id: "github:1", login: "instructor" };
 const now = "2026-01-01T00:00:00.000Z";
 const deadline = "2026-01-05T00:00:00.000Z";
@@ -457,6 +458,151 @@ test("private matching constraints and unrelated invitations stay private; edits
           },
         ],
         reason: "Too many members",
+      })
+    ).status,
+    400,
+  );
+});
+test("withdrawal closes pending invitations and removes allocation requirements while preserving allocated consent history", async (t) => {
+  const f = await fixture(t);
+  await f.open();
+  let trio = await f.propose(
+    students[0]!,
+    students.slice(0, 3).map((s) => s.id),
+  );
+  trio = await f.confirm(students[1]!, trio);
+  trio = await f.confirm(students[2]!, trio);
+  const allocated = await f.groups("establish", [
+    {
+      id: "",
+      members: students.slice(0, 3).map((s) => s.id),
+      proposal: trio.id,
+    },
+    { id: "", members: students.slice(3, 6).map((s) => s.id) },
+  ]);
+  const pending = await f.propose(students[3]!, [
+    students[3]!.id,
+    students[6]!.id,
+  ]);
+  await f.good(
+    `/${f.id}/group-preference/establish`,
+    {
+      expected: null,
+      request: "assign",
+      available: true,
+      availability: "PRIVATE",
+      support: "",
+    },
+    students[6]!,
+  );
+  for (const student of [students[2]!, students[6]!]) {
+    const view = await f.good(`/${f.id}`);
+    assert.equal(
+      (
+        await f.request(`/${f.id}/enrollment`, {
+          expected: view.administration.students,
+          student: student.id,
+          action: "withdraw",
+          reason: "",
+        })
+      ).status,
+      400,
+    );
+    await f.good(`/${f.id}/enrollment`, {
+      expected: view.administration.students,
+      student: student.id,
+      action: "withdraw",
+      reason: "PRIVATE withdrawal",
+    });
+  }
+  const own = (await f.good(`/${f.id}`, undefined, students[3]!)).config.value
+    .phases.establish.formation;
+  assert.equal(own.eligible.includes(students[6]!.id), false);
+  assert.equal(
+    own.preferences.some(
+      (p: { student: string }) => p.student === students[6]!.id,
+    ),
+    false,
+  );
+  assert.equal(
+    own.proposals.find((p: GroupProposal) => p.id === pending.id).closed,
+    true,
+  );
+  assert.equal(
+    (
+      await f.request(
+        `/${f.id}/group-confirmation/establish/${pending.id}`,
+        {
+          expected: pending.revision,
+          confirm: true,
+        },
+        students[3]!,
+      )
+    ).status,
+    409,
+  );
+  assert.equal(
+    (
+      await f.request(
+        `/${f.id}/group-proposal/establish`,
+        {
+          expected: null,
+          members: [students[4]!.id, students[6]!.id],
+        },
+        students[4]!,
+      )
+    ).status,
+    400,
+  );
+  // An approved correction keeps the original invitation as provenance, rather
+  // than reopening it or requiring the departed member to consent again.
+  const groups = allocated.value.phases.establish.groups;
+  await f.groups("establish", [
+    {
+      ...groups[0],
+      members: students.slice(0, 2).map((s) => s.id),
+      exception: "Approve a continuing pair after withdrawal",
+    },
+    groups[1],
+  ]);
+  const current = (await f.good(`/${f.id}`)).config.value as Course;
+  assert.equal(
+    proposalAllocation(current, "establish", trio)?.id,
+    groups[0].id,
+  );
+  assert.deepEqual(
+    current.phases.establish.formation!.proposals.find((p) => p.id === trio.id),
+    trio,
+  );
+  await f.open("establish", true);
+  await f.open("challenge");
+  const view = await f.good(`/${f.id}`);
+  assert.equal(
+    (
+      await f.request(`/${f.id}/groups/challenge`, {
+        expected: view.administration.groups.challenge,
+        groups: [{ id: "", members: students.slice(0, 3).map((s) => s.id) }],
+        reason: "Cannot add a withdrawn student to a later phase",
+      })
+    ).status,
+    400,
+  );
+  await f.good(`/${f.id}/enrollment`, {
+    expected: view.administration.students,
+    student: students[2]!.id,
+    action: "reinstate",
+    reason: "Correct mistaken withdrawal",
+  });
+  // Reinstatement restores the ordinary allocation requirement.
+  const reinstated = await f.good(`/${f.id}`);
+  assert.equal(
+    (
+      await f.request(`/${f.id}/formation/establish`, {
+        expected: reinstated.administration.groups.establish,
+        deadline,
+        correctionUntil,
+        publish: true,
+        reason: "Cannot leave an active student unassigned",
       })
     ).status,
     400,

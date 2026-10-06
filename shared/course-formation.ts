@@ -18,6 +18,7 @@ export interface GroupProposal {
   closed: boolean;
 }
 export interface GroupFormation {
+  eligible?: string[];
   deadline: string;
   correctionUntil: string;
   publishedAt: string | null;
@@ -38,11 +39,7 @@ export function proposalAllocation(
   phase: Phase,
   proposal: GroupProposal,
 ) {
-  return course.phases[phase].groups.find(
-    (g) =>
-      g.proposal === proposal.id &&
-      proposal.members.every((s) => g.members.includes(s)),
-  );
+  return course.phases[phase].groups.find((g) => g.proposal === proposal.id);
 }
 
 // Only names and an explicit opt-in signal are public. Private matching notes
@@ -50,21 +47,30 @@ export function proposalAllocation(
 export function studentFormation(
   formation: GroupFormation,
   student: string,
+  eligible: string[],
 ): GroupFormation {
   return {
     ...formation,
-    preferences: formation.preferences.map((p) =>
-      p.student === student
-        ? p
-        : {
-            student: p.student,
-            revision: "",
-            request: "none",
-            available: p.available,
-            availability: "",
-            support: "",
-          },
-    ),
-    proposals: formation.proposals.filter((p) => p.members.includes(student)),
+    eligible,
+    preferences: formation.preferences
+      .filter((p) => eligible.includes(p.student) || p.student === student)
+      .map((p) =>
+        p.student === student
+          ? p
+          : {
+              student: p.student,
+              revision: "",
+              request: "none",
+              available: p.available,
+              availability: "",
+              support: "",
+            },
+      ),
+    proposals: formation.proposals
+      .filter((p) => p.members.includes(student))
+      .map((p) => ({
+        ...p,
+        closed: p.closed || p.members.some((id) => !eligible.includes(id)),
+      })),
   };
 }

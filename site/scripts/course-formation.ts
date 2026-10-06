@@ -1,4 +1,5 @@
 import type { Course, Envelope, Phase } from "../../shared/course.ts";
+import { activeStudents } from "../../shared/course-enrollment.ts";
 import {
   groupLabel,
   proposalAllocation,
@@ -39,8 +40,11 @@ export function staffFormation(course: Course, phase: Phase, now: string) {
             .filter((p) => !p.closed)
             .map((p) => {
               const allocated = proposalAllocation(course, phase, p);
-              const ready = p.members.every((s) => p.confirmed.includes(s));
-              return `<article class="course-note"><h5>${e(p.name || "Proposed group")}</h5><p>${e(names(course, p.members))}</p><p>${p.confirmed.length}/${p.members.length} confirmed${allocated ? ` · allocated to ${e(groupLabel(allocated))}` : p.members.length < 3 ? " · awaiting more members" : ""}.</p><button type="button" class="course-quiet" data-allocate-proposal="${e(p.id)}" ${!ready || allocated ? "disabled" : ""}>Add proposal to allocation</button></article>`;
+              const active = activeStudents(course).map((s) => s.id);
+              const eligible = p.members.every((s) => active.includes(s));
+              const ready =
+                eligible && p.members.every((s) => p.confirmed.includes(s));
+              return `<article class="course-note"><h5>${e(p.name || "Proposed group")}</h5><p>${e(names(course, p.members))}</p><p>${p.confirmed.length}/${p.members.length} confirmed${allocated ? ` · allocated to ${e(groupLabel(allocated))}` : !eligible ? " · a member has withdrawn; review the allocation" : p.members.length < 3 ? " · awaiting more members" : ""}.</p><button type="button" class="course-quiet" data-allocate-proposal="${e(p.id)}" ${!ready || allocated ? "disabled" : ""}>Add proposal to allocation</button></article>`;
             })
             .join("") || "<p>No pending proposals.</p>"
         }</div><details><summary>Private matching notes and allocation requests</summary><div class="course-table-scroll" tabindex="0" role="region" aria-label="Private allocation notes"><table class="course-table"><caption>Visible only to course staff</caption><thead><tr><th>Student</th><th>Request</th><th>Meeting availability</th><th>Support constraints</th></tr></thead><tbody>${formation.preferences.map((p) => `<tr><th>${e(names(course, [p.student]))}</th><td>${p.request === "assign" ? "Assign me a group" : "No allocation request"}${p.available ? " · directory opt-in" : ""}</td><td class="course-evidence">${e(p.availability)}</td><td class="course-evidence">${e(p.support)}</td></tr>`).join("") || '<tr><td colspan="4">No matching notes yet.</td></tr>'}</tbody></table></div></details>`
@@ -104,7 +108,11 @@ export function studentGroups(
     ) || "Nobody else has opted in yet.",
   )}</p><p>Institutional contact details and private matching notes are not shared.</p></aside>
   <form data-form="group-proposal"><fieldset ${closed ? "disabled" : ""}><legend>${own ? "Your pending proposal" : "Propose a group"}</legend>${hidden("proposal", own?.id ?? "")}${hidden("expected", own?.revision ?? "")}${input("name", "Optional group display name", own?.name ?? "", false)}<label class="course-field">Proposed teammates<select multiple name="members" size="5">${course.students
-    .filter((s) => s.id !== student)
+    .filter(
+      (s) =>
+        s.id !== student &&
+        (!formation.eligible || formation.eligible.includes(s.id)),
+    )
     .map(
       (s) =>
         `<option value="${e(s.id)}" ${own?.members.includes(s.id) ? "selected" : ""}>${e(s.name)}</option>`,

@@ -7,6 +7,11 @@ import type {
 import { proposalAllocation } from "../shared/course-formation.ts";
 import { administrationRevisions } from "./course-administration.ts";
 import {
+  activeStudent,
+  activeStudents,
+  activeGroups,
+} from "../shared/course-enrollment.ts";
+import {
   array,
   date,
   requireThat,
@@ -22,7 +27,7 @@ const expected = (value: unknown, revision: string | null) =>
     409,
   );
 const enrolled = (course: Course, id: string) =>
-  course.students.some((s) => s.id === id);
+  course.students.some((s) => s.id === id && activeStudent(s));
 function open(
   formation: GroupFormation | undefined,
   now: string,
@@ -73,14 +78,14 @@ export function configureFormation(
   };
   if (body.publish === true) {
     requireThat(
-      course.students.length > 0 &&
-        course.students.every((s) =>
+      activeStudents(course).length > 0 &&
+        activeStudents(course).every((s) =>
           schedule.groups.some((g) => g.members.includes(s.id)),
         ),
       "Allocate every enrolled student before publishing groups.",
     );
     requireThat(
-      schedule.groups.every(
+      activeGroups(course, phase).every(
         (g) =>
           g.members.length <= 4 &&
           (g.members.length === 3 || Boolean(g.exception)),
@@ -210,6 +215,11 @@ export function updateFormation(
   );
   expected(body.expected, prior.revision);
   const confirm = boolean(body.confirm);
+  requireThat(
+    !confirm || prior.members.every((id) => enrolled(course, id)),
+    "A proposed member is no longer active. Ask the instructor to review the allocation.",
+    409,
+  );
   if (confirm)
     requireThat(
       !formation.proposals.some(

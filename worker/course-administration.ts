@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { enrollStudents } from "./course-enrollment.ts";
+import { activeStudent } from "../shared/course-enrollment.ts";
 import {
   phases,
   rubricVersion,
@@ -68,6 +69,14 @@ export function parseGroups(
       prior &&
       JSON.stringify([...prior.members].sort()) ===
         JSON.stringify([...members].sort());
+    requireThat(
+      members.every(
+        (id) =>
+          prior?.members.includes(id) ||
+          course.students.some((s) => s.id === id && activeStudent(s)),
+      ),
+      "New allocations can include only active students; retain historical membership where work has frozen.",
+    );
     const name = text(g.name ?? "", "Optional group name", 80);
     const exception = text(g.exception ?? "", "Group size exception", 2000);
     requireThat(
@@ -79,7 +88,7 @@ export function parseGroups(
       "Three members is the default. Explain instructor approval for a fourth member or a smaller group.",
     );
     const proposal = text(g.proposal ?? "", "Group proposal", 48);
-    if (proposal) {
+    if (proposal && proposal !== prior?.proposal) {
       const source = course.phases[phase].formation?.proposals.find(
         (p) => p.id === proposal,
       );
@@ -87,7 +96,12 @@ export function parseGroups(
         source &&
           !source.closed &&
           source.members.every(
-            (s) => source.confirmed.includes(s) && members.includes(s),
+            (s) =>
+              source.confirmed.includes(s) &&
+              members.includes(s) &&
+              course.students.some(
+                (student) => student.id === s && activeStudent(student),
+              ),
           ),
         "Every proposed member must confirm before the proposal can be allocated.",
       );
@@ -489,14 +503,15 @@ export function updateLegacySetup(
     course.students.every(
       (s) =>
         retained.has(s.id) ||
-        !records.some(
-          (r) =>
-            (r.value as { student?: string }).student === s.id ||
-            (r.kind === "individual-grade" &&
-              (r.value as Grade).subject === s.id),
-        ),
+        (!s.enrollment?.withdrawal &&
+          !records.some(
+            (r) =>
+              (r.value as { student?: string }).student === s.id ||
+              (r.kind === "individual-grade" &&
+                (r.value as Grade).subject === s.id),
+          )),
     ),
-    "Students with assessment records must remain on the roster.",
+    "Students with assessment records or a withdrawal must remain on the roster.",
   );
   return next;
 }

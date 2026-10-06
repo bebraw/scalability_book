@@ -4,7 +4,10 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { AdministrationRevisions } from "../shared/course-administration.ts";
-import { pendingCatchUps } from "../shared/course-enrollment.ts";
+import {
+  pendingCatchUps,
+  pendingWithdrawals,
+} from "../shared/course-enrollment.ts";
 import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import {
   handleCourses,
@@ -420,6 +423,273 @@ test("late enrollment records a private catch-up plan without changing frozen wo
   assert.equal(
     (historical[0]!.value as Course).students.at(-1)!.enrollment!.catchUp,
     arrangement.catchUp,
+  );
+});
+
+test("withdrawal preserves frozen work and history, prevents new assessment, and excludes inactive students and groups from release", async (t) => {
+  const f = fixture(t);
+  const created = await f.create(),
+    id = created.value.id;
+  const frozen = await f.submit(id, "establish", "red", alice);
+  const oldGrade = await f.good<Envelope<Grade>>(
+    `/${id}/project-grade/establish/red`,
+    "PUT",
+    {
+      expected: null,
+      scores: projectScores,
+      missing: false,
+      feedback: "Historical project assessment",
+      reason: "Before departure",
+    },
+  );
+  const frozenHistory = await f.store.history(frozen.key);
+  const gradeHistory = await f.store.history(oldGrade.key);
+  const initial: any = await f.good(`/${id}`);
+  assert.equal(
+    (
+      await f.request(
+        `/${id}/enrollment`,
+        "PUT",
+        {
+          expected: initial.administration.students,
+          student: alice.id,
+          action: "withdraw",
+          reason: "PRIVATE departure reason",
+        },
+        alice,
+      )
+    ).status,
+    403,
+  );
+  const withdrew = await f.good<Envelope<Course>>(
+    `/${id}/enrollment`,
+    "PUT",
+    {
+      expected: initial.administration.students,
+      student: alice.id,
+      action: "withdraw",
+      reason: "PRIVATE departure reason",
+    },
+    admin,
+    during,
+  );
+  const departed = withdrew.value.students.find((s) => s.id === alice.id)!;
+  assert.equal(departed.enrollment!.withdrawal!.at, during);
+  assert.equal(pendingWithdrawals(withdrew.value)[0]!.id, alice.id);
+  assert.deepEqual(withdrew.value.phases, created.value.phases);
+  assert.deepEqual(await f.store.get(frozen.key), frozen);
+  assert.deepEqual(await f.store.history(frozen.key), frozenHistory);
+  assert.deepEqual(await f.store.get(oldGrade.key), oldGrade);
+  assert.deepEqual(await f.store.history(oldGrade.key), gradeHistory);
+  const own: any = await f.good(`/${id}`, "GET", undefined, alice, during);
+  assert.equal(own.results[0].result.status, "withdrawn");
+  assert.equal(own.results[0].result.grade, null);
+  assert.deepEqual(own.results[0].result.pending, []);
+  assert.equal(JSON.stringify(own).includes("PRIVATE departure reason"), false);
+  assert.equal(
+    (
+      await f.request(
+        `/${id}/files/establish/${frozen.value.archive}`,
+        "GET",
+        undefined,
+        alice,
+        during,
+      )
+    ).status,
+    200,
+  );
+  for (const route of [
+    "portfolio/establish/" + alice.id,
+    "submission/establish/red",
+    "working-agreement/establish/red",
+    "group-preference/establish",
+    "audit/establish/red",
+  ])
+    assert.equal(
+      (await f.request(`/${id}/${route}`, "PUT", {}, alice, during)).status,
+      403,
+    );
+  assert.equal(
+    (
+      await f.request(
+        `/${id}/files/establish/red?scope=technical`,
+        "POST",
+        {},
+        alice,
+        during,
+      )
+    ).status,
+    403,
+  );
+  for (const route of [
+    "individual-grade/establish/" + alice.id,
+    "project-grade/establish/red",
+  ])
+    assert.equal(
+      (
+        await f.request(
+          `/${id}/${route}`,
+          "PUT",
+          { expected: null },
+          admin,
+          during,
+        )
+      ).status,
+      409,
+    );
+  assert.equal(
+    (
+      await f.request(`/${id}/enrollment`, "PUT", {
+        expected: initial.administration.students,
+        student: alice.id,
+        action: "reinstate",
+        reason: "Stale request",
+      })
+    ).status,
+    409,
+  );
+
+  for (const phase of phases) {
+    for (const [group, user] of [
+      ["blue", bob],
+      ["green", carol],
+    ] as const) {
+      const submission = await f.submit(id, phase, group, user);
+      const portfolio = {
+        ...emptyPortfolio(phase, user.id),
+        lectures: [0, 1, 2].map((i) => ({
+          mode: i < 2 ? "live" : "missing",
+          participation: i < 2 ? "Reviewed the model" : "",
+          idea: "A concrete queue",
+          connection: "Linked source evidence",
+        })),
+        self: "Contribution and next improvement",
+        peers: "Specific feedback",
+        reflection: "Response and adjustment",
+        contribution: "Challenged a decision using source evidence",
+      };
+      await f.good(
+        `/${id}/portfolio/${phase}/${user.id}`,
+        "PUT",
+        { expected: null, stage: "submit", value: portfolio },
+        user,
+        evidenceTime,
+      );
+      await f.good(`/${id}/project-grade/${phase}/${group}`, "PUT", {
+        expected: null,
+        scores:
+          phase === "establish" ? projectScores : [6, 4, 5, 3, 2, 3, 5, 2],
+        missing: false,
+        feedback: "Current group evidence",
+        reason: "Assess active group",
+      });
+      await f.good(`/${id}/individual-grade/${phase}/${user.id}`, "PUT", {
+        expected: null,
+        scores: individualScores,
+        missing: false,
+        feedback: "Current private evidence",
+        reason: "Assess active student",
+      });
+      assert.ok(submission.value.frozenAt);
+    }
+    const view: any = await f.good(`/${id}`);
+    await f.good(`/${id}/publish/${phase}`, "POST", {
+      expected: view.config.revision,
+      published: true,
+      reason: "Release active students without grading the departed student",
+    });
+  }
+  const released: any = await f.good(`/${id}`);
+  assert.equal(
+    released.results.find((r: any) => r.student.id === bob.id).result.status,
+    "pass",
+  );
+  assert.equal(
+    released.results.find((r: any) => r.student.id === alice.id).result.status,
+    "withdrawn",
+  );
+  assert.equal(
+    released.individuals.some((g: any) => g.value.subject === alice.id),
+    false,
+  );
+  const csv = await (await f.request(`/${id}/export`)).text();
+  const row = csv.split("\r\n").find((line) => line.includes('"S1"'))!;
+  assert.deepEqual(row.split(",").slice(3, 11), [
+    '""',
+    '""',
+    '""',
+    '""',
+    '"withdrawn"',
+    '""',
+    '""',
+  ]);
+
+  await f.good(`/${id}/enrollment`, "PUT", {
+    expected: released.administration.students,
+    student: alice.id,
+    action: "review-withdrawal",
+    resolution:
+      "PRIVATE team review: frozen members retained; future allocations and staff audit fallback checked",
+    reason: "Reviewed group consequences",
+  });
+  const reviewed: any = await f.good(`/${id}`);
+  assert.deepEqual(pendingWithdrawals(reviewed.config.value), []);
+  const privateOwn: any = await f.good(`/${id}`, "GET", undefined, alice);
+  assert.equal(
+    privateOwn.config.value.students.find((s: Student) => s.id === alice.id)
+      .enrollment.withdrawal.resolution,
+    "",
+  );
+  const other: any = await f.good(`/${id}`, "GET", undefined, bob);
+  assert.equal(
+    other.config.value.students.find((s: Student) => s.id === alice.id)
+      .enrollment,
+    undefined,
+  );
+  assert.equal(JSON.stringify(other).includes("PRIVATE team review"), false);
+  await f.good(`/${id}/students`, "PUT", {
+    expected: reviewed.administration.students,
+    format: "institutional",
+    students: [
+      {
+        number: "S1",
+        firstName: "Alice",
+        lastName: "Corrected",
+        email: "alice@institution.invalid",
+      },
+    ],
+    reason: "Correct a retained historical identity",
+  });
+  const corrected: any = await f.good(`/${id}`);
+  assert.deepEqual(
+    corrected.config.value.students.find((s: Student) => s.id === alice.id)
+      .enrollment,
+    reviewed.config.value.students.find((s: Student) => s.id === alice.id)
+      .enrollment,
+  );
+  await f.good(`/${id}/enrollment`, "PUT", {
+    expected: corrected.administration.students,
+    student: alice.id,
+    action: "reinstate",
+    reason: "Correct an erroneous withdrawal",
+  });
+  const reinstated: any = await f.good(`/${id}`);
+  assert.equal(
+    reinstated.results.find((r: any) => r.student.id === alice.id).result
+      .status,
+    "pending",
+  );
+  assert.deepEqual(await f.store.get(frozen.key), frozen);
+  assert.deepEqual(await f.store.history(oldGrade.key), gradeHistory);
+  assert.equal(
+    (
+      await f.request(`/${id}/publish/challenge`, "POST", {
+        expected: reinstated.config.revision,
+        published: true,
+        reason: "Must assess the reinstated student first",
+      })
+    ).status,
+    400,
   );
 });
 

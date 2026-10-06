@@ -23,9 +23,15 @@ import {
 } from "./course-evidence.ts";
 import {
   catchUpQueue,
+  withdrawalQueue,
   loadEnrollment,
   ownEnrollment,
 } from "./course-enrollment.ts";
+import {
+  activeStudent,
+  activeStudents,
+  activeGroups,
+} from "../../shared/course-enrollment.ts";
 import {
   groupLabel,
   type WorkingAgreement,
@@ -251,6 +257,8 @@ function header() {
     )}</nav>${view!.staff && administrationSections.includes(tab as (typeof administrationSections)[number]) ? administrationNavigation(tab) : ""}`;
 }
 function resultMarkup(result: Result) {
+  if (result.status === "withdrawn")
+    return '<aside class="course-note"><strong>Withdrawn · no final grade</strong><p>Saved evidence and assessment history are retained. This enrollment is excluded from grading and result-release requirements.</p></aside>';
   return `<div class="course-result"><div><span class="course-score">${result.earned}<small> / ${result.available}</small></span><p>${result.percentage.toFixed(1)}% · ${result.status === "pending" ? "Assessment pending" : result.status === "fail" ? "Passing requirements unmet" : `Grade ${result.grade}`}</p></div><div><p><strong>Each phase requires</strong> 10 project points, two complete lecture activities, a submitted self/peer assessment earning 6 points, and 1 contribution point. Approved arrangements appear below.</p>${result.pending.length ? `<p class="course-muted">Pending: ${e(result.pending.join("; "))}.</p>` : ""}${result.unmet.length ? `<ul class="course-unmet">${result.unmet.map((s) => `<li>${e(s)}</li>`).join("")}</ul>` : ""}</div></div>
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Points and mandatory work by phase</caption><thead><tr><th>Phase</th><th>Project /30</th><th>Lecture /9</th><th>Complete /3</th><th>Assessment /12</th><th>Contribution /3</th></tr></thead><tbody>${result.breakdown.map((b) => `<tr><th>${title(b.phase)}${!b.published ? " · unreleased" : ""}</th><td>${b.project ?? "Pending"}</td><td>${b.lecture ?? "Pending"}</td><td>${b.completed ?? "Pending"}</td><td>${b.assessment ?? "Pending"}</td><td>${b.contribution ?? "Pending"}</td></tr>`).join("")}</tbody></table></div>`;
 }
@@ -302,26 +310,38 @@ function overview() {
         "",
       )}${v.projects.map((g) => feedbackCard(g, true)).join("")}${v.individuals.map((g) => feedbackCard(g, false)).join("")}</section>`;
   }
+  const requiredGroups = new Set(activeGroups(course, phase).map((g) => g.id)),
+    requiredStudents = new Set(activeStudents(course).map((s) => s.id));
   const frozen = v.submissions.filter(
-    (r) => r.value.phase === phase && r.value.frozenAt,
+    (r) =>
+      r.value.phase === phase &&
+      r.value.frozenAt &&
+      requiredGroups.has(r.value.group),
   ).length;
   const submitted = v.portfolios.filter(
-    (r) => r.value.phase === phase && r.value.submittedAt,
+    (r) =>
+      r.value.phase === phase &&
+      r.value.submittedAt &&
+      requiredStudents.has(r.value.student),
   ).length;
   const graded =
-    v.projects.filter((r) => r.value.phase === phase).length +
-    v.individuals.filter((r) => r.value.phase === phase).length;
+    v.projects.filter(
+      (r) => r.value.phase === phase && requiredGroups.has(r.value.subject),
+    ).length +
+    v.individuals.filter(
+      (r) => r.value.phase === phase && requiredStudents.has(r.value.subject),
+    ).length;
   return `<section class="course-section"><div class="course-section-heading"><h3>${title(phase)} review queue</h3><button type="button" data-tab="schedule" class="course-quiet">Manage this phase</button></div>
-  <div class="course-metrics"><div><strong>${frozen}<span> / ${schedule.groups.length}</span></strong><p>Implementations frozen</p></div><div><strong>${submitted}<span> / ${course.students.length}</span></strong><p>Private portfolios submitted</p></div><div><strong>${graded}<span> / ${schedule.groups.length + course.students.length}</span></strong><p>Assessments recorded</p></div></div>
+  <div class="course-metrics"><div><strong>${frozen}<span> / ${requiredGroups.size}</span></strong><p>Implementations frozen</p></div><div><strong>${submitted}<span> / ${requiredStudents.size}</span></strong><p>Private portfolios submitted</p></div><div><strong>${graded}<span> / ${requiredGroups.size + requiredStudents.size}</span></strong><p>Assessments recorded</p></div></div>
   <div class="course-deadlines"><p><strong>Implementation</strong>${when(schedule.freezeAt)}</p><p><strong>Audit closes / class access opens</strong>${when(schedule.auditAt)}</p><p><strong>Evidence & portfolios</strong>${when(schedule.evidenceAt)}</p></div>
   ${!course.students.length ? '<aside class="course-note">Start in Students: import the roster, then form groups and prepare phase deadlines and audits.</aside>' : ""}
-  ${catchUpQueue(course)}
+  ${catchUpQueue(course)}${withdrawalQueue(course)}
   ${
-    course.students.some(
+    activeStudents(course).some(
       (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
     )
       ? `<aside class="course-note"><strong>Students awaiting a group</strong><p>${e(
-          course.students
+          activeStudents(course)
             .filter(
               (s) => !schedule.groups.some((g) => g.members.includes(s.id)),
             )
@@ -330,7 +350,7 @@ function overview() {
         )}</p><button type="button" data-tab="groups" class="course-quiet">Allocate groups</button></aside>`
       : ""
   }
-  ${schedule.groups.some((g) => !schedule.audits.some((a) => a.from === g.id) || !schedule.audits.some((a) => a.to === g.id)) ? '<aside class="course-note"><strong>Audit arrangements incomplete</strong><p>Each group needs an incoming and outgoing audit, or a staff-arranged fallback.</p><button type="button" data-tab="schedule" class="course-quiet">Arrange audits</button></aside>' : ""}
+  ${activeGroups(course, phase).some((g) => !schedule.audits.some((a) => a.from === g.id) || !schedule.audits.some((a) => a.to === g.id)) ? '<aside class="course-note"><strong>Audit arrangements incomplete</strong><p>Each group needs an incoming and outgoing audit, or a staff-arranged fallback.</p><button type="button" data-tab="schedule" class="course-quiet">Arrange audits</button></aside>' : ""}
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Group review status</caption><thead><tr><th>Group</th><th>Implementation</th><th>Incoming audit</th><th>Author response</th><th>Assessment</th><th>Review</th></tr></thead><tbody>${schedule.groups
     .map((g) => {
       const s = v.submissions.find(
@@ -342,7 +362,7 @@ function overview() {
         grade = v.projects.find(
           (r) => r.value.phase === phase && r.value.subject === g.id,
         );
-      return `<tr><th>${e(g.id)}</th><td>${s?.value.frozenAt ? "Frozen" : s ? "Draft" : "Missing"}</td><td>${a ? "Submitted" : "Missing"}</td><td>${s?.value.submittedAt ? "Submitted" : "Pending"}</td><td>${grade ? (grade.value.evidenceRevision !== (s?.revision ?? null) ? "Needs reassessment" : `${grade.value.scores.reduce((a, b) => a + b, 0)}/30`) : "Ungraded"}</td><td><button type="button" data-review-group="${e(g.id)}">Review</button></td></tr>`;
+      return `<tr><th>${e(g.id)}</th><td>${s?.value.frozenAt ? "Frozen" : s ? "Draft" : "Missing"}</td><td>${a ? "Submitted" : "Missing"}</td><td>${s?.value.submittedAt ? "Submitted" : "Pending"}</td><td>${!requiredGroups.has(g.id) ? "No active students" : grade ? (grade.value.evidenceRevision !== (s?.revision ?? null) ? "Needs reassessment" : `${grade.value.scores.reduce((a, b) => a + b, 0)}/30`) : "Ungraded"}</td><td><button type="button" data-review-group="${e(g.id)}">Review</button></td></tr>`;
     })
     .join("")}</tbody></table></div>
   <div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Individual review status · private to staff</caption><thead><tr><th>Student</th><th>Portfolio</th><th>Assessment</th><th>Course status</th><th>Review</th></tr></thead><tbody>${course.students
@@ -354,7 +374,7 @@ function overview() {
           (r) => r.value.phase === phase && r.value.subject === s.id,
         ),
         r = v.results.find((r) => r.student.id === s.id)?.result;
-      return `<tr><th>${e(s.name)}<small>${e(s.number)}</small></th><td>${p?.value.submittedAt ? "Submitted" : p ? "Draft" : "Missing"}</td><td>${g ? (g.value.evidenceRevision !== (p?.revision ?? null) ? "Needs reassessment" : "Recorded") : "Ungraded"}</td><td>${e(r?.status ?? "pending")}</td><td><button type="button" data-review-student="${e(s.id)}">Review</button></td></tr>`;
+      return `<tr><th>${e(s.name)}<small>${e(s.number)}</small></th><td>${p?.value.submittedAt ? "Submitted" : p ? "Draft" : "Missing"}</td><td>${!activeStudent(s) ? "Not required · withdrawn" : g ? (g.value.evidenceRevision !== (p?.revision ?? null) ? "Needs reassessment" : "Recorded") : "Ungraded"}</td><td>${e(r?.status ?? "pending")}</td><td><button type="button" data-review-student="${e(s.id)}">Review</button></td></tr>`;
     })
     .join("")}</tbody></table></div></section>`;
 }
@@ -389,6 +409,15 @@ function gradeForm(
     kind === "project-grade" ? view!.projects : view!.individuals
   ).find((r) => r.value.phase === phase && r.value.subject === subject);
   const p = kind === "project-grade";
+  const required = p
+    ? activeGroups(view!.config.value, phase).some(
+        (group) => group.id === subject,
+      )
+    : activeStudents(view!.config.value).some(
+        (student) => student.id === subject,
+      );
+  if (!required)
+    return `<aside class="course-note"><strong>${p ? "No active students in this group" : "Withdrawn · no individual assessment"}</strong><p>Historical evidence and feedback are retained; no assessment is required for release.</p>${g ? feedbackCard(g, p) + historyButton(g) : ""}</aside>`;
   const criteria = assessmentCriteria(phase, p);
   return `<form data-form="${kind}" class="course-grade-form"><h4>${p ? "Group project assessment" : "Private individual assessment"}</h4><p>Use the <a href="/project/grading/">published rubric</a>. Participation needs recorded live or remote evidence; contribution is an instructor judgment supported by the portfolio and project history.</p>
   <fieldset class="course-score-grid"><legend>Criterion scores</legend>${criteria.map(([label, max], i) => `<label>${e(label)}<span><input type="number" name="score-${i}" min="0" max="${max}" step="1" value="${g?.value.scores[i] ?? ""}" required aria-label="${e(label)} score"> / ${max}</span></label>`).join("")}</fieldset>
@@ -552,12 +581,26 @@ function gradebook() {
   const adjustment = course.adjustments.find(
     (a) => a.student === selectedStudent && a.phase === phase,
   );
-  return `<section class="course-section"><div class="course-section-heading"><h3>Course gradebook</h3><a class="course-button" href="${courseApiUrl(`/api/courses/${course.id}/export`)}">Export released grades (CSV)</a></div><p>Instructor view includes provisional scores. Exports use released assessments; pending work has a blank final grade. Missing work must be explicitly assessed.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Instructor totals · provisional until release</caption><thead><tr><th>Student</th><th>Points</th><th>Percentage</th><th>Result</th><th>Requirements</th></tr></thead><tbody>${v.results.map(({ student, result }) => `<tr><th><button type="button" data-grade-student="${e(student.id)}">${e(student.name)}</button><small>${e(student.number)}</small></th><td>${result.earned}/${result.available}</td><td>${result.percentage.toFixed(1)}%</td><td>${result.grade === null ? "Pending" : result.grade === 0 ? "Fail" : `Grade ${result.grade}`}</td><td>${e([...result.pending, ...result.unmet].join("; ") || "All met")}</td></tr>`).join("")}</tbody></table></div>
-  <form data-form="publish" class="course-note"><h4>${title(phase)} results: ${schedule.published ? "released" : "private drafts"}</h4><p>All groups and students need assessment records before release. Record zero scores for missing work, with reasons.</p>${input("reason", "Reason for releasing or withdrawing results", "")}<button type="submit">${schedule.published ? "Withdraw phase results" : "Release phase results"}</button></form>
-  ${studentPicker()}${selected ? `<h4>${e(selected.student.name)}: points and passing requirements</h4>${resultMarkup(selected.result)}<details><summary>Approved individual arrangement for ${title(phase)}</summary><form data-form="adjustment"><p>Document the approved replacement activity or adjusted requirement. Changes and reasons remain in the private history.</p>${input("lectureMinimum", "Required complete lecture activities (0–3)", String(adjustment?.lectureMinimum ?? 2), true, "number")}${input("assessmentMinimum", "Self/peer minimum (0–12)", String(adjustment?.assessmentMinimum ?? 6), true, "number")}${input("contributionMinimum", "Contribution minimum (0–3)", String(adjustment?.contributionMinimum ?? 1), true, "number")}${input("availablePoints", "Available individual points this phase (1–21)", String(adjustment?.availablePoints ?? 21), true, "number")}${field("reason", "Approved arrangement, replacement activity and reason", adjustment?.reason ?? "", 2000, true)}<button type="submit">Save private arrangement</button></form></details>` : ""}</section>`;
+  return `<section class="course-section"><div class="course-section-heading"><h3>Course gradebook</h3><a class="course-button" href="${courseApiUrl(`/api/courses/${course.id}/export`)}">Export released grades (CSV)</a></div><p>Instructor view includes provisional scores. Exports use released assessments; pending work has a blank final grade. Missing work must be explicitly assessed.</p><div class="course-table-scroll" tabindex="0" role="region" aria-label="Scrollable assessment table"><table class="course-table"><caption>Instructor totals · provisional until release</caption><thead><tr><th>Student</th><th>Points</th><th>Percentage</th><th>Result</th><th>Requirements</th></tr></thead><tbody>${v.results.map(({ student, result }) => `<tr><th><button type="button" data-grade-student="${e(student.id)}">${e(student.name)}</button><small>${e(student.number)}</small></th><td>${result.status === "withdrawn" ? "—" : `${result.earned}/${result.available}`}</td><td>${result.status === "withdrawn" ? "—" : `${result.percentage.toFixed(1)}%`}</td><td>${result.status === "withdrawn" ? "Withdrawn" : result.grade === null ? "Pending" : result.grade === 0 ? "Fail" : `Grade ${result.grade}`}</td><td>${result.status === "withdrawn" ? "No final grade" : e([...result.pending, ...result.unmet].join("; ") || "All met")}</td></tr>`).join("")}</tbody></table></div>
+  <form data-form="publish" class="course-note"><h4>${title(phase)} results: ${schedule.published ? "released" : "private drafts"}</h4><p>Groups with active members and active students need current assessment records before release. Withdrawn students receive no final grade and do not block release. Record zero scores for active students’ missing work, with reasons.</p>${input("reason", "Reason for releasing or withdrawing results", "")}<button type="submit">${schedule.published ? "Withdraw phase results" : "Release phase results"}</button></form>
+  ${studentPicker()}${selected ? `<h4>${e(selected.student.name)}: points and passing requirements</h4>${resultMarkup(selected.result)}${selected.result.status !== "withdrawn" ? `<details><summary>Approved individual arrangement for ${title(phase)}</summary><form data-form="adjustment"><p>Document the approved replacement activity or adjusted requirement. Changes and reasons remain in the private history.</p>${input("lectureMinimum", "Required complete lecture activities (0–3)", String(adjustment?.lectureMinimum ?? 2), true, "number")}${input("assessmentMinimum", "Self/peer minimum (0–12)", String(adjustment?.assessmentMinimum ?? 6), true, "number")}${input("contributionMinimum", "Contribution minimum (0–3)", String(adjustment?.contributionMinimum ?? 1), true, "number")}${input("availablePoints", "Available individual points this phase (1–21)", String(adjustment?.availablePoints ?? 21), true, "number")}${field("reason", "Approved arrangement, replacement activity and reason", adjustment?.reason ?? "", 2000, true)}<button type="submit">Save private arrangement</button></form></details>` : ""}` : ""}</section>`;
 }
 function render() {
   renderContent();
+  if (
+    view &&
+    !view.staff &&
+    view.config.value.students.find((s) => s.id === view!.user.id)?.enrollment
+      ?.withdrawal
+  )
+    for (const form of content.querySelectorAll<HTMLFormElement>(
+      "form[data-form]",
+    )) {
+      if (form.dataset.form?.startsWith("email-")) continue;
+      form
+        .querySelectorAll<Control>("button,input,select,textarea")
+        .forEach((control) => (control.disabled = true));
+    }
   applyContentLock();
 }
 function renderContent() {
@@ -889,7 +932,20 @@ content.addEventListener("click", async (event) => {
     if (button.hasAttribute("data-reuse-groups")) {
       const form = button.closest("form")!;
       const list = form.querySelector<HTMLElement>("[data-group-rows]")!;
-      const groups = view!.config.value.phases.establish.groups;
+      const active = new Set(
+        activeStudents(view!.config.value).map((s) => s.id),
+      );
+      const groups = view!.config.value.phases.establish.groups
+        .map((g) => {
+          const members = g.members.filter((id) => active.has(id));
+          return {
+            ...g,
+            members,
+            exception:
+              members.length === g.members.length ? (g.exception ?? "") : "",
+          };
+        })
+        .filter((g) => g.members.length);
       list.innerHTML = groups
         .map((g, i) => groupRow(view!.config.value, { ...g, proposal: "" }, i))
         .join("");
@@ -1081,12 +1137,22 @@ content.addEventListener("submit", async (event) => {
         text: val("text"),
       });
     } else if (kind === "enrollment") {
+      const action = submit?.value || "catch-up";
+      if (
+        action === "withdraw" &&
+        !confirm(
+          "Mark this student withdrawn? No final grade will be assigned. Saved work and history will be retained.",
+        )
+      )
+        return;
       await api(`/api/courses/${course.id}/enrollment`, "PUT", {
         expected: v.administration!.students,
         student: val("student"),
         late: values.has("late"),
         catchUp: val("catchUp"),
         reason: val("reason"),
+        action,
+        resolution: val("resolution"),
       });
     } else if (kind === "student") {
       await api(`/api/courses/${course.id}/students`, "PUT", {

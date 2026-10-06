@@ -41,16 +41,59 @@ export function updateEnrollment(
   const id = studentId(body.student);
   const student = next.students.find((s) => s.id === id);
   requireThat(student, "Unknown enrolled student.", 404);
+  const prior = student.enrollment ?? emptyEnrollment();
+  const reason = text(body.reason, "Enrollment arrangement reason", 2000, true);
+  if (body.action === "withdraw") {
+    requireThat(!prior.withdrawal, "This student is already withdrawn.", 409);
+    student.enrollment = {
+      ...prior,
+      reason,
+      withdrawal: { at: now, resolution: "", reviewedAt: null },
+    };
+    return next;
+  }
+  if (body.action === "review-withdrawal") {
+    requireThat(prior.withdrawal, "This student has not withdrawn.", 409);
+    student.enrollment = {
+      ...prior,
+      reason,
+      withdrawal: {
+        ...prior.withdrawal,
+        resolution: text(
+          body.resolution,
+          "Group and audit arrangements",
+          2000,
+          true,
+        ),
+        reviewedAt: now,
+      },
+    };
+    return next;
+  }
+  if (body.action === "reinstate") {
+    requireThat(prior.withdrawal, "This student is already active.", 409);
+    const { withdrawal: _withdrawal, ...retained } = prior;
+    student.enrollment = { ...retained, reason };
+    return next;
+  }
+  requireThat(
+    body.action === undefined || body.action === "catch-up",
+    "Choose a known enrollment action.",
+  );
   requireThat(
     typeof body.late === "boolean",
     "Specify whether this is a late arrival.",
   );
-  const prior = student.enrollment ?? emptyEnrollment();
+  requireThat(
+    !prior.withdrawal,
+    "Reinstate the student before changing their catch-up arrangement.",
+    409,
+  );
   student.enrollment = {
     ...prior,
     lateAt: body.late ? (prior.lateAt ?? now) : null,
     catchUp: text(body.catchUp, "Agreed catch-up arrangement", 2000),
-    reason: text(body.reason, "Enrollment arrangement reason", 2000, true),
+    reason,
   };
   return next;
 }
