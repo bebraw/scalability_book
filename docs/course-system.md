@@ -343,7 +343,8 @@ Application logs contain a `course_login_delivery_failed` event and course ID on
 Cloudflare accepting a send is not proof that it arrived in the student's inbox; use the provider's email logs for delivery/bounce diagnosis.
 
 The read-only account check on 2026-10-05 did not list `scalableweb.dev` as an enabled sending domain.
-The Gmail forwarding destination has not yet been supplied or verified.
+The selected forwarding destination is `info@survivejs.com`, hosted by Fastmail (confirmed 2026-10-06); Cloudflare destination verification remains outstanding.
+Fastmail’s role is the receiving inbox, so this selection does not change the Worker’s Cloudflare sender integration.
 No domain was onboarded, DNS changed, paid plan upgraded, real mail sent or Worker deployed by the implementation checks.
 
 Before live course access:
@@ -354,7 +355,7 @@ Before live course access:
 2. Onboard `scalableweb.dev` under **Compute → Email Service → Email Sending** and review the provider's generated DNS records before applying them.
    Verify sending MX/SPF on `cf-bounce`, sending DKIM and the domain's DMARC setup through the [domain configuration guide](https://developers.cloudflare.com/email-service/configuration/domains/).
    Preserve any existing mail arrangements when reviewing DNS changes.
-3. Configure **Email Routing** separately: verify the instructor's existing Gmail destination, then create the exact rule `info@scalableweb.dev` → **Send to an email** → that verified destination.
+3. Configure **Email Routing** separately: verify `info@survivejs.com` through the verification message in its Fastmail inbox, then create the exact rule `info@scalableweb.dev` → **Send to an email** → `info@survivejs.com`.
    Check Routing's own root-domain MX/SPF/DKIM records and the rule's active status.
    Use the [routing-address guide](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/); a Worker email handler or catch-all rule is unnecessary for this forwarding arrangement.
 4. Add this binding to the production `wrangler.jsonc`, retaining the existing course and book bindings:
@@ -371,14 +372,16 @@ Before live course access:
    The public request route still sends only to enrolled addresses.
 
 5. With explicit authorization to send the test message, request a link through the normal course sign-in form, inspect its sender and inbox delivery, confirm sign-in, and verify reuse rejection.
-   Test an incoming question to `info@scalableweb.dev` and confirm forwarding to Gmail.
+   Test an incoming question to `info@scalableweb.dev` and confirm forwarding to `info@survivejs.com` in Fastmail.
+   Send the incoming test from a different account than the forwarding destination, as some providers suppress same-account forwarding tests.
    Record results without saving a credential or full magic-link URL in reports.
    Remove the temporary recipient restriction only when starting institutional delivery; retain the fixed sender restriction.
 
 Disable login delivery by setting `COURSE_EMAIL_ENABLED` to `"false"` and deploying the configuration if a sender or service problem occurs.
 Check enrollment/address corrections and Cloudflare delivery, bounce and suppression logs before asking a student to request another link.
 Requests remain bounded by the application limits above; there is no automatic retry or staff endpoint that reveals a production login credential.
-Forwarding does not provide branded human replies from Gmail; reply from the existing inbox unless a separate reply arrangement is agreed.
+Human replies use the existing `info@survivejs.com` identity, as agreed with the instructor.
+The required incoming path is `info@scalableweb.dev` → Cloudflare Email Routing → `info@survivejs.com` in Fastmail; no additional Fastmail sending identity is required.
 The [mail ADR](adrs/accepted/ADR-006-use-cloudflare-for-course-email.md) tracks the remaining external setup and actual delivery verification.
 
 `wrangler.course.jsonc` includes a local-only email binding shape with delivery disabled for validation.

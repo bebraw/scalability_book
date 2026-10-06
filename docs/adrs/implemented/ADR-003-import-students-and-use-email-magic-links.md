@@ -81,7 +81,7 @@ Addresses can change; using them as record keys would complicate historical owne
 Institutional CSV mapping, incremental imports, preview, manual additions/corrections, stable internal identities and the email token/session flow are implemented.
 The local server uses a staff-only mock inbox; the Worker has D1 auth/session adapters and a native Cloudflare mail adapter gated by its binding and an explicit enablement variable.
 Repository behavior is implemented and verified; this status does not establish production deployment or delivery.
-The domain, verified Gmail forwarding and instructor-authorized live delivery check remain operational dependencies in ADR-006.
+The domain, verified forwarding to the Fastmail-hosted inbox and instructor-authorized live delivery check remain operational dependencies in ADR-006.
 
 `worker/course-administration.ts` matches imports by institutional student ID within a run.
 Existing GitHub-keyed records retain their keys; new enrollments receive opaque UUID identities.

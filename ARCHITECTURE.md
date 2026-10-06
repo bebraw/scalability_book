@@ -126,7 +126,7 @@ Their implemented status identifies repository behavior or published course cont
 
 The following decisions have implementation work outstanding in the current course workspace:
 
-- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified Gmail forwarding and live delivery verification remain outstanding.
+- [Course email](docs/adrs/accepted/ADR-006-use-cloudflare-for-course-email.md): the Cloudflare sender integration and simulation mock-mail boundary are implemented; domain setup, verified forwarding to the Fastmail-hosted inbox and live delivery verification remain outstanding.
 
 Implement these in bounded changes that retain historical identities, frozen membership, assessment provenance, and privacy.
 Record the implementation evidence before moving each ADR to `implemented/`.
