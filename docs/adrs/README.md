@@ -43,11 +43,7 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-| ADR                                                                                        | Summary                                                                                                                            |
-| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [ADR-030](accepted/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md) | Distribute a versioned standalone companion with guided setup, stable per-user storage, explicit migration and compatible updates. |
-
-ADR-030's standalone implementation is undergoing release verification; its record identifies the checks already passed and the pending platform matrix/publication.
+No accepted decisions await implementation.
 
 ## Implemented
 
@@ -82,6 +78,7 @@ ADR-030's standalone implementation is undergoing release verification; its reco
 | [ADR-027](implemented/ADR-027-connect-book-learning-to-student-agents-through-a-local-companion.md) | Connect the whole book to students' own agents through a local companion, shared context and bounded demo actions.                            |
 | [ADR-028](implemented/ADR-028-use-a-private-reflection-notebook-to-support-course-learning.md)      | Keep a portable private notebook with supported reflection, revisable concept self-assessment and selected material for existing submissions. |
 | [ADR-029](implemented/ADR-029-support-asynchronous-peer-inquiry-through-opt-in-annotations.md)      | Add opt-in group/cohort inquiry after individual work, preserving private feedback and deliberate public curation.                            |
+| [ADR-030](implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md)       | Distribute the standalone npm companion with guided setup, stable storage, explicit migration, recovery and verified releases.                |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

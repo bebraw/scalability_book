@@ -6,9 +6,8 @@ Reading the book does not require a companion or a model account.
 
 ## Start on your computer
 
-The standalone package is `@scalableweb/companion`, maintained by bebraw.
-Its first release is being verified before registry publication; the commands below require version 0.1.0 to be published.
-Use the repository fallback below until then.
+The standalone package is [@scalableweb/companion](https://www.npmjs.com/package/@scalableweb/companion), maintained by bebraw.
+These commands use the verified release 0.1.0.
 Install Node.js 24 or 26, then set up a notebook without cloning the book:
 
 ```sh
@@ -36,7 +35,7 @@ The packaged companion uses a stable directory independently of your current fol
 | macOS  | `~/Library/Application Support/scalableweb-companion/`                                                     |
 | Linux  | `$XDG_DATA_HOME/scalableweb-companion/`, or `~/.local/share/scalableweb-companion/` when unset or relative |
 
-The release checks target macOS and Linux with Node 24 and 26.
+The published release passed clean-installation checks on macOS and Linux with Node 24 and 26.
 Windows support has not been verified.
 The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
 Keep the companion running while using the book; Ctrl+C stops it without removing your work.
@@ -199,9 +198,9 @@ For a separately located profile, keep it and pass `--codex-home /absolute/path/
 Verify sign-in and resumed conversations before removing any old copy.
 If continuity is unavailable, keep conversations backed up and start a new conversation from selected retained notes.
 
-### Repository development fallback
+### Repository development
 
-The book checkout remains usable while the package release is being prepared:
+The book checkout retains the same companion for development:
 
 ```sh
 git clone https://github.com/bebraw/scalability_book.git
