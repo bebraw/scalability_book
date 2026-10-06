@@ -77,6 +77,9 @@ Without JavaScript and when printing, both demo and exercise remain in the readi
 The `/demos/` showcase renders the same exercise definitions and Explore/Practice pairs, plus the four standalone exercises.
 Stable exercise IDs share saved progress with the chapter versions.
 Links return to each exercise in its chapter.
+The gallery's **More practice** section has its own full-width exercise cards, a direct `#more-practice` link and an index of the standalone questions.
+Answer fields use two columns on wider screens and one on narrow screens; these cards remain outside the demos' sidebar/content frame.
+Checking, private saves, stable IDs and chapter progress use the same exercise definitions and controls.
 
 ## Concepts across the book
 

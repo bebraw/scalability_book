@@ -751,7 +751,7 @@ function getDemoGalleryHtml() {
       page.source.includes(`import "exercise:${id}"`),
     );
     return chapter
-      ? `<p><a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a></p>`
+      ? `<p class="demo-gallery-chapter-link"><a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a></p>`
       : "";
   };
   const sections = demoScriptIncludes
@@ -779,11 +779,19 @@ ${practice}
     })
     .join("\n\n");
 
-  const standalone = exerciseEntries
-    .filter(([, exercise]) => !exercise.demo)
+  const standaloneEntries = exerciseEntries.filter(
+    ([, exercise]) => !exercise.demo,
+  );
+  const practiceIndex = standaloneEntries
+    .map(
+      ([id, exercise], index) =>
+        `<a href="#exercise-${escapeAttribute(id)}"><span aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>${escapeAttribute(exercise.title)}</a>`,
+    )
+    .join("\n");
+  const standalone = standaloneEntries
     .map(
       ([id]) =>
-        `<section class="demo-gallery-item">\n{{ import "exercise:${id}" }}\n${chapterLink(id)}\n</section>`,
+        `<div class="demo-gallery-practice-item">\n{{ import "exercise:${id}" }}\n${chapterLink(id)}\n</div>`,
     )
     .join("\n");
   return `<div class="demo-gallery-lede">
@@ -794,10 +802,23 @@ ${practice}
 <div><dt>Mode</dt><dd>Self-guided</dd></div>
 </dl>
 </div>
+<nav class="demo-gallery-jumps" aria-label="On this page">
+<a href="#demo-${slugify(demoScriptIncludes[0].title)}-gallery">Explore demos</a>
+<a href="#more-practice">More practice</a>
+</nav>
 
 ${sections}
-<h2>More practice</h2>
+<section class="demo-gallery-practice" id="more-practice" aria-labelledby="more-practice-title">
+<header class="demo-gallery-practice-header">
+<p class="demo-gallery-practice-kicker">Apply the ideas · ${standaloneEntries.length} exercises</p>
+<h2 id="more-practice-title">More practice</h2>
+<p>Connect the calculations, choose a fair comparison, and separate observations from explanations. Check your answers here or continue in the chapter.</p>
+</header>
+<nav class="demo-gallery-practice-index" aria-label="More practice exercises">
+${practiceIndex}
+</nav>
 ${standalone}
+</section>
 `;
 }
 

@@ -1,7 +1,90 @@
 import { expect, test } from "@playwright/test";
 import { expectedDemoCount } from "./demo-fixtures.ts";
+import { exercises } from "../../shared/exercises.ts";
+import AxeBuilder from "@axe-core/playwright";
 
 test.describe("demo showcase", () => {
+  test("standalone practice is readable and usable on desktop and mobile", async ({
+    page,
+  }) => {
+    await page.route("**/api/auth/status", (route) =>
+      route.fulfill({
+        json: { authenticated: false, available: false },
+      }),
+    );
+    page.on("dialog", (dialog) => dialog.accept());
+    await page.goto("/demos/");
+    const standalone = Object.entries(exercises).filter(
+      ([, exercise]) => !exercise.demo,
+    );
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const [id] of standalone) {
+        const exercise = page.locator(`[data-exercise="${id}"]`);
+        const geometry = await exercise.evaluate((element) => ({
+          width: element.getBoundingClientRect().width,
+          available: element.parentElement!.getBoundingClientRect().width,
+          overflow: element.scrollWidth - element.clientWidth,
+        }));
+        expect(geometry.width / geometry.available).toBeGreaterThan(0.85);
+        expect(geometry.overflow).toBeLessThanOrEqual(1);
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - innerWidth,
+        ),
+      ).toBeLessThanOrEqual(1);
+      await page
+        .locator('[data-exercise="measurement-transfer"]')
+        .locator("..")
+        .screenshot({
+          path: test.info().outputPath(`more-practice-${width}.png`),
+        });
+    }
+    await page
+      .getByRole("link", { name: "More practice", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#more-practice$/);
+    const practice = page.getByRole("region", {
+      name: "More practice",
+      exact: true,
+    });
+    await expect(
+      practice
+        .getByRole("navigation", { name: "More practice exercises" })
+        .getByRole("link"),
+    ).toHaveCount(standalone.length);
+    await practice
+      .getByRole("link", {
+        name: "Follow work from events to review",
+        exact: true,
+      })
+      .click();
+    const exercise = practice.locator('[data-exercise="measurement-transfer"]');
+    await expect(exercise.locator('[data-field="events"]')).toBeEnabled();
+    await exercise.locator('[data-field="events"]').fill("10");
+    await exercise.locator('[data-field="changes"]').fill("12");
+    await exercise.locator('[data-field="balance"]').selectOption("no");
+    await exercise
+      .getByRole("button", { name: "Check answer", exact: true })
+      .click();
+    await expect(exercise.locator("[data-result]")).toContainText(
+      "Correct — all parts passed",
+    );
+    await expect(
+      exercise.getByRole("button", { name: "Save result", exact: true }),
+    ).toBeDisabled();
+    await exercise.getByText("Show worked answer", { exact: true }).click();
+    await expect(exercise.locator(".exercise-discussion")).toHaveAttribute(
+      "open",
+      "",
+    );
+    const accessibility = await new AxeBuilder({ page })
+      .include("#more-practice")
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(accessibility.violations).toEqual([]);
+  });
   test("all demos share a readable header and control style", async ({
     page,
   }) => {
