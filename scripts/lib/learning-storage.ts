@@ -159,6 +159,11 @@ export function migrateLearningDirectory(
         path.join(source, "conversations.sqlite"),
         "conversations",
       );
+    if (existsSync(path.join(source, "local-provider.sqlite")))
+      inspectLearningDatabase(
+        path.join(source, "local-provider.sqlite"),
+        "local-provider",
+      );
     mkdirSync(path.dirname(destination), { recursive: true });
     ensureLearningDirectory(stage);
     for (const name of readdirSync(source)) {
@@ -183,9 +188,13 @@ export function migrateLearningDirectory(
     return {
       source,
       destination,
-      providerContinuity: existsSync(path.join(destination, "codex"))
-        ? "Profile copied; verify sign-in and thread resume."
-        : "No provider profile copied; use --codex-home for the retained profile or sign in again.",
+      providerContinuity: existsSync(
+        path.join(destination, "local-provider.sqlite"),
+      )
+        ? "Local transcripts copied; configure the same endpoint/model/tool mode to resume. Retain any Codex profile for its conversations."
+        : existsSync(path.join(destination, "codex"))
+          ? "Profile copied; verify sign-in and thread resume."
+          : "No provider profile copied; use --codex-home for the retained profile or sign in again.",
     };
   } finally {
     if (existsSync(stage)) rmSync(stage, { recursive: true });

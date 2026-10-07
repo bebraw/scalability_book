@@ -37,7 +37,13 @@ The shared book layout exposes separate lazy Notebook and Teaching assistant ent
 [learning-navigation.ts](site/scripts/learning-navigation.ts) owns each panel's section presentation and launcher state, while [learning-assistant.ts](site/scripts/learning-assistant.ts) composes discussion, chapter guidance and human peer inquiry through the provider-independent handoff types in the shared workspace contract.
 The notebook and lower-right assistant can be visible together on larger screens; compact screens retain both open states while displaying the selected foreground panel.
 Preparing a handoff does not save or send; the student reviews the source and deliberately selected notes or notebook draft.
-[learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile.
+[learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-provider.ts](scripts/lib/learning-provider.ts) owns the provider port and three bounded tool schemas.
+[learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile; [learning-local.ts](scripts/lib/learning-local.ts) adapts a student-operated loopback OpenAI-compatible model server.
+[learning-provider-context.ts](scripts/lib/learning-provider-context.ts) builds selected turn context, with relevant authored navigation for local models.
+[learning-local-model.ts](scripts/lib/learning-local-model.ts) owns endpoint validation and read-only model diagnostics, while [learning-local-history.ts](scripts/lib/learning-local-history.ts) retains exact private context/message snapshots in schema-1 `local-provider.sqlite`.
+Local transcripts belong to the companion directory lease and full-directory migration/backup, independently of portable notebook archives.
+Local sessions bind to endpoint/model/tool mode; context budgeting omits whole completed turns visibly, preserves current selections and rejects oversized current/tool context.
+Discussion-only is the local default; an explicit native-tool mode uses the same browser broker and approval boundary, with no automatic model downloads, Codex sign-in or model-server browser connection.
 The shared [agent contract](shared/learning-agent.ts) owns the provider-independent teaching policy, role, manner, policy identity/version and student-selected help needs.
 Adapters advertise the policy they actually apply; conversations retain that policy and provider version on each new student/reply exchange, alongside requested help and supplied-note identities.
 Earlier turns remain unversioned or keep their original metadata when resumed; no inferred learner profile or notebook migration follows from a policy change.

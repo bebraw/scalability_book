@@ -52,6 +52,19 @@ On 2026-10-07, eight actual Codex CLI 0.154.0 replies under policy version 1 met
 They distinguished buffering from processing capacity, corrected the quoted assistant error, acknowledged absent measurements and preserved group disagreement.
 The default model was not identified, no live browser tool was used in these samples, and no learner participated; these observations establish neither reliable tutoring nor a learning gain.
 
+Local-model evaluation uses `LEARNING_LOCAL_LIVE=1 LEARNING_LOCAL_MODEL=google/gemma-4-12b-qat node scripts/evaluate-learning-support.ts` after loading that model in LM Studio.
+`LEARNING_LOCAL_URL` and `LEARNING_LOCAL_CONTEXT` optionally specify the loopback compatibility URL and configured context.
+It uses the direct discussion-only adapter, records the returned model/notices and retains synthetic wire snapshots under `.local/learning-evaluation/`.
+No Codex sign-in or personal notebook is used.
+
+On 2026-10-07, the loaded Gemma Q4_0/12B model completed all eight scenarios with reasoning disabled and context 8,192; the runner version was unknown.
+Human review found useful novice explanations, respectful challenges, a next-step question and preservation of disagreement/absent-member agency without invented browser execution.
+It also found omitted source URLs, no proposed check in the misconception reply, confusion between the temporal observation window and system boundary in the direct explanation, and an overgeneralized claim that doubling a buffer increases work in progress.
+The production-stability reply identified measurement uncertainty but did not directly propose checking backlog growth against arrival/completion rates.
+These are recorded model limitations, not a passed instructional-quality evaluation or evidence of learner outcomes.
+The ignored actual reply report is `.local/learning-evaluation/task-support-2026-10-07T13-39-38.165Z.json`.
+Native tools on the exposed Gemma configuration remain unverified; synthetic API/browser tests establish the software's observation and approval contracts separately.
+
 ### Recognizable manner and trust
 
 Ask whether the assistant was patient, curious, precise and constructive in the selected exchange, and whether that made asking for help easier or the explanation clearer.

@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { conceptPages } from "../../shared/concept-pages.ts";
 import { demoResources } from "../../shared/learning-resources.ts";
-import { concepts } from "../../shared/concepts.ts";
+import { buildLearningProviderContext } from "./learning-provider-context.ts";
 import {
   helpModes,
   supportNeeds,
@@ -23,7 +23,7 @@ import {
   LearningProblem,
 } from "../../shared/learning-workspace.ts";
 import type { LearningNotebook } from "./learning-notebook.ts";
-import type { LearningProvider } from "./learning-codex.ts";
+import type { LearningProvider } from "./learning-provider.ts";
 
 export function openLearningConversations(
   directory: string,
@@ -33,7 +33,11 @@ export function openLearningConversations(
   const teaching: TeachingContext | undefined = provider?.teaching
     ? {
         policy: { ...provider.teaching },
-        provider: { name: provider.name, version: provider.version ?? null },
+        provider: {
+          name: provider.name,
+          version: provider.version ?? null,
+          ...(provider.model ? { model: provider.model } : {}),
+        },
       }
     : undefined;
   const filename = path.join(directory, "conversations.sqlite");
@@ -92,6 +96,7 @@ export function openLearningConversations(
     support?: TaskSupport,
     noteIds?: string[],
     appliedTeaching?: TeachingContext,
+    notices?: string[],
   ) => {
     conversation.messages.push({
       id: randomUUID(),
@@ -101,6 +106,7 @@ export function openLearningConversations(
       ...(support ? { support } : {}),
       ...(noteIds ? { noteIds } : {}),
       ...(appliedTeaching ? { teaching: appliedTeaching } : {}),
+      ...(notices?.length ? { notices } : {}),
     });
     save(conversation);
   };
@@ -114,6 +120,7 @@ export function openLearningConversations(
   return {
     provider: provider?.name ?? null,
     teaching,
+    capabilities: provider?.capabilities,
     list() {
       return db
         .prepare("SELECT body FROM conversations ORDER BY rowid DESC")
@@ -159,7 +166,7 @@ export function openLearningConversations(
     send(id: string, input: unknown, session: string, origin: string) {
       learningAssert(
         provider,
-        "Start the companion with --codex after signing in to its dedicated profile.",
+        "Enable Codex or a local model in companion setup; notebook writing works without a model.",
         503,
       );
       learningAssert(
@@ -168,6 +175,7 @@ export function openLearningConversations(
         409,
       );
       const conversation = load(id);
+      provider.validateThread?.(conversation.threadId);
       learningAssert(
         conversation.messages.length < 500,
         "Start a new conversation; this one has reached its message limit.",
@@ -209,51 +217,15 @@ export function openLearningConversations(
           entry.source.anchor === conversation.source.anchor &&
           entry.body.trim().length > 0,
       );
-      const prompt = JSON.stringify({
-        helpMode: mode,
-        supportNeed: need,
-        goal,
+      const prompt = buildLearningProviderContext({
         source: conversation.source,
-        selectedNotes: selected.map(({ id, kind, source, body }) => ({
-          id,
-          kind,
-          source,
-          body,
-        })),
-        question: text,
-        supportResources: concepts
-          .filter((concept) =>
-            conversation.source.conceptIds.includes(concept.id),
-          )
-          .map(
-            ({
-              id,
-              title,
-              definition,
-              assumptions,
-              example,
-              misconception,
-              contexts,
-            }) => ({
-              id,
-              title,
-              definition,
-              assumptions,
-              example,
-              misconception,
-              url: new URL(`/concepts/#${id}`, origin).href,
-              contexts,
-            }),
-          ),
-        availableDemos: demoResources.map(
-          ({ id, title, url, assumptions }) => ({
-            id,
-            title,
-            url,
-            assumptions,
-          }),
-        ),
-        bookResources: conceptPages.map(({ title, url }) => ({ title, url })),
+        selected,
+        text,
+        goal,
+        mode: support.mode,
+        need: support.need,
+        origin,
+        focused: provider.focusedContext ?? false,
       });
       learningAssert(
         prompt.length <= 96_000,
@@ -387,10 +359,16 @@ export function openLearningConversations(
             message(
               conversation,
               "agent",
-              answer,
+              typeof answer === "string" ? answer : answer.text,
               undefined,
               undefined,
-              teaching,
+              typeof answer === "string" || !teaching
+                ? teaching
+                : {
+                    ...teaching,
+                    provider: { ...teaching.provider, model: answer.model },
+                  },
+              typeof answer === "string" ? undefined : answer.notices,
             );
             conversation.state = "idle";
           },

@@ -369,6 +369,9 @@ export function createLearningPane(
         view as AssistantSection,
         {
           client,
+          ...(companionStatus?.capabilities
+            ? { toolMode: companionStatus.capabilities.tools }
+            : {}),
           entries,
           draft: activeDraft,
           source: readingSource,
@@ -933,7 +936,7 @@ export function createLearningPane(
           container.append(
             node(
               "p",
-              `Teaching policy ${companionStatus.teaching.policy.id} v${companionStatus.teaching.policy.version}; ${companionStatus.teaching.provider.name} ${companionStatus.teaching.provider.version ?? "version not reported"}.`,
+              `Teaching policy ${companionStatus.teaching.policy.id} v${companionStatus.teaching.policy.version}; ${companionStatus.teaching.provider.name} ${companionStatus.teaching.provider.version ?? "version not reported"}${companionStatus.teaching.provider.model ? ` · ${companionStatus.teaching.provider.model}` : ""}.`,
               "learning-hint",
             ),
           );

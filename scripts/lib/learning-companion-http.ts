@@ -139,6 +139,9 @@ export function createCompanionHandler(options: CompanionOptions) {
             connected: true,
             version: companionRelease.protocol,
             provider: options.conversations?.provider ?? null,
+            ...(options.conversations?.capabilities
+              ? { capabilities: options.conversations.capabilities }
+              : {}),
             ...(options.conversations?.teaching
               ? { teaching: options.conversations.teaching }
               : {}),

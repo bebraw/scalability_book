@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { createLocalProvider } from "./lib/learning-local.ts";
 import { createCodexProvider } from "./lib/learning-codex.ts";
 import { concepts } from "../shared/concepts.ts";
 import { demoResources } from "../shared/learning-resources.ts";
@@ -13,9 +14,10 @@ import {
 } from "../shared/learning-agent.ts";
 import { companionRelease } from "../shared/learning-connection.ts";
 
-if (process.env.LEARNING_CODEX_LIVE !== "1") {
+const local = process.env.LEARNING_LOCAL_LIVE === "1";
+if (!local && process.env.LEARNING_CODEX_LIVE !== "1") {
   throw new Error(
-    "Set LEARNING_CODEX_LIVE=1 to run synthetic scenarios with the dedicated authenticated profile. No student records are used.",
+    "Set LEARNING_CODEX_LIVE=1 for the dedicated profile or LEARNING_LOCAL_LIVE=1 and LEARNING_LOCAL_MODEL for a loaded local model. No student records are used.",
   );
 }
 const cases: {
@@ -90,14 +92,26 @@ const cases: {
       "Retains disagreement and missing observation, does not speak for the absent member, and distinguishes a reviewed summary from assessed understanding.",
   },
 ];
-const provider = await createCodexProvider({
-  home: path.resolve(
-    process.env.LEARNING_CODEX_HOME ?? ".local/learning-companion/codex",
-  ),
-  ...(process.env.LEARNING_CODEX_MODEL
-    ? { model: process.env.LEARNING_CODEX_MODEL }
-    : {}),
-});
+const directory = path.resolve(".local/learning-evaluation");
+await mkdir(directory, { recursive: true, mode: 0o700 });
+const provider = local
+  ? await createLocalProvider({
+      directory,
+      url: process.env.LEARNING_LOCAL_URL ?? "http://127.0.0.1:1234/v1",
+      model: process.env.LEARNING_LOCAL_MODEL ?? "",
+      tools: "none",
+      ...(process.env.LEARNING_LOCAL_CONTEXT
+        ? { contextWindow: Number(process.env.LEARNING_LOCAL_CONTEXT) }
+        : {}),
+    })
+  : await createCodexProvider({
+      home: path.resolve(
+        process.env.LEARNING_CODEX_HOME ?? ".local/learning-companion/codex",
+      ),
+      ...(process.env.LEARNING_CODEX_MODEL
+        ? { model: process.env.LEARNING_CODEX_MODEL }
+        : {}),
+    });
 const sourceRevision = execFileSync("git", ["rev-parse", "HEAD"], {
   encoding: "utf8",
 }).trim();
@@ -114,6 +128,7 @@ const report = {
     name: provider.name,
     version: provider.version ?? null,
     model:
+      provider.model ??
       process.env.LEARNING_CODEX_MODEL ??
       "provider default; exact model not recorded",
   },
@@ -127,8 +142,6 @@ const report = {
   },
   scenarios: [] as unknown[],
 };
-const directory = path.resolve(".local/learning-evaluation");
-await mkdir(directory, { recursive: true });
 const filename = path.join(
   directory,
   `task-support-${report.at.replaceAll(":", "-")}.json`,
@@ -174,7 +187,14 @@ try {
       },
       () => {},
     );
-    report.scenarios.push({ ...scenario, reply, toolRequests });
+    report.scenarios.push({
+      ...scenario,
+      reply: typeof reply === "string" ? reply : reply.text,
+      ...(typeof reply === "string"
+        ? {}
+        : { model: reply.model, notices: reply.notices }),
+      toolRequests,
+    });
     await writeFile(filename, JSON.stringify(report, null, 2) + "\n", {
       mode: 0o600,
     });

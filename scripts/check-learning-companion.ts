@@ -1,6 +1,8 @@
 // Exercise the release artifact from clean directories; no provider account is needed.
 import assert from "node:assert/strict";
-import { spawn, spawnSync, execFileSync } from "node:child_process";
+import { promisify } from "node:util";
+import { startSyntheticLocalModel } from "../tests/fixtures/learning-local-server.ts";
+import { spawn, spawnSync, execFileSync, execFile } from "node:child_process";
 import { once } from "node:events";
 import {
   mkdtempSync,
@@ -29,6 +31,9 @@ const artifact =
 const directory = mkdtempSync(path.join(tmpdir(), "book-packed-companion-"));
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 let child: ReturnType<typeof spawn> | null = null;
+let localServer:
+  | Awaited<ReturnType<typeof startSyntheticLocalModel>>
+  | undefined;
 const currentChild = () => child;
 try {
   execFileSync(
@@ -276,8 +281,83 @@ try {
     /My initial prediction|Bearer|Pairing code/,
   );
   await stop();
+  localServer = await startSyntheticLocalModel();
+  const asyncExec = promisify(execFile);
+  await asyncExec(
+    process.execPath,
+    [
+      bin,
+      "setup",
+      ...args,
+      "--local",
+      "--local-url",
+      localServer.url,
+      "--model",
+      localServer.options.model,
+      "--local-context",
+      "8192",
+    ],
+    { cwd: a, env },
+  );
+  const localDiagnostic = JSON.parse(
+    (
+      await asyncExec(process.execPath, [bin, "doctor", ...args, "--json"], {
+        cwd: b,
+        env: { ...env, PATH: b },
+      })
+    ).stdout,
+  );
+  assert.equal(localDiagnostic.provider, "Local model");
+  assert.equal(localDiagnostic.localModel.model, localServer.options.model);
+  assert.equal(
+    localDiagnostic.checks.every((check: { ok: boolean }) => check.ok),
+    true,
+  );
+  assert.doesNotMatch(JSON.stringify(localDiagnostic), /My initial prediction/);
+  token = "";
+  await start(a);
+  token = (await request("/connect", "POST", {})).token;
+  assert.equal((await request("/status")).capabilities.tools, "none");
+  const discussion = await request("/agent/conversations", "POST", {
+    source: note.source,
+  });
+  const send = async () => {
+    await request(`/agent/conversations/${discussion.id}`, "POST", {
+      text: "Explain the selected prediction",
+      mode: "explanation",
+      browserId: "11111111-1111-4111-8111-111111111111",
+      noteIds: [note.id],
+    });
+    const end = Date.now() + 5000;
+    let result;
+    do {
+      result = await request(`/agent/conversations/${discussion.id}`);
+      if (result.state === "idle") break;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    } while (Date.now() < end);
+    assert.equal(result.state, "idle", JSON.stringify(result));
+    return result;
+  };
+  await send();
+  await stop();
+  token = "";
+  await start(b);
+  token = (await request("/connect", "POST", {})).token;
+  const resumed = await send();
+  assert.equal(
+    resumed.messages.at(-1).teaching.provider.model,
+    localServer.options.model,
+  );
+  assert.equal(localServer.requests.length, 2);
+  assert.match(
+    JSON.stringify(localServer.requests[1].messages),
+    /My initial prediction/,
+  );
+  assert.equal(localServer.requests[1].messages.length, 4);
+  assert.equal(existsSync(path.join(data, "local-provider.sqlite")), true);
+  await stop();
   console.log(
-    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, built-only runtime, setup/diagnostics, code-free connection and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
+    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, built-only runtime, setup/diagnostics, code-free connection, local-model replies/resume and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
   );
 } finally {
   const running = currentChild();
@@ -286,5 +366,6 @@ try {
     running.kill("SIGTERM");
     await exited;
   }
+  await localServer?.close();
   rmSync(directory, { recursive: true, force: true });
 }

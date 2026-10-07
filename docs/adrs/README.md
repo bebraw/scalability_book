@@ -37,10 +37,9 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Proposed
 
-| ADR                                                                                | Summary                                                                                                               |
-| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [ADR-000](proposed/ADR-000-template.md)                                            | Reusable template; not a product decision.                                                                            |
-| [ADR-038](proposed/ADR-038-support-local-models-through-the-learning-companion.md) | Add an OpenAI-compatible local provider, verifying LM Studio first with bounded context and honest demo capabilities. |
+| ADR                                     | Summary                                    |
+| --------------------------------------- | ------------------------------------------ |
+| [ADR-000](proposed/ADR-000-template.md) | Reusable template; not a product decision. |
 
 ## Accepted
 
@@ -87,6 +86,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-035](implemented/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md)         | Ground the assistant in a versioned shared teaching policy and recognizable manner, with separate evaluation of support and independent learning. |
 | [ADR-036](implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md)                 | Open Notebook and the lower-right Teaching assistant independently with a shared connection and separate context.                                 |
 | [ADR-037](implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md)              | Replace printed pairing codes with explicit origin-gated connection, retaining sessions and preparing protocol 2.                                 |
+| [ADR-038](implemented/ADR-038-support-local-models-through-the-learning-companion.md)               | Support a direct local-model provider with retained context, bounded replay and explicit discussion/native-tool modes; LM Studio verified first.  |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

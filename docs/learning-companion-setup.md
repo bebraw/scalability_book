@@ -108,7 +108,8 @@ Existing audio/video diary options remain available.
 
 ## Connect your agent
 
-The first adapter uses the Codex CLI; it was verified with version 0.154.0.
+Choose Codex or a locally loaded model.
+For Codex, the adapter was verified with CLI version 0.154.0.
 Install that version if you do not already have it:
 
 ```sh
@@ -148,11 +149,49 @@ Companion 0.3.0 retains the supplied note identities on each new turn, applies t
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.
 
-For a demo investigation, open **Help: … · Settings**, select its source and use **Save initial thinking** to write a notebook note first.
+With Codex or a verified local native-tool configuration, open **Help: … · Settings** for a demo investigation, select its source and use **Save initial thinking** to write a notebook note first.
 Select that note and choose **Discuss selected notes**, then ask your teaching assistant to inspect the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
 Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
+
+## Use a local model
+
+Start LM Studio's local server and load the language model you want to use.
+Choose its exact identifier from LM Studio; the companion does not download or load weights for you.
+Stop the companion before changing its saved provider choice, then run:
+
+```sh
+npm run companion -- setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
+npm run companion
+```
+
+Use your own loaded model identifier in place of this verified Gemma example.
+No Codex installation, account or `login` command is needed.
+Connect the companion in the book and use the same **Teaching assistant → Discuss** panel.
+The model server does not need browser CORS permission; only the companion connects to it.
+Keep inference local by choosing locally loaded weights, rather than a runner's remote/cloud model.
+A loopback address by itself does not establish where inference runs.
+
+Local models default to **discussion-only**.
+The panel explains that they cannot inspect live pages or demos; supply a saved demo result or use **Chapter guide** for an actual observation.
+Your explicitly selected passage/notes and shared teaching instructions are supplied on each turn.
+Earlier context is retained privately across restarts, including the original text of notes that you later edit.
+**About this reply** records the model identifier; separate notices show when old completed or interrupted turns were omitted from the model's context.
+Oversized current selections/tool results are rejected with your work retained, so you can select less context or start a new conversation.
+The budget is an estimate; a runner can still reject a request at its actual token limit.
+
+`doctor` reports the selected model, loaded context and advertised maximum separately.
+When a compatibility server does not report loaded context, supply `--local-context 8192` using the actual context configured in your runner.
+A smaller explicit budget is permitted; a larger one cannot exceed the reported loaded context.
+Turn off conflicting output-format settings in LM Studio if it rejects the companion's reply schema.
+Ollama and llama.cpp have not yet passed runner verification for this release.
+
+`setup --local --local-tools native` explicitly enables standard function calls for a model/runner configuration you have verified.
+This uses the same saved-initial-thinking and student-approval rules as Codex; discussion text is never executed as a tool call.
+A model's tool badge, listing or successful reply does not establish reliable demo tools.
+Gemma's current exposed configuration passed discussion/replay checks but did not produce native calls in the exploratory probes, so keep its default discussion-only mode.
+If you change endpoint, model or tool mode, start a new conversation or restore the original configuration; the companion does not silently send the old transcript to the new backend.
 
 ## Compare with peers
 
@@ -190,7 +229,7 @@ Stop the companion, then run the same release and directory/port options with `d
 npm run companion -- doctor
 ```
 
-It checks storage/schema compatibility, the loopback port, and the optional Codex prerequisites.
+It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites or the local endpoint/model/context configuration.
 Install the displayed verified provider version when it is missing or unsupported; run `login` for missing dedicated-profile authentication.
 An account's access is checked on its first real reply.
 Use `start --notebook` to continue writing without a provider.
@@ -233,12 +272,12 @@ Startup validates database schemas before writing and saves a `.before-schema-1-
 An interrupted conversion can be retried after stopping every writer; the backup remains available.
 Older releases may reject newer schemas.
 To roll back, stop the companion/provider and restore the full pre-update directory copy, retaining the upgraded copy separately; use its compatible release.
-For a single schema conversion, privately retain the current database, copy its matching `.backup` file back as `notebook.sqlite` or `conversations.sqlite`, then use a compatible release.
+For a single schema conversion, privately retain the current database, copy its matching `.backup` file back as `notebook.sqlite`, `conversations.sqlite` or `local-provider.sqlite`, then use a compatible release.
 Restoring a backup loses subsequent changes in that restored copy; keep exports/current files so you can review and recover them separately.
 Keep the verified Codex version until a newer version has passed the documented provider check.
 
 Portable notebook archives do not include credentials or raw conversations.
-Conversations are stored separately in `conversations.sqlite`, with provider threads in the dedicated Codex profile.
+Conversations are stored separately in `conversations.sqlite`, with Codex threads in the dedicated profile and exact local-model wire context in `local-provider.sqlite` (schema 1).
 To preserve conversation continuity as well, stop the companion and privately back up its directory and any separately configured profile.
 Restoring only the portable notebook lets you start a new conversation from selected notes without depending on an old provider session.
 
@@ -253,8 +292,8 @@ npm run companion -- migrate --from /absolute/path/to/old-notebook --directory /
 
 The command shows source/destination, retains the source, and rejects a nonempty destination.
 Use `--directory /absolute/path/to/new-location` when you need another destination.
-It copies notebook history, conversations and an included dedicated profile without changing record identities.
-After migration, run `setup --notebook`, or `setup --codex` and `doctor` to check the copied profile.
+It copies notebook history, conversations, local-model transcripts and an included dedicated profile without changing record identities.
+After migration, run `setup --notebook`, `setup --codex` for the copied profile, or `setup --local` with the same endpoint/model/tool mode for local conversation continuity, then run `doctor`.
 For a separately located profile, keep it and pass `--codex-home /absolute/path/to/profile` during setup.
 Verify sign-in and resumed conversations before removing any old copy.
 If continuity is unavailable, keep conversations backed up and start a new conversation from selected retained notes.

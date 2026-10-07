@@ -926,7 +926,9 @@ test("students choose task support and direct explanations without a saved initi
     noteIds: [],
   });
   expect(sent.text).toContain("Support requested: A prerequisite concept.");
-  await expect(panel.getByRole("status")).toContainText("--codex");
+  await expect(panel.getByRole("status")).toContainText(
+    "Enable Codex or a local model",
+  );
   await panel.getByLabel("Where I want support").selectOption("next-step");
   await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
   await chooseNotebookTool(panel, "Notes");

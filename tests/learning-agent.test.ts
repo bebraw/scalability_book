@@ -4,10 +4,8 @@ import { mkdtemp, rm, writeFile, copyFile, chmod } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
-import {
-  createCodexProvider,
-  type LearningProvider,
-} from "../scripts/lib/learning-codex.ts";
+import { createCodexProvider } from "../scripts/lib/learning-codex.ts";
+import type { LearningProvider } from "../scripts/lib/learning-provider.ts";
 import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
 import {

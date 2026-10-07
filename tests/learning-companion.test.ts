@@ -6,7 +6,7 @@ import path from "node:path";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
 import { createCompanionHandler } from "../scripts/lib/learning-companion-http.ts";
 import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
-import type { LearningProvider } from "../scripts/lib/learning-codex.ts";
+import type { LearningProvider } from "../scripts/lib/learning-provider.ts";
 import { teachingPolicyIdentity } from "../shared/learning-agent.ts";
 
 function fixture(

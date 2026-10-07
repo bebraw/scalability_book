@@ -51,7 +51,8 @@ Shared record refreshes preserve the assistant's unsent message and ongoing disc
 **Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
 An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
 Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
-The optional Codex adapter provides persisted conversations, bounded browser demo tools and student-reviewed notebook drafts.
+Optional Codex and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
+Codex and explicitly selected native local tools use the same bounded browser broker; local discussion has no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.
 Registry publication and the declared platform/provider evidence are recorded in ADR-030; a built package does not by itself establish registry availability.
@@ -109,14 +110,15 @@ There is no `/pair` route, code generator or manual-pairing option.
 ### Distribution, diagnostics and storage recovery
 
 [learning-cli.ts](../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`.
-Setup offers notebook-only or optional Codex use, creates required directories before login and stores the chosen provider/profile in `companion-settings.json`.
-Port/origin/model overrides remain explicit command options; repeat them when starting or diagnosing that configuration.
+Setup offers notebook-only, Codex or Local model use, creates required directories and stores the chosen provider/profile/model configuration in `companion-settings.json`.
+Port/origin overrides remain explicit command options; model and local endpoint/tool/context preferences are saved by setup and can be overridden explicitly.
 CLI storage/schema checks occur before opening the writing stores.
 An unavailable port, denied storage permission, unsupported provider version or missing dedicated-profile authentication provides a concrete next step while retaining records.
 The dedicated Codex CLI authentication result is a prerequisite check; a real reply establishes account/provider availability.
 
 Authenticated `/status` returns package/source revision, protocol, provider mode, selected storage path and notebook/conversation/archive schema versions.
-Policy-aware adapters also report optional `teaching` metadata: policy ID/version/name and provider name/version.
+Policy-aware adapters also report optional `teaching` metadata: policy ID/version/name and provider name/version/model where known.
+Local status adds selected tool mode, effective context budget and private transcript schema.
 Connect shows the installed policy; older companions retain their existing instructions and do not acquire a new policy from website JavaScript.
 The browser requires protocol 2 before retaining a connection token or accepting status.
 Expired sessions lead back to Connect; network feedback names the possible process/origin/local-permission causes without pretending to distinguish them.
@@ -125,12 +127,12 @@ Expired sessions lead back to Connect; network feedback names the possible proce
 [learning-storage.ts](../scripts/lib/learning-storage.ts) owns per-user path selection, exclusive process leases and explicit migration.
 Migration requires `--from` and `--confirm-stopped`, validates regular files/supported schemas and copies privately through an atomic staged-directory rename.
 It retains the source and rejects occupied destinations or active writers.
-Notebook/conversation identities and histories are copied intact; included provider profiles are copied, while external profiles need an explicit `--codex-home`.
+Notebook/conversation identities, histories and `local-provider.sqlite` are copied intact; included provider profiles are copied, while external profiles need an explicit `--codex-home`.
 Setup preferences are not copied because their absolute profile path may identify the old directory; select the mode again after migration.
 Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
-Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation/local-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
 Release 0.3.0 retains the previous storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
@@ -243,8 +245,20 @@ Shell, unified execution, apps, browser/computer use, multi-agent and image tool
 Codex's local tool host remains available for the three declared callbacks.
 Provider diagnostics are not relayed into website responses or logs.
 One reply runs at a time; students may interrupt it.
-The adapter is the first working provider, not a claim that all external agent clients already work.
-Local-model support remains proposed in [ADR-038](adrs/proposed/ADR-038-support-local-models-through-the-learning-companion.md), which records the LM Studio/Gemma investigation and its remaining context, history and tool-verification work.
+[ADR-038](adrs/implemented/ADR-038-support-local-models-through-the-learning-companion.md) adds the direct local-model provider behind [learning-provider.ts](../scripts/lib/learning-provider.ts)'s shared port and tool schemas.
+[learning-local-model.ts](../scripts/lib/learning-local-model.ts) accepts literal loopback HTTP `/v1` endpoints with no credentials, query, fragment or redirects, and diagnoses the explicit model without downloads, loading commands or Codex sign-in.
+LM Studio loaded-context metadata is separate from the advertised maximum; unknown context requires an explicit `--local-context`.
+[learning-provider-context.ts](../scripts/lib/learning-provider-context.ts) keeps selected source/notes intact and filters local authored navigation by reading/concept membership.
+[learning-local.ts](../scripts/lib/learning-local.ts) uses bounded non-streaming chat completions, a reply-only JSON schema in discussion mode, reasoning disabled, a 1,024-token output allowance and an estimated UTF-8-byte context budget with a 512-token guard.
+It rejects oversized current selections or tool results, omits whole older completed turns visibly and preserves full private snapshots in [learning-local-history.ts](../scripts/lib/learning-local-history.ts)'s schema-1 `local-provider.sqlite`.
+Failed/interrupted turns remain stored but are omitted on replay with a notice; private transcripts never enter portable archives or browser/course responses.
+Local sessions bind to the endpoint/model/tool mode, refuse Codex identities and detect a changed returned model.
+Provider errors, unknown/invalid calls, truncation, response-size limits and cancellation retain work; native mode allows at most eight rounds with three validated calls per response.
+Native calls use the existing broker, saved initial thinking and browser approval; neither prose nor the discussion JSON envelope triggers actions.
+The default discussion-only limitation appears before sending and beside local replies; discussion can use student-supplied saved observations.
+On 2026-10-07, actual Gemma `google/gemma-4-12b-qat` responses passed packed discussion/restart/resume checks at loaded context 8,192 and returned all eight synthetic teaching scenarios; native calls remain unverified on this configuration.
+Teaching review identified qualification and source-link gaps, recorded in the evaluation guide; these checks do not certify instructional reliability.
+Other compatibility runners are potential targets, not verified support claims.
 
 Authenticated companion routes:
 

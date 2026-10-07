@@ -7,6 +7,7 @@ export const companionRelease = {
   protocol: 2,
   notebookSchema: 1,
   conversationSchema: 1,
+  localProviderSchema: 1,
   codexVersion: "0.154.0",
 } as const;
 export interface CompanionStatus {
@@ -15,7 +16,13 @@ export interface CompanionStatus {
   provider: string | null;
   /** Absent on older companions and when no policy-aware provider is enabled. */
   teaching?: TeachingContext;
+  capabilities?: { tools: "none" | "native"; contextWindow: number };
   release?: { name: string; version: string; sourceRevision: string };
   storage?: string;
-  schemas?: { notebook: number; conversations: number; archive: number };
+  schemas?: {
+    notebook: number;
+    conversations: number;
+    archive: number;
+    localProvider?: number;
+  };
 }

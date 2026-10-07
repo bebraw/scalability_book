@@ -181,6 +181,8 @@ Only `https://scalableweb.dev` is trusted by default; specify exact development 
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
 See [the learning-workspace guide](learning-workspace.md) for code-free connection, exact origins, portability and the current implementation boundary.
 Use `npm run companion -- --codex --origin http://127.0.0.1:3000` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
+For direct local models, load a language model in LM Studio and use `npm run companion -- setup --local --model <exact-model-id>`, then start with the required `--origin`.
+Local mode defaults to discussion-only; `--local-url`, `--local-context` and `--local-tools none|native` configure the explicit loopback provider.
 The CLI also supports `setup`, `login`, `doctor` and `migrate`; for example, `npm run companion -- setup --codex` creates the development profile before `npm run companion -- login`.
 Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
 Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
@@ -207,6 +209,9 @@ The onboarding browser check also installs the actual tarball, so pack it before
 [The package workflow](../.github/workflows/learning-companion.yml) runs focused tests, packing and clean installation on macOS/Linux with Node 24/26.
 Wait for all declared matrix jobs to pass before claiming platform support or publishing.
 The verified Codex adapter currently requires CLI 0.154.0; provider verification uses a real separately authenticated profile, while automatic jobs use synthetic records without credentials.
+Local provider tests run with `node --test tests/learning-local.test.ts`; `companion:check` verifies setup, discussion and restart from the actual tarball.
+Build the companion first, then run `npx playwright test tests/e2e/learning-local-model.spec.ts` for packed-runtime capability/provenance and actual browser observation/declined/approved changes in Chromium and WebKit.
+The model responses in that browser check are synthetic; [the evaluation guide](learning-workspace-evaluation.md) owns the real LM Studio/Gemma teaching review and its limits.
 To verify a freshly installed tarball, set `LEARNING_COMPANION_BIN` to its launcher and `LEARNING_CODEX_HOME` to its dedicated authenticated profile when running the opt-in browser check.
 
 The repository prepares 0.3.0 (browser protocol 2) with code-free connection; it is not yet published.

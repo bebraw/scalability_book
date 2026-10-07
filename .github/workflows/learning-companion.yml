@@ -8,6 +8,7 @@ on:
       - "scripts/lib/learning-*.ts"
       - "shared/**"
       - "tests/learning-*.test.ts"
+      - "tests/fixtures/learning-*"
       - "package*.json"
       - ".github/workflows/learning-companion.yml"
   pull_request:
@@ -17,6 +18,7 @@ on:
       - "scripts/lib/learning-*.ts"
       - "shared/**"
       - "tests/learning-*.test.ts"
+      - "tests/fixtures/learning-*"
       - "package*.json"
       - ".github/workflows/learning-companion.yml"
   workflow_dispatch:
@@ -42,7 +44,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      - run: node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts
+      - run: node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/learning-local.test.ts
       - run: npm run companion:pack
       - run: npm run companion:check
       - if: github.event_name == 'workflow_dispatch' && inputs.verify-published

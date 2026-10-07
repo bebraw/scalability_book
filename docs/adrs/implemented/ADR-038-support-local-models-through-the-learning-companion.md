@@ -1,6 +1,6 @@
 # ADR-038: Support local models through the learning companion
 
-**Status:** Proposed
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -19,7 +19,7 @@ The current provider interface and three tool schemas still live in the Codex ad
 
 ## Decision
 
-Propose a direct OpenAI-compatible local-model adapter behind the existing companion.
+Use a direct OpenAI-compatible local-model adapter behind the existing companion.
 Verify LM Studio first, then test Ollama and llama.cpp against the same bounded contract before claiming support for those runners.
 The model service remains student-operated: the companion does not install, download, load or silently switch models.
 Use the same notebook and Teaching assistant panels, shared teaching policy and deliberate source/note handoffs.
@@ -29,14 +29,13 @@ Connection remains the code-free browser session from [ADR-037](../implemented/A
 ### Entry point, owners and dependencies
 
 Extend CLI setup/start/doctor with a Local model choice beside Notebook-only and Codex.
-A proposed explicit configuration is:
+The explicit configuration is:
 
 ```sh
 npm run companion -- setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
 npm run companion
 ```
 
-These options are proposed and do not exist in the current CLI.
 Store the chosen mode, endpoint and explicit model identifier in the local companion settings; origins remain explicit startup options.
 Model-list discovery can assist selection but must not select an embedding model, download weights or claim that listing proves inference availability.
 Doctor should report endpoint reachability, the selected model and available runtime metadata, distinguishing a model's advertised maximum from its loaded context size.
@@ -144,7 +143,15 @@ Use the compatibility API for inference and optional runner-specific read-only d
 
 ## Implementation and verification
 
-This is an exploration and proposed direction, not implemented local-provider support.
+Implemented in the prepared 0.3.0 companion with provider-neutral contracts and shared context construction, a bounded direct adapter, read-only model diagnostics and private SQLite wire snapshots.
+Setup/start/doctor support `--local`, `--local-url`, `--model`, `--local-context` and `--local-tools none|native`; setup retains the choice and the default is discussion-only.
+Unknown loaded context requires an explicit budget; LM Studio metadata caps an explicit budget at the loaded size.
+The adapter uses reasoning disabled, a 1,024-token output allowance, estimated UTF-8-byte token usage and a 512-token guard; runner context failures remain recoverable rather than treated as proof of the estimate.
+Replay preserves full current context and complete tool pairs, omits entire older completed turns visibly and excludes interrupted turns with a separate notice.
+Private `local-provider.sqlite` has schema 1 and participates in read-only schema checks, process leases, legacy backup and full-directory copy/recovery; portable archives omit it.
+Endpoint/model/tool-mode identities and returned-model checks prevent silent backend changes.
+Discussion-only uses an explicit reply JSON schema, exposes its limitation before sending and never parses generated prose as actions.
+Native mode validates a whole batch before execution and permits at most eight rounds of three calls, using the existing broker for actual observations and student approval.
 No model, package or website release was published, and no personal notebook record was used.
 Ignored exploration scripts/results live under `.local/local-model-exploration/`.
 
@@ -164,21 +171,24 @@ That does not establish a working action loop or explain the earlier formatting 
 The Responses endpoint also accepted a required-function request but returned only an answer, with no function call.
 Output-format configuration and native callbacks need further verification before claiming demo-tool support for this setup.
 
-Before marking Implemented, verify:
+Implementation verification on 2026-10-07:
 
-- Notebook-only, Codex and Local model setup/diagnosis with explicit retained storage and no unwanted downloads/sign-in.
-- Selected context, applied teaching policy and model metadata without unselected notebook access.
-- Restart/resume with original context snapshots, provider/model isolation, cancellation and retained work after endpoint/model/context failures.
-- Bounded malformed/oversized replies and unknown/invalid tools at the provider/broker boundary.
-- Actual browser observation, student-declined and student-approved changes, and honest unavailable-demo behavior through the packed companion.
-- Human review of the existing synthetic teaching scenarios on the named model/settings, separately from wire-format success and learner-outcome evaluation.
-- Packing and clean installation on the declared release matrix before standalone support claims.
+- Full unit suite: 163 passed, including ten local boundary tests for exact snapshots/restart, backend isolation, copied transcripts, schema rejection, context omission, cancellation, malformed/oversized replies, invalid calls and unchanged private work.
+- Existing Codex adapter/profile, notebook-only and conversation-policy tests remained passing after provider extraction.
+- Clean packed installation on macOS / Node 26.10.0: local setup/doctor without Codex on PATH, real HTTP discussion, restart/resume across working folders and built-only Node runtime.
+- Packed native-provider browser checks: actual queue DOM observation, student-declined and student-approved changes, discussion-only notices and model provenance; four passed across Chromium and WebKit with a synthetic API server.
+- Actual packed Gemma discussion and restart/resume with a selected synthetic note passed through the installed package.
+- Actual LM Studio/Gemma discussion evaluation: eight returned replies through the new adapter, reviewed against the existing criteria in [the evaluation guide](../../learning-workspace-evaluation.md).
+  Source-link omissions, insufficient qualification and observation-window confusion mean this is not a passed instructional-quality evaluation.
+- The existing package matrix includes the new provider tests and packed local setup/resume checks; each standalone release still requires its exact-artifact matrix before publication.
 
-## Open questions
+## Remaining limits
 
-- Can native tool callbacks work reliably with the exposed Gemma setup once its output-format behavior is understood, or should its first supported mode be discussion-only?
-- What context budget and reasoning defaults give acceptable latency on the first verified loaded model without hiding omitted context?
-- Which private transcript storage layout best fits existing migration, leases and schema checks?
+- Native tools remain unverified on the exposed Gemma configuration; its verified mode is discussion-only.
+- Ollama, llama.cpp and Windows are not verified runner/platform support claims.
+- The context budget is an estimate, not a tokenizer guarantee; model/hardware/settings affect latency and answer quality.
+- Prepared 0.3.0 is not published to npm; the student guide uses repository commands until registry availability and release checks are established.
+- Software verification and synthetic teaching review do not establish learning gains or course completion.
 
 ## References
 

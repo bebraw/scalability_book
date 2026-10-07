@@ -2,10 +2,10 @@ import { createServer } from "node:http";
 import { once } from "node:events";
 import { openLearningNotebook } from "./learning-notebook.ts";
 import { createCompanionHandler } from "./learning-companion-http.ts";
-import {
-  createCodexProvider,
-  type LearningProvider,
-} from "./learning-codex.ts";
+import { createCodexProvider } from "./learning-codex.ts";
+import type { LearningProvider } from "./learning-provider.ts";
+import { createLocalProvider } from "./learning-local.ts";
+import type { LocalModelOptions } from "./learning-local-model.ts";
 import { openLearningConversations } from "./learning-conversations.ts";
 import { lockLearningDirectory } from "./learning-storage.ts";
 import { companionRelease } from "../../shared/learning-connection.ts";
@@ -15,6 +15,7 @@ export async function startLearningCompanion(options: {
   origins: string[];
   codexHome?: string;
   model?: string;
+  local?: LocalModelOptions;
   sourceRevision: string;
 }) {
   const { directory, port, origins } = options;
@@ -31,7 +32,9 @@ export async function startLearningCompanion(options: {
           home: options.codexHome,
           ...(options.model ? { model: options.model } : {}),
         })
-      : null;
+      : options.local
+        ? await createLocalProvider({ ...options.local, directory })
+        : null;
     notebook = openLearningNotebook(directory);
     conversations = openLearningConversations(directory, notebook, provider);
     const companion = createCompanionHandler({
@@ -46,7 +49,12 @@ export async function startLearningCompanion(options: {
           sourceRevision: options.sourceRevision,
         },
         storage: directory,
-        schemas: { notebook: 1, conversations: 1, archive: 1 },
+        schemas: {
+          notebook: 1,
+          conversations: 1,
+          archive: 1,
+          ...(options.local ? { localProvider: 1 } : {}),
+        },
       },
     });
     const server = createServer(async (request, response) => {

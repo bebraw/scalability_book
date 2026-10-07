@@ -38,7 +38,7 @@ export interface TeachingPolicyIdentity {
 /** Instructions applied to this turn, not a claim that the reply follows them. */
 export interface TeachingContext {
   policy: TeachingPolicyIdentity;
-  provider: { name: string; version: string | null };
+  provider: { name: string; version: string | null; model?: string };
 }
 export interface AgentMessage {
   id: string;
@@ -51,6 +51,8 @@ export interface AgentMessage {
   noteIds?: string[];
   /** Earlier turns stay unversioned; resuming does not rewrite their history. */
   teaching?: TeachingContext;
+  /** Honest provider/context limits, separate from generated prose. */
+  notices?: string[];
 }
 export interface LearningConversation {
   id: string;

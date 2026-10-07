@@ -13,66 +13,14 @@ import {
 import {
   learningAgentInstructions,
   teachingPolicyIdentity,
-  type TeachingPolicyIdentity,
 } from "../../shared/learning-agent.ts";
 
+import {
+  learningToolSpecs,
+  type LearningProvider,
+} from "./learning-provider.ts";
+
 type Json = Record<string, unknown>;
-export interface LearningProvider {
-  name: string;
-  version?: string | null;
-  /** Advertise only the shared policy that this adapter actually applies. */
-  teaching?: TeachingPolicyIdentity;
-  run(
-    threadId: string | null,
-    text: string,
-    tool: (name: string, args: unknown) => Promise<unknown>,
-    saveThread: (id: string) => void,
-  ): Promise<string>;
-  cancel(): Promise<void>;
-  close(): void;
-}
-const toolSpecs = [
-  {
-    type: "function",
-    name: "read_book",
-    description:
-      "Read an approved published book page/resource. HTML is static source, not an observed demo.",
-    inputSchema: {
-      type: "object",
-      properties: { path: { type: "string" } },
-      required: ["path"],
-      additionalProperties: false,
-    },
-  },
-  {
-    type: "function",
-    name: "observe_demo",
-    description:
-      "Observe the real active browser demo, its declared controls, current inputs, visible results and authored assumptions.",
-    inputSchema: {
-      type: "object",
-      properties: { demoId: { type: "string" } },
-      required: ["demoId"],
-      additionalProperties: false,
-    },
-  },
-  {
-    type: "function",
-    name: "change_demo",
-    description:
-      "Propose one bounded change to a declared live demo control. The student must have saved initial thinking and approve it in the browser. The result is a real observation.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        demoId: { type: "string" },
-        controlId: { type: "string" },
-        value: { type: ["string", "number", "boolean", "null"] },
-      },
-      required: ["demoId", "controlId", "value"],
-      additionalProperties: false,
-    },
-  },
-];
 export async function validateLearningCodexProfile(
   home: string,
   requireAuth = true,
@@ -448,10 +396,23 @@ export async function createCodexProvider(options: {
     name: "Codex",
     version,
     teaching: teachingPolicyIdentity,
+    ...(options.model ? { model: options.model } : {}),
+    validateThread(threadId) {
+      learningAssert(
+        !threadId?.startsWith("local-"),
+        "This conversation belongs to a local model. Start a new conversation for Codex; its history was retained.",
+        409,
+      );
+    },
     async run(threadId, text, tool, saveThread) {
       learningAssert(
         !active,
         "A conversation is already running. Wait or stop it first.",
+        409,
+      );
+      learningAssert(
+        !threadId?.startsWith("local-"),
+        "Start a new conversation for Codex; this local-model history was retained.",
         409,
       );
       await start();
@@ -465,7 +426,7 @@ export async function createCodexProvider(options: {
       };
       const result = await rpc(threadId ? "thread/resume" : "thread/start", {
         ...params,
-        ...(threadId ? { threadId } : { dynamicTools: toolSpecs }),
+        ...(threadId ? { threadId } : { dynamicTools: learningToolSpecs }),
       });
       const thread = result.thread as Json;
       learningAssert(

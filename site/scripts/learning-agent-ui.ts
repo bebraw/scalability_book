@@ -52,6 +52,7 @@ const field = (text: string, control: HTMLElement) => {
 };
 interface Options {
   client: LearningClient;
+  toolMode?: "none" | "native";
   draft: AssistantDraft;
   source: () => LearningSource;
   selected: () => string[];
@@ -105,7 +106,12 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
   messages.setAttribute("aria-live", "polite");
   container.append(
     Object.assign(
-      element("p", "Automated study support through your chosen provider."),
+      element(
+        "p",
+        options.toolMode === "none"
+          ? "Discussion-only local model. It cannot inspect live book pages or demos. Supply a saved demo result or use Chapter guide for an actual observation."
+          : "Automated study support through your chosen provider.",
+      ),
       { className: "learning-hint" },
     ),
     toolbar,
@@ -420,18 +426,22 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
           element(
             "p",
             message.teaching
-              ? `${message.teaching.policy.name} · policy ${message.teaching.policy.id} v${message.teaching.policy.version} · ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}.`
+              ? `${message.teaching.policy.name} · policy ${message.teaching.policy.id} v${message.teaching.policy.version} · ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}${message.teaching.provider.model ? ` · ${message.teaching.provider.model}` : ""}.`
               : "Teaching policy and provider version were not recorded for this earlier reply.",
           ),
         );
         card.append(about);
+        for (const notice of message.notices ?? [])
+          card.append(
+            Object.assign(element("p", notice), { className: "learning-hint" }),
+          );
         const student = conversation.messages
           .slice(0, conversation.messages.indexOf(message))
           .reverse()
           .find((item) => item.role === "student");
         const relatedIds = student?.noteIds ?? [];
         const teaching = message.teaching
-          ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}`
+          ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}${message.teaching.provider.model ? `; model ${message.teaching.provider.model}` : ""}`
           : "; teaching policy not recorded";
         const provenance = `Assistant suggestion; conversation ${conversation.id}; message ${message.id}${teaching}; reviewed by student before saving`;
         card.append(

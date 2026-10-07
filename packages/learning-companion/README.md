@@ -1,6 +1,6 @@
 # Scalable Web learning companion
 
-A private local notebook and optional Codex connection for [scalableweb.dev](https://scalableweb.dev).
+A private local notebook and optional Codex or local-model connection for [scalableweb.dev](https://scalableweb.dev).
 Use Node.js 24 or newer.
 Version 0.3.0 is prepared in the repository and has not yet been published.
 
@@ -25,9 +25,24 @@ npx @scalableweb/companion@0.3.0 login
 npx @scalableweb/companion@0.3.0 start
 ```
 
+For local discussion, start LM Studio's server, load your chosen language model, and use its exact identifier:
+
+```sh
+npx @scalableweb/companion@0.3.0 setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
+npx @scalableweb/companion@0.3.0 start
+```
+
+No Codex installation or sign-in is required.
+The default local mode has no live tools; use a saved demo result or Chapter guide for actual observations.
+`--local-context <tokens>` supplies the loaded context when the runner cannot report it.
+`--local-tools native` is an explicit choice for a separately verified function-calling setup; Gemma's current setup is verified for discussion only.
+Private transcripts retain exact selected context across restarts in schema-1 `local-provider.sqlite`, outside portable notebook archives.
+A changed endpoint/model/tool mode requires a new conversation; context omission notices and failed selections preserve visible work.
+LM Studio is the first verified runner; Ollama, llama.cpp and Windows remain unverified.
+
 Run `doctor` for local checks, or `doctor --json` for a report you choose whether to share.
 Provider diagnostics, credentials, notes, conversations and connection tokens are excluded from that report.
-`--directory`, `--port`, repeated `--origin`, `--codex-home` and `--model` allow explicit overrides.
+`--directory`, `--port`, repeated `--origin`, `--codex-home`, `--model` and the local options above allow explicit overrides.
 `start --notebook` uses your notes without starting a model.
 
 To migrate an existing repository notebook, stop its companion and provider process, then run:
@@ -53,7 +68,7 @@ Sessions expire after twelve hours and Disconnect revokes them.
 This browser trust boundary does not isolate the service from other native processes on your computer.
 
 The optional teaching assistant retains the shared study policy version 1 and its recorded source/help/note/provider context.
-Notebook storage, portable archive and conversation schemas remain version 1.
+Notebook storage, portable archive and conversation schemas remain version 1; local-model wire history has its own schema 1.
 Codex CLI 0.154.0 remains the verified provider version; no new sign-in is needed when retaining the same dedicated profile.
 Before updating, export a notebook backup, stop the companion and privately copy its data directory and any external provider profile.
 Start 0.3.0 with the same directory/profile options and connect again; existing setup preferences and work remain available.
