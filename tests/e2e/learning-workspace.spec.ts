@@ -345,59 +345,55 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   ).toHaveCount(0);
 });
 
-test("an open notebook keeps wide reading centered and fits smaller desktops", async ({
+test("opening the notebook preserves book, reading and demo widths with expanded or folded navigation", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 2560, height: 1440 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/chapters/scaling/");
-  const reading = page.locator(".chapter-main");
-  const paragraph = page.locator(".prose > p:not(.chapter-kicker)").first();
+  await page.evaluate(() => document.fonts.ready);
   const panel = page.getByRole("dialog", { name: "My learning notebook" });
   const shell = page.locator(".book-shell");
   const navigation = page.locator("#book-navigation details");
   const toggle = navigation.locator("summary");
-  const demo = page.locator("[data-scaling-demo]");
-  await expect(paragraph).toBeVisible();
-  const closedParagraph = await paragraph.boundingBox();
-
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  await expect(panel).toBeVisible();
-  await expect
-    .poll(async () => {
-      const box = await paragraph.boundingBox();
-      return Math.abs(box!.x - closedParagraph!.x);
-    })
-    .toBeLessThan(2);
-
-  for (const width of [2560, 1920, 1600, 1280]) {
+  const targets = [
+    shell,
+    page.locator(".chapter-main"),
+    page.locator(".prose"),
+    page.locator(".prose > p:not(.chapter-kicker)").first(),
+    page.locator("[data-scaling-demo]"),
+  ];
+  for (const width of [2560, 1920, 1600, 1280, 1024, 768, 390]) {
     await page.setViewportSize({ width, height: 1000 });
-    for (const collapsed of [false, true]) {
+    for (const collapsed of width > 1216 ? [false, true] : [false]) {
       const isCollapsed = (await navigation.getAttribute("open")) === null;
       if (isCollapsed !== collapsed) await toggle.click();
       await expect(shell).toHaveAttribute(
         "data-navigation-collapsed",
         String(collapsed),
       );
-      await expect
-        .poll(async () => {
-          const box = await reading.boundingBox();
-          const notebook = await panel.boundingBox();
-          return notebook!.x - (box!.x + box!.width);
-        })
-        .toBeGreaterThanOrEqual(0);
-      if (width >= 1920) {
+      const before = await Promise.all(
+        targets.map((target) => target.boundingBox()),
+      );
+      await page.getByRole("button", { name: "Notebook", exact: true }).click();
+      await expect(panel).toBeVisible();
+      for (const [index, target] of targets.entries()) {
         await expect
-          .poll(async () => {
-            const box = await reading.boundingBox();
-            return Math.abs(box!.x + box!.width / 2 - width / 2);
-          })
-          .toBeLessThan(2);
+          .poll(
+            async () => {
+              const after = await target.boundingBox();
+              const original = before[index]!;
+              return Math.max(
+                Math.abs(after!.x - original.x),
+                Math.abs(after!.width - original.width),
+                index === 3 ? Math.abs(after!.height - original.height) : 0,
+              );
+            },
+            {
+              message: `Book geometry at ${width}px, navigation ${collapsed ? "folded" : "expanded"}, target ${index}`,
+            },
+          )
+          .toBeLessThan(1);
       }
-      const readingBox = await reading.boundingBox();
-      expect(readingBox!.width).toBeGreaterThan(300);
-      const demoBox = await demo.boundingBox();
-      const notebookBox = await panel.boundingBox();
-      expect(demoBox!.x + demoBox!.width).toBeLessThanOrEqual(notebookBox!.x);
       expect(
         await page.evaluate(
           () =>
@@ -405,23 +401,27 @@ test("an open notebook keeps wide reading centered and fits smaller desktops", a
             document.documentElement.clientWidth + 1,
         ),
       ).toBe(true);
-      if (width === 2560 && !collapsed)
+      if (width === 2560 && !collapsed) {
+        const reading = await targets[1]!.boundingBox();
+        const notebook = await panel.boundingBox();
+        expect(
+          Math.abs(reading!.x + reading!.width / 2 - width / 2),
+        ).toBeLessThan(1);
+        expect(
+          (await targets[4]!.boundingBox())!.x + before[4]!.width,
+        ).toBeLessThanOrEqual(notebook!.x);
         await page.screenshot({
-          path: test.info().outputPath("notebook-wide-centered.png"),
+          path: test.info().outputPath("notebook-wide-unchanged.png"),
         });
+      }
+      await panel.getByRole("button", { name: "Close notebook" }).click();
+      await expect(panel).toBeHidden();
+      for (const [index, target] of targets.entries()) {
+        const after = await target.boundingBox();
+        expect(Math.abs(after!.width - before[index]!.width)).toBeLessThan(1);
+      }
     }
   }
-
-  await page.setViewportSize({ width: 2560, height: 1440 });
-  if ((await navigation.getAttribute("open")) === null) await toggle.click();
-  await panel.getByRole("button", { name: "Close notebook" }).click();
-  await expect(panel).toBeHidden();
-  await expect
-    .poll(async () => {
-      const box = await paragraph.boundingBox();
-      return Math.abs(box!.x - closedParagraph!.x);
-    })
-    .toBeLessThan(2);
 });
 
 test("students choose task support and direct explanations without a saved initial note", async ({
@@ -526,11 +526,9 @@ test("selected context is explicit and the notebook follows chapters without los
   await expect(panel.getByRole("heading", { level: 2 })).toHaveText(
     "4 · Architecture",
   );
-  const readingBounds = await page.locator(".chapter-main").boundingBox();
   const notebookBounds = await panel.boundingBox();
-  expect(readingBounds!.x + readingBounds!.width).toBeLessThanOrEqual(
-    notebookBounds!.x,
-  );
+  expect(notebookBounds!.x).toBeGreaterThanOrEqual(0);
+  expect(notebookBounds!.x + notebookBounds!.width).toBeLessThanOrEqual(1280);
   await expect(
     panel.getByRole("region", { name: "Note context" }),
   ).toContainText("Writing about");
