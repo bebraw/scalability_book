@@ -45,7 +45,6 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 | ADR                                                                                       | Summary                                                                                                           |
 | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| [ADR-032](accepted/ADR-032-connect-notebook-investigations-to-independent-application.md) | Connect guided investigations to independent application, supported reflection and voluntary learner evaluation.  |
 | [ADR-033](accepted/ADR-033-scaffold-peer-inquiry-while-preserving-individual-learning.md) | Support shared reasoning and existing group responsibilities, with private individual application and reflection. |
 
 ## Implemented
@@ -83,6 +82,7 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 | [ADR-029](implemented/ADR-029-support-asynchronous-peer-inquiry-through-opt-in-annotations.md)      | Add opt-in group/cohort inquiry after individual work, preserving private feedback and deliberate public curation.                            |
 | [ADR-030](implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md)       | Distribute the standalone npm companion with guided setup, stable storage, explicit migration, recovery and verified releases.                |
 | [ADR-031](implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md)               | Adapt help to the student's current thinking and difficulty while preserving help choice and selected-context access.                         |
+| [ADR-032](implemented/ADR-032-connect-notebook-investigations-to-independent-application.md)        | Connect guided investigations to independent application, supported reflection and voluntary learner evaluation.                              |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

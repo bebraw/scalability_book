@@ -18,7 +18,7 @@ We use these ideas as a design rationale; their application to this course and a
 ## Decision
 
 Make task-specific, responsive assistance an explicit part of the optional notebook learning experience across the published book.
-Extend the supporting-agent contract in ADR-027 and connect it to independent practice in [ADR-032](../accepted/ADR-032-connect-notebook-investigations-to-independent-application.md).
+Extend the supporting-agent contract in ADR-027 and connect it to independent practice in [ADR-032](../implemented/ADR-032-connect-notebook-investigations-to-independent-application.md).
 
 ### Adapt assistance from visible student thinking
 

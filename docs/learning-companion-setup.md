@@ -47,7 +47,12 @@ The guide follows the chapter you are reading and uses its existing prompts and 
 For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Notebook → Chapter guide**, and select **Queue balance lab**.
 Save a prediction or a concrete uncertainty, change the demo's mean time, then choose **Save demo result**.
 This saves the demo's current inputs and displayed result as a private note and shows what was recorded below the button.
-Reflect in your own words, then choose **Review my saved notes**.
+Optionally try **Apply it in a different situation**: explain what happens to 300 waiting events when arrivals and processing capacity differ.
+Try your explanation before opening **Self-check after my attempt**, or choose your own related case.
+**Save my independent attempt** keeps it separately and links your initial thinking and saved observation.
+**Ask for help with this case** prepares an editable request; you decide whether to send it.
+Reflect in your own words, using **Reflection starters and examples** if useful, then choose **Review my saved notes**.
+Pages without demos offer an application to a different system or your project, without requiring a browser observation.
 Restart the companion, pair its new code and reopen those notes to check continuity.
 You can leave the investigation for your own question at any point.
 This is optional support, with no required answer, minimum length, completion mark or additional course report.
@@ -64,6 +69,7 @@ Closing Notebook keeps it closed on later pages.
 These unfinished drafts stay in this browser tab; save your notes before closing the tab.
 **More notebook tools** contains **Concepts**, **Peers**, **Prepare** and **Connect**.
 Quick notes may be short.
+Use **Notes → Revisit** after a delay to recall an idea before rereading your earlier explanation; there is no schedule or completion requirement.
 Developed reflections have prompts and examples to help you capture enough evidence and explanation.
 There is no single correct conclusion: uncertainty, a failed experiment or a better-supported unchanged view can be useful material.
 

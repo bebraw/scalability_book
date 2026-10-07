@@ -96,6 +96,7 @@ function beginNote(
   source = pageSource(),
   kind: NoteKind = "scratch",
   title = "",
+  relatedIds: string[] = [],
 ) {
   if (
     editorDirty() &&
@@ -112,7 +113,7 @@ function beginNote(
     kind,
     title,
     body: "",
-    relatedIds: [],
+    relatedIds,
     source,
   };
   navigate("write");
@@ -285,16 +286,30 @@ function render() {
         prepareLearningHelp(source, text);
         navigate("agent");
       },
-      reflect: () =>
+      initial: (source) =>
         beginNote(
-          pageSource(),
+          source,
+          "attempt",
+          `Initial thinking: ${source.title}`.slice(0, 300),
+        ),
+      reflect: (source, relatedIds) =>
+        beginNote(
+          source,
           "reflection",
           `Reflection: ${currentReading().title}`,
+          relatedIds,
         ),
       close,
-      save: async (kind, title, body, source) => {
-        await client.request("/entries", "POST", { kind, title, body, source });
+      save: async (kind, title, body, source, relatedIds = []) => {
+        const entry = await client.request<NotebookEntry>("/entries", "POST", {
+          kind,
+          title,
+          body,
+          source,
+          relatedIds,
+        });
         await refresh();
+        return entry;
       },
       notes: () => navigate("notes"),
       leave: () => navigate("write"),

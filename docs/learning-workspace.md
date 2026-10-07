@@ -31,6 +31,7 @@ Registry publication and the declared platform/provider evidence are recorded in
 Production availability of peer inquiry depends on the existing course storage and authentication rollout.
 
 The shared contract is [learning-workspace.ts](../shared/learning-workspace.ts).
+[learning-activities.ts](../shared/learning-activities.ts) owns optional versioned independent cases; it reuses canonical exercises without owning their checks.
 [learning-notebook.ts](../scripts/lib/learning-notebook.ts) owns local SQLite persistence; [learning-companion-http.ts](../scripts/lib/learning-companion-http.ts) owns pairing and API access.
 These modules do not depend on course storage or a provider SDK.
 The website/Worker never owns this private notebook or provider credentials.
@@ -125,7 +126,17 @@ Pages without a demo offer reflection without an observation action; the guide d
 Demo activities use existing authored prediction, operation, observation and reflection instructions and preserve their assumptions.
 Save demo result stays disabled until private initial thinking is saved, explains that it captures current browser inputs/text, and shows the saved observation beside the action.
 Errors and save confirmations appear at the relevant step; unavailable demos provide a visible fallback.
+The guide offers **Apply it in a different situation** before reflection, including a queue-recovery variation and the existing benchmark/scaling transfer exercises.
+Other readings use a claim applied to a different system with a changed condition, including pages without demos.
+Students can choose their own related question; the self-check is a closed disclosure and help remains available before or after an attempt.
+Explicitly saving creates a separate `revisit` entry related to the original thinking and evidence; reflection relates to those entries without replacing them.
+Activity ID/version, question, assumptions, self-check and any student-chosen case are captured in the source excerpt alongside its book revision.
+This uses the existing version 1 portable source and `relatedIds`, with no schema/protocol change; saved context is never re-resolved from a later activity definition.
+Reviewed agent suggestions retain the existing assistance provenance when accepted; saving in the guide records the student's own text, not an assertion that external help was absent.
+Reflection starters/examples are optional, and saving a reflection does not require completing the preceding steps.
 Guided prediction/reflection drafts remain in tab storage for returning to the same page; changing demo asks before clearing unfinished writing.
+Changed-case drafts are isolated by source and activity version and survive switching activities/pages within the tab.
+For delayed recall, use **Notes → Revisit** on an earlier entry before opening its closed earlier-explanation disclosure; the student chooses the timing.
 Leaving/skipping has no assessment consequence, and no mastery mark or new submission is generated.
 
 ## Verification

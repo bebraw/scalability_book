@@ -5,6 +5,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
 import {
+  followUpForSource,
+  followUpSource,
+} from "../shared/learning-activities.ts";
+import {
   parseNotebookArchive,
   notebookMarkdown,
 } from "../shared/learning-workspace.ts";
@@ -82,6 +86,55 @@ test("stale edits and deletions preserve the latest text", (t) => {
     /changed/,
   );
   assert.equal(f.notebook.entry(note.id)?.body, revised.body);
+});
+test("separate application and reflection retain authored context, relationships and reviewed assistance in portable version 1 archives", (t) => {
+  const from = fixture(t),
+    to = fixture(t);
+  const first = from.notebook.saveEntry(initial);
+  const demoSource = {
+    ...first.source,
+    kind: "demo" as const,
+    anchor: "demo-queue-balance-lab",
+  };
+  const activity = followUpForSource(demoSource);
+  const application = from.notebook.saveEntry({
+    kind: "revisit",
+    title: "My changed case",
+    body: "I think it drains at the difference in rates.",
+    source: followUpSource(demoSource, activity, "What if processing pauses?"),
+    relatedIds: [first.id],
+  });
+  const reflection = from.notebook.saveEntry({
+    kind: "reflection",
+    title: "Still uncertain",
+    body: "I still want help with the transient interval.",
+    source: demoSource,
+    relatedIds: [first.id, application.id],
+    assistance:
+      "Reviewed suggestion from a selected conversation; this is my own reflection.",
+  });
+  const future = followUpSource(demoSource, {
+    ...activity,
+    version: 2,
+    question: "A different question.",
+  });
+  assert.notEqual(application.source.excerpt, future.excerpt);
+  from.restart();
+  const archive = from.notebook.export();
+  assert.equal(archive.version, 1);
+  to.notebook.import(JSON.parse(JSON.stringify(archive)));
+  to.restart();
+  assert.deepEqual(to.notebook.entry(application.id), application);
+  assert.deepEqual(to.notebook.entry(reflection.id), reflection);
+  assert.match(application.source.excerpt, /queue-drain \(version 1\)/);
+  assert.match(application.source.excerpt, /300 waiting events/);
+  assert.match(
+    application.source.excerpt,
+    /Student-chosen case: What if processing pauses/,
+  );
+  assert.equal(application.source.revision, "test-revision");
+  assert.equal(to.notebook.entry(first.id)?.body, initial.body);
+  assert.deepEqual(to.notebook.judgments(), []);
 });
 test("portable import restores notes and dated concept judgments without replacing conflicting work", (t) => {
   const from = fixture(t),

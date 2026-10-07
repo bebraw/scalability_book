@@ -1,6 +1,6 @@
 # ADR-032: Connect notebook investigations to independent application and reflection
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -109,19 +109,27 @@ Use optional activities with transparent examples and evaluate their value and w
 
 ## Implementation and verification
 
-Current predictions, observations, reflections, revisit records and authored changed-situation exercises provide the baseline.
-A consistent notebook follow-up, its authored activity context and reflection support remain to be implemented.
+The Chapter guide now offers a separate optional independent application before reflection across reading and demo contexts.
+`shared/learning-activities.ts` owns stable/versioned tasks: queue recovery, canonical benchmark/scaling changed-situation exercises, and a claim applied to a different system elsewhere in the book.
+Canonical checking/grading remains in `shared/exercises.ts`; the notebook does not duplicate its calculator or award credit.
 
-Before marking this record Implemented:
+`site/scripts/learning-practice.ts` keeps self-check guidance in a closed disclosure, offers an editable help request and a student-chosen case, and retains unfinished writing by source/activity version within the tab.
+Saving creates a distinct revisit entry linked to prior attempts and evidence; reflections link those records and can be saved without completing every preceding step.
+Optional reflection starters/examples support uncertainty, failed checks and free writing.
+The existing Notes → Revisit action supports recall before opening the earlier explanation, on the student's chosen timing.
 
-- Connect the guided sequence across reading and demo contexts, reusing canonical exercises without changing their independent checking/grading contract.
-- Verify a meaningful authored changed situation, attempt before reveal, requested help, skipping/resuming, and operation without an agent.
-- Verify separate related records, retained source/activity versions, student-reviewed assistance and preservation of initial thinking across navigation, restart and portable export/import.
-- Verify that free writing, uncertainty and short notes remain valid and that no activity completion or agent reply automatically sets understanding or course credit.
-- Update workspace/setup documentation and the evaluation guide with independent application, delayed recall and learner-selected evidence.
+Activity ID/version, question, assumptions, criteria and chosen case are snapshotted in the existing portable source excerpt alongside the book revision.
+The existing version 1 archive and related-entry representation need no migration; an old attempt is never resolved against a newer task definition.
+Student-reviewed agent suggestions continue through the existing assistance-provenance path.
 
-Use synthetic records for technical checks and record the actual limits of any provider evaluation.
-A working sequence and evaluation protocol are sufficient software implementation evidence; a learning-gain claim requires learner outcomes.
+Verification on 2026-10-07 used synthetic notes:
+
+- Notebook tests retain separate initial/application/reflection records, source/activity snapshots, related IDs and reviewed assistance across restart and version 1 export/import, with no automatic judgment.
+- Chromium/WebKit verify a meaningful queue variation, initially closed self-check, requested help before an attempt, separately linked saves, skipped/resumed drafts, short uncertainty and reading-only application without an agent.
+- Type checks, production build/HTML validation, formatting and changed-document links pass.
+
+The workspace/setup/evaluation guides describe independent application, voluntary delayed recall and learner-selected evidence, workload and ordinary course progress.
+These establish software capability and an evaluation protocol; learner outcomes remain unmeasured.
 
 ## Open questions
 

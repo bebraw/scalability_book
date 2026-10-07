@@ -2,13 +2,17 @@ import type { LearningResource } from "../../shared/learning-resources.ts";
 import type {
   LearningSource,
   NotebookEntry,
-  NoteKind,
 } from "../../shared/learning-workspace.ts";
 import {
   availableLearningDemos,
   observeLearningDemo,
 } from "./learning-demos.ts";
 import { currentReading, pageSource } from "./learning-context.ts";
+import {
+  mountLearningPractice,
+  reflectionSupport,
+  type GuideSave,
+} from "./learning-practice.ts";
 
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   const element = document.createElement(tag);
@@ -17,15 +21,11 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
 };
 interface GuideOptions {
   entries: NotebookEntry[];
-  save: (
-    kind: NoteKind,
-    title: string,
-    body: string,
-    source: LearningSource,
-  ) => Promise<void>;
+  save: GuideSave;
   notes: () => void;
   leave: () => void;
-  reflect: () => void;
+  initial: (source: LearningSource) => void;
+  reflect: (source: LearningSource, relatedIds: string[]) => void;
   help: (source: LearningSource, text: string) => void;
   close: () => void;
   status: (text: string) => void;
@@ -42,6 +42,21 @@ export function mountLearningGuide(
 ) {
   options.status("");
   const reading = currentReading();
+  const savedEntries = [...options.entries];
+  const save: GuideSave = async (...args) => {
+    const entry = await options.save(...args);
+    savedEntries.push(entry);
+    return entry;
+  };
+  const related = (source: LearningSource) =>
+    savedEntries
+      .filter(
+        (entry) =>
+          entry.source.url === source.url &&
+          entry.source.anchor === source.anchor,
+      )
+      .slice(-20)
+      .map((entry) => entry.id);
   const intro = node("section");
   intro.className = "learning-context";
   intro.append(
@@ -59,7 +74,9 @@ export function mountLearningGuide(
   intro.append(help);
   const reflect = node("button", "Write a reflection on this reading");
   reflect.type = "button";
-  reflect.addEventListener("click", options.reflect);
+  reflect.addEventListener("click", () =>
+    options.reflect(pageSource(), related(pageSource())),
+  );
   intro.append(
     reflect,
     node(
@@ -76,6 +93,19 @@ export function mountLearningGuide(
         "There is no interactive demo on this page. You can reflect on the reading or ask your agent about a question.",
       ),
     );
+    const source = pageSource();
+    const starting = node("button", "Write my starting thought");
+    starting.type = "button";
+    starting.addEventListener("click", () => options.initial(source));
+    container.append(starting);
+    mountLearningPractice(container, {
+      source,
+      save,
+      related: () => related(source),
+      help: options.help,
+      notes: options.notes,
+    });
+    container.append(reflectionSupport());
     return;
   }
   const key = `book-learning-guide:${location.pathname}`;
@@ -139,7 +169,7 @@ export function mountLearningGuide(
     };
     const matches = (entry: NotebookEntry) =>
       entry.source.url === source.url && entry.source.anchor === source.anchor;
-    let hasInitial = options.entries.some(
+    let hasInitial = savedEntries.some(
       (entry) =>
         matches(entry) && entry.kind === "attempt" && entry.body.trim(),
     );
@@ -239,11 +269,12 @@ export function mountLearningGuide(
         .map((control) => `${control.label}: ${String(control.value)}`)
         .join("\n");
       const body = `Observed ${observation.observedAt}\n${demo.title}\n\nAssumptions: ${demo.assumptions}\n\nInputs:\n${inputs.slice(0, 4000)}\n\nDisplayed result:\n${observation.visibleText.slice(0, 9000)}\n\nThis captures browser controls and text, not canvas pixels or measured project evidence. Long output may be shortened.`;
-      await options.save(
+      await save(
         "scratch",
         `${demo.title}: demo result`,
         body.slice(0, 16_000),
         source,
+        related(source),
       );
       observed.textContent = `Inputs saved:\n${inputs.slice(0, 1500)}\n\nDisplayed result:\n${observation.visibleText.slice(0, 2000)}`;
       second.feedback.textContent =
@@ -275,7 +306,7 @@ export function mountLearningGuide(
           throw new Error(
             "Write a prediction or one uncertainty. There is no required answer or minimum length.",
           );
-        await options.save(
+        await save(
           "attempt",
           `${demo.title}: initial thinking`,
           prediction.textarea.value,
@@ -299,7 +330,17 @@ export function mountLearningGuide(
       second.feedback,
       observed,
     );
-    const third = step("3. What do you think now?", demo.experiment!.reflect);
+    mountLearningPractice(activity, {
+      source,
+      save,
+      related: () => related(source),
+      help: options.help,
+      notes: options.notes,
+    });
+    const third = step(
+      "Reflect on what you think now",
+      demo.experiment!.reflect,
+    );
     const reflection = input(
       "My reflection on this check",
       draft.reflection,
@@ -308,21 +349,19 @@ export function mountLearningGuide(
       },
     );
     third.section.append(
+      reflectionSupport(),
       reflection.field,
       button("Save my reflection", third.feedback, async () => {
-        if (!hasInitial)
-          throw new Error(
-            "Save a starting point before developing this reflection.",
-          );
         if (!reflection.textarea.value.trim())
           throw new Error(
             "Record what you observed, what you think now, or what remains uncertain.",
           );
-        await options.save(
+        await save(
           "reflection",
           `${demo.title}: reflection`,
           reflection.textarea.value,
           source,
+          related(source),
         );
         draft.reflection = "";
         reflection.textarea.value = "";

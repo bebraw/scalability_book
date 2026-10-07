@@ -10,7 +10,11 @@ The trial adds no assessment criterion, required report or activity quota.
 Let each learner choose a question they actually need to understand.
 For an example, use the [queue balance lab](https://scalableweb.dev/demos/#demo-queue-balance-lab): predict the queue implied by arrival rate and mean time, inspect the result, then question whether the averages cover a common stable interval.
 Include a changed situation, such as a growing queue or a tail percentile replacing the mean.
+The guide now offers a queue-recovery case (300 waiting events, 80/s arrivals, 100/s capacity, then 120/s arrivals), canonical changed-situation exercises and a reading/project application elsewhere in the book.
+Record the activity ID/version and source revision from the learner's chosen entry, and distinguish their own case from a reviewed agent suggestion.
 Ask learners to explain the change independently before returning to the agent or worked reasoning.
+Ask them to return after a delay of their choosing and use Notes → Revisit, recalling before opening the earlier explanation.
+Compare what they can justify now, continuing uncertainty, and where they ask for support again; a saved independent attempt does not prove that no help was used.
 
 Try capture without a model first, then one chosen agent help mode, an actual demo check and a short reflection.
 In a group, save individual explanations before revealing inquiry; compare predictions, retain consequential disagreement and rotate the existing operator/challenger/validator roles.
@@ -45,6 +49,8 @@ Do not enable routine transcript collection or evaluate success by message, note
 
 Record the date, book revision, companion/Codex version, chosen activity/help mode, individual/group setting and which excerpts the learner chose to share.
 Ask whether the reflection examples made expectations clearer and whether the 400-character suggestion encouraged useful material or unnecessary writing.
+Ask whether they skipped or resumed the changed case, whether its assumptions/self-check were useful, and whether linked notes reduced diary/portfolio preparation effort.
+Include failed checks and short free writing in the chosen evidence; a polished reflection is not a substitute for explaining a new case.
 There is no hard reflection minimum in this release.
 
 ## Report and revise

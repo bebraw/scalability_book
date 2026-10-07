@@ -35,6 +35,7 @@ The shared [agent contract](shared/learning-agent.ts) owns responsive task-suppo
 [learning-context.ts](site/scripts/learning-context.ts) derives chapter/page links, authored concept membership and explicitly selected passage context, with selection captured by the lightweight [learning-selection.ts](site/scripts/learning-selection.ts).
 [learning-session.ts](site/scripts/learning-session.ts) owns tab-scoped open/section state and unfinished notebook writing across book navigation; it does not create durable companion records.
 [learning-guide.ts](site/scripts/learning-guide.ts) uses the current reading's authored prompt and rendered demos for optional prediction, actual demo observation and private reflection after pairing.
+[learning-practice.ts](site/scripts/learning-practice.ts) presents optional independent cases from [learning-activities.ts](shared/learning-activities.ts), snapshots their versions into portable sources and links separately saved attempts/reflections.
 [course-inquiry.ts](shared/course-inquiry.ts) owns peer audiences and historical access, and [the inquiry handler](worker/course-inquiry.ts) enforces them through the existing course API in both local development and the Worker.
 [learning-peers.ts](site/scripts/learning-peers.ts) reveals peer work after a private initial attempt and supports selected shared contributions, individual reflection and separately consented editorial offers.
 [The workspace guide](docs/learning-workspace.md) owns these contracts and their deployment/evaluation limits.

@@ -59,6 +59,147 @@ test.afterEach(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
+test("optional changed cases preserve drafts and separate linked attempts without an agent", async ({
+  page,
+}) => {
+  await page.goto("/demos/#demo-queue-balance-lab");
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByLabel("Pairing code").fill(code);
+  await panel.getByRole("button", { name: "Pair companion" }).click();
+  await panel
+    .getByRole("button", { name: "Chapter guide", exact: true })
+    .click();
+  await panel
+    .getByLabel("Demo on this page")
+    .selectOption("demo-queue-balance-lab");
+  const practice = panel.locator("section").filter({
+    has: page.getByRole("heading", {
+      name: "Apply it in a different situation",
+    }),
+  });
+  await expect(practice).toContainText("300 waiting events");
+  const check = practice.locator("details").filter({
+    has: page.getByText("Self-check after my attempt", { exact: true }),
+  });
+  await expect(check).not.toHaveAttribute("open");
+  await practice
+    .getByRole("button", { name: "Ask for help with this case" })
+    .click();
+  await expect(panel.getByLabel("Message to my agent")).toHaveValue(
+    /300 waiting events/,
+  );
+  await panel
+    .getByRole("button", { name: "Chapter guide", exact: true })
+    .click();
+  await panel
+    .getByLabel("My prediction or uncertainty")
+    .fill("I am unsure whether the stable average still applies.");
+  const saved: {
+    id: string;
+    kind: string;
+    body: string;
+    relatedIds: string[];
+    source: { excerpt: string; revision: string };
+  }[] = [];
+  page.on("response", (response) => {
+    if (
+      response.url() === `${companionAddress}/entries` &&
+      response.request().method() === "POST" &&
+      response.ok()
+    )
+      void response.json().then((entry) => saved.push(entry));
+  });
+  await panel.getByRole("button", { name: "Save my starting point" }).click();
+  await expect(
+    panel.getByText("Starting point saved.", { exact: false }),
+  ).toBeVisible();
+  await panel
+    .getByRole("button", { name: "Save demo result", exact: true })
+    .click();
+  await expect(
+    panel.getByText("Demo result saved.", { exact: false }),
+  ).toBeVisible();
+  await practice
+    .getByLabel("My explanation of the changed case")
+    .fill(
+      "The backlog drains by 20 per second; I expect 15 seconds. At 120 arrivals it grows. I need more help with stable windows.",
+    );
+  await page.reload();
+  await expect(
+    practice.getByLabel("My explanation of the changed case"),
+  ).toHaveValue(/20 per second/);
+  await expect(check).not.toHaveAttribute("open");
+  await practice
+    .getByText("Self-check after my attempt", { exact: true })
+    .click();
+  await expect(check).toContainText("Compare arrivals with completions");
+  await practice
+    .getByRole("button", { name: "Save my independent attempt" })
+    .click();
+  await expect(practice.getByRole("status")).toContainText(
+    "Independent attempt saved separately",
+  );
+  await panel
+    .getByLabel("My reflection on this check")
+    .fill(
+      "Still unsure; the observation and changed case address different intervals.",
+    );
+  await panel
+    .getByRole("button", { name: "Save my reflection", exact: true })
+    .click();
+  await expect(
+    panel.getByText("Reflection saved.", { exact: false }),
+  ).toBeVisible();
+  await expect.poll(() => saved.length).toBe(4);
+  expect(saved.map((entry) => entry.kind)).toEqual([
+    "attempt",
+    "scratch",
+    "revisit",
+    "reflection",
+  ]);
+  expect(saved[2]!.source.excerpt).toContain("queue-drain (version 1)");
+  expect(saved[2]!.source.revision).toMatch(/^[a-f0-9]{64}$/);
+  expect(saved[2]!.relatedIds).toEqual(
+    expect.arrayContaining([saved[0]!.id, saved[1]!.id]),
+  );
+  expect(saved[3]!.relatedIds).toEqual(
+    expect.arrayContaining([saved[0]!.id, saved[1]!.id, saved[2]!.id]),
+  );
+  await page.goto("/chapters/introduction/");
+  await expect(practice).toContainText("Choose one claim from this reading");
+  await expect(
+    panel.getByRole("button", { name: "Save demo result", exact: true }),
+  ).toHaveCount(0);
+  await practice
+    .getByLabel("My explanation of the changed case")
+    .fill("My project may use a different boundary.");
+  await page.goto("/chapters/architecture/");
+  await expect(panel.getByRole("heading", { level: 2 })).toHaveText(
+    "4 · Architecture",
+  );
+  await expect(practice).toBeVisible();
+  await page.goto("/chapters/introduction/");
+  await expect(
+    practice.getByLabel("My explanation of the changed case"),
+  ).toHaveValue("My project may use a different boundary.");
+  await practice
+    .getByRole("button", { name: "Save my independent attempt" })
+    .click();
+  await expect(practice.getByRole("status")).toContainText(
+    "Independent attempt saved separately",
+  );
+  await panel
+    .getByRole("button", { name: "Write a reflection on this reading" })
+    .click();
+  await panel.getByLabel("Your thinking").fill("I still want help.");
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(panel.getByRole("status")).toContainText(
+    "Saved in your private notebook.",
+  );
+});
+
 test("whole-book entry points keep the notebook lazy and exclude administrative/course records", async ({
   page,
 }) => {
