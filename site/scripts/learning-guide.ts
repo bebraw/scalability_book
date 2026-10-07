@@ -26,6 +26,7 @@ interface GuideOptions {
   notes: () => void;
   leave: () => void;
   reflect: () => void;
+  help: (source: LearningSource, text: string) => void;
   close: () => void;
   status: (text: string) => void;
 }
@@ -47,6 +48,15 @@ export function mountLearningGuide(
     node("h3", `Explore ${reading.title}`),
     node("p", reading.prompt),
   );
+  const help = node("button", "Ask my agent about this reading");
+  help.type = "button";
+  help.addEventListener("click", () =>
+    options.help(
+      pageSource(),
+      `I want help getting started with this question: ${reading.prompt}`,
+    ),
+  );
+  intro.append(help);
   const reflect = node("button", "Write a reflection on this reading");
   reflect.type = "button";
   reflect.addEventListener("click", options.reflect);
@@ -253,6 +263,13 @@ export function mountLearningGuide(
     updateAvailability();
     first.section.append(
       prediction.field,
+      button("Help me get started", first.feedback, () =>
+        options.help(
+          source,
+          prediction.textarea.value.trim() ||
+            `I am unsure how to begin this investigation: ${demo.experiment!.predict}`,
+        ),
+      ),
       button("Save my starting point", first.feedback, async () => {
         if (!prediction.textarea.value.trim())
           throw new Error(

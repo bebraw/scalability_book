@@ -10,6 +10,7 @@ import {
 } from "../scripts/lib/learning-codex.ts";
 import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
+import { supportNeeds } from "../shared/learning-agent.ts";
 
 const source = {
   url: "https://scalableweb.dev/demos/",
@@ -212,6 +213,95 @@ test("conversations persist independently, send only selected notes, and bound o
       "synthetic-thread",
     );
     assert.equal(notebook.entries().length, 10);
+  } finally {
+    conversations.close();
+    notebook.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("task support is explicit, bounded, retained across restart and optional for old clients", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "book-task-support-"));
+  const notebook = openLearningNotebook(directory);
+  const prompts: Record<string, unknown>[] = [];
+  const provider: LearningProvider = {
+    name: "Synthetic",
+    async run(_thread, text) {
+      prompts.push(JSON.parse(text));
+      return "Synthetic response; this check verifies supplied context, not teaching quality.";
+    },
+    async cancel() {},
+    close() {},
+  };
+  let conversations = openLearningConversations(directory, notebook, provider);
+  try {
+    notebook.saveEntry({
+      kind: "scratch",
+      source,
+      title: "Private",
+      body: "DO NOT SEND THIS UNSELECTED NOTE",
+    });
+    const conversation = conversations.start(
+      { source },
+      "https://scalableweb.dev",
+    );
+    const input = {
+      browserId: randomUUID(),
+      text: "I am stuck. Please explain directly.",
+      goal: "Understand waiting and processing",
+      mode: "explanation",
+      noteIds: [],
+    };
+    assert.throws(
+      () =>
+        conversations.send(
+          conversation.id,
+          { ...input, supportNeed: "certify-mastery" },
+          "session",
+          "https://scalableweb.dev",
+        ),
+      /Choose where/,
+    );
+    assert.equal(conversations.get(conversation.id).messages.length, 0);
+    for (const need of supportNeeds) {
+      conversations.send(
+        conversation.id,
+        { ...input, ...(need === "unspecified" ? {} : { supportNeed: need }) },
+        "session",
+        "https://scalableweb.dev",
+      );
+      await waitUntil(
+        () => conversations.get(conversation.id).state === "idle",
+      );
+      const prompt = prompts.at(-1)!;
+      assert.equal(prompt.supportNeed, need);
+      assert.equal(prompt.helpMode, "explanation");
+      assert.deepEqual(prompt.selectedNotes, []);
+      assert.equal(JSON.stringify(prompt).includes("DO NOT SEND THIS"), false);
+      const routes = prompt.supportResources as {
+        id: string;
+        url: string;
+        definition: string;
+      }[];
+      assert.deepEqual(
+        routes.map((route) => route.id),
+        ["queue"],
+      );
+      assert.equal(routes[0]!.url, "https://scalableweb.dev/concepts/#queue");
+      assert.ok(routes[0]!.definition);
+      assert.deepEqual(
+        conversations.get(conversation.id).messages.at(-2)!.support,
+        { mode: "explanation", goal: input.goal, need },
+      );
+    }
+    conversations.close();
+    conversations = openLearningConversations(directory, notebook, null);
+    assert.equal(
+      conversations.get(conversation.id).messages.at(-2)!.support!.need,
+      "next-step",
+    );
+    assert.equal(notebook.entries().length, 1);
+    assert.deepEqual(notebook.judgments(), []);
   } finally {
     conversations.close();
     notebook.close();

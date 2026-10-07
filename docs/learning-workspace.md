@@ -4,7 +4,7 @@ This document owns the executable learning-workspace contracts and local compani
 [ADRs 027–029](adrs/README.md#implemented) record the agreed whole-book direction.
 Implemented status identifies verified software behavior; production rollout and learner outcomes have their own evidence.
 
-[Accepted ADRs 031–033](adrs/README.md#accepted) define follow-up adaptive support, independent application with reflection, and scaffolded peer inquiry.
+[Accepted ADRs 032–033](adrs/README.md#accepted) define follow-up independent application with reflection and scaffolded peer inquiry.
 These refinements await implementation; the current capabilities are described below.
 
 ## Current implementation
@@ -155,6 +155,13 @@ These checks establish executable behavior, not improved learning or course comp
 ## Agent and demo contract
 
 [learning-agent.ts](../shared/learning-agent.ts) owns help modes, conversation records and the supporting-agent instruction contract.
+Under [ADR-031](adrs/implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md), students can optionally identify getting started, a prerequisite, an unexpected result, demo operation or readiness for less help.
+The agent uses the actual response, selected context and authored concept references for tentative task-specific guidance; it asks a focused question when evidence is insufficient and explains directly when requested.
+Support increases or fades with the student's work, with no ability profile, turn quota, automatic concept judgment or explanation gate.
+Chapter guide can prepare an editable help request with its reading/demo source; students choose whether to send it, and unfinished guide writing stays in the tab.
+Student messages retain optional goal/help-mode/support-need metadata in existing conversation JSON; older requests default to unspecified and older turns remain valid.
+The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
+These provider changes require a companion built from the updated source; the published 0.1.0 package retains its earlier instructions until a new release.
 [learning-codex.ts](../scripts/lib/learning-codex.ts) adapts the [Codex app-server protocol](https://learn.chatgpt.com/docs/app-server) over local stdio.
 [learning-conversations.ts](../scripts/lib/learning-conversations.ts) owns `conversations.sqlite`, selected context and the browser request broker.
 Notebook records remain independent of these provider threads.
@@ -171,13 +178,13 @@ The adapter is the first working provider, not a claim that all external agent c
 
 Authenticated companion routes:
 
-| Route                               | Purpose                                                                        |
-| ----------------------------------- | ------------------------------------------------------------------------------ |
-| `GET/POST /agent/conversations`     | List/start a private conversation.                                             |
-| `GET/POST /agent/conversations/:id` | Read/send a turn with goal, help mode, selected note IDs and browser identity. |
-| `GET /agent/requests?browser=:id`   | Poll the initiating browser's bounded demo requests.                           |
-| `POST /agent/requests/:id`          | Return that browser's actual observation or a declined/unavailable result.     |
-| `POST /agent/stop`                  | Interrupt the current reply and retain its work.                               |
+| Route                               | Purpose                                                                                              |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `GET/POST /agent/conversations`     | List/start a private conversation.                                                                   |
+| `GET/POST /agent/conversations/:id` | Read/send a turn with goal, help mode, optional supportNeed, selected note IDs and browser identity. |
+| `GET /agent/requests?browser=:id`   | Poll the initiating browser's bounded demo requests.                                                 |
+| `POST /agent/requests/:id`          | Return that browser's actual observation or a declined/unavailable result.                           |
+| `POST /agent/stop`                  | Interrupt the current reply and retain its work.                                                     |
 
 The provider receives only the captured source, explicitly selected notebook entries and authored resource navigation.
 Combined turn context is limited to 96,000 characters; an oversized selection is rejected before saving a turn or starting the provider.

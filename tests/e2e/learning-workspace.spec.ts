@@ -283,6 +283,68 @@ test("an open notebook keeps wide reading centered and fits smaller desktops", a
     .toBeLessThan(2);
 });
 
+test("students choose task support and direct explanations without a saved initial note", async ({
+  page,
+}) => {
+  await page.goto("/chapters/benchmarking/");
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByLabel("Pairing code").fill(code);
+  await panel.getByRole("button", { name: "Pair companion" }).click();
+  await expect(panel.getByRole("status")).toContainText("Connected");
+  await panel.getByRole("button", { name: "Agent", exact: true }).click();
+  await panel.getByLabel("How I want help").selectOption("explanation");
+  await panel.getByLabel("Where I want support").selectOption("prerequisite");
+  await panel
+    .getByLabel("My learning goal")
+    .fill("Understand the measurement window");
+  await panel
+    .getByLabel("Message to my agent")
+    .fill(
+      "I do not know what a common observation window means. Please explain directly.",
+    );
+  const request = page.waitForRequest(
+    (request) =>
+      request.url().startsWith(companionAddress + "/agent/conversations/") &&
+      request.method() === "POST",
+  );
+  await panel.getByRole("button", { name: "Send to my agent" }).click();
+  const sent = (await request).postDataJSON();
+  expect(sent).toMatchObject({
+    mode: "explanation",
+    supportNeed: "prerequisite",
+    noteIds: [],
+  });
+  expect(sent.text).toContain("Support requested: A prerequisite concept.");
+  await expect(panel.getByRole("status")).toContainText("--codex");
+  await panel.getByLabel("Where I want support").selectOption("next-step");
+  await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
+  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await expect(
+    panel.getByText("No notes in this view yet.", { exact: false }),
+  ).toBeVisible();
+  await panel
+    .getByRole("button", { name: "Chapter guide", exact: true })
+    .click();
+  await panel
+    .getByLabel("My prediction or uncertainty")
+    .fill("I am unsure which inputs describe the same window.");
+  await panel
+    .getByRole("button", { name: "Help me get started", exact: true })
+    .click();
+  await expect(panel.getByLabel("Message to my agent")).toHaveValue(
+    "I am unsure which inputs describe the same window.",
+  );
+  await expect(
+    panel.getByLabel("Investigation source").locator("option").first(),
+  ).toContainText("Investigation ·");
+  await expect(panel.getByLabel("Where I want support")).toHaveValue(
+    "getting-started",
+  );
+  await expect(panel.getByLabel("How I want help")).toHaveValue("hint");
+});
+
 test("selected context is explicit and the notebook follows chapters without losing a draft", async ({
   page,
 }) => {

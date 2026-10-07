@@ -17,7 +17,7 @@ The user requested that this development direction be formalized alongside adapt
 ## Decision
 
 Extend the existing asynchronous peer inquiry with optional prompts for reasoning together and a clear path back to each student's private learning record.
-Use [ADR-031](ADR-031-adapt-learning-support-to-the-students-current-task.md) for supporting-agent behavior and [ADR-032](ADR-032-connect-notebook-investigations-to-independent-application.md) for individual application/reflection.
+Use [ADR-031](../implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md) for supporting-agent behavior and [ADR-032](ADR-032-connect-notebook-investigations-to-independent-application.md) for individual application/reflection.
 Groups continue to organize their own meetings and choose whether to use these tools.
 
 ### Support reasoning together

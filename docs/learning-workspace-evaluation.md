@@ -18,16 +18,30 @@ Select useful material for an existing diary/portfolio entry instead of producin
 
 ## Evidence to collect deliberately
 
+### Task-specific assistance
+
+Ask whether help addressed the learner's actual difficulty, whether its amount was useful, and whether they could take the next step with less help.
+Distinguish a prerequisite, misconception, unclear instructions and demo-operation problem; record uncertain or incorrect diagnoses rather than assuming a confident reply is useful.
+Include a learner who requests a direct explanation and one who records being stuck without a developed initial note.
+Students can request more help again; fading is responsive to their work rather than a fixed sequence.
+
+For provider development, `LEARNING_CODEX_LIVE=1 node scripts/evaluate-learning-support.ts` runs five synthetic novice, misconception, progress, unclear-task and direct-explanation scenarios through the dedicated profile.
+It saves actual replies and review criteria under `.local/learning-evaluation/`, without student records, automatic quality scores or live browser execution.
+Review source accuracy, the requested help mode, appropriate next-step responsibility and honest evidence limits before reporting a provider check as successful.
+On 2026-10-07 the five Codex CLI 0.154.0 replies met those representative criteria; this does not establish reliable tutoring across learners or a learning gain.
+
+### Learner-selected evidence
+
 Ask permission for selected examples and brief feedback; participation does not give staff access to private notebooks or full conversations.
 Use a participant's chosen excerpts or an interview, with personal identifiers omitted from the development report.
 Do not enable routine transcript collection or evaluate success by message, note, thread or character counts.
 
-| Outcome         | Useful evidence                                                                                                                                               | Follow-up                                                                                                                           |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Learning        | Initial and revised explanations, the observation supporting a revision or unchanged view, and an independent explanation/application in a changed situation. | Return after a delay; ask for recall before rereading.
-Record remaining uncertainty and where the agent supplied unsupported claims. |
-| Course progress | Whether the workspace helped the learner enter difficult material, prepare an existing submission and pass ordinary course checkpoints.                       | Follow actual progress through Establish, Challenge and Compare; report drop-off and difficulty as well as completion.              |
-| Workload        | Learner-estimated setup, investigation, reflection and submission-preparation effort, plus observed points of friction.                                       | Compare with the published course time budget and whether reusing notes reduced reconstruction work.                                |
+| Outcome                                                                       | Useful evidence                                                                                                                                               | Follow-up                                                                                                              |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Learning                                                                      | Initial and revised explanations, the observation supporting a revision or unchanged view, and an independent explanation/application in a changed situation. | Return after a delay; ask for recall before rereading.                                                                 |
+| Record remaining uncertainty and where the agent supplied unsupported claims. |
+| Course progress                                                               | Whether the workspace helped the learner enter difficult material, prepare an existing submission and pass ordinary course checkpoints.                       | Follow actual progress through Establish, Challenge and Compare; report drop-off and difficulty as well as completion. |
+| Workload                                                                      | Learner-estimated setup, investigation, reflection and submission-preparation effort, plus observed points of friction.                                       | Compare with the published course time budget and whether reusing notes reduced reconstruction work.                   |
 
 Record the date, book revision, companion/Codex version, chosen activity/help mode, individual/group setting and which excerpts the learner chose to share.
 Ask whether the reflection examples made expectations clearer and whether the 400-character suggestion encouraged useful material or unnecessary writing.

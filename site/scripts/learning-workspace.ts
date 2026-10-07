@@ -12,7 +12,10 @@ import {
   type NotebookView,
 } from "./learning-session.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
-import { mountLearningAgent } from "./learning-agent-ui.ts";
+import {
+  mountLearningAgent,
+  prepareLearningHelp,
+} from "./learning-agent-ui.ts";
 import { mountLearningPeers } from "./learning-peers.ts";
 export {
   observeLearningDemo,
@@ -278,6 +281,10 @@ function render() {
   if (view === "guide")
     mountLearningGuide(container, {
       entries,
+      help: (source, text) => {
+        prepareLearningHelp(source, text);
+        navigate("agent");
+      },
       reflect: () =>
         beginNote(
           pageSource(),

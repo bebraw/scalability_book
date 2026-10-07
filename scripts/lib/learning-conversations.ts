@@ -4,8 +4,11 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { conceptPages } from "../../shared/concept-pages.ts";
 import { demoResources } from "../../shared/learning-resources.ts";
+import { concepts } from "../../shared/concepts.ts";
 import {
   helpModes,
+  supportNeeds,
+  type TaskSupport,
   type DemoToolRequest,
   type LearningConversation,
 } from "../../shared/learning-agent.ts";
@@ -79,12 +82,14 @@ export function openLearningConversations(
     conversation: LearningConversation,
     role: "student" | "agent" | "observation",
     text: string,
+    support?: TaskSupport,
   ) => {
     conversation.messages.push({
       id: randomUUID(),
       role,
       text: text.slice(0, 32_000),
       at: new Date().toISOString(),
+      ...(support ? { support } : {}),
     });
     save(conversation);
   };
@@ -165,6 +170,21 @@ export function openLearningConversations(
         (helpModes as readonly string[]).includes(mode),
         "Choose a help mode.",
       );
+      const need = learningText(
+        value.supportNeed ?? "unspecified",
+        "Support need",
+        30,
+        true,
+      );
+      learningAssert(
+        (supportNeeds as readonly string[]).includes(need),
+        "Choose where you want support.",
+      );
+      const support: TaskSupport = {
+        mode: mode as TaskSupport["mode"],
+        goal,
+        need: need as TaskSupport["need"],
+      };
       const selected = learningList(value.noteIds ?? [], 30).map((id) => {
         const entry = notebook.entry(learningId(id));
         learningAssert(entry, "Selected note not found.", 404);
@@ -179,6 +199,7 @@ export function openLearningConversations(
       );
       const prompt = JSON.stringify({
         helpMode: mode,
+        supportNeed: need,
         goal,
         source: conversation.source,
         selectedNotes: selected.map(({ id, kind, source, body }) => ({
@@ -188,6 +209,30 @@ export function openLearningConversations(
           body,
         })),
         question: text,
+        supportResources: concepts
+          .filter((concept) =>
+            conversation.source.conceptIds.includes(concept.id),
+          )
+          .map(
+            ({
+              id,
+              title,
+              definition,
+              assumptions,
+              example,
+              misconception,
+              contexts,
+            }) => ({
+              id,
+              title,
+              definition,
+              assumptions,
+              example,
+              misconception,
+              url: new URL(`/concepts/#${id}`, origin).href,
+              contexts,
+            }),
+          ),
         availableDemos: demoResources.map(
           ({ id, title, url, assumptions }) => ({
             id,
@@ -206,7 +251,7 @@ export function openLearningConversations(
       running = { conversation, session, browser, origin, attempt };
       conversation.state = "working";
       conversation.error = null;
-      message(conversation, "student", text);
+      message(conversation, "student", text, support);
       const current = running;
       const runTool = async (name: string, arguments_: unknown) => {
         learningAssert(

@@ -1,6 +1,6 @@
 # ADR-031: Adapt learning support to the student's current task and understanding
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -18,7 +18,7 @@ We use these ideas as a design rationale; their application to this course and a
 ## Decision
 
 Make task-specific, responsive assistance an explicit part of the optional notebook learning experience across the published book.
-Extend the supporting-agent contract in ADR-027 and connect it to independent practice in [ADR-032](ADR-032-connect-notebook-investigations-to-independent-application.md).
+Extend the supporting-agent contract in ADR-027 and connect it to independent practice in [ADR-032](../accepted/ADR-032-connect-notebook-investigations-to-independent-application.md).
 
 ### Adapt assistance from visible student thinking
 
@@ -99,16 +99,22 @@ Preserve help choice and invite application after explaining.
 
 ## Implementation and verification
 
-Existing help modes, contextual conversations and agent instructions provide the baseline.
-Systematic task diagnosis, responsive changes in support and their observable evaluation remain to be implemented.
+[The shared agent contract](../../../shared/learning-agent.ts) defines task support needs, requested help metadata and responsive guidance instructions.
+[The conversation owner](../../../scripts/lib/learning-conversations.ts) validates the optional request, supplies authored source-concept references and retains the goal/mode/need on student turns.
+This is an additive field inside existing conversation JSON; older turns and requests remain readable and notebook/archive schemas stay at version 1.
+The browser exposes support choice and Chapter guide handoff without sending a message or saving a note automatically.
+The updated provider instructions require a companion built from this source; the previously published npm 0.1.0 artifact does not acquire them through a website update.
 
-Before marking this record Implemented:
+Verification on 2026-10-07:
 
-- Update the shared agent contract, relevant notebook entry points and owning workspace/setup documentation.
-- Verify representative novice, misconception, successful-next-step and unclear-task scenarios, including a request for direct explanation and operation without a provider.
-- Check that increased and reduced support follow student responses, that unsupported diagnoses are identified, and that source/observation boundaries are preserved.
-- Verify selected-context, saved-initial-thinking and student-approval boundaries with synthetic records; adapter checks alone cannot establish teaching quality.
-- Record representative observed provider behavior and extend the voluntary learner evaluation with whether help addressed the difficulty and enabled a later independent attempt.
+- Ten focused agent/client/notebook unit checks passed, including invalid support requests, old requests, retained choices across restart, selected-note privacy and session/browser-bound observations.
+- Chromium/WebKit verified immediate direct explanation requests without saved initial work, the notebook-only fallback and a source-preserving guide-to-agent handoff.
+- [The opt-in synthetic scenario runner](../../../scripts/evaluate-learning-support.ts) produced five actual replies using the dedicated authenticated Codex CLI 0.154.0 profile.
+  Review found a manageable novice hint, a qualified buffering/throughput correction, one changed-case question after progress, a focused question for missing evidence and a direct explanation before independent application.
+  No scenario claimed browser execution or used a browser tool.
+- [The evaluation guide](../../learning-workspace-evaluation.md) records how to review support quality and subsequent independent attempts using deliberately chosen learner evidence.
+
+These provider samples establish representative observed behavior, not guaranteed diagnosis or instructional effectiveness.
 
 Software verification establishes the implemented capability.
 Learning and course-completion claims require the evidence described in [the evaluation guide](../../learning-workspace-evaluation.md).

@@ -12,7 +12,7 @@ Agent instructions and the evaluation guide already encourage independent explan
 The ordinary notebook investigation does not consistently offer that follow-up.
 
 Completing a task with assistance does not establish that the student can explain or apply the idea independently.
-The ZPD/scaffolding rationale in [ADR-031](ADR-031-adapt-learning-support-to-the-students-current-task.md) calls for transferring responsibility as support becomes less necessary.
+The ZPD/scaffolding rationale in [ADR-031](../implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md) calls for transferring responsibility as support becomes less necessary.
 Students also need support for reflection itself, since many are unfamiliar with this practice.
 
 ## Decision

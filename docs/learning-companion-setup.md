@@ -102,6 +102,9 @@ It must not contain custom configuration, hooks, plugins, rules or custom skills
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
 In **Agent**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
+You can also indicate where you want support, such as a prerequisite, an unexpected result or trying the next step yourself.
+An honest statement of being stuck is enough; you can request a direct explanation immediately and change the amount of help later.
+Chapter guide can prepare a help request from your current question without sending it automatically.
 Select notebook entries in **Notes** when you want them included.
 Sending a question shares that source and those selected entries with your model provider.
 You can reopen saved conversations, stop a reply, or keep using the notebook without a model.
