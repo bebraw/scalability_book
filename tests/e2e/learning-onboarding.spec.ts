@@ -6,6 +6,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import AxeBuilder from "@axe-core/playwright";
+import { companionRelease } from "../../shared/learning-connection.ts";
 
 test("a packed companion supports an optional first investigation and retains the student's original work after restart", async ({
   page,
@@ -15,7 +16,7 @@ test("a packed companion supports an optional first investigation and retains th
     path.join(tmpdir(), "book-onboarding-browser-"),
   );
   const artifact = path.resolve(
-    ".local/companion-release/scalableweb-companion-0.1.0.tgz",
+    `.local/companion-release/scalableweb-companion-${companionRelease.version}.tgz`,
   );
   execFileSync(
     "npm",
@@ -96,7 +97,11 @@ test("a packed companion supports an optional first investigation and retains th
       "Connected to your private notebook.",
     );
     await chooseNotebookTool(panel, "Connect");
-    await expect(panel.getByText(/Companion 0.1.0; protocol 1/)).toBeVisible();
+    await expect(
+      panel.getByText(
+        `Companion ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook-only.`,
+      ),
+    ).toBeVisible();
     await panel.getByRole("button", { name: "Explore this reading" }).click();
     await expect(
       panel.getByRole("button", { name: "Save demo result" }),

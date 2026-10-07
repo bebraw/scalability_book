@@ -95,7 +95,13 @@ try {
       encoding: "utf8",
       env,
     });
-  assert.match(run("--version"), /0\.1\.0/);
+  const release = JSON.parse(
+    readFileSync(path.join(pkg, "dist/release.json"), "utf8"),
+  );
+  assert.equal(
+    run("--version").trim(),
+    `${companionRelease.name} ${companionRelease.version} (${release.sourceRevision}${release.dirty ? "+working-tree" : ""})`,
+  );
   run("setup", ["--notebook"]);
   const diagnostic = JSON.parse(run("doctor", ["--json"]));
   assert.equal(diagnostic.storage, data);
@@ -157,6 +163,7 @@ try {
   const status = await request("/status");
   assert.equal(status.storage, data);
   assert.equal(status.release.name, companionRelease.name);
+  assert.equal(status.release.version, companionRelease.version);
   assert.equal(status.schemas.notebook, 1);
   const note = await request("/entries", "POST", {
     kind: "attempt",

@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       verify-published:
-        description: Verify the published 0.1.0 registry tarball on the same matrix
+        description: Verify the current package version's registry tarball on the same matrix
         type: boolean
         default: false
 permissions:
@@ -48,5 +48,6 @@ jobs:
       - if: github.event_name == 'workflow_dispatch' && inputs.verify-published
         run: |
           mkdir -p .local/published-companion
-          npm pack @scalableweb/companion@0.1.0 --pack-destination .local/published-companion
-          COMPANION_CHECK_ARTIFACT="$PWD/.local/published-companion/scalableweb-companion-0.1.0.tgz" npm run companion:check
+          COMPANION_PACKAGE_VERSION="$(node -p "JSON.parse(require('node:fs').readFileSync('packages/learning-companion/package.json', 'utf8')).version")"
+          npm pack "@scalableweb/companion@${COMPANION_PACKAGE_VERSION}" --pack-destination .local/published-companion
+          COMPANION_CHECK_ARTIFACT="$PWD/.local/published-companion/scalableweb-companion-${COMPANION_PACKAGE_VERSION}.tgz" npm run companion:check

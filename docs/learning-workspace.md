@@ -51,6 +51,7 @@ The website/Worker never owns this private notebook or provider credentials.
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
 Follow [student setup](learning-companion-setup.md) for version 0.1.0 and its publication status.
+Source builds now prepare 0.2.0 with the shared teaching policy and additive conversation metadata; student instructions remain pinned to 0.1.0 until registry publication and artifact verification succeed.
 The development entry keeps the repository's installed dependencies and existing default:
 
 ```bash
@@ -101,7 +102,8 @@ Setup preferences are not copied because their absolute profile path may identif
 Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
-Package 0.1.0, browser protocol 1, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+Package 0.2.0, browser protocol 1, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+The 0.2.0 candidate retains 0.1.0's storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
 Interrupted migration retains a recoverable snapshot and can be retried once writers stop.

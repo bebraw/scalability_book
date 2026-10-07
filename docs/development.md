@@ -213,13 +213,13 @@ Authenticate through `npm login --scope=@scalableweb`, then verify `npm whoami` 
 After the artifact, matrix and provider checks pass, publish that exact tarball with public access:
 
 ```sh
-npm publish .local/companion-release/scalableweb-companion-0.1.0.tgz --access public
+npm publish .local/companion-release/scalableweb-companion-0.2.0.tgz --access public
 ```
 
 If npm requires a browser/2FA step, complete its own authentication flow and rerun publishing.
 The scope must already exist as an npm organization; a free organization supports this public package.
 If npm stages the release, inspect `npm stage list @scalableweb/companion` and approve its reviewed stage through npm's own 2FA flow or the account's Staged Packages page.
-A `0.0.0-stage` placeholder does not establish that version 0.1.0 is available; verify the actual version and integrity in the registry before updating student instructions.
+A `0.0.0-stage` placeholder does not establish that the requested version is available; verify the actual version and integrity in the registry before updating student instructions.
 See [npm's staged publishing instructions](https://docs.npmjs.com/staged-publishing/).
 After registry publication, run `gh workflow run learning-companion.yml -f verify-published=true` and confirm that the registry tarball passes the matrix as well.
 Source-built tarballs can have different bytes across build installations; this explicit check verifies the exact distributed artifact.
