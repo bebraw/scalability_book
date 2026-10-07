@@ -21,9 +21,15 @@
   align-items: start;
   padding: 1.25rem 1.4rem 0.8rem;
 }
+.learning-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg);
+}
 .learning-heading h2 {
   font-family: var(--font-serif);
-  font-size: 1.9rem;
+  font-size: 1.45rem;
   font-weight: 500;
   margin: 0.2rem 0;
 }
@@ -39,21 +45,34 @@
   padding: 0.2rem 0.6rem;
 }
 .learning-tabs {
-  display: flex;
-  gap: 0.3rem;
-  overflow-x: auto;
   padding: 0 1.4rem;
   border-bottom: 1px solid var(--border);
 }
-.learning-tabs button {
+.learning-tab-primary,
+.learning-tools-menu {
+  display: flex;
+  gap: 0.3rem;
+  overflow-x: auto;
+}
+.learning-workspace .learning-tabs button {
   border: 0;
   border-bottom: 3px solid transparent;
   border-radius: 0;
-  padding: 0.65rem 0.4rem;
+  padding: 0.65rem 0.5rem;
+  white-space: nowrap;
+  font-size: 0.8rem;
 }
-.learning-tabs button[aria-current="true"] {
+.learning-workspace .learning-tabs button[aria-current="true"] {
   border-color: var(--accent);
   color: var(--accent-strong);
+}
+.learning-tools > summary {
+  padding: 0.4rem 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.learning-tools-menu {
+  flex-wrap: wrap;
 }
 .learning-status {
   padding: 0 1.4rem;
@@ -62,6 +81,15 @@
 }
 .learning-status:empty {
   display: none;
+}
+.learning-selection {
+  padding: 0.6rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.learning-selection p {
+  margin: 0 0 0.4rem;
+  overflow-wrap: anywhere;
 }
 .learning-body {
   padding: 1rem 1.4rem 1.6rem;
@@ -102,8 +130,7 @@
   resize: vertical;
   line-height: 1.6;
 }
-.learning-workspace button,
-.paragraph-notebook-button {
+.learning-workspace button {
   cursor: pointer;
   color: var(--accent-strong);
   background: transparent;
@@ -119,6 +146,10 @@
   background: var(--accent-strong);
   color: var(--bg);
   border-color: var(--accent-strong);
+}
+.learning-workspace button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 .learning-workspace button:focus-visible,
 .learning-workspace a:focus-visible {
@@ -140,6 +171,27 @@
 .learning-workspace blockquote {
   margin: 1rem 0;
   color: var(--muted);
+  max-height: 9rem;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.learning-context > a {
+  display: block;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.learning-guide-step {
+  margin-top: 1.25rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+.learning-guide-feedback {
+  color: var(--accent-strong);
+  font-size: 0.85rem;
+  scroll-margin-top: 12rem;
+}
+.learning-guide-feedback:empty {
+  display: none;
 }
 .learning-workspace h3 {
   font-family: var(--font-serif);
@@ -172,11 +224,6 @@
 .learning-note details {
   margin: 0.5rem 0;
 }
-.paragraph-notebook-button {
-  font-size: 0.65rem;
-  padding: 0.15rem 0.35rem;
-  margin-left: 0.3rem;
-}
 .learning-toggle {
   background: transparent;
   color: var(--accent-strong);
@@ -184,6 +231,28 @@
   padding: 0.4rem 0.7rem;
   font: inherit;
   cursor: pointer;
+}
+@media (min-width: 76.0625rem) {
+  body[data-learning-open="true"] .book-shell {
+    --book-demo-inline-extension: 0rem;
+    grid-template-areas: "navigation chapter";
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 1.2rem;
+    margin-left: 0;
+    margin-right: 33rem;
+    max-width: none;
+    padding-inline: 1.5rem;
+  }
+  body[data-learning-open="true"]
+    .book-shell[data-navigation-collapsed="true"] {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+  body[data-learning-open="true"] .book-shell::after {
+    display: none;
+  }
+  body[data-learning-open="true"] .book-shell .prose {
+    display: block;
+  }
 }
 @media (max-width: 640px) {
   .learning-workspace {

@@ -1,3 +1,7 @@
+import {
+  selectReading,
+  chooseNotebookTool,
+} from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn, type ChildProcess } from "node:child_process";
@@ -96,11 +100,8 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
-  await panel.getByRole("button", { name: "Close notebook" }).click();
-  await page
-    .getByRole("button", { name: "Add this paragraph to my notebook" })
-    .first()
-    .click();
+  await selectReading(page);
+  await panel.getByRole("button", { name: "Use selected text" }).click();
   await panel
     .getByLabel("Title", { exact: true })
     .fill("Synthetic queue observation");
@@ -134,7 +135,7 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await expect(
     panel.getByLabel("Review and revise your submission material"),
   ).toHaveValue(/common stable interval/);
-  await panel.getByRole("button", { name: "Concepts", exact: true }).click();
+  await chooseNotebookTool(panel, "Concepts");
   await panel.getByLabel("Concept", { exact: true }).selectOption("queue");
   await panel.getByLabel("Studied", { exact: true }).check();
   await panel
@@ -165,11 +166,7 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await panel.getByRole("button", { name: "Save note", exact: true }).click();
   await panel.getByRole("button", { name: "Close notebook" }).click();
   await page.reload();
-  await expect(
-    page
-      .getByRole("button", { name: "Add this paragraph to my notebook" })
-      .first(),
-  ).toBeVisible();
+  await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
   await page.getByRole("button", { name: "Notebook", exact: true }).click();
   await panel.getByRole("button", { name: "Notes", exact: true }).click();
@@ -200,14 +197,14 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
     path: test.info().outputPath("notebook-mobile-dark.png"),
     fullPage: false,
   });
-  await panel.getByRole("button", { name: "Connect", exact: true }).click();
+  await chooseNotebookTool(panel, "Connect");
   await panel.getByRole("button", { name: "Disconnect", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Add this paragraph to my notebook" }),
   ).toHaveCount(0);
 });
 
-test("paragraph capture stays out of casual reading and validates restored notebook sessions", async ({
+test("selected context is explicit and the notebook follows chapters without losing a draft", async ({
   page,
 }) => {
   const requests: string[] = [];
@@ -219,43 +216,173 @@ test("paragraph capture stays out of casual reading and validates restored noteb
   await expect(
     page.getByRole("button", { name: "Notebook", exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".learning-workspace")).toHaveCount(0);
   await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
   expect(requests).toEqual([]);
-  await page.screenshot({
-    path: test.info().outputPath("casual-reader.png"),
-    fullPage: false,
-  });
+  const passage = await selectReading(page);
   await page.getByRole("button", { name: "Notebook", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "My learning notebook" });
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
-  await panel.getByRole("button", { name: "Close notebook" }).click();
-  const capture = page
-    .getByRole("button", { name: "Add this paragraph to my notebook" })
-    .first();
-  await expect(capture).toBeVisible();
+  await expect(panel.locator("blockquote")).toHaveText(
+    passage.slice(0, 500) + (passage.length > 500 ? "…" : ""),
+  );
+  await panel
+    .getByLabel("Title", { exact: true })
+    .fill("Synthetic selected passage");
+  await panel
+    .getByLabel("Your thinking")
+    .fill("Synthetic observation about this selected passage.");
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(panel.getByRole("status")).toHaveText(
+    "Saved in your private notebook.",
+  );
+
+  await page.goto("/chapters/architecture/");
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole("heading", { level: 2 })).toHaveText(
+    "4 · Architecture",
+  );
+  const readingBounds = await page.locator(".chapter-main").boundingBox();
+  const notebookBounds = await panel.boundingBox();
+  expect(readingBounds!.x + readingBounds!.width).toBeLessThanOrEqual(
+    notebookBounds!.x,
+  );
+  await expect(
+    panel.getByRole("region", { name: "Note context" }),
+  ).toContainText("Writing about");
+  await expect(panel.locator("blockquote")).toHaveCount(0);
+  await expect(panel.locator("summary", { hasText: "Reading:" })).toHaveCount(
+    0,
+  );
+  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await expect(
+    panel.getByRole("heading", { name: "Synthetic selected passage" }),
+  ).toHaveCount(0);
+  await panel.getByLabel("Notes to show").selectOption("all");
+  await expect(
+    panel.getByRole("heading", { name: "Synthetic selected passage" }),
+  ).toBeVisible();
+  await panel
+    .getByRole("button", { name: "Chapter guide", exact: true })
+    .click();
+  await expect(panel.getByText(/cached feed/)).toBeVisible();
+  await expect(
+    panel
+      .getByLabel("Demo in this chapter")
+      .locator("option", { hasText: "Boundary trace" }),
+  ).toHaveCount(1);
+  await expect(
+    panel
+      .getByLabel("Demo in this chapter")
+      .locator("option", { hasText: "Queue balance lab" }),
+  ).toHaveCount(0);
+  await expect(
+    panel.getByRole("button", { name: "Save demo result", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    panel.getByText(
+      "Save a prediction or uncertainty to enable Save demo result.",
+      { exact: true },
+    ),
+  ).toBeVisible();
   await page.screenshot({
-    path: test.info().outputPath("connected-reader.png"),
+    path: test.info().outputPath("architecture-guide.png"),
     fullPage: false,
   });
 
   await page.goto("/chapters/introduction/");
-  await expect(capture).toBeVisible();
-  await expect(page.locator(".learning-workspace")).toHaveCount(0);
-
-  await page.route(`${companionAddress}/status`, (route) => route.abort());
-  const unavailable = page.waitForEvent("requestfailed", {
-    predicate: (request) => request.url() === `${companionAddress}/status`,
+  await expect(panel).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Chapter guide", exact: true }),
+  ).toHaveAttribute("aria-current", "true");
+  await expect(
+    panel.getByText(/There is no interactive demo on this page/),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Save demo result", exact: true }),
+  ).toHaveCount(0);
+  await panel.getByRole("button", { name: "Write", exact: true }).click();
+  await panel
+    .getByLabel("Title", { exact: true })
+    .fill("Synthetic unfinished introduction note");
+  await panel
+    .getByLabel("Your thinking")
+    .fill(
+      "Keep this thought attached to the introduction.\nThe next paragraph is unfinished. ",
+    );
+  await page.locator('a[href="/chapters/scaling/"]').first().click();
+  await expect(panel).toBeVisible();
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "Keep this thought attached to the introduction.\nThe next paragraph is unfinished. ",
+  );
+  await expect(
+    panel.getByRole("region", { name: "Note context" }),
+  ).toContainText("still belongs to its original reading");
+  await expect(
+    panel.getByRole("region", { name: "Note context" }).getByRole("link"),
+  ).toHaveAttribute("href", /\/chapters\/introduction\//);
+  await chooseNotebookTool(panel, "Concepts");
+  await expect(panel.getByLabel("Concept", { exact: true })).toHaveValue(
+    conceptPages.find((page) => page.url === "/chapters/scaling/")!
+      .concepts[0]!,
+  );
+  await panel.getByRole("button", { name: "Agent", exact: true }).click();
+  await expect(
+    panel.getByLabel("Investigation source").locator("option").first(),
+  ).toContainText(
+    "Current reading · How should web applications respond to scaling pressure?",
+  );
+  await panel.getByRole("button", { name: "Write", exact: true }).click();
+  await expect(
+    panel.getByRole("region", { name: "Note context" }).getByRole("link"),
+  ).toHaveAttribute("href", /\/chapters\/introduction\//);
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(panel.getByRole("status")).toHaveText(
+    "Saved in your private notebook.",
+  );
+  await panel.getByRole("button", { name: "New note", exact: true }).click();
+  await expect(
+    panel.getByRole("region", { name: "Note context" }),
+  ).toBeInViewport();
+  await expect(
+    panel.getByRole("region", { name: "Note context" }).getByRole("link"),
+  ).toHaveAttribute("href", /\/chapters\/scaling\//);
+  await page.screenshot({
+    path: test.info().outputPath("chapter-writing.png"),
+    fullPage: false,
   });
-  await page.reload();
-  await unavailable;
-  await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
+  await panel.getByRole("button", { name: "Close notebook" }).click();
+  await page.goto("/chapters/benchmarking/");
+  await expect(
+    page.getByRole("button", { name: "Notebook", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
+});
+
+test("a restored open notebook explains unavailable or expired connections and retains writing", async ({
+  page,
+}) => {
+  await page.goto("/chapters/benchmarking/");
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByLabel("Pairing code").fill(code);
+  await panel.getByRole("button", { name: "Pair companion" }).click();
+  await panel
+    .getByLabel("Your thinking")
+    .fill("Synthetic unfinished draft survives recovery.");
+  await page.route(`${companionAddress}/status`, (route) => route.abort());
+  await page.reload();
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole("status")).toContainText("cannot tell us which");
+  await expect(panel.getByLabel("Pairing code")).toBeVisible();
   await page.unroute(`${companionAddress}/status`);
   await page.reload();
-  await expect(capture).toBeVisible();
-
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "Synthetic unfinished draft survives recovery.",
+  );
   await page.route(`${companionAddress}/status`, (route) =>
     route.fulfill({
       status: 401,
@@ -263,14 +390,18 @@ test("paragraph capture stays out of casual reading and validates restored noteb
       body: JSON.stringify({ message: "Synthetic companion session expired." }),
     }),
   );
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  await page.reload();
   await expect(panel.getByRole("status")).toContainText("session expired");
-  await expect(
-    page.getByRole("button", { name: "Add this paragraph to my notebook" }),
-  ).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       sessionStorage.getItem("book-learning-connection"),
     ),
   ).toBeNull();
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(sessionStorage.getItem("book-learning-workspace")!).editor
+          .body,
+    ),
+  ).toBe("Synthetic unfinished draft survives recovery.");
 });

@@ -72,7 +72,11 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     messages,
   );
   const demoSelect = element("select");
-  const pageOption = element("option", "Current reading or captured passage");
+  const reading = options.source();
+  const pageOption = element(
+    "option",
+    `${reading.kind === "passage" ? "Selected passage" : "Current reading"} · ${reading.title}`,
+  );
   pageOption.value = "";
   demoSelect.append(pageOption);
   for (const demo of availableLearningDemos()) {

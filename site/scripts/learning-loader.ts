@@ -1,8 +1,11 @@
-import { LearningClient } from "./learning-client.ts";
+import { readingSelection } from "./learning-selection.ts";
+import { readNotebookSession } from "./learning-session.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
-async function openNotebook(target?: string) {
+async function openNotebook(resume = false) {
+  // Capture before loading or focusing the notebook can alter the selection.
+  const selection = resume ? null : readingSelection();
   if (!loaded)
     loaded = new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -17,7 +20,7 @@ async function openNotebook(target?: string) {
   try {
     await loaded;
     document.dispatchEvent(
-      new CustomEvent("book-learning-open", { detail: { target } }),
+      new CustomEvent("book-learning-open", { detail: { selection, resume } }),
     );
   } catch (error) {
     window.alert(
@@ -25,48 +28,13 @@ async function openNotebook(target?: string) {
     );
   }
 }
-for (const button of document.querySelectorAll<HTMLButtonElement>(
+const buttons = document.querySelectorAll<HTMLButtonElement>(
   "[data-learning-toggle]",
-)) {
+);
+for (const button of buttons) {
   button.hidden = false;
   button.addEventListener("click", () => void openNotebook());
 }
-function showCaptureButtons(connected: boolean) {
-  for (const paragraph of document.querySelectorAll<HTMLElement>(
-    "[data-comment-target]",
-  )) {
-    let button = paragraph.querySelector<HTMLButtonElement>(
-      ":scope > [data-learning-capture]",
-    );
-    if (!button && connected) {
-      button = document.createElement("button");
-      button.type = "button";
-      button.className = "paragraph-notebook-button";
-      button.dataset.learningCapture = paragraph.id;
-      button.textContent = "Note";
-      button.setAttribute("aria-label", "Add this paragraph to my notebook");
-      button.addEventListener("click", () => void openNotebook(paragraph.id));
-      paragraph.append(button);
-    }
-    if (button) button.hidden = !connected;
-  }
-}
-
-let connectionRevision = 0;
-document.addEventListener("book-learning-connection", (event) => {
-  const { connected } = (event as CustomEvent<{ connected: boolean }>).detail;
-  connectionRevision++;
-  showCaptureButtons(connected);
-});
-// Restoring a connection must not load the workspace or contact the companion
-// for casual readers, nor override a newer pairing/disconnection in this page.
-const restored = new LearningClient();
-if (restored.token)
-  void restored.status().then(
-    () => {
-      if (connectionRevision === 0) showCaptureButtons(true);
-    },
-    () => {
-      /* Keep capture hidden until the student reconnects through Notebook. */
-    },
-  );
+// An explicitly opened notebook follows book navigation; other readers keep
+// the workspace unloaded and make no companion requests.
+if (buttons.length && readNotebookSession().open) void openNotebook(true);

@@ -1,5 +1,16 @@
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
-import { mountLearningStart } from "./learning-start.ts";
+import { mountLearningGuide } from "./learning-guide.ts";
+import { currentReading, pageSource, textOf } from "./learning-context.ts";
+import {
+  readingSelection,
+  type ReadingSelection,
+} from "./learning-selection.ts";
+import {
+  readNotebookSession,
+  saveNotebookSession,
+  type NotebookEditor,
+  type NotebookView,
+} from "./learning-session.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
 import { mountLearningAgent } from "./learning-agent-ui.ts";
 import { mountLearningPeers } from "./learning-peers.ts";
@@ -14,41 +25,33 @@ import {
   reflectionPrompts,
   reflectionExamples,
   suggestedReflectionCharacters,
-  type LearningSource,
   type NotebookEntry,
   type ConceptJudgment,
   type NoteKind,
 } from "../../shared/learning-workspace.ts";
 
-type View =
-  | "write"
-  | "notes"
-  | "concepts"
-  | "prepare"
-  | "connect"
-  | "agent"
-  | "peers";
-type NotebookView = View | "start";
 const client = new LearningClient();
 const panel = document.createElement("dialog");
 panel.className = "learning-workspace";
 panel.hidden = true;
 panel.setAttribute("aria-label", "My learning notebook");
-panel.innerHTML = `<div class="learning-heading"><div><p class="learning-eyebrow">A space for your thinking</p><h2>My notebook</h2></div><button type="button" data-learning-close aria-label="Close notebook">×</button></div>
-  <nav class="learning-tabs" aria-label="Notebook sections"></nav><p class="learning-status" role="status" aria-live="polite"></p><div class="learning-body"></div>`;
+panel.innerHTML = `<div class="learning-chrome"><div class="learning-heading"><div><p class="learning-eyebrow">My learning notebook</p><h2></h2></div><button type="button" data-learning-close aria-label="Close notebook">×</button></div>
+  <nav class="learning-tabs" aria-label="Notebook sections"></nav><p class="learning-status" role="status" aria-live="polite"></p><div class="learning-selection" hidden><p></p><button type="button" data-learning-selection>Use selected text</button></div></div><div class="learning-body"></div>`;
+panel.querySelector("h2")!.textContent = currentReading().title;
 document.body.append(panel);
 const container = panel.querySelector<HTMLDivElement>(".learning-body")!;
 const tabs = panel.querySelector<HTMLElement>(".learning-tabs")!;
 const status = panel.querySelector<HTMLElement>(".learning-status")!;
-let view: NotebookView = "write";
+const restored = readNotebookSession();
+let view: NotebookView = restored.view;
 let companionStatus: CompanionStatus | null = null;
 let connected = false;
 let entries: NotebookEntry[] = [];
 let judgments: ConceptJudgment[] = [];
-const selected = new Set<string>();
-let draft = "";
-let acceptedAssistance: string | null = null;
-let editor = {
+const selected = new Set<string>(restored.selected);
+let draft = restored.preparation;
+let acceptedAssistance: string | null = restored.assistance;
+let editor: NotebookEditor = restored.editor ?? {
   id: "",
   expected: "",
   kind: "scratch" as NoteKind,
@@ -58,60 +61,87 @@ let editor = {
   source: pageSource(),
 };
 
-function textOf(element: Element): string {
-  const clone = element.cloneNode(true) as Element;
-  for (const control of clone.querySelectorAll(
-    "button, input, select, textarea, script, style, .paragraph-feedback-actions, [data-paragraph-feedback-panel]",
-  ))
-    control.remove();
-  return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+function persist() {
+  saveNotebookSession({
+    open: !panel.hidden,
+    view,
+    editor,
+    assistance: acceptedAssistance,
+    preparation: draft,
+    selected: [...selected],
+  });
 }
-function pageSource(target?: string): LearningSource {
-  const element = target
-    ? document.getElementById(target)
-    : document.querySelector("main .prose, main article, main, #content");
-  const selection = window.getSelection();
-  const selectedText = selection?.toString().trim();
-  const inReading =
-    selection?.anchorNode &&
-    (target
-      ? element?.contains(selection.anchorNode)
-      : document
-          .querySelector("main, #content")
-          ?.contains(selection.anchorNode));
-  const excerpt =
-    selectedText && inReading ? selectedText : element ? textOf(element) : "";
-  const url = new URL(location.href);
-  url.hash = "";
-  url.search = "";
-  const conceptId =
-    location.pathname === "/concepts/"
-      ? (new URL(location.href).searchParams.get("topic") ??
-        location.hash.slice(1))
-      : "";
-  const kind = target
-    ? "passage"
-    : conceptId
-      ? "concept"
-      : location.pathname.startsWith("/explore/")
-        ? "exploration"
-        : "page";
-  return {
-    url: url.href,
-    title:
-      document.querySelector("main h1, #content h1")?.textContent?.trim() ??
-      document.title,
+container.addEventListener("input", persist);
+container.addEventListener("change", persist);
+window.addEventListener("pagehide", persist);
+function editorDirty() {
+  if (!editor.id) return Boolean(editor.body.trim() || editor.title.trim());
+  const saved = entries.find((entry) => entry.id === editor.id);
+  return (
+    !saved ||
+    saved.body !== editor.body ||
+    saved.title !== editor.title ||
+    saved.kind !== editor.kind
+  );
+}
+function readingSource() {
+  return new URL(editor.source.url).pathname === location.pathname
+    ? editor.source
+    : pageSource();
+}
+function beginNote(
+  source = pageSource(),
+  kind: NoteKind = "scratch",
+  title = "",
+) {
+  if (
+    editorDirty() &&
+    !window.confirm(
+      "Replace this unfinished note? Choose Cancel to keep writing it.",
+    )
+  )
+    return false;
+  acceptedAssistance = null;
+  status.textContent = "";
+  editor = {
+    id: "",
+    expected: "",
     kind,
-    anchor: target ?? (conceptId || location.hash.slice(1)),
-    excerpt: excerpt.slice(0, 12_000),
-    revision:
-      document.querySelector<HTMLMetaElement>(
-        'meta[name="book-content-revision"]',
-      )?.content ?? null,
-    conceptIds:
-      conceptId && concepts.some((c) => c.id === conceptId) ? [conceptId] : [],
+    title,
+    body: "",
+    relatedIds: [],
+    source,
   };
+  navigate("write");
+  return true;
 }
+let selectedReading: ReadingSelection | null = null;
+let pendingSelection: ReadingSelection | null = null;
+const selectionBar = panel.querySelector<HTMLDivElement>(
+  ".learning-selection",
+)!;
+const selectionButton = panel.querySelector<HTMLButtonElement>(
+  "[data-learning-selection]",
+)!;
+function updateSelection() {
+  selectedReading = readingSelection();
+  selectionBar.hidden = !connected || !selectedReading;
+  if (selectedReading)
+    selectionBar.querySelector("p")!.textContent =
+      `Selected in the reading: ${selectedReading.text.slice(0, 100)}${selectedReading.text.length > 100 ? "…" : ""}`;
+}
+selectionButton.addEventListener("pointerdown", () => {
+  pendingSelection = selectedReading;
+});
+selectionButton.addEventListener("click", () => {
+  const selection = pendingSelection ?? selectedReading;
+  pendingSelection = null;
+  if (selection && beginNote(pageSource(selection))) {
+    window.getSelection()?.removeAllRanges();
+    updateSelection();
+  }
+});
+document.addEventListener("selectionchange", updateSelection);
 function node<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   text?: string,
@@ -129,7 +159,18 @@ function button(
 ): HTMLButtonElement {
   const result = node("button", label, className);
   result.type = "button";
-  result.addEventListener("click", () => void run(action));
+  result.addEventListener(
+    "click",
+    () =>
+      void (async () => {
+        result.disabled = true;
+        try {
+          await run(action);
+        } finally {
+          result.disabled = false;
+        }
+      })(),
+  );
   return result;
 }
 async function run(action: () => void | Promise<void>) {
@@ -149,9 +190,7 @@ async function run(action: () => void | Promise<void>) {
 }
 function setConnected(value: boolean) {
   connected = value;
-  document.dispatchEvent(
-    new CustomEvent("book-learning-connection", { detail: { connected } }),
-  );
+  updateSelection();
 }
 let fieldNumber = 0;
 function field(label: string, input: HTMLElement): HTMLLabelElement {
@@ -189,23 +228,33 @@ async function refresh() {
 function navigate(next: NotebookView) {
   view = next;
   render();
+  panel.scrollTop = 0;
 }
 function render() {
+  persist();
   tabs.replaceChildren();
+  const primary = node("div", undefined, "learning-tab-primary");
+  const tools = node("details", undefined, "learning-tools");
+  tools.append(node("summary", "More notebook tools"));
+  const menu = node("div", undefined, "learning-tools-menu");
+  tools.append(menu);
+  const secondary: NotebookView[] = ["concepts", "peers", "prepare", "connect"];
+  tools.open = secondary.includes(view);
   for (const [id, label] of [
     ["write", "Write"],
     ["notes", "Notes"],
-    ["concepts", "Concepts"],
+    ["guide", "Chapter guide"],
     ["agent", "Agent"],
+    ["concepts", "Concepts"],
     ["peers", "Peers"],
     ["prepare", "Prepare"],
     ["connect", "Connect"],
-    ["start", "Start"],
   ] as const) {
     const tab = button(label, () => navigate(id));
     tab.setAttribute("aria-current", String(view === id));
-    tabs.append(tab);
+    (secondary.includes(id) ? menu : primary).append(tab);
   }
+  tabs.append(primary, tools);
   container.replaceChildren();
   if (!connected && view !== "connect") {
     container.append(
@@ -226,9 +275,16 @@ function render() {
   if (view === "concepts") renderConcepts();
   if (view === "prepare") renderPreparation();
   if (view === "connect") renderConnection();
-  if (view === "start")
-    mountLearningStart(container, {
+  if (view === "guide")
+    mountLearningGuide(container, {
       entries,
+      reflect: () =>
+        beginNote(
+          pageSource(),
+          "reflection",
+          `Reflection: ${currentReading().title}`,
+        ),
+      close,
       save: async (kind, title, body, source) => {
         await client.request("/entries", "POST", { kind, title, body, source });
         await refresh();
@@ -241,7 +297,7 @@ function render() {
     });
   if (view === "peers")
     mountLearningPeers(container, {
-      source: editor.source,
+      source: readingSource(),
       entries,
       status: (text) => {
         status.textContent = text;
@@ -278,7 +334,7 @@ function render() {
   if (view === "agent")
     mountLearningAgent(container, {
       client,
-      source: () => editor.source,
+      source: readingSource,
       selected: () => [...selected],
       active: () => !panel.hidden && view === "agent",
       status: (text) => {
@@ -317,12 +373,53 @@ function render() {
     });
 }
 function renderEditor() {
-  const context = node("details", undefined, "learning-context");
+  const context = node("section", undefined, "learning-context");
+  context.setAttribute("aria-label", "Note context");
   context.append(
-    node("summary", `Reading: ${editor.source.title}`),
-    node("blockquote", editor.source.excerpt),
-    link("Return to this source", sourceLink(editor.source)),
+    node(
+      "p",
+      editor.source.kind === "passage"
+        ? "Selected passage from"
+        : "Writing about",
+      "learning-eyebrow",
+    ),
+    link(editor.source.title, sourceLink(editor.source)),
   );
+  if (editor.source.excerpt) {
+    context.append(
+      node(
+        "blockquote",
+        editor.source.excerpt.slice(0, 500) +
+          (editor.source.excerpt.length > 500 ? "…" : ""),
+      ),
+    );
+    if (editor.source.excerpt.length > 500)
+      context.append(
+        node(
+          "p",
+          "First 500 characters shown. The full captured text is kept with this note.",
+          "learning-hint",
+        ),
+      );
+  } else
+    context.append(
+      node(
+        "p",
+        "This note keeps the reading link. Select text in the page to attach a particular passage.",
+        "learning-hint",
+      ),
+    );
+  if (new URL(editor.source.url).pathname !== location.pathname)
+    context.append(
+      node(
+        "p",
+        "This note still belongs to its original reading. The notebook header shows the page you are visiting now.",
+        "learning-hint",
+      ),
+      button("New note for this reading", () => {
+        beginNote();
+      }),
+    );
   container.append(context);
   const kind = node("select");
   for (const [value, label] of [
@@ -416,8 +513,15 @@ function renderEditor() {
             ...(id ? { expected } : {}),
           },
         );
-        editor.id = saved.id;
-        editor.expected = saved.revision;
+        editor = {
+          id: saved.id,
+          expected: saved.revision,
+          kind: saved.kind,
+          title: saved.title,
+          body: saved.body,
+          relatedIds: saved.relatedIds,
+          source: saved.source,
+        };
         await refresh();
         status.textContent = "Saved in your private notebook.";
         render();
@@ -432,20 +536,11 @@ function renderEditor() {
   );
   container.append(
     button("New note", () => {
-      acceptedAssistance = null;
-      editor = {
-        id: "",
-        expected: "",
-        kind: "scratch",
-        title: "",
-        body: "",
-        relatedIds: [],
-        source: pageSource(),
-      };
-      render();
+      beginNote();
     }),
   );
 }
+let notesScope = "page";
 function renderNotes() {
   container.append(
     node(
@@ -454,14 +549,35 @@ function renderNotes() {
       "learning-hint",
     ),
   );
-  if (!entries.length)
+  const scope = node("select");
+  for (const [value, label] of [
+    ["page", currentReading().isChapter ? "This chapter" : "This page"],
+    ["all", "Whole notebook"],
+  ]) {
+    const option = node("option", label);
+    option.value = value!;
+    scope.append(option);
+  }
+  scope.value = notesScope;
+  scope.addEventListener("change", () => {
+    notesScope = scope.value;
+    render();
+  });
+  container.append(field("Notes to show", scope));
+  const shown =
+    notesScope === "all"
+      ? entries
+      : entries.filter(
+          (entry) => new URL(entry.source.url).pathname === location.pathname,
+        );
+  if (!shown.length)
     container.append(
       node(
         "p",
-        "Your notebook is ready for its first question or observation.",
+        "No notes in this view yet. Write a question or observation, or choose Whole notebook to see your other reading.",
       ),
     );
-  for (const entry of entries) {
+  for (const entry of shown) {
     const card = node("article", undefined, "learning-note");
     const select = node("input");
     select.type = "checkbox";
@@ -497,7 +613,10 @@ function renderNotes() {
         ...(revision.assistance ? [node("small", revision.assistance)] : []),
       );
     card.append(content, history, link("Source", sourceLink(entry.source)));
-    if (new URL(entry.source.url).pathname === location.pathname) {
+    if (
+      entry.source.excerpt &&
+      new URL(entry.source.url).pathname === location.pathname
+    ) {
       const target = entry.source.anchor
         ? document.getElementById(entry.source.anchor)
         : document.querySelector("main .prose, main, #content");
@@ -578,12 +697,15 @@ function renderConcepts() {
     ),
   );
   const select = node("select");
-  for (const concept of concepts) {
+  const related = pageSource().conceptIds;
+  for (const concept of [...concepts].sort(
+    (a, b) => Number(related.includes(b.id)) - Number(related.includes(a.id)),
+  )) {
     const option = node("option", concept.title);
     option.value = concept.id;
     select.append(option);
   }
-  select.value = editor.source.conceptIds[0] ?? concepts[0]!.id;
+  select.value = related[0] ?? concepts[0]!.id;
   const form = node("div");
   container.append(field("Concept", select), form);
   const show = () => {
@@ -739,7 +861,8 @@ function renderConnection() {
           code.value = "";
           await refresh();
           status.textContent = "Connected to your private notebook.";
-          navigate("write");
+          if (view === "connect") navigate("write");
+          else render();
         },
         "learning-primary",
       ),
@@ -769,7 +892,7 @@ function renderConnection() {
           "Connection and protocol are available. Local prerequisite checks are available through doctor in your terminal.";
         render();
       }),
-      button("Try a first investigation", () => navigate("start")),
+      button("Explore this reading", () => navigate("guide")),
     );
     container.append(
       button("Export notebook backup", async () => {
@@ -821,6 +944,8 @@ function close() {
   if (typeof panel.close === "function") panel.close();
   else panel.removeAttribute("open");
   panel.hidden = true;
+  document.body.dataset.learningOpen = "false";
+  persist();
 }
 panel.querySelector("[data-learning-close]")!.addEventListener("click", close);
 panel.addEventListener("keydown", (event) => {
@@ -830,27 +955,17 @@ document.addEventListener(
   "book-learning-open",
   (event) =>
     void run(async () => {
-      const detail = (event as CustomEvent<{ target?: string }>).detail;
-      if (detail.target || !editor.body) {
-        const saved = entries.find((entry) => entry.id === editor.id);
-        if (
-          !editor.body ||
-          saved?.body === editor.body ||
-          window.confirm(
-            "Start a new note on this passage? Choose Cancel to keep working on your unsaved draft.",
-          )
-        ) {
-          acceptedAssistance = null;
-          editor = {
-            id: "",
-            expected: "",
-            kind: "scratch",
-            title: "",
-            body: "",
-            relatedIds: [],
-            source: pageSource(detail.target),
-          };
-        }
+      const detail = (
+        event as CustomEvent<{
+          selection: ReadingSelection | null;
+          resume: boolean;
+        }>
+      ).detail;
+      panel.hidden = false;
+      document.body.dataset.learningOpen = "true";
+      if (!panel.hasAttribute("open")) {
+        if (typeof panel.show === "function") panel.show();
+        else panel.setAttribute("open", "");
       }
       if (client.token && !connected) {
         try {
@@ -861,22 +976,66 @@ document.addEventListener(
             error instanceof Error ? error.message : "Reconnect the companion.";
         }
       }
-      view = connected
-        ? new URL(location.href).searchParams.has("inquiry")
-          ? "peers"
-          : "write"
-        : "connect";
-      render();
-      panel.hidden = false;
-      if (!panel.hasAttribute("open")) {
-        if (typeof panel.show === "function") panel.show();
-        else panel.setAttribute("open", "");
+      if (detail.selection) beginNote(pageSource(detail.selection));
+      else if (
+        !editorDirty() &&
+        new URL(editor.source.url).pathname !== location.pathname
+      ) {
+        acceptedAssistance = null;
+        editor = {
+          id: "",
+          expected: "",
+          kind: "scratch",
+          title: "",
+          body: "",
+          relatedIds: [],
+          source: pageSource(),
+        };
       }
+      if (!connected) view = "connect";
+      else if (
+        !detail.resume &&
+        new URL(location.href).searchParams.has("inquiry")
+      )
+        view = "peers";
+      else if (view === "connect") view = "write";
+      render();
+      persist();
+      updateSelection();
     }),
 );
+let followingBookLink = false;
+document.addEventListener("click", (event) => {
+  followingBookLink = false;
+  if (
+    event.defaultPrevented ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey ||
+    event.altKey
+  )
+    return;
+  const anchor = (
+    event.target instanceof Element ? event.target : null
+  )?.closest<HTMLAnchorElement>("a[href]");
+  if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download"))
+    return;
+  const destination = new URL(anchor.href);
+  followingBookLink =
+    destination.origin === location.origin &&
+    destination.pathname !== location.pathname &&
+    /^\/(chapters|appendices|parts|case-studies|project|concepts|explore|demos|notebook)\//.test(
+      destination.pathname,
+    );
+});
+window.addEventListener("pageshow", () => {
+  followingBookLink = false;
+});
 window.addEventListener("beforeunload", (event) => {
-  const saved = entries.find((entry) => entry.id === editor.id);
-  if (editor.body && (!saved || saved.body !== editor.body)) {
+  persist();
+  // Chapter links retain the draft in this tab; closing/leaving still warns
+  // about writing that has not been saved to the companion.
+  if (editorDirty() && !followingBookLink) {
     event.preventDefault();
     event.returnValue = "";
   }

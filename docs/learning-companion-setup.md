@@ -42,9 +42,11 @@ Keep the companion running while using the book; Ctrl+C stops it without removin
 
 ### Optional first investigation
 
-After pairing, choose **Connect → Try a first investigation**, or **Start**.
-Open the queue lab using its link and return to **Notebook → Start**.
-Save a prediction or a concrete uncertainty, change the demo's mean time, and record the browser observation.
+After pairing, choose **Chapter guide**, or **Connect → Explore this reading**.
+The guide follows the chapter you are reading and uses its existing prompts and available demos.
+For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Notebook → Chapter guide**, and select **Queue balance lab**.
+Save a prediction or a concrete uncertainty, change the demo's mean time, then choose **Save demo result**.
+This saves the demo's current inputs and displayed result as a private note and shows what was recorded below the button.
 Reflect in your own words, then choose **Review my saved notes**.
 Restart the companion, pair its new code and reopen those notes to check continuity.
 You can leave the investigation for your own question at any point.
@@ -52,8 +54,15 @@ This is optional support, with no required answer, minimum length, completion ma
 
 ## Capture and revisit your thinking
 
-After connecting your notebook, **Note** buttons appear beside paragraphs to retain their text and source.
 The header's **Notebook** button is always available for connecting or working on the current page.
+Without a text selection, **Write** starts a note about that chapter/page and keeps its reading link.
+To attach a passage, select text in the reading, then open **Notebook**; if it is already open, choose **Use selected text**.
+Write shows the source and a short preview of the selected quote; it does not copy the whole chapter into your note.
+The open notebook follows you between chapters, and **Notes** initially shows the current reading's entries; choose **Whole notebook** to see the rest.
+Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
+Closing Notebook keeps it closed on later pages.
+These unfinished drafts stay in this browser tab; save your notes before closing the tab.
+**More notebook tools** contains **Concepts**, **Peers**, **Prepare** and **Connect**.
 Quick notes may be short.
 Developed reflections have prompts and examples to help you capture enough evidence and explanation.
 There is no single correct conclusion: uncertainty, a failed experiment or a better-supported unchanged view can be useful material.

@@ -1,3 +1,7 @@
+import {
+  selectReading,
+  chooseNotebookTool,
+} from "./learning-notebook.helpers.ts";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
@@ -107,16 +111,13 @@ test("students save private initial work before group replies, reflect individua
       .fill(`http://127.0.0.1:${port}`);
     await panel.getByLabel("Pairing code").fill(code);
     await panel.getByRole("button", { name: "Pair companion" }).click();
-    await panel.getByRole("button", { name: "Close notebook" }).click();
-    await page
-      .getByRole("button", { name: "Add this paragraph to my notebook" })
-      .first()
-      .click();
+    await selectReading(page);
+    await panel.getByRole("button", { name: "Use selected text" }).click();
     return { page, panel };
   }
   async function peers(page: Page) {
     const panel = page.getByRole("dialog", { name: "My learning notebook" });
-    await panel.getByRole("button", { name: "Peers", exact: true }).click();
+    await chooseNotebookTool(panel, "Peers");
     await panel.getByLabel("Course for this inquiry").selectOption(course.id);
     return panel;
   }

@@ -8,9 +8,18 @@ Implemented status identifies verified software behavior; production rollout and
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
 The whole-book Notebook interface loads on demand on reading, concept, exploration and demo pages, with passage capture independent of feedback sign-in.
-The header's Notebook entry remains available to every reader; paragraph Note buttons appear only after a verified notebook connection.
-On navigation, a saved tab session is checked through the lightweight client without loading the workspace; readers without a saved connection make no companion request.
-Disconnecting or a detected unavailable, incompatible or expired connection hides the paragraph controls until reconnection.
+The header's Notebook entry remains available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
+Opening Notebook captures that selection before loading/focusing the interface; an already open notebook offers Use selected text.
+A chapter note keeps the reading link and authored concept membership without copying the chapter text.
+The source is visible in Write; selected quotes have a bounded preview while their full captured text remains in the saved record.
+An open notebook follows book navigation and retains its active section; closing it keeps later pages lazy, with no companion request until reopening.
+On wide book pages, reading reflows beside the open notebook so passages remain accessible for selection.
+Open state, unfinished writing, selected note IDs and a preparation draft live in this website's tab session, independently of the paired token.
+Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
+Guide and concept choices follow the current reading; Agent and Peers use a captured passage from this page or the current page link, without retargeting a retained draft from another chapter.
+Only Save note creates or revises a durable companion record; tab continuity is not a notebook backup and does not survive closing the tab.
+Notes defaults to the current chapter/page, with Whole notebook available for cross-book review.
+Write, Notes, Chapter guide and Agent stay in the primary navigation; Concepts, Peers, Prepare and Connect are available under More notebook tools.
 The optional Codex adapter provides persisted conversations, bounded browser demo tools and student-reviewed notebook drafts.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.
@@ -107,13 +116,18 @@ The Write, Notes, Concepts and Prepare sections support capture, revision, recal
 The Connect section handles pairing and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
 Students review drafts and use the ordinary course submission form.
 The published [student setup guide](learning-companion-setup.md) is available at `/notebook/setup/`.
-The optional Start section supports an initial prediction, actual queue-demo observation with authored assumptions, private reflection and reopening saved notes.
+The optional Chapter guide uses the current reading's authored prompt and demos actually present on that page.
+Pages without a demo offer reflection without an observation action; the guide does not redirect every chapter to the queue lab.
+Demo activities use existing authored prediction, operation, observation and reflection instructions and preserve their assumptions.
+Save demo result stays disabled until private initial thinking is saved, explains that it captures current browser inputs/text, and shows the saved observation beside the action.
+Errors and save confirmations appear at the relevant step; unavailable demos provide a visible fallback.
+Guided prediction/reflection drafts remain in tab storage for returning to the same page; changing demo asks before clearing unfinished writing.
 Leaving/skipping has no assessment consequence, and no mastery mark or new submission is generated.
 
 ## Verification
 
 ```bash
-node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts
+node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/learning-session.test.ts tests/course-inquiry.test.ts
 npm run companion:pack
 npm run companion:check
 npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts

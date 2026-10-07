@@ -1,3 +1,4 @@
+import { chooseNotebookTool } from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
@@ -88,51 +89,56 @@ test("a packed companion supports an optional first investigation and retains th
     await expect(panel.getByRole("status")).toContainText("did not match");
     await panel.getByLabel("Pairing code").fill(code);
     await panel.getByRole("button", { name: "Pair companion" }).click();
-    await panel.getByRole("button", { name: "Connect", exact: true }).click();
-    await expect(panel.getByText(/Companion 0.1.0; protocol 1/)).toBeVisible();
-    await panel
-      .getByRole("button", { name: "Try a first investigation" })
-      .click();
-    await panel
-      .getByRole("button", { name: "Record the browser observation" })
-      .click();
-    await expect(panel.getByRole("status")).toContainText(
-      "Save initial thinking first",
+    await expect(panel.getByRole("status")).toHaveText(
+      "Connected to your private notebook.",
     );
+    await chooseNotebookTool(panel, "Connect");
+    await expect(panel.getByText(/Companion 0.1.0; protocol 1/)).toBeVisible();
+    await panel.getByRole("button", { name: "Explore this reading" }).click();
+    await expect(
+      panel.getByRole("button", { name: "Save demo result" }),
+    ).toBeDisabled();
+    await expect(
+      panel.getByText(
+        "Save a prediction or uncertainty to enable Save demo result.",
+        { exact: true },
+      ),
+    ).toBeVisible();
     await panel
-      .getByLabel("My initial prediction or uncertainty")
+      .getByLabel("My prediction or uncertainty")
       .fill(
         "I expect 10 in progress initially and 20 if mean time doubles, provided the averages use the same boundary.",
       );
     await panel.getByRole("button", { name: "Save my starting point" }).click();
     await page.locator('[data-little-law-input="time"]').fill("1");
     await page.locator('[data-little-law-input="time"]').dispatchEvent("input");
-    await panel
-      .getByRole("button", { name: "Record the browser observation" })
-      .click();
-    await expect(panel.getByRole("status")).toContainText("actual inputs");
+    await panel.getByRole("button", { name: "Save demo result" }).click();
+    await expect(
+      panel.getByRole("status").filter({ hasText: "Demo result saved" }),
+    ).toBeVisible();
+    await expect(panel.locator(".learning-observation")).toContainText(
+      "Inputs saved:",
+    );
     await panel
       .getByLabel("My reflection on this check")
       .fill(
         "The displayed work in progress doubled to 20. I still need to check that a growing queue satisfies these stable-average assumptions.",
       );
-    await panel
-      .getByRole("button", { name: "Save my first reflection" })
-      .click();
+    await panel.getByRole("button", { name: "Save my reflection" }).click();
     await panel.getByRole("button", { name: "Review my saved notes" }).click();
     await expect(
       panel.getByRole("heading", {
-        name: "First investigation: initial thinking",
+        name: "Queue balance lab: initial thinking",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       panel.getByRole("heading", {
-        name: "First investigation: reflection",
+        name: "Queue balance lab: reflection",
         exact: true,
       }),
     ).toBeVisible();
-    await panel.getByRole("button", { name: "Connect", exact: true }).click();
+    await chooseNotebookTool(panel, "Connect");
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(panel).toBeVisible();
     const bounds = await panel.boundingBox();
@@ -152,13 +158,13 @@ test("a packed companion supports an optional first investigation and retains th
     await panel.getByRole("button", { name: "Notes", exact: true }).click();
     await expect(
       panel.getByRole("heading", {
-        name: "First investigation: initial thinking",
+        name: "Queue balance lab: initial thinking",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       panel.getByRole("heading", {
-        name: "First investigation: reflection",
+        name: "Queue balance lab: reflection",
         exact: true,
       }),
     ).toBeVisible();
