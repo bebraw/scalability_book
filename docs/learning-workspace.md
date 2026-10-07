@@ -4,8 +4,9 @@ This document owns the executable learning-workspace contracts and local compani
 [ADRs 027–029](adrs/README.md#implemented) record the agreed whole-book direction.
 Implemented status identifies verified software behavior; production rollout and learner outcomes have their own evidence.
 
-[Accepted ADRs 032–033](adrs/README.md#accepted) define follow-up independent application with reflection and scaffolded peer inquiry.
-These refinements await implementation; the current capabilities are described below.
+[Implemented ADRs 031–033](adrs/README.md#implemented) cover responsive support, independent application with reflection and scaffolded peer inquiry.
+[Accepted ADRs 034–035](adrs/README.md#accepted) define separate Notebook and Teaching assistant experiences, deliberate handoffs and a shared teaching policy with personality and evaluation criteria.
+That separation awaits implementation; the current combined Notebook capabilities are described below.
 
 ## Current implementation
 

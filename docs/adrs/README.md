@@ -43,7 +43,10 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 ## Accepted
 
-No accepted decisions are awaiting implementation.
+| ADR                                                                                      | Summary                                                                                                                                          |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [ADR-034](accepted/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) | Separate writing and teaching assistance with deliberate handoffs, shared companion infrastructure and independent record ownership.             |
+| [ADR-035](accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) | Ground the assistant in a shared teaching policy, recognizable manner and separate evaluation of behavior, personality and independent learning. |
 
 ## Implemented
 
