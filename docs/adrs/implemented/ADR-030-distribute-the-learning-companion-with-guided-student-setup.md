@@ -128,18 +128,20 @@ The present step distributes the existing local companion while preserving stude
 
 ## Implementation and verification
 
-The repository ships [@scalableweb/companion@0.1.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.1.0), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
+The repository ships [@scalableweb/companion@0.2.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.2.0), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
 [The CLI](../../../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`; [the package workflow](../../../.github/workflows/learning-companion.yml) verifies its compiled tarball on macOS/Linux with Node 24 and 26.
 The default data paths are `~/Library/Application Support/scalableweb-companion/` on macOS and an absolute `$XDG_DATA_HOME/scalableweb-companion/` or `~/.local/share/scalableweb-companion/` on Linux.
 The repository entry retains its original `.local/learning-companion/` default.
-Package version 0.1.0, browser protocol 1, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
+Package version 0.2.0, browser protocol 1, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
 Windows is not advertised as supported.
+
+### Initial release 0.1.0
 
 Local checks on 2026-10-06 passed clean tarball installation and per-user continuity on macOS with Node 24.21.0 and 26.10.0, all 146 unit tests, type checking and ten notebook/onboarding/demo/peer browser checks in Chromium/WebKit.
 A newly created dedicated profile was signed in through the packaged CLI, and the exact published tarball's real Codex browser check passed an actual reply, observed/approved demo change, resumed conversation and reviewed notebook draft.
 Synthetic checks passed copy migration, conflicts/live writers, preserved source history, schema snapshots/restoration, interrupted migration, newer-schema rejection, prerequisite failures and diagnostics without private text/tokens.
 
-The implementation is [efd316ff87641ffdb9e60c54f605a8899ead92b4](https://github.com/bebraw/scalability_book/commit/efd316ff87641ffdb9e60c54f605a8899ead92b4).
+The initial 0.1.0 implementation is [efd316ff87641ffdb9e60c54f605a8899ead92b4](https://github.com/bebraw/scalability_book/commit/efd316ff87641ffdb9e60c54f605a8899ead92b4).
 The shipped clean-source tarball records that revision and contains six allowed files with no runtime dependencies.
 Registry metadata and the downloaded artifact match SHA-1 `1be5d624c3cee3f5d8c63f5ec70f91a27a004719` and integrity `sha512-FurqAFJPXmwJSzw9jkAaMzPbIHxL2lsY+xKvdVtU/FokzT8yqBBt8lIV/fy77u8BwTRjB3UxIX3J4pj4yTvF0g==`.
 All four [source-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/37476631666) and all four [published-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/37478360750) passed.
@@ -156,6 +158,25 @@ Verification covered:
 - [Synthetic copy migration and schema recovery](../../../tests/learning-storage.test.ts): preserved identities/history/source/assistance, original-source retention, destination conflicts, live/stale locks, update snapshots, interrupted upgrade and backup restoration.
 - Release 0.1.0 encountering a synthetic schema 2 database and rejecting it without changing database bytes.
 - Package allowlist, built-only dependencies and private diagnostic-output checks, alongside existing selected-context/provider-tool checks.
+
+### Release 0.2.0
+
+Published on 2026-10-07, release 0.2.0 records clean source revision [372122d9f66e3f4140c494dd0da38295e4441da1](https://github.com/bebraw/scalability_book/commit/372122d9f66e3f4140c494dd0da38295e4441da1).
+The registry metadata and downloaded tarball match the verified release artifact byte-for-byte: SHA-1 `8ae18997ab3a4ff5b510fc55caba7785b153bda7`, integrity `sha512-bsYTFxKiOpOO3OlIfw61ZI5OCEbBIybpwGWAoBvjUgi4BAON4YN+UYsZ6oEc1tyodfUhL4OrCqs2f0DvygETIw==`.
+The six-file allowlist and absence of runtime dependencies remain unchanged.
+
+This release distributes ADR-031's responsive support, ADR-034's supplied-note identities per turn and ADR-035's shared teaching policy version 1 and provider provenance.
+It retains 0.1.0's storage location, setup preferences, dedicated profile and compatible records; protocol, archive and database schemas stay at version 1.
+Earlier turns keep their original metadata or remain unversioned, without inferred relationships.
+
+All four [source-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/37595997623) and all four [published-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/37603024220) passed on macOS/Linux with Node 24/26.
+Local checks on macOS with Node 26.10.0 passed 20 focused unit tests, type checking, clean installation, setup/diagnostics, pairing, retained work and newer-schema rejection.
+The packed-package onboarding journey passed in Chromium and WebKit.
+A clean installation of the same artifact passed the real Codex CLI 0.154.0 Chromium journey: actual browser observation, one approved arrival-rate change, a resumed focused question and a reviewed notebook draft with source and policy provenance.
+A synthetic upgrade from the downloaded published 0.1.0 package to 0.2.0 retained identical notebook/concept records, including stable identities, two revisions, sources and reviewed assistance.
+The downloaded published 0.2.0 artifact also passed the local installation and retained-work checker.
+A fresh-cache npm execution returned package version 0.2.0 and the recorded clean source revision; npm's `latest` tag resolves to 0.2.0.
+Student setup and the browser's pairing command now use verified release 0.2.0; starting with the existing directory/profile options and pairing again does not require repeating setup.
 
 Use the voluntary individual/group trial in [the evaluation guide](../../learning-workspace-evaluation.md) to measure setup friction, independent understanding, existing submission preparation and actual course progress.
 Successful onboarding alone does not establish improved learning or completion.

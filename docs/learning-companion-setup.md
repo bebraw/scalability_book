@@ -9,12 +9,12 @@ Reading the book does not require a companion or a model account.
 ## Start on your computer
 
 The standalone package is [@scalableweb/companion](https://www.npmjs.com/package/@scalableweb/companion), maintained by bebraw.
-These commands use the verified release 0.1.0.
+These commands use the verified release 0.2.0.
 Install Node.js 24 or 26, then set up a notebook without cloning the book:
 
 ```sh
-npx @scalableweb/companion@0.1.0 setup --notebook
-npx @scalableweb/companion@0.1.0 start
+npx @scalableweb/companion@0.2.0 setup --notebook
+npx @scalableweb/companion@0.2.0 start
 ```
 
 Keep the companion running while you use your notebook.
@@ -27,7 +27,7 @@ The default website is `https://scalableweb.dev`; local book development at `htt
 For another development address, pass its exact origin:
 
 ```sh
-npx @scalableweb/companion@0.1.0 start --origin http://127.0.0.1:3100
+npx @scalableweb/companion@0.2.0 start --origin http://127.0.0.1:3100
 ```
 
 The packaged companion uses a stable directory independently of your current folder and npm's cache:
@@ -95,14 +95,14 @@ Install that version if you do not already have it:
 
 ```sh
 npm install -g @openai/codex@0.154.0
-npx @scalableweb/companion@0.1.0 setup --codex
-npx @scalableweb/companion@0.1.0 login
+npx @scalableweb/companion@0.2.0 setup --codex
+npx @scalableweb/companion@0.2.0 login
 ```
 
 Stop the notebook-only companion, then start it with your dedicated Codex profile:
 
 ```sh
-npx @scalableweb/companion@0.1.0 start
+npx @scalableweb/companion@0.2.0 start
 ```
 
 Pair the new code in the book.
@@ -124,10 +124,10 @@ You can reopen saved conversations, stop a reply, or keep using the notebook wit
 **Write a takeaway** opens a blank personal draft; **Use as a notebook draft** prepares the selected suggestion for review and revision.
 Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
 Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
-Turn-linked notebook identities require an updated source-built companion; old conversations and the published 0.1.0 package remain readable without inferred links.
-The updated source companion also applies the shared teaching policy and records its version on new replies.
+Companion 0.2.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
+Old conversations remain readable without inferred links or policy history.
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; older replies retain their original history.
-The published 0.1.0 package keeps its earlier instructions until a later package release.
+An installed 0.1.0 companion keeps its earlier instructions; restart with 0.2.0 and pair again to use the new policy.
 Updating the website alone does not update your local assistant.
 
 For a demo investigation, select its source and save your **Initial thinking** first.
@@ -169,7 +169,7 @@ Solo learners can continue the Chapter guide and the existing independent human 
 Stop the companion, then run the same release and directory/port options with `doctor`:
 
 ```sh
-npx @scalableweb/companion@0.1.0 doctor
+npx @scalableweb/companion@0.2.0 doctor
 ```
 
 It checks storage/schema compatibility, the loopback port, and the optional Codex prerequisites.
@@ -202,14 +202,16 @@ Identical records are retained once; imports with conflicting existing work are 
 Keep both copies and start a separate notebook if you need to inspect a conflict:
 
 ```sh
-npx @scalableweb/companion@0.1.0 start --directory /absolute/path/to/another-notebook
+npx @scalableweb/companion@0.2.0 start --directory /absolute/path/to/another-notebook
 ```
 
 Keep a backup outside the companion's directory.
 Your course membership does not give teachers or peers access to the private notebook.
 
-Before updating, export a backup, stop the companion and privately copy its directory.
-Choose a documented newer package version explicitly; retain the same storage directory, then restart and pair again.
+Before updating, export a backup, stop the companion/provider and privately copy its directory and any separately configured profile.
+To update from 0.1.0, run `npx @scalableweb/companion@0.2.0 start` with the same directory, profile, origin and port options, then pair again.
+Release 0.2.0 retains your storage location, setup preferences, dedicated profile and records; the browser protocol, archive and database schemas remain version 1.
+You do not need to repeat setup or create a new profile for this update.
 Startup validates database schemas before writing and saves a `.before-schema-1-<id>.backup` snapshot when converting the original unversioned database to schema 1.
 An interrupted conversion can be retried after stopping every writer; the backup remains available.
 Older releases may reject newer schemas.
@@ -229,7 +231,7 @@ Stop the old companion and its Codex process.
 Before running packaged setup in the destination, migrate the old directory:
 
 ```sh
-npx @scalableweb/companion@0.1.0 migrate --from /absolute/path/to/scalability_book/.local/learning-companion --confirm-stopped
+npx @scalableweb/companion@0.2.0 migrate --from /absolute/path/to/scalability_book/.local/learning-companion --confirm-stopped
 ```
 
 The command shows source/destination, retains the source, and rejects a nonempty destination.

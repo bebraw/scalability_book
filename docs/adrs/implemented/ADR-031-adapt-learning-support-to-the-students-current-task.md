@@ -103,7 +103,7 @@ Preserve help choice and invite application after explaining.
 [The conversation owner](../../../scripts/lib/learning-conversations.ts) validates the optional request, supplies authored source-concept references and retains the goal/mode/need on student turns.
 This is an additive field inside existing conversation JSON; older turns and requests remain readable and notebook/archive schemas stay at version 1.
 The browser exposes support choice and Chapter guide handoff without sending a message or saving a note automatically.
-The updated provider instructions require a companion built from this source; the previously published npm 0.1.0 artifact does not acquire them through a website update.
+The updated provider instructions are available in published companion 0.2.0, verified under [ADR-030](ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020); an installed 0.1.0 companion does not acquire them through a website update.
 
 Verification on 2026-10-07:
 

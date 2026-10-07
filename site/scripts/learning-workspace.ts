@@ -839,7 +839,8 @@ function renderConnection() {
     ),
   );
   const command = node("pre");
-  command.append(node("code", "npx @scalableweb/companion@0.1.0 start"));
+  // Promote this student-facing pin only after verifying registry availability.
+  command.append(node("code", "npx @scalableweb/companion@0.2.0 start"));
   container.append(
     command,
     link("Companion setup and notebook backups", "/notebook/setup/"),

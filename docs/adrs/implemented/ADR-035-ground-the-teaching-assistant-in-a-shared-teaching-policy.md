@@ -178,9 +178,9 @@ All 22 Chromium/WebKit learning checks passed, including separate drafts, delibe
 The local tarball passed clean installation, setup/diagnosis, pairing and retained-work checks on macOS with Node 26.10.0.
 A freshly installed copy also passed the opt-in Chromium/Codex journey: actual observation, one approved arrival-rate change with displayed expected queue 11.0, a resumed focused question and a reviewed notebook draft retaining source and policy provenance.
 
-The website supplies the role, separate journeys and metadata presentation; the policy requires a companion built from this updated source.
-The published `@scalableweb/companion@0.1.0` retains its earlier adapter instructions until a later release, and the browser describes that limit explicitly.
-No npm package was published as part of this implementation.
+The website supplies the role, separate journeys and metadata presentation; published `@scalableweb/companion@0.2.0` supplies the policy.
+An installed 0.1.0 companion retains its earlier adapter instructions, and the browser describes that limit explicitly.
+The initial implementation did not publish an npm package; [ADR-030](ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) records the subsequent 0.2.0 release and artifact verification.
 The voluntary learner trial, delayed recall and actual course progress remain unevaluated; software checks and synthetic replies establish no learning gain or causal completion effect.
 
 ## Open questions

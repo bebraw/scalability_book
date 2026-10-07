@@ -50,8 +50,8 @@ The website/Worker never owns this private notebook or provider credentials.
 ## Start the companion
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
-Follow [student setup](learning-companion-setup.md) for version 0.1.0 and its publication status.
-Source builds now prepare 0.2.0 with the shared teaching policy and additive conversation metadata; student instructions remain pinned to 0.1.0 until registry publication and artifact verification succeed.
+Follow [student setup](learning-companion-setup.md) for the published and verified version 0.2.0.
+It includes the shared teaching policy and additive conversation metadata; [ADR-030](adrs/implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) records the registry artifact and release verification.
 The development entry keeps the repository's installed dependencies and existing default:
 
 ```bash
@@ -103,7 +103,7 @@ Sign-in/thread continuity must be checked before removing the source; retained n
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
 Package 0.2.0, browser protocol 1, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
-The 0.2.0 candidate retains 0.1.0's storage location, setup preferences and compatible records without a new schema migration.
+The 0.2.0 release retains 0.1.0's storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
 Interrupted migration retains a recoverable snapshot and can be retried once writers stop.
@@ -193,7 +193,7 @@ Chapter guide can prepare an editable help request with its reading/demo source;
 Student messages retain optional goal/help-mode/support-need metadata and the supplied note identities in existing conversation JSON; older requests default to unspecified and older turns remain valid.
 The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
 Supplied note identities allow a reviewed takeaway to link the notes used on its actual turn, rather than the current selection; old turns omit them and are not assigned inferred relationships.
-These provider changes require a companion built from the updated source; the published 0.1.0 package retains its earlier instructions until a new release.
+Published companion 0.2.0 supplies these provider changes; an installed 0.1.0 companion retains its earlier instructions and does not acquire them through a website update.
 The Codex adapter applies the current shared instructions on both thread start and resume and reports the actual CLI version (or null if it cannot be read).
 Each new student and assistant message stores optional `teaching: { policy: { id, version, name }, provider: { name, version } }` in existing conversation JSON.
 The metadata identifies applied instructions, not proof that a reply complies; later policies never rewrite earlier turns.

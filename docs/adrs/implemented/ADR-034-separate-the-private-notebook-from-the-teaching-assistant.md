@@ -130,7 +130,7 @@ Notes offer single-note or selected-note discussion, with visible bounded source
 Assistant replies offer a blank personal takeaway or a reviewed suggestion; unfinished notebook writing is protected by confirmation.
 New student turns retain supplied note IDs, so handoffs link the material actually used on that turn rather than a later selection.
 This is additive conversation JSON; notebook/archive/database schemas and protocol stay at version 1.
-Old turns and published package 0.1.0 remain usable without assigning inferred relationships; turn-linked identities require a companion built from this source and a later package release.
+Old turns and installed package 0.1.0 remain usable without assigning inferred relationships; published companion 0.2.0 supplies turn-linked identities, with release verification recorded under [ADR-030](ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020).
 
 Verification on 2026-10-07 used synthetic records:
 
@@ -139,7 +139,7 @@ Verification on 2026-10-07 used synthetic records:
 - The existing notebook checks cover restart and version 1 export/import; conversation checks retain the actual selected-note identities across restart and exclude unselected notes from provider context.
 - Both experiences preserve shell, reading, prose, paragraph and demo geometry at 390–2560 pixels with navigation expanded/folded in Chromium and WebKit.
 - All 150 unit tests and 22 combined notebook/onboarding/demo/peer browser checks pass; type checks, build and validation of 144 rendered HTML files pass.
-- The locally packed companion passes clean installation and retained-record checks on macOS / Node 26.10.0; the registry package is unchanged.
+- The locally packed companion passed clean installation and retained-record checks on macOS / Node 26.10.0; the registry package was unchanged at implementation time, before the subsequent 0.2.0 release.
 - Visual review covered source selection and notebook takeaways in both browsers; existing journeys also check accessibility, mobile dark theme and shared-peer authorization.
 
 These establish the software boundary and representative journeys.
