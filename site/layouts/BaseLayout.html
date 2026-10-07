@@ -37,22 +37,6 @@
         ><span &children="(resolve siteTitle)"></span
       ></a>
       <div class="header-actions">
-        <button
-          type="button"
-          class="learning-toggle"
-          data-learning-toggle="notebook"
-          hidden
-        >
-          Notebook
-        </button>
-        <button
-          type="button"
-          class="learning-toggle"
-          data-learning-toggle="assistant"
-          hidden
-        >
-          Teaching assistant
-        </button>
         <nav aria-label="Primary">
           <a href="/">Contents</a>
           <a href="/project/introduction/">Project</a>
@@ -60,6 +44,69 @@
           <a href="/demos/">Demos</a>
           <a href="/concepts/">Concepts</a>
         </nav>
+        <div
+          class="learning-launchers"
+          role="group"
+          aria-label="Learning tools"
+          hidden
+        >
+          <button
+            type="button"
+            class="learning-toggle"
+            data-learning-toggle="notebook"
+            aria-label="Notebook"
+            aria-controls="learning-notebook"
+            aria-expanded="false"
+            aria-haspopup="dialog"
+            title="Notebook"
+            hidden
+          >
+            <svg
+              class="learning-launcher-icon"
+              aria-hidden="true"
+              focusable="false"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M6 3.5h12a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19V5A1.5 1.5 0 0 1 6 3.5Z"
+              ></path>
+              <path
+                d="M8 3.5v17M2.5 7H6M2.5 12H6M2.5 17H6M11 8h5M11 12h5"
+              ></path>
+            </svg>
+            <span class="learning-launcher-label">Notebook</span>
+          </button>
+          <button
+            type="button"
+            class="learning-toggle"
+            data-learning-toggle="assistant"
+            aria-label="Teaching assistant"
+            aria-controls="learning-assistant"
+            aria-expanded="false"
+            aria-haspopup="dialog"
+            title="Teaching assistant"
+            hidden
+          >
+            <svg
+              class="learning-launcher-icon"
+              aria-hidden="true"
+              focusable="false"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M7 4.5h10a3.5 3.5 0 0 1 3.5 3.5v6a3.5 3.5 0 0 1-3.5 3.5h-6l-5 3v-3A3.5 3.5 0 0 1 3.5 14V8A3.5 3.5 0 0 1 7 4.5Z"
+              ></path>
+              <path
+                d="M9.75 9a2.25 2.25 0 1 1 3.5 1.87c-.9.56-1.25.9-1.25 1.63M12 14.5h.01"
+              ></path>
+            </svg>
+            <span class="learning-launcher-label">Assistant</span>
+          </button>
+        </div>
         <label class="theme-picker">
           <span class="visually-hidden">Theme</span>
           <svg

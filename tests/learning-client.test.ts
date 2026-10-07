@@ -5,7 +5,7 @@ import {
   LearningConnectionError,
 } from "../site/scripts/learning-client.ts";
 
-test("incompatible pairing does not persist a token; expired sessions retain a recovery explanation", async (t) => {
+test("connections validate protocol, retain tab tokens and recover without losing replacement sessions", async (t) => {
   const original = globalThis.fetch;
   const storage = new Map<string, string>();
   const descriptor = Object.getOwnPropertyDescriptor(
@@ -28,16 +28,30 @@ test("incompatible pairing does not persist a token; expired sessions retain a r
   });
   const token = "a".repeat(43),
     client = new LearningClient();
-  globalThis.fetch = async () => Response.json({ token, version: 2 });
+  globalThis.fetch = async () => Response.json({ token, version: 1 });
   await assert.rejects(
-    client.pair("http://127.0.0.1:8788", "synthetic"),
+    client.connect("http://127.0.0.1:8788"),
     (error) =>
       error instanceof LearningConnectionError && error.reason === "protocol",
   );
   assert.equal(client.token, "");
   assert.equal(storage.size, 0);
-  globalThis.fetch = async () => Response.json({ token, version: 1 });
-  await client.pair("http://127.0.0.1:8788", "synthetic");
+  globalThis.fetch = async () =>
+    Response.json({ token: "invalid", version: 2 });
+  await assert.rejects(
+    client.connect(client.base),
+    (error) =>
+      error instanceof LearningConnectionError && error.reason === "session",
+  );
+  assert.equal(client.token, "");
+  assert.equal(storage.size, 0);
+  globalThis.fetch = async (input, init) => {
+    assert.equal(input, "http://127.0.0.1:8788/connect");
+    assert.equal(init?.method, "POST");
+    assert.equal(init?.body, "{}");
+    return Response.json({ token, version: 2 });
+  };
+  await client.connect("http://127.0.0.1:8788");
   assert.equal(client.token, token);
   assert.equal(storage.size, 1);
   const restored = new LearningClient();
@@ -53,8 +67,8 @@ test("incompatible pairing does not persist a token; expired sessions retain a r
   );
   const replacement = "b".repeat(43);
   globalThis.fetch = async () =>
-    Response.json({ token: replacement, version: 1 });
-  await client.pair("http://127.0.0.1:8788", "new synthetic code");
+    Response.json({ token: replacement, version: 2 });
+  await client.connect("http://127.0.0.1:8788");
   finishRestore(
     Response.json({ message: "Previous session expired." }, { status: 401 }),
   );
@@ -79,6 +93,19 @@ test("incompatible pairing does not persist a token; expired sessions retain a r
   );
   assert.equal(client.token, "");
   assert.equal(storage.size, 0);
+  globalThis.fetch = async () => Response.json({ token, version: 2 });
+  await client.connect(client.base);
+  let sentAuthorization: string | null = null;
+  globalThis.fetch = async (_input, init) => {
+    sentAuthorization = new Headers(init?.headers).get("Authorization");
+    return Response.json({ token: replacement, version: 2 });
+  };
+  await client.connect("http://127.0.0.1:8789");
+  assert.equal(
+    sentAuthorization,
+    null,
+    "A previous companion's token must not be sent to a different address.",
+  );
   globalThis.fetch = async () => {
     throw new TypeError("Synthetic browser network error");
   };

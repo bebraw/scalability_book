@@ -63,11 +63,15 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
   assert.equal(restored.experience, "notebook");
   assert.equal(restored.notebookView, "write");
   assert.equal(restored.assistant, null);
+  assert.equal(restored.notebookOpen, true);
+  assert.equal(restored.assistantOpen, false);
   const legacy = JSON.parse(record!);
   legacy.view = "guide";
   record = JSON.stringify(legacy);
   assert.equal(readNotebookSession().experience, "assistant");
   assert.equal(readNotebookSession().assistantView, "guide");
+  assert.equal(readNotebookSession().assistantOpen, true);
+  assert.equal(readNotebookSession().notebookOpen, false);
   const current = {
     ...legacy,
     experience: "assistant",
@@ -87,6 +91,32 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
   assert.deepEqual(readNotebookSession().assistant, current.assistant);
   assert.equal(readNotebookSession().notebookView, "notes");
   assert.equal(readNotebookSession().assistantView, "agent");
+  record = JSON.stringify({ ...current, view: "connect" });
+  assert.equal(readNotebookSession().assistantPaneView, "connect");
+  assert.equal(readNotebookSession().notebookPaneView, "notes");
+  record = JSON.stringify({ ...current, selected: ["legacy-selected"] });
+  const migrated = readNotebookSession();
+  assert.deepEqual(migrated.assistantSelected, ["legacy-selected"]);
+  migrated.selected.push("notebook-only");
+  assert.deepEqual(migrated.assistantSelected, ["legacy-selected"]);
+  saveNotebookSession({
+    ...migrated,
+    notebookOpen: true,
+    assistantOpen: true,
+    notebookPaneView: "prepare",
+    assistantPaneView: "guide",
+    selected: ["notebook-only"],
+    assistantSelected: ["assistant-only"],
+  });
+  const concurrent = readNotebookSession();
+  assert.equal(concurrent.notebookOpen, true);
+  assert.equal(concurrent.assistantOpen, true);
+  assert.equal(concurrent.notebookPaneView, "prepare");
+  assert.equal(concurrent.assistantPaneView, "guide");
+  assert.deepEqual(concurrent.selected, ["notebook-only"]);
+  assert.deepEqual(concurrent.assistantSelected, ["assistant-only"]);
+  assert.deepEqual(concurrent.assistant, current.assistant);
+  assert.equal(concurrent.editor?.body, body);
   current.assistant.source = {
     ...current.assistant.source,
     url: "javascript:synthetic",

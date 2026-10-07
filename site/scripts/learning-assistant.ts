@@ -47,7 +47,7 @@ export function mountLearningAssistant(
   const help = (source: LearningSource, question: string) =>
     options.help({ source, question, noteIds: options.selected() });
   if (section === "guide")
-    mountLearningGuide(container, {
+    return mountLearningGuide(container, {
       entries: options.entries,
       save: options.save,
       notes: options.notes,
@@ -86,7 +86,7 @@ export function mountLearningAssistant(
         }),
     });
   if (section === "agent")
-    mountLearningAgent(container, {
+    return mountLearningAgent(container, {
       client: options.client,
       draft: options.draft,
       source: pageSource,

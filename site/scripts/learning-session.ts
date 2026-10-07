@@ -62,13 +62,18 @@ export function experienceForView(
   if (assistantSections.includes(view as AssistantSection)) return "assistant";
   return null;
 }
-interface SessionState {
+export interface SessionState {
   open: boolean;
   view: NotebookView;
   experience: LearningExperience;
   notebookView: NotebookSection;
   assistantView: AssistantSection;
   assistant: AssistantDraft | null;
+  notebookOpen: boolean;
+  assistantOpen: boolean;
+  notebookPaneView: NotebookSection | "connect";
+  assistantPaneView: AssistantSection | "connect";
+  assistantSelected: string[];
   editor: NotebookEditor | null;
   assistance: string | null;
   preparation: string;
@@ -83,6 +88,11 @@ export function readNotebookSession(): SessionState {
     notebookView: "write",
     assistantView: "agent",
     assistant: null,
+    notebookOpen: false,
+    assistantOpen: false,
+    notebookPaneView: "write",
+    assistantPaneView: "agent",
+    assistantSelected: [],
     editor: null,
     assistance: null,
     preparation: "",
@@ -156,27 +166,61 @@ export function readNotebookSession(): SessionState {
     } catch {
       /* An unusable assistant draft does not discard notebook writing. */
     }
+    const experience =
+      value.experience === "assistant" || value.experience === "notebook"
+        ? value.experience
+        : (experienceForView(view) ?? "notebook");
+    const notebookView = notebookSections.includes(
+      value.notebookView as NotebookSection,
+    )
+      ? (value.notebookView as NotebookSection)
+      : notebookSections.includes(view as NotebookSection)
+        ? (view as NotebookSection)
+        : "write";
+    const assistantView = assistantSections.includes(
+      value.assistantView as AssistantSection,
+    )
+      ? (value.assistantView as AssistantSection)
+      : assistantSections.includes(view as AssistantSection)
+        ? (view as AssistantSection)
+        : "agent";
+    const selectedIds = (ids: unknown) =>
+      Array.isArray(ids)
+        ? ids
+            .filter((id): id is string => typeof id === "string")
+            .slice(0, 5000)
+        : [];
     return {
       open: value.open === true,
       view,
-      experience:
-        value.experience === "assistant" || value.experience === "notebook"
-          ? value.experience
-          : (experienceForView(view) ?? "notebook"),
-      notebookView: notebookSections.includes(
-        value.notebookView as NotebookSection,
-      )
-        ? (value.notebookView as NotebookSection)
-        : notebookSections.includes(view as NotebookSection)
-          ? (view as NotebookSection)
-          : "write",
-      assistantView: assistantSections.includes(
-        value.assistantView as AssistantSection,
-      )
-        ? (value.assistantView as AssistantSection)
-        : assistantSections.includes(view as AssistantSection)
-          ? (view as AssistantSection)
-          : "agent",
+      experience,
+      notebookView,
+      assistantView,
+      notebookOpen:
+        typeof value.notebookOpen === "boolean"
+          ? value.notebookOpen
+          : value.open === true && experience === "notebook",
+      assistantOpen:
+        typeof value.assistantOpen === "boolean"
+          ? value.assistantOpen
+          : value.open === true && experience === "assistant",
+      notebookPaneView:
+        value.notebookPaneView === "connect" ||
+        notebookSections.includes(value.notebookPaneView as NotebookSection)
+          ? (value.notebookPaneView as NotebookSection | "connect")
+          : view === "connect" && experience === "notebook"
+            ? "connect"
+            : notebookView,
+      assistantPaneView:
+        value.assistantPaneView === "connect" ||
+        assistantSections.includes(value.assistantPaneView as AssistantSection)
+          ? (value.assistantPaneView as AssistantSection | "connect")
+          : view === "connect" && experience === "assistant"
+            ? "connect"
+            : assistantView,
+      assistantSelected: selectedIds(
+        value.assistantSelected ?? (assistant ? value.selected : []),
+      ),
       assistant,
       editor,
       assistance:
@@ -185,11 +229,7 @@ export function readNotebookSession(): SessionState {
           : null,
       preparation:
         typeof value.preparation === "string" ? value.preparation : "",
-      selected: Array.isArray(value.selected)
-        ? value.selected
-            .filter((id): id is string => typeof id === "string")
-            .slice(0, 5000)
-        : [],
+      selected: selectedIds(value.selected),
     };
   } catch {
     return fallback;
@@ -198,12 +238,28 @@ export function readNotebookSession(): SessionState {
 export function saveNotebookSession(
   state: Omit<
     SessionState,
-    "experience" | "notebookView" | "assistantView" | "assistant"
+    | "experience"
+    | "notebookView"
+    | "assistantView"
+    | "assistant"
+    | "notebookOpen"
+    | "assistantOpen"
+    | "notebookPaneView"
+    | "assistantPaneView"
+    | "assistantSelected"
   > &
     Partial<
       Pick<
         SessionState,
-        "experience" | "notebookView" | "assistantView" | "assistant"
+        | "experience"
+        | "notebookView"
+        | "assistantView"
+        | "assistant"
+        | "notebookOpen"
+        | "assistantOpen"
+        | "notebookPaneView"
+        | "assistantPaneView"
+        | "assistantSelected"
       >
     >,
 ) {

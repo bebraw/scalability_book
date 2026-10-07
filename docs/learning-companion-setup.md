@@ -2,33 +2,43 @@
 
 Your notebook is a private space for questions, observations and reflection across the book.
 You choose which material becomes a course submission or a shared contribution.
-The header offers **Notebook** for keeping your thinking and **Teaching assistant** for guidance and discussion.
-They share one companion connection; switching does not send a message or save a note.
+The header offers a notebook icon labelled **Notebook** for keeping your thinking and a question-bubble icon labelled **Assistant** for guidance and discussion.
+The panel identifies the second experience as **Teaching assistant** and shows its reading context.
+They share one companion connection; opening either panel does not send a message or save a note.
+On larger screens you can keep both open: the notebook sits above the assistant at the lower right.
 Reading the book does not require a companion or a model account.
 
 ## Start on your computer
 
 The standalone package is [@scalableweb/companion](https://www.npmjs.com/package/@scalableweb/companion), maintained by bebraw.
-These commands use the verified release 0.2.0.
-Install Node.js 24 or 26, then set up a notebook without cloning the book:
+Code-free connection is prepared in version 0.3.0 and has not yet been published to npm.
+Use the book checkout for now; [repository development](#repository-development) explains how to install it.
+The published 0.2.0 package uses the previous pairing contract and cannot connect to this updated website client.
+With Node.js 24 or 26 and the repository dependencies installed, run:
 
 ```sh
-npx @scalableweb/companion@0.2.0 setup --notebook
-npx @scalableweb/companion@0.2.0 start
+npm run companion -- setup --notebook
+npm run companion
 ```
 
 Keep the companion running while you use your notebook.
-It prints a local address and a pairing code valid for ten minutes.
-In the book, choose **Notebook → Connect**, enter the address and code, and choose **Pair companion**.
+It prints a local address and the websites it allows.
+In the book, choose **Notebook → Connect**, enter the address if needed, and choose **Connect companion**.
+There is no code to copy.
 If your browser requests permission to reach the local companion, allow it for the book website.
-The code works once; restart the companion to obtain a new one after disconnecting, losing a browser session or expiry.
+After disconnect, expiry or restart, choose **Connect companion** again; the running companion does not need a restart for reconnection.
 
-The default website is `https://scalableweb.dev`; local book development at `http://127.0.0.1:3000` is also allowed.
-For another development address, pass its exact origin:
+The only default website is `https://scalableweb.dev`.
+For local development, pass its exact origin explicitly:
 
 ```sh
-npx @scalableweb/companion@0.2.0 start --origin http://127.0.0.1:3100
+npm run companion -- --origin http://127.0.0.1:3000
 ```
+
+Repeat `--origin` to trust several exact websites; supplying it replaces the default list.
+The configured website can access your local notebook while the companion runs; opening a panel still does not send a model message.
+The checkout stores its notebook in `.local/learning-companion/`; the future standalone release uses the per-user locations below.
+To continue a notebook created by the packaged CLI, pass `--directory` with its existing printed storage path to the checkout commands.
 
 The packaged companion uses a stable directory independently of your current folder and npm's cache:
 
@@ -37,14 +47,15 @@ The packaged companion uses a stable directory independently of your current fol
 | macOS  | `~/Library/Application Support/scalableweb-companion/`                                                     |
 | Linux  | `$XDG_DATA_HOME/scalableweb-companion/`, or `~/.local/share/scalableweb-companion/` when unset or relative |
 
-The published release passed clean-installation checks on macOS and Linux with Node 24 and 26.
+Published 0.2.0 passed clean-installation checks on macOS and Linux with Node 24 and 26.
+Release 0.3.0 requires its own release checks before publication.
 Windows support has not been verified.
 The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
 Keep the companion running while using the book; Ctrl+C stops it without removing your work.
 
 ### Optional first investigation
 
-After pairing, choose **Teaching assistant → Chapter guide**, or **Connect → Explore this reading**.
+After connecting, choose **Teaching assistant → Chapter guide**, or **Connect → Explore this reading**.
 The guide follows the chapter you are reading and uses its existing prompts and available demos.
 For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Teaching assistant → Chapter guide**, and select **Queue balance lab**.
 Save a prediction or a concrete uncertainty, change the demo's mean time, then choose **Save demo result**.
@@ -55,7 +66,7 @@ Try your explanation before opening **Self-check after my attempt**, or choose y
 **Ask for help with this case** prepares an editable request; you decide whether to send it.
 Reflect in your own words, using **Reflection starters and examples** if useful, then choose **Review my saved notes**.
 Pages without demos offer an application to a different system or your project, without requiring a browser observation.
-Restart the companion, pair its new code and reopen those notes to check continuity.
+Restart the companion, connect again and reopen those notes to check continuity.
 You can leave the investigation for your own question at any point.
 This is optional support, with no required answer, minimum length, completion mark or additional course report.
 
@@ -64,14 +75,21 @@ This is optional support, with no required answer, minimum length, completion ma
 The header's **Notebook** button is always available for connecting or working on the current page.
 Without a text selection, **Write** starts a note about that chapter/page and keeps its reading link.
 To attach a passage, select text in the reading, then open **Notebook**; if it is already open, choose **Use selected text**.
-Write shows the source and a short preview of the selected quote; it does not copy the whole chapter into your note.
+Write shows the source; **Preview the selected source** reveals a short quote without copying the whole chapter into your note.
+Your writing and Save action come before the note's kind and title, so you can start with your thought and add details later.
 The open notebook follows you between chapters, and **Notes** initially shows the current reading's entries; choose **Whole notebook** to see the rest.
 Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
 The assistant remembers its own section, unsent question and active conversation across chapter navigation, with its original source shown explicitly.
-Closing either experience keeps the shared panel closed on later pages.
+Each panel stays open as you move between chapters until you close it.
+The header highlights each visible tool; choose its icon again to close just that panel, or use its close button or Escape.
+On smaller screens one panel is visible at a time.
+Use the other header icon to bring that panel forward; both retain your unfinished work.
+Closing the foreground panel reveals the other if you had left it open.
 These unfinished drafts stay in this browser tab; save your notes before closing the tab.
 **Notebook** has **Write**, **Notes** and **Concepts**.
 **Teaching assistant** has **Discuss**, **Chapter guide** and **Peer discussion**.
+Selecting notes in Notebook does not change an open assistant discussion.
+Choose **Discuss selected notes** to deliberately supply that material as assistant context.
 **More learning tools** contains the shared **Connect** settings and, in Notebook, **Prepare**.
 Quick notes may be short.
 Use **Notes → Revisit** after a delay to recall an idea before rereading your earlier explanation; there is no schedule or completion requirement.
@@ -95,24 +113,26 @@ Install that version if you do not already have it:
 
 ```sh
 npm install -g @openai/codex@0.154.0
-npx @scalableweb/companion@0.2.0 setup --codex
-npx @scalableweb/companion@0.2.0 login
+npm run companion -- setup --codex
+npm run companion -- login
 ```
 
 Stop the notebook-only companion, then start it with your dedicated Codex profile:
 
 ```sh
-npx @scalableweb/companion@0.2.0 start
+npm run companion -- start
 ```
 
-Pair the new code in the book.
+Choose **Connect companion** again in the book.
 Setup creates the dedicated profile before login and retains your provider choice.
 Login uses Codex's own authentication flow; do not send credentials to the website or a support request.
 The dedicated profile separates this learning space from your ordinary coding environment.
 It must not contain custom configuration, hooks, plugins, rules or custom skills.
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
-In **Teaching assistant → Discuss**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
+In **Teaching assistant → Discuss**, write your question and choose **Send message**.
+The **Help: … · Settings** disclosure shows the current help choice and contains conversation/source controls, your optional learning goal and support preferences.
+Choose a help mode there: a question, hint, direct explanation, reasoning check or reflection support.
 This is automated study support through your chosen provider; your instructor remains responsible for course assessment.
 You can also indicate where you want support, such as a prerequisite, an unexpected result or trying the next step yourself.
 An honest statement of being stuck is enough; you can request a direct explanation immediately and change the amount of help later.
@@ -124,14 +144,12 @@ You can reopen saved conversations, stop a reply, or keep using the notebook wit
 **Write a takeaway** opens a blank personal draft; **Use as a notebook draft** prepares the selected suggestion for review and revision.
 Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
 Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
-Companion 0.2.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
-Old conversations remain readable without inferred links or policy history.
-**Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; older replies retain their original history.
-An installed 0.1.0 companion keeps its earlier instructions; restart with 0.2.0 and pair again to use the new policy.
+Companion 0.3.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
+**Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.
 
-For a demo investigation, select its source and save your **Initial thinking** first.
-Select that note for context, then ask your teaching assistant to inspect the demo.
+For a demo investigation, open **Help: … · Settings**, select its source and use **Save initial thinking** to write a notebook note first.
+Select that note and choose **Discuss selected notes**, then ask your teaching assistant to inspect the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
 Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
@@ -169,24 +187,23 @@ Solo learners can continue the Chapter guide and the existing independent human 
 Stop the companion, then run the same release and directory/port options with `doctor`:
 
 ```sh
-npx @scalableweb/companion@0.2.0 doctor
+npm run companion -- doctor
 ```
 
 It checks storage/schema compatibility, the loopback port, and the optional Codex prerequisites.
 Install the displayed verified provider version when it is missing or unsupported; run `login` for missing dedicated-profile authentication.
 An account's access is checked on its first real reply.
 Use `start --notebook` to continue writing without a provider.
-If a port is busy, stop the other process or select `--port 8789` and pair that address.
+If a port is busy, stop the other process or select `--port 8789` and connect to that address.
 For a storage permission error, select a writable private directory; do not reset the database.
 
-In **Connect**, **Check connection** shows the package/protocol versions and storage path after successful pairing.
-A failed or expired code needs a restart and a fresh single-use code.
-An expired companion session needs pairing again; your notebook and unsaved browser draft remain available.
+In **Connect**, **Check connection** shows the package/protocol versions and storage path after connecting.
+After an expired session or restart, choose **Connect companion** again; your notebook and unsaved browser draft remain available.
 For an incompatible protocol, use the version shown in this guide and reload the book.
 Browser network errors cannot reliably distinguish a stopped process, an origin mismatch or denied local-network access.
 Check that the companion is running, that its allowed websites include the exact book origin, and that your browser permits local access.
 
-`doctor --json` produces a local report containing versions, paths and check results, without notes, conversations, provider diagnostics, credentials or connection tokens.
+`doctor --json` produces a local report containing versions, paths, allowed website origins and check results, without notes, conversations, provider diagnostics, credentials or connection tokens.
 Review its filesystem paths before deliberately sharing it for support.
 Nothing sends the report automatically.
 
@@ -202,15 +219,15 @@ Identical records are retained once; imports with conflicting existing work are 
 Keep both copies and start a separate notebook if you need to inspect a conflict:
 
 ```sh
-npx @scalableweb/companion@0.2.0 start --directory /absolute/path/to/another-notebook
+npm run companion -- start --directory /absolute/path/to/another-notebook
 ```
 
 Keep a backup outside the companion's directory.
 Your course membership does not give teachers or peers access to the private notebook.
 
 Before updating, export a backup, stop the companion/provider and privately copy its directory and any separately configured profile.
-To update from 0.1.0, run `npx @scalableweb/companion@0.2.0 start` with the same directory, profile, origin and port options, then pair again.
-Release 0.2.0 retains your storage location, setup preferences, dedicated profile and records; the browser protocol, archive and database schemas remain version 1.
+To update an existing notebook, start the updated checkout with the same directory, profile, origin and port options, then connect again.
+Release 0.3.0 retains your storage location, setup preferences, dedicated profile and records; the archive and database schemas remain version 1, and the browser connection uses protocol 2.
 You do not need to repeat setup or create a new profile for this update.
 Startup validates database schemas before writing and saves a `.before-schema-1-<id>.backup` snapshot when converting the original unversioned database to schema 1.
 An interrupted conversion can be retried after stopping every writer; the backup remains available.
@@ -231,7 +248,7 @@ Stop the old companion and its Codex process.
 Before running packaged setup in the destination, migrate the old directory:
 
 ```sh
-npx @scalableweb/companion@0.2.0 migrate --from /absolute/path/to/scalability_book/.local/learning-companion --confirm-stopped
+npm run companion -- migrate --from /absolute/path/to/old-notebook --directory /absolute/path/to/new-notebook --confirm-stopped
 ```
 
 The command shows source/destination, retains the source, and rejects a nonempty destination.

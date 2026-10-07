@@ -31,7 +31,6 @@ function fixture(
     port: 8788,
     notebook,
     conversations,
-    code: "synthetic-code",
     now: () => now,
   });
   async function request(
@@ -41,6 +40,7 @@ function fixture(
     token?: string,
     origin = "https://book.test",
     host = "127.0.0.1:8788",
+    headers: Record<string, string> = {},
   ) {
     return handler.handle(
       new Request(`http://${host}${route}`, {
@@ -49,6 +49,7 @@ function fixture(
           Origin: origin,
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...headers,
         },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       }),
@@ -60,33 +61,32 @@ function fixture(
     later() {
       now += 13 * 60 * 60_000;
     },
-    async pair() {
-      const response = await request("/pair", "POST", {
-        code: "synthetic-code",
-      });
+    async connect() {
+      const response = await request("/connect", "POST", {});
       assert.equal(response.status, 200);
       return ((await response.json()) as { token: string }).token;
     },
   };
 }
-test("pairing requires the exact website origin and loopback host; private routes require a session", async (t) => {
+test("code-free connections authorize only the configured origin and loopback host, and reconnect without restarting", async (t) => {
   const f = fixture(t);
   assert.equal((await f.request("/notebook")).status, 401);
-  const denied = await f.request(
-    "/pair",
-    "POST",
-    { code: "synthetic-code" },
-    undefined,
+  for (const origin of [
+    "",
+    "null",
     "https://book.test.evil.test",
-  );
-  assert.equal(denied.status, 403);
-  assert.equal(denied.headers.has("access-control-allow-origin"), false);
+    "http://127.0.0.1:3001",
+  ]) {
+    const response = await f.request("/connect", "POST", {}, undefined, origin);
+    assert.equal(response.status, 403);
+    assert.equal(response.headers.has("access-control-allow-origin"), false);
+  }
   assert.equal(
     (
       await f.request(
-        "/pair",
+        "/connect",
         "POST",
-        { code: "synthetic-code" },
+        {},
         undefined,
         "https://book.test",
         "rebind.test:8788",
@@ -94,10 +94,36 @@ test("pairing requires the exact website origin and loopback host; private route
     ).status,
     403,
   );
-  const token = await f.pair();
-  const response = await f.request("/notebook", "GET", undefined, token);
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("cache-control"), "private, no-store");
+  assert.equal(
+    (
+      await f.request(
+        "/connect",
+        "POST",
+        {},
+        undefined,
+        "https://book.test",
+        "127.0.0.1:8788",
+        { "Content-Type": "text/plain" },
+      )
+    ).status,
+    415,
+  );
+  assert.equal((await f.request("/connect", "POST", [])).status, 400);
+  assert.equal(
+    (await f.request("/connect", "POST", { excess: "x".repeat(96_000) }))
+      .status,
+    413,
+  );
+  const grant = await f.request("/connect", "POST", {});
+  assert.equal(grant.status, 200);
+  assert.equal(grant.headers.get("cache-control"), "private, no-store");
+  const { token, version } = await grant.json();
+  assert.equal(version, 2);
+  assert.match(token, /^[A-Za-z0-9_-]{43}$/);
+  assert.equal(
+    (await f.request("/notebook", "GET", undefined, token)).status,
+    200,
+  );
   assert.equal(
     (
       await f.request(
@@ -110,10 +136,35 @@ test("pairing requires the exact website origin and loopback host; private route
     ).status,
     401,
   );
+  const status = await (
+    await f.request("/status", "GET", undefined, token)
+  ).json();
+  assert.equal(status.version, 2);
   assert.equal(
-    (await f.request("/pair", "POST", { code: "synthetic-code" })).status,
-    403,
+    (await f.request("/pair", "POST", { code: "unused" }, token)).status,
+    404,
   );
+  assert.equal((await f.request("/disconnect", "POST", {}, token)).status, 200);
+  assert.equal(
+    (await f.request("/notebook", "GET", undefined, token)).status,
+    401,
+  );
+  const replacement = await (await f.request("/connect", "POST", {})).json();
+  assert.notEqual(replacement.token, token);
+  f.later();
+  assert.equal(
+    (await f.request("/notebook", "GET", undefined, replacement.token)).status,
+    401,
+  );
+  assert.equal((await f.request("/connect", "POST", {})).status, 200);
+});
+test("connection sessions are bounded and expired sessions release capacity", async (t) => {
+  const f = fixture(t);
+  for (let index = 0; index < 64; index++)
+    assert.equal((await f.request("/connect", "POST", {})).status, 200);
+  assert.equal((await f.request("/connect", "POST", {})).status, 429);
+  f.later();
+  assert.equal((await f.request("/connect", "POST", {})).status, 200);
 });
 test("status advertises only an enabled provider's applied teaching policy", async (t) => {
   const provider: LearningProvider = {
@@ -128,7 +179,7 @@ test("status advertises only an enabled provider's applied teaching policy", asy
   };
   const current = fixture(t, provider);
   const currentStatus = await (
-    await current.request("/status", "GET", undefined, await current.pair())
+    await current.request("/status", "GET", undefined, await current.connect())
   ).json();
   assert.deepEqual(currentStatus.teaching, {
     policy: teachingPolicyIdentity,
@@ -140,7 +191,7 @@ test("status advertises only an enabled provider's applied teaching policy", asy
       "/status",
       "GET",
       undefined,
-      await notebookOnly.pair(),
+      await notebookOnly.connect(),
     )
   ).json();
   assert.equal(notebookStatus.provider, null);
@@ -148,7 +199,7 @@ test("status advertises only an enabled provider's applied teaching policy", asy
   const { teaching: _teaching, ...unversioned } = provider;
   const earlier = fixture(t, unversioned);
   const earlierStatus = await (
-    await earlier.request("/status", "GET", undefined, await earlier.pair())
+    await earlier.request("/status", "GET", undefined, await earlier.connect())
   ).json();
   assert.equal(earlierStatus.provider, "Synthetic");
   assert.equal(earlierStatus.teaching, undefined);
@@ -168,14 +219,14 @@ test("browser preflight is origin-gated and sessions expire or can be revoked", 
     ).status,
     403,
   );
-  const token = await f.pair();
+  const token = await f.connect();
   assert.equal((await f.request("/disconnect", "POST", {}, token)).status, 200);
   assert.equal(
     (await f.request("/export", "GET", undefined, token)).status,
     401,
   );
   const second = fixture(t),
-    secondToken = await second.pair();
+    secondToken = await second.connect();
   second.later();
   assert.equal(
     (await second.request("/notebook", "GET", undefined, secondToken)).status,
@@ -184,7 +235,7 @@ test("browser preflight is origin-gated and sessions expire or can be revoked", 
 });
 test("authenticated notebook API captures short notes and prepares only selected submission material", async (t) => {
   const f = fixture(t),
-    token = await f.pair();
+    token = await f.connect();
   const result = await f.request(
     "/entries",
     "POST",

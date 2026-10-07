@@ -1,4 +1,8 @@
-import { chooseNotebookTool } from "./learning-notebook.helpers.ts";
+import {
+  activeLearningPanel,
+  chooseNotebookTool,
+  openAssistantSettings,
+} from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -35,7 +39,7 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     { stdio: ["ignore", "pipe", "pipe"] },
   );
   try {
-    const code = await new Promise<string>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       let text = "";
       const timeout = setTimeout(
         () => reject(new Error("Live companion failed to start")),
@@ -47,10 +51,10 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       });
       child.stdout!.on("data", (data) => {
         text += String(data);
-        const match = text.match(/Pairing code .*: ([A-Za-z0-9_-]+)/);
+        const match = text.match(/Learning companion: http:\/\/127\.0\.0\.1:/);
         if (match) {
           clearTimeout(timeout);
-          resolve(match[1]!);
+          resolve();
         }
       });
     });
@@ -59,10 +63,11 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       .locator(".site-header")
       .getByRole("button", { name: "Notebook", exact: true })
       .click();
-    const panel = page.locator(".learning-workspace");
+    const panel = activeLearningPanel(page);
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18889");
-    await panel.getByLabel("Pairing code").fill(code);
-    await panel.getByRole("button", { name: "Pair companion" }).click();
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
     await expect(panel.getByRole("status")).toContainText("Connected");
     await chooseNotebookTool(panel, "Connect");
     await expect(
@@ -83,7 +88,8 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
     await chooseNotebookTool(panel, "Notes");
     await panel.getByRole("checkbox").first().check();
-    await chooseNotebookTool(panel, "Discuss");
+    await panel.getByRole("button", { name: "Discuss selected notes" }).click();
+    await openAssistantSettings(panel);
     await panel.getByLabel("How I want help").selectOption("check");
     await panel
       .getByLabel("Message to the teaching assistant")

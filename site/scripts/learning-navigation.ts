@@ -15,14 +15,25 @@ const sections = {
   ],
 } as const;
 
+export function syncLearningLaunchers(
+  panel: HTMLDialogElement,
+  experience: LearningExperience,
+) {
+  const button = document.querySelector<HTMLButtonElement>(
+    `[data-learning-toggle="${experience}"]`,
+  );
+  button?.setAttribute("aria-expanded", String(!panel.hidden));
+  button?.setAttribute("aria-controls", panel.id);
+}
+
 /** Experience navigation owns presentation only, independently of providers/stores. */
 export function mountLearningNavigation(
   panel: HTMLDialogElement,
   experience: LearningExperience,
   view: NotebookView,
   navigate: (view: NotebookView) => void,
-  switchExperience: (experience: LearningExperience) => void,
 ) {
+  syncLearningLaunchers(panel, experience);
   const name =
     experience === "notebook" ? "My learning notebook" : "Teaching assistant";
   panel.setAttribute("aria-label", name);
@@ -37,19 +48,6 @@ export function mountLearningNavigation(
       "aria-label",
       experience === "notebook" ? "Close notebook" : "Close teaching assistant",
     );
-  const switcher = panel.querySelector<HTMLElement>(".learning-experiences")!;
-  switcher.replaceChildren();
-  for (const [id, title] of [
-    ["notebook", "Notebook"],
-    ["assistant", "Teaching assistant"],
-  ] as const) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = title;
-    button.setAttribute("aria-pressed", String(experience === id));
-    button.addEventListener("click", () => switchExperience(id));
-    switcher.append(button);
-  }
   const tabs = panel.querySelector<HTMLElement>(".learning-tabs")!;
   tabs.setAttribute("aria-label", `${name} sections`);
   tabs.replaceChildren();

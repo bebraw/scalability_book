@@ -1,4 +1,5 @@
 import {
+  activeLearningPanel,
   selectReading,
   chooseNotebookTool,
 } from "./learning-notebook.helpers.ts";
@@ -83,7 +84,7 @@ test("students save private initial work before group replies, reflect individua
       }
       await rm(directory, { recursive: true, force: true });
     });
-    const code = await new Promise<string>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       let output = "";
       const timeout = setTimeout(
         () => reject(new Error("Synthetic companion did not start")),
@@ -95,10 +96,12 @@ test("students save private initial work before group replies, reflect individua
       });
       child.stdout!.on("data", (data) => {
         output += String(data);
-        const match = output.match(/Pairing code .*: ([A-Za-z0-9_-]+)/);
+        const match = output.match(
+          /Learning companion: http:\/\/127\.0\.0\.1:/,
+        );
         if (match) {
           clearTimeout(timeout);
-          resolve(match[1]!);
+          resolve();
         }
       });
     });
@@ -108,18 +111,19 @@ test("students save private initial work before group replies, reflect individua
       .locator(".site-header")
       .getByRole("button", { name: "Notebook", exact: true })
       .click();
-    const panel = page.locator(".learning-workspace");
+    const panel = activeLearningPanel(page);
     await panel
       .getByLabel("Companion address")
       .fill(`http://127.0.0.1:${port}`);
-    await panel.getByLabel("Pairing code").fill(code);
-    await panel.getByRole("button", { name: "Pair companion" }).click();
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
     await selectReading(page);
     await panel.getByRole("button", { name: "Use selected text" }).click();
     return { page, panel };
   }
   async function peers(page: Page) {
-    const panel = page.locator(".learning-workspace");
+    const panel = activeLearningPanel(page);
     await chooseNotebookTool(panel, "Peer discussion");
     await panel.getByLabel("Course for this inquiry").selectOption(course.id);
     return panel;

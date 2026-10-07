@@ -4,6 +4,9 @@
 
 **Date:** 2026-10-06
 
+The connection bootstrap requirements below are refined by [ADR-037](ADR-037-connect-to-the-local-companion-without-pairing-codes.md): the current implementation uses explicit code-free connection from a configured trusted website, while retaining authenticated sessions.
+Historical release evidence here describes its original pairing flow.
+
 ## Context
 
 The book already publishes concepts, reading locations, optional explorations, graphics and HTML demos for students' external agents.

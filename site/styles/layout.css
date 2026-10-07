@@ -33,6 +33,55 @@
 .site-header nav a {
   text-decoration: none;
 }
+.learning-launchers {
+  align-items: center;
+  border-inline-start: 1px solid var(--border);
+  display: flex;
+  gap: 0.25rem;
+  padding-inline-start: 0.75rem;
+}
+.learning-launchers[hidden],
+.learning-toggle[hidden] {
+  display: none;
+}
+.learning-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  inline-size: 4rem;
+  min-block-size: 3rem;
+  padding: 0.3rem;
+  font: 600 0.68rem/1.2 var(--font-ui);
+}
+.learning-launcher-icon {
+  block-size: 1.3rem;
+  fill: none;
+  flex: 0 0 auto;
+  inline-size: 1.3rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+.learning-toggle:hover {
+  background: var(--bg);
+  color: var(--accent-strong);
+}
+.learning-toggle[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+.learning-toggle:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
 .theme-picker {
   align-items: center;
   display: inline-flex;

@@ -1,4 +1,7 @@
-import { chooseNotebookTool } from "./learning-notebook.helpers.ts";
+import {
+  activeLearningPanel,
+  chooseNotebookTool,
+} from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
@@ -16,7 +19,8 @@ test("a packed companion supports an optional first investigation and retains th
     path.join(tmpdir(), "book-onboarding-browser-"),
   );
   const artifact = path.resolve(
-    `.local/companion-release/scalableweb-companion-${companionRelease.version}.tgz`,
+    process.env.COMPANION_CHECK_ARTIFACT ??
+      `.local/companion-release/scalableweb-companion-${companionRelease.version}.tgz`,
   );
   execFileSync(
     "npm",
@@ -51,7 +55,7 @@ test("a packed companion supports an optional first investigation and retains th
       cwd: directory,
       stdio: ["ignore", "pipe", "pipe"],
     });
-    return await new Promise<string>((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       let output = "";
       const timer = setTimeout(
         () => reject(new Error("Packed companion failed to start")),
@@ -63,10 +67,13 @@ test("a packed companion supports an optional first investigation and retains th
       });
       child!.stdout!.on("data", (chunk) => {
         output += String(chunk);
-        const match = output.match(/Pairing code .*: ([A-Za-z0-9_-]+)/);
+        const match = output.match(
+          /Learning companion: http:\/\/127\.0\.0\.1:/,
+        );
         if (match) {
           clearTimeout(timer);
-          resolve(match[1]!);
+          expect(output).not.toMatch(/Pairing code \(single use/);
+          resolve();
         }
       });
     });
@@ -80,19 +87,18 @@ test("a packed companion supports an optional first investigation and retains th
     child = null;
   };
   try {
-    const code = await start();
+    await start();
     await page.goto("/demos/#demo-queue-balance-lab");
     await page
       .locator(".site-header")
       .getByRole("button", { name: "Notebook", exact: true })
       .click();
-    const panel = page.locator(".learning-workspace");
+    const panel = activeLearningPanel(page);
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18896");
-    await panel.getByLabel("Pairing code").fill("incorrect-synthetic-code");
-    await panel.getByRole("button", { name: "Pair companion" }).click();
-    await expect(panel.getByRole("status")).toContainText("did not match");
-    await panel.getByLabel("Pairing code").fill(code);
-    await panel.getByRole("button", { name: "Pair companion" }).click();
+    await expect(panel.getByLabel("Pairing code")).toHaveCount(0);
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
     await expect(panel.getByRole("status")).toHaveText(
       "Connected to your private notebook.",
     );
@@ -160,9 +166,10 @@ test("a packed companion supports an optional first investigation and retains th
     await expect(panel.getByRole("status")).toContainText(
       "cannot tell us which",
     );
-    const next = await start();
-    await panel.getByLabel("Pairing code").fill(next);
-    await panel.getByRole("button", { name: "Pair companion" }).click();
+    await start();
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
     await chooseNotebookTool(panel, "Notes");
     await expect(
       panel.getByRole("heading", {
@@ -170,6 +177,21 @@ test("a packed companion supports an optional first investigation and retains th
         exact: true,
       }),
     ).toBeVisible();
+    await expect(
+      panel.getByRole("heading", {
+        name: "Queue balance lab: reflection",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await chooseNotebookTool(panel, "Connect");
+    await panel
+      .getByRole("button", { name: "Disconnect", exact: true })
+      .click();
+    // Reconnection in the same process requires no restart or copied code.
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
+    await chooseNotebookTool(panel, "Notes");
     await expect(
       panel.getByRole("heading", {
         name: "Queue balance lab: reflection",

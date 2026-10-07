@@ -42,10 +42,12 @@ export function mountLearningGuide(
 ) {
   options.status("");
   const reading = currentReading();
-  const savedEntries = [...options.entries];
+  const savedEntries = options.entries;
+  let notebookChanged = () => {};
   const save: GuideSave = async (...args) => {
     const entry = await options.save(...args);
-    savedEntries.push(entry);
+    if (!savedEntries.some((saved) => saved.id === entry.id))
+      savedEntries.push(entry);
     return entry;
   };
   const related = (source: LearningSource) =>
@@ -291,6 +293,16 @@ export function mountLearningGuide(
           ? "Your starting point is saved. Try the demo, then save its result."
           : "Save a prediction or uncertainty to enable Save demo result.";
     };
+    notebookChanged = () => {
+      hasInitial = savedEntries.some(
+        (entry) =>
+          entry.kind === "attempt" &&
+          Boolean(entry.body.trim()) &&
+          entry.source.url === source.url &&
+          entry.source.anchor === source.anchor,
+      );
+      updateAvailability();
+    };
     updateAvailability();
     first.section.append(
       prediction.field,
@@ -394,4 +406,5 @@ export function mountLearningGuide(
   });
   persist();
   renderActivity(demos.find((demo) => demo.id === select.value)!);
+  return () => notebookChanged();
 }

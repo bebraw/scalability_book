@@ -36,6 +36,8 @@ const buttons = document.querySelectorAll<HTMLButtonElement>(
 );
 for (const button of buttons) {
   button.hidden = false;
+  button.closest<HTMLElement>(".learning-launchers")!.hidden = false;
+  button.closest<HTMLElement>(".site-header")!.dataset.learningReady = "true";
   button.addEventListener(
     "click",
     () =>

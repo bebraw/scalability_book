@@ -1,4 +1,4 @@
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import type { LearningNotebook } from "./learning-notebook.ts";
 import type { LearningConversations } from "./learning-conversations.ts";
 import {
@@ -9,7 +9,6 @@ import {
   LearningProblem,
   learningAssert,
   learningObject,
-  learningText,
   learningList,
   learningId,
   notebookMarkdown,
@@ -19,7 +18,6 @@ export interface CompanionOptions {
   origins: string[];
   port: number;
   notebook: LearningNotebook;
-  code?: string;
   now?: () => number;
   conversations?: LearningConversations;
   metadata?: Pick<CompanionStatus, "release" | "storage" | "schemas">;
@@ -36,16 +34,19 @@ export function createCompanionHandler(options: CompanionOptions) {
       return origin;
     }),
   );
-  const code = options.code ?? randomBytes(18).toString("base64url");
-  const codeExpires = now() + 10 * 60_000;
   const sessions = new Map<string, { origin: string; expires: number }>();
-  let paired = false;
-  let failedPairings = 0;
-  const matches = (left: string, right: string) => {
-    const a = Buffer.from(left),
-      b = Buffer.from(right);
-    return a.length === b.length && timingSafeEqual(a, b);
-  };
+  function createSession(origin: string) {
+    for (const [token, session] of sessions)
+      if (session.expires <= now()) sessions.delete(token);
+    learningAssert(
+      sessions.size < 64,
+      "Too many connected tabs. Disconnect unused tabs or restart the companion; your stored work is retained.",
+      429,
+    );
+    const token = randomBytes(32).toString("base64url");
+    sessions.set(token, { origin, expires: now() + 12 * 60 * 60_000 });
+    return { token, version: companionRelease.protocol };
+  }
   async function body(request: Request, maximum = 96_000) {
     learningAssert(
       request.headers.get("content-type")?.split(";")[0] === "application/json",
@@ -78,7 +79,6 @@ export function createCompanionHandler(options: CompanionOptions) {
     }
   }
   return {
-    code,
     async handle(request: Request): Promise<Response> {
       const origin = request.headers.get("origin") ?? "";
       const headers = new Headers({
@@ -97,7 +97,7 @@ export function createCompanionHandler(options: CompanionOptions) {
         );
         learningAssert(
           origins.has(origin),
-          "This website is not paired with the companion.",
+          "This website is not allowed to connect to the companion.",
           403,
         );
         headers.set("Access-Control-Allow-Origin", origin);
@@ -112,22 +112,11 @@ export function createCompanionHandler(options: CompanionOptions) {
         headers.set("Access-Control-Allow-Private-Network", "true");
         if (request.method === "OPTIONS")
           return new Response(null, { status: 204, headers });
-        if (url.pathname === "/pair" && request.method === "POST") {
-          learningAssert(
-            !paired && now() < codeExpires && failedPairings < 8,
-            "Pairing expired or was used. Restart the companion for a new code.",
-            403,
-          );
-          const value = await body(request);
-          const supplied = learningText(value.code, "Pairing code", 200, true);
-          if (!matches(supplied, code)) {
-            failedPairings++;
-            throw new LearningProblem("The pairing code did not match.", 403);
-          }
-          paired = true;
-          const token = randomBytes(32).toString("base64url");
-          sessions.set(token, { origin, expires: now() + 12 * 60 * 60_000 });
-          return reply({ token, version: companionRelease.protocol });
+        if (url.pathname === "/connect" && request.method === "POST") {
+          // JSON excludes simple cross-site form requests. The exact allowed
+          // Origin and loopback Host above authorize this session bootstrap.
+          await body(request);
+          return reply(createSession(origin));
         }
         const token = request.headers
           .get("authorization")
@@ -137,7 +126,7 @@ export function createCompanionHandler(options: CompanionOptions) {
           session && session.origin === origin && session.expires > now(),
           session && session.expires <= now()
             ? "Your companion session expired."
-            : "Connect the companion using its pairing code.",
+            : "Connect the companion from the book's Connect section.",
           401,
         );
         if (url.pathname === "/disconnect" && request.method === "POST") {

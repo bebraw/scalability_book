@@ -136,7 +136,7 @@ export function openLearningConversations(
       const source = parseLearningSource(value.source);
       learningAssert(
         new URL(source.url).origin === origin,
-        "Use the paired book's source context.",
+        "Use the connected book's source context.",
       );
       const conversation: LearningConversation = {
         id: randomUUID(),

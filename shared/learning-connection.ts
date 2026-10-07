@@ -3,8 +3,8 @@ import type { TeachingContext } from "./learning-agent.ts";
 /** Release and connection metadata, independent of a provider or rendering. */
 export const companionRelease = {
   name: "@scalableweb/companion",
-  version: "0.2.0",
-  protocol: 1,
+  version: "0.3.0",
+  protocol: 2,
   notebookSchema: 1,
   conversationSchema: 1,
   codexVersion: "0.154.0",

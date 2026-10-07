@@ -3,11 +3,8 @@ import {
   type CompanionStatus,
 } from "../../shared/learning-connection.ts";
 export class LearningConnectionError extends Error {
-  readonly reason: "network" | "session" | "pairing" | "protocol";
-  constructor(
-    message: string,
-    reason: "network" | "session" | "pairing" | "protocol",
-  ) {
+  readonly reason: "network" | "session" | "protocol";
+  constructor(message: string, reason: "network" | "session" | "protocol") {
     super(message);
     this.reason = reason;
   }
@@ -40,6 +37,7 @@ export class LearningClient {
       url.hash
     )
       throw new Error("Use the companion’s http://127.0.0.1 address and port.");
+    if (url.origin !== this.base) this.clearSession();
     this.base = url.origin;
   }
   async request<T>(route: string, method = "GET", body?: unknown): Promise<T> {
@@ -72,16 +70,10 @@ export class LearningClient {
       if (response.status === 401) {
         this.clearSession();
         throw new LearningConnectionError(
-          `${data.message ?? "The companion session is unavailable."} Restart it for a fresh pairing code and reconnect. Your stored notebook and this draft are retained.`,
+          `${data.message ?? "The companion session is unavailable."} Choose Connect companion again. Your stored notebook and this draft are retained.`,
           "session",
         );
       }
-      if (route === "/pair")
-        throw new LearningConnectionError(
-          data.message ??
-            "Pairing failed. Restart for a fresh code and check the address.",
-          "pairing",
-        );
       throw new Error(data.message ?? "The companion request failed.");
     }
     return data;
@@ -98,20 +90,21 @@ export class LearningClient {
     this.compatible(status.version);
     return status;
   }
-  async pair(base: string, code: string) {
+  async connect(base: string) {
     this.setBase(base);
     const result = await this.request<{ token: string; version: number }>(
-      "/pair",
+      "/connect",
       "POST",
-      {
-        code,
-      },
+      {},
     );
+    this.retainSession(result);
+  }
+  private retainSession(result: { token: string; version: number }) {
     this.compatible(result.version);
     if (!/^[A-Za-z0-9_-]{43}$/.test(result.token))
       throw new LearningConnectionError(
-        "Pairing returned an invalid session. Restart the companion and use a new code.",
-        "pairing",
+        "The companion returned an invalid session. Restart it and reconnect.",
+        "session",
       );
     this.token = result.token;
     try {
@@ -132,7 +125,7 @@ export class LearningClient {
       const saved = JSON.parse(
         sessionStorage.getItem("book-learning-connection") ?? "null",
       ) as { base: string; token: string } | null;
-      // A delayed restore check must not erase a newly paired session.
+      // A delayed restore check must not erase a newly connected session.
       if (saved?.base === this.base && saved.token === this.token)
         sessionStorage.removeItem("book-learning-connection");
     } catch {

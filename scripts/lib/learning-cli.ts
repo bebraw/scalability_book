@@ -114,7 +114,7 @@ export async function runLearningCli(
     const command = positionals[0] ?? "start";
     if (values.help) {
       console.log(
-        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, start (default), doctor, migrate\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --codex-home <path>, --model <name>\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json\nSetup starts notebook-only unless you choose Codex. Stop with Ctrl+C; your work remains local.`,
+        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, start (default), doctor, migrate\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --codex-home <path>, --model <name>\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json\nSetup starts notebook-only unless you choose Codex. Start trusts only https://scalableweb.dev by default; use --origin for local development. Connect from the book without a code. Stop with Ctrl+C; your work remains local.`,
       );
       return;
     }
@@ -135,10 +135,7 @@ export async function runLearningCli(
       Number.isInteger(port) && port >= 1024 && port <= 65535,
       "Choose a port from 1024 to 65535.",
     );
-    const origins = values.origin ?? [
-      "https://scalableweb.dev",
-      "http://127.0.0.1:3000",
-    ];
+    const origins = values.origin ?? ["https://scalableweb.dev"];
     for (const origin of origins) {
       let valid = false;
       try {
@@ -249,7 +246,7 @@ export async function runLearningCli(
         );
         renameSync(stage, settingsFile);
         console.log(
-          `Storage: ${directory}\nPackage: ${companionRelease.version}; protocol: ${companionRelease.protocol}\n${codex ? `Dedicated Codex profile: ${home}\nRun doctor --codex, then login if needed.` : "Notebook-only setup is ready."}\nRun start with these same directory options, then pair in https://scalableweb.dev/notebook/setup/.`,
+          `Storage: ${directory}\nPackage: ${companionRelease.version}; protocol: ${companionRelease.protocol}\n${codex ? `Dedicated Codex profile: ${home}\nRun doctor --codex, then login if needed.` : "Notebook-only setup is ready."}\nRun start with these same directory options, then connect in https://scalableweb.dev/notebook/setup/.`,
         );
         if (codex)
           for (const check of providerCheck(home))
@@ -335,6 +332,7 @@ export async function runLearningCli(
       }
       const report = {
         release: { ...companionRelease, sourceRevision },
+        connection: { origins },
         storage: directory,
         provider: codex ? "Codex" : null,
         checks,
@@ -350,7 +348,7 @@ export async function runLearningCli(
               `${check.ok ? "OK" : "ACTION"} ${check.name}: ${check.message}`,
             );
           console.log(
-            "If pairing fails: restart for a fresh code, check the exact website origin, and allow the browser's local-network request. A browser network error alone cannot identify its cause.",
+            "If connecting fails: check the address and exact allowed website origin, and allow the browser's local-network request. Choose Connect companion again after a restart or expired session. A browser network error alone cannot identify its cause.",
           );
         }
         if (checks.some((check) => !check.ok)) process.exitCode = 1;

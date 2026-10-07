@@ -98,12 +98,16 @@
   }
   .brand {
     font-size: 0.88rem;
-    line-height: 1.2;
+    line-height: 2.25rem;
     min-width: 0;
     overflow: hidden;
     padding-right: 3rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .site-header[data-learning-ready="true"] .brand {
+    line-height: 3rem;
+    padding-right: 11.75rem;
   }
   .header-actions {
     align-items: center;
@@ -119,12 +123,22 @@
     flex-wrap: wrap;
     font-size: 0.8rem;
     gap: 0.2rem;
-    grid-column: 1;
+    grid-column: 1 / -1;
     justify-content: space-between;
   }
   .site-header nav a {
     padding: 0.35rem 0.15rem;
     white-space: nowrap;
+  }
+  .learning-launchers {
+    border: 0;
+    inset-block-start: 0.55rem;
+    inset-inline-end: calc(clamp(1rem, 3vw, 2.5rem) + 3rem);
+    padding: 0;
+    position: absolute;
+  }
+  .learning-toggle {
+    inline-size: 3.5rem;
   }
   .theme-picker {
     block-size: 2.25rem;
@@ -132,11 +146,14 @@
     border-radius: 50%;
     display: grid;
     inline-size: 2.25rem;
-    inset-block-start: 0.38rem;
+    inset-block-start: 0.55rem;
     inset-inline-end: clamp(1rem, 3vw, 2.5rem);
     justify-self: auto;
     place-items: center;
     position: absolute;
+  }
+  .site-header[data-learning-ready="true"] .theme-picker {
+    inset-block-start: 0.925rem;
   }
   .theme-picker:focus-within {
     border-color: var(--accent);

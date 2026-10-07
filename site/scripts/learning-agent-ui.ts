@@ -96,17 +96,19 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     node.addEventListener("click", () => void act(fn));
     return node;
   };
-  const toolbar = element("div");
+  const toolbar = element("details");
+  toolbar.className = "learning-assistant-settings";
+  const settingsSummary = element("summary", "Conversation and help settings");
+  toolbar.append(settingsSummary);
   const messages = element("div");
   messages.className = "learning-messages";
   messages.setAttribute("aria-live", "polite");
   container.append(
-    element(
-      "p",
-      "This automated study assistant works through your chosen provider. Choose the support you need and what to keep in your notebook; your instructor assesses course work.",
+    Object.assign(
+      element("p", "Automated study support through your chosen provider."),
+      { className: "learning-hint" },
     ),
     toolbar,
-    messages,
   );
   const demoSelect = element("select");
   const reading = draft.source;
@@ -118,15 +120,19 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     const reading = conversation?.source ?? draft.source;
     const contextLink = element("a", reading.title);
     contextLink.href = sourceLink(reading);
-    context.append(element("p", "Source for this conversation"), contextLink);
-    if (reading.excerpt)
-      context.append(
+    context.append(contextLink);
+    if (reading.excerpt) {
+      const passage = element("details");
+      passage.append(
+        element("summary", "Preview the selected source"),
         element(
           "blockquote",
           reading.excerpt.slice(0, 500) +
             (reading.excerpt.length > 500 ? "…" : ""),
         ),
       );
+      context.append(passage);
+    }
     if (new URL(reading.url).pathname !== location.pathname)
       context.append(
         element(
@@ -163,7 +169,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       noteContext,
       element(
         "p",
-        "Only this source and the notes you select are supplied for your message. Opening this view sends no message.",
+        "Only this source and selected notes are sent with your message.",
       ),
     );
   }
@@ -264,8 +270,13 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     help.append(option);
   }
   help.value = draft.mode;
+  const describeHelp = () => {
+    settingsSummary.textContent = `Help: ${help.selectedOptions[0]!.textContent} · Settings`;
+  };
+  describeHelp();
   help.addEventListener("change", () => {
     draft.mode = help.value as AssistantDraft["mode"];
+    describeHelp();
     options.changed();
   });
   const need = element("select");
@@ -287,7 +298,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     options.changed();
   });
   const input = element("textarea");
-  input.rows = 5;
+  input.rows = 3;
   input.maxLength = 8000;
   input.value = draft.question;
   input.placeholder =
@@ -296,61 +307,68 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     draft.question = input.value;
     options.changed();
   });
-  container.append(
+  toolbar.append(
     field("My learning goal", goalInput),
     field("How I want help", help),
     field("Where I want support", need),
-    field("Message to the teaching assistant", input),
     element(
       "p",
       "You can ask for a direct explanation immediately, change help at any time, or try the next step yourself. Saving initial thinking is needed only for assistant demo changes.",
     ),
   );
-  container.append(
+  toolbar.append(
     button("Save initial thinking", () =>
       options.initial(conversation?.source ?? source()),
     ),
-    button("Send message", async () => {
-      if (!draft.question.trim()) {
-        options.status("Write your question or initial explanation first.");
-        return;
-      }
-      if (!conversation)
-        remember(
-          await client.request<LearningConversation>(
-            "/agent/conversations",
-            "POST",
-            { source: source() },
-          ),
-        );
+  );
+  container.append(field("Message to the teaching assistant", input));
+  const actions = element("div");
+  actions.className = "learning-assistant-actions";
+  const send = button("Send message", async () => {
+    if (!draft.question.trim()) {
+      options.status("Write your question or initial explanation first.");
+      return;
+    }
+    if (!conversation)
       remember(
         await client.request<LearningConversation>(
-          `/agent/conversations/${conversation!.id}`,
+          "/agent/conversations",
           "POST",
-          {
-            text:
-              draft.supportNeed === "unspecified"
-                ? draft.question
-                : `Support requested: ${supportNeedLabels[draft.supportNeed]}.\n\n${draft.question}`,
-            goal: draft.goal,
-            mode: draft.mode,
-            supportNeed: draft.supportNeed,
-            noteIds: options.selected(),
-            browserId: draft.browserId,
-          },
+          { source: source() },
         ),
       );
-      draft.question = "";
-      options.changed();
-      input.value = "";
-      draw();
-      poll();
-    }),
+    remember(
+      await client.request<LearningConversation>(
+        `/agent/conversations/${conversation!.id}`,
+        "POST",
+        {
+          text:
+            draft.supportNeed === "unspecified"
+              ? draft.question
+              : `Support requested: ${supportNeedLabels[draft.supportNeed]}.\n\n${draft.question}`,
+          goal: draft.goal,
+          mode: draft.mode,
+          supportNeed: draft.supportNeed,
+          noteIds: options.selected(),
+          browserId: draft.browserId,
+        },
+      ),
+    );
+    draft.question = "";
+    options.changed();
+    input.value = "";
+    draw();
+    poll();
+  });
+  send.className = "learning-primary";
+  actions.append(
+    send,
     button("Stop reply", async () => {
       await client.request("/agent/stop", "POST", {});
       options.status("Stopped. Your saved thinking is retained.");
     }),
   );
+  container.append(actions, messages);
   function draw() {
     drawContext();
     const current = conversation?.source ?? draft.source;
@@ -513,4 +531,5 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     }
   }
   draw();
+  return drawContext;
 }

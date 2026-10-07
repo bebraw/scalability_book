@@ -121,7 +121,8 @@ The shared layout now offers separate lazy Notebook and Teaching assistant entry
 `site/scripts/learning-navigation.ts` owns experience/section presentation, while `site/scripts/learning-assistant.ts` composes discussion, chapter guidance and human peer inquiry.
 The existing workspace remains the coordinator for pairing and reviewed notebook writes; shared handoff types do not depend on a provider or course store.
 
-The fixed panel shows one experience at a time, preserving the book's normal geometry.
+The initial implementation used one fixed panel showing one experience at a time, preserving the book's normal geometry.
+[ADR-036](../implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md) refines that presentation into independently openable panels while retaining this decision's responsibility and handoff boundaries.
 Notebook provides Write, Notes and Concepts, with Prepare under More learning tools.
 Teaching assistant provides Discuss, Chapter guide and Peer discussion, with the same Connect settings.
 Version 1 tab state adds separate remembered sections, assistant message/goal/help choices, captured source, active conversation ID and browser identity; older records retain writing and map their sections to the new experience.
@@ -148,7 +149,7 @@ Workspace, architecture, setup and course inquiry documentation describe the imp
 
 ## Resolved implementation choices
 
-One shared fixed panel and two header entry points keep pairing and tab continuity together while presenting distinct purposes.
+The initial shared fixed panel and two header entry points kept pairing and tab continuity together while presenting distinct purposes; ADR-036 retains the shared connection with independent panel state.
 Peer discussion sits visibly within Teaching assistant alongside chapter guidance, retaining its human audience, course identity and explicit sharing actions.
 Concrete naming and placement may be refined from learner feedback without changing record ownership or handoff rules.
 

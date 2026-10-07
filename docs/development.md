@@ -176,10 +176,11 @@ Run `npx playwright test tests/e2e/course-simulation-walkthrough.spec.ts --proje
 
 ## Learning companion
 
-Run `npm run companion` for the optional local private notebook service.
+Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional local private notebook service beside the development website.
+Only `https://scalableweb.dev` is trusted by default; specify exact development origins explicitly.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
-See [the learning-workspace guide](learning-workspace.md) for pairing, exact origins, portability and the current implementation boundary.
-Use `npm run companion -- --codex` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
+See [the learning-workspace guide](learning-workspace.md) for code-free connection, exact origins, portability and the current implementation boundary.
+Use `npm run companion -- --codex --origin http://127.0.0.1:3000` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
 The CLI also supports `setup`, `login`, `doctor` and `migrate`; for example, `npm run companion -- setup --codex` creates the development profile before `npm run companion -- login`.
 Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
 Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
@@ -200,7 +201,7 @@ npm run companion:check
 The first command bundles the runtime and records its Git revision in `packages/learning-companion/dist/release.json`, then writes `.local/companion-release/scalableweb-companion-<version>.tgz`.
 Both generated locations are ignored.
 Dirty builds are marked explicitly and are useful for iteration; publish only from a clean committed revision.
-The checker installs that tarball into a clean temporary directory, uses an isolated per-user home, launches without this checkout's dependencies and verifies retained notes across working directories, pairing and prerequisite failures.
+The checker installs that tarball into a clean temporary directory, uses an isolated per-user home, launches without this checkout's dependencies and verifies retained notes across working directories, code-free connection and prerequisite failures.
 The onboarding browser check also installs the actual tarball, so pack it before running that test.
 
 [The package workflow](../.github/workflows/learning-companion.yml) runs focused tests, packing and clean installation on macOS/Linux with Node 24/26.
@@ -208,17 +209,20 @@ Wait for all declared matrix jobs to pass before claiming platform support or pu
 The verified Codex adapter currently requires CLI 0.154.0; provider verification uses a real separately authenticated profile, while automatic jobs use synthetic records without credentials.
 To verify a freshly installed tarball, set `LEARNING_COMPANION_BIN` to its launcher and `LEARNING_CODEX_HOME` to its dedicated authenticated profile when running the opt-in browser check.
 
+The repository prepares 0.3.0 (browser protocol 2) with code-free connection; it is not yet published.
+The browser and setup guide use the checkout until registry availability is verified.
+For an isolated iteration artifact, set `COMPANION_CHECK_ARTIFACT` to its absolute path in both the checker and onboarding browser test.
 The publisher is bebraw, with access to the `scalableweb` npm organization.
 Authenticate through `npm login --scope=@scalableweb`, then verify `npm whoami` without reading credentials into logs.
 After the artifact, matrix and provider checks pass, publish that exact tarball with public access:
 
 ```sh
-npm publish .local/companion-release/scalableweb-companion-0.2.0.tgz --access public
+npm publish .local/companion-release/scalableweb-companion-0.3.0.tgz --access public
 ```
 
 If npm requires a browser/2FA step, complete its own authentication flow and rerun publishing.
 That interactive flow needs both stdin and stdout attached to a terminal.
-On macOS, a coding-agent terminal can use `rtk proxy script -q /dev/null npm publish .local/companion-release/scalableweb-companion-0.2.0.tgz --access public` to provide a full terminal through RTK.
+On macOS, a coding-agent terminal can use `rtk proxy script -q /dev/null npm publish .local/companion-release/scalableweb-companion-0.3.0.tgz --access public` to provide a full terminal through RTK.
 The scope must already exist as an npm organization; a free organization supports this public package.
 If npm stages the release, inspect `npm stage list @scalableweb/companion` and approve its reviewed stage through npm's own 2FA flow or the account's Staged Packages page.
 A `0.0.0-stage` placeholder does not establish that the requested version is available; verify the actual version and integrity in the registry before updating student instructions.

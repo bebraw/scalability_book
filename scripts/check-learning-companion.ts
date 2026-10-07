@@ -105,7 +105,7 @@ try {
   run("setup", ["--notebook"]);
   const diagnostic = JSON.parse(run("doctor", ["--json"]));
   assert.equal(diagnostic.storage, data);
-  assert.equal(diagnostic.release.protocol, 1);
+  assert.equal(diagnostic.release.protocol, companionRelease.protocol);
   assert.equal(
     diagnostic.checks.every((check: { ok: boolean }) => check.ok),
     true,
@@ -116,7 +116,7 @@ try {
       env,
       stdio: ["ignore", "pipe", "pipe"],
     });
-    return await new Promise<string>((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       let output = "";
       const timer = setTimeout(
         () => reject(new Error("Packed companion did not start")),
@@ -124,14 +124,17 @@ try {
       );
       child!.once("exit", () => {
         clearTimeout(timer);
-        reject(new Error("Packed companion exited before pairing"));
+        reject(new Error("Packed companion exited before connecting"));
       });
       child!.stdout!.on("data", (chunk) => {
         output += String(chunk);
-        const match = output.match(/Pairing code .*: ([A-Za-z0-9_-]+)/);
+        const match = output.match(
+          /Learning companion: http:\/\/127\.0\.0\.1:/,
+        );
         if (match) {
           clearTimeout(timer);
-          resolve(match[1]!);
+          assert.doesNotMatch(output, /Pairing code \(single use/);
+          resolve();
         }
       });
     });
@@ -159,7 +162,8 @@ try {
     assert.ok(response.ok, JSON.stringify(result));
     return result;
   };
-  token = (await request("/pair", "POST", { code: await start(a) })).token;
+  await start(a);
+  token = (await request("/connect", "POST", {})).token;
   const status = await request("/status");
   assert.equal(status.storage, data);
   assert.equal(status.release.name, companionRelease.name);
@@ -246,7 +250,8 @@ try {
     chmodSync(readonly, 0o700);
   }
   token = "";
-  token = (await request("/pair", "POST", { code: await start(b) })).token;
+  await start(b);
+  token = (await request("/connect", "POST", {})).token;
   const retained = await request("/notebook");
   assert.equal(retained.entries[0].id, note.id);
   assert.equal(retained.entries[0].body, "My initial prediction");
@@ -265,13 +270,14 @@ try {
       { cwd: b, encoding: "utf8" },
     ),
   );
+  assert.deepEqual(report.connection, { origins: ["https://scalableweb.dev"] });
   assert.doesNotMatch(
     JSON.stringify(report),
     /My initial prediction|Bearer|Pairing code/,
   );
   await stop();
   console.log(
-    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, built-only runtime, setup/diagnostics, pairing and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
+    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, built-only runtime, setup/diagnostics, code-free connection and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
   );
 } finally {
   const running = currentChild();

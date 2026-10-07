@@ -7,23 +7,36 @@ Implemented status identifies verified software behavior; production rollout and
 [Implemented ADRs 031–033](adrs/README.md#implemented) cover responsive support, independent application with reflection and scaffolded peer inquiry.
 [ADR-034](adrs/implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) separates Notebook and Teaching assistant experiences with deliberate handoffs.
 [ADR-035](adrs/implemented/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) defines the shared versioned teaching policy, recognizable manner and separate evaluation of usability, support and independent learning.
+[ADR-036](adrs/implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md) refines their presentation into independent panels with one shared connection.
 
 ## Current implementation
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
-The whole-book Notebook and Teaching assistant entry points load one shared interface on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
+The whole-book Notebook and Teaching assistant entry points load the shared coordinator and independently rendered panels on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
 Both header entries remain available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
+The header groups compact notebook and question-bubble icons after primary navigation, with visible **Notebook** and **Assistant** captions and full accessible names.
+Each visible panel highlights its launcher and exposes its expanded state; choosing it again closes only that panel without discarding drafts.
+Escape or the panel's close button returns keyboard focus to that experience's launcher when focus was inside the panel.
 Opening either experience captures the selection before loading/focusing the interface.
 Notebook offers **Use selected text** and Teaching assistant offers **Discuss selected text** when already open.
 Notebook captures a private writing context; assistant selection prepares a source without sending a message.
 A chapter note keeps the reading link and authored concept membership without copying the chapter text.
-The source is visible in Write; selected quotes have a bounded preview while their full captured text remains in the saved record.
-An open experience follows book navigation and retains its active section; closing it keeps later pages lazy, with no companion request until reopening.
+The source is visible in Write; **Preview the selected source** reveals a bounded quote while its full captured text remains in the saved record.
+Writing and Save actions precede kind/title details.
+Discuss puts the message before optional conversation/goal/support controls in the **Help: … · Settings** disclosure, whose summary identifies the current help mode.
+Each open panel follows book navigation and retains its active section.
+Closing both keeps later pages lazy, with no companion request until reopening.
 Opening either experience preserves the book's existing widths and positions, including its navigation, reading column and wider demos.
-The fixed shared panel uses the right margin when there is space and overlays the reading area on smaller screens; close it to reach covered passages or demo controls.
-Open experience, separate remembered sections, unfinished notebook writing, selected note IDs, submission preparation and assistant message/goal/help choices live in this website's tab session independently of the paired token.
+The fixed notebook uses the upper-right margin and the smaller assistant sits at the lower right.
+Both can remain visible without overlapping on screens wider than 68rem and taller than 42rem; the notebook shortens to leave room for the assistant.
+On more compact screens only the foreground panel is visible, while the other retains its open state and draft.
+Its header launcher brings it forward; closing the foreground panel reveals the other if it remains open.
+The panels overlay the reading area when the right margin is insufficient; close them to reach covered passages or demo controls.
+Each has independently scrollable content beneath its navigation.
+Independent open states, foreground experience, remembered sections, unfinished notebook writing, separate notebook/assistant selected note IDs, submission preparation and assistant message/goal/help choices live in this website's tab session independently of the connection token.
 Assistant state also retains the captured source, active conversation ID and initiating browser identity for resuming bounded requests after navigation.
-Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant without migrating notebook or conversation databases.
+Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant and restore their single open experience.
+Additive version 1 fields retain both panels and independent selections without migrating notebook or conversation databases.
 Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
 Guide and concept choices follow the current reading; peer inquiry uses the current page or its captured passage.
 Discuss retains its own chosen source across navigation and saved-conversation selection, independently of an unfinished notebook note; **Discuss the current reading** prepares a deliberate replacement.
@@ -31,7 +44,10 @@ Only Save note creates or revises a durable companion record; tab continuity is 
 Notes defaults to the current chapter/page, with Whole notebook available for cross-book review.
 Notebook presents **Write**, **Notes** and **Concepts**; **Prepare** and the shared **Connect** settings live under **More learning tools**.
 Teaching assistant presents **Discuss**, **Chapter guide** and **Peer discussion**, with the same connection settings.
-Switching experiences does not save, send a message or require a second pairing.
+Opening or bringing either panel forward does not save, send a message or require a second connection.
+There is no experience chooser within the panels.
+Checking notes in Notebook does not change the assistant's selected context; an explicit discussion handoff supplies the chosen set.
+Shared record refreshes preserve the assistant's unsent message and ongoing discussion.
 **Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
 An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
 Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
@@ -43,40 +59,52 @@ Production availability of peer inquiry depends on the existing course storage a
 
 The shared contract is [learning-workspace.ts](../shared/learning-workspace.ts).
 [learning-activities.ts](../shared/learning-activities.ts) owns optional versioned independent cases; it reuses canonical exercises without owning their checks.
-[learning-notebook.ts](../scripts/lib/learning-notebook.ts) owns local SQLite persistence; [learning-companion-http.ts](../scripts/lib/learning-companion-http.ts) owns pairing and API access.
+[learning-notebook.ts](../scripts/lib/learning-notebook.ts) owns local SQLite persistence; [learning-companion-http.ts](../scripts/lib/learning-companion-http.ts) owns session bootstrap and API access.
 These modules do not depend on course storage or a provider SDK.
 The website/Worker never owns this private notebook or provider credentials.
 
 ## Start the companion
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
-Follow [student setup](learning-companion-setup.md) for the published and verified version 0.2.0.
-It includes the shared teaching policy and additive conversation metadata; [ADR-030](adrs/implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) records the registry artifact and release verification.
-The development entry keeps the repository's installed dependencies and existing default:
+The repository prepares release 0.3.0 with code-free connection and browser protocol 2; it has not been published to npm.
+The published 0.2.0 artifact uses the previous connection contract and is not supported by this updated browser client.
+[ADR-030](adrs/implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) retains its release evidence; [ADR-037](adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records the new trust boundary.
+For now use the checkout command; it keeps the repository's installed dependencies and existing default:
 
 ```bash
-npm run companion
+npm run companion -- --origin http://127.0.0.1:3000
 ```
 
-The process binds to `127.0.0.1:8788` and prints a single-use pairing code valid for ten minutes.
-The default allowed websites are `https://scalableweb.dev` and `http://127.0.0.1:3000`.
-Pass exact origins for another development port:
+The process binds to `127.0.0.1:8788` and prints its address and allowed website origins.
+In either panel's **Connect** section, enter that address if different from the default and choose **Connect companion**.
+No pairing code is generated or entered.
+The only default allowed website is `https://scalableweb.dev`; specify an exact origin for every development address.
+Repeated `--origin` options replace the default allowlist, rather than adding to it:
 
 ```bash
-npm run companion -- --origin http://127.0.0.1:3100 --directory .local/learning-companion-test
+npm run companion -- --origin https://scalableweb.dev --origin http://127.0.0.1:3100 --directory .local/learning-companion-test
 ```
 
 The private notebook lives at `.local/learning-companion/notebook.sqlite`, outside published output and ignored by Git.
 That path belongs to the repository entry only.
 The packaged entry chooses the per-user macOS/Linux path in the student guide; both accept an explicit `--directory`.
+When switching between packaged and repository entries, pass the existing notebook directory explicitly to retain the same work/profile.
 Use `--directory` to choose another notebook and `--port` for another loopback port.
-Keep the original database when updating the companion; restart it to obtain a new pairing code after disconnect, expiry or a lost browser session.
+Keep the original database when updating the companion.
+After disconnect, expiry, restart or a lost browser session, choose **Connect companion** again; reconnecting does not require restarting a running companion.
 
-Pairing checks the exact website origin and loopback host.
-The resulting bearer session is bound to that origin, expires after twelve hours and can be revoked through `/disconnect`.
-Browser requests use the Authorization header, not URL credentials or cookies.
-CORS preflight is origin-gated, including local-network permission requests.
+Starting the companion authorizes the configured website, including its scripts, to request a session through `POST /connect` with a JSON object.
+This explicit origin trust replaces possession of a printed pairing code.
+The handler validates the exact website Origin and literal loopback host before routes or CORS preflight; missing/null origins and cross-site form content types are rejected.
+This is a browser boundary for a single-user local process, not isolation from native local processes that can forge HTTP headers.
+It does not grant machine execution or change the separate student approval for demo controls.
+The resulting random bearer session is bound to that origin, expires after twelve hours and can be revoked through `/disconnect`.
+At most 64 sessions are retained; expired sessions are pruned on connection and disconnect releases its session.
+Private notebook/provider routes still require a valid token.
+Browser requests use the Authorization header, not URL credentials or cookies, and tokens remain in tab-scoped session storage.
+Session responses are private and uncached; CORS preflight is origin-gated, including local-network permission requests.
 The companion does not log notes, provider credentials or session tokens.
+There is no `/pair` route, code generator or manual-pairing option.
 
 ### Distribution, diagnostics and storage recovery
 
@@ -90,9 +118,9 @@ The dedicated Codex CLI authentication result is a prerequisite check; a real re
 Authenticated `/status` returns package/source revision, protocol, provider mode, selected storage path and notebook/conversation/archive schema versions.
 Policy-aware adapters also report optional `teaching` metadata: policy ID/version/name and provider name/version.
 Connect shows the installed policy; older companions retain their existing instructions and do not acquire a new policy from website JavaScript.
-The browser requires protocol 1 before retaining a paired token or accepting status.
-Failed codes and expired sessions lead to ordinary re-pairing; network feedback names the possible process/origin/local-permission causes without pretending to distinguish them.
-`doctor --json` contains only release/path/check metadata; no telemetry or automatic support upload is introduced.
+The browser requires protocol 2 before retaining a connection token or accepting status.
+Expired sessions lead back to Connect; network feedback names the possible process/origin/local-permission causes without pretending to distinguish them.
+`doctor --json` contains only release/path/check metadata and configured website origins; no telemetry or automatic support upload is introduced.
 
 [learning-storage.ts](../scripts/lib/learning-storage.ts) owns per-user path selection, exclusive process leases and explicit migration.
 Migration requires `--from` and `--confirm-stopped`, validates regular files/supported schemas and copies privately through an atomic staged-directory rename.
@@ -102,8 +130,8 @@ Setup preferences are not copied because their absolute profile path may identif
 Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
-Package 0.2.0, browser protocol 1, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
-The 0.2.0 release retains 0.1.0's storage location, setup preferences and compatible records without a new schema migration.
+Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+Release 0.3.0 retains the previous storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
 Interrupted migration retains a recoverable snapshot and can be retried once writers stop.
@@ -133,7 +161,7 @@ This is guidance, not a minimum or a quality score; short scratch notes and the 
 Evaluation may change this reversible cue without changing the assessment rubric.
 
 The Write, Notes, Concepts and Prepare sections support capture, revision, recall before rereading, evidence-linked judgments and selected submission material.
-The Connect section handles pairing and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
+The Connect section handles connection and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
 Students review drafts and use the ordinary course submission form.
 The published [student setup guide](learning-companion-setup.md) is available at `/notebook/setup/`.
 The optional Chapter guide uses the current reading's authored prompt and demos actually present on that page.
@@ -164,8 +192,9 @@ npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onbo
 npm run types:check
 ```
 
-The checks cover restart persistence, accepted revisions, stale-write rejection, portable restore/import conflicts, selected-note preparation and the pairing/origin/session boundary with synthetic notes.
-Browser checks cover whole-book entry points, lazy loading, capture, revision history, concept judgments, revisit, resumed pairing, accessibility and mobile dark theme.
+The checks cover restart persistence, accepted revisions, stale-write rejection, portable restore/import conflicts, selected-note preparation and the connection/origin/session boundary with synthetic notes.
+Browser checks cover whole-book entry points, lazy loading, capture, revision history, concept judgments, revisit, reconnection, accessibility and mobile dark theme.
+Concurrent-panel checks cover separate selections and unsent work, independent closing, non-overlapping desktop bounds, compact-screen foreground transitions, shared connection recovery and retained sections/drafts across chapter navigation and reload.
 The optional real-provider check uses a dedicated authenticated profile and a temporary synthetic notebook:
 
 ```bash
@@ -193,13 +222,14 @@ Chapter guide can prepare an editable help request with its reading/demo source;
 Student messages retain optional goal/help-mode/support-need metadata and the supplied note identities in existing conversation JSON; older requests default to unspecified and older turns remain valid.
 The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
 Supplied note identities allow a reviewed takeaway to link the notes used on its actual turn, rather than the current selection; old turns omit them and are not assigned inferred relationships.
-Published companion 0.2.0 supplies these provider changes; an installed 0.1.0 companion retains its earlier instructions and does not acquire them through a website update.
+The prepared 0.3.0 companion retains the provider changes introduced in 0.2.0; a website update alone does not update an installed companion.
 The Codex adapter applies the current shared instructions on both thread start and resume and reports the actual CLI version (or null if it cannot be read).
 Each new student and assistant message stores optional `teaching: { policy: { id, version, name }, provider: { name, version } }` in existing conversation JSON.
 The metadata identifies applied instructions, not proof that a reply complies; later policies never rewrite earlier turns.
 **About this reply** shows recorded versions, with an explicit unknown-history message for legacy replies; reviewed notebook handoffs retain that provenance.
 Policy changes update the policy version alongside the instructions and their evaluation evidence.
-The HTTP protocol, conversation database schema and portable notebook/archive versions remain `1`: these fields are additive, and old records and clients remain valid.
+Teaching metadata is additive in the version 1 conversation database and portable notebook/archive schemas.
+The prepared companion uses HTTP protocol 2 for code-free connection; existing record histories remain valid.
 Providers that do not advertise a policy are treated as unversioned, rather than being assigned today's policy by the conversation owner.
 [learning-codex.ts](../scripts/lib/learning-codex.ts) adapts the [Codex app-server protocol](https://learn.chatgpt.com/docs/app-server) over local stdio.
 [learning-conversations.ts](../scripts/lib/learning-conversations.ts) owns `conversations.sqlite`, selected context and the browser request broker.
@@ -214,6 +244,7 @@ Codex's local tool host remains available for the three declared callbacks.
 Provider diagnostics are not relayed into website responses or logs.
 One reply runs at a time; students may interrupt it.
 The adapter is the first working provider, not a claim that all external agent clients already work.
+Local-model support remains proposed in [ADR-038](adrs/proposed/ADR-038-support-local-models-through-the-learning-companion.md), which records the LM Studio/Gemma investigation and its remaining context, history and tool-verification work.
 
 Authenticated companion routes:
 
@@ -228,7 +259,7 @@ Authenticated companion routes:
 The provider receives only the captured source, explicitly selected notebook entries and authored resource navigation.
 Combined turn context is limited to 96,000 characters; an oversized selection is rejected before saving a turn or starting the provider.
 It has no course-cookie or peer-retrieval tool.
-`read_book` accepts registered public reading/resource paths at the paired origin, rejects redirects, excludes private course APIs and bounds source text to 32,000 characters.
+`read_book` accepts registered public reading/resource paths at the connected origin, rejects redirects, excludes private course APIs and bounds source text to 32,000 characters.
 That source text is not evidence that a demo ran.
 
 The browser's version-1 bridge is available after lazy loading as `BookLearningWorkspace.observeLearningDemo(id)` and `changeLearningDemo(id, {controlId, value})`.
@@ -238,7 +269,7 @@ Changes accept a declared option, boolean, bounded/stepped number, text up to 1,
 They accept no arbitrary selector, script, remote URL or machine command.
 Observations cover DOM values/text, not inferred canvas pixels or production measurements.
 
-Agent requests bind to the initiating paired session and browser, expire after two minutes and report unavailable/declined actions honestly.
+Agent requests bind to the initiating connection session and browser, expire after two minutes and report unavailable/declined actions honestly.
 A changed demo requires selected saved initial thinking for the conversation source and an explicit browser approval.
 Peer-derived notebook material enters the agent only through deliberate selection after the peer reveal step.
 

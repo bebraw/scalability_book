@@ -102,7 +102,7 @@ export async function startLearningCompanion(options: {
     server.headersTimeout = 15_000;
     server.listen(port, "127.0.0.1", () => {
       process.stdout.write(
-        `Learning companion: http://127.0.0.1:${port}\nAllowed websites: ${origins.join(", ")}\nPairing code (single use, valid for 10 minutes): ${companion.code}\nPrivate notebook: ${directory}\n`,
+        `Learning companion: http://127.0.0.1:${port}\nAllowed websites: ${origins.join(", ")}\nIn the book, choose Notebook → Connect → Connect companion.\nPrivate notebook: ${directory}\n`,
       );
     });
 
