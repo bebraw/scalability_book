@@ -1,6 +1,6 @@
 # ADR-033: Scaffold peer inquiry while preserving individual learning
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -101,20 +101,32 @@ Students retain their own evidence and self-assessment.
 
 ## Implementation and verification
 
-Current initial-work gating, source-anchored threads, explicit sharing and private reflection handoff provide the baseline.
-Structured reasoning prompts, responsibility cues and the connected independent follow-up remain to be implemented.
+`shared/learning-inquiry.ts` now owns optional question, competing-explanation, evidence/check, decision and uncertainty prompts, plus the existing operator/challenger/validator responsibilities and rotation cues.
+The browser can prepare a freely editable outline without required fields, contribution counts or waiting for every member.
+The course specification retains ownership of required engineering-session practice and the solo independent human review route.
 
-Before marking this record Implemented:
+Contribution selection starts unchecked.
+Students can prepare a summary from selected visible contributions, retaining author identity/contribution IDs, disagreement, evidence links, dates and tool provenance without deriving consensus.
+Oversized selections fail visibly instead of silently losing material.
+The existing reviewed sharing action, audiences and record revisions still govern posting; no new shared schema, store, API or authorization rule is introduced.
 
-- Connect optional inquiry/session prompts and individual follow-up while retaining ordinary asynchronous questions/replies and the solo route.
-- Exercise a synthetic group with competing predictions, a checked result, retained disagreement and different private takeaways; include an absent member and a request for more help.
-- Verify that no required contribution count, common concept judgment or automatic private-note publication is introduced.
-- Recheck attempt-first access, deliberately selected agent context, group/cohort isolation, historical membership, source versions, concurrent edits and public-offer consent for any changed shared behavior.
-- Update workspace/course operating documentation and the voluntary evaluation guide.
+The private reflection handoff now contains only a thread reference and optional personal starters unless the student deliberately selects contributions to copy.
+The draft links their existing private records and requires review/save; it does not retrieve peer work for an agent or grant future thread access.
+Each thread also offers an optional authored independent case through the same practice component, with its own tab draft and a separately saved linked notebook attempt.
+Students can request help or continue the private guide without a group decision, and keep different personal explanations and concept judgments.
 
-Learner evaluation should ask consenting members to explain a related case individually and describe whether explanation, challenge and validation helped them.
-Use chosen excerpts/interviews and existing course evidence rather than routine notebook/transcript access or participation counts.
-Record usability, workload and independent learning separately from a successful group result.
+Verification on 2026-10-07 used synthetic records:
+
+- A two-student browser journey leaves a third member absent, compares explanations, runs an actual browser-model check, preserves disagreement and prepares a reviewed attributed summary before sharing.
+- It verifies a link-only private handoff by default, deliberately selected evidence in another student's draft, different private takeaways, requested help and a separately saved independent case without automatic concept updates.
+- Existing inquiry tests retain attempt-first disclosure, group/cohort and phase isolation, historical membership, original source snapshots, concurrent-write/allocation rejection and separate public-offer consent.
+- All 150 unit tests and 20 combined Chromium/WebKit notebook/onboarding/demo/peer checks pass, along with type checks, production build/77-page HTML validation, formatting and changed-document links.
+- The locally packed companion passes clean installation and retained-record checks on macOS / Node 26; the published npm package is unchanged.
+  ADR-031's new provider instructions still require a future companion release.
+
+Workspace, student setup, course operating and voluntary evaluation documentation now explain optional collaborative reasoning and each learner's chosen evidence, independent application, workload and ordinary course progress.
+Production inquiry still depends on the existing course identity/storage rollout.
+These establish working software and an evaluation protocol; learner outcomes remain unmeasured.
 
 ## References
 

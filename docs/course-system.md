@@ -633,6 +633,10 @@ Stop that Worker afterwards.
 Optional book inquiry enters through **Notebook → Peers**, using this workspace's course identity and published phase allocations.
 [The learning-workspace guide](learning-workspace.md#peer-inquiry-contract) owns attempt-first disclosure, group/cohort scope, membership corrections, moderation and consented editorial offers.
 Private initial notes stay in the student's companion; shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
+Optional reasoning outlines, role-rotation cues and reviewed summaries reuse the existing inquiry contribution and provenance contract.
+Students select which visible contributions enter a draft; summaries preserve named contributors, disagreement and evidence limitations and require the ordinary sharing action.
+Each learner can return to a separately saved private takeaway or changed case without waiting for absent members.
+These prompts add no roster, participation score, common self-assessment, course credit or required report; required session practice remains in [the common project specification](../specifications/00_common_project.md#shared-engineering-sessions).
 Apply all course migrations, including `0004_learning_inquiry.sql`, to live and simulation course databases before enabling these routes.
 The additive index bounds discovery to the requested source/activity; it does not change existing submission or feedback audiences.
 

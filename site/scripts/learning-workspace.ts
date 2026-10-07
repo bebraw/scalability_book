@@ -321,33 +321,43 @@ function render() {
     mountLearningPeers(container, {
       source: readingSource(),
       entries,
+      save: async (kind, title, body, source, relatedIds = []) => {
+        const entry = await client.request<NotebookEntry>("/entries", "POST", {
+          kind,
+          title,
+          body,
+          source,
+          relatedIds,
+        });
+        await refresh();
+        return entry;
+      },
+      help: (source, text) => {
+        prepareLearningHelp(source, text);
+        navigate("agent");
+      },
+      notes: () => navigate("notes"),
       status: (text) => {
         status.textContent = text;
       },
       initial: (source) => {
-        acceptedAssistance = null;
-        editor = {
-          id: "",
-          expected: "",
-          kind: "attempt",
-          title: `Initial thinking: ${source.title}`.slice(0, 300),
-          body: "",
-          relatedIds: [],
+        beginNote(
           source,
-        };
-        navigate("write");
+          "attempt",
+          `Initial thinking: ${source.title}`.slice(0, 300),
+        );
       },
-      reflect: (source, body) => {
-        acceptedAssistance = null;
-        editor = {
-          id: "",
-          expected: "",
-          kind: "reflection",
-          title: `Peer inquiry: ${source.title}`.slice(0, 300),
-          body: body.slice(0, 16000),
-          relatedIds: [],
-          source,
-        };
+      reflect: (source, body, relatedIds) => {
+        if (
+          !beginNote(
+            source,
+            "reflection",
+            `Peer inquiry: ${source.title}`.slice(0, 300),
+            relatedIds,
+          )
+        )
+          return;
+        editor.body = body;
         navigate("write");
         status.textContent =
           "Compare with your initial explanation and revise this private draft. Choose which material represents your own learning before saving.";

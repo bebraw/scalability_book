@@ -132,7 +132,13 @@ A concrete uncertainty is enough to begin.
 Review the text and its audience before sharing.
 Group inquiry is scoped to a phase allocation; course-cohort inquiry is visible to active participants in that run after their initial step.
 Replies can preserve disagreement and link evidence or tool provenance.
-**Reflect privately on this inquiry** prepares a local draft for your own revised explanation.
+**Optional reasoning and session prompts** offers a short outline: question, competing explanations, evidence/check, current decision and remaining uncertainty.
+Use any part or write freely; you need not wait for every member to reply.
+Select contributions you want in a draft, then **Prepare summary from selected contributions** if useful.
+Review contributor identities, disagreement, evidence limits and any agent assistance before using the ordinary share button; an absent member has not endorsed it.
+**Reflect privately on this inquiry** prepares a local draft with a discussion link and personal starters.
+It copies classmates' text only when you deliberately select their contributions.
+**Try a related case privately** lets you apply the idea yourself, save a separate attempt or request more help, regardless of the group's decision.
 Only notes you later select enter an agent conversation or submission draft.
 
 New members do not gain older group threads automatically.
@@ -140,6 +146,9 @@ Students who leave a group or withdraw retain read-only access to their own cont
 Public review is a separate opt-in copy of the author's reviewed contribution; it does not publish the thread or classmates' replies.
 Course staff review offers, and book editors decide what to publish through the existing Markdown review workflow.
 Optional session prompts support your existing operator/challenger/validator practice; arrange meetings yourselves.
+For another check, change responsibilities and ask someone other than the operator to explain why the result should be accepted.
+You can keep a different private conclusion and choose your own concept judgment.
+Solo learners can continue the Chapter guide and the existing independent human review route; peer replies are not a prerequisite.
 
 ## Diagnose a connection
 

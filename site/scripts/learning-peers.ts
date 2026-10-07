@@ -10,6 +10,13 @@ import {
   type InquiryOffer,
 } from "../../shared/course-inquiry.ts";
 import type { Envelope } from "../../shared/course.ts";
+import {
+  inquiryOutline,
+  inquiryReasoningPrompts,
+  inquiryRolePrompts,
+  selectedInquiryText,
+} from "../../shared/learning-inquiry.ts";
+import { mountLearningPractice, type GuideSave } from "./learning-practice.ts";
 
 type VisibleThread = Envelope<InquiryThread> & { readOnly?: boolean };
 type Membership = {
@@ -22,8 +29,11 @@ interface Options {
   source: LearningSource;
   entries: NotebookEntry[];
   initial: (source: LearningSource) => void;
-  reflect: (source: LearningSource, body: string) => void;
+  reflect: (source: LearningSource, body: string, relatedIds: string[]) => void;
   status: (text: string) => void;
+  save: GuideSave;
+  help: (source: LearningSource, text: string) => void;
+  notes: () => void;
 }
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   const result = document.createElement(tag);
@@ -41,6 +51,16 @@ function field(text: string, control: HTMLElement) {
 }
 export function mountLearningPeers(container: HTMLElement, options: Options) {
   const source = options.source;
+  const privateEntries = [...options.entries];
+  const related = (source: LearningSource) =>
+    privateEntries
+      .filter(
+        (entry) =>
+          entry.source.url === source.url &&
+          entry.source.anchor === source.anchor,
+      )
+      .slice(-20)
+      .map((entry) => entry.id);
   const state = {
     course: new URL(location.href).searchParams.get("course") ?? "",
     question: (inquiryQuestions.includes(
@@ -97,6 +117,12 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     node(
       "p",
       "Peer inquiry follows your own thinking. Save an explanation, prediction or where you are stuck, then compare and reflect. Your initial text stays in your private notebook.",
+    ),
+  );
+  container.append(
+    node(
+      "p",
+      "You can return to Chapter guide for a private related case at any time. Peer replies are optional; solo work does not require a group response.",
     ),
   );
   const sourceLink = node("a", source.title);
@@ -287,6 +313,10 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     for (const record of state.threads) {
       const thread = record.value;
       const card = node("article");
+      const selected = new Set<string>();
+      const chosen = () =>
+        thread.posts.filter((post) => selected.has(post.id) && !post.removedAt);
+      const selectionActions: HTMLButtonElement[] = [];
       card.className = "learning-note";
       card.append(
         node(
@@ -324,6 +354,19 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         );
         if (post.provenance)
           contribution.append(node("small", post.provenance));
+        if (!post.removedAt) {
+          const include = node("input");
+          include.type = "checkbox";
+          include.addEventListener("change", () => {
+            if (include.checked) selected.add(post.id);
+            else selected.delete(post.id);
+            for (const action of selectionActions)
+              action.disabled = !selected.size;
+          });
+          contribution.append(
+            field(`Select ${post.name} · ${post.kind} for my draft`, include),
+          );
+        }
         if (post.editedAt)
           contribution.append(
             node(
@@ -417,20 +460,35 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         button("Reflect privately on this inquiry", () =>
           options.reflect(
             thread.source,
-            `Discussion: ${threadLink(thread)}\n\n${thread.posts
-              .filter((post) => !post.removedAt)
-              .map(
-                (post) =>
-                  `${post.name} (${post.kind}${post.provenance ? `; ${post.provenance}` : ""}): ${post.body}`,
-              )
-              .join("\n\n")
-              .slice(
-                0,
-                12_000,
-              )}\n\nMy initial view, what changed or became better supported, and my next check:\n`,
+            `Discussion reference: ${threadLink(thread)}\nThis link does not copy replies or grant access after membership changes.\n\n${selected.size ? `Selected contributions for my review (not group consensus):\n${selectedInquiryText(chosen(), 12000)}\n\n` : ""}My initial view:\n\nWhat I can now justify myself:\n\nWhat remains uncertain or needs more help:\n\nMy next independent check:\n`,
+            related(thread.source),
           ),
         ),
       );
+      card.append(
+        node(
+          "p",
+          "Select only contributions you want copied into a reviewed draft. Leaving them unselected keeps the private reflection handoff to a discussion link and optional starters. Nothing is sent to an agent automatically.",
+        ),
+      );
+      const practice = node("details");
+      practice.append(node("summary", "Try a related case privately"));
+      mountLearningPractice(practice, {
+        source: {
+          ...thread.source,
+          excerpt: `Discussion reference: ${threadLink(thread)}\n\n${thread.source.excerpt}`,
+        },
+        related: () => related(thread.source),
+        save: async (...args) => {
+          const entry = await options.save(...args);
+          privateEntries.push(entry);
+          return entry;
+        },
+        help: options.help,
+        notes: options.notes,
+        draftScope: thread.id,
+      });
+      card.append(practice);
       if (!record.readOnly && !thread.closedAt) {
         const reply = node("textarea");
         reply.rows = 3;
@@ -438,10 +496,32 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         const kind = kindSelect();
         const provenance = node("input");
         provenance.maxLength = 1000;
+        const prepare = button(
+          "Prepare summary from selected contributions",
+          () => {
+            const text = selectedInquiryText(chosen(), 4700);
+            if (
+              reply.value.trim() &&
+              !window.confirm(
+                "Replace this unfinished reply with a selected-contribution summary draft? Cancel keeps your reply.",
+              )
+            )
+              return;
+            reply.value = `Selected contributions for review (not group consensus):\n${text}\n\n${inquiryOutline()}`;
+            kind.value = "summary";
+            options.status(
+              "Summary prepared for your review. Preserve disagreement and evidence limits, name who supports each decision, and record any agent assistance before sharing.",
+            );
+          },
+        );
+        prepare.disabled = true;
+        selectionActions.push(prepare);
         card.append(
           field("My reply", reply),
           field("Reply kind", kind),
           field("Reply tool or observation provenance", provenance),
+          reasoningSupport(reply),
+          prepare,
           button("Share reply with this audience", async () => {
             await api(`/${thread.id}/replies`, "POST", {
               expected: record.revision,
@@ -494,6 +574,31 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     }
     return select;
   }
+  function reasoningSupport(body: HTMLTextAreaElement) {
+    const details = node("details");
+    details.append(
+      node("summary", "Optional reasoning and session prompts"),
+      node(
+        "p",
+        "Use any prompt, write freely or leave a disagreement unresolved. No required fields, contribution count or meeting schedule.",
+      ),
+    );
+    for (const prompt of inquiryReasoningPrompts)
+      details.append(node("h4", prompt.title), node("p", prompt.prompt));
+    for (const prompt of inquiryRolePrompts) details.append(node("p", prompt));
+    details.append(
+      button("Use inquiry outline", () => {
+        const next = `${body.value.trim()}${body.value.trim() ? "\n\n" : ""}${inquiryOutline()}`;
+        if (next.length > 6000)
+          throw new Error(
+            "Keep your writing and use the prompts alongside it; this contribution is too long to add the outline.",
+          );
+        body.value = next;
+        body.focus();
+      }),
+    );
+    return details;
+  }
   function renderCompose() {
     compose.replaceChildren();
     const membership = state.membership!;
@@ -525,6 +630,11 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       field("Review the text I want to share", body),
       field("Tool or observation provenance", provenance),
       field("Optional HTTPS evidence link", evidence),
+      reasoningSupport(body),
+      node(
+        "p",
+        "Review the audience and text before sharing. For summaries, keep contributors, consequential disagreement, evidence limits and any agent/tool provenance explicit. An agent suggestion is not a group decision.",
+      ),
       button("Share reviewed text with the chosen audience", async () => {
         const [phase, group] = audience.value.split(":");
         await api("", "POST", {
@@ -544,15 +654,6 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         await reveal();
       }),
     );
-    const session = node("details");
-    session.append(
-      node("summary", "Optional session prompts"),
-      node(
-        "p",
-        "Operator: state the question and run the check. Challenger: compare independent predictions and challenge assumptions. Validator: another student checks the result. Record the observation, decision, disagreement and remaining uncertainty in your existing compact session log. Arrange your own meeting; this tool adds no scheduling or reporting requirement.",
-      ),
-    );
-    compose.append(session);
   }
   async function renderOffers() {
     const revision = selectionRevision;

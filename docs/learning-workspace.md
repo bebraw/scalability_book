@@ -225,6 +225,22 @@ Discovery filters by source/activity in storage and pages at most 40 records wit
 Ordinary course loads exclude inquiry records, leaving disclosure to the dedicated authorized API.
 
 Entry is **Notebook → Peers** at a passage, activity or demo.
+[learning-inquiry.ts](../shared/learning-inquiry.ts) owns optional reasoning outlines and operator/challenger/validator prompts; the browser uses the existing contribution body, identity, provenance and revision contract.
+After reveal, questions/replies can use question, competing explanations, evidence/check, current decision and remaining uncertainty, or free writing without filling every part.
+Responsibility cues invite someone other than the operator to explain acceptance and rotate roles for the next check; the common project specification still owns required session practice.
+Async contributions do not wait for every member and do not imply absent members' agreement.
+
+Per-contribution selection starts unchecked.
+**Prepare summary from selected contributions** copies only selected visible posts into an editable reply, retaining contributor identities/IDs, disagreement, links, dates and tool provenance without inferring consensus.
+Oversized selections are rejected rather than silently shortening consequential material.
+The student reviews and uses the existing share action; there is no automatic summary generation, posting or participation score.
+**Reflect privately on this inquiry** starts with a thread reference and optional personal starters; selected contributions are copied only when deliberately checked.
+The draft relates to the student's existing records for that source and must be reviewed and explicitly saved.
+The link does not grant later thread access and does not retrieve peers for an agent.
+**Try a related case privately** offers the same authored independent application in a thread-specific tab draft, without copying peer replies or requiring a group decision.
+It saves a separate linked notebook entry; students can request help, keep different conclusions, or continue the Chapter guide and existing independent human review route when working solo.
+No shared outcome updates a member's concept judgment, private reflection, course credit or submission.
+
 The scope combines the course run, source URL path/anchor and one activity key: reading, prediction, evidence or session.
 Initial-work declarations store only a timestamp and a fingerprint of the student's local note revision.
 This is a student declaration for pedagogical pacing, not proof of correctness or an anti-cheating mechanism.

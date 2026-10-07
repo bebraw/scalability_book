@@ -18,6 +18,10 @@ Compare what they can justify now, continuing uncertainty, and where they ask fo
 
 Try capture without a model first, then one chosen agent help mode, an actual demo check and a short reflection.
 In a group, save individual explanations before revealing inquiry; compare predictions, retain consequential disagreement and rotate the existing operator/challenger/validator roles.
+Try the optional inquiry outline and a summary assembled from deliberately selected contributions.
+Include a member who is absent for the check and one who needs more help; do not infer their agreement or understanding from a shared decision.
+Ask each consenting learner to explain the related case individually, using their chosen takeaway or interview instead of copying a common group reflection.
+Ask whether explaining, challenging and validating helped, whether a different private conclusion was easy to keep, and whether the prompts or summary preparation increased workload.
 Select useful material for an existing diary/portfolio entry instead of producing a separate trial report.
 
 ## Evidence to collect deliberately

@@ -46,6 +46,7 @@ export function mountLearningPractice(
     save: GuideSave;
     help: (source: LearningSource, text: string) => void;
     notes: () => void;
+    draftScope?: string;
   },
 ) {
   const activity = followUpForSource(options.source);
@@ -62,7 +63,7 @@ export function mountLearningPractice(
       "Try your own explanation before opening the self-check. You can skip this, return later, choose your own case or ask for help at any time.",
     ),
   );
-  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}`;
+  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}:${options.draftScope ?? "guide"}`;
   let draft = { question: "", answer: "" };
   try {
     const saved = JSON.parse(sessionStorage.getItem(key) ?? "null");
