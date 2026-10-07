@@ -69,7 +69,7 @@ Submission preparation remains deliberate selection into the existing course con
 - The browser owns the two entry points, visible context, tab drafts and unfinished navigation state.
 - The local notebook owner retains explicitly saved notes, histories, source snapshots, related records, self-assessments and accepted assistance provenance.
 - The local conversation owner retains assistant exchanges and selected-context requests independently of notebook archives.
-- Shared learning contracts own handoff/context types; shared agent policy owns instructional behavior under [ADR-035](../accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md).
+- Shared learning contracts own handoff/context types; shared agent policy owns instructional behavior under [ADR-035](../implemented/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md).
 - Provider adapters implement the shared contract without owning notebook rules; course APIs continue to own shared audiences, submissions and assessment.
 
 Refine responsibilities and entry-point placement from ADRs 027–033 while retaining their privacy, portability, responsive-support and independent-learning decisions.

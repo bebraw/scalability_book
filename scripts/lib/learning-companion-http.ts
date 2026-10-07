@@ -150,6 +150,9 @@ export function createCompanionHandler(options: CompanionOptions) {
             connected: true,
             version: companionRelease.protocol,
             provider: options.conversations?.provider ?? null,
+            ...(options.conversations?.teaching
+              ? { teaching: options.conversations.teaching }
+              : {}),
             ...options.metadata,
           });
         if (url.pathname.startsWith("/agent/")) {

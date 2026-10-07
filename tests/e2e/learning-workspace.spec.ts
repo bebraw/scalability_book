@@ -214,6 +214,14 @@ test("notebook and assistant retain separate drafts and use reviewed source-link
               role: "agent",
               text: "Synthetic suggestion for a reviewed notebook draft.",
               at: new Date().toISOString(),
+              teaching: {
+                policy: {
+                  id: "scalableweb-study-assistant",
+                  version: "1",
+                  name: "Teaching assistant",
+                },
+                provider: { name: "Synthetic", version: "test-version" },
+              },
             },
           ],
         };
@@ -232,10 +240,33 @@ test("notebook and assistant retain separate drafts and use reviewed source-link
     "Synthetic suggestion",
   );
   expect(supplied[0]!.noteIds).toEqual([chosen.id]);
+  await panel.getByText("About this reply", { exact: true }).click();
+  await expect(
+    panel.getByText(/policy scalableweb-study-assistant v1/),
+  ).toBeVisible();
+  // An earlier reply must not acquire today's policy on a resumed conversation.
+  delete synthetic!.messages[1]!.teaching;
   await page.reload();
   await expect(panel.locator(".learning-messages")).toContainText(
     "Synthetic suggestion",
   );
+  await panel.getByText("About this reply", { exact: true }).click();
+  await expect(
+    panel.getByText(
+      "Teaching policy and provider version were not recorded for this earlier reply.",
+    ),
+  ).toBeVisible();
+  expect(await panel.locator(".learning-messages").innerText()).not.toContain(
+    "scalableweb-study-assistant",
+  );
+  synthetic!.messages[1]!.teaching = {
+    policy: {
+      id: "scalableweb-study-assistant",
+      version: "1",
+      name: "Teaching assistant",
+    },
+    provider: { name: "Synthetic", version: "test-version" },
+  };
   await expect(
     panel
       .getByRole("region", { name: "Assistant context" })
@@ -280,6 +311,9 @@ test("notebook and assistant retain separate drafts and use reviewed source-link
   expect(takeaway.relatedIds).toEqual([chosen.id]);
   expect(takeaway.history[0].assistance).toContain(
     "Student-written takeaway after discussion",
+  );
+  expect(takeaway.history[0].assistance).toContain(
+    "policy scalableweb-study-assistant v1",
   );
   await chooseNotebookTool(panel, "Connect");
   const download = page.waitForEvent("download");
@@ -948,6 +982,26 @@ test("a restored open notebook explains unavailable or expired connections and r
   await expect(panel.getByLabel("Your thinking")).toHaveValue(
     "Synthetic unfinished draft survives recovery.",
   );
+  await page.route(`${companionAddress}/status`, (route) =>
+    route.fulfill({ json: { connected: true, version: 1, provider: "Codex" } }),
+  );
+  await page.reload();
+  await chooseNotebookTool(panel, "Connect");
+  await expect(
+    panel.getByText(
+      "This installed companion does not report a teaching policy. It keeps its existing instructions.",
+    ),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("link", {
+      name: "Companion setup and release availability",
+    }),
+  ).toHaveAttribute("href", "/notebook/setup/");
+  await chooseNotebookTool(panel, "Write");
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "Synthetic unfinished draft survives recovery.",
+  );
+  await page.unroute(`${companionAddress}/status`);
   await page.route(`${companionAddress}/status`, (route) =>
     route.fulfill({
       status: 401,

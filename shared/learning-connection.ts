@@ -1,3 +1,5 @@
+import type { TeachingContext } from "./learning-agent.ts";
+
 /** Release and connection metadata, independent of a provider or rendering. */
 export const companionRelease = {
   name: "@scalableweb/companion",
@@ -11,6 +13,8 @@ export interface CompanionStatus {
   connected: true;
   version: number;
   provider: string | null;
+  /** Absent on older companions and when no policy-aware provider is enabled. */
+  teaching?: TeachingContext;
   release?: { name: string; version: string; sourceRevision: string };
   storage?: string;
   schemas?: { notebook: number; conversations: number; archive: number };

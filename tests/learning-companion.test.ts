@@ -5,11 +5,23 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
 import { createCompanionHandler } from "../scripts/lib/learning-companion-http.ts";
+import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
+import type { LearningProvider } from "../scripts/lib/learning-codex.ts";
+import { teachingPolicyIdentity } from "../shared/learning-agent.ts";
 
-function fixture(t: test.TestContext) {
+function fixture(
+  t: test.TestContext,
+  provider: LearningProvider | null = null,
+) {
   const directory = mkdtempSync(path.join(tmpdir(), "learning-companion-"));
   const notebook = openLearningNotebook(directory);
+  const conversations = openLearningConversations(
+    directory,
+    notebook,
+    provider,
+  );
   t.after(() => {
+    conversations.close();
     notebook.close();
     rmSync(directory, { recursive: true, force: true });
   });
@@ -18,6 +30,7 @@ function fixture(t: test.TestContext) {
     origins: ["https://book.test", "http://127.0.0.1:3000"],
     port: 8788,
     notebook,
+    conversations,
     code: "synthetic-code",
     now: () => now,
   });
@@ -101,6 +114,44 @@ test("pairing requires the exact website origin and loopback host; private route
     (await f.request("/pair", "POST", { code: "synthetic-code" })).status,
     403,
   );
+});
+test("status advertises only an enabled provider's applied teaching policy", async (t) => {
+  const provider: LearningProvider = {
+    name: "Synthetic",
+    version: "test-version",
+    teaching: teachingPolicyIdentity,
+    async run() {
+      return "Synthetic reply";
+    },
+    async cancel() {},
+    close() {},
+  };
+  const current = fixture(t, provider);
+  const currentStatus = await (
+    await current.request("/status", "GET", undefined, await current.pair())
+  ).json();
+  assert.deepEqual(currentStatus.teaching, {
+    policy: teachingPolicyIdentity,
+    provider: { name: "Synthetic", version: "test-version" },
+  });
+  const notebookOnly = fixture(t);
+  const notebookStatus = await (
+    await notebookOnly.request(
+      "/status",
+      "GET",
+      undefined,
+      await notebookOnly.pair(),
+    )
+  ).json();
+  assert.equal(notebookStatus.provider, null);
+  assert.equal(notebookStatus.teaching, undefined);
+  const { teaching: _teaching, ...unversioned } = provider;
+  const earlier = fixture(t, unversioned);
+  const earlierStatus = await (
+    await earlier.request("/status", "GET", undefined, await earlier.pair())
+  ).json();
+  assert.equal(earlierStatus.provider, "Synthetic");
+  assert.equal(earlierStatus.teaching, undefined);
 });
 test("browser preflight is origin-gated and sessions expire or can be revoked", async (t) => {
   const f = fixture(t);

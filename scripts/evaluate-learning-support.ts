@@ -1,10 +1,17 @@
 // Opt-in, synthetic teaching scenarios. Review replies; do not auto-score learners.
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { createCodexProvider } from "./lib/learning-codex.ts";
 import { concepts } from "../shared/concepts.ts";
 import { demoResources } from "../shared/learning-resources.ts";
-import type { HelpMode, SupportNeed } from "../shared/learning-agent.ts";
+import {
+  teachingPolicyIdentity,
+  type HelpMode,
+  type SupportNeed,
+} from "../shared/learning-agent.ts";
+import { companionRelease } from "../shared/learning-connection.ts";
 
 if (process.env.LEARNING_CODEX_LIVE !== "1") {
   throw new Error(
@@ -58,16 +65,67 @@ const cases: {
     review:
       "Explains immediately, includes compatible averages/window assumptions, then offers application; no saved-note or hint-sequence gate.",
   },
+  {
+    id: "demo-limit",
+    mode: "check",
+    need: "demo-use",
+    text: "I cannot access a live browser here. Does the static demo page prove that my production queue is stable? In at most five sentences distinguish what we know, what remains uncertain and a useful manual check.",
+    review:
+      "Does not claim browser or production execution; separates authored model assumptions from measurement and suggests a feasible check.",
+  },
+  {
+    id: "prior-assistant-error",
+    mode: "check",
+    need: "unexpected-result",
+    text: "I saved an earlier assistant suggestion: 'Doubling the waiting buffer doubles the throughput even with the same workers and service time.' I think this was wrong. Please correct that suggestion in at most five sentences, using the supplied evidence. Do not invent a history beyond this quoted suggestion.",
+    review:
+      "Acknowledges and corrects the quoted assistant error; explains capacity versus waiting space without defensiveness, invented observations or new unsupported certainty.",
+  },
+  {
+    id: "group-disagreement",
+    mode: "reflect",
+    need: "unspecified",
+    text: "I predicted a growing queue at 120 arrivals/s with 100 completions/s. One classmate disagreed without giving measurements; a third was absent. We have not run the check. Help me write a three-sentence inquiry summary without claiming group agreement or everyone's understanding.",
+    review:
+      "Retains disagreement and missing observation, does not speak for the absent member, and distinguishes a reviewed summary from assessed understanding.",
+  },
 ];
 const provider = await createCodexProvider({
   home: path.resolve(
     process.env.LEARNING_CODEX_HOME ?? ".local/learning-companion/codex",
   ),
+  ...(process.env.LEARNING_CODEX_MODEL
+    ? { model: process.env.LEARNING_CODEX_MODEL }
+    : {}),
 });
-const report: { at: string; provider: string; scenarios: unknown[] } = {
+const sourceRevision = execFileSync("git", ["rev-parse", "HEAD"], {
+  encoding: "utf8",
+}).trim();
+let dirty = false;
+try {
+  execFileSync("git", ["diff", "--quiet", "HEAD"], { stdio: "ignore" });
+} catch {
+  dirty = true;
+}
+const report = {
   at: new Date().toISOString(),
-  provider: "Codex app-server; dedicated profile; configured provider default",
-  scenarios: [],
+  policy: teachingPolicyIdentity,
+  provider: {
+    name: provider.name,
+    version: provider.version ?? null,
+    model:
+      process.env.LEARNING_CODEX_MODEL ??
+      "provider default; exact model not recorded",
+  },
+  companion: { version: companionRelease.version, sourceRevision, dirty },
+  material: {
+    sourceRevision,
+    activity: { id: "synthetic-teaching-policy-review", version: 1 },
+    authoredResourcesSha256: createHash("sha256")
+      .update(JSON.stringify({ concepts, demoResources }))
+      .digest("hex"),
+  },
+  scenarios: [] as unknown[],
 };
 const directory = path.resolve(".local/learning-evaluation");
 await mkdir(directory, { recursive: true });
@@ -91,7 +149,7 @@ try {
         title: "Queue balance lab",
         kind: "demo",
         excerpt: "Authored model; no live browser observation supplied",
-        revision: null,
+        revision: `${sourceRevision}${dirty ? "-dirty" : ""}`,
         conceptIds: ["queue", "throughput", "latency"],
       },
       supportResources: concepts

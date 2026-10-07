@@ -10,7 +10,10 @@ import {
 } from "../scripts/lib/learning-codex.ts";
 import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
-import { supportNeeds } from "../shared/learning-agent.ts";
+import {
+  supportNeeds,
+  teachingPolicyIdentity,
+} from "../shared/learning-agent.ts";
 
 const source = {
   url: "https://scalableweb.dev/demos/",
@@ -43,6 +46,8 @@ test("Codex adapter initializes, resumes, uses bounded dynamic tools, declines m
   await chmod(binary, 0o700);
   const provider = await createCodexProvider({ home: directory, binary });
   try {
+    assert.equal(provider.version, "0.154.0");
+    assert.deepEqual(provider.teaching, teachingPolicyIdentity);
     let thread = "";
     let calls = 0;
     const tool = async (name: string, args: unknown) => {
@@ -77,6 +82,92 @@ test("Codex adapter initializes, resumes, uses bounded dynamic tools, declines m
     );
   } finally {
     provider.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("policy metadata describes each applied exchange without rewriting earlier conversations", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "book-teaching-policy-"));
+  const notebook = openLearningNotebook(directory);
+  const provider: LearningProvider = {
+    name: "Synthetic",
+    async run(_thread, _text, _tool, save) {
+      save("retained-thread");
+      return "Synthetic reply";
+    },
+    async cancel() {},
+    close() {},
+  };
+  let conversations = openLearningConversations(directory, notebook, provider);
+  const input = {
+    browserId: randomUUID(),
+    text: "Please explain.",
+    mode: "explanation",
+    noteIds: [],
+  };
+  try {
+    const conversation = conversations.start(
+      { source },
+      "https://scalableweb.dev",
+    );
+    const send = async () => {
+      conversations.send(
+        conversation.id,
+        input,
+        "session",
+        "https://scalableweb.dev",
+      );
+      await waitUntil(
+        () => conversations.get(conversation.id).state === "idle",
+      );
+    };
+    await send();
+    const legacy = conversations.get(conversation.id).messages;
+    assert.equal(legacy[0]!.teaching, undefined);
+    assert.equal(legacy[1]!.teaching, undefined);
+    conversations.close();
+    provider.version = "test-1";
+    provider.teaching = { ...teachingPolicyIdentity };
+    conversations = openLearningConversations(directory, notebook, provider);
+    await send();
+    const current = {
+      policy: teachingPolicyIdentity,
+      provider: { name: "Synthetic", version: "test-1" },
+    };
+    assert.deepEqual(conversations.teaching, current);
+    assert.deepEqual(
+      conversations.get(conversation.id).messages.slice(0, 2),
+      legacy,
+    );
+    assert.deepEqual(
+      conversations
+        .get(conversation.id)
+        .messages.slice(2)
+        .map((item) => item.teaching),
+      [current, current],
+    );
+    conversations.close();
+    provider.version = "test-2";
+    provider.teaching = {
+      ...teachingPolicyIdentity,
+      version: "synthetic-next",
+    };
+    conversations = openLearningConversations(directory, notebook, provider);
+    await send();
+    const messages = conversations.get(conversation.id).messages;
+    assert.deepEqual(messages.slice(0, 2), legacy);
+    assert.deepEqual(messages[3]!.teaching, current);
+    assert.equal(messages[5]!.teaching!.policy.version, "synthetic-next");
+    assert.equal(messages[5]!.teaching!.provider.version, "test-2");
+    assert.equal(
+      conversations.get(conversation.id).threadId,
+      "retained-thread",
+    );
+    assert.deepEqual(notebook.judgments(), []);
+    assert.equal(notebook.entries().length, 0);
+  } finally {
+    conversations.close();
+    notebook.close();
     await rm(directory, { recursive: true, force: true });
   }
 });

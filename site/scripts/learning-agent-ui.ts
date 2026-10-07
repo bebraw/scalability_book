@@ -84,7 +84,9 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       await fn();
     } catch (error) {
       options.status(
-        error instanceof Error ? error.message : "The agent request failed.",
+        error instanceof Error
+          ? error.message
+          : "The assistant request failed.",
       );
     }
   };
@@ -101,7 +103,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
   container.append(
     element(
       "p",
-      "Explore a question with your teaching assistant. Choose the support you need; you decide what to keep in your notebook.",
+      "This automated study assistant works through your chosen provider. Choose the support you need and what to keep in your notebook; your instructor assesses course work.",
     ),
     toolbar,
     messages,
@@ -301,7 +303,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     field("Message to the teaching assistant", input),
     element(
       "p",
-      "You can ask for a direct explanation immediately, change help at any time, or try the next step yourself. Saving initial thinking is needed only for agent demo changes.",
+      "You can ask for a direct explanation immediately, change help at any time, or try the next step yourself. Saving initial thinking is needed only for assistant demo changes.",
     ),
   );
   container.append(
@@ -394,17 +396,31 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
         card.append(detail);
       }
       if (message.role === "agent") {
+        const about = element("details");
+        about.append(
+          element("summary", "About this reply"),
+          element(
+            "p",
+            message.teaching
+              ? `${message.teaching.policy.name} · policy ${message.teaching.policy.id} v${message.teaching.policy.version} · ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}.`
+              : "Teaching policy and provider version were not recorded for this earlier reply.",
+          ),
+        );
+        card.append(about);
         const student = conversation.messages
           .slice(0, conversation.messages.indexOf(message))
           .reverse()
           .find((item) => item.role === "student");
         const relatedIds = student?.noteIds ?? [];
-        const provenance = `Assistant suggestion; conversation ${conversation.id}; message ${message.id}; reviewed by student before saving`;
+        const teaching = message.teaching
+          ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}`
+          : "; teaching policy not recorded";
+        const provenance = `Assistant suggestion; conversation ${conversation.id}; message ${message.id}${teaching}; reviewed by student before saving`;
         card.append(
           button("Write a takeaway", () =>
             options.accept(
               "",
-              `Student-written takeaway after discussion; conversation ${conversation!.id}; message ${message.id}`,
+              `Student-written takeaway after discussion; conversation ${conversation!.id}; message ${message.id}${teaching}`,
               conversation!.source,
               relatedIds,
             ),
@@ -425,7 +441,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       messages.append(
         element(
           "p",
-          "Your agent is thinking. Demo changes will ask for your review.",
+          "The teaching assistant is thinking. Demo changes will ask for your review.",
         ),
       );
     if (conversation.error) messages.append(element("p", conversation.error));
@@ -457,7 +473,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
               );
             if (
               !window.confirm(
-                `Your agent proposes changing “${control.label}” in “${observed.title}” to ${JSON.stringify(request.arguments.value)}. Apply this change and report the actual observation?`,
+                `The teaching assistant proposes changing “${control.label}” in “${observed.title}” to ${JSON.stringify(request.arguments.value)}. Apply this change and report the actual observation?`,
               )
             )
               throw new Error("The student declined this demo change.");

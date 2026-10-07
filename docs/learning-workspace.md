@@ -6,7 +6,7 @@ Implemented status identifies verified software behavior; production rollout and
 
 [Implemented ADRs 031–033](adrs/README.md#implemented) cover responsive support, independent application with reflection and scaffolded peer inquiry.
 [ADR-034](adrs/implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) separates Notebook and Teaching assistant experiences with deliberate handoffs.
-[Accepted ADR-035](adrs/accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) defines the follow-up shared teaching policy, personality and evaluation criteria; its new policy identity/versioning remains awaiting implementation.
+[ADR-035](adrs/implemented/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) defines the shared versioned teaching policy, recognizable manner and separate evaluation of usability, support and independent learning.
 
 ## Current implementation
 
@@ -87,6 +87,8 @@ An unavailable port, denied storage permission, unsupported provider version or 
 The dedicated Codex CLI authentication result is a prerequisite check; a real reply establishes account/provider availability.
 
 Authenticated `/status` returns package/source revision, protocol, provider mode, selected storage path and notebook/conversation/archive schema versions.
+Policy-aware adapters also report optional `teaching` metadata: policy ID/version/name and provider name/version.
+Connect shows the installed policy; older companions retain their existing instructions and do not acquire a new policy from website JavaScript.
 The browser requires protocol 1 before retaining a paired token or accepting status.
 Failed codes and expired sessions lead to ordinary re-pairing; network feedback names the possible process/origin/local-permission causes without pretending to distinguish them.
 `doctor --json` contains only release/path/check metadata; no telemetry or automatic support upload is introduced.
@@ -176,7 +178,12 @@ These checks establish executable behavior, not improved learning or course comp
 
 ## Agent and demo contract
 
-[learning-agent.ts](../shared/learning-agent.ts) owns help modes, conversation records and the supporting-agent instruction contract.
+[learning-agent.ts](../shared/learning-agent.ts) owns help modes, conversation records and the provider-independent `teachingPolicy`.
+Policy `scalableweb-study-assistant` version `1` presents an automated study assistant, distinct from the instructor and assessor, with a patient, curious, precise and constructive manner.
+It asks for useful missing evidence, respectfully challenges unsupported reasoning, corrects earlier errors and recognizes specific progress without certifying understanding.
+Source accuracy, direct-help choices, selected context and student approval govern the manner; the policy cannot grant tool access.
+Use reviewed concept definitions, assumptions, examples and misconceptions already supplied by the authored resource owners.
+Extend those resources from actual learner difficulties rather than generating an exercise for every paragraph.
 Under [ADR-031](adrs/implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md), students can optionally identify getting started, a prerequisite, an unexpected result, demo operation or readiness for less help.
 The agent uses the actual response, selected context and authored concept references for tentative task-specific guidance; it asks a focused question when evidence is insufficient and explains directly when requested.
 Support increases or fades with the student's work, with no ability profile, turn quota, automatic concept judgment or explanation gate.
@@ -185,6 +192,13 @@ Student messages retain optional goal/help-mode/support-need metadata and the su
 The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
 Supplied note identities allow a reviewed takeaway to link the notes used on its actual turn, rather than the current selection; old turns omit them and are not assigned inferred relationships.
 These provider changes require a companion built from the updated source; the published 0.1.0 package retains its earlier instructions until a new release.
+The Codex adapter applies the current shared instructions on both thread start and resume and reports the actual CLI version (or null if it cannot be read).
+Each new student and assistant message stores optional `teaching: { policy: { id, version, name }, provider: { name, version } }` in existing conversation JSON.
+The metadata identifies applied instructions, not proof that a reply complies; later policies never rewrite earlier turns.
+**About this reply** shows recorded versions, with an explicit unknown-history message for legacy replies; reviewed notebook handoffs retain that provenance.
+Policy changes update the policy version alongside the instructions and their evaluation evidence.
+The HTTP protocol, conversation database schema and portable notebook/archive versions remain `1`: these fields are additive, and old records and clients remain valid.
+Providers that do not advertise a policy are treated as unversioned, rather than being assigned today's policy by the conversation owner.
 [learning-codex.ts](../scripts/lib/learning-codex.ts) adapts the [Codex app-server protocol](https://learn.chatgpt.com/docs/app-server) over local stdio.
 [learning-conversations.ts](../scripts/lib/learning-conversations.ts) owns `conversations.sqlite`, selected context and the browser request broker.
 Notebook records remain independent of these provider threads.

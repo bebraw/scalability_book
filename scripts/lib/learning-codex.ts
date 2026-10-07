@@ -1,4 +1,8 @@
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import {
+  spawn,
+  spawnSync,
+  type ChildProcessWithoutNullStreams,
+} from "node:child_process";
 import { mkdir, lstat, readdir, writeFile } from "node:fs/promises";
 import { StringDecoder } from "node:string_decoder";
 import path from "node:path";
@@ -6,11 +10,18 @@ import {
   LearningProblem,
   learningAssert,
 } from "../../shared/learning-workspace.ts";
-import { learningAgentInstructions } from "../../shared/learning-agent.ts";
+import {
+  learningAgentInstructions,
+  teachingPolicyIdentity,
+  type TeachingPolicyIdentity,
+} from "../../shared/learning-agent.ts";
 
 type Json = Record<string, unknown>;
 export interface LearningProvider {
   name: string;
+  version?: string | null;
+  /** Advertise only the shared policy that this adapter actually applies. */
+  teaching?: TeachingPolicyIdentity;
   run(
     threadId: string | null,
     text: string,
@@ -125,6 +136,20 @@ export function learningCodexEnvironment(home: string) {
   Object.assign(env, { CODEX_HOME: home, HOME: home, USERPROFILE: home });
   return env as NodeJS.ProcessEnv;
 }
+export function learningCodexVersion(home: string, binary = "codex") {
+  const cli = spawnSync(binary, ["--version"], {
+    env: learningCodexEnvironment(home),
+    encoding: "utf8",
+    timeout: 8000,
+    maxBuffer: 64_000,
+  });
+  return cli.status === 0
+    ? (cli.stdout
+        .trim()
+        .match(/^codex-cli\s+(\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]{1,40})?)$/)?.[1] ??
+        null)
+    : null;
+}
 export async function createCodexProvider(options: {
   home: string;
   model?: string;
@@ -181,6 +206,7 @@ export async function createCodexProvider(options: {
     ),
   };
   const env = learningCodexEnvironment(home);
+  const version = learningCodexVersion(home, options.binary);
   let child: ChildProcessWithoutNullStreams | null = null;
   let sequence = 0;
   let ready: Promise<void> | null = null;
@@ -420,6 +446,8 @@ export async function createCodexProvider(options: {
   };
   return {
     name: "Codex",
+    version,
+    teaching: teachingPolicyIdentity,
     async run(threadId, text, tool, saveThread) {
       learningAssert(
         !active,

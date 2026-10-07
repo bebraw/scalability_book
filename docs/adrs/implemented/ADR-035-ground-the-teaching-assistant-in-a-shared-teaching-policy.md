@@ -1,6 +1,6 @@
 # ADR-035: Ground the teaching assistant in a shared teaching policy
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -155,17 +155,33 @@ Use supplied task evidence and student-controlled judgments, evaluating independ
 
 ## Implementation and verification
 
-Responsive support, independent cases, peer scaffolding and real-provider samples already exist under ADRs 031–033.
-The unified teaching role, policy identity/versioning, new interface and extended evaluation remain future work.
-No new package publication, hosted model service or learner-outcome claim follows from accepting this record.
+The shared contract owns policy `scalableweb-study-assistant` version `1`, the automated Teaching assistant role and its patient, curious, precise and constructive manner.
+It extends ADR-031's responsive support with explicit respectful challenge, uncertainty, correction and specific encouragement without mastery claims.
+Existing reviewed concept definitions, assumptions, examples and misconceptions supply subject support; further authoring remains guided by actual learner difficulties.
 
-Before marking Implemented:
+The Codex adapter applies those instructions on thread start and resume and reports the actual CLI version.
+The conversation owner records the advertised policy and provider version on each new student/reply exchange; earlier turns retain their metadata or remain unversioned.
+Authenticated status reports optional teaching metadata, Connect identifies the installed policy and About this reply identifies the recorded setup.
+Reviewed notebook handoffs retain that provenance without copying entire histories or changing concept judgments.
+The HTTP protocol, conversation database and portable notebook/archive remain version `1`; optional JSON fields require no record migration.
+An unversioned provider is never assigned the current policy by the UI or conversation owner.
+Tool access and student approvals remain enforced by the existing runtime boundaries.
 
-- Document the shared policy, its version metadata and the responsibilities of browser, conversation, notebook and provider owners.
-- Verify the assistant journeys and deliberate handoffs in ADR-034, including notebook-only operation and old-record compatibility.
-- Review actual provider replies against the representative criteria above and verify selected-context and demo-approval boundaries with synthetic records.
-- Publish the updated voluntary evaluation guidance, with separate measures for teaching behavior, personality, independent learning, workload and course progress.
-- State which website/companion release supplies the behavior and what learner evidence remains uncollected; implementation does not require claiming an established learning gain.
+[The evaluation guide](../../learning-workspace-evaluation.md) now separates usability, instructional behavior, manner/trust, independent learning, workload and course progress.
+It uses voluntary selected evidence and existing submissions, with no routine transcript collection, engagement quotas or additional assessment obligation.
+The opt-in provider runner retains material/activity, companion, provider and policy versions alongside eight synthetic scenarios and human-review criteria.
+On 2026-10-07 all eight actual Codex CLI 0.154.0 replies met those representative criteria: novice support, misconception correction, reduced support after progress, an unclear question, direct explanation, unavailable demo/uncertain production evidence, a quoted prior assistant error and disagreement with an absent group member.
+Those samples used a provider default whose exact model was not recorded; they did not use a live browser or learner records.
+
+Verification passed 152 unit checks, type checking, production build and validation of 77 HTML files.
+All 22 Chromium/WebKit learning checks passed, including separate drafts, deliberate handoffs, legacy reply metadata, older-companion release messaging, notebook-only operation, unchanged book geometry, onboarding and peer access.
+The local tarball passed clean installation, setup/diagnosis, pairing and retained-work checks on macOS with Node 26.10.0.
+A freshly installed copy also passed the opt-in Chromium/Codex journey: actual observation, one approved arrival-rate change with displayed expected queue 11.0, a resumed focused question and a reviewed notebook draft retaining source and policy provenance.
+
+The website supplies the role, separate journeys and metadata presentation; the policy requires a companion built from this updated source.
+The published `@scalableweb/companion@0.1.0` retains its earlier adapter instructions until a later release, and the browser describes that limit explicitly.
+No npm package was published as part of this implementation.
+The voluntary learner trial, delayed recall and actual course progress remain unevaluated; software checks and synthetic replies establish no learning gain or causal completion effect.
 
 ## Open questions
 

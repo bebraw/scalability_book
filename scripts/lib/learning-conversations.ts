@@ -9,6 +9,7 @@ import {
   helpModes,
   supportNeeds,
   type TaskSupport,
+  type TeachingContext,
   type DemoToolRequest,
   type LearningConversation,
 } from "../../shared/learning-agent.ts";
@@ -29,6 +30,12 @@ export function openLearningConversations(
   notebook: LearningNotebook,
   provider: LearningProvider | null,
 ) {
+  const teaching: TeachingContext | undefined = provider?.teaching
+    ? {
+        policy: { ...provider.teaching },
+        provider: { name: provider.name, version: provider.version ?? null },
+      }
+    : undefined;
   const filename = path.join(directory, "conversations.sqlite");
   const db = openLearningDatabase(
     filename,
@@ -84,6 +91,7 @@ export function openLearningConversations(
     text: string,
     support?: TaskSupport,
     noteIds?: string[],
+    appliedTeaching?: TeachingContext,
   ) => {
     conversation.messages.push({
       id: randomUUID(),
@@ -92,6 +100,7 @@ export function openLearningConversations(
       at: new Date().toISOString(),
       ...(support ? { support } : {}),
       ...(noteIds ? { noteIds } : {}),
+      ...(appliedTeaching ? { teaching: appliedTeaching } : {}),
     });
     save(conversation);
   };
@@ -104,6 +113,7 @@ export function openLearningConversations(
   };
   return {
     provider: provider?.name ?? null,
+    teaching,
     list() {
       return db
         .prepare("SELECT body FROM conversations ORDER BY rowid DESC")
@@ -259,6 +269,7 @@ export function openLearningConversations(
         text,
         support,
         selected.map((entry) => entry.id),
+        teaching,
       );
       const current = running;
       const runTool = async (name: string, arguments_: unknown) => {
@@ -373,7 +384,14 @@ export function openLearningConversations(
         })
         .then(
           (answer) => {
-            message(conversation, "agent", answer);
+            message(
+              conversation,
+              "agent",
+              answer,
+              undefined,
+              undefined,
+              teaching,
+            );
             conversation.state = "idle";
           },
           (error) => {

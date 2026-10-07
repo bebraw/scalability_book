@@ -873,10 +873,30 @@ function renderConnection() {
       container.append(
         node(
           "p",
-          `Companion ${companionStatus.release?.version ?? "legacy"}; protocol ${companionStatus.version}; ${companionStatus.provider ? "Codex enabled" : "notebook-only"}.`,
+          `Companion ${companionStatus.release?.version ?? "legacy"}; protocol ${companionStatus.version}; ${companionStatus.provider ? `${companionStatus.provider} enabled` : "notebook-only"}.`,
           "learning-hint",
         ),
       );
+      if (companionStatus.teaching)
+        container.append(
+          node(
+            "p",
+            `Teaching policy ${companionStatus.teaching.policy.id} v${companionStatus.teaching.policy.version}; ${companionStatus.teaching.provider.name} ${companionStatus.teaching.provider.version ?? "version not reported"}.`,
+            "learning-hint",
+          ),
+        );
+      else if (companionStatus.provider) {
+        container.append(
+          node(
+            "p",
+            "This installed companion does not report a teaching policy. It keeps its existing instructions.",
+            "learning-hint",
+          ),
+        );
+        const setup = node("a", "Companion setup and release availability");
+        setup.href = "/notebook/setup/";
+        container.append(setup);
+      }
       if (companionStatus.storage)
         container.append(
           node(

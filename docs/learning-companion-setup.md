@@ -113,6 +113,7 @@ It must not contain custom configuration, hooks, plugins, rules or custom skills
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
 In **Teaching assistant → Discuss**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
+This is automated study support through your chosen provider; your instructor remains responsible for course assessment.
 You can also indicate where you want support, such as a prerequisite, an unexpected result or trying the next step yourself.
 An honest statement of being stuck is enough; you can request a direct explanation immediately and change the amount of help later.
 Chapter guide can prepare a help request from your current question without sending it automatically.
@@ -124,9 +125,13 @@ You can reopen saved conversations, stop a reply, or keep using the notebook wit
 Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
 Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
 Turn-linked notebook identities require an updated source-built companion; old conversations and the published 0.1.0 package remain readable without inferred links.
+The updated source companion also applies the shared teaching policy and records its version on new replies.
+**Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; older replies retain their original history.
+The published 0.1.0 package keeps its earlier instructions until a later package release.
+Updating the website alone does not update your local assistant.
 
 For a demo investigation, select its source and save your **Initial thinking** first.
-Select that note for context, then ask your agent to inspect the demo.
+Select that note for context, then ask your teaching assistant to inspect the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
 Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.

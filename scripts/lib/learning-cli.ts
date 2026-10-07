@@ -26,6 +26,7 @@ import {
 import { inspectLearningDatabase } from "./learning-database.ts";
 import {
   learningCodexEnvironment,
+  learningCodexVersion,
   validateLearningCodexProfile,
 } from "./learning-codex.ts";
 import { startLearningCompanion } from "./learning-companion-server.ts";
@@ -51,18 +52,7 @@ export async function checkLearningPort(port: number) {
 }
 function providerCheck(home: string): Check[] {
   const env = learningCodexEnvironment(home);
-  const cli = spawnSync("codex", ["--version"], {
-    env,
-    encoding: "utf8",
-    timeout: 8000,
-    maxBuffer: 64_000,
-  });
-  const version =
-    cli.status === 0
-      ? cli.stdout
-          .trim()
-          .match(/^codex-cli\s+(\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]{1,40})?)$/)?.[1]
-      : null;
+  const version = learningCodexVersion(home);
   const compatible = version === companionRelease.codexVersion;
   const checks: Check[] = [
     {

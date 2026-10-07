@@ -1,6 +1,10 @@
 // Synthetic app-server transcript. No provider account or network access.
 import { createInterface } from "node:readline";
 import { existsSync, unlinkSync } from "node:fs";
+if (process.argv.includes("--version")) {
+  console.log("codex-cli 0.154.0");
+  process.exit(0);
+}
 let waiting;
 const send = (value) => process.stdout.write(JSON.stringify(value) + "\n");
 for await (const line of createInterface({ input: process.stdin })) {
@@ -18,7 +22,13 @@ for await (const line of createInterface({ input: process.stdin })) {
   if (message.method === "thread/start" || message.method === "thread/resume") {
     if (
       message.params.sandbox !== "read-only" ||
-      message.params.approvalPolicy !== "never"
+      message.params.approvalPolicy !== "never" ||
+      !message.params.developerInstructions.includes(
+        "automated study assistant",
+      ) ||
+      !message.params.developerInstructions.includes(
+        "correct your own earlier errors",
+      )
     )
       process.exit(3);
     send({

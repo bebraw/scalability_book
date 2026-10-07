@@ -63,6 +63,13 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18889");
     await panel.getByLabel("Pairing code").fill(code);
     await panel.getByRole("button", { name: "Pair companion" }).click();
+    await expect(panel.getByRole("status")).toContainText("Connected");
+    await chooseNotebookTool(panel, "Connect");
+    await expect(
+      panel.getByText(
+        /Teaching policy scalableweb-study-assistant v1; Codex 0.154.0/,
+      ),
+    ).toBeVisible();
     await chooseNotebookTool(panel, "Discuss");
     await panel
       .getByLabel("Investigation source")
@@ -95,15 +102,37 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       );
     }
     await expect(
-      panel.getByRole("heading", { name: "Agent suggestion", exact: true }),
+      panel.getByRole("heading", {
+        name: "Teaching assistant suggestion",
+        exact: true,
+      }),
     ).toBeVisible({ timeout: 30_000 });
     await expect(
       panel.getByText("Browser observation", { exact: true }),
     ).toHaveCount(2);
+    await expect(
+      page.locator('[data-little-law-metric="expected"]'),
+    ).toHaveText("11.0");
+    console.log(
+      "Observed teaching reply:",
+      await panel
+        .locator(".learning-messages article")
+        .last()
+        .locator("p")
+        .first()
+        .innerText(),
+    );
+    await panel.getByText("About this reply", { exact: true }).click();
+    await expect(
+      panel.getByText(/policy scalableweb-study-assistant v1/),
+    ).toBeVisible();
+    await page.screenshot({
+      path: test.info().outputPath("teaching-assistant-policy.png"),
+    });
     await panel
       .getByRole("button", { name: "Use as a notebook draft" })
       .click();
-    await expect(panel.getByRole("status")).toContainText("Review and revise");
+    await expect(panel.getByRole("status")).toContainText("Choose Save note");
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
     await chooseNotebookTool(panel, "Discuss");
     await panel
@@ -113,12 +142,31 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       );
     await panel.getByRole("button", { name: "Send message" }).click();
     await expect(
-      panel.getByRole("heading", { name: "Agent suggestion", exact: true }),
+      panel.getByRole("heading", {
+        name: "Teaching assistant suggestion",
+        exact: true,
+      }),
     ).toHaveCount(2, { timeout: 60_000 });
+    console.log(
+      "Resumed teaching reply:",
+      await panel
+        .locator(".learning-messages article")
+        .last()
+        .locator("p")
+        .first()
+        .innerText(),
+    );
+    await panel.getByText("About this reply", { exact: true }).last().click();
+    await expect(
+      panel.getByText(/policy scalableweb-study-assistant v1/).last(),
+    ).toBeVisible();
     await chooseNotebookTool(panel, "Notes");
     await panel.getByText("1 saved revision", { exact: true }).first().click();
     await expect(
-      panel.getByText(/Codex suggestion; conversation/),
+      panel.getByText(/Assistant suggestion; conversation/),
+    ).toBeVisible();
+    await expect(
+      panel.getByText(/policy scalableweb-study-assistant v1/),
     ).toBeVisible();
   } finally {
     if (child.exitCode === null) {
