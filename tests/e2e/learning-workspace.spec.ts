@@ -204,6 +204,85 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   ).toHaveCount(0);
 });
 
+test("an open notebook keeps wide reading centered and fits smaller desktops", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  await page.goto("/chapters/scaling/");
+  const reading = page.locator(".chapter-main");
+  const paragraph = page.locator(".prose > p:not(.chapter-kicker)").first();
+  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  const shell = page.locator(".book-shell");
+  const navigation = page.locator("#book-navigation details");
+  const toggle = navigation.locator("summary");
+  const demo = page.locator("[data-scaling-demo]");
+  await expect(paragraph).toBeVisible();
+  const closedParagraph = await paragraph.boundingBox();
+
+  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  await expect(panel).toBeVisible();
+  await expect
+    .poll(async () => {
+      const box = await paragraph.boundingBox();
+      return Math.abs(box!.x - closedParagraph!.x);
+    })
+    .toBeLessThan(2);
+
+  for (const width of [2560, 1920, 1600, 1280]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const collapsed of [false, true]) {
+      const isCollapsed = (await navigation.getAttribute("open")) === null;
+      if (isCollapsed !== collapsed) await toggle.click();
+      await expect(shell).toHaveAttribute(
+        "data-navigation-collapsed",
+        String(collapsed),
+      );
+      await expect
+        .poll(async () => {
+          const box = await reading.boundingBox();
+          const notebook = await panel.boundingBox();
+          return notebook!.x - (box!.x + box!.width);
+        })
+        .toBeGreaterThanOrEqual(0);
+      if (width >= 1920) {
+        await expect
+          .poll(async () => {
+            const box = await reading.boundingBox();
+            return Math.abs(box!.x + box!.width / 2 - width / 2);
+          })
+          .toBeLessThan(2);
+      }
+      const readingBox = await reading.boundingBox();
+      expect(readingBox!.width).toBeGreaterThan(300);
+      const demoBox = await demo.boundingBox();
+      const notebookBox = await panel.boundingBox();
+      expect(demoBox!.x + demoBox!.width).toBeLessThanOrEqual(notebookBox!.x);
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth + 1,
+        ),
+      ).toBe(true);
+      if (width === 2560 && !collapsed)
+        await page.screenshot({
+          path: test.info().outputPath("notebook-wide-centered.png"),
+        });
+    }
+  }
+
+  await page.setViewportSize({ width: 2560, height: 1440 });
+  if ((await navigation.getAttribute("open")) === null) await toggle.click();
+  await panel.getByRole("button", { name: "Close notebook" }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(async () => {
+      const box = await paragraph.boundingBox();
+      return Math.abs(box!.x - closedParagraph!.x);
+    })
+    .toBeLessThan(2);
+});
+
 test("selected context is explicit and the notebook follows chapters without losing a draft", async ({
   page,
 }) => {

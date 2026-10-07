@@ -234,24 +234,43 @@
 }
 @media (min-width: 76.0625rem) {
   body[data-learning-open="true"] .book-shell {
+    --notebook-navigation-width: 11rem;
+    --notebook-reading-width: 45rem;
+    --notebook-book-gap: 1.2rem;
+    --notebook-book-padding: 1.5rem;
+    --notebook-book-width: calc(
+      var(--notebook-navigation-width) + var(--notebook-reading-width) +
+        var(--notebook-book-gap) + 2 * var(--notebook-book-padding)
+    );
     --book-demo-inline-extension: 0rem;
     grid-template-areas: "navigation chapter";
-    grid-template-columns: 11rem minmax(0, 1fr);
-    gap: 1.2rem;
-    margin-left: 0;
-    margin-right: 33rem;
-    max-width: none;
-    padding-inline: 1.5rem;
+    grid-template-columns: var(--notebook-navigation-width) minmax(0, 1fr);
+    gap: var(--notebook-book-gap);
+    width: calc(100% - 33rem);
+    max-width: var(--notebook-book-width);
+    /* Center the chapter until it needs to move aside for the notebook. */
+    margin-left: max(
+      0px,
+      min(
+        calc(
+          50% - var(--notebook-navigation-width) - var(--notebook-book-gap) -
+            var(--notebook-book-padding) - var(--notebook-reading-width) / 2
+        ),
+        calc(100% - 33rem - var(--notebook-book-width))
+      )
+    );
+    margin-right: auto;
+    padding-inline: var(--notebook-book-padding);
+  }
+  body[data-learning-open="true"] .book-shell[data-layout-ready="true"] {
+    transition-property: grid-template-columns, max-width, margin-left;
   }
   body[data-learning-open="true"]
     .book-shell[data-navigation-collapsed="true"] {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
+    --notebook-navigation-width: 2.5rem;
   }
   body[data-learning-open="true"] .book-shell::after {
     display: none;
-  }
-  body[data-learning-open="true"] .book-shell .prose {
-    display: block;
   }
 }
 @media (max-width: 640px) {

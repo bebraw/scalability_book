@@ -17,6 +17,7 @@ A chapter note keeps the reading link and authored concept membership without co
 The source is visible in Write; selected quotes have a bounded preview while their full captured text remains in the saved record.
 An open notebook follows book navigation and retains its active section; closing it keeps later pages lazy, with no companion request until reopening.
 On wide book pages, reading reflows beside the open notebook so passages remain accessible for selection.
+The reading column keeps its viewport center when space permits and moves only as far as needed to fit beside the notebook on smaller desktop screens, including with folded navigation.
 Open state, unfinished writing, selected note IDs and a preparation draft live in this website's tab session, independently of the paired token.
 Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
 Guide and concept choices follow the current reading; Agent and Peers use a captured passage from this page or the current page link, without retargeting a retained draft from another chapter.
