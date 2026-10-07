@@ -5,26 +5,36 @@ This document owns the executable learning-workspace contracts and local compani
 Implemented status identifies verified software behavior; production rollout and learner outcomes have their own evidence.
 
 [Implemented ADRs 031–033](adrs/README.md#implemented) cover responsive support, independent application with reflection and scaffolded peer inquiry.
-[Accepted ADRs 034–035](adrs/README.md#accepted) define separate Notebook and Teaching assistant experiences, deliberate handoffs and a shared teaching policy with personality and evaluation criteria.
-That separation awaits implementation; the current combined Notebook capabilities are described below.
+[ADR-034](adrs/implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) separates Notebook and Teaching assistant experiences with deliberate handoffs.
+[Accepted ADR-035](adrs/accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) defines the follow-up shared teaching policy, personality and evaluation criteria; its new policy identity/versioning remains awaiting implementation.
 
 ## Current implementation
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
-The whole-book Notebook interface loads on demand on reading, concept, exploration and demo pages, with passage capture independent of feedback sign-in.
-The header's Notebook entry remains available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
-Opening Notebook captures that selection before loading/focusing the interface; an already open notebook offers Use selected text.
+The whole-book Notebook and Teaching assistant entry points load one shared interface on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
+Both header entries remain available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
+Opening either experience captures the selection before loading/focusing the interface.
+Notebook offers **Use selected text** and Teaching assistant offers **Discuss selected text** when already open.
+Notebook captures a private writing context; assistant selection prepares a source without sending a message.
 A chapter note keeps the reading link and authored concept membership without copying the chapter text.
 The source is visible in Write; selected quotes have a bounded preview while their full captured text remains in the saved record.
-An open notebook follows book navigation and retains its active section; closing it keeps later pages lazy, with no companion request until reopening.
-Opening the notebook preserves the book's existing widths and positions, including its navigation, reading column and wider demos.
-The fixed notebook uses the right margin when there is space and overlays the reading area on smaller screens; close it to reach covered passages or demo controls.
-Open state, unfinished writing, selected note IDs and a preparation draft live in this website's tab session, independently of the paired token.
+An open experience follows book navigation and retains its active section; closing it keeps later pages lazy, with no companion request until reopening.
+Opening either experience preserves the book's existing widths and positions, including its navigation, reading column and wider demos.
+The fixed shared panel uses the right margin when there is space and overlays the reading area on smaller screens; close it to reach covered passages or demo controls.
+Open experience, separate remembered sections, unfinished notebook writing, selected note IDs, submission preparation and assistant message/goal/help choices live in this website's tab session independently of the paired token.
+Assistant state also retains the captured source, active conversation ID and initiating browser identity for resuming bounded requests after navigation.
+Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant without migrating notebook or conversation databases.
 Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
-Guide and concept choices follow the current reading; Agent and Peers use a captured passage from this page or the current page link, without retargeting a retained draft from another chapter.
+Guide and concept choices follow the current reading; peer inquiry uses the current page or its captured passage.
+Discuss retains its own chosen source across navigation and saved-conversation selection, independently of an unfinished notebook note; **Discuss the current reading** prepares a deliberate replacement.
 Only Save note creates or revises a durable companion record; tab continuity is not a notebook backup and does not survive closing the tab.
 Notes defaults to the current chapter/page, with Whole notebook available for cross-book review.
-Write, Notes, Chapter guide and Agent stay in the primary navigation; Concepts, Peers, Prepare and Connect are available under More notebook tools.
+Notebook presents **Write**, **Notes** and **Concepts**; **Prepare** and the shared **Connect** settings live under **More learning tools**.
+Teaching assistant presents **Discuss**, **Chapter guide** and **Peer discussion**, with the same connection settings.
+Switching experiences does not save, send a message or require a second pairing.
+**Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
+An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
+Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
 The optional Codex adapter provides persisted conversations, bounded browser demo tools and student-reviewed notebook drafts.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.
@@ -171,8 +181,9 @@ Under [ADR-031](adrs/implemented/ADR-031-adapt-learning-support-to-the-students-
 The agent uses the actual response, selected context and authored concept references for tentative task-specific guidance; it asks a focused question when evidence is insufficient and explains directly when requested.
 Support increases or fades with the student's work, with no ability profile, turn quota, automatic concept judgment or explanation gate.
 Chapter guide can prepare an editable help request with its reading/demo source; students choose whether to send it, and unfinished guide writing stays in the tab.
-Student messages retain optional goal/help-mode/support-need metadata in existing conversation JSON; older requests default to unspecified and older turns remain valid.
+Student messages retain optional goal/help-mode/support-need metadata and the supplied note identities in existing conversation JSON; older requests default to unspecified and older turns remain valid.
 The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
+Supplied note identities allow a reviewed takeaway to link the notes used on its actual turn, rather than the current selection; old turns omit them and are not assigned inferred relationships.
 These provider changes require a companion built from the updated source; the published 0.1.0 package retains its earlier instructions until a new release.
 [learning-codex.ts](../scripts/lib/learning-codex.ts) adapts the [Codex app-server protocol](https://learn.chatgpt.com/docs/app-server) over local stdio.
 [learning-conversations.ts](../scripts/lib/learning-conversations.ts) owns `conversations.sqlite`, selected context and the browser request broker.
@@ -225,7 +236,7 @@ Migration `0004_learning_inquiry.sql` indexes course/kind/source identity in the
 Discovery filters by source/activity in storage and pages at most 40 records with an opaque course-scoped cursor.
 Ordinary course loads exclude inquiry records, leaving disclosure to the dedicated authorized API.
 
-Entry is **Notebook → Peers** at a passage, activity or demo.
+Entry is **Teaching assistant → Peer discussion** at a passage, activity or demo.
 [learning-inquiry.ts](../shared/learning-inquiry.ts) owns optional reasoning outlines and operator/challenger/validator prompts; the browser uses the existing contribution body, identity, provenance and revision contract.
 After reveal, questions/replies can use question, competing explanations, evidence/check, current decision and remaining uncertainty, or free writing without filling every part.
 Responsibility cues invite someone other than the operator to explain acceptance and rotate roles for the next check; the common project specification still owns required session practice.

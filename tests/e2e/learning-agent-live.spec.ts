@@ -1,3 +1,4 @@
+import { chooseNotebookTool } from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -54,12 +55,15 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       });
     });
     await page.goto("/demos/#demo-queue-balance-lab");
-    await page.getByRole("button", { name: "Notebook", exact: true }).click();
-    const panel = page.getByRole("dialog", { name: "My learning notebook" });
+    await page
+      .locator(".site-header")
+      .getByRole("button", { name: "Notebook", exact: true })
+      .click();
+    const panel = page.locator(".learning-workspace");
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18889");
     await panel.getByLabel("Pairing code").fill(code);
     await panel.getByRole("button", { name: "Pair companion" }).click();
-    await panel.getByRole("button", { name: "Agent", exact: true }).click();
+    await chooseNotebookTool(panel, "Discuss");
     await panel
       .getByLabel("Investigation source")
       .selectOption("demo-queue-balance-lab");
@@ -70,17 +74,17 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
         "I predict that changing arrivals to 22 while holding time at 0.5 gives an expected queue of 11. I will compare this with the observed queue.",
       );
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
-    await panel.getByRole("button", { name: "Notes", exact: true }).click();
+    await chooseNotebookTool(panel, "Notes");
     await panel.getByRole("checkbox").first().check();
-    await panel.getByRole("button", { name: "Agent", exact: true }).click();
+    await chooseNotebookTool(panel, "Discuss");
     await panel.getByLabel("How I want help").selectOption("check");
     await panel
-      .getByLabel("Message to my agent")
+      .getByLabel("Message to the teaching assistant")
       .fill(
         "Use observe_demo for demo-queue-balance-lab to inspect the actual browser controls, then use change_demo to change only the arrival rate to 22. I have saved and selected my prediction. Afterwards report the actual displayed expected queue and give me one brief question. Do not infer execution from HTML; use both tools.",
       );
     page.on("dialog", (dialog) => void dialog.accept());
-    await panel.getByRole("button", { name: "Send to my agent" }).click();
+    await panel.getByRole("button", { name: "Send message" }).click();
     try {
       await expect(
         page.locator('[data-little-law-input="arrival"]'),
@@ -101,17 +105,17 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       .click();
     await expect(panel.getByRole("status")).toContainText("Review and revise");
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
-    await panel.getByRole("button", { name: "Agent", exact: true }).click();
+    await chooseNotebookTool(panel, "Discuss");
     await panel
-      .getByLabel("Message to my agent")
+      .getByLabel("Message to the teaching assistant")
       .fill(
         "Continue this discussion with one short question about the observation window. Do not change the demo.",
       );
-    await panel.getByRole("button", { name: "Send to my agent" }).click();
+    await panel.getByRole("button", { name: "Send message" }).click();
     await expect(
       panel.getByRole("heading", { name: "Agent suggestion", exact: true }),
     ).toHaveCount(2, { timeout: 60_000 });
-    await panel.getByRole("button", { name: "Notes", exact: true }).click();
+    await chooseNotebookTool(panel, "Notes");
     await panel.getByText("1 saved revision", { exact: true }).first().click();
     await expect(
       panel.getByText(/Codex suggestion; conversation/),

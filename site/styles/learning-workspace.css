@@ -33,6 +33,24 @@
   font-weight: 500;
   margin: 0.2rem 0;
 }
+.learning-purpose {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.learning-experiences {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 1.4rem 0.6rem;
+}
+.learning-workspace .learning-experiences button {
+  font-size: 0.75rem;
+  margin: 0;
+}
+.learning-workspace .learning-experiences button[aria-pressed="true"] {
+  background: var(--panel);
+  border-color: var(--accent);
+}
 .learning-eyebrow {
   color: var(--muted);
   font-size: 0.7rem;

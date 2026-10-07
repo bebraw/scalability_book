@@ -630,7 +630,7 @@ Stop that Worker afterwards.
 
 ## Optional peer inquiry
 
-Optional book inquiry enters through **Notebook → Peers**, using this workspace's course identity and published phase allocations.
+Optional book inquiry enters through **Teaching assistant → Peer discussion**, using this workspace's course identity and published phase allocations.
 [The learning-workspace guide](learning-workspace.md#peer-inquiry-contract) owns attempt-first disclosure, group/cohort scope, membership corrections, moderation and consented editorial offers.
 Private initial notes stay in the student's companion; shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
 Optional reasoning outlines, role-rotation cues and reviewed summaries reuse the existing inquiry contribution and provenance contract.

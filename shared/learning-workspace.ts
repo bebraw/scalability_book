@@ -23,6 +23,21 @@ export interface LearningSource {
   revision: string | null;
   conceptIds: string[];
 }
+export type LearningExperience = "notebook" | "assistant";
+/** Deliberately prepared browser handoffs; preparing one does not send or save. */
+export interface AssistantHandoff {
+  source: LearningSource;
+  question: string;
+  noteIds: string[];
+}
+export interface NotebookHandoff {
+  source: LearningSource;
+  kind: NoteKind;
+  title: string;
+  body: string;
+  relatedIds: string[];
+  assistance: string | null;
+}
 export interface NoteRevision {
   revision: string;
   body: string;

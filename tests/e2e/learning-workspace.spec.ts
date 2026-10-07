@@ -10,6 +10,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { conceptPages } from "../../shared/concept-pages.ts";
+import type { LearningConversation } from "../../shared/learning-agent.ts";
 
 let child: ChildProcess;
 let directory: string;
@@ -59,18 +60,258 @@ test.afterEach(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-test("optional changed cases preserve drafts and separate linked attempts without an agent", async ({
+test("notebook and assistant retain separate drafts and use reviewed source-linked handoffs", async ({
   page,
 }) => {
-  await page.goto("/demos/#demo-queue-balance-lab");
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      request.url().startsWith(companionAddress)
+    )
+      writes.push(request.url());
+  });
+  await page.goto("/chapters/introduction/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
   await panel
-    .getByRole("button", { name: "Chapter guide", exact: true })
+    .getByLabel("Your thinking")
+    .fill("My unfinished private notebook thought.");
+  const baseline = writes.length;
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
+  await expect(panel).toHaveAttribute("aria-label", "Teaching assistant");
+  await expect(
+    panel.getByRole("button", { name: "Write", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    panel.getByRole("button", { name: "Notes", exact: true }),
+  ).toHaveCount(0);
+  await panel.getByLabel("How I want help").selectOption("explanation");
+  await panel.getByLabel("My learning goal").fill("Understand the trade-off");
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("My unfinished question about this introduction.");
+  const originalSource = await panel
+    .getByRole("region", { name: "Assistant context" })
+    .getByRole("link")
+    .first()
+    .getAttribute("href");
+  await page.locator('a[href="/chapters/architecture/"]').first().click();
+  await expect(panel).toHaveAttribute("aria-label", "Teaching assistant");
+  await expect(
+    panel.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue("My unfinished question about this introduction.");
+  await expect(panel.getByLabel("My learning goal")).toHaveValue(
+    "Understand the trade-off",
+  );
+  await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
+  await expect(
+    panel
+      .getByRole("region", { name: "Assistant context" })
+      .getByRole("link")
+      .first(),
+  ).toHaveAttribute("href", originalSource!);
+  await expect(
+    panel.getByRole("button", { name: "Discuss the current reading" }),
+  ).toBeVisible();
+  await chooseNotebookTool(panel, "Write");
+  await expect(panel).toHaveAttribute("aria-label", "My learning notebook");
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "My unfinished private notebook thought.",
+  );
+  await expect(
+    panel.getByRole("button", { name: "Chapter guide", exact: true }),
+  ).toHaveCount(0);
+  expect(writes.length).toBe(baseline);
+  await panel
+    .getByLabel("Title", { exact: true })
+    .fill("Chosen notebook thought");
+  const savedResponse = page.waitForResponse(
+    (response) =>
+      response.url() === `${companionAddress}/entries` &&
+      response.request().method() === "POST",
+  );
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  const chosen = await (await savedResponse).json();
+  await expect(panel.getByRole("status")).toContainText(
+    "Saved in your private notebook",
+  );
+  await panel.getByRole("button", { name: "New note", exact: true }).click();
+  await panel
+    .getByLabel("Title", { exact: true })
+    .fill("Unselected notebook thought");
+  await panel
+    .getByLabel("Your thinking")
+    .fill("PRIVATE UNSELECTED NOTE MATERIAL");
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(panel.getByRole("status")).toContainText(
+    "Saved in your private notebook",
+  );
+  await chooseNotebookTool(panel, "Notes");
+  await panel.getByLabel("Notes to show").selectOption("all");
+  page.once("dialog", (dialog) => dialog.accept());
+  await panel
+    .locator("article")
+    .filter({
+      has: page.getByRole("heading", {
+        name: "Chosen notebook thought",
+        exact: true,
+      }),
+    })
+    .getByRole("button", { name: "Discuss this note" })
+    .click();
+  await expect(panel).toHaveAttribute("aria-label", "Teaching assistant");
+  await panel
+    .getByText("1 notebook notes selected for context", { exact: true })
+    .click();
+  await expect(panel.getByLabel("Selected notebook context")).toContainText(
+    "Chosen notebook thought",
+  );
+  await expect(panel.getByLabel("Selected notebook context")).not.toContainText(
+    "PRIVATE UNSELECTED NOTE MATERIAL",
+  );
+  await expect(
+    panel.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue("");
+  await page.screenshot({
+    path: test.info().outputPath("assistant-context.png"),
+  });
+  let synthetic: LearningConversation | null = null;
+  const supplied: { noteIds: string[]; text: string }[] = [];
+  await page.route(
+    `${companionAddress}/agent/conversations/*`,
+    async (route) => {
+      const request = route.request();
+      if (request.method() === "POST") {
+        supplied.push(request.postDataJSON());
+        synthetic = {
+          id: new URL(request.url()).pathname.split("/").pop()!,
+          title: chosen.source.title,
+          source: chosen.source,
+          threadId: null,
+          state: "idle",
+          error: null,
+          updatedAt: new Date().toISOString(),
+          messages: [
+            {
+              id: "c0000000-0000-4000-8000-000000000001",
+              role: "student",
+              text: supplied[0]!.text,
+              noteIds: supplied[0]!.noteIds,
+              at: new Date().toISOString(),
+            },
+            {
+              id: "c0000000-0000-4000-8000-000000000002",
+              role: "agent",
+              text: "Synthetic suggestion for a reviewed notebook draft.",
+              at: new Date().toISOString(),
+            },
+          ],
+        };
+      }
+      if (synthetic) await route.fulfill({ json: synthetic });
+      else await route.continue();
+    },
+  );
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Discuss only my chosen note.");
+  await panel
+    .getByRole("button", { name: "Send message", exact: true })
+    .click();
+  await expect(panel.locator(".learning-messages")).toContainText(
+    "Synthetic suggestion",
+  );
+  expect(supplied[0]!.noteIds).toEqual([chosen.id]);
+  await page.reload();
+  await expect(panel.locator(".learning-messages")).toContainText(
+    "Synthetic suggestion",
+  );
+  await expect(
+    panel
+      .getByRole("region", { name: "Assistant context" })
+      .getByRole("link")
+      .first(),
+  ).toHaveAttribute("href", originalSource!);
+  await chooseNotebookTool(panel, "Write");
+  await panel.getByRole("button", { name: "New note", exact: true }).click();
+  await panel
+    .getByLabel("Your thinking")
+    .fill("Keep this separate unfinished note.");
+  await chooseNotebookTool(panel, "Discuss");
+  await expect(panel.locator(".learning-messages")).toContainText(
+    "Synthetic suggestion",
+  );
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await panel.getByRole("button", { name: "Use as a notebook draft" }).click();
+  await expect(panel).toHaveAttribute("aria-label", "Teaching assistant");
+  await chooseNotebookTool(panel, "Write");
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "Keep this separate unfinished note.",
+  );
+  await chooseNotebookTool(panel, "Discuss");
+  page.once("dialog", (dialog) => dialog.accept());
+  await panel.getByRole("button", { name: "Write a takeaway" }).click();
+  await expect(panel).toHaveAttribute("aria-label", "My learning notebook");
+  await expect(panel.getByLabel("Your thinking")).toHaveValue("");
+  await page.screenshot({
+    path: test.info().outputPath("notebook-takeaway.png"),
+  });
+  await panel
+    .getByLabel("Your thinking")
+    .fill("My own reviewed explanation, rather than the transcript.");
+  const takeawayResponse = page.waitForResponse(
+    (response) =>
+      response.url() === `${companionAddress}/entries` &&
+      response.request().method() === "POST",
+  );
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  const takeaway = await (await takeawayResponse).json();
+  expect(takeaway.source).toEqual(chosen.source);
+  expect(takeaway.relatedIds).toEqual([chosen.id]);
+  expect(takeaway.history[0].assistance).toContain(
+    "Student-written takeaway after discussion",
+  );
+  await chooseNotebookTool(panel, "Connect");
+  const download = page.waitForEvent("download");
+  await panel.getByRole("button", { name: "Export notebook backup" }).click();
+  const exported = await download;
+  const archive = JSON.parse(
+    await (
+      await import("node:fs/promises")
+    ).readFile((await exported.path())!, "utf8"),
+  );
+  expect(
+    archive.entries.find((entry: { id: string }) => entry.id === takeaway.id),
+  ).toMatchObject({
+    source: chosen.source,
+    relatedIds: [chosen.id],
+    body: "My own reviewed explanation, rather than the transcript.",
+  });
+});
+
+test("optional changed cases preserve drafts and separate linked attempts without an agent", async ({
+  page,
+}) => {
+  await page.goto("/demos/#demo-queue-balance-lab");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByLabel("Pairing code").fill(code);
+  await panel.getByRole("button", { name: "Pair companion" }).click();
+  await chooseNotebookTool(panel, "Chapter guide");
   await panel
     .getByLabel("Demo on this page")
     .selectOption("demo-queue-balance-lab");
@@ -87,12 +328,10 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   await practice
     .getByRole("button", { name: "Ask for help with this case" })
     .click();
-  await expect(panel.getByLabel("Message to my agent")).toHaveValue(
-    /300 waiting events/,
-  );
-  await panel
-    .getByRole("button", { name: "Chapter guide", exact: true })
-    .click();
+  await expect(
+    panel.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue(/300 waiting events/);
+  await chooseNotebookTool(panel, "Chapter guide");
   await panel
     .getByLabel("My prediction or uncertainty")
     .fill("I am unsure whether the stable average still applies.");
@@ -217,7 +456,14 @@ test("whole-book entry points keep the notebook lazy and exclude administrative/
   for (const route of routes) {
     await page.goto(route);
     await expect(
-      page.getByRole("button", { name: "Notebook", exact: true }),
+      page
+        .locator(".site-header")
+        .getByRole("button", { name: "Notebook", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator(".site-header")
+        .getByRole("button", { name: "Teaching assistant", exact: true }),
     ).toBeVisible();
     await expect(page.locator(".learning-workspace")).toHaveCount(0);
     await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
@@ -228,15 +474,19 @@ test("whole-book entry points keep the notebook lazy and exclude administrative/
     ).toMatch(/^[a-f0-9]{64}$/);
   }
   await page.goto("/admin/courses/");
-  await expect(page.locator("[data-learning-toggle]")).toBeHidden();
+  await expect(page.locator('[data-learning-toggle="notebook"]')).toBeHidden();
+  await expect(page.locator('[data-learning-toggle="assistant"]')).toBeHidden();
 });
 
 test("a student captures a passage, revises thinking, revisits it and prepares selected private material", async ({
   page,
 }) => {
   await page.goto("/chapters/benchmarking/");
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
   await expect(panel).toBeVisible();
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
@@ -267,7 +517,7 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
     panel.getByRole("heading", { name: "Honest uncertainty" }),
   ).toBeVisible();
   await panel.getByRole("button", { name: "Save note", exact: true }).click();
-  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await chooseNotebookTool(panel, "Notes");
   await panel.getByText("2 saved revisions", { exact: true }).click();
   await expect(panel.getByText(/Which averages describe/)).toBeVisible();
   await panel.getByLabel("Select Synthetic queue observation").check();
@@ -292,7 +542,7 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await expect(panel.getByRole("status")).toHaveText(
     "Saved your dated self-assessment.",
   );
-  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await chooseNotebookTool(panel, "Notes");
   await panel.getByRole("button", { name: "Revisit", exact: true }).click();
   await expect(
     panel.getByText("Before rereading, explain the idea from memory", {
@@ -309,8 +559,11 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   await page.reload();
   await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  await chooseNotebookTool(panel, "Notes");
   await expect(
     panel.getByRole("heading", {
       name: "Revisit: Synthetic queue observation",
@@ -345,13 +598,13 @@ test("a student captures a passage, revises thinking, revisits it and prepares s
   ).toHaveCount(0);
 });
 
-test("opening the notebook preserves book, reading and demo widths with expanded or folded navigation", async ({
+test("opening either experience preserves book, reading and demo widths with expanded or folded navigation", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/chapters/scaling/");
   await page.evaluate(() => document.fonts.ready);
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  const panel = page.locator(".learning-workspace");
   const shell = page.locator(".book-shell");
   const navigation = page.locator("#book-navigation details");
   const toggle = navigation.locator("summary");
@@ -371,54 +624,70 @@ test("opening the notebook preserves book, reading and demo widths with expanded
         "data-navigation-collapsed",
         String(collapsed),
       );
-      const before = await Promise.all(
-        targets.map((target) => target.boundingBox()),
+      // Let the navigation's own layout settle before measuring the baseline.
+      await page.evaluate(
+        () =>
+          new Promise<void>((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+          ),
       );
-      await page.getByRole("button", { name: "Notebook", exact: true }).click();
-      await expect(panel).toBeVisible();
-      for (const [index, target] of targets.entries()) {
-        await expect
-          .poll(
-            async () => {
-              const after = await target.boundingBox();
-              const original = before[index]!;
-              return Math.max(
-                Math.abs(after!.x - original.x),
-                Math.abs(after!.width - original.width),
-                index === 3 ? Math.abs(after!.height - original.height) : 0,
-              );
-            },
-            {
-              message: `Book geometry at ${width}px, navigation ${collapsed ? "folded" : "expanded"}, target ${index}`,
-            },
-          )
-          .toBeLessThan(1);
-      }
-      expect(
-        await page.evaluate(
-          () =>
-            document.documentElement.scrollWidth <=
-            document.documentElement.clientWidth + 1,
-        ),
-      ).toBe(true);
-      if (width === 2560 && !collapsed) {
-        const reading = await targets[1]!.boundingBox();
-        const notebook = await panel.boundingBox();
+      for (const experience of ["Notebook", "Teaching assistant"]) {
+        const before = await Promise.all(
+          targets.map((target) => target.boundingBox()),
+        );
+        await page
+          .locator(".site-header")
+          .getByRole("button", { name: experience, exact: true })
+          .click();
+        await expect(panel).toBeVisible();
+        for (const [index, target] of targets.entries()) {
+          await expect
+            .poll(
+              async () => {
+                const after = await target.boundingBox();
+                const original = before[index]!;
+                return Math.max(
+                  Math.abs(after!.x - original.x),
+                  Math.abs(after!.width - original.width),
+                  index === 3 ? Math.abs(after!.height - original.height) : 0,
+                );
+              },
+              {
+                message: `Book geometry at ${width}px, navigation ${collapsed ? "folded" : "expanded"}, target ${index}`,
+              },
+            )
+            .toBeLessThan(1);
+        }
         expect(
-          Math.abs(reading!.x + reading!.width / 2 - width / 2),
-        ).toBeLessThan(1);
-        expect(
-          (await targets[4]!.boundingBox())!.x + before[4]!.width,
-        ).toBeLessThanOrEqual(notebook!.x);
-        await page.screenshot({
-          path: test.info().outputPath("notebook-wide-unchanged.png"),
-        });
-      }
-      await panel.getByRole("button", { name: "Close notebook" }).click();
-      await expect(panel).toBeHidden();
-      for (const [index, target] of targets.entries()) {
-        const after = await target.boundingBox();
-        expect(Math.abs(after!.width - before[index]!.width)).toBeLessThan(1);
+          await page.evaluate(
+            () =>
+              document.documentElement.scrollWidth <=
+              document.documentElement.clientWidth + 1,
+          ),
+        ).toBe(true);
+        if (width === 2560 && !collapsed) {
+          const reading = await targets[1]!.boundingBox();
+          const notebook = await panel.boundingBox();
+          expect(
+            Math.abs(reading!.x + reading!.width / 2 - width / 2),
+          ).toBeLessThan(1);
+          expect(
+            (await targets[4]!.boundingBox())!.x + before[4]!.width,
+          ).toBeLessThanOrEqual(notebook!.x);
+          await page.screenshot({
+            path: test
+              .info()
+              .outputPath(
+                `${experience.replaceAll(" ", "-").toLowerCase()}-wide-unchanged.png`,
+              ),
+          });
+        }
+        await panel.locator("[data-learning-close]").click();
+        await expect(panel).toBeHidden();
+        for (const [index, target] of targets.entries()) {
+          const after = await target.boundingBox();
+          expect(Math.abs(after!.width - before[index]!.width)).toBeLessThan(1);
+        }
       }
     }
   }
@@ -428,20 +697,23 @@ test("students choose task support and direct explanations without a saved initi
   page,
 }) => {
   await page.goto("/chapters/benchmarking/");
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
   await expect(panel.getByRole("status")).toContainText("Connected");
-  await panel.getByRole("button", { name: "Agent", exact: true }).click();
+  await chooseNotebookTool(panel, "Discuss");
   await panel.getByLabel("How I want help").selectOption("explanation");
   await panel.getByLabel("Where I want support").selectOption("prerequisite");
   await panel
     .getByLabel("My learning goal")
     .fill("Understand the measurement window");
   await panel
-    .getByLabel("Message to my agent")
+    .getByLabel("Message to the teaching assistant")
     .fill(
       "I do not know what a common observation window means. Please explain directly.",
     );
@@ -450,7 +722,7 @@ test("students choose task support and direct explanations without a saved initi
       request.url().startsWith(companionAddress + "/agent/conversations/") &&
       request.method() === "POST",
   );
-  await panel.getByRole("button", { name: "Send to my agent" }).click();
+  await panel.getByRole("button", { name: "Send message" }).click();
   const sent = (await request).postDataJSON();
   expect(sent).toMatchObject({
     mode: "explanation",
@@ -461,22 +733,21 @@ test("students choose task support and direct explanations without a saved initi
   await expect(panel.getByRole("status")).toContainText("--codex");
   await panel.getByLabel("Where I want support").selectOption("next-step");
   await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
-  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await chooseNotebookTool(panel, "Notes");
   await expect(
     panel.getByText("No notes in this view yet.", { exact: false }),
   ).toBeVisible();
-  await panel
-    .getByRole("button", { name: "Chapter guide", exact: true })
-    .click();
+  await chooseNotebookTool(panel, "Chapter guide");
   await panel
     .getByLabel("My prediction or uncertainty")
     .fill("I am unsure which inputs describe the same window.");
+  page.once("dialog", (dialog) => dialog.accept());
   await panel
     .getByRole("button", { name: "Help me get started", exact: true })
     .click();
-  await expect(panel.getByLabel("Message to my agent")).toHaveValue(
-    "I am unsure which inputs describe the same window.",
-  );
+  await expect(
+    panel.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue("I am unsure which inputs describe the same window.");
   await expect(
     panel.getByLabel("Investigation source").locator("option").first(),
   ).toContainText("Investigation ·");
@@ -496,14 +767,19 @@ test("selected context is explicit and the notebook follows chapters without los
   });
   await page.goto("/chapters/benchmarking/");
   await expect(
-    page.getByRole("button", { name: "Notebook", exact: true }),
+    page
+      .locator(".site-header")
+      .getByRole("button", { name: "Notebook", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
   await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
   expect(requests).toEqual([]);
   const passage = await selectReading(page);
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();
@@ -536,7 +812,7 @@ test("selected context is explicit and the notebook follows chapters without los
   await expect(panel.locator("summary", { hasText: "Reading:" })).toHaveCount(
     0,
   );
-  await panel.getByRole("button", { name: "Notes", exact: true }).click();
+  await chooseNotebookTool(panel, "Notes");
   await expect(
     panel.getByRole("heading", { name: "Synthetic selected passage" }),
   ).toHaveCount(0);
@@ -544,9 +820,7 @@ test("selected context is explicit and the notebook follows chapters without los
   await expect(
     panel.getByRole("heading", { name: "Synthetic selected passage" }),
   ).toBeVisible();
-  await panel
-    .getByRole("button", { name: "Chapter guide", exact: true })
-    .click();
+  await chooseNotebookTool(panel, "Chapter guide");
   await expect(panel.getByText(/cached feed/)).toBeVisible();
   await expect(
     panel
@@ -583,7 +857,7 @@ test("selected context is explicit and the notebook follows chapters without los
   await expect(
     panel.getByRole("button", { name: "Save demo result", exact: true }),
   ).toHaveCount(0);
-  await panel.getByRole("button", { name: "Write", exact: true }).click();
+  await chooseNotebookTool(panel, "Write");
   await panel
     .getByLabel("Title", { exact: true })
     .fill("Synthetic unfinished introduction note");
@@ -608,13 +882,19 @@ test("selected context is explicit and the notebook follows chapters without los
     conceptPages.find((page) => page.url === "/chapters/scaling/")!
       .concepts[0]!,
   );
-  await panel.getByRole("button", { name: "Agent", exact: true }).click();
+  await chooseNotebookTool(panel, "Discuss");
+  await expect(
+    panel.getByRole("region", { name: "Assistant context" }),
+  ).toContainText("This conversation keeps its original source");
+  await panel
+    .getByRole("button", { name: "Discuss the current reading" })
+    .click();
   await expect(
     panel.getByLabel("Investigation source").locator("option").first(),
   ).toContainText(
     "Current reading · How should web applications respond to scaling pressure?",
   );
-  await panel.getByRole("button", { name: "Write", exact: true }).click();
+  await chooseNotebookTool(panel, "Write");
   await expect(
     panel.getByRole("region", { name: "Note context" }).getByRole("link"),
   ).toHaveAttribute("href", /\/chapters\/introduction\//);
@@ -636,7 +916,9 @@ test("selected context is explicit and the notebook follows chapters without los
   await panel.getByRole("button", { name: "Close notebook" }).click();
   await page.goto("/chapters/benchmarking/");
   await expect(
-    page.getByRole("button", { name: "Notebook", exact: true }),
+    page
+      .locator(".site-header")
+      .getByRole("button", { name: "Notebook", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
 });
@@ -645,8 +927,11 @@ test("a restored open notebook explains unavailable or expired connections and r
   page,
 }) => {
   await page.goto("/chapters/benchmarking/");
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "My learning notebook" });
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = page.locator(".learning-workspace");
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByLabel("Pairing code").fill(code);
   await panel.getByRole("button", { name: "Pair companion" }).click();

@@ -206,6 +206,9 @@ test("conversations persist independently, send only selected notes, and bound o
     );
     await waitUntil(() => conversations.get(conversation.id).state === "idle");
     assert.equal(conversations.get(conversation.id).messages.length, 3);
+    assert.deepEqual(conversations.get(conversation.id).messages[0]!.noteIds, [
+      initial.id,
+    ]);
     conversations.close();
     conversations = openLearningConversations(directory, notebook, null);
     assert.equal(
@@ -213,6 +216,9 @@ test("conversations persist independently, send only selected notes, and bound o
       "synthetic-thread",
     );
     assert.equal(notebook.entries().length, 10);
+    assert.deepEqual(conversations.get(conversation.id).messages[0]!.noteIds, [
+      initial.id,
+    ]);
   } finally {
     conversations.close();
     notebook.close();

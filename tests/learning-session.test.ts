@@ -60,6 +60,40 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
     "https://book.example/chapters/example/",
   );
   assert.equal(restored.preparation, preparation);
+  assert.equal(restored.experience, "notebook");
+  assert.equal(restored.notebookView, "write");
+  assert.equal(restored.assistant, null);
+  const legacy = JSON.parse(record!);
+  legacy.view = "guide";
+  record = JSON.stringify(legacy);
+  assert.equal(readNotebookSession().experience, "assistant");
+  assert.equal(readNotebookSession().assistantView, "guide");
+  const current = {
+    ...legacy,
+    experience: "assistant",
+    notebookView: "notes",
+    assistantView: "agent",
+    assistant: {
+      source: restored.editor!.source,
+      browserId: "c0000000-0000-4000-8000-000000000001",
+      conversationId: "c0000000-0000-4000-8000-000000000002",
+      question: "Keep this unfinished question. ",
+      goal: "A chosen goal",
+      mode: "explanation",
+      supportNeed: "prerequisite",
+    },
+  };
+  record = JSON.stringify(current);
+  assert.deepEqual(readNotebookSession().assistant, current.assistant);
+  assert.equal(readNotebookSession().notebookView, "notes");
+  assert.equal(readNotebookSession().assistantView, "agent");
+  current.assistant.source = {
+    ...current.assistant.source,
+    url: "javascript:synthetic",
+  };
+  record = JSON.stringify(current);
+  assert.equal(readNotebookSession().assistant, null);
+  assert.equal(readNotebookSession().editor?.body, body);
   const invalid = JSON.parse(record!);
   invalid.editor.source.url = "javascript:synthetic";
   record = JSON.stringify(invalid);

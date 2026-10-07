@@ -1,6 +1,6 @@
 # ADR-034: Separate the private notebook from the teaching assistant
 
-**Status:** Accepted
+**Status:** Implemented
 
 **Date:** 2026-10-07
 
@@ -69,7 +69,7 @@ Submission preparation remains deliberate selection into the existing course con
 - The browser owns the two entry points, visible context, tab drafts and unfinished navigation state.
 - The local notebook owner retains explicitly saved notes, histories, source snapshots, related records, self-assessments and accepted assistance provenance.
 - The local conversation owner retains assistant exchanges and selected-context requests independently of notebook archives.
-- Shared learning contracts own handoff/context types; shared agent policy owns instructional behavior under [ADR-035](ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md).
+- Shared learning contracts own handoff/context types; shared agent policy owns instructional behavior under [ADR-035](../accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md).
 - Provider adapters implement the shared contract without owning notebook rules; course APIs continue to own shared audiences, submissions and assessment.
 
 Refine responsibilities and entry-point placement from ADRs 027–033 while retaining their privacy, portability, responsive-support and independent-learning decisions.
@@ -117,23 +117,40 @@ Retain student-reviewed selection and saving.
 
 ## Implementation and verification
 
-The current implementation still combines these experiences under Notebook.
-Existing separate persistence and reviewed drafts are groundwork; this decision remains awaiting implementation.
-Update the workspace, architecture and student setup documents when the new composition exists.
+The shared layout now offers separate lazy Notebook and Teaching assistant entry points.
+`site/scripts/learning-navigation.ts` owns experience/section presentation, while `site/scripts/learning-assistant.ts` composes discussion, chapter guidance and human peer inquiry.
+The existing workspace remains the coordinator for pairing and reviewed notebook writes; shared handoff types do not depend on a provider or course store.
 
-Before marking Implemented, verify:
+The fixed panel shows one experience at a time, preserving the book's normal geometry.
+Notebook provides Write, Notes and Concepts, with Prepare under More learning tools.
+Teaching assistant provides Discuss, Chapter guide and Peer discussion, with the same Connect settings.
+Version 1 tab state adds separate remembered sections, assistant message/goal/help choices, captured source, active conversation ID and browser identity; older records retain writing and map their sections to the new experience.
 
-- A reader can choose writing or assistance from a chapter or selected passage and see the supplied context before model use.
-- Notebook capture, review, self-assessment and archives work without a provider; assistant connection failure retains writing and conversation history.
-- Switching experiences and navigating chapters preserve unfinished work, source identity and book widths/positions without an automatic send or save.
-- Selected-note discussion and reviewed takeaway/evidence saving preserve source, revisions, related records and assistance provenance across restart and export/import.
-- Unselected notes, gated peer contributions and course records do not enter model context; existing sharing and submission boundaries remain enforced.
-- Representative learners can identify where to write, ask for help and keep their own takeaway with manageable effort under the voluntary evaluation protocol.
+Notes offer single-note or selected-note discussion, with visible bounded source/context previews before sending.
+Assistant replies offer a blank personal takeaway or a reviewed suggestion; unfinished notebook writing is protected by confirmation.
+New student turns retain supplied note IDs, so handoffs link the material actually used on that turn rather than a later selection.
+This is additive conversation JSON; notebook/archive/database schemas and protocol stay at version 1.
+Old turns and published package 0.1.0 remain usable without assigning inferred relationships; turn-linked identities require a companion built from this source and a later package release.
 
-## Open questions
+Verification on 2026-10-07 used synthetic records:
 
-- Choose the concrete panel/navigation arrangement and final labels without changing these responsibility boundaries.
-- Place peer inquiry so its human audience stays clear and its handoffs remain easy to find.
+- Browser journeys retain separate unsent writing/questions, selected support, original sources and saved conversation resume across switching, chapter navigation and reload, with no automatic message or notebook save.
+- Reviewed handoffs retain source, related IDs and assistance history in the actual companion and portable export; declining replacement retains the unfinished note.
+- The existing notebook checks cover restart and version 1 export/import; conversation checks retain the actual selected-note identities across restart and exclude unselected notes from provider context.
+- Both experiences preserve shell, reading, prose, paragraph and demo geometry at 390–2560 pixels with navigation expanded/folded in Chromium and WebKit.
+- All 150 unit tests and 22 combined notebook/onboarding/demo/peer browser checks pass; type checks, build and validation of 144 rendered HTML files pass.
+- The locally packed companion passes clean installation and retained-record checks on macOS / Node 26.10.0; the registry package is unchanged.
+- Visual review covered source selection and notebook takeaways in both browsers; existing journeys also check accessibility, mobile dark theme and shared-peer authorization.
+
+These establish the software boundary and representative journeys.
+Whether learners find the distinction clear and the effort manageable remains to be evaluated under [the voluntary protocol](../../learning-workspace-evaluation.md); no learner result is inferred from automated checks.
+Workspace, architecture, setup and course inquiry documentation describe the implemented entry points and release limits.
+
+## Resolved implementation choices
+
+One shared fixed panel and two header entry points keep pairing and tab continuity together while presenting distinct purposes.
+Peer discussion sits visibly within Teaching assistant alongside chapter guidance, retaining its human audience, course identity and explicit sharing actions.
+Concrete naming and placement may be refined from learner feedback without changing record ownership or handoff rules.
 
 ## References
 

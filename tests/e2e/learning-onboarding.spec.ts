@@ -81,8 +81,11 @@ test("a packed companion supports an optional first investigation and retains th
   try {
     const code = await start();
     await page.goto("/demos/#demo-queue-balance-lab");
-    await page.getByRole("button", { name: "Notebook", exact: true }).click();
-    const panel = page.getByRole("dialog", { name: "My learning notebook" });
+    await page
+      .locator(".site-header")
+      .getByRole("button", { name: "Notebook", exact: true })
+      .click();
+    const panel = page.locator(".learning-workspace");
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18896");
     await panel.getByLabel("Pairing code").fill("incorrect-synthetic-code");
     await panel.getByRole("button", { name: "Pair companion" }).click();
@@ -155,7 +158,7 @@ test("a packed companion supports an optional first investigation and retains th
     const next = await start();
     await panel.getByLabel("Pairing code").fill(next);
     await panel.getByRole("button", { name: "Pair companion" }).click();
-    await panel.getByRole("button", { name: "Notes", exact: true }).click();
+    await chooseNotebookTool(panel, "Notes");
     await expect(
       panel.getByRole("heading", {
         name: "Queue balance lab: initial thinking",

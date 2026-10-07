@@ -2,6 +2,8 @@
 
 Your notebook is a private space for questions, observations and reflection across the book.
 You choose which material becomes a course submission or a shared contribution.
+The header offers **Notebook** for keeping your thinking and **Teaching assistant** for guidance and discussion.
+They share one companion connection; switching does not send a message or save a note.
 Reading the book does not require a companion or a model account.
 
 ## Start on your computer
@@ -42,9 +44,9 @@ Keep the companion running while using the book; Ctrl+C stops it without removin
 
 ### Optional first investigation
 
-After pairing, choose **Chapter guide**, or **Connect → Explore this reading**.
+After pairing, choose **Teaching assistant → Chapter guide**, or **Connect → Explore this reading**.
 The guide follows the chapter you are reading and uses its existing prompts and available demos.
-For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Notebook → Chapter guide**, and select **Queue balance lab**.
+For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Teaching assistant → Chapter guide**, and select **Queue balance lab**.
 Save a prediction or a concrete uncertainty, change the demo's mean time, then choose **Save demo result**.
 This saves the demo's current inputs and displayed result as a private note and shows what was recorded below the button.
 Optionally try **Apply it in a different situation**: explain what happens to 300 waiting events when arrivals and processing capacity differ.
@@ -65,9 +67,12 @@ To attach a passage, select text in the reading, then open **Notebook**; if it i
 Write shows the source and a short preview of the selected quote; it does not copy the whole chapter into your note.
 The open notebook follows you between chapters, and **Notes** initially shows the current reading's entries; choose **Whole notebook** to see the rest.
 Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
-Closing Notebook keeps it closed on later pages.
+The assistant remembers its own section, unsent question and active conversation across chapter navigation, with its original source shown explicitly.
+Closing either experience keeps the shared panel closed on later pages.
 These unfinished drafts stay in this browser tab; save your notes before closing the tab.
-**More notebook tools** contains **Concepts**, **Peers**, **Prepare** and **Connect**.
+**Notebook** has **Write**, **Notes** and **Concepts**.
+**Teaching assistant** has **Discuss**, **Chapter guide** and **Peer discussion**.
+**More learning tools** contains the shared **Connect** settings and, in Notebook, **Prepare**.
 Quick notes may be short.
 Use **Notes → Revisit** after a delay to recall an idea before rereading your earlier explanation; there is no schedule or completion requirement.
 Developed reflections have prompts and examples to help you capture enough evidence and explanation.
@@ -107,24 +112,28 @@ The dedicated profile separates this learning space from your ordinary coding en
 It must not contain custom configuration, hooks, plugins, rules or custom skills.
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
-In **Agent**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
+In **Teaching assistant → Discuss**, choose a goal and help mode: a question, hint, direct explanation, reasoning check or reflection support.
 You can also indicate where you want support, such as a prerequisite, an unexpected result or trying the next step yourself.
 An honest statement of being stuck is enough; you can request a direct explanation immediately and change the amount of help later.
 Chapter guide can prepare a help request from your current question without sending it automatically.
-Select notebook entries in **Notes** when you want them included.
+Use **Notes → Discuss this note** to discuss one note, or select entries and choose **Discuss selected notes**.
+Discuss shows the source and selected notebook context before sending; choosing another chapter does not retarget a retained conversation silently.
 Sending a question shares that source and those selected entries with your model provider.
 You can reopen saved conversations, stop a reply, or keep using the notebook without a model.
-**Use as a notebook draft** lets you review and revise a suggestion before saving it with assistance provenance.
+**Write a takeaway** opens a blank personal draft; **Use as a notebook draft** prepares the selected suggestion for review and revision.
+Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
+Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
+Turn-linked notebook identities require an updated source-built companion; old conversations and the published 0.1.0 package remain readable without inferred links.
 
 For a demo investigation, select its source and save your **Initial thinking** first.
 Select that note for context, then ask your agent to inspect the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
-Keep the Agent section open during a tool request.
+Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
 
 ## Compare with peers
 
-In **Peers**, sign in using your course account and choose the course run and inquiry activity.
+In **Teaching assistant → Peer discussion**, sign in using your course account and choose the course run and inquiry activity.
 Save initial thinking for that source, then choose **Reveal peer inquiry**.
 Only a declaration that you saved private work reaches the course API; your initial text remains local.
 A concrete uncertainty is enough to begin.

@@ -37,6 +37,8 @@ export interface AgentMessage {
   at: string;
   /** Optional, additive context on student turns; older conversations omit it. */
   support?: TaskSupport;
+  /** Deliberately supplied notebook identities on this turn; legacy turns omit it. */
+  noteIds?: string[];
 }
 export interface LearningConversation {
   id: string;

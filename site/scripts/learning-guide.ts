@@ -63,7 +63,7 @@ export function mountLearningGuide(
     node("h3", `Explore ${reading.title}`),
     node("p", reading.prompt),
   );
-  const help = node("button", "Ask my agent about this reading");
+  const help = node("button", "Discuss this reading");
   help.type = "button";
   help.addEventListener("click", () =>
     options.help(
@@ -90,7 +90,7 @@ export function mountLearningGuide(
     container.append(
       node(
         "p",
-        "There is no interactive demo on this page. You can reflect on the reading or ask your agent about a question.",
+        "There is no interactive demo on this page. You can reflect on the reading or ask your teaching assistant about a question.",
       ),
     );
     const source = pageSource();

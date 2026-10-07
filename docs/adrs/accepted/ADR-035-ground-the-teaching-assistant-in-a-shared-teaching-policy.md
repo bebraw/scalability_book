@@ -10,7 +10,7 @@ The local agent integration already supports selected reading context, authored 
 [ADRs 031–033](../implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md) add responsive support, independent application, reflection and scaffolded peer inquiry.
 These are substantial groundwork, but the current Agent interface does not present one recognizable teaching role distinct from notebook work.
 
-[ADR-034](ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) establishes that interface boundary.
+[ADR-034](../implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) establishes that interface boundary.
 The assistant also needs a shared definition of how it teaches, what evidence it uses and how its behavior will be evaluated.
 A personality or a successful provider call alone does not establish instructional quality.
 

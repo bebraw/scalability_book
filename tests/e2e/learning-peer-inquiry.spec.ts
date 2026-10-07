@@ -104,8 +104,11 @@ test("students save private initial work before group replies, reflect individua
     });
     const page = await context.newPage();
     await page.goto(`${baseURL}/chapters/benchmarking/`);
-    await page.getByRole("button", { name: "Notebook", exact: true }).click();
-    const panel = page.getByRole("dialog", { name: "My learning notebook" });
+    await page
+      .locator(".site-header")
+      .getByRole("button", { name: "Notebook", exact: true })
+      .click();
+    const panel = page.locator(".learning-workspace");
     await panel
       .getByLabel("Companion address")
       .fill(`http://127.0.0.1:${port}`);
@@ -116,8 +119,8 @@ test("students save private initial work before group replies, reflect individua
     return { page, panel };
   }
   async function peers(page: Page) {
-    const panel = page.getByRole("dialog", { name: "My learning notebook" });
-    await chooseNotebookTool(panel, "Peers");
+    const panel = page.locator(".learning-workspace");
+    await chooseNotebookTool(panel, "Peer discussion");
     await panel.getByLabel("Course for this inquiry").selectOption(course.id);
     return panel;
   }
@@ -335,10 +338,12 @@ test("students save private initial work before group replies, reflect individua
     await relatedCase
       .getByRole("button", { name: "Ask for help with this case" })
       .click();
-    await expect(alice.panel.getByLabel("Message to my agent")).toHaveValue(
-      /six changes\/hour/,
-    );
-    await expect(alice.panel.getByLabel("Message to my agent")).not.toHaveValue(
+    await expect(
+      alice.panel.getByLabel("Message to the teaching assistant"),
+    ).toHaveValue(/six changes\/hour/);
+    await expect(
+      alice.panel.getByLabel("Message to the teaching assistant"),
+    ).not.toHaveValue(
       /I still question whether|I changed a browser model input/,
     );
     await peers(alice.page);

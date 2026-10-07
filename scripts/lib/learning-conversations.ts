@@ -83,6 +83,7 @@ export function openLearningConversations(
     role: "student" | "agent" | "observation",
     text: string,
     support?: TaskSupport,
+    noteIds?: string[],
   ) => {
     conversation.messages.push({
       id: randomUUID(),
@@ -90,6 +91,7 @@ export function openLearningConversations(
       text: text.slice(0, 32_000),
       at: new Date().toISOString(),
       ...(support ? { support } : {}),
+      ...(noteIds ? { noteIds } : {}),
     });
     save(conversation);
   };
@@ -251,7 +253,13 @@ export function openLearningConversations(
       running = { conversation, session, browser, origin, attempt };
       conversation.state = "working";
       conversation.error = null;
-      message(conversation, "student", text, support);
+      message(
+        conversation,
+        "student",
+        text,
+        support,
+        selected.map((entry) => entry.id),
+      );
       const current = running;
       const runTool = async (name: string, arguments_: unknown) => {
         learningAssert(

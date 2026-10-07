@@ -1,5 +1,6 @@
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
-import { mountLearningGuide } from "./learning-guide.ts";
+import { mountLearningAssistant } from "./learning-assistant.ts";
+import { mountLearningNavigation } from "./learning-navigation.ts";
 import { currentReading, pageSource, textOf } from "./learning-context.ts";
 import {
   readingSelection,
@@ -10,13 +11,11 @@ import {
   saveNotebookSession,
   type NotebookEditor,
   type NotebookView,
+  type AssistantSection,
+  experienceForView,
 } from "./learning-session.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
-import {
-  mountLearningAgent,
-  prepareLearningHelp,
-} from "./learning-agent-ui.ts";
-import { mountLearningPeers } from "./learning-peers.ts";
+import { prepareLearningHelp } from "./learning-agent-ui.ts";
 export {
   observeLearningDemo,
   changeLearningDemo,
@@ -31,6 +30,9 @@ import {
   type NotebookEntry,
   type ConceptJudgment,
   type NoteKind,
+  type LearningExperience,
+  type AssistantHandoff,
+  type NotebookHandoff,
 } from "../../shared/learning-workspace.ts";
 
 const client = new LearningClient();
@@ -38,15 +40,18 @@ const panel = document.createElement("dialog");
 panel.className = "learning-workspace";
 panel.hidden = true;
 panel.setAttribute("aria-label", "My learning notebook");
-panel.innerHTML = `<div class="learning-chrome"><div class="learning-heading"><div><p class="learning-eyebrow">My learning notebook</p><h2></h2></div><button type="button" data-learning-close aria-label="Close notebook">×</button></div>
+panel.innerHTML = `<div class="learning-chrome"><div class="learning-heading"><div><p class="learning-eyebrow">My learning notebook</p><h2></h2><p class="learning-purpose"></p></div><button type="button" data-learning-close aria-label="Close notebook">×</button></div><nav class="learning-experiences" aria-label="Learning experiences"></nav>
   <nav class="learning-tabs" aria-label="Notebook sections"></nav><p class="learning-status" role="status" aria-live="polite"></p><div class="learning-selection" hidden><p></p><button type="button" data-learning-selection>Use selected text</button></div></div><div class="learning-body"></div>`;
 panel.querySelector("h2")!.textContent = currentReading().title;
 document.body.append(panel);
 const container = panel.querySelector<HTMLDivElement>(".learning-body")!;
-const tabs = panel.querySelector<HTMLElement>(".learning-tabs")!;
 const status = panel.querySelector<HTMLElement>(".learning-status")!;
 const restored = readNotebookSession();
 let view: NotebookView = restored.view;
+let experience: LearningExperience = restored.experience;
+let notebookView = restored.notebookView;
+let assistantView = restored.assistantView;
+let assistant = restored.assistant;
 let companionStatus: CompanionStatus | null = null;
 let connected = false;
 let entries: NotebookEntry[] = [];
@@ -68,6 +73,10 @@ function persist() {
   saveNotebookSession({
     open: !panel.hidden,
     view,
+    experience,
+    notebookView,
+    assistantView,
+    assistant,
     editor,
     assistance: acceptedAssistance,
     preparation: draft,
@@ -119,6 +128,34 @@ function beginNote(
   navigate("write");
   return true;
 }
+function writeHandoff(value: NotebookHandoff) {
+  if (!beginNote(value.source, value.kind, value.title, value.relatedIds))
+    return;
+  editor.body = value.body;
+  acceptedAssistance = value.assistance;
+  render();
+  status.textContent = value.assistance
+    ? "Write your own takeaway or review this suggestion. Choose Save note when it represents your thinking."
+    : "This is your private draft. Review and write what you want to keep, then choose Save note.";
+}
+function discussHandoff(value: AssistantHandoff) {
+  if (
+    assistant?.question.trim() &&
+    !window.confirm(
+      "Replace your unfinished assistant message? Choose Cancel to keep it.",
+    )
+  )
+    return;
+  status.textContent = "";
+  assistant = prepareLearningHelp(
+    value.source,
+    value.question,
+    assistant?.browserId,
+  );
+  selected.clear();
+  value.noteIds.forEach((id) => selected.add(id));
+  navigate("agent");
+}
 let selectedReading: ReadingSelection | null = null;
 let pendingSelection: ReadingSelection | null = null;
 const selectionBar = panel.querySelector<HTMLDivElement>(
@@ -140,7 +177,14 @@ selectionButton.addEventListener("pointerdown", () => {
 selectionButton.addEventListener("click", () => {
   const selection = pendingSelection ?? selectedReading;
   pendingSelection = null;
-  if (selection && beginNote(pageSource(selection))) {
+  if (selection) {
+    if (experience === "assistant")
+      discussHandoff({
+        source: pageSource(selection),
+        question: "",
+        noteIds: [...selected],
+      });
+    else beginNote(pageSource(selection));
     window.getSelection()?.removeAllRanges();
     updateSelection();
   }
@@ -182,7 +226,7 @@ async function run(action: () => void | Promise<void>) {
     await action();
   } catch (error) {
     status.textContent =
-      error instanceof Error ? error.message : "The notebook action failed.";
+      error instanceof Error ? error.message : "The learning action failed.";
     if (
       error instanceof LearningConnectionError &&
       error.reason !== "pairing"
@@ -230,41 +274,36 @@ async function refresh() {
   setConnected(true);
 }
 function navigate(next: NotebookView) {
+  const owner = experienceForView(next);
+  if (owner) experience = owner;
+  if (experience === "notebook" && owner)
+    notebookView = next as typeof notebookView;
+  if (experience === "assistant" && owner)
+    assistantView = next as typeof assistantView;
   view = next;
   render();
   panel.scrollTop = 0;
 }
+function switchExperience(next: LearningExperience) {
+  status.textContent = "";
+  experience = next;
+  navigate(next === "notebook" ? notebookView : assistantView);
+}
 function render() {
+  if (view === "agent" && !assistant)
+    assistant = prepareLearningHelp(pageSource(), "");
   persist();
-  tabs.replaceChildren();
-  const primary = node("div", undefined, "learning-tab-primary");
-  const tools = node("details", undefined, "learning-tools");
-  tools.append(node("summary", "More notebook tools"));
-  const menu = node("div", undefined, "learning-tools-menu");
-  tools.append(menu);
-  const secondary: NotebookView[] = ["concepts", "peers", "prepare", "connect"];
-  tools.open = secondary.includes(view);
-  for (const [id, label] of [
-    ["write", "Write"],
-    ["notes", "Notes"],
-    ["guide", "Chapter guide"],
-    ["agent", "Agent"],
-    ["concepts", "Concepts"],
-    ["peers", "Peers"],
-    ["prepare", "Prepare"],
-    ["connect", "Connect"],
-  ] as const) {
-    const tab = button(label, () => navigate(id));
-    tab.setAttribute("aria-current", String(view === id));
-    (secondary.includes(id) ? menu : primary).append(tab);
-  }
-  tabs.append(primary, tools);
+  mountLearningNavigation(panel, experience, view, navigate, switchExperience);
+  selectionButton.textContent =
+    experience === "assistant" ? "Discuss selected text" : "Use selected text";
   container.replaceChildren();
   if (!connected && view !== "connect") {
     container.append(
       node(
         "p",
-        "Connect your local companion to save and revisit your private notes. Reading the book does not require a connection.",
+        experience === "notebook"
+          ? "Connect your local companion to save and revisit your private notes. Reading the book does not require a connection."
+          : "Connect the shared local companion to use the chapter guide and discuss your questions. Enable your chosen provider for assistant replies; notebook writing works without a model.",
       ),
       button(
         "Connect companion",
@@ -279,130 +318,38 @@ function render() {
   if (view === "concepts") renderConcepts();
   if (view === "prepare") renderPreparation();
   if (view === "connect") renderConnection();
-  if (view === "guide")
-    mountLearningGuide(container, {
-      entries,
-      help: (source, text) => {
-        prepareLearningHelp(source, text);
-        navigate("agent");
-      },
-      initial: (source) =>
-        beginNote(
-          source,
-          "attempt",
-          `Initial thinking: ${source.title}`.slice(0, 300),
-        ),
-      reflect: (source, relatedIds) =>
-        beginNote(
-          source,
-          "reflection",
-          `Reflection: ${currentReading().title}`,
-          relatedIds,
-        ),
-      close,
-      save: async (kind, title, body, source, relatedIds = []) => {
-        const entry = await client.request<NotebookEntry>("/entries", "POST", {
-          kind,
-          title,
-          body,
-          source,
-          relatedIds,
-        });
-        await refresh();
-        return entry;
-      },
-      notes: () => navigate("notes"),
-      leave: () => navigate("write"),
-      status: (text) => {
-        status.textContent = text;
-      },
-    });
-  if (view === "peers")
-    mountLearningPeers(container, {
-      source: readingSource(),
-      entries,
-      save: async (kind, title, body, source, relatedIds = []) => {
-        const entry = await client.request<NotebookEntry>("/entries", "POST", {
-          kind,
-          title,
-          body,
-          source,
-          relatedIds,
-        });
-        await refresh();
-        return entry;
-      },
-      help: (source, text) => {
-        prepareLearningHelp(source, text);
-        navigate("agent");
-      },
-      notes: () => navigate("notes"),
-      status: (text) => {
-        status.textContent = text;
-      },
-      initial: (source) => {
-        beginNote(
-          source,
-          "attempt",
-          `Initial thinking: ${source.title}`.slice(0, 300),
-        );
-      },
-      reflect: (source, body, relatedIds) => {
-        if (
-          !beginNote(
-            source,
-            "reflection",
-            `Peer inquiry: ${source.title}`.slice(0, 300),
-            relatedIds,
-          )
-        )
-          return;
-        editor.body = body;
-        navigate("write");
-        status.textContent =
-          "Compare with your initial explanation and revise this private draft. Choose which material represents your own learning before saving.";
-      },
-    });
-  if (view === "agent")
-    mountLearningAgent(container, {
+  if (experience === "assistant" && view !== "connect") {
+    const activeDraft = assistant ?? prepareLearningHelp(pageSource(), "");
+    mountLearningAssistant(container, view as AssistantSection, {
       client,
+      entries,
+      draft: activeDraft,
       source: readingSource,
       selected: () => [...selected],
-      active: () => !panel.hidden && view === "agent",
+      active: () =>
+        !panel.hidden && view === "agent" && assistant === activeDraft,
+      changed: persist,
+      write: writeHandoff,
+      help: discussHandoff,
+      discuss: () => navigate("agent"),
+      notes: () => navigate("notes"),
+      close,
       status: (text) => {
         status.textContent = text;
       },
-      accept: (text, provenance, source) => {
-        acceptedAssistance = provenance;
-        editor = {
-          id: "",
-          expected: "",
-          kind: "reflection",
-          title: `Reflection: ${source.title}`.slice(0, 300),
-          body: text.slice(0, 16000),
-          relatedIds: [],
+      save: async (kind, title, body, source, relatedIds = []) => {
+        const entry = await client.request<NotebookEntry>("/entries", "POST", {
+          kind,
+          title,
+          body,
           source,
-        };
-        navigate("write");
-        status.textContent =
-          "Review and revise this agent suggestion, then choose Save note if it represents your thinking.";
-      },
-      initial: (source) => {
-        acceptedAssistance = null;
-        editor = {
-          id: "",
-          expected: "",
-          kind: "attempt",
-          title: `Initial thinking: ${source.title}`.slice(0, 300),
-          body: "",
-          relatedIds: [],
-          source,
-        };
-        navigate("write");
-        status.textContent =
-          "Save your own explanation, prediction or where you are stuck. Select this note in Notes before returning to the agent.";
+          relatedIds,
+        });
+        await refresh();
+        return entry;
       },
     });
+  }
 }
 function renderEditor() {
   const context = node("section", undefined, "learning-context");
@@ -695,6 +642,15 @@ function renderNotes() {
       }),
     );
     card.append(
+      button("Discuss this note", () =>
+        discussHandoff({
+          source: entry.source,
+          question: "",
+          noteIds: [entry.id],
+        }),
+      ),
+    );
+    card.append(
       button("Delete", async () => {
         if (
           !window.confirm(
@@ -713,6 +669,18 @@ function renderNotes() {
     container.append(card);
   }
   container.append(
+    button("Discuss selected notes", () => {
+      const chosen = entries.find((entry) => selected.has(entry.id));
+      if (!chosen) {
+        status.textContent = "Select the notes you want to discuss first.";
+        return;
+      }
+      discussHandoff({
+        source: chosen.source,
+        question: "",
+        noteIds: [...selected],
+      });
+    }),
     button(
       "Prepare selected notes",
       () => navigate("prepare"),
@@ -893,7 +861,8 @@ function renderConnection() {
           code.value = "";
           await refresh();
           status.textContent = "Connected to your private notebook.";
-          if (view === "connect") navigate("write");
+          if (view === "connect")
+            navigate(experience === "assistant" ? assistantView : notebookView);
           else render();
         },
         "learning-primary",
@@ -991,8 +960,14 @@ document.addEventListener(
         event as CustomEvent<{
           selection: ReadingSelection | null;
           resume: boolean;
+          experience: LearningExperience;
         }>
       ).detail;
+      if (!detail.resume) {
+        if (experience !== detail.experience) status.textContent = "";
+        experience = detail.experience;
+        view = experience === "assistant" ? assistantView : notebookView;
+      }
       panel.hidden = false;
       document.body.dataset.learningOpen = "true";
       if (!panel.hasAttribute("open")) {
@@ -1008,7 +983,13 @@ document.addEventListener(
             error instanceof Error ? error.message : "Reconnect the companion.";
         }
       }
-      if (detail.selection) beginNote(pageSource(detail.selection));
+      if (detail.selection && experience === "assistant")
+        discussHandoff({
+          source: pageSource(detail.selection),
+          question: "",
+          noteIds: [...selected],
+        });
+      else if (detail.selection) beginNote(pageSource(detail.selection));
       else if (
         !editorDirty() &&
         new URL(editor.source.url).pathname !== location.pathname
@@ -1029,8 +1010,9 @@ document.addEventListener(
         !detail.resume &&
         new URL(location.href).searchParams.has("inquiry")
       )
-        view = "peers";
-      else if (view === "connect") view = "write";
+        navigate("peers");
+      else if (view === "connect")
+        view = experience === "assistant" ? assistantView : notebookView;
       render();
       persist();
       updateSelection();
@@ -1067,7 +1049,7 @@ window.addEventListener("beforeunload", (event) => {
   persist();
   // Chapter links retain the draft in this tab; closing/leaving still warns
   // about writing that has not been saved to the companion.
-  if (editorDirty() && !followingBookLink) {
+  if ((editorDirty() || assistant?.question.trim()) && !followingBookLink) {
     event.preventDefault();
     event.returnValue = "";
   }

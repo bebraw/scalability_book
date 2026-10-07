@@ -45,7 +45,6 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 
 | ADR                                                                                      | Summary                                                                                                                                          |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [ADR-034](accepted/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) | Separate writing and teaching assistance with deliberate handoffs, shared companion infrastructure and independent record ownership.             |
 | [ADR-035](accepted/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) | Ground the assistant in a shared teaching policy, recognizable manner and separate evaluation of behavior, personality and independent learning. |
 
 ## Implemented
@@ -85,6 +84,7 @@ Current behavior belongs in the owning contract and operating guide; old follow-
 | [ADR-031](implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md)               | Adapt help to the student's current thinking and difficulty while preserving help choice and selected-context access.                         |
 | [ADR-032](implemented/ADR-032-connect-notebook-investigations-to-independent-application.md)        | Connect guided investigations to independent application, supported reflection and voluntary learner evaluation.                              |
 | [ADR-033](implemented/ADR-033-scaffold-peer-inquiry-while-preserving-individual-learning.md)        | Support shared reasoning and existing group responsibilities, with private individual application and reflection.                             |
+| [ADR-034](implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md)         | Separate writing and teaching assistance with deliberate handoffs, shared companion infrastructure and independent record ownership.          |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 
