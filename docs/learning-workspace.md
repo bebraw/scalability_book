@@ -4,6 +4,9 @@ This document owns the executable learning-workspace contracts and local compani
 [ADRs 027–029](adrs/README.md#implemented) record the agreed whole-book direction.
 Implemented status identifies verified software behavior; production rollout and learner outcomes have their own evidence.
 
+[Accepted ADRs 031–033](adrs/README.md#accepted) define follow-up adaptive support, independent application with reflection, and scaffolded peer inquiry.
+These refinements await implementation; the current capabilities are described below.
+
 ## Current implementation
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
