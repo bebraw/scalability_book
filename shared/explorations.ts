@@ -58,6 +58,22 @@ export const explorations: Exploration[] = [
     },
   },
   {
+    id: "temporary-api-consumers",
+    title: "Probe an API with temporary clients",
+    phase: "Challenge",
+    summary:
+      "A generated CSV client reports success but exports two rows. Design independent checks for a fixed paginated event feed.",
+    conceptIds: ["contract", "acceptance-criteria", "eval", "authority"],
+    task: {
+      title: "Repeat the evidence collection",
+      href: "/project/challenge/#4-2-repeat-the-evidence-collection",
+    },
+    reading: {
+      title: "Probe an API with temporary clients",
+      href: "/appendices/evaluating-agentic-workflows/#probe-an-api-with-temporary-clients",
+    },
+  },
+  {
     id: "human-work-in-progress",
     title: "Vary human work in progress",
     phase: "Compare",

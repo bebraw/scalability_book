@@ -34,6 +34,9 @@ They remain distinct responsibilities because a mistake at each boundary produce
 Friction becomes visible when the path is hard to trace, the same rule has several unsynchronized definitions, a local check cannot exercise the changed boundary, or a deployment makes earlier assumptions costly to recover.
 The path also gives the chapter a stable unit of analysis: ask what the category change costs in implementation A, then repeat the same audit for implementation B.
 
+An independently built client can expose assumptions that the provider's own tests share with its implementation.
+The [optional API-consumer investigation](/explore/temporary-api-consumers/) probes a fixed contract with temporary CSV and summary clients, then separates provider defects from consumer mistakes and confusing documentation.
+
 > **Sustainability angle**
 >
 > Friction creates repeated work.

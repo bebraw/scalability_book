@@ -302,6 +302,12 @@ File size, fan-in, churn concentration, or a crowded directory can act as struct
 When such a signal fires, inspect whether several authorities or change reasons have accumulated together.
 Consolidate ownership, split responsibilities, or document a justified exception; do not divide a file merely to satisfy a number.
 
+State which failure or future change the proposed repair should improve, then check its consequences.
+The architectural-degradation review maps measurement and remediation techniques, while distinguishing their reported frequency from evidence of effectiveness :citep[ahmad2026architecturaldegradation].
+Record the repair's cost, later change and review effort, regressions, and whether the original problem returns.
+A lower structural metric alone cannot establish that the repair was worthwhile.
+[Appendix A's optional repair comparison](/appendices/evaluating-agentic-workflows/#evaluate-the-cost-of-the-next-change) applies this reasoning to successive changes in the same implementation.
+
 ## Architectural dimensions for a web application
 
 Placement, rendering, data, and ownership choices interact along several dimensions.

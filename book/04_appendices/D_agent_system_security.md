@@ -75,6 +75,25 @@ Map every physical row to a delegated run or leave it unmatched, then reconcile 
 The packet is synthetic and deterministic.
 It rehearses evidence joins, accounting, bypass detection, and late-effect reasoning; it does not estimate the reliability or cost of a particular fleet platform.
 
+### Composed tool calls cross execution boundaries
+
+**Codemode** lets an agent write code that composes tool calls and processes intermediate results before returning a selected view to the model.
+:citet[ronacher2026codemode] distinguishes composition on the harness host from shell programs running in the target environment.
+His described interpreter restricts direct filesystem and network access while exposing tools; its effective reach therefore also depends on those tools' permissions.
+The [MCP tools specification](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) already supports structured and multimodal results.
+Check that the composition layer preserves errors, pagination, and decisive evidence across result shapes, using [Appendix A's output preflight](/appendices/evaluating-agentic-workflows/#qualify-the-served-configuration).
+
+Retaining a tool result in a session transcript lets later calls reuse it, but does not establish recovery of pending operations or deduplication of external effects.
+Inventory the harness host, target environment, exposed tools, and state stores before treating an interpreter restriction as a boundary for the whole operation.
+Name where each call is authorized, what happens to queued or in-flight work after cancellation, and which durable record determines recovery.
+[Appendix F's effect audit](/appendices/durable-workflows/#audit-the-effect-boundary) follows the gap between an external effect and recorded completion.
+
+For a paper extension of the control-boundary audit, trace a synthetic batch that reads workspace W1's paginated events, prepares a summary, and writes an export through a tool.
+The originating actor may read W1 and write only to the designated export directory.
+Try an unauthorized W2 read, a failed second page omitted from the summary, and a restart after the export is written but before completion is recorded.
+For each case, identify the enforcement point or retained evidence needed to detect the problem and the state owner responsible for recovery.
+Distinguish the batch's reported outcome from each tool attempt and any file already written.
+
 ## Trust boundaries
 
 An agent's role should define not only its task but also which information it can read and which actions it can take.

@@ -94,6 +94,13 @@ Ask whether they skipped or resumed the changed case, whether its assumptions/se
 Include failed checks and short free writing in the chosen evidence; a polished reflection is not a substitute for explaining a new case.
 There is no hard reflection minimum in this release.
 
+### Human facilitation effort
+
+In the same voluntary trial, record instructor preparation and facilitation time, which difficulty required human intervention, and what the learner could later explain or repair independently.
+Distinguish setup help, correction of assistant errors, and guidance on the subject so an assisted completion does not hide the work needed to support it.
+[Russinovich and Hanselman's mentoring proposal](https://dl.acm.org/doi/10.1145/3779312) motivates making that human contribution explicit; its staffing ratios and duration are design estimates rather than validated course parameters.
+Use the learner-selected evidence above and report facilitation effort alongside learner workload and independent performance.
+
 ## Report and revise
 
 Separate technical success, usability observations, instructional behavior, manner/trust feedback, independent learning evidence, workload and actual course progress.

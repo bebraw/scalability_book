@@ -25,6 +25,10 @@ These instructions guide the student's external agent; client behavior needs tes
 The resources are public, and separation of the discussion supports pacing rather than concealing answers.
 Activities add no required course deliverables or new saved-progress system.
 
+The [temporary API-consumer activity](../explorations/temporary-api-consumers.md) probes a fixed synthetic event-query contract with disposable clients.
+Its [separate discussion](../explorations/temporary-api-consumers.discussion.md) explains failure attribution and the regression evidence to retain after scaffolding is removed.
+It can be studied on paper or run against a local fixture; a paper design is not evidence of executed checks.
+
 The concept JSON and Markdown include a curated learning-resource catalog.
 Each concept's `resourceIds` refer to entries in `learningResources`.
 The catalog includes a labelled neighborhood image for every concept, the complete graph, the five book diagrams, and all gallery demos.

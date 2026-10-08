@@ -10,6 +10,7 @@ Read [evaluation anatomy](#anatomy-of-an-agent-evaluation), [task selection](#ca
 Add other sections when the decision requires them:
 
 - [Retained competence](#evaluate-assistance-and-retained-competence) for comparing assistance modes when learning is part of the task's purpose.
+- [Temporary API consumers](#probe-an-api-with-temporary-clients) for checking integration behavior and API usability.
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
 - [Cost denominators](#read-a-harness-benchmark-s-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
@@ -59,6 +60,16 @@ For each task, keep a reference solution or known passing run to show that the s
 Everything required by a grader should be justified by the task brief or a declared invariant; an agent should not fail because the evaluator silently assumed a filepath, output format, or environmental resource.
 Balance positive and negative cases so optimizing one behavior does not produce its opposite failure elsewhere.
 
+### Probe an API with temporary clients
+
+:citet[lemire2026ephemeral] proposes building disposable applications on top of a maintained component to probe its behavior and API usability.
+This is integration testing through temporary consumers; the essay reports practitioner experience rather than measured defect-detection gains.
+Keep the provider and its public contract fixed while building the clients, and investigate whether a failure belongs to the provider, consumer, environment, documentation, or acceptance check.
+Preserve confirmed reproductions and regression cases before discarding the client scaffolding.
+
+The [optional API-consumer investigation](/explore/temporary-api-consumers/) uses a synthetic paginated event feed, a CSV client, and a summary client.
+Predict what their results establish, then design independent checks and reduce any failure before deciding which component to change.
+
 ### Evaluate the cost of the next change
 
 An initial pass does not show how easily an implementation can be extended.
@@ -102,6 +113,13 @@ Checkpoints depend on earlier work; repeat fresh trajectories to study variation
 
 This optional design studies successive changes within one implementation.
 The course's A–B–C builds start fresh, while [cross-team probes](/concepts/#change-probe) examine another group's ability to understand and change each build.
+
+For an optional repair comparison, branch X after checkpoint 2 and consolidate its duplicated rate rule in one variant while retaining the other.
+Check that both variants still meet the same baseline behavior, then give each the same later changes, including one that exercises the repaired boundary.
+Count cleanup and compatibility work alongside subsequent review, repair, regressions, and agent spend; a faster later change may not repay the initial intervention.
+Also record whether the duplication returns during a later change.
+A third variant can enforce the new dependency boundary to test whether that extra constraint prevents recurrence.
+The architectural-degradation review maps possible diagnostics and interventions, but its catalogue does not establish which repair will improve a particular system :citep[ahmad2026architecturaldegradation].
 
 ## Evaluate assistance and retained competence
 
