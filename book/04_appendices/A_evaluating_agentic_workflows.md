@@ -13,7 +13,7 @@ Add other sections when the decision requires them:
 - [Temporary API consumers](#probe-an-api-with-temporary-clients) for checking integration behavior and API usability.
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
-- [Cost denominators](#read-a-harness-benchmark-s-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
+- [Cost denominators](#define-the-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
 - [Compressed evidence](#compressed-evidence-and-repeated-review) and [repeated review](#repeated-review-is-measurement-not-proof) for review workflows.
 - [Coordination and integration](#research-example-coordination-and-integration) for distinguishing a clean merge from correct behavior.
 
@@ -285,14 +285,10 @@ Verify that source status, separate output-stream provenance, critical facts, om
 Report critical facts retained over critical facts present, false or materially misleading facts, and any policy-safe fallback.
 Passing this preflight can reject an obviously lossy or unsafe policy; claims about cost or task effectiveness require paired end-to-end outcomes.
 
-## Read a harness benchmark's cost denominator
+## Define the cost denominator
 
-FrontierHarness v1.0 compares 12 configurations across 30 software-development and terminal tasks, using one Kimi K3 model and one attempt per task–configuration cell :citep[zhu2026frontierharness].
-Its authors describe interactions among the harness, model, gateway, and caching behavior, and explicitly decline to attribute the cost gap to the harness alone.
-Use it as a benchmark-reading exercise: identify the tested configuration and cost population before interpreting a ranking.
-A single attempt per cell does not measure repeated-run reliability.
-
-The following numbers are invented teaching data, not FrontierHarness results.
+Identify the tested configuration and cost population before interpreting an efficiency claim.
+The following numbers are invented teaching data.
 Suppose four distinct tasks each receive one attempt: two accepted attempts cost $1 and $3, while two failed attempts cost $8 and $12.
 The total measured execution spend is $24, the acceptance rate is 2/4, and there are no retries or missing usage records.
 :ref[table:harness-cost-denominators]{text="The table below"} derives three different summaries from this same cohort.
@@ -310,7 +306,7 @@ Calling all three numbers "cost per task" hides the distinction.
 If retries are allowed, include their spend while counting each accepted task once; label missing costs rather than treating them as zero.
 Report human review and other unpriced resources separately when they are outside the measured execution spend.
 
-For the published benchmark, also distinguish the median cache-hit rate across runs from the fraction of all input tokens served from cache.
+When interpreting cache savings, distinguish the median cache-hit rate across runs from the fraction of all input tokens served from cache.
 A few long runs can dominate token-weighted usage, and a high cache-hit rate can coexist with expensive failures.
 Before transferring a ranking to your project, test representative tasks with repeated fresh trials and the model, gateway, and cache conditions you intend to use.
 
@@ -354,7 +350,6 @@ High-risk work can bypass the router or retain mandatory review, and the policy 
 ### Check confidence before routing
 
 A closed choice set can simplify output validation.
-For example, [Clef's model card](https://huggingface.co/Cloudflare/clef) describes scoring schema-defined options and returning a probability for each.
 An allowed label can still be wrong, and the correct outcome may be missing from the choice set.
 
 **Confidence calibration** asks whether reported probabilities agree with the frequency of correct predictions over relevant cases :citep[guo2017calibration].
@@ -439,7 +434,7 @@ I do not yet have enough experience to claim a general method for designing stro
 So far, I have mostly allowed development models to propose the evaluators, then complained about obvious weaknesses I found while reviewing their code.
 
 [Slideotter](/case-studies/slideotter/) provides the clearest example of where this still became useful.
-The repository preserves the resulting [generation fuzz harness](https://github.com/bebraw/slideotter/blob/main/scripts/fuzz-lmstudio-generation.ts).
+The repository preserves the resulting [generation fuzz harness](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/scripts/fuzz-lmstudio-generation.ts).
 I asked a stronger development model to mutate presentation scenarios and exercise the smaller local models through that harness.
 The mutations explored combinations and failure cases I would not have devised on my own.
 

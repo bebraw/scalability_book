@@ -6,23 +6,23 @@ Sam Rose built it at ngrok to support durable, interactive explanations of Kuber
 The project is relevant to scalable development because language models produced most of a large port in a short period, while acceptance still depended on human review, explicit porting rules, and behavioral comparison with a real implementation.
 Its [development harness](/concepts/#harness) turns selected compatibility claims into observable contrasts.
 
-The figures below come from Rose's [30 June 2026 retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser) and describe that snapshot rather than the repository's later state.
+The development account follows Rose's [30 June 2026 retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser).
+Repository evidence is fixed to the [13 August 2026 source snapshot](https://github.com/ngrok/webernetes/tree/ccf55325db72e644ad10df60a29e01c70aa8e2b0), which includes later refinements to the porting and test rules.
 
 ## Case at a glance
+
+:ref[table:webernetes-snapshot]{text="The table below"} records the intended use and the limits of the reviewed implementation.
 
 | Evidence                              | Observation                                                              |
 | ------------------------------------- | ------------------------------------------------------------------------ |
 | Intended use                          | Interactive Kubernetes teaching content in the browser                   |
 | Implementation boundary               | A TypeScript reimplementation of a selected Kubernetes subset            |
 | Development interval in retrospective | Two months                                                               |
-| Repository snapshot in retrospective  | 552 commits across 629 files                                             |
-| Generated code reported               | Almost 100,000 lines                                                     |
-| Tests reported                        | 204 integration tests and 1,855 unit tests                               |
 | Behavioral reference                  | The same integration-test operations executed against a real k3s cluster |
 | Status in the reviewed snapshot       | Experimental; APIs and supported resources may change                    |
 
-Commit, file, line, and test counts describe scale and process shape.
-They do not establish correctness, productivity, or production readiness.
+::caption[Scope and behavioral reference in the reviewed Webernetes case.]
+::label[table:webernetes-snapshot]
 
 ## The product boundary made a partial port useful
 
@@ -31,7 +31,7 @@ Webernetes therefore simulates the parts needed by that content in the browser: 
 Images are TypeScript classes registered with the simulator rather than real images fetched from a container registry.
 
 That is a narrower goal than implementing Kubernetes.
-The [README's support inventory](https://github.com/ngrok/webernetes#whats-implemented-and-what-isnt) explicitly lists omitted or simplified behavior, including volumes, affinity, resource management, some service types, and much of the network stack.
+The [README's support inventory](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/README.md#whats-implemented-and-what-isnt) explicitly lists omitted or simplified behavior, including volumes, affinity, resource management, some service types, and much of the network stack.
 The simulator initially focused on the behavior needed to explain probes.
 This scope makes the browser artifact useful while preventing its familiar API from becoming an unsupported claim of production equivalence.
 
@@ -41,7 +41,7 @@ Rose reports that language models generated almost all of the code and that he r
 The retrospective also describes recurring failures: models replaced specific upstream structures with simpler ones, introduced locally convenient helpers that obscured comparison, and omitted cases while porting Go table tests.
 Those are especially dangerous in a compatibility project because code can look reasonable while changing the behavior being copied.
 
-The current [porting rules](https://github.com/ngrok/webernetes/blob/main/porting.md) make reviewability an architectural constraint.
+The reviewed [porting rules](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/porting.md) make reviewability an architectural constraint.
 Ported declarations carry breadcrumbs to a pinned upstream Kubernetes revision, preserve source order and helper boundaries where possible, use shared compatibility primitives for Go concepts such as channels and clocks, and require intentional deviations to be stated.
 The objective is not idiomatic TypeScript in isolation.
 It is a mapping a reviewer can compare with the upstream implementation without reconstructing an unrelated local design.
@@ -55,7 +55,7 @@ Webernetes exposes a fake client shaped closely enough to `@kubernetes/client-no
 One harness targets a real k3s cluster in Node.js; the other targets Webernetes in a browser.
 If an operation passes against k3s and fails against the simulator, the mismatch becomes a concrete porting problem instead of a model's opinion about its own output.
 
-The repository instructions now strengthen that [loop](/concepts/#feedback-loop).
+The [repository instructions](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/AGENTS.md) strengthen that [loop](/concepts/#feedback-loop).
 For Kubernetes-facing behavior, a contributor should first observe the test fail against the simulator and pass against k3s, then implement the fix.
 Simulator time also goes through a controllable cluster clock rather than ambient timers, making scheduling behavior easier to pause and test deterministically.
 

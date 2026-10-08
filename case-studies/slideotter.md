@@ -7,20 +7,17 @@ The case asks how a project can validate its artifacts thoroughly while learning
 
 ## Case at a glance
 
-:ref[table:slideotter-snapshot]{text="The table below"} records the reviewed interval and the early concentration of development.
+The case uses the [24 June 2026 source snapshot](https://github.com/bebraw/slideotter/tree/ab84d4ff679d485640c1774d20b86ad5a650d5a8).
+:ref[table:slideotter-snapshot]{text="The table below"} records the reviewed interval and delivery context.
 
-| Evidence                        | Observation                     |
-| ------------------------------- | ------------------------------- |
-| Development interval reviewed   | 19 April–24 June 2026           |
-| Repository history              | 1,606 commits                   |
-| Commits made by 15 May          | 1,444, about 90% of the history |
-| Public product status at review | Alpha                           |
+| Evidence                        | Observation                       |
+| ------------------------------- | --------------------------------- |
+| Development interval reviewed   | 19 April–24 June 2026             |
+| Delivery targets explored       | Local browser, desktop, and cloud |
+| Public product status at review | Alpha                             |
 
 ::caption[Repository evidence from the reviewed Slideotter snapshot.]
 ::label[table:slideotter-snapshot]
-
-Commit counts describe activity rather than productivity or product value.
-Most of the history accumulated before repeated use had established the first delivery target.
 
 ## Validate the rendered artifact
 
@@ -30,14 +27,14 @@ The first generator produced PowerPoint files, but two days after the initial co
 Two days later it began a browser studio, then moved preview, export, and validation to a shared DOM renderer.
 
 The replacement exposed a durable rule: preview and exported output should use the same rendering authority.
-The [architecture](https://github.com/bebraw/slideotter/blob/main/docs/ARCHITECTURE.md) keeps structured slide specifications as content, the DOM runtime as rendering authority, and the server as the file-write boundary.
+The [architecture](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/ARCHITECTURE.md) keeps structured slide specifications as content, the DOM runtime as rendering authority, and the server as the file-write boundary.
 Generated changes remain candidates until the author applies them.
 
 ### Validation treated the artifact as more than source code
 
 Slide software can typecheck while producing unreadable slides.
 Slideotter therefore checks geometry, text fit, media, visible-text quality, browser workflows, rendered baselines, and PDF output.
-Its [repository instructions](https://github.com/bebraw/slideotter/blob/main/AGENTS.md) require visual changes to be inspected in the rendered artifact.
+Its [repository instructions](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/AGENTS.md) require visual changes to be inspected in the rendered artifact.
 
 Rules for overlap, clipping, margins, and text fit turn named defects into machine-checkable failures.
 They cannot establish whether a slide communicates well.
@@ -52,7 +49,7 @@ The first month covered structured slide specifications, multiple model provider
 
 These capabilities pursued one broad vision while testing many product assumptions at once.
 Repeated use had not yet shown which workflow deserved priority.
-The [roadmap](https://github.com/bebraw/slideotter/blob/main/ROADMAP.md) subsequently made real studio usage the source of future work, after a large solution surface already existed.
+The [roadmap](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/ROADMAP.md) subsequently made real studio usage the source of future work, after a large solution surface already existed.
 
 The harness grew with that surface: fixtures, baselines, validators, build paths, and agent instructions all needed maintenance.
 Making the checks more precise could improve an implementation without resolving whether its workflow was worth expanding.
@@ -62,7 +59,7 @@ Making the checks more precise could improve an implementation without resolving
 Local filesystem use, a command-line package, a browser studio, a macOS wrapper, and a cloud deployment each introduce different storage, authentication, rendering, and release requirements.
 Supporting them together broadened the operating model before one delivery path had settled.
 
-At the reviewed point, the [cloud setup guide](https://github.com/bebraw/slideotter/blob/main/docs/GETTING_STARTED.md#current-limits) identified production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
+At the reviewed point, the [cloud setup guide](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/GETTING_STARTED.md#current-limits) identified production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
 The Electron path also needed production packaging work.
 A functioning authoring workflow and a dependable delivery path required different evidence.
 

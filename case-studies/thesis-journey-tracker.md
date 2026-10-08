@@ -14,23 +14,23 @@ The production assessment above is based on my direct use of the deployed applic
 
 ## Case at a glance
 
-| Evidence                                     | Observation                                      |
-| -------------------------------------------- | ------------------------------------------------ |
-| Development interval reviewed                | 22 March–30 July 2026                            |
-| Repository history                           | 282 commits                                      |
-| Commits made by 31 March                     | 175, about 62% of the history                    |
-| Focused security-hardening interval          | 29 commits on 13–14 July                         |
-| TypeScript files                             | 0 in the initial README-only commit; 160 at head |
-| TypeScript test or specification files       | 25                                               |
-| Application, test, and script lines reviewed | About 20,500                                     |
-| Runtime                                      | Cloudflare Workers and D1                        |
-| Rendering model                              | Server-rendered HTML with limited client script  |
-| Production status at review                  | Deployed and working in the author's use         |
+The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/thesis-journey-tracker/tree/f10a26716cb4e005d37e8885df8fb808806566ba).
+:ref[table:thesis-journey-tracker-snapshot]{text="The table below"} records the reviewed interval and operating context.
+
+| Evidence                      | Observation                                     |
+| ----------------------------- | ----------------------------------------------- |
+| Development interval reviewed | 22 March–30 July 2026                           |
+| Runtime                       | Cloudflare Workers and D1                       |
+| Rendering model               | Server-rendered HTML with limited client script |
+| Production status at review   | Deployed and working in the author's use        |
+
+::caption[Operating context at the reviewed Thesis Journey Tracker snapshot.]
+::label[table:thesis-journey-tracker-snapshot]
 
 ## The first pass was deliberately narrow
 
 The repository began with a README.
-The next commit, explicitly named [“First pass by codex-5.3”](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29), added an 838-line Worker, one database migration, basic configuration, and the package setup.
+The next commit, explicitly named [“First pass by codex-5.3”](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29), added one Worker, a database migration, basic configuration, and the package setup.
 It was a large first implementation, but the problem was bounded: represent the supervision workflow in one private dashboard.
 
 The same day, the history shows rapid correction rather than endless feature expansion.
@@ -44,7 +44,7 @@ The generated first pass made the real workflow concrete, and the following comm
 
 ### The product says what it is not
 
-The [README](https://github.com/bebraw/thesis-journey-tracker/blob/main/README.md) describes the project as intentionally small and focused on thesis advising rather than a generic student information system.
+The [README](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/README.md) describes the project as intentionally small and focused on thesis advising rather than a generic student information system.
 That negative boundary is consequential.
 
 The application can add more views or improve scheduling without acquiring course registration, grading, messaging, organization-wide identity, or other adjacent institutional concerns.
@@ -53,9 +53,8 @@ Agents therefore receive a smaller decision space, and each feature can be judge
 ### The runtime matches the problem
 
 The system uses one Cloudflare Worker, D1, server-rendered HTML, and small browser interaction scripts.
-The current [project structure](https://github.com/bebraw/thesis-journey-tracker/blob/main/docs/project-structure.md) keeps the Worker entrypoint thin and groups routes, persistence, rendering, authentication, calendar behavior, backups, and student-domain rules by capability.
+The reviewed [project structure](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/project-structure.md) keeps the Worker entrypoint thin and groups routes, persistence, rendering, authentication, calendar behavior, backups, and student-domain rules by capability.
 
-At the reviewed head, `src/worker.ts` is 447 lines even though the application has grown substantially beyond the original 838-line Worker.
 Complexity moved into feature-owned routes and stores rather than remaining in one entrypoint.
 The project still has large modules, but their names and ownership follow the user workflow.
 
@@ -72,7 +71,7 @@ Once the application had a real delivery context, security, recovery, and diagno
 
 ### CI mirrors a local gate
 
-The [CI workflow](https://github.com/bebraw/thesis-journey-tracker/blob/main/.github/workflows/ci.yml) audits dependencies, verifies generated Worker types, typechecks, runs unit and D1-backed integration tests, exercises browser workflows, and enforces a Lighthouse performance threshold.
+The [CI workflow](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/.github/workflows/ci.yml) audits dependencies, verifies generated Worker types, typechecks, runs unit and D1-backed integration tests, exercises browser workflows, and enforces a Lighthouse performance threshold.
 The same workflow can run locally through Agent CI.
 
 This alignment reduces the difference between an agent's local evidence and the repository's shared evidence.
@@ -80,7 +79,7 @@ Pinned runner images, restricted installation scripts, read-only workflow permis
 
 ### Deployment is intentionally separate from validation
 
-The [deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/main/docs/deployment.md) separates version upload from production promotion.
+The [deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/deployment.md) separates version upload from production promotion.
 A connected Cloudflare build creates a deployable version, but a reviewed version is promoted explicitly after CI succeeds.
 
 That boundary matters in agentic development.
@@ -98,7 +97,7 @@ This is validation applied to operations: the intended safety property is a [rec
 ## Why this evidence is still bounded
 
 Production use is stronger evidence than a working repository, but it is not universal evidence of [scalability](/concepts/#scalability).
-The current application serves a private personal or small-team context.
+At review, the application served a private personal or small-team context.
 Its own security documentation accepts residual denial-of-service and cost exposure that would need edge controls under broader traffic.
 
 The repository has one contributor and does not expose adoption, uptime, support burden, or realistic load measurements.

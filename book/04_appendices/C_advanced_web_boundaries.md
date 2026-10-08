@@ -268,13 +268,6 @@ Executable generated UI expands the boundary further.
 It needs a separate-origin sandbox or equivalent isolated runtime without ambient credentials, a narrow bridge to host data and tools, explicit network, storage, navigation, and tool permissions, resource limits, observability, and a safe fallback.
 Running generated code in a browser does not by itself provide that boundary.
 
-A Google Research preprint provides bounded preference evidence for one complete generative-UI pipeline.
-After excluding eight of 100 sampled LMArena prompts, the study sent each pre-cached result to two raters.
-Across the pairwise comparisons, raters preferred the generated UI over the study's markdown condition in 82.8%.
-Contractor-built pages were preferred over the generated pages in 50.0% of comparisons, while the generated pages were preferred in 35.3% and the remainder was neutral.
-The pipeline combined Gemini with search and image tools, extensive instructions, and post-processing; generation often took one to two minutes and was excluded from the ratings.
-The study therefore measures preference in that setup, not task success, correctness, accessibility, security, maintainability, or production readiness :citep[leviathan2026generativeui].
-
 ### Show the context behind a generated view
 
 A generated view can satisfy its schema while concealing why particular information was selected or omitted.
@@ -304,10 +297,10 @@ For [Slideotter](/case-studies/slideotter/), reliable layout was essential.
 
 The [LLM authoring plan](https://github.com/bebraw/slideotter/commit/24d335ec) assigned intent and structured content to the model, validation and approval to the server, and rendering to the existing engine.
 Its [schema-backed implementation](https://github.com/bebraw/slideotter/commit/fa56cd04) kept arbitrary executable components outside model output.
-Preview, comparison, PDF export, and validation later converged on [one DOM renderer](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0015-dom-first-rendering-and-validation.md), so checks examined the layout users saw.
+Preview, comparison, PDF export, and validation later converged on [one DOM renderer](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/adr/implemented/0015-dom-first-rendering-and-validation.md), so checks examined the layout users saw.
 
 This left geometry, spacing, overflow, and media placement under application control while the model selected content and supported layouts.
-[Declarative layout expansion](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0049-minimal-built-in-layouts-and-user-defined-layout-expansion.md) allowed variety within that contract.
+[Declarative layout expansion](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/adr/implemented/0049-minimal-built-in-layouts-and-user-defined-layout-expansion.md) allowed variety within that contract.
 I gave the model freedom around the property I needed the system to enforce reliably: layout.
 
 ## Descriptor boundary audit

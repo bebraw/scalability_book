@@ -95,7 +95,7 @@ This makes the external skill a reviewable development dependency rather than in
 I have not used Modern Web Guidance directly enough to claim that it improved a particular implementation.
 I adopted it into [Vibe Template](https://github.com/bebraw/vibe-template) because I consider current web-platform guidance useful context for an agent to have when a relevant decision appears.
 
-The [recorded integration decision](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/implemented/ADR-052-adopt-scoped-modern-web-guidance.md) deliberately narrows the upstream capability.
+The [recorded integration decision](https://github.com/bebraw/vibe-template/blob/4428c4351b98769c4ba839d55bc32672ffe02c8b/docs/adrs/implemented/ADR-052-adopt-scoped-modern-web-guidance.md) deliberately narrows the upstream capability.
 Retrieval uses a reviewed, pinned version with telemetry disabled, and the skill activates only when browser-facing work requires a platform choice, compatibility interpretation, or fallback.
 Project architecture, specifications, user instructions, and validation remain authoritative over anything retrieved.
 

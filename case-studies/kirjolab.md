@@ -8,28 +8,21 @@ With GPT-5.6, I revisited an idea combining features of [Zotero](https://www.zot
 Agents helped me build an integration I could not have achieved alone in the same time, but substantial refactoring followed almost immediately.
 The central question is why strong behavioral checks kept the system repairable while its ownership and dependency boundaries became difficult to understand.
 
-The commit counts below describe the shape of the history, not developer productivity.
-A small mechanical commit and a difficult design decision are not comparable units of effort.
-
 ## Case at a glance
 
-:ref[table:kirjolab-snapshot]{text="The table below"} records the reviewed interval and the concentration of later restructuring.
+The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/kirjolab/tree/02141653d503dbf78b0acaf2c4bae67ddd8752b6).
+:ref[table:kirjolab-snapshot]{text="The table below"} records the reviewed interval and development context.
 
-| Evidence                                  | Observation                                                     |
-| ----------------------------------------- | --------------------------------------------------------------- |
-| Development interval reviewed             | 10–30 July 2026                                                 |
-| Repository history                        | 1,433 commits                                                   |
-| Commit subjects beginning with `refactor` | 818, about 57% of the history                                   |
-| TypeScript files                          | 14 in the initial template; 583 at the reviewed head            |
-| TypeScript test files                     | 5 in the initial template; 265 at the reviewed head             |
-| Build Week implementation range           | 332 commits, 439 files, 88,867 insertions, and 16,140 deletions |
-| Most concentrated restructuring interval  | 696 of 707 commits from 25–28 July were named as refactors      |
+| Evidence                      | Observation                                                     |
+| ----------------------------- | --------------------------------------------------------------- |
+| Development interval reviewed | 10–30 July 2026                                                 |
+| Development controls          | Prepared harness with behavioral checks and decision records    |
+| Product status at review      | Working prototype followed by major architectural consolidation |
 
 ::caption[Repository evidence from the reviewed Kirjolab snapshot.]
 ::label[table:kirjolab-snapshot]
 
 The project began with a prepared template containing strict TypeScript, coverage and mutation checks, browser tests, affected-file checks, a pre-push gate, local CI, specifications, architecture decision records, and agent instructions.
-The product architecture was documented eight minutes after the initial commit; the first scholarly workspace slice followed about an hour later.
 
 ## What the harness made possible
 
@@ -39,11 +32,11 @@ The [project harness](/concepts/#harness) checked types, coverage, browser behav
 Existing tests could detect behavioral drift when responsibilities were extracted or dependencies replaced project-owned code.
 That made extensive restructuring possible without relying only on a fresh reading of every change.
 
-The early [architectural vision](https://github.com/bebraw/kirjolab/blob/main/VISION.md) also fixed durable product rules: portable manuscripts, traceable evidence, rebuildable derived views, and researcher acceptance of model suggestions.
+The early [architectural vision](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/VISION.md) also fixed durable product rules: portable manuscripts, traceable evidence, rebuildable derived views, and researcher acceptance of model suggestions.
 Those rules survived changes to the internal organization.
 The uncertainty concerned how code responsibilities should be divided as more capabilities arrived.
 
-Specifications, [architecture decision records](/concepts/#decision-log), review notes, and the [Build Week account](https://github.com/bebraw/kirjolab/blob/main/docs/build-week-2026-submission.md) preserve the decisions and corrections behind the final implementation.
+Specifications, [architecture decision records](/concepts/#decision-log), review notes, and the [Build Week account](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/build-week-2026-submission.md) preserve the decisions and corrections behind the final implementation.
 
 ## Where architectural understanding fell behind
 
@@ -53,7 +46,7 @@ The quality gates emphasized whether behavior remained correct.
 They did not initially place equally strong limits on module ownership, fan-in, churn concentration, or directory growth.
 
 By 25 July, `src/client/app.ts` had reached 12,495 lines and combined a large element registry with event binding, rendering, and feature orchestration.
-The later [modularization RFC](https://github.com/bebraw/kirjolab/blob/main/docs/modularization-and-dependency-rfc-2026-07-29.md) identified several other mixed authorities:
+The later [modularization RFC](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/modularization-and-dependency-rfc-2026-07-29.md) identified several other mixed authorities:
 
 - a 5,636-line document Durable Object covering collaboration, files, history, export, and persistence;
 - a 2,766-line review-study Durable Object combining commands and SQLite projection;
@@ -72,14 +65,14 @@ Implementation exposed the domains faster than the architecture absorbed them.
 
 ### The prepared template had a cost
 
-The initial template also contained 978 files and about 142,000 inserted lines, including vendored process material, skills, capability kits, and update infrastructure.
+The initial template also bundled vendored process material, skills, capability kits, and update infrastructure.
 Most of that was not product code.
 Explicit instructions and reusable workflows supported validation while adding navigation cost and search noise.
 Pruning unrelated material would reduce the context a contributor must understand before reaching the product code.
 
 ## Refactoring was the revision phase
 
-The history shifts from 461 mostly feature, fix, test, and documentation commits on 10–21 July to 696 refactor-named commits out of 707 on 25–28 July.
+The history shifts from feature implementation on 10–21 July to concentrated refactoring on 25–28 July.
 The corrections addressed specific ownership problems:
 
 - extracting presentation and workflow owners from the large client coordinator;
@@ -88,7 +81,7 @@ The corrections addressed specific ownership problems:
 - narrowing the reference-library contracts; and
 - organizing hundreds of flat source files by product capability.
 
-On 30 July, [ADR-198](https://github.com/bebraw/kirjolab/blob/main/docs/adrs/implemented/ADR-198-organize-source-by-capability.md) recorded 312 files at the root of `src/client/` and 119 at the root of `src/domain/`.
+On 30 July, [ADR-198](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/adrs/implemented/ADR-198-organize-source-by-capability.md) addressed flat client and domain directories that obscured product boundaries.
 The migration grouped them into shallow product-named directories without adding package or runtime boundaries.
 
 This was the “revise” step of the [development loop](/concepts/#feedback-loop) at repository scale: observed change patterns became boundaries for later work.
