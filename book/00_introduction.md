@@ -27,7 +27,7 @@ Developers can now delegate substantial parts of implementation, moving more of 
 Agents are also becoming consumers of web applications through browsers, APIs, and tools.
 This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.
 
-During the past few months, I have developed projects whose complexity would previously have kept me from attempting them.
+While developing this book, I built projects whose complexity would previously have kept me from attempting them.
 The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), and [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/).
 Each taught me something different: generation can outpace product judgment, architecture can lag behind implementation, and deliberately narrow scope can turn the same capability into dependable software.
 Reading about other people's experience helps, but there is also value in making bounded mistakes of your own and forming your own judgment.
@@ -62,7 +62,6 @@ Each phase begins from a fresh implementation and changes the development setup 
 
 Large and small describe the relative model configurations assigned for the course; the [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) publishes their identities and the basis for that distinction.
 Both may be hosted by the department; hosting location is separate from size.
-Both phases may use foundation models: broadly pretrained models adaptable to many tasks, as defined in the [Stanford report that introduced the term](https://crfm.stanford.edu/report.html).
 Neither hosting location nor model size establishes which workflow will perform better on the course tasks.
 The large-model first phase gives students a starting environment for learning the workflow; the small-model phase tests which practices transfer, and the fleet phase investigates coordination and model assignment.
 Whether those choices improve accepted quality, time, or cost remains a question for the evidence.
@@ -87,7 +86,7 @@ The shared specification, acceptance material, pressures, and reporting categori
 
 ### [Compare — Evaluate workflows and scaling responses](/parts/compare/)
 
-7. [When do agent fleets improve web development?](/chapters/agent-fleets/) grows one agent into a bounded fleet and makes correction part of the workflow.
+7. [When do agent fleets improve web development?](/chapters/agent-fleets/) selects coordination structures for bounded work and makes integration and correction part of the workflow.
 8. [How should web applications respond to scaling pressure?](/chapters/scaling/) selects architectural responses from measured limits rather than from a technique catalog.
 9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) synthesizes a justified target architecture and development workflow from the three builds.
 

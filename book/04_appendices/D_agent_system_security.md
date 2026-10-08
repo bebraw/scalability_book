@@ -233,11 +233,6 @@ Record the source commit you read and trace one child from launch to completion 
 For a service-based contrast, the [Responses multi-agent guide](https://developers.openai.com/api/docs/guides/responses-multi-agent) describes delegated model work and application tool execution; inspect which responsibilities remain with the caller.
 These are entry points for examining mechanisms, not required installations or a ranking of current products.
 
-Omnigent illustrates harness coordination: its open-source meta-harness wraps several agent harnesses behind a common session interface and documents composition, shared sessions, contextual policies, and local or remote sandbox execution :citep[zaharia2026omnigent].
-Unity AI Gateway illustrates traffic governance: for model and MCP traffic routed through it, Databricks documents catalog-backed permissions, rate limits, budgets, provider routing and fallbacks, and usage records :citep[databricks2026unitygatewaydocs].
-These are examples, not evidence that every fleet needs two products or exactly two control planes.
-Both accounts are documented in Databricks-authored sources, their responsibilities overlap, and Omnigent was introduced as alpha; they are not independent evaluations of effectiveness.
-
 For any option, inspect how child tasks inherit tools and credentials, whether concurrent writers are isolated, what state survives between runs, and how the execution trace is exported.
 Persistent memory, remote execution, and external messaging must be included in the declared workflow when enabled; they can change both the comparison and the authority boundary.
 Application-level agent orchestration has separate runtime users, data, and operational obligations.

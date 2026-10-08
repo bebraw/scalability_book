@@ -15,7 +15,7 @@ Add other sections when the decision requires them:
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
 - [Cost denominators](#read-a-harness-benchmark-s-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
 - [Compressed evidence](#compressed-evidence-and-repeated-review) and [repeated review](#repeated-review-is-measurement-not-proof) for review workflows.
-- Research examples on [judges](#research-example-evaluating-the-evaluator) and [coordination](#research-example-coordination-and-integration) for interpreting published comparisons.
+- [Coordination and integration](#research-example-coordination-and-integration) for distinguishing a clean merge from correct behavior.
 
 ## Anatomy of an agent evaluation
 
@@ -167,20 +167,13 @@ For this course, inspecting one packaged benchmark task is more useful than runn
 Identify its claimed capability, starting state, visible instructions, hidden or external assumptions, graders, reference solution, resource boundary, and plausible gaming paths.
 Then state what a passing result would and would not establish.
 
-> **Advanced option: derive candidate tasks from repository history**
->
-> Repo2RLEnv can mine merged pull requests or commits, reconstruct repository states in Docker, and emit Harbor-compatible tasks whose primary runtime signal comes from the repository's own tests :citep[huggingface2026repo2rlenv].
-> Its runtime pipelines use the familiar fail-to-pass and pass-to-pass shape: tests associated with the change should begin failing and pass under the reference patch, while previously passing behavior should remain intact.
-> This can help an instructor or a mature project turn reviewed changes into candidate evaluation data, but it is not a course baseline and does not make every repository an informative RL environment.
-> History records changes that happened, not a representative sample of future work; tests can omit intended behavior; generated instructions can leak or distort the problem; and similarity to an oracle diff can penalize a different valid patch.
-> An executable reward is verifiable under its grader, not automatically complete ground truth.
-
 Some outcomes can be checked deterministically through tests, schemas, or expected artifacts.
 Others require a rubric or human judgment.
 When a model acts as a judge, test whether answer order, verbosity, confidence, or the judge's own style changes its scores; LLM judges have documented position and self-enhancement biases :citep[zheng2023mtbench].
 Keep a small human-reviewed calibration set and report disagreement rather than treating the judge as ground truth.
 
-A separate [research example](#research-example-evaluating-the-evaluator) examines what happens when a judge supplies both training rewards and the headline evaluation.
+If a judge guides development, reserve independent acceptance evidence for final evaluation.
+A held-out task set does not make the scoring process independent when the same judge design also supplies the reported result.
 
 The demonstration below separates deterministic probes from a rubric score.
 Use it to inspect a failing task and decide whether the problem lies in the result, the rubric, or the evaluation setup.
@@ -430,38 +423,14 @@ Repeated review also consumes the same [scarce integration capacity](/concepts/#
 If you repeat an agent review, record the fixed code, prompt, agent harness, and model configuration; the number of runs; unique and recurring findings; reviewer time; and cost per accepted finding.
 More review samples are justified only when they improve accepted outcomes or allocate human attention better than a single review.
 
-## Research example: evaluating the evaluator
-
-:citet[falck2026training] offer a useful case in which evaluation becomes supervision.
-Their Replica setup trains a 27B agent on 242 figure-replication tasks using auto-generated per-task rubrics, three judge samples, and turn-level credit assignment, then scores it on 68 held-out AI-for-science tasks.
-The rubric judge was more repeatable than a generic judge in the paper's repeated-sampling analysis.
-In a blinded study of ten training tasks selected because the judges disagreed, its Kendall rank correlation with expert rankings was 0.19 rather than 0.15 for the generic judge; on disputed pairs, experts sided with the rubric judge 63% of the time, a difference that was not statistically significant (`p = 0.109`).
-Because the same judge design supplied training rewards and the headline evaluation, the task holdout did not make the scoring process independent.
-The evidence supports a bounded claim about a lower-noise training signal and improved scores under this judge, not that the judge is ground truth or that the system performs open-ended scientific innovation.
-
 ## Research example: coordination and integration
 
-The experiments below separate three properties that are easy to collapse: concurrent writing, coordination, and accepted behavior.
-CodeCRDT used a shared CRDT document and an observation-driven claim protocol so agents could edit concurrently without locks.
-Across 600 evaluations of six small TypeScript and React tasks with Claude Sonnet 4.5, every run converged without a textual merge failure, yet preliminary inspection still found semantic conflicts in roughly 5–10% of results.
-Raw completion time ranged from a 21.1% speedup to a 39.4% slowdown depending on the task :citep[pugachev2025codecrdt].
-The coordination substrate solved document convergence; it did not make independently reasonable changes semantically compatible or guarantee useful parallelism.
+CodeCRDT's experiments on six small TypeScript and React tasks used a shared CRDT document that converged without textual merge failures, while preliminary inspection still found semantic conflicts :citep[pugachev2025codecrdt].
+For example, interface and data code can use different event names in a document that merges cleanly.
+After concurrent work, test the integrated user journey against the settled contract.
 
-AgentRoom evaluated a separate coordination design that paired a CRDT-backed shared filesystem with explicit file claims, agent status, and message broadcasts :citep[cho2026agentroom].
-For the CLI-stable models in its evaluation, two-agent rooms reduced a specific one-file abandonment mode and lowered run-to-run variation relative to solo execution.
-At matched compute on one task, its primary LLM-judge composite favored AgentRoom over independent parallel generation followed by post-hoc file union.
-A separate seven-run bundle probe ordered the full system above shared-only and prompt-only partial conditions, but the interval for the coordination-layer step included zero.
-The result remains preliminary.
-The paper was a recent preprint, its headline tasks shared one Express and TypeScript environment, agents authored their own tests, and the main quality comparison did not use a held-out execution oracle.
-
-Repository-scale evidence shows why this distinction matters outside a controlled shared document.
-AgenticFlict selected 142,652 open or closed-but-unmerged agent-authored pull requests from the AIDev dataset; deterministic merge simulation succeeded for 107,026, and 27.67% of that restricted sample produced textual conflicts :citep[ogenrwot2026agenticflict].
-The dataset does not isolate fleets or establish that agents caused the conflicts; it measures agent-authored changes colliding with the repository state into which they would be merged.
-It nevertheless documents a substantial collection of integration failures that a fleet design should not treat as an incidental cleanup concern.
-
-Together, these studies support a bounded conclusion.
-A shared substrate can prevent some textual collisions, and an explicit coordination interface can reduce some duplicated or abandoned work, but neither replaces a settled contract or end-to-end acceptance evidence.
-Parallelize only work whose ownership and dependencies are clear, then test the integrated behavior through the web boundary.
+For further reading, :citet[cho2026agentroom] examine coordination through shared files, claims, and messages; :citet[ogenrwot2026agenticflict] examine textual merge conflicts in agent-authored pull requests.
+Read each study's task selection, acceptance checks, and coordination boundary before transferring its conclusions to a fleet design.
 
 ## Field note — Let repeated failures shape the first evals
 

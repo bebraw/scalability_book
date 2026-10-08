@@ -444,5 +444,5 @@ It changes matching, without rewriting the URL or relaxing storage, freshness, o
 List only parameters known to be safe to ignore so that new, unknown parameters still distinguish responses.
 Identical HTML is insufficient if reuse would bypass required server processing, such as authorization or signature verification.
 An ignored parameter also cannot be relied on to bypass the cache for debugging.
-As of September 2026, the [HTTP Working Group specification](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) remains a draft: verify syntax and behavior in the target caches before relying on it.
+As of October 2026, the [HTTP Working Group specification](https://httpwg.org/http-extensions/draft-ietf-httpbis-no-vary-search.html) remains a draft: verify syntax and behavior in the target caches before relying on it.
 Harry Roberts's [practical introduction](https://csswizardry.com/2026/05/better-browser-caching-with-no-vary-search/) develops the campaign-URL example further.

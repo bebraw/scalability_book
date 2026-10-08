@@ -268,9 +268,9 @@ export const bookConcepts: Concept[] = [
         "Identify the observation–action loop.",
       ],
       [
-        "Fleets: move from one agent to several",
-        "/chapters/agent-fleets/#from-one-agent-to-a-fleet",
-        "Explain the new coordination obligations.",
+        "Fleets: choose a coordination structure",
+        "/chapters/agent-fleets/#choose-a-coordination-structure",
+        "Explain the coordination obligations of each option.",
       ],
     ],
     {
@@ -517,9 +517,9 @@ export const bookConcepts: Concept[] = [
     "More agents guarantee more useful output. Shared dependencies and sequential review can erase the benefit.",
     [
       [
-        "Fleets: one agent to a fleet",
-        "/chapters/agent-fleets/#from-one-agent-to-a-fleet",
-        "Define what the fleet adds to the workflow.",
+        "Fleets: choose a coordination structure",
+        "/chapters/agent-fleets/#choose-a-coordination-structure",
+        "Choose a structure that fits the work and integration capacity.",
       ],
       [
         "Compare: implementation C",

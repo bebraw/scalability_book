@@ -132,9 +132,8 @@ Keep learning and participation effects unverified when the comparison did not e
 
 ### Field note — Familiarity is part of effective capability
 
-GPT-family models' communication style is easier for me to follow than Claude's default prose.
-That personal fit affects how quickly I can review and correct their work; it is not a general model ranking.
-A model's nominal capability can be less useful if I must first translate its explanations into terms I understand.
+I can review and correct an agent's work more quickly when its explanations use terms I understand.
+That personal fit affects the workflow alongside the model's task capability.
 Changing models therefore changes both the tool and the reviewer's fluency with it, which belongs among the comparison's alternative explanations.
 
 ### Final reflection package builder

@@ -15,27 +15,32 @@ This chapter follows a fleet from task decomposition through integration, correc
 > Count the fleet's total compute and human review cost.
 > Parallel work earns that cost when it improves accepted outcomes, reduces rework, or saves scarce human time.
 
-## From one agent to a fleet
+## Choose a coordination structure
 
 A fleet should be an answer to the shape of the work, not the starting assumption.
 Begin with the smallest coordination structure that can complete the task.
+:ref[table:fleet-coordination-options]{text="The table below"} compares options by the work they support and the costs they introduce.
 
-| Stage                 | Structure                                                       | Useful when                                                           | New cost or risk                                                     |
-| --------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| One agent             | One context and action stream                                   | The change is small, coupled, or depends on frequent interpretation   | Limited concurrency; one interpretation can dominate                 |
-| Sequential delegation | One agent hands a bounded result to the next                    | Later work genuinely depends on an earlier finding or decision        | Handoff latency and accumulated misunderstanding                     |
-| Parallel specialists  | Independent agents work against a settled interface             | Tasks touch different modules and have independently testable outputs | Duplicate exploration, conflicts, and a growing review queue         |
-| Integrated fleet      | Orchestration, isolated workspaces, shared contracts, and gates | The workflow repeats often enough to justify explicit infrastructure  | Control, observability, recovery, and integration become system work |
+| Option                | Structure                                                                              | Useful when                                                              | New cost or risk                                                     |
+| --------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| One agent             | One context and action stream                                                          | The change is small, coupled, or depends on frequent interpretation      | Limited concurrency; one interpretation can dominate                 |
+| Sequential delegation | One agent hands a bounded result to the next                                           | Later work genuinely depends on an earlier finding or decision           | Handoff latency and accumulated misunderstanding                     |
+| Parallel specialists  | Independent agents work against a settled interface                                    | Tasks touch different modules and have independently testable outputs    | Duplicate exploration, conflicts, and a growing review queue         |
+| Integrated fleet      | Harness or application orchestration, isolated workspaces, shared contracts, and gates | Repeated delegation needs coordinated state, integration, and acceptance | Control, observability, recovery, and integration become system work |
 
-::caption[Progression from a single coding agent to an integrated development fleet.]
-::label[table:fleet-progression]
+::caption[Coordination options for different development tasks.]
+::label[table:fleet-coordination-options]
 
-The first useful expansion is often sequential rather than parallel.
+Inspect the coordination controls supplied by the chosen harness before adding custom orchestration.
+For example, [Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) distinguishes focused subagents that return results to a caller from teams whose members communicate and coordinate shared tasks.
+Check the supported configuration and its limitations in the [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md).
+
+Sequential delegation fits work whose next step depends on an earlier result.
 A read-only scout maps the relevant routes, components, data flow, and tests; an implementer then receives the compressed findings and a bounded objective.
 This keeps noisy reconnaissance out of the implementation context without pretending that dependent work can happen simultaneously.
 An implementer followed by a reviewer is another sequential pattern: the reviewer receives a concrete diff and validation evidence rather than guessing what might change.
 
-Parallelism becomes reasonable only after a shared decision has settled the seam between tasks.
+Parallel implementation becomes reasonable after a shared decision has settled the seam between tasks.
 For implementation C, one possible dependency graph is:
 
 `reconnaissance → shared domain and API contract → interface work ∥ data work → integration → browser acceptance`
@@ -96,27 +101,26 @@ The company-authored accounts below show different ways to organize agentic web 
 Read each account as a snapshot of its stated tasks and configuration, not a current estimate of agent productivity.
 The transfer questions identify what to inspect in the event tracker.
 
-| Documented case                                                                                                                        | Practice in the web-development workflow                                          | Reported evidence and important limit                                                     | Transfer question                                                        |
-| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [GitHub assigns Copilot work in github.com](https://github.blog/ai-and-ml/github-copilot/how-copilot-helps-build-the-github-platform/) | Issues become proposed changes to UI, APIs, migrations, and production code       | One month of task examples; no counts, review time, or defect rate                        | Which decisions may an agent execute, and who accepts the result?        |
-| [Vercel teaches agents product design](https://vercel.com/blog/teaching-agents-product-design-at-vercel)                               | Repository skills, linters, and review carry UI and interaction decisions forward | June 2026 workflow account; no general product-quality effect established                 | How does a web project make product judgment available and maintainable? |
-| [Stripe runs parallel Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents)                              | Unattended agents produce pull requests in isolated development environments      | February 2026 report of over 1,000 merged PRs per week; no attempt or quality denominator | What infrastructure makes parallel work bounded and reviewable?          |
-| [Stripe evaluates web integrations](https://stripe.com/blog/can-ai-agents-build-real-stripe-integrations)                              | Agents modify frontends, backends, databases, and live payment flows              | March 2026 suite of eleven environments with UI and API graders; limited task coverage    | What evidence establishes that the resulting web behavior is correct?    |
+| Documented case                                                                                                                        | Practice in the web-development workflow                                          | Reported evidence and important limit                                                  | Transfer question                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [GitHub assigns Copilot work in github.com](https://github.blog/ai-and-ml/github-copilot/how-copilot-helps-build-the-github-platform/) | Issues become proposed changes to UI, APIs, migrations, and production code       | One month of task examples; no counts, review time, or defect rate                     | Which decisions may an agent execute, and who accepts the result?        |
+| [Vercel teaches agents product design](https://vercel.com/blog/teaching-agents-product-design-at-vercel)                               | Repository skills, linters, and review carry UI and interaction decisions forward | June 2026 workflow account; no general product-quality effect established              | How does a web project make product judgment available and maintainable? |
+| [Stripe runs parallel Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents)                              | Unattended agents produce pull requests in isolated development environments      | February 2026 workflow account; activity counts lack an attempt or quality denominator | What infrastructure makes parallel work bounded and reviewable?          |
+| [Stripe evaluates web integrations](https://stripe.com/blog/can-ai-agents-build-real-stripe-integrations)                              | Agents modify frontends, backends, databases, and live payment flows              | March 2026 suite with UI and API graders; limited task coverage                        | What evidence establishes that the resulting web behavior is correct?    |
 
 ::caption[Documented agentic-development cases and their transfer questions.]
 ::label[table:documented-agentic-development-cases]
 
-Vercel’s separate [January 2026 Next.js evaluation](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) reported that an available skill went uninvoked in 56% of cases under its default setup.
-That is evidence about guidance retrieval in that evaluation, not the success rate of the later product-design workflow or a universal ranking of skills against instruction files.
-The transferable check is to observe whether guidance was loaded before judging whether it was followed.
+Observe whether project guidance was loaded before judging whether it was followed.
+Vercel's separate [Next.js evaluation](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) illustrates this retrieval check; its result applies to the tested setup.
 
 For implementation C, connect each delegated task to its acceptance check and integration owner.
 The comparison with a single agent must include failed attempts and human review, which the published activity counts do not always expose.
 
 ### Field note — Different reviewers expose different blind spots
 
-I have found GPT useful for reviewing implementations, and a colleague's Claude review of one of my pull requests surfaced different issues.
-Claude also sometimes overstated an issue or preferred a different design.
+A colleague's review with a different model surfaced issues that my usual reviewer had missed.
+Some findings overstated an issue or preferred a different design.
 The disagreement made assumptions visible; resolving it still required a judgment about the intended behavior and the simpler workable design.
 
 I usually ask the agent to implement a fix once I agree with its reasoning.
@@ -235,8 +239,9 @@ The generated packet is a rehearsal: if the task is vague, boundaries overlap, o
 {{ import "site/includes/agent-fleet-demo.html" }}
 
 Translate the packet into a [task graph](/concepts/#task-graph) rather than launching every named role automatically.
-Run three small patterns before the complete implementation: scout then plan, implement then review, and parallel scouts over independent subsystems.
-For each pattern, state why the tasks are sequential or independent and who integrates the result.
+Use the [required matched single-agent/fleet probe](/project/compare/#required-matched-single-agent-fleet-probe) to test one bounded task under both workflows.
+For optional practice, rehearse a coordination pattern such as scout then plan, implement then review, or parallel scouts over independent subsystems.
+State why the tasks are sequential or independent and who integrates the result.
 
 ### Correction lab
 
