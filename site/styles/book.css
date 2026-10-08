@@ -261,7 +261,7 @@
   text-decoration: underline;
   text-underline-offset: 0.14em;
 }
-.prose > .semantic-table {
+:is(.prose > .semantic-table, .project-prose > table) {
   border-collapse: collapse;
   border-spacing: 0;
   font-family: var(--font-ui);
@@ -271,14 +271,14 @@
   margin-block: 2rem 2.35rem;
   scroll-margin-block-start: 6rem;
 }
-.prose > .semantic-table th,
-.prose > .semantic-table td {
+:is(.prose > .semantic-table, .project-prose > table) th,
+:is(.prose > .semantic-table, .project-prose > table) td {
   border-block-end: 1px solid var(--border);
   padding: 0.72rem 0.8rem;
   text-align: start;
   vertical-align: top;
 }
-.prose > .semantic-table th {
+:is(.prose > .semantic-table, .project-prose > table) th {
   background: var(--panel);
   color: var(--text);
   font-size: 0.78rem;
@@ -286,10 +286,10 @@
   letter-spacing: 0.025em;
   line-height: 1.35;
 }
-.prose > .semantic-table tbody tr:nth-child(even) {
+:is(.prose > .semantic-table, .project-prose > table) tbody tr:nth-child(even) {
   background: color-mix(in srgb, var(--panel) 45%, transparent);
 }
-.prose > .semantic-table tbody tr:hover {
+:is(.prose > .semantic-table, .project-prose > table) tbody tr:hover {
   background: color-mix(in srgb, var(--accent) 9%, transparent);
 }
 .prose > :is(.semantic-table, .semantic-figure):target {
@@ -342,8 +342,8 @@
     overflow-x: auto;
     overscroll-behavior-inline: contain;
   }
-  .prose > .semantic-table th,
-  .prose > .semantic-table td {
+  :is(.prose > .semantic-table, .project-prose > table) th,
+  :is(.prose > .semantic-table, .project-prose > table) td {
     min-inline-size: 10rem;
   }
 }

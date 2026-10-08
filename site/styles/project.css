@@ -183,6 +183,21 @@
   font-size: clamp(1.45rem, 3vw, 2.15rem);
   margin-top: -1.4rem;
 }
+.project-shell[data-project-phase="grading"]
+  .project-prose
+  > table:has(th:nth-child(3))
+  th:first-child {
+  inline-size: 30%;
+}
+.project-shell[data-project-phase="grading"]
+  .project-prose
+  > table
+  :is(th, td)[style*="text-align: right"] {
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 6rem;
+  padding-inline: 1.25rem;
+  white-space: nowrap;
+}
 .project-page-tools {
   display: grid;
   gap: 1.5rem;

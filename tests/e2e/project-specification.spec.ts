@@ -1,6 +1,56 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
+  for (const width of [1280, 800, 390]) {
+    test(`keeps rubric points separated from prose at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of [
+        "/project/grading/",
+        "/project/requirements/2026-10-v2/grading/",
+      ]) {
+        await page.goto(route);
+        const columns = await page
+          .locator(".project-prose > table")
+          .evaluateAll((tables) =>
+            tables.flatMap((table) => {
+              const headers = Array.from(table.querySelectorAll("thead th"));
+              const index = headers.findIndex(
+                (header) => header.textContent?.trim() === "Points",
+              );
+              if (index < 0) return [];
+              return Array.from(table.querySelectorAll("tr")).map((row) => {
+                const cell = row.children[index];
+                const box = cell.getBoundingClientRect();
+                const range = document.createRange();
+                range.selectNodeContents(cell);
+                const text = range.getBoundingClientRect();
+                return {
+                  width: box.width,
+                  leftGap: text.left - box.left,
+                  rightGap: box.right - text.right,
+                  lines: range.getClientRects().length,
+                };
+              });
+            }),
+          );
+        expect(columns.length).toBeGreaterThan(20);
+        for (const column of columns) {
+          expect(column.width).toBeGreaterThanOrEqual(80);
+          expect(column.leftGap).toBeGreaterThanOrEqual(12);
+          expect(column.rightGap).toBeGreaterThanOrEqual(12);
+          expect(column.lines).toBe(1);
+        }
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+      }
+    });
+  }
+
   test("publishes the model-size sequence and bounded mixed-fleet policy", async ({
     page,
     request,

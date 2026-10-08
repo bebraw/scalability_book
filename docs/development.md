@@ -63,6 +63,9 @@ Every book table should place `::caption[Caption text.]` immediately after the G
 ScholarMark numbers captioned tables and figures within each chapter (for example, `Table 4.2`), attaches the postfix label directly to the semantic block, and supplies its default reference title; the site adds a caption permalink.
 Introduce the table with a semantic reference such as `:ref[table:descriptive-id]{text="The table below"}` so prose and anchors stay connected if content moves.
 
+Course brief tables share the spacing, borders, and row styling of captioned book tables, including when the course table has no caption.
+Assessment tables give numeric columns room for a single line; compact tables scroll horizontally when needed.
+
 ## Downloadable labs
 
 Standalone source exercises live in one directory per lab under [labs/](../labs/).
