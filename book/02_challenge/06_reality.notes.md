@@ -24,7 +24,7 @@
   Do not make them a license to change the common functional scope of implementation B.
 - Distinguish the immutable acceptance core from scalability scenarios.
   The implementation must satisfy the former; students use the latter to explain what would fail and how the architecture could respond.
-- Ask students to compare whether the local and comparison-model implementations exposed different failure assumptions, and whether those differences came from architecture, generated defaults, or team decisions.
+- Ask students to compare whether the large-model and small-model implementations exposed different failure assumptions, and whether those differences came from architecture, generated defaults, or team decisions.
 - Preserve identical pressure-map headings across phases so the final analysis can compare event volume, concurrency, storage growth, retries, partial failure, and eventual correctness directly.
 - Add one prompt about development reality: what happens when model access, latency, privacy requirements, cost, or human review capacity changes?
 - Keep the company-authored case-study caveat visible and avoid presenting source-reported figures as transferable performance expectations.

@@ -114,7 +114,7 @@ const projectSpecificationDefinitions = [
     phase: "establish",
     sequence: "01",
     slug: "establish",
-    summary: "Implementation A · local model · single agent.",
+    summary: "Implementation A · large model · single agent.",
   },
   {
     file: "specifications/02_challenge.md",
@@ -122,7 +122,7 @@ const projectSpecificationDefinitions = [
     phase: "challenge",
     sequence: "02",
     slug: "challenge",
-    summary: "Implementation B · comparison model · single agent.",
+    summary: "Implementation B · small model · single agent.",
   },
   {
     file: "specifications/03_compare.md",

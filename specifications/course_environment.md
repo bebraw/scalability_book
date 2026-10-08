@@ -3,30 +3,38 @@
 This file defines the operational choices that must be published for each course run.
 Model and agent products change faster than the book's architectural and measurement concepts, so the current assignments belong here rather than in permanent chapter prose.
 
+Establish uses an approved large model, Challenge an approved small model, and Compare a declared fleet of small models, large models, or a mixture.
+Large and small are relative course assignments; publish the model identities and size basis where exposed rather than assume a universal parameter threshold or capability ranking.
+Both models may be hosted by the department, and both may be foundation models.
+Hosting, serving configuration, context, and orchestration are recorded separately from model size.
+
 ## Publication rule
 
 The instructor must complete and publish the table below before the affected project begins.
 A phase does not begin until every student has a supported access path, a declared fallback for service failure, and a cost policy that does not require unannounced personal spending or hardware.
 
-| Phase     | Required assignment before launch                                                                                                                                                                                                                                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Establish | Approved local model artifact or departmental endpoint; resolved revision where exposed; runtime and quantization where applicable; supported hardware or hosted allocation; single-agent harness; context and tool limits; network and data-boundary policy; fallback and support contact |
-| Challenge | Approved second model and endpoint; comparison hypothesis; single-agent harness and enforcement rule; account or credit provision; data-boundary and retention policy; tool limits; fallback and support contact                                                                           |
-| Compare   | Approved fleet harness; declared base model, preferably the Challenge model; maximum concurrent agents and total budget; isolation and external-action policy; trace export or transformation path; fallback and support contact                                                           |
+| Phase     | Required assignment before launch                                                                                                                                                                                                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Establish | Approved large model and departmental or other supported endpoint; resolved revision and size basis where exposed; serving configuration; single-agent harness; context and tool limits; cost basis and access allocation; data-boundary policy; fallback and support contact                         |
+| Challenge | Approved small model and supported endpoint; model-size comparison hypothesis; resolved revision and serving configuration; single-agent harness and enforcement rule; cost basis and access allocation; data-boundary policy; tool limits; fallback and support contact                              |
+| Compare   | Approved fleet harness and permitted small/large model set; reference small-model configuration; role/task assignments and routing/fallback policy; maximum concurrent agents and aggregate budget; cost basis; isolation and external-action policy; trace export path; fallback and support contact |
 
 The instructor should publish one filled table per course run with the following fields:
 
-| Field                                             | Establish       | Challenge       | Compare         |
-| ------------------------------------------------- | --------------- | --------------- | --------------- |
-| Model and resolved revision or declared route     | To be announced | To be announced | To be announced |
-| Agent harness and version                         | To be announced | To be announced | To be announced |
-| Orchestration rule                                | Single agent    | Single agent    | To be announced |
-| Supported execution environment                   | To be announced | To be announced | To be announced |
-| Student cost limit and provided credit            | To be announced | To be announced | To be announced |
-| Project-data egress and retention                 | To be announced | To be announced | To be announced |
-| Tool, network, and external-action limits         | To be announced | To be announced | To be announced |
-| Fallback when the assigned service is unavailable | To be announced | To be announced | To be announced |
-| Support and exception path                        | To be announced | To be announced | To be announced |
+| Field                                                 | Establish       | Challenge       | Compare         |
+| ----------------------------------------------------- | --------------- | --------------- | --------------- |
+| Model and resolved revision or declared route         | To be announced | To be announced | To be announced |
+| Model size basis and serving configuration            | To be announced | To be announced | To be announced |
+| Role/task model assignment and routing policy         | One large model | One small model | To be announced |
+| Agent harness and version                             | To be announced | To be announced | To be announced |
+| Orchestration rule                                    | Single agent    | Single agent    | To be announced |
+| Supported execution environment                       | To be announced | To be announced | To be announced |
+| Student cost limit and provided credit                | To be announced | To be announced | To be announced |
+| Inference pricing or departmental resource-cost basis | To be announced | To be announced | To be announced |
+| Project-data egress and retention                     | To be announced | To be announced | To be announced |
+| Tool, network, and external-action limits             | To be announced | To be announced | To be announced |
+| Fallback when the assigned service is unavailable     | To be announced | To be announced | To be announced |
+| Support and exception path                            | To be announced | To be announced | To be announced |
 
 ## Publish the course workflow
 
@@ -54,14 +62,18 @@ Before launch, test the access paths as an author, a classmate, and an instructo
 Before launch, run one small task with the published configuration and retain its trace.
 For Establish and Challenge, confirm that automatic delegation and unapproved model routes are disabled or fail closed; one visible chat window is not evidence of one agent.
 For Compare, verify child-task attribution, cancellation, usage accounting, workspace isolation, and trace export with the selected harness version.
+For a mixed-model fleet, also verify that task/attempt evidence identifies the model actually used, routing and fallback remain within the published model set, and aggregate accounting includes every worker and retry.
 Repeat this check after a material tool or routing change and record the change date.
 
 ## Comparison rules
 
-- Choose a Challenge model different from Establish and publish the hypothesis the comparison will test; either model may be a foundation model, and hosting or size alone does not establish a capability ranking.
-- Keep the Challenge model as the Compare fleet's base model when practical so B-C primarily changes orchestration.
+- Choose and preflight the large Establish and small Challenge configurations; publish the size basis and hypothesis without promising that the larger model always produces better results.
+- Use the Challenge small model as the fleet reference; permit approved large-model and mixed-model fleets with declared assignments and quality, time, and cost hypotheses.
+- Keep the required bounded single-agent/fleet pair on the same small model and fixed routing policy.
+  An optional small-only/mixed-fleet pair holds the task graph fixed and varies one model assignment within the existing rehearsal budget.
+- When B and C also differ in model assignment, describe their full builds as development-system cases rather than attribute the difference to orchestration alone.
 - If a model, route, harness, or hardware allocation changes, record the actual configuration and narrow the comparison claim.
-- Do not rank local inference latency across unequal student hardware as though the environment were controlled.
+- Record departmental allocations, shared-service contention, and student hardware where relevant; avoid raw latency rankings across unequal serving conditions.
 - Manual implementation remains legitimate and must be reported; access failure should not pressure students to conceal work or buy an unapproved service.
 - When the assigned tool does not expose a requested configuration field, record it as unavailable rather than estimating it.
 

@@ -17,7 +17,9 @@ Complete Compare with implementation C and its fleet trace, a three-way applicat
 
 The [Compare project specification](/project/compare/) defines the third fresh implementation and its bounded fleet workflow.
 The common behavior, permitted acceptance material, pressures, and reporting categories remain stable while delegation, orchestration, authority allocation, integration, and fleet controls vary deliberately.
-When practical, use the same comparison model as implementation B so orchestration is the primary changed variable; otherwise record the configuration difference and narrow the comparison claim.
+Use B's small model as the reference configuration; an approved fleet may use small models, large models, or a mixture with declared role or task assignments.
+When model assignment also changes, the full B–C builds compare development systems rather than isolate orchestration.
+The required bounded paired task holds the small model fixed; an optional small-only/mixed-fleet comparison holds the task graph fixed and varies one model assignment.
 
 Implementation C also turns its development process into application data.
 A transformed fleet trace is loaded into the Work Activity Tracker so its history, filters, and relationships can expose attempts, failures, handoffs, validation, correction, and human intervention.

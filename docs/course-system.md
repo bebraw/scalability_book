@@ -275,7 +275,9 @@ Staff must manage storage cleanup outside the UI; no destructive removal of orig
 
 ## Run requirements and evidence checklists
 
-New runs retain the current requirement edition (`2026-10-v1` initially); historical runs without that field use the fixed first edition.
+New runs retain the current requirement edition, `2026-10-v2`.
+The course has not run yet; this is the sole pre-course contract and there are no earlier run contracts to maintain.
+It assigns a large model to Establish, a small model to Challenge, and a declared small/large or mixed-model fleet to Compare.
 The workspace's project guide, rubric and checklist links open the archived documents for that edition.
 **Course settings** shows the edition; ordinary administration cannot replace it on an existing run.
 See [requirements/README.md](../requirements/README.md) for publication/versioning.
@@ -286,7 +288,7 @@ One artifact can serve several entries; entries do not require separate uploads 
 Students can freeze honestly incomplete work and submit later evidence with declared gaps.
 The server does not execute source or infer safety/completeness from archive filenames.
 
-The checklist indexes the complete common evidence categories, A's local workflow/claims, B's pressures/case transfer/Little's Law, and C's fleet/trace/paired contrast, separate application/workflow models, scaling/deployment and conditional decision.
+The checklist indexes the complete common evidence categories, A's large-model workflow/claims, B's small-model comparison/pressures/case transfer/Little's Law, and C's model assignments/fleet/trace/paired contrast, separate application/workflow models, scaling/deployment and conditional decision.
 The detailed archived briefs and retained rubric remain the requirements; private individual portfolios have their separate workflow.
 Freezing retains the initial checklist; final evidence stores its own checklist without replacing the original.
 Changing final evidence creates another revision and makes prior project assessments stale until reviewed.
@@ -300,8 +302,8 @@ One project score applies to every frozen phase member.
 Lecture participation, diaries and self/peer assessments remain individual.
 
 The rubric is versioned per run.
-Historical rubric `2026-10-individual-minima-v1` and current rubric `2026-10-solo-equivalence-v2` retain 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted individual assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
-The current version adds explicit solo assessment equivalents without changing the group-route criteria or numeric scoring rules.
+The sole supported rubric, `2026-10-solo-equivalence-v2`, retains 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted individual assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
+It includes explicit solo assessment equivalents alongside the group-route criteria.
 Grades use the published 50/60/70/80/90% thresholds.
 
 An ungraded record is pending, not zero.

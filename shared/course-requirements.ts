@@ -1,8 +1,6 @@
 import type { Course, Phase } from "./course.ts";
 
 export const requirementVersion = "2026-10-v2";
-// Old runs without a stored edition retain this first edition when new ones are added.
-export const legacyRequirementVersion = "2026-10-v1";
 export type RequirementDocument = "introduction" | "common" | Phase | "grading";
 export interface RequirementEntry {
   id: string;
@@ -53,7 +51,7 @@ const common = [
   entry(
     "configuration",
     "Development setup and data paths",
-    "Identify implementation/commit, stack/storage/deployment, model and inference route, agent/version, imported capabilities, orchestration, hardware/environment and fallback policy. Record exposed revisions, context and resource limits; mark unavailable fields.",
+    "Identify implementation/commit, stack/storage/deployment, models, size assignments and inference routes, agent/version, imported capabilities, orchestration, hardware/environment and fallback policy. Record exposed revisions, context and resource limits; mark unavailable fields.",
     "common",
     "9-1-development-setup",
   ),
@@ -94,15 +92,15 @@ const common = [
   ),
   entry(
     "shared-session",
-    "Shared engineering session",
-    "Index the existing session record: operator/challenger/validator, individual predictions, the phase question, check, non-operator acceptance decision and uncertainty. Rotate responsibilities across phases; this is part of ordinary project work.",
+    "Engineering session and independent challenge",
+    "Group route: rotating operator/challenger/validator and non-operator acceptance. Approved solo route: prediction before agent use, explicit operator/challenger/validator passes and an instructor discussion per phase. Index checks, acceptance and remaining uncertainty in the existing evidence.",
     "common",
     "shared-engineering-sessions",
   ),
   entry(
     "audit-response",
     "Bounded audit and author response",
-    "The assigned audit identifies the frozen revision, setup and probe times, prior inspection/tools, checks, patch and findings. Complete technical evidence and respond without replacing the frozen implementation. Keep individual portfolios and peer reports private.",
+    "Retain the incoming independent audit and author response. Solo students also audit an instructor-supplied frozen reference or assigned group, with separate setup/probe times, prior exposure, tools, checks and findings. Keep private assessment material outside the technical bundle.",
     "common",
     "10-bounded-cross-team-audit",
   ),
@@ -110,9 +108,9 @@ const common = [
 const phaseEntries: Record<Phase, RequirementEntry[]> = {
   establish: [
     entry(
-      "a-fresh-local",
-      "Fresh A and approved local single agent",
-      "Start cleanly under the transfer policy. Use only the approved local inference route, fail closed on other routes/fallbacks, and run one coding agent without delegation; disclose consequential manual work.",
+      "a-fresh-model",
+      "Fresh A and approved large-model single agent",
+      "Start cleanly under the transfer policy. Use only the approved large-model inference route, fail closed on other routes/fallbacks, and run one coding agent without delegation; disclose consequential manual work.",
       "establish",
       "2-development-system-constraint",
     ),
@@ -126,7 +124,7 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     entry(
       "a-stack",
       "Stack hypothesis and revisit condition",
-      "Explain suitability, learning question, local-model understanding and setup/operation/change risks; identify reversible choices, hardening dependencies and evidence for review.",
+      "Explain suitability, learning question, assigned-model understanding and setup/operation/change risks; identify reversible choices, hardening dependencies and evidence for review.",
       "establish",
       "3-3-record-the-stack-hypothesis",
     ),
@@ -146,7 +144,7 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     ),
     entry(
       "a-reflection",
-      "Local-workflow reflection",
+      "Large-model workflow reflection",
       "What worked, what needed smaller tasks/context/correction/manual work, and which limits belong to model, harness, hardware/environment or project? Tie interpretations to evidence.",
       "establish",
       "4-deliverables",
@@ -155,8 +153,8 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
   challenge: [
     entry(
       "b-fresh-model",
-      "Fresh B and approved comparison single agent",
-      "Start cleanly; do not copy A source, implementation tests or configuration. Declare the different approved model, one-agent boundary, substantial manual work, stable stack or approved change and its confounding effect.",
+      "Fresh B and approved small-model single agent",
+      "Start cleanly; do not copy A source, implementation tests or configuration. Declare the approved small model and inference route, one-agent boundary, substantial manual work, stable stack or approved change and its confounding effect.",
       "challenge",
       "2-starting-conditions",
     ),
@@ -207,14 +205,14 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     entry(
       "c-fresh-fleet",
       "Fresh C with real delegated work",
-      "At least two independent instances/delegated executions, responsibilities and outputs, a handoff/integration/parallel branch, and review before acceptance. Keep B's model/stack where practical and declare differences; fictional perspectives do not count.",
+      "At least two independent instances/delegated executions, responsibilities and outputs, a handoff/integration/parallel branch, and review before acceptance. Use B's small model as the reference; declare permitted small/large models, role/task assignments and routing/fallback. Keep the primary stack where practical; fictional perspectives do not count.",
       "compare",
       "3-what-counts-as-a-fleet",
     ),
     entry(
       "c-plan",
       "Fleet plan, authority and coordination",
-      "Task graph, tools/files, shared-state writers/readers/lifetime, identity and policy/budget/trace handoffs, validation, dependencies, integration owner, approvals and stop conditions. Record parallel work, duplication, blocked time, failures, total usage and human review/correction.",
+      "Task graph, model assignments and quality/time/cost hypothesis, tools/files, shared-state writers/readers/lifetime, identity and policy/budget/trace handoffs, validation, dependencies, integration owner, approvals and stop conditions. Record parallel work, duplication, blocked time, failures, actual model/route per attempt, aggregate usage/cost and its declared basis, and human review/correction.",
       "compare",
       "4-fleet-plan",
     ),
@@ -228,7 +226,7 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     entry(
       "c-pair",
       "Bounded single-agent/fleet contrast",
-      "Index B–C case analysis and a paired task or supplied traces with provenance. Same accepted revision, brief/checks, model/harness/permissions, fresh copies/sessions, intervention policy, predeclared ≤20-minute limit per attempt and aggregate resource limit; preserve failures and accounting gaps. One pair does not establish a general effect.",
+      "Index B–C case analysis and a paired task or supplied traces with provenance. Same accepted revision, brief/checks, small-model configuration/routing, harness/permissions, fresh copies/sessions, intervention policy, predeclared ≤20-minute limit per attempt and aggregate resource limit; preserve failures and accounting gaps. The required pair examines orchestration even if C uses mixed models. An optional small-only/mixed-fleet pair fixes the task graph and varies one assignment within the remaining rehearsal budget. One pair does not establish a general effect.",
       "compare",
       "5-4-compare-one-agent-with-the-fleet",
     ),
@@ -277,28 +275,8 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
   ],
 };
 export const requirementEditions = {
-  "2026-10-v1": {
-    common,
-    phases: phaseEntries,
-    rubric: "2026-10-individual-minima-v1",
-  },
   "2026-10-v2": {
-    common: common.map((item) =>
-      item.id === "shared-session"
-        ? {
-            ...item,
-            title: "Engineering session and independent challenge",
-            detail:
-              "Group route: rotating operator/challenger/validator and non-operator acceptance. Approved solo route: prediction before agent use, explicit operator/challenger/validator passes and an instructor discussion per phase. Index checks, acceptance and remaining uncertainty in the existing evidence.",
-          }
-        : item.id === "audit-response"
-          ? {
-              ...item,
-              detail:
-                "Retain the incoming independent audit and author response. Solo students also audit an instructor-supplied frozen reference or assigned group, with separate setup/probe times, prior exposure, tools, checks and findings. Keep private assessment material outside the technical bundle.",
-            }
-          : item,
-    ),
+    common,
     phases: Object.fromEntries(
       Object.entries(phaseEntries).map(([phase, entries]) => [
         phase,
@@ -318,7 +296,7 @@ export const requirementEditions = {
   },
 } as const;
 export function requirementsFor(course: Pick<Course, "requirements">) {
-  const version = course.requirements ?? legacyRequirementVersion;
+  const version = course.requirements ?? requirementVersion;
   const edition =
     requirementEditions[version as keyof typeof requirementEditions];
   if (!edition) throw new Error(`Unsupported requirement edition: ${version}`);

@@ -25,11 +25,13 @@ Use:
 
 - the same common specification and acceptance scenarios;
 - the transfer policy in the common specification;
-- a declared base model;
-- normally the same comparison model and primary stack used for Challenge.
+- a declared model set and assignment policy: the Challenge small model is the reference configuration, and an approved fleet may use small models, large models, or a mixture;
+- normally the same primary stack used for Challenge.
 
-Keeping the model and stack stable makes B–C primarily a comparison of orchestration.
-If the available fleet tooling requires another model or stack, document the difference and treat it as a limitation.
+With the Challenge model held constant, B–C foregrounds orchestration while practice and architecture still differ.
+A mixed-model fleet also changes model assignment, so B–C compares complete development systems rather than isolating either effect.
+Declare the model assigned to each role or task, any routing or fallback rule, and the hypothesis about accepted quality, time, and cost.
+Record the actual models used and any stack or configuration differences as interpretation limits.
 
 ---
 
@@ -56,6 +58,7 @@ Before implementation, record:
 
 - the [task graph](/concepts/#task-graph) or workflow;
 - each role or delegated responsibility;
+- permitted models, their role or task assignments, routing and fallback rules, and the quality, time, or cost hypothesis behind the assignment;
 - allowed tools, files, or modules where relevant;
 - shared state that can survive between delegated runs, including who can write and later read it, how writes are attributed, how long it persists, and how it is cleared;
 - when session orchestration and resource access are separate, their policy ownership and precedence, bypass paths, and the authenticated identity, [scoped delegated authority](/concepts/#authority), and task, budget, policy, and trace identifiers passed across the boundary;
@@ -89,6 +92,8 @@ In addition to the common evidence, record where possible:
 - conflicts or incompatible assumptions;
 - idle time or blocked tasks;
 - total model usage across the fleet;
+- the model and route actually used for each task or attempt, including substitutions and fallback;
+- total cost or resource use across all workers, retries, and failed attempts, with a declared cost basis for departmental inference and unavailable measurements marked;
 - active human integration and [review time](/concepts/#review-budget);
 - defects found after individual agents considered their work complete.
 
@@ -121,6 +126,7 @@ Use the application to inspect the run and answer at least two debugging questio
 - Can every physical model or tool attempt, including denied, failed, retried, and cancelled attempts, be linked to its delegated run, actor, policy result, and usage or cost provenance, and can that run be assigned an explicit outcome?
 
 Present the findings through the application's existing feed, filters, summaries, and any small additional view needed to make the evidence understandable.
+Preserve model assignments in actor records and any per-attempt substitutions in event metadata or linked execution evidence; the portable example's model names and costs are synthetic teaching data.
 A real-time integration, generic adapter for every agent tool, polished graph editor, and interactive step debugger are not required.
 
 Treat imported traces as potentially sensitive.
@@ -144,8 +150,9 @@ For one narrower contrast, replace part of the existing fleet rehearsal with a *
 
 1. Freeze one accepted repository revision and a small change brief with independent acceptance checks before either attempt.
    Use two fresh copies of that revision and fresh agent sessions; this probe may reuse B and does not become the starting code for C.
-2. Run one single-agent attempt and one bounded fleet attempt using the same base-model version, harness, available tools and permissions, environment, brief, and acceptance checks.
+2. Run one single-agent attempt and one bounded fleet attempt using the same small-model version, harness, available tools and permissions, environment, brief, and acceptance checks.
    Declare the fleet size and decomposition as the treatment being examined.
+   This matched pair may use the Challenge model even when C's main implementation uses a mixed-model fleet; keep routing and fallback fixed so the pair examines orchestration.
 3. Give both attempts the same predeclared wall-time limit, no more than 20 minutes each, and the same aggregate model-resource limit using the tool's supported token, cost, or request accounting.
    Count every fleet worker and retry against that limit; record which limit stops each attempt and any accounting gaps.
 4. Hold the human-intervention policy constant, preserve failed and partial outcomes, and include integration and independent review in the recorded effort.
@@ -158,6 +165,11 @@ This is a small task, not a fourth application or a requirement to repeat a whol
 If matched access or accounting is unavailable, use instructor-supplied paired traces with the same metadata and checks; identify their provenance and missing evidence.
 An unmatched pair may still be analyzed descriptively, but cannot establish an orchestration effect.
 Link the pair and its limits in the fleet evidence bundle rather than adding a separate report.
+
+An optional model-assignment comparison can use two fresh copies of the same frozen revision with the same brief, task graph, tools, checks, intervention policy, and predeclared limits.
+Compare a small-only fleet with the same fleet assigning a large model to one named role or task; preserve actual routes and usage for all attempts.
+Assess accepted behavior and defects, time through integration and human acceptance, and total cost under the declared cost basis.
+Use this within the remaining rehearsal budget; it requires no fourth application or additional submission, and a useful result may show no benefit from the larger model.
 To investigate unfinished work or routing decisions further, choose an optional [Compare exploration starting point](/explore/#phase-compare).
 
 ### 5.5 Analyze the three applications
@@ -237,7 +249,7 @@ Use the final decision bundle to make one conditional engineering argument:
 2. **Explain the consequential results.** Compare application architecture under the shared and selected pressures and development effort through acceptance; use the fleet debugging findings to show what final code or a raw transcript concealed.
 3. **Bound the explanation.** Separate A–B–C observations from hypotheses about model capability, practice, architecture, and orchestration.
    Use the bounded paired task for the narrower workflow contrast, stating what was controlled and what remains unresolved; neither one pair nor the three builds establishes a general effect.
-4. **Choose and set a revisit condition.** For stated project constraints, choose an architecture and a local single agent, comparison-model single agent, or fleet; explain rejected alternatives, responsibilities that remained human across the phases, ownership of operations and correction, and the next saturation signal or measurement that would change the decision.
+4. **Choose and set a revisit condition.** For stated project constraints, choose an architecture and a large-model single agent, small-model single agent, or declared fleet configuration; explain rejected alternatives, responsibilities that remained human across the phases, ownership of operations and correction, and the next saturation signal or measurement that would change the decision.
 
 Label important claims as observed, inferred, or proposed.
 The [recap chapter](/chapters/recap/#turn-comparison-into-a-decision) shows how to connect the matrix to this argument.
@@ -275,7 +287,8 @@ Record the solo operator's review and integration effort; agents within one flee
 
 ## Instructor Notes
 
-- Use the Challenge model as the fleet base model when tooling and access allow it.
+- Provide the Challenge small model as the reference configuration and publish which large models or mixtures are permitted for C.
+  Keep the required single-agent/fleet pair on the same small model; any optional small-only/mixed-fleet contrast changes assignment while holding the task graph fixed.
 - Before Compare begins, publish matched resource limits and condition-order assignments for the paired probe; provide a trace alternative when equivalent access is unavailable.
 - Clarify whether sequential delegation counts.
   It can be pedagogically valid when the handoffs are explicit, although at least one parallel branch gives stronger evidence about integration and review pressure.

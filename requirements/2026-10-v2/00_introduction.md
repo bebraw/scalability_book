@@ -5,9 +5,9 @@ Begin here for the guidelines shared by all three projects, then read the [Commo
 
 ## Three projects, one application
 
-1. [**Establish**](01_establish.md): build implementation A with a locally hosted model and a single-agent workflow, then record its evidence baseline.
-2. [**Challenge**](02_challenge.md): build implementation B with an approved comparison model and a single-agent workflow, then examine architectural assumptions and development friction.
-3. [**Compare**](03_compare.md): build implementation C with a declared agent fleet, then compare the three applications and development workflows.
+1. [**Establish**](01_establish.md): build implementation A with an approved large model and a single-agent workflow, then record its evidence baseline.
+2. [**Challenge**](02_challenge.md): build implementation B with an approved small model and a single-agent workflow, then examine architectural assumptions and development friction.
+3. [**Compare**](03_compare.md): build implementation C with a declared agent fleet with approved model assignments, then compare the three applications and development workflows.
 
 The required behavior remains substantially stable while the development setup changes.
 Each later phase also benefits from your growing domain knowledge, so the comparison supports a conditional engineering judgment rather than a universal model ranking.

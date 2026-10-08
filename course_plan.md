@@ -54,9 +54,9 @@ They produce three independent implementations of one common, bounded applicatio
 The required behavior and acceptance checks stay stable while the AI-assisted development setup changes.
 In short:
 
-- Establish - build a working baseline with a locally hosted model and a single-agent workflow.
-- Challenge - build the same required behavior afresh with a comparison model and compare the process and result.
-- Compare - build it again with an agent fleet, load the fleet's execution trace into the resulting application as debugging data, then measure, explain, and critique all three implementations and workflows.
+- Establish - build a working baseline with an approved large model and a single-agent workflow.
+- Challenge - build the same required behavior afresh with an approved small model and compare the process and result.
+- Compare - build it again with a declared fleet of small models, large models, or a mixture, load the fleet's execution trace into the resulting application as debugging data, then measure, explain, and critique all three implementations and workflows.
 
 The full handover-and-return cycle is no longer the main mechanism.
 A bounded cross-team audit should preserve the unfamiliar-system lesson: another group runs the project from its documentation, applies the common checks, identifies a hidden assumption, and attempts one phase-specific but structurally equivalent change.
@@ -67,25 +67,29 @@ The highest-leverage operational opportunities before the first run are recorded
 
 ## AI development-system comparison
 
-The progression compares a local single agent, a single agent using a second approved model, and a declared agent fleet.
+The progression compares a large-model single agent, a small-model single agent, and a declared agent fleet with approved model assignments.
+Both single-agent models may be hosted by the department; size and hosting are separate choices.
+The first phase introduces the engineering workflow, the second tests which practices transfer under the small-model configuration, and the third investigates coordination and model assignment.
 Model capability is an observed, task-dependent result rather than a ranking built into the phase names.
 
 The comparison has two main transitions.
 The three builds are comparative engineering case studies: practice, design, model, and environment can change together, so their differences do not identify model or orchestration effects.
 Establish to Challenge changes the assigned model and potentially its serving configuration while keeping the single-agent workflow broadly comparable.
 Record changes to tools, context, hardware, and hosting so they are not mistaken for effects of model capability alone.
-Challenge to Compare changes orchestration while keeping the fleet's base model declared and, preferably, equal to the Challenge model.
-This avoids treating a fleet as if it were a model category.
-Within Compare, one bounded paired task on a frozen repository provides a narrower single-agent versus fleet contrast under the same model, checks, and resource limits; it replaces part of the existing comparison work and remains exploratory.
+Challenge to Compare changes orchestration and may also change model assignment; B's small model remains the reference configuration.
+Declare role/task assignments, actual routes, fallback, and the hypothesis about accepted quality, time, and total cost.
+Within Compare, one bounded paired task on a frozen repository provides a narrower single-agent versus fleet contrast under the same small model, checks, routing policy, and resource limits; it replaces part of the existing comparison work and remains exploratory.
+An optional small-only/mixed-fleet comparison holds the task graph fixed and assigns a large model to one named role within the remaining rehearsal budget.
+Mixed fleets are permitted for the main C implementation without requiring another complete application or a new submission.
 
 Possible phase mapping:
 
-- Establish: use a supported locally hosted model and a single-agent workflow to create the smallest compliant implementation and the first evidence package.
-- Challenge: start from the same specification, not the Establish code, and use a comparison model through a single-agent workflow.
+- Establish: use a supported large model and a single-agent workflow to create the smallest compliant implementation and the first evidence package.
+- Challenge: start from the same specification, not the Establish code, and use a small model through a single-agent workflow.
   Compare capability, speed, defects, architecture, review effort, and resource use.
 - Compare: build a third implementation through bounded fleet roles and explicit integration.
   Transform the fleet trace into application data so the result becomes a debugging and observability tool for its own development workflow.
-  Compare the fleet with the comparison-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, and quality.
+  Compare the fleet with the small-model single-agent workflow and analyze coordination cost, duplicated work, review throughput, quality, and any changed model assignments.
 
 This arc can help grading: evaluate the common required behavior, scalability reasoning, quality of evidence, and the group's ability to constrain, generate, validate, integrate, and review AI-assisted work.
 Do not reward generated output volume.

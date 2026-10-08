@@ -46,11 +46,11 @@ A modest implementation can earn full credit when it satisfies the contract and 
 
 ### Establish-specific criteria: 10 points
 
-| Criterion                                         | Points | Full-credit evidence                                                                                                                                                          |
-| ------------------------------------------------- | -----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Local single-agent constraint and project harness |    0-4 | The declared local-model workflow is followed; instructions, feature and architecture material, commands, and checks make accepted work reviewable; manual work is disclosed. |
-| Baseline and bounded scalability claims           |    0-4 | The two initial claims, shared workload, primary pressure, observation baseline, and evidence limits provide a repeatable starting point for later phases.                    |
-| Ownership and local-workflow reflection           |    0-2 | The ownership card and reflection distinguish model, harness, hardware or environment, project, and human contributions without turning impressions into causal claims.       |
+| Criterion                                               | Points | Full-credit evidence                                                                                                                                                          |
+| ------------------------------------------------------- | -----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Large-model single-agent constraint and project harness |    0-4 | The declared large-model workflow is followed; instructions, feature and architecture material, commands, and checks make accepted work reviewable; manual work is disclosed. |
+| Baseline and bounded scalability claims                 |    0-4 | The two initial claims, shared workload, primary pressure, observation baseline, and evidence limits provide a repeatable starting point for later phases.                    |
+| Ownership and workflow reflection                       |    0-2 | The ownership card and reflection distinguish model, harness, hardware or environment, project, and human contributions without turning impressions into causal claims.       |
 
 ### Challenge-specific criteria: 10 points
 

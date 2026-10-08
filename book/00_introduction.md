@@ -54,16 +54,18 @@ The required browser-visible behavior remains substantially stable while product
 
 Each phase begins from a fresh implementation and changes the development setup deliberately:
 
-1. **Establish:** a locally hosted model in a single-agent workflow produces implementation A and its evidence baseline.
-2. **Challenge:** a second, approved model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
-3. **Compare:** a declared agent fleet produces implementation C before all three applications and development workflows are compared.
+1. **Establish:** an approved large model in a single-agent workflow produces implementation A and its evidence baseline.
+2. **Challenge:** an approved small model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
+3. **Compare:** a declared fleet of small models, large models, or a mixture produces implementation C before all three applications and development workflows are compared.
 
 {{ import "site/includes/course-progression-figure.html" }}
 
-The **comparison model** is the model assigned to Challenge, chosen to test a stated hypothesis about task quality, cost, or development effort.
-Local describes where inference runs; it does not name a capability class.
+Large and small describe the relative model configurations assigned for the course; the [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) publishes their identities and the basis for that distinction.
+Both may be hosted by the department; hosting location is separate from size.
 Both phases may use foundation models: broadly pretrained models adaptable to many tasks, as defined in the [Stanford report that introduced the term](https://crfm.stanford.edu/report.html).
 Neither hosting location nor model size establishes which workflow will perform better on the course tasks.
+The large-model first phase gives students a starting environment for learning the workflow; the small-model phase tests which practices transfer, and the fleet phase investigates coordination and model assignment.
+Whether those choices improve accepted quality, time, or cost remains a question for the evidence.
 
 The comparison is bounded rather than perfectly controlled.
 You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.

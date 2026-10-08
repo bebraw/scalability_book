@@ -5,6 +5,8 @@ It is a transformation target, not a universal export format for agent tools and
 
 The example contains one accepted fleet run, two agents, one human integration owner, and three dependent tasks.
 Its events include delegation, start, handoff, failure, retry, validation, review, human intervention, and completion.
+The fixture uses synthetic small-model identities and illustrative costs, not measured performance or prices.
+A mixed-model export should preserve each actor's assigned model and any per-attempt routing or substitutions in event metadata or linked evidence.
 
 Files:
 

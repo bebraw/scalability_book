@@ -166,8 +166,11 @@ Then assign bounded work such as:
 Role names are illustrative.
 Grade whether every task has an objective, allowed files and tools, expected output, validation commands, non-goals, owner, and stopping condition.
 If two roles must edit the same shared contract, resolve that decision before they branch or reduce the fleet.
-Use separate workspaces or worktrees for concurrent writers, and pin the same declared base model for the single-agent and fleet runs where possible.
-Record any substitution as a confounding factor.
+Use separate workspaces or worktrees for concurrent writers.
+The Challenge small model is the reference configuration; an approved C fleet may assign small models, large models, or a mixture to its roles or tasks.
+State the quality, time, or cost hypothesis behind each assignment, preserve the actual model and route used for each attempt, and record substitutions and fallback.
+For the required bounded single-agent/fleet pair, pin the same small-model configuration and routing policy so the contrast examines orchestration.
+An optional model-assignment pair keeps the fleet's task graph fixed while assigning a large model to one named role; the [Compare specification](/project/compare/#5-4-compare-one-agent-with-the-fleet) defines the limits.
 
 ### Research note — A clean merge is not a correct integration
 
@@ -270,6 +273,9 @@ Repeated agent agreement can also preserve a shared blind spot; resolve findings
 
 Measure time and cost through acceptance, including failed runs, duplicated exploration, handoffs, merge conflicts, retries, model use, and active human integration and review.
 Record [reviewer backlog](/concepts/#review-budget) alongside completed tasks to see whether the fleet is exceeding the team's acceptance capacity.
+For mixed fleets, report usage by model and count every worker, retry, and failed attempt in the total.
+State the pricing or departmental resource-cost basis; department-provided access does not establish zero inference cost.
+Compare accepted behavior and defects, time through integration and human acceptance, and total cost rather than treating a faster model reply as a completed change.
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.

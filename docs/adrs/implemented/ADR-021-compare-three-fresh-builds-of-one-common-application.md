@@ -1,6 +1,6 @@
 # ADR-021: Compare three fresh builds of one common application
 
-**Status:** Implemented
+**Status:** Superseded by [ADR-039](ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md)
 
 **Date:** 2026-10-05
 

@@ -4,8 +4,8 @@ The course uses one common application contract and three phase-specific develop
 
 1. [Project introduction](00_introduction.md) — the three projects, group and individual responsibilities, staged submissions, class access, and shared course guidelines.
 2. [Common project specification](00_common_project.md) — required behavior, technical freedom, acceptance scenarios, shared runtime workload, transfer policy, evidence, and cross-team audit.
-3. [Establish](01_establish.md) — implementation A with a locally hosted single agent.
-4. [Challenge](02_challenge.md) — implementation B with a comparison-model single agent.
+3. [Establish](01_establish.md) — implementation A with a large-model single agent.
+4. [Challenge](02_challenge.md) — implementation B with a small-model single agent.
 5. [Compare](03_compare.md) — implementation C with an agent fleet, a trace-based debugging view of the fleet itself, and the final comparison.
 
 The [course environment sheet](course_environment.md) defines the model, harness, access, budget, privacy, and fallback assignments for the current course run.
@@ -21,11 +21,11 @@ The **Project artifact** section at the end of each main chapter is a staged che
 The common bundle and the current phase specification are the authoritative submission contract.
 One clearly structured evidence document may satisfy several checkpoints when its headings make the required evidence easy to locate.
 
-| Phase     | Chapter checkpoints                                                                                                                                                                     | Where they are submitted                                                   |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Establish | Two bounded scalability claims; project harness and representative AI-use record; measurement and observation baseline                                                                  | Common bundle plus the Establish ownership card and local-model reflection |
-| Challenge | Architecture hypothesis and updated ownership card; standardized friction audit; documented-case transfer, pressure map, and Little's Law check                                         | Common bundle plus the Challenge A-B comparison                            |
-| Compare   | Fleet plan, correction, and transformed trace; three-way scaling comparison, implemented response, deployment evidence, and target design; final evidence matrix and decision narrative | Common bundle plus the Compare fleet evidence and final A-B-C package      |
+| Phase     | Chapter checkpoints                                                                                                                                                                     | Where they are submitted                                                            |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Establish | Two bounded scalability claims; project harness and representative AI-use record; measurement and observation baseline                                                                  | Common bundle plus the Establish ownership card and large-model workflow reflection |
+| Challenge | Architecture hypothesis and updated ownership card; standardized friction audit; documented-case transfer, pressure map, and Little's Law check                                         | Common bundle plus the Challenge A-B comparison                                     |
+| Compare   | Fleet plan, correction, and transformed trace; three-way scaling comparison, implemented response, deployment evidence, and target design; final evidence matrix and decision narrative | Common bundle plus the Compare fleet evidence and final A-B-C package               |
 
 When a chapter suggests an optional lab or advanced appendix exercise, it becomes required only if the common or phase specification names it or the instructor announces it before the relevant phase begins.
 

@@ -4,9 +4,11 @@ The common contract, phase briefs, introduction and rubric in `specifications/` 
 The course interface's authored checklist in `shared/course-requirements.ts` summarizes where students should index their evidence; it does not replace those documents or determine grades.
 
 Each course run stores a requirement edition on creation.
-Historical runs without that field use the fixed first edition, `2026-10-v1`, rather than the current edition.
-The current `2026-10-v2` edition adds an explicitly approved solo route across all three phases and retains the group route; its `2026-10-solo-equivalence-v2` rubric preserves numeric scoring and passing rules while replacing teammate-specific evidence for solo students.
-The published snapshots below are immutable after publication, including their checklist text.
+The course has not yet run; `2026-10-v2` is the sole pre-course edition, with large-model Establish, small-model Challenge, and declared small/large or mixed-model fleets in Compare.
+The `2026-10-solo-equivalence-v2` rubric retains the group and approved solo routes with the same numeric scoring and passing rules.
+Earlier unused requirement and rubric contracts have been removed.
+Before the first course run, the current owners, checklist, and snapshots may be revised together in place.
+Once a real run begins, its snapshots and checklist are immutable and later changes require a new edition.
 The site builds readable archived briefs and Markdown downloads under `/project/requirements/<edition>/<document>/`.
 Links among the briefs stay within their edition; links to supporting book concepts may follow the current book.
 
@@ -18,14 +20,14 @@ The digests detect drift; they do not establish the quality or semantic complete
 To revise requirements:
 
 1. Edit the owning documents and review the common and phase checklist against their complete deliverables and rubric.
-2. Add a new independently retained edition in `shared/course-requirements.ts` and make it `requirementVersion`; retain every previous edition and `legacyRequirementVersion`.
-   Do not reuse mutable common/phase arrays in a way that changes an old edition.
-3. Run `node scripts/snapshot-course-requirements.ts <new-edition>`.
+2. Before the first run, update the sole edition in `shared/course-requirements.ts` and regenerate its snapshots together with the owner changes.
+   After a run begins, add a new independently retained edition and make it `requirementVersion`; retain every edition used by a run and avoid mutable shared arrays that change an earlier checklist.
+3. Run `node scripts/snapshot-course-requirements.ts <edition>`.
    It creates a new directory and refuses to overwrite an existing edition.
+   For an authorized pre-course revision, remove only the unused edition directory before regenerating it; never do this for an edition used by a real run.
 4. Verify types, requirement/checklist tests, the affected course browser flow, build and HTML validation.
    Inspect the archived pages and their evidence links.
 5. Commit the owner changes, new checklist and snapshots together before creating runs on that edition.
 
-Existing runs and frozen checklists are retained.
 A change to the numerical rubric needs its own supported grading version; changing a checklist does not change scoring rules.
-Do not update an old manifest to bless edits to a published edition.
+After the course begins, do not update an old manifest to bless edits to a run's contract.

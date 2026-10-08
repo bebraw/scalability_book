@@ -69,7 +69,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-018](implemented/ADR-018-offer-optional-agent-explorations-with-separate-worked-reasoning.md)  | Offer task-based optional explorations, prediction-led guidance, and separate worked reasoning.                                                   |
 | [ADR-019](implemented/ADR-019-publish-self-study-through-a-pinned-public-exporter.md)               | Build public self-study modules through a pinned exporter without hosting its authoring service.                                                  |
 | [ADR-020](implemented/ADR-020-generate-reading-and-lecture-pdfs-from-versioned-sources.md)          | Regenerate portable reading and lecture artifacts from reviewed sources.                                                                          |
-| [ADR-021](implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)              | Compare fresh local-model, comparison-model, and fleet builds of a stable application brief.                                                      |
+| [ADR-021](implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)              | Superseded by ADR-039; initially compare fresh local-model, comparison-model, and fleet builds of a stable application brief.                     |
 | [ADR-022](implemented/ADR-022-use-a-shared-runtime-protocol-and-bounded-pressure-experiments.md)    | Use a shared measurement protocol and bounded, cumulative pressure experiments.                                                                   |
 | [ADR-023](implemented/ADR-023-test-unfamiliar-system-work-through-bounded-audits.md)                | Test setup and change friction through equivalent, time-bounded cross-team audits.                                                                |
 | [ADR-024](implemented/ADR-024-make-prose-reviewable-and-derive-chapter-dates-from-git.md)           | Keep prose changes inspectable and derive publication dates from complete source history.                                                         |
@@ -87,6 +87,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-036](implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md)                 | Open Notebook and the lower-right Teaching assistant independently with a shared connection and separate context.                                 |
 | [ADR-037](implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md)              | Replace printed pairing codes with explicit origin-gated connection, retaining sessions and preparing protocol 2.                                 |
 | [ADR-038](implemented/ADR-038-support-local-models-through-the-learning-companion.md)               | Support a direct local-model provider with retained context, bounded replay and explicit discussion/native-tool modes; LM Studio verified first.  |
+| [ADR-039](implemented/ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md)                      | Sequence large-model and small-model single agents, then declared small/large or mixed-model fleets; replace unused pre-course contracts.         |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

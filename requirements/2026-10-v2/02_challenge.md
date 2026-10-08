@@ -1,6 +1,6 @@
 # Challenge Project
 
-## Implementation B: Comparison Model, Single Agent
+## Implementation B: Small Model, Single Agent
 
 The [common project specification](00_common_project.md) applies to this phase.
 
@@ -8,10 +8,12 @@ The [common project specification](00_common_project.md) applies to this phase.
 
 ## 1. Purpose
 
-Challenge creates a fresh implementation of the same Work Activity Tracker using a comparison model through a single-agent workflow.
+Challenge creates a fresh implementation of the same Work Activity Tracker using a small model through a single-agent workflow.
 
-The purpose is to compare implementation B with the local-model baseline.
-The approved comparison model must differ from the Establish model; its hosting and harness configuration must be declared.
+The purpose is to compare implementation B with the large-model baseline.
+The approved small model must differ from the Establish model; its hosting and harness configuration must be declared.
+The department may host both models; large and small describe the assigned model configurations, not where inference runs.
+Use the domain knowledge and permitted lessons from A to investigate which specifications, task boundaries, and validation practices help with B.
 It may handle the same tasks differently, but higher quality, lower cost, and less review are hypotheses to test.
 A model that generates more code may also introduce unnecessary complexity, plausible-looking defects, greater cost, or more demanding review work.
 
@@ -29,7 +31,7 @@ Use:
 
 - the same common specification and [acceptance scenarios](/concepts/#acceptance-criteria);
 - the transfer policy in the common specification;
-- the approved comparison model;
+- the approved small model;
 - one coding-agent process at a time;
 - normally the same primary stack chosen for Establish.
 
@@ -43,7 +45,7 @@ The final comparison must then treat the stack change as a confounding factor ra
 
 You may:
 
-- use the approved comparison model for planning, implementation, testing, explanation, and review;
+- use only the approved small-model route for planning, implementation, testing, explanation, and review; disable unapproved routes and automatic model fallback or make them fail closed;
 - begin new agent sessions when needed;
 - use ordinary deterministic development tools;
 - use the permitted shared artifacts described in the transfer policy.
@@ -52,7 +54,7 @@ You may not:
 
 - copy application code or implementation-specific tests from implementation A;
 - use an agent fleet, subagents, or parallel coding agents;
-- describe implementation B as a comparison-model result without recording substantial manual correction.
+- describe implementation B as a small-model result without recording substantial manual correction.
 
 The group remains responsible for every submitted decision and line of code, regardless of who or what generated it.
 
@@ -96,7 +98,7 @@ Compare the cumulative pressure evidence for A and B:
 
 - Did the new implementation make different architectural assumptions?
 - Does it fail or slow down in a different place?
-- Did the comparison model introduce infrastructure or abstractions that the evidence does not justify?
+- Did the small model introduce infrastructure or abstractions that the evidence does not justify?
 - Which implementation responds better to the pressures studied, and according to what evidence?
 
 For one queue, pool, request path, or other conserved-work boundary in A or B, apply [Little's Law](/concepts/#little-law) over one consistent observation window.
@@ -144,7 +146,7 @@ A larger implementation B is not automatically a better implementation.
 
 ## Solo route
 
-Build a fresh B under the same transfer policy with the approved comparison model and one-agent boundary.
+Build a fresh B under the same transfer policy with the approved small model and one-agent boundary.
 Keep the required common behavior, baseline workload and primary-pressure procedure comparable with A.
 Retain the architecture hypothesis, secondary pressure, documented-case transfer, Little's Law check, ownership card, friction audit and A–B interpretation.
 Report growing domain knowledge and solo human review effort as comparison limitations.
@@ -157,7 +159,7 @@ Complete the solo portfolio equivalents and ordinary lecture activities; improve
 
 ## Instructor Notes
 
-- Choose the approved comparison model and agent environment before the phase begins.
+- Choose the approved small model and agent environment before the phase begins.
 - Keep the single-agent boundary operationally clear.
   A tool that silently delegates to several agents may invalidate the intended comparison.
 - Require the same primary stack by default, but allow justified exceptions.

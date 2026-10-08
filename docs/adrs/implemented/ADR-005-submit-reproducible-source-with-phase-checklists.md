@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-05
 
+**Later revision:** [ADR-039](ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md) revises the phase model assignments and replaces the unused pre-course editions and legacy fallback recorded here.
+
 ## Context
 
 Students need clear requirements for each phase, and auditors need a small, usable copy of the assessed implementation.

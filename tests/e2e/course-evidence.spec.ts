@@ -268,9 +268,9 @@ test("student indexes incomplete evidence, appends technical files and links ear
     "Later technical results; baseline limits retained.",
   );
   const archived = await page.request.get(
-    "/project/requirements/2026-10-v1/compare/",
+    "/project/requirements/2026-10-v2/compare/",
   );
   expect(archived.status()).toBe(200);
-  expect(await archived.text()).toContain("Archived requirements 2026-10-v1");
+  expect(await archived.text()).toContain("Archived requirements 2026-10-v2");
   await context.close();
 });

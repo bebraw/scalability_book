@@ -620,7 +620,7 @@ function getQuestions(values: DirectionValues) {
   }
   if (questions.length === 0) {
     questions.push(
-      "Which choice would you reconsider first if the local model or cross-team audit struggles with this direction?",
+      "Which choice would you reconsider first if the assigned model or cross-team audit struggles with this direction?",
     );
   }
 

@@ -1,6 +1,48 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
+  test("publishes the model-size sequence and bounded mixed-fleet policy", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/project/introduction/");
+    const prose = page.locator(".project-prose");
+    await expect(prose).toContainText("approved large model");
+    await expect(prose).toContainText("approved small model");
+
+    await page.goto("/project/establish/");
+    await expect(
+      page.getByRole("heading", {
+        name: "Implementation A: Large Model, Single Agent",
+      }),
+    ).toBeVisible();
+    await page.goto("/project/challenge/");
+    await expect(
+      page.getByRole("heading", {
+        name: "Implementation B: Small Model, Single Agent",
+      }),
+    ).toBeVisible();
+    await page.goto("/project/compare/");
+    await expect(prose).toContainText(
+      "an approved fleet may use small models, large models, or a mixture",
+    );
+    await expect(prose).toContainText("same small-model version");
+    await expect(prose).toContainText(
+      "An optional model-assignment comparison",
+    );
+
+    const pinned = await request.get(
+      "/project/requirements/2026-10-v2/compare/",
+    );
+    expect(pinned.status()).toBe(200);
+    expect(await pinned.text()).toContain(
+      "An optional model-assignment comparison",
+    );
+    expect(
+      (await request.get("/project/requirements/2026-10-v1/compare/")).status(),
+    ).toBe(404);
+  });
+
   test("publishes the assessment rubric and preserves specification fragments", async ({
     page,
     request,

@@ -15,9 +15,10 @@ Preserve a negative result when it is informative instead of spending the remain
   Appendix D's Pi extension example is an optional code-reading exercise, not an implicit tool assignment.
 - Teach explicit context, scoped capabilities, cancellation, and reviewable traces through the assigned harness.
   Students should identify where each control is enforced and what the trace can establish.
-- Connect the assigned harness to the comparison: locally hosted single agent for implementation A, comparison-model single agent for implementation B, and an explicitly designed fleet for implementation C.
-- State the fleet's base model and keep it equal to the implementation B comparison model when practical.
-  The comparison should change orchestration deliberately instead of changing model capability and orchestration at once.
+- Connect the assigned harness to the comparison: large-model single agent for implementation A, small-model single agent for implementation B, and an explicitly designed fleet for implementation C.
+- Use B's small model as the fleet reference and permit approved small/large model mixtures with explicit assignments.
+  Keep the required single-agent/fleet probe on the same small model; an optional model-assignment contrast fixes the task graph.
+  Full mixed-fleet builds compare development systems rather than isolate orchestration.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit.
   This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
 - Introduce a small agent fleet with roles such as `scout`, `planner`, `implementer`, and `reviewer`.

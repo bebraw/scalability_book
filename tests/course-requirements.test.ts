@@ -9,12 +9,17 @@ import {
 } from "../scripts/lib/course-requirements.ts";
 import {
   checklistEntries,
+  requirementVersion,
   requirementsFor,
 } from "../shared/course-requirements.ts";
 import { renderMarkdown } from "../scripts/lib/markdown.ts";
 
-test("run checklists link every entry to its archived owner; legacy runs retain a fixed edition", async () => {
+test("run checklists link every entry to its pinned owner and reject unsupported editions", async () => {
   const editions = await readRequirementEditions(process.cwd());
+  assert.deepEqual(
+    editions.map((edition) => edition.version),
+    [requirementVersion],
+  );
   const bibliography = await readFile("bibliography.bib", "utf8");
   for (const edition of editions) {
     const rendered = new Map(
@@ -40,7 +45,7 @@ test("run checklists link every entry to its archived owner; legacy runs retain 
         );
     }
   }
-  assert.equal(requirementsFor({}).version, "2026-10-v1");
+  assert.equal(requirementsFor({}).version, "2026-10-v2");
   assert.throws(
     () => requirementsFor({ requirements: "unavailable-edition" }),
     /Unsupported/,
@@ -48,9 +53,9 @@ test("run checklists link every entry to its archived owner; legacy runs retain 
   assert.equal(
     rewriteRequirementLinks(
       "[Common](00_common_project.md#6-minimum-project-harness) [Compare](/project/compare/#6-deliverables)",
-      "2026-10-v1",
+      "2026-10-v2",
     ),
-    "[Common](/project/requirements/2026-10-v1/common/#6-minimum-project-harness) [Compare](/project/requirements/2026-10-v1/compare/#6-deliverables)",
+    "[Common](/project/requirements/2026-10-v2/common/#6-minimum-project-harness) [Compare](/project/requirements/2026-10-v2/compare/#6-deliverables)",
   );
 });
 test("build rejects changed live owners, archived briefs and checklist digests rather than drifting a run", async (t) => {
@@ -72,7 +77,7 @@ test("build rejects changed live owners, archived briefs and checklist digests r
   await writeFile(owner, original);
   const archived = path.join(
     directory,
-    "requirements/2026-10-v1/03_compare.md",
+    "requirements/2026-10-v2/03_compare.md",
   );
   const archivedOriginal = await readFile(archived, "utf8");
   await writeFile(
@@ -86,7 +91,7 @@ test("build rejects changed live owners, archived briefs and checklist digests r
   await writeFile(archived, archivedOriginal);
   const manifestFile = path.join(
     directory,
-    "requirements/2026-10-v1/manifest.json",
+    "requirements/2026-10-v2/manifest.json",
   );
   const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
   manifest.checklistSha256 = "0".repeat(64);

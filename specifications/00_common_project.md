@@ -6,9 +6,9 @@ This specification defines the application that your group will implement three 
 The required behavior remains substantially the same.
 The development setup changes:
 
-1. **Establish:** locally hosted model and a single-agent workflow.
-2. **Challenge:** comparison model and a single-agent workflow.
-3. **Compare:** an agent fleet using a declared base model.
+1. **Establish:** large model and a single-agent workflow.
+2. **Challenge:** small model and a single-agent workflow.
+3. **Compare:** an agent fleet with a declared model configuration.
 
 Each phase produces a separate implementation.
 The purpose is not to find one universally best model, framework, or architecture.
@@ -485,7 +485,7 @@ Identify the group and phase in the evidence index, link the submitted revision 
 
 - implementation identifier and commit;
 - language, framework, storage, and deployment approach;
-- model name and whether inference was local, departmental, or externally hosted;
+- model names, assigned large or small configurations, and whether inference was local, departmental, or externally hosted;
 - agent tool and version or retrieval date, together with any imported skill, plugin, or instruction bundle that materially affected the workflow;
 - orchestration configuration, if any;
 - local hardware class or hosted environment relevant to the result, paths by which project data may leave that environment, and any fallback policy.
@@ -497,13 +497,14 @@ Mark unavailable fields as unavailable rather than spending project time estimat
 
 - elapsed project time;
 - estimated active human time;
-- approximate model usage, cost, or locally measurable resource use;
+- approximate model usage across all workers and attempts, cost under a declared pricing or departmental resource-cost basis, or measurable resource use;
 - failed or abandoned attempts worth noting;
 - important human interventions and corrections.
 - one representative AI-assisted task record containing the task brief, relevant model and agent configuration, checks, trace or compact execution evidence, human correction, acceptance decision, and known limits.
 
 Exact accounting is not expected when a tool does not expose it.
 State what could and could not be measured.
+Department-provided access may remove student spending while still consuming inference resources; report the cost basis separately from the student's payment.
 
 ### 9.3 Product evidence
 
@@ -698,7 +699,7 @@ The phase specifications describe the emphasis and deliverables for each build.
   Clarify a requirement when groups cannot tell what observable capability is required, but avoid resolving design choices merely because implementations differ.
 - Publish any course-provided acceptance checks and measurement workload in a stack-neutral form.
   Prefer observable behavior over framework-specific APIs or file layouts.
-- Decide whether every group receives the same local model endpoint or whether local hardware is part of the exercise.
+- Publish supported departmental or other approved endpoints for the large and small models, and declare each fleet's permitted model set.
   If hardware varies, require it to be reported and avoid ranking groups by raw latency.
 - Keep the exact prompts in the instructor-only probe sheet out of published student materials.
   Release only the current phase's prompt after submission and preserve the common time box and reporting rubric.

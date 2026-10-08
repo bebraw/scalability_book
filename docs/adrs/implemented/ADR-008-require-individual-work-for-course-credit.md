@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-05
 
+**Later revisions:** [ADR-026](ADR-026-support-an-approved-solo-course-route.md) adds approved solo assessment equivalents; [ADR-039](ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md) makes that rubric the sole pre-course version and removes unused legacy compatibility.
+
 ## Context
 
 Shared project scores could otherwise let a student pass without participating in lectures or submitting meaningful individual assessment.

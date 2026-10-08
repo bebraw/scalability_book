@@ -1,7 +1,7 @@
 # Establish — Build and measure a baseline
 
 Establish creates implementation A and a baseline for the later comparisons.
-Define what should remain true under pressure, build the common behavior through the approved local single-agent workflow, and record what the first implementation actually does.
+Define what should remain true under pressure, build the common behavior through the approved large-model single-agent workflow, and record what the first implementation actually does.
 
 ## From scalability claims to comparable evidence
 

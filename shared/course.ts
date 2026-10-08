@@ -3,10 +3,9 @@ import type {
   EvidenceCheckpoint,
   PhaseReference,
 } from "./course-requirements.ts";
-// Historical runs retain their published rubric and requirements.
+// Runs pin the published rubric and requirement edition.
 export const phases = ["establish", "challenge", "compare"] as const;
 export type Phase = (typeof phases)[number];
-export const legacyRubricVersion = "2026-10-individual-minima-v1";
 export const rubricVersion = "2026-10-solo-equivalence-v2";
 export const commonCriteria = [
   ["Required behavior and correctness", 6],
@@ -17,7 +16,7 @@ export const commonCriteria = [
 ] as const;
 export const phaseCriteria = {
   establish: [
-    ["Local workflow and project harness", 4],
+    ["Single-agent workflow and project harness", 4],
     ["Baseline and bounded claims", 4],
     ["Ownership and reflection", 2],
   ],
@@ -99,7 +98,7 @@ export interface Course {
   nextGroupNumber?: number;
   id: string;
   name: string;
-  rubric: typeof rubricVersion | typeof legacyRubricVersion;
+  rubric: typeof rubricVersion;
   staff: string[];
   students: Student[];
   phases: Record<Phase, PhaseSetup>;

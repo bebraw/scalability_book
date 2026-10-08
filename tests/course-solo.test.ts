@@ -414,23 +414,25 @@ test("a solo student completes all three phases with independent review, portfol
   );
 });
 
-test("solo allocation requires explicit approval and the new edition; frozen routes cannot be rewritten", async (t) => {
+test("solo allocation requires explicit approval and a supported edition; frozen routes cannot be rewritten", async (t) => {
   const f = await fixture(t),
     course = f.config.value;
-  const legacy = {
+  const unsupported = {
     ...course,
-    rubric: "2026-10-individual-minima-v1" as const,
-    requirements: "2026-10-v1",
+    requirements: "unsupported-edition",
   };
   const groups = course.phases.establish.groups;
   assert.throws(
     () =>
       updateAdministration(
-        legacy,
+        unsupported,
         [],
         "groups",
         "establish",
-        { expected: administrationRevisions(legacy).groups.establish, groups },
+        {
+          expected: administrationRevisions(unsupported).groups.establish,
+          groups,
+        },
         teacher.id,
         before,
       ),

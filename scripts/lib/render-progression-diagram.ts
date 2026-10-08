@@ -32,7 +32,7 @@ export const courseProgressionDiagram: ProgressionDiagram = {
   id: "course-progression",
   title: "One application, three development systems",
   description:
-    "A shared Work Activity Tracker specification feeds three fresh implementations. Domain knowledge, evidence, and development skill accumulate from Establish through Challenge and Compare, while application code and implementation-specific tests do not carry between builds. The three results are compared at the end.",
+    "A shared Work Activity Tracker specification feeds three fresh implementations. Domain knowledge, evidence, and development skill accumulate from Establish through Challenge and Compare, while application code and implementation-specific tests do not carry between builds. Establish uses a large model, Challenge a small model, and Compare a declared fleet of small models, large models, or a mixture. The three results are compared at the end.",
   shared: {
     title: "One Work Activity Tracker specification",
     detail: "Acceptance material · pressures · reporting categories",
@@ -41,17 +41,17 @@ export const courseProgressionDiagram: ProgressionDiagram = {
     {
       phase: "Establish",
       build: "Implementation A",
-      setup: ["Local model", "Single-agent workflow"],
+      setup: ["Large model", "Single-agent workflow"],
     },
     {
       phase: "Challenge",
       build: "Implementation B",
-      setup: ["Comparison model", "Single-agent workflow"],
+      setup: ["Small model", "Single-agent workflow"],
     },
     {
       phase: "Compare",
       build: "Implementation C",
-      setup: ["Declared agent fleet", "Multi-agent workflow"],
+      setup: ["Declared agent fleet", "Small, large, or mixed"],
     },
   ],
   outcome: {

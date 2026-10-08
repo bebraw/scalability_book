@@ -96,9 +96,9 @@ Each eval should define:
 
 Development ideas:
 
-- Define a small set of project-specific tasks during implementation A and record the local-model baseline.
-  Rerun the same tasks with the comparison-model and fleet workflows when implementations B and C become available.
-- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the comparison model.
+- Define a small set of project-specific tasks during implementation A and record the large-model baseline.
+  Rerun the same tasks with the small-model and fleet workflows when implementations B and C become available.
+- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the small model.
 - Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
 - Use human review for quality judgments that require understanding of the project.
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
@@ -266,7 +266,7 @@ Ideas to develop:
 - Students add one benchmark or load script for implementation A and preserve it for equivalent runs against implementations B and C.
 - Students add basic structured logging around event creation and querying.
 - Students run one measurement, document the result, and explain what the result does and does not prove.
-- Students define a small model-eval task set, run the permitted local-model baseline, and preserve the inputs for equivalent runs against implementations B and C.
+- Students define a small model-eval task set, run the permitted large-model baseline, and preserve the inputs for equivalent runs against implementations B and C.
 - Students use the measurement to identify one likely reconstruction pressure.
 - Students add one efficiency observation, such as resource use per event, database queries per request, bundle size, storage growth, or repeated background work.
 - Students propose one sustainability-oriented improvement and explain the trade-off it introduces.
@@ -282,8 +282,8 @@ Ideas to develop:
 - Define two linked benchmark layers: the same runtime workload for each web application and the same reporting schema for each AI-assisted development workflow.
 - Expand the workflow schema to include active human time, failed attempts, interventions, acceptance-test pass rate, defects found in review, setup friction, and approximate resource use.
   Raw token or speed figures alone are insufficient.
-- Explain the two comparisons separately: A–B primarily compares model setups; B–C primarily compares orchestration.
-  Require the fleet's base model and configuration to be declared.
+- Explain the two comparisons separately: A–B compares model setups; B–C also changes orchestration and may change model assignment.
+  Require the fleet's model set, assignments, actual routes and configuration to be declared; the matched small-model probe studies orchestration separately.
 - Add practice effects, optional feature scope, hardware differences, and selective reporting to the measurement-traps section.
 - Require the evidence template to be completed after every phase, not recreated from memory in the final week.
 - Make the implementation A public discussion use benchmark evidence.

@@ -33,6 +33,8 @@ The course-plan table describes the associated reading and project work as well 
 The slide drafts are a pool of framing and discussion material, especially in presentation-led sessions.
 
 Before each phase begins, complete the [course environment sheet](specifications/course_environment.md) and confirm supported access, budget, and fallback arrangements.
+Establish uses a large-model single agent, Challenge a small-model single agent, and Compare a declared fleet that may use small models, large models, or a mixture.
+Both single-agent models may be department-hosted; frame size and hosting separately, and keep the matched small-model probe distinct from any optional model-assignment comparison.
 Implementation A is submitted before Lecture 4, B before Lecture 7, and C before Lecture 9.
 Schedule the bounded cross-team audit after each submission within the existing project allocation; announce the audit window and probe release separately so setup and change work do not consume presentation time.
 
