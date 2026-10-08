@@ -82,7 +82,7 @@ It rehearses evidence joins, accounting, bypass detection, and late-effect reaso
 **Codemode** lets an agent write code that composes tool calls and processes intermediate results before returning a selected view to the model.
 :citet[ronacher2026codemode] distinguishes composition on the harness host from shell programs running in the target environment.
 His described interpreter restricts direct filesystem and network access while exposing tools; its effective reach therefore also depends on those tools' permissions.
-The [MCP tools specification](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) already supports structured and multimodal results.
+The [MCP tools specification](https://modelcontextprotocol.io/specification/2026-07-28/server/tools) supports structured and multimodal results.
 Check that the composition layer preserves errors, pagination, and decisive evidence across result shapes, using [Appendix A's output preflight](/appendices/evaluating-agentic-workflows/#qualify-the-served-configuration).
 
 Retaining a tool result in a session transcript lets later calls reuse it, but does not establish recovery of pending operations or deduplication of external effects.
@@ -105,9 +105,7 @@ Prompt injection in the untrusted content can then turn the agent's legitimate p
 ### Separate credential custody, action authorization, and containment
 
 A credential-injecting proxy can let an agent call a service while another process holds the real credential.
-[fnox's credential-proxy documentation](https://fnox.jdx.dev/guide/proxy) describes supplying placeholders and substituting credentials into matching HTTPS requests; it explicitly distinguishes this from an operating-system sandbox.
-[Claw Patrol's security model](https://clawpatrol.dev/docs/security-model/) also separates protection of injected credentials from broader host access and network containment.
-These are documented designs, accessed September 24, 2026; their effectiveness depends on the deployed configuration and its actual access paths.
+That does not by itself restrict service operations, host access, or network destinations.
 
 :ref[table:credential-control-properties]{text="The table below"} separates the properties to check.
 
@@ -200,17 +198,12 @@ Authority should follow the expected loss and recovery path, not the mere fact t
 
 ## External contribution policies
 
-Use this example when preparing an external issue or pull request.
-The [shared course guidelines](/project/introduction/#guidelines-for-course-work) distinguish course evidence from a receiving project's submission rules.
-The example below illustrates how private tooling, public authorship, and disclosure can be governed differently.
+Before preparing an external issue or pull request, read the receiving project's contribution and AI policies.
+Permission to use private assistance does not establish who may write or post public text, what must be disclosed, or who owns follow-up.
+Check each obligation separately and respect a project's refusal of particular assistance or submissions.
 
-For example, the [Human Responsible policy template, version 1.0.0](https://ai-policy.dev/policies/human-responsible/1.0.0), permits private tooling while requiring public text written and posted by the contributor, understood and tested changes, and human follow-up.
-It prohibits AI-disclosure notes and submissions from automated accounts.
-These are requirements for projects that adopt the template.
-
-Under that policy, a student can record private agent assistance in the course evidence while personally writing and posting the reviewed contribution text and owning the change.
-Answer provenance questions truthfully, avoid false claims of human-only production, and respect a project's refusal of particular assistance or submissions.
-Disclosure does not make a prohibited contribution acceptable; an external disclosure rule does not remove the course's evidence requirements.
+The [shared course guidelines](/project/introduction/#guidelines-for-course-work) require truthful provenance and accountable ownership.
+Record assistance in the course evidence even when the external project has different disclosure rules.
 
 ## Choose a delegation environment
 
@@ -272,8 +265,7 @@ Judge memory by the work it improves, including its initialization and maintenan
 
 Use the two-revision event-list fixture above, whose current response contains `items` and `nextCursor`.
 A discoverable [contract](/concepts/#contract) can still leave out an obligation.
-[Code Contracts](https://github.com/spolu/code-contracts) places identified requirements beside code, but its formatter checks syntax and duplicate identifiers rather than semantic compliance.
-[Decision Engineering](https://github.com/hpark0011/decision-engineering) records intended decisions, their dependencies, enforcement, and verification; the record still needs checking against actual consumers and behavior.
+A well-formed record still needs checking against actual consumers and behavior.
 
 Extend the fixture with a CSV export whose stated requirement is to include every event matching the selected filter.
 Keep the data fixed and use enough matching events to require at least two pages.
@@ -287,9 +279,8 @@ Record missed obligations, false alarms, and the effort to maintain the records 
 
 ### Test a human review gate
 
-[Human Todos](https://arsctx.com/blog/human-todos/) proposes marking consequential changes for human review and blocking selected implementation steps until a human resolves them.
-The marker makes a decision visible, but an unresolved-marker check cannot detect a marker the producing agent omitted.
-Use the pattern to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).
+A review marker makes a decision visible, but an unresolved-marker check cannot detect a required marker the producing agent omitted.
+Use this exercise to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).
 
 In a disposable branch or review fixture, declare that changing an existing endpoint's authorization or adding a new endpoint requires human review before acceptance.
 Check both cases: a rule limited to modified existing handlers would miss the new endpoint.

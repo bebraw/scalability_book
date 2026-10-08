@@ -27,9 +27,9 @@ Every approach adds durable state and operational ownership; replay-based engine
 
 I have encountered this problem repeatedly with local models in [Slideotter](/case-studies/slideotter/).
 A model may return structurally valid slide data that still contains metadata-like language in audience-visible fields.
-Slideotter treats this as a [semantic leak](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0050-visible-text-quarantine.md): authoring instructions, schema labels, sourcing notes, or layout guidance have crossed into presentation content.
+Slideotter treats this as a [semantic leak](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/adr/implemented/0050-visible-text-quarantine.md): authoring instructions, schema labels, sourcing notes, or layout guidance have crossed into presentation content.
 
-The [implemented progressive-generation workflow](https://github.com/bebraw/slideotter/blob/main/docs/adr/implemented/0012-progressive-slide-generation-preview.md) preserves completed slides and allows generation to resume from the failed slide.
+The [implemented progressive-generation workflow](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/adr/implemented/0012-progressive-slide-generation-preview.md) preserves completed slides and allows generation to resume from the failed slide.
 That is better than restarting the entire deck, but retry is not always the right product concept.
 Parts of the rejected slide may already be correct, and blindly regenerating it can discard useful work.
 

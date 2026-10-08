@@ -59,7 +59,7 @@ Without that property, stale dependencies and one-off repairs can eventually lea
 In my agent-assisted projects, remote CI has usually been too slow for the primary [feedback loop](/concepts/#feedback-loop): an agent can produce several changes during one cycle.
 I use local validation during iteration and retain clean, independent CI where the acceptance risk justifies it.
 
-I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template), whose [affected-guardrail decision](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/implemented/ADR-026-run-affected-guardrails-when-possible.md) documents the focused path and its fallbacks to broader validation.
+I have tried to encode this approach in [Vibe Template](https://github.com/bebraw/vibe-template), whose [affected-guardrail decision](https://github.com/bebraw/vibe-template/blob/4428c4351b98769c4ba839d55bc32672ffe02c8b/docs/adrs/implemented/ADR-026-run-affected-guardrails-when-possible.md) documents the focused path and its fallbacks to broader validation.
 The validation loop has several strengths:
 
 1. **Run focused checks during ordinary iteration.** Select tests, diagnostics, and mutation targets from the affected files where the dependency information is reliable.

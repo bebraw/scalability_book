@@ -14,6 +14,15 @@ The report is a snapshot; rerun the command after further edits.
 Git and Python 3.10 or newer must be available as `git` and `python3`.
 The generator uses only Python's standard library; the resulting HTML works offline without a server or external assets.
 
+## Serving a review
+
+When presenting a highlighted review to the user, serve it over loopback HTTP and provide a clickable browser URL.
+Open and inspect the rendered report before handing it over; a link to the HTML file alone is insufficient.
+
+Copy the current report into a dedicated directory under `.local/reviews/` and serve only that directory, bound to `127.0.0.1`, on an available port.
+Keep the server running until the user asks to close it.
+After further edits, regenerate the report and refresh the served copy.
+
 ## Reading the report
 
 Book chapters, case studies, and the bibliography come first, followed by assignments, slides, demo wording, teaching notes, documentation, and code.

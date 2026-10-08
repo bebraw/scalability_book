@@ -126,14 +126,13 @@ For an external issue or pull request, follow the receiving project's applicable
 Read them before preparing the submission: they may govern permitted assistance, who writes and posts public text, and disclosure.
 Respect a project's refusal of particular assistance or submissions; disclosure does not make a prohibited contribution acceptable.
 An external disclosure rule does not remove the course's evidence requirements.
-[Appendix D's contribution-policy example](/appendices/agent-system-security/#external-contribution-policies) examines how private tooling, public authorship, and disclosure can be governed differently.
+[Appendix D's review of contribution policies](/appendices/agent-system-security/#external-contribution-policies) separates private assistance from public authorship, disclosure, and follow-up obligations.
 
 ### Protect learning, not only output
 
 Immediate task performance is not the only outcome worth protecting.
-Across three randomized experiments involving short arithmetic and reading-comprehension tasks, brief AI assistance improved work while it was available but reduced later unaided performance and persistence.
-In a cross-sectional subgroup analysis of the second experiment, participants who reported using AI for direct answers later performed worse and skipped more than both the control group and those who reported using it for hints :citep[liu2026assistance].
-These tasks do not establish the long-term effect on professional programming, but they support a practical course rule: use agents for hints, critique, and verification when the underlying skill must remain yours.
+Use agents for hints, critique, and verification when the underlying skill must remain yours.
+Keep enough direct practice to explain and change the implementation yourself.
 
 ## Begin the first project
 

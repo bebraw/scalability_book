@@ -195,10 +195,6 @@ Notice that monitoring the proxy is still useful after the repair, but it no lon
 
 Energy use is harder to measure than latency or transferred bytes, and neither of those proxies is an automatic substitute for it :citep[kalliola2025energy].
 
-EcoAssist illustrates the need to check the product alongside resource use :citep[barrocas2026ecoassist].
-Its before-and-after benchmark reported reduced local CPU and GPU energy on selected standalone webpages using one M4 MacBook and Chrome testbed.
-In a separate lab study, some participants observed removed content or changed layouts after optimization.
-The measurements concern those pages and that device, exclude the optimizing model's full footprint, and are not a whole-system carbon estimate.
 An optimization must preserve the intended behavior as well as improve the selected resource measure.
 
 Run one bounded optimization experiment:
@@ -283,7 +279,7 @@ I have not established a practice of preserving complete agent transcripts or de
 When returning to a project, I rely mainly on code, documentation, and commit history to recover the implemented state and accepted intent.
 
 [Architecture Decision Records](/concepts/#decision-log) are especially useful.
-[Vibe Template's ADR workflow](https://github.com/bebraw/vibe-template/blob/main/docs/adrs/README.md) keeps proposed, accepted, implemented, and superseded decisions distinct.
+[Vibe Template's ADR workflow](https://github.com/bebraw/vibe-template/blob/4428c4351b98769c4ba839d55bc32672ffe02c8b/docs/adrs/README.md) keeps proposed, accepted, implemented, and superseded decisions distinct.
 I let agents draft records, but negotiate important choices carefully; implementation can then expose what an unresolved decision still needs to settle.
 
 Those records preserve the rationale I accepted, not every prompt, disagreement, retry, or abandoned path.

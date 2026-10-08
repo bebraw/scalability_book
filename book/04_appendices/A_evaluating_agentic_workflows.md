@@ -41,8 +41,7 @@ The following vocabulary helps keep those layers separate :citep[grace2026demyst
 These terms describe different measurement objects.
 A repository test is often one deterministic grader inside an agent evaluation rather than the entire evaluation.
 A public [benchmark](/concepts/#benchmark) is a shared evaluation suite designed for comparison across systems, while a local product or project evaluation should represent the work and failure modes that matter in its own setting.
-An RL environment additionally exposes a reward signal for optimization or training.
-Treating these as synonyms hides differences in task selection, incentives, and supported claims.
+Treating these as synonyms hides differences in task selection, measurement, and supported claims.
 
 Prefer grading the outcome when several valid paths can solve the task.
 Use the trace to diagnose failures, account for cost and intervention, and check process requirements that genuinely matter, such as permission compliance or a mandatory approval.
@@ -186,8 +185,7 @@ A project can reproduce the smaller experimental shape: hold the task, model, st
 The resulting difference measures performance on that task and those checks, not whether the guidance makes every application better in production.
 
 Literal task completion is not enough for an agent that can take actions.
-The proposed "Genie coefficient" asks how far an agent's behavior departs from a reasonable interpretation of the user's intent :citep[raghavan2026genie].
-It is a conceptual framework rather than a validated metric, but it suggests a useful evaluation split: score task success, permission compliance, unnecessary actions, side effects, and clarification quality separately.
+Score task success, permission compliance, unnecessary actions, side effects, and clarification quality separately.
 
 For the course project, evaluate one representative AI-assisted task twice: once for the correctness of the produced artifact and once for the quality of the workflow that produced it.
 Preserve the prompt or task brief, relevant context, model and tool versions, execution trace, checks, human corrections, and final acceptance decision.
@@ -321,8 +319,6 @@ Research distinguishes **routing**, which selects one model before it produces a
 Both depend on an accurate quality estimate; :citet[dekoninck2025routing] identify estimator quality as a critical condition for improving the cost-performance trade-off.
 In their SWE-Bench experiment, the post-generation estimator could use the task's ground-truth test outcomes.
 The result therefore shows what a strong verifier can enable, not how well the approach works for tasks without one.
-Databricks presents routing as an emerging coding-agent cost-control technique and reports an internal benchmark result, but publishes too little about that router evaluation to predict savings in another codebase :citep[wendell2026codingcosts].
-This motivates a local experiment, not a promised saving.
 
 When access rules permit both models—or when instructor-provided outputs are available—choose two models with different measured cost and task-success profiles within the same declared agent harness and assemble a small set of representative tasks.
 Keep near-duplicates and tasks from the same module in the same partition, using one partition to define the policy and reserving the other for held-out evaluation.

@@ -17,6 +17,10 @@ Accepted ADRs describe agreed future work; they do not mean that behavior exists
 
 ## Make changes reviewable
 
+For highlighted HTML reviews, serve the report over loopback HTTP, open and inspect it in the browser, and provide the live review URL.
+Keep the review server running until the user asks to close it; a local HTML file link alone is insufficient.
+Follow [docs/reviewing-changes.md](docs/reviewing-changes.md).
+
 Update the owning documentation in the same change as a behavior or contract change.
 Add or update an ADR when choosing between meaningful architectural alternatives, establishing a lasting constraint, or superseding a decision.
 Use the lifecycle in the ADR guide; leave small, reversible implementation choices in the code and ordinary change description.
