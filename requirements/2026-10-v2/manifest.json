@@ -6,7 +6,7 @@
     {
       "document": "introduction",
       "file": "specifications/00_introduction.md",
-      "sha256": "9f9654ce1822d9e8fa107b5b9d963990145c31f0f33f047e789fee2beae69f42"
+      "sha256": "6903b44de51bb2b6f458a214bb7496368f6f956c43bda7e05f13f4edc861c5cb"
     },
     {
       "document": "common",
@@ -31,7 +31,7 @@
     {
       "document": "grading",
       "file": "specifications/grading.md",
-      "sha256": "366b02fe3df407948b1a6ab8f1a95088c43b4829f9d6794fff5b48b305a045da"
+      "sha256": "2ddfede8f49b605de3ce62b09aeb42b815459e51c13ddea077ab785ab4e2c225"
     }
   ]
 }

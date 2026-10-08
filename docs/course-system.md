@@ -204,9 +204,12 @@ With only one group or a missing frozen implementation, staff arrange and record
 
 ## Solo route across all three phases
 
+Solo participation is an individually approved exception.
+The public grading page publishes the standard group criteria; staff agree any equivalent assessment arrangements with the student in writing before work begins and retain them in the private portfolio.
+
 New runs use requirements `2026-10-v2` and rubric `2026-10-solo-equivalence-v2`.
 Historical runs keep their pinned requirements and rubric; do not rewrite them to enable this route.
-The [project introduction](../specifications/00_introduction.md#approved-solo-route), all three phase briefs and [solo assessment equivalents](../specifications/grading.md#solo-assessment-equivalents) own the student contract.
+The [project introduction](../specifications/00_introduction.md#approved-solo-route) and all three phase briefs describe the work for an allocated exception; the [assessment equivalents below](#solo-assessment-equivalents) guide the individual agreement.
 The common application, three fresh implementations, workload, points and passing minima remain required.
 
 1. Agree a realistic workload/schedule, supported environments, a human reviewer and a short instructor discussion for each phase.
@@ -235,6 +238,28 @@ The student's instructor discussion and portfolio stay private to that student a
 Route changes are blocked after frozen source or review/portfolio evidence exists; choose a different route in a later phase instead of reinterpreting saved work.
 Recorded human-review evidence establishes what staff attested, rather than automatically establishing a completed learning outcome or awarding points.
 The [solo API walkthrough](../tests/course-solo.test.ts) covers all three phases through grade release/export, and [browser checks](../tests/e2e/course-solo.spec.ts) exercise allocation, review, reference audit and portfolio/assessment prompts.
+
+### Solo assessment equivalents
+
+For an explicitly allocated exception on the solo rubric edition, agree the following four criteria in the same score positions and with the same twelve-point maximum:
+
+| Criterion                                       | Points | Full-credit evidence                                                                                                                                                    |
+| ----------------------------------------------- | -----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Evidence-based self-assessment                  |    0–3 | Concrete decisions, completed and missed commitments, learning and next improvement linked to the student's work.                                                       |
+| Useful independent implementation review        |    0–3 | Specific, actionable findings from the outgoing reference or cross-group audit, supported by checks and clear limitations.                                              |
+| Response to feedback and solo reflection        |    0–3 | A considered response to the independent human audit/instructor challenge, one adjustment and a working condition that affected the outcome.                            |
+| Reliable contribution and accountable ownership |    0–3 | Instructor judgment against project history, checks, the portfolio and completed discussion shows that the student understands and accepts responsibility for the work. |
+
+The private portfolio's review field holds independent-implementation review evidence rather than invented feedback to teammates.
+The instructor records a completed discussion and incoming independent audit, and the student submits the outgoing audit before ordinary solo assessment.
+Incomplete work may be explicitly assessed as missing with zero scores and a reason; it does not waive passing requirements.
+A reviewer or agent recommendation is evidence, not an automatic grade.
+
+Keep the three 30-point projects, nine lecture activities, 153-point maximum, grade thresholds and per-phase minima.
+The six-point assessment minimum and one-point contribution minimum apply to these equivalent criteria.
+The individual portfolio itself remains required, and instructor check-ins do not automatically satisfy lecture participation.
+An approved exception changes the evidence for human collaboration criteria; it does not claim that the student practiced team collaboration.
+Historical runs retain their published rubric and requirements.
 
 ## Submission and access flow
 
@@ -317,7 +342,7 @@ Lecture participation, diaries and self/peer assessments remain individual.
 
 The rubric is versioned per run.
 The sole supported rubric, `2026-10-solo-equivalence-v2`, retains 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted individual assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
-It includes explicit solo assessment equivalents alongside the group-route criteria.
+Individually approved solo exceptions use the [agreed assessment equivalents](#solo-assessment-equivalents) in the same score positions.
 Grades use the published 50/60/70/80/90% thresholds.
 
 An ungraded record is pending, not zero.

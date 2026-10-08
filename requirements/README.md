@@ -5,7 +5,8 @@ The course interface's authored checklist in `shared/course-requirements.ts` sum
 
 Each course run stores a requirement edition on creation.
 The course has not yet run; `2026-10-v2` is the sole pre-course edition, with large-model Establish, small-model Challenge, and declared small/large or mixed-model fleets in Compare.
-The `2026-10-solo-equivalence-v2` rubric retains the group and approved solo routes with the same numeric scoring and passing rules.
+The `2026-10-solo-equivalence-v2` rubric retains standard group scoring and individually approved solo exceptions with the same numeric scoring and passing rules.
+The public grading page covers the standard group criteria; [staff guidance](../docs/course-system.md#solo-assessment-equivalents) owns the exception assessment arrangements.
 Earlier unused requirement and rubric contracts have been removed.
 Before the first course run, the current owners, checklist, and snapshots may be revised together in place.
 Once a real run begins, its snapshots and checklist are immutable and later changes require a new edition.

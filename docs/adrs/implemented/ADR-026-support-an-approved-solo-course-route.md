@@ -4,6 +4,9 @@
 
 **Date:** 2026-10-06
 
+**Publication adjustment (2026-10-08):** Solo participation is an individually approved exception.
+The public grading page covers standard group criteria; [staff guidance](../../course-system.md#solo-assessment-equivalents) owns the equivalent assessment arrangements agreed with the student before work begins.
+
 ## Context
 
 A student wants to take the course while working alone.
@@ -69,7 +72,7 @@ The approved route changes collaboration evidence within the existing common app
 
 ## Implementation and verification
 
-[The introduction](../../../specifications/00_introduction.md#approved-solo-route), [common audit/session contract](../../../specifications/00_common_project.md), all three phase briefs and [rubric equivalents](../../../specifications/grading.md#solo-assessment-equivalents) define the route.
+[The introduction](../../../specifications/00_introduction.md#approved-solo-route), [common audit/session contract](../../../specifications/00_common_project.md), all three phase briefs and [staff assessment equivalents](../../course-system.md#solo-assessment-equivalents) define the individually approved exception.
 [Shared solo contracts](../../../shared/course-solo.ts), [validation](../../../worker/course-solo.ts), [course handler](../../../worker/courses.ts) and [solo interface](../../../site/scripts/course-solo.ts) implement the shared local/Worker behavior.
 [Requirement publication](../../../requirements/README.md) retains both editions and their digests.
 [API checks](../../../tests/course-solo.test.ts) exercise all three phases, independent review, outgoing audits, portfolios, grade release/export, retained A/B records, locked provenance and reassessment after corrections.

@@ -55,7 +55,7 @@ To pass, each student must also complete the [mandatory lecture activities and i
 
 ### Approved solo route
 
-An instructor may approve a one-person group for all three phases on a run using the solo requirement and rubric edition.
+An instructor may approve a one-person group as an individual exception for all three phases.
 Agree the route, realistic time budget, supported model/hardware access, independent reviewer and audit arrangements before work begins.
 Approval is recorded for each phase; it does not reduce application behavior, evidence, points or passing requirements.
 The student completes three fresh implementations and owns their correctness, operation and acceptance.
@@ -66,7 +66,7 @@ Replace rotating human responsibilities with explicit operator, challenger and v
 A human reviewer independently audits the student's frozen implementation, and the student audits an assigned group or an instructor-supplied frozen reference implementation.
 An agent can help within the announced phase/audit tool policy; it cannot stand in for the independent human reviewer.
 
-The private portfolio uses the [solo assessment equivalents](grading.md#solo-assessment-equivalents).
+Agree any exceptional assessment arrangements with the instructor in writing before work begins, and retain them in the private portfolio.
 Keep lecture participation and diary obligations; a project check-in does not automatically count as a lecture activity.
 Solo evidence supports conclusions about individual engineering and agent coordination, not claims of practiced human teamwork.
 
