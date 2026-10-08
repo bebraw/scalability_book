@@ -61,7 +61,7 @@ Record those differences when interpreting a result.
 
 ### Build the evidence matrix
 
-The matrix belongs in the **final decision** bundle of the [four-part Compare submission](/project/compare/#6-deliverables).
+The matrix belongs in the **final decision** bundle of the [four-part Compare submission](/project/compare/#what-to-do-and-submit).
 For each dimension, link evidence from implementations A, B, and C—or explicitly state `not measured`—before answering the comparison question.
 Use the earlier phase records and the implementation, fleet, and scaling/deployment bundles as sources; the matrix is an index and interpretation of that evidence.
 
@@ -96,7 +96,7 @@ For example, “implementation B had the lowest measured p95 under the declared 
 “A queue would protect its write path” is a proposal until the new behavior and [trade-offs](/concepts/#trade-off) are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 The three builds are engineering case studies, with design, experience, and tool conditions changing together.
-Keep their observations separate from the [bounded paired workflow task](/project/compare/#5-4-compare-one-agent-with-the-fleet), which holds a frozen revision and declared conditions stable for a narrower exploratory contrast.
+Keep their observations separate from the [bounded paired workflow task](/project/compare/#required-matched-single-agent-fleet-probe), which holds a frozen revision and declared conditions stable for a narrower exploratory contrast.
 
 > **Case — Faster libraries and uncertain attribution**
 >
@@ -113,7 +113,7 @@ Keep their observations separate from the [bounded paired workflow task](/projec
 
 ## Turn comparison into a decision
 
-Use the [final comparison structure](/project/compare/#7-final-comparison) to turn the matrix into one argument: establish the comparison, explain consequential results, bound the explanation, and choose with a revisit condition.
+Use the [final comparison structure](/project/compare/#final-comparison) to turn the matrix into one argument: establish the comparison, explain consequential results, bound the explanation, and choose with a revisit condition.
 A useful decision connects a constraint to evidence and an owner:
 
 > For **[goal and constraints]**, choose **[architecture and workflow]** because **[observed result and its limits]**.
@@ -147,7 +147,7 @@ The selections help organize the submission; they do not verify its completeness
 
 ## Project artifact
 
-Complete the evidence matrix and final decision narrative within the [Compare submission](/project/compare/#6-deliverables).
+Complete the evidence matrix and final decision narrative within the [Compare submission](/project/compare/#what-to-do-and-submit).
 Link the other three bundles and earlier phase records, mark missing evidence and remaining risks, and defend the next decision.
 
 ## Author perspective — Learn where to look

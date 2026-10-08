@@ -2,22 +2,54 @@
 
 ## Implementation C: Agent Fleet and Final Analysis
 
-The [common project specification](00_common_project.md) applies to this phase.
+**Deadline:** submit implementation C before lecture 9.
+
+**Development setup:** agent fleet with approved small, large, or mixed-model assignments.
+The [common project specification](00_common_project.md) applies throughout.
+Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
+
+## What to do and submit
+
+Organize one evidence index into the four sections below.
+Link each artifact once and refer to it wherever it supports another requirement.
+These are sections of the existing submission, not four new reports or repositories.
+
+### Implementation
+
+Build and validate fresh C through the declared fleet workflow.
+Submit the accepted C revision and [common bundle](/project/#9-common-submission-bundle-and-comparable-evidence), including the engineering session, independent audit, and author response.
+Link the already-submitted A and B revisions and evidence.
+
+### Fleet evidence
+
+Include the [fleet plan](#fleet-plan), coordination measurements, transformed execution trace and repeatable loader, and application views answering at least two debugging questions.
+Add the B–C case comparison, [required matched single-agent/fleet probe](#required-matched-single-agent-fleet-probe) or supplied-trace alternative, and one workflow-level formal-model analysis.
+Select evidence that explains delegation, validation, integration, failure, and correction; an uncurated transcript is not the analysis.
+
+### Scaling and deployment experiment
+
+Include a separate [application-level formal-model analysis](#analyze-the-three-applications), [implemented scaling response](#implement-and-evaluate-one-scaling-response) with before-and-after evidence and its new failure or recovery obligation, and [realistic deployment](#validate-one-realistic-deployment) with a rerun workload.
+Identify the selected A, B, or C revisions, environments, and measurement limits.
+
+### Final decision
+
+Provide the [A–B–C evidence matrix and one decision narrative](#final-comparison) with the target architecture and scaling trade-offs.
+Link the other sections and earlier phase evidence instead of repeating their measurements.
 
 ---
 
-## 1. Purpose
+## Purpose
 
 Compare creates a third fresh implementation of the Work Activity Tracker through an [agent fleet](/concepts/#agent-fleet) and then analyzes all three implementations and development workflows.
 
 A fleet is an orchestration strategy, not a model category.
 The central question is whether decomposition, specialization, and parallelism improve the result enough to justify coordination, duplicated work, integration, review, and resource cost.
 
-Complete and submit implementation C before lecture 9. The public discussion and brief recap during lecture 9 use the fleet debugging views and final comparisons as evidence.
+The public discussion and brief recap during lecture 9 use the fleet debugging views and final comparisons as evidence.
 
 ---
 
-## 2. Starting Conditions
+## Starting Conditions
 
 Begin in a new repository or clean implementation directory.
 
@@ -35,7 +67,7 @@ Record the actual models used and any stack or configuration differences as inte
 
 ---
 
-## 3. What Counts as a Fleet
+## What Counts as a Fleet
 
 For this project, a fleet must include:
 
@@ -52,7 +84,7 @@ Use the smallest fleet that allows the group to study a real coordination questi
 
 ---
 
-## 4. Fleet Plan
+## Fleet Plan
 
 Before implementation, record:
 
@@ -75,13 +107,13 @@ Preserve important changes and explain why they were made.
 
 ---
 
-## 5. Required Work
+## Required Work
 
-### 5.1 Implement the common core again
+### Implement the common core again
 
 Complete implementation C through the documented fleet workflow.
 
-### 5.2 Evaluate coordination
+### Evaluate coordination
 
 In addition to the common evidence, record where possible:
 
@@ -97,7 +129,7 @@ In addition to the common evidence, record where possible:
 - active human integration and [review time](/concepts/#review-budget);
 - defects found after individual agents considered their work complete.
 
-### 5.3 Turn the fleet trace into debugging data
+### Turn the fleet trace into debugging data
 
 Export or transform evidence from the actual fleet run into a documented machine-readable trace.
 JSON is recommended, but another portable format is acceptable.
@@ -132,7 +164,7 @@ A real-time integration, generic adapter for every agent tool, polished graph ed
 Treat imported traces as potentially sensitive.
 Remove secrets and unnecessary prompt or source-code content before submission.
 
-### 5.4 Compare one agent with the fleet
+### Compare one agent with the fleet
 
 Treat implementations A, B, and C as comparative engineering cases, not estimates of the causal effects of model capability or orchestration.
 Compare the recorded B and C workflows:
@@ -146,7 +178,9 @@ Compare the recorded B and C workflows:
 Apply at least one relevant scalability law or formal model to the workflow.
 Amdahl's Law, Little's Law, queueing, backpressure, or the Universal Scalability Law may be appropriate.
 
-For one narrower contrast, replace part of the existing fleet rehearsal with a **bounded paired task**:
+### Required: matched single-agent/fleet probe
+
+Replace part of the existing fleet rehearsal with one **bounded paired task**:
 
 1. Freeze one accepted repository revision and a small change brief with independent acceptance checks before either attempt.
    Use two fresh copies of that revision and fresh agent sessions; this probe may reuse B and does not become the starting code for C.
@@ -166,31 +200,28 @@ If matched access or accounting is unavailable, use instructor-supplied paired t
 An unmatched pair may still be analyzed descriptively, but cannot establish an orchestration effect.
 Link the pair and its limits in the fleet evidence bundle rather than adding a separate report.
 
+### Optional: compare model assignments
+
 An optional model-assignment comparison can use two fresh copies of the same frozen revision with the same brief, task graph, tools, checks, intervention policy, and predeclared limits.
 Compare a small-only fleet with the same fleet assigning a large model to one named role or task; preserve actual routes and usage for all attempts.
 Assess accepted behavior and defects, time through integration and human acceptance, and total cost under the declared cost basis.
 Use this within the remaining rehearsal budget; it requires no fourth application or additional submission, and a useful result may show no benefit from the larger model.
 To investigate unfinished work or routing decisions further, choose an optional [Compare exploration starting point](/explore/#phase-compare).
 
-### 5.5 Analyze the three applications
+### Analyze the three applications
 
 Repeat the primary pressure against implementation C using the same workload and procedure where practical.
 Compare A, B, and C under that shared pressure.
 Then use the broader pressure catalog to select only the additional scenarios needed to explain consequential architectural differences.
 You do not need to apply every catalog scenario exhaustively to every implementation.
 
-Use the [final evidence matrix](/chapters/recap/#build-the-evidence-matrix) to compare accepted behavior, architecture, pressure, measurement and recovery, development friction, human–agent workflow, and resource use.
-Judge scalability, reliability, maintainability, simplicity, and resource efficiency from that evidence.
-Include optional-scope differences and the influence of practice, hardware, stack, tools, and other confounding factors.
-Link existing phase evidence and mark missing measurements explicitly.
-
-The final result should support a conditional engineering decision, not declare a universal winner.
+Use these results in the [final comparison](#final-comparison).
 
 Apply at least one scalability law or formal model to an application-architecture decision raised by the primary or selected pressures.
 Name the variables and assumptions, show the calculation or reasoning, connect the result to runtime evidence or a stated pressure, and explain what the model does not capture.
-This application analysis is separate from the workflow model required in section 5.4.
+This application analysis is separate from the [workflow model](#compare-one-agent-with-the-fleet).
 
-### 5.6 Implement and evaluate one scaling response
+### Implement and evaluate one scaling response
 
 Select implementation A, B, or C and one pressure supported by runtime evidence or a credibly projected limit that the available environment can exercise.
 Preserve the accepted revision and its baseline evidence, then implement the smallest justified response to that limit.
@@ -202,7 +233,7 @@ Rerun the common acceptance scenarios and the selected pressure, report every re
 Exercise one failure or recovery obligation introduced by the response.
 State whether the result supported, challenged, or left the original hypothesis unresolved, and preserve an unsuccessful result instead of silently replacing it with a more elaborate design.
 
-### 5.7 Validate one realistic deployment
+### Validate one realistic deployment
 
 Select implementation A, B, or C based on the evidence collected so far.
 Deploy the revision selected after the scaling-response experiment in an instructor-approved realistic environment outside the author's development process and rerun the [shared baseline workload](/project/#7-1-shared-baseline-workload).
@@ -210,40 +241,14 @@ Record the environment and configuration, operational steps, result, difference 
 
 ---
 
-## 6. Deliverables
+## Final Comparison
 
-Organize the final submission into four bundles.
-These are sections in one evidence index, not four new documents or repositories.
-Link each artifact once and refer to it from the relevant analysis; the common evidence and phase-specific requirements may share the same artifact.
-
-### 6.1 Implementation
-
-Provide the accepted implementation C revision and its [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence), including setup, configuration, time and resource use, validation, architecture, pressure, and friction evidence.
-Include the cross-team audit and response, and link the already-submitted A and B revisions and evidence for comparison.
-
-### 6.2 Fleet evidence
-
-Connect the fleet plan and task graph to a compact selected execution trace, its documented transformation, a repeatable loader into C, and application views answering at least two debugging questions.
-Include coordination measurements, the B–C case analysis, the bounded paired task or supplied traces, and one workflow-level formal-model analysis.
-The trace should expose consequential delegation, validation, integration, failure, or human intervention; select evidence that explains the findings rather than submitting an uncurated transcript dump.
-
-### 6.3 Scaling and deployment experiment
-
-Include one application-level formal-model analysis, the before-and-after evidence for an implemented scaling response, and its new failure or recovery obligation.
-Add the realistic deployed-workload evidence and identify the selected implementation, revisions, environment, and measurement limits.
-Sections 5.5–5.7 define the experiment; the application model is separate from the workflow model in the fleet bundle.
-
-### 6.4 Final decision
-
-Combine the A–B–C evidence matrix with one decision narrative following section 7.
+Combine the [final evidence matrix](/chapters/recap/#build-the-evidence-matrix) with one conditional engineering argument in the final decision section of your evidence index.
+The matrix compares accepted behavior, architecture, pressure, measurement and recovery, development friction, human–agent workflow, and resource use.
+Use it to judge scalability, reliability, maintainability, simplicity, and resource efficiency, linking earlier evidence and explicitly marking missing measurements.
 Include the target architecture and scaling trade-off table, distinguishing implemented results from remaining proposals.
-Reference the other bundles and earlier phase evidence instead of repeating their measurements or writing another report for each comparison question.
 
----
-
-## 7. Final Comparison
-
-Use the final decision bundle to make one conditional engineering argument:
+Build the decision narrative around four steps:
 
 1. **Establish the comparison.** State what the common specification kept stable and what differed across A, B, and C, including optional scope and measurement gaps.
 2. **Explain the consequential results.** Compare application architecture under the shared and selected pressures and development effort through acceptance; use the fleet debugging findings to show what final code or a raw transcript concealed.
@@ -256,7 +261,7 @@ The [recap chapter](/chapters/recap/#turn-comparison-into-a-decision) shows how 
 
 ---
 
-## 8. Evaluation Emphasis
+## Evaluation Emphasis
 
 This phase emphasizes:
 

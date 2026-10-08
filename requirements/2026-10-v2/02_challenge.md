@@ -2,11 +2,26 @@
 
 ## Implementation B: Small Model, Single Agent
 
-The [common project specification](00_common_project.md) applies to this phase.
+**Deadline:** submit implementation B before lecture 7.
+
+**Development setup:** approved small model, one coding agent at a time.
+The [common project specification](00_common_project.md) applies throughout.
+Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
+
+## What to do and submit
+
+Use one [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation B.
+Index these additions in the same bundle:
+
+- **Build and validate fresh B:** implement the common core and repeat the shared evidence collection under the small-model constraint.
+- **Explain the architecture:** include B’s architecture hypothesis and updated capability ownership card for the main event workflow.
+- **Extend the pressure record:** repeat A’s primary pressure, add one secondary pressure, and include the documented-case transfer, pressure map, justified response, and Little’s Law check defined in [Apply runtime pressure](#apply-runtime-pressure).
+- **Compare A and B:** use the [two-workflow comparison](#compare-the-two-single-agent-workflows) to separate observed differences, plausible explanations, alternatives and confounding factors, and what the evidence cannot establish.
+- **Complete the shared evidence:** include the [engineering session](/project/#shared-engineering-sessions), independent audit, and author response.
 
 ---
 
-## 1. Purpose
+## Purpose
 
 Challenge creates a fresh implementation of the same Work Activity Tracker using a small model through a single-agent workflow.
 
@@ -19,11 +34,11 @@ A model that generates more code may also introduce unnecessary complexity, plau
 
 This is a new implementation, not a refactor of implementation A.
 
-Complete and submit implementation B before lecture 7. The public discussion during lecture 7 will compare the Challenge results before the course introduces the fleet workflow for implementation C.
+The public discussion during lecture 7 compares the Challenge results before the course introduces the fleet workflow for implementation C.
 
 ---
 
-## 2. Starting Conditions
+## Starting Conditions
 
 Begin in a new repository or clean implementation directory.
 
@@ -41,7 +56,7 @@ The final comparison must then treat the stack change as a confounding factor ra
 
 ---
 
-## 3. Development-System Constraint
+## Development-System Constraint
 
 You may:
 
@@ -60,18 +75,18 @@ The group remains responsible for every submitted decision and line of code, reg
 
 ---
 
-## 4. Required Work
+## Required Work
 
-### 4.1 Implement the common core again
+### Implement the common core again
 
 Complete a fresh implementation of the required domain model, behavior, harness, and acceptance scenarios.
 
-### 4.2 Repeat the evidence collection
+### Repeat the evidence collection
 
 Use the same evidence categories and measurement units as Establish.
 Preserve failed attempts and human corrections that help explain the result.
 
-### 4.3 Compare the two single-agent workflows
+### Compare the two single-agent workflows
 
 Compare implementations A and B in terms of:
 
@@ -88,7 +103,7 @@ Do not present correlation as proof.
 This is a comparison of two engineering cases, not an estimate of the effect of changing the model alone.
 The group has more domain knowledge during Challenge, and this practice effect is part of the comparison's limitations.
 
-### 4.4 Apply runtime pressure
+### Apply runtime pressure
 
 Repeat the primary [pressure](/concepts/#pressure) selected in Establish against implementation B using the same workload and procedure where practical.
 Then select one secondary pressure from the shared catalog that is exposed by an architectural difference or by evidence from A or B.
@@ -114,25 +129,7 @@ For an optional recovery investigation, choose a [Challenge exploration starting
 
 ---
 
-## 5. Deliverables
-
-Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation B plus:
-
-- the architecture hypothesis for implementation B;
-- an updated capability ownership card for the main event workflow;
-- the documented-case transfer, pressure map, and Little's Law check;
-- a concise A–B comparison.
-
-The A–B comparison should distinguish:
-
-- observed differences;
-- plausible explanations;
-- alternative explanations and confounding factors;
-- what the available evidence cannot establish.
-
----
-
-## 6. Evaluation Emphasis
+## Evaluation Emphasis
 
 This phase emphasizes:
 

@@ -3,21 +3,63 @@
 This rubric turns the course learning outcomes and project evidence into student-facing scoring rules.
 It applies to every course run unless the published course environment or learning-platform instructions announce a revision before the affected phase begins.
 
-## Group and individual scoring records
+## Passing and final grade
 
-Assess one project bundle per group and phase.
-Every registered member receives that group's project score for the phase; differences in individual contribution are assessed through the twelve-point self- and peer-assessment criteria.
-Participation and learning-diary points are also individual.
-The [project introduction](00_introduction.md#groups-submissions-and-access) explains the submission stages and access to classmates' technical work.
+The maximum is 153 points:
 
-For each phase, record the group identifier, membership, assessed implementation revision, criterion scores, brief reasons, and any missing evidence.
-Link that group result to each member's individual scoring record rather than assessing duplicate project submissions.
-Keep private individual portfolios together by phase, while scoring their diary entries by lecture and their self- and peer-assessment by criterion.
+- projects: `3 × 30 = 90`;
+- participation and learning diaries: `9 × 3 = 27`;
+- self- and peer-assessment: `3 × 12 = 36`.
 
-Give each group its project breakdown and feedback, and each student their individual breakdown, accumulated total, and status against every passing requirement.
-Show completed lecture activities and each phase's assessment and contribution scores so students can see which individual minimum is still unmet.
-Confidential peer reports remain available to the teaching staff; the class submission index contains technical work and excludes scores and private student records.
-Keep the original score and reason when a correction changes a result, and explain the adjustment to the affected students.
+To pass, a student must:
+
+1. receive at least 10 points from each of the three projects;
+2. meet the [mandatory lecture participation and diary requirement](#mandatory-individual-work) in every phase;
+3. meet the [mandatory self- and peer-assessment requirement](#mandatory-individual-work) in every phase; and
+4. receive at least 50% of the available total points.
+
+A student whose total reaches a grade threshold but who has an unmet mandatory requirement has not passed the course.
+
+Let `p = 100 × earned_points / available_points` after any formally approved absence adjustment.
+Once all passing requirements are met, the final grade is:
+
+|       Percentage | Grade |
+| ---------------: | ----: |
+|        Below 50% |  Fail |
+| 50% to below 60% |     1 |
+| 60% to below 70% |     2 |
+| 70% to below 80% |     3 |
+| 80% to below 90% |     4 |
+|     90% or above |     5 |
+
+## Mandatory individual work
+
+Individual participation and assessment are required in every phase.
+Check these requirements using the existing private portfolios and rubric scores.
+
+| Requirement                              | Minimum in each phase                                                                                                                   | Evidence used                                                                                                                                                                                           |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lecture participation and learning diary | Two of the three lecture activities, for six across the course                                                                          | Each counted activity earns all three existing points: live participation or the announced equivalent remote activity, one concrete idea, and its connection to evidence, an assumption, or a decision. |
+| Self- and peer-assessment                | A submitted assessment earning at least 6 of 12 points, including at least 1 of 3 points for reliable contribution and shared ownership | The existing self-assessment, peer feedback, group reflection, and corroborated contribution evidence.                                                                                                  |
+
+Diary points alone do not satisfy the participation requirement.
+Record live or remote participation separately from the diary content.
+The contribution minimum is an instructor judgment against the existing evidence and criterion, with peer reports used as evidence.
+
+Use the published completion and correction arrangements for missing required work.
+An approved absence or support arrangement must specify the replacement activity or adjusted individual requirement as well as any change to available points.
+Record and explain the arrangement in the student's private scoring record.
+
+## Group and individual scores
+
+Each group submits one project bundle per phase, and every registered member receives that group’s project score.
+Individual contribution is assessed through the twelve-point self- and peer-assessment criteria; lecture participation and diaries are also individual.
+The [project introduction](00_introduction.md#groups-submissions-and-access) explains submission stages and access.
+
+Each group receives its project breakdown and feedback.
+Each student receives their individual breakdown, total, and status against the passing requirements, including completed lecture activities and phase assessment and contribution scores.
+Peer reports and individual scoring records remain private; the class submission index contains technical work.
+Corrections retain the original result and reason, and the adjustment is explained to the affected students.
 
 ## Project scoring: 30 points per phase
 
@@ -116,52 +158,3 @@ For the solo route, the six-point assessment minimum and one-point contribution 
 The individual portfolio itself remains required, and instructor check-ins do not automatically satisfy lecture participation.
 An approved solo route changes the evidence for human collaboration criteria; it does not claim that the student practiced team collaboration.
 Historical runs retain their published rubric and requirements.
-
-## Mandatory individual work
-
-Individual participation and assessment are required in every phase.
-Check these requirements using the existing private portfolios and rubric scores.
-
-| Requirement                              | Minimum in each phase                                                                                                                   | Evidence used                                                                                                                                                                                           |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Lecture participation and learning diary | Two of the three lecture activities, for six across the course                                                                          | Each counted activity earns all three existing points: live participation or the announced equivalent remote activity, one concrete idea, and its connection to evidence, an assumption, or a decision. |
-| Self- and peer-assessment                | A submitted assessment earning at least 6 of 12 points, including at least 1 of 3 points for reliable contribution and shared ownership | The existing self-assessment, peer feedback, group reflection, and corroborated contribution evidence.                                                                                                  |
-
-Diary points alone do not satisfy the participation requirement.
-Record live or remote participation separately from the diary content.
-The contribution minimum is an instructor judgment against the existing evidence and criterion, with peer reports used as evidence.
-
-Use the published completion and correction arrangements for missing required work.
-An approved absence or support arrangement must specify the replacement activity or adjusted individual requirement as well as any change to available points.
-Record and explain the arrangement in the student's private scoring record.
-
-## Passing and final grade
-
-The maximum is 153 points:
-
-- projects: `3 × 30 = 90`;
-- participation and learning diaries: `9 × 3 = 27`;
-- self- and peer-assessment: `3 × 12 = 36`.
-
-To pass, a student must:
-
-1. receive at least 10 points from each of the three projects;
-2. meet the [mandatory lecture participation and diary requirement](#mandatory-individual-work) in every phase;
-3. meet the [mandatory self- and peer-assessment requirement](#mandatory-individual-work) in every phase; and
-4. receive at least 50% of the available total points.
-
-A student whose total reaches a grade threshold but who has an unmet mandatory requirement has not passed the course.
-
-Let `p = 100 × earned_points / available_points` after any formally approved absence adjustment.
-Once all passing requirements are met, the final grade is:
-
-|       Percentage | Grade |
-| ---------------: | ----: |
-|        Below 50% |  Fail |
-| 50% to below 60% |     1 |
-| 60% to below 70% |     2 |
-| 70% to below 80% |     3 |
-| 80% to below 90% |     4 |
-|     90% or above |     5 |
-
-Keep the original evidence and scoring record when a correction or approved adjustment changes a result.

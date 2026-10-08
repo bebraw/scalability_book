@@ -104,11 +104,11 @@ test.describe("project specification", () => {
     });
     await expect(pairedTask).toHaveAttribute(
       "href",
-      "/project/compare/#5-4-compare-one-agent-with-the-fleet",
+      "/project/compare/#required-matched-single-agent-fleet-probe",
     );
     await pairedTask.click();
     await expect(
-      page.locator('[id="5-4-compare-one-agent-with-the-fleet"]'),
+      page.locator('[id="required-matched-single-agent-fleet-probe"]'),
     ).toBeVisible();
     await page.locator('.project-index a[href="/project/grading/"]').click();
     await expect(page.locator("#passing-and-final-grade")).toBeVisible();

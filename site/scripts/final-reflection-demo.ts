@@ -183,7 +183,7 @@ Artifact links and interpretation:
     "",
     ...missingLines,
     "",
-    "Requirements: /project/compare/#6-deliverables",
+    "Requirements: /project/compare/#what-to-do-and-submit",
   ].join("\n");
 }
 

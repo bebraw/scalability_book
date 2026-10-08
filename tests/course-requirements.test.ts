@@ -52,10 +52,10 @@ test("run checklists link every entry to its pinned owner and reject unsupported
   );
   assert.equal(
     rewriteRequirementLinks(
-      "[Common](00_common_project.md#6-minimum-project-harness) [Compare](/project/compare/#6-deliverables)",
+      "[Common](00_common_project.md#6-minimum-project-harness) [Compare](/project/compare/#what-to-do-and-submit)",
       "2026-10-v2",
     ),
-    "[Common](/project/requirements/2026-10-v2/common/#6-minimum-project-harness) [Compare](/project/requirements/2026-10-v2/compare/#6-deliverables)",
+    "[Common](/project/requirements/2026-10-v2/common/#6-minimum-project-harness) [Compare](/project/requirements/2026-10-v2/compare/#what-to-do-and-submit)",
   );
 });
 test("build rejects changed live owners, archived briefs and checklist digests rather than drifting a run", async (t) => {

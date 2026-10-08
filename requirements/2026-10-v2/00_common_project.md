@@ -395,24 +395,41 @@ Reuse that scenario and its procedure in Challenge and Compare so the three impl
 Challenge adds one **secondary pressure** revealed by an architectural difference or observation.
 Compare uses the broader catalog to interpret important differences across A, B, and C, but only relevant pressures need in-depth analysis.
 
-For each pressure analyzed in depth, identify:
-
-- what is likely to fail or slow down first;
-- the resource, quota, dependency, or operational limit being approached;
-- the first useful signal that would reveal the problem;
-- one plausible response;
-- at least one prepared recovery action available if the limit is reached;
-- the new cost or failure mode introduced by that response.
-
 When automated use or data exposure is the selected pressure, also distinguish cooperating, authorized, and abusive consumers; state which information is intentionally public or retained; and account for the false-positive and accessibility cost of the proposed control.
 
 Use runtime evidence where the available workload and environment allow it.
 Label reasoned projections as projections rather than observations.
 The goal is a cumulative, justified analysis, not repeated hypothetical matrices or distributed infrastructure added without evidence.
 
+### Pressure-record template
+
+Use this record in your existing evidence index for each pressure analyzed in depth.
+It also supplies the fields for Establish’s two bounded claims; a contributor/change claim may use a scenario rather than a runtime workload.
+Keep the same record across phases, adding revision-specific evidence rather than copying the analysis into new reports.
+
+```md
+### Claim or pressure: <name>
+
+- Goal and pressure: <what must remain true; what increases or changes>
+- Range or scenario: <conditions studied>
+- Boundary and constraints: <system boundary; fixed assumptions and limits>
+- Procedure: <baseline transformation or change scenario; how to repeat it>
+- First limit: <what fails or slows first; resource, quota, or dependency>
+- First useful signal: <what would reveal the problem>
+- Candidate response and trade-off: <action; new cost or failure mode>
+- Prepared recovery: <action available if the limit is reached>
+- Evidence: <implementation/revision; result and evidence link; measured or projected>
+- Excluded dimension: <one aspect this claim does not cover>
+```
+
+Keep every measured repetition and the required measurement metadata in the linked evidence; the record summarizes them.
+For Establish’s contributor/change claim, a runtime procedure or prepared recovery action may be inapplicable; state why.
+
 ### 7.3 Arrival-controlled overload and recovery
 
-When a selected pressure or scaling claim concerns sustained incoming demand, queue growth, or admission control, add a bounded **open-loop** pressure run within that experiment.
+**When applicable:** this run is required only for a selected pressure or claim about sustained incoming demand, queue growth, or admission control.
+
+Add a bounded **open-loop** pressure run within that experiment.
 It replaces part of the existing pressure analysis rather than adding another mandatory scenario for every build.
 Schedule arrivals independently of earlier completions; a closed-loop client population can reduce its own offered load as the application slows.
 
@@ -451,7 +468,7 @@ You may not carry forward:
 - an earlier repository used as the starting point for the next phase;
 - prompts that contain substantial blocks of the earlier implementation.
 
-The [bounded paired task](03_compare.md#5-4-compare-one-agent-with-the-fleet) is an explicit exception for experimental copies of a frozen revision, not for implementation C's starting code.
+The [bounded paired task](03_compare.md#required-matched-single-agent-fleet-probe) is an explicit exception for experimental copies of a frozen revision, not for implementation C's starting code.
 
 When uncertain, disclose the reuse in the evidence package.
 The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.
@@ -630,16 +647,22 @@ An estimate may be included as commentary, but it does not count as completed ch
 
 ### 10.2 Friction report
 
-Return any patch or diff together with a report containing:
+Return any patch or diff with the following report in the existing audit submission.
+Use the same template for a group audit or an approved solo/reference audit; it does not add another submission.
 
-- setup outcome and setup time, reported separately from the probe;
-- time required to identify the likely user-interface, application, domain, persistence, and test locations;
-- probe outcome: complete, partial, blocked, or not attempted;
-- acceptance checks completed and still missing;
-- files or boundaries changed and any duplicated change that appeared necessary;
-- commands run and their results, including existing regressions;
-- assumptions, documentation gaps, and remaining uncertainty;
-- the first point at which progress became slow or blocked.
+```md
+### Friction audit: <group/reference, phase, frozen revision>
+
+- Auditor and conditions: <auditor; tool policy; prior inspection or exposure>
+- Setup: <outcome; setup time; access or setup problems>
+- Locate the change: <time to identify UI, application, domain, persistence, and test locations>
+- Probe: <complete / partial / blocked / not attempted; probe time, excluding setup>
+- Acceptance checks: <completed; still missing>
+- Changes: <files or boundaries; any duplicated change; patch/diff link>
+- Validation: <commands and results; existing regressions>
+- Assumptions and gaps: <documentation gaps; remaining uncertainty>
+- First friction: <first point where progress slowed or stopped>
+```
 
 The audit is not a full code review and does not transfer ownership.
 Auditors are not expected to become experts in the chosen stack.

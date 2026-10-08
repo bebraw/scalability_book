@@ -295,6 +295,20 @@ Changing final evidence creates another revision and makes prior project assessm
 
 ## Review and grading
 
+### Scoring records and feedback
+
+Assess one project bundle per group and phase.
+Record its group identifier, frozen membership, assessed implementation revision, criterion scores, brief reasons, and missing evidence.
+Link that result to each member’s individual record rather than assessing duplicate project submissions.
+Keep private individual portfolios together by phase, scoring diary entries by lecture and self/peer assessment by criterion.
+
+Release the group project breakdown and feedback to the group, and each student’s individual breakdown, total, and status against every passing requirement to that student.
+Show completed lecture activities and each phase’s assessment and contribution scores so unmet minima are visible.
+Confidential peer reports remain available to staff; the class submission index excludes scores and private records.
+Retain the original evidence, score, and reason when correcting a result or applying an approved arrangement, and explain the adjustment to affected students.
+
+### Review, release, and grade export
+
 The review queue shows frozen implementations, missing incoming audits, author responses, private portfolios and ungraded or stale assessments.
 Staff score each criterion from the [published rubric](../specifications/grading.md), with reasons and missing evidence.
 The contribution criterion is an instructor judgment; peer reports are not automatic grade votes.

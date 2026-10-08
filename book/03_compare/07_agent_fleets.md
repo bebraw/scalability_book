@@ -170,7 +170,7 @@ Use separate workspaces or worktrees for concurrent writers.
 The Challenge small model is the reference configuration; an approved C fleet may assign small models, large models, or a mixture to its roles or tasks.
 State the quality, time, or cost hypothesis behind each assignment, preserve the actual model and route used for each attempt, and record substitutions and fallback.
 For the required bounded single-agent/fleet pair, pin the same small-model configuration and routing policy so the contrast examines orchestration.
-An optional model-assignment pair keeps the fleet's task graph fixed while assigning a large model to one named role; the [Compare specification](/project/compare/#5-4-compare-one-agent-with-the-fleet) defines the limits.
+An optional model-assignment pair keeps the fleet's task graph fixed while assigning a large model to one named role; the [Compare specification](/project/compare/#optional-compare-model-assignments) defines the limits.
 
 ### Research note — A clean merge is not a correct integration
 
@@ -279,7 +279,7 @@ Compare accepted behavior and defects, time through integration and human accept
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.
-For a narrower workflow contrast, use the [Compare project's bounded paired task](/project/compare/#5-4-compare-one-agent-with-the-fleet): fresh copies of the same frozen revision, the same brief, model, checks, environment, intervention policy, and aggregate resource limits.
+For a narrower workflow contrast, use the [Compare project's bounded paired task](/project/compare/#required-matched-single-agent-fleet-probe): fresh copies of the same frozen revision, the same brief, model, checks, environment, intervention policy, and aggregate resource limits.
 The full B and C builds remain case studies because their design choices and the team's experience differ.
 One matched pair supports an exploratory observation about this task; reliability or general effect claims require a justified sampling design and repeated trials.
 
@@ -302,7 +302,7 @@ Give your agent the [work-in-progress starting point](/explore/human-work-in-pro
 
 ## Project artifact
 
-In implementation C's existing [Compare evidence package](/project/compare/#6-deliverables), connect the fleet plan to what actually happened:
+In implementation C's existing [Compare evidence package](/project/compare/#what-to-do-and-submit), connect the fleet plan to what actually happened:
 
 - declared model and harness configuration, task dependencies, authority, integration ownership, and stopping rules;
 - the correction probe and comparable measurements through acceptance;

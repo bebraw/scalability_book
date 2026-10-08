@@ -11,7 +11,9 @@ The course uses one common application contract and three phase-specific develop
 The [course environment sheet](course_environment.md) defines the model, harness, access, budget, privacy, and fallback assignments for the current course run.
 The [assessment rubric](grading.md) defines the project, participation, learning-diary, and self- and peer-assessment scoring.
 
-Begin with the project introduction, then read the common specification together with the current phase specification.
+Begin with the project introduction, then use the **What to do and submit** checklist at the top of the current phase brief alongside the common specification.
+The common contract provides reusable [pressure-record](00_common_project.md#pressure-record-template) and [friction-audit](00_common_project.md#10-2-friction-report) templates for the existing evidence index and audit submission.
+**Required**, **When applicable**, and **Optional** labels distinguish the matched fleet probe, arrival-controlled overload run, and additional model-assignment experiment.
 Every phase includes an engineering session: rotating responsibilities for groups, or explicit solo passes and an instructor discussion for the [approved solo route](00_introduction.md#approved-solo-route).
 All three phase briefs define the solo equivalents, while the common contract retains independent audits and the rubric preserves points and passing requirements.
 

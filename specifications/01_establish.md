@@ -2,11 +2,29 @@
 
 ## Implementation A: Large Model, Single Agent
 
-The [common project specification](00_common_project.md) applies to this phase.
+**Deadline:** submit implementation A before lecture 4.
+
+**Development setup:** approved large model, one coding agent at a time.
+The [common project specification](00_common_project.md) applies throughout.
+Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
+
+## What to do and submit
+
+Use one [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation A.
+The checklist below indexes that bundle; it does not require a separate report for each item.
+
+- **Build and validate A:** complete the common core, harness, acceptance checks, and shared workload; document the [closed product loop and any starter decisions](#implement-the-common-core).
+- **Record the stack hypothesis:** explain the learning question, risks, and revisit condition in the [stack decision record](#record-the-stack-hypothesis).
+- **Analyze initial scalability:** include [two bounded claims and the repeatable primary pressure](#analyze-initial-scalability).
+- **Show ownership:** include a capability ownership card for the main event workflow.
+- **Reflect on the large-model workflow:** answer the questions below using the recorded evidence.
+- **Complete the shared evidence:** include the [engineering session](/project/#shared-engineering-sessions), independent audit, and author response in the same bundle.
+
+In the workflow reflection, explain what the large model handled well; where it needed smaller tasks, more context, correction, or manual work; which limits came from the model, harness, or project; and what evidence supports those interpretations.
 
 ---
 
-## 1. Purpose
+## Purpose
 
 Establish creates the first implementation and the comparison baseline.
 
@@ -15,14 +33,14 @@ The assigned large model provides the starting environment for learning to speci
 Its ability to make that work easier is a hypothesis to check with the supported course configuration.
 The goal is to experience what this particular model and environment make easy, difficult, fast, slow, private, controllable, or resource-intensive.
 
-Complete and submit implementation A before lecture 4. The public discussion during lecture 4 will use the submitted applications, benchmark results, and architecture diagrams as concrete cases.
+The public discussion during lecture 4 uses the submitted applications, benchmark results, and architecture diagrams as concrete cases.
 
 Keep the implementation deliberately modest.
 A complete common core with clear evidence is more valuable than a large unfinished application.
 
 ---
 
-## 2. Development-System Constraint
+## Development-System Constraint
 
 You must use:
 
@@ -48,9 +66,9 @@ Record consequential human intervention instead of hiding it.
 
 ---
 
-## 3. Required Work
+## Required Work
 
-### 3.1 Implement the common core
+### Implement the common core
 
 Complete the required domain model, behavior, [harness](/concepts/#harness), and acceptance scenarios from the common specification.
 Before expanding optional scope, describe the first closed product loop and list the capabilities deliberately deferred until that loop produces evidence.
@@ -66,13 +84,13 @@ Classify inherited material as:
 Review the exact removal set before editing, especially when automation or an agent performs the pruning.
 The template is a distribution artifact, not the finished architecture of the product.
 
-### 3.2 Establish the evidence baseline
+### Establish the evidence baseline
 
 Record the comparable evidence fields in the common submission bundle while the work is happening.
 Do not attempt to recreate model usage, failed attempts, or human intervention at the end.
 For optional practice in checking explanations and ownership, choose an [Establish exploration starting point](/explore/#phase-establish).
 
-### 3.3 Record the stack hypothesis
+### Record the stack hypothesis
 
 In the stack [decision record](/concepts/#decision-log), explain:
 
@@ -84,10 +102,10 @@ In the stack [decision record](/concepts/#decision-log), explain:
 
 The [decision-log example](/chapters/friction/#keep-a-decision-log) shows how to record reversibility and a revisit condition alongside the rationale.
 
-### 3.4 Analyze initial scalability
+### Analyze initial scalability
 
 Produce two bounded scalability claims: one about runtime demand or data and one about contributors or change.
-For each, name the maintained goal, pressure, range or scenario, boundary, constraints, likely first limit, first useful signal, candidate response, expected trade-off, supporting or challenging evidence, and one intentionally excluded dimension.
+Use the [pressure-record template](/project/#pressure-record-template) to state each claim’s goal, pressure, range, boundary, constraints, first limit and signal, candidate response, trade-off, evidence, and one excluded dimension.
 
 Choose one primary pressure from the shared catalog that is likely to expose an important limit in implementation A.
 Use the runtime or data claim as the starting hypothesis for that choice, and retain the contributor or change claim for the later friction and development-workflow comparison.
@@ -99,23 +117,7 @@ You are not expected to add distributed infrastructure.
 
 ---
 
-## 4. Deliverables
-
-Submit the [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation A plus:
-
-- a capability ownership card for the main event workflow;
-- a short large-model workflow reflection.
-
-The workflow reflection should answer:
-
-- What did the large model handle well?
-- Where did it require smaller tasks, more context, correction, or manual work?
-- Which limitation came from the model, which from the harness, and which from the project itself?
-- What evidence supports those interpretations?
-
----
-
-## 5. Evaluation Emphasis
+## Evaluation Emphasis
 
 This phase emphasizes:
 

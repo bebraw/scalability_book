@@ -420,7 +420,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Project: record the stack hypothesis",
-        "/project/establish/#3-3-record-the-stack-hypothesis",
+        "/project/establish/#record-the-stack-hypothesis",
         "Use the existing stack decision record to make assumptions reviewable.",
       ],
     ],

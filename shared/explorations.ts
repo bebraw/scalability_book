@@ -18,7 +18,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["authority", "acceptance-criteria", "decision-reversibility"],
     task: {
       title: "Establish the evidence baseline",
-      href: "/project/establish/#3-2-establish-the-evidence-baseline",
+      href: "/project/establish/#establish-the-evidence-baseline",
     },
     reading: {
       title: "Assign authority and ownership",
@@ -34,7 +34,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["idempotency", "state-authority", "acceptance-criteria"],
     task: {
       title: "Establish the evidence baseline",
-      href: "/project/establish/#3-2-establish-the-evidence-baseline",
+      href: "/project/establish/#establish-the-evidence-baseline",
     },
     reading: {
       title: "Test an explanation against behavior",
@@ -50,7 +50,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["recovery", "observability", "acceptance-criteria"],
     task: {
       title: "Apply runtime pressure and examine recovery",
-      href: "/project/challenge/#4-4-apply-runtime-pressure",
+      href: "/project/challenge/#apply-runtime-pressure",
     },
     reading: {
       title: "Follow a fix through affected deployments",
@@ -66,7 +66,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["contract", "acceptance-criteria", "eval", "authority"],
     task: {
       title: "Repeat the evidence collection",
-      href: "/project/challenge/#4-2-repeat-the-evidence-collection",
+      href: "/project/challenge/#repeat-the-evidence-collection",
     },
     reading: {
       title: "Probe an API with temporary clients",
@@ -82,7 +82,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["review-budget", "agent-fleet", "throughput", "queue"],
     task: {
       title: "Compare one agent with the fleet",
-      href: "/project/compare/#5-4-compare-one-agent-with-the-fleet",
+      href: "/project/compare/#compare-one-agent-with-the-fleet",
     },
     reading: {
       title: "Agent concurrency and human work in progress",
@@ -98,7 +98,7 @@ export const explorations: Exploration[] = [
     conceptIds: ["eval", "authority", "acceptance-criteria"],
     task: {
       title: "Compare one agent with the fleet",
-      href: "/project/compare/#5-4-compare-one-agent-with-the-fleet",
+      href: "/project/compare/#compare-one-agent-with-the-fleet",
     },
     reading: {
       title: "Check confidence before routing",
