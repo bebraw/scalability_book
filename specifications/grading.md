@@ -23,14 +23,14 @@ A student whose total reaches a grade threshold but who has an unmet mandatory r
 Let `p = 100 × earned_points / available_points` after any formally approved absence adjustment.
 Once all passing requirements are met, the final grade is:
 
-|       Percentage | Grade |
-| ---------------: | ----: |
-|        Below 50% |  Fail |
+| Percentage       | Grade |
+| ---------------- | ----: |
+| Below 50%        |  Fail |
 | 50% to below 60% |     1 |
 | 60% to below 70% |     2 |
 | 70% to below 80% |     3 |
 | 80% to below 90% |     4 |
-|     90% or above |     5 |
+| 90% or above     |     5 |
 
 ## Mandatory individual work
 

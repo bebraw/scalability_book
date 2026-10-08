@@ -2,6 +2,54 @@ import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
   for (const width of [1280, 800, 390]) {
+    test(`keeps grade thresholds compact and aligned at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of [
+        "/project/grading/",
+        "/project/requirements/2026-10-v2/grading/",
+      ]) {
+        await page.goto(route);
+        const layout = await page
+          .getByRole("table")
+          .filter({ hasText: "Percentage" })
+          .evaluate((table) => {
+            const box = table.getBoundingClientRect();
+            const rows = Array.from(table.querySelectorAll("tr"));
+            return {
+              width: box.width,
+              rows: rows.map((row) => {
+                const percentage = row.children[0];
+                const grade = row.children[1];
+                const range = document.createRange();
+                range.selectNodeContents(percentage);
+                return {
+                  leftGap: range.getBoundingClientRect().left - box.left,
+                  gradeWidth: grade.getBoundingClientRect().width,
+                  gradeAlign: getComputedStyle(grade).textAlign,
+                  lines: range.getClientRects().length,
+                };
+              }),
+            };
+          });
+        expect(layout.width).toBeLessThanOrEqual(420);
+        expect(layout.rows).toHaveLength(7);
+        for (const row of layout.rows) {
+          expect(row.leftGap).toBeGreaterThanOrEqual(12);
+          expect(row.leftGap).toBeLessThanOrEqual(24);
+          expect(row.gradeWidth).toBeLessThanOrEqual(110);
+          expect(row.gradeAlign).toBe("right");
+          expect(row.lines).toBe(1);
+        }
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+      }
+    });
+
     test(`keeps rubric points separated from prose at ${width}px`, async ({
       page,
     }) => {

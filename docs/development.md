@@ -65,6 +65,7 @@ Introduce the table with a semantic reference such as `:ref[table:descriptive-id
 
 Course brief tables share the spacing, borders, and row styling of captioned book tables, including when the course table has no caption.
 Assessment tables give numeric columns room for a single line; compact tables scroll horizontally when needed.
+The grade-threshold table uses a compact width and left-aligned percentage ranges, with a narrow right-aligned grade column.
 
 ## Downloadable labs
 
