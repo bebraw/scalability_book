@@ -148,3 +148,18 @@ Verification passed: formatting, `git diff --check`, the three exploration unit 
 All three Chromium exploration checks passed, covering publication, task/reading anchors, concept discovery, disclosure behavior, and independent reading without JavaScript.
 The changed book sections and the new activity were inspected in the generated site; the activity also fits the mobile viewport without horizontal overflow.
 These checks verify publication and presentation, not defect-detection gains or learner outcomes.
+
+## Follow-up — AI software engineering trends synthesis
+
+After commit `1082ac8`, a further MCP review covered `Clippings/_Analysis/AI Software Engineering Trends and Directions.md`.
+The note interprets the same October 8 intake; it adds a connection between the existing themes rather than new empirical evidence.
+All five directions already have substantial coverage in the book.
+
+Two prose refinements make the organizational connection explicit.
+[Chapter 2](../book/01_establish/02_scalable_development.md#choose-what-to-participate-in) connects future review capacity to practice and mentoring, using the existing shared engineering sessions as an example.
+[The recap](../book/03_compare/09_recap.md#turn-comparison-into-a-decision) explains that better software outcomes can coexist with higher review costs, reduced learning opportunities, or less valued participation, and keeps unmeasured effects unverified.
+These are adoption considerations; the course requirements and assessment criteria remain unchanged.
+The synthesis's curated collection supplies directions for investigation, not evidence of uniform industry trends.
+
+Follow-up verification passed: Prettier, `git diff --check`, `npm run build`, and `npm run validate` including type checking and 78 generated HTML pages.
+Both passages were inspected in the generated site, and their links to the shared engineering sessions and Chapter 2 resolved to the intended sections.

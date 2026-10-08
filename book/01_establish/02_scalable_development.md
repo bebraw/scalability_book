@@ -261,6 +261,12 @@ Choose what to delegate in light of those purposes as well as the result's quali
 Manual work, agent critique, supervised implementation, and delegation can each fit a different task.
 Finishing the agreed work can be a reason to stop, even when the agent has capacity for another task.
 
+These choices also affect the team's future capacity to review and maintain software.
+A workflow that relies on experienced reviewers needs opportunities for people to acquire that judgment.
+Protected practice and mentoring can make room for predicting behavior, investigating failures, and explaining acceptance decisions.
+The [shared engineering sessions](/project/#shared-engineering-sessions) illustrate one approach through individual predictions and rotating responsibilities.
+Check later independent explanation or repair before claiming a learning benefit, and ask separately whether people retain meaningful choice and manageable workloads.
+
 [Appendix A's optional Navigator exercise](/appendices/evaluating-agentic-workflows/#optional-exercise-write-with-an-agent-as-navigator) compares agent guidance with delegated implementation, then checks later unaided explanation and repair.
 
 ## Project artifact

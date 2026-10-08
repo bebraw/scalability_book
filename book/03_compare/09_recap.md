@@ -71,7 +71,7 @@ Use the earlier phase records and the implementation, fleet, and scaling/deploym
 | Architecture and contracts     | Request trace and key boundary decisions                                                      | Which boundaries made independent change safer or harder?                       |
 | Pressure and saturation        | Pressure map and first predicted or observed limit                                            | How did each architecture respond to the same growth scenario?                  |
 | Measurement and recovery       | Benchmark, operational signals, and recovery result                                           | What was directly observed, and what remained invisible?                        |
-| Development friction           | Cross-team audit and [change effort](/concepts/#change-probe)                                                            | Which setup, test, or coupling cost would dominate the next change?             |
+| Development friction           | Cross-team audit and [change effort](/concepts/#change-probe)                                 | Which setup, test, or coupling cost would dominate the next change?             |
 | Human–agent workflow           | Execution trace, interventions, and review effort; include handoffs and backlog for the fleet | Which allocation produced accepted work at a sustainable correction cost?       |
 | Resource use and externalities | Runtime and model-use evidence                                                                | Did added resources create useful capacity or quality, or merely more activity? |
 
@@ -123,6 +123,12 @@ A useful decision connects a constraint to evidence and an owner:
 In the queue example, faster HTTP acknowledgment alone would not justify the decision.
 The argument must also account for event-visibility delay, recovery behavior, and the effort to maintain and review the new worker path.
 Use the same evidence to explain both the benefit and its price.
+
+The same reasoning applies to adopting an agent workflow.
+Better software outcomes can coexist with more review and maintenance work, fewer opportunities to learn, or less valued participation.
+[Chapter 2's assistance outcomes](/chapters/scalable-development/#choose-what-to-participate-in) distinguish accepted output, retained competence, and valued participation.
+A useful adoption decision considers how the team will develop the judgment needed to review and correct future changes.
+Keep learning and participation effects unverified when the comparison did not examine them.
 
 ### Field note — Familiarity is part of effective capability
 
