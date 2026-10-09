@@ -14,6 +14,8 @@ import type { GuideSave } from "./learning-practice.ts";
 
 interface Options {
   client: LearningClient;
+  provider: string | null;
+  connect: () => void;
   toolMode?: "none" | "native";
   entries: NotebookEntry[];
   draft: AssistantDraft;
@@ -89,6 +91,8 @@ export function mountLearningAssistant(
   if (section === "agent")
     return mountLearningAgent(container, {
       client: options.client,
+      provider: options.provider,
+      connect: options.connect,
       ...(options.toolMode ? { toolMode: options.toolMode } : {}),
       draft: options.draft,
       source: pageSource,

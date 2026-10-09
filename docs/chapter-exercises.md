@@ -24,6 +24,8 @@ Save result persists the structured response; the server independently calculate
 An incorrect attempt can be saved and retried.
 There is no self-reported completion checkbox or free-text grading.
 The UI distinguishes unsaved, saved, restored, failed, and conflicting changes.
+When loading saved answers fails, editing, checking and restoring a tab draft retain that failure explanation and keep Save disabled.
+A signed-in learner is not prompted to sign in again merely because answer storage is unavailable; automatic checking remains usable.
 The answer API exposes only the verified session owner's records; it has no teacher/admin listing and does not publish answers as feedback.
 GitHub numeric user IDs provide account identity independently of username changes.
 Verified enrolled-student email sessions can also save answers, keyed by course run and stable internal student identity.

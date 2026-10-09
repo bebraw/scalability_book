@@ -99,6 +99,7 @@ Developed reflections have prompts and examples to help you capture enough evide
 There is no single correct conclusion: uncertainty, a failed experiment or a better-supported unchanged view can be useful material.
 
 **Notes** lets you review saved revisions and revisit an earlier idea.
+Edit and Revisit ask before replacing unfinished writing; choose Cancel to keep your current draft.
 Try explaining it from memory and applying it to a changed situation before rereading your earlier explanation.
 **Concepts** records your own revisable judgment and the notebook evidence behind it.
 These markers do not grade or certify your understanding.
@@ -134,6 +135,9 @@ It must not contain custom configuration, hooks, plugins, rules or custom skills
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
 In **Teaching assistant → Discuss**, write your question and choose **Send message**.
+The provider notice beside your message identifies whether replies are enabled.
+For a notebook-only connection, Send is disabled; **Set up assistant replies** opens Connect with setup links and a copyable Codex start command.
+After enabling the provider, choose **Check connection** and reconnect if asked; your unsent question stays in the tab.
 The **Help: … · Settings** disclosure shows the current help choice and contains conversation/source controls, your optional learning goal and support preferences.
 Choose a help mode there: a question, hint, direct explanation, reasoning check or reflection support.
 This is automated study support through your chosen provider; your instructor remains responsible for course assessment.

@@ -71,6 +71,7 @@ async function mount(root: HTMLElement, auth: Auth) {
   let loadRevision = 0;
   let followingAccountLink = false;
   let expected: string | null = null;
+  let savingProblem: string | null = null;
   let ready = false,
     dirty = false,
     checked = false,
@@ -78,6 +79,13 @@ async function mount(root: HTMLElement, auth: Auth) {
   const say = (text: string) => {
     status.textContent = text;
   };
+  const unavailableReason = () =>
+    savingProblem ??
+    (auth.authenticated
+      ? "Load this account’s saved answers before saving."
+      : auth.available === false
+        ? "Saving is unavailable. Automatic checking still works."
+        : "Sign in to save your result.");
   const read = () =>
     JSON.stringify(
       Object.fromEntries(
@@ -140,9 +148,7 @@ async function mount(root: HTMLElement, auth: Auth) {
       "[data-feedback]",
     ))
       feedback.hidden = true;
-    say(
-      ready ? "Unsaved changes." : "Not saved. Sign in to keep your results.",
-    );
+    say(ready ? "Unsaved changes." : `Not saved. ${unavailableReason()}`);
   }
   function showSignin() {
     if (auth.loginUrl) {
@@ -157,6 +163,7 @@ async function mount(root: HTMLElement, auth: Auth) {
     const owner = auth.owner;
     const keepDraft = preserveDraft && dirty;
     ready = false;
+    savingProblem = null;
     expected = null;
     lock(true);
     try {
@@ -215,11 +222,11 @@ async function mount(root: HTMLElement, auth: Auth) {
       );
     } catch (error) {
       if (own !== loadRevision || owner !== auth.owner) return;
-      say(
+      savingProblem =
         error instanceof Error
           ? error.message
-          : "Could not load saved answers. Reload to retry.",
-      );
+          : "Could not load saved answers. Reload to retry.";
+      say(savingProblem);
     } finally {
       if (own === loadRevision) lock(false);
     }
@@ -242,7 +249,7 @@ async function mount(root: HTMLElement, auth: Auth) {
       say(
         ready
           ? "Checked. Save your result to keep it."
-          : "Checked in this browser. Sign in to save your result.",
+          : `Checked in this browser. ${unavailableReason()}`,
       );
   });
   signin.addEventListener("click", (event) => {
@@ -270,6 +277,7 @@ async function mount(root: HTMLElement, auth: Auth) {
     if (next.owner === auth.owner) return;
     loadRevision++;
     auth = next;
+    savingProblem = null;
     ready = false;
     lock(false);
     save.disabled = true;
@@ -305,7 +313,9 @@ async function mount(root: HTMLElement, auth: Auth) {
       restore(draft);
       changed();
       say(
-        "Unfinished answers restored in this tab. Check and save them when ready.",
+        ready
+          ? "Unfinished answers restored in this tab. Check and save them when ready."
+          : `Unfinished answers restored in this tab. ${unavailableReason()}`,
       );
     }
   } catch {
@@ -377,11 +387,12 @@ async function mount(root: HTMLElement, auth: Auth) {
           : "Saved to your account.",
       );
     } catch (error) {
-      say(
+      const message =
         error instanceof Error
           ? error.message
-          : "Could not save. Your answers remain here; try again.",
-      );
+          : "Could not save. Your answers remain here; try again.";
+      if (!ready) savingProblem = message;
+      say(message);
     } finally {
       saving = false;
       lock(false);

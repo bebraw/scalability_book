@@ -149,13 +149,7 @@ export function createLearningPane(
   ) {
     if (experience !== "notebook")
       return services.beginNote(source, kind, title, relatedIds);
-    if (
-      editorDirty() &&
-      !window.confirm(
-        "Replace this unfinished note? Choose Cancel to keep writing it.",
-      )
-    )
-      return false;
+    if (!canReplaceNote()) return false;
     acceptedAssistance = null;
     status.textContent = "";
     editor = {
@@ -169,6 +163,14 @@ export function createLearningPane(
     };
     navigate("write");
     return true;
+  }
+  function canReplaceNote() {
+    return (
+      !editorDirty() ||
+      window.confirm(
+        "Replace this unfinished note? Choose Cancel to keep writing it.",
+      )
+    );
   }
   function writeHandoff(value: NotebookHandoff) {
     if (experience !== "notebook") {
@@ -369,6 +371,8 @@ export function createLearningPane(
         view as AssistantSection,
         {
           client,
+          provider: companionStatus?.provider ?? null,
+          connect: () => navigate("connect"),
           ...(companionStatus?.capabilities
             ? { toolMode: companionStatus.capabilities.tools }
             : {}),
@@ -654,12 +658,19 @@ export function createLearningPane(
         const target = entry.source.anchor
           ? document.getElementById(entry.source.anchor)
           : document.querySelector("main .prose, main, #content");
-        const matches = target && textOf(target).includes(entry.source.excerpt);
+        // Demo excerpts can be authored descriptions or snapshots of changing
+        // controls. They are not quotes that must still match the live demo.
+        const matches =
+          target &&
+          (entry.source.kind === "demo" ||
+            textOf(target).includes(entry.source.excerpt));
         card.append(
           node(
             "p",
             matches
-              ? "Captured text is present on this page."
+              ? entry.source.kind === "demo"
+                ? "Demo source is present on this page. Saved observations keep their original inputs and result."
+                : "Captured text is present on this page."
               : "This source may have changed or moved. Your captured text is retained.",
             "learning-hint",
           ),
@@ -667,6 +678,8 @@ export function createLearningPane(
       }
       card.append(
         button("Edit", () => {
+          if (!canReplaceNote()) return;
+          status.textContent = "";
           acceptedAssistance =
             entry.history[entry.history.length - 1]?.assistance ?? null;
           editor = {
@@ -683,17 +696,12 @@ export function createLearningPane(
       );
       card.append(
         button("Revisit", () => {
-          acceptedAssistance = null;
-          editor = {
-            id: "",
-            expected: "",
-            kind: "revisit",
-            title: `Revisit: ${entry.title}`.slice(0, 300),
-            body: "",
-            relatedIds: [entry.id],
-            source: entry.source,
-          };
-          navigate("write");
+          beginNote(
+            entry.source,
+            "revisit",
+            `Revisit: ${entry.title}`.slice(0, 300),
+            [entry.id],
+          );
         }),
       );
       card.append(
@@ -884,19 +892,11 @@ export function createLearningPane(
       ),
     );
   }
-  function renderConnection() {
-    container.append(
-      node(
-        "p",
-        connected
-          ? "Your private notebook is connected. You can work without a model connection."
-          : "Start the learning companion on your computer, then choose Connect companion.",
-      ),
-    );
+  function renderStartCommand(codex = false) {
     const command = node("pre");
     // Use the checkout until the code-free standalone release is published.
     const origin = location.origin.replaceAll("'", "'\\''");
-    const startCommand = `npm run companion -- --origin '${origin}'`;
+    const startCommand = `npm run companion -- ${codex ? "--codex " : ""}--origin '${origin}'`;
     command.append(node("code", startCommand));
     container.append(
       node(
@@ -905,7 +905,7 @@ export function createLearningPane(
         "learning-hint",
       ),
       command,
-      button("Copy command", async () => {
+      button(codex ? "Copy Codex command" : "Copy command", async () => {
         try {
           await navigator.clipboard.writeText(startCommand);
           status.textContent =
@@ -920,8 +920,35 @@ export function createLearningPane(
             "Copy is unavailable here. The command is selected; copy it using your keyboard.";
         }
       }),
+    );
+  }
+  function renderConnection() {
+    container.append(
+      node(
+        "p",
+        connected
+          ? "Your private notebook is connected. You can work without a model connection."
+          : "Start the learning companion on your computer, then choose Connect companion.",
+      ),
+    );
+    renderStartCommand();
+    container.append(
       link("Companion setup and notebook backups", "/notebook/setup/"),
     );
+    if (connected && !companionStatus?.provider) {
+      container.append(
+        node("h3", "Enable assistant replies"),
+        node(
+          "p",
+          "For Codex, complete the dedicated-profile setup and sign in if needed. Stop the current companion, restart it with this command, then choose Check connection and Connect companion again. Your notes and message draft are retained.",
+        ),
+        link("Set up Codex", "/notebook/setup/#connect-your-agent"),
+      );
+      renderStartCommand(true);
+      container.append(
+        link("Set up a local model", "/notebook/setup/#use-a-local-model"),
+      );
+    }
     if (!connected) {
       const address = node("input");
       address.value = client.base;

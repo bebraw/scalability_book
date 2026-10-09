@@ -19,6 +19,9 @@ The website account is optional for notebook writing and assistant discussion.
 Only an existing companion session is checked when opening the account view; no notebook contents or model replies are requested.
 **Open connection settings** opens the existing notebook Connect section on pages that provide learning tools; other pages link to companion setup.
 Provider status reports configuration and connection, while an actual assistant reply establishes provider availability.
+Discuss shows this status beside the message composer.
+A notebook-only connection disables Send and offers **Set up assistant replies**; Connect provides a copyable Codex restart command and links for dedicated-profile setup and local models.
+Checking the connection after enabling a provider retains the unsent question.
 
 Checked chapter exercises offer **Discuss my answer** and a preview of the exact prompt, exercise ID/version, attempt and checker feedback.
 The handoff prepares an editable assistant message with no notebook notes selected; it neither sends the message nor saves the attempt as a note.
@@ -53,6 +56,7 @@ Assistant state also retains the captured source, active conversation ID and ini
 Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant and restore their single open experience.
 Additive version 1 fields retain both panels and independent selections without migrating notebook or conversation databases.
 Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
+This includes **Notes → Edit** and **Notes → Revisit**; cancelling preserves the unfinished draft, while accepting clears the previous save confirmation.
 Guide and concept choices follow the current reading; peer inquiry uses the current page or its captured passage.
 Discuss retains its own chosen source across navigation and saved-conversation selection, independently of an unfinished notebook note; **Discuss the current reading** prepares a deliberate replacement.
 Only Save note creates or revises a durable companion record; tab continuity is not a notebook backup and does not survive closing the tab.
@@ -66,6 +70,10 @@ Shared record refreshes preserve the assistant's unsent message and ongoing disc
 **Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
 An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
 Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
+Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
+[learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
+Unsupported equations retain their original notation.
+Conversation storage and reviewed notebook drafts retain the original reply text; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records this presentation boundary.
 Optional Codex and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
 Codex and explicitly selected native local tools use the same bounded browser broker; local discussion has no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
@@ -165,6 +173,9 @@ The student guide owns the concrete recovery steps and limits.
 ## Notebook and portability
 
 Notes retain their original source URL, anchor, excerpt and available revision.
+On the current page, passage notes compare the captured excerpt with the live source text.
+Demo notes check that their anchored demo exists, because authored captions and saved observations need not match its changing controls/output.
+The saved demo inputs/result remain historical evidence; presence does not establish that the demo is unchanged.
 Editing appends a dated revision and preserves accepted assistance provenance.
 Concurrent/stale edits are rejected rather than overwriting the latest note.
 Concept judgments separate Studied from Unsure, Can explain and Can apply, with dated history, evidence references and a next intention.

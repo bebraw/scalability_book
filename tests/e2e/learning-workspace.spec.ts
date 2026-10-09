@@ -61,6 +61,141 @@ test.afterEach(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
+async function advertiseProvider(page: import("@playwright/test").Page) {
+  await page.route(`${companionAddress}/status`, async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      json: { ...(await response.json()), provider: "Synthetic" },
+    });
+  });
+}
+
+test("notebook-only connections explain setup before sending and retain the question", async ({
+  page,
+  baseURL,
+}) => {
+  const posts: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      request.url().includes("/agent/conversations/")
+    )
+      posts.push(request.url());
+  });
+  await page.goto("/chapters/benchmarking/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = activeLearningPanel(page);
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  await chooseNotebookTool(panel, "Discuss");
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Keep my question while I enable a provider.");
+  await expect(
+    panel.getByRole("button", { name: "Send message", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    panel.getByRole("region", { name: "Assistant provider" }),
+  ).toContainText("Notebook-only connection");
+  await panel.getByRole("button", { name: "Set up assistant replies" }).click();
+  await expect(
+    panel.getByRole("heading", { name: "Enable assistant replies" }),
+  ).toBeVisible();
+  await expect(
+    panel.locator("code").filter({ hasText: "--codex" }),
+  ).toContainText(
+    `npm run companion -- --codex --origin '${new URL(baseURL!).origin}'`,
+  );
+  await expect(
+    panel.getByRole("button", { name: "Copy Codex command", exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("link", { name: "Set up Codex", exact: true }),
+  ).toHaveAttribute("href", "/notebook/setup/#connect-your-agent");
+  await advertiseProvider(page);
+  await panel
+    .getByRole("button", { name: "Check connection", exact: true })
+    .click();
+  await chooseNotebookTool(panel, "Discuss");
+  await expect(
+    panel.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue("Keep my question while I enable a provider.");
+  await expect(
+    panel.getByRole("region", { name: "Assistant provider" }),
+  ).toContainText("Synthetic enabled");
+  await expect(
+    panel.getByRole("button", { name: "Send message", exact: true }),
+  ).toBeEnabled();
+  expect(posts).toEqual([]);
+});
+
+test("editing or revisiting a saved note protects unfinished writing and clears old save status", async ({
+  page,
+}) => {
+  await page.goto("/chapters/benchmarking/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = activeLearningPanel(page);
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  await panel
+    .getByLabel("Title", { exact: true })
+    .fill("Synthetic protected note");
+  await panel
+    .getByLabel("Your thinking")
+    .fill("My saved original explanation.");
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(panel.getByRole("status")).toContainText(
+    "Saved in your private notebook",
+  );
+  await chooseNotebookTool(panel, "Notes");
+  const note = panel.locator("article").filter({
+    has: page.getByRole("heading", {
+      name: "Synthetic protected note",
+      exact: true,
+    }),
+  });
+  await note.getByRole("button", { name: "Edit", exact: true }).click();
+  await expect(panel.locator('[role="status"]')).toBeEmpty();
+  await panel
+    .getByLabel("Your thinking")
+    .fill("Keep this unfinished revision.");
+  for (const action of ["Edit", "Revisit"]) {
+    await chooseNotebookTool(panel, "Notes");
+    page.once("dialog", (dialog) => dialog.dismiss());
+    await note.getByRole("button", { name: action, exact: true }).click();
+    await chooseNotebookTool(panel, "Write");
+    await expect(panel.getByLabel("Your thinking")).toHaveValue(
+      "Keep this unfinished revision.",
+    );
+    await page.reload();
+    await expect(panel.getByLabel("Your thinking")).toHaveValue(
+      "Keep this unfinished revision.",
+    );
+  }
+  await chooseNotebookTool(panel, "Notes");
+  page.once("dialog", (dialog) => dialog.accept());
+  await note.getByRole("button", { name: "Revisit", exact: true }).click();
+  await expect(panel.getByLabel("Your thinking")).toHaveValue("");
+  await panel.getByLabel("Your thinking").fill("Another unfinished revisit.");
+  await chooseNotebookTool(panel, "Notes");
+  page.once("dialog", (dialog) => dialog.accept());
+  await note.getByRole("button", { name: "Edit", exact: true }).click();
+  await expect(panel.getByLabel("Your thinking")).toHaveValue(
+    "My saved original explanation.",
+  );
+  await expect(panel.locator('[role="status"]')).toBeEmpty();
+});
+
 test("independent learning launchers support keyboard return, closing and chapter continuity", async ({
   page,
 }) => {
@@ -219,6 +354,7 @@ test("concurrent panels retain independent context and drafts across reload, res
 test("notebook and assistant retain separate drafts and use reviewed source-linked handoffs", async ({
   page,
 }) => {
+  await advertiseProvider(page);
   const writes: string[] = [];
   page.on("request", (request) => {
     if (
@@ -370,7 +506,29 @@ test("notebook and assistant retain separate drafts and use reviewed source-link
             {
               id: "c0000000-0000-4000-8000-000000000002",
               role: "agent",
-              text: "Synthetic suggestion for a reviewed notebook draft.",
+              text: String.raw`Synthetic suggestion for a **reviewed** notebook draft.
+
+[Source chapter](/chapters/benchmarking/) and [external source](https://example.org/).
+
+| Quantity | Value |
+| --- | --- |
+| Work | 10 |
+
+Inline \(L = \lambda W\) and $L$.
+
+\[L = 20 \times 0.5 = 10\]
+
+\(\unknowncommand{fallback}\)
+
+<img src="https://example.org/tracker" onerror="alert(1)">
+<iframe src="https://example.org/"></iframe>
+[unsafe](javascript:alert%281%29)
+![Image description](https://example.org/image.png)
+
+~~~html
+<script>alert(1)</script>
+\(literal code\)
+~~~`,
               at: new Date().toISOString(),
               teaching: {
                 policy: {
@@ -397,6 +555,27 @@ test("notebook and assistant retain separate drafts and use reviewed source-link
   await expect(panel.locator(".learning-messages")).toContainText(
     "Synthetic suggestion",
   );
+  const reply = panel.locator(".learning-reply");
+  await expect(reply.locator("strong")).toHaveText("reviewed");
+  await expect(
+    reply.getByRole("link", { name: "Source chapter" }),
+  ).toHaveAttribute("href", /\/chapters\/benchmarking\/$/);
+  await expect(
+    reply.getByRole("link", { name: "external source" }),
+  ).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(reply.getByRole("table")).toContainText("Work");
+  await expect(reply.locator("math")).toHaveCount(3);
+  await expect(reply.locator(".learning-math code")).toContainText(
+    "unknowncommand",
+  );
+  await expect(reply.locator("pre code")).toContainText(
+    String.raw`\(literal code\)`,
+  );
+  await expect(
+    reply.locator("img, iframe, script, a[href^='javascript:']"),
+  ).toHaveCount(0);
+  await expect(reply).toContainText('onerror="alert(1)"');
+  await expect(reply).toContainText("Image description");
   expect(supplied[0]!.noteIds).toEqual([chosen.id]);
   await panel.getByText("About this reply", { exact: true }).click();
   await expect(
@@ -553,6 +732,27 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   await expect(
     panel.getByText("Demo result saved.", { exact: false }),
   ).toBeVisible();
+  await chooseNotebookTool(panel, "Notes");
+  await expect(
+    panel.getByText("Demo source is present on this page.", { exact: false }),
+  ).toHaveCount(2);
+  await expect(
+    panel.getByText("This source may have changed or moved.", {
+      exact: false,
+    }),
+  ).toHaveCount(0);
+  await page.locator("#demo-queue-balance-lab input").first().fill("25");
+  await chooseNotebookTool(panel, "Write");
+  await chooseNotebookTool(panel, "Notes");
+  await expect(
+    panel.getByText("Demo source is present on this page.", { exact: false }),
+  ).toHaveCount(2);
+  await expect(
+    panel.getByText("This source may have changed or moved.", {
+      exact: false,
+    }),
+  ).toHaveCount(0);
+  await chooseNotebookTool(panel, "Chapter guide");
   await practice
     .getByLabel("My explanation of the changed case")
     .fill(
@@ -599,6 +799,15 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   expect(saved[3]!.relatedIds).toEqual(
     expect.arrayContaining([saved[0]!.id, saved[1]!.id, saved[2]!.id]),
   );
+  // A missing anchor remains a real source-location warning.
+  await page
+    .locator("#demo-queue-balance-lab")
+    .evaluate((demo) => demo.remove());
+  await chooseNotebookTool(panel, "Notes");
+  await expect(
+    panel.getByText("This source may have changed or moved.", { exact: false }),
+  ).toHaveCount(4);
+  await chooseNotebookTool(panel, "Chapter guide");
   await page.goto("/chapters/introduction/");
   await expect(practice).toContainText("Choose one claim from this reading");
   await expect(
@@ -891,6 +1100,8 @@ test("opening either experience preserves book, reading and demo widths with exp
 test("students choose task support and direct explanations without a saved initial note", async ({
   page,
 }) => {
+  // A configured provider may still fail when contacted; retain the request.
+  await advertiseProvider(page);
   await page.goto("/chapters/benchmarking/");
   await page
     .locator(".site-header")
@@ -996,6 +1207,23 @@ test("selected context is explicit and the notebook follows chapters without los
     "Saved in your private notebook.",
   );
 
+  await chooseNotebookTool(panel, "Notes");
+  await expect(
+    panel.getByText("Captured text is present on this page.", { exact: true }),
+  ).toBeVisible();
+  await page
+    .locator("[data-comment-target]")
+    .first()
+    .evaluate((paragraph) => {
+      paragraph.textContent =
+        "Synthetic revised passage with different source text.";
+    });
+  await chooseNotebookTool(panel, "Write");
+  await chooseNotebookTool(panel, "Notes");
+  await expect(
+    panel.getByText("This source may have changed or moved.", { exact: false }),
+  ).toBeVisible();
+  await chooseNotebookTool(panel, "Write");
   await page.goto("/chapters/architecture/");
   await expect(panel).toBeVisible();
   await expect(panel.getByRole("heading", { level: 2 })).toHaveText(

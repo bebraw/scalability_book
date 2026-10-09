@@ -5,6 +5,7 @@ import {
   type NotebookEntry,
 } from "../../shared/learning-workspace.ts";
 import type { AssistantDraft } from "./learning-session.ts";
+import { renderLearningReply } from "./learning-reply.ts";
 import {
   helpModes,
   supportNeeds,
@@ -52,6 +53,8 @@ const field = (text: string, control: HTMLElement) => {
 };
 interface Options {
   client: LearningClient;
+  provider: string | null;
+  connect: () => void;
   toolMode?: "none" | "native";
   draft: AssistantDraft;
   source: () => LearningSource;
@@ -328,9 +331,24 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     ),
   );
   container.append(field("Message to the teaching assistant", input));
+  const readiness = element("section");
+  readiness.className = "learning-provider-readiness";
+  readiness.setAttribute("aria-label", "Assistant provider");
+  readiness.append(
+    element(
+      "p",
+      options.provider
+        ? `${options.provider} enabled. Send a message to check that it can reply.`
+        : "Notebook-only connection. Enable Codex or a local model for assistant replies. Your message stays here while you set up the provider.",
+    ),
+  );
+  if (!options.provider)
+    readiness.append(button("Set up assistant replies", options.connect));
+  container.append(readiness);
   const actions = element("div");
   actions.className = "learning-assistant-actions";
   const send = button("Send message", async () => {
+    if (!options.provider) return;
     if (!draft.question.trim()) {
       options.status("Write your question or initial explanation first.");
       return;
@@ -367,6 +385,9 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     poll();
   });
   send.className = "learning-primary";
+  send.disabled = !options.provider;
+  send.setAttribute("aria-describedby", "learning-provider-readiness");
+  readiness.id = "learning-provider-readiness";
   actions.append(
     send,
     button("Stop reply", async () => {
@@ -409,7 +430,10 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
               : "Browser observation",
         ),
       );
-      const body = element("p", message.text);
+      const body =
+        message.role === "agent"
+          ? renderLearningReply(message.text)
+          : element("p", message.text);
       card.append(body);
       if (message.role === "student" && message.support) {
         const detail = element(

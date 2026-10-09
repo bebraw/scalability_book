@@ -10,6 +10,66 @@ test.setTimeout(90_000);
 const chapter = "/chapters/benchmarking/";
 const exerciseId = "exercise-measurement-boundary";
 
+test("signed-in learners retain the answer storage failure after editing, checking and reload", async ({
+  page,
+}) => {
+  await page.route("**/api/account/status", (route) =>
+    route.fulfill({
+      json: {
+        local: false,
+        github: {
+          available: true,
+          user: { id: 17, login: "reader" },
+          loginUrl: "/api/auth/github/start",
+        },
+        course: { available: false, emailAvailable: false, user: null },
+        answers: { userId: "github:17", label: "@reader" },
+      },
+    }),
+  );
+  const failure =
+    "Answer storage is not available yet. Your text has not been saved.";
+  await page.route("**/api/learning/*", (route) =>
+    route.fulfill({ status: 503, json: { message: failure } }),
+  );
+  await page.goto(`${chapter}#${exerciseId}`);
+  const exercise = page.locator(`#${exerciseId}`);
+  await expect(exercise.locator(".exercise-privacy")).toContainText("@reader");
+  await expect(exercise.locator(".exercise-status")).toHaveText(failure);
+  await exercise
+    .getByLabel("Calculated work in progress (operations)")
+    .fill("10");
+  await exercise
+    .getByLabel("What follows from the mismatch?")
+    .selectOption("check");
+  await expect(exercise.locator(".exercise-status")).toContainText(failure);
+  await exercise
+    .getByRole("button", { name: "Check answer", exact: true })
+    .click();
+  await expect(exercise.locator(".exercise-status")).toHaveText(
+    `Checked in this browser. ${failure}`,
+  );
+  await expect(
+    exercise.getByRole("button", { name: "Save result", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    exercise.getByRole("link", { name: "Sign in to save", exact: true }),
+  ).toBeHidden();
+  await page.reload();
+  await expect(
+    exercise.getByLabel("Calculated work in progress (operations)"),
+  ).toHaveValue("10");
+  await expect(exercise.locator(".exercise-status")).toHaveText(
+    `Unfinished answers restored in this tab. ${failure}`,
+  );
+  await exercise
+    .getByRole("button", { name: "Check answer", exact: true })
+    .click();
+  await expect(exercise.locator(".exercise-status")).toHaveText(
+    `Checked in this browser. ${failure}`,
+  );
+});
+
 test("signing out of GitHub updates feedback and selects the separate course account", async ({
   page,
 }) => {
