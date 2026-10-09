@@ -896,7 +896,8 @@ export function createLearningPane(
     const command = node("pre");
     // Use the checkout until the code-free standalone release is published.
     const origin = location.origin.replaceAll("'", "'\\''");
-    command.append(node("code", `npm run companion -- --origin '${origin}'`));
+    const startCommand = `npm run companion -- --origin '${origin}'`;
+    command.append(node("code", startCommand));
     container.append(
       node(
         "p",
@@ -904,6 +905,21 @@ export function createLearningPane(
         "learning-hint",
       ),
       command,
+      button("Copy command", async () => {
+        try {
+          await navigator.clipboard.writeText(startCommand);
+          status.textContent =
+            "Companion command copied. Paste it in a terminal from the book checkout.";
+        } catch {
+          const selection = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(command);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          status.textContent =
+            "Copy is unavailable here. The command is selected; copy it using your keyboard.";
+        }
+      }),
       link("Companion setup and notebook backups", "/notebook/setup/"),
     );
     if (!connected) {

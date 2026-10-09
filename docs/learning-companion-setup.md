@@ -24,7 +24,9 @@ npm run companion
 Keep the companion running while you use your notebook.
 It prints a local address and the websites it allows.
 In the book, choose **Notebook → Connect**, enter the address if needed, and choose **Connect companion**.
-There is no code to copy.
+The connection instructions include **Copy command** for the startup command with this website's exact origin.
+If clipboard access is unavailable, the command is selected for keyboard copying.
+No pairing code is needed.
 If your browser requests permission to reach the local companion, allow it for the book website.
 After disconnect, expiry or restart, choose **Connect companion** again; the running companion does not need a restart for reconnection.
 
