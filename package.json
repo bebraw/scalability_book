@@ -46,6 +46,7 @@
     "@citation-js/core": "0.8.2",
     "@citation-js/plugin-bibtex": "0.8.2",
     "@citation-js/plugin-csl": "0.8.2",
+    "@modelcontextprotocol/server": "2.3.1",
     "@ngrok/webernetes": "0.1.5",
     "@tailwindcss/typography": "0.5.19",
     "easymde": "2.20.0",
@@ -57,11 +58,13 @@
     "marked": "18.0.2",
     "scholarmark": "0.9.1",
     "vite": "8.0.10",
-    "xstate": "5.32.5"
+    "xstate": "5.32.5",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",
     "@cloudflare/workers-types": "4.20260702.1",
+    "@modelcontextprotocol/client": "2.3.1",
     "@playwright/test": "1.60.0",
     "@types/hast": "3.0.5",
     "@types/node": "25.7.0",

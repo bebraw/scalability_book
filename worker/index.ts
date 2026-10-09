@@ -3,6 +3,7 @@ import { handleLearning, d1AnswerStore } from "./learning.ts";
 import { safeReturnTo } from "../shared/exercises.ts";
 import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { handlePublicMcp } from "./public-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
@@ -117,6 +118,20 @@ export default {
     ctx?: Pick<ExecutionContext, "waitUntil">,
   ): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/mcp" || url.pathname === "/mcp/") {
+      return handlePublicMcp(
+        request,
+        async (pathname) => {
+          const asset = await env.ASSETS.fetch(
+            new Request(new URL(pathname, url.origin)),
+          );
+          if (!asset.ok) throw new Error("Public asset unavailable");
+          return asset.text();
+        },
+        url.origin,
+      );
+    }
 
     if (url.pathname === "/__worker/health") {
       return Response.json({

@@ -8,6 +8,51 @@ The optional **Notebook → Agent** interface connects these resources to a stud
 [The student setup guide](learning-companion-setup.md) is published at `/notebook/setup/`.
 The public resource guidance below remains usable with ordinary external clients.
 
+## Public MCP server
+
+`/mcp` is a public, stateless Streamable HTTP endpoint, available in production and through `npm run dev`.
+[The student connection guide](external-agent-setup.md) is published at `/agents/` and linked from the concept explorer, Markdown guide and `/llms.txt`.
+The guide and graph files remain ordinary HTTP resources and file-based fallbacks.
+
+`worker/public-mcp.ts` owns protocol registration, request bounds and origin checks using the official TypeScript SDK.
+It supports current 2026-07-28 requests and stateless 2025-era clients.
+`shared/book-retrieval.ts` owns transport-independent search and lookup.
+The Worker and development server supply only published assets, without forwarding cookies or consulting account, notebook, conversation, exercise-answer or course storage.
+MCP makes no model calls and stores no learner/session data.
+
+| Tool                         | Contract                                                                                                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_book(query, limit?)` | Lexical search over concepts, rendered passages, activity summaries and demo metadata; at most 20 results, with source URLs and explicit retrieval actions. |
+| `read_passage(url, offset?)` | Same-site indexed prose at a page, heading or paragraph anchor; at most 8000 characters and `nextOffset` when more remains.                                 |
+| No arbitrary URL fetch.      |
+| `get_concept(id)`            | Definition, assumptions, example, common mistake, usage, teaching passages, visual resources and activity IDs.                                              |
+| `get_neighbors(id)`          | Incident authored edges with original source, target, direction, label and explanation; incoming discovery never reverses a claim.                          |
+| `get_activity(id, part?)`    | Authored scenario and guidance by default; `part=discussion` explicitly retrieves the separate worked reasoning after an attempt or request.                |
+| `get_demo(id)`               | Authored controls, assumptions, images and prediction-led prompts, with explicit `liveState=false` and `execute=false` capabilities.                        |
+
+Results include structured data plus equivalent text for clients that only consume text.
+The two MCP resources expose the existing guide and graph; the `start_investigation` prompt offers a question-led starting workflow.
+Tools are read-only, with bounded schemas and a 64 KiB request limit.
+Requests without an Origin header support server clients; browser requests accept the current site origin, `https://chatgpt.com` and `https://claude.ai`, with matching CORS headers.
+Other browser origins are rejected.
+There is no legacy HTTP+SSE endpoint or connection-dependent tool list.
+
+`scripts/lib/book-passages.ts` builds `/concepts/passages.json` from already-rendered published book pages, current course briefs and case studies.
+It excludes navigation, imported interactive UI, exercise/discussion disclosures, comments and author-only material.
+Heading ancestry and paragraph anchors preserve section context.
+The publication revision fingerprints this prose independently of the graph revision; both describe the current deployment, not immutable archived URLs.
+An exercise or demo anchor excluded from the prose index returns an unavailable-passage error; the agent can search for explanatory prose or use the original browser page.
+Do not claim an unavailable passage was read.
+
+The server's instructions, activity pacing and `agentPresentation` guide client behavior; they cannot enforce an external agent's teaching choices.
+No browser interaction, current passage selection or private context is implied by connecting.
+Those remain the companion's separate, explicitly selected-context boundary.
+
+Verification uses the official client against both protocol eras, including passage retrieval, a qualified Queue → Latency connection, demo guidance, separate discussions, resource/prompt discovery, invalid inputs and private-path rejection.
+These checks establish retrieval and protocol behavior, not model selection quality, ChatGPT UI rendering or learner outcomes.
+
+## Authored resources
+
 `shared/explorations.ts` owns stable activity IDs, course-task connections, reading context, and concept membership.
 The scenario and prompts live in `explorations/<id>.md`; worked reasoning lives separately in `explorations/<id>.discussion.md`.
 The build generates one student page and two Markdown resources per activity:
@@ -76,7 +121,7 @@ Generated results are illustrative; they do not become measured project evidence
 The guidance preserves the first-question pause and separate worked reasoning.
 
 For example, an agent can help investigate work in progress with the queue balance lab, trace the recorder fixture across restart, or compare reported confidence with reference agreement after a prediction.
-No MCP UI server or hosted conversational client is introduced by this guidance.
+The public MCP server returns data and guidance; it does not register an embedded MCP Apps UI or host a conversational client.
 Client behavior should be tested with both an interactive-capable client and a text-only client.
 
 Resource fields are additive to graph schema version 2.

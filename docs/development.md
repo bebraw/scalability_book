@@ -102,6 +102,13 @@ npm run build
 npm run dev
 ```
 
+The same server exposes public learning retrieval at `http://127.0.0.1:3000/mcp`.
+Run `node --test tests/public-mcp.test.ts tests/concept-export.test.ts tests/explorations.test.ts` for the retrieval boundary and current/legacy MCP client checks.
+For Worker changes, also run `npm run worker:build` and `npx wrangler deploy --dry-run --outdir .local/mcp-worker-dry-run`; exercise the endpoint through `wrangler dev --local` before deployment.
+With a server running, use `node scripts/check-public-mcp.ts http://127.0.0.1:8790/mcp` (or the deployed HTTPS endpoint) to compare three retrieval tasks with the published guide and graph through both protocol eras.
+This check makes no model calls and does not evaluate an external agent's teaching behavior.
+See [the public tool contract](agent-learning-resources.md#public-mcp-server) and [student setup](external-agent-setup.md).
+
 `npm run dev` serves the site locally at `http://127.0.0.1:3000` with an Edit button on book pages.
 In this mode, all Markdown files referenced by `parts` are shown regardless of the `chapters` list in `site.config.jsonc`, so drafts are easy to edit locally.
 

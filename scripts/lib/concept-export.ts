@@ -37,6 +37,8 @@ export function exportConceptGraph(siteUrl: string, title: string) {
       markdown: absolute("/concepts/graph.md"),
       explorations: absolute("/explore/index.json"),
       explorationIndex: absolute("/explore/"),
+      mcp: absolute("/mcp"),
+      agentSetup: absolute("/agents/"),
     },
     semantics: {
       relationships:
@@ -120,6 +122,7 @@ Choose your own question or start with one of the activities below. The chapters
 
 ## Connect
 
+- [Public MCP server](${graph.resources.mcp}): search and retrieve passages, concepts, connections, activities and demo instructions using a Streamable HTTP client with no authentication. [Connection instructions](${graph.resources.agentSetup}).
 - [Structured graph (JSON)](${graph.resources.json}): definitions, assumptions, examples, usage notes, explained connections, reading locations, graphics, and demo experiments.
 - [Text graph (Markdown)](${graph.resources.markdown}): the same authored content for agents that read text more readily than JSON.
 - [Visual explorer](${graph.url}): follow concepts and connections yourself.
@@ -127,7 +130,9 @@ Choose your own question or start with one of the activities below. The chapters
 
 Use an agent with an HTTP retrieval tool, or download this guide and either graph file and give them to an agent that reads local files. File-only agents can inspect the graph but need the linked reading pages supplied separately to verify the full argument. A chat assistant with no retrieval or file access cannot query these resources simply by being given a URL.
 
-These are public, read-only files. Fetch them directly with an HTTP GET or a file reader. The URLs are data resources; they are not an MCP server endpoint. You can build a retrieval tool around the JSON using the operations below.
+The guide and graph URLs are public, read-only files: fetch them with HTTP GET or a file reader. The separate \`/mcp\` endpoint implements MCP. It cannot see private learning records or live browser state. Choose the connection your client supports; both routes use the same authored material.
+
+With MCP, use \`search_book\` to find a source, then \`read_passage\` to verify its argument. Use \`get_concept\` for assumptions, common mistakes and resource IDs; \`get_neighbors\` for explained connections; \`get_activity\` for a scenario; and \`get_demo\` for prediction-led experiment guidance. These tools return context and suggested next actions, not evidence that an experiment ran. Search snippets alone are not a complete passage. Worked reasoning requires an explicit \`get_activity\` call with \`part: "discussion"\`, after an attempt or request.
 
 ## Your first reply to the student
 
@@ -340,6 +345,8 @@ The knowledge graph provides curated definitions, assumptions, examples, and exp
 
 ## Knowledge graph
 
+- [Connect your agent](${graph.resources.agentSetup}): public MCP setup and guide-based alternatives.
+- [MCP endpoint](${graph.resources.mcp}): Streamable HTTP, no authentication; search, passages, concepts, connections, activities and demo metadata. No private learner state or browser execution.
 - [Agent guide](${graph.resources.guide}): first-conversation activities, access, data contract, retrieval operations, citations, and checking an explanation against the book.
 - [Graph as Markdown](${graph.resources.markdown}): the complete authored reference, connections, graphics, and prediction-led demo experiments.
 - [Graph as JSON](${graph.resources.json}): structured data for searching concepts, following edges, locating readings, and selecting visual resources.

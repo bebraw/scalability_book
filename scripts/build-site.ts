@@ -9,6 +9,11 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { demoCatalog } from "../shared/demo-catalog.ts";
+import {
+  extractBookPassages,
+  exportBookPassages,
+} from "./lib/book-passages.ts";
+import type { BookPassage } from "../shared/book-retrieval.ts";
 import { exercises } from "../shared/exercises.ts";
 import { exportExplorations } from "../shared/explorations.ts";
 import {
@@ -401,6 +406,7 @@ const caseStudies = await Promise.all(
   }),
 );
 const openGraphCards: OpenGraphCard[] = [];
+const publicPassages: BookPassage[] = [];
 const renderer = createSiteRenderer({
   caseStudies,
   chapters,
@@ -418,6 +424,20 @@ const notebookSetup = await readFile(
   path.join(root, "docs/learning-companion-setup.md"),
   "utf8",
 );
+const externalAgentSetup = await readFile(
+  path.join(root, "docs/external-agent-setup.md"),
+  "utf8",
+);
+await writePage(
+  "agents/index.html",
+  renderer.renderLayout({
+    title: `Explore with your own agent - ${config.title}`,
+    description:
+      "Connect your agent to the public book MCP server, or start with the Markdown guide.",
+    currentUrl: "/agents/",
+    children: `<main id="content" class="chapter-main"><article class="prose">${renderMarkdown(externalAgentSetup, { number: "" }, bibliographySource).content}</article></main>`,
+  }),
+);
 await writePage(
   "notebook/setup/index.html",
   renderer.renderLayout({
@@ -432,6 +452,7 @@ await writePage(
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
   const rendered = renderMarkdown(page.source, page, bibliographySource);
+  publicPassages.push(...extractBookPassages(rendered.content, page, siteUrl));
   rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
   rendered.content = injectStatechartDiagram(rendered.content);
   rendered.content = attachConceptIndex(rendered.content, page.url);
@@ -597,6 +618,9 @@ for (let index = 0; index < projectSpecifications.length; index++) {
     { number: "" },
     bibliographySource,
   );
+  publicPassages.push(
+    ...extractBookPassages(rendered.content, specification, siteUrl),
+  );
   rendered.content = attachConceptIndex(rendered.content, specification.url);
   const previous = projectSpecifications[index - 1];
   const next = projectSpecifications[index + 1];
@@ -681,6 +705,9 @@ for (const caseStudy of caseStudies) {
     { number: "" },
     bibliographySource,
   );
+  publicPassages.push(
+    ...extractBookPassages(rendered.content, caseStudy, siteUrl),
+  );
   rendered.content = injectBookDiagrams(rendered.content, bookDiagramHtml);
   rendered.content = attachConceptIndex(rendered.content, caseStudy.url);
 
@@ -732,6 +759,10 @@ await writeOpenGraphImages({
 });
 
 await copyStaticAssets();
+await writePage(
+  "concepts/passages.json",
+  JSON.stringify(exportBookPassages(publicPassages)) + "\n",
+);
 await writeLabDownloads();
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);

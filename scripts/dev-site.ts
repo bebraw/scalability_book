@@ -7,6 +7,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { localAnswerStore } from "./lib/local-answers.ts";
 import { handleLearning } from "../worker/learning.ts";
+import { handlePublicMcp } from "../worker/public-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
@@ -82,6 +83,33 @@ if (process.env.RESET_LOCAL_COMMENTS === "1" && process.env.LOCAL_DATA_DIR) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || "/", `http://${host}:${port}`);
+
+    if (url.pathname === "/mcp" || url.pathname === "/mcp/") {
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(request.headers)) {
+        if (value)
+          headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+      }
+      const method = request.method || "GET";
+      const result = await handlePublicMcp(
+        new Request(url, {
+          method,
+          headers,
+          ...(method !== "GET" && method !== "HEAD"
+            ? { body: request, duplex: "half" }
+            : {}),
+        }),
+        (pathname) => readFile(path.join(buildDir, pathname), "utf8"),
+        url.origin,
+      );
+      response.writeHead(result.status, Object.fromEntries(result.headers));
+      if (result.body)
+        for await (const chunk of result.body) {
+          if (!response.write(chunk))
+            await new Promise((resolve) => response.once("drain", resolve));
+        }
+      return response.end();
+    }
 
     if (
       url.pathname === "/api/courses" ||
