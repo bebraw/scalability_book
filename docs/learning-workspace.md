@@ -99,6 +99,24 @@ The website/Worker never owns this private notebook or provider credentials.
 
 ## Explore an idea in the reading
 
+### Learn the tools by trying them
+
+The first cockpit opening offers **Try the tutorial**, with **Not now** leaving the learning loop available immediately.
+**Cockpit → Tutorial** reopens it at any time; the [setup guide's tutorial link](/notebook/setup/#try-the-learning-tutorial) also opens it directly.
+Five optional steps rehearse a prediction, a bounded queue illustration, an explicitly authored example reply, personal reflection and a preview of Notebook saving.
+The tutorial works without a companion, makes no model calls and does not change real demo controls or actual learning-loop writing.
+It explains source/evidence boundaries, selected assistant context, explicit saving, independent next checks, recent loops, peer sharing and the separation of website sign-in from companion connection.
+
+The browser owns tutorial progress and bounded writing in its tab session, independently of loop drafts, Notebook records and course state.
+A browser-local preference remembers dismissing or finishing the invitation; it contains no tutorial writing and is independent of sign-in.
+Exiting retains the current step for replay across book navigation; finishing starts replay from the beginning while retaining the rehearsal writing in the tab.
+Unavailable browser storage falls back to the mounted rehearsal's memory.
+Only **Prepare this as a real Notebook draft** invokes the existing reviewed handoff, using a tutorial-labelled source and preserving the unfinished-note confirmation.
+An enabled model is not required for that handoff; a connected notebook companion is.
+Only **Save note** persists a Notebook entry, and tutorial completion does not imply learning mastery or a course completion mark.
+
+### Your own learning loop
+
 **Learning cockpit** is the common learning loop across readings, appendices, part introductions, concepts, explorations, case studies, project briefs, the demo gallery, Notebook setup and the student course workspace.
 The header's **Cockpit** launcher opens a source-scoped workspace in the reading flow; an explicit passage selection becomes its bounded source context.
 Every authored demo offers **Explore this idea**, opening the same cockpit beside that activity.

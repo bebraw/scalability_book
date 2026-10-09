@@ -18,6 +18,7 @@ import {
   recentInvestigations,
 } from "./learning-investigation-session.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
+import { createLearningTutorial } from "./learning-tutorial.ts";
 
 export interface CockpitRequest {
   source?: LearningSource;
@@ -27,6 +28,7 @@ export interface CockpitRequest {
   selection?: ReadingSelection | null;
   resume?: boolean;
   phase?: InvestigationPhase;
+  tutorial?: boolean;
 }
 type Services = Omit<
   Parameters<typeof mountReadingInvestigation>[1],
@@ -44,6 +46,18 @@ export function createLearningCockpit(services: Services) {
   let mounted: ReturnType<typeof mountReadingInvestigation> | null = null;
   let activeKey = "";
   let root: HTMLElement | null = null;
+  const tutorial = createLearningTutorial({
+    settings: services.settings,
+    write: services.write,
+    active: (value) => {
+      if (root) root.dataset.tutorialActive = String(value);
+    },
+    returnFocus: () => {
+      root
+        ?.querySelector<HTMLButtonElement>("[data-cockpit-tutorial]")
+        ?.focus();
+    },
+  });
   function open(request: CockpitRequest = {}) {
     if (request.resume) {
       try {
@@ -90,6 +104,8 @@ export function createLearningCockpit(services: Services) {
     const key = investigationKey(source, activity);
     if (key === activeKey && mounted && !request.draft) {
       mounted.open();
+      tutorial.sync();
+      if (request.tutorial) tutorial.open();
       root!.scrollIntoView({ block: "start" });
       return;
     }
@@ -120,6 +136,12 @@ export function createLearningCockpit(services: Services) {
     }
     heading.append(title, resources);
     root.append(heading);
+    const help = node("button", "Tutorial");
+    help.type = "button";
+    help.dataset.cockpitTutorial = "";
+    help.addEventListener("click", tutorial.open);
+    resources.append(help);
+    heading.after(tutorial.element);
     const chooser = node("select");
     chooser.setAttribute("aria-label", "Learning focus");
     const current = node("option", `Current: ${source.title}`);
@@ -219,6 +241,7 @@ export function createLearningCockpit(services: Services) {
       ),
     );
     root.append(recent);
+    tutorial.sync();
     document
       .querySelector("[data-learning-cockpit]")
       ?.setAttribute("aria-expanded", "true");
@@ -226,6 +249,7 @@ export function createLearningCockpit(services: Services) {
       root.scrollIntoView({ block: "start" });
       root.focus({ preventScroll: true });
     }
+    if (request.tutorial) tutorial.open();
   }
   document.addEventListener("book-cockpit-paused", () =>
     document

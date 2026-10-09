@@ -210,6 +210,8 @@ The opt-in real-provider check and voluntary learner evaluation are documented i
 
 For shared learning loops, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts tests/e2e/learning-cockpit.spec.ts --project=chromium --project=webkit`.
 The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, selected-note and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
+Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and an actual notebook-only companion's reviewed save path.
+The tutorial's example reply is authored; these checks assert no model calls and distinguish preparing a draft from saving a note.
 Use a fresh `E2E_LOCAL_DATA_DIR` for synthetic browser records.
 The browser check runs an actual companion and synthetic local model, checking submitted activity context rather than model teaching quality.
 Manually test with an enabled provider before reporting an actual generated explanation; restart an older companion so authenticated status advertises `learning-loop` and every demo activity version.

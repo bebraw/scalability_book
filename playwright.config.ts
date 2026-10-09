@@ -38,6 +38,7 @@ export default defineConfig({
         "learning-local-model.spec.ts",
         "reading-investigation.spec.ts",
         "learning-cockpit.spec.ts",
+        "learning-tutorial.spec.ts",
         "account-learning.spec.ts",
       ],
       use: { ...devices["Desktop Safari"] },

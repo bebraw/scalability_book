@@ -101,33 +101,62 @@ for (const demo of document.querySelectorAll<HTMLElement>(
   );
   demo.after(button);
 }
-try {
-  const saved = JSON.parse(
-    sessionStorage.getItem("book-learning-cockpit-active") ?? "null",
+const tutorialLink = (url: URL) =>
+  url.origin === location.origin &&
+  url.pathname === "/notebook/setup/" &&
+  url.hash === "#try-the-learning-tutorial";
+const openTutorial = () =>
+  document.dispatchEvent(
+    new CustomEvent("book-learning-request", {
+      detail: { kind: "investigate", tutorial: true },
+    }),
   );
-  if (saved?.open && new URL(saved.source.url).pathname === location.pathname)
-    document.dispatchEvent(
-      new CustomEvent("book-learning-request", {
-        detail: { kind: "investigate", resume: true },
-      }),
+document.addEventListener("click", (event) => {
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  const link =
+    event.target instanceof Element ? event.target.closest("a") : null;
+  if (
+    link?.href &&
+    (!link.target || link.target === "_self") &&
+    tutorialLink(new URL(link.href)) &&
+    location.pathname === "/notebook/setup/"
+  ) {
+    event.preventDefault();
+    openTutorial();
+  }
+});
+window.addEventListener("hashchange", () => {
+  if (tutorialLink(new URL(location.href))) openTutorial();
+});
+if (tutorialLink(new URL(location.href))) openTutorial();
+else
+  try {
+    const saved = JSON.parse(
+      sessionStorage.getItem("book-learning-cockpit-active") ?? "null",
     );
-  else {
-    const legacy = JSON.parse(
-      sessionStorage.getItem(
-        `book-reading-investigation:${location.pathname}:queue-balance`,
-      ) ?? "null",
-    );
-    if (
-      !saved &&
-      legacy?.open &&
-      document.getElementById("demo-queue-balance-lab")
-    )
+    if (saved?.open && new URL(saved.source.url).pathname === location.pathname)
       document.dispatchEvent(
         new CustomEvent("book-learning-request", {
-          detail: { kind: "investigate", activityId: "queue-balance" },
+          detail: { kind: "investigate", resume: true },
         }),
       );
+    else {
+      const legacy = JSON.parse(
+        sessionStorage.getItem(
+          `book-reading-investigation:${location.pathname}:queue-balance`,
+        ) ?? "null",
+      );
+      if (
+        !saved &&
+        legacy?.open &&
+        document.getElementById("demo-queue-balance-lab")
+      )
+        document.dispatchEvent(
+          new CustomEvent("book-learning-request", {
+            detail: { kind: "investigate", activityId: "queue-balance" },
+          }),
+        );
+    }
+  } catch {
+    /* Learning works without tab storage. */
   }
-} catch {
-  /* Learning works without tab storage. */
-}

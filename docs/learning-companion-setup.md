@@ -55,6 +55,14 @@ Windows support has not been verified.
 The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
 Keep the companion running while using the book; Ctrl+C stops it without removing your work.
 
+### Try the learning tutorial
+
+Choose **Cockpit → Tutorial** for a short hands-on introduction, or [open the tutorial](/notebook/setup/#try-the-learning-tutorial) directly.
+Predict what happens when requests take longer, change a small teaching illustration, inspect an authored example reply, reflect and preview a Notebook takeaway.
+It works before connecting a companion and makes no model calls.
+You can skip it, exit at any step or resume it later using **Tutorial**.
+Its writing stays in the current tab; only **Prepare this as a real Notebook draft** hands your reflection to Notebook, where you review it and explicitly **Save note**.
+
 ### Optional first investigation
 
 Choose **Cockpit** in the header on any reading, concept, exploration or project page.

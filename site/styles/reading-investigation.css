@@ -39,6 +39,71 @@
 .cockpit-heading nav {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.learning-cockpit[data-tutorial-active="true"]
+  > :not(.cockpit-heading):not(.learning-tutorial) {
+  display: none !important;
+}
+.learning-tutorial {
+  margin-block: 1.5rem;
+  padding-block: 1.25rem;
+  border-block: 1px solid var(--accent);
+}
+.learning-tutorial .tutorial-kicker {
+  font: 600 0.75rem/1.4 var(--font-ui);
+  letter-spacing: 0.12em;
+  color: var(--accent-strong);
+}
+.tutorial-progress {
+  display: flex;
+  list-style: none;
+  gap: 0.4rem;
+  padding: 0;
+  margin-block: 1rem;
+}
+.tutorial-progress li {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: 1px solid var(--border);
+  font: 500 0.8rem/1 var(--font-ui);
+}
+.tutorial-progress [aria-current] {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.tutorial-illustration,
+.tutorial-example {
+  margin-block: 1.25rem;
+  padding: 1rem;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--bg);
+}
+.tutorial-illustration dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.5rem 1rem;
+  font-variant-numeric: tabular-nums;
+}
+.tutorial-illustration dd {
+  margin: 0;
+  font-weight: 700;
+}
+.tutorial-preview p {
+  white-space: pre-wrap;
+}
+.tutorial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-block-start: 1.25rem;
+}
+.tutorial-actions button:nth-last-child(2) {
+  border-width: 2px;
+  font-weight: 700;
 }
 .reading-investigation select {
   box-sizing: border-box;
