@@ -57,8 +57,9 @@ After this chapter, students should be able to:
   Good specifications, tests, examples, and validation practices should improve across phases without allowing the later implementation to become a fork of the first.
 - Make the evidence log part of the constrain-generate-validate loop.
   Students should record task framing, relevant model/tool configuration, validation outcome, human correction, and approximate cost or latency without submitting an unreadable raw transcript.
-- Explain that local models are affected by hardware, serving configuration, context limits, and quantization.
-  Ask for contextual reporting rather than simplistic local-versus-cloud rankings.
+- Explain how serving configuration, hardware, context limits, and quantization where applicable affect both assigned models.
+  Separate the large/small distinction from hosting location; both models may be department-hosted.
+  Ask for the actual served configuration and contextual results when comparing workflows.
 - Keep the project-harness discussion, but distinguish common course material from implementation-specific project memory.
   Decide in the shared specification which project-harness files are supplied, which students author, and which may be carried into later builds.
 - Keep the implementation discovery lab aligned with the shared specification as the project evolves.

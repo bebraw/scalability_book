@@ -354,38 +354,56 @@ No style wins every row.
 A stable public resource model, a workflow discovered through hypermedia, a frontend assembling related data, and an internal service command provide different reasons to accept different forms of coupling.
 Begin with consumers, change patterns, network conditions, tooling, and ownership rather than a preferred acronym.
 
-For the project, design a minimal event-creation operation and event-query operation in one style.
+For the project, design a work-item creation or lifecycle-transition operation and an activity-event query in one style.
 Then identify what changes when consumers retry, devices go offline, a new workflow state appears, many tenants share the system, or the interface needs an additional related field.
 
 ## Executable HTTP contracts
 
 An API description becomes more durable when representative requests and expected responses are executable.
 [Hurl](https://hurl.dev/) expresses HTTP sessions in plain text and can assert status codes, headers, and response bodies without depending on the application's implementation language.
-For example, an HTTP-based event tracker could preserve one creation-and-read scenario as follows:
+For example, check that moving a work item into its active stage updates its state and records one corresponding activity event.
+The routes and JSON below are illustrative; adapt them to the application's public contract.
+Before each run, seed workspace `workspace-9` with an `open` work item `item-42` and no `work_started` event for that item.
 
 ```text
-POST http://localhost:3000/events
+POST {{base_url}}/work-items/item-42/transitions
 Content-Type: application/json
 {
-  "type": "work.started",
-  "workItemId": "item-42"
+  "to": "in_progress",
+  "actor": "student-7"
 }
 
-HTTP 201
-[Captures]
-event_id: jsonpath "$.id"
+HTTP 200
 
-GET http://localhost:3000/events/{{event_id}}
+GET {{base_url}}/work-items/item-42
 
 HTTP 200
 [Asserts]
-jsonpath "$.type" == "work.started"
-jsonpath "$.workItemId" == "item-42"
+jsonpath "$.id" == "item-42"
+jsonpath "$.state" == "in_progress"
+
+GET {{base_url}}/events?workItemId=item-42&type=work_started
+
+HTTP 200
+[Asserts]
+jsonpath "$.items" count == 1
+jsonpath "$.nextCursor" == null
+jsonpath "$.items[0].type" == "work_started"
+jsonpath "$.items[0].workItemId" == "item-42"
+jsonpath "$.items[0].workspaceId" == "workspace-9"
+jsonpath "$.items[0].actor" == "student-7"
+```
+
+Save the scenario as `lifecycle.hurl` and supply the instance's base URL:
+
+```sh
+hurl --test --variable base_url=http://localhost:3000 lifecycle.hurl
 ```
 
 This file is both an example of the interface and a deterministic integration test.
 It can be run locally or in continuous integration, and a failure points to the request or assertion that no longer matches the implementation.
 If implementations A, B, and C expose a compatible HTTP boundary, the same scenario can be run against each one by changing the base URL rather than rewriting the test in each implementation's language.
+These checks cover one successful transition; separate rejection, retry, and concurrency cases are needed to establish their corresponding guarantees.
 
 Hurl does not replace browser testing: it checks the HTTP boundary, while a tool such as Playwright checks behavior through a browser, including rendering and interaction.
 Although Hurl can repeat requests and assert response duration, a small contract scenario is not evidence that the system will behave well under representative load.

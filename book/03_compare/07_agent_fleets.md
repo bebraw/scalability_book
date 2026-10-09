@@ -32,8 +32,10 @@ Begin with the smallest coordination structure that can complete the task.
 ::label[table:fleet-coordination-options]
 
 Inspect the coordination controls supplied by the chosen harness before adding custom orchestration.
-For example, [Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) distinguishes focused subagents that return results to a caller from teams whose members communicate and coordinate shared tasks.
-Check the supported configuration and its limitations in the [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md).
+Check separate execution contexts and workspace isolation, result return and inter-agent messaging, shared task state, permission inheritance, cancellation, and recovery.
+Labels such as "subagent" or "team" do not establish which controls are available.
+[Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) documents one arrangement; verify the capabilities and limits of the configuration you actually run.
+Use the [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) to identify the assigned configuration and its limitations.
 
 Sequential delegation fits work whose next step depends on an earlier result.
 A read-only scout maps the relevant routes, components, data flow, and tests; an implementer then receives the compressed findings and a bounded objective.

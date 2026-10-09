@@ -34,7 +34,8 @@
 - Connect the two scalability claims directly to fields in the common specification and final comparison rubric.
 - Decide whether the Establish project discussion should require every group to show one challenged claim and explain which assumed limit was wrong.
 - Add a compact visual only if students struggle to distinguish the four pressures from response surfaces and constraints; the table and lab currently cover that relationship.
-- Keep local-model hardware, privacy, availability, context, and latency visible as legitimate constraints rather than treating them only as disadvantages.
+- Keep model configuration, hardware, privacy, availability, context, and latency visible as constraints in both assigned environments.
+  Treat model size and inference location as separate variables; both assigned models may be department-hosted.
 - Use the chapter's multiple dimensions to prevent the AI comparison from swallowing runtime behavior.
   Every implementation should still address comparable web pressures.
 - Obsidian candidate: `Clippings/_Processed/A Survey on Large Language Model Impact on Software Evolvability and Maintainability the Good, the Bad, the Ugly, and the Remedy.md` could support the contributor and change dimensions.
