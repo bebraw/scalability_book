@@ -59,15 +59,28 @@ Answers persist in `LOCAL_DATA_DIR/learning.sqlite` (default `.local/learning.sq
 Opening another browser context or restarting the dev server retains them.
 Local review does not execute GitHub OAuth or contact a production answer database.
 
-## Production preparation
+## Production storage and deployment
 
-No production database has been created or migrated by this change.
-Before deployment, create a dedicated D1 database, enable the `LEARNING_DB` binding illustrated in `wrangler.jsonc`, and apply `migrations/0001_learning_answers.sql`.
+The dedicated `scalability-book-learning` D1 database was provisioned in the EU jurisdiction on 2026-10-09.
+`wrangler.jsonc` binds it as `LEARNING_DB`; `migrations/0001_learning_answers.sql` has been applied to the production database.
+This database is separate from course records, reader feedback and the local companion's private notebook.
+Wrangler previews use local D1 storage by default; the binding does not enable remote development access.
+
+Apply pending migrations before deploying a change that needs a new schema:
+
+```sh
+npx wrangler d1 migrations list LEARNING_DB --remote
+npx wrangler d1 migrations apply LEARNING_DB --remote
+```
+
+For an isolated local Worker preview, apply the same migrations with `--local` in place of `--remote`.
+On a separate Cloudflare account, create a dedicated database and replace this binding's database ID before applying migrations or deploying.
 Use the existing GitHub OAuth secrets and session secret.
 Email-only exercise access also needs the existing course database/auth migrations and enabled course-mail configuration from [the course guide](course-system.md#institutional-enrollment-and-sign-in).
 No new exercise or course schema migration is required for these identities and return destinations.
-Verify OAuth return-to-exercise behavior and cross-device saves in the deployed environment.
+After deployment, verify that a signed-in learner can save an answer and restore it in a fresh tab, independently of the original tab draft.
 Without the binding, the API returns 503 and the UI never claims a save succeeded.
+Rolling back the Worker or removing its binding does not roll back the database; retain the database and its saved answers when reverting application code.
 
 The query adapter follows the [D1 prepared-statement API](https://developers.cloudflare.com/d1/worker-api/prepared-statements/).
 Tests cover identity isolation, email session revocation, existing GitHub ownership, disk persistence, conflicting writes, version retention, input/origin validation, mobile layout, save failures, reviewed assistant context, and anonymous/no-JavaScript reading.

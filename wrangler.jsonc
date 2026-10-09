@@ -6,8 +6,9 @@
   "compatibility_flags": ["nodejs_compat"],
   // Course portal bindings are separate from private chapter exercises.
   // Provision COURSE_DB and COURSE_FILES using docs/course-system.md before enabling.
-  // "d1_databases": [{ "binding": "COURSE_DB", "database_name": "scalability-book-course",
-  //   "database_id": "<created-database-id>", "migrations_dir": "course-migrations" }],
+  // Add COURSE_DB to the d1_databases array below rather than replacing LEARNING_DB:
+  // { "binding": "COURSE_DB", "database_name": "scalability-book-course",
+  //   "database_id": "<created-database-id>", "migrations_dir": "course-migrations" }
   // "r2_buckets": [{ "binding": "COURSE_FILES", "bucket_name": "scalability-book-course-files" }],
   // COURSE_ADMIN_GITHUB_LOGINS grants course administration separately from book moderation.
   // Course sender and incoming forwarding destination stay in Worker secrets:
@@ -22,14 +23,16 @@
   // Simulation always uses mock mail, regardless of COURSE_EMAIL_ENABLED.
   "send_email": [{ "name": "COURSE_MAIL" }],
   "vars": { "COURSE_EMAIL_ENABLED": "false" },
-  // Private exercise answers use a separate D1 database. Provision and migrate
-  // it before enabling production saves; see docs/chapter-exercises.md.
-  // "d1_databases": [{
-  //   "binding": "LEARNING_DB",
-  //   "database_name": "scalability-book-learning",
-  //   "database_id": "<created-database-id>",
-  //   "migrations_dir": "migrations"
-  // }],
+  // Private exercise answers use a dedicated production database, separate from
+  // course records and feedback. Apply migrations before deploying; see docs/chapter-exercises.md.
+  "d1_databases": [
+    {
+      "binding": "LEARNING_DB",
+      "database_name": "scalability-book-learning",
+      "database_id": "75a56bc7-6b3b-46a2-b200-655e970ed7b3",
+      "migrations_dir": "migrations",
+    },
+  ],
   "build": {
     "command": "npm run worker:build",
   },

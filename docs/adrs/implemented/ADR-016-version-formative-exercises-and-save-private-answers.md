@@ -64,7 +64,9 @@ The published exercise contract explicitly calls this formative work and provide
 
 [Exercise definitions](../../../shared/exercises.ts), [rendering](../../../scripts/lib/exercise-html.ts), [client behavior](../../../site/scripts/exercises.ts), [answer API](../../../worker/learning.ts), and [local adapter](../../../scripts/lib/local-answers.ts) implement the contract.
 [Learning API](../../../tests/learning.test.ts), [authentication](../../../tests/learning-auth.test.ts), and [chapter exercise](../../../tests/e2e/chapter-exercises.spec.ts) tests cover the relevant boundaries.
-[chapter-exercises.md](../../chapter-exercises.md) owns current behavior and provisioning instructions; repository support does not establish production database setup.
+[chapter-exercises.md](../../chapter-exercises.md) owns current behavior and provisioning instructions.
+On 2026-10-09, the dedicated production D1 database was provisioned in the EU jurisdiction, the existing answer migration was applied, and [wrangler.jsonc](../../../wrangler.jsonc) was configured with its `LEARNING_DB` binding.
+Local Worker previews retain local D1 storage; this operational setup implements the existing private-answer decision without connecting companion notebooks or course records to the answer database.
 
 ## Historical evidence
 

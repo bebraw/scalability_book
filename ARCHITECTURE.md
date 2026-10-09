@@ -135,7 +135,7 @@ Versioned grading-review presets also exercise retained work through withdrawal,
 | Teacher simulation and revision history | `.local/course-simulation/course.sqlite`          | Separate `COURSE_SIMULATION_DB` D1 binding               |
 | Simulation archives and attachments     | `.local/course-simulation/course-files/`          | Separate `COURSE_SIMULATION_FILES` R2 binding            |
 | Reader feedback                         | `.local/comments.json`                            | `COMMENTS_KV`                                            |
-| Chapter exercise answers                | `.local/learning.sqlite` by default               | Separate optional `LEARNING_DB` binding                  |
+| Chapter exercise answers                | `.local/learning.sqlite` by default               | Dedicated `LEARNING_DB` D1 database (EU jurisdiction)    |
 | Private learning notebook               | `notebook.sqlite` in the companion data directory | Student's local companion; never Worker storage          |
 | Private agent conversations             | `conversations.sqlite` in that directory          | Student's local companion; excluded from notebook export |
 | Shared learning inquiries and offers    | Course record/history store                       | Existing `COURSE_DB`; source-scoped paginated reads      |
