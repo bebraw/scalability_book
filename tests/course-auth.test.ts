@@ -279,6 +279,36 @@ test("magic links are single-use, expiring and course-scoped; imported students 
   assert.equal((await f.auth.activity(id)).length, 1);
 });
 
+test("email sign-in carries a bounded internal activity destination without changing credential rules", async (t) => {
+  const f = fixture(t);
+  const record = await f.create();
+  const target =
+    "/chapters/benchmarking/?inquiry=1&inquiryActivity=prediction#source";
+  for (const [returnTo, expected] of [
+    [target, target],
+    ["https://evil.test", "/"],
+    ["x".repeat(4097), null],
+  ]) {
+    assert.equal(
+      (
+        await f.signIn("request", {
+          course: record.value.id,
+          email: imported.email,
+          returnTo,
+        })
+      ).status,
+      202,
+    );
+    const [mail] = await f.mail.list(record.value.id);
+    const url = new URL(mail!.url);
+    assert.equal(url.searchParams.get("returnTo"), expected);
+    assert.equal(url.pathname, "/course/");
+    const token = new URLSearchParams(url.hash.slice(1)).get("login");
+    assert.equal((await f.signIn("verify", { token })).status, 200);
+    assert.equal((await f.signIn("verify", { token })).status, 400);
+  }
+});
+
 test("unknown and throttled emails have the same response; mail failure and corrections revoke credentials", async (t) => {
   const f = fixture(t),
     record = await f.create(),

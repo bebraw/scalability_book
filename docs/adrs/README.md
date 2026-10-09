@@ -88,6 +88,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-037](implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md)              | Replace printed pairing codes with explicit origin-gated connection, retaining sessions and preparing protocol 2.                                 |
 | [ADR-038](implemented/ADR-038-support-local-models-through-the-learning-companion.md)               | Support a direct local-model provider with retained context, bounded replay and explicit discussion/native-tool modes; LM Studio verified first.  |
 | [ADR-039](implemented/ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md)                      | Sequence large-model and small-model single agents, then declared small/large or mixed-model fleets; replace unused pre-course contracts.         |
+| [ADR-040](implemented/ADR-040-integrate-website-sign-in-with-learning-tools.md)                     | Integrate account and connection status, enrolled email exercise access and reviewed learning handoffs.                                           |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

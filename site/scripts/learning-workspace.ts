@@ -11,6 +11,8 @@ import {
 } from "./learning-session.ts";
 import type { LearningExperience } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
+import type { LearningAction } from "./learning-actions.ts";
+import type { SiteAccount } from "../../shared/site-account.ts";
 export {
   observeLearningDemo,
   changeLearningDemo,
@@ -151,6 +153,33 @@ panes = {
   assistant: createLearningPane("assistant", services),
 };
 compact.addEventListener("change", syncPanels);
+let accountIdentity: string | null = null;
+document.addEventListener("book-account-changed", (event) => {
+  const account = (event as CustomEvent<SiteAccount>).detail;
+  const identity = JSON.stringify([
+    account.github.user?.id,
+    account.course.user?.id,
+    account.course.user?.courseId,
+  ]);
+  if (identity !== accountIdentity) {
+    accountIdentity = identity;
+    panes.assistant.accountChanged();
+  }
+});
+document.addEventListener("book-learning-action", (event) => {
+  const action = (event as CustomEvent<LearningAction>).detail;
+  void (async () => {
+    if (client.token && !snapshot.connected) {
+      try {
+        await refresh();
+      } catch {
+        /* Keep the requested draft available through connection recovery. */
+      }
+    }
+    if (action.kind === "discuss") panes.assistant.discuss(action.draft);
+    else services.navigate(action.experience, action.view);
+  })();
+});
 document.addEventListener("book-learning-open", (event) => {
   const { experience, selection, resume } = (
     event as CustomEvent<{
@@ -204,9 +233,10 @@ document.addEventListener("click", (event) => {
   followingBookLink =
     destination.origin === location.origin &&
     destination.pathname !== location.pathname &&
-    /^\/(chapters|appendices|parts|case-studies|project|concepts|explore|demos|notebook)\//.test(
-      destination.pathname,
-    );
+    (anchor.hasAttribute("data-account-navigation") ||
+      /^\/(chapters|appendices|parts|case-studies|project|concepts|explore|demos|notebook|course)\//.test(
+        destination.pathname,
+      ));
 });
 window.addEventListener("pageshow", () => {
   followingBookLink = false;

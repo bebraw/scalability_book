@@ -137,6 +137,24 @@ test("students save private initial work before group replies, reflect individua
         exact: false,
       }),
     ).toBeVisible();
+    await alice.panel.getByLabel("Inquiry activity").selectOption("prediction");
+    await alice.page
+      .getByRole("button", { name: "Account", exact: true })
+      .click();
+    const account = alice.page.getByRole("dialog", {
+      name: "Account & connections",
+      exact: true,
+    });
+    await expect(account).toContainText("Exercise answers belong to");
+    await account
+      .getByRole("button", {
+        name: "Close account and connections",
+        exact: true,
+      })
+      .click();
+    await expect(alice.panel.getByLabel("Inquiry activity")).toHaveValue(
+      "prediction",
+    );
     await alice.panel
       .getByRole("button", { name: "Write my initial thinking" })
       .click();
@@ -152,6 +170,10 @@ test("students save private initial work before group replies, reflect individua
       "Saved in your private notebook.",
     );
     await peers(alice.page);
+    await expect(alice.panel.getByLabel("Inquiry activity")).toHaveValue(
+      "prediction",
+    );
+    await alice.panel.getByLabel("Inquiry activity").selectOption("reading");
     await alice.panel
       .getByRole("button", { name: "Reveal peer inquiry" })
       .click();
@@ -170,6 +192,19 @@ test("students save private initial work before group replies, reflect individua
     await alice.panel
       .getByLabel("Review the text I want to share")
       .fill("Which interval and population are common to both averages?");
+    await alice.panel.getByRole("button", { name: "Reload inquiry" }).click();
+    await expect(
+      alice.panel.getByLabel("Review the text I want to share"),
+    ).toHaveValue("Which interval and population are common to both averages?");
+    await expect(alice.panel).toContainText(
+      "Sharing as local-student-2 with Group",
+    );
+    await expect(
+      alice.panel.getByText(
+        "Which interval and population are common to both averages?",
+        { exact: true },
+      ),
+    ).toHaveCount(0);
     await alice.panel
       .getByRole("button", {
         name: "Share reviewed text with the chosen audience",
@@ -221,6 +256,13 @@ test("students save private initial work before group replies, reflect individua
         "I still question whether the interval is stable; I would check queue growth first.",
       );
     await bob.panel.getByLabel("Reply kind").selectOption("disagreement");
+    await bob.panel.getByRole("button", { name: "Reload inquiry" }).click();
+    await expect(bob.panel.getByLabel("My reply", { exact: true })).toHaveValue(
+      "I still question whether the interval is stable; I would check queue growth first.",
+    );
+    await expect(bob.panel.getByLabel("Reply kind")).toHaveValue(
+      "disagreement",
+    );
     await bob.panel
       .getByRole("button", { name: "Share reply with this audience" })
       .click();

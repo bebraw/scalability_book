@@ -66,9 +66,20 @@ Runtime adapters depend on shared domain contracts, while shared domain calculat
 New course capabilities should preserve this direction and use the same domain rules locally and in the Worker.
 
 Course sign-in enters through `/api/course-auth/` in both adapters.
+The shared [website account contract](shared/site-account.ts) projects verified GitHub and course sessions through `/api/account/status` in both adapters.
+[account.ts](site/scripts/account.ts) owns the website-wide Account & connections dialog and in-place email-link requests; [account-client.ts](site/scripts/account-client.ts) owns its status requests and tab-scoped course preference.
+The account projection does not link identities or grant course permissions.
+Saved exercises retain existing GitHub numeric ownership (and the local editor key); verified email-only sessions use a course-run/student namespace.
+GitHub answers remain selected while both sessions are active, with the owner shown to the reader.
+Account changes disable exercise saves until an explicit in-place load fetches the chosen owner's records, retaining the current draft for review.
+The account view checks only an already-connected companion's status and does not read notes or start a provider.
+[exercise-discussion.ts](shared/exercise-discussion.ts) builds the selected attempt/checker handoff, while [learning-actions.ts](site/scripts/learning-actions.ts) and the lazy loader deliver explicit navigation or discussion drafts to the workspace.
+Neither action sends a model message or creates a notebook record.
 `worker/course-auth.ts` owns token/session and mail-delivery rules; `worker/course-auth-store.ts` shares atomic SQL through the D1 and local SQLite ports.
 `shared/course-roster.ts` owns CSV parsing and mapping, while the administration domain validates identities and merges enrollment into the current course snapshot.
 `site/scripts/course-signin.ts` renders the email request and explicit link-confirmation flow.
+Email requests can carry a bounded internal return destination; the mail link retains it and the browser validates it again after verification.
+Peer inquiry displays the sharing account/audience and retains identity-scoped unsent contributions in bounded tab storage, independently of notebook and course persistence.
 `worker/course-mail.ts` adapts login messages to Cloudflare Email Sending with a server-configured sender; the Worker selects it only when its binding, valid `COURSE_EMAIL_FROM` secret and explicit enablement variable are present.
 `worker/course-forwarding.ts` owns incoming mail, invoked by the Worker's `email()` entry point through an exact Email Routing rule.
 It accepts only the configured course inbox and forwards the original message to the verified `COURSE_EMAIL_FORWARD_TO` destination; neither address nor message content is published, stored or logged by the application.

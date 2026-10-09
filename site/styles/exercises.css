@@ -83,6 +83,16 @@
 .exercise-old-answer {
   white-space: pre-wrap;
 }
+[data-assistant-preview] {
+  margin-top: 1rem;
+  font: 0.85rem/1.5 var(--font-ui);
+}
+[data-assistant-preview] pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 20rem;
+  overflow: auto;
+}
 @media print {
   .exercise-actions,
   .exercise-status,
@@ -95,6 +105,8 @@
 .exercise-tabs {
   margin-block: 2.5rem;
   scroll-margin-top: 8rem;
+  /* Exercise controls extend into the grid's balance column, like demos. */
+  position: relative;
 }
 .exercise-tab-list {
   display: flex;

@@ -8,6 +8,7 @@ test("instructor imports institutional students; student signs in through mock m
   page.setDefaultTimeout(10_000);
   page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/admin/courses/");
+  await expect(page.locator("[data-course-content]")).not.toBeEmpty();
   if (await page.locator("[data-back]").count())
     await page
       .getByRole("button", { name: "All courses", exact: true })

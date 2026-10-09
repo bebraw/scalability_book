@@ -69,7 +69,13 @@ test("editable assets keep stable URLs for CSS hot reload", async (t) => {
 
 test("rendered HTML resolves base assets and page-specific assets through the same registry", async (t) => {
   const { directory, assets } = await fixture(t, true);
-  const names = ["styles.css", "theme.js", "course.css", "course.js"];
+  const names = [
+    "styles.css",
+    "theme.js",
+    "account.js",
+    "course.css",
+    "course.js",
+  ];
   for (const name of names) {
     await writeFile(path.join(directory, name), `compiled ${name}`);
     await assets.publish(name);

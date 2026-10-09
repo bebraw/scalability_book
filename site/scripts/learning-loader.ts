@@ -1,12 +1,21 @@
 import { readingSelection } from "./learning-selection.ts";
 import { readNotebookSession } from "./learning-session.ts";
 import type { LearningExperience } from "../../shared/learning-workspace.ts";
+import type { LearningAction } from "./learning-actions.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
 async function openLearning(experience: LearningExperience, resume = false) {
   // Capture before loading or focusing the notebook can alter the selection.
   const selection = resume ? null : readingSelection();
+  if (!(await loadLearning())) return;
+  document.dispatchEvent(
+    new CustomEvent("book-learning-open", {
+      detail: { selection, resume, experience },
+    }),
+  );
+}
+async function loadLearning() {
   if (!loaded)
     loaded = new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -20,17 +29,23 @@ async function openLearning(experience: LearningExperience, resume = false) {
     });
   try {
     await loaded;
-    document.dispatchEvent(
-      new CustomEvent("book-learning-open", {
-        detail: { selection, resume, experience },
-      }),
-    );
+    return true;
   } catch (error) {
     window.alert(
       error instanceof Error ? error.message : "Learning tools could not load.",
     );
+    return false;
   }
 }
+document.addEventListener("book-learning-request", (event) => {
+  const action = (event as CustomEvent<LearningAction>).detail;
+  void loadLearning().then((ready) => {
+    if (ready)
+      document.dispatchEvent(
+        new CustomEvent("book-learning-action", { detail: action }),
+      );
+  });
+});
 const buttons = document.querySelectorAll<HTMLButtonElement>(
   "[data-learning-toggle]",
 );

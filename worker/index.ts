@@ -3,6 +3,7 @@ import { handleLearning, d1AnswerStore } from "./learning.ts";
 import { safeReturnTo } from "../shared/exercises.ts";
 import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { siteAccount } from "../shared/site-account.ts";
 import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
 import { d1CourseAuthStore } from "./course-auth-store.ts";
@@ -124,13 +125,56 @@ export default {
       });
     }
 
-    if (url.pathname.startsWith("/api/learning/")) {
-      const user = await getSessionUser(request, env);
-      return handleLearning(
-        request,
-        user?.id && Number.isSafeInteger(user.id) ? `github:${user.id}` : null,
-        env.LEARNING_DB ? d1AnswerStore(env.LEARNING_DB) : undefined,
-      );
+    if (
+      url.pathname === "/api/account/status" ||
+      url.pathname.startsWith("/api/learning/")
+    ) {
+      try {
+        const github = await getSessionUser(request, env);
+        const storage = env.COURSE_DB
+          ? {
+              store: d1CourseStore(env.COURSE_DB),
+              auth: d1CourseAuthStore(env.COURSE_DB),
+            }
+          : {};
+        await assertLiveCourseStorage(storage.store, env.COURSE_FILES);
+        const email = await courseSessionUser(request, storage);
+        const account = siteAccount({
+          github: github?.id ? { ...github, id: github.id } : null,
+          course:
+            email ??
+            (github?.id && Number.isSafeInteger(github.id)
+              ? {
+                  id: `github:${github.id}`,
+                  login: github.login,
+                  provider: "github",
+                }
+              : null),
+          githubAvailable: oauthConfigured(env),
+          courseAvailable: Boolean(env.COURSE_DB),
+          emailAvailable: Boolean(
+            cloudflareCourseMail(
+              env.COURSE_MAIL,
+              env.COURSE_EMAIL_ENABLED,
+              env.COURSE_EMAIL_FROM,
+            ),
+          ),
+        });
+        if (url.pathname === "/api/account/status")
+          return request.method === "GET"
+            ? json(account)
+            : json({ message: "Method not allowed." }, { status: 405 });
+        return handleLearning(
+          request,
+          account.answers?.userId ?? null,
+          env.LEARNING_DB ? d1AnswerStore(env.LEARNING_DB) : undefined,
+        );
+      } catch {
+        return json(
+          { message: "Account access is temporarily unavailable." },
+          { status: 503 },
+        );
+      }
     }
 
     if (

@@ -103,12 +103,17 @@ test("anonymous reading and no-JavaScript discussion remain available", async ({
   browser,
   baseURL,
 }) => {
-  await page.route("**/api/auth/status", (route) =>
+  await page.route("**/api/account/status", (route) =>
     route.fulfill({
       json: {
-        authenticated: false,
-        available: true,
-        loginUrl: "/api/auth/github/start",
+        local: false,
+        github: {
+          available: true,
+          user: null,
+          loginUrl: "/api/auth/github/start",
+        },
+        course: { available: false, emailAvailable: false, user: null },
+        answers: null,
       },
     }),
   );

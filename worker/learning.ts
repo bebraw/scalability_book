@@ -102,7 +102,7 @@ export async function handleLearning(
     );
   try {
     if (request.method === "GET")
-      return reply({ answers: await store.list(userId, id) });
+      return reply({ userId, answers: await store.list(userId, id) });
     if (request.method !== "PUT")
       return reply({ message: "Method not allowed." }, 405);
     if (request.headers.get("Origin") !== new URL(request.url).origin)
@@ -133,6 +133,14 @@ export async function handleLearning(
       return reply({ message: "Invalid JSON." }, 400);
     }
     const definition = exercises[id]!;
+    if (body && body.owner !== undefined && body.owner !== userId)
+      return reply(
+        {
+          message:
+            "Sign-in changed. Check your account and load its saved answers before saving.",
+        },
+        409,
+      );
     if (
       !body ||
       typeof body.answer !== "string" ||

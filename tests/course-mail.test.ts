@@ -4,6 +4,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { readFileSync } from "node:fs";
+import { authHash } from "../worker/course-auth.ts";
 import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import { handleCourses } from "../worker/courses.ts";
 import { cloudflareCourseMail } from "../worker/course-mail.ts";
@@ -151,8 +153,82 @@ async function fixture(t: test.TestContext) {
   };
   const deferred: Promise<void>[] = [];
   const ctx = { waitUntil: (task: Promise<void>) => deferred.push(task) };
-  return { request, env, ctx, deferred, id, stores };
+  return { request, env, ctx, deferred, id, stores, db };
 }
+test("Worker accepts a verified enrollment for answers and revokes its access with the session", async (t) => {
+  const f = await fixture(t);
+  f.db.exec(
+    readFileSync(
+      new URL("../migrations/0001_learning_answers.sql", import.meta.url),
+      "utf8",
+    ),
+  );
+  const env = { ...f.env, LEARNING_DB: f.env.COURSE_DB };
+  // Use the same enrollment that was created through the ordinary import API.
+  const records = await f.stores.store.courses();
+  const student = records.find((entry) => entry.value.id === f.id)!.value
+    .students[0]!;
+  const credential = "s".repeat(43);
+  await f.stores.auth.saveSession(authHash(credential), {
+    course: f.id,
+    student: student.id,
+    email: message.to,
+    expiresAt: new Date(Date.now() + 60000).toISOString(),
+  });
+  const headers = { Cookie: `scalableweb_course_session=${credential}` };
+  const status = await worker.fetch(
+    new Request("https://scalableweb.dev/api/account/status", { headers }),
+    env,
+  );
+  assert.equal(status.status, 200);
+  assert.equal(status.headers.get("Cache-Control"), "private, no-store");
+  const account = await status.json();
+  assert.equal(account.github.user, null);
+  assert.equal(account.course.user.provider, "email");
+  assert.equal(account.answers.userId, `course:${f.id}:${student.id}`);
+  const url = "https://scalableweb.dev/api/learning/measurement-boundary";
+  const save = await worker.fetch(
+    new Request(url, {
+      method: "PUT",
+      headers: {
+        ...headers,
+        Origin: "https://scalableweb.dev",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        version: 2,
+        answer: JSON.stringify({ expected: "10", conclusion: "check" }),
+        expected: null,
+      }),
+    }),
+    env,
+  );
+  assert.equal(save.status, 200);
+  assert.equal(
+    (await (await worker.fetch(new Request(url, { headers }), env)).json())
+      .answers.length,
+    1,
+  );
+  assert.equal((await worker.fetch(new Request(url), env)).status, 401);
+  await f.stores.auth.deleteSession(authHash(credential));
+  assert.equal(
+    (await worker.fetch(new Request(url, { headers }), env)).status,
+    401,
+  );
+  assert.equal(
+    (
+      await (
+        await worker.fetch(
+          new Request("https://scalableweb.dev/api/account/status", {
+            headers,
+          }),
+          env,
+        )
+      ).json()
+    ).answers,
+    null,
+  );
+});
 const mailToken = (text: string) =>
   new URLSearchParams(
     new URL(

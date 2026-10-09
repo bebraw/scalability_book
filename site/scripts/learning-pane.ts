@@ -1102,6 +1102,9 @@ export function createLearningPane(
     write: writeHandoff,
     discuss: discussHandoff,
     update,
+    accountChanged: () => {
+      if (view === "peers") render();
+    },
     recover: (message: string) => {
       status.textContent = message;
     },

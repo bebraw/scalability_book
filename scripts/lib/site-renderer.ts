@@ -184,6 +184,7 @@ export function createSiteRenderer({
       ogImageUrl: imageUrl,
       scriptTags: [
         ...new Set([
+          "/account.js",
           ...scripts,
           ...(learningScript &&
           currentUrl &&

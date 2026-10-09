@@ -5,6 +5,7 @@ import { staffAllowed, type CourseUser } from "./courses.ts";
 import type { CourseAuthStore } from "./course-auth-store.ts";
 import type { MockMailStore } from "./course-mock-mail.ts";
 import { boundedJson, sameOrigin } from "./course-http.ts";
+import { safeReturnTo } from "../shared/exercises.ts";
 import {
   institutionalEmail,
   Problem,
@@ -184,6 +185,10 @@ export async function handleCourseAuth(
       const mail = context.mail;
       const courseId = text(body.course, "Course run ID", 48, true);
       const email = institutionalEmail(body.email);
+      const returnTo =
+        typeof body.returnTo === "string" && body.returnTo.length <= 4096
+          ? safeReturnTo(body.returnTo)
+          : null;
       await auth.cleanup(now);
       requireThat(
         await quota(request, auth, now, "request-ip", "", 30),
@@ -219,6 +224,7 @@ export async function handleCourseAuth(
               context.loginOrigin ?? url.origin,
             );
             loginUrl.searchParams.set("course", courseId);
+            if (returnTo) loginUrl.searchParams.set("returnTo", returnTo);
             for (const [key, value] of Object.entries(
               context.loginParameters ?? {},
             ))

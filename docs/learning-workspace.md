@@ -11,6 +11,21 @@ Implemented status identifies verified software behavior; production rollout and
 
 ## Current implementation
 
+**Account → Account & connections** shows website sign-in, course access, the exercise-answer owner and private companion/provider connection together.
+GitHub and course email sign-in retain separate sessions; enrolled students can request email links directly from this view without leaving their reading or unfinished writing.
+If email opens in another tab, confirm it there and return to the original tab to keep its drafts; **Check sign-in again** refreshes the account explicitly.
+The email link returns to the initiating passage/activity after confirmation.
+The website account is optional for notebook writing and assistant discussion.
+Only an existing companion session is checked when opening the account view; no notebook contents or model replies are requested.
+**Open connection settings** opens the existing notebook Connect section on pages that provide learning tools; other pages link to companion setup.
+Provider status reports configuration and connection, while an actual assistant reply establishes provider availability.
+
+Checked chapter exercises offer **Discuss my answer** and a preview of the exact prompt, exercise ID/version, attempt and checker feedback.
+The handoff prepares an editable assistant message with no notebook notes selected; it neither sends the message nor saves the attempt as a note.
+The student reviews and sends it, then can use the existing reviewed takeaway actions.
+An unfinished assistant message is protected by the existing replacement confirmation.
+The source and prepared message survive companion connection recovery and book navigation in tab state.
+
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
 The whole-book Notebook and Teaching assistant entry points load the shared coordinator and independently rendered panels on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
 Both header entries remain available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
@@ -54,6 +69,13 @@ Either handoff asks before replacing unfinished writing; only the student's Save
 Optional Codex and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
 Codex and explicitly selected native local tools use the same bounded browser broker; local discussion has no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
+Peer sign-in opens the shared account view in place and carries the source anchor/activity through email confirmation.
+A single accessible run is selected automatically; otherwise the reader chooses the run explicitly.
+The selected inquiry activity stays in the original tab when account refresh remounts the peer view.
+Before posting, the interface identifies the course account and selected audience.
+Unsent contributions/replies, their kind, selected audience and provenance survive remounting/reload in bounded tab storage scoped to course, source, activity, member and thread.
+At most 20 such drafts are retained; they are cleared after successful sharing and are not notebook backups or submitted course records.
+An account change clears the displayed inquiry and reloads authorization before showing contributions again.
 The standalone `@scalableweb/companion` package adds guided setup, a stable per-user default, local diagnosis, copy migration and an optional first investigation.
 Registry publication and the declared platform/provider evidence are recorded in ADR-030; a built package does not by itself establish registry availability.
 Production availability of peer inquiry depends on the existing course storage and authentication rollout.

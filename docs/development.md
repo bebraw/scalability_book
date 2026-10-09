@@ -180,6 +180,13 @@ Run `npx playwright test tests/e2e/course-simulation-walkthrough.spec.ts --proje
 
 ## Learning companion
 
+The website's Account dialog uses `/api/account/status`, with the same verified-session projection in local development and the Worker.
+`shared/site-account.ts` owns exercise identity selection; keep existing GitHub/local keys and email course namespaces consistent between adapters.
+Development honors explicit test identity overrides for both account status and exercise routes; those headers remain unavailable in the Worker.
+Run `node --test tests/site-account.test.ts tests/learning-auth.test.ts tests/course-auth.test.ts tests/course-mail.test.ts` for account/return-context boundaries, and `npx playwright test tests/e2e/account-learning.spec.ts tests/e2e/chapter-exercises.spec.ts tests/e2e/course-email-signin.spec.ts` for the connected browser journeys.
+The new account journey runs in Chromium and WebKit, including an actual notebook-only companion, cross-tab email confirmation, reviewed exercise context and retained private writing.
+Use a fresh `E2E_LOCAL_DATA_DIR` when testing synthetic enrollments; retained simulation directories must not be relabeled or deleted to bypass isolation checks.
+
 Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional local private notebook service beside the development website.
 Only `https://scalableweb.dev` is trusted by default; specify exact development origins explicitly.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
@@ -245,6 +252,8 @@ Future releases update the package manifest and shared release metadata together
 
 The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured.
 Students sign in with GitHub, use the paragraph comment control, and post comments.
+The feedback sign-in button opens the shared Account view; reader feedback continues to use its GitHub identity, independently of a course email session.
+Signing out through Account clears feedback controls and refreshes their GitHub status in place.
 Students see only their own comments and admin replies to those comments.
 Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, reply to comments, resolve comments, hide comments that should not be shown back to students, and feature curated reader notes publicly.
 Admins can open `/admin/feedback/` (or choose `Review all` from a chapter's feedback controls) to search and filter feedback from across the whole book.

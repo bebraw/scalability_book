@@ -1,3 +1,6 @@
+import type { SiteAccount } from "../../shared/site-account.ts";
+import { openAccount } from "./account-client.ts";
+
 type FeedbackOption = readonly [string, string];
 type FeedbackAuthor = {
   login?: string;
@@ -110,12 +113,23 @@ if (commentsRoot) {
   let comments: FeedbackComment[] = [];
   let activeFeedbackParagraphId: string | null = null;
   let viewMode = localStorage.getItem("comments-view-mode") || "admin";
+  let authRevision = 0;
 
   initComments();
 
   async function initComments() {
+    await refreshAuth();
+    wireParagraphSelection();
+    wireParagraphButtons();
+    wireReflectionButtons();
+  }
+
+  async function refreshAuth() {
+    const own = ++authRevision;
     try {
-      auth = await fetchJson<FeedbackAuth>("/api/auth/status");
+      const next = await fetchJson<FeedbackAuth>("/api/auth/status");
+      if (own !== authRevision) return;
+      auth = next;
       if (commentsControls) {
         commentsControls.hidden = false;
       }
@@ -132,10 +146,8 @@ if (commentsRoot) {
       updateViewControl();
       syncPreviewMode();
       await loadComments();
-      wireParagraphSelection();
-      wireParagraphButtons();
-      wireReflectionButtons();
     } catch {
+      if (own !== authRevision) return;
       if (commentsControls) {
         commentsControls.hidden = true;
       }
@@ -144,6 +156,32 @@ if (commentsRoot) {
       }
     }
   }
+
+  document.addEventListener("book-account-changed", (event) => {
+    const account = (event as CustomEvent<SiteAccount>).detail;
+    if (
+      Boolean(account.github.user) === auth.authenticated &&
+      account.github.user?.login === auth.user?.login
+    )
+      return;
+    authRevision++;
+    auth = {
+      authenticated: false,
+      admin: false,
+      available: account.github.available,
+      loginUrl: account.github.loginUrl,
+    };
+    comments = [];
+    document.documentElement.dataset.commentsReady = "false";
+    document.documentElement.dataset.commentsAdmin = "false";
+    if (reflectionPrompts) reflectionPrompts.hidden = true;
+    closeParagraphFeedbackPanel();
+    updateParagraphBadges();
+    updateAuthControls();
+    updateViewControl();
+    syncPreviewMode();
+    void refreshAuth();
+  });
 
   function updateAuthControls() {
     if (auth.authenticated) {
@@ -206,7 +244,7 @@ if (commentsRoot) {
 
   loginButton.addEventListener("click", () => {
     if (auth.loginUrl) {
-      location.href = auth.loginUrl;
+      openAccount();
     }
   });
 
@@ -220,9 +258,12 @@ if (commentsRoot) {
   });
 
   async function loadComments() {
-    comments = await fetchJson<FeedbackComment[]>(
+    const own = authRevision;
+    const next = await fetchJson<FeedbackComment[]>(
       `/api/comments?chapter=${encodeURIComponent(chapterSlug)}`,
     );
+    if (own !== authRevision) return;
+    comments = next;
     updateParagraphBadges();
     if (activeFeedbackParagraphId) {
       renderParagraphFeedbackPanel(activeFeedbackParagraphId);

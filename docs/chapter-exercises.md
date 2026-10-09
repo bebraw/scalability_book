@@ -26,8 +26,21 @@ There is no self-reported completion checkbox or free-text grading.
 The UI distinguishes unsaved, saved, restored, failed, and conflicting changes.
 The answer API exposes only the verified session owner's records; it has no teacher/admin listing and does not publish answers as feedback.
 GitHub numeric user IDs provide account identity independently of username changes.
+Verified enrolled-student email sessions can also save answers, keyed by course run and stable internal student identity.
+The website's **Account** view offers both sign-in methods and names the selected exercise owner.
+Existing GitHub answers stay selected while GitHub is signed in, even if a course email session is also active; signing out of GitHub selects that enrollment's separate answer collection.
+Names, matching emails and optional profile fields never merge collections.
+After an account change, saves are disabled until **Load this account’s saved answers** explicitly loads the chosen collection in place, preserving an unfinished attempt for review.
+The server rejects saves from a browser that still expects a different answer owner.
 Sessions created before this identity field was added need a fresh sign-in.
-Authentication returns to the chapter and exercise; a temporary session-storage draft can bridge sign-in, with copy-before-leaving guidance when browser storage is blocked.
+Authentication returns to the chapter and exercise; per-exercise session-storage drafts retain unfinished fields in the original tab, including incomplete answers.
+Email links can be requested in place from Account; when confirmation opens another tab, the original tab retains the unfinished attempt.
+
+After checking a complete answer, **Discuss my answer** prepares an editable assistant message.
+The adjacent preview shows the canonical exercise prompt, ID/version, selected attempt and field-specific checker feedback.
+The worked answer and notebook notes are excluded from this handoff.
+Preparing it requires neither GitHub nor course sign-in and sends no model request or notebook save.
+The existing companion connection and explicit assistant Send action are still required for a reply.
 
 Answers use a separate `LEARNING_DB` D1 binding, not `COMMENTS_KV`.
 Writes are awaited, bounded to 4000 serialized characters and validated against the exercise fields, same-origin, and conditionally applied against the revision the reader loaded.
@@ -49,11 +62,13 @@ Local review does not execute GitHub OAuth or contact a production answer databa
 No production database has been created or migrated by this change.
 Before deployment, create a dedicated D1 database, enable the `LEARNING_DB` binding illustrated in `wrangler.jsonc`, and apply `migrations/0001_learning_answers.sql`.
 Use the existing GitHub OAuth secrets and session secret.
+Email-only exercise access also needs the existing course database/auth migrations and enabled course-mail configuration from [the course guide](course-system.md#institutional-enrollment-and-sign-in).
+No new exercise or course schema migration is required for these identities and return destinations.
 Verify OAuth return-to-exercise behavior and cross-device saves in the deployed environment.
 Without the binding, the API returns 503 and the UI never claims a save succeeded.
 
 The query adapter follows the [D1 prepared-statement API](https://developers.cloudflare.com/d1/worker-api/prepared-statements/).
-Tests cover identity isolation, disk persistence, conflicting writes, version retention, input/origin validation, mobile layout, save failures, and anonymous/no-JavaScript reading.
+Tests cover identity isolation, email session revocation, existing GitHub ownership, disk persistence, conflicting writes, version retention, input/origin validation, mobile layout, save failures, reviewed assistant context, and anonymous/no-JavaScript reading.
 
 Version 2 of the three measurement exercises replaces the original free-text pilot.
 Exercises introduced in the other chapters start at version 1.

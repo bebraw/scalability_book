@@ -83,6 +83,19 @@ The legacy `student_number,name,github_id,github_login` CSV and setup API remain
 Legacy imports preserve previously added institutional details.
 Staff continue to sign in with GitHub and are entered as `github:<numeric-id>` in **Course settings**.
 
+The website-wide **Account** entry presents GitHub sign-in and enrolled-student email access together.
+An instructor's course link supplies the run ID; students can also enter it explicitly or choose an accessible run when signed in.
+A remembered course is a tab navigation preference, not proof of enrollment.
+Email requests from a reading/peer activity retain a validated internal return location; confirmation returns there instead of the course overview.
+Requests from the ordinary course workspace retain its existing overview behavior.
+When email opens another tab, unfinished notebook, assistant and exercise writing remains in the original tab; return there and choose **Check sign-in again** if necessary.
+GitHub and course sessions can be signed out independently through Account.
+
+Verified email students can also save private chapter exercise answers under their course run and stable student identity.
+Existing GitHub answers keep their original ownership; when both sessions are active, the account view identifies GitHub as the selected exercise owner.
+Signing out of GitHub selects the email enrollment's separate answers after an explicit in-place load; records are never merged by email or profile name.
+Email access does not grant feedback moderation or staff permissions, and does not move notebook records or provider credentials to course storage.
+
 Give students the course workspace URL shown in **Students**.
 Students request a magic link using their imported institutional email; there is no registration or self-enrollment flow.
 Valid, unknown and per-address-throttled requests have the same public response.

@@ -7,6 +7,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { localAnswerStore } from "./lib/local-answers.ts";
 import { handleLearning } from "../worker/learning.ts";
+import { siteAccount } from "../shared/site-account.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
 import { localCourseSimulation } from "./lib/local-course-simulation.ts";
@@ -158,7 +159,10 @@ const server = createServer(async (request, response) => {
       return response.end();
     }
 
-    if (url.pathname.startsWith("/api/learning/")) {
+    if (
+      url.pathname === "/api/account/status" ||
+      url.pathname.startsWith("/api/learning/")
+    ) {
       const headers = new Headers();
       for (const [key, value] of Object.entries(request.headers)) {
         if (value)
@@ -172,7 +176,62 @@ const server = createServer(async (request, response) => {
           ? { body: request, duplex: "half" }
           : {}),
       });
-      const result = await handleLearning(webRequest, "local-editor", answers);
+      const localId =
+        (process.env.COURSE_TEST_IDENTITIES === "1"
+          ? headers.get("x-course-test-user")
+          : null) ||
+        process.env.COURSE_LOCAL_USER_ID ||
+        "1";
+      if (
+        localId !== "anonymous" &&
+        localId !== "0" &&
+        !/^[1-9][0-9]{0,14}$/.test(localId)
+      )
+        throw new Error("Invalid local course identity");
+      const github =
+        localId === "anonymous" || localId === "0"
+          ? null
+          : {
+              id: Number(localId),
+              login:
+                localId === "1" ? "local-editor" : `local-student-${localId}`,
+            };
+      const email = await courseSessionUser(webRequest, courses);
+      const account = siteAccount({
+        github,
+        course:
+          email ??
+          (github
+            ? {
+                id: `github:${github.id}`,
+                login: github.login,
+                provider: "github",
+              }
+            : null),
+        githubAvailable: true,
+        courseAvailable: true,
+        emailAvailable: true,
+        local: true,
+      });
+      const result =
+        url.pathname === "/api/account/status"
+          ? Response.json(
+              request.method === "GET"
+                ? account
+                : { message: "Method not allowed." },
+              {
+                status: request.method === "GET" ? 200 : 405,
+                headers: {
+                  "Cache-Control": "private, no-store",
+                  Vary: "Cookie",
+                },
+              },
+            )
+          : await handleLearning(
+              webRequest,
+              account.answers?.userId ?? null,
+              answers,
+            );
       response.writeHead(result.status, Object.fromEntries(result.headers));
       return response.end(await result.text());
     }

@@ -1,0 +1,121 @@
+.account-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  color: var(--text);
+  cursor: pointer;
+  font: 600 0.82rem var(--font-ui);
+  padding: 0.65rem 0.8rem;
+}
+.account-toggle[hidden] {
+  display: none;
+}
+.account-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-strong);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: 0.9rem/1.55 var(--font-ui);
+  inline-size: min(30rem, calc(100vw - 2rem));
+  max-block-size: calc(100dvh - 3rem);
+  padding: 1.4rem;
+  box-sizing: border-box;
+  overflow: auto;
+}
+.account-panel::backdrop {
+  background: rgb(0 0 0 / 30%);
+}
+.account-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+.account-eyebrow {
+  color: var(--accent-strong);
+  font: 0.72rem var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+}
+.account-panel h2 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+.account-panel h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+.account-panel section {
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.account-panel p {
+  margin-block: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.account-panel form,
+.account-panel label {
+  display: grid;
+  gap: 0.5rem;
+}
+.account-panel form {
+  margin-block: 0.8rem;
+  gap: 0.8rem;
+}
+.account-panel label {
+  font-size: 0.82rem;
+  margin-block: 0.6rem;
+}
+.account-panel input,
+.account-panel select {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  inline-size: 100%;
+  padding: 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--muted);
+  color: var(--text);
+  font: inherit;
+}
+.account-panel button {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  background: var(--bg);
+  color: var(--text);
+  font: 600 0.82rem var(--font-ui);
+  cursor: pointer;
+}
+.account-panel button[type="submit"] {
+  background: var(--accent-strong);
+  color: var(--panel);
+  border-color: var(--accent-strong);
+}
+.account-panel button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.account-panel a {
+  display: inline-block;
+  margin-block: 0.4rem;
+}
+.account-panel :focus-visible,
+.account-toggle:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+[data-account-status]:empty {
+  display: none;
+}
+[data-account-body] > button {
+  margin-top: 0.8rem;
+}
+@media print {
+  .account-toggle,
+  .account-panel {
+    display: none;
+  }
+}

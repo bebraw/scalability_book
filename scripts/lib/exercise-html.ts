@@ -30,7 +30,8 @@ export function renderExercise(id: string): string {
     ${fields}
     <p class="exercise-privacy" id="${id}-privacy">Automatically checked practice. Saved answers are private to your account.</p>
     <p class="exercise-result" data-result role="status" aria-live="polite"></p>
-    <div class="exercise-actions"><button type="button" data-check>Check answer</button><button type="button" data-save disabled>Save result</button><a data-signin hidden>Sign in to save</a></div>
+    <div class="exercise-actions"><button type="button" data-check>Check answer</button><button type="button" data-save disabled>Save result</button><a data-signin hidden>Sign in to save</a><button type="button" data-discuss disabled>Discuss my answer</button></div>
+    <details data-assistant-preview hidden><summary>Preview the exercise context for the assistant</summary><p>This prepares an editable message. Review it in the assistant before sending. Your notebook notes are not included.</p><pre></pre></details>
     <p class="exercise-status" role="status" aria-live="polite">Checking saved answers…</p>
     <details data-previous hidden><summary>Your answers to earlier versions</summary><div></div></details>
   </div>

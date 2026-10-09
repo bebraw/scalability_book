@@ -41,13 +41,44 @@ test("private answers persist across store connections and are isolated by ident
       localAnswerStore(dir),
     );
     assert.equal(reload.headers.get("Cache-Control"), "private, no-store");
-    const { answers } = await reload.json();
+    const { answers, userId } = await reload.json();
+    assert.equal(userId, "github:1");
     assert.equal(answers[0].answer, draft.answer);
     assert.equal(answers[0].completed, true);
     assert.deepEqual(
       (await (await handleLearning(new Request(url), "github:2", store)).json())
         .answers,
       [],
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("an account switch cannot save a draft to the newly verified owner", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "book-answers-"));
+  try {
+    const store = localAnswerStore(dir);
+    const response = await handleLearning(
+      put({ ...draft, owner: "github:1" }),
+      "course:run-a:student:2",
+      store,
+    );
+    assert.equal(response.status, 409);
+    assert.match((await response.json()).message, /Sign-in changed/);
+    assert.deepEqual(
+      await store.list("course:run-a:student:2", "measurement-boundary"),
+      [],
+    );
+    assert.equal(
+      (
+        await handleLearning(
+          put({ ...draft, owner: "course:run-a:student:2" }),
+          "course:run-a:student:2",
+          store,
+        )
+      ).status,
+      200,
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });

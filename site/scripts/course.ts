@@ -4,6 +4,8 @@ import {
   requirementsFor,
 } from "../../shared/course-requirements.ts";
 import { courseSignIn } from "./course-signin.ts";
+import { safeReturnTo } from "../../shared/exercises.ts";
+import { rememberCourse } from "./account-client.ts";
 import {
   courseApiUrl,
   initializeSimulation,
@@ -1125,7 +1127,17 @@ content.addEventListener("submit", async (event) => {
       const data = await api<{ message: string }>(
         "/api/course-auth/request",
         "POST",
-        { course: val("course"), email: val("email") },
+        {
+          course: val("course"),
+          email: val("email"),
+          ...(new URLSearchParams(location.search).has("returnTo")
+            ? {
+                returnTo: safeReturnTo(
+                  new URLSearchParams(location.search).get("returnTo"),
+                ),
+              }
+            : {}),
+        },
       );
       dirty = false;
       tell(data.message);
@@ -1138,6 +1150,13 @@ content.addEventListener("submit", async (event) => {
         { token: loginToken },
       );
       loginToken = null;
+      rememberCourse(data.course);
+      const destination = new URLSearchParams(location.search).get("returnTo");
+      if (destination && !simulationMode) {
+        dirty = false;
+        location.assign(safeReturnTo(destination));
+        return;
+      }
       listing = await api<Listing>("/api/courses");
       tab = "overview";
       await openCourse(data.course);

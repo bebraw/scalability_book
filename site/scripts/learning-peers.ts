@@ -17,6 +17,12 @@ import {
   selectedInquiryText,
 } from "../../shared/learning-inquiry.ts";
 import { mountLearningPractice, type GuideSave } from "./learning-practice.ts";
+import {
+  currentCourse,
+  rememberCourse,
+  openAccount,
+  signInDestination,
+} from "./account-client.ts";
 
 type VisibleThread = Envelope<InquiryThread> & { readOnly?: boolean };
 type Membership = {
@@ -51,6 +57,23 @@ function field(text: string, control: HTMLElement) {
 }
 export function mountLearningPeers(container: HTMLElement, options: Options) {
   const source = options.source;
+  const activitySource = JSON.stringify([source.url, source.anchor]);
+  const requestedActivity = new URL(location.href).searchParams.get(
+    "inquiryActivity",
+  );
+  let selectedActivity = requestedActivity;
+  try {
+    const remembered = JSON.parse(
+      sessionStorage.getItem("book-inquiry-activity") ?? "null",
+    );
+    if (
+      remembered?.source === activitySource &&
+      remembered.requested === requestedActivity
+    )
+      selectedActivity = remembered.question;
+  } catch {
+    /* Activity links work without tab storage. */
+  }
   const privateEntries = [...options.entries];
   const related = (source: LearningSource) =>
     privateEntries
@@ -62,13 +85,10 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       .slice(-20)
       .map((entry) => entry.id);
   const state = {
-    course: new URL(location.href).searchParams.get("course") ?? "",
-    question: (inquiryQuestions.includes(
-      new URL(location.href).searchParams.get(
-        "inquiryActivity",
-      ) as InquiryQuestion,
-    )
-      ? new URL(location.href).searchParams.get("inquiryActivity")
+    course: currentCourse(),
+    sharingName: "",
+    question: (inquiryQuestions.includes(selectedActivity as InquiryQuestion)
+      ? selectedActivity
       : "reading") as InquiryQuestion,
     membership: null as Membership | null,
     threads: [] as VisibleThread[],
@@ -169,10 +189,23 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
   };
   courseSelect.addEventListener("change", () => {
     state.course = courseSelect.value;
+    rememberCourse(state.course);
     reset();
   });
   question.addEventListener("change", () => {
     state.question = question.value as InquiryQuestion;
+    try {
+      sessionStorage.setItem(
+        "book-inquiry-activity",
+        JSON.stringify({
+          source: activitySource,
+          requested: requestedActivity,
+          question: state.question,
+        }),
+      );
+    } catch {
+      /* The current activity remains usable without tab storage. */
+    }
     reset();
   });
   void act(async () => {
@@ -188,23 +221,39 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         ),
       );
       const link = node("a", "Course sign-in");
-      link.href = "/course/";
+      const destination = new URL(location.href);
+      destination.hash = source.anchor;
+      destination.searchParams.set("inquiry", "1");
+      destination.searchParams.set("inquiryActivity", state.question);
+      if (state.course) destination.searchParams.set("course", state.course);
+      const returnTo =
+        destination.pathname + destination.search + destination.hash;
+      link.href = signInDestination(returnTo, state.course);
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        openAccount(state.course, returnTo);
+      });
       gate.append(link);
       return;
     }
     const data = (await response.json()) as {
       courses: { id: string; name: string }[];
+      user: { login: string };
     };
+    state.sharingName = data.user.login;
     for (const course of data.courses) {
       const option = node("option", course.name);
       option.value = course.id;
       courseSelect.append(option);
     }
+    if (!state.course && data.courses.length === 1)
+      state.course = data.courses[0]!.id;
     if (
       state.course &&
       data.courses.some((course) => course.id === state.course)
     ) {
       courseSelect.value = state.course;
+      rememberCourse(state.course);
       await loadGate();
     } else
       gate.append(
@@ -221,6 +270,12 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     const membership = await api<Membership>("/membership");
     if (revision !== selectionRevision) return;
     state.membership = membership;
+    gate.append(
+      node(
+        "p",
+        `Course account: ${state.sharingName}. Shared text is attributed to this account in ${state.course}.`,
+      ),
+    );
     const own = options.entries.filter(
       (entry) =>
         entry.kind === "attempt" &&
@@ -496,6 +551,11 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         const kind = kindSelect();
         const provenance = node("input");
         provenance.maxLength = 1000;
+        const clearDraft = retainDraft(thread.id, {
+          body: reply,
+          kind,
+          provenance,
+        });
         const prepare = button(
           "Prepare summary from selected contributions",
           () => {
@@ -509,6 +569,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
               return;
             reply.value = `Selected contributions for review (not group consensus):\n${text}\n\n${inquiryOutline()}`;
             kind.value = "summary";
+            reply.dispatchEvent(new Event("input"));
             options.status(
               "Summary prepared for your review. Preserve disagreement and evidence limits, name who supports each decision, and record any agent assistance before sharing.",
             );
@@ -522,6 +583,10 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
           field("Reply tool or observation provenance", provenance),
           reasoningSupport(reply),
           prepare,
+          node(
+            "p",
+            `Sharing as ${state.sharingName} with ${thread.audience.kind === "group" ? `${thread.audience.phase} / ${thread.audience.group}` : "the course cohort"}.`,
+          ),
           button("Share reply with this audience", async () => {
             await api(`/${thread.id}/replies`, "POST", {
               expected: record.revision,
@@ -530,6 +595,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
               provenance: provenance.value,
               links: [],
             });
+            clearDraft();
             await reveal();
           }),
         );
@@ -624,6 +690,19 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     provenance.maxLength = 1000;
     const evidence = node("input");
     evidence.type = "url";
+    const clearDraft = retainDraft("new", {
+      body,
+      kind,
+      provenance,
+      evidence,
+      audience,
+    });
+    const sharing = node("p");
+    const updateSharing = () => {
+      sharing.textContent = `Sharing as ${state.sharingName} with ${audience.selectedOptions[0]?.textContent ?? "the selected audience"}.`;
+    };
+    audience.addEventListener("change", updateSharing);
+    updateSharing();
     compose.append(
       field("Who will read this contribution?", audience),
       field("Contribution kind", kind),
@@ -631,6 +710,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       field("Tool or observation provenance", provenance),
       field("Optional HTTPS evidence link", evidence),
       reasoningSupport(body),
+      sharing,
       node(
         "p",
         "Review the audience and text before sharing. For summaries, keep contributors, consequential disagreement, evidence limits and any agent/tool provenance explicit. An agent suggestion is not a group decision.",
@@ -651,9 +731,85 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
             ? [{ url: evidence.value, caption: "Investigation evidence" }]
             : [],
         });
+        clearDraft();
         await reveal();
       }),
     );
+  }
+  function retainDraft(
+    scope: string,
+    controls: Record<
+      string,
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) {
+    const key = JSON.stringify([
+      state.course,
+      source.url,
+      source.anchor,
+      state.question,
+      state.membership!.user,
+      scope,
+    ]);
+    const read = (): Record<string, Record<string, string>> => {
+      try {
+        const value: unknown = JSON.parse(
+          sessionStorage.getItem("book-peer-drafts") ?? "{}",
+        );
+        return value && typeof value === "object" && !Array.isArray(value)
+          ? (value as Record<string, Record<string, string>>)
+          : {};
+      } catch {
+        return {};
+      }
+    };
+    const saved = read()[key];
+    for (const [name, control] of Object.entries(controls)) {
+      if (saved && typeof saved[name] === "string") {
+        if (control instanceof HTMLSelectElement) {
+          if (
+            [...control.options].some((option) => option.value === saved[name])
+          )
+            control.value = saved[name];
+        } else
+          control.value = saved[name].slice(
+            0,
+            control.maxLength > 0 ? control.maxLength : 6000,
+          );
+      }
+      const persist = () => {
+        try {
+          const drafts = read();
+          delete drafts[key];
+          const retained = Object.entries(drafts).slice(-19);
+          sessionStorage.setItem(
+            "book-peer-drafts",
+            JSON.stringify({
+              ...Object.fromEntries(retained),
+              [key]: Object.fromEntries(
+                Object.entries(controls).map(([field, input]) => [
+                  field,
+                  input.value,
+                ]),
+              ),
+            }),
+          );
+        } catch {
+          /* Sharing still works with memory-only drafts. */
+        }
+      };
+      control.addEventListener("input", persist);
+      control.addEventListener("change", persist);
+    }
+    return () => {
+      try {
+        const drafts = read();
+        delete drafts[key];
+        sessionStorage.setItem("book-peer-drafts", JSON.stringify(drafts));
+      } catch {
+        /* Successful sharing does not depend on tab storage. */
+      }
+    };
   }
   async function renderOffers() {
     const revision = selectionRevision;

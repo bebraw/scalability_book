@@ -164,6 +164,12 @@ await compileSiteBundle(
 );
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteBundle(
+  "scripts/account.ts",
+  "account.js",
+  "BookAccount",
+  "es2019",
+);
+await compileSiteBundle(
   "scripts/learning-workspace.ts",
   "learning-workspace.js",
   "BookLearningWorkspace",
@@ -188,7 +194,12 @@ await compileSiteBundle(
   "es2019",
 );
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
-await compileSiteScript("scripts/comments.ts", "comments.js");
+await compileSiteBundle(
+  "scripts/comments.ts",
+  "comments.js",
+  "BookFeedback",
+  "es2019",
+);
 await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteScript(

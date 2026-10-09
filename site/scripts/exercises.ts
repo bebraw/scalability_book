@@ -5,13 +5,35 @@ import {
   type SavedAnswer,
   type ExerciseResponse,
 } from "../../shared/exercises.ts";
+import { exerciseDiscussion } from "../../shared/exercise-discussion.ts";
+import type { SiteAccount } from "../../shared/site-account.ts";
+import {
+  readAccount,
+  signInDestination,
+  openAccount,
+} from "./account-client.ts";
+import { requestLearning } from "./learning-actions.ts";
+import { pageSource } from "./learning-context.ts";
 
 type Auth = {
   authenticated: boolean;
   available?: boolean;
   loginUrl?: string | null;
   local?: boolean;
+  owner?: string;
+  label?: string;
 };
+function exerciseAuth(account: SiteAccount): Auth {
+  return {
+    authenticated: Boolean(account.answers),
+    available: account.github.available || account.course.emailAvailable,
+    loginUrl: signInDestination(),
+    local: account.local,
+    ...(account.answers
+      ? { owner: account.answers.userId, label: account.answers.label }
+      : {}),
+  };
+}
 const roots = [...document.querySelectorAll<HTMLElement>("[data-exercise]")];
 initializeExerciseTabs();
 if (roots.length) void initialize();
@@ -19,9 +41,7 @@ if (roots.length) void initialize();
 async function initialize() {
   let auth: Auth;
   try {
-    const response = await fetch("/api/auth/status", { cache: "no-store" });
-    if (!response.ok) throw Error();
-    auth = await response.json();
+    auth = exerciseAuth(await readAccount());
   } catch {
     auth = { authenticated: false, available: false };
   }
@@ -42,7 +62,14 @@ async function mount(root: HTMLElement, auth: Auth) {
   const signin = root.querySelector<HTMLAnchorElement>("[data-signin]")!;
   const status = root.querySelector<HTMLElement>(".exercise-status")!;
   const result = root.querySelector<HTMLElement>("[data-result]")!;
+  const discuss = root.querySelector<HTMLButtonElement>("[data-discuss]")!;
+  const preview = root.querySelector<HTMLDetailsElement>(
+    "[data-assistant-preview]",
+  )!;
   const url = "/api/learning/" + id;
+  const draftKey = `book-exercise-draft:${id}:${version}`;
+  let loadRevision = 0;
+  let followingAccountLink = false;
   let expected: string | null = null;
   let ready = false,
     dirty = false,
@@ -87,13 +114,26 @@ async function mount(root: HTMLElement, auth: Auth) {
       new CustomEvent("exercise-checked", { detail: evaluation.correct }),
     );
     checked = true;
+    discuss.disabled = false;
+    preview.hidden = false;
+    preview.querySelector("pre")!.textContent = exerciseDiscussion(
+      id,
+      response,
+    );
     save.disabled = !ready || !dirty || saving;
     return true;
   }
   function changed() {
     dirty = true;
+    try {
+      sessionStorage.setItem(draftKey, read());
+    } catch {
+      /* The page still retains writing when tab storage is unavailable. */
+    }
     root.dispatchEvent(new CustomEvent("exercise-checked", { detail: false }));
     checked = false;
+    discuss.disabled = true;
+    preview.hidden = true;
     save.disabled = true;
     result.textContent = "Answers changed. Check them again.";
     for (const feedback of root.querySelectorAll<HTMLElement>(
@@ -106,35 +146,52 @@ async function mount(root: HTMLElement, auth: Auth) {
   }
   function showSignin() {
     if (auth.loginUrl) {
-      signin.href =
-        auth.loginUrl +
-        "?returnTo=" +
-        encodeURIComponent(location.pathname + location.search + "#" + root.id);
+      signin.href = signInDestination(
+        location.pathname + location.search + "#" + root.id,
+      );
       signin.hidden = false;
     }
   }
-  work.hidden = false;
-  lock(true);
-  if (auth.authenticated) {
+  async function loadAnswers(preserveDraft = false) {
+    const own = ++loadRevision;
+    const owner = auth.owner;
+    const keepDraft = preserveDraft && dirty;
+    ready = false;
+    expected = null;
+    lock(true);
     try {
       const response = await fetch(url, { cache: "no-store" });
       const data = await response.json();
+      if (own !== loadRevision || owner !== auth.owner) return;
       if (!response.ok) {
         if (response.status === 401) showSignin();
         throw Error(data.message || "Could not load saved answers.");
       }
       const answers = data.answers as SavedAnswer[];
       const current = answers.find((a) => a.version === version);
-      if (current) {
+      if (data.userId !== owner)
+        throw Error(
+          "Sign-in changed again. Check your account before loading answers.",
+        );
+      if (!keepDraft) {
+        restore({});
+        checked = false;
+        discuss.disabled = true;
+        preview.hidden = true;
+        result.textContent = "";
+      }
+      if (current && !keepDraft) {
         const parsed = parseExerciseResponse(id, current.answer);
         if (parsed) {
           restore(parsed);
           evaluate();
         }
-        expected = current.revision;
       }
+      expected = current?.revision ?? null;
       const previous =
         root.querySelector<HTMLDetailsElement>("[data-previous]")!;
+      previous.querySelector("div")!.replaceChildren();
+      previous.hidden = true;
       for (const answer of answers.filter((a) => a.version !== version)) {
         const heading = document.createElement("p");
         heading.textContent = `Version ${answer.version}: ${answer.prompt}`;
@@ -145,22 +202,33 @@ async function mount(root: HTMLElement, auth: Auth) {
         previous.hidden = false;
       }
       ready = true;
+      save.disabled = !checked || !dirty || saving;
+      root.querySelector("[data-account-reload]")?.remove();
       say(
-        current
-          ? "Saved result restored."
-          : auth.local
-            ? "Local preview account. Check your answers, then save your result."
-            : "Check your answers, then save your result privately.",
+        keepDraft
+          ? "Account answers loaded. Your unfinished attempt remains here; check it and save when ready."
+          : current
+            ? "Saved result restored."
+            : auth.local
+              ? "Local preview account. Check your answers, then save your result."
+              : "Check your answers, then save your result privately.",
       );
     } catch (error) {
+      if (own !== loadRevision || owner !== auth.owner) return;
       say(
         error instanceof Error
           ? error.message
           : "Could not load saved answers. Reload to retry.",
       );
+    } finally {
+      if (own === loadRevision) lock(false);
     }
+  }
+  work.hidden = false;
+  if (auth.authenticated) {
+    await loadAnswers();
   } else {
-    showSignin();
+    if (!auth.authenticated) showSignin();
     say(
       auth.available === false
         ? "Saving is unavailable. Automatic checking still works."
@@ -177,49 +245,97 @@ async function mount(root: HTMLElement, auth: Auth) {
           : "Checked in this browser. Sign in to save your result.",
       );
   });
-  signin.addEventListener("click", () => {
-    try {
-      sessionStorage.setItem(
-        "book-signin-draft",
-        JSON.stringify({ id, version, answer: read() }),
-      );
-      dirty = false;
-    } catch {
-      /* Checking works even when browser storage is unavailable. */
-    }
+  signin.addEventListener("click", (event) => {
+    event.preventDefault();
+    openAccount(undefined, location.pathname + location.search + "#" + root.id);
   });
-  if (ready) {
-    try {
-      const draft = JSON.parse(
-        sessionStorage.getItem("book-signin-draft") || "null",
+  discuss.addEventListener("click", () => {
+    const answer = parseExerciseResponse(id, read());
+    if (!checked || !answer) return;
+    requestLearning({
+      kind: "discuss",
+      draft: {
+        source: {
+          ...pageSource(),
+          anchor: root.id,
+          excerpt: exercises[id]!.prompt,
+        },
+        question: exerciseDiscussion(id, answer),
+        noteIds: [],
+      },
+    });
+  });
+  document.addEventListener("book-account-changed", (event) => {
+    const next = exerciseAuth((event as CustomEvent<SiteAccount>).detail);
+    if (next.owner === auth.owner) return;
+    loadRevision++;
+    auth = next;
+    ready = false;
+    lock(false);
+    save.disabled = true;
+    signin.hidden = auth.authenticated;
+    root.querySelector<HTMLElement>(".exercise-privacy")!.textContent =
+      auth.label
+        ? `Saved answers are private to ${auth.label}.`
+        : "Saved answers are private to your account.";
+    if (!auth.authenticated) showSignin();
+    const reload = document.createElement("button");
+    reload.type = "button";
+    reload.textContent = "Load this account’s saved answers";
+    root.querySelector("[data-account-reload]")?.remove();
+    reload.dataset.accountReload = "true";
+    reload.addEventListener("click", () => void loadAnswers(true));
+    root.querySelector(".exercise-actions")!.append(reload);
+    reload.hidden = !auth.authenticated;
+    say(
+      "Sign-in changed. Your current answers remain here. Load this account’s saved answers before saving.",
+    );
+  });
+  root.querySelector<HTMLElement>(".exercise-privacy")!.textContent = auth.label
+    ? `Saved answers are private to ${auth.label}.`
+    : "Saved answers are private to your account.";
+  try {
+    const draft = JSON.parse(sessionStorage.getItem(draftKey) || "null");
+    if (
+      draft &&
+      typeof draft === "object" &&
+      !Array.isArray(draft) &&
+      inputs.every((input) => typeof draft[input.dataset.field!] === "string")
+    ) {
+      restore(draft);
+      changed();
+      say(
+        "Unfinished answers restored in this tab. Check and save them when ready.",
       );
-      if (
-        draft?.id === id &&
-        draft.version === version &&
-        typeof draft.answer === "string"
-      ) {
-        const parsed = parseExerciseResponse(id, draft.answer);
-        if (parsed) {
-          restore(parsed);
-          changed();
-          say(
-            "Answers restored after sign-in. Check and save them when ready.",
-          );
-          sessionStorage.removeItem("book-signin-draft");
-        }
-      }
-    } catch {
-      /* Temporary drafts are optional. */
     }
+  } catch {
+    /* Temporary drafts are optional. */
   }
   window.addEventListener("beforeunload", (event) => {
-    if (dirty) {
+    if (dirty && !followingAccountLink) {
       event.preventDefault();
       event.returnValue = "";
     }
   });
+  document.addEventListener("click", (event) => {
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      "a[data-account-navigation]",
+    );
+    if (!link || new URL(link.href, location.href).origin !== location.origin)
+      return;
+    try {
+      if (dirty) sessionStorage.setItem(draftKey, read());
+      followingAccountLink = true;
+    } catch {
+      /* Keep the navigation warning when writing could not be retained. */
+    }
+  });
+  window.addEventListener("pageshow", () => {
+    followingAccountLink = false;
+  });
   save.addEventListener("click", async () => {
-    if (!checked) return;
+    if (!ready || !dirty || !checked) return;
+    const owner = auth.owner;
     saving = true;
     save.disabled = true;
     lock(true);
@@ -228,7 +344,7 @@ async function mount(root: HTMLElement, auth: Auth) {
       const response = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version, answer: read(), expected }),
+        body: JSON.stringify({ version, answer: read(), expected, owner }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -242,8 +358,19 @@ async function mount(root: HTMLElement, auth: Auth) {
             "Could not save. Your answers remain here; try again.",
         );
       }
+      if (owner !== auth.owner) {
+        say(
+          "Sign-in changed while saving. Your attempt remains here; load the current account before saving again.",
+        );
+        return;
+      }
       expected = data.answer.revision;
       dirty = false;
+      try {
+        sessionStorage.removeItem(draftKey);
+      } catch {
+        /* Tab drafts are optional. */
+      }
       say(
         auth.local
           ? "Saved to the local preview server."
