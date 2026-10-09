@@ -43,6 +43,8 @@ A chapter note keeps the reading link and authored concept membership without co
 The source is visible in Write; **Preview the selected source** reveals a bounded quote while its full captured text remains in the saved record.
 Writing and Save actions precede kind/title details.
 Discuss puts the message before optional conversation/goal/support controls in the **Help: … · Settings** disclosure, whose summary identifies the current help mode.
+Saved conversation labels include their last-updated time in the reader's locale to help distinguish discussions from the same chapter.
+Starting or sending a new conversation immediately adds and selects it in the picker; changing the investigation source clears that selection.
 Each open panel follows book navigation and retains its active section.
 Closing both keeps later pages lazy, with no companion request until reopening.
 Opening either experience preserves the book's existing widths and positions, including its navigation, reading column and wider demos.

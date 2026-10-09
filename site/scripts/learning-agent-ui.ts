@@ -77,10 +77,35 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
   if (timer) clearTimeout(timer);
   const { client, draft } = options;
   let conversation: LearningConversation | null = null;
+  const choose = element("select");
+  const placeholder = element("option", "Choose a saved conversation");
+  placeholder.value = "";
+  choose.append(placeholder);
+  const updateChoice = (
+    value: Pick<LearningConversation, "id" | "title" | "updatedAt">,
+    select = false,
+  ) => {
+    let option = Array.from(choose.options).find(
+      (option) => option.value === value.id,
+    );
+    if (!option) {
+      option = element("option");
+      option.value = value.id;
+      if (select) choose.insertBefore(option, choose.options[1] ?? null);
+      else choose.append(option);
+    }
+    const updated = new Date(value.updatedAt).toLocaleString(undefined, {
+      dateStyle: "short",
+      timeStyle: "medium",
+    });
+    option.textContent = `${updated} · ${value.title}`;
+    if (select) choose.value = value.id;
+  };
   const remember = (value: LearningConversation) => {
     conversation = value;
     draft.conversationId = value.id;
     draft.source = value.source;
+    updateChoice(value, true);
     options.changed();
   };
   const act = async (fn: () => Promise<void> | void) => {
@@ -212,26 +237,20 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     draft.conversationId = null;
     options.changed();
     conversation = null;
+    choose.value = "";
     draw();
   });
-  const choose = element("select");
-  choose.append(element("option", "Choose a saved conversation"));
   void act(async () => {
-    const saved = await client.request<{ id: string; title: string }[]>(
-      "/agent/conversations",
-    );
-    for (const item of saved) {
-      const option = element("option", item.title);
-      option.value = item.id;
-      choose.append(option);
-    }
+    const saved = await client.request<
+      Pick<LearningConversation, "id" | "title" | "updatedAt">[]
+    >("/agent/conversations");
+    for (const item of saved) updateChoice(item);
     if (draft.conversationId && options.active()) {
       remember(
         await client.request<LearningConversation>(
           `/agent/conversations/${draft.conversationId}`,
         ),
       );
-      choose.value = conversation!.id;
       draw();
       poll();
     }
@@ -240,7 +259,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     "change",
     () =>
       void act(async () => {
-        if (choose.value === "Choose a saved conversation") return;
+        if (!choose.value) return;
         remember(
           await client.request<LearningConversation>(
             `/agent/conversations/${choose.value}`,

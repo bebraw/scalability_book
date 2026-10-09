@@ -70,6 +70,54 @@ async function advertiseProvider(page: import("@playwright/test").Page) {
   });
 }
 
+test("the conversation picker immediately follows new discussions and retains a reopened selection", async ({
+  page,
+}) => {
+  await page.goto("/chapters/benchmarking/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Teaching assistant", exact: true })
+    .click();
+  const panel = activeLearningPanel(page);
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel.getByRole("button", { name: "Connect companion" }).click();
+  await openAssistantSettings(panel);
+  const picker = panel.getByLabel("Saved conversations", { exact: true });
+  await expect(picker.getByRole("option")).toHaveCount(1);
+  const start = async () => {
+    const response = page.waitForResponse(
+      (response) =>
+        response.url() === `${companionAddress}/agent/conversations` &&
+        response.request().method() === "POST",
+    );
+    await panel.getByRole("button", { name: "New conversation" }).click();
+    return (await (await response).json()) as LearningConversation;
+  };
+  const first = await start();
+  await expect(picker).toHaveValue(first.id);
+  await expect(picker.getByRole("option", { selected: true })).toHaveText(
+    /^\d.+ · How can we measure web applications and development workflows\?$/,
+  );
+  const second = await start();
+  await expect(picker).toHaveValue(second.id);
+  await expect(picker.getByRole("option")).toHaveCount(3);
+  await picker.selectOption(first.id);
+  await expect(picker).toHaveValue(first.id);
+  await page.reload();
+  await openAssistantSettings(panel);
+  await expect(picker).toHaveValue(first.id);
+  await expect(picker.getByRole("option")).toHaveCount(3);
+  await panel
+    .getByLabel("Investigation source")
+    .selectOption({ label: "Queue balance lab" });
+  await expect(picker).toHaveValue("");
+  const investigation = await start();
+  await expect(picker).toHaveValue(investigation.id);
+  await expect(picker.getByRole("option", { selected: true })).toContainText(
+    " · Queue balance lab",
+  );
+});
+
 test("notebook-only connections explain setup before sending and retain the question", async ({
   page,
   baseURL,
@@ -568,6 +616,9 @@ Inline \(L = \lambda W\) and $L$.
     .click();
   await expect(panel.locator(".learning-messages")).toContainText(
     "Synthetic suggestion",
+  );
+  await expect(panel.getByLabel("Saved conversations")).toHaveValue(
+    synthetic!.id,
   );
   const reply = panel.locator(".learning-reply");
   await expect(reply.locator("strong")).toHaveText("reviewed");
