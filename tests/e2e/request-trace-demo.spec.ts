@@ -6,7 +6,7 @@ test.describe("request trace demo", () => {
     await expect(page.locator("[data-request-trace-demo]")).toBeVisible();
   });
 
-  test("traces one event request across architectural boundaries", async ({
+  test("traces one work-item transition across architectural boundaries", async ({
     page,
   }) => {
     const demo = page.locator("[data-request-trace-demo]");
@@ -16,7 +16,7 @@ test.describe("request trace demo", () => {
     ).toContainText("5 steps");
     await expect(demo.locator(".request-trace-scene")).toContainText("You tap");
     await expect(demo.locator(".request-trace-wire")).toContainText(
-      "POST /events",
+      "POST /work-items/item-42/transitions",
     );
 
     await demo
@@ -39,6 +39,9 @@ test.describe("request trace demo", () => {
     await expect(demo.locator("[data-request-trace-demo-path]")).toContainText(
       "Storage must distinguish",
     );
+    await expect(demo.locator("[data-request-trace-demo-path]")).toContainText(
+      "state, matching activity event, and reusable command result together",
+    );
     await expect(
       demo.locator("[data-request-trace-demo-metric='risk']"),
     ).toContainText("high");
@@ -51,7 +54,10 @@ test.describe("request trace demo", () => {
     ).toHaveValue(/Architecture boundary brief/);
     await expect(
       demo.locator("[data-request-trace-demo-artifact]"),
-    ).toHaveValue(/POST \/events/);
+    ).toHaveValue(/POST \/work-items\/item-42\/transitions/);
+    await expect(
+      demo.locator("[data-request-trace-demo-artifact]"),
+    ).toHaveValue(/Defer only derived summary work/);
     await expect(
       demo.locator("[data-request-trace-demo-artifact]"),
     ).toHaveValue(/Each boundary needs an owner/);

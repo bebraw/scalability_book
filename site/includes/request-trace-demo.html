@@ -8,10 +8,10 @@
   <div class="scaling-demo-header demo-header">
     <div>
       <p class="scaling-demo-kicker demo-kicker">Architecture boundary trace</p>
-      <h3 id="request-trace-demo-heading">Trace one event request</h3>
+      <h3 id="request-trace-demo-heading">Trace one work-item transition</h3>
     </div>
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
-      <span data-request-trace-demo-verdict>Trace POST /events</span>
+      <span data-request-trace-demo-verdict>Trace a start-work request</span>
       <small>
         Follow a request from the browser to storage and back. Risk labels are
         illustrative.
@@ -27,28 +27,33 @@
           <div class="request-trace-scene">
             <div class="request-trace-phone" aria-hidden="true">
               <div>
-                <span>Room A</span>
-                <strong>Check in</strong>
-                <small>09:15</small>
+                <span>Workspace 9</span>
+                <strong>Start work</strong>
+                <small>Item 42 · open</small>
               </div>
             </div>
             <div class="request-trace-scene-copy">
-              <strong>You tap "Check in"</strong>
+              <strong>You tap "Start work"</strong>
               <p>
-                The browser turns that tap into a `session.checked_in` event for
-                Room A.
+                The browser requests a transition from <code>open</code> to
+                <code>in_progress</code>. The server must change the item state
+                and record one <code>work_started</code> event together.
               </p>
             </div>
           </div>
           <div class="request-trace-wire">
             <span>Browser sends</span>
-            <code>POST /events</code>
+            <code>POST /work-items/item-42/transitions</code>
           </div>
           <div class="request-trace-fields">
-            <span>type: session.checked_in</span>
-            <span>entity: room-a</span>
-            <span>time: 09:15</span>
+            <span>to: in_progress</span>
+            <span>actor: student-7</span>
+            <span>commandId: start-42</span>
           </div>
+          <p class="demo-note">
+            Illustrative route and identity policy. The stored item belongs to
+            workspace-9; a retry reuses command start-42.
+          </p>
         </div>
       </div>
       <div class="scaling-demo-panel">
@@ -61,7 +66,7 @@
               data-request-trace-demo-condition
               checked
             />
-            <span>Server checks required fields</span>
+            <span>Server checks fields and lifecycle</span>
           </label>
           <label>
             <input

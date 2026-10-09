@@ -1,4 +1,4 @@
-type ScalingScenarioId = "arrival" | "dashboard" | "tenants";
+type ScalingScenarioId = "burst" | "dashboard" | "tenants";
 type ScalingPressureKey = "writes" | "reads" | "freshness" | "tenants";
 type ScalingTechniqueId =
   | "index"
@@ -33,22 +33,22 @@ type ScalingTechnique = {
 };
 
 const scalingScenarios: Record<ScalingScenarioId, ScalingScenario> = {
-  arrival: {
-    label: "Conference arrival spike",
+  burst: {
+    label: "Work-item action burst",
     context:
-      "20,000 check-in events arrive during a 30-minute conference opening. The API currently validates, stores, enriches, and updates dashboard summaries before responding. Organizers need the latest arrivals view to stay useful during the burst.",
+      "Invented teaching workload: 20,000 valid work-item creations and lifecycle transitions arrive across eight workspaces in 30 minutes. Each accepted action must commit its state change and one matching activity event together. The API also updates derived summaries before responding; workspace feeds and summaries need to remain useful during the burst. This is not the required course benchmark.",
     pressures: { writes: 4, reads: 3, freshness: 4, tenants: 2 },
   },
   dashboard: {
-    label: "Slow operator dashboard",
+    label: "Slow workspace activity feed",
     context:
-      "Operators refresh the latest-events dashboard every few seconds while writes continue. GET /events runs SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The table has indexes on project_id and event_type, but not on created_at.",
+      "Readers refresh workspace activity feeds and filter by event type while work-item actions continue. GET /events?workspace=<id> runs SELECT * FROM activity_events WHERE workspace_id = ? ORDER BY occurred_at DESC, id DESC LIMIT 50. Separate workspace_id and event_type indexes do not match the full filter and ordering; inspect the query plan before claiming an index will help.",
     pressures: { writes: 2, reads: 5, freshness: 5, tenants: 2 },
   },
   tenants: {
     label: "Noisy tenant isolation",
     context:
-      "One large project imports historical events while smaller projects are trying to record normal activity. The shared events table and shared worker pool make unrelated projects slower.",
+      "One busy workspace creates and advances many work items while smaller workspaces continue ordinary work. The shared work-item and activity-event tables and shared worker pool make unrelated workspaces slower. Isolation must preserve each accepted action's state-and-event commit.",
     pressures: { writes: 4, reads: 3, freshness: 3, tenants: 5 },
   },
 };
@@ -57,9 +57,11 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
   index: {
     label: "Composite index",
     pressure: "Latest-events queries sort too much data.",
-    benefit: "Speeds reads that filter by project and order by created_at.",
+    benefit:
+      "May speed activity reads filtered by workspace and ordered by occurred_at and id.",
     cost: "Adds storage and makes writes maintain another index.",
-    failure: "The index may not help other filters or cross-project reports.",
+    failure:
+      "The index may not help event-type filters or cross-workspace reports.",
     signal: "Query plan, p95 GET /events latency, index size.",
     simplerAlternative:
       "Start with the missing index before adding replicas or caches.",
@@ -74,13 +76,15 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     },
   },
   queue: {
-    label: "Queue ingestion",
-    pressure: "Writes block on enrichment or aggregation work.",
+    label: "Queue derived summary work",
+    pressure:
+      "Action responses wait for derived summaries after the core commit.",
     benefit:
-      "Lets the API durably accept events before slower processing finishes.",
+      "Lets the API acknowledge the committed state and event before slower summary processing finishes.",
     cost: "Introduces queue depth, retries, idempotency, and delayed summaries.",
     failure: "Processors can fall behind while the API still appears healthy.",
-    signal: "Queue depth, event age, retry count, processing error rate.",
+    signal:
+      "Queue depth, oldest unprocessed event age, retry count, summary lag.",
     simplerAlternative:
       "Move only nonessential processing out of the request path first.",
     complexityMovesTo:
@@ -98,7 +102,7 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     pressure: "Many users repeat the same latest-events or summary reads.",
     benefit: "Reduces repeated database work for dashboards.",
     cost: "Adds invalidation and stale-read decisions.",
-    failure: "Users may see stale data during active incidents or arrivals.",
+    failure: "Users may see stale activity or counts while work items change.",
     signal: "Cache hit rate, stale age, database read rate.",
     simplerAlternative:
       "Use pagination and indexing before caching everything.",
@@ -131,14 +135,14 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     },
   },
   partition: {
-    label: "Partition by project",
-    pressure: "One project or tenant dominates table size or worker capacity.",
+    label: "Partition by workspace",
+    pressure: "One workspace dominates table size or worker capacity.",
     benefit:
       "Limits blast radius and makes large tenants easier to route or archive.",
     cost: "Adds routing, migration, and cross-partition query complexity.",
     failure: "Global reports and tenant moves become harder.",
     signal:
-      "Per-project storage, hot partition rate, cross-partition query count.",
+      "Per-workspace storage, hot partition rate, cross-partition query count.",
     simplerAlternative: "Add per-tenant rate limits before sharding storage.",
     complexityMovesTo:
       "Routing, rebalancing, migrations, and cross-partition queries.",
@@ -154,13 +158,13 @@ const scalingTechniques: Record<ScalingTechniqueId, ScalingTechnique> = {
     label: "Rate limit and backpressure",
     pressure: "Clients can submit faster than the system can safely absorb.",
     benefit: "Protects core paths and makes overload explicit to callers.",
-    cost: "Clients must handle retry-after responses and partial acceptance.",
+    cost: "Clients must distinguish rejected actions from unconfirmed outcomes and respect retry-after responses.",
     failure: "Aggressive limits can reject legitimate bursts.",
-    signal: "429 rate, rejected event count, retry-after usage, queue depth.",
+    signal: "429 rate, rejected action count, retry-after usage, queue depth.",
     simplerAlternative:
       "Set clear limits before adding capacity for rare peaks.",
     complexityMovesTo:
-      "Client retry discipline, fairness policy, and partial acceptance.",
+      "Client retry discipline, fairness policy, and per-action outcomes.",
     effects: {
       writes: 3,
       reads: 0,
@@ -287,7 +291,7 @@ function initializeScalingDemo(root: HTMLElement) {
   scenario.addEventListener("change", () => {
     const nextScenario =
       scalingScenarios[scenario.value as ScalingScenarioId] ??
-      scalingScenarios.arrival;
+      scalingScenarios.burst;
 
     context.value = nextScenario.context;
     pressureInputs.forEach((input) => {
@@ -429,33 +433,37 @@ function buildScalingPipeline(selected: ScalingTechniqueId[]) {
     ];
   }
 
-  const steps = ["Client submits event to the ingestion API."];
+  const steps = [
+    "Client requests a work-item creation or lifecycle transition.",
+  ];
 
   if (selected.includes("backpressure")) {
     steps.push(
-      "API applies per-project limits and returns retry-after when overloaded.",
-    );
-  }
-
-  if (selected.includes("queue")) {
-    steps.push(
-      "API stores the raw event durably and enqueues enrichment or aggregation work.",
-    );
-  } else {
-    steps.push(
-      "API performs validation, storage, and read-model updates synchronously.",
+      "API applies per-workspace limits and rejects overloaded actions before mutation, with retry-after guidance.",
     );
   }
 
   if (selected.includes("partition")) {
     steps.push(
-      "Events are routed by project partition to limit noisy-tenant blast radius.",
+      "The workspace routes to a partition that keeps its work-item and activity-event commit together.",
     );
+  }
+
+  steps.push(
+    "API validates the action against authoritative state, then commits the state change and one matching activity event together before confirming success. Rejected transitions change neither.",
+  );
+
+  if (selected.includes("queue")) {
+    steps.push(
+      "Only derived summary work runs later. Recover pending work from committed events and make processing retry-safe; summary lag does not defer the accepted state change or event.",
+    );
+  } else {
+    steps.push("API also updates derived summaries before responding.");
   }
 
   if (selected.includes("index")) {
     steps.push(
-      "Latest-events reads use a composite project_id and created_at index.",
+      "Workspace activity reads try a composite workspace_id, occurred_at, and id index; verify its benefit with the query plan and workload.",
     );
   }
 
@@ -576,6 +584,9 @@ ${scenario}
 
 ## Context
 ${context}
+
+## Correctness boundary
+Every accepted creation or transition commits its work-item state and matching activity event together before success is confirmed. A rejected transition changes neither. Queues defer only derived work, with recoverable, retry-safe processing and a declared freshness policy.
 
 ## Pressure scores
 - Writes: ${pressures.writes}/5

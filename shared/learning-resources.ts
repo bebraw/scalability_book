@@ -259,7 +259,7 @@ const activities: Record<string, Activity> = {
       "latency",
     ],
     caption:
-      "Trace an event submission across browser, network, application, and durable storage boundaries.",
+      "Trace a work-item transition across browser, network, application, and durable storage boundaries.",
     controls: [
       "Validation",
       "Dropped connection",
@@ -268,12 +268,12 @@ const activities: Record<string, Activity> = {
       "Delayed summary",
     ],
     assumptions:
-      "The trace is illustrative. Visible feedback, acknowledgments, and durable completion are separate events.",
+      "Illustrative route, identity, and retry policy. Success requires the state change and matching activity event to commit together; derived summaries may catch up later.",
     predict:
       "If the connection drops after submission, what can the browser actually know about the durable outcome?",
     try: "Trace a normal submission, then enable a dropped connection or duplicate tap.",
     observe:
-      "Locate the boundary where the outcome becomes ambiguous and what retry safety would require.",
+      "Locate the state-and-event commit, the point where the outcome becomes ambiguous, and the retry-safety rule.",
   },
   "ACID transaction lab": {
     conceptIds: [
@@ -632,7 +632,7 @@ const activities: Record<string, Activity> = {
       "trade-off",
     ],
     caption:
-      "Compare hypothetical role assignments, model cost, and human review burden.",
+      "Plan task-specific roles and compare hypothetical model cost and human review burden.",
     controls: [
       "Delegation target",
       "Project readiness",
@@ -640,12 +640,12 @@ const activities: Record<string, Activity> = {
       "Hypothetical model profiles",
     ],
     assumptions:
-      "All figures are illustrative; the scenario assumes higher-cost profiles need less review, which real task evidence may contradict.",
+      "Investigations are read-only; tests and refactors permit bounded edits. All figures are illustrative; the assumed cost/review relationship needs real task evidence.",
     predict:
       "Will reducing direct model cost also reduce total effort once review is counted?",
     try: "Keep the target fixed and compare two role/profile assignments, then change project readiness.",
     observe:
-      "Compare direct cost with review burden and identify the assumptions behind the difference.",
+      "Inspect how the packet's scope and evidence change with the task, then compare direct cost with review burden under the stated assumptions.",
   },
   "Reliability chain lab": {
     conceptIds: [
@@ -693,19 +693,19 @@ const activities: Record<string, Activity> = {
       "partition",
     ],
     caption:
-      "Choose the smallest set of responses that addresses a named application pressure.",
+      "Choose responses to Work Activity Tracker pressure while preserving each accepted action's state-and-event commit.",
     controls: [
       "Scenario",
       "Pressure levels",
       "Index, queue, cache, replica, partition, or admission choices",
     ],
     assumptions:
-      "A planning model. Every chosen move needs a benefit, a signal, and a failure story; selections are not capacity measurements.",
+      "Invented scenarios and illustrative scores, not the course benchmark or measured capacity. Queues defer only derived work after the authoritative commit.",
     predict:
       "Which single move addresses the declared pressure, and what new obligation does it create?",
     try: "Choose a scenario and one response, then inspect the cost of adding another move.",
     observe:
-      "Connect each response to a signal and distinguish the maintained goal from faster acknowledgment.",
+      "Connect each response to a signal; distinguish the state-and-event commit from deferred summaries and faster acknowledgment.",
   },
   "Saturation boundary lab": {
     conceptIds: [

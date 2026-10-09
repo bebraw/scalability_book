@@ -26,14 +26,16 @@ In web security and HTTP URI terminology, an **origin** is the normalized scheme
 CDN discussions also use “origin” as shorthand for the upstream origin server or backend; this placement alone does not identify the authoritative data store.
 Likewise, an edge function may execute application logic without becoming the authority for the data it reads.
 
-Use the event tracker to keep the model concrete.
+Use the Work Activity Tracker to keep the model concrete.
 A `GET /events` request asks for a representation and may be answered from a browser [cache](/concepts/#cache), an edge cache, or the origin.
-A `POST /events` request expresses an action whose validation may begin near the consumer, but whose accepted result must eventually reach the component that owns the event history.
+A lifecycle request, such as `POST /work-items/item-42/transitions`, asks to change an item's state.
+Its success boundary must preserve the state change and matching activity event together; a derived summary may catch up later under a declared freshness policy.
 The two paths can share an interface while placing execution, copies, and authority differently.
 
 ### Request boundary lab
 
-The demonstration below traces one `POST /events` request through the browser, network, API, storage, and response path.
+The demonstration below traces a start-work request through the browser, network, API, storage, and response path.
+Its route, fields, and retry contract are illustrative; the project permits other interfaces that preserve the required lifecycle behavior.
 Each boundary has an owner, a failure mode, and a contract that future clients, humans, and agents may depend on.
 
 {{ import "site/includes/request-trace-demo.html" }}

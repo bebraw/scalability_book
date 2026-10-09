@@ -6,9 +6,13 @@ test.describe("agent fleet demo", () => {
     await expect(page.locator("[data-agent-fleet]")).toBeVisible();
   });
 
-  test("builds a default delegation brief", async ({ page }) => {
+  test("builds a delegation brief for a bounded code change", async ({
+    page,
+  }) => {
     const demo = page.locator("[data-agent-fleet]");
 
+    await demo.locator("[data-agent-fleet-task]").selectOption("tests");
+    await demo.locator("[data-agent-fleet-role][value='implementer']").check();
     await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
       "4 roles, medium modeled risk",
     );
@@ -55,13 +59,13 @@ test.describe("agent fleet demo", () => {
     );
     await overviewTab.click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /Identify one likely bottleneck/,
+      /Add regression coverage for a rejected work-item transition/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /event-tracker API/,
+      /work-item transition workflow/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /src\/routes\/events\.ts/,
+      /src\/routes\/work-items\.ts/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /implementer \(Profile P\)/,
@@ -74,7 +78,7 @@ test.describe("agent fleet demo", () => {
       /Read-only inspection/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /GET \/events runs SELECT/,
+      /POST \/work-items\/item-42\/transitions/,
     );
     await demo.locator("[data-agent-fleet-packet-tab='implementer']").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
@@ -92,6 +96,74 @@ test.describe("agent fleet demo", () => {
     );
     await expectElementsInsideDemo(demo, [".agent-fleet-brief-step"]);
     await expect(demo.locator("[data-agent-fleet-step]")).toHaveCount(0);
+  });
+
+  test("keeps investigations read-only when switching from an editing task", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-agent-fleet]");
+    const target = demo.locator("[data-agent-fleet-task]");
+    const implementer = demo.locator(
+      "[data-agent-fleet-role][value='implementer']",
+    );
+    const implementerTab = demo.getByRole("tab", {
+      name: "Implementer",
+      exact: true,
+    });
+    const packet = demo.getByRole("textbox", { name: "Selected run packet" });
+
+    await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
+      "3 roles, low modeled risk",
+    );
+    await expect(implementer).toBeDisabled();
+    await expect(implementer).not.toBeChecked();
+    await expect(
+      demo.locator("[data-agent-fleet-model='implementer']"),
+    ).toBeDisabled();
+    await demo.locator(".agent-fleet-brief-step summary").click();
+    await expect(implementerTab).toBeDisabled();
+    await demo.getByRole("tab", { name: "Planner", exact: true }).click();
+    await expect(packet).toHaveValue(
+      /Propose one measurement.*Do not edit files\./,
+    );
+    await demo.getByRole("tab", { name: "Reviewer", exact: true }).click();
+    await expect(packet).toHaveValue(/No code change or diff is expected/);
+    await expect(packet).not.toHaveValue(/Inspect the final diff/);
+
+    await target.selectOption("tests");
+    await expect(implementer).toBeEnabled();
+    await expect(implementer).not.toBeChecked();
+    await implementer.check();
+    await expect(implementerTab).toBeEnabled();
+    await implementerTab.click();
+    await expect(packet).toHaveValue(
+      /Make one bounded change inside the allowed files/,
+    );
+    await expect(packet).toHaveValue(
+      /rejected action must change neither state nor successful-event history/,
+    );
+
+    await target.selectOption("refactor");
+    await expect(implementer).toBeChecked();
+    await expect(packet).toHaveValue(/Improve one module boundary/);
+    await expect(packet).toHaveValue(/preserve the transaction boundary/);
+
+    await target.selectOption("bottleneck");
+    await expect(implementer).toBeDisabled();
+    await expect(implementer).not.toBeChecked();
+    await expect(implementerTab).toBeDisabled();
+    await expect(
+      demo.getByRole("tab", { name: "Overview", exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(packet).toHaveValue(/Files to inspect \(read-only\)/);
+    await expect(packet).not.toHaveValue(/Make one bounded change/);
+    await demo.getByRole("tab", { name: "Submission", exact: true }).click();
+    await expect(packet).toHaveValue(
+      /Reviewer challenges the bottleneck claim/,
+    );
+    await expect(packet).not.toHaveValue(
+      /Implementer makes one bounded change|Reviewer inspected the diff/,
+    );
   });
 
   test("shows when the project should be hardened before delegation", async ({

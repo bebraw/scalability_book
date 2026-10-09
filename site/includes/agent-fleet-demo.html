@@ -46,6 +46,10 @@
 
       <section class="agent-fleet-panel agent-fleet-roles-step">
         <h4 id="agent-fleet-roles-title">Fleet roles</h4>
+        <p class="demo-note" data-agent-fleet-task-scope>
+          Read-only investigation. Return a bottleneck claim and measurement
+          plan; do not edit files. The Implementer is unavailable for this task.
+        </p>
         <div class="agent-fleet-role-options">
           <label>
             <input
@@ -65,14 +69,14 @@
               checked
             />
             <span>Planner</span>
-            <small>Plan, risks, and boundaries</small>
+            <small>Scope, risks, and validation</small>
           </label>
           <label>
             <input
               type="checkbox"
               value="implementer"
               data-agent-fleet-role
-              checked
+              disabled
             />
             <span>Implementer</span>
             <small>One bounded code change</small>
@@ -85,7 +89,7 @@
               checked
             />
             <span>Reviewer</span>
-            <small>Diff, tests, and regressions</small>
+            <small>Evidence and acceptance</small>
           </label>
         </div>
       </section>

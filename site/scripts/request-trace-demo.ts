@@ -25,9 +25,10 @@ const baseTraceNodes: RequestTraceNode[] = [
   {
     label: "Browser",
     boundary: "user device",
-    responsibility: "Collect intent and send the event request.",
+    responsibility:
+      "Collect the intent to start item-42 and send a transition request.",
     risk: "The client can be stale, offline, interrupted, or untrusted.",
-    rule: "Send type, entityId, occurredAt, and a client request id.",
+    rule: "Send to=in_progress, the declared actor, and commandId=start-42; reuse that command id for retries of this intent.",
   },
   {
     label: "Network",
@@ -41,23 +42,24 @@ const baseTraceNodes: RequestTraceNode[] = [
     label: "API handler",
     boundary: "trust and ownership",
     responsibility:
-      "Authenticate, validate, and decide whether the event is acceptable.",
+      "Resolve the actor and workspace, check access, and validate the requested lifecycle transition.",
     risk: "Client assumptions can drift from server rules.",
-    rule: "Reject missing fields with a 400 response that names the field.",
+    rule: "Reject missing fields or an unsupported transition without changing item state or successful-event history.",
   },
   {
     label: "Database",
     boundary: "durability",
-    responsibility: "Persist the raw event before derived views depend on it.",
+    responsibility:
+      "Commit the item state, matching activity event, and reusable command result together.",
     risk: "A slow or failed write can make success ambiguous.",
-    rule: "Store each idempotency key once and return the existing event on repeat.",
+    rule: "Atomically move open to in_progress and record one work_started event with its workspace, item, actor, and time. Bind the command key to its caller and arguments; return its stored result on replay and reject conflicting reuse.",
   },
   {
     label: "Response",
     boundary: "client feedback",
     responsibility: "Tell the client what happened without exposing internals.",
     risk: "A vague response makes retry and user feedback unsafe.",
-    rule: "Return accepted, duplicate, validation_failed, or retry_later.",
+    rule: "Confirm success only after the state and event commit; distinguish a replayed result, rejection, and unconfirmed outcome.",
   },
 ];
 
@@ -66,41 +68,42 @@ const conditionDetails: Record<
   RequestTraceCondition
 > = {
   "server-validation": {
-    label: "Server checks required fields",
+    label: "Server checks fields and lifecycle",
     impact:
       "The API boundary owns correctness instead of trusting the browser.",
     risk: "Validation failures must be explicit enough for clients and agents to fix.",
-    rule: "Reject invalid events before writing and return field-level errors.",
+    rule: "Check required fields and the current lifecycle state before committing; a rejected transition changes neither state nor successful-event history.",
   },
   "client-retry": {
     label: "Wi-Fi drops after submit",
     impact: "The network boundary can replay the same intent.",
-    risk: "The server may process an event even when the client sees a timeout.",
-    rule: "Require an idempotency key so retries do not create new events.",
+    risk: "The server may commit the state and event even when the client sees a timeout.",
+    rule: "Retry the same command id and arguments so a lost response cannot cause a second state change or activity event.",
   },
   duplicate: {
     label: "You tap twice",
-    impact: "Storage must distinguish a new fact from a repeated request.",
-    risk: "Counts and summaries become wrong if duplicates are accepted as new events.",
-    rule: "Treat the same room, type, time, and request id as one event.",
+    impact:
+      "Storage must distinguish a replayed command from a distinct action.",
+    risk: "Concurrent requests can both observe open unless the lifecycle check and write are coordinated.",
+    rule: "Return the stored result for a repeated command id. A distinct start command must still pass the authoritative lifecycle check; it cannot create a second work_started event.",
   },
   "db-timeout": {
     label: "Save takes too long",
     impact: "The API cannot always know whether persistence succeeded.",
     risk: "A timeout can create uncertain state between server, database, and client.",
-    rule: "Return retry_later and log whether the write eventually succeeded.",
+    rule: "Report the outcome as unconfirmed, then reconcile or retry with the same command id; a timeout does not prove that the transaction failed.",
   },
   queue: {
     label: "Summary updates later",
     impact:
-      "The request can finish before summaries and analytics are updated.",
-    risk: "Users may see accepted events before derived views catch up.",
-    rule: "Return accepted immediately and expose processed status separately.",
+      "The request can finish after the state and event commit while summaries catch up.",
+    risk: "A delayed summary can disagree with committed work-item state and activity history.",
+    rule: "Defer only derived summary work. Recover it from committed events, make processing retry-safe, and expose its freshness separately from transition success.",
   },
   cache: {
     label: "Dashboard may show old count",
     impact: "Reads become faster but may not reflect the latest write.",
-    risk: "The dashboard can disagree with the raw event store.",
+    risk: "The dashboard can disagree with committed state and activity history.",
     rule: "Show the dashboard freshness time and invalidate after accepted writes.",
   },
 };
@@ -256,7 +259,7 @@ function analyzeRequestTrace(
       ? rulePriority
           .filter((key) => selected.includes(key))
           .map((key) => conditionDetails[key].rule)
-      : [baseTraceNodes[2]?.rule ?? "Validate POST /events before writing."];
+      : [baseTraceNodes[2]?.rule ?? "Validate the transition before writing."];
 
   return {
     boundaries: nodes.length,
@@ -274,7 +277,7 @@ function getRequestTraceNodes(selected: RequestTraceConditionKey[]) {
       label: "Queue",
       boundary: "time",
       responsibility:
-        "Move analytics and summaries out of the synchronous write path.",
+        "Process summaries from committed activity events; keep the state-and-event commit synchronous.",
       risk: conditionDetails.queue.risk,
       rule: conditionDetails.queue.rule,
     });
@@ -462,7 +465,9 @@ function buildRequestTraceArtifact(
   return [
     "Architecture boundary brief",
     "",
-    "Request: POST /events",
+    "Request: POST /work-items/item-42/transitions",
+    "Intent: start item-42 in workspace-9; to=in_progress, actor=student-7, commandId=start-42.",
+    "Success boundary: the state change, work_started event, and reusable command result commit together.",
     `Request path: ${result.path}`,
     `Boundary count: ${result.boundaries}`,
     `Highest risk: ${result.riskLevel}`,

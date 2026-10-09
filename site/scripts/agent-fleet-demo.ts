@@ -5,6 +5,7 @@ type AgentModelId = "small" | "balanced" | "strong";
 type PacketId = RoleId | "brief" | "submission";
 
 type TaskConfig = {
+  kind: "investigation" | "change";
   label: string;
   objective: string;
   evidence: string;
@@ -38,45 +39,49 @@ const readinessPenalty: Record<ReadinessId, number> = {
 
 const taskConfigs: Record<TaskId, TaskConfig> = {
   bottleneck: {
+    kind: "investigation",
     label: "Investigate a scaling bottleneck",
     objective:
-      "Identify one likely bottleneck in the event tracking project and propose a measurement before changing code.",
+      "Identify one likely bottleneck in the Work Activity Tracker and propose a measurement. This investigation is read-only; do not edit files.",
     evidence:
       "Name the endpoint, query, data flow, or file that supports the claim.",
-    nonGoal: "Do not redesign the system or apply speculative optimizations.",
+    nonGoal:
+      "Do not edit files, apply optimizations, or redesign the system. Return the claim and measurement plan for human review.",
     validation:
       "A benchmark, query plan, trace, or log signal that can confirm or reject the bottleneck.",
     changeSize: 2,
     projectContext: {
-      module: "event-tracker API",
-      validation: "npm test -- events",
+      module: "Work Activity Tracker API",
+      validation: "npm test -- activity-feed",
       allowedFiles:
-        "src/routes/events.ts\nsrc/db/events.ts\ntests/events.test.ts",
+        "src/routes/events.ts\nsrc/db/activity-events.ts\ntests/activity-feed.test.ts",
       branch: "agent-fleet/latest-events-bottleneck",
       context:
-        "The app records project events and shows the latest 50 events per project. GET /events runs SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The migration has indexes on project_id and event_type, but not created_at.",
+        "Invented repository: users create work items in workspaces and advance open -> in_progress -> done. Each accepted action commits its state change and matching activity event together. GET /events?workspace=<id> reads SELECT * FROM activity_events WHERE workspace_id = ? ORDER BY occurred_at DESC, id DESC LIMIT 50. Separate indexes on workspace_id and event_type do not match the full filter and ordering. The query plan and runtime measurements are not supplied.",
     },
   },
   tests: {
+    kind: "change",
     label: "Add regression tests for one workflow",
     objective:
-      "Add focused tests for one event recording or querying workflow that currently lacks coverage.",
+      "Add regression coverage for a rejected work-item transition and make a bounded fix if the test exposes a defect.",
     evidence: "Name the workflow, existing behavior, and test file touched.",
     nonGoal: "Do not rewrite the application structure while adding tests.",
     validation:
-      "The new test fails for the broken behavior and passes after the fix.",
+      "An unsupported transition is rejected without changing item state or successful-event history. The regression fails for the defect and passes after the fix.",
     changeSize: 2,
     projectContext: {
-      module: "event creation workflow",
-      validation: "npm test -- create-event",
+      module: "work-item transition workflow",
+      validation: "npm test -- transitions",
       allowedFiles:
-        "src/routes/events.ts\nsrc/validation/events.ts\ntests/create-event.test.ts",
-      branch: "agent-fleet/event-creation-regression",
+        "src/routes/work-items.ts\nsrc/db/work-items.ts\ntests/transitions.test.ts",
+      branch: "agent-fleet/transition-regression",
       context:
-        "The browser submits POST /events with type, entityId, and occurredAt. Recent bug reports say malformed events can reach storage when client-side validation is bypassed.",
+        "Invented defect report: POST /work-items/item-42/transitions requests to=done for an open item. The API returns a rejection, but the activity feed contains a work_completed event. The required lifecycle is open -> in_progress -> done; a rejected action must change neither state nor successful-event history. Check both records at the real persistence boundary, including when client-side checks are bypassed.",
     },
   },
   refactor: {
+    kind: "change",
     label: "Refactor one bounded module",
     objective:
       "Improve one module boundary without changing user-visible behavior.",
@@ -87,13 +92,13 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
       "Existing tests pass and one characterization test protects the refactor.",
     changeSize: 3,
     projectContext: {
-      module: "event storage module",
-      validation: "npm test -- event-storage",
+      module: "activity storage module",
+      validation: "npm test -- activity-storage",
       allowedFiles:
-        "src/db/events.ts\nsrc/db/event-queries.ts\ntests/event-storage.test.ts",
-      branch: "agent-fleet/event-storage-boundary",
+        "src/db/activity-events.ts\nsrc/db/activity-queries.ts\ntests/activity-storage.test.ts",
+      branch: "agent-fleet/activity-storage-boundary",
       context:
-        "Event storage mixes query construction, result mapping, and pagination defaults in one module. The API contract must stay stable while the storage boundary becomes easier to review.",
+        "Invented repository: activity storage mixes workspace and event-type filtering, result mapping, and pagination defaults in one module. Preserve the documented occurred_at DESC, id DESC ordering, cursor behavior, and event fields identifying workspace, work item, actor, and time. Refactoring must also preserve the transaction boundary that commits each work-item state change and matching activity event together.",
     },
   },
 };
@@ -157,6 +162,9 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     "[data-agent-fleet-readiness]",
   );
   const task = root.querySelector<HTMLSelectElement>("[data-agent-fleet-task]");
+  const taskScope = root.querySelector<HTMLElement>(
+    "[data-agent-fleet-task-scope]",
+  );
   const roles = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-agent-fleet-role]"),
   );
@@ -200,6 +208,7 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     !form ||
     !readiness ||
     !task ||
+    !taskScope ||
     !verdict ||
     !workflowSteps ||
     !coordination ||
@@ -221,6 +230,8 @@ function initializeAgentFleetDemo(root: HTMLElement) {
   const render = () => {
     const selectedTask =
       taskConfigs[task.value as TaskId] ?? taskConfigs.bottleneck;
+    updateRoleAvailability(selectedTask, roles);
+    taskScope.textContent = getTaskScope(selectedTask);
     const selectedReadiness = readiness.value as ReadinessId;
     const selectedRoles = getSelectedRoles(roles);
     const selectedModels = getSelectedModels(modelSelects);
@@ -268,7 +279,7 @@ function initializeAgentFleetDemo(root: HTMLElement) {
       selectedRoles.length > 1
         ? `${selectedRoles.length} roles, ${riskLabel.toLowerCase()} modeled risk`
         : "Use one careful agent";
-    workflowSteps.innerHTML = buildSteps(selectedRoles)
+    workflowSteps.innerHTML = buildSteps(selectedRoles, selectedTask)
       .map((item) => `<li>${escapeAgentFleetHtml(item)}</li>`)
       .join("");
     currentPacket = getAvailablePacket(currentPacket, selectedRoles);
@@ -342,8 +353,33 @@ function initializeAgentFleetDemo(root: HTMLElement) {
 
 function getSelectedRoles(roleInputs: HTMLInputElement[]) {
   return roleInputs
-    .filter((role) => role.checked)
+    .filter((role) => role.checked && !role.disabled)
     .map((role) => role.value as RoleId);
+}
+
+function updateRoleAvailability(task: TaskConfig, inputs: HTMLInputElement[]) {
+  for (const input of inputs) {
+    input.disabled =
+      task.kind === "investigation" && input.value === "implementer";
+    if (input.disabled) input.checked = false;
+    input.closest("label")?.classList.toggle("is-disabled", input.disabled);
+  }
+}
+
+function getTaskScope(task: TaskConfig) {
+  return task.kind === "investigation"
+    ? "Read-only investigation. Return a bottleneck claim and measurement plan; do not edit files. The Implementer is unavailable for this task."
+    : "One bounded code change inside the allowed files. Select an Implementer when the workflow needs an edit.";
+}
+
+function getRoleOutput(role: RoleId, task: TaskConfig) {
+  if (task.kind === "investigation") {
+    if (role === "planner")
+      return "Planner proposes a measurement with a falsifiable claim, risks, and limits; no file edits.";
+    if (role === "reviewer")
+      return "Reviewer challenges the bottleneck claim and measurement plan against repository evidence; no file edits.";
+  }
+  return roleOutput[role];
 }
 
 function getSelectedModels(modelInputs: HTMLSelectElement[]) {
@@ -514,7 +550,7 @@ function getPatternLabel(
   return "Sequential delegation";
 }
 
-function buildSteps(roles: RoleId[]) {
+function buildSteps(roles: RoleId[], task: TaskConfig) {
   if (roles.length === 0) {
     return [
       "No delegation yet. Assign at least one role or do the task manually.",
@@ -522,7 +558,7 @@ function buildSteps(roles: RoleId[]) {
     ];
   }
 
-  return roles.map((role) => roleOutput[role]);
+  return roles.map((role) => getRoleOutput(role, task));
 }
 
 function buildRunPackets(context: {
@@ -572,7 +608,7 @@ function buildAgentFleetBrief({
       ? selectedRoles
           .map(
             (role) =>
-              `- ${role} (${agentModels[selectedModels[role] ?? "balanced"].label}): ${roleOutput[role]}`,
+              `- ${role} (${agentModels[selectedModels[role] ?? "balanced"].label}): ${getRoleOutput(role, selectedTask)}`,
           )
           .join("\n")
       : "- No role selected.";
@@ -588,7 +624,7 @@ ${selectedReadiness}
 Repository or module:
 ${projectContext.module}
 
-Allowed files or directories:
+${selectedTask.kind === "investigation" ? "Files to inspect (read-only)" : "Allowed files or directories"}:
 ${projectContext.allowedFiles}
 
 Validation command:
@@ -600,7 +636,7 @@ ${projectContext.branch}
 Concrete project context:
 ${projectContext.context}
 
-Change size:
+Task size:
 ${changeSize}/5
 
 Recommended pattern:
@@ -619,7 +655,7 @@ Roles and expected outputs:
 ${roles}
 
 Allowed scope:
-One bounded workflow or module. Keep file ownership explicit before editing.
+${getTaskScope(selectedTask)}
 
 Required evidence:
 ${selectedTask.evidence}
@@ -676,7 +712,7 @@ ${selectedTask.objective}
 Repository or module:
 ${projectContext.module}
 
-Allowed files or directories:
+${selectedTask.kind === "investigation" ? "Files to inspect (read-only)" : "Allowed files or directories"}:
 ${projectContext.allowedFiles}
 
 Validation command:
@@ -694,14 +730,14 @@ Paste the previous role output here before running this role.
 Project readiness:
 ${selectedReadiness}
 
-Change size:
+Task size:
 ${changeSize}/5
 
 Overall workflow pattern:
 ${patternLabel}
 
 Your allowed scope:
-${getRoleScope(role)}
+${getRoleScope(role, selectedTask)}
 
 Forbidden changes:
 ${selectedTask.nonGoal}
@@ -710,10 +746,10 @@ Required evidence:
 ${getRoleEvidence(role, selectedTask)}
 
 Expected output format:
-${getRoleOutputFormat(role)}
+${getRoleOutputFormat(role, selectedTask)}
 
 Handoff:
-${getRoleHandoff(role, previous, next)}`;
+${getRoleHandoff(role, previous, next, selectedTask)}`;
 }
 
 function buildSubmissionNote({
@@ -758,10 +794,11 @@ ${projectContext.context}
 ## Setup
 - Repository or module: ${projectContext.module}
 - Branch or working area: ${projectContext.branch}
-- Allowed files or directories: ${projectContext.allowedFiles.replace(/\n/g, ", ")}
+- ${selectedTask.kind === "investigation" ? "Files to inspect (read-only)" : "Allowed files or directories"}: ${projectContext.allowedFiles.replace(/\n/g, ", ")}
 - Validation command: ${projectContext.validation}
 - Project readiness: ${selectedReadiness}
-- Change size: ${changeSize}/5
+- Task size: ${changeSize}/5
+- Scope: ${getTaskScope(selectedTask)}
 - Workflow pattern: ${patternLabel}
 - Modeled integration risk: ${riskLabel}
 
@@ -776,14 +813,11 @@ ${roleList}
 
 ## Evidence checklist
 - Each role named concrete files, commands, assumptions, and risks:
-- Scout findings used by planner:
-- Planner boundaries followed by implementer:
-- Implementer reported commands run:
-- Reviewer inspected the diff and validation output:
+${selectedRoles.map((role) => `- ${getRoleOutput(role, selectedTask)}`).join("\n")}
 - Human changed or rejected:
 
 ## Result
-- What changed:
+- Findings or changes:
 - Validation command and result:
 - What the fleet missed:
 - What you would do differently next time:`;
@@ -845,16 +879,20 @@ function getNextRole(role: RoleId, selectedRoles: RoleId[]): RoleId | null {
     : null;
 }
 
-function getRoleScope(role: RoleId) {
+function getRoleScope(role: RoleId, task: TaskConfig) {
   switch (role) {
     case "scout":
       return "Read-only inspection. Do not edit files. Compress findings into concrete file references and unknowns.";
     case "planner":
-      return "Use scout findings to define scope, risks, allowed files, non-goals, and acceptance criteria. Do not edit files.";
+      return task.kind === "investigation"
+        ? "Use prior findings, or inspect the named files if no scout is selected. Propose one measurement that could confirm or reject the claim. Do not edit files."
+        : "Use prior findings, or inspect the named files if no scout is selected, to define scope, risks, allowed files, non-goals, and acceptance criteria. Do not edit files.";
     case "implementer":
       return "Make one bounded change inside the allowed files. Keep behavior outside the task stable.";
     case "reviewer":
-      return "Review the diff, validation output, regressions, missing tests, and whether the change respects the plan.";
+      return task.kind === "investigation"
+        ? "Review the bottleneck claim, cited repository evidence, proposed measurement, and remaining unknowns. Do not edit files."
+        : "Review the diff, validation output, regressions, missing tests, and whether the change respects the plan. Do not edit files.";
   }
 }
 
@@ -863,24 +901,32 @@ function getRoleEvidence(role: RoleId, task: TaskConfig) {
     case "scout":
       return `${task.evidence} Also list what cannot be known from the available context.`;
     case "planner":
-      return "A scoped plan with allowed files, forbidden changes, risks, acceptance criteria, and validation command.";
+      return task.kind === "investigation"
+        ? "A falsifiable bottleneck claim, cited evidence, proposed measurement boundary and workload, alternative explanations, and limits. Distinguish planned checks from checks actually run."
+        : "A scoped plan with allowed files, forbidden changes, risks, acceptance criteria, and validation command.";
     case "implementer":
       return `${task.validation} Report files changed and commands run.`;
     case "reviewer":
-      return "Findings ordered by severity, with file references, test gaps, and a clear accept/revise recommendation.";
+      return task.kind === "investigation"
+        ? "Evidence-backed findings about the claim and measurement, missing evidence, and an accept/revise recommendation for human review. No code change or diff is expected."
+        : "Findings ordered by severity, with file references, test gaps, and a clear accept/revise recommendation.";
   }
 }
 
-function getRoleOutputFormat(role: RoleId) {
+function getRoleOutputFormat(role: RoleId, task: TaskConfig) {
   switch (role) {
     case "scout":
       return "- Findings:\n- Relevant files:\n- Unknowns:\n- Suggested next role input:";
     case "planner":
-      return "- Plan:\n- Allowed files:\n- Non-goals:\n- Risks:\n- Acceptance criteria:\n- Validation command:";
+      return task.kind === "investigation"
+        ? "- Bottleneck claim:\n- Repository evidence:\n- Proposed measurement:\n- Alternative explanations:\n- Checks actually run:\n- Limits:"
+        : "- Plan:\n- Allowed files:\n- Non-goals:\n- Risks:\n- Acceptance criteria:\n- Validation command:";
     case "implementer":
       return "- Changes made:\n- Files changed:\n- Commands run:\n- Evidence:\n- Follow-up risks:";
     case "reviewer":
-      return "- Findings:\n- Missing evidence:\n- Regression risk:\n- Recommendation:\n- Human decision needed:";
+      return task.kind === "investigation"
+        ? "- Claim and measurement findings:\n- Missing evidence:\n- Recommendation:\n- Human decision needed:"
+        : "- Findings:\n- Missing evidence:\n- Regression risk:\n- Recommendation:\n- Human decision needed:";
   }
 }
 
@@ -888,6 +934,7 @@ function getRoleHandoff(
   role: RoleId,
   previous: RoleId | null,
   next: RoleId | null,
+  task: TaskConfig,
 ) {
   const previousText = previous
     ? `Start from the ${previous} output pasted into "Relevant prior output".`
@@ -897,7 +944,9 @@ function getRoleHandoff(
     : "Write your output so the human integrator can make the final decision.";
 
   if (role === "reviewer") {
-    return `${previousText} Inspect the final diff and validation evidence before recommending accept or revise.`;
+    return task.kind === "investigation"
+      ? `${previousText} Check the claim and measurement plan against the repository evidence before recommending accept or revise to the human owner.`
+      : `${previousText} Inspect the final diff and validation evidence before recommending accept or revise.`;
   }
 
   return `${previousText} ${nextText}`;

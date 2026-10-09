@@ -14,7 +14,7 @@ test.describe("scaling pressure demo", () => {
     );
     await expect(demo.locator(".scaling-pressure-grid")).toBeVisible();
     await expect(demo.locator("[data-scaling-demo-context]")).toHaveValue(
-      /20,000 check-in events/,
+      /20,000 valid work-item creations and lifecycle transitions/,
     );
 
     await demo
@@ -48,7 +48,7 @@ test.describe("scaling pressure demo", () => {
       /Scaling Trade-off Table/,
     );
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
-      /Queue ingestion/,
+      /Queue derived summary work/,
     );
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
       /Cache dashboard reads/,
@@ -70,7 +70,7 @@ test.describe("scaling pressure demo", () => {
 
     await demo.locator("[data-scaling-demo-scenario]").selectOption("tenants");
     await expect(demo.locator("[data-scaling-demo-context]")).toHaveValue(
-      /One large project imports historical events/,
+      /One busy workspace creates and advances many work items/,
     );
     await expect(
       demo.locator("[data-scaling-demo-output='tenants']"),
@@ -84,7 +84,7 @@ test.describe("scaling pressure demo", () => {
       .setChecked(true);
 
     await expect(demo.locator("[data-scaling-demo-pipeline]")).toContainText(
-      "project partition",
+      "partition that keeps its work-item and activity-event commit together",
     );
   });
 });

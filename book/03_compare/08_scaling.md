@@ -26,7 +26,10 @@ A queue can duplicate effects without idempotency, and controlled rejection can 
 
 ### Scaling pressure lab
 
-The demonstration below starts from a concrete event-tracking pressure: event writes spike, dashboard reads get slower, and the latest-events query has to stay useful without pretending the system needs every scaling technique at once.
+The demonstration below starts from an invented Work Activity Tracker pressure: work-item actions spike while workspace activity feeds and summaries need to stay useful.
+Each accepted creation or transition must preserve its state change and matching activity event together.
+Queueing can defer derived summary work after that commit; a faster acknowledgment must not conceal a pending core operation.
+The scenarios and scores are teaching assumptions, not the required course benchmark or measured capacity.
 
 {{ import "site/includes/scaling-pressure-demo.html" }}
 

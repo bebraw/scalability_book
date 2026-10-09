@@ -1106,7 +1106,8 @@
   border-radius: 0.3rem;
   padding: 0.65rem;
 }
-.agent-fleet-model-options label.is-disabled {
+.agent-fleet-model-options label.is-disabled,
+.agent-fleet-role-options label.is-disabled {
   opacity: 0.48;
 }
 .agent-fleet-role-options label {

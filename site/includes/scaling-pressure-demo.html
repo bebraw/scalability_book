@@ -22,12 +22,12 @@
   <form class="scaling-demo-form scaling-pressure-grid" data-scaling-demo-form>
     <div class="scaling-pressure-column">
       <div class="scaling-demo-panel">
-        <h4 id="scaling-demo-pressure-title">Event tracker pressure</h4>
+        <h4 id="scaling-demo-pressure-title">Work Activity Tracker pressure</h4>
         <label>
           <span>Scenario</span>
           <select data-scaling-demo-scenario>
-            <option value="arrival">Conference arrival spike</option>
-            <option value="dashboard">Slow operator dashboard</option>
+            <option value="burst">Work-item action burst</option>
+            <option value="dashboard">Slow workspace activity feed</option>
             <option value="tenants">Noisy tenant isolation</option>
           </select>
         </label>
@@ -98,7 +98,9 @@
               checked
             />
             <span>Composite index</span>
-            <small>Speed up latest-events reads by project and time.</small>
+            <small
+              >Try an index matching workspace, occurrence time, and id.</small
+            >
           </label>
           <label>
             <input
@@ -107,9 +109,10 @@
               data-scaling-demo-technique
               checked
             />
-            <span>Queue ingestion</span>
+            <span>Queue derived summary work</span>
             <small
-              >Accept writes quickly and process expensive work later.</small
+              >Commit state and activity together, then process summaries
+              later.</small
             >
           </label>
           <label>
@@ -134,9 +137,10 @@
               value="partition"
               data-scaling-demo-technique
             />
-            <span>Partition by project</span>
+            <span>Partition by workspace</span>
             <small
-              >Limit one large tenant or project from dominating storage.</small
+              >Isolate busy workspaces while preserving each action's
+              commit.</small
             >
           </label>
           <label>
