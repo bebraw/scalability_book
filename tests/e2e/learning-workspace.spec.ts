@@ -74,6 +74,15 @@ test("notebook-only connections explain setup before sending and retain the ques
   page,
   baseURL,
 }) => {
+  await page.route(`${companionAddress}/status`, async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      json: {
+        ...(await response.json()),
+        storage: "/private/tmp/synthetic learner's notebook",
+      },
+    });
+  });
   const posts: string[] = [];
   page.on("request", (request) => {
     if (
@@ -110,6 +119,11 @@ test("notebook-only connections explain setup before sending and retain the ques
     panel.locator("code").filter({ hasText: "--codex" }),
   ).toContainText(
     `npm run companion -- --codex --origin '${new URL(baseURL!).origin}'`,
+  );
+  await expect(
+    panel.locator("code").filter({ hasText: "--codex" }),
+  ).toContainText(
+    "--port 18888 --directory '/private/tmp/synthetic learner'\\''s notebook'",
   );
   await expect(
     panel.getByRole("button", { name: "Copy Codex command", exact: true }),

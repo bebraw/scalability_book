@@ -21,6 +21,7 @@ Only an existing companion session is checked when opening the account view; no 
 Provider status reports configuration and connection, while an actual assistant reply establishes provider availability.
 Discuss shows this status beside the message composer.
 A notebook-only connection disables Send and offers **Set up assistant replies**; Connect provides a copyable Codex restart command and links for dedicated-profile setup and local models.
+The Codex restart command retains the connected companion's port and reported notebook directory, quoting filesystem paths for the shell.
 Checking the connection after enabling a provider retains the unsent question.
 
 Checked chapter exercises offer **Discuss my answer** and a preview of the exact prompt, exercise ID/version, attempt and checker feedback.

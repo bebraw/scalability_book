@@ -895,8 +895,13 @@ export function createLearningPane(
   function renderStartCommand(codex = false) {
     const command = node("pre");
     // Use the checkout until the code-free standalone release is published.
-    const origin = location.origin.replaceAll("'", "'\\''");
-    const startCommand = `npm run companion -- ${codex ? "--codex " : ""}--origin '${origin}'`;
+    const quote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
+    const port = new URL(client.base).port || "80";
+    const retained =
+      codex && connected
+        ? `${port === "8788" ? "" : ` --port ${port}`}${companionStatus?.storage ? ` --directory ${quote(companionStatus.storage)}` : ""}`
+        : "";
+    const startCommand = `npm run companion -- ${codex ? "--codex " : ""}--origin ${quote(location.origin)}${retained}`;
     command.append(node("code", startCommand));
     container.append(
       node(

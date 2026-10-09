@@ -137,6 +137,7 @@ You can choose a profile with `--codex-home` or a model available to your accoun
 In **Teaching assistant → Discuss**, write your question and choose **Send message**.
 The provider notice beside your message identifies whether replies are enabled.
 For a notebook-only connection, Send is disabled; **Set up assistant replies** opens Connect with setup links and a copyable Codex start command.
+The copied Codex command includes your connected port and notebook directory so a custom location stays selected.
 After enabling the provider, choose **Check connection** and reconnect if asked; your unsent question stays in the tab.
 The **Help: … · Settings** disclosure shows the current help choice and contains conversation/source controls, your optional learning goal and support preferences.
 Choose a help mode there: a question, hint, direct explanation, reasoning check or reflection support.
