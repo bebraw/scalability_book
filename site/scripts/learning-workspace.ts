@@ -13,6 +13,7 @@ import type { LearningExperience } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 import type { LearningAction } from "./learning-actions.ts";
 import type { SiteAccount } from "../../shared/site-account.ts";
+import { mountReadingInvestigation } from "./learning-investigation.ts";
 export {
   observeLearningDemo,
   changeLearningDemo,
@@ -154,6 +155,7 @@ panes = {
 };
 compact.addEventListener("change", syncPanels);
 let accountIdentity: string | null = null;
+let investigation: ReturnType<typeof mountReadingInvestigation> | null = null;
 document.addEventListener("book-account-changed", (event) => {
   const account = (event as CustomEvent<SiteAccount>).detail;
   const identity = JSON.stringify([
@@ -168,6 +170,33 @@ document.addEventListener("book-account-changed", (event) => {
 });
 document.addEventListener("book-learning-action", (event) => {
   const action = (event as CustomEvent<LearningAction>).detail;
+  if (action.kind === "investigate") {
+    const root = document.querySelector<HTMLElement>(
+      "[data-reading-investigation='queue-balance']",
+    );
+    if (!root) return;
+    if (investigation) investigation.open();
+    else
+      investigation = mountReadingInvestigation(root, {
+        client,
+        settings: async () => {
+          if (client.token) {
+            try {
+              await refresh();
+            } catch {
+              services.connection(false);
+            }
+          }
+          services.navigate("assistant", "connect");
+        },
+        write: async (draft) => {
+          await refresh();
+          services.write(draft);
+        },
+        disconnected: () => services.connection(false),
+      });
+    return;
+  }
   void (async () => {
     if (client.token && !snapshot.connected) {
       try {

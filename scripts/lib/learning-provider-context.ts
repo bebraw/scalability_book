@@ -6,6 +6,10 @@ import type {
   NotebookEntry,
 } from "../../shared/learning-workspace.ts";
 import type { HelpMode, SupportNeed } from "../../shared/learning-agent.ts";
+import {
+  queueInvestigation,
+  type InvestigationTurn,
+} from "../../shared/reading-investigation.ts";
 
 export function buildLearningProviderContext({
   source,
@@ -16,6 +20,7 @@ export function buildLearningProviderContext({
   need,
   origin,
   focused = false,
+  investigation,
 }: {
   source: LearningSource;
   selected: NotebookEntry[];
@@ -25,6 +30,7 @@ export function buildLearningProviderContext({
   need: SupportNeed;
   origin: string;
   focused?: boolean;
+  investigation?: InvestigationTurn;
 }) {
   return JSON.stringify({
     helpMode: mode,
@@ -38,6 +44,14 @@ export function buildLearningProviderContext({
       body,
     })),
     question: text,
+    ...(investigation
+      ? {
+          readingActivity: {
+            contract: queueInvestigation,
+            turn: investigation,
+          },
+        }
+      : {}),
     supportResources: concepts
       .filter((concept) => source.conceptIds.includes(concept.id))
       .map(

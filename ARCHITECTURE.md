@@ -54,6 +54,13 @@ The browser presents an automated study role and reply metadata, while runtime a
 [learning-context.ts](site/scripts/learning-context.ts) derives chapter/page links, authored concept membership and explicitly selected passage context, with selection captured by the lightweight [learning-selection.ts](site/scripts/learning-selection.ts).
 [learning-session.ts](site/scripts/learning-session.ts) owns tab-scoped independent open states, foreground experience, remembered sections, separate notebook/assistant note selections and unfinished writing/context/message/conversation continuity across book navigation; it does not create durable companion records.
 [learning-guide.ts](site/scripts/learning-guide.ts) uses the current reading's authored prompt and rendered demos for optional prediction, actual demo observation and private reflection after connecting.
+[reading-investigation.ts](shared/reading-investigation.ts) owns the versioned queue activity, phases and validated browser-snapshot contract, also published through the concept graph and public MCP demo lookup.
+[learning-investigation.ts](site/scripts/learning-investigation.ts) renders an optional inline exploration beside the queue lab using the coordinator's existing companion client.
+Its unsent writing, current controls and activity/conversation identity live in tab storage; submitted activity turns and observations remain with the companion's conversation owner.
+[learning-investigation-session.ts](site/scripts/learning-investigation-session.ts) owns bounded tab restoration and reading actual simulator outputs, separately from the inline presentation.
+Explicit sends supply the activity and displayed values without selecting notebook entries; an active reply can observe only this queue through the existing broker.
+The student operates controls, generated explanations use the restricted reply renderer, and preparing a takeaway invokes the existing reviewed notebook handoff.
+The public MCP remains stateless and publishes only the authored activity contract.
 [learning-practice.ts](site/scripts/learning-practice.ts) presents optional independent cases from [learning-activities.ts](shared/learning-activities.ts), snapshots their versions into portable sources and links separately saved attempts/reflections.
 [course-inquiry.ts](shared/course-inquiry.ts) owns peer audiences and historical access, and [the inquiry handler](worker/course-inquiry.ts) enforces them through the existing course API in both local development and the Worker.
 [learning-peers.ts](site/scripts/learning-peers.ts) reveals peer work after a private initial attempt and supports selected shared contributions, individual reflection and separately consented editorial offers.

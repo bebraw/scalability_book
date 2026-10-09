@@ -91,6 +91,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-040](implemented/ADR-040-integrate-website-sign-in-with-learning-tools.md)                     | Integrate account and connection status, enrolled email exercise access and reviewed learning handoffs.                                           |
 | [ADR-041](implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md)                 | Render untrusted assistant Markdown and equations through permitted DOM elements while retaining original reply text.                             |
 | [ADR-042](implemented/ADR-042-expose-public-learning-material-through-stateless-mcp.md)             | Expose bounded public learning retrieval and experiment guidance through stateless MCP, retaining Markdown and companion privacy boundaries.      |
+| [ADR-043](implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md)            | Activate the queue-lab reading through shared activity context, actual browser observations, adapted explanations and reviewed notebook handoffs. |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

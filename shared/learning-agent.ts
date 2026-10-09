@@ -1,4 +1,5 @@
 import type { LearningSource } from "./learning-workspace.ts";
+import type { InvestigationTurn } from "./reading-investigation.ts";
 
 export const helpModes = [
   "question",
@@ -53,6 +54,8 @@ export interface AgentMessage {
   teaching?: TeachingContext;
   /** Honest provider/context limits, separate from generated prose. */
   notices?: string[];
+  /** Explicit inline activity context on this turn; absent in earlier histories. */
+  investigation?: InvestigationTurn;
 }
 export interface LearningConversation {
   id: string;

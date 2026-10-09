@@ -6,6 +6,10 @@ import { conceptPages } from "../../shared/concept-pages.ts";
 import { demoResources } from "../../shared/learning-resources.ts";
 import { buildLearningProviderContext } from "./learning-provider-context.ts";
 import {
+  parseInvestigationTurn,
+  type InvestigationTurn,
+} from "../../shared/reading-investigation.ts";
+import {
   helpModes,
   supportNeeds,
   type TaskSupport,
@@ -97,6 +101,7 @@ export function openLearningConversations(
     noteIds?: string[],
     appliedTeaching?: TeachingContext,
     notices?: string[],
+    investigation?: InvestigationTurn,
   ) => {
     conversation.messages.push({
       id: randomUUID(),
@@ -107,6 +112,7 @@ export function openLearningConversations(
       ...(noteIds ? { noteIds } : {}),
       ...(appliedTeaching ? { teaching: appliedTeaching } : {}),
       ...(notices?.length ? { notices } : {}),
+      ...(investigation ? { investigation } : {}),
     });
     save(conversation);
   };
@@ -183,6 +189,10 @@ export function openLearningConversations(
       );
       const value = learningObject(input);
       const browser = learningId(value.browserId);
+      const investigation =
+        value.investigation === undefined
+          ? undefined
+          : parseInvestigationTurn(value.investigation, conversation.source);
       const text = learningText(value.text, "Your question", 8000, true);
       const goal = learningText(value.goal ?? "", "Learning goal", 1000);
       const mode = learningText(value.mode, "Help mode", 30, true);
@@ -226,6 +236,7 @@ export function openLearningConversations(
         need: support.need,
         origin,
         focused: provider.focusedContext ?? false,
+        ...(investigation ? { investigation } : {}),
       });
       learningAssert(
         prompt.length <= 96_000,
@@ -242,6 +253,8 @@ export function openLearningConversations(
         support,
         selected.map((entry) => entry.id),
         teaching,
+        undefined,
+        investigation,
       );
       const current = running;
       const runTool = async (name: string, arguments_: unknown) => {

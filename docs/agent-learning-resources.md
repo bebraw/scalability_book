@@ -20,19 +20,19 @@ It supports current 2026-07-28 requests and stateless 2025-era clients.
 The Worker and development server supply only published assets, without forwarding cookies or consulting account, notebook, conversation, exercise-answer or course storage.
 MCP makes no model calls and stores no learner/session data.
 
-| Tool                         | Contract                                                                                                                                                    |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search_book(query, limit?)` | Lexical search over concepts, rendered passages, activity summaries and demo metadata; at most 20 results, with source URLs and explicit retrieval actions. |
-| `read_passage(url, offset?)` | Same-site indexed prose at a page, heading or paragraph anchor; at most 8000 characters and `nextOffset` when more remains.                                 |
-| No arbitrary URL fetch.      |
-| `get_concept(id)`            | Definition, assumptions, example, common mistake, usage, teaching passages, visual resources and activity IDs.                                              |
-| `get_neighbors(id)`          | Incident authored edges with original source, target, direction, label and explanation; incoming discovery never reverses a claim.                          |
-| `get_activity(id, part?)`    | Authored scenario and guidance by default; `part=discussion` explicitly retrieves the separate worked reasoning after an attempt or request.                |
-| `get_demo(id)`               | Authored controls, assumptions, images and prediction-led prompts, with explicit `liveState=false` and `execute=false` capabilities.                        |
+| Tool                         | Contract                                                                                                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_book(query, limit?)` | Lexical search over concepts, rendered passages, activity summaries and demo metadata; at most 20 results, with source URLs and explicit retrieval actions.                  |
+| `read_passage(url, offset?)` | Same-site indexed prose at a page, heading or paragraph anchor; at most 8000 characters and `nextOffset` when more remains.                                                  |
+| `get_concept(id)`            | Definition, assumptions, example, common mistake, usage, teaching passages, visual resources and activity IDs.                                                               |
+| `get_neighbors(id)`          | Incident authored edges with original source, target, direction, label and explanation; incoming discovery never reverses a claim.                                           |
+| `get_activity(id, part?)`    | Authored scenario and guidance by default; `part=discussion` explicitly retrieves the separate worked reasoning after an attempt or request.                                 |
+| `get_demo(id)`               | Authored controls, assumptions, images, prediction-led prompts and an optional versioned reading activity, with explicit `liveState=false` and `execute=false` capabilities. |
 
 Results include structured data plus equivalent text for clients that only consume text.
 The two MCP resources expose the existing guide and graph; the `start_investigation` prompt offers a question-led starting workflow.
 Tools are read-only, with bounded schemas and a 64 KiB request limit.
+Passage retrieval does not fetch arbitrary URLs.
 Requests without an Origin header support server clients; browser requests accept the current site origin, `https://chatgpt.com` and `https://claude.ai`, with matching CORS headers.
 Other browser origins are rejected.
 There is no legacy HTTP+SSE endpoint or connection-dependent tool list.
@@ -47,6 +47,11 @@ Do not claim an unavailable passage was read.
 The server's instructions, activity pacing and `agentPresentation` guide client behavior; they cannot enforce an external agent's teaching choices.
 No browser interaction, current passage selection or private context is implied by connecting.
 Those remain the companion's separate, explicitly selected-context boundary.
+The queue demo also returns its shared `activity` contract: stable ID/version, source reading, phases, adaptation guidance and browser-observation field/unit semantics.
+The graph exports these as additive `readingActivities` in schema version 2.
+External clients may present the same predict/experiment/reflect flow, but must obtain actual observations from their own authorized browser tools or the student.
+These public fields contain no current phase, prediction, snapshot or conversation identity.
+The website's [inline queue exploration](learning-workspace.md#explore-an-idea-in-the-reading) implements that contract through the local companion.
 
 Verification uses the official client against both protocol eras, including passage retrieval, a qualified Queue → Latency connection, demo guidance, separate discussions, resource/prompt discovery, invalid inputs and private-path rejection.
 These checks establish retrieval and protocol behavior, not model selection quality, ChatGPT UI rendering or learner outcomes.

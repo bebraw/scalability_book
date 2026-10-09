@@ -14,6 +14,7 @@ export interface CompanionStatus {
   connected: true;
   version: number;
   provider: string | null;
+  readingActivities?: { id: string; version: number }[];
   /** Absent on older companions and when no policy-aware provider is enabled. */
   teaching?: TeachingContext;
   capabilities?: { tools: "none" | "native"; contextWindow: number };

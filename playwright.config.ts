@@ -36,6 +36,7 @@ export default defineConfig({
         "learning-peer-inquiry.spec.ts",
         "learning-onboarding.spec.ts",
         "learning-local-model.spec.ts",
+        "reading-investigation.spec.ts",
         "account-learning.spec.ts",
       ],
       use: { ...devices["Desktop Safari"] },

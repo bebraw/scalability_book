@@ -206,6 +206,14 @@ Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-c
 Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
 
+### Inline reading investigations
+
+For inline queue investigations, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts --project=chromium --project=webkit`.
+Use a fresh `E2E_LOCAL_DATA_DIR` for synthetic browser records.
+The browser check runs an actual companion and synthetic local model, checking submitted activity context rather than model teaching quality.
+Manually test with an enabled provider before reporting an actual generated explanation; restart an older companion so authenticated status advertises `queue-balance` version 1.
+See [the inline activity contract](learning-workspace.md#explore-an-idea-in-the-reading) for the state and observation boundaries.
+
 ### Build and release the standalone package
 
 `packages/learning-companion/` owns `@scalableweb/companion`; its executable is `scalableweb-companion`.

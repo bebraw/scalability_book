@@ -3,6 +3,7 @@ import type { ConceptRelationship } from "./concept-relationships.ts";
 import type { LearningResource } from "./learning-resources.ts";
 import type { exportExplorations } from "./explorations.ts";
 import type { agentPresentation } from "./agent-presentation.ts";
+import type { queueInvestigation } from "./reading-investigation.ts";
 
 // Publication data, independent of HTTP, MCP, accounts and private companion state.
 export type PublicBookGraph = {
@@ -22,6 +23,7 @@ export type PublicBookGraph = {
   relationships: ConceptRelationship[];
   explorations: ReturnType<typeof exportExplorations>;
   learningResources: LearningResource[];
+  readingActivities?: (typeof queueInvestigation)[];
 };
 
 export type BookPassage = {
@@ -238,6 +240,10 @@ export function getBookDemo(graph: PublicBookGraph, id: string) {
   return {
     revision: graph.revision,
     demo,
+    activity:
+      graph.readingActivities?.find(
+        (activity) => activity.demoId === demo.id,
+      ) ?? null,
     capabilities: {
       metadata: true,
       liveState: false,

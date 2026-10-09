@@ -67,3 +67,30 @@ for (const button of buttons) {
 // the workspace unloaded and make no companion requests.
 const session = readNotebookSession();
 if (buttons.length && session.open) void openLearning(session.experience, true);
+
+for (const root of document.querySelectorAll<HTMLElement>(
+  "[data-reading-investigation='queue-balance']",
+)) {
+  const start = root.querySelector<HTMLButtonElement>(
+    "[data-investigation-start]",
+  );
+  if (!start) continue;
+  start.hidden = false;
+  const explore = () =>
+    document.dispatchEvent(
+      new CustomEvent("book-learning-request", {
+        detail: { kind: "investigate", activityId: "queue-balance" },
+      }),
+    );
+  start.addEventListener("click", explore);
+  try {
+    const saved = JSON.parse(
+      sessionStorage.getItem(
+        `book-reading-investigation:${location.pathname}:queue-balance`,
+      ) ?? "null",
+    );
+    if (saved?.open === true) explore();
+  } catch {
+    /* Reading and activation work without tab storage. */
+  }
+}

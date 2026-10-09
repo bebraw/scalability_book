@@ -97,6 +97,45 @@ The shared contract is [learning-workspace.ts](../shared/learning-workspace.ts).
 These modules do not depend on course storage or a provider SDK.
 The website/Worker never owns this private notebook or provider credentials.
 
+## Explore an idea in the reading
+
+The queue balance lab in Benchmarking and the demo gallery offers **Explore this idea** directly below its controls.
+Activation opens a three-phase exploration in the reading flow: **Predict**, **Experiment** and **Reflect**.
+Connect the same local companion used by Notebook and Teaching assistant; existing connections are reused.
+The companion advertises `readingActivities: [{ id: "queue-balance", version: 1 }]` in authenticated status.
+An older running companion displays a restart instruction and retains the writing; restart from the updated checkout, reconnect and check again.
+A notebook-only connection offers the existing provider setup through **Connection settings**.
+Provider configuration establishes readiness; an actual response establishes availability.
+
+Describe a system optionally, write a prediction or uncertainty, then choose **Discuss my prediction**.
+**Explain directly** works without a prediction, and phase choices remain available without completing earlier steps.
+The latest generated explanation appears beside the lab, with source links, provider/policy metadata and a collapsible conversation history.
+The authored passage and simulator remain the reference; generated examples and next experiments are suggestions.
+Operate the existing controls yourself and choose **Discuss this result** to send a fresh snapshot of their actual displayed values.
+The snapshot contains arrival rate, mean time, observed/expected work in progress, gap and capture time; it is an illustrative browser result, not a production measurement.
+The previous sent snapshot remains separately labelled as controls change.
+If Practice hides the queue, reopen Explore before sending a result; direct explanation remains available without a new observation.
+
+Activation, connection and slider changes do not start a model reply or load notebook entries.
+An explicit send shares the source, optional system description, prediction, current message and browser snapshot with the chosen provider, with no selected notes.
+During that reply the existing origin/session/browser-bound broker can service observations of this queue only.
+The inline adapter declines other demos and agent control changes; the ordinary assistant retains its existing saved-initial-thinking and approval boundary.
+The companion validates activity version, source, phase, bounds and snapshot consistency before storing a turn or calling the provider.
+Browser reports are not independently attested measurements and never grant action permissions.
+Each new student turn retains its activity context in the existing additive conversation JSON; earlier conversations are unaffected.
+
+Writing, phase, current controls, last sent snapshot and conversation/browser identity survive book navigation and reload in tab storage scoped to the current page and activity.
+They are not durable notebook records and do not survive closing the tab.
+**Pause this exploration** stops browser polling and leaves its draft available through **Explore this idea**.
+Use **Stop reply** to interrupt an active provider response before pausing; pausing alone does not cancel a provider's running turn.
+Connection failures retain writing and offer reconnect/check actions.
+**Start a new conversation** retains the writing and leaves the old conversation in companion history.
+
+In Reflect, write **My takeaway** and choose **Prepare notebook takeaway**.
+That explicit handoff initializes Notebook, preserves its unfinished-writing confirmation and prepares an editable reflection with activity/conversation provenance and the last sent illustration.
+Only **Save note** persists a notebook entry; no activity action changes a concept judgment, course submission or grade.
+[ADR-043](adrs/implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md) records the shared activity boundary and the current single-lab scope.
+
 ## Start the companion
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.

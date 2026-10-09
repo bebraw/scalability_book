@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { queueInvestigation } from "../../shared/reading-investigation.ts";
 import type { LearningNotebook } from "./learning-notebook.ts";
 import type { LearningConversations } from "./learning-conversations.ts";
 import {
@@ -139,6 +140,12 @@ export function createCompanionHandler(options: CompanionOptions) {
             connected: true,
             version: companionRelease.protocol,
             provider: options.conversations?.provider ?? null,
+            readingActivities: [
+              {
+                id: queueInvestigation.id,
+                version: queueInvestigation.version,
+              },
+            ],
             ...(options.conversations?.capabilities
               ? { capabilities: options.conversations.capabilities }
               : {}),

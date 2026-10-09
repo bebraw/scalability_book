@@ -111,7 +111,7 @@ export function observeLearningDemo(id: string) {
   const { root, resource } = demoRoot(id);
   const clone = root.cloneNode(true) as HTMLElement;
   for (const element of clone.querySelectorAll(
-    "script,style,input,select,textarea,button,[hidden]",
+    "script,style,input,select,textarea,button,[hidden],.reading-investigation",
   ))
     element.remove();
   return {

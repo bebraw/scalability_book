@@ -1,0 +1,141 @@
+.reading-investigation {
+  overflow-wrap: anywhere;
+  margin-block: 1.5rem 2.5rem;
+  padding: clamp(1rem, 3vw, 1.8rem);
+  border-block-start: 3px solid var(--accent);
+  border-inline-start: 1px solid var(--border);
+  background: var(--panel);
+}
+.reading-investigation [hidden] {
+  display: none !important;
+}
+.reading-investigation p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-block: 0.7rem;
+}
+.reading-investigation .reading-investigation-kicker {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  margin-block: 0 0.5rem;
+}
+.reading-investigation h3 {
+  margin-block: 0.3rem 0.7rem;
+}
+.reading-investigation h4 {
+  font-size: 1rem;
+  margin-block: 1rem 0.5rem;
+}
+.reading-investigation button {
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: 0.2rem;
+  background: transparent;
+  cursor: pointer;
+  white-space: normal;
+}
+.reading-investigation button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.reading-investigation button:focus-visible,
+.reading-investigation textarea:focus-visible,
+.reading-investigation input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.reading-investigation-steps {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+  margin-block: 1.5rem 1rem;
+  flex-wrap: wrap;
+}
+.reading-investigation-steps li {
+  padding: 0;
+  margin: 0;
+}
+.reading-investigation-steps button {
+  font-size: 0.8rem;
+  border-color: transparent;
+}
+.reading-investigation-steps [aria-current="true"] {
+  border-color: currentColor;
+  font-weight: 700;
+}
+.reading-investigation-prompt {
+  font-weight: 600;
+}
+.reading-investigation label {
+  display: grid;
+  gap: 0.4rem;
+  margin-block: 1rem;
+}
+.reading-investigation label > span {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.reading-investigation textarea,
+.reading-investigation input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 0.2rem;
+  padding: 0.7rem;
+  font: inherit;
+}
+.reading-investigation textarea {
+  resize: vertical;
+}
+.reading-investigation-connection {
+  font-size: 0.85rem;
+}
+.reading-investigation-connection p {
+  font: 0.85rem/1.5 var(--font-ui);
+}
+.reading-investigation-connection button {
+  margin-block-start: 0.6rem;
+  margin-inline-end: 0.5rem;
+}
+.reading-investigation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.reading-investigation-actions button:first-child {
+  font-weight: 700;
+  border-width: 2px;
+}
+.reading-investigation-observation {
+  padding-inline-start: 0.8rem;
+  border-inline-start: 2px solid currentColor;
+  font-variant-numeric: tabular-nums;
+}
+.reading-investigation-hint {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.reading-investigation-hint p {
+  font: 0.85rem/1.5 var(--font-ui);
+}
+.reading-investigation-messages {
+  margin-block: 1rem;
+  overflow-wrap: anywhere;
+}
+.reading-investigation-messages:not(:empty) {
+  padding-block: 0.5rem 1rem;
+  border-block: 1px solid currentColor;
+}
+.reading-investigation details {
+  margin-block: 0.8rem;
+}
+.reading-investigation summary {
+  cursor: pointer;
+}
