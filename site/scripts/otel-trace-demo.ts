@@ -154,7 +154,7 @@ function renderTrace(
   setText(
     root,
     "[data-otel-demo-trace-name]",
-    `POST /events · ${scenario.duration} ms`,
+    `POST /events · ${scenario.duration} ms on server`,
   );
   setText(root, "[data-otel-demo-trace-id]", scenario.traceId);
   setText(
@@ -284,7 +284,7 @@ function httpSpan(id: string, duration: number): SimulatedSpan {
       "http.route": "/events",
       "http.response.status_code": "201",
     },
-    note: "Automatic HTTP instrumentation creates the root server span and captures the end-to-end request duration.",
+    note: "Automatic HTTP instrumentation measures server-side handling here. This simulated span has no parent; incoming trace context can make a real server span a child of an upstream span.",
   };
 }
 
@@ -328,7 +328,7 @@ function storeSpan(
       "app.storage.slow_path": String(slow),
     },
     note: slow
-      ? "This child span explains most of the end-to-end latency. The trace narrows the investigation; it does not prove the underlying cause."
+      ? "This child span accounts for most of the server request duration. The trace narrows the investigation; it does not prove the underlying cause."
       : "The storage operation completes within the expected range for this simulated request.",
   };
 }

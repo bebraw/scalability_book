@@ -349,7 +349,7 @@ const activities: Record<string, Activity> = {
       "First interaction trace",
     ],
     assumptions:
-      "Illustrative JavaScript values for one teaching model, not measurements or framework rankings.",
+      "Illustrative JavaScript values for one teaching model, not measurements or framework rankings. The hydration baseline puts all five regions in one client tree and hydrates them on page load; server-only content and hydrated regions can coexist, and islands can use hydration.",
     predict:
       "What work must occur before the first event-recording interaction can finish?",
     try: "Keep the server document fixed and compare two activation approaches.",
@@ -521,10 +521,10 @@ const activities: Record<string, Activity> = {
   "OpenTelemetry trace explorer": {
     conceptIds: ["observability", "latency", "measurement-boundary", "retry"],
     caption:
-      "Inspect spans, timing, and retries within a simulated request trace.",
+      "Inspect spans, timing, and retries within a simulated server request trace.",
     controls: ["Healthy, slow, or retried request", "Span selection"],
     assumptions:
-      "A simplified teaching export; literal OTLP uses typed values and a more verbose envelope. A trace is not proof of every user-visible outcome.",
+      "The timeline covers server handling, excluding browser work and time outside the server span. No incoming parent context is modeled. Literal OTLP uses typed values and a more verbose envelope; a trace is not proof of every user-visible outcome.",
     predict:
       "Which span would account for the additional time in the slow or retried request?",
     try: "Compare the healthy request with a slow write or successful storage retry and inspect the relevant spans.",

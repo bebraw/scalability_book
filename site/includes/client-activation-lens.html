@@ -14,7 +14,7 @@
     </div>
     <div class="activation-lens-question demo-summary" aria-live="polite">
       <span data-activation-lens-mode-badge>Hydration</span>
-      <small data-activation-lens-boundary-badge>component tree</small>
+      <small data-activation-lens-boundary-badge>all 5 regions</small>
     </div>
   </div>
 
@@ -38,7 +38,7 @@
           />
           <span>
             <strong>Hydration</strong>
-            <small>Attach behavior to server HTML</small>
+            <small>All five regions hydrated on page load</small>
           </span>
         </label>
         <label>
@@ -163,7 +163,7 @@
     <div class="activation-lens-readout">
       <div>
         <p class="request-trace-section-label">What this means</p>
-        <h4 data-activation-lens-title>Replay the application</h4>
+        <h4 data-activation-lens-title>Replay all five client regions</h4>
         <p data-activation-lens-summary></p>
       </div>
       <div class="activation-lens-pressure">
@@ -174,8 +174,11 @@
     </div>
 
     <p class="activation-lens-note">
-      Illustrative compressed JavaScript values for one teaching model. They
-      show where work moves; they do not rank frameworks.
+      The hydration baseline places all five regions in one client tree and
+      hydrates them on page load. Real pages can keep content server-only and
+      hydrate selected regions; islands can use hydration too. Illustrative
+      compressed JavaScript values for one teaching model. They show where work
+      moves; they do not rank frameworks.
     </p>
   </form>
 </section>

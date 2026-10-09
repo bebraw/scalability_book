@@ -212,13 +212,17 @@ That activation work affects payload size, client processing, first-interaction 
 
 | Approach              | Activation unit                         | Main benefit                                           | Main constraint                                                  |
 | --------------------- | --------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
-| Hydration             | The rendered component tree             | Familiar, general application model                    | Re-executes client code to recover state and listeners           |
-| Progressive hydration | Ordered portions of the same tree       | Prioritizes important interaction                      | The application is still eventually hydrated                     |
+| Hydration             | Selected client component trees         | Reuses server HTML for interactive regions             | Runs client code to recover state and listeners                  |
+| Progressive hydration | Ordered portions of a client tree       | Prioritizes important interaction                      | Selected client regions still require hydration                  |
 | Islands architecture  | Explicit interactive regions            | Static HTML elsewhere; work can be deferred or avoided | Shared state, navigation, and communication across islands       |
 | Resumability          | Serialized state and handler boundaries | Continues without replaying the application            | Serializable state and framework compiler or runtime constraints |
 
 ::caption[Client activation approaches and their principal trade-offs.]
 ::label[table:client-activation-approaches]
+
+These approaches describe different choices about boundaries and activation, and they can be combined.
+Islands can use hydration for their interactive regions.
+A page can also combine server-only output with hydrated client components: [React Server Components](https://react.dev/reference/rsc/server-components) keep their implementation out of the browser bundle while composing their output with Client Components.
 
 Islands partition a page into static and interactive regions and attach a loading strategy to each interactive region.
 Resumability changes how execution crosses the server-client boundary: component boundaries, application state, and listener references are serialized into the delivered HTML so the browser can continue without replaying the application :citep[vepsalainen2024resumability].
@@ -231,6 +235,8 @@ Inter-island state, navigation, and communication then become architectural cost
 ### Client activation lens
 
 The lab below holds the server-rendered event page constant and changes only how its behavior becomes available in the browser.
+In its hydration baseline, all five regions belong to one client tree and hydrate on page load.
+Both the scope and timing are teaching assumptions.
 Compare what happens before the first interaction, then run the same record-event action.
 The transfer values are illustrative teaching values, not framework benchmarks; a real comparison should record production bundles, client execution, and interaction latency on representative devices.
 

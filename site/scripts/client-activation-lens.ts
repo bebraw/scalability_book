@@ -27,7 +27,7 @@ type ActivationModel = {
 const activationModels: Record<ActivationMode, ActivationModel> = {
   hydration: {
     actionJs: "0 KB",
-    boundary: "component tree",
+    boundary: "all 5 regions",
     caution:
       "The first action is ready immediately, but the browser paid for code and replay across regions the user may never touch.",
     initialJs: "≈54 KB",
@@ -43,7 +43,7 @@ const activationModels: Record<ActivationMode, ActivationModel> = {
         label: "Download ≈54 KB JS",
       },
       {
-        detail: "Recover boundaries and client state",
+        detail: "Recover client state across all five regions",
         kind: "execute",
         label: "Replay component tree",
       },
@@ -77,8 +77,8 @@ const activationModels: Record<ActivationMode, ActivationModel> = {
     ],
     state: "Initial props snapshot",
     summary:
-      "The server supplies visible HTML, then the browser re-executes the application to recover component boundaries, state, and listeners before interaction.",
-    title: "Replay the application",
+      "This baseline places all five regions in one client tree and hydrates them on page load. The browser runs that tree to recover state and listeners. Other hydration designs can leave content server-only and hydrate smaller client regions.",
+    title: "Replay all five client regions",
   },
   islands: {
     actionJs: "≈14 KB island",
@@ -430,7 +430,7 @@ function getInitialStatus(mode: ActivationMode) {
   if (mode === "resumability") {
     return "Serialized handler references are ready; the component tree was not replayed.";
   }
-  return "The full component tree has replayed and every listener is attached.";
+  return "All five regions in this baseline's client tree have replayed and their listeners are attached.";
 }
 
 function getCompleteStatus(mode: ActivationMode) {

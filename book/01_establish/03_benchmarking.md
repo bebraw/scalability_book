@@ -225,12 +225,14 @@ The trace explorer below reuses the event-recording request from the benchmark d
 Switch between a healthy write, a slow write, and a successful request that required a retry.
 Select individual spans to inspect their duration, status, source, and attributes.
 A span represents one timed unit of work and carries its own span ID, while every span in the same trace shares a trace ID.
+The [HTTP server span](https://opentelemetry.io/docs/specs/semconv/http/http-spans/#http-server-span) measures this server's handling of the request; it does not include the complete client-observed request or browser interaction.
+It is the root in this simulation because no incoming parent context is modeled; in a distributed trace it may be a child of an upstream span.
 The spans are not necessarily sent as separate network messages: an SDK can batch completed span records into one OTLP export request before a Collector processes and routes them.
 
 {{ import "site/includes/otel-trace-demo.html" }}
 
-The slow trace localizes most of the request time to connection waiting and event storage.
-That is a stronger lead than the end-to-end latency alone, but it still does not establish root cause.
+The slow trace localizes most of the server request time to connection waiting and event storage.
+That is a stronger lead than the server request duration alone, but it still does not establish root cause.
 The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
 

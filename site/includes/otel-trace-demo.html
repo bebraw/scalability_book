@@ -31,8 +31,9 @@
     <span><b>Backend</b><small>stores + explores</small></span>
   </div>
   <p class="otel-demo-pipeline-note">
-    The rows below are spans from one trace. Select a row to inspect the record
-    the SDK could include in a batched OTLP export.
+    The rows cover one server's handling of an inbound HTTP request. Browser
+    work and time outside this server span are excluded. Select a row to inspect
+    the record the SDK could include in a batched OTLP export.
   </p>
 
   <div class="otel-demo-controls">
@@ -50,8 +51,8 @@
     <section class="scaling-demo-panel otel-demo-trace-panel">
       <div class="otel-demo-trace-heading">
         <div>
-          <p class="benchmark-demo-eyebrow">Trace</p>
-          <h4 data-otel-demo-trace-name>POST /events · 286 ms</h4>
+          <p class="benchmark-demo-eyebrow">Server trace</p>
+          <h4 data-otel-demo-trace-name>POST /events · 286 ms on server</h4>
         </div>
         <code data-otel-demo-trace-id>4bf92f3577b34da6a3ce929d0e0e4736</code>
       </div>
@@ -102,8 +103,8 @@
         </p>
       </details>
       <p class="demo-note" data-otel-demo-span-note>
-        This child span explains most of the end-to-end latency. The trace
-        narrows the investigation; it does not prove the underlying cause.
+        This child span accounts for most of the server request duration. The
+        trace narrows the investigation; it does not prove the underlying cause.
       </p>
     </aside>
   </div>
