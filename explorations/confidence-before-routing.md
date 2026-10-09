@@ -3,7 +3,7 @@
 A classifier must name the single layer affected by a proposed change, choosing `interface` or `data`.
 In an invented policy-development batch of 20 single-layer changes, every output chooses `interface` with confidence `0.9` and passes schema validation.
 The fixture's independently adjudicated reference labels are assumed correct: 12 are `interface` and eight are `data`.
-These are teaching inputs, rather than results from Clef or another model.
+These are invented teaching inputs, not observed model outputs.
 
 ## Investigate
 
@@ -23,4 +23,4 @@ Keep the findings in the existing evaluation notes.
 ## Further reading
 
 [Guo and colleagues' calibration paper](https://proceedings.mlr.press/v70/guo17a.html) defines the calibration question.
-The numbers here are invented teaching inputs, not measurements from that paper or Clef.
+The numbers here are invented teaching inputs, not measurements from that paper.

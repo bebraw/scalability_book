@@ -1,13 +1,17 @@
 type EvalTaskId = "bottleneck" | "benchmark" | "data-model";
 type ModelId = "x" | "y";
-type RubricKey = "grounding" | "specificity" | "measurement";
+
+type RubricCriterion = {
+  label: string;
+  expectation: string;
+};
 
 type EvalTask = {
   id: EvalTaskId;
   label: string;
   context: string;
   prompt: string;
-  rubric: string[];
+  rubric: [RubricCriterion, RubricCriterion, RubricCriterion];
   outputs: Record<ModelId, string>;
 };
 
@@ -16,7 +20,7 @@ type ModelAttempt = {
   label: string;
   latency: number;
   cost: number;
-  sampleScores: Record<EvalTaskId, Record<RubricKey, number>>;
+  sampleScores: Record<EvalTaskId, [number, number, number]>;
 };
 
 const tasks: Record<EvalTaskId, EvalTask> = {
@@ -24,51 +28,87 @@ const tasks: Record<EvalTaskId, EvalTask> = {
     id: "bottleneck",
     label: "Find one likely scaling bottleneck",
     context:
-      "README: Users record workflow events and view the latest activity per project. Code excerpt: GET /events loads events with SELECT * FROM events WHERE project_id = ? ORDER BY created_at DESC LIMIT 50. The migration defines indexes on project_id and event_type, but not created_at.",
+      "Invented implementation excerpt: Users create work items in workspaces, advance their lifecycle, and inspect the activity feed. Each accepted creation or transition records one event. GET /events?workspace=<id> reads SELECT * FROM activity_events WHERE workspace_id = ? ORDER BY occurred_at DESC, id DESC LIMIT 50. The migration declares separate indexes on workspace_id and event_type, with no composite index matching the filter and ordering.",
     prompt:
-      "You are helping with the Challenge phase of a course project.\nUse only the context below. If something is missing, say what you cannot know.\n\nTask: Find one likely scaling bottleneck in the event tracking project.\n\nRequired output:\n- Bottleneck:\n- Evidence from the context:\n- Why it matters under higher load:\n- One measurement that would confirm or reject it:",
+      "You are examining a Work Activity Tracker implementation.\nUse only the context below. If something is missing, say what you cannot know.\n\nTask: Find one likely scaling bottleneck.\n\nRequired output:\n- Bottleneck:\n- Evidence from the context:\n- Why it matters under higher load:\n- One measurement that would confirm or reject it:",
     rubric: [
-      "Grounded in the supplied context rather than generic advice.",
-      "Names a concrete query, endpoint, file, or data flow.",
-      "Explains a measurement that could confirm or reject the claim.",
+      {
+        label: "Grounding",
+        expectation:
+          "Clearly uses the supplied context as evidence without inventing facts.",
+      },
+      {
+        label: "Specificity",
+        expectation:
+          "Names the concrete query or read path and explains why its work may grow.",
+      },
+      {
+        label: "Measurement",
+        expectation:
+          "Names a measurement that could confirm or reject the proposed bottleneck.",
+      },
     ],
     outputs: {
-      x: "Bottleneck: the latest-events read path for GET /events.\nEvidence from the context: the endpoint sorts each project's events by created_at, but the migration only mentions indexes on project_id and event_type.\nWhy it matters under higher load: as project event volume grows, the database may scan or sort too much data to return the latest 50 events.\nOne measurement that would confirm or reject it: seed projects with increasing event counts and record p95 latency plus the query plan for the ORDER BY created_at query.",
-      y: "Bottleneck: the database could become slow when there are many events.\nEvidence from the context: the app stores workflow events and users view activity.\nWhy it matters under higher load: more events usually means slower pages.\nOne measurement that would confirm or reject it: run a load test and see if it is slow.",
+      x: "Bottleneck: the workspace activity-feed read path for GET /events?workspace=<id>.\nEvidence from the context: the query filters by workspace_id and orders by occurred_at and id; no matching composite index is declared.\nWhy it matters under higher load: growing event history may increase the scan or sort work needed to return 50 rows. The actual query plan is not supplied.\nOne measurement that would confirm or reject it: seed increasing history per workspace, inspect the query plan, and measure feed p95 under the same concurrent read/write workload.",
+      y: "Bottleneck: the database could become slow when there are many events.\nEvidence from the context: the app stores activity events and users view a feed.\nWhy it matters under higher load: more events usually means slower pages.\nOne measurement that would confirm or reject it: run a load test and see if it is slow.",
     },
   },
   benchmark: {
     id: "benchmark",
     label: "Produce a benchmark plan",
     context:
-      "Project: a conference check-in event tracker. Users submit check-in events, organizers view the latest arrivals, and admins filter events by session. The Challenge assumption is 20,000 events during a 30-minute arrival peak.",
+      "Invented pressure scenario: A Work Activity Tracker receives 20,000 valid work-item creations and lifecycle transitions across eight workspaces during 30 minutes. Readers inspect workspace activity feeds and filter by event type while writes continue. Each accepted action must record exactly one event with its workspace, work item, actor, and occurrence time. This is a teaching workload, not the required course benchmark.",
     prompt:
-      "You are helping with the Challenge phase of a course project.\nUse only the context below.\n\nTask: Propose one benchmark plan.\n\nRequired output:\n- Workload:\n- Load level:\n- Metrics:\n- What the result does not prove:",
+      "You are examining a Work Activity Tracker implementation.\nUse only the context below.\n\nTask: Propose one benchmark plan.\n\nRequired output:\n- Workload:\n- Load level:\n- Metrics:\n- What the result does not prove:",
     rubric: [
-      "Defines a workload that matches the project workflow.",
-      "States a concrete load level rather than 'many users'.",
-      "Includes latency, throughput, error rate, and at least one limitation.",
+      {
+        label: "Workload",
+        expectation:
+          "Covers valid work-item actions and concurrent feed reads, with the matching-event check.",
+      },
+      {
+        label: "Load level",
+        expectation:
+          "States an executable load schedule consistent with the supplied action count and duration.",
+      },
+      {
+        label: "Metrics and limits",
+        expectation:
+          "Includes latency, accepted throughput, errors, and a limit on what the result proves.",
+      },
     ],
     outputs: {
-      x: "Workload: submit check-in events while organizers repeatedly load the latest arrivals and admins filter by session.\nLoad level: simulate 20,000 events over 30 minutes, with short bursts of 100 concurrent submitters.\nMetrics: write p95 latency, latest-arrivals p95 latency, filter latency, throughput, error rate, database CPU, and query count per request.\nWhat the result does not prove: it does not prove production behavior because the data, network, hardware, and user timing are synthetic.",
-      y: "Workload: test check-ins and admin viewing.\nLoad level: use lots of users.\nMetrics: speed and errors.\nWhat the result does not prove: it may be different in production.",
+      x: "Workload: create and advance work items across eight workspaces while readers inspect feeds and filter by event type. Use eligible items for each transition and check that every accepted action has one matching event.\nLoad level: submit 20,000 actions over 30 minutes, cycling create, start, and complete for separate items; schedule 100 feed reads per minute, divided across workspace and event-type filters.\nMetrics: action and feed p95 latency, accepted actions per second, errors, missing or duplicate events, and database CPU.\nWhat the result does not prove: synthetic data, scheduling, network, and hardware do not establish production capacity or every failure mode.",
+      y: "Workload: test work-item updates and feed viewing.\nLoad level: use lots of users.\nMetrics: speed and errors.\nWhat the result does not prove: it may be different in production.",
     },
   },
   "data-model": {
     id: "data-model",
-    label: "Explain the event data model",
+    label: "Explain the work-item and activity model",
     context:
-      "Schema excerpt: Project(id, name), User(id, email), Event(id, project_id, actor_id, event_type, payload_json, created_at). README: events describe actions inside one project. Some events are created by system jobs, so actor_id can be null.",
+      "Invented schema excerpt: Workspace(id, name), WorkItem(id, workspace_id, title, state), ActivityEvent(id, workspace_id, work_item_id, event_type, actor, occurred_at). README: items move from open to in_progress to done. Creation and each successful transition record one matching event; rejected transitions change neither state nor successful-event history. Every event identifies its workspace, work item, actor, and occurrence time. Transaction boundaries and database constraints are not shown.",
     prompt:
-      "You are helping with the Challenge phase of a course project.\nUse only the context below.\n\nTask: Explain the event data model.\n\nRequired output:\n- Main entities:\n- How events relate to them:\n- One unclear assumption:",
+      "You are examining a Work Activity Tracker implementation.\nUse only the context below.\n\nTask: Explain the work-item and activity model.\n\nRequired output:\n- Main entities:\n- Relationships and lifecycle rules:\n- One unclear enforcement assumption:",
     rubric: [
-      "Names the core entities and relationships.",
-      "Accounts for nullable actor_id instead of inventing a user for every event.",
-      "Identifies one assumption that should be clarified before redesign.",
+      {
+        label: "Entities",
+        expectation:
+          "Identifies Workspace, WorkItem, and ActivityEvent and their distinct roles.",
+      },
+      {
+        label: "Relationships and lifecycle",
+        expectation:
+          "Connects items and events to their workspace and explains accepted versus rejected lifecycle actions.",
+      },
+      {
+        label: "Uncertainty",
+        expectation:
+          "Names an unresolved enforcement question without inventing a transaction or database guarantee.",
+      },
     ],
     outputs: {
-      x: "Main entities: Project, User, and Event.\nHow events relate to them: each Event belongs to one Project through project_id. An Event may refer to the User who caused it through actor_id, but actor_id can be null for system-created events. payload_json stores event-specific details.\nOne unclear assumption: the schema does not show which event_type values are allowed or how payload_json is validated for each type.",
-      y: "Main entities: projects, users, and events.\nHow events relate to them: users create events in projects and the event has data in JSON.\nOne unclear assumption: the database may need more tables later.",
+      x: "Main entities: Workspace groups work; WorkItem stores a title and current lifecycle state; ActivityEvent records a past action with its actor and occurrence time.\nRelationships and lifecycle rules: each item belongs to a workspace, and each event refers to that item and the same workspace. Creating an item or making an allowed forward transition records one matching event. A rejected transition must change neither item state nor successful-event history.\nOne unclear enforcement assumption: the excerpt does not show whether state changes and event inserts commit atomically if a write fails.",
+      y: "Main entities: Workspace groups work, WorkItem stores a task, and ActivityEvent stores its history.\nRelationships and lifecycle rules: users update items in workspaces and events record those updates.\nOne unclear enforcement assumption: the database may need more tables later.",
     },
   },
 };
@@ -80,9 +120,9 @@ const models: ModelAttempt[] = [
     latency: 18,
     cost: 0.42,
     sampleScores: {
-      bottleneck: { grounding: 2, specificity: 2, measurement: 2 },
-      benchmark: { grounding: 2, specificity: 2, measurement: 2 },
-      "data-model": { grounding: 2, specificity: 2, measurement: 2 },
+      bottleneck: [2, 2, 2],
+      benchmark: [2, 2, 2],
+      "data-model": [2, 2, 2],
     },
   },
   {
@@ -91,27 +131,12 @@ const models: ModelAttempt[] = [
     latency: 6,
     cost: 0.04,
     sampleScores: {
-      bottleneck: { grounding: 1, specificity: 1, measurement: 1 },
-      benchmark: { grounding: 1, specificity: 0, measurement: 1 },
-      "data-model": { grounding: 1, specificity: 1, measurement: 0 },
+      bottleneck: [1, 1, 1],
+      benchmark: [1, 0, 1],
+      "data-model": [2, 1, 0],
     },
   },
 ];
-
-const rubricLabels: Record<RubricKey, string> = {
-  grounding: "Grounding",
-  specificity: "Specificity",
-  measurement: "Measurement",
-};
-
-const rubricHelp: Record<RubricKey, string> = {
-  grounding:
-    "0 = unsupported or invented. 1 = partly grounded. 2 = clearly uses the supplied context as evidence.",
-  specificity:
-    "0 = generic. 1 = names a broad area. 2 = points to a concrete query, endpoint, file, entity, or data flow.",
-  measurement:
-    "0 = no check. 1 = vague check. 2 = actionable metric, test, query plan, log signal, or benchmark.",
-};
 
 for (const root of document.querySelectorAll<HTMLElement>(
   "[data-model-eval]",
@@ -180,14 +205,21 @@ function initializeEvalDemo(root: HTMLElement) {
   const render = () => {
     const task = tasks[taskSelect.value as EvalTaskId] ?? tasks.bottleneck;
 
-    prompt.value = task.prompt;
+    prompt.value = `${task.prompt}\n\nInput context:\n${task.context}`;
     context.textContent = task.context;
     rubric.innerHTML = task.rubric
-      .map((item) => `<li>${escapeModelEvalHtml(item)}</li>`)
+      .map(
+        (criterion) => `<li>${escapeModelEvalHtml(criterion.expectation)}</li>`,
+      )
       .join("");
     cards.innerHTML = models
       .map((model) => renderModelCard(model, task))
       .join("");
+    for (const check of root.querySelectorAll<HTMLInputElement>(
+      "[data-model-eval-check]",
+    )) {
+      check.checked = false;
+    }
     updateScores(root, task, results, verdict, conclusion);
     updateModelEvalStage(root, steps, tabs, previous, next, currentStep, false);
   };
@@ -263,10 +295,7 @@ function fillModelSample(
     output.value = task.outputs[model.id];
   }
 
-  for (const [key, value] of Object.entries(model.sampleScores[task.id]) as [
-    RubricKey,
-    number,
-  ][]) {
+  for (const [key, value] of model.sampleScores[task.id].entries()) {
     const input = root.querySelector<HTMLInputElement>(
       `[data-model="${model.id}"][data-rubric="${key}"]`,
     );
@@ -278,22 +307,22 @@ function fillModelSample(
 }
 
 function renderModelCard(model: ModelAttempt, task: EvalTask) {
-  const sliders = (Object.keys(rubricLabels) as RubricKey[])
-    .map((key) => {
+  const sliders = task.rubric
+    .map((criterion, key) => {
       const helpId = `model-eval-help-${model.id}-${key}`;
 
       return `<div class="model-eval-slider">
         <span class="model-eval-slider-label">
-          <span>${escapeModelEvalHtml(rubricLabels[key])}</span>
+          <span>${escapeModelEvalHtml(criterion.label)}</span>
           <button
             type="button"
             class="model-eval-help"
-            aria-label="Help for ${escapeModelEvalHtml(rubricLabels[key])}"
+            aria-label="Help for ${escapeModelEvalHtml(criterion.label)}"
             aria-describedby="${helpId}"
           >?</button>
-          <span id="${helpId}" role="tooltip">${escapeModelEvalHtml(rubricHelp[key])}</span>
+          <span id="${helpId}" role="tooltip">0 = missing or incorrect. 1 = partly meets the criterion. 2 = ${escapeModelEvalHtml(criterion.expectation)}</span>
         </span>
-        <input aria-label="${escapeModelEvalHtml(rubricLabels[key])} score for ${escapeModelEvalHtml(model.label)}" type="range" min="0" max="2" step="1" value="0" data-model="${model.id}" data-rubric="${key}" />
+        <input aria-label="${escapeModelEvalHtml(criterion.label)} score for ${escapeModelEvalHtml(model.label)}" type="range" min="0" max="2" step="1" value="0" data-model="${model.id}" data-rubric="${key}" />
         <output data-score-output="${model.id}-${key}">0</output>
       </div>`;
     })

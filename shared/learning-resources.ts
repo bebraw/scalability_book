@@ -477,20 +477,20 @@ const activities: Record<string, Activity> = {
       "reliability",
     ],
     caption:
-      "Compare blinded attempts on the same task and rubric, including human correction effort.",
+      "Score two attempts against a task-specific rubric and inspect the limits of the comparison.",
     controls: [
       "Eval task",
-      "Prompt shape",
+      "Shared prompt",
       "Attempt outputs",
       "Rubric and comparability checks",
     ],
     assumptions:
-      "Sample answers and displayed cost/latency are invented examples. Real evaluations need recorded usage and repeated comparable trials.",
+      "Sample answers, preset scores, and displayed cost/latency are invented. Rubric scores and protocol confirmations are manual; real evaluations need separate acceptance checks, recorded usage and correction effort, and repeated comparable trials.",
     predict:
       "What evidence would distinguish a convincing example from a more reliable model on this task?",
-    try: "Score two attempts against the same rubric before revealing identities.",
+    try: "Use samples or permitted outputs, inspect the complete shared prompt, and score both attempts against the selected task's rubric. Conceal identities when another person prepares the pair.",
     observe:
-      "Record task success, rubric evidence, human corrections, and comparability limits.",
+      "Identify the missed criteria and comparability limits. For real runs, record acceptance results, usage, and human corrections separately.",
   },
   "Observability signal picker": {
     conceptIds: [

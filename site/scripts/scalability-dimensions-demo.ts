@@ -41,7 +41,7 @@ const dimensions: Record<DimensionKey, Dimension> = {
   data: {
     label: "Data",
     radarLabel: "Data",
-    component: "Event storage, indexes, and derived views",
+    component: "Work-item and event storage, indexes, and derived views",
     signal:
       "write latency, query time, storage growth, recovery time, and retention cost",
     tradeoff:
@@ -70,7 +70,7 @@ const dimensions: Record<DimensionKey, Dimension> = {
 
 const pressures: Record<PressureKey, Pressure> = {
   traffic: {
-    label: "Many people submit events at the same time",
+    label: "Many people create or advance work items at the same time",
     weights: {
       demand: 3,
       data: 1,
@@ -97,7 +97,7 @@ const pressures: Record<PressureKey, Pressure> = {
     },
   },
   requirements: {
-    label: "Event types and rules change every week",
+    label: "New filters and metadata are requested every week",
     weights: {
       demand: 0,
       data: 0,
@@ -464,7 +464,7 @@ function buildDimensionsInterpretation(
   primary: DimensionKey[],
 ) {
   if (selected.length === 0) {
-    return "Choose pressures that would matter if the event tracker succeeded.";
+    return "Choose pressures that would matter if the Work Activity Tracker succeeded.";
   }
 
   if (primary.length === 1) {

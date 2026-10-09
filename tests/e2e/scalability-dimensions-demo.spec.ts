@@ -23,7 +23,7 @@ test.describe("scalability dimensions demo", () => {
       demo.locator("[data-dimensions-demo-interpretation]"),
     ).toContainText("share the highest relative pressure");
     await expect(demo.locator(".demo-card").first()).toContainText(
-      "event-oriented app",
+      "Workspaces contain work items",
     );
     await expect(
       demo.locator("[data-dimensions-demo-radar] svg"),

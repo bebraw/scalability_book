@@ -26,12 +26,12 @@ test.describe("model eval demo", () => {
     );
     await demo.locator("[data-model-eval-sample='x']").click();
     await expect(demo.locator("[data-model-output='x']")).toHaveValue(
-      /created_at/,
+      /occurred_at/,
     );
     await expect(demo.locator(".model-eval-help")).toHaveCount(6);
     await demo.locator(".model-eval-help").first().focus();
     await expect(demo.getByRole("tooltip").first()).toContainText(
-      "clearly uses the supplied context",
+      "Clearly uses the supplied context",
     );
     await expect(demo.locator("[data-model-card='x']")).toBeInViewport();
     await expect(demo.locator("[data-model-card='y']")).toBeInViewport();
@@ -49,6 +49,16 @@ test.describe("model eval demo", () => {
     ]);
     await expect(demo.locator("[data-model-eval-next]")).toBeDisabled();
     await expect(demo).toContainText("Illustrative cost");
+    await expect(demo.locator("[data-model-eval-conclusion]")).toContainText(
+      "Complete the comparison protocol",
+    );
+    for (const check of await demo.getByRole("checkbox").all()) {
+      await expect(check).not.toBeChecked();
+      await check.check();
+    }
+    await expect(
+      demo.locator("[data-model-eval-conclusion]"),
+    ).not.toContainText("Complete the comparison protocol");
   });
 
   test("updates task, score, checks, and local conclusion", async ({
@@ -64,10 +74,23 @@ test.describe("model eval demo", () => {
     await demo.locator("[data-model-eval-tab='2']").click();
     await demo.locator("[data-model-eval-sample='x']").click();
     await demo.locator("[data-model-eval-sample='y']").click();
-    await demo.locator("[data-model='y'][data-rubric='specificity']").fill("2");
+    await demo
+      .getByRole("slider", {
+        name: "Load level score for Attempt Y",
+        exact: true,
+      })
+      .fill("2");
 
     await demo.locator("[data-model-eval-tab='3']").click();
-    await demo.locator("[data-model-eval-check='file']").setChecked(false);
+    for (const check of await demo.getByRole("checkbox").all()) {
+      await check.check();
+    }
+    await demo
+      .getByRole("checkbox", {
+        name: "Both attempts were scored with the selected task's rubric",
+        exact: true,
+      })
+      .uncheck();
 
     await expect(demo.locator("[data-model-eval-verdict]")).toContainText(
       "Attempt X: 6/6",
@@ -84,12 +107,124 @@ test.describe("model eval demo", () => {
 
     // A lower score for X can reverse the result; the attempt label is not a rank.
     await demo.locator("[data-model-eval-tab='2']").click();
-    await demo.locator("[data-model='x'][data-rubric='grounding']").fill("0");
-    await demo.locator("[data-model='x'][data-rubric='specificity']").fill("0");
+    await demo
+      .getByRole("slider", {
+        name: "Workload score for Attempt X",
+        exact: true,
+      })
+      .fill("0");
+    await demo
+      .getByRole("slider", {
+        name: "Load level score for Attempt X",
+        exact: true,
+      })
+      .fill("0");
     await demo.locator("[data-model-eval-tab='3']").click();
     await expect(demo.locator("[data-model-eval-verdict]")).toContainText(
       "Attempt Y: 4/6",
     );
+  });
+
+  test("keeps the copied context and scoring criteria aligned with the selected task", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-model-eval]");
+    const prompt = demo.getByRole("textbox", {
+      name: "Shared prompt",
+      exact: true,
+    });
+    await demo.getByRole("button", { name: "2 Prompt", exact: true }).click();
+    const initialContext = await demo
+      .locator("[data-model-eval-context]")
+      .textContent();
+    expect(await prompt.inputValue()).toContain(initialContext);
+    await expect(prompt).toHaveValue(/ORDER BY occurred_at DESC, id DESC/);
+
+    await demo.getByRole("button", { name: "1 Task", exact: true }).click();
+    await demo
+      .getByLabel("Eval task", { exact: true })
+      .selectOption("benchmark");
+    await demo.getByRole("button", { name: "2 Prompt", exact: true }).click();
+    const benchmarkContext = await demo
+      .locator("[data-model-eval-context]")
+      .textContent();
+    expect(await prompt.inputValue()).toContain(benchmarkContext);
+    await expect(prompt).toHaveValue(/20,000 valid work-item creations/);
+    await demo.getByRole("button", { name: "3 Score", exact: true }).click();
+    await expect(
+      demo.getByRole("slider", {
+        name: "Load level score for Attempt X",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      demo.getByRole("slider", {
+        name: "Measurement score for Attempt X",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await demo
+      .getByRole("button", { name: "Use sample outputs", exact: true })
+      .click();
+    await demo.getByRole("button", { name: "4 Compare", exact: true }).click();
+    for (const check of await demo.getByRole("checkbox").all()) {
+      await check.check();
+    }
+
+    await demo.getByRole("button", { name: "1 Task", exact: true }).click();
+    await demo
+      .getByLabel("Eval task", { exact: true })
+      .selectOption("data-model");
+    await demo.getByRole("button", { name: "2 Prompt", exact: true }).click();
+    const modelContext = await demo
+      .locator("[data-model-eval-context]")
+      .textContent();
+    expect(await prompt.inputValue()).toContain(modelContext);
+    await expect(prompt).toHaveValue(
+      /WorkItem\(id, workspace_id, title, state\)/,
+    );
+    await demo.getByRole("button", { name: "3 Score", exact: true }).click();
+    await expect(
+      demo.getByRole("slider", {
+        name: "Entities score for Attempt X",
+        exact: true,
+      }),
+    ).toHaveValue("0");
+    await expect(
+      demo.getByRole("slider", {
+        name: "Relationships and lifecycle score for Attempt X",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      demo.getByRole("textbox", { name: "Model output" }).first(),
+    ).toHaveValue("");
+    await demo
+      .getByRole("button", { name: "Use sample outputs", exact: true })
+      .click();
+    await demo
+      .getByRole("button", { name: "Help for Uncertainty", exact: true })
+      .first()
+      .focus();
+    await expect(
+      demo
+        .getByRole("tooltip")
+        .filter({ hasText: "unresolved enforcement question" })
+        .first(),
+    ).toBeVisible();
+    await demo
+      .getByRole("slider", {
+        name: "Uncertainty score for Attempt X",
+        exact: true,
+      })
+      .fill("0");
+    await demo.getByRole("button", { name: "4 Compare", exact: true }).click();
+    await expect(demo.locator("[data-model-eval-results]")).toContainText(
+      "4/6",
+    );
+    for (const check of await demo.getByRole("checkbox").all()) {
+      await expect(check).not.toBeChecked();
+    }
   });
 });
 

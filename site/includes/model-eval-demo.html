@@ -54,13 +54,17 @@
       <div class="model-eval-field">
         <label for="model-eval-task">Eval task</label>
         <p>
-          Start with one task from the work you actually do in Challenge. Choose
-          a task that represents your project work.
+          Use an invented Work Activity Tracker task below, or adapt it to your
+          implementation. Start real runs with the approved large-model
+          baseline; revisit the task with the small-model and fleet setups as
+          they become available. Supplied outputs can be scored at any stage.
         </p>
         <select id="model-eval-task" name="task" data-model-eval-task>
           <option value="bottleneck">Find one likely scaling bottleneck</option>
           <option value="benchmark">Produce a benchmark plan</option>
-          <option value="data-model">Explain the event data model</option>
+          <option value="data-model">
+            Explain the work-item and activity model
+          </option>
         </select>
       </div>
       <div class="model-eval-task-preview">
@@ -75,9 +79,11 @@
       hidden
     >
       <div class="model-eval-prompt-panel">
-        <label for="model-eval-prompt">Prompt shape</label>
+        <label for="model-eval-prompt">Shared prompt</label>
         <p>
-          Both models receive the same context, task, and required output shape.
+          Copy the complete prompt, including its input context, for each
+          permitted attempt. Keep the task, context, and required output shape
+          fixed.
         </p>
         <textarea
           id="model-eval-prompt"
@@ -87,7 +93,7 @@
       </div>
       <div class="model-eval-rubric-panel">
         <h4>Rubric</h4>
-        <p>Use the same rubric for both pasted outputs.</p>
+        <p>Use these criteria for both outputs. Each is scored from 0 to 2.</p>
         <ul data-model-eval-rubric></ul>
       </div>
     </section>
@@ -100,11 +106,13 @@
       <div class="model-eval-step-copy">
         <h4>Paste and score attempts</h4>
         <p>
-          Run the shared prompt with two models, paste each output, then score
-          against the rubric before revealing model identities. X and Y are
-          attempt labels, unrelated to course phases A and B. Sample answers and
-          the displayed cost and latency figures are invented teaching examples.
-          Record actual usage separately when evaluating your own runs.
+          Paste two supplied or permitted outputs and score each against the
+          selected task's rubric. If another person prepares the pair, ask them
+          to conceal model identities until scoring is complete. X and Y are
+          attempt labels, unrelated to course phases A and B. Sample answers,
+          preset scores, cost, and latency are invented teaching examples;
+          inspect and revise the scores. Record actual usage separately for your
+          own runs.
         </p>
         <button
           type="button"
@@ -125,21 +133,21 @@
       <div class="model-eval-checks">
         <h4>Compare the local result</h4>
         <p>
-          Confirm the comparison protocol, then report a narrow claim about this
-          task set. These shared checks do not add points to either answer;
-          executable acceptance checks must be run separately for each attempt.
+          Confirm the protocol for the pair you scored. These confirmations are
+          self-reported and add no points. Run executable acceptance checks
+          separately where applicable; the demo records manual rubric scores.
         </p>
         <label>
-          <input type="checkbox" data-model-eval-check="headings" checked />
+          <input type="checkbox" data-model-eval-check="context" />
           Both attempts received the same task and context
         </label>
         <label>
-          <input type="checkbox" data-model-eval-check="file" checked />
-          Both attempts were scored with the same rubric
+          <input type="checkbox" data-model-eval-check="rubric" />
+          Both attempts were scored with the selected task's rubric
         </label>
         <label>
-          <input type="checkbox" data-model-eval-check="measurement" checked />
-          Human corrections and review effort were recorded
+          <input type="checkbox" data-model-eval-check="provenance" />
+          Sample assumptions are separated from measurements
         </label>
       </div>
       <div class="model-eval-note">

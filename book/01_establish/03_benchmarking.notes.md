@@ -137,13 +137,14 @@ Its defensible lesson is that product-specific output quality, latency, and cost
 
 A simple classroom demonstration can be interactive.
 The point is to show that an eval is a controlled comparison, not a magic score.
-Students can change the task, inspect the shared prompt and context, score two model attempts, and notice how the conclusion changes when quality, latency, and cost are considered together.
+Students can change the task, inspect the complete shared prompt, score two attempts against the task's rubric, and notice how the conclusion changes when quality, latency, and cost are considered together.
+Use the invented samples or instructor-provided outputs before real comparisons are permitted; begin with the large-model baseline and revisit the tasks with the small-model and fleet setups later.
 
 {{ import "site/includes/model-eval-demo.html" }}
 
-This is not enough data to declare a universal winner.
-It is enough to support a local decision such as: "For open-ended diagnosis, the stronger model saved review time.
-For checklist-style benchmark plans, the smaller model may be acceptable if a human verifies the result." To make the exercise more engineering-like, add deterministic checks: did the answer name a real file, include all required headings, or produce valid JSON?
+The sample exercise supports a conclusion about the scored answers, not a claim about a real model's quality, cost, latency, or saved review time.
+For real attempts, record those measurements separately and keep any conclusion local to the task and conditions.
+Run deterministic checks separately where useful: did the answer name a real file, include all required headings, or produce valid JSON?
 To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
 
 ### Short eval lab

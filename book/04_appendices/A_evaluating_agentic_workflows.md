@@ -174,8 +174,9 @@ Keep a small human-reviewed calibration set and report disagreement rather than 
 If a judge guides development, reserve independent acceptance evidence for final evaluation.
 A held-out task set does not make the scoring process independent when the same judge design also supplies the reported result.
 
-The demonstration below separates deterministic probes from a rubric score.
-Use it to inspect a failing task and decide whether the problem lies in the result, the rubric, or the evaluation setup.
+The demonstration below lets you score two attempts against the selected task's rubric and inspect which criterion an answer misses.
+Its sample answers, cost, and latency are invented; use supplied outputs at any stage or collect real attempts within the course's permitted setup.
+The scores are manual judgments, and the protocol confirmations are self-reported; executable acceptance checks need to be run separately.
 
 {{ import "site/includes/model-eval-demo.html" }}
 
