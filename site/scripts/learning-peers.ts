@@ -1,3 +1,4 @@
+import { requestLearning } from "./learning-actions.ts";
 import type {
   LearningSource,
   NotebookEntry,
@@ -524,6 +525,24 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         node(
           "p",
           "Select only contributions you want copied into a reviewed draft. Leaving them unselected keeps the private reflection handoff to a discussion link and optional starters. Nothing is sent to an agent automatically.",
+        ),
+      );
+      card.append(
+        button("Reflect in the learning cockpit", () =>
+          requestLearning({
+            kind: "investigate",
+            activityId: "learning-loop",
+            phase: "reflect",
+            draft: {
+              source: thread.source,
+              question:
+                `Discussion reference: ${threadLink(thread)}\n${selected.size ? `Selected contributions for my review (not group consensus):\n${selectedInquiryText(chosen(), 3000)}` : "No peer contributions selected. Help me reflect on my own explanation and one next independent check."}`.slice(
+                  0,
+                  4000,
+                ),
+              noteIds: [],
+            },
+          }),
         ),
       );
       const practice = node("details");

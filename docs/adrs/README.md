@@ -92,6 +92,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-041](implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md)                 | Render untrusted assistant Markdown and equations through permitted DOM elements while retaining original reply text.                             |
 | [ADR-042](implemented/ADR-042-expose-public-learning-material-through-stateless-mcp.md)             | Expose bounded public learning retrieval and experiment guidance through stateless MCP, retaining Markdown and companion privacy boundaries.      |
 | [ADR-043](implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md)            | Activate the queue-lab reading through shared activity context, actual browser observations, adapted explanations and reviewed notebook handoffs. |
+| [ADR-044](implemented/ADR-044-generalize-the-learning-loop-through-a-contextual-cockpit.md)         | Generalize source-scoped thinking, checks, reflection and independent next steps across learning surfaces through one contextual cockpit.         |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

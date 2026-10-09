@@ -3,7 +3,7 @@ import type { ConceptRelationship } from "./concept-relationships.ts";
 import type { LearningResource } from "./learning-resources.ts";
 import type { exportExplorations } from "./explorations.ts";
 import type { agentPresentation } from "./agent-presentation.ts";
-import type { queueInvestigation } from "./reading-investigation.ts";
+import { learningLoop, type ReadingActivity } from "./reading-investigation.ts";
 
 // Publication data, independent of HTTP, MCP, accounts and private companion state.
 export type PublicBookGraph = {
@@ -23,7 +23,7 @@ export type PublicBookGraph = {
   relationships: ConceptRelationship[];
   explorations: ReturnType<typeof exportExplorations>;
   learningResources: LearningResource[];
-  readingActivities?: (typeof queueInvestigation)[];
+  readingActivities?: ReadingActivity[];
 };
 
 export type BookPassage = {
@@ -42,7 +42,7 @@ export type BookPassages = {
 
 export class BookLookupError extends Error {}
 
-export const publicBookInstructions = `Help the student investigate one question at a time using this public book. Start from their question or offer a passage, a concept connection, or a short experiment. Ask for their explanation or prediction before feedback or results. Use search_book, then retrieve the relevant concept and passage; search excerpts alone do not establish that you read the passage. Preserve authored relationship direction, linking phrases and qualifications. A graph path is navigation, not proof. get_demo returns authored controls and prompts, never live state or execution. Follow predict → interact → explain, waiting for the student's attempt. Use inline interactive explanations only when the client supports them, label adaptations and preserve quantities and assumptions. Ask for observations unless tools actually expose them. Keep worked reasoning separate until an attempt or explicit request. Cite retrieved URLs and distinguish source claims, student reports, direct observations and deductions. These tools have no access to accounts, private notes, conversations or browser actions. Read the agent-guide resource for the full teaching and presentation guidance.`;
+export const publicBookInstructions = `Help the student investigate one question at a time using this public book. Start from their question or offer a passage, a concept connection, or a short experiment. Ask for their explanation or prediction before feedback or results. Use search_book, then retrieve the relevant concept and passage; search excerpts alone do not establish that you read the passage. Preserve authored relationship direction, linking phrases and qualifications. A graph path is navigation, not proof. get_demo returns authored controls and prompts, never live state or execution. Follow predict → interact → explain, waiting for the student's attempt. The shared learningLoop and demo activity contracts connect initial thinking, a check, the student's own reflection and one next independent check. Respect direct explanation requests and let the student skip or revisit phases. Use inline interactive explanations only when the client supports them, label adaptations and preserve quantities and assumptions. Ask for observations unless tools actually expose them. Keep worked reasoning separate until an attempt or explicit request. Cite retrieved URLs and distinguish source claims, student reports, direct observations and deductions. These tools have no access to accounts, private notes, conversations or browser actions. Read the agent-guide resource for the full teaching and presentation guidance.`;
 
 const stopWords = new Set(
   "a an and are as at be by can do does for from how i in is it of on or that the this to was what when where which with".split(
@@ -130,6 +130,7 @@ export function searchBook(
   return {
     revision: graph.revision,
     publicationRevision: book.revision,
+    learningLoop,
     query,
     search:
       "Lexical matching over public concepts, rendered reading passages, activities and demo metadata; not semantic inference.",
@@ -160,6 +161,7 @@ export function getBookConcept(graph: PublicBookGraph, id: string) {
   return {
     revision: graph.revision,
     concept,
+    learningLoop,
     resources: graph.learningResources.filter((resource) =>
       concept.resourceIds.includes(resource.id),
     ),
@@ -216,6 +218,7 @@ export function getBookActivity(
   return {
     revision: graph.revision,
     activity,
+    learningLoop,
     part,
     url: part === "discussion" ? activity.discussionUrl : activity.agentUrl,
     presentation: graph.agentPresentation,
@@ -301,6 +304,7 @@ export function readBookPassage(
   const end = Math.min(offset + 8000, text.length);
   return {
     publicationRevision: book.revision,
+    learningLoop,
     url: url.href,
     title: passages[0]!.title,
     text: text.slice(offset, end),

@@ -442,6 +442,31 @@ test("students save private initial work before group replies, reflect individua
     await expect(bob.panel.getByRole("status")).toContainText(
       "Saved in your private notebook.",
     );
+    await peers(bob.page);
+    await bob.panel
+      .getByRole("button", { name: "Reveal peer inquiry" })
+      .click();
+    await bob.panel
+      .getByLabel("Select Synthetic student 2 · check for my draft", {
+        exact: true,
+      })
+      .check();
+    await bob.panel
+      .getByRole("button", { name: "Reflect in the learning cockpit" })
+      .click();
+    const cockpit = bob.page.locator("#learning-cockpit");
+    await expect(
+      cockpit.getByLabel("My takeaway", { exact: true }),
+    ).toBeVisible();
+    await expect(cockpit.getByLabel("What I noticed")).toHaveValue(
+      /Student-operated browser model/,
+    );
+    await expect(cockpit.getByLabel("What I noticed")).not.toHaveValue(
+      /Private Alice initial thinking|Alice private takeaway/,
+    );
+    await expect(
+      cockpit.getByRole("button", { name: "Explain directly", exact: true }),
+    ).toBeDisabled();
     alice.page.on(
       "dialog",
       (dialog) =>

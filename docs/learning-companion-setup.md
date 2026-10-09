@@ -57,20 +57,27 @@ Keep the companion running while using the book; Ctrl+C stops it without removin
 
 ### Optional first investigation
 
-After connecting, choose **Teaching assistant → Chapter guide**, or **Connect → Explore this reading**.
-The guide follows the chapter you are reading and uses its existing prompts and available demos.
-For a first queue investigation, open [the queue lab](/demos/#demo-queue-balance-lab), choose **Teaching assistant → Chapter guide**, and select **Queue balance lab**.
-Save a prediction or a concrete uncertainty, change the demo's mean time, then choose **Save demo result**.
-This saves the demo's current inputs and displayed result as a private note and shows what was recorded below the button.
-Optionally try **Apply it in a different situation**: explain what happens to 300 waiting events when arrivals and processing capacity differ.
-Try your explanation before opening **Self-check after my attempt**, or choose your own related case.
-**Save my independent attempt** keeps it separately and links your initial thinking and saved observation.
-**Ask for help with this case** prepares an editable request; you decide whether to send it.
-Reflect in your own words, using **Reflection starters and examples** if useful, then choose **Review my saved notes**.
-Pages without demos offer an application to a different system or your project, without requiring a browser observation.
-Restart the companion, connect again and reopen those notes to check continuity.
-You can leave the investigation for your own question at any point.
+Choose **Cockpit** in the header on any reading, concept, exploration or project page.
+It gives you one place to state your thinking, try a check, reflect and choose your next independent check.
+You can select a passage first, or choose **Explore this idea** below any demo to work beside its controls.
+For a first experiment, open [the queue lab](/demos/#demo-queue-balance-lab) and choose **Explore this idea**.
+Connect your existing companion, write a prediction or uncertainty, then choose **Discuss my prediction**.
+With assistant replies enabled, its explanation appears in the reading.
+Change a control yourself and choose **Discuss this result** to share fresh displayed values; moving controls does not send anything.
+You can always choose **Explain directly**, or reflect without asking for a reply.
+Write **My takeaway** and **My next independent check**, then **Prepare notebook takeaway**.
+Review the editable Notebook draft and choose **Save note** to keep it.
+Only that Save action creates the notebook entry.
+Choose **Start my next check** to begin a fresh loop from your next question while retaining the earlier reflection; it does not invoke an assistant.
+
+**Working on** changes focus while preserving independent drafts.
+**Recent learning loops in this tab** lets you return to unfinished thinking across the book; save a takeaway before closing the tab to retain it durably.
+Checked exercises, independent practice, selected Notebook notes and selected peer contributions have explicit cockpit handoffs.
+Review **Shared context** before sending; no notebook notes are included by default.
+The course page offers the same private loop without copying or submitting course records.
+The separate Chapter guide remains available for its existing step-by-step saving workflow.
 This is optional support, with no required answer, minimum length, completion mark or additional course report.
+Restart an older companion from the updated checkout if the cockpit asks for the new activity support.
 
 ## Capture and revisit your thinking
 

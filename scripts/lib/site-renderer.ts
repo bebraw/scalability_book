@@ -189,7 +189,7 @@ export function createSiteRenderer({
           ...(learningScript &&
           currentUrl &&
           (currentUrl === "/" ||
-            /^\/(chapters|appendices|parts|concepts|explore|demos|case-studies|project|notebook)\//.test(
+            /^\/(chapters|appendices|parts|concepts|explore|demos|case-studies|project|notebook|course)\//.test(
               currentUrl,
             ))
             ? [learningScript]

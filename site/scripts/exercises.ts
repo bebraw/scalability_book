@@ -272,6 +272,37 @@ async function mount(root: HTMLElement, auth: Auth) {
       },
     });
   });
+  const loop = document.createElement("button");
+  loop.type = "button";
+  loop.textContent = "Explore and reflect on this attempt";
+  loop.disabled = true;
+  root.querySelector(".exercise-actions")!.append(loop);
+  // Reuse the same reviewed attempt/checker handoff as discussion. Nothing sends
+  // automatically and worked answers are never copied into the learning loop.
+  loop.addEventListener("click", () => {
+    const answer = parseExerciseResponse(id, read());
+    if (!checked || !answer) return;
+    requestLearning({
+      kind: "investigate",
+      activityId: "learning-loop",
+      draft: {
+        source: {
+          ...pageSource(),
+          anchor: root.id,
+          excerpt: exercises[id]!.prompt,
+        },
+        question: exerciseDiscussion(id, answer).slice(0, 4000),
+        noteIds: [],
+      },
+    });
+  });
+  check.addEventListener("click", () => {
+    loop.disabled = !checked;
+  });
+  for (const input of inputs)
+    input.addEventListener("input", () => {
+      loop.disabled = true;
+    });
   document.addEventListener("book-account-changed", (event) => {
     const next = exerciseAuth((event as CustomEvent<SiteAccount>).detail);
     if (next.owner === auth.owner) return;

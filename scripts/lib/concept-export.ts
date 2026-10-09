@@ -5,7 +5,7 @@ import { conceptRelationships } from "../../shared/concept-relationships.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
 import { explorations, exportExplorations } from "../../shared/explorations.ts";
 import { agentPresentation } from "../../shared/agent-presentation.ts";
-import { queueInvestigation } from "../../shared/reading-investigation.ts";
+import { readingActivities } from "../../shared/reading-investigation.ts";
 import { renderInteractiveLearningGuidance } from "./agent-presentation.ts";
 
 export function exportConceptGraph(siteUrl: string, title: string) {
@@ -27,7 +27,7 @@ export function exportConceptGraph(siteUrl: string, title: string) {
           learningResources,
           explorations,
           agentPresentation,
-          readingActivities: [queueInvestigation],
+          readingActivities,
         }),
       )
       .digest("hex"),
@@ -59,7 +59,7 @@ export function exportConceptGraph(siteUrl: string, title: string) {
         "Optional guidance for the student's agent, not site-enforced behavior or an advertisement of client rendering capabilities. The authored material remains the reference for agent-created adaptations.",
     },
     agentPresentation,
-    readingActivities: [queueInvestigation],
+    readingActivities,
     concepts: concepts.map((concept) => ({
       ...concept,
       url: absolute(`/concepts/#${concept.id}`),
@@ -171,7 +171,7 @@ The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SH
 - \`learningResources\`: stable \`id\`, \`kind\` (\`graphic\` or \`demo\`), \`title\`, \`conceptIds\`, \`url\`, \`caption\`, \`assumptions\`, and \`images\`. Every image has a PNG URL and alt text; graphics also have a standalone SVG. Demos include \`controls\` and an \`experiment\` with \`predict\`, \`try\`, \`observe\`, and \`reflect\` prompts. These fields are additive to version 2.
 - \`explorations\`: optional activities with stable \`id\`, \`phase\`, \`title\`, \`summary\`, \`conceptIds\`, course \`task\`, \`reading\`, \`graphUrl\`, \`url\` for independent study, \`agentUrl\` for starting a conversation, and separate \`discussionUrl\` for worked reasoning. Concepts carry matching \`explorationIds\`. These fields are additive to version 2; the catalog deliberately omits worked answers.
 - \`agentPresentation\`: optional predict → interact → explain guidance, with client capability checks, pacing, source fidelity, observation handling, and a browser or conversational fallback. It guides an external agent rather than declaring a supported rendering capability. This field is additive to version 2.
-- \`readingActivities\`: optional versioned activities shared with inline reading experiences. The queue activity supplies predict/experiment/reflect phases, adaptation guidance and explicit browser-snapshot fields and units. Retrieve it through \`get_demo\` or this graph. These are authored contracts, not live learner state or additional tool permissions. Obtain actual observations through your own authorized tools or the student.
+- \`readingActivities\`: optional versioned activities shared with inline reading experiences. The learning cockpit shares a predict/check/reflect loop for readings, concepts, explorations and selected learning context, plus a versioned activity for every authored demo. Demo activities supply prediction, experiment and reflection prompts, adaptation guidance and explicit browser-snapshot fields; the queue retains its numeric fields and units. Retrieve it through \`get_demo\` or this graph. These are authored contracts, not live learner state or additional tool permissions. Obtain actual observations through your own authorized tools or the student.
 
 Definitions and examples use the book's declared assumptions. Some vocabulary is still developing; preserve the usage notes when interpreting it. Example rates are illustrative unless the reading identifies them as measurements.
 

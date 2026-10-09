@@ -9,6 +9,7 @@ import {
   type NotebookEntry,
   type NoteKind,
 } from "../../shared/learning-workspace.ts";
+import { requestLearning } from "./learning-actions.ts";
 
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   const element = document.createElement(tag);
@@ -186,6 +187,27 @@ export function mountLearningPractice(
     ),
   );
   const revisit = node("button", "Revisit later in Notes");
+  const loop = node("button", "Explore this case in the learning cockpit");
+  loop.type = "button";
+  loop.addEventListener("click", () =>
+    requestLearning({
+      kind: "investigate",
+      activityId: "learning-loop",
+      draft: {
+        source: followUpSource(
+          options.source,
+          activity,
+          question.textarea.value,
+        ),
+        question:
+          `My thinking so far: ${answer.textarea.value.trim() || "I am unsure how to begin."}`.slice(
+            0,
+            4000,
+          ),
+        noteIds: [],
+      },
+    }),
+  );
   revisit.type = "button";
   revisit.addEventListener("click", options.notes);
   section.append(
@@ -193,6 +215,7 @@ export function mountLearningPractice(
     answer.wrapper,
     save,
     help,
+    loop,
     feedback,
     check,
     node(

@@ -68,29 +68,66 @@ for (const button of buttons) {
 const session = readNotebookSession();
 if (buttons.length && session.open) void openLearning(session.experience, true);
 
-for (const root of document.querySelectorAll<HTMLElement>(
-  "[data-reading-investigation='queue-balance']",
-)) {
-  const start = root.querySelector<HTMLButtonElement>(
-    "[data-investigation-start]",
-  );
-  if (!start) continue;
-  start.hidden = false;
-  const explore = () =>
+const cockpit = document.querySelector<HTMLButtonElement>(
+  "[data-learning-cockpit]",
+);
+if (cockpit) {
+  cockpit.hidden = false;
+  cockpit.addEventListener("click", () => {
+    const selection = readingSelection();
     document.dispatchEvent(
       new CustomEvent("book-learning-request", {
-        detail: { kind: "investigate", activityId: "queue-balance" },
+        detail: { kind: "investigate", selection },
       }),
     );
-  start.addEventListener("click", explore);
-  try {
-    const saved = JSON.parse(
+  });
+}
+// Small launchers activate the same cockpit beside any authored demo. No model,
+// notebook read or companion connection occurs until the reader chooses it.
+for (const demo of document.querySelectorAll<HTMLElement>(
+  "[data-demo-anchor]",
+)) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "learning-loop-launch";
+  button.dataset.investigateDemo = demo.id;
+  button.textContent = "Explore this idea";
+  button.addEventListener("click", () =>
+    document.dispatchEvent(
+      new CustomEvent("book-learning-request", {
+        detail: { kind: "investigate", demoId: demo.id },
+      }),
+    ),
+  );
+  demo.after(button);
+}
+try {
+  const saved = JSON.parse(
+    sessionStorage.getItem("book-learning-cockpit-active") ?? "null",
+  );
+  if (saved?.open && new URL(saved.source.url).pathname === location.pathname)
+    document.dispatchEvent(
+      new CustomEvent("book-learning-request", {
+        detail: { kind: "investigate", resume: true },
+      }),
+    );
+  else {
+    const legacy = JSON.parse(
       sessionStorage.getItem(
         `book-reading-investigation:${location.pathname}:queue-balance`,
       ) ?? "null",
     );
-    if (saved?.open === true) explore();
-  } catch {
-    /* Reading and activation work without tab storage. */
+    if (
+      !saved &&
+      legacy?.open &&
+      document.getElementById("demo-queue-balance-lab")
+    )
+      document.dispatchEvent(
+        new CustomEvent("book-learning-request", {
+          detail: { kind: "investigate", activityId: "queue-balance" },
+        }),
+      );
   }
+} catch {
+  /* Learning works without tab storage. */
 }

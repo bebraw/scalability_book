@@ -7,7 +7,7 @@ import type {
 } from "../../shared/learning-workspace.ts";
 import type { HelpMode, SupportNeed } from "../../shared/learning-agent.ts";
 import {
-  queueInvestigation,
+  activityById,
   type InvestigationTurn,
 } from "../../shared/reading-investigation.ts";
 
@@ -47,7 +47,7 @@ export function buildLearningProviderContext({
     ...(investigation
       ? {
           readingActivity: {
-            contract: queueInvestigation,
+            contract: activityById(investigation.activityId),
             turn: investigation,
           },
         }

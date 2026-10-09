@@ -1,21 +1,27 @@
 import {
-  queueInvestigation as activity,
+  type ReadingActivity,
   parseInvestigationTurn,
-  type QueueObservation,
+  type InvestigationObservation,
+  type InvestigationPhase,
 } from "../../shared/reading-investigation.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
 import type {
   LearningConversation,
   DemoToolRequest,
 } from "../../shared/learning-agent.ts";
-import type { NotebookHandoff } from "../../shared/learning-workspace.ts";
+import {
+  sourceLink,
+  type LearningSource,
+  type AssistantHandoff,
+  type NotebookHandoff,
+} from "../../shared/learning-workspace.ts";
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import {
-  investigationSource as source,
   readInvestigationDraft,
   saveInvestigationDraft,
-  observeQueue,
-  describeQueue as describe,
+  observeInvestigation,
+  restoreInvestigationControls,
+  describeObservation as describe,
 } from "./learning-investigation-session.ts";
 import { observeLearningDemo } from "./learning-demos.ts";
 import { renderLearningReply } from "./learning-reply.ts";
@@ -25,28 +31,47 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   result.textContent = text;
   return result;
 };
-/** One inline activity uses the coordinator's client; it never reads notebook entries. */
+/** A scoped learning loop uses the coordinator's connection and explicit context only. */
 export function mountReadingInvestigation(
   root: HTMLElement,
   options: {
     client: LearningClient;
+    source: LearningSource;
+    activity: ReadingActivity;
+    handoff?: AssistantHandoff;
+    phase?: InvestigationPhase;
     settings: () => void | Promise<void>;
     write: (draft: NotebookHandoff) => void | Promise<void>;
     disconnected: () => void;
+    next: (source: LearningSource, takeaway: string, nextCheck: string) => void;
   },
 ) {
-  const { client } = options;
-  const draft = readInvestigationDraft();
+  const { client, activity } = options;
+  const source = () => options.source;
+  const draft = readInvestigationDraft(source(), activity);
+  if (
+    options.handoff &&
+    (!draft.question.trim() ||
+      window.confirm(
+        "Replace this loop's unfinished question with the selected context? Your other loops are retained.",
+      ))
+  ) {
+    draft.question = options.handoff.question.slice(0, 4000);
+    draft.noteIds = options.handoff.noteIds.slice(0, 100);
+    draft.phase = "experiment";
+  }
+  if (options.phase) draft.phase = options.phase;
   let status: CompanionStatus | null = null;
   let conversation: LearningConversation | null = null;
   let busy = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let generation = 0;
   let pollingKey: string | null = null;
-  const save = () => saveInvestigationDraft(draft);
+  let disposed = false;
+  const save = () => saveInvestigationDraft(draft, activity, !disposed);
   const start = root.querySelector<HTMLButtonElement>(
     "[data-investigation-start]",
-  )!;
+  );
   const body = node("div");
   body.className = "reading-investigation-body";
   const notice = node("p");
@@ -111,11 +136,22 @@ export function mountReadingInvestigation(
   });
   const prompt = node("p");
   prompt.className = "reading-investigation-prompt";
-  const controlsLink = node("a", "Return to queue controls ↑");
-  controlsLink.href = `#${activity.demoId}`;
+  const controlsLink = node(
+    "a",
+    activity.demoId
+      ? `Return to ${activity.id === "queue-balance" ? "queue controls" : "activity"} ↑`
+      : "Return to the source ↑",
+  );
+  controlsLink.href = sourceLink(source());
   const field = (
     label: string,
-    name: "system" | "prediction" | "question" | "takeaway",
+    name:
+      | "system"
+      | "prediction"
+      | "question"
+      | "takeaway"
+      | "evidence"
+      | "nextCheck",
     maximum: number,
     placeholder: string,
   ) => {
@@ -136,25 +172,37 @@ export function mountReadingInvestigation(
     "A system I want to understand (optional)",
     "system",
     1000,
-    "For example, incoming requests waiting for a database connection.",
+    "Name a system, project or situation you want to understand.",
   );
   const prediction = field(
     "My prediction or uncertainty",
     "prediction",
     2000,
-    "If average time doubles while arrivals stay steady, I think…",
+    "I think… / I expect… / I am unsure whether…",
   );
   const question = field(
     "What I noticed or want to ask (optional)",
     "question",
     4000,
-    "Which value surprised you? You can also ask for a direct explanation.",
+    "What surprised you? What would you like help understanding?",
   );
   const takeaway = field(
     "My takeaway",
     "takeaway",
     4000,
     "Explain the idea in your own words, including one assumption to check.",
+  );
+  const evidence = field(
+    "My check and evidence",
+    "evidence",
+    4000,
+    "What did you try, read or observe? Identify a real result, a student report or a hypothetical example.",
+  );
+  const nextCheck = field(
+    "My next independent check",
+    "nextCheck",
+    2000,
+    "One question or action I can try without the assistant.",
   );
   const snapshot = node("p");
   snapshot.className = "reading-investigation-observation";
@@ -166,13 +214,33 @@ export function mountReadingInvestigation(
   );
   const privacy = node("details");
   privacy.append(
-    node("summary", "Shared context: this activity and queue"),
+    node("summary", "Shared context: this activity and my selections"),
     node(
       "p",
-      "Sending shares this activity, your writing and the displayed queue values with your companion's provider. During that reply, the assistant can also inspect this queue. No notebook entries are selected. Moving a slider never starts a reply.",
+      "Sending shares the source shown here, your writing and any displayed demo snapshot with your companion’s provider. During a reply, only this activity’s demo can be inspected. Control changes never start a reply. Notebook entries are included only when explicitly handed off below.",
     ),
   );
   privacy.className = "reading-investigation-hint";
+  const excerpt = node(
+    "p",
+    source().excerpt ||
+      "This page’s title, source link and authored concepts; no page-wide capture.",
+  );
+  privacy.append(node("h3", "Selected source context"), excerpt);
+  const selections = node("p");
+  const clearSelections = button("Clear selected notes", () => {
+    draft.noteIds = [];
+    save();
+    drawSelections();
+  });
+  privacy.append(selections, clearSelections);
+  function drawSelections() {
+    selections.textContent = draft.noteIds.length
+      ? `${draft.noteIds.length} deliberately selected notebook entries will be supplied on send.`
+      : "No notebook entries are selected.";
+    clearSelections.hidden = !draft.noteIds.length;
+  }
+  drawSelections();
   const actions = node("div");
   actions.className = "reading-investigation-actions";
   const send = button("Discuss my prediction", () => sendTurn(false));
@@ -197,18 +265,37 @@ export function mountReadingInvestigation(
     await options.write({
       source: source(),
       kind: "reflection",
-      title: `Queue investigation: ${draft.system || "Little's Law"}`.slice(
+      title: `Learning takeaway: ${draft.system || source().title}`.slice(
         0,
         300,
       ),
-      body: `${draft.takeaway}\n\n${draft.prediction ? `Initial thinking: ${draft.prediction}\n\n` : ""}${draft.lastSent ? `Browser illustration (${draft.lastSent.observedAt}): ${describe(draft.lastSent)}` : ""}`.trim(),
-      relatedIds: [],
+      body: [
+        draft.takeaway,
+        draft.prediction ? `Initial thinking: ${draft.prediction}` : "",
+        draft.evidence ? `My check and evidence: ${draft.evidence}` : "",
+        draft.nextCheck ? `Next independent check: ${draft.nextCheck}` : "",
+        draft.lastSent
+          ? `Browser snapshot (${draft.lastSent.observedAt}): ${describe(draft.lastSent)}`
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n")
+        .slice(0, 16_000),
+      relatedIds: [...draft.noteIds],
       assistance: draft.conversationId
-        ? `Student-written takeaway after inline activity ${activity.id} v${activity.version}; conversation ${draft.conversationId}; reviewed before saving`
+        ? `Student-written takeaway after learning activity ${activity.id} v${activity.version}; conversation ${draft.conversationId}; reviewed before saving`
         : null,
     });
   });
-  actions.append(send, explain, stop, write);
+  const next = button("Start my next check", () => {
+    if (!draft.nextCheck.trim()) {
+      notice.textContent =
+        "Write your next independent check first. This starts a new draft without saving or sending.";
+      return;
+    }
+    options.next(source(), draft.takeaway, draft.nextCheck);
+  });
+  actions.append(send, explain, stop, write, next);
   const messages = node("div");
   messages.className = "reading-investigation-messages";
   messages.setAttribute("aria-live", "polite");
@@ -222,8 +309,12 @@ export function mountReadingInvestigation(
     if (timer) clearTimeout(timer);
     save();
     body.hidden = true;
-    start.hidden = false;
-    start.focus({ preventScroll: true });
+    if (start) {
+      start.hidden = false;
+      start.focus({ preventScroll: true });
+    }
+    root.dataset.paused = "true";
+    document.dispatchEvent(new CustomEvent("book-cockpit-paused"));
   });
   body.append(
     connection,
@@ -236,6 +327,8 @@ export function mountReadingInvestigation(
     previous,
     question.wrapper,
     takeaway.wrapper,
+    evidence.wrapper,
+    nextCheck.wrapper,
     privacy,
     actions,
     notice,
@@ -256,7 +349,7 @@ export function mountReadingInvestigation(
     const working = conversation?.state === "working";
     for (const control of [send, explain])
       control.disabled = busy || Boolean(working) || !supported();
-    for (const control of [connect, check, setup, write, ...phases])
+    for (const control of [connect, check, setup, write, next, ...phases])
       control.disabled = busy;
     stop.hidden = !working;
     stop.disabled = busy;
@@ -272,9 +365,9 @@ export function mountReadingInvestigation(
             ({ id, version }) =>
               id === activity.id && version === activity.version,
           )
-        ? "Restart the companion from the updated checkout to enable inline explorations. Your writing is retained."
+        ? "Restart the companion from the updated checkout to enable the learning cockpit. Your writing is retained."
         : status.provider
-          ? `${status.provider} connected · Your exploration stays in this reading.`
+          ? `${status.provider} connected · Your learning loop stays beside the work.`
           : "Notebook-only connection. Enable Codex or a local model in Connection settings, then check the connection again.";
   }
   function drawPhase() {
@@ -290,8 +383,11 @@ export function mountReadingInvestigation(
       draft.phase !== "predict";
     question.wrapper.hidden = draft.phase === "predict";
     controlsLink.hidden = draft.phase !== "experiment";
+    evidence.wrapper.hidden = draft.phase === "predict";
+    nextCheck.wrapper.hidden = draft.phase !== "reflect";
     takeaway.wrapper.hidden = draft.phase !== "reflect";
     write.hidden = draft.phase !== "reflect";
+    next.hidden = draft.phase !== "reflect";
     send.textContent =
       draft.phase === "predict"
         ? "Discuss my prediction"
@@ -302,12 +398,17 @@ export function mountReadingInvestigation(
   }
   function drawSnapshot() {
     try {
-      draft.current = observeQueue();
-      snapshot.textContent = `Current browser illustration: ${describe(draft.current)}`;
+      if (!activity.demoId) throw new Error("No demo selected");
+      draft.current = observeInvestigation(source(), activity);
+      snapshot.textContent =
+        activity.id === "queue-balance"
+          ? `Current browser illustration: ${describe(draft.current)}`
+          : `Current browser snapshot: ${describe(draft.current).slice(0, 1400)}`;
       save();
     } catch {
-      snapshot.textContent =
-        "The queue is unavailable in this browser. You can still ask for an explanation.";
+      snapshot.textContent = activity.demoId
+        ? "This demo is hidden or unavailable. Open its Explore tab to share actual results, or ask for an explanation."
+        : "Describe your check below. Reading, project and peer context do not imply a live browser experiment.";
     }
     previous.hidden = !draft.lastSent;
     previousText.textContent = draft.lastSent
@@ -322,11 +423,13 @@ export function mountReadingInvestigation(
     const latest = replies.at(-1);
     if (latest) {
       messages.append(
-        node("h4", "Adapted explanation · Teaching assistant"),
+        node("h3", "Adapted explanation · Teaching assistant"),
         renderLearningReply(latest.text),
       );
       const reference = node("a", "Read the authored explanation");
-      reference.href = new URL(activity.reading, location.origin).href;
+      reference.href = activity.reading
+        ? new URL(activity.reading, location.origin).href
+        : sourceLink(source());
       messages.append(reference);
       const about = node("details");
       about.append(
@@ -345,7 +448,7 @@ export function mountReadingInvestigation(
       const card = node("article");
       card.append(
         node(
-          "h4",
+          "h3",
           message.role === "student"
             ? "Your thinking"
             : message.role === "agent"
@@ -370,7 +473,9 @@ export function mountReadingInvestigation(
     status = await client.status();
     if (draft.companionBase && draft.companionBase !== client.base) {
       draft.conversationId = null;
+      draft.noteIds = [];
       conversation = null;
+      drawSelections();
     }
     draft.companionBase = client.base;
     address.value = client.base;
@@ -391,15 +496,20 @@ export function mountReadingInvestigation(
       return;
     }
     if (!supported()) return;
-    let observation: QueueObservation | undefined;
+    let observation: InvestigationObservation | undefined;
     try {
-      observation = observeQueue();
+      observation = observeInvestigation(source(), activity);
     } catch {
       /* Explain without claiming execution. */
     }
-    if (!observation && !direct && draft.phase === "experiment") {
+    if (
+      activity.demoId &&
+      !observation &&
+      !direct &&
+      draft.phase === "experiment"
+    ) {
       notice.textContent =
-        "Open the queue's Explore tab before sending a browser result. You can still choose Explain directly.";
+        "Open the demo’s Explore tab before sending a browser result. You can still choose Explain directly.";
       return;
     }
     if (!conversation) {
@@ -418,6 +528,8 @@ export function mountReadingInvestigation(
         phase: draft.phase,
         system: draft.system,
         prediction: draft.prediction,
+        evidence: draft.evidence,
+        nextCheck: draft.nextCheck,
         observation,
       },
       source(),
@@ -429,7 +541,9 @@ export function mountReadingInvestigation(
         text: direct
           ? `Please explain directly. ${observation ? "" : "No current browser observation is available; do not infer a new result. "}${text}`
           : text ||
-            "Compare this actual browser result with my earlier prediction and suggest one next check.",
+            (observation
+              ? "Compare this actual browser result with my earlier prediction and suggest one next check."
+              : "Help me choose one check of my initial thinking using this source; no browser experiment is implied."),
         mode: direct
           ? "explanation"
           : draft.phase === "reflect"
@@ -438,7 +552,7 @@ export function mountReadingInvestigation(
         supportNeed: "unspecified",
         goal: draft.system,
         browserId: draft.browserId,
-        noteIds: [],
+        noteIds: [...draft.noteIds],
         investigation: turn,
       },
     );
@@ -450,7 +564,7 @@ export function mountReadingInvestigation(
     void poll();
   }
   async function poll() {
-    if (!draft.open || !draft.conversationId) return;
+    if (disposed || !draft.open || !draft.conversationId) return;
     const epoch = generation;
     const id = draft.conversationId;
     const currentKey = `${id}:${epoch}`;
@@ -472,9 +586,9 @@ export function mountReadingInvestigation(
             request.tool !== "observe_demo"
           )
             throw new Error(
-              "This inline activity observes only its queue lab. The student operates its controls; use the Teaching assistant for reviewed demo changes.",
+              "The learning cockpit observes only its selected demo. The student operates controls; use the Teaching assistant for reviewed demo changes.",
             );
-          observeQueue();
+          observeInvestigation(source(), activity);
           result = observeLearningDemo(activity.demoId);
         } catch (failure) {
           error =
@@ -510,21 +624,18 @@ export function mountReadingInvestigation(
       if (pollingKey === currentKey) pollingKey = null;
     }
   }
-  const demo = document.getElementById(activity.demoId)!;
-  // Restore only student-operated, validated values; no provider request is sent.
-  if (draft.current)
-    for (const name of ["arrival", "time", "observed"] as const) {
-      const input = demo.querySelector<HTMLInputElement>(
-        `[data-little-law-input="${name}"]`,
-      )!;
-      input.value = String(draft.current[name]);
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-  demo.addEventListener("input", drawSnapshot);
+  const demo = activity.demoId
+    ? document.getElementById(activity.demoId)
+    : null;
+  restoreInvestigationControls(draft, activity);
+  demo?.addEventListener("input", drawSnapshot);
+  demo?.addEventListener("change", drawSnapshot);
+  demo?.addEventListener("click", drawSnapshot);
   const open = () => {
     draft.open = true;
     body.hidden = false;
-    start.hidden = true;
+    if (start) start.hidden = true;
+    root.dataset.paused = "false";
     save();
     drawPhase();
     drawConnection();
@@ -532,5 +643,25 @@ export function mountReadingInvestigation(
     if (client.token) void act(checkConnection);
   };
   open();
-  return { open };
+  return {
+    open,
+    hasDraft: () =>
+      [
+        draft.prediction,
+        draft.question,
+        draft.takeaway,
+        draft.evidence,
+        draft.nextCheck,
+      ].some((text) => text.trim()),
+    dispose() {
+      disposed = true;
+      generation++;
+      if (timer) clearTimeout(timer);
+      demo?.removeEventListener("input", drawSnapshot);
+      demo?.removeEventListener("change", drawSnapshot);
+      demo?.removeEventListener("click", drawSnapshot);
+      save();
+      body.remove();
+    },
+  };
 }

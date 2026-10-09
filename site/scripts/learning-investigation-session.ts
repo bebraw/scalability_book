@@ -1,75 +1,110 @@
 import {
-  queueInvestigation as activity,
+  queueInvestigation,
   parseInvestigationTurn,
+  type ReadingActivity,
   type InvestigationPhase,
+  type InvestigationObservation,
   type QueueObservation,
 } from "../../shared/reading-investigation.ts";
-import { pageSource } from "./learning-context.ts";
+import {
+  parseLearningSource,
+  type LearningSource,
+} from "../../shared/learning-workspace.ts";
 import { observeLearningDemo } from "./learning-demos.ts";
 
-export const investigationSource = () => ({
-  ...pageSource(),
-  kind: "demo" as const,
-  anchor: activity.demoId,
-  title: activity.title,
-  excerpt: `Little's Law: L = λW, for stable averages within the same boundary. ${activity.phases.map(({ prompt }) => prompt).join(" ")}`,
-  conceptIds: [...activity.conceptIds],
-});
-const key = () =>
-  `book-reading-investigation:${location.pathname}:${activity.id}`;
-interface Draft {
-  version: 1;
+export const cockpitBookmark = "book-learning-cockpit-active";
+const prefix = "book-learning-loop:";
+const maxDraftLength = 256_000;
+export const investigationKey = (
+  source: LearningSource,
+  activity: ReadingActivity,
+) => {
+  let hash = 2166136261;
+  for (const char of source.excerpt + source.conceptIds.join(","))
+    hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return `${prefix}${source.url}#${source.anchor}:${activity.id}:${hash >>> 0}`;
+};
+export interface InvestigationDraft {
+  version: 2;
+  source: LearningSource;
+  activityId: string;
+  updatedAt: string;
   open: boolean;
   phase: InvestigationPhase;
   system: string;
   prediction: string;
   question: string;
   takeaway: string;
+  evidence: string;
+  nextCheck: string;
+  noteIds: string[];
   conversationId: string | null;
   browserId: string;
   companionBase: string;
-  current?: QueueObservation | undefined;
-  lastSent?: QueueObservation | undefined;
+  current?: InvestigationObservation | undefined;
+  lastSent?: InvestigationObservation | undefined;
 }
-export function readInvestigationDraft(): Draft {
-  const fresh: Draft = {
-    version: 1,
+export function readInvestigationDraft(
+  source: LearningSource,
+  activity: ReadingActivity,
+): InvestigationDraft {
+  const fresh: InvestigationDraft = {
+    version: 2,
+    source,
+    activityId: activity.id,
+    updatedAt: new Date().toISOString(),
     open: true,
     phase: "predict",
     system: "",
     prediction: "",
     question: "",
     takeaway: "",
+    evidence: "",
+    nextCheck: "",
+    noteIds: [],
     conversationId: null,
     browserId: crypto.randomUUID(),
     companionBase: "",
   };
   try {
-    const raw = sessionStorage.getItem(key());
-    if (!raw || raw.length > 80_000) return fresh;
+    const raw =
+      sessionStorage.getItem(investigationKey(source, activity)) ??
+      (activity.id === queueInvestigation.id
+        ? sessionStorage.getItem(
+            `book-reading-investigation:${new URL(source.url).pathname}:${activity.id}`,
+          )
+        : null);
+    if (!raw || raw.length > maxDraftLength) return fresh;
     const saved = JSON.parse(raw);
-    if (saved.version !== 1) return fresh;
+    if (![1, 2].includes(saved.version)) return fresh;
     const turn = parseInvestigationTurn(
       {
         ...saved,
         activityId: activity.id,
-        version: 1,
+        version: activity.version,
         observation: saved.current,
       },
-      investigationSource(),
+      source,
     );
     const uuid =
       /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+    const text = (key: string, limit: number) =>
+      typeof saved[key] === "string" ? saved[key].slice(0, limit) : "";
     return {
       ...fresh,
       open: saved.open === true,
       phase: turn.phase,
       system: turn.system,
       prediction: turn.prediction,
-      question:
-        typeof saved.question === "string" ? saved.question.slice(0, 4000) : "",
-      takeaway:
-        typeof saved.takeaway === "string" ? saved.takeaway.slice(0, 4000) : "",
+      question: text("question", 4000),
+      takeaway: text("takeaway", 4000),
+      evidence: turn.evidence ?? "",
+      nextCheck: turn.nextCheck ?? "",
+      noteIds: Array.isArray(saved.noteIds)
+        ? saved.noteIds
+            .filter((id: unknown) => typeof id === "string" && uuid.test(id))
+            .slice(0, 100)
+        : [],
       conversationId:
         typeof saved.conversationId === "string" &&
         uuid.test(saved.conversationId)
@@ -79,13 +114,12 @@ export function readInvestigationDraft(): Draft {
         typeof saved.browserId === "string" && uuid.test(saved.browserId)
           ? saved.browserId
           : fresh.browserId,
-      companionBase:
-        typeof saved.companionBase === "string" ? saved.companionBase : "",
+      companionBase: text("companionBase", 2000),
       current: turn.observation,
       lastSent: saved.lastSent
         ? parseInvestigationTurn(
             { ...turn, observation: saved.lastSent },
-            investigationSource(),
+            source,
           ).observation
         : undefined,
     };
@@ -93,13 +127,17 @@ export function readInvestigationDraft(): Draft {
     return fresh;
   }
 }
-export function observeQueue(): QueueObservation {
-  // Read the simulator's actual displayed outputs. Do not independently simulate it.
-  observeLearningDemo(activity.demoId);
+export function observeInvestigation(
+  source: LearningSource,
+  activity: ReadingActivity,
+): InvestigationObservation {
+  if (!activity.demoId || new URL(source.url).pathname !== location.pathname)
+    throw new Error("Describe your check and evidence in your own words.");
+  const actual = observeLearningDemo(activity.demoId);
   const root = document.getElementById(activity.demoId)!;
   if (root.closest("[hidden]") || root.getClientRects().length === 0)
     throw new Error(
-      "Open the queue's Explore tab before sending a browser result.",
+      "Open the demo's Explore tab before sending a browser result.",
     );
   const input = (name: string) =>
     Number(
@@ -110,31 +148,158 @@ export function observeQueue(): QueueObservation {
     Number(
       root.querySelector(`[data-little-law-metric="${name}"]`)!.textContent,
     );
+  const observation =
+    activity.id === queueInvestigation.id
+      ? {
+          kind: "browser-queue-snapshot",
+          observedAt: actual.observedAt,
+          arrival: input("arrival"),
+          time: input("time"),
+          observed: input("observed"),
+          expected: metric("expected"),
+          gap: metric("gap"),
+        }
+      : {
+          kind: "browser-demo-snapshot",
+          demoId: activity.demoId,
+          observedAt: actual.observedAt,
+          controls: actual.controls
+            .filter((control) => "value" in control)
+            .slice(0, 60)
+            .map(({ label, type, value }) => ({
+              label,
+              type,
+              value: typeof value === "string" ? value.slice(0, 1024) : value,
+            })),
+          visibleText: actual.visibleText.slice(0, 8000),
+        };
   return parseInvestigationTurn(
     {
       activityId: activity.id,
-      version: 1,
+      version: activity.version,
       phase: "experiment",
-      observation: {
-        kind: "browser-queue-snapshot",
-        observedAt: new Date().toISOString(),
-        arrival: input("arrival"),
-        time: input("time"),
-        observed: input("observed"),
-        expected: metric("expected"),
-        gap: metric("gap"),
-      },
+      observation,
     },
-    investigationSource(),
+    source,
   ).observation!;
 }
-export const describeQueue = (value: QueueObservation) =>
-  `${value.arrival} events/s × ${value.time} s → expected ${value.expected} events; observed ${value.observed}; gap ${value.gap}.`;
+export const describeObservation = (value: InvestigationObservation) =>
+  value.kind === "browser-queue-snapshot"
+    ? `${value.arrival} events/s × ${value.time} s → expected ${value.expected} events; observed ${value.observed}; gap ${value.gap}.`
+    : `${value.controls.map(({ label, value }) => `${label}: ${String(value)}`).join("; ")}\n\n${value.visibleText}`;
 
-export function saveInvestigationDraft(draft: Draft) {
+export function restoreInvestigationControls(
+  draft: InvestigationDraft,
+  activity: ReadingActivity,
+) {
+  // Only the queue has a faithful, reversible input-only restoration. Other demos
+  // may have action histories: retain their dated snapshots without replaying actions.
+  if (
+    activity.id !== queueInvestigation.id ||
+    draft.current?.kind !== "browser-queue-snapshot"
+  )
+    return;
+  const root = document.getElementById(activity.demoId!);
+  if (!root) return;
+  for (const name of ["arrival", "time", "observed"] as const) {
+    const input = root.querySelector<HTMLInputElement>(
+      `[data-little-law-input="${name}"]`,
+    )!;
+    input.value = String((draft.current as QueueObservation)[name]);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
+export function saveInvestigationDraft(
+  draft: InvestigationDraft,
+  activity: ReadingActivity,
+  active = true,
+) {
+  draft.updatedAt = new Date().toISOString();
   try {
-    sessionStorage.setItem(key(), JSON.stringify(draft));
+    const key = investigationKey(draft.source, activity);
+    let serialized = JSON.stringify(draft);
+    // Escaped demo text and two snapshots can exceed the tab-record budget.
+    // Keep the learner's writing and conversation; a new observation is explicit.
+    if (serialized.length > maxDraftLength)
+      serialized = JSON.stringify({
+        ...draft,
+        current: undefined,
+        lastSent: undefined,
+      });
+    if (serialized.length > maxDraftLength) return;
+    sessionStorage.setItem(key, serialized);
+    if (active)
+      sessionStorage.setItem(
+        cockpitBookmark,
+        JSON.stringify({
+          key,
+          source: draft.source,
+          activityId: activity.id,
+          open: draft.open,
+        }),
+      );
+    // Bounded tab history, not a durable notebook or an inferred learner profile.
+    const keys = Object.keys(sessionStorage).filter((item) =>
+      item.startsWith(prefix),
+    );
+    if (keys.length > 30) {
+      const oldest = keys
+        .filter((item) => item !== key)
+        .sort((a, b) => {
+          try {
+            return JSON.parse(
+              sessionStorage.getItem(a)!,
+            ).updatedAt.localeCompare(
+              JSON.parse(sessionStorage.getItem(b)!).updatedAt,
+            );
+          } catch {
+            return 0;
+          }
+        });
+      for (const item of oldest.slice(0, keys.length - 30))
+        sessionStorage.removeItem(item);
+    }
   } catch {
     /* Memory-only fallback. */
   }
+}
+export function recentInvestigations(): {
+  source: LearningSource;
+  activityId: string;
+  phase: string;
+  updatedAt: string;
+}[] {
+  const result = [];
+  try {
+    for (const key of Object.keys(sessionStorage)
+      .filter((item) => item.startsWith(prefix))
+      .slice(0, 100)) {
+      try {
+        const raw = sessionStorage.getItem(key)!;
+        if (raw.length > maxDraftLength) continue;
+        const saved = JSON.parse(raw);
+        if (
+          saved.version !== 2 ||
+          typeof saved.updatedAt !== "string" ||
+          typeof saved.activityId !== "string"
+        )
+          continue;
+        const source = parseLearningSource(saved.source);
+        if (new URL(source.url).origin !== location.origin) continue;
+        result.push({
+          source,
+          activityId: saved.activityId,
+          phase: saved.phase,
+          updatedAt: saved.updatedAt,
+        });
+      } catch {
+        /* Ignore invalid tab records. */
+      }
+    }
+  } catch {
+    /* Tab storage is optional. */
+  }
+  return result
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .slice(0, 10);
 }

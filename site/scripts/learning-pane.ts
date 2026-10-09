@@ -15,6 +15,7 @@ import {
 } from "./learning-session.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
 import { prepareLearningHelp } from "./learning-agent-ui.ts";
+import { requestLearning } from "./learning-actions.ts";
 import { concepts } from "../../shared/concepts.ts";
 import {
   sourceLink,
@@ -342,6 +343,23 @@ export function createLearningPane(
         ? "Discuss selected text"
         : "Use selected text";
     container.replaceChildren();
+    container.append(
+      button("Open learning cockpit", () =>
+        requestLearning({
+          kind: "investigate",
+          activityId: "learning-loop",
+          ...(experience === "assistant" && assistant
+            ? {
+                draft: {
+                  source: assistant.source,
+                  question: assistant.question,
+                  noteIds: [...selected],
+                },
+              }
+            : {}),
+        }),
+      ),
+    );
     updateAssistantRecords = undefined;
     if (!connected && view !== "connect") {
       container.append(
@@ -693,6 +711,20 @@ export function createLearningPane(
           };
           navigate("write");
         }),
+      );
+      card.append(
+        button("Explore and reflect", () =>
+          requestLearning({
+            kind: "investigate",
+            activityId: "learning-loop",
+            draft: {
+              source: entry.source,
+              question:
+                "Help me revisit this selected note, test one assumption and reflect on what I can explain now.",
+              noteIds: [entry.id],
+            },
+          }),
+        ),
       );
       card.append(
         button("Revisit", () => {

@@ -83,10 +83,12 @@ for (const native of [false, true])
       await page.goto("/chapters/benchmarking/#demo-queue-balance-lab");
       const activity = page.locator("[data-reading-investigation]");
       await expect(
-        activity.getByRole("button", { name: "Explore this idea" }),
+        page.locator('[data-investigate-demo="demo-queue-balance-lab"]'),
       ).toBeVisible();
       expect(privateRequests).toEqual([]);
-      await activity.getByRole("button", { name: "Explore this idea" }).click();
+      await page
+        .locator('[data-investigate-demo="demo-queue-balance-lab"]')
+        .click();
       await expect(
         activity.getByRole("button", { name: "Discuss my prediction" }),
       ).toBeDisabled();
@@ -242,7 +244,7 @@ for (const native of [false, true])
         .click();
       await page.reload();
       await expect(
-        activity.getByRole("button", { name: "Explore this idea" }),
+        page.locator('[data-investigate-demo="demo-queue-balance-lab"]'),
       ).toBeVisible();
       await expect(page.locator(".learning-workspace")).toHaveCount(0);
     } finally {
@@ -258,7 +260,9 @@ test("direct explanations, incompatible companions and connection failures retai
 }) => {
   await page.goto("/chapters/benchmarking/#demo-queue-balance-lab");
   const activity = page.locator("[data-reading-investigation]");
-  await activity.getByRole("button", { name: "Explore this idea" }).click();
+  await page
+    .locator('[data-investigate-demo="demo-queue-balance-lab"]')
+    .click();
   await activity
     .getByLabel("My prediction or uncertainty")
     .fill("I am unsure about the boundary.");

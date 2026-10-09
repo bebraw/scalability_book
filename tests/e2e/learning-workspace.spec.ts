@@ -906,7 +906,7 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   );
 });
 
-test("whole-book entry points keep the notebook lazy and exclude administrative/course records", async ({
+test("whole-book entry points keep learning tools lazy and exclude administrative records", async ({
   page,
 }) => {
   const routes = new Set(
@@ -920,6 +920,7 @@ test("whole-book entry points keep the notebook lazy and exclude administrative/
   routes.add("/explore/");
   routes.add("/demos/");
   routes.add("/notebook/setup/");
+  routes.add("/course/");
   for (const route of routes) {
     await page.goto(route);
     await expect(
@@ -932,6 +933,7 @@ test("whole-book entry points keep the notebook lazy and exclude administrative/
         .locator(".site-header")
         .getByRole("button", { name: "Teaching assistant", exact: true }),
     ).toBeVisible();
+    await expect(page.locator("[data-learning-cockpit]")).toBeVisible();
     await expect(page.locator(".learning-workspace")).toHaveCount(0);
     await expect(page.locator(".paragraph-notebook-button")).toHaveCount(0);
     expect(

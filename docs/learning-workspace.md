@@ -32,8 +32,8 @@ The source and prepared message survive companion connection recovery and book n
 
 The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
 The whole-book Notebook and Teaching assistant entry points load the shared coordinator and independently rendered panels on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
-Both header entries remain available to every reader; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
-The header groups compact notebook and question-bubble icons after primary navigation, with visible **Notebook** and **Assistant** captions and full accessible names.
+Notebook and Assistant remain available beside the Cockpit entry; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
+The header groups compact notebook and question-bubble icons after primary navigation, with visible **Cockpit**, **Notebook** and **Assistant** captions and full accessible names.
 Each visible panel highlights its launcher and exposes its expanded state; choosing it again closes only that panel without discarding drafts.
 Escape or the panel's close button returns keyboard focus to that experience's launcher when focus was inside the panel.
 Opening either experience captures the selection before loading/focusing the interface.
@@ -99,42 +99,72 @@ The website/Worker never owns this private notebook or provider credentials.
 
 ## Explore an idea in the reading
 
-The queue balance lab in Benchmarking and the demo gallery offers **Explore this idea** directly below its controls.
-Activation opens a three-phase exploration in the reading flow: **Predict**, **Experiment** and **Reflect**.
+**Learning cockpit** is the common learning loop across readings, appendices, part introductions, concepts, explorations, case studies, project briefs, the demo gallery, Notebook setup and the student course workspace.
+The header's **Cockpit** launcher opens a source-scoped workspace in the reading flow; an explicit passage selection becomes its bounded source context.
+Every authored demo offers **Explore this idea**, opening the same cockpit beside that activity.
+**Working on** switches between the reading and demos present on the page, retaining independent writing and conversations.
+Administrative pages have no learning launchers.
+On the student course page, the cockpit captures the public page title and the student's own writing, without scraping course records, submissions or grades.
+
+The loop is **Predict → Experiment → Reflect**: state an explanation, prediction or uncertainty; perform one check; write a personal takeaway and **My next independent check**.
+Readings use the authored reading question; concepts and explorations supply their authored definition or scenario.
+Demo activities reuse their existing prediction, operation, observation and reflection prompts and assumptions.
+A check can mean revisiting a passage, comparing a hypothetical case, applying an idea to a project or operating a demo.
+**My check and evidence** is explicitly a student report, never an assertion that a browser or project test ran.
+**Explain directly** works without a prediction, and the phases remain available independently.
+The latest generated explanation stays beside the work, with source links, provider/policy metadata and conversation history.
+The authored passage and simulator remain the reference.
+
 Connect the same local companion used by Notebook and Teaching assistant; existing connections are reused.
-The companion advertises `readingActivities: [{ id: "queue-balance", version: 1 }]` in authenticated status.
-An older running companion displays a restart instruction and retains the writing; restart from the updated checkout, reconnect and check again.
-A notebook-only connection offers the existing provider setup through **Connection settings**.
-Provider configuration establishes readiness; an actual response establishes availability.
+Authenticated status advertises the supported ID/version of the general `learning-loop` and every demo activity in `readingActivities`.
+An older running companion displays a restart instruction and retains writing; restart from the updated checkout, reconnect and check again.
+A notebook-only connection supports reflection drafts and reviewed notebook saving while offering provider setup through **Connection settings**.
+An actual response, rather than configuration status, establishes provider availability.
 
-Describe a system optionally, write a prediction or uncertainty, then choose **Discuss my prediction**.
-**Explain directly** works without a prediction, and phase choices remain available without completing earlier steps.
-The latest generated explanation appears beside the lab, with source links, provider/policy metadata and a collapsible conversation history.
-The authored passage and simulator remain the reference; generated examples and next experiments are suggestions.
-Operate the existing controls yourself and choose **Discuss this result** to send a fresh snapshot of their actual displayed values.
-The snapshot contains arrival rate, mean time, observed/expected work in progress, gap and capture time; it is an illustrative browser result, not a production measurement.
-The previous sent snapshot remains separately labelled as controls change.
-If Practice hides the queue, reopen Explore before sending a result; direct explanation remains available without a new observation.
+Activation, connection, focus changes and demo controls never start a model reply or load notebook entries.
+An explicit send shares the previewed source, current writing, selected-note IDs and the current demo snapshot when available.
+No notebook entries are selected by default.
+**Shared context** shows the exact source excerpt, selected-note count and a way to clear those selections before sending.
+Checked exercises offer **Explore and reflect on this attempt**, using the existing editable attempt/checker handoff without worked answers.
+Independent practice offers **Explore this case in the learning cockpit** with a reviewed copy of the current thinking (up to 4,000 characters).
+Notebook notes offer **Explore and reflect**, deliberately selecting only that note.
+The existing panels offer **Open learning cockpit**; the assistant supplies its current source/question and deliberately selected note set.
+Peer inquiry offers **Reflect in the learning cockpit**, copying only explicitly selected contributions into a private draft and retaining the discussion reference; this does not post or change the inquiry's audience.
+These entry points prepare context, never save or send automatically.
+Opening the cockpit from a learning panel closes the overlay while retaining its unfinished writing; Notebook and Assistant actions reopen the existing panels.
 
-Activation, connection and slider changes do not start a model reply or load notebook entries.
-An explicit send shares the source, optional system description, prediction, current message and browser snapshot with the chosen provider, with no selected notes.
-During that reply the existing origin/session/browser-bound broker can service observations of this queue only.
-The inline adapter declines other demos and agent control changes; the ordinary assistant retains its existing saved-initial-thinking and approval boundary.
-The companion validates activity version, source, phase, bounds and snapshot consistency before storing a turn or calling the provider.
+Demo sends read actual visible controls and text from the existing observation bridge, not an independently simulated result.
+The queue retains its typed arrival rate, mean time, observed/expected work in progress, gap and capture time.
+Other demos use a dated `browser-demo-snapshot` with at most 60 named values (text values shortened to 1,024 characters) and 8,000 characters of displayed text.
+The preview is bounded; canvas pixels, hidden output and real project measurements are never inferred.
+Current values and the last sent snapshot are labelled separately.
+If Practice hides a demo, reopen Explore before sending a result; direct explanation remains available without a new observation.
+During an explicitly started reply, the existing origin/session/browser-bound broker services observations of the selected demo only.
+The cockpit declines other demos and control changes; the ordinary assistant retains its existing saved-initial-thinking and approval boundary for changes.
+The companion validates the activity/source/version, phase, text/observation bounds and queue arithmetic before storing a turn or calling the provider.
 Browser reports are not independently attested measurements and never grant action permissions.
-Each new student turn retains its activity context in the existing additive conversation JSON; earlier conversations are unaffected.
+Submitted activity turns remain additive JSON in the companion's existing conversation store; notebook and protocol schemas are unchanged.
+The public graph/MCP exposes the same authored loop and all demo contracts without learner state, execution or private access.
 
-Writing, phase, current controls, last sent snapshot and conversation/browser identity survive book navigation and reload in tab storage scoped to the current page and activity.
-They are not durable notebook records and do not survive closing the tab.
-**Pause this exploration** stops browser polling and leaves its draft available through **Explore this idea**.
-Use **Stop reply** to interrupt an active provider response before pausing; pausing alone does not cancel a provider's running turn.
-Connection failures retain writing and offer reconnect/check actions.
-**Start a new conversation** retains the writing and leaves the old conversation in companion history.
+The browser owns source-scoped unsent writing, phase, last sent snapshot, selected-note IDs and conversation/browser identity.
+Up to 30 loops are kept in tab storage; the ten most recent appear in **Recent learning loops in this tab** and can be resumed across book navigation.
+Each tab record is bounded to 256,000 serialized characters; oversized demo snapshots are omitted before the student's writing and conversation identity.
+The next explicit send takes a fresh browser observation.
+Selected source excerpts distinguish different passages/attempt contexts rather than overwriting one page-wide draft.
+Reload resumes the active loop on its source page; other readers retain lazy loading with no companion request.
+Queue inputs have faithful input-only restoration; other demos retain dated snapshots without replaying their actions or claiming that their prior output has been restored.
+Legacy queue drafts are read without changing notebook records.
+Tab continuity is not durable storage or a notebook backup.
+**Pause this exploration** stops browser polling and retains the draft; **Stop reply** interrupts a running provider response.
+Pausing or switching focus alone does not cancel the provider's turn.
+Connection failures retain writing; **Start a new conversation** retains writing and leaves the prior conversation in companion history.
 
-In Reflect, write **My takeaway** and choose **Prepare notebook takeaway**.
-That explicit handoff initializes Notebook, preserves its unfinished-writing confirmation and prepares an editable reflection with activity/conversation provenance and the last sent illustration.
-Only **Save note** persists a notebook entry; no activity action changes a concept judgment, course submission or grade.
-[ADR-043](adrs/implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md) records the shared activity boundary and the current single-lab scope.
+In Reflect, write **My takeaway** and optionally **My next independent check**, then choose **Prepare notebook takeaway**.
+The handoff initializes Notebook, protects its existing unfinished-writing confirmation and prepares an editable reflection containing the student's own takeaway, initial thinking, evidence, last sent snapshot and next check.
+Explicit selected notes become related-note references; activity/conversation assistance provenance is retained.
+**Start my next check** opens a separate draft from the chosen next check and the student-written takeaway, retaining the previous loop and sending nothing automatically.
+Only **Save note** creates a durable notebook entry; no cockpit action judges mastery, marks a concept, submits coursework or changes a grade.
+[ADR-044](adrs/implemented/ADR-044-generalize-the-learning-loop-through-a-contextual-cockpit.md) generalizes the first queue slice recorded in [ADR-043](adrs/implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md).
 
 ## Start the companion
 

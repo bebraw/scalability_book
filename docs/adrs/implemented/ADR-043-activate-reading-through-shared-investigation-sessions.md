@@ -69,6 +69,10 @@ The first slice uses the authored queue model and restricted reply renderer, ret
 - The 179-test unit suite, site build/types/HTML validation and packed companion installation/runtime check passed; the public retrieval acceptance check retained both protocol eras.
 - Current behavior, recovery and manual evaluation limits live in [the workspace guide](../../learning-workspace.md#explore-an-idea-in-the-reading).
 
+## Follow-up
+
+[ADR-044](ADR-044-generalize-the-learning-loop-through-a-contextual-cockpit.md) extends this first queue slice across the learning system while retaining its connection, observation and reviewed-save boundaries.
+
 ## References
 
 - [ADR-027: Companion boundary](ADR-027-connect-book-learning-to-student-agents-through-a-local-companion.md)

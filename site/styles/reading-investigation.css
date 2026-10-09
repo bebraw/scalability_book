@@ -1,4 +1,5 @@
 .reading-investigation {
+  scroll-margin-block-start: 7rem;
   overflow-wrap: anywhere;
   margin-block: 1.5rem 2.5rem;
   padding: clamp(1rem, 3vw, 1.8rem);
@@ -22,6 +23,63 @@
 }
 .reading-investigation h3 {
   margin-block: 0.3rem 0.7rem;
+}
+.reading-investigation h2 {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  line-height: 1.25;
+  margin-block: 0.3rem 0.7rem;
+}
+.cockpit-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.cockpit-heading nav {
+  display: flex;
+  gap: 0.5rem;
+}
+.reading-investigation select {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0.65rem;
+  background: var(--panel);
+  color: inherit;
+  border: 1px solid var(--border);
+  font: inherit;
+}
+.learning-loop-launch {
+  display: inline-block;
+  color: var(--accent-strong);
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 0.2rem;
+  padding: 0.6rem 1rem;
+  font: 600 0.85rem/1.3 var(--font-ui);
+  cursor: pointer;
+  margin-block: 0.5rem 1.5rem;
+}
+.learning-loop-launch:focus-visible,
+.reading-investigation select:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+.cockpit-trail {
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 0.75rem;
+}
+.reading-investigation .cockpit-trail p {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+@media print {
+  .learning-loop-launch,
+  .learning-cockpit {
+    display: none;
+  }
 }
 .reading-investigation h4 {
   font-size: 1rem;
@@ -72,12 +130,20 @@
 }
 .reading-investigation label {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.4rem;
   margin-block: 1rem;
 }
 .reading-investigation label > span {
   font-size: 0.9rem;
   font-weight: 600;
+}
+.reading-investigation .cockpit-focus {
+  display: block;
+}
+.cockpit-focus > span {
+  display: block;
+  margin-block-end: 0.4rem;
 }
 .reading-investigation textarea,
 .reading-investigation input {
