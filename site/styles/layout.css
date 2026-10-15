@@ -724,6 +724,14 @@
   grid-area: chapter;
   min-width: 0;
 }
+.guide-main {
+  margin: 0 auto;
+  max-width: 52rem;
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem;
+}
+.guide-main > .prose {
+  padding: 0;
+}
 @media (min-width: 76.0625rem) {
   .book-shell[data-layout-ready="true"] {
     transition:

@@ -121,6 +121,11 @@ test("both agent formats carry graphics, demo assumptions, and a prediction befo
   }
   const guide = renderConceptAgentGuide(graph);
   assert.match(guide, /concepts\[\]\.resourceIds/);
+  const diagram = graph.learningResources.find(
+    ({ id }) => id === "graph-little-law",
+  )!;
+  assert.ok(guide.includes(diagram.images.png));
+  assert.ok(guide.includes(lab.images.png));
   assert.match(guide, /Markdown images/);
   assert.match(guide, /static preview of the default view/);
   assert.match(guide, /an HTTP fetch does not run their JavaScript/);

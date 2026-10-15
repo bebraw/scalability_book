@@ -119,6 +119,9 @@ export function renderConceptAgentGuide(graph: ExportedGraph): string {
   const queueLab = graph.learningResources.find(
     ({ id }) => id === "demo-queue-balance-lab",
   )!;
+  const littleLawGraph = graph.learningResources.find(
+    ({ id }) => id === "graph-little-law",
+  )!;
   return `# Exploring ${graph.title} with your own agent
 
 Choose your own question or start with one of the activities below. The chapters offer a concise narrative; course tasks motivate deeper exploration through your agent and the knowledge graph. Connecting the data, inspecting retrieval, and evaluating the explanation are part of the learning.
@@ -207,6 +210,8 @@ The same operations can be implemented as local file queries, HTTP-backed tools,
 Look up a concept's \`resourceIds\` in \`learningResources\`. Each concept has a labelled image of its neighborhood; \`graph-complete\` provides the full map. Book diagrams and gallery demos are also mapped to the concepts they teach. Choose a relevant aid rather than returning every resource.
 
 Return the image URL with its alt text, caption, assumptions, and source URL. For clients that support Markdown images, use \`![alt text](PNG URL)\`; otherwise return a descriptive link. SVGs are available for vector-capable clients and download. A text-only retrieval tool may fetch image bytes without being able to inspect or display them; describe your actual capabilities and do not claim to have visually checked an image you only linked.
+
+For a direct image check, open the [Little's Law connection diagram](${littleLawGraph.images.png}) or the [queue balance lab's static preview](${queueLab.images.png}) in a browser. The guide supplies instructions; graphics are separate files. An image that loads there is available, even when an agent's retrieval or display path cannot use it. If a URL-reading tool rejects Markdown, use the public MCP server or download the guide and graph for a file-capable agent. Report retrieval and display failures separately.
 
 For a demo, show the \`experiment.predict\` prompt first and let the student state a prediction. Then provide the demo URL, \`controls\`, and \`try\`, \`observe\`, and \`reflect\` prompts. The PNG is a static preview of the default view, not a recorded result of the student's experiment. Current UI and saved input state can differ. Open the actual demo to check behavior. These links are browser interfaces, not simulation API endpoints; an HTTP fetch does not run their JavaScript. With browser tools, an agent can operate the demo and report the chosen controls and observed output. Without browser tools, ask the student to operate it and bring back observations.
 

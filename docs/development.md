@@ -155,6 +155,12 @@ npm run serve
 The production build emits a static site to `build/` for `scalableweb.dev`.
 The deployed site remains read-only because the editing API exists only in the local dev server.
 
+### Setup guide layout
+
+The standalone `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
+Keep code blocks and tables within that reading column at wide and narrow widths.
+Run `npx playwright test tests/e2e/book-layout.spec.ts --project=chromium --grep 'setup guides'` for the focused layout regression.
+
 ### Theme initialization
 
 The shared layout runs [the inline theme bootstrap](../scripts/lib/theme-bootstrap.ts) before loading stylesheets.

@@ -435,7 +435,7 @@ await writePage(
     description:
       "Connect your agent to the public book MCP server, or start with the Markdown guide.",
     currentUrl: "/agents/",
-    children: `<main id="content" class="chapter-main"><article class="prose">${renderMarkdown(externalAgentSetup, { number: "" }, bibliographySource).content}</article></main>`,
+    children: `<main id="content" class="chapter-main guide-main"><article class="prose">${renderMarkdown(externalAgentSetup, { number: "" }, bibliographySource).content}</article></main>`,
   }),
 );
 await writePage(
@@ -445,7 +445,7 @@ await writePage(
     description:
       "Connect a private local notebook, capture your thinking, revisit ideas and prepare existing course submissions.",
     currentUrl: "/notebook/setup/",
-    children: `<main id="content" class="chapter-main"><article class="prose">${renderMarkdown(notebookSetup, { number: "", title: "Set up your learning notebook" }, bibliographySource).content}</article></main>`,
+    children: `<main id="content" class="chapter-main guide-main"><article class="prose">${renderMarkdown(notebookSetup, { number: "", title: "Set up your learning notebook" }, bibliographySource).content}</article></main>`,
   }),
 );
 

@@ -54,8 +54,18 @@ A static preview or generated output is not evidence that the original experimen
 ## Use the guide without MCP
 
 Give your agent the [Markdown guide](/concepts/agent-guide.md), or choose an [activity starting point](/explore/).
-An agent that can fetch URLs can read these directly.
+Use a client whose retrieval tools support Markdown; some URL readers reject that format even when the file is available.
 For a file-based agent, download the guide and the [Markdown graph](/concepts/graph.md) or [JSON graph](/concepts/graph.json); supply cited reading pages separately when needed.
 No MCP connection is required for this route.
 
 If a connection or retrieval fails, ask the agent to say what it actually accessed, then use the guide or reading directly.
+
+## If a diagram does not appear
+
+The guide explains how to find graphics; the images are separate files referenced by the graph.
+Ask your agent which image URL it retrieved and whether its client can inspect or display images.
+For a direct check, open the [Little's Law connection diagram](/concepts/visuals/graph-little-law.png) in your browser.
+A working image link confirms that the file is available; the agent's retrieval and display capabilities still need checking.
+
+If its URL reader rejects Markdown, connect through MCP or download the guide and graph and attach them to a file-capable client.
+A client that cannot display an image should return its descriptive link and source instead.

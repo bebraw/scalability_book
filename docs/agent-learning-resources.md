@@ -86,6 +86,10 @@ Each concept's `resourceIds` refer to entries in `learningResources`.
 The catalog includes a labelled neighborhood image for every concept, the complete graph, the five book diagrams, and all gallery demos.
 Resource membership helps discover teaching aids; it does not create a new concept relationship.
 
+The Markdown guide contains navigation and conversation instructions, with direct PNG links for a diagram and a static demo preview to help diagnose missing images.
+Images are separate resources; distinguish a failed HTTP retrieval from a client that cannot inspect or display them.
+Some URL readers reject `text/markdown`; the public MCP server and downloaded guide/graph files remain alternatives.
+
 `shared/demo-catalog.ts` is the gallery's source of titles, includes, and scripts.
 `shared/learning-resources.ts` supplies concept membership, captions, assumptions, controls, and prediction-led experiments.
 Keep the activity consistent with the actual demo controls and preserve the distinction between illustrative models and measured evidence.

@@ -64,6 +64,37 @@ test.describe("book reading layout", () => {
     expect(paragraphWidth).toBeLessThan(eightyCharactersWidth);
   });
 
+  test("keeps setup guides centered with contained code on wide and narrow screens", async ({
+    page,
+  }) => {
+    for (const width of [1600, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of ["/agents/", "/notebook/setup/"]) {
+        await page.goto(route);
+        const main = page.getByRole("main");
+        await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
+        const mainBox = await main.boundingBox();
+        const codeBox = await main.locator("pre").first().boundingBox();
+        expect(mainBox).not.toBeNull();
+        expect(codeBox).not.toBeNull();
+        expect(mainBox!.width).toBeLessThanOrEqual(Math.min(width, 960));
+        expect(
+          Math.abs(mainBox!.x + mainBox!.width / 2 - width / 2),
+        ).toBeLessThan(1);
+        expect(codeBox!.x).toBeGreaterThanOrEqual(mainBox!.x + 16);
+        expect(codeBox!.x + codeBox!.width).toBeLessThanOrEqual(
+          mainBox!.x + mainBox!.width - 16,
+        );
+        const overflow = await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
   test("keeps paragraph-to-list spacing in the prose rhythm", async ({
     page,
   }) => {
