@@ -10,6 +10,7 @@ import { handleLearning } from "../worker/learning.ts";
 import { handlePublicMcp } from "../worker/public-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { agentResourceHeaders } from "../shared/agent-resource-headers.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
 import { localCourseSimulation } from "./lib/local-course-simulation.ts";
 import {
@@ -721,6 +722,7 @@ async function serveStatic(response, url) {
   response.writeHead(200, {
     "Content-Type":
       contentTypes.get(path.extname(file)) || "application/octet-stream",
+    ...agentResourceHeaders(url.pathname),
     ...studyHeaders(url.pathname),
   });
   return createReadStream(file).pipe(response);

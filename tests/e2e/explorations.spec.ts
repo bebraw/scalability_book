@@ -21,6 +21,10 @@ test("task starting URLs, source anchors, and graph discovery are usable", async
     const discussion = await request.get(activity.discussionUrl);
     const page = await request.get(activity.url);
     expect(start.ok() && discussion.ok() && page.ok()).toBe(true);
+    expect(start.headers()["content-type"]).toBe("text/plain; charset=utf-8");
+    expect(discussion.headers()["content-type"]).toBe(
+      "text/plain; charset=utf-8",
+    );
     expect(await start.text()).toContain("Then wait for their answer");
     expect(await start.text()).not.toContain("# Worked reasoning:");
     expect(await discussion.text()).toContain(

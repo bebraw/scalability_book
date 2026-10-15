@@ -88,7 +88,11 @@ Resource membership helps discover teaching aids; it does not create a new conce
 
 The Markdown guide contains navigation and conversation instructions, with direct PNG links for a diagram and a static demo preview to help diagnose missing images.
 Images are separate resources; distinguish a failed HTTP retrieval from a client that cannot inspect or display them.
-Some URL readers reject `text/markdown`; the public MCP server and downloaded guide/graph files remain alternatives.
+Codex's URL reader was observed rejecting `text/markdown` before it could read the guide and discover images.
+`shared/agent-resource-headers.ts` makes the Worker and development server serve the guide, graph Markdown and activity Markdown as `text/plain; charset=utf-8`, preserving Markdown bytes, URLs and validators and requiring revalidation.
+MCP resources retain their semantic `text/markdown` type; MCP does not use the URL reader.
+The guide also directs Codex agents with terminal and image-viewing tools to download a PNG and open the local file, using the viewer's image output when remote Markdown images remain links.
+The public MCP server and downloaded guide/graph files remain alternatives for clients without a working URL reader.
 
 `shared/demo-catalog.ts` is the gallery's source of titles, includes, and scripts.
 `shared/learning-resources.ts` supplies concept membership, captions, assumptions, controls, and prediction-led experiments.

@@ -3,6 +3,7 @@ import { handleLearning, d1AnswerStore } from "./learning.ts";
 import { safeReturnTo } from "../shared/exercises.ts";
 import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
+import { agentResourceHeaders } from "../shared/agent-resource-headers.ts";
 import { handlePublicMcp } from "./public-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { handleCourses } from "./courses.ts";
@@ -350,6 +351,14 @@ export default {
         immutableAssetPattern.test(url.pathname))
     ) {
       headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    }
+
+    if (cacheable) {
+      for (const [name, value] of Object.entries(
+        agentResourceHeaders(url.pathname),
+      )) {
+        headers.set(name, value);
+      }
     }
 
     for (const [name, value] of Object.entries(studyHeaders(url.pathname))) {

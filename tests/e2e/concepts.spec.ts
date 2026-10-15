@@ -101,10 +101,12 @@ test("students can retrieve the graph and check its evidence with their own tool
 
   const guideResponse = await request.get(guideUrl);
   expect(guideResponse.ok()).toBe(true);
-  expect(guideResponse.headers()["content-type"]).toContain("text/markdown");
+  expect(guideResponse.headers()["content-type"]).toBe(
+    "text/plain; charset=utf-8",
+  );
   const guide = await guideResponse.text();
   expect(guide).toContain("Choose your own question");
-  expect(guide).toContain("not an MCP server endpoint");
+  expect(guide).toContain("endpoint implements MCP");
   expect(guide).toContain(new URL("/concepts/graph.json", baseURL).href);
   const index = await request.get("/llms.txt");
   expect(index.ok()).toBe(true);
@@ -116,8 +118,8 @@ test("students can retrieve the graph and check its evidence with their own tool
   const graph = await dataResponse.json();
   expect(graph.schemaVersion).toBe(2);
   expect(graph.revision).toMatch(/^[a-f0-9]{64}$/);
-  expect(graph.concepts).toHaveLength(45);
-  expect(graph.relationships).toHaveLength(102);
+  expect(graph.concepts).toHaveLength(46);
+  expect(graph.relationships).toHaveLength(110);
   expect(graph.readings).toHaveLength(conceptPages.length);
   expect(graph.semantics.relationships).toContain("undirected");
   expect(
@@ -128,6 +130,7 @@ test("students can retrieve the graph and check its evidence with their own tool
   ).toMatchObject({ direction: "directed", label: "can add waiting time to" });
   const markdown = await request.get(graph.resources.markdown);
   expect(markdown.ok()).toBe(true);
+  expect(markdown.headers()["content-type"]).toBe("text/plain; charset=utf-8");
   expect(await markdown.text()).toContain(graph.revision);
 
   // A file/HTTP retrieval tool follows either endpoint and carries its evidence.
@@ -158,7 +161,7 @@ test("agent resources return usable images, cite their source, and lead to a pre
   baseURL,
 }) => {
   const graph = await (await request.get("/concepts/graph.json")).json();
-  expect(graph.learningResources).toHaveLength(83);
+  expect(graph.learningResources).toHaveLength(84);
   const pages = new Map<string, string>();
   for (const resource of graph.learningResources as LearningResource[]) {
     expect(new URL(resource.url).origin).toBe(new URL(baseURL!).origin);
