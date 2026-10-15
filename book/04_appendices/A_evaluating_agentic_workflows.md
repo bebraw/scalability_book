@@ -11,6 +11,8 @@ Add other sections when the decision requires them:
 
 - [Retained competence](#evaluate-assistance-and-retained-competence) for comparing assistance modes when learning is part of the task's purpose.
 - [Temporary API consumers](#probe-an-api-with-temporary-clients) for checking integration behavior and API usability.
+- [Verification loops](#design-the-verification-loop) for choosing checks an agent can use during implementation and challenging their assumptions.
+- [Loop-engineering research](#research-behind-loop-engineering) for distinguishing evidence about recurring agent runs from experiments on feedback, memory, and repair.
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
 - [Cost denominators](#define-the-cost-denominator), [routing](#from-evaluation-to-routing), and [confidence checks](#check-confidence-before-routing) for efficiency decisions.
@@ -190,6 +192,80 @@ Score task success, permission compliance, unnecessary actions, side effects, an
 
 For the course project, evaluate one representative AI-assisted task twice: once for the correctness of the produced artifact and once for the quality of the workflow that produced it.
 Preserve the prompt or task brief, relevant context, model and tool versions, execution trace, checks, human corrections, and final acceptance decision.
+
+## Research behind loop engineering
+
+[Loop engineering](/concepts/#loop-engineering) connects several research questions: how agents use feedback, what progress survives another attempt, how runs are initiated and bounded, and what the resulting work costs people.
+The practitioner sources introduce an emerging label; scientific studies examine different parts of the design rather than establishing one universally effective recipe.
+
+:ref[table:loop-engineering-research]{text="The table below"} distinguishes direct research on the named practice from earlier work on its mechanisms.
+
+| Research                                                                           | What it examines                                                                                                                   | What the evidence supports and leaves open                                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Loop Engineering: Building Blocks, Adoption, and Impact :citep[lulla2026loop]      | An exploratory literature review and repository-mining study; version 2 is an under-review preprint.                               | The authors confirmed autonomous loops in 217 of 256 heuristic-matched repositories; detection can miss other designs and the controlled experiment on effort and outcomes remains proposed. |
+| Self-Refine :citep[madaan2023selfrefine]                                           | The same model generates an output, critiques it, and revises it; evaluated on seven tasks at NeurIPS 2023.                        | Reports improvements over one-step generation in the tested settings, without establishing the value of recurring unattended repository work.                                                |
+| Reflexion :citep[shinn2023reflexion]                                               | Feedback and textual reflection retained across trials, evaluated on decision-making, reasoning, and coding tasks at NeurIPS 2023. | Supports studying memory and feedback as design variables, without establishing production maintainability or developer-effort savings.                                                      |
+| Is Self-Repair a Silver Bullet for Code Generation? :citep[olausson2024selfrepair] | Repair experiments with Code Llama, GPT-3.5, and GPT-4 on HumanEval and APPS; accepted at ICLR 2024.                               | Cost-aware gains were variable and sometimes absent, while stronger feedback improved repair; iteration count alone cannot justify a repair policy.                                          |
+
+::caption[Scientific sources on loop engineering and related feedback, memory, and repair mechanisms.]
+::label[table:loop-engineering-research]
+
+These studies concern different units: a revised answer, repeated attempts at a task, or recurring repository runs.
+Treat them as related evidence and keep their task, model, budget, and outcome boundaries visible when transferring a claim.
+In particular, adoption counts cannot establish productivity, and a benchmark improvement cannot establish lower human review or maintenance cost.
+
+For a local comparison, hold the task, starting revision, model and tools, acceptance checks, and resource limits stable while changing one loop decision.
+Record accepted outcomes, unsuccessful attempts, elapsed time, resource use, and human correction or review.
+The [uncertainty guidance](#report-uncertainty-not-only-point-estimates) explains why one successful task remains a case comparison.
+
+## Design the verification loop
+
+The [Scalable Development chapter](/chapters/scalable-development/#loop-engineering) introduces loop engineering; this section develops its verification decisions.
+Begin with a claim about behavior and describe a plausible wrong outcome before choosing the check.
+For example, suppose a CSV export must contain only events the requesting user may read.
+A downloaded file can have valid syntax while including another workspace's events; checking that the download occurred would miss that fault.
+Define the expected event identities and permitted fields from the task contract before implementing the exporter.
+
+:ref[table:verification-loop-checks]{text="The table below"} compares checks for that example and an exporter replacement.
+Use the combination that resolves the uncertainty in the change.
+
+| Check          | Example observation                                                                                                                                        | Evidence limit                                                                     |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| End-to-end     | Seed synthetic permitted and forbidden events, export through the interface, and inspect the downloaded rows against independently specified expectations. | Establishes the asserted behavior for the exercised users, data, and environment.  |
+| Property-based | Generate event values and permission assignments; check that exported identities stay within the permitted set and field values survive CSV quoting.       | Depends on the correctness of the properties and the cases the generators explore. |
+| Differential   | For a replacement exporter, compare parsed old and new output on the same inputs, allowing only documented intentional differences.                        | Establishes compatibility on those inputs; the old exporter may contain defects.   |
+
+::caption[Complementary checks for a CSV exporter and the claims their results support.]
+::label[table:verification-loop-checks]
+
+For differential checks, normalize only differences the contract makes irrelevant; compare raw output too when byte-level compatibility matters.
+Investigate mismatches before deciding whether to repair a regression or document an intended behavior change.
+
+### Challenge the check itself
+
+Executing a check separately does not make its assumptions independent of the implementation.
+An expected result calculated with the exporter's own access filter can reproduce its bug.
+Use separately specified fixtures or a simpler reference rule, and inspect generated tests alongside generated code.
+For a consequential check, state one named fault it should detect and confirm that it fails when that fault is introduced reversibly.
+The [concern-directed mutation lab](/chapters/scalable-development/#constrain-generate-validate-revise) also checks that a behavior-preserving implementation change still passes.
+This challenges both false acceptance and tests coupled too tightly to one implementation.
+A fresh reviewer can help identify assumptions, but agreement between reviewers still needs behavioral evidence.
+
+### Make repair repeatable and acceptance explicit
+
+Keep a small repair loop near the changed behavior, then run the relevant integration and user-flow checks before acceptance.
+Control clocks, network responses, and starting state where they affect reproducibility.
+Record generated-input seeds so a failure can be replayed; deliberately vary seeds across additional runs to explore more cases.
+Preserve reduced failing inputs as regression cases when they protect a meaningful boundary.
+
+Keep the first failure and investigate whether it belongs to the product, test, or environment.
+A later passing retry alone does not explain an intermittent failure.
+Report unresolved instability and the acceptance claim it limits.
+Useful failure output identifies the expected and observed behavior, the reproducing input, and relevant runtime evidence.
+
+Review the final change for ownership, dependency direction, and maintenance consequences beyond the assertions.
+Record which revision and environment were checked, the results, and material omissions.
+Stop when the agreed evidence is sufficient for the change's consequences; add another check when it resolves a concrete uncertainty.
 
 ## Report uncertainty, not only point estimates
 

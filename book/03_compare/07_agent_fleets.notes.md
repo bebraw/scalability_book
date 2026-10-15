@@ -13,6 +13,9 @@ Keep Amdahl’s Law, integration failure, correction, and measured coordination 
 Distinguish executing agents from started changes awaiting human acceptance; the optional work-in-progress comparison varies admission while keeping the worker limit fixed and records actual concurrency separately.
 The memory, contract-completeness, and human review-gate exercises are linked extensions in Appendix D.
 
+Revisit the [secondary teaching intention](../00_introduction.notes.md#secondary-teaching-intention-from-prompting-to-loops): show how an existing workflow can continue, verify, and repair within a budget without a fresh human prompt for every routine step.
+Use this as a teaching opportunity within the existing fleet work, with explicit escalation and human acceptance.
+
 ## Notes for further development
 
 - Add a small trace-transformation example that maps an export from the assigned fleet harness to the common project model.

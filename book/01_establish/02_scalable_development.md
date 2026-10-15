@@ -49,7 +49,23 @@ The change is that a probabilistic tool-using system can perform more of the imp
 The event tracker could use BDD scenarios to define acceptance, generate an API client from a schema, and delegate implementation to an agent.
 Across these patterns, a requested outcome still has to become a checked change someone can maintain.
 
-## Constrain, generate, validate, revise
+## Loop engineering
+
+**[Loop engineering](/concepts/#loop-engineering)** is the design of control structures that repeatedly direct agent work toward a declared goal, using observations, retained state, bounded actions and resources, and explicit acceptance, stopping, and escalation rules.
+A [feedback loop](/concepts/#feedback-loop) describes how effects influence subsequent behavior.
+An agent harness runs the model-and-tool cycle; a project harness supplies maintained project knowledge and checks.
+Loop engineering connects these controls to decisions about starting work, continuing after an observation, retaining progress, and returning a result for acceptance.
+
+Osmani's practitioner account and IBM's industry explainer frame the practice around systems that direct agent work with less repeated human prompting :citep[osmani2026loop,belcic2026loop].
+An exploratory research preprint uses a narrower definition requiring scheduled or event-triggered recurring runs :citep[lulla2026loop].
+Here, the term also covers bounded goal-driven iteration within a session, with people participating in feedback and acceptance.
+Schedules and fleets are optional choices; neither establishes that a loop is useful.
+
+For each loop, name its trigger, goal, allowed actions, state owner, evidence, resource budget, and conditions for success, unsuccessful termination, or human escalation.
+Retained progress should distinguish attempted work from verified outcomes so another iteration does not silently repeat a failed approach or treat an unchecked patch as complete.
+The [research discussion in Appendix A](/appendices/evaluating-agentic-workflows/#research-behind-loop-engineering) separates adoption evidence from experiments on refinement and repair.
+
+### Constrain, generate, validate, revise
 
 Agentic development follows a [repeated loop](/concepts/#feedback-loop): constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
 This is a corrective feedback loop: evidence of a deviation informs the next revision.
@@ -97,6 +113,20 @@ The concern-directed mutation lab lets you apply both checks to authorization, r
 
 **Revise.** Correct the candidate and preserve the lesson in requirements, tests, architectural decisions, or project instructions.
 The next attempt should begin with better information about the failure.
+
+### Engineer the verification loop
+
+In a practitioner essay, :citet[osmani2026verification] emphasizes giving agents executable feedback during implementation.
+Verification is one part of loop engineering: decide what evidence justifies accepting the result.
+
+For CSV export, observing a download establishes less than inspecting its rows against the permitted events and fields.
+An agent that writes both the exporter and its checks can repeat the same mistaken access rule in both.
+Ground expected results in the agreed contract and ask which plausible wrong outcome each check would reject.
+Keep failures reproducible, use focused checks during repair, and run broader checks before integration.
+
+Passing checks still leaves ownership, dependency boundaries, and future change costs to review.
+Judge a loop improvement by accepted behavior and the correction effort it requires, including failed attempts.
+[Appendix A](/appendices/evaluating-agentic-workflows/#design-the-verification-loop) develops check selection, failure preservation, and the limits of the evidence.
 
 ### Constraint feedback loop
 

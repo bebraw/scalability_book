@@ -14,6 +14,24 @@ Review correctness against a concrete user action and outcome, including relevan
 For bugs, reproduce and minimize the trigger before fixing the cause; add a regression test when a stable boundary makes it useful.
 Prefer tests of observable behavior over checks that repeat private implementation details.
 
+## Engineer the verification loop
+
+Before implementation, state the observable acceptance criteria and one plausible wrong outcome a check should reject.
+For a bug, establish a failing reproduction before changing the implementation.
+Ground expected results in the owning contract, independently specified examples, or domain invariants; avoid calculating expectations with the same production logic under test.
+Review agent-generated checks for shared assumptions and whether they tolerate behavior-preserving changes.
+The [book's verification-loop method](../book/04_appendices/A_evaluating_agentic_workflows.md#design-the-verification-loop) explains complementary end-to-end, property-based, and differential checks.
+
+Keep repair runs focused and reproducible with isolated state, controlled external inputs, and recorded random seeds where applicable.
+Additional generated-input runs can vary seeds; retain meaningful reduced failures as regression cases.
+Preserve the first failure and distinguish product defects from test or environment failures; a passing retry alone does not resolve intermittent behavior.
+Run the affected-surface checks below before acceptance, and report unresolved instability or omitted verification.
+
+Review ownership, dependency direction, and maintenance consequences alongside behavioral evidence.
+Bind reported checks to the revision and environment they exercised.
+Improve the loop when a recurring failure exposes a missing constraint, diagnostic, or check; assess the improvement through accepted outcomes and correction effort.
+Use existing tools and scale the evidence to the change, including manual inspection for reversible prose edits.
+
 ## Verification by change
 
 Use targeted checks during iteration, then verify the affected surface before declaring the change ready.

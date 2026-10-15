@@ -240,6 +240,7 @@ Also notice that useful domain spans and attributes require conscious instrument
 
 Observe the development workflow as well as the application.
 In both, outcome checks establish what worked and traces help explain the path to that result.
+Use these evidence roles to evaluate [loop engineering](/concepts/#loop-engineering): changing a trigger, repair policy, or stop condition needs outcome and effort evidence, including unsuccessful runs.
 
 | Evidence role         | Web application                                         | Agentic development workflow                               |
 | --------------------- | ------------------------------------------------------- | ---------------------------------------------------------- |

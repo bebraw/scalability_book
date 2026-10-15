@@ -139,6 +139,7 @@ const figures = [
     title: "Three connected scalability loops",
     conceptIds: [
       "scalability",
+      "loop-engineering",
       "pressure",
       "agent",
       "queue",
@@ -198,7 +199,13 @@ const activities: Record<string, Activity> = {
       "Inspect the generated direction and identify the evidence still needed to test it.",
   },
   "Constraint feedback loop": {
-    conceptIds: ["agent", "harness", "acceptance-criteria", "feedback-loop"],
+    conceptIds: [
+      "agent",
+      "loop-engineering",
+      "harness",
+      "acceptance-criteria",
+      "feedback-loop",
+    ],
     caption:
       "Generate a CSV-export candidate under explicit constraints, then inspect the validation feedback.",
     controls: [
@@ -534,6 +541,7 @@ const activities: Record<string, Activity> = {
   "Workflow loop": {
     conceptIds: [
       "feedback-loop",
+      "loop-engineering",
       "harness",
       "development-friction",
       "agent",
@@ -625,6 +633,7 @@ const activities: Record<string, Activity> = {
   "Agent fleet delegation": {
     conceptIds: [
       "agent-fleet",
+      "loop-engineering",
       "agent",
       "task-graph",
       "harness",

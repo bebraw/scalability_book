@@ -31,6 +31,8 @@ Review ownership when a module becomes difficult to change; split by responsibil
 
 For a bug, reproduce a concrete trigger, reduce it, fix the cause, and verify the observable result.
 Add a regression test when it protects meaningful behavior at a stable boundary.
+Ground expected results in the owning contract and choose checks that reject a plausible wrong outcome.
+Review generated checks for assumptions shared with the implementation; preserve and explain failures rather than accepting a passing retry alone.
 Use the smallest relevant checks while iterating and the development guide's checks before calling the work ready.
 Do not add tests that merely repeat the implementation or introduce tooling solely to check a reversible prose edit.
 

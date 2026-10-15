@@ -186,6 +186,7 @@ The result does not show that every clean-code rule improves every task, but it 
 
 ## Match feedback to the changed boundary
 
+This is a [loop engineering](/concepts/#loop-engineering) decision: choose observations and repair steps that resolve uncertainty while keeping final acceptance explicit.
 Validation can itself become a source of friction.
 A ten-minute clean-install or browser suite may provide valuable release evidence while being a poor response to every saved file.
 Conversely, a fast test that never crosses the changed boundary can create confidence without useful coverage.

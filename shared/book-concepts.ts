@@ -284,6 +284,55 @@ export const bookConcepts: Concept[] = [
     },
   ),
   concept(
+    "loop-engineering",
+    "Loop engineering",
+    "Development",
+    "The design of control structures that repeatedly direct agent work toward a declared goal, using observations, retained state, bounded actions and resources, and explicit acceptance, stopping, and escalation rules.",
+    "Name the trigger, goal, permitted actions, state owner, evidence, budget, and human acceptance responsibility. Retain relevant progress between iterations or runs; recurrence and delegation are separate design choices.",
+    "A CSV-export repair loop gives an agent the failing input and a bounded task, records the attempted fix, and checks downloaded rows against permitted events and fields. It returns evidence for acceptance or escalates when the repair budget is exhausted.",
+    "Repeating a prompt, adding a schedule, or assigning another reviewer guarantees improvement. A loop can repeatedly pursue the wrong goal or pass checks that share its mistaken assumptions.",
+    [
+      [
+        "Development: design the loop",
+        "/chapters/scalable-development/#loop-engineering",
+        "Distinguish loop design from feedback and harness infrastructure.",
+      ],
+      [
+        "Appendix A: research and evidence",
+        "/appendices/evaluating-agentic-workflows/#research-behind-loop-engineering",
+        "Separate adoption evidence, refinement experiments, and claims about developer effort.",
+      ],
+      [
+        "Friction: match feedback to the boundary",
+        "/chapters/friction/#match-feedback-to-the-changed-boundary",
+        "Choose useful repair feedback without weakening final acceptance.",
+      ],
+      [
+        "Fleets: choose coordination deliberately",
+        "/chapters/agent-fleets/#choose-a-coordination-structure",
+        "Add delegation only when the task and acceptance arrangement justify it.",
+      ],
+    ],
+    {
+      note: "Loop engineering is an emerging practitioner term. This book includes bounded goal-driven iteration as well as recurring agent runs. Lulla and colleagues use a narrower definition requiring scheduled or event-triggered recurrence. The label does not establish that greater autonomy improves outcomes.",
+      sources: [
+        {
+          label: "Osmani: Loop Engineering (practitioner essay)",
+          href: "https://addyosmani.com/blog/loop-engineering/",
+        },
+        {
+          label: "IBM: What is loop engineering? (industry explainer)",
+          href: "https://www.ibm.com/think/topics/loop-engineering",
+        },
+        {
+          label:
+            "Lulla et al.: building blocks and adoption (exploratory preprint)",
+          href: "https://arxiv.org/abs/2608.21884v2",
+        },
+      ],
+    },
+  ),
+  concept(
     "harness",
     "Project harness",
     "Development",

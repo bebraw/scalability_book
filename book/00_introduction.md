@@ -27,6 +27,9 @@ Developers can now delegate substantial parts of implementation, moving more of 
 Agents are also becoming consumers of web applications through browsers, APIs, and tools.
 This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.
 
+[Loop engineering](/concepts/#loop-engineering) is a central practice in that development system: designing how agent work starts, uses feedback and retained progress, stays within authority and resource limits, and stops or escalates.
+The book follows these choices from one agent's repair loop through fleet coordination and the evidence needed to accept a change.
+
 While developing this book, I built projects whose complexity would previously have kept me from attempting them.
 The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), and [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/).
 Each taught me something different: generation can outpace product judgment, architecture can lag behind implementation, and deliberately narrow scope can turn the same capability into dependable software.

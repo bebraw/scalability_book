@@ -7,6 +7,18 @@
 5. Point course participants to the project introduction, which centralizes submission checkpoints, assistance and acceptance evidence, external contributions, and retained learning outside the main book content.
 6. Map each chapter to the evidence or decision it contributes to the final synthesis.
 
+## Secondary teaching intention: from prompting to loops
+
+A hoped-for side effect of the course is that students become able to develop bounded agent loops and need less incessant prompting for routine continuation, checking, and repair.
+Keep this as a reminder for teaching, separate from the official learning outcomes, required submissions, and grading criteria.
+
+While discussing the existing project work, ask which recurring prompt could become a maintained instruction, a check, or a rule for continuing, stopping, or escalating.
+Use Establish to make the human-guided loop visible, Challenge to notice repeated interventions, and Compare to show how a reusable workflow can take over those routine steps.
+Work within each phase's assigned tools and coordination limits; a reusable loop can use one agent.
+
+The desired shift is fewer prompts that merely tell the agent what routine step comes next, while students retain the understanding and judgment to set the goal, challenge the evidence, and accept or redirect the work.
+Use the final discussion to revisit that possibility, without adding a new deliverable or treating less human intervention as automatically better.
+
 ## Project artifacts
 
 Each chapter should help you produce or revise one concrete project artifact.

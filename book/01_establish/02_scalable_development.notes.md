@@ -48,6 +48,12 @@ After this chapter, students should be able to:
 - Separate a prototype's demonstrated behavior from the data access, deployment authority, recovery, and support obligations of shared use; use the optional exploration without adding required project scope.
 - Connect development practices to implementations A, B, and C and the development setup used for each.
 
+## Secondary teaching reminder
+
+Introduce loop engineering as a step toward the [secondary teaching intention](../00_introduction.notes.md#secondary-teaching-intention-from-prompting-to-loops) of reducing repetitive prompting.
+Use the CSV-export example to distinguish a prompt supplying new judgment from one that could become a reusable instruction or verification step.
+Keep this outside the chapter's learning-goal list and the official assessment contract.
+
 ## Notes for further development
 
 - The full development-approaches chronology is archived below; the chapter now compares three composable control patterns.

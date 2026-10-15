@@ -15,6 +15,7 @@ export const conceptPages: ConceptPage[] = [
       "scalability",
       "pressure",
       "agent",
+      "loop-engineering",
       "harness",
       "benchmark",
       "trade-off",
@@ -43,6 +44,7 @@ export const conceptPages: ConceptPage[] = [
     title: "2 · Scalable development",
     concepts: [
       "agent",
+      "loop-engineering",
       "harness",
       "decision-log",
       "authority",
@@ -61,6 +63,7 @@ export const conceptPages: ConceptPage[] = [
     title: "3 · Measurement",
     concepts: [
       "measurement-boundary",
+      "loop-engineering",
       "benchmark",
       "decision-log",
       "throughput",
@@ -97,6 +100,7 @@ export const conceptPages: ConceptPage[] = [
     title: "5 · Friction",
     concepts: [
       "development-friction",
+      "loop-engineering",
       "technical-debt",
       "decision-reversibility",
       "decision-log",
@@ -134,6 +138,7 @@ export const conceptPages: ConceptPage[] = [
     title: "7 · Agent fleets",
     concepts: [
       "agent-fleet",
+      "loop-engineering",
       "task-graph",
       "authority",
       "decision-log",
@@ -171,6 +176,7 @@ export const conceptPages: ConceptPage[] = [
     title: "9 · Recap",
     concepts: [
       "scalability",
+      "loop-engineering",
       "feedback-loop",
       "decision-log",
       "queue",
@@ -188,6 +194,7 @@ export const conceptPages: ConceptPage[] = [
     title: "A · Agent evaluation",
     concepts: [
       "eval",
+      "loop-engineering",
       "benchmark",
       "acceptance-criteria",
       "reliability",

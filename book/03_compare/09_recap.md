@@ -26,6 +26,7 @@ Identify what made the change difficult and which lesson became an executable ch
 ### The agentic loop: turn execution into accepted change
 
 The [constrain–generate–validate–revise loop](/concepts/#feedback-loop) allocates authority, produces a candidate, checks it, and corrects failures.
+[Loop engineering](/concepts/#loop-engineering) designs how that work begins, retains progress, responds to observations, and stops or escalates within its authority and budget.
 Its trace exposes attempts, handoffs, and human intervention that the final repository can hide.
 Determine whether delegation reduced completion time through acceptance or moved effort into integration and [review](/concepts/#review-budget).
 

@@ -17,6 +17,8 @@ This chapter follows a fleet from task decomposition through integration, correc
 
 ## Choose a coordination structure
 
+[Loop engineering](/concepts/#loop-engineering) governs how agent work starts, retains progress, uses checks, and stops or escalates.
+A fleet is one possible execution arrangement within that design; single-agent loops also need those controls.
 A fleet should be an answer to the shape of the work, not the starting assumption.
 Begin with the smallest coordination structure that can complete the task.
 :ref[table:fleet-coordination-options]{text="The table below"} compares options by the work they support and the costs they introduce.
