@@ -94,6 +94,12 @@ MCP resources retain their semantic `text/markdown` type; MCP does not use the U
 The guide also directs Codex agents with terminal and image-viewing tools to download a PNG and open the local file, using the viewer's image output when remote Markdown images remain links.
 The public MCP server and downloaded guide/graph files remain alternatives for clients without a working URL reader.
 
+Post-deployment verification on 2026-10-15 retrieved the current guide and graph through direct HTTP and decoded the linked diagram and demo PNGs; the local image viewer displayed the downloaded diagram.
+The hosted URL reader continued reporting the earlier `text/markdown` error after the live response had changed to `text/plain`.
+Codex [defaults to cached web search](https://learn.chatgpt.com/docs/web-search#configure-local-web-search), and the inspected user configuration had no search-mode override.
+The setup guide therefore supplies a direct-HTTP and local-image-viewer prompt, and the agent guide distinguishes cached lookup failures from live HTTP failures.
+These checks establish a working retrieval/display route; they do not establish that the hosted reader's cache has refreshed or that every client renders remote Markdown images.
+
 `shared/demo-catalog.ts` is the gallery's source of titles, includes, and scripts.
 `shared/learning-resources.ts` supplies concept membership, captions, assumptions, controls, and prediction-led experiments.
 Keep the activity consistent with the actual demo controls and preserve the distinction between illustrative models and measured evidence.

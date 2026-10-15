@@ -58,6 +58,14 @@ The Markdown files are served as UTF-8 plain text for compatibility with URL rea
 For a file-based agent, download the guide and the [Markdown graph](/concepts/graph.md) or [JSON graph](/concepts/graph.json); supply cited reading pages separately when needed.
 No MCP connection is required for this route.
 
+Codex uses [cached web search by default](https://learn.chatgpt.com/docs/web-search#configure-local-web-search), so a pasted URL can produce an old response or appear unavailable.
+Ask it to use direct HTTP retrieval when you need the current files:
+
+> Read https://scalableweb.dev/concepts/agent-guide.md using `curl`, follow its graph link, then download the Little's Law PNG and show it with your local image viewer.
+> Cite the source URL.
+
+The Codex CLI also supports `codex --search` for live web search.
+
 If a connection or retrieval fails, ask the agent to say what it actually accessed, then use the guide or reading directly.
 
 ## If a diagram does not appear
