@@ -93,6 +93,7 @@ No accepted decisions are currently awaiting implementation.
 | [ADR-042](implemented/ADR-042-expose-public-learning-material-through-stateless-mcp.md)             | Expose bounded public learning retrieval and experiment guidance through stateless MCP, retaining Markdown and companion privacy boundaries.      |
 | [ADR-043](implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md)            | Activate the queue-lab reading through shared activity context, actual browser observations, adapted explanations and reviewed notebook handoffs. |
 | [ADR-044](implemented/ADR-044-generalize-the-learning-loop-through-a-contextual-cockpit.md)         | Generalize source-scoped thinking, checks, reflection and independent next steps across learning surfaces through one contextual cockpit.         |
+| [ADR-045](implemented/ADR-045-check-published-links-during-verification.md)                         | Check candidate-build targets and external missing pages during validation, explicit deployment and recurring CI.                                 |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

@@ -16,6 +16,37 @@ const camera = (graphic: Locator) =>
 const sameScreenPosition = (actual: number, expected: number, scale: number) =>
   expect(Math.abs(actual - expected) * scale).toBeLessThan(1);
 
+test("the Coding agent card and agent guide retain distinct accessible names without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    baseURL,
+    javaScriptEnabled: false,
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto("/concepts/");
+    await page.locator("#concept-explorer > summary").click();
+    await page.locator('[data-concept-select="agent"]').click();
+    const card = page.locator('[data-concept-card="agent"]');
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAccessibleName("Coding agent");
+    await expect(page.locator(".concept-agent")).toHaveAccessibleName(
+      "Explore with your own agent",
+    );
+    const duplicateIds = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll("[id]")].map(
+        (element) => element.id,
+      );
+      return [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+    });
+    expect(duplicateIds).toEqual([]);
+  } finally {
+    await context.close();
+  }
+});
+
 test("expanded and fitted graphs pan in both directions, including from a concept", async ({
   page,
 }) => {

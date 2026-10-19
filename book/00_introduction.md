@@ -63,7 +63,9 @@ Each phase begins from a fresh implementation and changes the development setup 
 
 {{ import "site/includes/course-progression-figure.html" }}
 
-Large and small describe the relative model configurations assigned for the course; the [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) publishes their identities and the basis for that distinction.
+Large and small describe the relative model configurations assigned for the course.
+The [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) is the template for the model identities, size basis, access, and limits the instructor must publish before each phase.
+Use the completed assignment for your course run; “To be announced” is not a usable model configuration.
 Both may be hosted by the department; hosting location is separate from size.
 Neither hosting location nor model size establishes which workflow will perform better on the course tasks.
 The large-model first phase gives students a starting environment for learning the workflow; the small-model phase tests which practices transfer, and the fleet phase investigates coordination and model assignment.

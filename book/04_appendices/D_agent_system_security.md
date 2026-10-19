@@ -208,7 +208,8 @@ Record assistance in the course evidence even when the external project has diff
 ## Choose a delegation environment
 
 Choose the execution and control boundaries the exercise needs before choosing a product.
-The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) records the supported tool, version, model route, limits, and fallback for each course run.
+The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) defines the tool, version, model route, limits, and fallback the instructor must publish for each course run.
+Use the completed run assignment when selecting an environment.
 A product can expose several of the patterns in :ref[table:fleet-tool-options]; its name alone does not identify the workflow being measured.
 
 | Delegation pattern        | Where work is coordinated                                   | Controls to inspect                                                                         | Evidence to retain                                                            |
@@ -278,6 +279,11 @@ Repair the export and update the map, then confirm that it includes every expect
 Record missed obligations, false alarms, and the effort to maintain the records alongside the existing exercise notes.
 
 ### Test a human review gate
+
+An enforced review obligation and a useful human decision require separate evidence.
+In an experiment with 199 participants making nutrition decisions, :citet[bucinca2021trust] found that interfaces designed to encourage deliberation (“cognitive forcing”) reduced reliance on incorrect AI suggestions relative to simple explanatory interfaces, while the most effective designs received less favorable subjective ratings.
+That task does not establish a security guarantee for deployment approvals.
+When evaluating a review interaction, measure correct acceptance and rejection, effort, and usability; neither an explanation nor an extra click establishes effective oversight by itself.
 
 A review marker makes a decision visible, but an unresolved-marker check cannot detect a required marker the producing agent omitted.
 Use this exercise to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).

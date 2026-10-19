@@ -40,7 +40,7 @@ The following commands use the existing repository tools; they are not new autom
 | Change                                           | Relevant verification                                                                                                                                                                |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Internal Markdown documentation and ADRs         | Prettier on changed files; inspect relative links, ADR IDs/status/index, and `git diff --check`.                                                                                     |
-| Published book, course briefs, or site templates | `npm run build` followed by `npm run validate`; inspect the affected rendered pages.                                                                                                 |
+| Published book, course briefs, or site templates | `npm run build`, `npm run validate`, and `npm run check:links`; inspect the affected rendered pages.                                                                                 |
 | TypeScript behavior                              | `npm run types:check` and relevant unit tests, such as `node --test tests/courses.test.ts`; run `npm run test:unit` when shared behavior or a broad change affects multiple suites.  |
 | Browser interactions                             | The affected Playwright test, such as `npx playwright test tests/e2e/course-workspace.spec.ts --project=chromium`; include other configured browsers when compatibility is affected. |
 | Course persistence or Worker bindings            | The course verification and local Worker checks in [course-system.md](course-system.md#verification).                                                                                |
@@ -51,6 +51,26 @@ Check formatting with `npx prettier --check <changed-files>` and apply it with `
 Use `npm run format:check` for a repository-wide formatting check when appropriate.
 Broaden verification when a new failure, dependency, or unresolved concern justifies it; a passing check does not replace reviewing the changed contract.
 Record which checks ran and any material limitations in the change description.
+
+### Published link checks
+
+After building, run `npm run check:links` before committing and pushing published content.
+The checker reads generated HTML, resolves local pages, downloads and anchor fragments against that build, and checks each distinct external HTTP(S) URL with an anonymous GET that follows redirects.
+Missing local targets or anchors and external `404`/`410` responses fail the command and identify the referring HTML files.
+An absent or empty build also fails.
+The checker uses the site's configured domain, so absolute links to our own pages are checked against the candidate build rather than an older deployment.
+
+`npm run validate` includes the local checks without network access; `npm run check:links -- --local-only` runs that part directly.
+The explicit `npm run deploy` command runs the full link check before publishing.
+[The Published links workflow](../.github/workflows/links.yml) runs on pushes to `main`, pull requests, manual dispatch, and Monday mornings at 05:23 UTC to detect later external link rot.
+It builds and validates the candidate revision and retains `.local/link-check/report.json` as a workflow artifact, including results and referring pages.
+Repository check requirements and independently configured automatic deployment ordering remain hosting settings; a parallel CI failure alone does not stop an independently started deployment.
+
+External requests have bounded concurrency and timeouts, with one retry for network errors, rate limits, or server errors.
+Bot blocks, authentication responses, timeouts, and other non-success responses besides `404`/`410` are reported as **inconclusive**, not silently counted as verified links or treated as proof of a missing page.
+Inspect these warnings and the report when accepting a publication.
+External fragments, soft-404 pages returning `200`, and whether a working destination supports the surrounding claim still need editorial review.
+Run `node --test tests/link-check.test.ts` when changing the checker.
 
 Coding agents must prefix shell commands with `rtk` as specified in [AGENTS.md](../AGENTS.md); use `rtk proxy` when a command needs unfiltered output.
 

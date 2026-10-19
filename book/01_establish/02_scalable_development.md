@@ -232,7 +232,7 @@ Package a reusable capability with its fit criteria, files, dependencies, integr
 
 [Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
 Imported capabilities also create a trust boundary because instructions or bundled code may influence tools operating with the agent's authority.
-The [Agent Fleets chapter](/chapters/agent-fleets/) develops the security implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
+[Appendix D's imported-capability review](/appendices/agent-system-security/#imported-capabilities-are-development-dependencies) develops these security implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
 
 ## When generation outruns comprehension
 
@@ -240,15 +240,21 @@ An agent can increase the arrival rate of candidate changes while comprehension,
 The resulting backlog appears as large diffs, delayed review, shallow acceptance, rework, or [technical debt](/concepts/#technical-debt).
 :ref[table:candidate-production-and-comprehension]{text="The table below"} collects evidence about different parts of that mismatch.
 
-| Evidence                                                                                                                                                                     | What it supports                                                                     | Important limit                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| Three field experiments covering 4,867 developers found about 26% more completed tasks with an AI coding assistant :citep[cui2026effects]                                    | Candidate production can increase in some settings                                   | Individual experiments were noisy, and the result does not apply equally to every person or project |
-| A study of 78 developers across seven projects classified about 58% of observed time as program comprehension :citep[xia2018comprehension]                                   | Understanding already consumed substantial development capacity before generative AI | Two companies using Java and C# do not establish a universal reading-to-writing ratio               |
-| A professional code-review study found that understanding supports knowledge transfer and alternative solutions as well as defect detection :citep[bacchelli2013review]      | Review is broader than checking whether generated code passes                        | The study predates current coding agents                                                            |
-| A live LLM-review study at Mozilla and Ubisoft found that generated comments sometimes informed revisions, but reviewers accepted only a minority :citep[olewicki2026review] | AI-assisted review can contribute evidence while still consuming human judgment      | One deployment does not establish the effectiveness of every review agent                           |
+| Evidence                                                                                                                                                                     | What it supports                                                                     | Important limit                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Three field experiments covering 4,867 developers found about 26% more completed tasks with an AI coding assistant :citep[cui2026effects]                                    | Candidate production can increase in some settings                                   | Individual experiments were noisy, and the result does not apply equally to every person or project   |
+| A randomized study of 16 experienced developers completing 246 tasks found 19% longer completion time when early-2025 AI tools were allowed :citep[becker2025productivity]   | Assistance can increase task time in a familiar repository                           | Mature open-source projects and early-2025 tools do not establish a current effect for other settings |
+| A study of 78 developers across seven projects classified about 58% of observed time as program comprehension :citep[xia2018comprehension]                                   | Understanding already consumed substantial development capacity before generative AI | Two companies using Java and C# do not establish a universal reading-to-writing ratio                 |
+| A professional code-review study found that understanding supports knowledge transfer and alternative solutions as well as defect detection :citep[bacchelli2013review]      | Review is broader than checking whether generated code passes                        | The study predates current coding agents                                                              |
+| A live LLM-review study at Mozilla and Ubisoft found that generated comments sometimes informed revisions, but reviewers accepted only a minority :citep[olewicki2026review] | AI-assisted review can contribute evidence while still consuming human judgment      | One deployment does not establish the effectiveness of every review agent                             |
 
 ::caption[Evidence behind the distinction between candidate production and accepted change.]
 ::label[table:candidate-production-and-comprehension]
+
+Completed-task counts and time per task measure different outcomes in different populations.
+Do not average these productivity estimates into one general AI effect.
+METR's February 2026 follow-up reported that selection effects and concurrent-agent timing problems prevented a reliable estimate of the later tools' productivity effect :citep[becker2026productivityupdate].
+Keep the study date, task, developer experience, tools, and measurement boundary attached to each result.
 
 Types, tests, small modules, and architectural notes can reduce the work needed to understand a change.
 Their value is the uncertainty they resolve.
@@ -285,6 +291,9 @@ Choose assistance according to the result you need, the skills you need to retai
 
 ::caption[Different outcomes of assistance require different evidence.]
 ::label[table:assistance-outcomes]
+
+Randomized studies of programmers learning an unfamiliar library and students practicing mathematics found that AI access could reduce subsequent unaided performance :citep[shen2026skill,bastani2025learning].
+The tasks and assistance designs differ; [Appendix A](/appendices/evaluating-agentic-workflows/#evaluate-assistance-and-retained-competence) explains what these short-term findings support and leave open.
 
 Learning, investigating with colleagues, and enjoying implementation can be purposes of the work.
 Choose what to delegate in light of those purposes as well as the result's quality and cost.

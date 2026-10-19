@@ -9,7 +9,7 @@ Live browser verification confirmed the changed chapter passages, new activity, 
 This audit screened the published reading for aging product assumptions, stale terminology, internal references, citation keys, and the relationship between claims and evidence.
 It checked generated navigation and public external URLs, then inspected selected scientific sources and their current versions.
 It is not a replication of the studies or a line-by-line revalidation of all 93 bibliography entries.
-The recommendations below have not been applied to the manuscript.
+The findings below describe the audited baseline; the implementation follow-up at the end records subsequent corrections.
 
 ## Findings, in priority order
 
@@ -17,8 +17,8 @@ The recommendations below have not been applied to the manuscript.
 
 **High priority: public readers cannot follow required setup guidance.**
 
-The repository is private, confirmed through the authenticated GitHub repository API.
-Unauthenticated HEAD and GET requests return `404` for four destinations used in the published material:
+At the time of the audit, the repository was private, confirmed through the authenticated GitHub repository API.
+Unauthenticated HEAD and GET requests returned `404` for four destinations used in the published material:
 
 - `https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md`
 - `https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation`
@@ -171,3 +171,29 @@ Use differences in task, experience, tool generation, outcome, and selection to 
 
 The highest-value next pass is to repair public resource access and the ambiguous concept label, narrow the generated-context recommendation, and add the retained-competence and coordination evidence.
 The remaining studies can strengthen existing explanations without new required course deliverables.
+
+## Implementation follow-up for review
+
+The audit was committed as `650a6b9` before preparing the corrections.
+The author then made the repository public.
+All four previously inaccessible source URLs now return `200` to unauthenticated GET requests; the source and download links are retained.
+The introduction, Chapter 7, and Appendix D distinguish the environment template from the instructor's completed course-run assignment.
+No new publication route is needed to resolve the access failure.
+
+The working-copy corrections:
+
+- narrow the instruction-file proposal to missing, necessary project guidance, with a controlled comparison for optional additions;
+- point Chapter 2's imported-capability warning directly to Appendix D;
+- give the concept guide introduction a distinct heading ID, preserving the Coding agent card's existing ID;
+- retain the Shift-Up bibliography entry because the archived Chapter 2 teaching notes still cite it, resolving the audit's conditional removal recommendation without leaving a hanging source reference;
+- add the reviewed scientific evidence to the existing productivity, learning, oversight, incident, and coordination sections, with eight bibliography entries including METR's follow-up.
+
+The concept-label regression was reproduced before the renderer changed: opening the Coding agent card without JavaScript gave it the accessible name “Explore with your own agent.”
+The new browser regression checks the card and guide's distinct accessible names and document ID uniqueness.
+The original failure context is retained at `.local/audits/2026-10-19/concept-name-before-fix.md`.
+The production build and validation pass.
+The regression passes in Chromium and WebKit.
+The rebuilt site's 74 canonical HTML pages contain no broken internal links or duplicate IDs, and all citation keys in the reading and archived teaching notes have bibliography definitions.
+The affected passages and rendered references were inspected in the browser, including the expanded productivity table at a narrow viewport.
+The author approved committing and publishing these corrections after review.
+The subsequent link-check process is documented in [the development guide](development.md#published-link-checks); pushed-revision CI and deployment results provide the publication record.

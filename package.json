@@ -28,8 +28,9 @@
     "worker:prepare": "node scripts/generate-worker-manifest.ts",
     "worker:build": "npm run build && npm run worker:prepare",
     "preview:worker": "npm run worker:build && wrangler dev",
-    "deploy": "npm run worker:build && wrangler deploy",
-    "validate": "npm run types:check && gustwind --validate --input ./build",
+    "deploy": "npm run worker:build && npm run check:links && wrangler deploy",
+    "validate": "npm run types:check && gustwind --validate --input ./build && npm run check:links -- --local-only",
+    "check:links": "node scripts/check-links.ts",
     "types:check": "tsc --noEmit",
     "review": "python3 scripts/review-diff.py",
     "test:review": "python3 -B -m unittest discover -s tests -p review_diff_test.py"

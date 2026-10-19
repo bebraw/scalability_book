@@ -45,7 +45,7 @@ Inspect the coordination controls supplied by the chosen harness before adding c
 Check separate execution contexts and workspace isolation, result return and inter-agent messaging, shared task state, permission inheritance, cancellation, and recovery.
 Labels such as "subagent" or "team" do not establish which controls are available.
 [Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) documents one arrangement; verify the capabilities and limits of the configuration you actually run.
-Use the [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) to identify the assigned configuration and its limitations.
+The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) defines what the instructor must publish before each phase; use your course run's completed assignment to identify the configuration and its limitations.
 
 Sequential delegation fits work whose next step depends on an earlier result.
 A read-only scout maps the relevant routes, components, data flow, and tests; an implementer then receives the compressed findings and a bounded objective.
@@ -140,7 +140,7 @@ Different reviewers can broaden the search, but I remain responsible for accepti
 
 ## Build a small web-development fleet
 
-Use the [course-assigned environment](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) and record its version, model routes, delegation settings, and tool permissions.
+Use the completed course-run assignment described by the [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) and record its version, model routes, delegation settings, and tool permissions.
 The lab requires bounded child tasks, inspectable results, and an explicit integration owner.
 [Appendix D's environment guide](/appendices/agent-system-security/#choose-a-delegation-environment) helps you inspect these boundaries and offers optional implementation examples.
 
@@ -148,15 +148,23 @@ The lab requires bounded child tasks, inspectable results, and an explicit integ
 
 Follow the setup instructions published for the assigned harness and start in a version-controlled project.
 Confirm that the single-agent baseline has delegation disabled before enabling the declared fleet configuration.
-Before adding subagents, ask one agent to inspect the repository:
+Before adding subagents, ask one agent to locate the project's existing instructions and identify any missing essentials:
 
-> Inspect this project and propose an `AGENTS.md`; do not edit yet.
-> Include the project purpose, setup and validation commands, coding conventions, architectural boundaries, forbidden operations, and review checklist.
-> Cite the files that support each proposal and mark unknowns.
+> Inspect this project's README, development guide, architecture, and existing agent instructions; do not edit yet.
+> Identify missing commands or project-specific constraints an agent needs to perform the assigned task.
+> Propose only necessary additions, link to owning documents, and mark unknowns.
 
 Review the proposal before saving it.
-An instruction file is maintained project policy, not an automatically authoritative summary.
-For a web project it should expose at least the development command, unit and browser-test commands, route and persistence locations, styling and accessibility expectations, responsive states, secrets policy, and the definition of done.
+An instruction file is maintained project policy.
+Make development and validation commands, access constraints, architectural ownership, and acceptance expectations discoverable without copying an overview that will drift from its source.
+
+In version 3 of their context-file preprint, :citet[gloaguen2026context] found no statistically significant task-resolution improvement over no context file, while generated files increased average inference cost by 20–23% in the tested settings.
+Developer-provided files outperformed generated ones, but their improvement over no file was not statistically significant.
+The evaluation focuses on Python tasks and does not establish the value of security policy or every project's unusual tooling.
+
+Treat optional guidance as a workflow hypothesis.
+For an optional comparison, use representative tasks in fresh copies with and without that extra guidance, keeping mandatory permissions and project constraints fixed.
+Record accepted behavior, effort, and cost; following more instructions does not itself establish a better outcome.
 
 Project memory needs a lifecycle.
 Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a [decision log](/concepts/#decision-log); promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
@@ -229,6 +237,8 @@ Publishing a patch, deployment, or message requires an accountable human who can
 
 The labs expose where a delegated task diverges from its contract and whether the workflow can recover.
 Start with one small mismatch whose effect can be checked through the application.
+Use [Appendix A's coordination research](/appendices/evaluating-agentic-workflows/#research-example-coordination-and-integration) as a catalog of possible failure mechanisms when interpreting the trace.
+A category can organize a diagnosis; the repaired behavior still needs checking.
 
 ### Field note — Correct the direction before the details
 

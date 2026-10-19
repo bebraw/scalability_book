@@ -73,6 +73,13 @@ Treat each reported number as evidence about that system and use the transfer qu
 Use one incident to identify the earliest point where a prepared control could have interrupted propagation.
 Then test that reasoning against a smaller event-tracker failure.
 
+A systematic study complements these company accounts.
+:citet[yuan2014failures] examined 198 severe, developer-confirmed failures in five distributed data systems, including 48 classified as catastrophic.
+Incorrect handling of explicitly signaled errors featured in 92% of that catastrophic subset.
+That is not a claim that unit tests prevent 92% of all outages: the study separately analyzes preventability, and its selected systems and issue reports limit generalization.
+In the existing pressure probe, follow one dependency error through the handler, retry or fallback, durable state, and user-visible result.
+Checking that an error was detected establishes less than checking how the application recovered from it.
+
 ## Trace one failure across the web boundary
 
 The [Architecture chapter](/chapters/architecture/) separated consumer, representation, execution, and authority.

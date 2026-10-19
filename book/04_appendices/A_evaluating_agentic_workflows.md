@@ -129,6 +129,16 @@ Use this optional comparison when learning or retaining a skill is part of the t
 The [Scalable Development chapter](/chapters/scalable-development/#choose-what-to-participate-in) distinguishes accepted output, retained competence, and valued participation.
 Evaluate these outcomes separately: a behavioral check cannot establish what the person can do unaided or which activities they want to retain.
 
+The preprint by :citet[shen2026skill] reports a randomized study of 52 programmers learning the unfamiliar Trio library.
+AI access reduced immediate understanding scores without a statistically significant average completion-time benefit.
+Its observed interaction patterns were not randomly assigned, so the study does not establish that asking for explanations causally protects learning.
+A short library-learning session also cannot establish long-term professional skill loss.
+
+In a classroom trial with nearly a thousand high-school mathematics students, :citet[bastani2025learning] found that unrestricted AI access improved assisted practice but reduced subsequent unaided performance.
+A tutor using teacher-designed safeguards largely avoided that harm without establishing a positive unaided effect.
+The mathematics tasks and tutoring design limit transfer to university programming.
+Together, these studies motivate checking unaided competence separately; they do not establish one best assistance mode for every learner.
+
 In a personal essay, :citet[stewart2026alienation] describes missing the investigation and decisions involved in implementation even when the result passes his checks.
 :citet[mollick2026overhang] offers a complementary perspective: human knowledge, taste, and initiative can turn agent capability into projects a person would otherwise struggle to attempt.
 These accounts motivate choices about delegation; they do not establish a universal effect on skill or well-being.
@@ -517,6 +527,11 @@ More review samples are justified only when they improve accepted outcomes or al
 CodeCRDT's experiments on six small TypeScript and React tasks used a shared CRDT document that converged without textual merge failures, while preliminary inspection still found semantic conflicts :citep[pugachev2025codecrdt].
 For example, interface and data code can use different event names in a document that merges cleanly.
 After concurrent work, test the integrated user journey against the settled contract.
+
+:citet[cemri2025failures] provide a broader diagnosis catalog: over 1,600 annotated traces from seven multi-agent frameworks and a taxonomy of 14 failure modes involving system design, inter-agent misalignment, and verification.
+Expert analysis of 150 traces informed the taxonomy; annotation at larger scale also used an LLM judge.
+These categories describe the studied traces, not an industry-wide failure rate or proof that a role template repairs coordination.
+For one observed failure, connect a proposed category to the actual task, shared state, handoff, and acceptance check, then verify the repair through behavior.
 
 For further reading, :citet[cho2026agentroom] examine coordination through shared files, claims, and messages; :citet[ogenrwot2026agenticflict] examine textual merge conflicts in agent-authored pull requests.
 Read each study's task selection, acceptance checks, and coordination boundary before transferring its conclusions to a fleet design.

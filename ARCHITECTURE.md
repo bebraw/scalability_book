@@ -23,6 +23,9 @@ It uses npm and the Node version range in [package.json](package.json).
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                               |
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
+[The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.
+Local targets and fragments are checked during validation; external missing-page checks run before explicit deployment and through [CI](.github/workflows/links.yml), with generated reports kept in `.local/`.
+See [the development guide](docs/development.md#published-link-checks) for failure criteria and inconclusive external responses.
 The optional local learning companion exposes the private notebook API independently of course storage and model providers.
 [learning-cli.ts](scripts/lib/learning-cli.ts) owns setup, authentication entry, startup and local diagnostics for both the repository command and the built [npm package](packages/learning-companion/package.json).
 [learning-storage.ts](scripts/lib/learning-storage.ts) owns stable per-user directories, directory leases and explicit copy migration; [learning-database.ts](scripts/lib/learning-database.ts) validates schemas read-only and backs up atomic upgrades.
