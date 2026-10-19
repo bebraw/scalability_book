@@ -38,6 +38,27 @@ Use the [bounded arrival-controlled pressure run](/project/#7-3-arrival-controll
 Count offered, admitted, and completed work separately: a lower latency among successful requests can coexist with more rejected or unfinished work.
 Timeouts supply deadline lower bounds, not observed completion times; report them beside the completed-request latency distribution.
 
+### Worked case — A larger buffer changes the result
+
+In an October 11, 2026 investigation of Campfire rewrites, :citet[sarnacki2026campfire] reports changing a Rust implementation's notification buffer at a fixed arrival rate of 100 POSTs per second.
+:ref[table:campfire-buffer-tradeoff]{text="The table below"} contains his reported observations.
+The article does not pin the implementation commits; treat this as a case to interpret, with incomplete reproduction information.
+
+| Buffer capacity | Notifications delivered | Maximum latency       |
+| --------------- | ----------------------- | --------------------- |
+| 256             | About 14%               | 11 seconds            |
+| 16,384          | About 90%               | More than 130 seconds |
+
+::caption[Reported buffer trade-off in Sarnacki's Campfire investigation; these are practitioner observations, not measurements reproduced for this book.]
+::label[table:campfire-buffer-tradeoff]
+
+More delivered notifications can coexist with updates too late to use.
+A missing notification also does not establish lost durable data: the described client reconnects and fetches current messages.
+Specify persistence, timely visibility, and reconnect recovery separately before benchmarking a replacement.
+
+For your own comparison, pin both implementations and the load script, hold offered load fixed, and report admissions, errors, update latency, memory, and recovered event IDs.
+Which buffer meets your declared update deadline, and what further observation would establish recovery?
+
 ### Simulated benchmark lab
 
 The demonstration below models 60 requests to an event-recording endpoint.
@@ -235,6 +256,15 @@ The slow trace localizes most of the server request time to connection waiting a
 That is a stronger lead than the server request duration alone, but it still does not establish root cause.
 The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
+
+### Use runtime evidence during repair
+
+Telemetry can also become input to an agent repairing the application.
+The TeleGen preprint links browser actions to runtime observations and compresses them into repair briefs :citep[luo2026telegen].
+It reports gains on two web-generation benchmarks with different success measures; those results do not establish lower production maintenance cost.
+
+The [optional repair-evidence investigation](/explore/telemetry-guided-repair/) compares task feedback alone, raw telemetry, and a brief for the same failure.
+[Appendix A](/appendices/evaluating-agentic-workflows/#compare-repair-evidence) explains the controls and acceptance boundary.
 
 ## Observe the agentic workflow too
 

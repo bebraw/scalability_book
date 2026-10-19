@@ -21,6 +21,14 @@ This chapter follows a fleet from task decomposition through integration, correc
 A fleet is one possible execution arrangement within that design; single-agent loops also need those controls.
 A fleet should be an answer to the shape of the work, not the starting assumption.
 Begin with the smallest coordination structure that can complete the task.
+
+The Engineering Sustainable Agents preprint compares non-agentic through multi-agent configurations on five selected developer tasks :citep[astekin2026sustainable].
+Non-agentic and single-agent configurations occupy 59 of its 66 reported Pareto-optimal points: configurations for which no tested alternative improves one measured objective without worsening another.
+This supports including simpler baselines; it does not establish a generally optimal agent count.
+Runs start cold with agent caching disabled, and energy is estimated for the process rather than the whole machine or its lifecycle.
+Most configurations have three repetitions; the GPT-OSS configurations have one and cover only one server.
+When comparing your own workflows, separate cold and warm operation and distinguish resources spent producing software from resources consumed by the resulting application.
+
 :ref[table:fleet-coordination-options]{text="The table below"} compares options by the work they support and the costs they introduce.
 
 | Option                | Structure                                                                              | Useful when                                                              | New cost or risk                                                     |

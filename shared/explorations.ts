@@ -42,6 +42,22 @@ export const explorations: Exploration[] = [
     },
   },
   {
+    id: "telemetry-guided-repair",
+    title: "Compare evidence for an agent repair",
+    phase: "Establish",
+    summary:
+      "Saving an event reports success, but the list stays unchanged. Compare task feedback, runtime logs, and a diagnostic brief.",
+    conceptIds: ["observability", "eval", "acceptance-criteria"],
+    task: {
+      title: "Establish the evidence baseline",
+      href: "/project/establish/#establish-the-evidence-baseline",
+    },
+    reading: {
+      title: "Use runtime evidence during repair",
+      href: "/chapters/benchmarking/#use-runtime-evidence-during-repair",
+    },
+  },
+  {
     id: "verify-remediation",
     title: "Follow a fix into running systems",
     phase: "Challenge",

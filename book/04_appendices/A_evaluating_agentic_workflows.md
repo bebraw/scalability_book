@@ -12,6 +12,7 @@ Add other sections when the decision requires them:
 - [Retained competence](#evaluate-assistance-and-retained-competence) for comparing assistance modes when learning is part of the task's purpose.
 - [Temporary API consumers](#probe-an-api-with-temporary-clients) for checking integration behavior and API usability.
 - [Verification loops](#design-the-verification-loop) for choosing checks an agent can use during implementation and challenging their assumptions.
+- [Repair evidence](#compare-repair-evidence) for comparing task feedback, raw telemetry, and a diagnostic brief.
 - [Loop-engineering research](#research-behind-loop-engineering) for distinguishing evidence about recurring agent runs from experiments on feedback, memory, and repair.
 - [Uncertainty](#report-uncertainty-not-only-point-estimates) for repeated, multi-task comparisons.
 - [Served configuration](#qualify-the-served-configuration) for model, environment, and context-reduction controls.
@@ -251,6 +252,16 @@ The [concern-directed mutation lab](/chapters/scalable-development/#constrain-ge
 This challenges both false acceptance and tests coupled too tightly to one implementation.
 A fresh reviewer can help identify assumptions, but agreement between reviewers still needs behavioral evidence.
 
+The TestJack preprint supplies a research example :citep[yao2026testjack].
+Its detailed audit reports refuting 1,545 of 4,487 previously passing trials across five coding benchmarks, or 34.4% of those passing trials.
+The auditors derive checks from task requirements, require a replayable test that passes the reference and fails the candidate, and use a separate reviewer to challenge the requirement.
+That percentage describes the selected audit corpus, not all agent-produced software.
+
+An executable difference still needs adjudication: the reference can be wrong, or the check can assert an incidental choice rather than a requirement.
+Preserve disputed expectations alongside the witness.
+If an audit changes the acceptance suite, version it and re-evaluate every compared candidate against the same suite.
+The existing mutation lab provides a smaller local way to challenge a check before trusting its passes.
+
 ### Make repair repeatable and acceptance explicit
 
 Keep a small repair loop near the changed behavior, then run the relevant integration and user-flow checks before acceptance.
@@ -266,6 +277,21 @@ Useful failure output identifies the expected and observed behavior, the reprodu
 Review the final change for ownership, dependency direction, and maintenance consequences beyond the assertions.
 Record which revision and environment were checked, the results, and material omissions.
 Stop when the agreed evidence is sufficient for the change's consequences; add another check when it resolves a concrete uncertainty.
+
+### Compare repair evidence
+
+Changing the evidence supplied to a repair agent is an intervention in the loop.
+Start each trial from the same failing revision and synthetic data, with the same task, model, tools, limits, and independently specified acceptance checks.
+Vary only the additional diagnostic packet: none, raw telemetry, or a brief derived from that same telemetry.
+Keep the raw source available for auditing the brief, and record evidence collected during each repair so an arm does not silently acquire another arm's input.
+
+Count instrumentation, collection, brief preparation, unsuccessful repairs, and human correction alongside accepted outcomes.
+Check that instrumentation preserves the observed behavior and that the repaired application passes without diagnostic instrumentation.
+A shorter brief can omit the decisive observation; a plausible diagnosis remains a hypothesis until the behavior is checked.
+
+The [optional telemetry-guided repair activity](/explore/telemetry-guided-repair/) supplies an invented stale-list scenario and a bounded comparison protocol.
+Use it on paper to design the investigation or run fresh local trials on an application you control.
+One trial per condition is exploratory evidence; broader claims need repeated trials and varied failures under the [uncertainty guidance](#report-uncertainty-not-only-point-estimates).
 
 ## Report uncertainty, not only point estimates
 

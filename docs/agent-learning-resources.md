@@ -81,6 +81,10 @@ The [temporary API-consumer activity](../explorations/temporary-api-consumers.md
 Its [separate discussion](../explorations/temporary-api-consumers.discussion.md) explains failure attribution and the regression evidence to retain after scaffolding is removed.
 It can be studied on paper or run against a local fixture; a paper design is not evidence of executed checks.
 
+The [repair-evidence activity](../explorations/telemetry-guided-repair.md) uses an invented stale-list packet to compare task feedback alone, raw telemetry, and a diagnostic brief.
+Its [separate discussion](../explorations/telemetry-guided-repair.discussion.md) distinguishes reported success, observed state, hypotheses, and independent acceptance.
+Real trials require a student-controlled local application and actual observations; the supplied packet is a paper fixture.
+
 The concept JSON and Markdown include a curated learning-resource catalog.
 Each concept's `resourceIds` refer to entries in `learningResources`.
 The catalog includes a labelled neighborhood image for every concept, the complete graph, the five book diagrams, and all gallery demos.
