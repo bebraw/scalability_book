@@ -40,7 +40,7 @@ The following commands use the existing repository tools; they are not new autom
 | Change                                           | Relevant verification                                                                                                                                                                |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Internal Markdown documentation and ADRs         | Prettier on changed files; inspect relative links, ADR IDs/status/index, and `git diff --check`.                                                                                     |
-| Published book, course briefs, or site templates | `npm run build`, `npm run validate`, and `npm run check:links`; inspect the affected rendered pages.                                                                                 |
+| Published book, course briefs, or site templates | `npm run worker:build`, `npm run validate`, and `npm run check:links`; inspect the affected rendered pages.                                                                          |
 | TypeScript behavior                              | `npm run types:check` and relevant unit tests, such as `node --test tests/courses.test.ts`; run `npm run test:unit` when shared behavior or a broad change affects multiple suites.  |
 | Browser interactions                             | The affected Playwright test, such as `npx playwright test tests/e2e/course-workspace.spec.ts --project=chromium`; include other configured browsers when compatibility is affected. |
 | Course persistence or Worker bindings            | The course verification and local Worker checks in [course-system.md](course-system.md#verification).                                                                                |
@@ -55,6 +55,7 @@ Record which checks ran and any material limitations in the change description.
 ### Published link checks
 
 After building, run `npm run check:links` before committing and pushing published content.
+Use `npm run worker:build` before validation on a clean checkout: it builds the site and generates the ignored Worker asset manifest needed by type checking.
 The checker reads generated HTML, resolves local pages, downloads and anchor fragments against that build, and checks each distinct external HTTP(S) URL with an anonymous GET that follows redirects.
 Missing local targets or anchors and external `404`/`410` responses fail the command and identify the referring HTML files.
 An absent or empty build also fails.
