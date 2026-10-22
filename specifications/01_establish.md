@@ -14,7 +14,7 @@ Use one [common submission bundle](/project/#9-common-submission-bundle-and-comp
 The checklist below indexes that bundle; it does not require a separate report for each item.
 
 - **Build and validate A:** complete the common core, harness, acceptance checks, and shared workload; document the [closed product loop and any starter decisions](#implement-the-common-core).
-- **Record the stack hypothesis:** explain the learning question, risks, and revisit condition in the [stack decision record](#record-the-stack-hypothesis).
+- **Begin the decision log:** explain the learning question, risks, and revisit condition in the [stack decision record](#record-the-stack-hypothesis), and record other consequential choices as work proceeds.
 - **Analyze initial scalability:** include [two bounded claims and the repeatable primary pressure](#analyze-initial-scalability).
 - **Show ownership:** include a capability ownership card for the main event workflow.
 - **Reflect on the large-model workflow:** answer the questions below using the recorded evidence.
@@ -74,7 +74,8 @@ Complete the required domain model, behavior, [harness](/concepts/#harness), and
 Before expanding optional scope, describe the first closed product loop and list the capabilities deliberately deferred until that loop produces evidence.
 
 If the implementation begins from a starter template, record the template source and starting revision before pruning it.
-Classify inherited material as:
+Record material changes and inherited assumptions in the existing evidence bundle, and consequential adoption or adaptation choices in the decision log.
+You may classify inherited material as a working aid:
 
 - **keep** because it protects the closed product loop or its development harness;
 - **replace later** because it is still the only working seam;
@@ -82,6 +83,7 @@ Classify inherited material as:
 - **decide** because removal would settle a product or architecture question that remains open.
 
 Review the exact removal set before editing, especially when automation or an agent performs the pruning.
+The detailed inventory is optional and its absence does not reduce credit when the required evidence and reasoning are present.
 The template is a distribution artifact, not the finished architecture of the product.
 
 ### Establish the evidence baseline

@@ -6,6 +6,8 @@
 
 **Recorded retrospectively:** Shared workload specified on 2026-08-28.
 
+**Implemented follow-up:** [ADR-049](ADR-049-focus-required-pressure-investigations-and-offer-extensions.md) replaces the compulsory additional Challenge pressure with a bounded correctness or recovery investigation and makes further scenarios optional; the revised contract is reflected in the current owners and snapshots.
+
 ## Context
 
 Three implementations can use different architectures and still appear comparable if measurements silently change operation boundaries, fixtures, retries, or completion rules.

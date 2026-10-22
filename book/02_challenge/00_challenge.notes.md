@@ -13,7 +13,7 @@
 The three numbered chapters in this part are the required Challenge reading.
 Use a case study or appendix selectively when it supports the documented-case transfer, architecture hypothesis, pressure analysis, or a problem the group has actually observed.
 
-The project ceiling is one fresh implementation B, one standardized friction audit, and a focused comparison under the shared primary pressure plus one revealing secondary pressure.
+The project ceiling is one fresh implementation B, both bounded audits, one evidenced friction finding and response, and a focused comparison under the shared primary pressure plus one bounded correctness or recovery case.
 Students should recognize several response patterns but do not need to implement distributed versions of them during Challenge.
 Keep optional features out when they would weaken comparability, operational evidence, or the cross-team audit.
 

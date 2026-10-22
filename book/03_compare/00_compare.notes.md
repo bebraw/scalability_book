@@ -17,7 +17,7 @@ Preserve a negative result when it is informative instead of spending the remain
   Students should identify where each control is enforced and what the trace can establish.
 - Connect the assigned harness to the comparison: large-model single agent for implementation A, small-model single agent for implementation B, and an explicitly designed fleet for implementation C.
 - Use B's small model as the fleet reference and permit approved small/large model mixtures with explicit assignments.
-  Keep the required single-agent/fleet probe on the same small model; an optional model-assignment contrast fixes the task graph.
+  Use supplied matched single-agent/fleet traces on the same small model for the required analysis; a student-run matched pair is optional, and an optional model-assignment contrast fixes the task graph.
   Full mixed-fleet builds compare development systems rather than isolate orchestration.
 - Show how `AGENTS.md` or equivalent project instructions make implicit project knowledge explicit.
   This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
@@ -36,10 +36,10 @@ Preserve a negative result when it is informative instead of spending the remain
 - Make cross-build analysis a first-class output: what differed in architecture, completeness, defects, elapsed time, active human time, resource use, and review burden, and which explanations are supported by evidence?
 - Preserve the bounded cross-team audit after the fleet build.
   Its coordination-friction findings should be comparable with the earlier audits.
-- Make the project converge on a self-observation loop: students transform the fleet run into activity data and load it into implementation C.
+- Offer a self-observation extension: students may transform the fleet run into activity data and load it into implementation C.
   The application becomes a trace-based agent workflow debugger that can expose delegation, task state, failures, retries, handoffs, validation, and human intervention.
-- Keep the required integration deliberately small.
-  A portable transformed trace and repeatable import are enough; live streaming, universal tool adapters, and a polished node graph should remain optional.
+- Keep the optional integration deliberately small.
+  For that extension, a portable transformed trace and repeatable import are enough; live streaming, universal tool adapters, and a polished node graph should remain optional.
 
 ## Tool examples to develop
 
@@ -89,4 +89,5 @@ Suggested deliverables:
 
 The part should leave students with three connected artifacts: an agent workflow that is bounded and reviewable, a three-way scaling comparison and target design, and a final reflection that uses evidence from the whole project arc.
 
-The artifact should culminate in implementation C, a transformed fleet trace loaded into the application, debugging findings about the workflow that produced it, a fleet coordination analysis, a three-way implementation comparison, and an evidence-based scalability analysis.
+The artifact should culminate in implementation C, compact actual-run evidence and debugging findings, supplied matched-trace analysis, a fleet coordination analysis, a three-way implementation comparison and an evidence-based scalability analysis.
+Trace import and a student-run matched pair are optional extensions.

@@ -19,15 +19,17 @@ All three phase briefs define the solo equivalents, while the common contract re
 
 ## How chapter artifacts become submissions
 
-The **Project artifact** section at the end of each main chapter is a staged checkpoint, not a request for an additional standalone file.
+The project or activity checkpoint in each main chapter supports the existing evidence bundle rather than creating another standalone file.
 The common bundle and the current phase specification are the authoritative submission contract.
 One clearly structured evidence document may satisfy several checkpoints when its headings make the required evidence easy to locate.
 
-| Phase     | Chapter checkpoints                                                                                                                                                                     | Where they are submitted                                                            |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Establish | Two bounded scalability claims; project harness and representative AI-use record; measurement and observation baseline                                                                  | Common bundle plus the Establish ownership card and large-model workflow reflection |
-| Challenge | Architecture hypothesis and updated ownership card; standardized friction audit; documented-case transfer, pressure map, and Little's Law check                                         | Common bundle plus the Challenge A-B comparison                                     |
-| Compare   | Fleet plan, correction, and transformed trace; three-way scaling comparison, implemented response, deployment evidence, and target design; final evidence matrix and decision narrative | Common bundle plus the Compare fleet evidence and final A-B-C package               |
+| Phase     | Chapter checkpoints                                                                                                                                                                                                                 | Where they are submitted                                                            |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Establish | Two bounded scalability claims; project harness and representative AI-use record; measurement and observation baseline                                                                                                              | Common bundle plus the Establish ownership card and large-model workflow reflection |
+| Challenge | Architecture hypothesis and ownership card; both audits and one evidenced friction finding; primary pressure, bounded correctness or recovery case and Little's Law check                                                           | Common bundle plus A–B comparison and a link to the incident-transfer activity      |
+| Compare   | Fleet plan, correction, actual-run debugging findings and supplied matched-trace analysis; three-way scaling comparison, implemented response, deployment evidence, and target design; final evidence matrix and decision narrative | Common bundle plus the Compare fleet evidence and final A-B-C package               |
+
+Trace import, a student-run matched pair and additional pressure scenarios are optional; the required path supports full credit.
 
 When a chapter suggests an optional lab or advanced appendix exercise, it becomes required only if the common or phase specification names it or the instructor announces it before the relevant phase begins.
 

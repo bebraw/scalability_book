@@ -110,9 +110,12 @@ These guidelines apply across all three implementations.
 
 ### Keep one evidence bundle
 
-Each main chapter ends with a **Project artifact** section.
+Each main chapter includes a project or activity checkpoint.
 These sections are staged checkpoints for building the current phase's evidence; they do not silently create separate submissions.
 The [common project specification](00_common_project.md) and current phase specification provide the authoritative deliverable checklist, and one clearly structured artifact may satisfy several chapter checkpoints.
+Maintain specifications and an evolving ADR-style decision log throughout the three fresh builds, using the standard ownership card to locate evidence.
+The required path supports full credit, including grade 5; additional pressures, trace import into C and student-run matched experiments are optional explorations within the same budget.
+The course may provide a benchmark runner for convenience, and students may build their own under the same published measurement protocol.
 
 ### Record assistance and acceptance evidence
 

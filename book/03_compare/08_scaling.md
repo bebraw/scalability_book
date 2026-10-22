@@ -5,7 +5,7 @@ Each response should relieve an identified limit while making its new costs and 
 
 ## Start with the pressure
 
-Use the pressure map from the Reality chapter to select a response hypothesis.
+Use the primary-pressure and bounded correctness or recovery evidence from Challenge to select a response hypothesis.
 :ref[table:scaling-response-patterns]{text="The table below"} connects common pressures to the contracts each response adds.
 
 | Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |

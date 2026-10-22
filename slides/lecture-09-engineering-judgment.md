@@ -119,7 +119,7 @@ The decision should name who owns its operational and correction obligations.
 Use four bundles in one evidence index:
 
 - **Implementation:** C and its common evidence, cross-team audit and response, with links to A and B.
-- **Fleet evidence:** plan, trace, loader, debugging findings, coordination measurements, and workflow model.
+- **Fleet evidence:** plan, actual-run record, debugging findings, supplied matched-trace analysis, coordination measurements and workflow model.
 - **Scaling and deployment experiment:** application model, implemented and remeasured response, new failure or recovery check, and realistic deployed workload.
 - **Final decision:** evidence matrix, target architecture, trade-offs, ownership, and the next boundary or measurement.
 

@@ -19,10 +19,11 @@ The [Compare project specification](/project/compare/) defines the third fresh i
 The common behavior, permitted acceptance material, pressures, and reporting categories remain stable while delegation, orchestration, authority allocation, integration, and fleet controls vary deliberately.
 Use B's small model as the reference configuration; an approved fleet may use small models, large models, or a mixture with declared role or task assignments.
 When model assignment also changes, the full B–C builds compare development systems rather than isolate orchestration.
-The required bounded paired task holds the small model fixed; an optional small-only/mixed-fleet comparison holds the task graph fixed and varies one model assignment.
+The supplied matched-trace activity holds the small model fixed; students may optionally run their own matched pair or vary one model assignment with the task graph fixed.
 
 Implementation C also turns its development process into application data.
-A transformed fleet trace is loaded into the Work Activity Tracker so its history, filters, and relationships can expose attempts, failures, handoffs, validation, correction, and human intervention.
+The actual fleet run supplies a compact redacted execution record and debugging findings about attempts, failures, handoffs, validation, correction and human intervention.
+Transforming and loading the trace into the Work Activity Tracker is an optional extension.
 Use that view to locate where coordination failed and which correction worked.
 
 ## Compare applications and development systems

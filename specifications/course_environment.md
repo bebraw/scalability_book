@@ -11,6 +11,8 @@ Hosting, serving configuration, context, and orchestration are recorded separate
 ## Publication rule
 
 The instructor must complete and publish the table below before the affected project begins.
+Give each published configuration a version, date and stable retained snapshot; keep earlier versions available when a configuration changes.
+Students may reference unchanged fields through that exact version, but must confirm the models, routes and environment actually used and record deviations.
 A phase does not begin until every student has a supported access path, a declared fallback for service failure, and a cost policy that does not require unannounced personal spending or hardware.
 
 | Phase     | Required assignment before launch                                                                                                                                                                                                                                                                     |
@@ -69,7 +71,9 @@ Repeat this check after a material tool or routing change and record the change 
 
 - Choose and preflight the large Establish and small Challenge configurations; publish the size basis and hypothesis without promising that the larger model always produces better results.
 - Use the Challenge small model as the fleet reference; permit approved large-model and mixed-model fleets with declared assignments and quality, time, and cost hypotheses.
-- Keep the required bounded single-agent/fleet pair on the same small model and fixed routing policy.
+- Supply matched single-agent/fleet traces with the same small model and fixed routing policy, provenance, brief, checks, outcomes and accounting limits.
+  Label synthetic teaching data and its evidential limits.
+  Keep an optional student-run pair under those same matching rules and resource limits.
   An optional small-only/mixed-fleet pair holds the task graph fixed and varies one model assignment within the existing rehearsal budget.
 - When B and C also differ in model assignment, describe their full builds as development-system cases rather than attribute the difference to orchestration alone.
 - If a model, route, harness, or hardware allocation changes, record the actual configuration and narrow the comparison claim.

@@ -22,8 +22,9 @@ Link the already-submitted A and B revisions and evidence.
 
 ### Fleet evidence
 
-Include the [fleet plan](#fleet-plan), coordination measurements, transformed execution trace and repeatable loader, and application views answering at least two debugging questions.
-Add the B–C case comparison, [required matched single-agent/fleet probe](#required-matched-single-agent-fleet-probe) or supplied-trace alternative, and one workflow-level formal-model analysis.
+Include the [fleet plan](#fleet-plan), coordination measurements and a compact redacted record of the actual fleet run with at least two debugging findings.
+Add the B–C case comparison, [supplied matched-trace analysis](#supplied-matched-single-agent-fleet-analysis), and one workflow-level formal-model analysis.
+Trace transformation and import into C, and running your own matched pair, are optional extensions.
 Select evidence that explains delegation, validation, integration, failure, and correction; an uncurated transcript is not the analysis.
 
 ### Scaling and deployment experiment
@@ -45,7 +46,7 @@ Compare creates a third fresh implementation of the Work Activity Tracker throug
 A fleet is an orchestration strategy, not a model category.
 The central question is whether decomposition, specialization, and parallelism improve the result enough to justify coordination, duplicated work, integration, review, and resource cost.
 
-The public discussion and brief recap during lecture 9 use the fleet debugging views and final comparisons as evidence.
+The public discussion and brief recap during lecture 9 use the fleet debugging findings and final comparisons as evidence.
 
 ---
 
@@ -129,9 +130,17 @@ In addition to the common evidence, record where possible:
 - active human integration and [review time](/concepts/#review-budget);
 - defects found after individual agents considered their work complete.
 
-### Turn the fleet trace into debugging data
+### Analyze the actual fleet run
 
-Export or transform evidence from the actual fleet run into a documented machine-readable trace.
+Keep a compact redacted execution record from the actual fleet run; a curated log excerpt or table is sufficient.
+Identify relevant tasks and actors, handoffs, validation, integration, correction and human intervention, linking the observations that support at least two debugging findings.
+Explain what the evidence establishes and what remains uncertain; unavailable measurements must remain visible.
+Use questions such as where work stalled, which handoff delayed progress, where validation rejected apparently completed work, or why a human intervened.
+Machine-readable normalization, trace import and application-based views are not required for full credit.
+
+### Optional: import the trace into C
+
+Transform actual-run evidence into a documented portable trace and load it into C for debugging.
 JSON is recommended, but another portable format is acceptable.
 Use the downloadable [portable fleet-trace example](/downloads/project/fleet-trace-example.zip) to study the minimum schema, application mapping, redaction record, and repeat-import contract.
 It is a transformation target rather than a required internal storage schema or a universal export format.
@@ -146,7 +155,7 @@ Map the fleet workflow to the application concepts:
 
 The trace format may contain additional relationships and metadata, such as parent tasks, dependencies, model information, duration, token use, cost, tool calls, validation results, or error details.
 
-Provide a repeatable way to load the transformed trace into implementation C.
+Provide a repeatable way to load the transformed trace into implementation C without creating duplicates on repeat import.
 Use the application to inspect the run and answer at least two debugging questions, such as:
 
 - Where did work stall, fail, or require a retry?
@@ -178,9 +187,18 @@ Compare the recorded B and C workflows:
 Apply at least one relevant scalability law or formal model to the workflow.
 Amdahl's Law, Little's Law, queueing, backpressure, or the Universal Scalability Law may be appropriate.
 
-### Required: matched single-agent/fleet probe
+### Supplied matched single-agent/fleet analysis
 
-Replace part of the existing fleet rehearsal with one **bounded paired task**:
+Analyze instructor-supplied matched single-agent/fleet traces in the existing Compare activity and reuse the analysis in this evidence index.
+The supplied package must identify provenance, the task brief, configurations, acceptance checks, outcomes, resource observations and accounting gaps.
+Identify what was held constant, what changed, whether checks support the recorded outcomes, and how elapsed time, human effort, model resources and correction work compare.
+Explain missing observations and limits; supplied observations are not results from your own workflow, and one pair does not establish a general orchestration effect.
+Synthetic teaching data must be labeled and cannot establish an empirical effect.
+This required analysis supports full credit, including grade 5, while fresh C still requires a real fleet and actual-run evidence.
+
+### Optional: run a matched single-agent/fleet probe
+
+Within the existing rehearsal budget, you may run your own **bounded paired task**:
 
 1. Freeze one accepted repository revision and a small change brief with independent acceptance checks before either attempt.
    Use two fresh copies of that revision and fresh agent sessions; this probe may reuse B and does not become the starting code for C.
@@ -196,9 +214,9 @@ Replace part of the existing fleet rehearsal with one **bounded paired task**:
    Human familiarity and stochastic variation can still affect the result.
 
 This is a small task, not a fourth application or a requirement to repeat a whole build.
-If matched access or accounting is unavailable, use instructor-supplied paired traces with the same metadata and checks; identify their provenance and missing evidence.
 An unmatched pair may still be analyzed descriptively, but cannot establish an orchestration effect.
 Link the pair and its limits in the fleet evidence bundle rather than adding a separate report.
+This extension has no separate point allocation and cannot replace the required supplied-trace analysis or actual fleet-build evidence.
 
 ### Optional: compare model assignments
 
@@ -212,8 +230,8 @@ To investigate unfinished work or routing decisions further, choose an optional 
 
 Repeat the primary pressure against implementation C using the same workload and procedure where practical.
 Compare A, B, and C under that shared pressure.
-Then use the broader pressure catalog to select only the additional scenarios needed to explain consequential architectural differences.
-You do not need to apply every catalog scenario exhaustively to every implementation.
+Further scenarios from the broader pressure catalog are optional explorations within the phase budget.
+Identify required and optional findings and their conditions separately in the final matrix.
 
 Use these results in the [final comparison](#final-comparison).
 
@@ -279,7 +297,8 @@ Fleet size, transcript length, generated code volume, and architectural complexi
 
 A single student may orchestrate the declared agent fleet; the fleet requirement concerns agents rather than the number of human teammates.
 Use the smallest fleet that exposes a real delegation, handoff or integration question, retaining the published fleet, trace, correction and acceptance evidence.
-Build fresh C, retain the bounded single-agent/fleet probe or approved supplied-trace alternative, and distinguish agent coordination from human teamwork.
+Build fresh C, analyze the supplied matched traces, and distinguish agent coordination from human teamwork.
+Your own matched pair and trace import into C are optional, with the required analysis sufficient for full credit.
 Keep the three-way comparison, workflow-model analysis, measured scaling response, realistic deployment, final evidence matrix and conditional engineering decision.
 Reference the already-frozen A and B records.
 
@@ -293,15 +312,16 @@ Record the solo operator's review and integration effort; agents within one flee
 ## Instructor Notes
 
 - Provide the Challenge small model as the reference configuration and publish which large models or mixtures are permitted for C.
-  Keep the required single-agent/fleet pair on the same small model; any optional small-only/mixed-fleet contrast changes assignment while holding the task graph fixed.
-- Before Compare begins, publish matched resource limits and condition-order assignments for the paired probe; provide a trace alternative when equivalent access is unavailable.
+  Keep supplied matched traces and any optional live single-agent/fleet pair on the same small model; an optional small-only/mixed-fleet contrast changes assignment while holding the task graph fixed.
+- Before Compare begins, prepare the supplied matched traces with provenance, task brief, configurations, checks, outcomes and accounting limits; label any synthetic data.
+  For students choosing the optional live probe, publish matched resource limits and condition-order assignments.
 - Clarify whether sequential delegation counts.
   It can be pedagogically valid when the handoffs are explicit, although at least one parallel branch gives stronger evidence about integration and review pressure.
 - Set a practical upper bound on fleet size or total model budget if resource use could become excessive.
 - Require compact evidence.
   Raw multi-agent traces can become too large to review and may contain sensitive information.
-- Use the portable example trace as the minimum transformation reference when the approved fleet tools do not expose a usable export.
-  Grade the mapping and debugging reasoning rather than adapter complexity or exact schema imitation.
+- Accept curated actual-run logs or tables for the required debugging analysis.
+  Offer the portable trace example as a transformation reference for optional import; assess reasoning rather than adapter complexity or exact schema imitation.
 - Keep live ingestion and advanced graph visualization optional.
   The required learning outcome is trace-based understanding of the fleet, not integration with a particular agent platform.
 - Align the final comparison with the course learning outcomes and the published [30-point project rubric](grading.md).

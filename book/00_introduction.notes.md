@@ -29,7 +29,7 @@ By the end of the course, these artifacts should form a small engineering portfo
 - Chapter 3: shared measurement protocol and implementation A baseline.
 - Chapter 4: architecture reading, implementation A analysis, and an implementation B architecture hypothesis.
 - Chapter 5: friction audit.
-- Chapter 6: challenged-assumptions and pressure maps for implementations A and B.
+- Chapter 6: repeated primary pressure, a bounded correctness or recovery case, and an activity-based documented-incident transfer.
 - Chapter 7: agent instructions, task boundaries, and review workflow.
 - Chapter 8: three-way scaling comparison, target design, and scaling trade-off table.
 - Chapter 9: final evidence-based reflection.

@@ -85,6 +85,10 @@ Use the following general interpretation within each point range:
 
 Score required behavior and correctness independently of visual polish or extra features.
 A modest implementation can earn full credit when it satisfies the contract and supports its decisions with strong evidence.
+The required path supports grade 5: additional pressure scenarios, trace import into C, student-run matched experiments and exhaustive starter or friction inventories are optional and have no separate point allocation.
+Optional work cannot compensate for missing required behavior, evidence or reasoning.
+Assess maintained specifications and evolving decision records through the existing harness, architecture, evidence and reflection criteria; usefulness and actual use matter, with no document quota.
+One evidenced development bottleneck and a checked improvement or justified follow-up can satisfy the friction requirement; both bounded audits remain required.
 
 ### Establish-specific criteria: 10 points
 
@@ -96,17 +100,17 @@ A modest implementation can earn full credit when it satisfies the contract and 
 
 ### Challenge-specific criteria: 10 points
 
-| Criterion                                     | Points | Full-credit evidence                                                                                                                                                                               |
-| --------------------------------------------- | -----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fresh and comparable implementation B         |    0-3 | Implementation B starts cleanly, respects the single-agent and transfer constraints, completes the common core, and records scope or configuration differences.                                    |
-| Architecture, friction, and pressure analysis |    0-5 | The architecture hypothesis, ownership card, standardized audit, primary and secondary pressures, documented-case transfer, recovery reasoning, and Little's Law check form one coherent analysis. |
-| A-B interpretation                            |    0-2 | Observations, plausible explanations, practice effects, stack or hardware differences, and unresolved alternatives are separated clearly.                                                          |
+| Criterion                                     | Points | Full-credit evidence                                                                                                                                                                                                      |
+| --------------------------------------------- | -----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fresh and comparable implementation B         |    0-3 | Implementation B starts cleanly, respects the single-agent and transfer constraints, completes the common core, and records scope or configuration differences.                                                           |
+| Architecture, friction, and pressure analysis |    0-5 | The architecture hypothesis, ownership card, bounded audits, evidenced friction finding and response, repeated primary pressure, bounded correctness or recovery case, and Little's Law check form one coherent analysis. |
+| A-B interpretation                            |    0-2 | Observations, plausible explanations, practice effects, stack or hardware differences, and unresolved alternatives are separated clearly.                                                                                 |
 
 ### Compare-specific criteria: 10 points
 
 | Criterion                                        | Points | Full-credit evidence                                                                                                                                                                                          |
 | ------------------------------------------------ | -----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fleet design, integration, correction, and trace |    0-3 | Independent agent work, task and authority boundaries, integration, one correction loop, transformed trace, and debugging findings are inspectable and bounded.                                               |
+| Fleet design, integration, correction, and trace |    0-3 | Independent agent work, task and authority boundaries, integration, one correction loop, compact redacted actual-run evidence and at least two debugging findings are inspectable and bounded.                |
 | Applied scaling and deployment                   |    0-5 | Application- and workflow-level models, one implemented before-and-after response, its new failure or recovery obligation, realistic deployment, rerun workload, and target design are supported by evidence. |
 | Final engineering judgment                       |    0-2 | The evidence matrix and decision narrative compare A, B, and C, label observation, inference, and proposal, reject alternatives, and state the next boundary and measurement.                                 |
 
@@ -120,6 +124,8 @@ A modest implementation can earn full credit when it satisfies the contract and 
 
 The diary entry may be written, audio, or video.
 Production polish is not graded; specificity and reflection are.
+Assess the documented-incident transfer in the chapter 6 activity or announced equivalent, and the supplied matched-trace analysis in the Compare activity.
+Link their existing entries from the project index; no additional detailed incident pressure map or duplicate analysis report is required.
 
 ## Self- and peer-assessment: 12 points per phase
 

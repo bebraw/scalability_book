@@ -193,7 +193,7 @@ If two roles must edit the same shared contract, resolve that decision before th
 Use separate workspaces or worktrees for concurrent writers.
 The Challenge small model is the reference configuration; an approved C fleet may assign small models, large models, or a mixture to its roles or tasks.
 State the quality, time, or cost hypothesis behind each assignment, preserve the actual model and route used for each attempt, and record substitutions and fallback.
-For the required bounded single-agent/fleet pair, pin the same small-model configuration and routing policy so the contrast examines orchestration.
+For supplied matched traces and any optional live single-agent/fleet pair, pin the same small-model configuration and routing policy so the contrast examines orchestration.
 An optional model-assignment pair keeps the fleet's task graph fixed while assigning a large model to one named role; the [Compare specification](/project/compare/#optional-compare-model-assignments) defines the limits.
 
 ### Research note — A clean merge is not a correct integration
@@ -263,7 +263,8 @@ The generated packet is a rehearsal: if the task is vague, boundaries overlap, o
 {{ import "site/includes/agent-fleet-demo.html" }}
 
 Translate the packet into a [task graph](/concepts/#task-graph) rather than launching every named role automatically.
-Use the [required matched single-agent/fleet probe](/project/compare/#required-matched-single-agent-fleet-probe) to test one bounded task under both workflows.
+Analyze the [supplied matched single-agent/fleet traces](/project/compare/#supplied-matched-single-agent-fleet-analysis) to examine one bounded task under both workflows.
+Running your own matched pair is an optional extension.
 For optional practice, rehearse a coordination pattern such as scout then plan, implement then review, or parallel scouts over independent subsystems.
 State why the tasks are sequential or independent and who integrates the result.
 
@@ -308,11 +309,14 @@ Compare accepted behavior and defects, time through integration and human accept
 
 Treat one end-to-end fleet attempt as one trial.
 The internal agents, retries, and handoffs are parts of that trial rather than independent samples.
-For a narrower workflow contrast, use the [Compare project's bounded paired task](/project/compare/#required-matched-single-agent-fleet-probe): fresh copies of the same frozen revision, the same brief, model, checks, environment, intervention policy, and aggregate resource limits.
+For a narrower workflow contrast, analyze the [supplied matched traces](/project/compare/#supplied-matched-single-agent-fleet-analysis): the frozen revision, brief, model, checks, environment, intervention policy and aggregate resource limits should be comparable.
+An optional live pair uses those same controls on fresh copies and sessions within the published time and resource bounds.
 The full B and C builds remain case studies because their design choices and the team's experience differ.
 One matched pair supports an exploratory observation about this task; reliability or general effect claims require a justified sampling design and repeated trials.
 
-Finally, transform the execution trace into implementation C.
+Finally, retain a compact redacted record from the actual fleet run and at least two debugging findings, linking supporting observations and their limits.
+A curated log or table is sufficient for the required analysis.
+As an optional extension, transform the execution trace into implementation C.
 The fleet run maps to a workspace, delegated tasks to work items, agents and humans to actors, and attempts, validations, failures, reviews, and interventions to activity events.
 Use the application's history, filters, summaries, and relationships to answer two questions: where did coordination first fail, and which correction produced accepted behavior?
 A [portable fleet-trace example](/downloads/project/fleet-trace-example.zip) provides a small transformation target, mapping guide, redaction record, and repeat-import contract.
@@ -335,7 +339,7 @@ In implementation C's existing [Compare evidence package](/project/compare/#what
 
 - declared model and harness configuration, task dependencies, authority, integration ownership, and stopping rules;
 - the correction probe and comparable measurements through acceptance;
-- the transformed trace loaded into C, with findings that explain coordination failures and successful corrections.
+- the actual-run record and at least two findings explaining coordination failures and successful corrections, with trace import into C as an optional extension.
 
 Preserve consequential changes to the plan and link acceptance to the checked revision.
 The specification defines the complete submission requirements.

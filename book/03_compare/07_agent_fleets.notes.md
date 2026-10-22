@@ -6,7 +6,7 @@ This chapter follows one practical progression:
 2. use documented web-development cases to identify benefits and failure points
 3. build a bounded fleet for implementation C
 4. expose a cross-layer defect and practice correction through the web boundary
-5. measure coordination cost through acceptance and inspect the transformed trace in C
+5. measure coordination cost through acceptance and analyze compact actual-run evidence, with trace import into C optional
 
 Use Chapter 2’s constrain–generate–validate–revise loop throughout; task-graph dependencies are an instance of the loop, not another stage vocabulary.
 Keep Amdahl’s Law, integration failure, correction, and measured coordination on the main path.

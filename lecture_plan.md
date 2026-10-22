@@ -34,7 +34,7 @@ The slide drafts are a pool of framing and discussion material, especially in pr
 
 Before each phase begins, complete the [course environment sheet](specifications/course_environment.md) and confirm supported access, budget, and fallback arrangements.
 Establish uses a large-model single agent, Challenge a small-model single agent, and Compare a declared fleet that may use small models, large models, or a mixture.
-Both single-agent models may be department-hosted; frame size and hosting separately, and keep the matched small-model probe distinct from any optional model-assignment comparison.
+Both single-agent models may be department-hosted; frame size and hosting separately, and keep supplied matched small-model trace analysis and any optional live probe distinct from an optional model-assignment comparison.
 Implementation A is submitted before Lecture 4, B before Lecture 7, and C before Lecture 9.
 Schedule the bounded cross-team audit after each submission within the existing project allocation; announce the audit window and probe release separately so setup and change work do not consume presentation time.
 
@@ -125,8 +125,8 @@ Possible elements:
 - use the [status-and-activity retry exercise](https://scalableweb.dev/chapters/reality/#exercise-pressure-retries): ask students to predict individually, inspect all promised effects in pairs, and explain their verdict before revealing the worked answer; change the duplicate domain event to a diagnostic request log and revisit the boundary;
 - use [Appendix C's HTTP method discussion](https://scalableweb.dev/appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety) when teams need the distinction between method semantics, response differences, and application-specific retry guarantees;
 - apply Little's Law to a suitable queue or in-flight boundary;
-- connect the discussion to the repeated primary pressure and one revealing secondary pressure required for Challenge;
-- show how a documented case becomes a project pressure map, distinguishing source facts, interpretation, and transfer to the students' application.
+- connect the discussion to the repeated primary pressure and bounded correctness or recovery investigation required for Challenge;
+- assess a compact documented-incident transfer in this lecture activity, distinguishing source facts, interpretation and project transfer; link its entry from the project index without another detailed incident pressure map.
 
 The lecture can lean toward cases, a live pressure-map exercise, or project discussion depending on which form makes the causal chain clearest to the group.
 
@@ -143,7 +143,8 @@ Useful presentation material includes:
 
 Use the presentations to separate observed differences from attribution to a model, stack, workflow, or growing team experience.
 Finish with a concise launch of Compare and implementation C, including the fleet constraint, task and authority boundaries, integration and validation gates, and immediate practical questions.
-Point students to the portable trace example and the requirement to load their transformed fleet trace into C and explain at least two debugging findings.
+Require compact redacted actual-run evidence and at least two debugging findings; offer the portable trace example and import into C as an optional extension.
+Prepare supplied matched traces with provenance, brief, configurations, acceptance outcomes and accounting limits for the Compare activity; a student-run matched pair is optional.
 Assign the fleet chapter as preparation, including task decomposition, authority, integration, review capacity, and Amdahl's Law.
 Use Lecture 8 to work through the application and workflow models students must apply.
 

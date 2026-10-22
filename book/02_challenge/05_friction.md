@@ -238,7 +238,7 @@ The arithmetic can show increased effort as well as a reduction; it does not pre
 {{ import "site/includes/friction-audit-demo.html" }}
 
 Apply the same audit to implementation A using the category change or another equivalently bounded request.
-Observe setup, comprehension, change, testing, review, deployment, operations, and coordination; use timing records and concrete blockages to identify the largest supported source of resistance and choose one intervention to test.
+Use setup, comprehension, change, testing, review, deployment, operations and coordination as prompts; use timing records and concrete blockages to identify one supported bottleneck and a response.
 Leave unmeasured stages unknown rather than treating them as zero, and record the intervention's introduction and ongoing maintenance costs separately.
 For one implemented choice, compare introduction with safe reversal: mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
 
@@ -248,16 +248,11 @@ A difference may come from architecture, tooling, documentation, generated defau
 
 ## Project artifact
 
-Produce a friction audit for implementations A and B.
-It should:
-
-- trace one bounded web change from the browser-facing interaction through its contract, validation, data, derived view, cache, and deployment boundaries,
-- separate protective friction from repeated work that provides no useful evidence or control,
-- identify the first commitment point and explain what safe reversal requires after it,
-- explain which decisions remain soft, which have become hard, and what would change their reversibility, linking one consequential choice to its decision-log entry,
-- name the largest source of setup, comprehension, change, testing, review, deployment, operational, or coordination friction,
-- map the project's validation ladder and identify one check that should move earlier, later, or become conditional,
-- and improve one feedback loop that can be measured again without changing the audit request.
+Retain both bounded audits and one compact friction entry per phase in the existing evidence index.
+Identify the phase and revision, one concrete bottleneck and supporting observations, the response and rationale, and either a checked improvement or a justified follow-up.
+Preserve unchanged or worse results and distinguish a proposal from an improvement already achieved.
+The eight categories are prompts; commentary on every category is optional and unnecessary for full credit.
+Use the chapter's questions about protective friction, reversibility, decision history and feedback timing to investigate the finding where useful, linking existing evidence rather than creating another report.
 
 ## Summary
 

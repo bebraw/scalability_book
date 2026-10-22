@@ -32,14 +32,14 @@ const evidenceItems: Record<EvidenceKey, EvidenceItem> = {
   fleet: {
     label: "Fleet evidence",
     artifact:
-      "Fleet plan, selected trace, transformed trace, repeatable loader, and debugging findings",
+      "Fleet plan, compact actual-run record, and at least two debugging findings",
     section: "2. Fleet evidence",
     evidencePrompt:
-      "Connect the task graph to the run, show at least two debugging findings in C, and include coordination measurements, the B–C case analysis, the bounded paired task, and one workflow-level formal-model analysis.",
+      "Connect the task graph to the actual run and at least two debugging findings, and include coordination measurements, B–C case analysis, supplied matched-trace analysis, and one workflow-level formal-model analysis; trace import and your own matched pair are optional.",
     limitationPrompt:
-      "Include failed attempts and human review; record missing usage or trace data, unmatched conditions in the paired task, and alternative explanations for the B–C result.",
+      "Include failed attempts and human review; record missing usage or trace data, supplied-trace provenance and comparison limits, and alternative explanations for the B–C result.",
     missing:
-      "Connect the fleet plan, trace, loader, and two debugging findings to coordination measurements, the bounded paired task, and the workflow model.",
+      "Connect the fleet plan, actual-run record and two debugging findings to coordination measurements, supplied matched-trace analysis, and the workflow model.",
   },
   experiment: {
     label: "Scaling and deployment experiment",

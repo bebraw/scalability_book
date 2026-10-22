@@ -97,7 +97,7 @@ For example, “implementation B had the lowest measured p95 under the declared 
 “A queue would protect its write path” is a proposal until the new behavior and [trade-offs](/concepts/#trade-off) are tested.
 This vocabulary lets you reason beyond the available experiment without presenting plans as results.
 The three builds are engineering case studies, with design, experience, and tool conditions changing together.
-Keep their observations separate from the [bounded paired workflow task](/project/compare/#required-matched-single-agent-fleet-probe), which holds a frozen revision and declared conditions stable for a narrower exploratory contrast.
+Keep their observations separate from the [supplied matched-trace analysis](/project/compare/#supplied-matched-single-agent-fleet-analysis) and any optional live pair, which hold a frozen revision and declared conditions stable for a narrower exploratory contrast.
 
 > **Case — Faster libraries and uncertain attribution**
 >

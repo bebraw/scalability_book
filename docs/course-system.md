@@ -220,6 +220,9 @@ With only one group or a missing frozen implementation, staff arrange and record
 Solo participation is an individually approved exception.
 The public grading page publishes the standard group criteria; staff agree any equivalent assessment arrangements with the student in writing before work begins and retain them in the private portfolio.
 
+The [October to December 2026 pilot review pack](solo-pilot-2026/README.md) provides a draft study agreement, dated milestones, independent lecture activities and an instructor preparation checklist for a pre-course solo run.
+Complete its operational choices and retain the agreed arrangement privately before using it with a student.
+
 New runs use requirements `2026-10-v2` and rubric `2026-10-solo-equivalence-v2`.
 Historical runs keep their pinned requirements and rubric; do not rewrite them to enable this route.
 The [project introduction](../specifications/00_introduction.md#approved-solo-route) and all three phase briefs describe the work for an allocated exception; the [assessment equivalents below](#solo-assessment-equivalents) guide the individual agreement.
@@ -316,6 +319,12 @@ Staff must manage storage cleanup outside the UI; no destructive removal of orig
 New runs retain the current requirement edition, `2026-10-v2`.
 The course has not run yet; this is the sole pre-course contract and there are no earlier run contracts to maintain.
 It assigns a large model to Establish, a small model to Challenge, and a declared small/large or mixed-model fleet to Compare.
+The pre-course scope review retains three fresh builds, maintained specifications and an evolving ADR-style log, with a standard six-field ownership card in each phase's evidence index.
+Required pressure work follows one primary procedure across A–B–C, a bounded correctness or recovery case in B, and one measured scaling response with its new obligation checked in Compare.
+Keep both bounded audits and one evidenced friction finding with a checked improvement or justified follow-up per phase.
+Actual fleet-run analysis and supplied matched-trace analysis remain required; trace import, student-run matched pairs and additional pressure scenarios are optional and unnecessary for grade 5.
+Students may reference an exact retained course-configuration version, confirming actual models, routes and environment and recording deviations and material exposed settings.
+The optional course benchmark runner, dedicated private audit reference and supplied matched-trace package still need preparation; the revised contract does not establish their availability.
 The workspace's project guide, rubric and checklist links open the archived documents for that edition.
 **Course settings** shows the edition; ordinary administration cannot replace it on an existing run.
 See [requirements/README.md](../requirements/README.md) for publication/versioning.

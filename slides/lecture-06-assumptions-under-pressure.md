@@ -31,16 +31,16 @@ Common examples:
 
 ---
 
-# Choose one primary and one revealing secondary pressure
+# Repeat the primary pressure and investigate correctness
 
 **Primary pressure** stays comparable across A and B.
 
-**Secondary pressure** should expose a consequence of an architectural difference.
+Investigate one bounded **correctness or recovery case**, reusing the engineering session where appropriate.
 
 Possible pressures include concurrency, data growth, retries, partial failure, tenancy, retention, geographical distance, automated abuse, or changing requirements.
 
-Do not run every scenario.
-Choose the ones that can change the engineering conclusion.
+Additional scenarios are optional explorations within the project budget.
+Choose those that can change the engineering conclusion.
 
 <!-- [Sources] book/02_challenge/06_reality.md; specifications/02_challenge.md -->
 

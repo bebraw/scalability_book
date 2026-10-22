@@ -15,7 +15,7 @@ Index these additions in the same bundle:
 
 - **Build and validate fresh B:** implement the common core and repeat the shared evidence collection under the small-model constraint.
 - **Explain the architecture:** include B’s architecture hypothesis and updated capability ownership card for the main event workflow.
-- **Extend the pressure record:** repeat A’s primary pressure, add one secondary pressure, and include the documented-case transfer, pressure map, justified response, and Little’s Law check defined in [Apply runtime pressure](#apply-runtime-pressure).
+- **Extend the pressure record:** repeat A's primary pressure, investigate one bounded correctness or recovery case, and include the justified response and Little's Law check defined in [Apply runtime pressure](#apply-runtime-pressure).
 - **Compare A and B:** use the [two-workflow comparison](#compare-the-two-single-agent-workflows) to separate observed differences, plausible explanations, alternatives and confounding factors, and what the evidence cannot establish.
 - **Complete the shared evidence:** include the [engineering session](/project/#shared-engineering-sessions), independent audit, and author response.
 
@@ -106,8 +106,9 @@ The group has more domain knowledge during Challenge, and this practice effect i
 ### Apply runtime pressure
 
 Repeat the primary [pressure](/concepts/#pressure) selected in Establish against implementation B using the same workload and procedure where practical.
-Then select one secondary pressure from the shared catalog that is exposed by an architectural difference or by evidence from A or B.
-Analyze how both implementations would respond to that secondary pressure; run it when practical and label projections clearly.
+Investigate one bounded correctness or recovery case, such as concurrent transitions or a repeated request, reusing the existing engineering session and its evidence where appropriate.
+Predict the outcome, challenge an assumption, check the actual result and explain the acceptance decision.
+Further pressures from the shared catalog are optional explorations; label projections clearly.
 
 Compare the cumulative pressure evidence for A and B:
 
@@ -123,8 +124,10 @@ Use the result to interpret the boundary, not to claim a cause of delay or stabi
 Connect one failed assumption or approaching limit to a justified response pattern such as an index, derived view, idempotency boundary, bounded queue, partition, quota, backpressure, rate limit, or graceful degradation.
 At this phase the response may remain a design hypothesis, but name the new correctness, failure, operational, or recovery obligation it would introduce.
 
-Complete the chapter's documented-case transfer and pressure map as part of this cumulative pressure record.
-Link the selected source, separate reported facts from interpretation and project transfer, trace the failure across the relevant web boundaries, and identify the assumption, amplification path, user-visible effect, first useful signal, recovery mode, and evidence that recovery is complete.
+Assess the documented incident and its transferable lessons through the chapter 6 lecture activity or announced equivalent, using the existing activity and diary criteria.
+Keep a compact source-linked explanation of the failed assumption, observable signal, response and recovery obligation relevant to B, distinguishing source facts from interpretation and proposed transfer.
+Link the activity entry from this evidence index; an additional detailed incident pressure map or incident reproduction is not required.
+Revisit relevant A decisions and specifications using the fresh build, measurements and audit evidence, preserving the earlier reasoning and phase-specific implementation status.
 For an optional recovery investigation, choose a [Challenge exploration starting point](/explore/#phase-challenge).
 
 ---
@@ -145,7 +148,8 @@ A larger implementation B is not automatically a better implementation.
 
 Build a fresh B under the same transfer policy with the approved small model and one-agent boundary.
 Keep the required common behavior, baseline workload and primary-pressure procedure comparable with A.
-Retain the architecture hypothesis, secondary pressure, documented-case transfer, Little's Law check, ownership card, friction audit and A–B interpretation.
+Retain the architecture hypothesis, bounded correctness or recovery case, Little's Law check, ownership card, focused friction entry, both audits and A–B interpretation.
+Link the incident-transfer activity and update the maintained specifications and decision log.
 Report growing domain knowledge and solo human review effort as comparison limitations.
 
 For the engineering session, predict two clients' concurrent transition outcome, challenge the relevant consistency assumption, validate it and discuss the result with the instructor.

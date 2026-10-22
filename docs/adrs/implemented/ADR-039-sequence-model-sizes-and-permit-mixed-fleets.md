@@ -6,6 +6,10 @@
 
 **Supersedes:** [ADR-021](../implemented/ADR-021-compare-three-fresh-builds-of-one-common-application.md)
 
+**Implemented follow-up:** [ADR-046](ADR-046-make-fleet-trace-import-an-optional-extension.md) makes trace import optional while retaining actual-run analysis and this three-build progression; the revised contract is reflected in the current owners and snapshots.
+
+**Implemented follow-up:** [ADR-047](ADR-047-make-live-paired-experiments-an-optional-extension.md) requires supplied matched-trace analysis and makes student-run paired experiments optional; the revised contract is reflected in the current owners and snapshots.
+
 ## Context
 
 The course has not run yet.

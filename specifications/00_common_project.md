@@ -285,8 +285,43 @@ Each implementation must provide:
 - tests covering the work-item lifecycle and its event recording;
 - project instructions for the AI development workflow;
 - an architecture or data-flow diagram and a short architecture note for the core event workflow;
-- one maintained feature specification for the core event workflow, including its acceptance path;
-- a short [decision record](/concepts/#decision-log) explaining the stack choice.
+- maintained specifications for the core event workflow and consequential project work, including intended behavior and acceptance conditions;
+- an evolving [decision log](/concepts/#decision-log), using ADRs or an equivalent approach, beginning with the stack choice.
+
+### Maintained specifications and decision records
+
+Choose and improve how you maintain specifications across the projects.
+Documents, structured issues, examples or executable scenarios are suitable when intended behavior, acceptance, constraints, assumptions and scope are clear and discoverable by humans and agents.
+Refer to the common course contract rather than reproduce it; your project context cannot waive its requirements.
+Use this context when briefing agents, dividing work and accepting results, and update it as legitimate clarifications and agreed changes occur.
+Distinguish intended behavior, implemented behavior and known gaps; a defect alone does not justify changing the specification to match it.
+
+Record consequential decisions while working: context, alternatives, decision and rationale, assumptions and consequences, status and owner, evidence, reversibility and a condition for revisiting the choice.
+Start in A, revisit relevant choices in B, and use the accumulated reasoning for C's fleet, scaling and final decisions.
+Explain why a choice is retained, revised or rejected; an unchanged decision can be well supported.
+Preserve earlier records and link replacements when superseded, with implementation status and evidence scoped to the applicable phase and revision.
+The specification describes current intent; the log preserves reasoning and history, and the architecture note explains the running system.
+They may share a tool or document when their roles remain clear.
+No particular tool, file layout, word count or record quota is required.
+Link readable phase snapshots or exports from the evidence index so the reviewer does not need access to your chosen tool.
+Use the existing representative agent-task record to show how this context informed work and validation.
+
+### Ownership card
+
+Include a short **Ownership card** under that heading in each phase's evidence index, identifying the phase and submitted revision for the core event workflow.
+Use brief answers or evidence links for these six fields:
+
+| Field                     | What to record                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| Code entry points         | Source root and composition or request entry point for the workflow.           |
+| State authority           | Authoritative state and the component responsible for changing it.             |
+| Public contracts          | Interfaces, lifecycle and event-recording obligations.                         |
+| Dependency direction      | Which components may depend on which others.                                   |
+| Excluded responsibilities | Responsibilities outside this workflow or component.                           |
+| Validation and acceptance | Relevant checks and results, plus the role responsible for accepting the work. |
+
+Keep the card consistent with the current specification, architecture and decision records.
+It locates evidence for existing architecture and ownership criteria; a completed card alone does not establish correctness or earn separate points.
 
 Setup may use native tools, containers, a development environment definition, or another documented mechanism.
 Do not require an auditor to infer missing steps from knowledge held only by your team.
@@ -302,6 +337,11 @@ You do not have to build a production-scale distributed system.
 You must be able to measure a stable baseline and reason about what your implementation would do under pressure.
 
 ### 7.1 Shared baseline workload
+
+You may use a course-provided benchmark runner when available or implement your own under this same protocol.
+Both paths require the same fixture, operation mix, seeded order, boundaries, profiles, repetitions, resets, deadlines, outcome accounting and correctness checks.
+The runner owns generic scheduling, timing and reporting; the application adapter must exercise the real application and persistence path.
+Writing a custom runner earns no separate points; its compliance, results and reproducibility must be inspectable.
 
 Run the same stack-neutral workload against implementations A, B, and C.
 The workload measures logical user operations from the adapter's request until the application returns an observable result, not individual internal network requests.
@@ -392,8 +432,16 @@ Use these scenarios as a shared pressure catalog:
 Do not exhaustively apply the entire catalog after every phase.
 In Establish, select one **primary pressure** that is likely to expose an important architectural limit and define it as a documented transformation of the baseline workload.
 Reuse that scenario and its procedure in Challenge and Compare so the three implementations remain comparable.
-Challenge adds one **secondary pressure** revealed by an architectural difference or observation.
-Compare uses the broader catalog to interpret important differences across A, B, and C, but only relevant pressures need in-depth analysis.
+Challenge repeats the primary pressure and adds one bounded correctness or recovery investigation, such as concurrent work-item transitions, reusing the engineering session and its evidence where appropriate.
+Compare repeats the primary pressure on C, implements one justified scaling response in A, B or C, measures before and after, and checks a new failure or recovery obligation introduced by the response.
+Application and workflow formal-model reasoning, realistic deployment and the deployed baseline rerun remain required.
+Further pressure scenarios are optional explorations within the existing phase budget.
+The required investigation supports full credit, including grade 5; extra scenarios have no separate point allocation and cannot replace required evidence.
+Optional scope does not weaken the evidence needed for a chosen claim, including the conditional arrival-controlled procedure below.
+
+The shared baseline supports comparison across groups; chosen primary pressures and extensions may differ.
+Identify required and optional findings in the final matrix with their environments, scope and conditions visible.
+Uncontrolled differences do not establish model effects, and raw latency alone does not rank the quality of a group's work.
 
 When automated use or data exposure is the selected pressure, also distinguish cooperating, authorized, and abusive consumers; state which information is intentionally public or retained; and account for the false-positive and accessibility cost of the proposed control.
 
@@ -455,7 +503,7 @@ You may carry forward:
 
 - this specification and instructor-provided materials;
 - acceptance scenarios and course-provided tests;
-- your own written lessons and comparison notes;
+- your own written lessons, behavior-level specifications, decision history and comparison notes, revisited for each fresh implementation;
 - domain terminology and user-facing copy;
 - technology-neutral diagrams;
 - generic personal or course tooling that does not contain application behavior.
@@ -468,7 +516,8 @@ You may not carry forward:
 - an earlier repository used as the starting point for the next phase;
 - prompts that contain substantial blocks of the earlier implementation.
 
-The [bounded paired task](03_compare.md#required-matched-single-agent-fleet-probe) is an explicit exception for experimental copies of a frozen revision, not for implementation C's starting code.
+The [optional bounded paired task](03_compare.md#optional-run-a-matched-single-agent-fleet-probe) is an explicit exception for experimental copies of a frozen revision, not for implementation C's starting code.
+Transferred reasoning does not establish that a choice is implemented or validated in the next build; implementation-specific bindings, tests and configuration remain subject to the restrictions above.
 
 When uncertain, disclose the reuse in the evidence package.
 The purpose of the rule is to create genuinely fresh implementations, not to prevent students from learning.
@@ -500,15 +549,14 @@ Identify the group and phase in the evidence index, link the submitted revision 
 
 ### 9.1 Development setup
 
-- implementation identifier and commit;
-- language, framework, storage, and deployment approach;
-- model names, assigned large or small configurations, and whether inference was local, departmental, or externally hosted;
-- agent tool and version or retrieval date, together with any imported skill, plugin, or instruction bundle that materially affected the workflow;
-- orchestration configuration, if any;
-- local hardware class or hosted environment relevant to the result, paths by which project data may leave that environment, and any fallback policy.
+Identify the implementation and submitted commit, language, framework, storage and deployment approach.
+Link the exact version or retained snapshot of the published course configuration and confirm the models, role or size assignments, actual inference routes and local or hosted environment used.
+Record deviations, including substitutions, fallback and changes during an attempt; the configured route alone is not proof of the route that ran.
 
-When the tool exposes them and they materially affect a comparison, also record the resolved model revision or digest, quantization, runtime, allocated context, actual inference route, memory limits, accelerator residency or CPU/GPU offload, and resolved revision or content digest of imported capabilities.
-Mark unavailable fields as unavailable rather than spending project time estimating hidden configuration.
+The referenced configuration and deviations together must identify the agent tool/version, material imported instructions or capabilities, orchestration, relevant hardware or hosted resources, data paths and fallback policy.
+You may reference unchanged published details instead of restating them.
+When exposed and material to a claim, add resolved revisions or digests, quantization, runtime, context, resource limits, accelerator residency or offload, and imported-capability versions.
+Mark unavailable details honestly; do not reconstruct hidden settings or treat an unavailable field as confirmation of the published default.
 
 ### 9.2 Effort and execution
 
@@ -540,10 +588,17 @@ The Compare phase adds one realistic deployment outside the author's development
 ### 9.4 Engineering explanation
 
 - architecture and data-flow diagram;
-- stack decision record;
+- evolving decision log and readable maintained-specification snapshot, linked through the ownership card;
 - the phase's cumulative scalability-pressure record;
-- a standardized friction audit covering setup, comprehension, change, testing, review, deployment, operations, and coordination, including the largest source of resistance and one improvement or follow-up decision;
+- one concrete development bottleneck supported by observations, with a checked improvement or a justified follow-up decision;
 - short reflection distinguishing observation from a possible explanation.
+
+For the friction entry, identify phase and revision, bottleneck and supporting evidence, response and rationale, and check result or justified next step.
+Reuse task, audit and validation evidence in the index; no additional report is needed.
+Setup, comprehension, change, testing, review, deployment, operations and coordination are prompts, without compulsory commentary on every category.
+One well-supported finding and response can satisfy the friction requirement for full credit.
+Keep an unchanged or worse check result visible, and distinguish a proposed follow-up from an improvement already achieved.
+Both incoming and outgoing audits remain required under section 10, with their actual outcomes, setup/probe boundaries and reporting conditions preserved.
 
 Do not submit an uncurated raw agent transcript as the main evidence.
 Preserve enough task, prompt, trace, and review information to explain consequential decisions and failures.

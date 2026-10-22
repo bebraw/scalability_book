@@ -217,18 +217,16 @@ Explain which assumptions differ between implementations A and B and which remai
 A good reconstruction makes failure and recovery obligations visible without trying to solve every possible future problem.
 Use that diagnosis to choose and test a response in the [Scaling chapter](/chapters/scaling/).
 
-## Project artifact
+## Activity and project evidence
 
-Produce a documented-case transfer and a pressure map for implementations A and B.
-The artifact should:
+In the chapter 6 activity or announced equivalent, briefly connect one documented incident to implementation B: failed assumption, observable signal, response and recovery obligation.
+Link the source and distinguish reported facts, interpretation and proposed transfer.
+Keep this in the activity entry, assessed through the existing activity and diary criteria, and link it from the project index.
+An additional detailed incident pressure map or reproduction is not required.
 
-- link the selected source and separate its reported facts from your interpretation,
-- trace one failure across consumer, network, execution, authority, and operational boundaries,
-- name the assumption, binding limit, first useful signal, amplification path, and user-visible effect,
-- apply Little's Law to one declared queue, pool, request path, or other conserved-work boundary and interpret its limits,
-- connect the failed assumption to one justified response pattern and the new obligation that response would introduce,
-- identify a prepared recovery mode and the evidence that would show recovery is complete,
-- and explain what differs between the two implementations without changing the common acceptance core.
+In the existing A–B project pressure record, repeat the primary pressure and investigate one bounded correctness or recovery case, reusing the engineering session where appropriate.
+Apply Little's Law to one declared conserved-work boundary and connect a failed assumption or limit to a justified response and its new obligation.
+Use the same required acceptance core; further pressure scenarios are optional explorations.
 
 ## Summary
 

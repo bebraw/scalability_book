@@ -147,16 +147,16 @@ test.describe("project specification", () => {
   }) => {
     await page.goto("/project/");
     const pairedTask = page.getByRole("link", {
-      name: "bounded paired task",
+      name: "optional bounded paired task",
       exact: true,
     });
     await expect(pairedTask).toHaveAttribute(
       "href",
-      "/project/compare/#required-matched-single-agent-fleet-probe",
+      "/project/compare/#optional-run-a-matched-single-agent-fleet-probe",
     );
     await pairedTask.click();
     await expect(
-      page.locator('[id="required-matched-single-agent-fleet-probe"]'),
+      page.locator('[id="optional-run-a-matched-single-agent-fleet-probe"]'),
     ).toBeVisible();
     await page.locator('.project-index a[href="/project/grading/"]').click();
     await expect(page.locator("#passing-and-final-grade")).toBeVisible();
