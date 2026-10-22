@@ -1372,6 +1372,10 @@ async function writeProjectDownloads() {
     path.join(root, "specifications", "examples", "fleet-trace"),
     path.join(downloadsDirectory, "fleet-trace-example.zip"),
   );
+  await writeDirectoryZip(
+    path.join(root, "course-tools", "benchmark"),
+    path.join(downloadsDirectory, "benchmark-runner.zip"),
+  );
 }
 
 async function copyProjectSpecificationSources(specifications) {

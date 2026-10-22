@@ -338,7 +338,7 @@ You must be able to measure a stable baseline and reason about what your impleme
 
 ### 7.1 Shared baseline workload
 
-You may use a course-provided benchmark runner when available or implement your own under this same protocol.
+You may use the [course-provided benchmark runner](/downloads/project/benchmark-runner.zip) or implement your own under this same protocol.
 Both paths require the same fixture, operation mix, seeded order, boundaries, profiles, repetitions, resets, deadlines, outcome accounting and correctness checks.
 The runner owns generic scheduling, timing and reporting; the application adapter must exercise the real application and persistence path.
 Writing a custom runner earns no separate points; its compliance, results and reproducibility must be inspectable.
@@ -685,7 +685,8 @@ It provides evidence about understanding, modifying, and validating one change u
 
 The instructor releases one phase-specific probe only after the implementation has been submitted.
 The probes use different product language but exercise an equivalent vertical slice and acceptance burden.
-Their exact change shape is withheld until release.
+The current phase-specific prompt, fields and values are withheld until release.
+Record exposure to prior phases or earlier published examples as a familiarity limitation rather than assuming the general probe pattern is unknown.
 
 The change-probe portion of the audit lasts thirty minutes.
 Begin timing after the auditor receives the prompt and has a runnable checkout, so setup friction and change friction remain separate observations.

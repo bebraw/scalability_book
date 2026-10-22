@@ -45,6 +45,7 @@ The following commands use the existing repository tools; they are not new autom
 | Browser interactions                             | The affected Playwright test, such as `npx playwright test tests/e2e/course-workspace.spec.ts --project=chromium`; include other configured browsers when compatibility is affected. |
 | Course persistence or Worker bindings            | The course verification and local Worker checks in [course-system.md](course-system.md#verification).                                                                                |
 | Review report tooling                            | `npm run test:review`.                                                                                                                                                               |
+| Course workload runner or download               | `npm run test:benchmark`, the build and download inspection; private reference checks and clean-unpack validation follow [the tooling guide](course-tooling.md).                     |
 | PDF layout or publication ordering               | `npm run pdf` and inspection of the affected exported pages.                                                                                                                         |
 
 Check formatting with `npx prettier --check <changed-files>` and apply it with `npx prettier --write <changed-files>`.

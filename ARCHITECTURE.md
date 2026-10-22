@@ -22,6 +22,11 @@ It uses npm and the Node version range in [package.json](package.json).
 | Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                                                              | Build pinned public learning bundles without hosting the authoring service.                                             |
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                               |
 
+Course preparation tooling is separate from the website application and course records.
+[The optional benchmark CLI](course-tools/benchmark/cli.mjs) composes the public protocol and scheduler with an application-specific adapter; [the tooling guide](docs/course-tooling.md) owns that contract and validation.
+The generic tool does not import the private reference, whose standalone source, SQLite state, adapter, frozen archives and withheld probes stay under ignored `.local/course-preparation/`.
+The site download builder packages only `course-tools/benchmark/`; reference source never enters the public build or download inputs.
+
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
 [The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.
 Local targets and fragments are checked during validation; external missing-page checks run before explicit deployment and through [CI](.github/workflows/links.yml), with generated reports kept in `.local/`.

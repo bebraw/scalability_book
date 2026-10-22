@@ -1,6 +1,41 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
+  test("offers the optional runner download without the private audit source", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/project/");
+    const link = page.getByRole("link", {
+      name: "course-provided benchmark runner",
+      exact: true,
+    });
+    await expect(link).toHaveAttribute(
+      "href",
+      "/downloads/project/benchmark-runner.zip",
+    );
+    const response = await request.get((await link.getAttribute("href"))!);
+    expect(response.status()).toBe(200);
+    const archive = await response.body();
+    expect(
+      archive.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+    ).toBe(true);
+    for (const required of [
+      "benchmark/README.md",
+      "benchmark/cli.mjs",
+      "benchmark/protocol.mjs",
+      "benchmark/runner.mjs",
+    ])
+      expect(archive.includes(Buffer.from(required))).toBe(true);
+    for (const privatePath of [
+      ".local/",
+      "/store.mjs",
+      "/reference/",
+      "ledger.sqlite",
+      "audit_change_probes",
+    ])
+      expect(archive.includes(Buffer.from(privatePath))).toBe(false);
+  });
   for (const width of [1280, 800, 390]) {
     test(`keeps grade thresholds compact and aligned at ${width}px`, async ({
       page,

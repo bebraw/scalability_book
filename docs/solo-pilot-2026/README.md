@@ -14,6 +14,7 @@ Dates and support commitments become operative when agreed with the student and 
 | --------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
 | [Specification scope review](../project-specification-scope-review-2026-10-22.md) | Instructor             | Agreed scope and preparation boundaries for the reference and study contract.                          |
 | [Study agreement](study-agreement.md)                                             | Student and instructor | Scope, dated milestones, responsibilities, grading and correction arrangements.                        |
+| [Student discussion proposal](student-discussion-proposal.md)                     | Student and instructor | A staged small-model exercise to calibrate difficulty before choosing further scope.                   |
 | [Independent activities](independent-activities.md)                               | Student and instructor | Nine concrete equivalents for the lecture activities, using the existing reading and project evidence. |
 | [Instructor guide](instructor-guide.md)                                           | Instructor             | Preparation, reference audits, phase reviews, assessment and evaluation of the pilot.                  |
 
@@ -24,19 +25,20 @@ Keep actual reference assignments, unreleased change probes and private assessme
 ## Agreed reviewer
 
 The course instructor will personally perform the incoming independent human audit of the student's frozen implementation in each of the three phases.
-The student's outgoing reference audits remain separate work; their repositories and probes are still to be selected.
+The student's outgoing reference audits remain separate work; private frozen packages and phase prompts are prepared, with their actual assignment and release still to be recorded.
 
 ## Agreed reference preparation
 
 Build a dedicated reference implementation after critically reviewing and settling the project specifications.
 The [scope review](../project-specification-scope-review-2026-10-22.md) records the settled choices, now reflected in the course contracts, checklist, snapshots and this pack.
 Building the reference and its audit packages needs additional preparation beyond the current instructor allowance, which assumed suitable references were available.
+The [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records the frozen reference, clean-unpack verification and release limitations.
 
 ## Agreed builds and benchmark tooling
 
 Keep three fresh implementations: large-model single-agent A, small-model single-agent B and fleet-built C.
 Provide a course benchmark runner as optional tooling; students may implement their own runner under the same measurement and evidence protocol.
-The runner is planned and still needs implementation and validation alongside the reference preparation.
+The optional runner is implemented and validated against the private reference; its public download is built with the site.
 The scope choices are settled; model assignments and operational preparations remain open.
 
 ## Agreed trace extension
@@ -109,8 +111,8 @@ Mark unavailable details honestly and reference unchanged published fields throu
 - Select the kickoff time during 2–4 November and confirm the proposed 16 November, 30 November and 15 December reviews, instructor availability during the audit windows, and the local deadline for registering the grade.
 - Choose the supported models, harnesses, execution environments, budgets and fallbacks using the [course environment sheet](../../specifications/course_environment.md).
   Establish must be ready before its project work begins; prepare Challenge and Compare before their respective phases.
-- Build and verify the dedicated reference and prepare each outgoing audit assignment, with phase-specific probes held back until the audit window.
-  Budget the additional reference work and any supported model access that needs to be established.
+- Retain an instructor-controlled backup of the prepared private reference packages and record each outgoing audit assignment, holding phase-specific probes back until the audit window.
+  Confirm supported model access and any remaining preparation budget, including the supplied matched-trace package.
 - Confirm the private submission, communication and feedback channels, and the proposed two-working-day response to blockers.
 - Agree the solo assessment equivalents and proposed correction arrangements in writing before work begins.
 

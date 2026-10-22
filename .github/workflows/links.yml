@@ -22,6 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --test tests/link-check.test.ts
+      - run: npm run test:benchmark
       - run: npm run worker:build
       - run: npm run validate
       - run: npm run check:links

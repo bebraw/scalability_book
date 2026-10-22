@@ -16,7 +16,9 @@ Use the [study agreement](study-agreement.md) for the calendar and commitments.
 | **Total**                                                                         | **16–23 h** |
 
 Building the dedicated reference implementation and audit packages is agreed, following the [specification scope review](../project-specification-scope-review-2026-10-22.md).
-This work, the planned optional benchmark runner, supplied matched-trace package and any model infrastructure setup need additional preparation beyond the allowance above; their scope and time remain to be estimated before committing to delivery.
+This work, the optional benchmark runner, supplied matched-trace package and any model infrastructure setup are preparation beyond the allowance above.
+The reference and runner are now locally validated; the [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records their evidence and remaining release work.
+Matched-trace preparation and model setup remain outstanding; do not count automated development elapsed time as measured instructor effort.
 Confirm the audit windows before fixing the dates with the student.
 
 ## Prepare the private arrangement
@@ -36,7 +38,8 @@ Confirm the audit windows before fixing the dates with the student.
 - [x] Friction reporting agreed: retain both audits and require one evidenced bottleneck and a checked improvement or justified follow-up per phase; use the eight categories as prompts.
 - [x] Scope review completed and the common contract, briefs, rubric wording, checklist, snapshots, chapter checkpoints and pilot documents revised together.
 - [x] Configuration reporting agreed: reference exact retained versions, confirm actual models/routes/environment, and record deviations, material settings and unavailable details.
-- [ ] Build and verify the reference before its first audit release.
+- [x] Build and verify the private reference and clean-unpack the three frozen source packages.
+- [ ] Back up the private preparation records under instructor control and register the actual phase assignments before release.
 - [x] Reflect [ADR-046](../adrs/implemented/ADR-046-make-fleet-trace-import-an-optional-extension.md) consistently to the retained Compare brief, rubric, evidence checklist and pilot agreement before use.
 - [x] Reflect [ADR-047](../adrs/implemented/ADR-047-make-live-paired-experiments-an-optional-extension.md) in the paired comparison requirements, retaining provenance, configurations, checks, outcomes and accounting limits as supplied-package obligations.
 - [x] Reflect [ADR-048](../adrs/implemented/ADR-048-require-evolving-decision-records-across-fresh-builds.md) to the project harness, phase expectations, transfer guidance and assessment wording before use, including the optional starter inventory and required provenance and reasoning.
@@ -45,7 +48,8 @@ Confirm the audit windows before fixing the dates with the student.
 - [x] Reflect [ADR-050](../adrs/implemented/ADR-050-focus-friction-reporting-on-evidenced-bottlenecks.md) to the common engineering evidence, affected phase briefs, rubric wording, requirement checklist and pilot materials while preserving the bounded audit protocol.
 - [x] Reflect [ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) in the evidence contract, environment publication rule, checklist and pilot agreement.
 - [ ] Prepare and verify the supplied matched traces, retaining provenance, brief, configurations, checks, outcomes and accounting gaps.
-- [ ] Implement and validate the optional course runner, publish its protocol and result format, and explain how a student-built runner demonstrates equivalent compliance.
+- [x] Implement and validate the optional course runner, document its protocol and result format, and explain equivalent compliance for a student-built runner.
+- [ ] Publish the reviewed runner download with the site and verify the deployed archive before directing the student to it.
 - [ ] Confirm 6–8 student orientation hours before kickoff, approximately 20–21 hours per week afterward and 22–25 hours per week during the final phase.
 - [ ] Select a kickoff time during 2–4 November and confirm the proposed 16 November, 30 November and 15 December reviews.
 - [ ] Agree the study agreement, independent activities, solo assessment equivalents and correction policy; retain the agreed copy privately.

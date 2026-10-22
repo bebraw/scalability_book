@@ -23,29 +23,15 @@ The implementation must:
 The probe does not require editing the property after creation, filtering by it, adding a new activity-event type, or migrating an external production database.
 An implementation may perform an ordinary local schema migration if its chosen storage requires one.
 
-## Establish probe: urgency
+## Current phase prompts
 
-Add an `urgency` property to work items.
+Current prompts are instructor-controlled preparation artifacts outside this public repository.
+Prepare one private prompt per phase with its field, exactly three supported values and default, using the common acceptance contract above.
+Release only that phase's prompt after the implementation freezes; do not bundle prompts into the reference source archive or public downloads.
 
-- Supported values: `routine`, `normal`, `urgent`
-- Default: `normal`
-- Acceptance: apply the common acceptance contract without adding unrelated scope.
-
-## Challenge probe: effort
-
-Add an `effort` property to work items.
-
-- Supported values: `small`, `medium`, `large`
-- Default: `medium`
-- Acceptance: apply the common acceptance contract without adding unrelated scope.
-
-## Compare probe: work type
-
-Add a `work_type` property to work items.
-
-- Supported values: `task`, `defect`, `experiment`
-- Default: `task`
-- Acceptance: apply the common acceptance contract without adding unrelated scope.
+Earlier concrete variants remain discoverable in repository history and may already be familiar to students.
+Use fresh private release variants and record any exposure to earlier examples or phases; a new field name does not establish an independent or blinded maintainability experiment.
+See [the tooling guide](../docs/course-tooling.md) for private storage and release-package ownership.
 
 ## Release and audit procedure
 
@@ -61,14 +47,14 @@ Add a `work_type` property to work items.
 
 Use the report as evidence rather than reducing the audit to completion alone.
 
-| Dimension | Record |
-| --- | --- |
-| Setup | Whether the documented path ran, elapsed setup time, and the first blocker |
+| Dimension     | Record                                                                                |
+| ------------- | ------------------------------------------------------------------------------------- |
+| Setup         | Whether the documented path ran, elapsed setup time, and the first blocker            |
 | Comprehension | Time to locate the likely interface, application, domain, persistence, and test paths |
-| Propagation | Boundaries and files changed, repeated representations, and hidden coupling |
-| Validation | Existing and new checks run, their results, and missing evidence |
-| Outcome | Complete, partial, blocked, or not attempted, plus acceptance items satisfied |
-| Uncertainty | Assumptions, unfamiliar-stack effects, auditor changes, and unresolved questions |
+| Propagation   | Boundaries and files changed, repeated representations, and hidden coupling           |
+| Validation    | Existing and new checks run, their results, and missing evidence                      |
+| Outcome       | Complete, partial, blocked, or not attempted, plus acceptance items satisfied         |
+| Uncertainty   | Assumptions, unfamiliar-stack effects, auditor changes, and unresolved questions      |
 
 Do not rank groups by raw completion time across different auditors or environments as though those conditions were controlled.
 Compare the three audits within a group primarily through the recorded path, evidence, and sources of friction.
