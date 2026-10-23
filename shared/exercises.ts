@@ -426,8 +426,8 @@ export const exercises: Record<string, Exercise> = {
       },
     ],
     demo: {
-      id: "demo-workflow-loop",
-      label: "Change cycle",
+      id: "demo-friction-audit",
+      label: "Observed change effort",
     },
   },
   "pressure-retries": {

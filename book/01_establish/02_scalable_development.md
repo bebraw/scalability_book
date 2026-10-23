@@ -131,12 +131,17 @@ Judge a loop improvement by accepted behavior and the correction effort it requi
 ### Constraint feedback loop
 
 The demonstration starts with an underspecified request to add CSV export to an event list.
-Generate a candidate, validate it, revise the project memory from failed checks, and begin the next round.
+Generate an authored candidate, inspect simulated checks, revise the project memory and begin the next round.
 Compare a run with the default constraints with one that selects every constraint before generation.
 
 {{ import "site/includes/constrain-generate-validate-demo.html" }}
 
-The candidate is deterministic teaching data, not model output.
+The candidates and check results are scripted teaching data; no model or independent test runner executes in this demonstration.
+Selecting every constraint guarantees success only inside this model.
+For executed evidence, use the [CSV starter lab](/downloads/labs/csv-export.zip) ([browse lab sources](https://github.com/bebraw/scalability_book/tree/main/labs)).
+The working page supplies filtering and download handling; ask your model to implement one serialization function, preserve the supplied checks, then inspect the actual downloaded bytes.
+Maintain the specification and record a consequential decision using your existing ADR approach.
+This optional exercise can replace an existing practice activity within the agreed study time; it adds no grading criterion or separate submission.
 Use validation failures to revise the project's rules and context before the next generation attempt.
 
 ## Assign authority and ownership

@@ -137,13 +137,45 @@ I can review and correct an agent's work more quickly when its explanations use 
 That personal fit affects the workflow alongside the model's task capability.
 Changing models therefore changes both the tool and the reviewer's fluency with it, which belongs among the comparison's alternative explanations.
 
-### Final reflection package builder
+### Compare evidence index
 
-The builder uses the same four bundles as the specification.
-Mark the bundles you have assembled and replace the outline prompts with links to your evidence.
-The selections help organize the submission; they do not verify its completeness or the strength of its claims.
+Copy this outline into your existing evidence index and replace the prompts with links to actual records.
+Use the [Compare deliverables](/project/compare/#what-to-do-and-submit) to check completeness and defend each claim against its evidence.
+The template organizes the same four bundles; it adds no report or assessment criterion.
 
-{{ import "site/includes/final-reflection-demo.html" }}
+```md
+# Compare evidence index
+
+## 1. Implementation
+
+- Accepted C revision and reproducible setup:
+- Common checks, pressure evidence and cross-team audit/response:
+- Earlier A and B records:
+
+## 2. Fleet evidence
+
+- Task graph, actual run and at least two debugging findings:
+- Coordination measurements, failed attempts and human review:
+- Supplied matched-trace analysis and workflow model:
+- Missing records and comparison limits:
+
+## 3. Scaling and deployment experiment
+
+- Application model and selected revision:
+- Implemented response and every same-procedure measurement:
+- New failure or recovery check and deployed workload:
+- Unverified properties and disappointing results:
+
+## 4. Final decision
+
+- A–B–C evidence matrix, target architecture and trade-offs:
+- Conditional architecture and workflow choice:
+- Observation, inference and proposal kept distinct:
+- Rejected alternatives, owner and revisit condition:
+```
+
+Before finalizing, choose one key observation that could be contradicted.
+Explain how that would change your decision and what you would check next.
 
 ## Project artifact
 

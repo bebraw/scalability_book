@@ -217,17 +217,11 @@ If a slow check repeatedly catches problems that no earlier stage sees, consider
 
 ## Audit the event-tracker workflow
 
-### Workflow loop lab
-
-The demonstration below puts the work into a [visible loop](/concepts/#feedback-loop): human framing, implementation, tool feedback, review, and correction.
-It separates agent speed from workflow quality, because an agent can produce more output while still pushing uncertainty into human review.
-
-{{ import "site/includes/workflow-loop-demo.html" }}
+Follow one [feedback loop](/concepts/#feedback-loop): frame the change, implement it, inspect tool feedback, review the result and revise the project context.
+Predict which stage an intervention should improve and which work still needs human judgment.
+The whole-cycle exercise tests how a local speedup contributes to total effort; use observed records in the audit afterward.
 
 {{ import "exercise:friction-cycle" }}
-
-Use this first to make the human-in-the-loop process explicit.
-Then use the friction audit to ask which part of that process is creating repeated work.
 
 ### Friction audit lab
 

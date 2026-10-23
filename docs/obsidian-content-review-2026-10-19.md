@@ -2,7 +2,7 @@
 
 ## Scope and baseline
 
-The October 19 Obsidian intake contains 25 unique new sources and one archived duplicate since the [October 8 review](obsidian-content-review-2026-10-08.md).
+The October 19 Obsidian intake contains 25 unique new sources and one archived duplicate since the October 8 review, whose completed report is retained in Git history.
 The working tree was clean at `b3039d9` before these additions.
 The intake, quality audit, current trends synthesis, selected primary captures, and existing book sections informed the review.
 The two most recently modified event-planning notes were also screened; they supplied no additional book change.

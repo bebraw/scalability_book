@@ -184,6 +184,70 @@ test("non-demo loops preserve reported evidence and next checks without inventin
   assert.deepEqual(context.selectedNotes, []);
 });
 
+test("changed demo activities reject stale turns while keeping their current evidence contract", () => {
+  for (const id of [
+    "demo-constraint-feedback-loop",
+    "demo-agent-fleet-delegation",
+    "demo-scaling-pressure-planner",
+  ]) {
+    const activity = readingActivities.find((item) => item.demoId === id)!;
+    const selected = {
+      ...source,
+      anchor: id,
+      conceptIds: [...activity.conceptIds],
+    };
+    assert.equal(activity.version, 2);
+    assert.throws(() =>
+      parseInvestigationTurn(
+        { activityId: activity.id, version: 1, phase: "predict" },
+        selected,
+      ),
+    );
+    assert.equal(
+      parseInvestigationTurn(
+        { activityId: activity.id, version: 2, phase: "predict" },
+        selected,
+      ).version,
+      2,
+    );
+  }
+});
+
+test("retired demo notes survive restart and fall back to the general learning loop", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "book-retired-demo-"));
+  let notebook = openLearningNotebook(directory);
+  const ids = [
+    "demo-workflow-loop",
+    "demo-observability-signal-picker",
+    "demo-final-reflection-package",
+  ];
+  try {
+    for (const id of ids)
+      notebook.saveEntry({
+        source: { ...source, anchor: id },
+        kind: "reflection",
+        title: id,
+        body: "Earlier reasoning remains mine.",
+        relatedIds: [],
+      });
+    notebook.close();
+    notebook = openLearningNotebook(directory);
+    assert.equal(notebook.entries().length, 3);
+    for (const note of notebook.entries()) {
+      assert.ok(ids.includes(note.source.anchor));
+      assert.equal(note.body, "Earlier reasoning remains mine.");
+      assert.equal(activityForSource(note.source).id, learningLoop.id);
+      assert.equal(
+        demoResources.some((demo) => demo.id === note.source.anchor),
+        false,
+      );
+    }
+  } finally {
+    notebook.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("large valid demo snapshots never discard a learner's tab reflection", (t) => {
   const records = new Map<string, string>();
   const original = Object.getOwnPropertyDescriptor(

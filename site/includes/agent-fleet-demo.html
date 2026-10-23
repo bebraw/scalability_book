@@ -95,89 +95,18 @@
       </section>
     </div>
 
-    <div class="agent-fleet-column">
-      <section class="agent-fleet-panel agent-fleet-models-step">
-        <h4 id="agent-fleet-models-title">Hypothetical model profiles</h4>
-        <p>
-          Assign hypothetical profiles to explore cost and review trade-offs.
-          All figures are illustrative assumptions, not model measurements. This
-          scenario assumes higher-cost profiles need less review; task evidence
-          may show a different relationship.
-        </p>
-        <div class="agent-fleet-model-options">
-          <label data-agent-fleet-model-row="scout">
-            <span>Scout model</span>
-            <select data-agent-fleet-model="scout">
-              <option value="small">P: lower cost, more review</option>
-              <option value="balanced" selected>Q: middle assumptions</option>
-              <option value="strong">R: higher cost, less review</option>
-            </select>
-          </label>
-          <label data-agent-fleet-model-row="planner">
-            <span>Planner model</span>
-            <select data-agent-fleet-model="planner">
-              <option value="small">P: lower cost, more review</option>
-              <option value="balanced" selected>Q: middle assumptions</option>
-              <option value="strong">R: higher cost, less review</option>
-            </select>
-          </label>
-          <label data-agent-fleet-model-row="implementer">
-            <span>Implementer model</span>
-            <select data-agent-fleet-model="implementer">
-              <option value="small">P: lower cost, more review</option>
-              <option value="balanced" selected>Q: middle assumptions</option>
-              <option value="strong">R: higher cost, less review</option>
-            </select>
-          </label>
-          <label data-agent-fleet-model-row="reviewer">
-            <span>Reviewer model</span>
-            <select data-agent-fleet-model="reviewer">
-              <option value="small">P: lower cost, more review</option>
-              <option value="balanced" selected>Q: middle assumptions</option>
-              <option value="strong">R: higher cost, less review</option>
-            </select>
-          </label>
-        </div>
-      </section>
-    </div>
-
     <div class="agent-fleet-column agent-fleet-output-column">
       <section class="agent-fleet-panel agent-fleet-review-step">
-        <h4 id="agent-fleet-plan-title">Workflow under these assumptions</h4>
+        <h4 id="agent-fleet-plan-title">Planned handoffs</h4>
         <ol data-agent-fleet-steps></ol>
-        <dl class="agent-fleet-metrics demo-metrics-compact">
-          <div>
-            <dt>Coordination</dt>
-            <dd data-agent-fleet-coordination>0</dd>
-          </div>
-          <div>
-            <dt>Modeled integration risk</dt>
-            <dd data-agent-fleet-risk>Low</dd>
-          </div>
-          <div>
-            <dt>Suggested pattern</dt>
-            <dd data-agent-fleet-pattern>Single agent</dd>
-          </div>
-          <div>
-            <dt>Illustrative model cost</dt>
-            <dd data-agent-fleet-model-cost>0.00 EUR</dd>
-          </div>
-          <div>
-            <dt>Illustrative model latency</dt>
-            <dd data-agent-fleet-model-latency>0 min</dd>
-          </div>
-          <div>
-            <dt>Illustrative review time</dt>
-            <dd data-agent-fleet-review-time>0 min</dd>
-          </div>
-          <div>
-            <dt>Modeled rework risk</dt>
-            <dd data-agent-fleet-rework>Low</dd>
-          </div>
-        </dl>
-        <p data-agent-fleet-model-impact>
-          Choose roles and models to compare direct model cost with review
-          burden.
+        <p data-agent-fleet-guidance>
+          Check scope, validation and completed handoffs before comparing actual
+          runs.
+        </p>
+        <p class="demo-note">
+          Compare recorded runs and the supplied matched-trace analysis. This
+          worksheet prepares prompts; execution supplies time, usage and outcome
+          evidence.
         </p>
       </section>
 

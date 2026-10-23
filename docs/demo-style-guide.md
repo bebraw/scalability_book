@@ -49,6 +49,26 @@ For example, use “2 loops (simulated)” for a hypothetical workflow and “El
 Keep units and observation boundaries visible, and carry the qualification into copied output.
 An illustrative score does not establish a measured performance improvement or a calibrated risk estimate.
 
+## Learning value and local practice
+
+The shared catalog owns 29 demos grouped into reading investigations, optional depth and project worksheets.
+Give an investigation a concrete prediction or decision, inspectable consequences and a question that transfers to a changed case.
+Use an explicit mechanism or stated formal model for a simulation; keep capacity, productivity and risk claims tied to observed evidence.
+The fleet and scaling worksheets prepare scope, handoffs and trade-offs without forecasting effort or assigning numerical relief scores.
+The recap's static Compare evidence index preserves submission prompts without a separate checklist widget.
+
+The constraint feedback loop explicitly labels its candidates and checks as scripted.
+Its download is an authored example, separate from executed validation.
+The optional [CSV starter](../labs/csv-export/README.md) supplies a working local page, a single serialization gap, a specification and fixed acceptance checks.
+Students use their own model and harness, maintain specifications and decision records, and inspect actual downloaded bytes within existing study time.
+The unfinished starter must fail its feature checks while its setup preflight passes; validation of a completed candidate belongs in a clean disposable copy.
+Do not put a completed solution, model credentials or generated check records in the starter download.
+
+Keep the catalog, includes/scripts, preview images, reading embeds and agent-resource metadata consistent when retiring a demo.
+Increment the authored activity version when its meaning changes; browser snapshot schema versions are independent.
+Historical notebook entries retain their recorded sources and use the general learning loop when a specialized activity is retired.
+See [ADR-053](adrs/implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md) for the decision and verification boundary.
+
 ## Review
 
 Review all demos together at `/demos/`, then check the affected chapter or appendix embeds.

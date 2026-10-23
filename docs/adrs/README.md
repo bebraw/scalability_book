@@ -32,7 +32,7 @@ They document the implemented outcome rather than invent an earlier formal appro
 Unless an original source explicitly discusses alternatives, the alternatives and trade-offs are retrospective analysis of the chosen design, not a claim about conversations that Git cannot establish.
 Implemented status may describe a published course protocol or software capability; it does not establish production provisioning, a completed course run, or external-client compliance.
 
-Related historical notes remain available as rationale.
+ADRs retain lasting rationale; completed editorial review reports are recoverable from Git history after their findings are incorporated into the owning material.
 Current behavior belongs in the owning contract and operating guide; old follow-up lists do not independently authorize or require new features.
 
 ## Proposed
@@ -101,6 +101,7 @@ No accepted decisions await implementation.
 | [ADR-050](implemented/ADR-050-focus-friction-reporting-on-evidenced-bottlenecks.md)                 | Retain both audits and require one evidenced bottleneck and response per phase; use the eight friction categories as prompts.                               |
 | [ADR-051](implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md)     | Reference exact retained course configurations, confirm actual execution conditions and record deviations and material settings.                            |
 | [ADR-052](implemented/ADR-052-separate-private-audit-reference-from-public-workload-tooling.md)     | Keep the audit reference private and independently frozen, with a public implementation-independent benchmark runner and explicit adapter responsibilities. |
+| [ADR-053](implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md)             | Focus 29 demos on inspectable reasoning, remove unsupported scoring and provide an optional executable CSV starter.                                         |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

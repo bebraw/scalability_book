@@ -153,3 +153,26 @@ The observations show a trade-off in this task: the fleet used more time and req
 One sequential pair does not establish a general orchestration advantage; shared service load, uncontrolled caching and the prescribed decomposition limit the comparison.
 Shell tools also used temporary helper files outside the allocated application directory; recorded commands write their own helpers before executing them, but filesystem isolation was not complete.
 Use the evidence packet in the student discussion before choosing additional task difficulty; the required course outcomes and grading remain unchanged.
+
+### Lessons for student review
+
+The bounded label task is a feasible starting exercise for this department-model configuration: both conditions complete it within the declared limits without human implementation repairs.
+The fleet takes 58 seconds longer and nearly twice as many inference requests, while producing the better mobile layout.
+Assess correctness, usability, coordination and resource use separately when interpreting that trade-off.
+
+Maintaining specifications and ADRs proved practical in both conditions, but their claims still need checking against the evidence.
+The fleet ADR credits the supplied acceptance file with an explicit check against collapsing internal whitespace; that case is actually in a worker-generated test.
+Distinguish supplied checks from generated checks and confirm that each cited check rejects the failure claimed for it.
+
+The candidates also make different choices where the task leaves behavior open.
+The single-agent implementation rejects a non-string JSON label with HTTP 400, while the fleet treats it as absent and stores an empty string.
+Type validation was explicitly outside the exercise, so this variation is a specification discussion rather than an acceptance failure.
+
+For the first student discussion, use the retained pair to:
+
+1. Identify one missing acceptance condition, using the mobile overflow as a concrete example.
+2. Assess one consequential design decision and verify its claimed evidence, including whether the task actually specifies the behavior.
+3. Explain the incomplete worker handoff and how to retain cancelled requests and missing usage visibly.
+
+After that review, choose one additional difficulty, such as input validation or one specified retry case, before combining concurrency and recovery.
+This is a rehearsal within the existing work, with no new grading criterion or required submission.

@@ -63,7 +63,7 @@ function initializeCgvDemo(root: HTMLElement) {
       : "Choose the constraints the candidate should receive.";
     reading.textContent = feedback
       ? "The next attempt is informed by recorded learning, not merely by an instruction to try again. Generate with the revised boundary."
-      : "Generation is not evidence. Generate a candidate, then run the checks.";
+      : "This is a scripted model of the loop. Generate an example, then inspect its simulated checks.";
     cgvRenderChecks(root, null);
     cgvRenderStages(root, "constrain", round > 1);
     roundView.textContent = `Round ${round}`;
@@ -73,10 +73,10 @@ function initializeCgvDemo(root: HTMLElement) {
     candidate = cgvReadConstraints(root);
     phase = "generated";
     status.textContent = `Round ${round} · candidate generated`;
-    title.textContent = "Candidate ready for independent checks";
+    title.textContent = "Candidate ready for simulated checks";
     candidateView.innerHTML = cgvCandidateMarkup(candidate);
     reading.textContent =
-      "The candidate looks plausible, but its own description is not proof. Validate each declared boundary.";
+      "The candidate and check results are authored examples. Inspect the modeled boundaries, then use the local starter for executed evidence.";
     action.textContent = "Validate candidate";
     cgvRenderChecks(root, null);
     cgvRenderStages(root, "generate", round > 1);
@@ -90,14 +90,14 @@ function initializeCgvDemo(root: HTMLElement) {
     cgvRenderStages(root, "validate", round > 1);
 
     if (failures.length === 0) {
-      status.textContent = `Round ${round} · all checks pass`;
-      title.textContent = "Evidence supports this candidate";
+      status.textContent = `Round ${round} · all simulated checks pass`;
+      title.textContent = "Scripted checks accept this example";
       reading.textContent =
-        "The candidate satisfies the three stated boundaries. Human judgment can now focus on whether the requested change is valuable and the constraints were sufficient.";
-      action.textContent = "Accept evidence";
+        "The authored example matches these three constraints. Real agent output still needs independently executed checks; an instruction does not guarantee conformance.";
+      action.textContent = "Accept example";
     } else {
-      status.textContent = `Round ${round} · ${failures.length} check${failures.length === 1 ? "" : "s"} failed`;
-      title.textContent = "Candidate rejected by the harness";
+      status.textContent = `Round ${round} · ${failures.length} simulated check${failures.length === 1 ? "" : "s"} failed`;
+      title.textContent = "Example rejected by scripted checks";
       reading.textContent = `${cgvFailureSummary(failures)} Feed those failures back as explicit constraints before generating again.`;
       action.textContent = "Revise project memory";
     }
@@ -114,7 +114,7 @@ function initializeCgvDemo(root: HTMLElement) {
       action.disabled = true;
       download.disabled = false;
       reading.textContent =
-        "The validated patch is now applied to the fixture. Click Export CSV to download the artifact that passed these checks.";
+        "The scripted loop is complete. Download the authored example CSV, or implement and test the CSV starter locally.";
       root.classList.remove("is-cgv-looping");
       root.classList.add("is-cgv-complete");
       return;
@@ -213,8 +213,8 @@ Build, measure, learn,Main hall
 API "office hours",Online`;
 
   return `<div class="cgv-artifact-grid">
-<section><span>Generated patch · ${files.length} files</span><ul>${files.map((file) => `<li>${file}</li>`).join("")}</ul><p><b>Download API</b> ${candidate.platform ? "Blob + URL.createObjectURL" : "node:fs.writeFileSync"}</p></section>
-<section><span>Observed export · events.csv</span><pre>${csv}</pre></section>
+<section><span>Scripted patch · ${files.length} files</span><ul>${files.map((file) => `<li>${file}</li>`).join("")}</ul><p><b>Download API</b> ${candidate.platform ? "Blob + URL.createObjectURL" : "node:fs.writeFileSync"}</p></section>
+<section><span>Example export · events.csv</span><pre>${csv}</pre></section>
 </div>`;
 }
 
@@ -238,18 +238,18 @@ function cgvRenderChecks(root: HTMLElement, candidate: CgvCandidate | null) {
   > = {
     platform: {
       pending: "Can clicking Export create a download?",
-      pass: "PASS — the click emitted events.csv through the Blob API.",
-      fail: "FAIL — node:fs is not available in the browser.",
+      pass: "Simulated pass — this example uses browser APIs; no download test has run.",
+      fail: "Simulated fail — this example uses a Node-only API in a browser.",
     },
     scope: {
       pending: "Did the patch stay inside export.ts and export.test.ts?",
-      pass: "PASS — both changed files are inside the declared boundary.",
-      fail: "FAIL — app.ts, events.ts, shared/csv.ts, and package.json changed.",
+      pass: "Simulated pass — the supplied file list stays inside the declared boundary.",
+      fail: "Simulated fail — the supplied patch lists app.ts, events.ts, shared/csv.ts and package.json.",
     },
     acceptance: {
       pending: "Are commas and quotation marks escaped?",
-      pass: "PASS — “Build, measure, learn” remains one CSV field.",
-      fail: "FAIL — “Build, measure, learn” was split into three fields.",
+      pass: "Simulated pass — the supplied CSV preserves commas and quotation marks.",
+      fail: "Simulated fail — “Build, measure, learn” was split into three fields.",
     },
   };
 

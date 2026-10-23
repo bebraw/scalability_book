@@ -109,7 +109,7 @@ export const readingActivities: ReadingActivity[] = [
     .map(
       (demo): ReadingActivity => ({
         id: `investigate-${demo.id}`,
-        version: 1,
+        version: demo.activityVersion ?? 1,
         demoId: demo.id,
         title: demo.title,
         reading: demo.url,

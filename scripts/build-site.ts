@@ -263,15 +263,7 @@ await compileSiteBundle(
   "es2019",
 );
 await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
-await compileSiteScript(
-  "scripts/observability-signal-demo.ts",
-  "observability-signal-demo.js",
-);
 await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
-await compileSiteScript(
-  "scripts/workflow-loop-demo.ts",
-  "workflow-loop-demo.js",
-);
 await compileSiteScript(
   "scripts/friction-audit-demo.ts",
   "friction-audit-demo.js",
@@ -314,10 +306,6 @@ await compileSiteScript("scripts/cap-partition-lab.ts", "cap-partition-lab.js");
 await compileSiteScript(
   "scripts/latency-budget-demo.ts",
   "latency-budget-demo.js",
-);
-await compileSiteScript(
-  "scripts/final-reflection-demo.ts",
-  "final-reflection-demo.js",
 );
 if (includeEditor) {
   await compileSiteScript("scripts/editor.ts", "editor.js");
@@ -829,27 +817,60 @@ function getDemoGalleryHtml() {
       ? `<p class="demo-gallery-chapter-link"><a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a></p>`
       : "";
   };
-  const sections = demoScriptIncludes
-    .map(({ title, chapter, include }, index) => {
-      const demoId = `demo-${slugify(title)}`;
-      const galleryId = `${demoId}-gallery`;
-      const displayIndex = String(index + 1).padStart(2, "0");
-      const practice = exerciseEntries
-        .filter(([, exercise]) => exercise.demo?.id === demoId)
-        .map(([id]) => `{{ import "exercise:${id}" }}\n${chapterLink(id)}`)
-        .join("\n");
+  const categories = [
+    {
+      id: "reading",
+      title: "Reading investigations",
+      badge: "Reading",
+      description:
+        "Use these alongside the main chapters. Predict a result, change one condition and explain what the evidence supports.",
+    },
+    {
+      id: "advanced",
+      title: "Optional depth",
+      badge: "Optional",
+      description:
+        "Explore a specific mechanism when it helps answer your question. These models and appendix activities do not add required submissions.",
+    },
+    {
+      id: "worksheet",
+      title: "Project worksheets",
+      badge: "Worksheet",
+      description:
+        "Prepare a bounded implementation, investigation or decision. Fill in actual observations from your project; selections alone do not validate a claim.",
+    },
+  ];
+  let demoIndex = 0;
+  const sections = categories
+    .map((category) => {
+      const cards = demoScriptIncludes
+        .filter((demo) => demo.category === category.id)
+        .map(({ title, chapter, include }) => {
+          const demoId = `demo-${slugify(title)}`;
+          const galleryId = `${demoId}-gallery`;
+          const displayIndex = String(++demoIndex).padStart(2, "0");
+          const practice = exerciseEntries
+            .filter(([, exercise]) => exercise.demo?.id === demoId)
+            .map(([id]) => `{{ import "exercise:${id}" }}\n${chapterLink(id)}`)
+            .join("\n");
 
-      return `<section class="demo-gallery-item" id="${escapeAttribute(galleryId)}">
+          return `<section class="demo-gallery-item" id="${escapeAttribute(galleryId)}">
 <div class="demo-gallery-item-header">
 <span class="demo-gallery-index" aria-hidden="true">${displayIndex}</span>
 <div>
 <p>${chapter}</p>
 <a href="#${escapeAttribute(demoId)}">${title}</a>
 </div>
-<span class="demo-gallery-status"><i aria-hidden="true"></i> Ready</span>
+<span class="demo-gallery-status"><i aria-hidden="true"></i> ${category.badge}</span>
 </div>
 {{ import "${include}" }}
 ${practice}
+</section>`;
+        })
+        .join("\n\n");
+      return `<section class="demo-gallery-group" id="${category.id}-demos" aria-labelledby="${category.id}-demos-title">
+<header class="demo-gallery-practice-header"><h2 id="${category.id}-demos-title">${category.title}</h2><p>${category.description}</p></header>
+${cards}
 </section>`;
     })
     .join("\n\n");
@@ -871,6 +892,7 @@ ${practice}
     .join("\n");
   return `<div class="demo-gallery-lede">
 <p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface. Where practice is available, switch to its tab to check your understanding. Saved results are shared with the chapter exercises.</p>
+<p>For a small local implementation with your own model, download the <a href="/downloads/labs/csv-export.zip">CSV starter lab</a> and run its independent checks.</p>
 <dl class="demo-gallery-stats">
 <div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
 <div><dt>Exercises</dt><dd>${exerciseEntries.length}</dd></div>
@@ -878,7 +900,7 @@ ${practice}
 </dl>
 </div>
 <nav class="demo-gallery-jumps" aria-label="On this page">
-<a href="#demo-${slugify(demoScriptIncludes[0].title)}-gallery">Explore demos</a>
+${categories.map((category) => `<a href="#${category.id}-demos">${category.title}</a>`).join("\n")}
 <a href="#more-practice">More practice</a>
 </nav>
 

@@ -117,6 +117,11 @@ Generated archives are build output and should not be committed.
 Transient `.git`, `node_modules`, `playwright-report`, and `test-results` directories and `.DS_Store` files are omitted automatically.
 Reader material should normally offer both the repository source and the generated download so students can inspect before downloading.
 
+For [the CSV starter](../labs/csv-export/README.md), run `npm run preflight` in its directory to check the supplied server independently of the unfinished serializer.
+`npm run check` retains preflight, contract and browser logs in ignored `test-results/evidence/`; feature failures are expected in the untouched starter.
+Verify the seven contract checks and three browser cases with a completed candidate in a separate clean-unpacked copy, preserving both the initial failures and completed results.
+Inspect the ZIP to exclude dependencies, generated evidence and any completed solution; verify its pinned `npm ci` setup outside this checkout.
+
 To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
 
 ```md

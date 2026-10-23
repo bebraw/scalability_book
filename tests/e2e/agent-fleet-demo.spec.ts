@@ -14,34 +14,15 @@ test.describe("agent fleet demo", () => {
     await demo.locator("[data-agent-fleet-task]").selectOption("tests");
     await demo.locator("[data-agent-fleet-role][value='implementer']").check();
     await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
-      "4 roles, medium modeled risk",
+      "4 roles selected",
     );
     await expect(demo.locator(".agent-fleet-grid")).toBeVisible();
     await expect(demo.locator("[data-agent-fleet-steps]")).toContainText(
       "Scout returns compressed findings",
     );
-    await demo
-      .locator("[data-agent-fleet-model='implementer']")
-      .selectOption("small");
-
-    await expect(demo.locator("[data-agent-fleet-coordination]")).toContainText(
-      "6/10",
-    );
-    await expect(demo.locator("[data-agent-fleet-risk]")).toContainText("High");
-    await expect(demo.locator("[data-agent-fleet-pattern]")).toContainText(
-      "Single agent",
-    );
-    await expect(demo.locator("[data-agent-fleet-model-cost]")).toContainText(
-      "1.10 EUR",
-    );
-    await expect(demo.locator("[data-agent-fleet-review-time]")).toContainText(
-      "43 min",
-    );
-    await expect(demo.locator("[data-agent-fleet-rework]")).toContainText(
-      "Medium",
-    );
-    await expect(demo.locator("[data-agent-fleet-model-impact]")).toContainText(
-      "Implementer uses profile P",
+    await expect(demo.locator("[data-agent-fleet-model]")).toHaveCount(0);
+    await expect(demo.locator("[data-agent-fleet-guidance]")).toContainText(
+      "actual model use",
     );
 
     await demo.locator(".agent-fleet-brief-step summary").click();
@@ -68,7 +49,7 @@ test.describe("agent fleet demo", () => {
       /src\/routes\/work-items\.ts/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /implementer \(Profile P\)/,
+      /implementer:/,
     );
     await demo.locator("[data-agent-fleet-packet-tab='scout']").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
@@ -82,7 +63,7 @@ test.describe("agent fleet demo", () => {
     );
     await demo.locator("[data-agent-fleet-packet-tab='implementer']").click();
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
-      /Hypothetical model profile:\nProfile P/,
+      /Model and harness:\nRecord the actual assigned configuration/,
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /Validation command:/,
@@ -93,6 +74,12 @@ test.describe("agent fleet demo", () => {
     );
     await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
       /What the fleet missed/,
+    );
+    await expect(demo.locator("[data-agent-fleet-brief]")).toHaveValue(
+      /Aggregate requests, usage and missing records/,
+    );
+    await expect(demo.locator("[data-agent-fleet-brief]")).not.toHaveValue(
+      /Estimated impact|EUR|Modeled integration risk/,
     );
     await expectElementsInsideDemo(demo, [".agent-fleet-brief-step"]);
     await expect(demo.locator("[data-agent-fleet-step]")).toHaveCount(0);
@@ -113,13 +100,10 @@ test.describe("agent fleet demo", () => {
     const packet = demo.getByRole("textbox", { name: "Selected run packet" });
 
     await expect(demo.locator("[data-agent-fleet-verdict]")).toContainText(
-      "3 roles, low modeled risk",
+      "3 roles selected",
     );
     await expect(implementer).toBeDisabled();
     await expect(implementer).not.toBeChecked();
-    await expect(
-      demo.locator("[data-agent-fleet-model='implementer']"),
-    ).toBeDisabled();
     await demo.locator(".agent-fleet-brief-step summary").click();
     await expect(implementerTab).toBeDisabled();
     await demo.getByRole("tab", { name: "Planner", exact: true }).click();
@@ -180,9 +164,8 @@ test.describe("agent fleet demo", () => {
       .locator("[data-agent-fleet-role][value='reviewer']")
       .setChecked(false);
 
-    await expect(demo.locator("[data-agent-fleet-risk]")).toContainText("High");
-    await expect(demo.locator("[data-agent-fleet-pattern]")).toContainText(
-      "Harden first",
+    await expect(demo.locator("[data-agent-fleet-guidance]")).toContainText(
+      "Resolve setup and validation gaps",
     );
 
     await demo.locator(".agent-fleet-brief-step summary").click();

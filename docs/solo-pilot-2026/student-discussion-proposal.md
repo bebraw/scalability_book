@@ -43,6 +43,7 @@ The existing course briefs retain their required investigations; this staged exe
 
 The instructor-prepared pair uses the verified department model with thinking disabled and gives each condition twenty minutes and eighty aggregate requests, including all workers and retries.
 Review its evidence before adding difficulty: compare correctness, specification/ADR quality, time, requests and coordination problems, and explain what the automated checks missed.
+Use the [student review prompts](../course-tooling.md#lessons-for-student-review) to identify a missing acceptance condition, check a design decision against its evidence and explain the incomplete worker handoff.
 The calibration is separate from the matched pair, and the recorded candidates remain unchanged for analysis.
 Further model trials can then help investigate whether a difficulty comes from the task, model configuration or orchestration.
 The student's own matched experiment remains optional; the required supplied-trace analysis supports full credit.

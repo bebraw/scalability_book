@@ -12,6 +12,20 @@ test.describe("demo showcase", () => {
         json: { authenticated: false, available: false },
       }),
     );
+    await page.route("**/api/account/status", (route) =>
+      route.fulfill({
+        json: {
+          local: false,
+          github: {
+            available: true,
+            user: null,
+            loginUrl: "/api/auth/github/start",
+          },
+          course: { available: false, emailAvailable: false, user: null },
+          answers: null,
+        },
+      }),
+    );
     page.on("dialog", (dialog) => dialog.accept());
     await page.goto("/demos/");
     const standalone = Object.entries(exercises).filter(
@@ -166,6 +180,22 @@ test.describe("demo showcase", () => {
       "Work through one module at a time",
     );
     await expect(items).toHaveCount(expectedDemoCount);
+    await expect(gallery.locator(".demo-gallery-group")).toHaveCount(3);
+    await expect(
+      page.locator("#advanced-demos #demo-acid-transaction-lab"),
+    ).toBeVisible();
+    await expect(
+      page.locator("#worksheet-demos #demo-friction-audit"),
+    ).toBeVisible();
+    await expect(
+      page.locator("#reading-demos #demo-tail-latency-simulator"),
+    ).toBeVisible();
+    await expect(
+      page.locator(
+        "#demo-workflow-loop, #demo-observability-signal-picker, #demo-final-reflection-package",
+      ),
+    ).toHaveCount(0);
+
     await expect(gallery.locator(".demo-gallery-stats")).toContainText(
       String(expectedDemoCount),
     );
@@ -240,7 +270,10 @@ test.describe("demo showcase", () => {
 
     await expectSharedShellPalette();
 
-    expect(await gallery.innerText()).not.toMatch(
+    const framing = await gallery
+      .locator(".demo-gallery-lede, .demo-gallery-group > header")
+      .allTextContents();
+    expect(framing.join("\n")).not.toMatch(
       /\b(students?|classroom|lecturer|instructor)\b/i,
     );
 

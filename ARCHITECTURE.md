@@ -27,6 +27,11 @@ Course preparation tooling is separate from the website application and course r
 The generic tool does not import the private reference, whose standalone source, SQLite state, adapter, frozen archives and withheld probes stay under ignored `.local/course-preparation/`.
 The site download builder packages only `course-tools/benchmark/`; reference source never enters the public build or download inputs.
 
+Standalone teaching labs under `labs/` are packaged independently of the private course reference.
+In [the CSV starter](labs/csv-export/README.md), the browser owns filtering and visible rows, `export.mjs` owns the one missing pure serialization function, and the loopback server serves only the fixed fixture assets.
+Supplied Node and browser checks own literal contract expectations and actual download inspection; generated evidence stays in ignored `test-results/` and is excluded from lab archives.
+The website publishes the source ZIP and links, without executing a student model or depending on the lab server at runtime.
+
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
 [The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.
 Local targets and fragments are checked during validation; external missing-page checks run before explicit deployment and through [CI](.github/workflows/links.yml), with generated reports kept in `.local/`.

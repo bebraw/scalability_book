@@ -16,7 +16,7 @@ test.describe("constrain, generate, validate demo", () => {
 
     await action.click();
     await expect(demo.locator("[data-cgv-candidate-title]")).toContainText(
-      "ready for independent checks",
+      "ready for simulated checks",
     );
     await expect(demo.locator("[data-cgv-stage='generate']")).toHaveClass(
       /is-current/,
@@ -32,7 +32,7 @@ test.describe("constrain, generate, validate demo", () => {
     await expect(demo.locator(".cgv-checks .is-pass")).toHaveCount(1);
     await expect(demo.locator(".cgv-checks .is-fail")).toHaveCount(2);
     await expect(demo.locator("[data-cgv-status]")).toContainText(
-      "2 checks failed",
+      "2 simulated checks failed",
     );
     await expect(demo.locator('[data-cgv-check="acceptance"]')).toContainText(
       "split into three fields",
@@ -73,7 +73,7 @@ test.describe("constrain, generate, validate demo", () => {
     await expect(demo.locator(".cgv-checks .is-pass")).toHaveCount(3);
     await expect(demo.locator(".cgv-checks .is-fail")).toHaveCount(0);
     await expect(demo.locator("[data-cgv-status]")).toContainText(
-      "all checks pass",
+      "all simulated checks pass",
     );
 
     await action.click();
@@ -82,7 +82,7 @@ test.describe("constrain, generate, validate demo", () => {
       "loop complete",
     );
     await expect(demo.locator("[data-cgv-reading]")).toContainText(
-      "applied to the fixture",
+      "authored example CSV",
     );
     await expect(demo).not.toHaveClass(/is-cgv-looping/);
     const downloadButton = demo.locator("[data-cgv-download]");
@@ -112,6 +112,24 @@ test.describe("constrain, generate, validate demo", () => {
     await expect(demo.locator("[data-cgv-candidate]")).toContainText(
       "Blob + URL.createObjectURL",
     );
+  });
+
+  test("labels scripted checks without claiming an unperformed download", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-cgv-demo]");
+    await demo.locator("[data-cgv-action]").click();
+    await demo.locator("[data-cgv-action]").click();
+    await expect(demo.locator("[data-cgv-download]")).toBeDisabled();
+    await expect(demo.locator('[data-cgv-check="platform"]')).not.toContainText(
+      "the click emitted",
+    );
+    await expect(demo.locator('[data-cgv-check="platform"]')).toContainText(
+      "Simulated",
+    );
+    await expect(
+      demo.getByRole("link", { name: "CSV starter lab" }),
+    ).toHaveAttribute("href", "/downloads/labs/csv-export.zip");
   });
 
   test("uses the active theme accent", async ({ page }) => {

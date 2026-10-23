@@ -240,6 +240,9 @@ Observability is the broader capability to use that evidence to investigate syst
 It supplies APIs, SDKs, semantic conventions, and a Collector, but it is not itself a storage or visualization backend.
 That distinction matters: instrumenting an application creates evidence, while operating the pipeline and asking useful questions turns that evidence into an observability practice.
 
+Before opening a trace, choose the first signal you would inspect for a slow request, stale summary or missing event.
+State which observation could distinguish competing explanations; the name of a signal alone does not establish a cause.
+
 ### Simulated OpenTelemetry trace lab
 
 The trace explorer below reuses the event-recording request from the benchmark demonstration.

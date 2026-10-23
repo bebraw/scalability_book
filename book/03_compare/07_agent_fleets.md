@@ -255,9 +255,10 @@ That remains a direction I am exploring, but it could make correction less depen
 ### Delegation lab
 
 Use the planner below before running real agents.
-Choose a task and project-readiness level, then change the roles and model allocation.
+Choose a task and project-readiness level, then choose roles, permissions and handoffs.
 The bottleneck investigation is read-only: its planner and reviewer work on a claim and measurement plan, and the Implementer is unavailable.
 The regression-test and refactoring tasks permit a bounded code change; select an Implementer when needed.
+Record the actual model and harness before execution; compare observed time, requests, outcomes and review effort using the run record and supplied matched traces.
 The generated packet is a rehearsal: if the task is vague, boundaries overlap, or the review burden exceeds available capacity, reduce the fleet or harden the project first.
 
 {{ import "site/includes/agent-fleet-demo.html" }}

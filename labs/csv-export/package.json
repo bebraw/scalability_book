@@ -1,0 +1,19 @@
+{
+  "name": "csv-export-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "preflight": "node --test tests/preflight.test.mjs",
+    "test": "node --test tests/export.test.mjs",
+    "test:browser": "playwright test",
+    "check": "node check.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.60.0"
+  }
+}

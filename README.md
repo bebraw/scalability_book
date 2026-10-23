@@ -11,6 +11,7 @@ Markdown source files live under [book/](book/).
 The public website is generated from those chapters and deployed at [scalableweb.dev](https://scalableweb.dev/).
 
 Development, preview, feedback, and deployment notes are in [docs/development.md](docs/development.md).
+The [documentation index](docs/README.md) points to course operations, learning tools, pilot preparation and remaining reviews.
 The [architecture map](ARCHITECTURE.md) describes the current system, and [Architecture Decision Records](docs/adrs/README.md) distinguish implemented decisions from the agreed course administration revision.
 
 ## Reviewing changes

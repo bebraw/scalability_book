@@ -1,7 +1,6 @@
 type ReadinessId = "high" | "medium" | "low";
 type TaskId = "bottleneck" | "tests" | "refactor";
 type RoleId = "scout" | "planner" | "implementer" | "reviewer";
-type AgentModelId = "small" | "balanced" | "strong";
 type PacketId = RoleId | "brief" | "submission";
 
 type TaskConfig = {
@@ -11,7 +10,6 @@ type TaskConfig = {
   evidence: string;
   nonGoal: string;
   validation: string;
-  changeSize: number;
   projectContext: ProjectContext;
 };
 
@@ -21,20 +19,6 @@ type ProjectContext = {
   allowedFiles: string;
   branch: string;
   context: string;
-};
-
-type AgentModelConfig = {
-  label: string;
-  costPerUnit: number;
-  latencyPerUnit: number;
-  reviewModifier: number;
-  riskModifier: number;
-};
-
-const readinessPenalty: Record<ReadinessId, number> = {
-  high: 0,
-  medium: 2,
-  low: 5,
 };
 
 const taskConfigs: Record<TaskId, TaskConfig> = {
@@ -49,7 +33,6 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
       "Do not edit files, apply optimizations, or redesign the system. Return the claim and measurement plan for human review.",
     validation:
       "A benchmark, query plan, trace, or log signal that can confirm or reject the bottleneck.",
-    changeSize: 2,
     projectContext: {
       module: "Work Activity Tracker API",
       validation: "npm test -- activity-feed",
@@ -69,7 +52,6 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
     nonGoal: "Do not rewrite the application structure while adding tests.",
     validation:
       "An unsupported transition is rejected without changing item state or successful-event history. The regression fails for the defect and passes after the fix.",
-    changeSize: 2,
     projectContext: {
       module: "work-item transition workflow",
       validation: "npm test -- transitions",
@@ -90,7 +72,6 @@ const taskConfigs: Record<TaskId, TaskConfig> = {
     nonGoal: "Do not change database schema, routes, or public API contracts.",
     validation:
       "Existing tests pass and one characterization test protects the refactor.",
-    changeSize: 3,
     projectContext: {
       module: "activity storage module",
       validation: "npm test -- activity-storage",
@@ -112,42 +93,11 @@ const roleOutput: Record<RoleId, string> = {
     "Reviewer inspects the diff, tests, regressions, and missing evidence.",
 };
 
-const roleWorkUnits: Record<RoleId, number> = {
-  scout: 1,
-  planner: 1.4,
-  implementer: 2.4,
-  reviewer: 1.6,
-};
-
-const roleRiskWeight: Record<RoleId, number> = {
-  scout: 1,
-  planner: 2,
-  implementer: 3,
-  reviewer: 2,
-};
-
-const agentModels: Record<AgentModelId, AgentModelConfig> = {
-  small: {
-    label: "Profile P",
-    costPerUnit: 0.03,
-    latencyPerUnit: 1.5,
-    reviewModifier: 1.35,
-    riskModifier: 1.2,
-  },
-  balanced: {
-    label: "Profile Q",
-    costPerUnit: 0.12,
-    latencyPerUnit: 3.5,
-    reviewModifier: 1,
-    riskModifier: 0,
-  },
-  strong: {
-    label: "Profile R",
-    costPerUnit: 0.38,
-    latencyPerUnit: 7,
-    reviewModifier: 0.72,
-    riskModifier: -0.8,
-  },
+type FleetContext = {
+  selectedTask: TaskConfig;
+  selectedReadiness: ReadinessId;
+  selectedRoles: RoleId[];
+  projectContext: ProjectContext;
 };
 
 for (const root of document.querySelectorAll<HTMLElement>(
@@ -168,33 +118,12 @@ function initializeAgentFleetDemo(root: HTMLElement) {
   const roles = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-agent-fleet-role]"),
   );
-  const modelSelects = Array.from(
-    root.querySelectorAll<HTMLSelectElement>("[data-agent-fleet-model]"),
-  );
-  const modelRows = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-agent-fleet-model-row]"),
-  );
   const verdict = root.querySelector<HTMLElement>("[data-agent-fleet-verdict]");
   const workflowSteps = root.querySelector<HTMLElement>(
     "[data-agent-fleet-steps]",
   );
-  const coordination = root.querySelector<HTMLElement>(
-    "[data-agent-fleet-coordination]",
-  );
-  const risk = root.querySelector<HTMLElement>("[data-agent-fleet-risk]");
-  const pattern = root.querySelector<HTMLElement>("[data-agent-fleet-pattern]");
-  const modelCost = root.querySelector<HTMLElement>(
-    "[data-agent-fleet-model-cost]",
-  );
-  const modelLatency = root.querySelector<HTMLElement>(
-    "[data-agent-fleet-model-latency]",
-  );
-  const reviewTime = root.querySelector<HTMLElement>(
-    "[data-agent-fleet-review-time]",
-  );
-  const rework = root.querySelector<HTMLElement>("[data-agent-fleet-rework]");
-  const modelImpact = root.querySelector<HTMLElement>(
-    "[data-agent-fleet-model-impact]",
+  const guidance = root.querySelector<HTMLElement>(
+    "[data-agent-fleet-guidance]",
   );
   const brief = root.querySelector<HTMLTextAreaElement>(
     "[data-agent-fleet-brief]",
@@ -203,7 +132,6 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     root.querySelectorAll<HTMLButtonElement>("[data-agent-fleet-packet-tab]"),
   );
   const copy = root.querySelector<HTMLButtonElement>("[data-agent-fleet-copy]");
-
   if (
     !form ||
     !readiness ||
@@ -211,74 +139,33 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     !taskScope ||
     !verdict ||
     !workflowSteps ||
-    !coordination ||
-    !risk ||
-    !pattern ||
-    !modelCost ||
-    !modelLatency ||
-    !reviewTime ||
-    !rework ||
-    !modelImpact ||
+    !guidance ||
     !brief ||
-    packetTabs.length === 0 ||
-    !copy
-  ) {
+    !copy ||
+    !packetTabs.length
+  )
     return;
-  }
-
   let currentPacket: PacketId = "brief";
   const render = () => {
     const selectedTask =
       taskConfigs[task.value as TaskId] ?? taskConfigs.bottleneck;
     updateRoleAvailability(selectedTask, roles);
     taskScope.textContent = getTaskScope(selectedTask);
-    const selectedReadiness = readiness.value as ReadinessId;
     const selectedRoles = getSelectedRoles(roles);
-    const selectedModels = getSelectedModels(modelSelects);
-    const projectContext = selectedTask.projectContext;
-    const changeSize = selectedTask.changeSize;
-    const score = getCoordinationScore(
-      selectedReadiness,
-      selectedRoles.length,
-      changeSize,
-    );
-    const modelResult = getModelImpact(
-      selectedRoles,
-      selectedModels,
-      selectedReadiness,
-      changeSize,
-    );
-    const riskLabel = getRiskLabel(score + modelResult.riskPenalty);
-    const patternLabel = getPatternLabel(
-      selectedRoles,
-      selectedReadiness,
-      score + modelResult.riskPenalty,
-    );
+    const selectedReadiness = readiness.value as ReadinessId;
     const packets = buildRunPackets({
       selectedTask,
       selectedReadiness,
       selectedRoles,
-      selectedModels,
-      projectContext,
-      changeSize,
-      riskLabel,
-      patternLabel,
-      modelResult,
+      projectContext: selectedTask.projectContext,
     });
-
-    updateModelRows(selectedRoles, modelRows, modelSelects);
-    coordination.textContent = `${score}/10`;
-    risk.textContent = riskLabel;
-    pattern.textContent = patternLabel;
-    modelCost.textContent = `${modelResult.cost.toFixed(2)} EUR`;
-    modelLatency.textContent = `${Math.round(modelResult.latency)} min`;
-    reviewTime.textContent = `${Math.round(modelResult.reviewMinutes)} min`;
-    rework.textContent = getRiskLabel(modelResult.reworkScore);
-    modelImpact.textContent = buildModelImpactSummary(modelResult);
-    verdict.textContent =
-      selectedRoles.length > 1
-        ? `${selectedRoles.length} roles, ${riskLabel.toLowerCase()} modeled risk`
-        : "Use one careful agent";
+    verdict.textContent = selectedRoles.length
+      ? `${selectedRoles.length} roles selected`
+      : "No roles selected";
+    guidance.textContent =
+      selectedReadiness === "low"
+        ? "Resolve setup and validation gaps before execution. Record the model, tools and limits; use actual runs to assess effort and integration."
+        : "Check each handoff against the task and acceptance criteria. Record actual model use, failed attempts and human review before comparing workflows.";
     workflowSteps.innerHTML = buildSteps(selectedRoles, selectedTask)
       .map((item) => `<li>${escapeAgentFleetHtml(item)}</li>`)
       .join("");
@@ -286,7 +173,6 @@ function initializeAgentFleetDemo(root: HTMLElement) {
     updatePacketTabs(packetTabs, currentPacket, selectedRoles);
     brief.value = packets[currentPacket];
   };
-
   form.addEventListener("submit", (event) => {
     event.preventDefault();
   });
@@ -382,174 +268,6 @@ function getRoleOutput(role: RoleId, task: TaskConfig) {
   return roleOutput[role];
 }
 
-function getSelectedModels(modelInputs: HTMLSelectElement[]) {
-  return modelInputs.reduce(
-    (selected, input) => {
-      const role = input.dataset.agentFleetModel as RoleId | undefined;
-      const model = input.value as AgentModelId;
-
-      if (role && agentModels[model]) {
-        selected[role] = model;
-      }
-
-      return selected;
-    },
-    {} as Record<RoleId, AgentModelId>,
-  );
-}
-
-function updateModelRows(
-  selectedRoles: RoleId[],
-  rows: HTMLElement[],
-  modelInputs: HTMLSelectElement[],
-) {
-  const selected = new Set(selectedRoles);
-
-  rows.forEach((row) => {
-    const role = row.dataset.agentFleetModelRow as RoleId | undefined;
-    const active = role ? selected.has(role) : false;
-
-    row.classList.toggle("is-disabled", !active);
-  });
-  modelInputs.forEach((input) => {
-    const role = input.dataset.agentFleetModel as RoleId | undefined;
-
-    input.disabled = role ? !selected.has(role) : true;
-  });
-}
-
-function getCoordinationScore(
-  readiness: ReadinessId,
-  roleCount: number,
-  changeSize: number,
-) {
-  const base = Math.max(0, roleCount - 1) * 2;
-  const sizePenalty = Math.max(0, changeSize - 2);
-
-  return Math.min(10, base + sizePenalty + readinessPenalty[readiness]);
-}
-
-function getRiskLabel(score: number) {
-  if (score >= 8) {
-    return "High";
-  }
-
-  if (score >= 5) {
-    return "Medium";
-  }
-
-  return "Low";
-}
-
-function getModelImpact(
-  roles: RoleId[],
-  models: Record<RoleId, AgentModelId>,
-  readiness: ReadinessId,
-  changeSize: number,
-) {
-  if (roles.length === 0) {
-    return {
-      cost: 0,
-      latency: 0,
-      reviewMinutes: 0,
-      riskPenalty: 0,
-      reworkScore: 0,
-      strongestRole: null as RoleId | null,
-      weakestRole: null as RoleId | null,
-    };
-  }
-
-  const readinessReviewPenalty = readinessPenalty[readiness] * 4;
-  const baseReview = 10 + roles.length * 5 + changeSize * 4;
-  let cost = 0;
-  let latency = 0;
-  let reviewMultiplierTotal = 0;
-  let riskPenalty = 0;
-  let strongestRole: RoleId | null = null;
-  let weakestRole: RoleId | null = null;
-
-  roles.forEach((role) => {
-    const modelId = models[role] ?? "balanced";
-    const model = agentModels[modelId];
-    const work = roleWorkUnits[role];
-
-    cost += model.costPerUnit * work * changeSize;
-    latency += model.latencyPerUnit * work;
-    reviewMultiplierTotal += model.reviewModifier * roleRiskWeight[role];
-    riskPenalty += model.riskModifier * roleRiskWeight[role];
-
-    if (modelId === "strong") {
-      strongestRole = role;
-    }
-
-    if (modelId === "small") {
-      weakestRole = role;
-    }
-  });
-
-  const riskWeightTotal = roles.reduce(
-    (total, role) => total + roleRiskWeight[role],
-    0,
-  );
-  const reviewMinutes =
-    (baseReview + readinessReviewPenalty) *
-    (reviewMultiplierTotal / Math.max(1, riskWeightTotal));
-  const reworkScore =
-    readinessPenalty[readiness] + changeSize + Math.max(0, riskPenalty);
-
-  return {
-    cost,
-    latency,
-    reviewMinutes,
-    riskPenalty,
-    reworkScore,
-    strongestRole,
-    weakestRole,
-  };
-}
-
-function buildModelImpactSummary(
-  modelResult: ReturnType<typeof getModelImpact>,
-) {
-  if (!modelResult.weakestRole && !modelResult.strongestRole) {
-    return "Profile Q uses the middle cost, latency, and review assumptions in this simulation.";
-  }
-
-  if (modelResult.weakestRole) {
-    return `${capitalizeRole(modelResult.weakestRole)} uses profile P. This simulation assumes lower direct cost and latency but more review and rework for that role; verify that trade-off with actual tasks.`;
-  }
-
-  return `${capitalizeRole(modelResult.strongestRole)} uses profile R. This simulation assumes higher direct cost and latency but less review and rework for that role; higher spending does not establish that outcome.`;
-}
-
-function getPatternLabel(
-  roles: RoleId[],
-  readiness: ReadinessId,
-  score: number,
-) {
-  if (readiness === "low") {
-    return "Harden first";
-  }
-
-  if (roles.length <= 1 || score >= 8) {
-    return "Single agent";
-  }
-
-  if (
-    roles.includes("scout") &&
-    roles.includes("planner") &&
-    roles.length <= 2
-  ) {
-    return "Scout then plan";
-  }
-
-  if (roles.includes("implementer") && roles.includes("reviewer")) {
-    return "Implement then review";
-  }
-
-  return "Sequential delegation";
-}
-
 function buildSteps(roles: RoleId[], task: TaskConfig) {
   if (roles.length === 0) {
     return [
@@ -561,17 +279,7 @@ function buildSteps(roles: RoleId[], task: TaskConfig) {
   return roles.map((role) => getRoleOutput(role, task));
 }
 
-function buildRunPackets(context: {
-  selectedTask: TaskConfig;
-  selectedReadiness: ReadinessId;
-  selectedRoles: RoleId[];
-  selectedModels: Record<RoleId, AgentModelId>;
-  projectContext: ProjectContext;
-  changeSize: number;
-  riskLabel: string;
-  patternLabel: string;
-  modelResult: ReturnType<typeof getModelImpact>;
-}) {
+function buildRunPackets(context: FleetContext) {
   return {
     brief: buildAgentFleetBrief(context),
     scout: buildRolePrompt("scout", context),
@@ -586,34 +294,9 @@ function buildAgentFleetBrief({
   selectedTask,
   selectedReadiness,
   selectedRoles,
-  selectedModels,
   projectContext,
-  changeSize,
-  riskLabel,
-  patternLabel,
-  modelResult,
-}: {
-  selectedTask: TaskConfig;
-  selectedReadiness: ReadinessId;
-  selectedRoles: RoleId[];
-  selectedModels: Record<RoleId, AgentModelId>;
-  projectContext: ProjectContext;
-  changeSize: number;
-  riskLabel: string;
-  patternLabel: string;
-  modelResult: ReturnType<typeof getModelImpact>;
-}) {
-  const roles =
-    selectedRoles.length > 0
-      ? selectedRoles
-          .map(
-            (role) =>
-              `- ${role} (${agentModels[selectedModels[role] ?? "balanced"].label}): ${getRoleOutput(role, selectedTask)}`,
-          )
-          .join("\n")
-      : "- No role selected.";
-
-  return `Example packet: replace model profiles and repository fields with your assigned configuration.
+}: FleetContext) {
+  return `Example packet: replace the invented repository fields and record the actual model, harness and limits before execution.
 
 Objective:
 ${selectedTask.objective}
@@ -636,23 +319,8 @@ ${projectContext.branch}
 Concrete project context:
 ${projectContext.context}
 
-Task size:
-${changeSize}/5
-
-Recommended pattern:
-${patternLabel}
-
-Modeled integration risk:
-${riskLabel}
-
-Estimated model impact:
-- Direct model cost: ${modelResult.cost.toFixed(2)} EUR
-- Model latency: ${Math.round(modelResult.latency)} min
-- Human review time: ${Math.round(modelResult.reviewMinutes)} min
-- Modeled rework risk: ${getRiskLabel(modelResult.reworkScore)}
-
 Roles and expected outputs:
-${roles}
+${selectedRoles.map((role) => `- ${role}: ${getRoleOutput(role, selectedTask)}`).join("\n") || "- No roles selected."}
 
 Allowed scope:
 ${getTaskScope(selectedTask)}
@@ -667,7 +335,10 @@ Non-goal:
 ${selectedTask.nonGoal}
 
 Human review checkpoint:
-Accept only outputs that name concrete files, commands, assumptions, and remaining risks.`;
+Check concrete files, commands, assumptions and remaining risks. Confirm each worker's completed handoff, not only the presence of its files.
+
+Measurements to collect from execution:
+Model and harness; elapsed time; aggregate requests and available usage; failed attempts; active human review; missing accounting. Keep unmeasured values unknown.`;
 }
 
 function buildRolePrompt(
@@ -676,35 +347,16 @@ function buildRolePrompt(
     selectedTask,
     selectedReadiness,
     selectedRoles,
-    selectedModels,
     projectContext,
-    changeSize,
-    patternLabel,
-  }: {
-    selectedTask: TaskConfig;
-    selectedReadiness: ReadinessId;
-    selectedRoles: RoleId[];
-    selectedModels: Record<RoleId, AgentModelId>;
-    projectContext: ProjectContext;
-    changeSize: number;
-    riskLabel: string;
-    patternLabel: string;
-    modelResult: ReturnType<typeof getModelImpact>;
-  },
+  }: FleetContext,
 ) {
-  const model = agentModels[selectedModels[role] ?? "balanced"];
-  const previous = getPreviousRole(role, selectedRoles);
-  const next = getNextRole(role, selectedRoles);
-
-  if (!selectedRoles.includes(role)) {
+  if (!selectedRoles.includes(role))
     return `${capitalizeRole(role)} is not selected for this run.`;
-  }
-
   return `Role:
 ${capitalizeRole(role)}
 
-Hypothetical model profile:
-${model.label} — replace with the approved model identifier before use
+Model and harness:
+Record the actual assigned configuration before use.
 
 Objective:
 ${selectedTask.objective}
@@ -730,12 +382,6 @@ Paste the previous role output here before running this role.
 Project readiness:
 ${selectedReadiness}
 
-Task size:
-${changeSize}/5
-
-Overall workflow pattern:
-${patternLabel}
-
 Your allowed scope:
 ${getRoleScope(role, selectedTask)}
 
@@ -749,40 +395,16 @@ Expected output format:
 ${getRoleOutputFormat(role, selectedTask)}
 
 Handoff:
-${getRoleHandoff(role, previous, next, selectedTask)}`;
+${getRoleHandoff(role, getPreviousRole(role, selectedRoles), getNextRole(role, selectedRoles), selectedTask)}
+Report whether work is complete, unfinished or blocked, and retain failed checks.`;
 }
 
 function buildSubmissionNote({
   selectedTask,
   selectedReadiness,
   selectedRoles,
-  selectedModels,
   projectContext,
-  changeSize,
-  riskLabel,
-  patternLabel,
-  modelResult,
-}: {
-  selectedTask: TaskConfig;
-  selectedReadiness: ReadinessId;
-  selectedRoles: RoleId[];
-  selectedModels: Record<RoleId, AgentModelId>;
-  projectContext: ProjectContext;
-  changeSize: number;
-  riskLabel: string;
-  patternLabel: string;
-  modelResult: ReturnType<typeof getModelImpact>;
-}) {
-  const roleList =
-    selectedRoles.length > 0
-      ? selectedRoles
-          .map(
-            (role) =>
-              `- ${role}: ${agentModels[selectedModels[role] ?? "balanced"].label}`,
-          )
-          .join("\n")
-      : "- No roles selected.";
-
+}: FleetContext) {
   return `# Agent Fleet Submission Note
 
 ## Task
@@ -797,22 +419,20 @@ ${projectContext.context}
 - ${selectedTask.kind === "investigation" ? "Files to inspect (read-only)" : "Allowed files or directories"}: ${projectContext.allowedFiles.replace(/\n/g, ", ")}
 - Validation command: ${projectContext.validation}
 - Project readiness: ${selectedReadiness}
-- Task size: ${changeSize}/5
 - Scope: ${getTaskScope(selectedTask)}
-- Workflow pattern: ${patternLabel}
-- Modeled integration risk: ${riskLabel}
 
-## Roles and models
-${roleList}
+## Roles and actual configurations
+${selectedRoles.map((role) => `- ${role}: record model, harness and limits`).join("\n") || "- No roles selected."}
 
-## Estimated impact
-- Direct model cost: ${modelResult.cost.toFixed(2)} EUR
-- Model latency: ${Math.round(modelResult.latency)} min
-- Human review time: ${Math.round(modelResult.reviewMinutes)} min
-- Modeled rework risk: ${getRiskLabel(modelResult.reworkScore)}
+## Observed execution
+- Source revision and task:
+- Elapsed time and observation boundary:
+- Aggregate requests, usage and missing records:
+- Failed or unfinished work:
+- Active human review and intervention:
+- Each worker's completion and handoff:
 
-## Evidence checklist
-- Each role named concrete files, commands, assumptions, and risks:
+## Evidence to inspect
 ${selectedRoles.map((role) => `- ${getRoleOutput(role, selectedTask)}`).join("\n")}
 - Human changed or rejected:
 

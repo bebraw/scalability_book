@@ -29,7 +29,8 @@ A queue can duplicate effects without idempotency, and controlled rejection can 
 The demonstration below starts from an invented Work Activity Tracker pressure: work-item actions spike while workspace activity feeds and summaries need to stay useful.
 Each accepted creation or transition must preserve its state change and matching activity event together.
 Queueing can defer derived summary work after that commit; a faster acknowledgment must not conceal a pending core operation.
-The scenarios and scores are teaching assumptions, not the required course benchmark or measured capacity.
+The scenarios are teaching examples; the worksheet proposes responses and their obligations, without estimating capacity or assigning risk scores.
+Choose one response and predict a result before inspecting the candidate design.
 
 {{ import "site/includes/scaling-pressure-demo.html" }}
 

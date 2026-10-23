@@ -182,7 +182,8 @@ Important distinction:
 The demonstration below asks students to choose evidence for a concrete operational symptom.
 The useful signal depends on the question: the right first signal for stale summaries is not always the right first signal for missing events or a slow dashboard.
 
-{{ import "site/includes/observability-signal-demo.html" }}
+Ask which specific log, metric or trace observation could distinguish the proposed explanations.
+Use the current chapter’s trace explorer and incident challenge to inspect evidence before choosing a response.
 
 Use the result as a starting point for an observability plan.
 A good plan names the symptom, the first signal to inspect, and what that signal can or cannot prove.

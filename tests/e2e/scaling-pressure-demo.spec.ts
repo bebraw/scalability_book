@@ -10,7 +10,7 @@ test.describe("scaling pressure demo", () => {
     const demo = page.locator("[data-scaling-demo]");
 
     await expect(demo.locator("[data-scaling-demo-verdict]")).toContainText(
-      "3 moves",
+      "3 candidate moves",
     );
     await expect(demo.locator(".scaling-pressure-grid")).toBeVisible();
     await expect(demo.locator("[data-scaling-demo-context]")).toHaveValue(
@@ -22,17 +22,15 @@ test.describe("scaling pressure demo", () => {
       .setChecked(true);
     await expect(
       demo.locator("[data-scaling-demo-recommendations]"),
-    ).toContainText("Write pressure is high");
+    ).toContainText("Burst writes");
 
     await expect(demo.locator("[data-scaling-demo-pipeline]")).toContainText(
       "short-lived cache",
     );
-    await expect(
-      demo.locator("[data-scaling-demo-metric='freshness']"),
-    ).toContainText("Medium");
+    await expect(demo.locator("[data-scaling-demo-metric]")).toHaveCount(0);
     await expect(
       demo.locator("[data-scaling-demo-interpretation]"),
-    ).toContainText("freshness budget");
+    ).toContainText("Each move is a hypothesis");
     await expect(
       demo.locator("[data-scaling-demo-waterbed-summary]"),
     ).toContainText("4 moves add new operating obligations");
@@ -59,6 +57,9 @@ test.describe("scaling pressure demo", () => {
     await expect(demo.locator("[data-scaling-demo-artifact]")).toHaveValue(
       /where did the displaced complexity reappear/,
     );
+    await expect(demo.locator("[data-scaling-demo-artifact]")).not.toHaveValue(
+      /Write relief|Read relief|Pressure scores|Freshness risk/,
+    );
     await expectElementsInsideDemo(demo, [".scaling-demo-artifact-step"]);
     await expect(demo.locator("[data-scaling-demo-step]")).toHaveCount(0);
   });
@@ -73,12 +74,12 @@ test.describe("scaling pressure demo", () => {
       /One busy workspace creates and advances many work items/,
     );
     await expect(
-      demo.locator("[data-scaling-demo-output='tenants']"),
-    ).toContainText("5");
+      demo.locator("[data-scaling-demo-pressure='tenants']"),
+    ).toBeChecked();
 
     await expect(
       demo.locator("[data-scaling-demo-recommendations]"),
-    ).toContainText("Tenant pressure is high");
+    ).toContainText("Tenant isolation");
     await demo
       .locator("[data-scaling-demo-technique][value='partition']")
       .setChecked(true);

@@ -13,6 +13,7 @@ export type LearningResource = {
   assumptions: string;
   images: { png: string; svg?: string; alt: string };
   controls?: string[];
+  activityVersion?: number;
   experiment?: {
     predict: string;
     try: string;
@@ -163,6 +164,7 @@ export const bookGraphicResources: LearningResource[] = figures.map(
 );
 
 type Activity = {
+  activityVersion?: number;
   conceptIds: string[];
   caption: string;
   controls: string[];
@@ -199,6 +201,7 @@ const activities: Record<string, Activity> = {
       "Inspect the generated direction and identify the evidence still needed to test it.",
   },
   "Constraint feedback loop": {
+    activityVersion: 2,
     conceptIds: [
       "agent",
       "loop-engineering",
@@ -207,7 +210,7 @@ const activities: Record<string, Activity> = {
       "feedback-loop",
     ],
     caption:
-      "Generate a CSV-export candidate under explicit constraints, then inspect the validation feedback.",
+      "Generate an authored CSV candidate under explicit constraints, then inspect simulated validation feedback.",
     controls: [
       "Client-only constraint",
       "Local patch constraint",
@@ -215,10 +218,10 @@ const activities: Record<string, Activity> = {
       "Generate and validate",
     ],
     assumptions:
-      "The generated candidates and checks are teaching examples. Passing one check does not establish every requirement.",
+      "Candidates and check results are scripted examples, not executed model output or tests. The separate CSV starter produces actual downloads and check records.",
     predict:
       "Which requirement could a plausible-looking CSV export still violate?",
-    try: "Change one constraint, generate a candidate, and run the checks.",
+    try: "Change one constraint, generate an authored candidate and inspect the simulated checks.",
     observe:
       "Separate candidate generation from evidence that the declared requirements hold.",
   },
@@ -499,32 +502,6 @@ const activities: Record<string, Activity> = {
     observe:
       "Identify the missed criteria and comparability limits. For real runs, record acceptance results, usage, and human corrections separately.",
   },
-  "Observability signal picker": {
-    conceptIds: [
-      "observability",
-      "measurement-boundary",
-      "recovery",
-      "tail-latency",
-    ],
-    caption:
-      "Choose signals that could explain an incident rather than collecting everything indiscriminately.",
-    controls: [
-      "Incident symptom",
-      "Logs",
-      "Metrics",
-      "Traces",
-      "User errors",
-      "Benchmark data",
-      "Database inspection",
-    ],
-    assumptions:
-      "Selecting a signal describes an investigation plan; it does not establish the incident's cause.",
-    predict:
-      "Which signal would discriminate between your two most plausible explanations of the symptom?",
-    try: "Choose an incident and a minimal set of signals, then inspect the feedback.",
-    observe:
-      "Identify what each signal can establish and which question remains unanswered.",
-  },
   "OpenTelemetry trace explorer": {
     conceptIds: ["observability", "latency", "measurement-boundary", "retry"],
     caption:
@@ -537,31 +514,6 @@ const activities: Record<string, Activity> = {
     try: "Compare the healthy request with a slow write or successful storage retry and inspect the relevant spans.",
     observe:
       "Relate span timing, parentage, and events to the declared request boundary.",
-  },
-  "Workflow loop": {
-    conceptIds: [
-      "feedback-loop",
-      "loop-engineering",
-      "harness",
-      "development-friction",
-      "agent",
-      "review-budget",
-    ],
-    caption:
-      "Explore how setup, examples, and failing tests move effort within a development workflow.",
-    controls: [
-      "Manual or agent-assisted mode",
-      "Local setup",
-      "Nearby examples",
-      "Failing-test strength",
-    ],
-    assumptions:
-      "Scenario ratings and timings are illustrative, not verified correctness or measured savings.",
-    predict:
-      "If local feedback improves, which stage's effort should change and which work still needs review?",
-    try: "Keep the mode fixed and improve one setup, example, or test assumption.",
-    observe:
-      "Inspect where modeled work moved and propose a bounded measurement to test the claim.",
   },
   "Friction audit": {
     conceptIds: [
@@ -631,6 +583,7 @@ const activities: Record<string, Activity> = {
       "Compare the physical ledger with orchestration intent and identify unsupported attribution.",
   },
   "Agent fleet delegation": {
+    activityVersion: 2,
     conceptIds: [
       "agent-fleet",
       "loop-engineering",
@@ -641,20 +594,20 @@ const activities: Record<string, Activity> = {
       "trade-off",
     ],
     caption:
-      "Plan task-specific roles and compare hypothetical model cost and human review burden.",
+      "Plan task-specific scope, roles, validation and completed handoffs before measuring an actual run.",
     controls: [
       "Delegation target",
       "Project readiness",
       "Roles",
-      "Hypothetical model profiles",
+      "Run packet sections",
     ],
     assumptions:
-      "Investigations are read-only; tests and refactors permit bounded edits. All figures are illustrative; the assumed cost/review relationship needs real task evidence.",
+      "Invented repository examples prepare prompts, not measured outcomes. Investigations are read-only; tests and refactors permit bounded edits. Record actual configuration, effort and accounting gaps from execution.",
     predict:
-      "Will reducing direct model cost also reduce total effort once review is counted?",
-    try: "Keep the target fixed and compare two role/profile assignments, then change project readiness.",
+      "Which handoff could lose a requirement, and what evidence should its recipient check?",
+    try: "Keep the target fixed, change the selected roles and inspect their scope, validation and handoffs.",
     observe:
-      "Inspect how the packet's scope and evidence change with the task, then compare direct cost with review burden under the stated assumptions.",
+      "Inspect how the packet changes between an investigation and a code change; distinguish preparation from completed-run evidence.",
   },
   "Reliability chain lab": {
     conceptIds: [
@@ -693,6 +646,7 @@ const activities: Record<string, Activity> = {
       "Inspect the unchanged sequential work and explain why accepted-change throughput is a separate claim.",
   },
   "Scaling pressure planner": {
+    activityVersion: 2,
     conceptIds: [
       "pressure",
       "scalability",
@@ -705,11 +659,11 @@ const activities: Record<string, Activity> = {
       "Choose responses to Work Activity Tracker pressure while preserving each accepted action's state-and-event commit.",
     controls: [
       "Scenario",
-      "Pressure levels",
+      "Pressures to investigate",
       "Index, queue, cache, replica, partition, or admission choices",
     ],
     assumptions:
-      "Invented scenarios and illustrative scores, not the course benchmark or measured capacity. Queues defer only derived work after the authoritative commit.",
+      "Invented scenarios prepare a qualitative plan, not capacity or risk estimates. Queues defer only derived work after the authoritative commit; observations from an actual workload must test the proposed benefit.",
     predict:
       "Which single move addresses the declared pressure, and what new obligation does it create?",
     try: "Choose a scenario and one response, then inspect the cost of adding another move.",
@@ -848,25 +802,6 @@ const activities: Record<string, Activity> = {
     try: "Keep placement fixed and vary query count; then keep work fixed and move the database.",
     observe:
       "Compare contributions within the declared response boundary and identify omitted costs.",
-  },
-  "Final reflection package": {
-    conceptIds: [
-      "benchmark",
-      "trade-off",
-      "decision-log",
-      "agent-fleet",
-      "change-probe",
-    ],
-    caption:
-      "Assemble implementation, fleet, scaling, and decision evidence for a conditional engineering judgment.",
-    controls: ["Evidence package checklist"],
-    assumptions:
-      "Checklist completion records supplied material; it does not grade its quality or establish the student's understanding.",
-    predict:
-      "Which part of your final decision would change if one key piece of evidence were contradicted?",
-    try: "Assemble the evidence package and identify one conditional decision with an owner and revisit condition.",
-    observe:
-      "Distinguish supplied artifacts from verified claims and identify unresolved uncertainty.",
   },
 };
 

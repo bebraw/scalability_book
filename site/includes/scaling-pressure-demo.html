@@ -13,8 +13,8 @@
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-scaling-demo-verdict>Describe the pressure</span>
       <small data-scaling-demo-caveat
-        >Name the limit, expected benefit, and new cost. The scores below are
-        illustrative.</small
+        >Name the limit, expected benefit and new cost; test the selected
+        response against actual observations.</small
       >
     </div>
   </div>
@@ -38,51 +38,27 @@
       </div>
 
       <div class="scaling-demo-panel">
-        <h4>Pressure levels</h4>
-        <label>
-          <span>Write burst</span>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value="4"
-            data-scaling-demo-pressure="writes"
-          />
-          <output data-scaling-demo-output="writes">4</output>
-        </label>
-        <label>
-          <span>Read load</span>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value="3"
-            data-scaling-demo-pressure="reads"
-          />
-          <output data-scaling-demo-output="reads">3</output>
-        </label>
-        <label>
-          <span>Freshness requirement</span>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value="4"
+        <h4>Pressures to investigate</h4>
+        <label
+          ><input type="checkbox" data-scaling-demo-pressure="writes" checked />
+          Burst writes</label
+        >
+        <label
+          ><input type="checkbox" data-scaling-demo-pressure="reads" /> Repeated
+          reads</label
+        >
+        <label
+          ><input
+            type="checkbox"
             data-scaling-demo-pressure="freshness"
+            checked
           />
-          <output data-scaling-demo-output="freshness">4</output>
-        </label>
-        <label>
-          <span>Tenant count</span>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value="2"
-            data-scaling-demo-pressure="tenants"
-          />
-          <output data-scaling-demo-output="tenants">2</output>
-        </label>
+          Freshness requirement</label
+        >
+        <label
+          ><input type="checkbox" data-scaling-demo-pressure="tenants" /> Tenant
+          isolation</label
+        >
       </div>
     </div>
 
@@ -168,30 +144,8 @@
 
     <div class="scaling-pressure-column scaling-pressure-output-column">
       <section class="scaling-demo-panel scaling-demo-tradeoff-step">
-        <h4 id="scaling-demo-tradeoff-title">Resulting design</h4>
+        <h4 id="scaling-demo-tradeoff-title">Candidate design</h4>
         <ol data-scaling-demo-pipeline></ol>
-        <dl class="scaling-demo-metrics demo-metrics-compact">
-          <div>
-            <dt>Write relief</dt>
-            <dd data-scaling-demo-metric="writes">0/10</dd>
-          </div>
-          <div>
-            <dt>Read relief</dt>
-            <dd data-scaling-demo-metric="reads">0/10</dd>
-          </div>
-          <div>
-            <dt>Freshness risk</dt>
-            <dd data-scaling-demo-metric="freshness">Low</dd>
-          </div>
-          <div>
-            <dt>Operational complexity</dt>
-            <dd data-scaling-demo-metric="complexity">Low</dd>
-          </div>
-          <div>
-            <dt>Resource cost</dt>
-            <dd data-scaling-demo-metric="cost">Low</dd>
-          </div>
-        </dl>
         <section
           class="scaling-waterbed-lens"
           aria-labelledby="scaling-waterbed-title"

@@ -7,14 +7,25 @@
 >
   <div class="scaling-demo-header demo-header">
     <div>
-      <p class="scaling-demo-kicker demo-kicker">Constraint learning loop</p>
+      <p class="scaling-demo-kicker demo-kicker">Scripted constraint loop</p>
       <h3 id="cgv-demo-heading">Use checks to improve the next change</h3>
     </div>
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-cgv-status>Round 1 · constrain the change</span>
-      <small>Task: add CSV export to the browser event list.</small>
+      <small
+        >Authored candidates and simulated checks; no model or test runner
+        executes here.</small
+      >
     </div>
   </div>
+
+  <p class="demo-note">
+    For executed evidence, use the
+    <a href="/downloads/labs/csv-export.zip">CSV starter lab</a> (<a
+      href="https://github.com/bebraw/scalability_book/tree/main/labs"
+      >browse lab sources</a
+    >): implement one function with your model, then run the supplied checks.
+  </p>
 
   <ol
     class="cgv-loop-map"
@@ -54,7 +65,9 @@
         <div class="cgv-fixture-bar">
           <span aria-hidden="true">● ● ●</span>
           <strong>Events</strong>
-          <button type="button" data-cgv-download disabled>Export CSV</button>
+          <button type="button" data-cgv-download disabled>
+            Download example CSV
+          </button>
         </div>
         <table>
           <thead>
@@ -113,7 +126,7 @@
     <section class="scaling-demo-panel cgv-evidence" aria-live="polite">
       <div class="cgv-evidence-header">
         <div>
-          <p class="cgv-eyebrow">Candidate + evidence</p>
+          <p class="cgv-eyebrow">Candidate + simulated checks</p>
           <h4 data-cgv-candidate-title>No candidate generated</h4>
         </div>
         <span data-cgv-round>Round 1</span>
@@ -154,7 +167,7 @@
       </ul>
 
       <p class="cgv-reading" data-cgv-reading>
-        Generation is not evidence. Generate a candidate, then run the checks.
+        Generate an authored candidate and inspect the simulated checks.
       </p>
 
       <div class="cgv-actions">

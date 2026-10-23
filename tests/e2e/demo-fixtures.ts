@@ -1,1 +1,1 @@
-export const expectedDemoCount = 32;
+export const expectedDemoCount = 29;

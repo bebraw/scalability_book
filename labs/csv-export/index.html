@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CSV export lab</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.mjs"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="kicker">Local implementation lab · 01</p>
+        <h1>Export what you can see.</h1>
+        <p>
+          Complete <code>serializeEvents</code> with your model, then inspect an
+          actual download. Filtering and download handling already work.
+        </p>
+      </header>
+      <section aria-labelledby="events-title">
+        <div class="toolbar">
+          <h2 id="events-title">Event list</h2>
+          <button id="export" type="button">Export visible rows</button>
+        </div>
+        <label for="filter">Filter by title or location</label>
+        <input id="filter" type="search" placeholder="Try API or a location" />
+        <p id="count"></p>
+        <div
+          class="table-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Visible event records"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Location</th>
+              </tr>
+            </thead>
+            <tbody id="events"></tbody>
+          </table>
+        </div>
+        <p id="status" role="status">
+          Ready. The starter deliberately leaves CSV serialization unfinished.
+        </p>
+      </section>
+      <footer>
+        <p>
+          Predict which fields need quoting before exporting. Check the
+          downloaded bytes against SPEC.md; a successful click alone does not
+          establish correct CSV.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
