@@ -29,6 +29,9 @@ export default defineConfig({
     {
       name: "webkit",
       testMatch: [
+        "browser-compatibility-demo.spec.ts",
+        "orchestration-demo.spec.ts",
+        "course-workspace.spec.ts",
         "concept-navigation.spec.ts",
         "theme-initialization.spec.ts",
         "learning-workspace.spec.ts",

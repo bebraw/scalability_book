@@ -1084,7 +1084,7 @@ test("opening either experience preserves book, reading and demo widths with exp
     page.locator(".chapter-main"),
     page.locator(".prose"),
     page.locator(".prose > p:not(.chapter-kicker)").first(),
-    page.locator("[data-scaling-demo]"),
+    page.locator("[data-saturation-boundary-demo]"),
   ];
   for (const width of [2560, 1920, 1600, 1280, 1024, 768, 390]) {
     await page.setViewportSize({ width, height: 1000 });

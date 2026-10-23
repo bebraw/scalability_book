@@ -61,6 +61,7 @@ Verification on 2026-10-23 includes:
 
 Ignored evidence is under `.local/reviews/demo-strict-2026-10-23/`.
 A broader Safari compatibility scan still fails on pre-existing ES2022 course output and `.at`/`.replaceAll` calls in learning dependencies; this change does not claim to fix that separate compatibility boundary.
+[ADR-056](ADR-056-align-browser-support-with-site-requirements.md) subsequently resolves that mismatch through an explicit modern browser baseline, shared build targets and updated checks.
 The native-tool reading fixture now uses a 16k context budget for generic visible-text snapshots; production context limits remain enforced.
 No live model evaluation or learner study was run, and production publication is separate from local implementation.
 

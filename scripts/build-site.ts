@@ -53,6 +53,7 @@ import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
+import { getBrowserBuildTargets } from "./lib/browser-targets.ts";
 import {
   readRequirementEditions,
   rewriteRequirementLinks,
@@ -67,6 +68,10 @@ import {
 } from "./lib/text.ts";
 
 const root = process.cwd();
+const browserTargets = getBrowserBuildTargets(
+  JSON.parse(await readFile(path.join(root, "package.json"), "utf8"))
+    .browserslist,
+);
 const archivedRequirements = await readRequirementEditions(root);
 const buildDir = path.resolve(root, process.env.BUILD_DIR || "build");
 const siteDir = path.join(root, "site");
@@ -162,30 +167,18 @@ await compileSiteStylesheet("styles/demos.css");
 await compileSiteStylesheet("styles/feedback-admin.css");
 await compileSiteStylesheet("styles/project.css");
 await compileSiteStylesheet("styles/course.css");
-await compileSiteBundle(
-  "scripts/course.ts",
-  "course.js",
-  "CourseWorkspace",
-  "es2022",
-);
+await compileSiteBundle("scripts/course.ts", "course.js", "CourseWorkspace");
 await compileSiteScript("scripts/theme.ts", "theme.js");
-await compileSiteBundle(
-  "scripts/account.ts",
-  "account.js",
-  "BookAccount",
-  "es2019",
-);
+await compileSiteBundle("scripts/account.ts", "account.js", "BookAccount");
 await compileSiteBundle(
   "scripts/learning-workspace.ts",
   "learning-workspace.js",
   "BookLearningWorkspace",
-  "es2019",
 );
 await compileSiteBundle(
   "scripts/learning-loader.ts",
   "learning-loader.js",
   "BookLearningLoader",
-  "es2019",
   {
     __LEARNING_WORKSPACE_URL__: JSON.stringify(
       assets.url("/learning-workspace.js"),
@@ -193,26 +186,15 @@ await compileSiteBundle(
   },
 );
 await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
-await compileSiteBundle(
-  "scripts/concepts.ts",
-  "concepts.js",
-  "BookConcepts",
-  "es2019",
-);
+await compileSiteBundle("scripts/concepts.ts", "concepts.js", "BookConcepts");
 await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
-await compileSiteBundle(
-  "scripts/comments.ts",
-  "comments.js",
-  "BookFeedback",
-  "es2019",
-);
+await compileSiteBundle("scripts/comments.ts", "comments.js", "BookFeedback");
 await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteBundle(
   "scripts/statechart-boundary-demo.ts",
   "statechart-boundary-demo.js",
   "StatechartBoundaryDemo",
-  "es2019",
 );
 await compileSiteScript(
   "scripts/acid-transaction-lab.ts",
@@ -236,7 +218,6 @@ await compileSiteBundle(
   "scripts/exercises.ts",
   "exercises.js",
   "BookExercises",
-  "es2019",
 );
 await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
 await compileSiteScript(
@@ -251,8 +232,6 @@ await compileSiteBundle(
   "scripts/orchestration-demo.ts",
   "vendor/orchestration-demo.js",
   "OrchestrationDemo",
-  // Webernetes models 64-bit Kubernetes values with BigInt.
-  "es2020",
 );
 await compileSiteScript(
   "scripts/orchestration-demo-loader.ts",
@@ -1137,8 +1116,7 @@ async function compileSiteScript(
   const result = await transformWithOxc(source, sourcePath, {
     lang: "ts",
     define,
-    // Keep this aligned with package.json browserslist Safari/iOS Safari support.
-    target: "es2019",
+    target: browserTargets,
   });
 
   await mkdir(path.dirname(outputPath), { recursive: true });
@@ -1150,7 +1128,6 @@ async function compileSiteBundle(
   sourceRelativePath,
   outputRelativePath,
   globalName,
-  target: "es2019" | "es2020",
   define: Record<string, string> = {},
 ) {
   await viteBuild({
@@ -1158,7 +1135,7 @@ async function compileSiteBundle(
     logLevel: "warn",
     define,
     build: {
-      target,
+      target: browserTargets,
       outDir: buildDir,
       emptyOutDir: false,
       sourcemap: false,

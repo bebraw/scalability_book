@@ -40,9 +40,11 @@
     "node": ">=24"
   },
   "browserslist": [
-    "defaults",
-    "safari >= 13",
-    "ios_saf >= 13"
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 121",
+    "safari >= 16.4",
+    "ios_saf >= 16.4"
   ],
   "dependencies": {
     "@citation-js/core": "0.8.2",

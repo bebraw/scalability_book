@@ -18,7 +18,8 @@ Use the [study agreement](study-agreement.md) for the calendar and commitments.
 Building the dedicated reference implementation and audit packages is agreed, following the [specification scope review](../project-specification-scope-review-2026-10-22.md).
 This work, the optional benchmark runner, supplied matched-trace package and any model infrastructure setup are preparation beyond the allowance above.
 The reference and runner are now locally validated; the [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records their evidence and remaining release work.
-Matched-trace preparation and model setup remain outstanding; do not count automated development elapsed time as measured instructor effort.
+The [department model baseline and matched pair](../course-tooling.md#department-model-configuration) are now verified for the bounded label task; student access, phase assignments and private evidence release remain to be arranged.
+Do not count automated development elapsed time as measured instructor effort.
 Confirm the audit windows before fixing the dates with the student.
 
 ## Prepare the private arrangement
@@ -47,7 +48,9 @@ Confirm the audit windows before fixing the dates with the student.
 - [x] Reflect [ADR-049](../adrs/implemented/ADR-049-focus-required-pressure-investigations-and-offer-extensions.md) to the common pressure protocol, phase instructions, rubric wording, evidence checklist and pilot agreement, including the activity-based incident-transfer assessment and affected book checkpoint.
 - [x] Reflect [ADR-050](../adrs/implemented/ADR-050-focus-friction-reporting-on-evidenced-bottlenecks.md) to the common engineering evidence, affected phase briefs, rubric wording, requirement checklist and pilot materials while preserving the bounded audit protocol.
 - [x] Reflect [ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) in the evidence contract, environment publication rule, checklist and pilot agreement.
-- [ ] Prepare and verify the supplied matched traces, retaining provenance, brief, configurations, checks, outcomes and accounting gaps.
+- [x] Prepare and verify the supplied matched traces, retaining provenance, brief, configurations, checks, outcomes and accounting gaps.
+- [ ] Review and release the curated matched-trace packet through the private student channel.
+- [ ] Confirm the student's department credentials and allocation, then use the [published model access and tool preflight](../../labs/README.md#department-model-baseline) with the student's actual coding harness.
 - [x] Implement and validate the optional course runner, document its protocol and result format, and explain equivalent compliance for a student-built runner.
 - [ ] Publish the reviewed runner download with the site and verify the deployed archive before directing the student to it.
 - [ ] Confirm 6–8 student orientation hours before kickoff, approximately 20–21 hours per week afterward and 22–25 hours per week during the final phase.
@@ -62,7 +65,8 @@ Confirm the audit windows before fixing the dates with the student.
 - [ ] Complete the run-specific [environment sheet](../../specifications/course_environment.md) before the affected phase.
       Store operational records in the private course workspace and give the student the supported access instructions.
 
-The model choices, access paths, budgets and fallback services are still to be selected.
+The working optional-practice baseline is `Qwen/Qwen3.8-27B-FP8` with thinking disabled, under configuration `aalto-qwen38-27b-2026-10-23`.
+This establishes a starting point for orientation; phase model assignments, access allocations, budgets and operational policies still need publication.
 Complete the following decisions for Establish before substantive work, for Challenge by 17 November and for Compare by 1 December:
 
 | Decision                       | Establish                                                           | Challenge                                                           | Compare                                                                              |
@@ -75,8 +79,8 @@ Complete the following decisions for Establish before substantive work, for Chal
 Run one small preflight task with each assigned configuration and retain its trace.
 For A and B, verify that automatic delegation and unapproved model routes are disabled.
 For C, verify task attribution, cancellation, usage accounting, isolation and trace export.
-Prepare the supplied paired evidence, and any optional live pair, under the same small-model configuration and fixed routing policy.
-The live pair becomes optional under ADR-047 when the revised contract is published; the supplied analysis and actual fleet work remain required.
+Use the retained supplied paired evidence with its exact configuration and fixed routing policy, and freeze the same fields for any optional live pair.
+The live pair is optional under ADR-047; the supplied analysis and actual fleet work remain required.
 Do not require unannounced personal spending or hardware.
 
 ## Support orientation before the November kickoff

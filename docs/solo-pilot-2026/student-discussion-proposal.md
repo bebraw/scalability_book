@@ -10,11 +10,14 @@ The [study agreement](study-agreement.md) gives the proposed calendar, workload 
 We would like to calibrate the difficulty before choosing additional technical scope.
 A preliminary Qwen3.5 9B attempt showed substantial effort spent reading and rebuilding context around a change involving retries, persistence and concurrency.
 The instructor interrupted that attempt before its full time or request allowance; it is an early observation, not a completed comparison or a general result about small models.
-A subsequent department-hosted Qwen3.8 27B calibration with thinking disabled implemented the simpler label task and passed 22 independent checks in 6 minutes 24 seconds and 38 requests.
+A subsequent department-hosted `Qwen/Qwen3.8-27B-FP8` calibration with thinking disabled implemented the simpler label task and passed 22 independent checks in 6 minutes 24 seconds and 38 requests.
 Browser review found an unintended form/API length discrepancy, which led to the explicit label rule and additional checks below.
 The subsequent matched pair passed all 24 independent checks in both conditions: one agent took 8m38s and 33 requests; a coordinator with two workers took 9m36s and 64 requests.
 The fleet preserved a usable mobile layout, while the single-agent candidate overflowed; it also closed a still-running worker, leaving one request without complete usage accounting.
 These are observations from one exploratory pair, with [configuration and measurement limits](../course-tooling.md#completed-matched-pair).
+Use configuration `aalto-qwen38-27b-2026-10-23` as the known-working starting point for orientation: the [workspace instructions](../../labs/README.md#department-model-baseline) include the exact endpoint, model, thinking setting and access check.
+The instructor confirms departmental access and allocation; the student verifies the selected coding harness with a small file-copy task before attempting an exercise.
+The recorded experiment used a private proxy, so another harness needs its own tool check even when it uses the same model.
 
 ## Start with one small change
 
@@ -54,6 +57,6 @@ The student works independently, maintains concise specifications and ADR-style 
 The instructor supplies the supported environment and agreed limits, personally conducts the incoming audits, and uses the planned phase discussions and existing rubric for feedback and grading.
 Course feedback and an unsuccessful exploratory result do not themselves lower the grade; assessment follows the published criteria and passing requirements.
 
-Before kickoff, confirm available weekly hours, the supported model and tools, the first calibration task and checks, and the point at which help or a scope adjustment is needed.
+Before kickoff, confirm available weekly hours, access to the documented model, the supported coding tools, the first calibration task and checks, and the point at which help or a scope adjustment is needed.
 The planning assumption is approximately 20–21 student hours per week after kickoff, with 22–25 during the final phase.
 Optional exploration can be reduced when workload grows; changes to required outcomes need an explicit agreement.

@@ -39,6 +39,9 @@ Its direct HTTP checks verify response behavior; isolated browser checks verify 
 These fixtures do not import production course state, share an application runtime with the Worker or expose a model execution service.
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
+[The explicit browser floors](package.json) drive every site-owned JavaScript transform through [browser-targets.ts](scripts/lib/browser-targets.ts), including lazy vendor bundles.
+CSS is inlined without compatibility transformation; the browser baseline covers its required features as well as JavaScript and DOM APIs.
+[The development guide](docs/development.md#browser-support) owns supported versions and verification limits; the separately pinned study exporter owns its generated assets.
 [The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.
 Local targets and fragments are checked during validation; external missing-page checks run before explicit deployment and through [CI](.github/workflows/links.yml), with generated reports kept in `.local/`.
 See [the development guide](docs/development.md#published-link-checks) for failure criteria and inconclusive external responses.

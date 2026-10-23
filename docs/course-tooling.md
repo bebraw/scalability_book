@@ -82,6 +82,48 @@ The [student discussion proposal](solo-pilot-2026/student-discussion-proposal.md
 Resume with a separately identified task, fresh copies and frozen independent checks after discussing scope with the student.
 The completed supplied-trace package remains preparation work.
 
+## Department model configuration
+
+**Retained configuration: `aalto-qwen38-27b-2026-10-23`.**
+Use this as the known-working baseline for optional practice and the solo-pilot discussion.
+The [workspace README](../labs/README.md#department-model-baseline) carries self-contained student access instructions and a one-request Node smoke check inside the downloadable ZIP.
+It distinguishes gateway access, coding-tool verification and the book's separate learning companion.
+The exercise runtime has no provider dependency; the experimental bridge, private reference and credentials are excluded from the workspace.
+Students may use their own coding harness, recording its version and checking actual tool execution before attempting an exercise.
+
+| Field                            | Recorded value                                                                                                       |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Gateway                          | `https://llm-gateway.k8s.aalto.fi/api/v1`                                                                            |
+| Verified protocol and endpoint   | Responses; `POST https://llm-gateway.k8s.aalto.fi/api/v1/responses`                                                  |
+| Model                            | `Qwen/Qwen3.8-27B-FP8`; FP8 as advertised; exact weight revision unavailable                                         |
+| Authentication                   | Department-issued bearer key, read from local `AALTO_KEY` by the HTTPS bridge only                                   |
+| Harness                          | Codex CLI 0.154.0, recorded Responses proxy and credential-only HTTPS bridge                                         |
+| Native thinking                  | Final provider payload contains `chat_template_kwargs.enable_thinking=false`                                         |
+| Client context                   | 32,768 tokens; automatic compaction at 24,000                                                                        |
+| Output                           | At most 4,096 tokens per request                                                                                     |
+| Other inference controls         | No temperature, top-p or hosted reasoning-effort override                                                            |
+| Automatic request/stream retries | Disabled in the client; any forwarded retry still counts toward the shared allowance                                 |
+| Tools                            | Command execution and polling; collaboration controls only in the fleet; direct patch tools absent                   |
+| Fleet                            | One coordinator and exactly two fresh workers; inherited model/provider, `fork_context:false`, no further delegation |
+| Runtime                          | Node 24.22.1 on the instructor's macOS ARM64 machine; model inference hosted by the department                       |
+| Calibration allowance            | One agent, 20 minutes and 40 forwarded inference requests                                                            |
+| Matched-pair allowance           | Each condition: 20 minutes and 80 aggregate forwarded inference requests, including workers and retries              |
+
+The proxy fixes model routing and request/output limits, consolidates instruction messages, removes unsupported hosted fields and translates collaboration tools.
+The credential bridge adds authentication and the native-thinking control to the final upstream request.
+Preserve these transformations when interpreting the result: naming the model alone does not reproduce the tested coding setup, and direct Codex-to-gateway compatibility has not been established.
+The retained private harness and preflight traces are under `.local/course-preparation/department-2026-10-23/nonthinking/`; the frozen matched configuration and its SHA-256 are under `label-comparison-v2/matched-2026-10-23/`.
+Do not publish that private preparation tree to distribute access instructions.
+
+Before an instructor-supported repeat, retain a fresh configuration snapshot and confirm department access, allocation/cost basis, data policy and support contact in the course environment sheet.
+Use the documented single-agent file-copy preflight; for a fleet, require both workers' matching outputs and coordinator verification, closure and aggregate request accounting.
+Keep actual initial failure and final result, including incomplete responses, missing usage and service errors.
+On service or tool failure, preserve partial work and use local/manual practice until the instructor agrees a replacement; do not silently change models or incur personal spending.
+
+This configuration has evidence for one bounded label task and tool routing, not for all four public exercises, the complete course projects or the hosted model in the learning companion.
+The course's large/small phase assignments remain run-specific under [the environment publication rule](../specifications/course_environment.md#publication-rule).
+The following dated observations are the basis of the baseline; they are not a current service-availability or capacity guarantee.
+
 ## Department-hosted calibration — 23 October 2026
 
 Department gateway access is verified for `Qwen/Qwen3.8-27B-FP8`.

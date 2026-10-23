@@ -15,6 +15,7 @@ Dates and support commitments become operative when agreed with the student and 
 | [Specification scope review](../project-specification-scope-review-2026-10-22.md) | Instructor             | Agreed scope and preparation boundaries for the reference and study contract.                          |
 | [Study agreement](study-agreement.md)                                             | Student and instructor | Scope, dated milestones, responsibilities, grading and correction arrangements.                        |
 | [Student discussion proposal](student-discussion-proposal.md)                     | Student and instructor | A staged small-model exercise to calibrate difficulty before choosing further scope.                   |
+| [Department model baseline](../../labs/README.md#department-model-baseline)       | Student and instructor | Exact known-working model and request settings, access check, harness preflight and evidence limits.   |
 | [Independent activities](independent-activities.md)                               | Student and instructor | Nine concrete equivalents for the lecture activities, using the existing reading and project evidence. |
 | [Instructor guide](instructor-guide.md)                                           | Instructor             | Preparation, reference audits, phase reviews, assessment and evaluation of the pilot.                  |
 
@@ -53,7 +54,8 @@ The required path must support full credit, including grade 5.
 Require analysis of supplied matched single-agent/fleet traces within the existing Compare activity and evidence.
 Make execution of the student's own matched pair optional, with full credit available through the required analysis.
 The actual fleet build and analysis of its real execution remain required.
-[ADR-047](../adrs/implemented/ADR-047-make-live-paired-experiments-an-optional-extension.md) records the adopted comparison contract; the supplied evidence package still needs preparation.
+[ADR-047](../adrs/implemented/ADR-047-make-live-paired-experiments-an-optional-extension.md) records the adopted comparison contract.
+The [completed matched pair](../course-tooling.md#completed-matched-pair) and curated student evidence packet are retained privately for instructor review and release.
 
 ## Agreed decision records
 
@@ -103,7 +105,8 @@ The conceptual work, numeric rubric and passing minima remain; the course contra
 
 Link the exact retained course-configuration version, confirm actual models, routes and environment, and record deviations and material exposed settings.
 Mark unavailable details honestly and reference unchanged published fields through the retained snapshot.
-[ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) records the publication rule; actual model and access choices still need preparation.
+[ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) records the publication rule.
+Configuration [`aalto-qwen38-27b-2026-10-23`](../course-tooling.md#department-model-configuration) records the working departmental Qwen baseline for optional practice; phase assignments, student allocation and operational policies still need publication.
 
 ## Decisions needed before starting
 
@@ -112,7 +115,7 @@ Mark unavailable details honestly and reference unchanged published fields throu
 - Choose the supported models, harnesses, execution environments, budgets and fallbacks using the [course environment sheet](../../specifications/course_environment.md).
   Establish must be ready before its project work begins; prepare Challenge and Compare before their respective phases.
 - Retain an instructor-controlled backup of the prepared private reference packages and record each outgoing audit assignment, holding phase-specific probes back until the audit window.
-  Confirm supported model access and any remaining preparation budget, including the supplied matched-trace package.
+  Confirm supported model access and any remaining preparation budget, then review and release the retained supplied matched-trace package.
 - Confirm the private submission, communication and feedback channels, and the proposed two-working-day response to blockers.
 - Agree the solo assessment equivalents and proposed correction arrangements in writing before work begins.
 

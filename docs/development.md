@@ -233,7 +233,35 @@ Editable builds retain stable filenames so CSS hot reload can replace the existi
 The pinned exporter owns `/learn/pilot/` asset names and references; its existing revalidation policy still applies.
 The publishing decision and verification boundaries are recorded in [ADR-025](adrs/implemented/ADR-025-fingerprint-published-site-css-and-javascript.md).
 
-Run browser-level checks with:
+## Browser support
+
+The interactive site targets Chrome and Edge 111+, Firefox 121+, and Safari/iOS Safari 16.4+.
+Use a current browser for ordinary course work.
+These explicit floors replace the former Safari 13 declaration, which did not match the site's JavaScript, DOM or CSS requirements.
+There are no existing course runs requiring that older baseline.
+
+`package.json` owns the version floors in `browserslist`.
+[The target adapter](../scripts/lib/browser-targets.ts) converts those explicit minimum queries to Vite/Oxc targets for every site-owned script and bundle, including the course, learning and lazy orchestration bundles.
+Moving queries such as `defaults` are rejected so a dependency update cannot silently change the contract.
+Build targets transform syntax; they do not polyfill built-ins, DOM APIs or CSS.
+Review those separately before adopting a newer feature or dependency.
+The current baseline accommodates dialogs, `crypto.randomUUID()`, `.at()`, `.replaceAll()`, copy-array methods, `color-mix()`, dynamic viewport units and `:has()`.
+CSS is emitted without downlevel transformation, and the separately pinned self-study exporter owns `/learn/pilot/` assets.
+
+Run the target regression and affected browser journeys with:
+
+```bash
+node --test tests/browser-targets.test.ts
+npx playwright test tests/e2e/browser-compatibility-demo.spec.ts tests/e2e/orchestration-demo.spec.ts tests/e2e/course-workspace.spec.ts tests/e2e/account-learning.spec.ts tests/e2e/learning-workspace.spec.ts --project=chromium --project=webkit
+```
+
+The compatibility check parses emitted root and `vendor/` JavaScript, including lazy dependencies, and rejects selected post-baseline features with negative controls.
+It is a bounded regression guard, not a complete API/CSS compatibility audit.
+The runtime journeys use the installed Playwright Chromium and WebKit; they do not run historical minimum versions, branded Safari/iOS or Firefox.
+Passing them must not be reported as minimum-version certification.
+[ADR-056](adrs/implemented/ADR-056-align-browser-support-with-site-requirements.md) records the baseline rationale and evidence.
+
+Run all configured browser-level checks with:
 
 ```bash
 npm run e2e

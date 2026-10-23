@@ -2,117 +2,179 @@ import { readdir, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
-import browserslist from "browserslist";
 import ts from "typescript";
 
-const browsers = browserslist(undefined, { path: process.cwd() });
-const es2019SafariTargets = browsers.filter(targetsSafariBefore14);
 const e2ePort = Number(process.env.E2E_PORT || 3100);
 const e2eBuildDir = path.resolve(
   process.cwd(),
   process.env.E2E_BUILD_DIR ||
     path.join(tmpdir(), `scalability-book-e2e-build-${e2ePort}`),
 );
-const unsupportedTokenKinds = new Map<ts.SyntaxKind, string>([
-  [ts.SyntaxKind.BigIntLiteral, "BigInt literal"],
-  [ts.SyntaxKind.QuestionQuestionToken, "nullish coalescing (??)"],
-  [ts.SyntaxKind.QuestionDotToken, "optional chaining (?.)"],
-  [ts.SyntaxKind.QuestionQuestionEqualsToken, "logical assignment"],
-  [ts.SyntaxKind.BarBarEqualsToken, "logical assignment"],
-  [ts.SyntaxKind.AmpersandAmpersandEqualsToken, "logical assignment"],
-]);
-const unsupportedBuiltInCalls = new Map([
-  ["at", "Array/String.prototype.at"],
-  ["replaceAll", "String.prototype.replaceAll"],
+
+// A targeted guard against known post-baseline features, not a complete
+// compatibility analyser. Build targets own syntax lowering; browser journeys
+// cover DOM/CSS behavior. Indirect aliases and arbitrary prototype calls are
+// deliberately outside this check's scope.
+const unsupportedBuiltInCalls = new Set([
+  "Array.fromAsync",
+  "Object.groupBy",
+  "Map.groupBy",
+  "Promise.withResolvers",
+  "Promise.try",
+  "RegExp.escape",
 ]);
 
-function targetsSafariBefore14(target: string) {
-  const [browser, versionRange] = target.split(" ");
+function propertyPath(node: ts.Expression): string | undefined {
+  if (ts.isIdentifier(node)) return node.text;
 
-  if (browser !== "ios_saf" && browser !== "safari") {
-    return false;
+  if (ts.isPropertyAccessExpression(node)) {
+    const owner = propertyPath(node.expression);
+    return owner && `${owner}.${node.name.text}`;
   }
 
-  const firstVersion = versionRange?.split("-")[0] || "";
-  const major = Number.parseInt(firstVersion, 10);
+  if (
+    ts.isElementAccessExpression(node) &&
+    ts.isStringLiteralLike(node.argumentExpression)
+  ) {
+    const owner = propertyPath(node.expression);
+    return owner && `${owner}.${node.argumentExpression.text}`;
+  }
 
-  return Number.isFinite(major) && major < 14;
+  return undefined;
+}
+
+function unsupportedFeatures(source: string, file = "fixture.js"): string[] {
+  const sourceFile = ts.createSourceFile(
+    file,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.JS,
+  );
+  const found = new Set<string>();
+
+  const inspect = (node: ts.Node) => {
+    if (ts.isCallExpression(node) || ts.isNewExpression(node)) {
+      const name = propertyPath(node.expression)?.replace(/^globalThis\./, "");
+      if (name && unsupportedBuiltInCalls.has(name)) found.add(`${name}()`);
+
+      const flags = node.arguments?.[1];
+      if (
+        name === "RegExp" &&
+        flags &&
+        ts.isStringLiteralLike(flags) &&
+        flags.text.includes("v")
+      ) {
+        found.add("RegExp Unicode sets (v flag)");
+      }
+    }
+
+    if (
+      ts.isRegularExpressionLiteral(node) &&
+      node.text.slice(node.text.lastIndexOf("/") + 1).includes("v")
+    ) {
+      found.add("RegExp Unicode sets (v flag)");
+    }
+
+    if (
+      ts.isVariableDeclarationList(node) &&
+      (node.flags & ts.NodeFlags.Using) !== 0
+    ) {
+      found.add("explicit resource management (using)");
+    }
+
+    if (
+      ts.isPropertyDeclaration(node) &&
+      node.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.AccessorKeyword,
+      )
+    ) {
+      found.add("class auto-accessor");
+    }
+
+    ts.forEachChild(node, inspect);
+  };
+
+  inspect(sourceFile);
+  return [...found].sort();
+}
+
+async function vendorScripts(directory: string): Promise<string[]> {
+  const files: string[] = [];
+
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...(await vendorScripts(file)));
+    else if (entry.name.endsWith(".js")) files.push(file);
+  }
+
+  return files;
 }
 
 test.describe("browser bundle compatibility", () => {
-  test("avoids unsupported syntax and built-ins in eager bundles", async () => {
-    test.setTimeout(60_000);
+  test("the guard rejects newer features without misreading supported syntax", () => {
+    const negativeControls: Array<[string, string]> = [
+      ["Object.groupBy(values, key);", "Object.groupBy()"],
+      ["Map['groupBy'](values, key);", "Map.groupBy()"],
+      ["globalThis.Promise.withResolvers();", "Promise.withResolvers()"],
+      ["Array.fromAsync(values);", "Array.fromAsync()"],
+      ["Promise.try(work);", "Promise.try()"],
+      ["RegExp.escape(value);", "RegExp.escape()"],
+      ["const pattern = /[a&&b]/v;", "RegExp Unicode sets (v flag)"],
+      ['new RegExp("[a&&b]", "v");', "RegExp Unicode sets (v flag)"],
+      ["using resource = acquire();", "explicit resource management (using)"],
+      [
+        "await using resource = acquire();",
+        "explicit resource management (using)",
+      ],
+      ["class Example { accessor value = 1; }", "class auto-accessor"],
+    ];
+
+    for (const [source, feature] of negativeControls) {
+      expect(unsupportedFeatures(source), source).toEqual([feature]);
+    }
 
     expect(
-      es2019SafariTargets,
-      "package.json browserslist should include Safari/iOS Safari targets that need ES2019-safe demo bundles",
-    ).not.toEqual([]);
+      unsupportedFeatures(String.raw`
+        const pattern = /\?\?|\?\.|\|\|=|Object\.groupBy/gu;
+        const text = "Object.groupBy(values, key); /pattern/v";
+        const last = values.at(-1)?.name ?? "";
+        const cleaned = last.replaceAll("_", " ");
+        const large = 1n + BigInt(2);
+        const owns = Object.hasOwn(record, "id");
+        const copy = values.toSorted().toReversed();
+        let flag = false;
+        flag ||= true;
+      `),
+    ).toEqual([]);
+  });
 
-    const files = (await readdir(e2eBuildDir))
-      .filter((file) => file.endsWith(".js"))
-      .sort();
+  test("eager and lazy site bundles avoid known post-baseline features", async () => {
+    test.setTimeout(60_000);
+
+    // The site build owns root scripts and vendor/. The independent pinned
+    // study exporter under learn/ has its own asset/build contract.
+    const files = [
+      ...(await readdir(e2eBuildDir))
+        .filter((file) => file.endsWith(".js"))
+        .map((file) => path.join(e2eBuildDir, file)),
+      ...(await vendorScripts(path.join(e2eBuildDir, "vendor"))),
+    ].sort();
+
+    expect(files.map((file) => path.relative(e2eBuildDir, file))).toEqual(
+      expect.arrayContaining([
+        "course.js",
+        "learning-workspace.js",
+        path.join("vendor", "orchestration-demo.js"),
+      ]),
+    );
+
     const unsupported: Array<{ file: string; feature: string }> = [];
-
     for (const file of files) {
-      const source = await readFile(path.join(e2eBuildDir, file), "utf8");
-      const scanner = ts.createScanner(
-        ts.ScriptTarget.Latest,
-        true,
-        ts.LanguageVariant.Standard,
-        source,
-      );
-      const found = new Set<string>();
-
-      for (
-        let token = scanner.scan();
-        token !== ts.SyntaxKind.EndOfFileToken;
-        token = scanner.scan()
-      ) {
-        const syntax = unsupportedTokenKinds.get(token);
-
-        if (syntax && !found.has(syntax)) {
-          found.add(syntax);
-          unsupported.push({ file, feature: syntax });
-        }
+      const source = await readFile(file, "utf8");
+      for (const feature of unsupportedFeatures(source, file)) {
+        unsupported.push({ file: path.relative(e2eBuildDir, file), feature });
       }
-
-      const sourceFile = ts.createSourceFile(
-        file,
-        source,
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.JS,
-      );
-
-      const inspectBuiltInCalls = (node: ts.Node) => {
-        if (
-          ts.isCallExpression(node) &&
-          ts.isIdentifier(node.expression) &&
-          node.expression.text === "BigInt" &&
-          !found.has("BigInt()")
-        ) {
-          found.add("BigInt()");
-          unsupported.push({ file, feature: "BigInt()" });
-        }
-
-        if (
-          ts.isCallExpression(node) &&
-          ts.isPropertyAccessExpression(node.expression)
-        ) {
-          const feature = unsupportedBuiltInCalls.get(
-            node.expression.name.text,
-          );
-
-          if (feature && !found.has(feature)) {
-            found.add(feature);
-            unsupported.push({ file, feature });
-          }
-        }
-
-        ts.forEachChild(node, inspectBuiltInCalls);
-      };
-
-      inspectBuiltInCalls(sourceFile);
     }
 
     expect(unsupported).toEqual([]);

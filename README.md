@@ -9,6 +9,8 @@ The new course book is hosted at [scalableweb.dev](https://scalableweb.dev/).
 
 Markdown source files live under [book/](book/).
 The public website is generated from those chapters and deployed at [scalableweb.dev](https://scalableweb.dev/).
+The interactive site targets Chrome/Edge 111+, Firefox 121+, and Safari/iOS Safari 16.4+; use an up-to-date browser.
+See [browser support and verification](docs/development.md#browser-support) for the build contract and test limits.
 
 Development, preview, feedback, and deployment notes are in [docs/development.md](docs/development.md).
 The [documentation index](docs/README.md) points to course operations, learning tools, pilot preparation and remaining reviews.
