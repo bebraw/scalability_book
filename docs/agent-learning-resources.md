@@ -48,8 +48,10 @@ The server's instructions, activity pacing and `agentPresentation` guide client 
 No browser interaction, current passage selection or private context is implied by connecting.
 Those remain the companion's separate, explicitly selected-context boundary.
 Every demo returns its shared `activity` contract: stable ID/version, source reading, authored phases, adaptation guidance and bounded browser-observation semantics.
-The catalog currently has 29 demos; the gallery distinguishes reading investigations, optional depth and project worksheets.
-The constraint-loop, fleet-planning and scaling-planning activities use version 2 after removing unsupported validation claims or forecasts.
+The catalog currently has 28 demos; the gallery distinguishes reading investigations, optional depth and project worksheets.
+The constraint-loop, fleet-planning, scaling-planning, boundary-trace, cache, API-contract, queue and evaluation activities use version 2 after changes to their interpretation or controls.
+The specialized queue activity's bounds include fractional observed work from 0 to 80; its version is independent of the browser snapshot schema.
+The retired dimensions radar is now a static mapping in its chapter; its conceptual exercise remains available.
 Their assumptions describe scripted results or qualitative preparation explicitly; the downloadable CSV starter is a separate executable exercise.
 Retired demos are absent from current public retrieval and live controls, while existing notebook entries retain their historical source and can use the general learning loop.
 The queue retains its typed numeric fields and units; other demos describe named controls and displayed text.

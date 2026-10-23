@@ -65,6 +65,10 @@ test.describe("demo accessibility", () => {
     page,
   }) => {
     await page.goto("/demos/");
+    // The lazy teaching cluster's controls are disabled during startup.
+    await expect(page.locator("[data-orchestration-replicas]")).toBeEnabled({
+      timeout: 15_000,
+    });
     const auditedDemos = new Set<string>();
     const visitedControls = new Set<number>();
     const controlsWithoutFocusIndicators: string[] = [];

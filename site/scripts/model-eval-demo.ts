@@ -18,8 +18,6 @@ type EvalTask = {
 type ModelAttempt = {
   id: ModelId;
   label: string;
-  latency: number;
-  cost: number;
   sampleScores: Record<EvalTaskId, [number, number, number]>;
 };
 
@@ -117,8 +115,6 @@ const models: ModelAttempt[] = [
   {
     id: "x",
     label: "Attempt X",
-    latency: 18,
-    cost: 0.42,
     sampleScores: {
       bottleneck: [2, 2, 2],
       benchmark: [2, 2, 2],
@@ -128,8 +124,6 @@ const models: ModelAttempt[] = [
   {
     id: "y",
     label: "Attempt Y",
-    latency: 6,
-    cost: 0.04,
     sampleScores: {
       bottleneck: [1, 1, 1],
       benchmark: [1, 0, 1],
@@ -236,20 +230,31 @@ function initializeEvalDemo(root: HTMLElement) {
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => showStep(index, true));
   });
-  cards.addEventListener("input", () => {
+  cards.addEventListener("input", (event) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+    if (target.matches("[data-model-output]")) {
+      const card = target.closest<HTMLElement>("[data-model-card]")!;
+      card.dataset.origin = "entered";
+      clearAttemptEvidence(card);
+      for (const check of root.querySelectorAll<HTMLInputElement>(
+        "[data-model-eval-check]",
+      ))
+        check.checked = false;
+    }
     const task = tasks[taskSelect.value as EvalTaskId] ?? tasks.bottleneck;
     updateScores(root, task, results, verdict, conclusion);
   });
   cards.addEventListener("click", (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
-      "[data-model-eval-sample]",
+      "[data-model-eval-sample], [data-model-eval-worked]",
     );
 
     if (!button) {
       return;
     }
 
-    const model = button.dataset.modelEvalSample as ModelId | undefined;
+    const model = (button.dataset.modelEvalSample ??
+      button.dataset.modelEvalWorked) as ModelId | undefined;
     const task = tasks[taskSelect.value as EvalTaskId] ?? tasks.bottleneck;
     const modelConfig = models.find((candidate) => candidate.id === model);
 
@@ -257,7 +262,13 @@ function initializeEvalDemo(root: HTMLElement) {
       return;
     }
 
-    fillModelSample(root, task, modelConfig);
+    if (button.hasAttribute("data-model-eval-worked")) {
+      for (const [key, value] of modelConfig.sampleScores[task.id].entries()) {
+        root.querySelector<HTMLInputElement>(
+          `[data-model="${model}"][data-rubric="${key}"]`,
+        )!.value = String(value);
+      }
+    } else fillModelSample(root, task, modelConfig);
     updateScores(root, task, results, verdict, conclusion);
   });
   root.addEventListener("click", (event) => {
@@ -294,15 +305,22 @@ function fillModelSample(
   if (output) {
     output.value = task.outputs[model.id];
   }
+  const card = root.querySelector<HTMLElement>(
+    `[data-model-card="${model.id}"]`,
+  )!;
+  card.dataset.origin = "sample";
+  clearAttemptEvidence(card);
+  for (const check of root.querySelectorAll<HTMLInputElement>(
+    "[data-model-eval-check]",
+  ))
+    check.checked = false;
+}
 
-  for (const [key, value] of model.sampleScores[task.id].entries()) {
-    const input = root.querySelector<HTMLInputElement>(
-      `[data-model="${model.id}"][data-rubric="${key}"]`,
-    );
-
-    if (input) {
-      input.value = String(value);
-    }
+function clearAttemptEvidence(card: HTMLElement) {
+  for (const input of card.querySelectorAll<HTMLInputElement>(
+    "[data-rubric], [data-rubric-evidence], [data-observation]",
+  )) {
+    input.value = input.hasAttribute("data-rubric") ? "0" : "";
   }
 }
 
@@ -324,14 +342,17 @@ function renderModelCard(model: ModelAttempt, task: EvalTask) {
         </span>
         <input aria-label="${escapeModelEvalHtml(criterion.label)} score for ${escapeModelEvalHtml(model.label)}" type="range" min="0" max="2" step="1" value="0" data-model="${model.id}" data-rubric="${key}" />
         <output data-score-output="${model.id}-${key}">0</output>
+        <label class="model-eval-evidence">Supporting excerpt or reason
+          <input type="text" aria-label="Evidence for ${escapeModelEvalHtml(criterion.label)} in ${escapeModelEvalHtml(model.label)}" data-rubric-evidence="${key}" />
+        </label>
       </div>`;
     })
     .join("");
 
-  return `<article class="model-eval-card" data-model-card="${model.id}">
+  return `<article class="model-eval-card" data-model-card="${model.id}" data-origin="entered">
     <header>
       <h4>${escapeModelEvalHtml(model.label)}</h4>
-      <span>Illustrative: ${model.latency}s / ${model.cost.toFixed(2)} EUR</span>
+      <span data-attempt-origin>No output recorded</span>
     </header>
     <label class="model-eval-output-field">
       <span>Model output</span>
@@ -341,6 +362,13 @@ function renderModelCard(model: ModelAttempt, task: EvalTask) {
       Use sample output
     </button>
     <div class="model-eval-sliders">${sliders}</div>
+    <button type="button" class="model-eval-sample" data-model-eval-worked="${model.id}" disabled>Reveal worked scores</button>
+    <fieldset class="model-eval-observations">
+      <legend>Reported run observations · optional</legend>
+      <label>Elapsed seconds<input type="number" min="0" step="any" data-observation="elapsed" aria-label="Elapsed seconds for ${escapeModelEvalHtml(model.label)}" /></label>
+      <label>Cost in EUR<input type="number" min="0" step="any" data-observation="cost" aria-label="Cost in EUR for ${escapeModelEvalHtml(model.label)}" /></label>
+      <label>Source record<input type="text" data-observation="source" aria-label="Source record for ${escapeModelEvalHtml(model.label)}" placeholder="Run ID, log or notes reference" /></label>
+    </fieldset>
   </article>`;
 }
 
@@ -351,64 +379,94 @@ function updateScores(
   verdict: HTMLElement,
   conclusion: HTMLElement,
 ) {
-  const checks = Array.from(
+  const protocolComplete = Array.from(
     root.querySelectorAll<HTMLInputElement>("[data-model-eval-check]"),
-  );
-  const protocolComplete = checks.every((check) => check.checked);
+  ).every((check) => check.checked);
   const rows = models.map((model) => {
-    const quality = getQualityScore(root, model.id);
-    const output = root.querySelector<HTMLTextAreaElement>(
-      `[data-model-output="${model.id}"]`,
+    const card = root.querySelector<HTMLElement>(
+      `[data-model-card="${model.id}"]`,
+    )!;
+    const sample = card.dataset.origin === "sample";
+    const hasOutput = Boolean(
+      card
+        .querySelector<HTMLTextAreaElement>("[data-model-output]")
+        ?.value.trim(),
     );
-
+    card.querySelector<HTMLElement>("[data-attempt-origin]")!.textContent =
+      !hasOutput
+        ? "No output recorded"
+        : sample
+          ? "Authored sample · no run observations"
+          : "Entered output · observations are self-reported";
+    card.querySelector<HTMLButtonElement>(
+      "[data-model-eval-worked]",
+    )!.disabled = !sample;
+    for (const input of card.querySelectorAll<HTMLInputElement>(
+      "[data-observation]",
+    ))
+      input.disabled = sample;
+    const source = card
+      .querySelector<HTMLInputElement>('[data-observation="source"]')!
+      .value.trim();
+    const observation = (key: string) => {
+      const raw = card.querySelector<HTMLInputElement>(
+        `[data-observation="${key}"]`,
+      )!.value;
+      if (sample || !hasOutput || !raw.trim()) return "Not recorded";
+      const number = Number(raw);
+      if (!Number.isFinite(number) || number < 0) return "Invalid value";
+      return source
+        ? `${number}${key === "elapsed" ? " s" : " EUR"}`
+        : "Source required";
+    };
+    const quality = getQualityScore(root, model.id);
+    const supported = Array.from(
+      card.querySelectorAll<HTMLInputElement>("[data-rubric-evidence]"),
+    ).every((input) => input.value.trim());
     return {
       model,
       quality,
-      hasOutput: Boolean(output?.value.trim()),
+      hasOutput,
+      sample,
+      supported,
+      source,
+      elapsed: observation("elapsed"),
+      cost: observation("cost"),
     };
   });
-  const best = [...rows].sort(
-    (a, b) => b.quality - a.quality || a.model.cost - b.model.cost,
-  )[0];
-  const cheapest = [...rows].sort((a, b) => a.model.cost - b.model.cost)[0];
-
-  if (!best || !cheapest) {
-    return;
-  }
-
   for (const output of root.querySelectorAll<HTMLOutputElement>(
     "[data-score-output]",
   )) {
-    const [modelId, key] = output.dataset.scoreOutput?.split("-") ?? [];
-    const input = root.querySelector<HTMLInputElement>(
+    const [modelId, key] = output.dataset.scoreOutput!.split("-");
+    const value = root.querySelector<HTMLInputElement>(
       `[data-model="${modelId}"][data-rubric="${key}"]`,
-    );
-
-    if (input) {
-      output.value = input.value;
-      output.textContent = input.value;
-    }
+    )!.value;
+    output.value = value;
+    output.textContent = value;
   }
-
   results.innerHTML = rows
     .map(
-      (row) => `<tr>
-        <td>${escapeModelEvalHtml(row.model.label)}</td>
-        <td>${row.quality}/6</td>
-        <td>${row.model.latency}s</td>
-        <td>${row.model.cost.toFixed(2)} EUR</td>
-      </tr>`,
+      (row) =>
+        `<tr><td>${escapeModelEvalHtml(row.model.label)}<br/><small>${row.sample ? "Authored sample" : "Entered output"}</small></td><td>${row.quality}/6</td><td>${row.elapsed}</td><td>${row.cost}</td><td>${escapeModelEvalHtml(row.sample ? "No model run" : row.source || "Not recorded")}</td></tr>`,
     )
     .join("");
-
   const allHaveOutput = rows.every((row) => row.hasOutput);
+  const highest = Math.max(...rows.map((row) => row.quality));
+  const winners = rows.filter((row) => row.quality === highest);
+  const labels = winners.map((row) => row.model.label).join(" / ");
   verdict.textContent = allHaveOutput
-    ? `${best.model.label}: ${best.quality}/6`
+    ? `${labels}: ${highest}/6`
     : "Paste outputs to score";
   conclusion.textContent = [
-    allHaveOutput
-      ? buildConclusion(task, best, cheapest)
-      : "Paste both model outputs, then score them against the rubric before drawing a local conclusion.",
+    !allHaveOutput
+      ? "Paste both model outputs, then score them against the rubric before drawing a local conclusion."
+      : winners.length > 1
+        ? `The attempts tie on the manual rubric for "${task.label}". No cost or latency tie-break is inferred.`
+        : `${labels} scores higher on the manual rubric for "${task.label}"; this is a judgment about these outputs, not a model ranking.`,
+    allHaveOutput && rows.some((row) => !row.supported)
+      ? "Add a supporting excerpt or reason for each criterion before defending the scores."
+      : "",
+    "Missing observations remain unknown. Reported elapsed time and cost need their source records and do not include unrecorded correction effort.",
     protocolComplete
       ? ""
       : "Complete the comparison protocol before interpreting these scores.",
@@ -423,22 +481,6 @@ function getQualityScore(root: HTMLElement, model: ModelId) {
       `[data-model="${model}"][data-rubric]`,
     ),
   ).reduce((total, input) => total + Number(input.value), 0);
-}
-
-function buildConclusion(
-  task: EvalTask,
-  best: { model: ModelAttempt; quality: number; hasOutput?: boolean },
-  cheapest: { model: ModelAttempt; quality: number; hasOutput?: boolean },
-) {
-  if (!best.hasOutput || !cheapest.hasOutput) {
-    return "Paste both model outputs, then score them against the rubric before drawing a local conclusion.";
-  }
-
-  if (best.model.id === cheapest.model.id) {
-    return `Under the illustrative cost assumptions, ${best.model.label} is both the highest-scoring and cheapest option on "${task.label}". Measure actual cost and test more examples before choosing a model for this task.`;
-  }
-
-  return `${best.model.label} scores higher on "${task.label}", while ${cheapest.model.label} has lower illustrative cost and latency. Replace those assumptions with measurements from your runs. A defensible report would say which failure pattern matters more: answer quality, review time, latency, or cost.`;
 }
 
 function updateModelEvalStage(

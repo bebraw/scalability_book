@@ -188,7 +188,8 @@ If a judge guides development, reserve independent acceptance evidence for final
 A held-out task set does not make the scoring process independent when the same judge design also supplies the reported result.
 
 The demonstration below lets you score two attempts against the selected task's rubric and inspect which criterion an answer misses.
-Its sample answers, cost, and latency are invented; use supplied outputs at any stage or collect real attempts within the course's permitted setup.
+Its sample answers and separately revealed worked scores are authored examples; use them at any stage or collect real attempts within the course's permitted setup.
+Justify scores with excerpts or reasons, and enter actual elapsed time and cost only with a source record; missing observations remain unknown.
 The scores are manual judgments, and the protocol confirmations are self-reported; executable acceptance checks need to be run separately.
 
 {{ import "site/includes/model-eval-demo.html" }}

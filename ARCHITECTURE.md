@@ -31,6 +31,10 @@ Standalone teaching labs under `labs/` are packaged independently of the private
 In [the CSV starter](labs/csv-export/README.md), the browser owns filtering and visible rows, `export.mjs` owns the one missing pure serialization function, and the loopback server serves only the fixed fixture assets.
 Supplied Node and browser checks own literal contract expectations and actual download inspection; generated evidence stays in ignored `test-results/` and is excluded from lab archives.
 The website publishes the source ZIP and links, without executing a student model or depending on the lab server at runtime.
+The [retry starter](labs/persisted-retry/README.md) separates receiver and worker SQLite files; the missing receiver operation owns atomic effect-and-receipt recording while the supplied worker/harness owns attempts, interruption and restart.
+The [HTTP starter](labs/http-cache/README.md) separates a missing pure response-policy function, a loopback origin with volatile synthetic versions/request logs, and an ordinary browser fetch UI.
+Its direct HTTP checks verify response behavior; isolated browser checks verify actual cache reuse and the distinction between network 304 and the browser-visible stored body.
+These fixtures do not import production course state, share an application runtime with the Worker or expose a model execution service.
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
 [The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.

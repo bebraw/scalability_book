@@ -46,7 +46,7 @@ const observation = {
 };
 const turn = {
   activityId: queueInvestigation.id,
-  version: 1,
+  version: queueInvestigation.version,
   phase: "experiment",
   system: "Database requests",
   prediction: "Doubling time doubles unfinished work",
@@ -56,7 +56,7 @@ const turn = {
 test("inline turns reject unknown activities, unrelated sources, invalid phases and inconsistent observations", () => {
   assert.deepEqual(parseInvestigationTurn(turn, source), turn);
   for (const patch of [
-    { version: 2 },
+    { version: queueInvestigation.version + 1 },
     { activityId: "arbitrary" },
     { phase: "mastered" },
     { system: "x".repeat(1001) },
@@ -189,6 +189,11 @@ test("changed demo activities reject stale turns while keeping their current evi
     "demo-constraint-feedback-loop",
     "demo-agent-fleet-delegation",
     "demo-scaling-pressure-planner",
+    "demo-boundary-trace",
+    "demo-cache-decision-lab",
+    "demo-api-contract-lens",
+    "demo-queue-balance-lab",
+    "demo-model-evaluation-lab",
   ]) {
     const activity = readingActivities.find((item) => item.demoId === id)!;
     const selected = {
@@ -213,6 +218,27 @@ test("changed demo activities reject stale turns while keeping their current evi
   }
 });
 
+test("queue observations preserve fractional averages and the full entered range", () => {
+  for (const snapshot of [
+    { arrival: 2, time: 0.1, observed: 0.2, expected: 0.2, gap: 0 },
+    { arrival: 40, time: 2, observed: 0, expected: 80, gap: -80 },
+    { arrival: 2, time: 0.1, observed: 80, expected: 0.2, gap: 79.8 },
+  ]) {
+    const supplied = { ...observation, ...snapshot };
+    assert.deepEqual(
+      parseInvestigationTurn({ ...turn, observation: supplied }, source)
+        .observation,
+      supplied,
+    );
+  }
+  assert.throws(() =>
+    parseInvestigationTurn(
+      { ...turn, observation: { ...observation, observed: 80.1 } },
+      source,
+    ),
+  );
+});
+
 test("retired demo notes survive restart and fall back to the general learning loop", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "book-retired-demo-"));
   let notebook = openLearningNotebook(directory);
@@ -220,6 +246,7 @@ test("retired demo notes survive restart and fall back to the general learning l
     "demo-workflow-loop",
     "demo-observability-signal-picker",
     "demo-final-reflection-package",
+    "demo-scalability-dimensions-lab",
   ];
   try {
     for (const id of ids)
@@ -232,7 +259,7 @@ test("retired demo notes survive restart and fall back to the general learning l
       });
     notebook.close();
     notebook = openLearningNotebook(directory);
-    assert.equal(notebook.entries().length, 3);
+    assert.equal(notebook.entries().length, ids.length);
     for (const note of notebook.entries()) {
       assert.ok(ids.includes(note.source.anchor));
       assert.equal(note.body, "Earlier reasoning remains mine.");

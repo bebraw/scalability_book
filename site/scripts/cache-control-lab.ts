@@ -180,9 +180,13 @@ function decideCache(
     };
   }
 
-  if (profile === "asset" && age <= model.maxAge) {
+  if (
+    (profile === "asset" && age < model.maxAge) ||
+    (profile === "summary" && age < 30)
+  ) {
     return {
-      browserState: "fresh immutable hit",
+      browserState:
+        profile === "asset" ? "fresh immutable hit" : "fresh private entry",
       bytes: "0 KB",
       code: "browser cache → response",
       originState: "not contacted",
@@ -193,24 +197,30 @@ function decideCache(
         {
           detail: "age is within max-age",
           kind: "hit",
-          label: "Find fresh stored asset",
+          label:
+            profile === "asset"
+              ? "Find fresh stored asset"
+              : "Find fresh stored summary",
           node: "browser",
         },
         {
-          detail: "immutable suppresses ordinary validation",
+          detail:
+            profile === "asset"
+              ? "immutable suppresses ordinary validation"
+              : "browser max-age has not expired",
           kind: "hit",
           label: "Reuse representation",
           node: "browser",
         },
       ],
-      version: "stored fingerprint",
+      version: profile === "asset" ? "stored fingerprint" : "stored summary-v7",
       wait: "no",
     };
   }
 
-  if (profile === "summary" && age <= model.maxAge) {
+  if (profile === "summary" && age < model.maxAge) {
     return {
-      browserState: age <= 30 ? "fresh private entry" : "private entry stale",
+      browserState: "private entry stale",
       bytes: "0 KB",
       code: "shared cache → response",
       originState: "not contacted",

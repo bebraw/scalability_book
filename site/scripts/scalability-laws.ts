@@ -30,7 +30,11 @@ function initializeLittleLaw(root: HTMLElement) {
   if (!form) return;
 
   const update = () => {
-    const arrival = lawReadNumber(root, "[data-little-law-input='arrival']", 20);
+    const arrival = lawReadNumber(
+      root,
+      "[data-little-law-input='arrival']",
+      20,
+    );
     const time = lawReadNumber(root, "[data-little-law-input='time']", 0.5);
     const observed = lawReadNumber(
       root,
@@ -39,7 +43,8 @@ function initializeLittleLaw(root: HTMLElement) {
     );
     const expected = arrival * time;
     const gap = observed - expected;
-    const tolerance = Math.max(1, expected * 0.1);
+    // Ignore floating-point rounding only, not a statistical measurement error.
+    const tolerance = Number.EPSILON * Math.max(1, expected, observed) * 8;
     const verdict = root.querySelector<HTMLElement>(
       "[data-little-law-verdict]",
     );
@@ -47,9 +52,17 @@ function initializeLittleLaw(root: HTMLElement) {
       "[data-little-law-reading]",
     );
 
-    lawSetText(root, "[data-little-law-output='arrival']", `${arrival} events/s`);
+    lawSetText(
+      root,
+      "[data-little-law-output='arrival']",
+      `${arrival} events/s`,
+    );
     lawSetText(root, "[data-little-law-output='time']", `${time.toFixed(1)} s`);
-    lawSetText(root, "[data-little-law-output='observed']", `${observed} events`);
+    lawSetText(
+      root,
+      "[data-little-law-output='observed']",
+      `${observed} events`,
+    );
     lawSetText(
       root,
       "[data-little-law-equation]",
@@ -73,7 +86,7 @@ function initializeLittleLaw(root: HTMLElement) {
       if (verdict) verdict.textContent = "Measurements agree";
       if (reading) {
         reading.textContent =
-          "The three averages are mutually consistent for a stable observation window. The equation still does not identify why work takes this long.";
+          "The entered averages agree numerically, allowing only floating-point rounding. This does not establish that their observation window was stable or identify why work takes this long.";
       }
     } else if (gap > 0) {
       if (verdict) verdict.textContent = "More work observed than predicted";
@@ -103,9 +116,11 @@ function renderQueue(
   const queue = root.querySelector<HTMLElement>("[data-little-law-queue]");
   if (!queue) return;
 
-  queue.innerHTML = Array.from({ length: observed }, (_, index) => {
-    const warning = Math.abs(gap) > tolerance && index >= observed - Math.abs(gap);
-    return `<i${warning ? ' class="is-gap"' : ""}></i>`;
+  queue.innerHTML = Array.from({ length: Math.ceil(observed) }, (_, index) => {
+    const warning =
+      Math.abs(gap) > tolerance && index >= observed - Math.abs(gap);
+    const fraction = Math.min(1, observed - index);
+    return `<i${warning ? ' class="is-gap"' : ""} style="opacity:${fraction}"></i>`;
   }).join("");
 }
 
@@ -401,7 +416,11 @@ function initializeAmdahlLaw(root: HTMLElement) {
       "[data-amdahl-law-reading]",
     );
 
-    lawSetText(root, "[data-amdahl-law-output='parallel']", `${parallelPercent}%`);
+    lawSetText(
+      root,
+      "[data-amdahl-law-output='parallel']",
+      `${parallelPercent}%`,
+    );
     lawSetText(
       root,
       "[data-amdahl-law-output='agents']",
@@ -439,7 +458,8 @@ function initializeAmdahlLaw(root: HTMLElement) {
     );
 
     if (sequentialBar) sequentialBar.style.inlineSize = `${sequential * 100}%`;
-    if (parallelBar) parallelBar.style.inlineSize = `${(parallel / agents) * 100}%`;
+    if (parallelBar)
+      parallelBar.style.inlineSize = `${(parallel / agents) * 100}%`;
     if (verdict) verdict.textContent = `${speedup.toFixed(2)}× ideal speedup`;
     if (reading) {
       reading.textContent = `${agents} agent${agents === 1 ? "" : "s"} divide the parallel work, but the sequential ${Math.round(sequential * 100)}% remains. Even unlimited agents cannot exceed ${ceiling.toFixed(2)}× before coordination costs are considered.`;
@@ -507,7 +527,8 @@ function initializeUsl(root: HTMLElement) {
     } else if (nextHelps) {
       if (verdict) verdict.textContent = "Capacity is still rising";
     } else {
-      if (verdict) verdict.textContent = "More concurrency now reduces capacity";
+      if (verdict)
+        verdict.textContent = "More concurrency now reduces capacity";
     }
 
     if (reading) {
@@ -548,9 +569,13 @@ function renderUslChart(
   const maximum = Math.max(...points.map(({ capacity }) => capacity), 1);
   const x = (point: UslPoint) =>
     left + ((point.concurrency - 1) / (points.length - 1)) * width;
-  const y = (point: UslPoint) => top + height - (point.capacity / maximum) * height;
+  const y = (point: UslPoint) =>
+    top + height - (point.capacity / maximum) * height;
   const path = points
-    .map((point, index) => `${index === 0 ? "M" : "L"}${x(point).toFixed(1)},${y(point).toFixed(1)}`)
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"}${x(point).toFixed(1)},${y(point).toFixed(1)}`,
+    )
     .join(" ");
   const grid = [0, 0.25, 0.5, 0.75, 1]
     .map((ratio) => {

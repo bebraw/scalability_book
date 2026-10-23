@@ -178,13 +178,18 @@ HTTP 200
   }
 }
 
+POST {{links.start.href}}
+
+HTTP 200
+{ "state": "active", "_links": { "pause": {...}, "complete": {...} } }
+
 GET {{links.assignee.href}}
 
 HTTP 200
 { "name": "Ada" }`,
         delta:
           "Follow the advertised assignee relation; the client does not construct its URL.",
-        result: "2 linked responses · item active + Ada",
+        result: "3 linked responses · item active + Ada",
         server: [
           "current representation",
           "transition and assignee links",

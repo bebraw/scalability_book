@@ -22,13 +22,6 @@ export const demoCatalog = [
     script: "/statechart-boundary-demo.js",
   },
   {
-    title: "Scalability dimensions lab",
-    category: "reading",
-    chapter: "What does scalability mean for web development?",
-    include: "site/includes/scalability-dimensions-demo.html",
-    script: "/scalability-dimensions-demo.js",
-  },
-  {
     title: "Boundary trace",
     category: "reading",
     chapter: "Architecture",

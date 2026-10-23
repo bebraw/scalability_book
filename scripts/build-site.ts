@@ -222,10 +222,6 @@ await compileSiteBundle(
   "es2019",
 );
 await compileSiteScript(
-  "scripts/scalability-dimensions-demo.ts",
-  "scalability-dimensions-demo.js",
-);
-await compileSiteScript(
   "scripts/request-trace-demo.ts",
   "request-trace-demo.js",
 );

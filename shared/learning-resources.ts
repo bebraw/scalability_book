@@ -242,25 +242,8 @@ const activities: Record<string, Activity> = {
     observe:
       "Compare state, enabled actions, and the shared parent cancellation rule.",
   },
-  "Scalability dimensions lab": {
-    conceptIds: ["scalability", "pressure", "trade-off"],
-    caption:
-      "Connect demand, data, contributors, and changing rules to different scaling pressures.",
-    controls: [
-      "Concurrent submissions",
-      "History growth",
-      "More contributors",
-      "Changing event rules",
-    ],
-    assumptions:
-      "The selections frame a scalability question; they do not measure capacity or rank architectures.",
-    predict:
-      "Which maintained goal would your selected pressure threaten first?",
-    try: "Choose one pressure, inspect its dimension, then add a second pressure.",
-    observe:
-      "Identify the new obligations and the measurement needed to justify a response.",
-  },
   "Boundary trace": {
+    activityVersion: 2,
     conceptIds: [
       "contract",
       "measurement-boundary",
@@ -309,6 +292,7 @@ const activities: Record<string, Activity> = {
       "Inspect the lifecycle and activity ledger together rather than inferring correctness from a response.",
   },
   "Cache decision lab": {
+    activityVersion: 2,
     conceptIds: ["cache", "contract", "consistency", "trade-off"],
     caption:
       "Trace reuse, validation, and stale responses under different HTTP cache policies.",
@@ -318,7 +302,7 @@ const activities: Record<string, Activity> = {
       "Changed origin representation",
     ],
     assumptions:
-      "A compliant-cache teaching model. Real cache keys, authorization, request directives, and platform overrides need separate verification.",
+      "Warm browser and shared entries of the same age; a stale browser entry is forwarded and only the shared cache uses the stale window. Request overrides and browser SWR behavior need separate verification.",
     predict:
       "Which policy can reuse a response without contacting the origin, and what freshness promise does that make?",
     try: "Change policy and response age, then mark the origin representation as changed.",
@@ -367,6 +351,7 @@ const activities: Record<string, Activity> = {
       "Separate visible content, downloaded code, and available behavior along the user journey.",
   },
   "API contract lens": {
+    activityVersion: 2,
     conceptIds: [
       "contract",
       "authority",
@@ -456,6 +441,7 @@ const activities: Record<string, Activity> = {
       "Compare distributions and timer boundaries before claiming an improvement in user-visible response.",
   },
   "Queue balance lab": {
+    activityVersion: 2,
     conceptIds: [
       "little-law",
       "queue",
@@ -471,7 +457,7 @@ const activities: Record<string, Activity> = {
       "Observed average work in progress, L",
     ],
     assumptions:
-      "Little's Law applies to stable long-run averages within the same boundary and population. Use mean time, not a tail percentile. The controls are illustrative values.",
+      "Little's Law applies to stable long-run averages within the same boundary and population. Use mean time, not a tail percentile. The controls are illustrative entered averages; agreement allows numerical rounding only and does not establish a stable observation window.",
     predict:
       "Arrival rate stays at 20 events/s. Average time doubles from 0.5 to 1 second. What average work in progress would make the measurements agree?",
     try: "Set arrival rate to 20 and average time to 1, then adjust observed work in progress to your prediction.",
@@ -479,6 +465,7 @@ const activities: Record<string, Activity> = {
       "Compare expected and observed L and the displayed gap. Explain what a disagreement could mean about the measurement assumptions.",
   },
   "Model evaluation lab": {
+    activityVersion: 2,
     conceptIds: [
       "eval",
       "acceptance-criteria",
@@ -492,10 +479,12 @@ const activities: Record<string, Activity> = {
       "Eval task",
       "Shared prompt",
       "Attempt outputs",
-      "Rubric and comparability checks",
+      "Rubric evidence and worked-score reveal",
+      "Sourced elapsed time and cost",
+      "Comparability checks",
     ],
     assumptions:
-      "Sample answers, preset scores, and displayed cost/latency are invented. Rubric scores and protocol confirmations are manual; real evaluations need separate acceptance checks, recorded usage and correction effort, and repeated comparable trials.",
+      "Sample answers and revealed worked scores are authored examples. Rubric judgments and sourced run observations are manual; missing elapsed time/cost remains unknown. Separate acceptance checks, correction effort and repeated comparable trials are still needed.",
     predict:
       "What evidence would distinguish a convincing example from a more reliable model on this task?",
     try: "Use samples or permitted outputs, inspect the complete shared prompt, and score both attempts against the selected task's rubric. Conceal identities when another person prepares the pair.",

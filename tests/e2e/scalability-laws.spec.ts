@@ -1,6 +1,25 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("scalability law labs", () => {
+  test("regression: a fivefold discrepancy is not agreement and fractional averages are allowed", async ({
+    page,
+  }) => {
+    await page.goto("/demos/#demo-queue-balance-lab");
+    const demo = page.locator("[data-little-law-demo]");
+    await demo.locator('[data-little-law-input="arrival"]').fill("2");
+    await demo.locator('[data-little-law-input="time"]').fill("0.1");
+    await demo.locator('[data-little-law-input="observed"]').fill("1");
+    await expect(
+      demo.locator('[data-little-law-metric="expected"]'),
+    ).toHaveText("0.2");
+    await expect(demo.locator("[data-little-law-verdict]")).toContainText(
+      "More work observed",
+    );
+    await demo.locator('[data-little-law-input="observed"]').fill("0.2");
+    await expect(demo.locator("[data-little-law-verdict]")).toHaveText(
+      "Measurements agree",
+    );
+  });
   test("checks a Little's Law measurement boundary", async ({ page }) => {
     await page.goto("/demos/#demo-queue-balance-lab");
     const demo = page.locator("[data-little-law-demo]");
@@ -25,12 +44,12 @@ test.describe("scalability law labs", () => {
     await page.goto("/demos/#demo-sequential-work-bound");
     const demo = page.locator("[data-amdahl-law-demo]");
 
-    await expect(
-      demo.locator('[data-amdahl-law-metric="speedup"]'),
-    ).toHaveText("2.50×");
-    await expect(
-      demo.locator('[data-amdahl-law-metric="ceiling"]'),
-    ).toHaveText("5.00×");
+    await expect(demo.locator('[data-amdahl-law-metric="speedup"]')).toHaveText(
+      "2.50×",
+    );
+    await expect(demo.locator('[data-amdahl-law-metric="ceiling"]')).toHaveText(
+      "5.00×",
+    );
     const sequentialSegment = await demo
       .locator("[data-amdahl-sequential]")
       .boundingBox();
@@ -41,9 +60,9 @@ test.describe("scalability law labs", () => {
     expect(parallelSegment?.width).toBeCloseTo(sequentialSegment!.width, 0);
 
     await demo.locator('[data-amdahl-law-input="agents"]').fill("16");
-    await expect(
-      demo.locator('[data-amdahl-law-metric="speedup"]'),
-    ).toHaveText("4.00×");
+    await expect(demo.locator('[data-amdahl-law-metric="speedup"]')).toHaveText(
+      "4.00×",
+    );
     await expect(demo.locator("[data-amdahl-law-reading]")).toContainText(
       "sequential 20% remains",
     );
@@ -116,9 +135,8 @@ test.describe("scalability law labs", () => {
         const expected = getComputedStyle(probe).color;
         probe.remove();
         return (
-          getComputedStyle(
-            element.querySelector("[data-usl-chart]")!,
-          ).color === expected
+          getComputedStyle(element.querySelector("[data-usl-chart]")!).color ===
+          expected
         );
       });
       expect(usesThemeAccent).toBe(true);

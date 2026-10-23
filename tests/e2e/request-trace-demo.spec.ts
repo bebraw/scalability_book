@@ -44,7 +44,7 @@ test.describe("request trace demo", () => {
     );
     await expect(
       demo.locator("[data-request-trace-demo-metric='risk']"),
-    ).toContainText("high");
+    ).toHaveCount(0);
     await expect(
       demo.locator("[data-request-trace-demo-interpretation]"),
     ).toContainText("database timeout");
@@ -61,5 +61,11 @@ test.describe("request trace demo", () => {
     await expect(
       demo.locator("[data-request-trace-demo-artifact]"),
     ).toHaveValue(/Each boundary needs an owner/);
+    await expect(
+      demo.locator("[data-request-trace-demo-artifact]"),
+    ).not.toHaveValue(/Highest risk/);
+    await expect(
+      demo.locator("[data-request-trace-demo-artifact]"),
+    ).toHaveValue(/Evidence to collect/);
   });
 });

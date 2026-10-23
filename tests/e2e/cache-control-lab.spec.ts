@@ -1,6 +1,33 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("cache control lab", () => {
+  test("regression: a still-fresh browser entry does not take the shared path", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-cache-control-lab]");
+    await demo
+      .locator('label:has([data-cache-profile][value="summary"])')
+      .click();
+    await demo.locator("[data-cache-age]").fill("0");
+    await expect(demo.locator('[data-cache-fact="source"]')).toHaveText(
+      "browser cache",
+    );
+    await expect(demo.locator("[data-cache-steps]")).not.toContainText(
+      "forwards",
+    );
+    await demo.locator("[data-cache-age]").fill("12"); // 29 seconds
+    await expect(demo.locator('[data-cache-fact="source"]')).toHaveText(
+      "browser cache",
+    );
+    await demo.locator("[data-cache-age]").fill("13"); // 31 seconds
+    await expect(demo.locator("[data-cache-outcome]")).toHaveText(
+      "Fresh shared hit",
+    );
+    await demo.locator("[data-cache-age]").fill("50"); // exactly the shared 120-second lifetime
+    await expect(demo.locator("[data-cache-outcome]")).toHaveText(
+      "Serve stale, revalidate",
+    );
+  });
   test.beforeEach(async ({ page }) => {
     await page.goto("/chapters/architecture/#cache-decision-lab");
     await expect(page.locator("[data-cache-control-lab]")).toBeVisible();

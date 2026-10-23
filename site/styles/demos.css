@@ -1124,10 +1124,6 @@
   font-weight: 850;
   line-height: 1.1;
 }
-.dimensions-demo .scaling-demo-summary span {
-  block-size: 4.125rem;
-  overflow-wrap: anywhere;
-}
 .scaling-demo-summary small {
   color: var(--muted);
   display: block;
@@ -1240,7 +1236,6 @@
 
 .pressure-map-demo .scaling-demo-panel,
 .request-trace-demo .scaling-demo-panel,
-.dimensions-demo .scaling-demo-panel,
 .friction-demo .scaling-demo-panel {
   align-content: start;
 }
@@ -1469,109 +1464,6 @@
   .friction-observation-row {
     gap: 0.4rem;
     font-size: var(--demo-font-label);
-  }
-}
-.dimensions-demo-grid {
-  align-items: start;
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.2fr);
-}
-.dimensions-demo-controls,
-.dimensions-demo-output,
-.dimensions-demo-radar-section,
-.dimensions-demo-tradeoff,
-.dimensions-demo-pressures,
-.dimensions-demo-radar {
-  display: grid;
-  gap: 0.65rem;
-}
-.dimensions-demo-output {
-  grid-template-columns: 1fr;
-}
-.dimensions-demo-pressures label {
-  align-items: start;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.3rem;
-  display: grid;
-  gap: 0 0.55rem;
-  grid-template-columns: auto minmax(0, 1fr);
-  padding: 0.58rem 0.65rem;
-}
-.dimensions-demo-pressures input {
-  margin-top: 0.18rem;
-}
-.dimensions-demo-pressures span {
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1.25;
-}
-.dimensions-demo-radar-chart {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.35rem;
-  display: grid;
-  gap: 0.65rem;
-  inline-size: min(100%, 34rem);
-  justify-self: center;
-  margin: 0;
-  padding: 0.6rem;
-}
-.dimensions-demo-radar-chart svg {
-  aspect-ratio: 1;
-  background: radial-gradient(
-    circle at center,
-    color-mix(in srgb, var(--accent) 9%, transparent) 0 34%,
-    transparent 35%
-  );
-  display: block;
-  inline-size: 100%;
-  min-block-size: 13.5rem;
-}
-.dimensions-demo-radar-ring {
-  fill: none;
-  stroke: color-mix(in srgb, var(--accent) 20%, var(--border));
-  stroke-width: 1;
-}
-.dimensions-demo-radar-axis {
-  stroke: color-mix(in srgb, var(--accent) 24%, var(--border));
-  stroke-width: 1;
-}
-.dimensions-demo-radar-point {
-  fill: var(--panel);
-  stroke: color-mix(in srgb, var(--accent) 45%, var(--border));
-  stroke-width: 1.2;
-}
-.dimensions-demo-radar-shape {
-  fill: color-mix(in srgb, var(--accent) 32%, transparent);
-  stroke: var(--accent-strong);
-  stroke-linejoin: round;
-  stroke-width: 2.8;
-}
-.dimensions-demo-radar-score-point {
-  fill: var(--accent-strong);
-  stroke: var(--panel);
-  stroke-width: 1.6;
-}
-.dimensions-demo-radar-label {
-  fill: var(--text);
-  font-family: var(--font-ui);
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-  paint-order: stroke;
-  stroke: var(--panel);
-  stroke-linejoin: round;
-  stroke-width: 3px;
-  text-anchor: middle;
-  text-transform: uppercase;
-}
-@media (width <= 62rem) {
-  .dimensions-demo-grid,
-  .dimensions-demo-output {
-    grid-template-columns: 1fr;
   }
 }
 .friction-demo .scaling-demo-progress {
@@ -4055,6 +3947,34 @@
 .model-eval-sliders {
   display: grid;
   gap: 0.55rem;
+}
+
+.model-eval-evidence {
+  grid-column: 1 / -1;
+}
+.model-eval-evidence,
+.model-eval-observations,
+.model-eval-observations label {
+  display: grid;
+  gap: 0.5rem;
+  min-inline-size: 0;
+}
+.model-eval-observations {
+  border: 1px solid var(--border);
+  margin-block-start: 1rem;
+  padding: 0.75rem;
+}
+.model-eval-evidence input,
+.model-eval-observations input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 2.5rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  font: inherit;
 }
 .model-eval-slider {
   align-items: center;

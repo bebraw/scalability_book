@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HTTP cache lab</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.mjs"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="kicker">Local implementation lab · 03</p>
+        <h1>Which request reached the origin?</h1>
+        <p>
+          Implement one response function, predict the next body and request
+          count, then compare actual browser reuse with the origin log.
+        </p>
+      </header>
+      <section aria-labelledby="policy-title">
+        <h2 id="policy-title">One resource, two policies</h2>
+        <label for="policy">Response policy</label
+        ><select id="policy">
+          <option value="fresh">Private, fresh for 60 seconds</option>
+          <option value="validate">Private, validate every reuse</option>
+        </select>
+        <div class="toolbar">
+          <button id="request" type="button">Fetch summary</button
+          ><button id="change" type="button">Change origin body</button>
+        </div>
+        <p>
+          Changing the origin does not invalidate a fresh browser entry. Keep
+          DevTools “disable cache” off; use these buttons rather than reloading.
+        </p>
+        <p id="status" role="status">
+          Ready. The starter deliberately leaves responseFor unfinished.
+        </p>
+        <dl class="observations">
+          <div>
+            <dt>Successful browser fetches</dt>
+            <dd id="fetches">0</dd>
+          </div>
+          <div>
+            <dt>Summary requests at origin</dt>
+            <dd id="origin-count">0</dd>
+          </div>
+          <div>
+            <dt>Current origin version</dt>
+            <dd id="version">1</dd>
+          </div>
+        </dl>
+        <h3>Body the browser received</h3>
+        <pre id="body">No response yet</pre>
+        <h3>Origin request log</h3>
+        <pre id="log">[]</pre>
+        <p>
+          A browser fetch can expose status 200 after the network returned 304
+          and reused a stored body. The origin log records network status; these
+          are different observations.
+        </p>
+      </section>
+      <footer>
+        <p>
+          All records are synthetic and local. The fixture supplies no shared
+          cache or CDN. See SPEC.md for the bounded contract.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

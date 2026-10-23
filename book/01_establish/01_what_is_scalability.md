@@ -214,19 +214,27 @@ For the course project, time, available hardware, privacy, model access, team ex
 A bounded local implementation can be a strong baseline precisely because its constraints are visible.
 Later implementations can test different hypotheses without pretending that newer or more distributed means better.
 
-## Scalability dimensions lab
+## Connect a pressure to a scalability claim
 
-The demonstration below applies four pressures to the event tracker.
-Select the scenarios that matter and observe which dimensions receive the greatest relative strain.
-The weights are deterministic teaching inputs, not measurements of a real application, so use the result to form a claim rather than to select an architecture.
+Choose a pressure and predict which maintained goal it could threaten first.
+The following mapping names possible boundaries and signals; it does not rank their importance for your implementation.
+Use :ref[table:scalability-pressure-signals] to frame a check that could reject your prediction.
 
-{{ import "site/includes/scalability-dimensions-demo.html" }}
+| Pressure                                | Boundary to investigate                 | Possible first signal                                |
+| --------------------------------------- | --------------------------------------- | ---------------------------------------------------- |
+| Concurrent work-item actions            | Request path and state-and-event commit | Accepted throughput, tail latency and queue depth    |
+| Growing event history                   | Feed query, index and retention policy  | Query plan, rows examined and recovery time          |
+| More developers or agents               | Ownership, review and integration       | Review delay, conflicting changes and rework         |
+| Frequently changing filters or metadata | Contracts, migrations and tests         | Change fan-out, regression rate and migration effort |
+
+::caption[Possible observations for four kinds of scalability pressure.]
+::label[table:scalability-pressure-signals]
 
 {{ import "exercise:scalability-contract" }}
 
 Choose one leading dimension and write its pressure, maintained goal, likely first limit, and first useful signal.
-Then select a second pressure and inspect how the conclusion changes.
-If several dimensions rise together, preserve them as separate claims instead of averaging them into a single scalability score.
+Then add a second pressure and explain whether you would investigate a different boundary.
+Preserve the dimensions as separate claims instead of averaging them into a single scalability score.
 
 ## Project artifact
 

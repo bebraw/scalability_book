@@ -102,6 +102,7 @@ No accepted decisions await implementation.
 | [ADR-051](implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md)     | Reference exact retained course configurations, confirm actual execution conditions and record deviations and material settings.                            |
 | [ADR-052](implemented/ADR-052-separate-private-audit-reference-from-public-workload-tooling.md)     | Keep the audit reference private and independently frozen, with a public implementation-independent benchmark runner and explicit adapter responsibilities. |
 | [ADR-053](implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md)             | Focus 29 demos on inspectable reasoning, remove unsupported scoring and provide an optional executable CSV starter.                                         |
+| [ADR-054](implemented/ADR-054-correct-demo-inference-and-add-bounded-local-experiments.md)          | Correct demo inference, simplify residual rankings and offer bounded local retry/cache starters.                                                            |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

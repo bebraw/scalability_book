@@ -1,0 +1,18 @@
+{
+  "name": "persisted-retry-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node receiver.mjs",
+    "worker": "node worker.mjs",
+    "inspect": "node inspect.mjs",
+    "preflight": "node --test tests/preflight.test.mjs",
+    "test": "node --test tests/contract.test.mjs",
+    "test:process": "node --test tests/process.test.mjs",
+    "check": "node check.mjs"
+  }
+}

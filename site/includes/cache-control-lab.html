@@ -20,7 +20,9 @@
 
   <p class="cache-control-lab-intro">
     Every case begins after one successful response. Change its policy and age,
-    then trace the next request without changing the URL.
+    then trace the next request without changing the URL. For an executed
+    browser observation, try the optional
+    <a href="/downloads/labs/http-cache.zip">local HTTP cache starter</a>.
   </p>
 
   <form data-cache-control-form>
@@ -173,8 +175,10 @@
     </div>
 
     <p class="cache-control-lab-note">
-      The trace models compliant HTTP cache behavior at a teaching scale. Real
-      cache keys, platform overrides, authorization, request directives, and
+      This model begins with warm browser and shared entries of the same age. A
+      stale browser entry is forwarded; only the shared cache uses the stale
+      window here. Reloads and request overrides are not modeled. Real cache
+      keys, platform overrides, authorization, request directives, and
       invalidation rules must be verified in the deployed path.
     </p>
   </form>

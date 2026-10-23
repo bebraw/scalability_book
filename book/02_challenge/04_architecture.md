@@ -269,6 +269,11 @@ Then inspect whether the request is served fresh, served stale while validation 
 
 {{ import "site/includes/cache-control-lab.html" }}
 
+The optional [HTTP cache starter](/downloads/labs/http-cache.zip) ([browse lab sources](https://github.com/bebraw/scalability_book/tree/main/labs)) supplies a local origin and browser page, leaving one conditional-response function to implement with your model.
+Predict body versions and origin-request counts, then inspect actual browser reuse and network 200/304 records.
+It focuses on private browser caching; shared caches and CDN behavior remain separate investigations.
+Maintain its specification and one decision record within existing practice time, with no additional submission or grading criterion.
+
 Cache behavior should be tested at the deployed boundary because application code is only one participant.
 A framework, reverse proxy, CDN, browser, or hosting platform may add, remove, or reinterpret cache metadata.
 Record the final response headers, cache status, `Age`, and origin traffic rather than assuming the source-code declaration is the complete policy.

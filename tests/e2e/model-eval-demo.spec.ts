@@ -28,6 +28,7 @@ test.describe("model eval demo", () => {
     await expect(demo.locator("[data-model-output='x']")).toHaveValue(
       /occurred_at/,
     );
+    await revealWorked(demo);
     await expect(demo.locator(".model-eval-help")).toHaveCount(6);
     await demo.locator(".model-eval-help").first().focus();
     await expect(demo.getByRole("tooltip").first()).toContainText(
@@ -48,7 +49,7 @@ test.describe("model eval demo", () => {
       ".model-eval-note",
     ]);
     await expect(demo.locator("[data-model-eval-next]")).toBeDisabled();
-    await expect(demo).toContainText("Illustrative cost");
+    await expect(demo).toContainText("Reported cost");
     await expect(demo.locator("[data-model-eval-conclusion]")).toContainText(
       "Complete the comparison protocol",
     );
@@ -74,6 +75,7 @@ test.describe("model eval demo", () => {
     await demo.locator("[data-model-eval-tab='2']").click();
     await demo.locator("[data-model-eval-sample='x']").click();
     await demo.locator("[data-model-eval-sample='y']").click();
+    await revealWorked(demo);
     await demo
       .getByRole("slider", {
         name: "Load level score for Attempt Y",
@@ -212,6 +214,7 @@ test.describe("model eval demo", () => {
         .filter({ hasText: "unresolved enforcement question" })
         .first(),
     ).toBeVisible();
+    await revealWorked(demo);
     await demo
       .getByRole("slider", {
         name: "Uncertainty score for Attempt X",
@@ -257,4 +260,11 @@ async function expectElementsInsideDemo(demo: Locator, selectors: string[]) {
   );
 
   expect(overflow).toEqual([]);
+}
+
+async function revealWorked(demo: Locator) {
+  for (const button of await demo
+    .locator("[data-model-eval-worked]:enabled")
+    .all())
+    await button.click();
 }

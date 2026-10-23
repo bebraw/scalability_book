@@ -114,13 +114,21 @@ Each lab should contain a README that states how to run or study it, what its ev
 
 The site build packages every lab directory as `/downloads/labs/<directory-name>.zip` with the directory itself as the archive root.
 Generated archives are build output and should not be committed.
-Transient `.git`, `node_modules`, `playwright-report`, and `test-results` directories and `.DS_Store` files are omitted automatically.
+Transient `.git`, `.lab-data`, `node_modules`, `playwright-report`, and `test-results` directories and `.DS_Store` files are omitted automatically.
 Reader material should normally offer both the repository source and the generated download so students can inspect before downloading.
 
 For [the CSV starter](../labs/csv-export/README.md), run `npm run preflight` in its directory to check the supplied server independently of the unfinished serializer.
 `npm run check` retains preflight, contract and browser logs in ignored `test-results/evidence/`; feature failures are expected in the untouched starter.
 Verify the seven contract checks and three browser cases with a completed candidate in a separate clean-unpacked copy, preserving both the initial failures and completed results.
 Inspect the ZIP to exclude dependencies, generated evidence and any completed solution; verify its pinned `npm ci` setup outside this checkout.
+
+The [persisted retry starter](../labs/persisted-retry/README.md) uses built-in Node SQLite and has five contract tests plus two actual process cases, including a fresh-key negative control.
+The [HTTP cache starter](../labs/http-cache/README.md) has six contract tests and three Chromium cases; its browser baseline passes before implementation while the feature cases fail.
+Both expose `preflight` and `check` scripts and retain logs in ignored `test-results/`.
+Validate completed clean-unpacked candidates and retain the expected unfinished results separately.
+Challenge retry checks with an autocommit-only receiver and HTTP checks with always-200 or no-store responses; do not weaken checks to accept those candidates.
+The HTTP browser checks use real cache behavior without request routing/mocks; keep manual preview servers off their test port or use `HTTP_LAB_PORT`.
+These optional labs use existing practice time and are independent of the private audit reference.
 
 To keep a block of draft material in a chapter without publishing it, wrap it in a Markdown comment block:
 

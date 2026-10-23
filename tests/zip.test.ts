@@ -1,6 +1,41 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createStoredZip } from "../scripts/lib/zip.ts";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { createStoredZip, writeDirectoryZip } from "../scripts/lib/zip.ts";
+
+test("source downloads exclude local lab records and generated check evidence", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "book-source-zip-"));
+  const source = path.join(directory, "fixture");
+  try {
+    await mkdir(source);
+    await writeFile(
+      path.join(source, "README.md"),
+      "Synthetic teaching source\n",
+    );
+    for (const name of [
+      ".lab-data",
+      "test-results",
+      "node_modules",
+      "playwright-report",
+      ".git",
+    ]) {
+      await mkdir(path.join(source, name));
+      await writeFile(
+        path.join(source, name, "synthetic-record.txt"),
+        "Must stay local\n",
+      );
+    }
+    const output = path.join(directory, "fixture.zip");
+    await writeDirectoryZip(source, output);
+    assert.deepEqual(readStoredEntries(await readFile(output)), {
+      "fixture/README.md": "Synthetic teaching source\n",
+    });
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("stored ZIP archives are deterministic and preserve file contents", () => {
   const entries = [

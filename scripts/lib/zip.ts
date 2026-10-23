@@ -7,6 +7,7 @@ export { createStoredZip } from "../../shared/zip.ts";
 type ZipEntry = { data: Uint8Array; name: string };
 const excludedDirectoryNames = new Set([
   ".git",
+  ".lab-data",
   "node_modules",
   "playwright-report",
   "test-results",

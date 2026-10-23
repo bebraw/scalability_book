@@ -192,7 +192,7 @@ test.describe("demo showcase", () => {
     ).toBeVisible();
     await expect(
       page.locator(
-        "#demo-workflow-loop, #demo-observability-signal-picker, #demo-final-reflection-package",
+        "#demo-workflow-loop, #demo-observability-signal-picker, #demo-final-reflection-package, #demo-scalability-dimensions-lab",
       ),
     ).toHaveCount(0);
 

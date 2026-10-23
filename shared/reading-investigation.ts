@@ -10,7 +10,7 @@ import { demoResources } from "./learning-resources.ts";
 /** Authored activity semantics; rendering, browser state and providers are adapters. */
 export const queueInvestigation = {
   id: "queue-balance",
-  version: 1,
+  version: 2,
   demoId: "demo-queue-balance-lab",
   title: "Explore the queue in your system",
   reading: "/chapters/benchmarking/#check-measurements-against-a-model",
@@ -247,9 +247,9 @@ export function parseInvestigationTurn(
     for (const [key, min, max] of [
       ["arrival", 2, 40],
       ["time", 0.1, 2],
-      ["observed", 1, 40],
+      ["observed", 0, 80],
       ["expected", 0.2, 80],
-      ["gap", -79, 39.8],
+      ["gap", -80, 79.8],
     ] as const)
       learningAssert(
         typeof observation[key] === "number" &&

@@ -1,6 +1,23 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("API contract lens", () => {
+  test("regression: the related hypermedia example sends the start command it claims", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-api-contract-lens]");
+    await demo
+      .locator('label:has([data-api-contract-option][value="hypermedia"])')
+      .click();
+    await demo.locator("[data-api-contract-change]").check();
+    await expect(demo.locator("[data-api-contract-code]")).toContainText(
+      "POST {{links.start.href}}",
+    );
+    await demo.locator("[data-api-contract-run]").click();
+    await expect(demo.locator("[data-api-contract-result]")).toHaveText(
+      "3 linked responses · item active + Ada",
+      { timeout: 5000 },
+    );
+  });
   test.beforeEach(async ({ page }) => {
     await page.goto(
       "/appendices/advanced-web-boundaries/#demo-api-contract-lens",

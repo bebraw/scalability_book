@@ -51,11 +51,16 @@ An illustrative score does not establish a measured performance improvement or a
 
 ## Learning value and local practice
 
-The shared catalog owns 29 demos grouped into reading investigations, optional depth and project worksheets.
+The shared catalog owns 28 demos grouped into reading investigations, optional depth and project worksheets.
 Give an investigation a concrete prediction or decision, inspectable consequences and a question that transfers to a changed case.
 Use an explicit mechanism or stated formal model for a simulation; keep capacity, productivity and risk claims tied to observed evidence.
 The fleet and scaling worksheets prepare scope, handoffs and trade-offs without forecasting effort or assigning numerical relief scores.
 The recap's static Compare evidence index preserves submission prompts without a separate checklist widget.
+The dimensions chapter uses a static pressure–boundary–signal mapping rather than a weighted radar.
+Boundary trace exposes ownership and failure questions without assigning an overall risk rank.
+The queue model compares fractional entered averages with numerical rounding only; it does not infer a stable observation window or statistical agreement.
+The evaluation worksheet separates sample output from revealed worked scores, accepts sourced run observations and leaves missing elapsed time/cost unknown.
+Replacing an output clears its earlier judgments and observations; cost does not break rubric-score ties.
 
 The constraint feedback loop explicitly labels its candidates and checks as scripted.
 Its download is an authored example, separate from executed validation.
@@ -64,10 +69,16 @@ Students use their own model and harness, maintain specifications and decision r
 The unfinished starter must fail its feature checks while its setup preflight passes; validation of a completed candidate belongs in a clean disposable copy.
 Do not put a completed solution, model credentials or generated check records in the starter download.
 
+The optional [persisted retry](../labs/persisted-retry/README.md) and [HTTP cache](../labs/http-cache/README.md) starters follow that same bounded pattern.
+The first uses actual receiver/worker processes and separate SQLite ledgers; the second distinguishes browser-visible bodies from origin request/status records.
+Their fixed checks must reject a partial receiver write and a false claim of browser reuse, respectively.
+Retain formal models and short browser orientations without requiring local implementations of every demo.
+
 Keep the catalog, includes/scripts, preview images, reading embeds and agent-resource metadata consistent when retiring a demo.
 Increment the authored activity version when its meaning changes; browser snapshot schema versions are independent.
 Historical notebook entries retain their recorded sources and use the general learning loop when a specialized activity is retired.
 See [ADR-053](adrs/implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md) for the decision and verification boundary.
+Its follow-up is [ADR-054](adrs/implemented/ADR-054-correct-demo-inference-and-add-bounded-local-experiments.md).
 
 ## Review
 

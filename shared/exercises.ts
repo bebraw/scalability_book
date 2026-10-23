@@ -281,10 +281,6 @@ export const exercises: Record<string, Exercise> = {
         explanation: "All three criteria must pass.",
       },
     ],
-    demo: {
-      id: "demo-scalability-dimensions-lab",
-      label: "Scaling contract",
-    },
   },
   "development-gates": {
     version: 1,

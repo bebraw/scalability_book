@@ -184,7 +184,7 @@ function initializeRequestTraceDemo(root: HTMLElement) {
       selectedBoundaryIndex,
     );
     updateRequestTraceMetrics(metrics, result);
-    verdict.textContent = `${result.boundaries} steps / ${result.riskLevel} risk`;
+    verdict.textContent = `${result.boundaries} steps to inspect`;
     interpretation.textContent = buildRequestTraceInterpretation(
       selected,
       result,
@@ -245,15 +245,6 @@ function analyzeRequestTrace(
   selected: RequestTraceConditionKey[],
   nodes: RequestTraceNode[],
 ) {
-  const severeConditions = ["duplicate", "db-timeout"].filter((key) =>
-    selected.includes(key as RequestTraceConditionKey),
-  ).length;
-  const riskLevel =
-    severeConditions >= 2
-      ? "high"
-      : severeConditions === 1 || selected.includes("client-retry")
-        ? "medium"
-        : "low";
   const rules =
     selected.length > 0
       ? rulePriority
@@ -264,7 +255,6 @@ function analyzeRequestTrace(
   return {
     boundaries: nodes.length,
     path: formatRequestTracePath(nodes),
-    riskLevel,
     rules,
   };
 }
@@ -405,8 +395,6 @@ function updateRequestTraceMetrics(
 
     if (key === "path") {
       node.textContent = result.path;
-    } else if (key === "risk") {
-      node.textContent = result.riskLevel;
     } else if (key === "rules") {
       node.innerHTML = buildRequestTraceRuleList(result.rules);
     }
@@ -470,7 +458,7 @@ function buildRequestTraceArtifact(
     "Success boundary: the state change, work_started event, and reusable command result commit together.",
     `Request path: ${result.path}`,
     `Boundary count: ${result.boundaries}`,
-    `Highest risk: ${result.riskLevel}`,
+    "Evidence to collect: name one boundary, predict a failure and record the check that could reject your claim.",
     "Rules to implement:",
     ...result.rules.map((rule) => `- ${rule}`),
     "",
