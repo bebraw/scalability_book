@@ -80,10 +80,8 @@ export function createLearningCockpit(services: Services) {
       request.draft?.source ?? request.source ?? pageSource(request.selection);
     const demoId =
       request.demoId ?? (source.kind === "demo" ? source.anchor : "");
-    if (request.demoId || request.activityId === "queue-balance") {
-      const demo = demoResources.find(
-        ({ id }) => id === (request.demoId ?? "demo-queue-balance-lab"),
-      );
+    if (request.demoId) {
+      const demo = demoResources.find(({ id }) => id === request.demoId);
       if (!demo || !document.getElementById(demo.id)) return;
       source = {
         ...pageSource(),

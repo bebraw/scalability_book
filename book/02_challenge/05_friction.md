@@ -223,22 +223,29 @@ The whole-cycle exercise tests how a local speedup contributes to total effort; 
 
 {{ import "exercise:friction-cycle" }}
 
-### Friction audit lab
+### Record one evidenced bottleneck
 
-The audit below records observed effort in a bounded change path and makes an intervention's hypothesis explicit.
-Enter active person-minutes from your records, keeping passive waiting, acceptance evidence, and changed conditions in the notes.
-The arithmetic can show increased effort as well as a reduction; it does not predict productivity or assign risk from an assistance mode.
+Use the existing task, setup or change-probe record to identify one concrete blockage.
+The following prompts fit in the project's existing evidence index; the eight friction categories remain optional prompts, not eight required measurements.
 
-{{ import "site/includes/friction-audit-demo.html" }}
+```text
+Phase, revision and bounded task:
+Observed bottleneck and linked evidence:
+Response and why it might help:
+Acceptance check and actual result:
+Introduction cost, changed conditions and unknowns:
+Next check or reversal condition:
+```
 
-Apply the same audit to implementation A using the category change or another equivalently bounded request.
-Use setup, comprehension, change, testing, review, deployment, operations and coordination as prompts; use timing records and concrete blockages to identify one supported bottleneck and a response.
-Leave unmeasured stages unknown rather than treating them as zero, and record the intervention's introduction and ongoing maintenance costs separately.
-For one implemented choice, compare introduction with safe reversal: mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
+Distinguish active person-minutes from elapsed time and passive waiting; assign each person's effort once, including rework.
+Leave unmeasured effort unknown.
+For example, in an illustrative pair of accepted changes, 18 baseline person-minutes and 12 candidate person-minutes give a difference of -6; an eight-minute setup investment makes the first comparison +2 person-minutes overall.
+Neither number establishes future savings or a causal benefit from the intervention.
+Use your own linked observations and account for practice effects, configuration changes and ongoing maintenance.
 
-Repeat the unchanged audit for implementation B.
-The comparison is useful only if the change request and categories remain stable.
-A difference may come from architecture, tooling, documentation, generated defaults, or team practice; the audit should expose competing explanations rather than attribute every difference to the implementation approach.
+Apply the same bounded request and acceptance boundary when comparing implementations A and B.
+For an implemented choice, mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
+A checked improvement, unchanged or worse result, or justified follow-up can all support an honest friction finding.
 
 ## Project artifact
 

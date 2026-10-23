@@ -61,9 +61,10 @@ Which buffer meets your declared update deadline, and what further observation w
 
 ### Simulated benchmark lab
 
-The demonstration below models 60 requests to an event-recording endpoint.
-Change the number of concurrent clients, the share of requests that take a slow storage path, and the [p95 latency](/concepts/#tail-latency) objective.
-The values are deterministic and run only in the browser, so this is a teaching model rather than a capacity test.
+The demonstration below supplies 60 authored request durations for an event-recording endpoint.
+Change the share that takes a slow storage path and the [p95 latency](/concepts/#tail-latency) objective.
+Inspect the ordered records, the percentile rank and how many requests miss the objective.
+This is a deterministic percentile investigation; it does not model concurrency, queueing or a system's capacity.
 
 {{ import "exercise:measurement-prediction" }}
 
@@ -71,7 +72,7 @@ The values are deterministic and run only in the browser, so this is a teaching 
 
 Predict the default result before running the simulated workload, then compare the average with p95.
 Treat the first result as a baseline, change one condition, and predict again before recording the comparison.
-Record the workload, load, metric, and acceptance threshold together.
+Record the duration population, percentile convention and acceptance threshold together; a separate executed workload is needed for a capacity claim.
 
 Synthetic benchmarks deliberately simplify reality.
 They can omit workload mixes, client behavior, cache histories, data shapes, provider quotas, dependency contention, and failure combinations that appear in production.
@@ -137,12 +138,32 @@ Measurements become more useful when they can be checked against a model.
 For an event pipeline, `L` can be the average number of events waiting or being processed, `λ` the average arrival rate, and `W` the average time from arrival to completion.
 If 20 events arrive per second and each spends half a second in the system, the expected average work in progress is 10 events.
 
-#### Queue balance lab
+#### Derive averages from one observation window
 
-Use the lab below to check whether three observed averages are mutually consistent.
-Change one value at a time and explain whether the mismatch suggests overload, incompatible measurement windows, or a missing boundary.
+:ref[table:queue-observation-record]{text="The record below"} is an authored example with one arrival and one terminal completion per event, no retries and no work present before time zero.
+Times are seconds on the same clock; the boundary includes both waiting and processing.
 
-{{ import "site/includes/little-law-demo.html" }}
+| Event | Arrives | Completes |
+| ----- | ------: | --------: |
+| A     |       0 |         2 |
+| B     |       1 |         3 |
+| C     |       2 |         4 |
+| D     |       3 |         5 |
+
+::caption[An event cohort with explicit arrival and completion times.]
+::label[table:queue-observation-record]
+
+For the window from 0 inclusive to 6 exclusive, calculate the arrival rate, each event's time inside the boundary, and the time-weighted number of unfinished events.
+The successive one-second occupancy intervals contain `1, 2, 2, 2, 1, 0` events: eight event-seconds in total.
+Thus `L = 8/6` events, `λ = 4/6` events/s and mean `W = 2` seconds agree.
+This exact accounting for an empty-to-empty cohort does not establish that a running service has reached a stable long-run regime.
+
+Now shorten the window to 0 inclusive through 3 exclusive.
+Which events have arrived but not completed, and which portions of their residence times lie outside the window?
+The occupancy area is five event-seconds, while the only completion strictly inside the window is A.
+Multiplying the arrival rate by A's two-second residence time does not recover `5/3` events.
+Explain the incomplete population before interpreting that mismatch as overload.
+Finally, state what would change if the timer measured only processing but occupancy included queued events.
 
 {{ import "exercise:measurement-boundary" }}
 
@@ -200,19 +221,19 @@ This conclusion came from my editorial review rather than a separate evaluation.
 The observed result belonged to the complete configuration—model, prompts, schemas, validators, and review workflow—so I could not confidently attribute poor outputs to the model rather than the harness.
 Structural and rendering checks could establish that a deck was valid; they could not establish that it was a good response to what I meant.
 
-### Goodhart pressure test
+### Challenge a coverage target
 
-The worked coverage case below turns that four-part review into a prediction and a proposed gate.
-Predict how an optimizer could respond to a line-coverage target, inspect the displaced cost, and choose a safeguard to examine.
-Revealing its authored assessment does not execute or validate the proposed gate.
-The values illustrate one failure mode; they are not empirical comparisons between tools or teams.
+In this authored case, a team requires at least 95% line coverage.
+A candidate adds tests that execute the transition handler but never assert the resulting state or event history.
+Before revealing the explanation, predict whether the candidate could meet the target while missing a regression, and name one observation that would challenge your prediction.
 
-{{ import "site/includes/goodhart-challenge-demo.html" }}
+{{ import "site/includes/coverage-target-explanation.html" }}
 
-For optional executed evidence, use the [concern-directed mutation lab](/downloads/labs/concern-directed-mutation.zip) with your model and harness.
-Strengthen one black-box assertion so that it passes the baseline, rejects a named faulty variant, and still passes the harmless storage refactor.
-Explain the behavior it distinguishes in your existing specification and decision notes.
-Monitoring the proxy can remain useful; the independent behavior check tests a different claim.
+For optional executed evidence, open `concern-directed-mutation/README.md` in the [course workspace](/downloads/labs/course-workspace.zip) and use your model and harness.
+Strengthen one black-box assertion so that it passes the baseline, rejects a named faulty variant with an ordinary assertion failure, and still passes the harmless storage refactor.
+Preserve the first result and explain the behavior it distinguishes in your existing specification and decision notes.
+Monitoring coverage can remain useful; the independent behavior check tests a different claim.
+One detected fault and one tolerated refactor do not establish a complete acceptance gate.
 
 ### Resource proxies are not the outcome
 
@@ -248,8 +269,9 @@ State which observation could distinguish competing explanations; the name of a 
 ### Simulated OpenTelemetry trace lab
 
 The trace explorer below reuses the event-recording request from the benchmark demonstration.
-Switch between a healthy write, a slow write, and a successful request that required a retry.
-Select individual spans to inspect their duration, status, source, and attributes.
+Compare requests A, B and C without revealing the authored explanation first.
+Inspect child spans for duration, status, source and attributes, then predict which work accounts for the additional server time.
+Only after inspecting the record, reveal the case reading and compare it with your explanation.
 A span represents one timed unit of work and carries its own span ID, while every span in the same trace shares a trace ID.
 The [HTTP server span](https://opentelemetry.io/docs/specs/semconv/http/http-spans/#http-server-span) measures this server's handling of the request; it does not include the complete client-observed request or browser interaction.
 It is the root in this simulation because no incoming parent context is modeled; in a distributed trace it may be a child of an upstream span.
@@ -257,9 +279,15 @@ The spans are not necessarily sent as separate network messages: an SDK can batc
 
 {{ import "site/includes/otel-trace-demo.html" }}
 
-The slow trace localizes most of the server request time to connection waiting and event storage.
-That is a stronger lead than the server request duration alone, but it still does not establish root cause.
-The next investigation might inspect database saturation, pool configuration, query behavior, or competing workloads.
+A long span can localize elapsed time without establishing root cause.
+Explain what additional evidence would distinguish a saturated resource, a configuration limit, slow work or a competing workload.
+A successful HTTP response can also contain an earlier failed attempt; retain both outcomes when interpreting the trace.
+
+For optional local practice, ask your model to instrument one operation in your own project and export spans to a local console or file.
+Keep the accepted behavior and workload fixed, then add one controlled delay or one fail-once dependency in a disposable setup.
+Retain the original and changed records, including the failed attempt, and check shared trace IDs, parent-child links and the timer boundary.
+Use an independent acceptance check to establish the operation's final outcome.
+A telemetry backend is unnecessary for this bounded check; the local delay does not establish the cause of an unrelated production incident.
 Also notice that useful domain spans and attributes require conscious instrumentation, while generic HTTP spans can often be produced automatically.
 
 ### Use runtime evidence during repair

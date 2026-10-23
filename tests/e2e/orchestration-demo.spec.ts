@@ -14,6 +14,7 @@ test.describe("orchestration control-loop demo", () => {
   test("routes traffic and reconciles replicas, failure, and a rollout", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     const demo = page.locator("[data-orchestration-lab]");
 
     await expect(
@@ -62,6 +63,40 @@ test.describe("orchestration control-loop demo", () => {
     ).toHaveText("v2");
     await expect(demo.locator("[data-pod-release='v2']")).toHaveCount(5);
     await expect(demo.locator("[data-orchestration-rollout]")).toBeDisabled();
+    await demo.locator("[data-orchestration-burst]").click();
+    await expect(
+      demo.locator("[data-orchestration-metric='failed']"),
+    ).toHaveText("6");
+    await expect(
+      demo.locator("[data-orchestration-metric='served']"),
+    ).toHaveText("6");
+    await expect(
+      demo.locator("[data-orchestration-controller-state]"),
+    ).toHaveText("Converged");
+    await expect(
+      demo.locator("[data-orchestration-metric='running']"),
+    ).toHaveText("5");
+    await expect(
+      demo.locator(
+        "[data-orchestration-requests] [data-response-status='500']",
+      ),
+    ).toHaveCount(6);
+    await expect(demo.locator("[data-orchestration-burst]")).toBeEnabled();
+    await demo.locator("[data-orchestration-rollback]").click();
+    await expect(demo.locator("[data-orchestration-status]")).toContainText(
+      "Release v1 is fully rolled out",
+      { timeout: 25_000 },
+    );
+    await demo.locator("[data-orchestration-burst]").click();
+    await expect(
+      demo.locator("[data-orchestration-metric='served']"),
+    ).toHaveText("12");
+    await expect(
+      demo.locator("[data-orchestration-metric='failed']"),
+    ).toHaveText("6");
+    await expect(
+      demo.locator("[data-orchestration-requests] li").last(),
+    ).toContainText("HTTP 200 · v1");
 
     const overflow = await demo.evaluate((root: HTMLElement) => {
       const rootRect = root.getBoundingClientRect();

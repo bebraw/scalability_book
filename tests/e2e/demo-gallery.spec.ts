@@ -152,10 +152,7 @@ test.describe("demo showcase", () => {
           "button, select, input[type='text'], input[type='number']",
         )) {
           if (!control.checkVisibility()) continue;
-          if (
-            control.getBoundingClientRect().height <
-            (control.classList.contains("project-fit-help") ? 24 : 39)
-          )
+          if (control.getBoundingClientRect().height < 39)
             defects.push(element.id + ": small control");
           if (Number.parseFloat(getComputedStyle(control).fontSize) < 12)
             defects.push(element.id + ": small control text");
@@ -180,12 +177,9 @@ test.describe("demo showcase", () => {
       "Work through one module at a time",
     );
     await expect(items).toHaveCount(expectedDemoCount);
-    await expect(gallery.locator(".demo-gallery-group")).toHaveCount(3);
+    await expect(gallery.locator(".demo-gallery-group")).toHaveCount(2);
     await expect(
       page.locator("#advanced-demos #demo-acid-transaction-lab"),
-    ).toBeVisible();
-    await expect(
-      page.locator("#worksheet-demos #demo-friction-audit"),
     ).toBeVisible();
     await expect(
       page.locator("#reading-demos #demo-tail-latency-simulator"),
@@ -254,8 +248,8 @@ test.describe("demo showcase", () => {
 
     const expectSharedShellPalette = async () => {
       const reference = await readShellPalette(
-        gallery.locator(".agent-fleet-header"),
-        gallery.locator(".agent-fleet-summary"),
+        gallery.locator(".cache-control-lab-header"),
+        gallery.locator(".cache-control-lab-badge"),
       );
 
       for (const lab of alignedLabShells) {
@@ -339,8 +333,8 @@ test.describe("demo showcase", () => {
   test("uses the systems-lab treatment for demos embedded in chapters", async ({
     page,
   }) => {
-    await page.goto("/chapters/scaling/#scaling-pressure-lab");
-    const demo = page.locator("[data-scaling-demo]");
+    await page.goto("/chapters/scaling/#saturation-boundary-lab");
+    const demo = page.locator("[data-saturation-boundary-demo]");
     await expect(demo).toBeVisible();
 
     await expect(demo).toHaveCSS("border-radius", "0px");
@@ -348,7 +342,7 @@ test.describe("demo showcase", () => {
       "border-radius",
       "0px",
     );
-    await expect(demo.locator("select").first()).toHaveCSS(
+    await expect(demo.locator("button").first()).toHaveCSS(
       "border-radius",
       "0px",
     );

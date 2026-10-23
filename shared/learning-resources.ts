@@ -177,99 +177,27 @@ type Activity = {
 // Curated activities describe the actual gallery controls. They deliberately
 // withhold a model answer so the learner can predict before operating the demo.
 const activities: Record<string, Activity> = {
-  "Implementation discovery lab": {
-    conceptIds: [
-      "contract",
-      "trade-off",
-      "change-probe",
-      "reproducible-environment",
-    ],
-    caption:
-      "Choose a product interpretation and implementation hypothesis while keeping the common behavior visible.",
-    controls: [
-      "Product interpretation",
-      "Stack and persistence",
-      "Run environment",
-      "Implementation question and evidence",
-    ],
-    assumptions:
-      "This is a planning aid, not a preferred stack or proof that an implementation meets the common contract.",
-    predict:
-      "Which boundary will your chosen stack make easiest to change, and which might create friction?",
-    try: "Specify one user moment, a supported run environment, and one bounded implementation question.",
-    observe:
-      "Inspect the generated direction and identify the evidence still needed to test it.",
-  },
-  "Constraint feedback loop": {
-    activityVersion: 2,
-    conceptIds: [
-      "agent",
-      "loop-engineering",
-      "harness",
-      "acceptance-criteria",
-      "feedback-loop",
-    ],
-    caption:
-      "Generate an authored CSV candidate under explicit constraints, then inspect simulated validation feedback.",
-    controls: [
-      "Client-only constraint",
-      "Local patch constraint",
-      "CSV correctness constraint",
-      "Generate and validate",
-    ],
-    assumptions:
-      "Candidates and check results are scripted examples, not executed model output or tests. The separate CSV starter produces actual downloads and check records.",
-    predict:
-      "Which requirement could a plausible-looking CSV export still violate?",
-    try: "Change one constraint, generate an authored candidate and inspect the simulated checks.",
-    observe:
-      "Separate candidate generation from evidence that the declared requirements hold.",
-  },
   "Deterministic boundary lab": {
+    activityVersion: 2,
     conceptIds: ["invariant", "authority", "contract", "state-authority"],
     caption:
       "Follow accepted and rejected transitions through a delivery statechart.",
     controls: [
       "Scenario and transition actions",
+      "Premature RELEASE proposal",
       "Cancellation",
       "Statechart inspection",
     ],
     assumptions:
-      "The statechart models a declared delivery protocol. It does not by itself authorize real operations or guarantee durable effects.",
+      "TESTS_PASS is a supplied event, not an executed application test. The statechart models a declared delivery protocol. It does not by itself authorize real operations or guarantee durable effects.",
     predict:
       "Which state or guard should prevent the next proposed action, and why?",
-    try: "Follow two different routes toward the same goal, then attempt cancellation.",
+    try: "Propose RELEASE before checks pass; inspect the rejected event and unchanged state. Then follow a valid route or cancel.",
     observe:
       "Compare state, enabled actions, and the shared parent cancellation rule.",
   },
-  "Boundary trace": {
-    activityVersion: 2,
-    conceptIds: [
-      "contract",
-      "measurement-boundary",
-      "state-authority",
-      "retry",
-      "latency",
-    ],
-    caption:
-      "Trace a work-item transition across browser, network, application, and durable storage boundaries.",
-    controls: [
-      "Validation",
-      "Dropped connection",
-      "Duplicate tap",
-      "Slow save",
-      "Delayed summary",
-    ],
-    assumptions:
-      "Illustrative route, identity, and retry policy. Success requires the state change and matching activity event to commit together; derived summaries may catch up later.",
-    predict:
-      "If the connection drops after submission, what can the browser actually know about the durable outcome?",
-    try: "Trace a normal submission, then enable a dropped connection or duplicate tap.",
-    observe:
-      "Locate the state-and-event commit, the point where the outcome becomes ambiguous, and the retry-safety rule.",
-  },
   "ACID transaction lab": {
-    activityVersion: 2,
+    activityVersion: 3,
     conceptIds: [
       "transaction",
       "invariant",
@@ -283,12 +211,13 @@ const activities: Record<string, Activity> = {
       "Disturbance",
       "Separate writes or transaction",
       "Read committed or serializable isolation",
+      "Reply before or after durable commit on restart",
     ],
     assumptions:
-      "The concurrency case assumes a stale application check followed by an unconditional write; the displayed conditional-write alternative is pseudocode, not executed SQL. Check the deployed store's guarantees.",
+      "These are authored ledger traces, not database execution. The restart case holds the transaction fixed and varies acknowledgement timing. The concurrency case assumes a stale application check followed by an unconditional write; the displayed conditional-write alternative is pseudocode, not executed SQL. Check the deployed store's guarantees.",
     predict:
       "Which invariant could fail between two application-managed writes?",
-    try: "Run the same disturbance with separate writes and a transaction; for concurrency, inspect the assumed program before varying isolation and compare its conditional-write alternative.",
+    try: "For failure compare separate writes and a transaction; for concurrency inspect the stale-check program before varying isolation. For restart keep the durable transaction fixed and vary reply timing.",
     observe:
       "Inspect the lifecycle and activity ledger together rather than inferring correctness from a response.",
   },
@@ -311,6 +240,7 @@ const activities: Record<string, Activity> = {
       "Distinguish stored data, validation, and what the caller actually receives.",
   },
   "Web architecture lens": {
+    activityVersion: 2,
     conceptIds: [
       "rendering",
       "contract",
@@ -321,62 +251,21 @@ const activities: Record<string, Activity> = {
     caption:
       "Compare page navigation, HTML fragments, and browser-built views for the same operation.",
     controls: [
-      "MPA, HDA, or SPA",
-      "SSR, ISR, or CSR first load",
-      "Local draft and session actions",
+      "Document, HTML fragment, or JSON update",
+      "Unsaved note",
+      "Explicit draft restoration",
+      "Reveal modeled update",
     ],
     assumptions:
-      "Representative flows and illustrative compressed responses; initial downloads and other excluded costs prevent a universal performance ranking.",
+      "Three representative modeled exchanges, with no network calls or payload estimates. Draft restoration is an explicit application choice, not a guarantee of an architecture.",
     predict:
       "Which local state might be lost when an action causes a full-page navigation?",
     try: "Create a local draft and perform the same action in two interaction modes.",
     observe:
       "Inspect the exchanged representation, state ownership, and preserved browser state.",
   },
-  "Client activation lens": {
-    conceptIds: ["rendering", "latency", "trade-off", "measurement-boundary"],
-    caption:
-      "Follow when browser behavior becomes available after useful server HTML arrives.",
-    controls: [
-      "Hydration",
-      "Islands",
-      "Resumability",
-      "First interaction trace",
-    ],
-    assumptions:
-      "Illustrative JavaScript values for one teaching model, not measurements or framework rankings. The hydration baseline puts all five regions in one client tree and hydrates them on page load; server-only content and hydrated regions can coexist, and islands can use hydration.",
-    predict:
-      "What work must occur before the first event-recording interaction can finish?",
-    try: "Keep the server document fixed and compare two activation approaches.",
-    observe:
-      "Separate visible content, downloaded code, and available behavior along the user journey.",
-  },
-  "API contract lens": {
-    activityVersion: 2,
-    conceptIds: [
-      "contract",
-      "authority",
-      "decision-reversibility",
-      "trade-off",
-    ],
-    caption:
-      "Compare what clients must know and servers supply across API styles.",
-    controls: [
-      "Resource HTTP",
-      "REST with hypermedia",
-      "GraphQL",
-      "RPC",
-      "Additional requested field",
-    ],
-    assumptions:
-      "A structural comparison, not a ranking. Authentication, authorization, retries, observability, and versioning still apply.",
-    predict:
-      "Which client assumption must change if the operation needs the assignee name too?",
-    try: "Run the exchange in two API styles and add the extra field.",
-    observe:
-      "Identify coupled changes and where the operation's permission and contract are enforced.",
-  },
   "Tail latency simulator": {
+    activityVersion: 2,
     conceptIds: [
       "latency",
       "tail-latency",
@@ -386,38 +275,17 @@ const activities: Record<string, Activity> = {
     caption:
       "Compare average latency and p95 when a minority of requests take a slow path.",
     controls: [
-      "Concurrent clients",
       "Slow-path fraction",
-      "p95 objective",
+      "Average and p95 objective",
       "Prediction and simulation",
     ],
     assumptions:
-      "Simulated requests under a declared model; conclusions depend on the population and percentile convention.",
+      "A constructed population of 60 records, nearest-rank p95 at rank 57. No queueing or capacity model; a passing p95 can leave three slower requests outside it.",
     predict:
       "Will the average and p95 cross the objective together when only a minority of requests become slow?",
-    try: "Keep the objective fixed and increase the fraction of slow storage requests.",
+    try: "Keep the objective fixed and compare 5% with 10% slow paths.",
     observe:
-      "Compare the average, p95, and outcome population rather than only the average.",
-  },
-  "Goodhart pressure test": {
-    activityVersion: 2,
-    conceptIds: ["goodhart-law", "acceptance-criteria", "benchmark", "eval"],
-    caption:
-      "Predict one authored coverage case, examine a proposed safeguard, then challenge an actual check locally.",
-    controls: [
-      "Prediction",
-      "Reveal authored outcome",
-      "Proposed safeguard",
-      "Reveal case assessment",
-      "Case notes and reset",
-    ],
-    assumptions:
-      "One authored line-coverage failure case; revealing the assessment executes no gate or model. Targets can stay useful when their relation to the intended outcome is checked.",
-    predict:
-      "Could raising line coverage make the report look better without making assertions detect more faults?",
-    try: "Predict, reveal the coverage case, and examine a safeguard. Optionally use the existing mutation starter with your model to strengthen one black-box check.",
-    observe:
-      "Separate authored reasoning from executed evidence. In the local lab, pass baseline, reject a named faulty variant and pass the harmless storage refactor; explain the distinction.",
+      "Inspect ordered records, rank 57 and the count missing the objective alongside average and p95.",
   },
   "Browser performance workbench": {
     conceptIds: ["benchmark", "latency", "measurement-boundary", "rendering"],
@@ -436,113 +304,23 @@ const activities: Record<string, Activity> = {
     observe:
       "Compare distributions and timer boundaries before claiming an improvement in user-visible response.",
   },
-  "Queue balance lab": {
-    activityVersion: 2,
-    conceptIds: [
-      "little-law",
-      "queue",
-      "latency",
-      "throughput",
-      "measurement-boundary",
-    ],
-    caption:
-      "Check whether observed work in progress agrees with rate and average time inside one boundary.",
-    controls: [
-      "Arrival rate, λ",
-      "Average time in system, W",
-      "Observed average work in progress, L",
-    ],
-    assumptions:
-      "Little's Law applies to stable long-run averages within the same boundary and population. Use mean time, not a tail percentile. The controls are illustrative entered averages; agreement allows numerical rounding only and does not establish a stable observation window.",
-    predict:
-      "Arrival rate stays at 20 events/s. Average time doubles from 0.5 to 1 second. What average work in progress would make the measurements agree?",
-    try: "Set arrival rate to 20 and average time to 1, then adjust observed work in progress to your prediction.",
-    observe:
-      "Compare expected and observed L and the displayed gap. Explain what a disagreement could mean about the measurement assumptions.",
-  },
-  "Model evaluation lab": {
-    activityVersion: 2,
-    conceptIds: [
-      "eval",
-      "acceptance-criteria",
-      "review-budget",
-      "benchmark",
-      "reliability",
-    ],
-    caption:
-      "Score two attempts against a task-specific rubric and inspect the limits of the comparison.",
-    controls: [
-      "Eval task",
-      "Shared prompt",
-      "Attempt outputs",
-      "Rubric evidence and worked-score reveal",
-      "Sourced elapsed time and cost",
-      "Comparability checks",
-    ],
-    assumptions:
-      "Sample answers and revealed worked scores are authored examples. Rubric judgments and sourced run observations are manual; missing elapsed time/cost remains unknown. Separate acceptance checks, correction effort and repeated comparable trials are still needed.",
-    predict:
-      "What evidence would distinguish a convincing example from a more reliable model on this task?",
-    try: "Use samples or permitted outputs, inspect the complete shared prompt, and score both attempts against the selected task's rubric. Conceal identities when another person prepares the pair.",
-    observe:
-      "Identify the missed criteria and comparability limits. For real runs, record acceptance results, usage, and human corrections separately.",
-  },
   "OpenTelemetry trace explorer": {
+    activityVersion: 2,
     conceptIds: ["observability", "latency", "measurement-boundary", "retry"],
     caption:
       "Inspect spans, timing, and retries within a simulated server request trace.",
-    controls: ["Healthy, slow, or retried request", "Span selection"],
+    controls: [
+      "Request A, B, or C",
+      "Span selection",
+      "Reveal authored interpretation",
+    ],
     assumptions:
       "The timeline covers server handling, excluding browser work and time outside the server span. No incoming parent context is modeled. Literal OTLP uses typed values and a more verbose envelope; a trace is not proof of every user-visible outcome.",
     predict:
       "Which span would account for the additional time in the slow or retried request?",
-    try: "Compare the healthy request with a slow write or successful storage retry and inspect the relevant spans.",
+    try: "Compare unlabeled request cases, select a child span as evidence, then reveal the authored interpretation. Instrument one operation in your own project for actual trace evidence.",
     observe:
       "Relate span timing, parentage, and events to the declared request boundary.",
-  },
-  "Friction audit": {
-    conceptIds: [
-      "development-friction",
-      "change-probe",
-      "technical-debt",
-      "benchmark",
-      "decision-log",
-    ],
-    caption:
-      "Compare active person-minutes and acceptance evidence for one bounded change.",
-    controls: [
-      "Task and intervention",
-      "Stage effort",
-      "One-off cost",
-      "Acceptance checks",
-      "Evidence and reversal condition",
-    ],
-    assumptions:
-      "Assign each person's active effort once; unknown is not zero. One comparison cannot establish causation, future savings, or rework risk.",
-    predict:
-      "Which stage should your intervention improve, and where might it introduce new effort?",
-    try: "Record comparable baseline and candidate observations, one-off cost, and acceptance evidence.",
-    observe:
-      "Separate task effort from intervention cost and keep conditions and unknown values visible.",
-  },
-  "Changed assumptions map": {
-    conceptIds: [
-      "pressure",
-      "saturation",
-      "scalability",
-      "observability",
-      "trade-off",
-    ],
-    caption:
-      "Follow evidence from changed demand, retries, and a large import toward a bounded response.",
-    controls: ["Evidence signals", "Response choices"],
-    assumptions:
-      "An authored scenario; the selected signal must justify the response under the declared goal.",
-    predict:
-      "Which signal identifies a binding limit rather than merely a busy component?",
-    try: "Inspect one signal before choosing a response, then compare an alternative signal.",
-    observe:
-      "State the changed assumption, maintained goal, and evidence the response still needs.",
   },
   "Fleet trace debugger": {
     conceptIds: [
@@ -566,33 +344,6 @@ const activities: Record<string, Activity> = {
     try: "Attribute records to R41, R42, or unmatched using the available linking evidence.",
     observe:
       "Compare the physical ledger with orchestration intent and identify unsupported attribution.",
-  },
-  "Agent fleet delegation": {
-    activityVersion: 2,
-    conceptIds: [
-      "agent-fleet",
-      "loop-engineering",
-      "agent",
-      "task-graph",
-      "harness",
-      "review-budget",
-      "trade-off",
-    ],
-    caption:
-      "Plan task-specific scope, roles, validation and completed handoffs before measuring an actual run.",
-    controls: [
-      "Delegation target",
-      "Project readiness",
-      "Roles",
-      "Run packet sections",
-    ],
-    assumptions:
-      "Invented repository examples prepare prompts, not measured outcomes. Investigations are read-only; tests and refactors permit bounded edits. Record actual configuration, effort and accounting gaps from execution.",
-    predict:
-      "Which handoff could lose a requirement, and what evidence should its recipient check?",
-    try: "Keep the target fixed, change the selected roles and inspect their scope, validation and handoffs.",
-    observe:
-      "Inspect how the packet changes between an investigation and a code change; distinguish preparation from completed-run evidence.",
   },
   "Reliability chain lab": {
     activityVersion: 2,
@@ -631,55 +382,27 @@ const activities: Record<string, Activity> = {
     observe:
       "Inspect the unchanged sequential work and explain why accepted-change throughput is a separate claim.",
   },
-  "Scaling pressure planner": {
-    activityVersion: 2,
-    conceptIds: [
-      "pressure",
-      "scalability",
-      "trade-off",
-      "cache",
-      "backpressure",
-      "partition",
-    ],
-    caption:
-      "Choose responses to Work Activity Tracker pressure while preserving each accepted action's state-and-event commit.",
-    controls: [
-      "Scenario",
-      "Pressures to investigate",
-      "Index, queue, cache, replica, partition, or admission choices",
-    ],
-    assumptions:
-      "Invented scenarios prepare a qualitative plan, not capacity or risk estimates. Queues defer only derived work after the authoritative commit; observations from an actual workload must test the proposed benefit.",
-    predict:
-      "Which single move addresses the declared pressure, and what new obligation does it create?",
-    try: "Choose a scenario and one response, then inspect the cost of adding another move.",
-    observe:
-      "Connect each response to a signal; distinguish the state-and-event commit from deferred summaries and faster acknowledgment.",
-  },
   "Saturation boundary lab": {
-    activityVersion: 2,
+    activityVersion: 3,
     conceptIds: [
       "saturation",
       "throughput",
       "queue",
-      "retry",
       "backpressure",
       "pressure",
     ],
     caption:
-      "Compare effective demand with stage capacities and move the binding limit.",
+      "Compare offered, admitted and completed event rates and move the binding limit.",
     controls: [
-      "Scenario",
       "Offered load",
-      "Retry amplification",
       "Stage capacities",
-      "Ingress backpressure",
+      "Limit admission to bottleneck rate",
     ],
     assumptions:
-      "A teaching model, not a benchmark; it compares one effective demand rate with declared stage limits.",
+      "Steady rates, one visit per stage, successful work, and a buffer before the pipeline. Completion is the minimum admitted rate and stage capacity. Bars compare admitted rates to limits, not measured utilization.",
     predict:
-      "If you raise only the database capacity, which stage will bind next and can retries change the conclusion?",
-    try: "Inspect the current limit, raise its capacity, then vary retry amplification and admission control.",
+      "If you raise only the database capacity, which stage will limit completion next?",
+    try: "Predict the next limit, expand the current one and compare the recorded before/after. Enable admission limiting and compare admitted, completed, queued and rejected work.",
     observe:
       "Distinguish spare capacity, zero headroom at the limit and excess demand; inspect backlog or explicit rejection and the newly limiting stage.",
   },
@@ -702,6 +425,7 @@ const activities: Record<string, Activity> = {
       "Identify plateau or decline where shown; a rising chart endpoint is not an optimum. Distinguish this model from Amdahl's ideal bound.",
   },
   "Orchestration control loop": {
+    activityVersion: 2,
     conceptIds: [
       "feedback-loop",
       "recovery",
@@ -711,16 +435,22 @@ const activities: Record<string, Activity> = {
     ],
     caption:
       "Follow controller actions that reconcile observed replicas with desired state.",
-    controls: ["Desired replicas", "Controller and failure actions"],
+    controls: [
+      "Desired replicas",
+      "Controller and failure actions",
+      "Send simulated request",
+      "Roll back to v1",
+    ],
     assumptions:
       "A simplified control loop; restoring replica count does not establish application correctness or recovery of durable effects.",
     predict:
       "After losing a replica, what discrepancy should the controller observe and what action should follow?",
-    try: "Change desired replicas or introduce a failure, then run the controller.",
+    try: "Deploy running-but-broken v2, send a simulated request and reconcile replicas. Compare HTTP 500 with the response after rollback to v1.",
     observe:
-      "Name desired state, observed state, and controller action separately.",
+      "Separate replica convergence from useful HTTP responses; retain failed responses in the request log.",
   },
   "Durable effect retry lab": {
+    activityVersion: 2,
     conceptIds: [
       "durable-workflow",
       "retry",
@@ -737,7 +467,7 @@ const activities: Record<string, Activity> = {
       "Prediction and failure window",
     ],
     assumptions:
-      "The failure is outside the workflow history boundary. Retry safety depends on the receiver atomically preserving operation identity with the effect.",
+      "All counts and history here are an in-memory model; the persisted-retry workspace exercise supplies real SQLite/process evidence. The failure is outside the workflow history boundary. Retry safety depends on the receiver atomically preserving operation identity with the effect.",
     predict:
       "If the receiver applied the effect but completion was not recorded, what could make a retry apply it twice?",
     try: "Stop in the failure window, then compare key reuse and receiver deduplication choices.",
@@ -767,7 +497,7 @@ const activities: Record<string, Activity> = {
       "Record acknowledgments, state divergence, and what reconciliation can and cannot fix.",
   },
   "Latency budget map": {
-    activityVersion: 2,
+    activityVersion: 3,
     conceptIds: [
       "latency",
       "measurement-boundary",
@@ -778,19 +508,18 @@ const activities: Record<string, Activity> = {
     caption:
       "Estimate latency contributions from geography, round trips, and execution time.",
     controls: [
-      "User and database placement",
+      "User–application and application–database distances",
       "Network multiplier",
-      "Hardware profile",
       "Sequential query count",
       "Query and application work",
     ],
     assumptions:
-      "Illustrative estimates, not measured deployment latency. Routing, queues, protocol setup, and consistency obligations can add work.",
+      "Hypothetical timings and a propagation floor, not hardware classes or deployment advice. Batching requires identical query results, unchanged execution cost and dependencies fitting into at most two trips.",
     predict:
       "Which will matter more in your scenario: faster query execution or fewer sequential remote round trips?",
     try: "Keep placement fixed and vary query count; then keep work fixed and move the database.",
     observe:
-      "Compare network and execution contributions, the calculated batching saving and omitted costs. The 100-request total assumes serial requests, not a page-load boundary.",
+      "Compare sequential and batched response budgets side by side, explain when batching is possible and identify omitted costs.",
   },
 };
 

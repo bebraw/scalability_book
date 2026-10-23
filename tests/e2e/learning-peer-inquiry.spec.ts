@@ -277,7 +277,7 @@ test("students save private initial work before group replies, reflect individua
           BookLearningWorkspace: typeof import("../../site/scripts/learning-demos.ts");
         }
       ).BookLearningWorkspace;
-      const before = bridge.observeLearningDemo("demo-queue-balance-lab");
+      const before = bridge.observeLearningDemo("demo-tail-latency-simulator");
       const control = before.controls.find(
         (control) => control.type === "range" || control.type === "number",
       )!;
@@ -285,16 +285,16 @@ test("students save private initial work before group replies, reflect individua
         Number(control.value) + Number(control.step ?? 1) <= Number(control.max)
           ? Number(control.value) + Number(control.step ?? 1)
           : Number(control.min);
-      return bridge.changeLearningDemo("demo-queue-balance-lab", {
+      return bridge.changeLearningDemo("demo-tail-latency-simulator", {
         controlId: control.id,
         value,
       });
     });
-    expect(observation.visibleText).toMatch(/\d+\s*=\s*\d+\s*×/);
+    expect(observation.visibleText).toContain("p95");
     await alice.panel
       .getByLabel("My reply", { exact: true })
       .fill(
-        `I changed a browser model input and checked the displayed relation. This does not prove our project is stable.\n${observation.visibleText.slice(0, 1500)}`,
+        `I changed a browser model input and inspected the displayed distribution. This does not prove our project is stable.\n${observation.visibleText.slice(0, 1500)}`,
       );
     await alice.panel.getByLabel("Reply kind").selectOption("check");
     await alice.panel

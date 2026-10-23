@@ -1,0 +1,20 @@
+{
+  "name": "scalableweb-course-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "csv-export",
+    "concern-directed-mutation",
+    "persisted-retry",
+    "http-cache"
+  ],
+  "scripts": {
+    "lab": "node workspace.mjs",
+    "preflight": "node workspace.mjs preflight",
+    "browser:install": "node workspace.mjs browser:install"
+  }
+}

@@ -1,10 +1,8 @@
 import {
-  queueInvestigation,
   parseInvestigationTurn,
   type ReadingActivity,
   type InvestigationPhase,
   type InvestigationObservation,
-  type QueueObservation,
 } from "../../shared/reading-investigation.ts";
 import {
   parseLearningSource,
@@ -67,16 +65,10 @@ export function readInvestigationDraft(
     companionBase: "",
   };
   try {
-    const raw =
-      sessionStorage.getItem(investigationKey(source, activity)) ??
-      (activity.id === queueInvestigation.id
-        ? sessionStorage.getItem(
-            `book-reading-investigation:${new URL(source.url).pathname}:${activity.id}`,
-          )
-        : null);
+    const raw = sessionStorage.getItem(investigationKey(source, activity));
     if (!raw || raw.length > maxDraftLength) return fresh;
     const saved = JSON.parse(raw);
-    if (![1, 2].includes(saved.version)) return fresh;
+    if (saved.version !== 2) return fresh;
     const turn = parseInvestigationTurn(
       {
         ...saved,
@@ -139,40 +131,20 @@ export function observeInvestigation(
     throw new Error(
       "Open the demo's Explore tab before sending a browser result.",
     );
-  const input = (name: string) =>
-    Number(
-      root.querySelector<HTMLInputElement>(`[data-little-law-input="${name}"]`)!
-        .value,
-    );
-  const metric = (name: string) =>
-    Number(
-      root.querySelector(`[data-little-law-metric="${name}"]`)!.textContent,
-    );
-  const observation =
-    activity.id === queueInvestigation.id
-      ? {
-          kind: "browser-queue-snapshot",
-          observedAt: actual.observedAt,
-          arrival: input("arrival"),
-          time: input("time"),
-          observed: input("observed"),
-          expected: metric("expected"),
-          gap: metric("gap"),
-        }
-      : {
-          kind: "browser-demo-snapshot",
-          demoId: activity.demoId,
-          observedAt: actual.observedAt,
-          controls: actual.controls
-            .filter((control) => "value" in control)
-            .slice(0, 60)
-            .map(({ label, type, value }) => ({
-              label,
-              type,
-              value: typeof value === "string" ? value.slice(0, 1024) : value,
-            })),
-          visibleText: actual.visibleText.slice(0, 8000),
-        };
+  const observation = {
+    kind: "browser-demo-snapshot",
+    demoId: activity.demoId,
+    observedAt: actual.observedAt,
+    controls: actual.controls
+      .filter((control) => "value" in control)
+      .slice(0, 60)
+      .map(({ label, type, value }) => ({
+        label,
+        type,
+        value: typeof value === "string" ? value.slice(0, 1024) : value,
+      })),
+    visibleText: actual.visibleText.slice(0, 8000),
+  };
   return parseInvestigationTurn(
     {
       activityId: activity.id,
@@ -184,31 +156,8 @@ export function observeInvestigation(
   ).observation!;
 }
 export const describeObservation = (value: InvestigationObservation) =>
-  value.kind === "browser-queue-snapshot"
-    ? `${value.arrival} events/s × ${value.time} s → expected ${value.expected} events; observed ${value.observed}; gap ${value.gap}.`
-    : `${value.controls.map(({ label, value }) => `${label}: ${String(value)}`).join("; ")}\n\n${value.visibleText}`;
+  `${value.controls.map(({ label, value }) => `${label}: ${String(value)}`).join("; ")}\n\n${value.visibleText}`;
 
-export function restoreInvestigationControls(
-  draft: InvestigationDraft,
-  activity: ReadingActivity,
-) {
-  // Only the queue has a faithful, reversible input-only restoration. Other demos
-  // may have action histories: retain their dated snapshots without replaying actions.
-  if (
-    activity.id !== queueInvestigation.id ||
-    draft.current?.kind !== "browser-queue-snapshot"
-  )
-    return;
-  const root = document.getElementById(activity.demoId!);
-  if (!root) return;
-  for (const name of ["arrival", "time", "observed"] as const) {
-    const input = root.querySelector<HTMLInputElement>(
-      `[data-little-law-input="${name}"]`,
-    )!;
-    input.value = String((draft.current as QueueObservation)[name]);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-}
 export function saveInvestigationDraft(
   draft: InvestigationDraft,
   activity: ReadingActivity,

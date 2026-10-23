@@ -20,7 +20,6 @@ import {
   readInvestigationDraft,
   saveInvestigationDraft,
   observeInvestigation,
-  restoreInvestigationControls,
   describeObservation as describe,
 } from "./learning-investigation-session.ts";
 import { observeLearningDemo } from "./learning-demos.ts";
@@ -138,9 +137,7 @@ export function mountReadingInvestigation(
   prompt.className = "reading-investigation-prompt";
   const controlsLink = node(
     "a",
-    activity.demoId
-      ? `Return to ${activity.id === "queue-balance" ? "queue controls" : "activity"} ↑`
-      : "Return to the source ↑",
+    activity.demoId ? "Return to activity ↑" : "Return to the source ↑",
   );
   controlsLink.href = sourceLink(source());
   const field = (
@@ -400,10 +397,7 @@ export function mountReadingInvestigation(
     try {
       if (!activity.demoId) throw new Error("No demo selected");
       draft.current = observeInvestigation(source(), activity);
-      snapshot.textContent =
-        activity.id === "queue-balance"
-          ? `Current browser illustration: ${describe(draft.current)}`
-          : `Current browser snapshot: ${describe(draft.current).slice(0, 1400)}`;
+      snapshot.textContent = `Current browser snapshot: ${describe(draft.current).slice(0, 1400)}`;
       save();
     } catch {
       snapshot.textContent = activity.demoId
@@ -627,7 +621,6 @@ export function mountReadingInvestigation(
   const demo = activity.demoId
     ? document.getElementById(activity.demoId)
     : null;
-  restoreInvestigationControls(draft, activity);
   demo?.addEventListener("input", drawSnapshot);
   demo?.addEventListener("change", drawSnapshot);
   demo?.addEventListener("click", drawSnapshot);

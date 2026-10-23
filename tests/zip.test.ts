@@ -16,6 +16,7 @@ test("source downloads exclude local lab records and generated check evidence", 
     );
     for (const name of [
       ".lab-data",
+      ".local",
       "test-results",
       "node_modules",
       "playwright-report",
@@ -27,10 +28,26 @@ test("source downloads exclude local lab records and generated check evidence", 
         "Must stay local\n",
       );
     }
+    await mkdir(path.join(source, "nested"));
+    await writeFile(path.join(source, ".env"), "SYNTHETIC_KEY=keep-local\n");
+    await writeFile(
+      path.join(source, "nested", ".env.model"),
+      "SYNTHETIC_KEY=keep-local\n",
+    );
+    await mkdir(path.join(source, "nested", ".local"));
+    await writeFile(
+      path.join(source, "nested", ".local", "observations.json"),
+      '{"synthetic":true}\n',
+    );
+    await writeFile(
+      path.join(source, "nested", "source.json"),
+      '{"fixture":true}\n',
+    );
     const output = path.join(directory, "fixture.zip");
     await writeDirectoryZip(source, output);
     assert.deepEqual(readStoredEntries(await readFile(output)), {
       "fixture/README.md": "Synthetic teaching source\n",
+      "fixture/nested/source.json": '{"fixture":true}\n',
     });
   } finally {
     await rm(directory, { recursive: true, force: true });

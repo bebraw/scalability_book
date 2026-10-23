@@ -6,27 +6,16 @@ test.describe("latency budget demo", () => {
     await expect(page.locator("[data-latency-demo]")).toBeVisible();
   });
 
-  test("shows how distance and database round trips add up", async ({
+  test("compares sequential and batched paths with explicit timings", async ({
     page,
   }) => {
     const demo = page.locator("[data-latency-demo]");
-
-    await expect(demo.locator("[data-latency-demo-verdict]")).toContainText(
+    await expect(demo.locator('[data-latency-demo-metric="total"]')).toHaveText(
       "75 ms",
     );
-    await expect(demo.locator("[data-latency-demo-step='0']")).toBeVisible();
     await expect(
-      demo.locator("[data-latency-demo-metric='userFloor']"),
-    ).toContainText("5.0 ms");
-    await expect(
-      demo.locator("[data-latency-demo-map='userDistance']"),
-    ).toContainText("500 km");
-    await expect(
-      demo.locator("[data-latency-demo-db-placement]").first(),
-    ).toContainText("Edge read replica");
-    await expect(
-      demo.locator("[data-latency-demo-db-impact]").first(),
-    ).toContainText("writes may still coordinate");
+      demo.locator('[data-latency-demo-metric="userFloor"]'),
+    ).toHaveText("5.0 ms");
     await expect(demo.locator(".latency-demo-source")).toContainText(
       "BlankMap-World.svg",
     );
@@ -36,55 +25,36 @@ test.describe("latency budget demo", () => {
       ".latency-demo-node-db",
     ]);
     await demo
-      .locator("[data-latency-demo-distance='appDb']")
+      .locator('[data-latency-demo-distance="appDb"]')
       .selectOption("500");
+    await expect(demo.locator('[data-latency-demo-metric="total"]')).toHaveText(
+      "117 ms",
+    );
     await expect(
-      demo.locator("[data-latency-demo-map='dbDistance']"),
-    ).toContainText("500 km");
+      demo.locator('[data-latency-demo-metric="batchedTotal"]'),
+    ).toHaveText("89 ms");
     await expect(
-      demo.locator("[data-latency-demo-map='dbLatency']"),
-    ).toContainText("5.0 ms RTT floor");
+      demo.locator('[data-latency-demo-metric="sequentialDb"]'),
+    ).toHaveText("90 ms");
+    await demo.locator("[data-latency-demo-db-exec]").fill("30");
+    await demo.locator("[data-latency-demo-app-work]").fill("55");
     await expect(
-      demo.locator("[data-latency-demo-db-placement]").first(),
-    ).toContainText("Regional managed database");
-
-    await demo.locator("[data-latency-demo-next]").click();
-    await expect(demo.locator("[data-latency-demo-step='1']")).toBeVisible();
-    await expect(
-      demo.locator("[data-latency-demo-metric='sequentialDb']"),
-    ).toContainText("90 ms");
-    await expect(
-      demo.locator("[data-latency-demo-metric='dbTripNetwork']"),
-    ).toContainText("7.0 ms");
-    await demo
-      .locator("[data-latency-demo-hardware]")
-      .selectOption("contended");
-    await expect(
-      demo.locator("[data-latency-demo-hardware-name]"),
-    ).toContainText("CPU or disk contention");
-    await expect(
-      demo.locator("[data-latency-demo-db-exec-output]"),
-    ).toContainText("30 ms");
-    await expect(
-      demo.locator("[data-latency-demo-app-work-output]"),
-    ).toContainText("55 ms");
-    await expect(
-      demo.locator("[data-latency-demo-metric='serverExecution']"),
-    ).toContainText("235 ms");
+      demo.locator('[data-latency-demo-metric="serverExecution"]'),
+    ).toHaveText("235 ms");
     await demo.locator("[data-latency-demo-db-roundtrips]").fill("10");
     await expect(
-      demo.locator("[data-latency-demo-metric='roundtripPenalty']"),
-    ).toContainText("56 ms");
-
-    await demo.locator("[data-latency-demo-next]").click();
-    await expect(demo.locator("[data-latency-demo-step='2']")).toBeVisible();
-    await expect(demo.locator("[data-latency-demo-breakdown]")).toContainText(
-      "10 sequential database round trips",
-    );
+      demo.locator('[data-latency-demo-metric="roundtripPenalty"]'),
+    ).toHaveText("56 ms");
     await expect(
       demo.locator("[data-latency-demo-interpretation]"),
     ).toContainText("56 ms of repeated database network wait");
-    await expect(demo.locator("[data-latency-demo-next]")).toBeDisabled();
+    await expect(
+      demo.locator("[data-latency-demo-interpretation]"),
+    ).toContainText("identical results");
+    await demo.locator("[data-latency-demo-db-roundtrips]").fill("1");
+    await expect(
+      demo.locator('[data-latency-demo-metric="roundtripPenalty"]'),
+    ).toHaveText("0.0 ms");
     await expectElementsInsideDemo(demo, [".scaling-demo-tradeoff-step"]);
   });
 
@@ -104,7 +74,6 @@ test.describe("latency budget demo", () => {
       demo.locator("[data-latency-demo-node='user']"),
     ).toHaveAttribute("transform", "translate(132 102)");
 
-    await demo.locator("[data-latency-demo-tab='2']").click();
     await expect(
       demo.locator("[data-latency-demo-metric='physical']"),
     ).toContainText("70 ms");

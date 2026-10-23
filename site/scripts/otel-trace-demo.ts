@@ -16,7 +16,6 @@ type TraceScenario = {
   traceId: string;
   duration: number;
   verdict: string;
-  selectedSpanId: string;
   spans: SimulatedSpan[];
 };
 
@@ -25,7 +24,6 @@ const traceScenarios: Record<TraceScenarioKey, TraceScenario> = {
     traceId: "7c4d8a116f5447218d61bb3bc1a73ea2",
     duration: 48,
     verdict: "Request path looks healthy",
-    selectedSpanId: "healthy-store",
     spans: [
       httpSpan("healthy-http", 48),
       validationSpan("healthy-validate", "healthy-http", 4),
@@ -48,7 +46,6 @@ const traceScenarios: Record<TraceScenarioKey, TraceScenario> = {
     traceId: "4bf92f3577b34da6a3ce929d0e0e4736",
     duration: 286,
     verdict: "Slow storage path found",
-    selectedSpanId: "slow-store",
     spans: [
       httpSpan("slow-http", 286),
       validationSpan("slow-validate", "slow-http", 4),
@@ -71,7 +68,6 @@ const traceScenarios: Record<TraceScenarioKey, TraceScenario> = {
     traceId: "1fd09b0b23af498c8d9db8e487a6307d",
     duration: 171,
     verdict: "Retry hides a transient failure",
-    selectedSpanId: "retry-first-store",
     spans: [
       httpSpan("retry-http", 171),
       validationSpan("retry-validate", "retry-http", 4),
@@ -118,15 +114,36 @@ function initializeOtelTraceDemo(root: HTMLElement) {
   }
 
   let scenario = traceScenarios.slow;
-  let selectedSpanId = scenario.selectedSpanId;
+  let selectedSpanId = scenario.spans[0]!.id;
+  let evidenceSelected = false;
+  let revealed = false;
+  const reveal = root.querySelector<HTMLButtonElement>(
+    "[data-otel-demo-reveal]",
+  );
 
   const render = () => {
     renderTrace(root, scenario, selectedSpanId);
+    setText(
+      root,
+      "[data-otel-demo-verdict]",
+      revealed
+        ? scenario.verdict
+        : "Inspect a child span before revealing the case reading",
+    );
+    if (reveal) reveal.disabled = !evidenceSelected || revealed;
+    if (!revealed)
+      setText(
+        root,
+        "[data-otel-demo-span-note]",
+        "Use duration, parentage and status to choose evidence. What does this span show, and what is still unknown?",
+      );
   };
 
   select.addEventListener("change", () => {
     scenario = traceScenarios[readTraceScenario(select.value)];
-    selectedSpanId = scenario.selectedSpanId;
+    selectedSpanId = scenario.spans[0]!.id;
+    evidenceSelected = false;
+    revealed = false;
     render();
   });
 
@@ -138,7 +155,16 @@ function initializeOtelTraceDemo(root: HTMLElement) {
       return;
     }
 
-    selectedSpanId = button.dataset.otelDemoSpan ?? scenario.selectedSpanId;
+    selectedSpanId = button.dataset.otelDemoSpan ?? scenario.spans[0]!.id;
+    evidenceSelected ||= Boolean(
+      scenario.spans.find((span) => span.id === selectedSpanId)?.parentId,
+    );
+    render();
+  });
+
+  reveal?.addEventListener("click", () => {
+    if (!evidenceSelected) return;
+    revealed = true;
     render();
   });
 

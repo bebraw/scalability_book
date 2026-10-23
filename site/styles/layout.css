@@ -817,11 +817,8 @@
   .book-shell
     .prose
     > :is(
-      .project-fit,
-      .model-eval-demo,
       .observability-demo,
       .reflection-package-demo,
-      .agent-fleet-demo,
       .scaling-demo,
       .orchestration-lab
     ) {

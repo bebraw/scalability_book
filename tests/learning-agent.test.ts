@@ -15,12 +15,12 @@ import {
 
 const source = {
   url: "https://scalableweb.dev/demos/",
-  anchor: "demo-queue-balance-lab",
-  title: "Queue balance lab",
+  anchor: "demo-cache-decision-lab",
+  title: "Cache decision lab",
   kind: "demo",
-  excerpt: "Check the observation interval",
+  excerpt: "Check the response age",
   revision: null,
-  conceptIds: ["queue"],
+  conceptIds: ["cache"],
 };
 const waitUntil = async (fn: () => boolean) => {
   const end = Date.now() + 2000;
@@ -52,7 +52,9 @@ test("Codex adapter initializes, resumes, uses bounded dynamic tools, declines m
       assert.equal(name, "observe_demo");
       assert.deepEqual(args, { demoId: source.anchor });
       calls++;
-      return { observation: "10 = 20 × 0.5" };
+      return {
+        observation: "Versioned asset: 100 days old, fresh for 365 days",
+      };
     };
     await writeFile(`${binary}.reject-initialize`, "");
     await assert.rejects(
@@ -208,7 +210,7 @@ test("conversations persist independently, send only selected notes, and bound o
     kind: "attempt",
     source,
     title: "My prediction",
-    body: "I expect the averages to agree.",
+    body: "I expect this fresh stored response to be reused.",
   });
   notebook.saveEntry({
     kind: "scratch",
@@ -252,7 +254,7 @@ test("conversations persist independently, send only selected notes, and bound o
       conversation.id,
       {
         browserId: browser,
-        text: "Check the interval",
+        text: "Check the response age",
         mode: "check",
         noteIds: [initial.id],
       },
@@ -289,7 +291,9 @@ test("conversations persist independently, send only selected notes, and bound o
       {
         browserId: browser,
         success: true,
-        result: { equation: "10 = 20 × .5" },
+        result: {
+          visibleText: "Versioned asset: 100 days old, fresh for 365 days",
+        },
       },
       session,
     );
@@ -343,7 +347,7 @@ test("task support is explicit, bounded, retained across restart and optional fo
     const input = {
       browserId: randomUUID(),
       text: "I am stuck. Please explain directly.",
-      goal: "Understand waiting and processing",
+      goal: "Understand freshness and validation",
       mode: "explanation",
       noteIds: [],
     };
@@ -380,9 +384,9 @@ test("task support is explicit, bounded, retained across restart and optional fo
       }[];
       assert.deepEqual(
         routes.map((route) => route.id),
-        ["queue"],
+        ["cache"],
       );
-      assert.equal(routes[0]!.url, "https://scalableweb.dev/concepts/#queue");
+      assert.equal(routes[0]!.url, "https://scalableweb.dev/concepts/#cache");
       assert.ok(routes[0]!.definition);
       assert.deepEqual(
         conversations.get(conversation.id).messages.at(-2)!.support,

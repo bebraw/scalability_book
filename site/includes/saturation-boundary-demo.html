@@ -30,16 +30,7 @@
   >
     <div class="saturation-boundary-controls">
       <section class="scaling-demo-panel">
-        <h4>Disturbance</h4>
-        <label>
-          <span>Scenario</span>
-          <select data-saturation-boundary-scenario>
-            <option value="arrival">Arrival burst</option>
-            <option value="dependency">Slow dependency</option>
-            <option value="retry">Retry amplification</option>
-            <option value="baseline">Healthy baseline</option>
-          </select>
-        </label>
+        <h4>Offered events</h4>
         <label>
           <span>Offered load</span>
           <div class="saturation-boundary-range">
@@ -52,20 +43,6 @@
               data-saturation-boundary-load
             />
             <output data-saturation-boundary-output="load">140 ev/s</output>
-          </div>
-        </label>
-        <label>
-          <span>Retry amplification</span>
-          <div class="saturation-boundary-range">
-            <input
-              type="range"
-              min="0"
-              max="80"
-              step="5"
-              value="5"
-              data-saturation-boundary-retries
-            />
-            <output data-saturation-boundary-output="retries">5%</output>
           </div>
         </label>
       </section>
@@ -142,9 +119,9 @@
     <div class="saturation-boundary-workbench">
       <section class="saturation-boundary-instrument" aria-live="polite">
         <div class="saturation-boundary-demand">
-          <span>Effective demand</span>
-          <strong data-saturation-boundary-effective-load>147 ev/s</strong>
-          <small>offered load + retries</small>
+          <span>Offered load</span>
+          <strong data-saturation-boundary-effective-load>140 ev/s</strong>
+          <small>one visit per stage; no retries</small>
         </div>
         <div
           class="saturation-boundary-pipeline"
@@ -155,6 +132,14 @@
       <section class="saturation-boundary-readout">
         <div class="saturation-boundary-metrics">
           <article>
+            <span>Admitted</span
+            ><strong data-saturation-boundary-metric="admitted">—</strong>
+          </article>
+          <article>
+            <span>Useful completed</span
+            ><strong data-saturation-boundary-metric="completed">—</strong>
+          </article>
+          <article>
             <span>Boundary</span>
             <strong data-saturation-boundary-metric="boundary">—</strong>
           </article>
@@ -163,7 +148,7 @@
             <strong data-saturation-boundary-metric="headroom">—</strong>
           </article>
           <article>
-            <span>Hidden backlog</span>
+            <span>Queue growth</span>
             <strong data-saturation-boundary-metric="backlog">—</strong>
           </article>
           <article>
@@ -175,20 +160,6 @@
           <p data-saturation-boundary-diagnosis>
             Adjust demand or capacity to expose a boundary.
           </p>
-          <dl>
-            <div>
-              <dt>First useful signal</dt>
-              <dd data-saturation-boundary-signal>—</dd>
-            </div>
-            <div>
-              <dt>Prepared recovery</dt>
-              <dd data-saturation-boundary-recovery>—</dd>
-            </div>
-            <div>
-              <dt>Next closest boundary</dt>
-              <dd data-saturation-boundary-next>—</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
@@ -196,7 +167,7 @@
         <label class="saturation-boundary-switch">
           <input type="checkbox" data-saturation-boundary-backpressure />
           <span>
-            <strong>Enable ingress backpressure</strong>
+            <strong>Limit admission to bottleneck rate</strong>
             <small
               >Reject excess demand explicitly instead of accumulating hidden
               work.</small
@@ -208,27 +179,31 @@
         </button>
       </section>
 
-      <details class="scaling-demo-panel saturation-boundary-artifact">
-        <summary>Boundary report</summary>
-        <div class="scaling-demo-artifact-header">
-          <h4>Copyable saturation analysis</h4>
-          <button type="button" data-saturation-boundary-copy>
-            Copy report
-          </button>
-        </div>
-        <textarea
-          data-saturation-boundary-artifact
-          aria-label="Generated saturation boundary report"
-          rows="12"
-          readonly
-        ></textarea>
+      <p class="demo-note" data-saturation-boundary-comparison>
+        Predict which stage will limit completion after one capacity increase,
+        then compare.
+      </p>
+      <details class="scaling-demo-panel">
+        <summary>What would you measure in a real system?</summary>
+        <p>
+          Before revealing a hint, choose evidence that could distinguish a
+          resource limit from an enforced quota. A smaller declared number alone
+          cannot distinguish them.
+        </p>
+        <details>
+          <summary>Reveal a signal for this limit</summary>
+          <p data-saturation-boundary-signal></p>
+        </details>
       </details>
     </div>
   </form>
 
   <p class="demo-note saturation-boundary-caveat">
-    This is a teaching model, not a capacity benchmark. It compares one
-    effective demand rate with declared stage limits so the movement of a
-    bottleneck is visible.
+    A steady-rate model with one visit per stage, successful work and one buffer
+    before the pipeline. Completion is the minimum of admitted load and all
+    declared capacities. Admission limiting rejects excess immediately; without
+    it the buffer grows. Bars compare admitted rate with limits, not measured
+    stage utilization. There are no latency, transient queue or production
+    capacity predictions.
   </p>
 </section>

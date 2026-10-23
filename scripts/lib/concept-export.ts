@@ -116,8 +116,8 @@ type ExportedGraph = ReturnType<typeof exportConceptGraph>;
 export function renderConceptAgentGuide(graph: ExportedGraph): string {
   const queue = graph.concepts.find(({ id }) => id === "queue")!;
   const latency = graph.concepts.find(({ id }) => id === "latency")!;
-  const queueLab = graph.learningResources.find(
-    ({ id }) => id === "demo-queue-balance-lab",
+  const cacheLab = graph.learningResources.find(
+    ({ id }) => id === "demo-cache-decision-lab",
   )!;
   const littleLawGraph = graph.learningResources.find(
     ({ id }) => id === "graph-little-law",
@@ -152,7 +152,7 @@ After successfully reading the graph, a first reply could be:
 >
 > 1. **Follow your reading.** Tell me your chapter or paste a passage. We'll explore one idea and follow a connection into the book.
 > 2. **Connect two ideas.** Try [${queue.title}](${queue.url}) and [${latency.title}](${latency.url}): make a guess about how they relate, then we'll check it against a diagram and a passage.
-> 3. **Try a short experiment.** With arrivals held steady, predict what doubling the average time means for unfinished work, then check it in the [${queueLab.title}](${queueLab.url}).
+> 3. **Try a short experiment.** Predict whether a stored response can be reused after its freshness lifetime, then check it in the [${cacheLab.title}](${cacheLab.url}).
 >
 > If you're unsure, I recommend the experiment. Which would you like to try, or do you have a question of your own?
 
@@ -176,7 +176,7 @@ The JSON has \`schemaVersion: ${graph.schemaVersion}\`. Its \`revision\` is a SH
 - \`learningResources\`: stable \`id\`, \`kind\` (\`graphic\` or \`demo\`), \`title\`, \`conceptIds\`, \`url\`, \`caption\`, \`assumptions\`, and \`images\`. Every image has a PNG URL and alt text; graphics also have a standalone SVG. Demos include \`controls\` and an \`experiment\` with \`predict\`, \`try\`, \`observe\`, and \`reflect\` prompts. These fields are additive to version 2.
 - \`explorations\`: optional activities with stable \`id\`, \`phase\`, \`title\`, \`summary\`, \`conceptIds\`, course \`task\`, \`reading\`, \`graphUrl\`, \`url\` for independent study, \`agentUrl\` for starting a conversation, and separate \`discussionUrl\` for worked reasoning. Concepts carry matching \`explorationIds\`. These fields are additive to version 2; the catalog deliberately omits worked answers.
 - \`agentPresentation\`: optional predict → interact → explain guidance, with client capability checks, pacing, source fidelity, observation handling, and a browser or conversational fallback. It guides an external agent rather than declaring a supported rendering capability. This field is additive to version 2.
-- \`readingActivities\`: optional versioned activities shared with inline reading experiences. The learning cockpit shares a predict/check/reflect loop for readings, concepts, explorations and selected learning context, plus a versioned activity for every authored demo. Demo activities supply prediction, experiment and reflection prompts, adaptation guidance and explicit browser-snapshot fields; the queue retains its numeric fields and units. Retrieve it through \`get_demo\` or this graph. These are authored contracts, not live learner state or additional tool permissions. Obtain actual observations through your own authorized tools or the student.
+- \`readingActivities\`: optional versioned activities shared with inline reading experiences. The learning cockpit shares a predict/check/reflect loop for readings, concepts, explorations and selected learning context, plus a versioned activity for every authored demo. Demo activities supply prediction, experiment and reflection prompts, adaptation guidance and explicit browser-snapshot fields. Retrieve it through \`get_demo\` or this graph. These are authored contracts, not live learner state or additional tool permissions. Obtain actual observations through your own authorized tools or the student.
 
 Definitions and examples use the book's declared assumptions. Some vocabulary is still developing; preserve the usage notes when interpreting it. Example rates are illustrative unless the reading identifies them as measurements.
 
@@ -213,11 +213,11 @@ Look up a concept's \`resourceIds\` in \`learningResources\`. Each concept has a
 
 Retrieve the chosen PNG with an image-capable tool, then present it with its alt text, caption, assumptions, and source URL. For clients that support remote Markdown images, use \`![alt text](PNG URL)\`. For Codex with terminal and local image-viewing tools, download the PNG to a temporary local file and open that file with the image viewer; its image output can show the diagram even when a remote Markdown image stays a link. If no image-capable tool or renderer is available, return a descriptive link. SVGs are available for vector-capable clients and download. A text-only retrieval tool may fetch image bytes without being able to inspect or display them; describe your actual capabilities and do not claim to have visually checked an image you only linked.
 
-For a direct image check, open the [Little's Law connection diagram](${littleLawGraph.images.png}) or the [queue balance lab's static preview](${queueLab.images.png}) in a browser. The guide supplies instructions; graphics are separate files. An image that loads there is available, even when an agent's retrieval or display path cannot use it. The Markdown files are served as UTF-8 plain text for URL-reader compatibility. If a URL-reading tool still fails, use an HTTP download tool such as \`curl\` to read the guide and graph, or use the public MCP server. Report retrieval and display failures separately.
+For a direct image check, open the [Little's Law connection diagram](${littleLawGraph.images.png}) or the [cache decision lab's static preview](${cacheLab.images.png}) in a browser. The guide supplies instructions; graphics are separate files. An image that loads there is available, even when an agent's retrieval or display path cannot use it. The Markdown files are served as UTF-8 plain text for URL-reader compatibility. If a URL-reading tool still fails, use an HTTP download tool such as \`curl\` to read the guide and graph, or use the public MCP server. Report retrieval and display failures separately.
 
 For a demo, show the \`experiment.predict\` prompt first and let the student state a prediction. Then provide the demo URL, \`controls\`, and \`try\`, \`observe\`, and \`reflect\` prompts. The PNG is a static preview of the default view, not a recorded result of the student's experiment. Current UI and saved input state can differ. Open the actual demo to check behavior. These links are browser interfaces, not simulation API endpoints; an HTTP fetch does not run their JavaScript. With browser tools, an agent can operate the demo and report the chosen controls and observed output. Without browser tools, ask the student to operate it and bring back observations.
 
-For example, retrieve \`little-law\` and \`demo-queue-balance-lab\`. Present its graph image and ask: “Arrival rate stays at 20 events/s. Average time doubles from 0.5 to 1 second. What average work in progress would make the measurements agree?” Let the student predict before opening the lab. Compare the result with the book's stable-average and shared-boundary assumptions. Do not treat an illustrative simulator result as a capacity measurement of a real system.
+For example, retrieve \`cache\` and \`demo-cache-decision-lab\`. Present the graph image and the demo's exact prediction prompt before opening the lab. Select a response profile, vary its age, and compare browser reuse, shared-cache reuse and origin validation under the displayed policy. Preserve the declared freshness and authorization assumptions. Do not treat this authored decision model as evidence of an actual browser or deployed cache.
 
 ${renderInteractiveLearningGuidance(graph.url)}
 

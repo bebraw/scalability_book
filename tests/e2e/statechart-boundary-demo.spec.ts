@@ -9,6 +9,34 @@ test.describe("statechart boundary demo", () => {
     await expect(page.locator("[data-statechart-demo]")).toBeVisible();
   });
 
+  test("rejects premature RELEASE without changing either verification region", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-statechart-demo]");
+    const state = demo.locator("[data-statechart-demo-agent-state]");
+    const propose = demo.locator("[data-statechart-demo-propose-release]");
+    await propose.click();
+    await expect(state).toHaveText("active.planning");
+    await expect(
+      demo.locator("[data-statechart-demo-history] li").last(),
+    ).toContainText("Rejected; state unchanged: active.planning");
+    for (const event of ["PLAN_APPROVED", "PATCH_READY", "TESTS_PASS"])
+      await demo.locator(`[data-statechart-demo-event='${event}']`).click();
+    const before = await state.textContent();
+    await propose.click();
+    await expect(state).toHaveText(before!);
+    await expect(
+      demo.locator("[data-statechart-demo-history] li").last(),
+    ).toContainText("Rejected; state unchanged");
+    for (const event of ["REVIEW_START", "APPROVE"])
+      await demo.locator(`[data-statechart-demo-event='${event}']`).click();
+    await propose.click();
+    await expect(state).toHaveText("released");
+    await expect(
+      demo.locator("[data-statechart-demo-history] li").last(),
+    ).toContainText("Accepted: released");
+  });
+
   test("syntax-highlights the executable TypeScript model", async ({
     page,
   }) => {

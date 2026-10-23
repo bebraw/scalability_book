@@ -88,7 +88,7 @@ test("a packed companion supports an optional first investigation and retains th
   };
   try {
     await start();
-    await page.goto("/demos/#demo-queue-balance-lab");
+    await page.goto("/demos/#demo-cache-decision-lab");
     await page
       .locator(".site-header")
       .getByRole("button", { name: "Notebook", exact: true })
@@ -121,11 +121,11 @@ test("a packed companion supports an optional first investigation and retains th
     await panel
       .getByLabel("My prediction or uncertainty")
       .fill(
-        "I expect 10 in progress initially and 20 if mean time doubles, provided the averages use the same boundary.",
+        "I expect the fresh asset to need an origin request when its age exceeds365days.",
       );
     await panel.getByRole("button", { name: "Save my starting point" }).click();
-    await page.locator('[data-little-law-input="time"]').fill("1");
-    await page.locator('[data-little-law-input="time"]').dispatchEvent("input");
+    await page.locator("[data-cache-age]").fill("100");
+    await page.locator("[data-cache-age]").dispatchEvent("input");
     await panel.getByRole("button", { name: "Save demo result" }).click();
     await expect(
       panel.getByRole("status").filter({ hasText: "Demo result saved" }),
@@ -136,19 +136,19 @@ test("a packed companion supports an optional first investigation and retains th
     await panel
       .getByLabel("My reflection on this check")
       .fill(
-        "The displayed work in progress doubled to 20. I still need to check that a growing queue satisfies these stable-average assumptions.",
+        "At400days the stored asset is stale. I still need actual browser records before making a claim about my application.",
       );
     await panel.getByRole("button", { name: "Save my reflection" }).click();
     await panel.getByRole("button", { name: "Review my saved notes" }).click();
     await expect(
       panel.getByRole("heading", {
-        name: "Queue balance lab: initial thinking",
+        name: "Cache decision lab: initial thinking",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       panel.getByRole("heading", {
-        name: "Queue balance lab: reflection",
+        name: "Cache decision lab: reflection",
         exact: true,
       }),
     ).toBeVisible();
@@ -173,13 +173,13 @@ test("a packed companion supports an optional first investigation and retains th
     await chooseNotebookTool(panel, "Notes");
     await expect(
       panel.getByRole("heading", {
-        name: "Queue balance lab: initial thinking",
+        name: "Cache decision lab: initial thinking",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       panel.getByRole("heading", {
-        name: "Queue balance lab: reflection",
+        name: "Cache decision lab: reflection",
         exact: true,
       }),
     ).toBeVisible();
@@ -194,7 +194,7 @@ test("a packed companion supports an optional first investigation and retains th
     await chooseNotebookTool(panel, "Notes");
     await expect(
       panel.getByRole("heading", {
-        name: "Queue balance lab: reflection",
+        name: "Cache decision lab: reflection",
         exact: true,
       }),
     ).toBeVisible();

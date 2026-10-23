@@ -1,18 +1,10 @@
-type SaturationScenarioId = "arrival" | "dependency" | "retry" | "baseline";
 type SaturationStageId = "ingestion" | "database" | "processor" | "downstream";
-
-type SaturationScenario = {
-  load: number;
-  retries: number;
-  capacities: Record<SaturationStageId, number>;
-};
 
 type SaturationStage = {
   id: SaturationStageId;
   label: string;
   shortLabel: string;
   signal: string;
-  recovery: string;
 };
 
 const saturationStages: SaturationStage[] = [
@@ -21,73 +13,26 @@ const saturationStages: SaturationStage[] = [
     label: "Ingestion API",
     shortLabel: "API",
     signal: "Concurrent requests and admission latency.",
-    recovery: "Enable ingress throttling or switch to buffered acceptance.",
   },
   {
     id: "database",
     label: "Database pool",
     shortLabel: "DB pool",
     signal: "Connection wait time and pool utilization.",
-    recovery: "Shed optional reads or move aggregation out of the write path.",
   },
   {
     id: "processor",
     label: "Event processors",
     shortLabel: "Workers",
     signal: "Oldest event age and processing lag.",
-    recovery: "Pause optional enrichment or scale the prepared worker pool.",
   },
   {
     id: "downstream",
     label: "Downstream quota",
     shortLabel: "Quota",
     signal: "HTTP 429 responses and remaining request quota.",
-    recovery: "Open the circuit and buffer or defer downstream calls.",
   },
 ];
-
-const saturationScenarios: Record<SaturationScenarioId, SaturationScenario> = {
-  arrival: {
-    load: 140,
-    retries: 5,
-    capacities: {
-      ingestion: 180,
-      database: 110,
-      processor: 150,
-      downstream: 130,
-    },
-  },
-  dependency: {
-    load: 85,
-    retries: 20,
-    capacities: {
-      ingestion: 180,
-      database: 150,
-      processor: 140,
-      downstream: 60,
-    },
-  },
-  retry: {
-    load: 110,
-    retries: 55,
-    capacities: {
-      ingestion: 180,
-      database: 150,
-      processor: 130,
-      downstream: 160,
-    },
-  },
-  baseline: {
-    load: 70,
-    retries: 0,
-    capacities: {
-      ingestion: 180,
-      database: 150,
-      processor: 140,
-      downstream: 120,
-    },
-  },
-};
 
 for (const root of document.querySelectorAll<HTMLElement>(
   "[data-saturation-boundary-demo]",
@@ -99,14 +44,8 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
   const form = root.querySelector<HTMLFormElement>(
     "[data-saturation-boundary-form]",
   );
-  const scenario = root.querySelector<HTMLSelectElement>(
-    "[data-saturation-boundary-scenario]",
-  );
   const load = root.querySelector<HTMLInputElement>(
     "[data-saturation-boundary-load]",
-  );
-  const retries = root.querySelector<HTMLInputElement>(
-    "[data-saturation-boundary-retries]",
   );
   const backpressure = root.querySelector<HTMLInputElement>(
     "[data-saturation-boundary-backpressure]",
@@ -126,29 +65,14 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
   const signal = root.querySelector<HTMLElement>(
     "[data-saturation-boundary-signal]",
   );
-  const recovery = root.querySelector<HTMLElement>(
-    "[data-saturation-boundary-recovery]",
-  );
-  const next = root.querySelector<HTMLElement>(
-    "[data-saturation-boundary-next]",
-  );
   const effectiveLoad = root.querySelector<HTMLElement>(
     "[data-saturation-boundary-effective-load]",
-  );
-  const artifact = root.querySelector<HTMLTextAreaElement>(
-    "[data-saturation-boundary-artifact]",
   );
   const expand = root.querySelector<HTMLButtonElement>(
     "[data-saturation-boundary-expand]",
   );
-  const copy = root.querySelector<HTMLButtonElement>(
-    "[data-saturation-boundary-copy]",
-  );
   const loadOutput = root.querySelector<HTMLOutputElement>(
     "[data-saturation-boundary-output='load']",
-  );
-  const retryOutput = root.querySelector<HTMLOutputElement>(
-    "[data-saturation-boundary-output='retries']",
   );
   const capacityInputs = Array.from(
     root.querySelectorAll<HTMLInputElement>(
@@ -166,31 +90,23 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
 
   if (
     !form ||
-    !scenario ||
     !load ||
-    !retries ||
     !backpressure ||
     !pipeline ||
     !verdict ||
     !summary ||
     !diagnosis ||
     !signal ||
-    !recovery ||
-    !next ||
     !effectiveLoad ||
-    !artifact ||
     !expand ||
-    !copy ||
-    !loadOutput ||
-    !retryOutput
+    !loadOutput
   ) {
     return;
   }
 
   const render = () => {
     const offeredLoad = Number(load.value);
-    const retryRate = Number(retries.value);
-    const demand = Math.round(offeredLoad * (1 + retryRate / 100));
+    const demand = offeredLoad;
     const capacities = getSaturationCapacities(capacityInputs);
     const result = analyzeSaturationBoundary(
       demand,
@@ -200,8 +116,6 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
 
     loadOutput.value = `${offeredLoad} ev/s`;
     loadOutput.textContent = loadOutput.value;
-    retryOutput.value = `${retryRate}%`;
-    retryOutput.textContent = retryOutput.value;
     capacityOutputs.forEach((output) => {
       const id = output.dataset
         .saturationBoundaryCapacityOutput as SaturationStageId;
@@ -210,7 +124,7 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
     });
 
     effectiveLoad.textContent = `${demand} ev/s`;
-    pipeline.innerHTML = buildSaturationPipeline(demand, capacities);
+    pipeline.innerHTML = buildSaturationPipeline(result.admitted, capacities);
     root.dataset.saturationState = result.saturated
       ? "saturated"
       : result.atLimit
@@ -229,35 +143,15 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
       backpressure.checked,
     );
     signal.textContent = result.boundary.signal;
-    recovery.textContent = result.boundary.recovery;
-    next.textContent = `${result.next.label} at ${result.nextCapacity} ev/s`;
     updateSaturationMetrics(metrics, result);
-    artifact.value = buildSaturationArtifact({
-      scenario:
-        scenario.options[scenario.selectedIndex]?.textContent?.trim() ??
-        "Custom scenario",
-      offeredLoad,
-      retryRate,
-      demand,
-      backpressure: backpressure.checked,
-      result,
-    });
+    const comparison = root.querySelector<HTMLElement>(
+      "[data-saturation-boundary-comparison]",
+    );
+    if (comparison)
+      comparison.textContent =
+        "Predict which stage will limit completion after one capacity increase, then compare.";
   };
 
-  scenario.addEventListener("change", () => {
-    const preset =
-      saturationScenarios[scenario.value as SaturationScenarioId] ??
-      saturationScenarios.arrival;
-
-    load.value = String(preset.load);
-    retries.value = String(preset.retries);
-    backpressure.checked = false;
-    capacityInputs.forEach((input) => {
-      const id = input.dataset.saturationBoundaryCapacity as SaturationStageId;
-      input.value = String(preset.capacities[id]);
-    });
-    render();
-  });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
   });
@@ -265,9 +159,7 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
   form.addEventListener("change", render);
   expand.addEventListener("click", () => {
     const capacities = getSaturationCapacities(capacityInputs);
-    const demand = Math.round(
-      Number(load.value) * (1 + Number(retries.value) / 100),
-    );
+    const demand = Number(load.value);
     const result = analyzeSaturationBoundary(
       demand,
       capacities,
@@ -282,21 +174,17 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
       input.value = String(
         Math.min(Number(input.max), Number(input.value) + 40),
       );
-      scenario.value = "";
       render();
-    }
-  });
-  copy.addEventListener("click", async () => {
-    artifact.select();
-
-    try {
-      await navigator.clipboard.writeText(artifact.value);
-      copy.textContent = "Copied";
-      window.setTimeout(() => {
-        copy.textContent = "Copy report";
-      }, 1400);
-    } catch {
-      copy.textContent = "Select text";
+      const after = analyzeSaturationBoundary(
+        demand,
+        getSaturationCapacities(capacityInputs),
+        backpressure.checked,
+      );
+      const comparison = root.querySelector<HTMLElement>(
+        "[data-saturation-boundary-comparison]",
+      );
+      if (comparison)
+        comparison.textContent = `Before expansion: ${result.boundary.label}, ${result.completed} completed/s. After: ${after.boundary.label}, ${after.completed} completed/s. The smallest remaining capacity limits completion.`;
     }
   });
 
@@ -348,6 +236,8 @@ function analyzeSaturationBoundary(
     headroom,
     atLimit: headroom === 0,
     saturated: headroom < 0,
+    admitted: backpressure ? Math.min(demand, boundary.capacity) : demand,
+    completed: Math.min(demand, boundary.capacity),
     backlog: backpressure ? 0 : excess,
     rejected: backpressure ? excess : 0,
   };
@@ -364,7 +254,11 @@ function buildSaturationPipeline(
       const capacity = capacities[stage.id];
       const utilization = capacity === 0 ? 0 : demand / capacity;
       const state =
-        utilization > 1 ? "saturated" : utilization >= 0.8 ? "near" : "healthy";
+        utilization > 1
+          ? "saturated"
+          : utilization === 1
+            ? "at-limit"
+            : "healthy";
       const isBoundary = capacity === minimumCapacity;
       const utilizationPercent = Math.round(utilization * 100);
       const pressure = Math.min(100, utilizationPercent);
@@ -380,10 +274,10 @@ function buildSaturationPipeline(
           <strong>${escapeSaturationHtml(stage.label)}</strong>
           <small>${capacity} ev/s capacity</small>
         </div>
-        <div class="saturation-boundary-meter" role="img" aria-label="${utilizationPercent}% of declared capacity">
+        <div class="saturation-boundary-meter" role="img" aria-label="Admitted rate is ${utilizationPercent}% of this declared limit">
           <i></i>
         </div>
-        <b>${utilizationPercent}%</b>
+        <b>${demand} admitted/s</b>
         <em data-active="${isBoundary ? "true" : "false"}">Binding limit</em>
       </article>`;
     })
@@ -402,10 +296,10 @@ function buildSaturationDiagnosis(
   }
 
   if (backpressure) {
-    return `${result.boundary.label} is binding. Backpressure keeps hidden backlog at zero by rejecting ${result.rejected} events each second explicitly.`;
+    return `${result.boundary.label} is binding. Backpressure limits admitted work to ${result.admitted} events/s, rejecting ${result.rejected} events each second. Completed work stays ${result.completed} events/s.`;
   }
 
-  return `${result.boundary.label} is binding. Uncontrolled demand adds ${result.backlog} events of hidden work each second.`;
+  return `${result.boundary.label} is binding. Uncontrolled demand adds ${result.backlog} queued events each second; ${result.completed} events/s complete.`;
 }
 
 function updateSaturationMetrics(
@@ -423,47 +317,12 @@ function updateSaturationMetrics(
       node.textContent = `${result.backlog} ev/s`;
     } else if (key === "rejected") {
       node.textContent = `${result.rejected} ev/s`;
+    } else if (key === "admitted") {
+      node.textContent = `${result.admitted} ev/s`;
+    } else if (key === "completed") {
+      node.textContent = `${result.completed} ev/s`;
     }
   });
-}
-
-function buildSaturationArtifact({
-  scenario,
-  offeredLoad,
-  retryRate,
-  demand,
-  backpressure,
-  result,
-}: {
-  scenario: string;
-  offeredLoad: number;
-  retryRate: number;
-  demand: number;
-  backpressure: boolean;
-  result: ReturnType<typeof analyzeSaturationBoundary>;
-}) {
-  return [
-    "Saturation Boundary Report",
-    "",
-    `Scenario: ${scenario}`,
-    `Offered load: ${offeredLoad} events/s`,
-    `Retry amplification: ${retryRate}%`,
-    `Effective demand: ${demand} events/s`,
-    `Ingress backpressure: ${backpressure ? "enabled" : "disabled"}`,
-    "",
-    `First boundary: ${result.boundary.label}`,
-    `Declared capacity: ${result.boundaryCapacity} events/s`,
-    `Capacity state: ${result.saturated ? "Overloaded" : result.atLimit ? "At capacity — no headroom" : "Spare capacity"}`,
-    `Headroom: ${result.headroom} events/s`,
-    `Hidden backlog growth: ${result.backlog} events/s`,
-    `Explicitly rejected: ${result.rejected} events/s`,
-    `First useful signal: ${result.boundary.signal}`,
-    `Prepared recovery: ${result.boundary.recovery}`,
-    `Next closest boundary: ${result.next.label} at ${result.nextCapacity} events/s`,
-    "",
-    "Model limit:",
-    "This comparison uses declared rates and does not predict production capacity, latency distributions, or interactions between stages.",
-  ].join("\n");
 }
 
 function escapeSaturationHtml(value: string) {

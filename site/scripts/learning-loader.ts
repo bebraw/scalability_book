@@ -140,23 +140,6 @@ else
           detail: { kind: "investigate", resume: true },
         }),
       );
-    else {
-      const legacy = JSON.parse(
-        sessionStorage.getItem(
-          `book-reading-investigation:${location.pathname}:queue-balance`,
-        ) ?? "null",
-      );
-      if (
-        !saved &&
-        legacy?.open &&
-        document.getElementById("demo-queue-balance-lab")
-      )
-        document.dispatchEvent(
-          new CustomEvent("book-learning-request", {
-            detail: { kind: "investigate", activityId: "queue-balance" },
-          }),
-        );
-    }
   } catch {
     /* Learning works without tab storage. */
   }

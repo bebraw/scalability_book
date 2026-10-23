@@ -30,9 +30,13 @@ class EventApiV2 extends BaseImage {
 
   override async exec(ctx: ProcessContext): Promise<number> {
     ctx.listenHttp(8080, async () => ({
-      status: 200,
+      status: 500,
       header: { "content-type": ["application/json"] },
-      body: JSON.stringify({ pod: ctx.pod.name, release: "v2" }),
+      body: JSON.stringify({
+        pod: ctx.pod.name,
+        release: "v2",
+        error: "invalid activity schema",
+      }),
     }));
     return await ctx.waitUntilKilled();
   }
@@ -51,9 +55,11 @@ class OrchestrationLab {
   private readonly burstButton: HTMLButtonElement;
   private readonly terminateButton: HTMLButtonElement;
   private readonly rolloutButton: HTMLButtonElement;
+  private readonly rollbackButton: HTMLButtonElement;
+  private readonly requests: HTMLOListElement;
   private readonly log: HTMLOListElement;
   private readonly metrics: Record<
-    "desired" | "running" | "release" | "served",
+    "desired" | "running" | "release" | "served" | "failed",
     HTMLElement
   >;
   private readonly nodeLists: Map<string, HTMLUListElement>;
@@ -63,6 +69,8 @@ class OrchestrationLab {
   private informer: InformerHandle | undefined;
   private desiredReplicas = 3;
   private servedRequests = 0;
+  private failedRequests = 0;
+  private requestCount = 0;
   private currentRelease = "v1";
   private busy = true;
 
@@ -106,6 +114,16 @@ class OrchestrationLab {
       "[data-orchestration-rollout]",
       HTMLButtonElement,
     );
+    this.rollbackButton = requiredElement(
+      root,
+      "[data-orchestration-rollback]",
+      HTMLButtonElement,
+    );
+    this.requests = requiredElement(
+      root,
+      "[data-orchestration-requests]",
+      HTMLOListElement,
+    );
     this.log = requiredElement(
       root,
       "[data-orchestration-log]",
@@ -116,6 +134,7 @@ class OrchestrationLab {
       running: requiredElement(root, "[data-orchestration-metric='running']"),
       release: requiredElement(root, "[data-orchestration-metric='release']"),
       served: requiredElement(root, "[data-orchestration-metric='served']"),
+      failed: requiredElement(root, "[data-orchestration-metric='failed']"),
     };
     this.nodeLists = new Map(
       Array.from(
@@ -134,7 +153,11 @@ class OrchestrationLab {
       "click",
       () => void this.terminatePod(),
     );
-    this.rolloutButton.addEventListener("click", () => void this.rolloutV2());
+    this.rolloutButton.addEventListener("click", () => void this.rollout("v2"));
+    this.rollbackButton.addEventListener(
+      "click",
+      () => void this.rollout("v1"),
+    );
     window.addEventListener("pagehide", () => void this.close(), {
       once: true,
     });
@@ -228,7 +251,7 @@ class OrchestrationLab {
       const cluster = this.requireCluster();
       this.setStatus(
         "Routing a six-request burst",
-        "The NodePort service selects a healthy endpoint for each request.",
+        "The service selects a running endpoint. Check its application response separately.",
       );
 
       for (let index = 0; index < 6; index++) {
@@ -237,19 +260,29 @@ class OrchestrationLab {
           pod: string;
           release: string;
         };
-        this.servedRequests += 1;
+        this.requestCount += 1;
+        if (response.status >= 200 && response.status < 300)
+          this.servedRequests += 1;
+        else this.failedRequests += 1;
         this.metrics.served.textContent = String(this.servedRequests);
+        this.metrics.failed.textContent = String(this.failedRequests);
+        const record = document.createElement("li");
+        record.dataset.responseStatus = String(response.status);
+        record.textContent = `Request ${this.requestCount}: HTTP ${response.status} · ${result.release} · ${shortPodName(result.pod)}`;
+        this.requests.append(record);
         this.highlightPod(result.pod);
         this.addLog(
           "Service",
-          `Request ${this.servedRequests} → ${shortPodName(result.pod)} (${result.release}).`,
+          `Request ${this.requestCount} → HTTP ${response.status}, ${shortPodName(result.pod)} (${result.release}).`,
         );
         await delay(140);
       }
 
       this.setStatus(
-        "Burst served across pod endpoints",
-        "Distribution adds capacity only when the application and its state can be replicated safely.",
+        this.currentRelease === "v2"
+          ? "Running pods returned application failures"
+          : "Burst completed with successful responses",
+        "Pod convergence and application responses are separate observations. Inspect the request log before judging the release.",
       );
     });
   }
@@ -306,20 +339,20 @@ class OrchestrationLab {
     });
   }
 
-  private async rolloutV2(): Promise<void> {
-    if (this.currentRelease === "v2") {
+  private async rollout(release: "v1" | "v2"): Promise<void> {
+    if (this.currentRelease === release) {
       return;
     }
 
     await this.runOperation(async () => {
       this.controllerState.textContent = "Rolling update";
       this.setStatus(
-        "Rolling out release v2",
-        "The Deployment controller is replacing v1 pods while preserving capacity.",
+        `Rolling out release ${release}`,
+        "The controller replaces pods to match the selected image; that does not validate application behavior.",
       );
       this.addLog(
         "Deployment",
-        "Changed the pod template image to event-api:2.0.",
+        `Changed the pod template image to event-api:${release === "v2" ? "2.0" : "1.0"}.`,
       );
 
       await this.updateDeployment((deployment) => {
@@ -327,11 +360,11 @@ class OrchestrationLab {
         if (!template?.spec?.containers?.[0]) {
           throw new Error("The Deployment pod template is incomplete.");
         }
-        template.spec.containers[0].image = "course/event-api:2.0";
+        template.spec.containers[0].image = `course/event-api:${release === "v2" ? "2.0" : "1.0"}`;
         template.metadata ??= {};
         template.metadata.labels = {
           ...template.metadata.labels,
-          release: "v2",
+          release,
         };
       });
 
@@ -339,18 +372,21 @@ class OrchestrationLab {
         const running = runningPods(pods);
         return (
           running.length === this.desiredReplicas &&
-          running.every((pod) => podRelease(pod) === "v2")
+          running.every((pod) => podRelease(pod) === release)
         );
       }, 20_000);
 
-      this.currentRelease = "v2";
-      this.metrics.release.textContent = "v2";
+      this.currentRelease = release;
+      this.metrics.release.textContent = release;
       this.controllerState.textContent = "Converged";
       this.setStatus(
-        "Release v2 is fully rolled out",
-        "The new pod template became the observed state without replacing every pod at once.",
+        `Release ${release} is fully rolled out`,
+        "Desired pod state has converged. Send requests to check whether this release serves the application correctly.",
       );
-      this.addLog("Deployment", "All running replicas now use release v2.");
+      this.addLog(
+        "Deployment",
+        `All running replicas now use release ${release}. Application responses remain to be checked.`,
+      );
     });
   }
 
@@ -542,6 +578,7 @@ class OrchestrationLab {
     this.burstButton.disabled = busy;
     this.terminateButton.disabled = busy;
     this.rolloutButton.disabled = busy || this.currentRelease === "v2";
+    this.rollbackButton.disabled = busy || this.currentRelease === "v1";
   }
 
   private setStatus(title: string, detail: string): void {

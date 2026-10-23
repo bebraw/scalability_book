@@ -66,10 +66,12 @@ for (const era of ["modern", "legacy"] as const) {
     )!;
     assert.equal(connection.explanation, authored.explanation);
 
-    const demo = await call("get_demo", { id: "demo-queue-balance-lab" });
+    const demo = await call("get_demo", { id: "demo-cache-decision-lab" });
     assert.deepEqual(
       demo.demo,
-      graph.learningResources.find(({ id }) => id === "demo-queue-balance-lab"),
+      graph.learningResources.find(
+        ({ id }) => id === "demo-cache-decision-lab",
+      ),
     );
     assert.equal(demo.nextActions[0].action, "ask_prediction");
     assert.equal(demo.capabilities.liveState, false);

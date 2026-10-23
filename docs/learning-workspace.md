@@ -152,14 +152,13 @@ These entry points prepare context, never save or send automatically.
 Opening the cockpit from a learning panel closes the overlay while retaining its unfinished writing; Notebook and Assistant actions reopen the existing panels.
 
 Demo sends read actual visible controls and text from the existing observation bridge, not an independently simulated result.
-The queue retains its typed arrival rate, mean time, observed/expected work in progress, gap and capture time.
-Other demos use a dated `browser-demo-snapshot` with at most 60 named values (text values shortened to 1,024 characters) and 8,000 characters of displayed text.
+All demos use a dated `browser-demo-snapshot` with at most 60 named values (text values shortened to 1,024 characters) and 8,000 characters of displayed text.
 The preview is bounded; canvas pixels, hidden output and real project measurements are never inferred.
 Current values and the last sent snapshot are labelled separately.
 If Practice hides a demo, reopen Explore before sending a result; direct explanation remains available without a new observation.
 During an explicitly started reply, the existing origin/session/browser-bound broker services observations of the selected demo only.
 The cockpit declines other demos and control changes; the ordinary assistant retains its existing saved-initial-thinking and approval boundary for changes.
-The companion validates the activity/source/version, phase, text/observation bounds and queue arithmetic before storing a turn or calling the provider.
+The companion validates the activity/source/version, phase, text/observation bounds before storing a turn or calling the provider.
 Browser reports are not independently attested measurements and never grant action permissions.
 Submitted activity turns remain additive JSON in the companion's existing conversation store; notebook and protocol schemas are unchanged.
 The public graph/MCP exposes the same authored loop and all demo contracts without learner state, execution or private access.
@@ -170,8 +169,7 @@ Each tab record is bounded to 256,000 serialized characters; oversized demo snap
 The next explicit send takes a fresh browser observation.
 Selected source excerpts distinguish different passages/attempt contexts rather than overwriting one page-wide draft.
 Reload resumes the active loop on its source page; other readers retain lazy loading with no companion request.
-Queue inputs have faithful input-only restoration; other demos retain dated snapshots without replaying their actions or claiming that their prior output has been restored.
-Legacy queue drafts are read without changing notebook records.
+Demos retain dated snapshots without replaying controls or actions or claiming that their prior output has been restored.
 Tab continuity is not durable storage or a notebook backup.
 **Pause this exploration** stops browser polling and retains the draft; **Stop reply** interrupts a running provider response.
 Pausing or switching focus alone does not cancel the provider's turn.
@@ -294,7 +292,7 @@ Pages without a demo offer reflection without an observation action; the guide d
 Demo activities use existing authored prediction, operation, observation and reflection instructions and preserve their assumptions.
 Save demo result stays disabled until private initial thinking is saved, explains that it captures current browser inputs/text, and shows the saved observation beside the action.
 Errors and save confirmations appear at the relevant step; unavailable demos provide a visible fallback.
-The guide offers **Apply it in a different situation** before reflection, including a queue-recovery variation and the existing benchmark/scaling transfer exercises.
+The guide offers **Apply it in a different situation** before reflection, including the existing benchmark/scaling transfer exercises.
 Other readings use a claim applied to a different system with a changed condition, including pages without demos.
 Students can choose their own related question; the self-check is a closed disclosure and help remains available before or after an attempt.
 Explicitly saving creates a separate `revisit` entry related to the original thinking and evidence; reflection relates to those entries without replacing them.
@@ -327,7 +325,7 @@ LEARNING_CODEX_LIVE=1 npx playwright test tests/e2e/learning-agent-live.spec.ts 
 ```
 
 On 2026-10-06, Codex CLI 0.154.0 passed real reply/resume and the browser observation → approved change → actual result → reviewed notebook draft workflow.
-The 32 authored demos passed live DOM observation/action checks; disabled controls remain unavailable during startup or a busy operation.
+The retained demo catalog is checked through live DOM observation/action tests; disabled controls remain unavailable during startup or a busy operation.
 Synthetic peer checks cover attempt-first discovery/direct access, course/group/phase isolation, corrected allocation, withdrawal, concurrent writes, source changes and own-text public consent.
 These checks establish executable behavior, not improved learning or course completion.
 [The evaluation guide](learning-workspace-evaluation.md) owns the voluntary learner evaluation and reporting limits.

@@ -4,12 +4,6 @@ type UslPoint = {
 };
 
 for (const root of document.querySelectorAll<HTMLElement>(
-  "[data-little-law-demo]",
-)) {
-  initializeLittleLaw(root);
-}
-
-for (const root of document.querySelectorAll<HTMLElement>(
   "[data-amdahl-law-demo]",
 )) {
   initializeAmdahlLaw(root);
@@ -23,105 +17,6 @@ for (const root of document.querySelectorAll<HTMLElement>(
 
 for (const root of document.querySelectorAll<HTMLElement>("[data-usl-demo]")) {
   initializeUsl(root);
-}
-
-function initializeLittleLaw(root: HTMLElement) {
-  const form = root.querySelector<HTMLFormElement>("[data-little-law-form]");
-  if (!form) return;
-
-  const update = () => {
-    const arrival = lawReadNumber(
-      root,
-      "[data-little-law-input='arrival']",
-      20,
-    );
-    const time = lawReadNumber(root, "[data-little-law-input='time']", 0.5);
-    const observed = lawReadNumber(
-      root,
-      "[data-little-law-input='observed']",
-      10,
-    );
-    const expected = arrival * time;
-    const gap = observed - expected;
-    // Ignore floating-point rounding only, not a statistical measurement error.
-    const tolerance = Number.EPSILON * Math.max(1, expected, observed) * 8;
-    const verdict = root.querySelector<HTMLElement>(
-      "[data-little-law-verdict]",
-    );
-    const reading = root.querySelector<HTMLElement>(
-      "[data-little-law-reading]",
-    );
-
-    lawSetText(
-      root,
-      "[data-little-law-output='arrival']",
-      `${arrival} events/s`,
-    );
-    lawSetText(root, "[data-little-law-output='time']", `${time.toFixed(1)} s`);
-    lawSetText(
-      root,
-      "[data-little-law-output='observed']",
-      `${observed} events`,
-    );
-    lawSetText(
-      root,
-      "[data-little-law-equation]",
-      `${formatNumber(expected)} = ${arrival} × ${time.toFixed(1)}`,
-    );
-    lawSetText(
-      root,
-      "[data-little-law-metric='expected']",
-      formatNumber(expected),
-    );
-    lawSetText(root, "[data-little-law-metric='observed']", String(observed));
-    lawSetText(
-      root,
-      "[data-little-law-metric='gap']",
-      `${gap > 0 ? "+" : ""}${formatNumber(gap)}`,
-    );
-    renderQueue(root, observed, gap, tolerance);
-
-    root.classList.toggle("is-law-warning", Math.abs(gap) > tolerance);
-    if (Math.abs(gap) <= tolerance) {
-      if (verdict) verdict.textContent = "Measurements agree";
-      if (reading) {
-        reading.textContent =
-          "The entered averages agree numerically, allowing only floating-point rounding. This does not establish that their observation window was stable or identify why work takes this long.";
-      }
-    } else if (gap > 0) {
-      if (verdict) verdict.textContent = "More work observed than predicted";
-      if (reading) {
-        reading.textContent =
-          "The observed queue is larger than λW predicts. The system may be unstable, the measurement boundaries may differ, or some work may be missing from arrival or duration measurements.";
-      }
-    } else {
-      if (verdict) verdict.textContent = "Less work observed than predicted";
-      if (reading) {
-        reading.textContent =
-          "The observed queue is smaller than λW predicts. Check whether arrivals, completions, duration, and work in progress came from the same stable time window.";
-      }
-    }
-  };
-
-  form.addEventListener("input", update);
-  update();
-}
-
-function renderQueue(
-  root: HTMLElement,
-  observed: number,
-  gap: number,
-  tolerance: number,
-) {
-  const queue = root.querySelector<HTMLElement>("[data-little-law-queue]");
-  if (!queue) return;
-
-  queue.innerHTML = Array.from({ length: Math.ceil(observed) }, (_, index) => {
-    const warning =
-      Math.abs(gap) > tolerance && index >= observed - Math.abs(gap);
-    const fraction = Math.min(1, observed - index);
-    return `<i${warning ? ' class="is-gap"' : ""} style="opacity:${fraction}"></i>`;
-  }).join("");
 }
 
 function initializeLusserLaw(root: HTMLElement) {

@@ -10,6 +10,10 @@ test.describe("durable effect retry lab", () => {
     page,
   }) => {
     const lab = page.locator("[data-durable-retry]");
+    await expect(lab).toContainText("Browser simulation");
+    await expect(lab.locator("[data-durable-retry-artifact]")).toHaveValue(
+      /Browser-only in-memory simulation/,
+    );
     const crash = lab.locator("[data-durable-retry-crash]");
     const recover = lab.locator("[data-durable-retry-recover]");
 
@@ -28,17 +32,13 @@ test.describe("durable effect retry lab", () => {
     await expect(lab.locator("[data-durable-retry-history]")).not.toContainText(
       "ActivityCompleted",
     );
-    await expectMetric(lab, "commands", "1");
     await expectMetric(lab, "attempts", "1");
-    await expectMetric(lab, "calls", "1");
     await expectMetric(lab, "effects", "1");
     await expectMetric(lab, "completion", "0");
 
     await recover.click();
     await expect(lab).toHaveAttribute("data-durable-retry-phase", "recovered");
-    await expectMetric(lab, "commands", "1");
     await expectMetric(lab, "attempts", "2");
-    await expectMetric(lab, "calls", "2");
     await expectMetric(lab, "effects", "2");
     await expectMetric(lab, "completion", "1");
     await expect(
@@ -70,9 +70,7 @@ test.describe("durable effect retry lab", () => {
     await lab.locator("[data-durable-retry-crash]").click();
     await lab.locator("[data-durable-retry-recover]").click();
 
-    await expectMetric(lab, "commands", "1");
     await expectMetric(lab, "attempts", "2");
-    await expectMetric(lab, "calls", "2");
     await expectMetric(lab, "effects", "1");
     await expectMetric(lab, "completion", "1");
     await expect(

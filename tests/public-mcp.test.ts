@@ -264,10 +264,13 @@ for (const era of ["modern", "legacy"] as const)
       );
       assert.equal(edge.direction, "directed");
       assert.equal(edge.label, "can add waiting time to");
-      const demo = await call("get_demo", { id: "demo-queue-balance-lab" });
+      const demo = await call("get_demo", { id: "demo-cache-decision-lab" });
       assert.equal(demo.capabilities.execute, false);
       assert.equal(demo.capabilities.liveState, false);
-      assert.match(demo.demo.experiment.predict, /20 events\/s/);
+      assert.match(
+        demo.demo.experiment.predict,
+        /reuse a response without contacting the origin/,
+      );
       assert.equal(demo.nextActions[0].action, "ask_prediction");
       const activity = await call("get_activity", {
         id: "challenge-an-explanation",

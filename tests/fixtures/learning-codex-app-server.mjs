@@ -47,7 +47,7 @@ for await (const line of createInterface({ input: process.stdin })) {
         threadId: "synthetic-thread",
         turnId: "synthetic-turn",
         tool: "observe_demo",
-        arguments: { demoId: "demo-queue-balance-lab" },
+        arguments: { demoId: "demo-cache-decision-lab" },
       },
     });
     send({

@@ -75,15 +75,29 @@ test.describe("benchmark simulation demo", () => {
       demo.locator("[data-benchmark-demo-comparison]"),
     ).toContainText("p95 −183 ms");
 
-    await demo.locator('[data-benchmark-demo-input="concurrency"]').fill("20");
-    await clickPrediction(demo, "Average and p95 fail");
+    await demo
+      .locator('[data-benchmark-demo-input="slow-rate"]')
+      .selectOption("5");
+    await clickPrediction(demo, "Average and p95 pass");
     await demo.locator(".benchmark-demo-run").click();
-    await expect(demo.locator("[data-benchmark-demo-verdict]")).toHaveText(
-      "Prediction confirmed — average and p95 fail",
+    await expect(demo.locator('[data-benchmark-demo-metric="p95"]')).toHaveText(
+      "34 ms",
     );
     await expect(
       demo.locator("[data-benchmark-demo-interpretation]"),
-    ).toContainText("queueing");
+    ).toContainText("3 of 60 requests miss");
+    await expect(
+      demo.locator("[data-benchmark-demo-interpretation]"),
+    ).toContainText("A passing p95 can leave slow requests");
+    await demo
+      .getByText("Inspect all ordered records", { exact: true })
+      .click();
+    await expect(demo.locator("[data-benchmark-demo-records]")).toContainText(
+      "57: 34 ms ← p95",
+    );
+    await expect(
+      demo.locator("[data-benchmark-demo-chart] i.is-percentile"),
+    ).toHaveCount(1);
   });
 });
 

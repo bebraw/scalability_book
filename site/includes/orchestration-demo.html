@@ -29,7 +29,8 @@
     <strong>Simulation boundary</strong>
     <span
       >This runs Kubernetes-compatible control logic in your browser. It does
-      not run Docker images or measure production capacity.</span
+      not run Docker images or measure production capacity. No application-aware
+      readiness check is configured: a running pod can return HTTP 500.</span
     >
   </div>
 
@@ -49,8 +50,12 @@
           <strong data-orchestration-metric="release">v1</strong>
         </div>
         <div>
-          <span>Served</span>
+          <span>Successful responses</span>
           <strong data-orchestration-metric="served">0</strong>
+        </div>
+        <div>
+          <span>Failed responses</span
+          ><strong data-orchestration-metric="failed">0</strong>
         </div>
       </div>
 
@@ -84,9 +89,15 @@
         </button>
         <button type="button" data-orchestration-rollout disabled>
           <span aria-hidden="true">↻</span>
-          Roll out release v2
+          Roll out faulty release v2
+        </button>
+        <button type="button" data-orchestration-rollback disabled>
+          Roll back to v1
         </button>
       </div>
+      <p>
+        Predict: can every pod be running while every application request fails?
+      </p>
     </aside>
 
     <div class="orchestration-stage">
@@ -136,12 +147,24 @@
     ></ol>
   </div>
 
+  <div class="orchestration-observer">
+    <div class="orchestration-observer-heading">
+      <span>Application request log</span
+      ><small>Actual responses inside this browser simulation</small>
+    </div>
+    <ol
+      data-orchestration-requests
+      aria-label="Application request log"
+      tabindex="0"
+    ></ol>
+  </div>
   <details class="orchestration-debrief">
     <summary>Debrief the mechanism and its limits</summary>
     <div>
       <p>
-        Name the desired state, the observed state, and the controller action
-        after each experiment. Then identify what remains outside this model.
+        Roll out v2, send requests, then roll back and repeat. Name the desired
+        state, the observed state, and the controller action after each
+        experiment. Then identify what remains outside this model.
       </p>
       <ul>
         <li>

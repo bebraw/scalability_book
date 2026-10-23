@@ -92,13 +92,17 @@ The same invariant is threatened when two requests make a decision from the same
 
 ### ACID transaction lab
 
-Choose one disturbance, predict where the invariant could leak, and run it first with application-managed writes.
-Then introduce a database transaction and, for concurrent requests, compare read committed with serializable execution.
+Choose one question at a time.
+For a failed second write, compare application-managed writes with one transaction and inspect whether state and event commit together.
+For concurrent requests, inspect the displayed stale-check program before comparing its read-committed and serializable histories; compare the conditional-write alternative separately.
+For restart, keep the transaction fixed and change only whether acknowledgment precedes or follows the durable commit.
 
 {{ import "site/includes/acid-transaction-lab.html" }}
 
-The simulation does not imply that every database implements an isolation level or durable commit in the same way.
-For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point, and documented failure model, then test them against the deployed storage path.
+The program traces execute no SQL and do not imply that every database implements an isolation level or durable commit in the same way.
+For actual atomicity and restart practice, open `persisted-retry/README.md` in the [course workspace](/downloads/labs/course-workspace.zip).
+Its checks concern the receiver's SQLite transaction and process failure; they do not compare PostgreSQL isolation levels.
+For an implementation-specific claim, identify the real transaction boundary, constraints, isolation setting, acknowledgment point and documented failure model, then test the claimed property against that storage path.
 
 ## Partitions and replicated state
 
@@ -232,18 +236,24 @@ The strongest fit for explicit islands is an application with meaningful static 
 Research on edge-powered islands found that work could be deferred or avoided, but also concluded that the benefit becomes harder to obtain as an application grows more dynamic and difficult to divide into independent portions :citep[vepsalainen2025islands].
 Inter-island state, navigation, and communication then become architectural costs rather than incidental implementation details.
 
-### Client activation lens
+### Follow one control from HTML to interaction
 
-The lab below holds the server-rendered event page constant and changes only how its behavior becomes available in the browser.
-In its hydration baseline, all five regions belong to one client tree and hydrate on page load.
-Both the scope and timing are teaching assumptions.
-Compare what happens before the first interaction, then run the same record-event action.
-The transfer values are illustrative teaching values, not framework benchmarks; a real comparison should record production bundles, client execution, and interaction latency on representative devices.
+Use :ref[table:client-activation-approaches] to compare one server-rendered event form:
 
-{{ import "site/includes/client-activation-lens.html" }}
+```text
+HTML arrives → content can be displayed → required behavior becomes available
+             → user submits → handler validates → authoritative result renders
+```
 
-Ask which code and state must cross the boundary, which work happens before the user requests it, which latency moves to the first interaction, and what new constraints the chosen technique introduces.
-For each interactive region in the project, record its activation strategy, state owner, and communication path.
+For hydration, identify which client tree runs to recover state and listeners before the submit handler is ready.
+For an island, identify the region and the event that triggers its loading; the island may still hydrate.
+For resumability, identify the serialized state and handler reference that permit continuation without replaying the application.
+A delayed dynamic import by itself does not establish resumability.
+
+Before inspecting a real page, predict which work runs before the first interaction and which work the interaction may wait for.
+As optional depth, use one production build of your chosen project: preserve the initial HTML, inspect its network and execution records, then submit the form and verify the accepted result.
+Record the activation strategy, state owner and communication path you can support from those records.
+One inspected build does not compare frameworks, and this exercise does not require implementing several frameworks or assuming typical transfer sizes.
 
 ## Runtime UI generation changes the control boundary
 
@@ -349,19 +359,86 @@ GraphQL and RPC commonly travel over HTTP, so transport and application interact
 Event streams, queues, webhooks, and publish-subscribe interfaces add another decision: communication can become asynchronous.
 That can reduce temporal coupling while making delivery guarantees, ordering, replay, idempotency, and schema evolution explicit parts of the contract.
 
-### API contract lens
+### Compare four annotated exchanges
 
-The lab below holds one user intent constant: start work on item 42 and obtain its current state, title, workspace, and available next actions.
-Switch the interaction style to see what crosses the wire, what the consumer must know in advance, and where a request for one more related field creates pressure.
+Hold one intent constant: start work on item 42 and obtain its current state, title, workspace and available next action.
+These compact exchanges are illustrative contracts, not executed requests or interchangeable protocol definitions.
+Every server still owns authorization, lifecycle validation and the atomic state-and-event commit.
 
-{{ import "site/includes/api-contract-lens.html" }}
+**Resource-oriented HTTP.** The consumer knows the route, PATCH representation and state vocabulary in advance.
 
-No style wins every row.
-A stable public resource model, a workflow discovered through hypermedia, a frontend assembling related data, and an internal service command provide different reasons to accept different forms of coupling.
-Begin with consumers, change patterns, network conditions, tooling, and ownership rather than a preferred acronym.
+```http
+PATCH /work-items/42
+Content-Type: application/json
 
-For the project, design a work-item creation or lifecycle-transition operation and an activity-event query in one style.
-Then identify what changes when consumers retry, devices go offline, a new workflow state appears, many tenants share the system, or the interface needs an additional related field.
+{"state":"in_progress"}
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id":"42","state":"in_progress","title":"Prepare room","workspace":{"id":"w7","name":"Course"},"allowedTransitions":["done"]}
+```
+
+Requesting an assignee name requires a documented representation extension or another known resource request.
+Resource URLs and HTTP methods alone do not give the client a discoverable workflow.
+
+**Hypermedia-driven REST.** The consumer knows the entry resource and the media type's `start` relation, including its POST semantics; it follows the advertised address.
+
+```http
+GET /work-items/42
+
+HTTP/1.1 200 OK
+Content-Type: application/vnd.course.work-item+json
+
+{"id":"42","state":"open","_links":{"start":{"href":"/actions/start-42"}}}
+
+POST /actions/start-42
+
+HTTP/1.1 200 OK
+Content-Type: application/vnd.course.work-item+json
+
+{"id":"42","state":"in_progress","title":"Prepare room","workspace":{"id":"w7","name":"Course"},"_links":{"complete":{"href":"/actions/complete-42"}}}
+```
+
+An advertised `assignee` relation can supply the next address, but the client must already understand that relation's meaning.
+Changing a URL does not require client reconstruction when it actually follows the control; changing relation semantics still requires coordination.
+
+**GraphQL.** The consumer knows the schema and selects the result fields; the transport status is separate from the operation's result and errors.
+
+```text
+mutation Start($id: ID!) {
+  startWorkItem(id: $id) {
+    item { id state title workspace { name } availableActions }
+  }
+}
+variables: {"id":"42"}
+
+result:
+{"data":{"startWorkItem":{"item":{"id":"42","state":"in_progress","title":"Prepare room","workspace":{"name":"Course"},"availableActions":["complete"]}}}}
+```
+
+Adding `assignee { name }` changes the selection when that field is available.
+The server still has to authorize and execute its resolver work; one endpoint is not a cost bound.
+
+**RPC.** The consumer knows the service, method and message schema, often through a generated client.
+
+```text
+WorkItemService.StartWork({work_item_id: "42"})
+
+=> WorkItemView {
+  id: "42", state: IN_PROGRESS, title: "Prepare room",
+  workspace_name: "Course", available_actions: [COMPLETE]
+}
+```
+
+Returning an assignee name requires a compatible message change or another method call.
+The function-like notation does not remove deadlines, ambiguous outcomes or retry obligations.
+
+Use :ref[table:api-interaction-styles] to locate the consumer knowledge in each exchange.
+No style wins every row: choose from consumers, change patterns, network conditions, tooling and ownership.
+In the project's chosen style, preserve one old consumer request or script, add an optional related field on the server, and rerun that unchanged consumer against a fresh fixture.
+Check its expected response and the state/event outcome; then make an intentionally incompatible change in a disposable copy and confirm that the check detects it.
+This optional extension uses the contract exercise below and the existing project, rather than requiring four API implementations.
 
 ## Executable HTTP contracts
 

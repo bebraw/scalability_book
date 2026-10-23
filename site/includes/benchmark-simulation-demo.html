@@ -15,8 +15,8 @@
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
       <span data-benchmark-demo-verdict>Choose a claim before measuring</span>
       <small>
-        A deterministic teaching model of 60 <code>POST /events</code>
-        requests. It does not contact a server.
+        A constructed population of 60 requests: 24–34 ms plus 188 ms for the
+        selected slow paths. It does not contact a server.
       </small>
     </div>
   </div>
@@ -29,18 +29,6 @@
       </div>
 
       <label>
-        <span>Concurrent clients</span>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          value="4"
-          data-benchmark-demo-input="concurrency"
-        />
-        <output data-benchmark-demo-output="concurrency">4 clients</output>
-      </label>
-
-      <label>
         <span>Requests taking the slow storage path</span>
         <select data-benchmark-demo-input="slow-rate">
           <option value="0">None</option>
@@ -51,7 +39,7 @@
       </label>
 
       <label>
-        <span>Latency objective for p95</span>
+        <span>Average and p95 must be strictly below</span>
         <input
           type="range"
           min="60"
@@ -104,7 +92,7 @@
       <div class="benchmark-demo-console-heading">
         <div>
           <p class="benchmark-demo-eyebrow">02 / Read the distribution</p>
-          <h4>Completion time per request</h4>
+          <h4>60 records, ordered fastest to slowest</h4>
         </div>
         <div class="benchmark-demo-legend" aria-label="Chart legend">
           <span><i class="is-typical" aria-hidden="true"></i>Typical</span>
@@ -126,6 +114,17 @@
           <span data-benchmark-demo-axis-maximum>—</span>
         </div>
       </div>
+
+      <p class="demo-note">
+        The outlined bar is rank 57, the nearest-rank p95. Three slower records
+        can sit beyond it.
+      </p>
+      <details>
+        <summary>Inspect all ordered records</summary>
+        <p data-benchmark-demo-records>
+          Make a prediction to reveal the population.
+        </p>
+      </details>
 
       <dl class="scaling-demo-metrics benchmark-demo-metrics">
         <div>

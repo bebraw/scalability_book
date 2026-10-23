@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "preflight": "node --check tracker.ts",
     "lab": "node run.ts"
   },
   "engines": {

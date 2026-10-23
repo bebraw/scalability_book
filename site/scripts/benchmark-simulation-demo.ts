@@ -1,5 +1,4 @@
 type BenchmarkSettings = {
-  concurrency: number;
   slowRate: number;
   threshold: number;
 };
@@ -144,7 +143,6 @@ function runBenchmark(settings: BenchmarkSettings): BenchmarkResult {
 
 function readBenchmarkSettings(root: HTMLElement): BenchmarkSettings {
   return {
-    concurrency: readNumber(root, "concurrency", 4),
     slowRate: readNumber(root, "slow-rate", 10),
     threshold: readNumber(root, "threshold", 120),
   };
@@ -212,13 +210,11 @@ function updateRunButton(
 
 function simulateRequests(settings: BenchmarkSettings): SimulatedRequest[] {
   const slowInterval = settings.slowRate === 0 ? 0 : 100 / settings.slowRate;
-  const queuePressure = Math.max(0, settings.concurrency - 4);
 
   return Array.from({ length: simulatedRequestCount }, (_, index) => {
     const slow = slowInterval > 0 && (index + 1) % slowInterval === 0;
     const normalVariation = (index * 7) % 11;
-    const queueWave = queuePressure * ((index * 3) % 5) * 4;
-    const latency = 24 + normalVariation + queueWave + (slow ? 188 : 0);
+    const latency = 24 + normalVariation + (slow ? 188 : 0);
 
     return { latency, slow };
   });
@@ -235,16 +231,10 @@ function updateBenchmarkOutputs(
   root: HTMLElement,
   settings: BenchmarkSettings,
 ) {
-  const concurrency = root.querySelector<HTMLOutputElement>(
-    '[data-benchmark-demo-output="concurrency"]',
-  );
   const threshold = root.querySelector<HTMLOutputElement>(
     '[data-benchmark-demo-output="threshold"]',
   );
 
-  if (concurrency) {
-    concurrency.value = `${settings.concurrency} client${settings.concurrency === 1 ? "" : "s"}`;
-  }
   if (threshold) {
     threshold.value = `${settings.threshold} ms`;
   }
@@ -283,11 +273,12 @@ function renderBenchmarkChart(
     100,
     (settings.threshold / scaleMaximum) * 100,
   );
-  const bars = requests
+  const ordered = [...requests].sort((a, b) => a.latency - b.latency);
+  const bars = ordered
     .map(({ latency, slow }, index) => {
       const height = Math.max(4, (latency / scaleMaximum) * 100);
 
-      return `<i class="${slow ? "is-slow" : "is-typical"}" style="--benchmark-bar-height: ${height}%; --benchmark-bar-delay: ${index * 8}ms"><span>Request ${index + 1}: ${latency} ms${slow ? ", slow storage path" : ""}</span></i>`;
+      return `<i class="${slow ? "is-slow" : "is-typical"}${index === 56 ? " is-percentile" : ""}" style="--benchmark-bar-height: ${height}%; --benchmark-bar-delay: ${index * 8}ms"><span>Rank ${index + 1}${index === 56 ? " (p95)" : ""}: ${latency} ms${slow ? ", slow storage path" : ""}</span></i>`;
     })
     .join("");
 
@@ -302,8 +293,19 @@ function renderBenchmarkChart(
   chart.innerHTML = `<div class="benchmark-demo-threshold" aria-hidden="true"><span>${settings.threshold} ms objective</span></div>${bars}`;
   chart.setAttribute(
     "aria-label",
-    `Simulated latency for ${requests.length} requests. The objective is ${settings.threshold} milliseconds. Slow-path requests are highlighted.`,
+    `Ordered simulated latency for ${requests.length} requests. Nearest-rank p95 is rank 57. The objective is strictly below ${settings.threshold} milliseconds. Slow-path requests are highlighted.`,
   );
+
+  const records = chart
+    .closest("[data-benchmark-simulation-demo]")
+    ?.querySelector<HTMLElement>("[data-benchmark-demo-records]");
+  if (records)
+    records.textContent = ordered
+      .map(
+        ({ latency }, index) =>
+          `${index + 1}: ${latency} ms${index === 56 ? " ← p95" : ""}`,
+      )
+      .join("; ");
 
   const axisMaximum = chart.parentElement?.querySelector<HTMLElement>(
     "[data-benchmark-demo-axis-maximum]",
@@ -366,15 +368,8 @@ function getOutcomeLabel(outcome: BenchmarkOutcome) {
 }
 
 function getBenchmarkInterpretation(result: BenchmarkResult) {
-  if (result.outcome === "tail-fails") {
-    return `The ${result.average} ms average looks acceptable, but p95 is ${result.p95} ms. At least 5% of requests miss the ${result.settings.threshold} ms objective.`;
-  }
-  if (result.outcome === "both-pass") {
-    return `Both reported measurements meet the ${result.settings.threshold} ms objective in this simulated workload. That does not establish production capacity.`;
-  }
-  if (result.outcome === "both-fail") {
-    return `Even the ${result.average} ms average misses the objective, while p95 reaches ${result.p95} ms. Increased concurrency can make queueing visible beyond the injected slow path.`;
-  }
-
-  return `The distribution is unusual: p95 passes while the average fails. Inspect the individual simulated requests before drawing a conclusion.`;
+  const misses = result.requests.filter(
+    ({ latency }) => latency >= result.settings.threshold,
+  ).length;
+  return `Nearest-rank p95 selects rank ceil(0.95 × 60) = 57: ${result.p95} ms. ${misses} of 60 requests miss the strictly-below-${result.settings.threshold} ms objective. ${result.outcome === "both-pass" && misses > 0 ? "A passing p95 can leave slow requests beyond rank 57. " : ""}These are constructed records, not a capacity measurement. Compare 5% and 10% slow paths: which ranks change?`;
 }

@@ -109,12 +109,12 @@ test("the conversation picker immediately follows new discussions and retains a 
   await expect(picker.getByRole("option")).toHaveCount(3);
   await panel
     .getByLabel("Investigation source")
-    .selectOption({ label: "Queue balance lab" });
+    .selectOption({ label: "Tail latency simulator" });
   await expect(picker).toHaveValue("");
   const investigation = await start();
   await expect(picker).toHaveValue(investigation.id);
   await expect(picker.getByRole("option", { selected: true })).toContainText(
-    " · Queue balance lab",
+    " · Tail latency simulator",
   );
 });
 
@@ -738,7 +738,7 @@ Inline \(L = \lambda W\) and $L$.
 test("optional changed cases preserve drafts and separate linked attempts without an agent", async ({
   page,
 }) => {
-  await page.goto("/demos/#demo-queue-balance-lab");
+  await page.goto("/demos/#demo-cache-decision-lab");
   await page
     .locator(".site-header")
     .getByRole("button", { name: "Notebook", exact: true })
@@ -751,13 +751,13 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   await chooseNotebookTool(panel, "Chapter guide");
   await panel
     .getByLabel("Demo on this page")
-    .selectOption("demo-queue-balance-lab");
+    .selectOption("demo-cache-decision-lab");
   const practice = panel.locator("section").filter({
     has: page.getByRole("heading", {
       name: "Apply it in a different situation",
     }),
   });
-  await expect(practice).toContainText("300 waiting events");
+  await expect(practice).toContainText("Choose one claim from this reading");
   const check = practice.locator("details").filter({
     has: page.getByText("Self-check after my attempt", { exact: true }),
   });
@@ -767,11 +767,11 @@ test("optional changed cases preserve drafts and separate linked attempts withou
     .click();
   await expect(
     panel.getByLabel("Message to the teaching assistant"),
-  ).toHaveValue(/300 waiting events/);
+  ).toHaveValue(/Choose one claim from this reading/);
   await chooseNotebookTool(panel, "Chapter guide");
   await panel
     .getByLabel("My prediction or uncertainty")
-    .fill("I am unsure whether the stable average still applies.");
+    .fill("I am unsure whether the cache assumption still applies.");
   const saved: {
     id: string;
     kind: string;
@@ -806,7 +806,7 @@ test("optional changed cases preserve drafts and separate linked attempts withou
       exact: false,
     }),
   ).toHaveCount(0);
-  await page.locator("#demo-queue-balance-lab input").first().fill("25");
+  await page.locator("#demo-cache-decision-lab [data-cache-age]").fill("100");
   await chooseNotebookTool(panel, "Write");
   await chooseNotebookTool(panel, "Notes");
   await expect(
@@ -821,17 +821,17 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   await practice
     .getByLabel("My explanation of the changed case")
     .fill(
-      "The backlog drains by 20 per second; I expect 15 seconds. At 120 arrivals it grows. I need more help with stable windows.",
+      "A private response needs a different cache policy. I need to check which cache can store it before changing the freshness interval.",
     );
   await page.reload();
   await expect(
     practice.getByLabel("My explanation of the changed case"),
-  ).toHaveValue(/20 per second/);
+  ).toHaveValue(/private response/);
   await expect(check).not.toHaveAttribute("open");
   await practice
     .getByText("Self-check after my attempt", { exact: true })
     .click();
-  await expect(check).toContainText("Compare arrivals with completions");
+  await expect(check).toContainText("Name the changed condition");
   await practice
     .getByRole("button", { name: "Save my independent attempt" })
     .click();
@@ -856,7 +856,7 @@ test("optional changed cases preserve drafts and separate linked attempts withou
     "revisit",
     "reflection",
   ]);
-  expect(saved[2]!.source.excerpt).toContain("queue-drain (version 1)");
+  expect(saved[2]!.source.excerpt).toContain("reading-application (version 1)");
   expect(saved[2]!.source.revision).toMatch(/^[a-f0-9]{64}$/);
   expect(saved[2]!.relatedIds).toEqual(
     expect.arrayContaining([saved[0]!.id, saved[1]!.id]),
@@ -866,7 +866,7 @@ test("optional changed cases preserve drafts and separate linked attempts withou
   );
   // A missing anchor remains a real source-location warning.
   await page
-    .locator("#demo-queue-balance-lab")
+    .locator("#demo-cache-decision-lab")
     .evaluate((demo) => demo.remove());
   await chooseNotebookTool(panel, "Notes");
   await expect(
@@ -1319,12 +1319,12 @@ test("selected context is explicit and the notebook follows chapters without los
   await expect(
     panel
       .getByLabel("Demo in this chapter")
-      .locator("option", { hasText: "Boundary trace" }),
+      .locator("option", { hasText: "Cache decision lab" }),
   ).toHaveCount(1);
   await expect(
     panel
       .getByLabel("Demo in this chapter")
-      .locator("option", { hasText: "Queue balance lab" }),
+      .locator("option", { hasText: "Tail latency simulator" }),
   ).toHaveCount(0);
   await expect(
     panel.getByRole("button", { name: "Save demo result", exact: true }),

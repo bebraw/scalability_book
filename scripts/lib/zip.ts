@@ -8,6 +8,7 @@ type ZipEntry = { data: Uint8Array; name: string };
 const excludedDirectoryNames = new Set([
   ".git",
   ".lab-data",
+  ".local",
   "node_modules",
   "playwright-report",
   "test-results",
@@ -18,8 +19,13 @@ export async function writeDirectoryZip(
   sourceDirectory: string,
   outputFile: string,
   archiveRoot = path.basename(sourceDirectory),
+  rootEntries?: readonly string[],
 ): Promise<void> {
-  const entries = await collectDirectoryEntries(sourceDirectory, archiveRoot);
+  const entries = await collectDirectoryEntries(
+    sourceDirectory,
+    archiveRoot,
+    rootEntries,
+  );
 
   await mkdir(path.dirname(outputFile), { recursive: true });
   await writeFile(outputFile, createStoredZip(entries));
@@ -28,16 +34,25 @@ export async function writeDirectoryZip(
 async function collectDirectoryEntries(
   directory: string,
   archiveDirectory: string,
+  rootEntries?: readonly string[],
 ): Promise<ZipEntry[]> {
   const entries: ZipEntry[] = [];
   const children = await readdir(directory, { withFileTypes: true });
 
   for (const child of children.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (rootEntries && !rootEntries.includes(child.name)) {
+      continue;
+    }
     if (child.isDirectory() && excludedDirectoryNames.has(child.name)) {
       continue;
     }
 
-    if (child.isFile() && excludedFileNames.has(child.name)) {
+    if (
+      child.isFile() &&
+      (excludedFileNames.has(child.name) ||
+        child.name === ".env" ||
+        child.name.startsWith(".env."))
+    ) {
       continue;
     }
 

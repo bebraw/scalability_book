@@ -109,7 +109,7 @@ That contrast does not prove the mutant is realistic or the broader requirement 
 Tests must also tolerate correct changes.
 :citet[bromley2026tests] illustrates generated tests that copy implementation logic or accept either outcome; a complementary check is whether the same tests accept a behavior-preserving refactor.
 The concern-directed mutation lab lets you apply both checks to authorization, retry, or archived-state behavior: pass the baseline, fail the selected fault, and pass a variant that stores the events differently.
-[Study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation) or [download the standalone lab](/downloads/labs/concern-directed-mutation.zip).
+Open `concern-directed-mutation/README.md` in the [course workspace](/downloads/labs/course-workspace.zip), or [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation).
 
 **Revise.** Correct the candidate and preserve the lesson in requirements, tests, architectural decisions, or project instructions.
 The next attempt should begin with better information about the failure.
@@ -128,21 +128,26 @@ Passing checks still leaves ownership, dependency boundaries, and future change 
 Judge a loop improvement by accepted behavior and the correction effort it requires, including failed attempts.
 [Appendix A](/appendices/evaluating-agentic-workflows/#design-the-verification-loop) develops check selection, failure preservation, and the limits of the evidence.
 
-### Constraint feedback loop
+### Constraint feedback through an actual export
 
-The demonstration starts with an underspecified request to add CSV export to an event list.
-Generate an authored candidate, inspect simulated checks, revise the project memory and begin the next round.
-Compare a run with the default constraints with one that selects every constraint before generation.
+Consider this authored candidate for exporting an event whose title is `Build, measure, learn` and location is `Main hall`:
 
-{{ import "site/includes/constrain-generate-validate-demo.html" }}
+```csv
+title,location
+Build, measure, learn,Main hall
+```
 
-The candidates and check results are scripted teaching data; no model or independent test runner executes in this demonstration.
-Selecting every constraint guarantees success only inside this model.
-For executed evidence, use the [CSV starter lab](/downloads/labs/csv-export.zip) ([browse lab sources](https://github.com/bebraw/scalability_book/tree/main/labs)).
-The working page supplies filtering and download handling; ask your model to implement one serialization function, preserve the supplied checks, then inspect the actual downloaded bytes.
-Maintain the specification and record a consequential decision using your existing ADR approach.
-This optional exercise can replace an existing practice activity within the agreed study time; it adds no grading criterion or separate submission.
-Use validation failures to revise the project's rules and context before the next generation attempt.
+It looks readable, but a CSV reader sees four fields in the data row instead of two.
+Quoting the title as `"Build, measure, learn"` addresses this case; it does not establish correct handling of quotation marks, line breaks, filtering or empty results.
+Write the expected fields before asking a model to repair the serializer, then check the downloaded bytes independently.
+An instruction to preserve those fields is a requirement, not evidence that the generated code satisfies it.
+
+For optional practice, download the [course workspace](/downloads/labs/course-workspace.zip) and open `csv-export/README.md`.
+Its working page supplies filtering and download handling; `TASK.md` scopes the missing serialization function and the supplied checks retain their own expected values.
+Give the task to your own permitted model, preserve the first failed check, inspect a real filtered download, and revise the specification or agent context before another attempt.
+Keep consequential decisions in your existing ADR approach.
+This replaces an existing practice activity within the agreed study time; it adds no grading criterion or separate submission.
+If setup or model access is unavailable, inspect the example above and specify the independent checks; record that implementation has not been exercised.
 
 ## Assign authority and ownership
 
@@ -223,8 +228,10 @@ The demonstration applies that pattern to delivering a code change.
 
 {{ import "exercise:development-gates" }}
 
+Try a premature release and inspect the unchanged state before following a valid route.
 One cancellation rule covers the active state, tests and human review can proceed independently, and either failure can return the workflow to implementation.
-The statechart restricts the available routes; the checks and reviewer still determine whether the code meets the requirement.
+The statechart restricts the available routes; its tests-pass event is supplied input, not an executed test result.
+The actual checks and reviewer still determine whether the code meets the requirement.
 Deterministic controls can encode a wrong or incomplete rule.
 The [Architecture chapter](/chapters/architecture/) develops the related controls around data representation and durable state changes.
 

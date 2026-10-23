@@ -7,50 +7,7 @@ import {
 } from "./learning-workspace.ts";
 import { demoResources } from "./learning-resources.ts";
 
-/** Authored activity semantics; rendering, browser state and providers are adapters. */
-export const queueInvestigation = {
-  id: "queue-balance",
-  version: 2,
-  demoId: "demo-queue-balance-lab",
-  title: "Explore the queue in your system",
-  reading: "/chapters/benchmarking/#check-measurements-against-a-model",
-  conceptIds: ["little-law", "queue", "measurement-boundary"],
-  phases: [
-    {
-      id: "predict",
-      prompt:
-        "Before changing a control, what do you expect to happen to unfinished work? An uncertainty is enough to start.",
-    },
-    {
-      id: "experiment",
-      prompt:
-        "Change one queue control above. Compare the actual result with your prediction.",
-    },
-    {
-      id: "reflect",
-      prompt:
-        "What would you check before applying this relationship to your own system?",
-    },
-  ],
-  guidance:
-    "Adapt the explanation and one next experiment to the student's system, prediction and supplied observation. Cite the source. Keep the supplied units and model assumptions; label any adapted example. The student operates the controls. Offer one useful next step, not a complete lesson. A browser snapshot is an illustration, not a production measurement. Respect requests for a direct explanation without requiring a prediction. Do not infer later control changes or notebook access.",
-  observation: {
-    kind: "browser-queue-snapshot",
-    fields: ["arrival", "time", "observed", "expected", "gap", "observedAt"],
-    units: {
-      arrival: "events/s",
-      time: "s",
-      observed: "events",
-      expected: "events",
-      gap: "events",
-    },
-    authority:
-      "The active browser supplies displayed values on explicit send and can service queue observations during that reply. Public MCP supplies this contract, never a live snapshot.",
-  },
-} as const;
-
-export type InvestigationPhase =
-  (typeof queueInvestigation.phases)[number]["id"];
+export type InvestigationPhase = "predict" | "experiment" | "reflect";
 export interface ReadingActivity {
   id: string;
   version: number;
@@ -103,34 +60,31 @@ export const learningLoop: ReadingActivity = {
 };
 export const readingActivities: ReadingActivity[] = [
   learningLoop,
-  queueInvestigation,
-  ...demoResources
-    .filter(({ id }) => id !== queueInvestigation.demoId)
-    .map(
-      (demo): ReadingActivity => ({
-        id: `investigate-${demo.id}`,
-        version: demo.activityVersion ?? 1,
-        demoId: demo.id,
-        title: demo.title,
-        reading: demo.url,
-        conceptIds: demo.conceptIds,
-        phases: [
-          { id: "predict", prompt: demo.experiment!.predict },
-          {
-            id: "experiment",
-            prompt: `${demo.experiment!.try} ${demo.experiment!.observe}`,
-          },
-          { id: "reflect", prompt: demo.experiment!.reflect },
-        ],
-        guidance: `${learningLoop.guidance} The student operates the demo controls. Treat the actual controls and displayed text as a bounded browser snapshot; do not infer canvas pixels, hidden results or later changes. Preserve these authored assumptions: ${demo.assumptions}`,
-        observation: {
-          kind: "browser-demo-snapshot",
-          fields: ["demoId", "observedAt", "controls", "visibleText"],
-          authority:
-            "The active browser supplies this demo's actual visible controls and text on explicit send and can service observations during that reply. Canvas pixels are excluded. A snapshot is not project evidence. Public MCP publishes the contract without live state or execution.",
+  ...demoResources.map(
+    (demo): ReadingActivity => ({
+      id: `investigate-${demo.id}`,
+      version: demo.activityVersion ?? 1,
+      demoId: demo.id,
+      title: demo.title,
+      reading: demo.url,
+      conceptIds: demo.conceptIds,
+      phases: [
+        { id: "predict", prompt: demo.experiment!.predict },
+        {
+          id: "experiment",
+          prompt: `${demo.experiment!.try} ${demo.experiment!.observe}`,
         },
-      }),
-    ),
+        { id: "reflect", prompt: demo.experiment!.reflect },
+      ],
+      guidance: `${learningLoop.guidance} The student operates the demo controls. Treat the actual controls and displayed text as a bounded browser snapshot; do not infer canvas pixels, hidden results or later changes. Preserve these authored assumptions: ${demo.assumptions}`,
+      observation: {
+        kind: "browser-demo-snapshot",
+        fields: ["demoId", "observedAt", "controls", "visibleText"],
+        authority:
+          "The active browser supplies this demo's actual visible controls and text on explicit send and can service observations during that reply. Canvas pixels are excluded. A snapshot is not project evidence. Public MCP publishes the contract without live state or execution.",
+      },
+    }),
+  ),
 ];
 export const activityById = (id: string) =>
   readingActivities.find((activity) => activity.id === id);
@@ -147,16 +101,7 @@ export interface DemoObservation {
   controls: { label: string; type: string; value: string | boolean | number }[];
   visibleText: string;
 }
-export type InvestigationObservation = QueueObservation | DemoObservation;
-export interface QueueObservation {
-  kind: "browser-queue-snapshot";
-  observedAt: string;
-  arrival: number;
-  time: number;
-  observed: number;
-  expected: number;
-  gap: number;
-}
+export type InvestigationObservation = DemoObservation;
 export interface InvestigationTurn {
   activityId: string;
   version: number;
@@ -187,7 +132,7 @@ export function parseInvestigationTurn(
     "This activity needs its declared demo source and concepts.",
   );
   learningAssert(
-    queueInvestigation.phases.some(({ id }) => id === value.phase),
+    learningLoop.phases.some(({ id }) => id === value.phase),
     "Choose an activity phase.",
   );
   const result: InvestigationTurn = {
@@ -244,36 +189,6 @@ export function parseInvestigationTurn(
       };
       return result;
     }
-    for (const [key, min, max] of [
-      ["arrival", 2, 40],
-      ["time", 0.1, 2],
-      ["observed", 0, 80],
-      ["expected", 0.2, 80],
-      ["gap", -80, 79.8],
-    ] as const)
-      learningAssert(
-        typeof observation[key] === "number" &&
-          Number.isFinite(observation[key]) &&
-          observation[key] >= min &&
-          observation[key] <= max,
-        "Use the queue's declared numeric bounds.",
-      );
-    const snapshot = observation as unknown as QueueObservation;
-    learningAssert(
-      Math.abs(snapshot.expected - snapshot.arrival * snapshot.time) < 0.051 &&
-        Math.abs(snapshot.gap - (snapshot.observed - snapshot.expected)) <
-          0.051,
-      "The displayed queue values are inconsistent. Observe again.",
-    );
-    result.observation = {
-      kind: "browser-queue-snapshot",
-      observedAt: snapshot.observedAt,
-      arrival: snapshot.arrival,
-      time: snapshot.time,
-      observed: snapshot.observed,
-      expected: snapshot.expected,
-      gap: snapshot.gap,
-    };
   }
   return result;
 }

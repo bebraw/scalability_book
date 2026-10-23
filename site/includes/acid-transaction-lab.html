@@ -20,9 +20,9 @@
   </header>
 
   <p class="acid-lab-intro">
-    Run the same work-item operation with application-managed writes or a
-    database transaction. Inspect the records to see which guarantee protects
-    the transition.
+    Predict the stored state and client result, then reveal an authored trace.
+    These examples execute no database operations. Transaction scope, the
+    concurrent program and acknowledgement timing answer different questions.
   </p>
 
   <form class="acid-lab-form" data-acid-form>
@@ -54,8 +54,15 @@
         </select>
       </label>
 
+      <label hidden
+        ><span>Reply timing in the restart trace</span
+        ><select data-acid-reply-timing>
+          <option value="before">Before durable commit</option>
+          <option value="after">After durable commit</option>
+        </select></label
+      >
       <div class="acid-lab-actions">
-        <button type="submit" data-acid-run>Run disturbance</button>
+        <button type="submit" data-acid-run>Reveal modeled trace</button>
         <button type="button" data-acid-reset>Reset</button>
       </div>
     </div>
@@ -108,29 +115,6 @@ ELSE:
         >.
       </p>
     </details>
-
-    <ol class="acid-lab-rail" aria-label="Transaction execution trace">
-      <li data-acid-stage="read">
-        <span>01</span>
-        <strong>Read</strong>
-        <small>Inspect the current lifecycle state</small>
-      </li>
-      <li data-acid-stage="state">
-        <span>02</span>
-        <strong>Change state</strong>
-        <small>Move the item through the lifecycle</small>
-      </li>
-      <li data-acid-stage="event">
-        <span>03</span>
-        <strong>Append event</strong>
-        <small>Record the matching domain fact</small>
-      </li>
-      <li data-acid-stage="commit">
-        <span>04</span>
-        <strong>Commit</strong>
-        <small>Make the accepted result durable</small>
-      </li>
-    </ol>
 
     <div class="acid-lab-ledger">
       <section class="acid-lab-record" aria-labelledby="acid-record-heading">
@@ -202,25 +186,6 @@ ELSE:
       </section>
     </div>
 
-    <dl class="acid-lab-properties" aria-label="ACID property assessment">
-      <div data-acid-property="atomicity" data-status="idle">
-        <dt><b>A</b> Atomicity</dt>
-        <dd>Not exercised</dd>
-      </div>
-      <div data-acid-property="consistency" data-status="idle">
-        <dt><b>C</b> Consistency</dt>
-        <dd>Not exercised</dd>
-      </div>
-      <div data-acid-property="isolation" data-status="idle">
-        <dt><b>I</b> Isolation</dt>
-        <dd>Not exercised</dd>
-      </div>
-      <div data-acid-property="durability" data-status="idle">
-        <dt><b>D</b> Durability</dt>
-        <dd>Not exercised</dd>
-      </div>
-    </dl>
-
     <section class="acid-lab-invariant" aria-live="polite">
       <div class="acid-lab-invariant-mark" aria-hidden="true">?</div>
       <div>
@@ -238,7 +203,8 @@ ELSE:
     database. Real isolation and durability depend on the database, transaction
     boundaries, constraints, storage configuration, and failure model. For
     actual atomic rollback and process-restart records, try the optional
-    <a href="/downloads/labs/persisted-retry.zip">persisted retry starter</a>.
-    It does not reproduce the isolation-level comparison.
+    <a href="/downloads/labs/course-workspace.zip">course workspace</a>
+    (<code>persisted-retry/</code>). It does not reproduce the isolation-level
+    comparison.
   </p>
 </section>

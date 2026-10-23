@@ -58,7 +58,7 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
         }
       });
     });
-    await page.goto("/demos/#demo-queue-balance-lab");
+    await page.goto("/demos/#demo-cache-decision-lab");
     await page
       .locator(".site-header")
       .getByRole("button", { name: "Notebook", exact: true })
@@ -78,12 +78,12 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await chooseNotebookTool(panel, "Discuss");
     await panel
       .getByLabel("Investigation source")
-      .selectOption("demo-queue-balance-lab");
+      .selectOption("demo-cache-decision-lab");
     await panel.getByRole("button", { name: "Save initial thinking" }).click();
     await panel
       .getByLabel("Your thinking")
       .fill(
-        "I predict that changing arrivals to 22 while holding time at 0.5 gives an expected queue of 11. I will compare this with the observed queue.",
+        "I predict that changing the age control to100 gives400days and requires an origin request. I will inspect the actual displayed path.",
       );
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
     await chooseNotebookTool(panel, "Notes");
@@ -94,14 +94,14 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await panel
       .getByLabel("Message to the teaching assistant")
       .fill(
-        "Use observe_demo for demo-queue-balance-lab to inspect the actual browser controls, then use change_demo to change only the arrival rate to 22. I have saved and selected my prediction. Afterwards report the actual displayed expected queue and give me one brief question. Do not infer execution from HTML; use both tools.",
+        "Use observe_demo for demo-cache-decision-lab to inspect the actual browser controls, then use change_demo to change only Time since response was stored to100 (400days). I have saved and selected my prediction. Afterwards report the actual displayed cache age and response path and give me one brief question. Do not infer execution from HTML; use both tools.",
       );
     page.on("dialog", (dialog) => void dialog.accept());
     await panel.getByRole("button", { name: "Send message" }).click();
     try {
-      await expect(
-        page.locator('[data-little-law-input="arrival"]'),
-      ).toHaveValue("22", { timeout: 60_000 });
+      await expect(page.locator("[data-cache-age]")).toHaveValue("100", {
+        timeout: 60_000,
+      });
     } catch {
       throw new Error(
         `Live demo check: ${(await panel.locator(".learning-messages").innerText()).slice(-4000)}; ${await panel.getByRole("status").innerText()}`,
@@ -116,9 +116,7 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await expect(
       panel.getByText("Browser observation", { exact: true }),
     ).toHaveCount(2);
-    await expect(
-      page.locator('[data-little-law-metric="expected"]'),
-    ).toHaveText("11.0");
+    await expect(page.locator("[data-cache-age-label]")).toHaveText("400 days");
     console.log(
       "Observed teaching reply:",
       await panel

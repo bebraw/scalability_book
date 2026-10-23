@@ -211,51 +211,50 @@ test("demo tabs preserve state, support keyboard and links, and print both panel
   baseURL,
 }) => {
   await page.goto(chapter);
-  const group = page.locator('[data-exercise-tabs="measurement-boundary"]');
+  const group = page.locator('[data-exercise-tabs="measurement-prediction"]');
   const explore = group.getByRole("tab", { name: "Explore", exact: true });
   const practice = group.getByRole("tab", {
     name: /^Practice(?: · Complete)?$/,
   });
   await expect(practice).not.toContainText("1 exercise");
-  await expect(page.locator(".exercise-tabs [role=tablist]")).toHaveCount(2);
+  await expect(page.locator(".exercise-tabs [role=tablist]")).toHaveCount(1);
   await expect(explore).toHaveAttribute("aria-selected", "true");
   await expect(group.locator(".book-exercise")).toBeHidden();
-  const time = group.locator('[data-little-law-input="time"]');
-  await time.fill("1");
+  const threshold = group.locator('[data-benchmark-demo-input="threshold"]');
+  await threshold.fill("180");
   await practice.click();
-  await expect(group.locator("#demo-queue-balance-lab")).toBeHidden();
-  await group.getByLabel("Calculated work in progress (operations)").fill("10");
+  await expect(group.locator("#demo-tail-latency-simulator")).toBeHidden();
+  await group.getByLabel("Mean latency (ms)").fill("60");
+  await group.getByLabel("p95 latency (ms)").fill("240");
   await group
-    .getByLabel("What follows from the mismatch?")
-    .selectOption("check");
+    .getByLabel("Which measurements meet the objective?")
+    .selectOption("mean-only");
   await group
     .getByRole("button", { name: "Check answer", exact: true })
     .click();
   await expect(practice).toContainText("Complete");
   await explore.click();
-  await expect(time).toHaveValue("1");
+  await expect(threshold).toHaveValue("180");
   await explore.focus();
   await page.keyboard.press("ArrowRight");
   await expect(practice).toBeFocused();
   await expect(practice).toHaveAttribute("aria-selected", "true");
-  await expect(
-    group.getByLabel("Calculated work in progress (operations)"),
-  ).toHaveValue("10");
+  await expect(group.getByLabel("Mean latency (ms)")).toHaveValue("60");
   expect(
     (
       await new AxeBuilder({ page })
-        .include('[data-exercise-tabs="measurement-boundary"]')
+        .include('[data-exercise-tabs="measurement-prediction"]')
         .analyze()
     ).violations,
   ).toEqual([]);
   await page.keyboard.press("Home");
   await expect(explore).toBeFocused();
   await page.evaluate(() => {
-    location.hash = "exercise-measurement-boundary";
+    location.hash = "exercise-measurement-prediction";
   });
   await expect(practice).toHaveAttribute("aria-selected", "true");
   await page.emulateMedia({ media: "print" });
-  await expect(group.locator("#demo-queue-balance-lab")).toBeVisible();
+  await expect(group.locator("#demo-tail-latency-simulator")).toBeVisible();
   await expect(group.locator(".book-exercise")).toBeVisible();
   await expect(group.getByRole("tablist")).toBeHidden();
   await page.emulateMedia({ media: "screen" });
@@ -277,8 +276,10 @@ test("demo tabs preserve state, support keyboard and links, and print both panel
   const reading = await context.newPage();
   await reading.goto(chapter);
   await expect(reading.locator(".exercise-tabs [role=tablist]")).toHaveCount(0);
-  await expect(reading.locator("#demo-queue-balance-lab")).toBeVisible();
-  await expect(reading.locator("#exercise-measurement-boundary")).toBeVisible();
+  await expect(reading.locator("#demo-tail-latency-simulator")).toBeVisible();
+  await expect(
+    reading.locator("#exercise-measurement-prediction"),
+  ).toBeVisible();
   await context.close();
 });
 

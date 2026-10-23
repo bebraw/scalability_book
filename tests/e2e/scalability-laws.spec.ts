@@ -1,45 +1,6 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("scalability law labs", () => {
-  test("regression: a fivefold discrepancy is not agreement and fractional averages are allowed", async ({
-    page,
-  }) => {
-    await page.goto("/demos/#demo-queue-balance-lab");
-    const demo = page.locator("[data-little-law-demo]");
-    await demo.locator('[data-little-law-input="arrival"]').fill("2");
-    await demo.locator('[data-little-law-input="time"]').fill("0.1");
-    await demo.locator('[data-little-law-input="observed"]').fill("1");
-    await expect(
-      demo.locator('[data-little-law-metric="expected"]'),
-    ).toHaveText("0.2");
-    await expect(demo.locator("[data-little-law-verdict]")).toContainText(
-      "More work observed",
-    );
-    await demo.locator('[data-little-law-input="observed"]').fill("0.2");
-    await expect(demo.locator("[data-little-law-verdict]")).toHaveText(
-      "Measurements agree",
-    );
-  });
-  test("checks a Little's Law measurement boundary", async ({ page }) => {
-    await page.goto("/demos/#demo-queue-balance-lab");
-    const demo = page.locator("[data-little-law-demo]");
-
-    await expect(demo.locator("[data-little-law-verdict]")).toHaveText(
-      "Measurements agree",
-    );
-    await expect(
-      demo.locator('[data-little-law-metric="expected"]'),
-    ).toHaveText("10.0");
-
-    await demo.locator('[data-little-law-input="observed"]').fill("20");
-    await expect(demo.locator("[data-little-law-verdict]")).toContainText(
-      "More work observed",
-    );
-    await expect(demo.locator("[data-little-law-reading]")).toContainText(
-      "unstable",
-    );
-  });
-
   test("shows Amdahl's sequential ceiling", async ({ page }) => {
     await page.goto("/demos/#demo-sequential-work-bound");
     const demo = page.locator("[data-amdahl-law-demo]");

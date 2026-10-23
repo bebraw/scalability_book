@@ -5,7 +5,6 @@ test("saturation distinguishes spare capacity, no headroom and excess demand", a
 }) => {
   await page.goto("/demos/#demo-saturation-boundary-lab");
   const demo = page.locator("[data-saturation-boundary-demo]");
-  await demo.locator("[data-saturation-boundary-retries]").fill("0");
   await demo.locator("[data-saturation-boundary-load]").fill("105");
   await expect(
     demo.locator('[data-saturation-boundary-metric="headroom"]'),
@@ -27,9 +26,6 @@ test("saturation distinguishes spare capacity, no headroom and excess demand", a
   await expect(
     demo.locator('[data-saturation-boundary-metric="rejected"]'),
   ).toHaveText("0 ev/s");
-  await expect(demo.locator("[data-saturation-boundary-artifact]")).toHaveValue(
-    /At capacity/,
-  );
 
   await demo.locator("[data-saturation-boundary-load]").fill("115");
   await expect(
@@ -52,7 +48,6 @@ test("latency advice retains the calculated batching saving without ranking unmo
   await demo
     .locator('[data-latency-demo-distance="appDb"]')
     .selectOption("500");
-  await demo.locator('[data-latency-demo-tab="2"]').click();
   await expect(demo.locator('[data-latency-demo-metric="total"]')).toHaveText(
     "117 ms",
   );
@@ -65,12 +60,7 @@ test("latency advice retains the calculated batching saving without ranking unmo
   await expect(
     demo.locator("[data-latency-demo-interpretation]"),
   ).not.toContainText("larger architectural fix");
-  await expect(demo.locator('[data-latency-demo-step="2"]')).toContainText(
-    "100 serial requests",
-  );
-  await demo.locator('[data-latency-demo-tab="0"]').click();
   await demo.locator('[data-latency-demo-distance="appDb"]').selectOption("1");
-  await demo.locator('[data-latency-demo-tab="2"]').click();
   await expect(demo.locator('[data-latency-demo-metric="total"]')).toHaveText(
     "75 ms",
   );

@@ -79,14 +79,14 @@ test("every authored demo declares live observations and bounded controls", asyn
     expect(demo.text).toBeGreaterThan(0);
     expect(demo.invalidRejected).toBe(true);
   }
-  const queue = await page.evaluate(() => {
+  const cache = await page.evaluate(() => {
     const bridge = (
       window as unknown as {
         BookLearningWorkspace: typeof import("../../site/scripts/learning-demos.ts");
       }
     ).BookLearningWorkspace;
-    return bridge.observeLearningDemo("demo-queue-balance-lab");
+    return bridge.observeLearningDemo("demo-cache-decision-lab");
   });
-  expect(queue.assumptions).toContain("stable long-run averages");
-  expect(queue.visibleText).toMatch(/\d+\s*=\s*\d+\s*×/);
+  expect(cache.assumptions).toContain("Warm browser and shared entries");
+  expect(cache.visibleText).toContain("Cache-Control");
 });

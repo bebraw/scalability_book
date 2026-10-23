@@ -14,7 +14,7 @@ test("stable learning images revalidate while preserving asset bodies and valida
   for (const file of [
     "graph-queue.png",
     "graph-complete.svg",
-    "demo-queue-balance-lab.png",
+    "demo-cache-decision-lab.png",
   ]) {
     const response = await worker.fetch(
       new Request(`https://scalableweb.dev/concepts/visuals/${file}`),

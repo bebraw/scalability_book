@@ -3,13 +3,7 @@
   type AcidMode = "application" | "transaction";
   type AcidIsolation = "read-committed" | "serializable";
   type AcidStatus = "pass" | "fail" | "idle";
-  type AcidStage = "read" | "state" | "event" | "commit";
-  type AcidStageStatus = "complete" | "failed" | "rolled-back" | "skipped";
-
-  type AcidProperty = {
-    status: AcidStatus;
-    text: string;
-  };
+  type AcidReplyTiming = "before" | "after";
 
   type AcidEvent = {
     actor: string;
@@ -28,12 +22,7 @@
     explanation: string;
     invariant: string;
     itemState: "Initial" | "Active" | "Finished";
-    properties: Record<
-      "atomicity" | "consistency" | "isolation" | "durability",
-      AcidProperty
-    >;
     result: "protected" | "broken";
-    stages: Record<AcidStage, AcidStageStatus>;
     summary: string;
     trace: AcidTrace[];
     verdict: string;
@@ -48,27 +37,35 @@
     const scenario = query<HTMLSelectElement>(root, "[data-acid-scenario]");
     const mode = query<HTMLSelectElement>(root, "[data-acid-mode]");
     const isolation = query<HTMLSelectElement>(root, "[data-acid-isolation]");
+    const timing = query<HTMLSelectElement>(root, "[data-acid-reply-timing]");
     const reset = query<HTMLButtonElement>(root, "[data-acid-reset]");
     const controlNote = query<HTMLElement>(root, "[data-acid-control-note]");
     const program = query<HTMLDetailsElement>(root, "[data-acid-program]");
 
     const updateControls = () => {
       const isConcurrent = readScenario(scenario.value) === "concurrent";
+      const isRestart = readScenario(scenario.value) === "restart";
+      mode.disabled = isRestart;
+      mode.closest("label")!.hidden = isRestart;
+      timing.closest("label")!.hidden = !isRestart;
       const usesTransaction = readMode(mode.value) === "transaction";
       isolation.disabled = !isConcurrent || !usesTransaction;
       program.hidden = !isConcurrent;
       program.open = isConcurrent;
-      controlNote.textContent = isConcurrent
-        ? usesTransaction
-          ? "Both requests read initial before either commits, then write unconditionally as shown below. Vary isolation for this program; compare the conditional-write alternative separately."
-          : "Separate application-managed writes do not share an isolation boundary."
-        : "Isolation is not varied in this disturbance; the experiment focuses on the selected failure boundary.";
+      controlNote.textContent = isRestart
+        ? "Both restart traces use the same durable transaction. Only the reply timing changes: before or after commit. No database executes here."
+        : isConcurrent
+          ? usesTransaction
+            ? "Both requests read initial before either commits, then write unconditionally as shown below. Vary isolation for this program; compare the conditional-write alternative separately."
+            : "Separate application-managed writes do not share an isolation boundary."
+          : "Isolation is not varied in this disturbance; the experiment focuses on the selected failure boundary.";
       resetOutput(root);
     };
 
     scenario.addEventListener("change", updateControls);
     mode.addEventListener("change", updateControls);
     isolation.addEventListener("change", () => resetOutput(root));
+    timing.addEventListener("change", () => resetOutput(root));
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -76,6 +73,7 @@
         readScenario(scenario.value),
         readMode(mode.value),
         readIsolation(isolation.value),
+        timing.value === "after" ? "after" : "before",
       );
       renderAcidResult(root, result);
     });
@@ -92,9 +90,10 @@
     scenario: AcidScenario,
     mode: AcidMode,
     isolation: AcidIsolation,
+    timing: AcidReplyTiming,
   ): AcidResult {
     if (scenario === "failure") return evaluateFailure(mode);
-    if (scenario === "restart") return evaluateRestart(mode);
+    if (scenario === "restart") return evaluateRestart(timing);
     return evaluateConcurrency(mode, isolation);
   }
 
@@ -107,14 +106,8 @@
           "The injected failure occurred before commit. The database rolled back the state change, so the item and event ledger still agree.",
         invariant: "Protected: no partial transition escaped",
         itemState: "Active",
-        properties: {
-          atomicity: property("pass", "Both writes rolled back"),
-          consistency: property("pass", "Lifecycle invariant preserved"),
-          isolation: property("idle", "No competing transaction"),
-          durability: property("idle", "Nothing committed"),
-        },
         result: "protected",
-        stages: stages("complete", "rolled-back", "failed", "rolled-back"),
+
         summary:
           "The state change and its event remained one indivisible unit.",
         trace: [
@@ -138,14 +131,8 @@
         "The state write became durable before the event write began. The failure left a finished item with no work_completed event.",
       invariant: "Broken: finished item has no completion event",
       itemState: "Finished",
-      properties: {
-        atomicity: property("fail", "Only the state write survived"),
-        consistency: property("fail", "Lifecycle invariant broken"),
-        isolation: property("idle", "No competing operation"),
-        durability: property("idle", "Not the tested boundary"),
-      },
       result: "broken",
-      stages: stages("complete", "complete", "failed", "skipped"),
+
       summary:
         "Two individually durable writes still formed one broken operation.",
       trace: [
@@ -178,14 +165,8 @@
           "The database accepted one serial order. Alice committed the transition; Bob's transaction could no longer behave as though it started from the same initial state.",
         invariant: "Protected: one transition produced one event",
         itemState: "Active",
-        properties: {
-          atomicity: property("pass", "Each attempt stayed whole"),
-          consistency: property("pass", "One successful transition"),
-          isolation: property("pass", "Equivalent to a serial order"),
-          durability: property("idle", "Restart not exercised"),
-        },
         result: "protected",
-        stages: stages("complete", "complete", "complete", "complete"),
+
         summary:
           "One transaction committed; the conflicting transaction must retry.",
         trace: [
@@ -216,19 +197,8 @@
       explanation: `${transactionText} Atomicity alone does not serialize competing decisions.`,
       invariant: "Broken: one transition was accepted twice",
       itemState: "Active",
-      properties: {
-        atomicity: property(
-          mode === "transaction" ? "pass" : "idle",
-          mode === "transaction"
-            ? "Each pair committed together"
-            : "No shared transaction",
-        ),
-        consistency: property("fail", "Duplicate transition events"),
-        isolation: property("fail", "Both acted on the same old state"),
-        durability: property("idle", "Restart not exercised"),
-      },
       result: "broken",
-      stages: stages("complete", "complete", "complete", "complete"),
+
       summary:
         "Both callers received success for the same lifecycle transition.",
       trace: [
@@ -241,8 +211,8 @@
     };
   }
 
-  function evaluateRestart(mode: AcidMode): AcidResult {
-    if (mode === "transaction") {
+  function evaluateRestart(timing: AcidReplyTiming): AcidResult {
+    if (timing === "after") {
       return {
         acknowledgement: "200 · committed before reply",
         events: [{ actor: "Alice", type: "work_started" }],
@@ -250,14 +220,8 @@
           "The server returned success only after the durable commit. A fresh process reconstructed the acknowledged state and its event from storage.",
         invariant: "Protected: acknowledged state survived restart",
         itemState: "Active",
-        properties: {
-          atomicity: property("pass", "State and event committed together"),
-          consistency: property("pass", "Lifecycle invariant preserved"),
-          isolation: property("idle", "No competing transaction"),
-          durability: property("pass", "Commit survived restart"),
-        },
         result: "protected",
-        stages: stages("complete", "complete", "complete", "complete"),
+
         summary:
           "The acknowledged transition remained visible after process loss.",
         trace: [
@@ -271,26 +235,28 @@
     }
 
     return {
-      acknowledgement: "200 · returned before flush",
+      acknowledgement: "200 · returned before commit",
       events: [],
       explanation:
-        "The application acknowledged an in-memory change while its persistence task was still pending. Restart removed the state that the client had been told was complete.",
+        "The application replied while the transaction was still uncommitted. The modeled crash discarded that pending transaction. The same durable store is used in both restart traces; early acknowledgement caused the broken promise.",
       invariant: "Broken: acknowledged transition disappeared",
       itemState: "Initial",
-      properties: {
-        atomicity: property("idle", "No durable write completed"),
-        consistency: property("idle", "Reloaded records agree"),
-        isolation: property("idle", "No competing operation"),
-        durability: property("fail", "Acknowledged state was lost"),
-      },
       result: "broken",
-      stages: stages("complete", "complete", "complete", "failed"),
+
       summary:
         "A fast response promised more than the persistence boundary guaranteed.",
       trace: [
-        trace("pass", "MEMORY", "Apply initial → active and create an event"),
-        trace("fail", "REPLY", "Return success before durable flush"),
-        trace("fail", "RESTART", "Process stops with the flush still pending"),
+        trace(
+          "pass",
+          "BEGIN",
+          "Stage initial → active and its event in one transaction",
+        ),
+        trace("fail", "REPLY", "Return success before durable commit"),
+        trace(
+          "fail",
+          "RESTART",
+          "Process stops before commit; uncommitted writes roll back",
+        ),
         trace("fail", "RELOAD", "Storage still contains the initial state"),
       ],
       verdict: "The success response was not durable",
@@ -322,20 +288,6 @@
       query<HTMLOListElement>(root, "[data-acid-trace]"),
       result.trace,
     );
-
-    for (const [name, assessment] of Object.entries(result.properties)) {
-      const property = query<HTMLElement>(
-        root,
-        `[data-acid-property="${name}"]`,
-      );
-      property.dataset.status = assessment.status;
-      query<HTMLElement>(property, "dd").textContent = assessment.text;
-    }
-
-    for (const [name, status] of Object.entries(result.stages)) {
-      query<HTMLElement>(root, `[data-acid-stage="${name}"]`).dataset.status =
-        status;
-    }
   }
 
   function renderEvents(target: HTMLTableSectionElement, events: AcidEvent[]) {
@@ -402,32 +354,10 @@
     renderTrace(query<HTMLOListElement>(root, "[data-acid-trace]"), [
       trace("idle", "Ready", "Select a scenario and run it."),
     ]);
-    root
-      .querySelectorAll<HTMLElement>("[data-acid-property]")
-      .forEach((property) => {
-        property.dataset.status = "idle";
-        query<HTMLElement>(property, "dd").textContent = "Not exercised";
-      });
-    root.querySelectorAll<HTMLElement>("[data-acid-stage]").forEach((stage) => {
-      delete stage.dataset.status;
-    });
-  }
-
-  function property(status: AcidStatus, text: string): AcidProperty {
-    return { status, text };
   }
 
   function trace(status: AcidStatus, label: string, detail: string): AcidTrace {
     return { detail, label, status };
-  }
-
-  function stages(
-    read: AcidStageStatus,
-    state: AcidStageStatus,
-    event: AcidStageStatus,
-    commit: AcidStageStatus,
-  ): Record<AcidStage, AcidStageStatus> {
-    return { commit, event, read, state };
   }
 
   function readScenario(value: string): AcidScenario {

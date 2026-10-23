@@ -252,17 +252,25 @@ Screenshots preserve the rendered state I am discussing.
 I am also experimenting with shared browser sessions and feedback captured inside the application: attach my description to the UI state and location where the problem appears.
 That remains a direction I am exploring, but it could make correction less dependent on reconstructing what I saw.
 
-### Delegation lab
+### Prepare a delegation packet
 
-Use the planner below before running real agents.
-Choose a task and project-readiness level, then choose roles, permissions and handoffs.
-The bottleneck investigation is read-only: its planner and reviewer work on a claim and measurement plan, and the Implementer is unavailable.
-The regression-test and refactoring tasks permit a bounded code change; select an Implementer when needed.
-Record the actual model and harness before execution; compare observed time, requests, outcomes and review effort using the run record and supplied matched traces.
-The generated packet is a rehearsal: if the task is vague, boundaries overlap, or the review burden exceeds available capacity, reduce the fleet or harden the project first.
+Use one editable packet for the next bounded task in the actual project.
+Place it with the specifications or decision notes that the agents already read; this is preparation for existing fleet work, not another submission.
 
-{{ import "site/includes/agent-fleet-demo.html" }}
+```text
+Task, source revision and expected observable outcome:
+Inputs: actual files, contract and prior findings:
+Allowed actions and files; forbidden changes:
+Independent tasks and prerequisites:
+Acceptance command and evidence it must establish:
+Handoff: result, changed files, checks, failures and unknowns:
+Integration owner and human acceptance decision:
+Model, harness, limits and actual resource records:
+```
 
+For a bottleneck investigation, allow read-only inspection and require a falsifiable claim and measurement plan.
+For a code change, name the editing boundary and the behavior the independent reviewer must check.
+Do not infer completion from a worker's files alone: retain its handoff, unfinished work and failed checks.
 Translate the packet into a [task graph](/concepts/#task-graph) rather than launching every named role automatically.
 Analyze the [supplied matched single-agent/fleet traces](/project/compare/#supplied-matched-single-agent-fleet-analysis) to examine one bounded task under both workflows.
 Running your own matched pair is an optional extension.

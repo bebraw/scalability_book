@@ -12,19 +12,6 @@ export interface LearningFollowUp {
   exerciseUrl?: string;
 }
 
-const queueDrain: LearningFollowUp = {
-  id: "queue-drain",
-  version: 1,
-  title: "Can the queue recover?",
-  question:
-    "There are 300 waiting events. New events arrive at 80/s and processing can complete 100/s while work is waiting. Predict when the waiting backlog will clear. What changes if arrivals become 120/s? Explain why a steady-state average from the earlier demo may not describe either transient interval.",
-  assumptions:
-    "Rates stay constant in each case; one event enters and completes once; there are no drops, retries or additional bottlenecks. We count waiting events, not all work in service. This is a thought experiment, not a recorded browser run.",
-  selfCheck:
-    "Compare arrivals with completions before dividing the backlog by their difference. Explain the units, whether the backlog shrinks or grows, and why stability matters. A real system would need evidence for the stated rates and boundary.",
-  exerciseUrl: "/chapters/benchmarking/#exercise-measurement-transfer",
-};
-
 const readingApplication: LearningFollowUp = {
   id: "reading-application",
   version: 1,
@@ -38,8 +25,6 @@ const readingApplication: LearningFollowUp = {
 };
 
 export function followUpForSource(source: LearningSource): LearningFollowUp {
-  if (source.kind === "demo" && source.anchor === "demo-queue-balance-lab")
-    return queueDrain;
   const pathname = new URL(source.url).pathname;
   const canonical =
     pathname === "/chapters/benchmarking/"

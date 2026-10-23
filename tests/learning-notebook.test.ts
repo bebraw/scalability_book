@@ -94,20 +94,23 @@ test("separate application and reflection retain authored context, relationships
   const demoSource = {
     ...first.source,
     kind: "demo" as const,
-    anchor: "demo-queue-balance-lab",
+    anchor: "demo-cache-decision-lab",
+    url: "https://book.test/chapters/architecture/",
+    title: "Cache decision lab",
+    conceptIds: ["cache", "contract", "consistency", "trade-off"],
   };
   const activity = followUpForSource(demoSource);
   const application = from.notebook.saveEntry({
     kind: "revisit",
     title: "My changed case",
-    body: "I think it drains at the difference in rates.",
-    source: followUpSource(demoSource, activity, "What if processing pauses?"),
+    body: "I think the stale response needs validation.",
+    source: followUpSource(demoSource, activity, "What if the origin changes?"),
     relatedIds: [first.id],
   });
   const reflection = from.notebook.saveEntry({
     kind: "reflection",
     title: "Still uncertain",
-    body: "I still want help with the transient interval.",
+    body: "I still want help distinguishing freshness and validation.",
     source: demoSource,
     relatedIds: [first.id, application.id],
     assistance:
@@ -126,11 +129,11 @@ test("separate application and reflection retain authored context, relationships
   to.restart();
   assert.deepEqual(to.notebook.entry(application.id), application);
   assert.deepEqual(to.notebook.entry(reflection.id), reflection);
-  assert.match(application.source.excerpt, /queue-drain \(version 1\)/);
-  assert.match(application.source.excerpt, /300 waiting events/);
+  assert.match(application.source.excerpt, /reading-application \(version 1\)/);
+  assert.match(application.source.excerpt, /change one assumption or boundary/);
   assert.match(
     application.source.excerpt,
-    /Student-chosen case: What if processing pauses/,
+    /Student-chosen case: What if the origin changes/,
   );
   assert.equal(application.source.revision, "test-revision");
   assert.equal(to.notebook.entry(first.id)?.body, initial.body);

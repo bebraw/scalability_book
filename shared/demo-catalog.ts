@@ -1,32 +1,11 @@
 // Shared by the gallery build and the agent resource catalog.
 export const demoCatalog = [
   {
-    title: "Implementation discovery lab",
-    category: "worksheet",
-    chapter: "Scalable development",
-    include: "site/includes/project-fit-checker.html",
-    script: "/project-fit-checker.js",
-  },
-  {
-    title: "Constraint feedback loop",
-    category: "reading",
-    chapter: "Scalable development",
-    include: "site/includes/constrain-generate-validate-demo.html",
-    script: "/constrain-generate-validate-demo.js",
-  },
-  {
     title: "Deterministic boundary lab",
     category: "reading",
     chapter: "Scalable development",
     include: "site/includes/statechart-boundary-demo.html",
     script: "/statechart-boundary-demo.js",
-  },
-  {
-    title: "Boundary trace",
-    category: "reading",
-    chapter: "Architecture",
-    include: "site/includes/request-trace-demo.html",
-    script: "/request-trace-demo.js",
   },
   {
     title: "ACID transaction lab",
@@ -50,32 +29,11 @@ export const demoCatalog = [
     script: "/web-architecture-lens.js",
   },
   {
-    title: "Client activation lens",
-    category: "advanced",
-    chapter: "Architecture",
-    include: "site/includes/client-activation-lens.html",
-    script: "/client-activation-lens.js",
-  },
-  {
-    title: "API contract lens",
-    category: "advanced",
-    chapter: "Architecture",
-    include: "site/includes/api-contract-lens.html",
-    script: "/api-contract-lens.js",
-  },
-  {
     title: "Tail latency simulator",
     category: "reading",
     chapter: "Benchmarking",
     include: "site/includes/benchmark-simulation-demo.html",
     script: "/benchmark-simulation-demo.js",
-  },
-  {
-    title: "Goodhart pressure test",
-    category: "reading",
-    chapter: "Benchmarking",
-    include: "site/includes/goodhart-challenge-demo.html",
-    script: "/goodhart-challenge-demo.js",
   },
   {
     title: "Browser performance workbench",
@@ -85,20 +43,6 @@ export const demoCatalog = [
     script: "/browser-performance-workbench.js",
   },
   {
-    title: "Queue balance lab",
-    category: "reading",
-    chapter: "Benchmarking",
-    include: "site/includes/little-law-demo.html",
-    script: "/scalability-laws.js",
-  },
-  {
-    title: "Model evaluation lab",
-    category: "advanced",
-    chapter: "Appendix A: Agent workflow evaluation",
-    include: "site/includes/model-eval-demo.html",
-    script: "/model-eval-demo.js",
-  },
-  {
     title: "OpenTelemetry trace explorer",
     category: "reading",
     chapter: "Benchmarking",
@@ -106,32 +50,11 @@ export const demoCatalog = [
     script: "/otel-trace-demo.js",
   },
   {
-    title: "Friction audit",
-    category: "worksheet",
-    chapter: "Friction",
-    include: "site/includes/friction-audit-demo.html",
-    script: "/friction-audit-demo.js",
-  },
-  {
-    title: "Changed assumptions map",
-    category: "reading",
-    chapter: "Reality",
-    include: "site/includes/pressure-map-demo.html",
-    script: "/pressure-map-demo.js",
-  },
-  {
     title: "Fleet trace debugger",
     category: "advanced",
     chapter: "Appendix D: Agent-system security",
     include: "site/includes/fleet-trace-debugger.html",
     script: "/fleet-trace-debugger.js",
-  },
-  {
-    title: "Agent fleet delegation",
-    category: "worksheet",
-    chapter: "Agent fleets",
-    include: "site/includes/agent-fleet-demo.html",
-    script: "/agent-fleet-demo.js",
   },
   {
     title: "Reliability chain lab",
@@ -146,13 +69,6 @@ export const demoCatalog = [
     chapter: "Agent fleets",
     include: "site/includes/amdahl-law-demo.html",
     script: "/scalability-laws.js",
-  },
-  {
-    title: "Scaling pressure planner",
-    category: "worksheet",
-    chapter: "Scaling",
-    include: "site/includes/scaling-pressure-demo.html",
-    script: "/scaling-pressure-demo.js",
   },
   {
     title: "Saturation boundary lab",

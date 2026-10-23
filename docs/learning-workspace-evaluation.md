@@ -9,9 +9,9 @@ The trial adds no assessment criterion, required report or activity quota.
 ## A short first investigation
 
 Let each learner choose a question they actually need to understand.
-For an example, use the [queue balance lab](https://scalableweb.dev/demos/#demo-queue-balance-lab): predict the queue implied by arrival rate and mean time, inspect the result, then question whether the averages cover a common stable interval.
-Include a changed situation, such as a growing queue or a tail percentile replacing the mean.
-The guide now offers a queue-recovery case (300 waiting events, 80/s arrivals, 100/s capacity, then 120/s arrivals), canonical changed-situation exercises and a reading/project application elsewhere in the book.
+For an example, use the [cache decision lab](https://scalableweb.dev/demos/#demo-cache-decision-lab): predict whether a response can be reused, change its age, inspect the result, then question which policy and storage assumptions make that result hold.
+Include a changed situation, such as a changed origin representation or a private response requiring validation.
+The guide offers canonical changed-situation exercises and a reading/project application elsewhere in the book.
 Record the activity ID/version and source revision from the learner's chosen entry, and distinguish their own case from a reviewed agent suggestion.
 Ask learners to explain the change independently before returning to the agent or worked reasoning.
 Ask them to return after a delay of their choosing and use Notes → Revisit, recalling before opening the earlier explanation.
@@ -43,6 +43,7 @@ Include a learner who requests a direct explanation and one who records being st
 Students can request more help again; fading is responsive to their work rather than a fixed sequence.
 
 For provider development, `LEARNING_CODEX_LIVE=1 node scripts/evaluate-learning-support.ts` runs eight synthetic scenarios through the dedicated profile: novice, misconception, progress, unclear question, direct explanation, unavailable demo/uncertain production evidence, a quoted prior assistant error and group disagreement with an absent member.
+The current synthetic review uses cache cases (activity version 2); the dated October 7 observations below used the earlier queue cases.
 The incorrect prior claim is deliberately supplied synthetic context, not a fabricated account of an actual learner's conversation.
 It saves actual replies, tool requests, review criteria and policy/provider/companion/material versions under `.local/learning-evaluation/`, without student records, automatic quality scores or live browser execution.
 Source revision and an authored-resource hash distinguish dirty development samples; the exact model is reported as unknown when using the provider default.

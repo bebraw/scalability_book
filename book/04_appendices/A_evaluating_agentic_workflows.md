@@ -187,12 +187,45 @@ Keep a small human-reviewed calibration set and report disagreement rather than 
 If a judge guides development, reserve independent acceptance evidence for final evaluation.
 A held-out task set does not make the scoring process independent when the same judge design also supplies the reported result.
 
-The demonstration below lets you score two attempts against the selected task's rubric and inspect which criterion an answer misses.
-Its sample answers and separately revealed worked scores are authored examples; use them at any stage or collect real attempts within the course's permitted setup.
-Justify scores with excerpts or reasons, and enter actual elapsed time and cost only with a source record; missing observations remain unknown.
-The scores are manual judgments, and the protocol confirmations are self-reported; executable acceptance checks need to be run separately.
+### Calibrate a rubric on actual attempts
 
-{{ import "site/includes/model-eval-demo.html" }}
+Freeze one task and rubric before looking at the outputs.
+For a short explanation task, the following authored input can be given unchanged to two permitted model attempts:
+
+```text
+Context: Workspace(id), WorkItem(id, workspace_id, state),
+ActivityEvent(id, workspace_id, work_item_id, actor, occurred_at).
+Items move open -> in_progress -> done. Each accepted creation or
+transition must record one matching event; rejection changes neither
+state nor successful-event history. No implementation code is supplied.
+
+Explain the entities and relationships, distinguish accepted and rejected
+actions, and identify one enforcement question this context cannot settle.
+Cite the supplied context and do not invent an implementation guarantee.
+```
+
+Use :ref[table:attempt-calibration-rubric] for both actual outputs.
+Score 0 for absent or incorrect, 1 for partial, and 2 when the stated criterion is met; quote an excerpt or explain the missing evidence for each judgment.
+
+| Criterion   | Evidence for a score of 2                                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Grounding   | Distinguishes the three entities and their relationships using only the supplied context.                                           |
+| Behavior    | Explains the allowed lifecycle and that accepted actions require one matching event while rejected actions change neither record.   |
+| Uncertainty | Identifies an unresolved enforcement question, such as atomic persistence, without asserting that the implementation guarantees it. |
+
+::caption[A fixed rubric for a bounded explanation task, independent of the model identity.]
+::label[table:attempt-calibration-rubric]
+
+Label the actual responses X and Y; when another person prepares them, conceal configuration identities until scoring is complete.
+Keep the exact prompt, response, model and harness configuration, source record, corrections and acceptance decision.
+Record elapsed time and cost only when their observation boundary and source are available; missing observations remain unknown.
+Compare criterion-level reasons before adding scores, and preserve a disagreement instead of treating an authored answer as the only acceptable wording.
+Two attempts establish a comparison of those outputs, not a ranking of models or a reliable estimate of future success.
+
+For an executable task, use one exercise in the [course workspace](/downloads/labs/course-workspace.zip), such as `csv-export/`, and keep its fixed acceptance checks separate from the manual rubric.
+Use a disposable clean copy for each attempt, retain failures and human corrections, and check actual output behavior rather than only the explanation.
+This is optional practice within existing study time.
+Without model access, analyze the instructor-supplied records used by the [Compare activity](/project/compare/#supplied-matched-single-agent-fleet-analysis), retaining their stated provenance and missing evidence; do not label an invented answer as an actual run.
 
 [Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started#how-is-accuracy-ensured) provides a concrete example of evaluating an imported agent capability.
 Its evaluation harness first checks browser assertions against both a reference implementation and a deliberately flawed implementation, then compares agent runs with and without the guidance.

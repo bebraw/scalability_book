@@ -19,27 +19,6 @@
     </div>
   </div>
 
-  <ol class="scaling-demo-progress" aria-label="Latency demo steps">
-    <li>
-      <button type="button" data-latency-demo-tab="0" aria-current="step">
-        <span>1</span>
-        Distance
-      </button>
-    </li>
-    <li>
-      <button type="button" data-latency-demo-tab="1">
-        <span>2</span>
-        Database
-      </button>
-    </li>
-    <li>
-      <button type="button" data-latency-demo-tab="2">
-        <span>3</span>
-        Budget
-      </button>
-    </li>
-  </ol>
-
   <form class="scaling-demo-form" data-latency-demo-form>
     <section
       class="scaling-demo-step scaling-demo-pressure-step is-active"
@@ -58,21 +37,14 @@
           </select>
         </label>
         <label>
-          <span>Database placement</span>
+          <span>Application to database distance</span>
           <select data-latency-demo-distance="appDb">
-            <option value="1" selected>Edge read replica near app, 1 km</option>
-            <option value="25">Same metro primary, 25 km</option>
-            <option value="500">Regional managed database, 500 km</option>
-            <option value="1500">Home-region primary, 1,500 km</option>
+            <option value="1" selected>1 km</option>
+            <option value="25">25 km</option>
+            <option value="500">500 km</option>
+            <option value="1500">1,500 km</option>
           </select>
         </label>
-        <div class="latency-demo-db-choice">
-          <span data-latency-demo-db-placement>Edge read replica</span>
-          <p data-latency-demo-db-impact>
-            Reads stay close to the application, but writes may still coordinate
-            with a primary database.
-          </p>
-        </div>
         <label>
           <span>Network overhead multiplier</span>
           <input
@@ -175,34 +147,12 @@
     </section>
 
     <section
-      class="scaling-demo-step scaling-demo-pressure-step"
+      class="scaling-demo-step scaling-demo-pressure-step is-active"
       data-latency-demo-step="1"
       aria-labelledby="latency-database-title"
-      hidden
     >
       <div class="scaling-demo-panel">
         <h4 id="latency-database-title">Database access pattern</h4>
-        <label>
-          <span>Server hardware profile</span>
-          <select data-latency-demo-hardware>
-            <option value="shared">Shared or small instance</option>
-            <option value="production" selected>
-              Typical production instance
-            </option>
-            <option value="tuned">Tuned database and warm cache</option>
-            <option value="contended">CPU or disk contention</option>
-            <option value="custom">Custom manual values</option>
-          </select>
-        </label>
-        <div class="latency-demo-hardware-choice">
-          <span data-latency-demo-hardware-name>
-            Typical production instance
-          </span>
-          <p data-latency-demo-hardware-impact>
-            Ordinary compute and database performance: hardware matters, but
-            round trips can still dominate.
-          </p>
-        </div>
         <label>
           <span>Sequential database round trips</span>
           <input
@@ -245,7 +195,7 @@
             <dd data-latency-demo-metric="sequentialDb">0 ms</dd>
           </div>
           <div>
-            <dt>If batched into 2 trips</dt>
+            <dt>DB wait in at most 2 trips</dt>
             <dd data-latency-demo-metric="batchedDb">0 ms</dd>
           </div>
           <div>
@@ -261,25 +211,19 @@
             <dd data-latency-demo-metric="serverExecution">0 ms</dd>
           </div>
         </dl>
-        <div class="latency-demo-db-impact">
-          <h4 data-latency-demo-db-placement>Edge read replica</h4>
-          <p data-latency-demo-db-impact>
-            Reads stay close to the application, but writes may still coordinate
-            with a primary database.
-          </p>
-          <small data-latency-demo-db-caveat>
-            Edge placement helps read-heavy paths most. It does not remove
-            consistency, replication, or write-routing trade-offs.
-          </small>
-        </div>
+        <p class="demo-note">
+          Hypothetical timings: these values describe no hardware class.
+          Batching keeps the same queries and execution cost; it is possible
+          only if their dependencies permit at most two trips with identical
+          results.
+        </p>
       </div>
     </section>
 
     <section
-      class="scaling-demo-step scaling-demo-tradeoff-step"
+      class="scaling-demo-step scaling-demo-tradeoff-step is-active"
       data-latency-demo-step="2"
       aria-labelledby="latency-budget-title"
-      hidden
     >
       <div>
         <h4 id="latency-budget-title">Latency budget</h4>
@@ -289,7 +233,7 @@
         <h4>Totals</h4>
         <dl class="scaling-demo-metrics">
           <div>
-            <dt>Estimated response</dt>
+            <dt>Sequential response</dt>
             <dd data-latency-demo-metric="total">0 ms</dd>
           </div>
           <div>
@@ -301,15 +245,10 @@
             <dd data-latency-demo-metric="avoidable">0 ms</dd>
           </div>
           <div>
-            <dt>100 serial requests</dt>
-            <dd data-latency-demo-metric="hundred">0 s</dd>
+            <dt>Response with at most 2 DB trips</dt>
+            <dd data-latency-demo-metric="batchedTotal">0 ms</dd>
           </div>
         </dl>
-        <p class="latency-demo-note">
-          The serial total adds 100 identical response times. Page elapsed time
-          also depends on concurrency and request dependencies, which this model
-          does not include.
-        </p>
       </div>
       <div class="scaling-demo-impact">
         <h4>Interpretation</h4>
@@ -318,10 +257,5 @@
         </p>
       </div>
     </section>
-
-    <div class="scaling-demo-actions">
-      <button type="button" data-latency-demo-prev>Previous</button>
-      <button type="submit" data-latency-demo-next>Next</button>
-    </div>
   </form>
 </section>

@@ -17,7 +17,7 @@ ${
   includeExamples
     ? `Possible aids, selected after the student's attempt:
 
-- For queues, use the [queue balance lab](${absolute("/demos/#demo-queue-balance-lab")}) and its catalog assumptions to investigate average work in progress.
+- For caching, use the [cache decision lab](${absolute("/demos/#demo-cache-decision-lab")}) and its catalog assumptions to investigate response age and origin validation.
 - For retries, use [the recorder fixture](${absolute("/explore/challenge-an-explanation/agent.md")}) to trace local and durable state across a restart.
 - For confidence, use [the classification fixture](${absolute("/explore/confidence-before-routing/agent.md")}) to compare a reported score with reference agreement after the student predicts it.
 

@@ -109,13 +109,21 @@ The grade-threshold table uses a compact width and left-aligned percentage range
 
 ## Downloadable labs
 
-Standalone source exercises live in one directory per lab under [labs/](../labs/).
-Each lab should contain a README that states how to run or study it, what its evidence establishes, and what remains outside its scope.
+The [local practice workspace](../labs/README.md) groups CSV export, concern-directed mutation, persisted retry and HTTP cache under one npm setup and exercise index.
+From `labs/`, run `npm ci`, `npm run preflight`, then `npm run lab -- <exercise> <command>`; the index documents available commands and expected initial failures.
+`npm run browser:install` installs Chromium only when needed by CSV or cache work.
+The common preflight verifies setup only; feature checks are selected per exercise and an unrelated unfinished task must not block the selected one.
+Keep specifications, decision notes, fixtures and generated evidence inside each independent exercise directory.
 
-The site build packages every lab directory as `/downloads/labs/<directory-name>.zip` with the directory itself as the archive root.
+[scripts/lib/lab-downloads.ts](../scripts/lib/lab-downloads.ts) owns archive composition.
+The primary `/downloads/labs/course-workspace.zip` contains allowlisted root setup files and the four exercise directories.
+The same sources also generate independent `/downloads/labs/<directory-name>.zip` archives; the journey and skill-adoption labs remain separate.
 Generated archives are build output and should not be committed.
-Transient `.git`, `.lab-data`, `node_modules`, `playwright-report`, and `test-results` directories and `.DS_Store` files are omitted automatically.
-Reader material should normally offer both the repository source and the generated download so students can inspect before downloading.
+Transient `.git`, `.lab-data`, `node_modules`, `playwright-report`, `test-results`, `.local`, `.env` and `.env.*` files are excluded.
+Do not package solutions or private reference inputs.
+Reader material links the primary workspace and source.
+Run `node --test tests/lab-workspace.test.ts tests/zip.test.ts` for archive boundaries and selected-command failure propagation, then inspect and clean-unpack the actual build ZIP.
+Verify its root `npm ci`, setup preflight and selected exercise checks without depending on this checkout’s install.
 
 For [the CSV starter](../labs/csv-export/README.md), run `npm run preflight` in its directory to check the supplied server independently of the unfinished serializer.
 `npm run check` retains preflight, contract and browser logs in ignored `test-results/evidence/`; feature failures are expected in the untouched starter.

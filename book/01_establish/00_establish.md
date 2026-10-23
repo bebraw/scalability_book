@@ -29,9 +29,21 @@ Agents can make a fresh implementation inexpensive enough to abandon a weak prod
 Carry forward the permitted specifications, acceptance material, evidence, and lessons instead of protecting code merely because it took effort to produce.
 By the third build, you should be better able to judge both the application and the workflow that produced it.
 
-## Implementation discovery lab
+## Choose an implementation direction
 
-Use this lab to turn the [shared specification](/project/) into a direction to explore.
-It produces a first project-direction document that you can refine as implementation creates evidence.
+Use these prompts in the specification you already maintain; they do not require a separate submission.
+Keep the [shared behavior](/project/) fixed while choosing one implementation question.
 
-{{ import "site/includes/project-fit-checker.html" }}
+```text
+Product interpretation and intended user:
+One state or ownership boundary to keep visible:
+Language, persistence and supported run command:
+Hypothesis about this implementation:
+Observation that would challenge the hypothesis:
+First small check and evidence to retain:
+```
+
+For example: “We expect a server-rendered interface to make the lifecycle easier to trace because one application boundary owns validation, state and event creation.
+Try one valid and one invalid transition through the browser, inspect persisted records, and record any rule duplicated in the client.”
+This is an implementation hypothesis, not a claim that one stack is generally superior.
+Revise it after the first check and record any consequential change in your existing decision record.

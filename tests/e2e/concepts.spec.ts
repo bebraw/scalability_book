@@ -161,7 +161,6 @@ test("agent resources return usable images, cite their source, and lead to a pre
   baseURL,
 }) => {
   const graph = await (await request.get("/concepts/graph.json")).json();
-  expect(graph.learningResources).toHaveLength(84);
   const pages = new Map<string, string>();
   for (const resource of graph.learningResources as LearningResource[]) {
     expect(new URL(resource.url).origin).toBe(new URL(baseURL!).origin);
@@ -196,28 +195,25 @@ test("agent resources return usable images, cite their source, and lead to a pre
     (concept: { id: string }) => concept.id === "little-law",
   );
   expect(law.resourceIds).toContain("graph-little-law");
-  expect(law.resourceIds).toContain("demo-queue-balance-lab");
-  const lab = graph.learningResources.find(
-    (resource: LearningResource) => resource.id === "demo-queue-balance-lab",
+  expect(law.resourceIds).not.toContain("demo-queue-balance-lab");
+  const cache = graph.concepts.find(
+    (concept: { id: string }) => concept.id === "cache",
   );
-  await page.goto(law.url);
-  const resources = page.locator("#little-law .concept-learning-resources");
+  expect(cache.resourceIds).toContain("demo-cache-decision-lab");
+  const lab = graph.learningResources.find(
+    (resource: LearningResource) => resource.id === "demo-cache-decision-lab",
+  );
+  await page.goto(cache.url);
+  const resources = page.locator("#cache .concept-learning-resources");
   await resources.locator("summary").click();
   await expect(resources).toContainText(lab.experiment.predict);
   await resources
-    .getByRole("link", { name: "Queue balance lab", exact: true })
+    .getByRole("link", { name: "Cache decision lab", exact: true })
     .click();
   await expect(page).toHaveURL(lab.url);
-  const demo = page.locator("#demo-queue-balance-lab");
-  await demo
-    .locator('[data-little-law-input="time"]')
-    .evaluate((element: HTMLInputElement) => {
-      element.value = "1";
-      element.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-  await expect(demo.locator('[data-little-law-metric="expected"]')).toHaveText(
-    "20.0",
-  );
+  const demo = page.locator("#demo-cache-decision-lab");
+  await demo.locator("[data-cache-age]").fill("100");
+  await expect(demo.locator("[data-cache-age-label]")).toHaveText("400 days");
 });
 
 test("copying the guide still works when clipboard access is unavailable", async ({

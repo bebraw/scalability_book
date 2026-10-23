@@ -151,7 +151,6 @@ export const exercises: Record<string, Exercise> = {
     ],
   },
   "measurement-boundary": {
-    demo: { id: "demo-queue-balance-lab", label: "Queue balance" },
     version: 2,
     title: "Check whether the averages agree",
     prompt:

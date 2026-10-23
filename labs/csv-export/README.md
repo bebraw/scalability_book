@@ -7,6 +7,10 @@ No model calls are made by the page or checks.
 
 ## Start and separate setup from feature failures
 
+In the combined course workspace, use the root `npm ci` once and run `npm run lab -- csv-export <command>` there.
+Install Chromium once with the root `npm run browser:install`; skip the separate installation below.
+The remaining commands and records still belong to this exercise.
+
 Use Node 24 or newer.
 From this directory:
 

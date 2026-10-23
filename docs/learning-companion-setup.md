@@ -68,7 +68,7 @@ Its writing stays in the current tab; only **Prepare this as a real Notebook dra
 Choose **Cockpit** in the header on any reading, concept, exploration or project page.
 It gives you one place to state your thinking, try a check, reflect and choose your next independent check.
 You can select a passage first, or choose **Explore this idea** below any demo to work beside its controls.
-For a first experiment, open [the queue lab](/demos/#demo-queue-balance-lab) and choose **Explore this idea**.
+For a first experiment, open [the cache lab](/demos/#demo-cache-decision-lab) and choose **Explore this idea**.
 Connect your existing companion, write a prediction or uncertainty, then choose **Discuss my prediction**.
 With assistant replies enabled, its explanation appears in the reading.
 Change a control yourself and choose **Discuss this result** to share fresh displayed values; moving controls does not send anything.

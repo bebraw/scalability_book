@@ -23,7 +23,7 @@ for (const native of [false, true])
       if (native && body.messages.at(-1).role === "user") return localCall();
       if (native)
         expect(JSON.parse(body.messages.at(-1).content)).toMatchObject({
-          demoId: "demo-queue-balance-lab",
+          demoId: "demo-cache-decision-lab",
           version: 1,
         });
       const context = JSON.parse(
@@ -31,8 +31,11 @@ for (const native of [false, true])
           .content,
       );
       const turn = context.readingActivity.turn;
+      const age = turn.observation.controls.find((control: { label: string }) =>
+        control.label.startsWith("Time since response was stored"),
+      ).value;
       return localAnswer(
-        `For ${turn.system || "your system"}, the browser illustration reports **${turn.observation.expected} events** expected. ${turn.phase === "predict" ? "Try doubling average time while holding arrivals steady." : "Which shared observation window would you check next?"}\n\n[Check the source](${context.source.url}#${context.source.anchor})`,
+        `For ${turn.system || "your system"}, the browser illustration reports **${age} age-control units**. ${turn.phase === "predict" ? "Try aging the stored asset beyond its freshness window." : "Which real request record would you check next?"}\n\n[Check the source](${context.source.url}#${context.source.anchor})`,
         native,
       );
     });
@@ -46,7 +49,7 @@ for (const native of [false, true])
         "--local-url",
         model.url,
         "--local-context",
-        "8192",
+        "16384",
         "--local-tools",
         native ? "native" : "none",
         "--directory",
@@ -80,14 +83,14 @@ for (const native of [false, true])
         if (request.url().startsWith("http://127.0.0.1:18891"))
           privateRequests.push(request.url());
       });
-      await page.goto("/chapters/benchmarking/#demo-queue-balance-lab");
+      await page.goto("/chapters/architecture/#demo-cache-decision-lab");
       const activity = page.locator("[data-reading-investigation]");
       await expect(
-        page.locator('[data-investigate-demo="demo-queue-balance-lab"]'),
+        page.locator('[data-investigate-demo="demo-cache-decision-lab"]'),
       ).toBeVisible();
       expect(privateRequests).toEqual([]);
       await page
-        .locator('[data-investigate-demo="demo-queue-balance-lab"]')
+        .locator('[data-investigate-demo="demo-cache-decision-lab"]')
         .click();
       await expect(
         activity.getByRole("button", { name: "Discuss my prediction" }),
@@ -105,39 +108,41 @@ for (const native of [false, true])
       expect(model.requests).toEqual([]);
       await activity
         .getByLabel("A system I want to understand")
-        .fill("Database requests");
+        .fill("Cached assets");
       await activity
         .getByLabel("My prediction or uncertainty")
-        .fill("Doubling time should double unfinished work.");
+        .fill(
+          "The stored asset should require an origin request after 365 days.",
+        );
       await activity
         .getByRole("button", { name: "Discuss my prediction" })
         .click();
       await expect(
         activity.locator(".reading-investigation-messages"),
-      ).toContainText("For Database requests");
+      ).toContainText("For Cached assets");
       await expect(
         activity.locator(".reading-investigation-messages strong"),
-      ).toHaveText("10 events");
+      ).toHaveText("25 age-control units");
       await expect(
         activity.getByRole("button", { name: "Discuss this result" }),
       ).toBeEnabled();
       const sent = model.requests.length;
-      await page.locator('[data-little-law-input="time"]').fill("1");
+      await page.locator("[data-cache-age]").fill("100");
       await expect(
         activity.locator(".reading-investigation-observation"),
-      ).toContainText("expected 20 events");
+      ).toContainText(/Time since response was stored.*: 100/);
       expect(model.requests.length).toBe(sent);
       await activity
         .getByLabel("What I noticed")
         .fill(
-          "The expected queue doubled but the observed queue stayed at ten.",
+          "The asset age reached 400 days and the model returned to the origin.",
         );
       await activity
         .getByRole("button", { name: "Discuss this result" })
         .click();
       await expect(
         activity.locator(".reading-investigation-messages strong"),
-      ).toHaveText("20 events");
+      ).toHaveText("100 age-control units");
       await expect(
         activity.getByRole("button", { name: "Discuss this result" }),
       ).toBeEnabled();
@@ -148,32 +153,41 @@ for (const native of [false, true])
       );
       expect(context.readingActivity.turn).toMatchObject({
         phase: "experiment",
-        system: "Database requests",
-        prediction: "Doubling time should double unfinished work.",
+        system: "Cached assets",
+        prediction:
+          "The stored asset should require an origin request after 365 days.",
         observation: {
-          arrival: 20,
-          time: 1,
-          observed: 10,
-          expected: 20,
-          gap: -10,
+          kind: "browser-demo-snapshot",
+          demoId: "demo-cache-decision-lab",
+          controls: expect.arrayContaining([
+            {
+              label: expect.stringContaining("Time since response was stored"),
+              type: "range",
+              value: "100",
+            },
+          ]),
+          visibleText: expect.stringContaining("400 days"),
         },
       });
       expect(context.selectedNotes).toEqual([]);
       const beforeHidden = model.requests.length;
-      await page.locator("#measurement-boundary-tab-1").click();
+      await page.locator("#demo-cache-decision-lab").evaluate((demo) => {
+        demo.hidden = true;
+      });
       await activity
         .getByRole("button", { name: "Discuss this result" })
         .click();
       await expect(activity.getByRole("status")).toContainText("Explore tab");
       expect(model.requests.length).toBe(beforeHidden);
-      await page.locator("#measurement-boundary-tab-0").click();
+      await page.locator("#demo-cache-decision-lab").evaluate((demo) => {
+        demo.hidden = false;
+      });
       await page.reload();
       await expect(
         activity.locator(".reading-investigation-messages strong"),
-      ).toHaveText("20 events");
-      await expect(page.locator('[data-little-law-input="time"]')).toHaveValue(
-        "1",
-      );
+      ).toHaveText("100 age-control units");
+      // Historical replies persist; a generic demo snapshot does not replay controls.
+      await expect(page.locator("[data-cache-age]")).toHaveValue("25");
       await activity.getByText("Conversation history", { exact: true }).click();
       await activity
         .getByRole("button", { name: "Start a new conversation" })
@@ -183,7 +197,7 @@ for (const native of [false, true])
       await activity.getByRole("button", { name: "Explain directly" }).click();
       await expect(
         activity.locator(".reading-investigation-messages strong"),
-      ).toHaveText("20 events");
+      ).toHaveText("25 age-control units");
       await expect(
         activity.getByRole("button", { name: "Discuss this result" }),
       ).toBeEnabled();
@@ -197,7 +211,9 @@ for (const native of [false, true])
       await activity.getByRole("button", { name: "03 / Reflect" }).click();
       await activity
         .getByLabel("My takeaway", { exact: true })
-        .fill("The three averages must describe the same stable boundary.");
+        .fill(
+          "The stored policy and actual age determine whether reuse is permitted.",
+        );
       expect(
         (
           await new AxeBuilder({ page })
@@ -227,7 +243,7 @@ for (const native of [false, true])
         .click();
       const notebook = page.locator("#learning-notebook");
       await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-        /The three averages must describe/,
+        /The stored policy and actual age/,
       );
       expect(
         privateRequests.filter((url) => /\/notebook\/entries/.test(url)),
@@ -244,7 +260,7 @@ for (const native of [false, true])
         .click();
       await page.reload();
       await expect(
-        page.locator('[data-investigate-demo="demo-queue-balance-lab"]'),
+        page.locator('[data-investigate-demo="demo-cache-decision-lab"]'),
       ).toBeVisible();
       await expect(page.locator(".learning-workspace")).toHaveCount(0);
     } finally {
@@ -258,10 +274,10 @@ for (const native of [false, true])
 test("direct explanations, incompatible companions and connection failures retain the student's writing", async ({
   page,
 }) => {
-  await page.goto("/chapters/benchmarking/#demo-queue-balance-lab");
+  await page.goto("/chapters/architecture/#demo-cache-decision-lab");
   const activity = page.locator("[data-reading-investigation]");
   await page
-    .locator('[data-investigate-demo="demo-queue-balance-lab"]')
+    .locator('[data-investigate-demo="demo-cache-decision-lab"]')
     .click();
   await activity
     .getByLabel("My prediction or uncertainty")

@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import {
-  queueInvestigation,
   parseInvestigationTurn,
   readingActivities,
   learningLoop,
@@ -26,44 +25,54 @@ import {
   cockpitBookmark,
 } from "../site/scripts/learning-investigation-session.ts";
 
+const cacheInvestigation = readingActivities.find(
+  ({ demoId }) => demoId === "demo-cache-decision-lab",
+)!;
+
 const source: LearningSource = {
   kind: "demo",
-  url: "https://scalableweb.dev/chapters/benchmarking/",
-  anchor: queueInvestigation.demoId,
-  title: "Queue investigation",
-  excerpt: "L = λW",
+  url: "https://scalableweb.dev/chapters/architecture/",
+  anchor: cacheInvestigation.demoId,
+  title: "Cache investigation",
+  excerpt: "Response age and freshness",
   revision: null,
-  conceptIds: [...queueInvestigation.conceptIds],
+  conceptIds: [...cacheInvestigation.conceptIds],
 };
 const observation = {
-  kind: "browser-queue-snapshot",
+  kind: "browser-demo-snapshot",
+  demoId: "demo-cache-decision-lab",
   observedAt: "2026-10-09T10:00:00.000Z",
-  arrival: 20,
-  time: 1,
-  observed: 10,
-  expected: 20,
-  gap: -10,
+  controls: [
+    { label: "Time since response was stored", type: "range", value: "25" },
+  ],
+  visibleText:
+    "Versioned asset: 100 days old; fresh for 365 days. Fresh cache hit.",
 };
 const turn = {
-  activityId: queueInvestigation.id,
-  version: queueInvestigation.version,
+  activityId: cacheInvestigation.id,
+  version: cacheInvestigation.version,
   phase: "experiment",
-  system: "Database requests",
-  prediction: "Doubling time doubles unfinished work",
+  system: "Browser cache",
+  prediction: "A versioned asset can be reused while fresh",
   observation,
 };
 
-test("inline turns reject unknown activities, unrelated sources, invalid phases and inconsistent observations", () => {
+test("inline turns reject unknown activities, unrelated sources, invalid phases and unbounded or unrelated observations", () => {
   assert.deepEqual(parseInvestigationTurn(turn, source), turn);
   for (const patch of [
-    { version: queueInvestigation.version + 1 },
+    { version: cacheInvestigation.version + 1 },
     { activityId: "arbitrary" },
     { phase: "mastered" },
     { system: "x".repeat(1001) },
-    { observation: { ...observation, expected: 10 } },
-    { observation: { ...observation, time: null } },
+    { observation: { ...observation, demoId: "unrelated" } },
+    { observation: { ...observation, visibleText: "x".repeat(8001) } },
     { observation: { ...observation, observedAt: "invalid" } },
-    { observation: { ...observation, arrival: 80 } },
+    {
+      observation: {
+        ...observation,
+        controls: [{ label: "Age", type: "range", value: Infinity }],
+      },
+    },
   ])
     assert.throws(() => parseInvestigationTurn({ ...turn, ...patch }, source));
   assert.throws(() =>
@@ -81,9 +90,9 @@ test("inline turns reject unknown activities, unrelated sources, invalid phases 
 test("MCP publishes the same activity contract without learner state or execution", () => {
   const demo = getBookDemo(
     exportConceptGraph("https://scalableweb.dev", "Book"),
-    queueInvestigation.demoId,
+    cacheInvestigation.demoId,
   );
-  assert.deepEqual(demo.activity, queueInvestigation);
+  assert.deepEqual(demo.activity, cacheInvestigation);
   assert.equal(demo.capabilities.liveState, false);
   assert.equal(demo.capabilities.execute, false);
   assert.equal("turn" in demo, false);
@@ -105,7 +114,6 @@ test("every authored demo shares its prompts, assumptions and bounded snapshot w
     const activity = activityForSource(selected);
     assert.equal(activity.demoId, demo.id);
     assert.deepEqual(getBookDemo(graph, demo.id).activity, activity);
-    if (demo.id === queueInvestigation.demoId) continue;
     assert.equal(activity.phases[0]!.prompt, demo.experiment!.predict);
     assert.ok(activity.guidance.includes(demo.assumptions));
     const input = {
@@ -184,103 +192,6 @@ test("non-demo loops preserve reported evidence and next checks without inventin
   assert.deepEqual(context.selectedNotes, []);
 });
 
-test("changed demo activities reject stale turns while keeping their current evidence contract", () => {
-  for (const id of [
-    "demo-constraint-feedback-loop",
-    "demo-agent-fleet-delegation",
-    "demo-scaling-pressure-planner",
-    "demo-boundary-trace",
-    "demo-cache-decision-lab",
-    "demo-api-contract-lens",
-    "demo-queue-balance-lab",
-    "demo-model-evaluation-lab",
-    "demo-acid-transaction-lab",
-    "demo-goodhart-pressure-test",
-    "demo-reliability-chain-lab",
-    "demo-saturation-boundary-lab",
-    "demo-contention-curve-lab",
-    "demo-latency-budget-map",
-  ]) {
-    const activity = readingActivities.find((item) => item.demoId === id)!;
-    const selected = {
-      ...source,
-      anchor: id,
-      conceptIds: [...activity.conceptIds],
-    };
-    assert.equal(activity.version, 2);
-    assert.throws(() =>
-      parseInvestigationTurn(
-        { activityId: activity.id, version: 1, phase: "predict" },
-        selected,
-      ),
-    );
-    assert.equal(
-      parseInvestigationTurn(
-        { activityId: activity.id, version: 2, phase: "predict" },
-        selected,
-      ).version,
-      2,
-    );
-  }
-});
-
-test("queue observations preserve fractional averages and the full entered range", () => {
-  for (const snapshot of [
-    { arrival: 2, time: 0.1, observed: 0.2, expected: 0.2, gap: 0 },
-    { arrival: 40, time: 2, observed: 0, expected: 80, gap: -80 },
-    { arrival: 2, time: 0.1, observed: 80, expected: 0.2, gap: 79.8 },
-  ]) {
-    const supplied = { ...observation, ...snapshot };
-    assert.deepEqual(
-      parseInvestigationTurn({ ...turn, observation: supplied }, source)
-        .observation,
-      supplied,
-    );
-  }
-  assert.throws(() =>
-    parseInvestigationTurn(
-      { ...turn, observation: { ...observation, observed: 80.1 } },
-      source,
-    ),
-  );
-});
-
-test("retired demo notes survive restart and fall back to the general learning loop", async () => {
-  const directory = await mkdtemp(path.join(tmpdir(), "book-retired-demo-"));
-  let notebook = openLearningNotebook(directory);
-  const ids = [
-    "demo-workflow-loop",
-    "demo-observability-signal-picker",
-    "demo-final-reflection-package",
-    "demo-scalability-dimensions-lab",
-  ];
-  try {
-    for (const id of ids)
-      notebook.saveEntry({
-        source: { ...source, anchor: id },
-        kind: "reflection",
-        title: id,
-        body: "Earlier reasoning remains mine.",
-        relatedIds: [],
-      });
-    notebook.close();
-    notebook = openLearningNotebook(directory);
-    assert.equal(notebook.entries().length, ids.length);
-    for (const note of notebook.entries()) {
-      assert.ok(ids.includes(note.source.anchor));
-      assert.equal(note.body, "Earlier reasoning remains mine.");
-      assert.equal(activityForSource(note.source).id, learningLoop.id);
-      assert.equal(
-        demoResources.some((demo) => demo.id === note.source.anchor),
-        false,
-      );
-    }
-  } finally {
-    notebook.close();
-    await rm(directory, { recursive: true, force: true });
-  }
-});
-
 test("large valid demo snapshots never discard a learner's tab reflection", (t) => {
   const records = new Map<string, string>();
   const original = Object.getOwnPropertyDescriptor(
@@ -298,9 +209,7 @@ test("large valid demo snapshots never discard a learner's tab reflection", (t) 
     if (original) Object.defineProperty(globalThis, "sessionStorage", original);
     else Reflect.deleteProperty(globalThis, "sessionStorage");
   });
-  const activity = readingActivities.find(
-    ({ demoId }) => demoId && demoId !== queueInvestigation.demoId,
-  )!;
+  const activity = readingActivities.find(({ demoId }) => Boolean(demoId))!;
   const selected = {
     ...source,
     anchor: activity.demoId!,
@@ -424,7 +333,7 @@ test("validated activity context reaches providers and survives restart without 
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
     assert.deepEqual(contexts[0].readingActivity.turn, turn);
-    assert.deepEqual(contexts[0].readingActivity.contract, queueInvestigation);
+    assert.deepEqual(contexts[0].readingActivity.contract, cacheInvestigation);
     assert.deepEqual(contexts[0].selectedNotes, []);
     assert.ok(!JSON.stringify(contexts).includes("PRIVATE SENTINEL"));
     conversations.close();

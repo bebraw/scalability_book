@@ -24,18 +24,28 @@ Use the primary-pressure and bounded correctness or recovery evidence from Chall
 Combine techniques only where the pressure requires them.
 A queue can duplicate effects without idempotency, and controlled rejection can amplify load if clients immediately retry.
 
-### Scaling pressure lab
+### Prepare one scaling decision
 
-The demonstration below starts from an invented Work Activity Tracker pressure: work-item actions spike while workspace activity feeds and summaries need to stay useful.
-Each accepted creation or transition must preserve its state change and matching activity event together.
-Queueing can defer derived summary work after that commit; a faster acknowledgment must not conceal a pending core operation.
-The scenarios are teaching examples; the worksheet proposes responses and their obligations, without estimating capacity or assigning risk scores.
-Choose one response and predict a result before inspecting the candidate design.
+Use the response patterns above to frame the existing before-and-after project experiment.
+Copy these prompts into the specification or decision record you maintain:
 
-{{ import "site/includes/scaling-pressure-demo.html" }}
+```text
+Observed limit, revision and supporting record:
+One response to test and expected observable benefit:
+Simpler alternative and why it is insufficient:
+Same-workload comparison and acceptance checks:
+New failure, freshness or recovery obligation:
+Result, uncertainty and reversal condition:
+```
 
-The important part is the exported [trade-off](/concepts/#trade-off) table.
-Use it to explain why a chosen technique fits the pressure, what it costs, what failure mode it introduces, and which signal would show whether the design is working.
+For example, a slow workspace feed may justify testing an index that matches its filter and ordering.
+Inspect the query plan and repeat the declared workload; also check result ordering and the added write or storage cost.
+The existence of an index is not evidence of useful improvement.
+
+Each accepted work-item creation or transition must preserve its state change and matching activity event together.
+Queueing may defer derived summaries after that commit; a faster acknowledgment must not conceal a pending core operation.
+For optional practice with a particular mechanism, the [course workspace](/downloads/labs/course-workspace.zip) contains `http-cache/` and `persisted-retry/` with fixed checks.
+Choose one when it answers your question; completing extra exercises is not an additional grading requirement.
 
 ## Name the saturation boundary
 
@@ -61,9 +71,10 @@ These dynamics explain why a locally sensible mechanism can worsen a system-wide
 
 ### Saturation boundary lab
 
-The model below compares one effective event rate with four declared stage limits.
+The model below follows offered, admitted and completed rates through four declared stage limits.
 Increase demand until a boundary becomes binding, expand that limit, and observe which constraint becomes visible next.
-Then enable [backpressure](/concepts/#backpressure) and compare hidden backlog growth with explicit rejection.
+Then enable [backpressure](/concepts/#backpressure) and distinguish the excess that queues from the excess explicitly rejected.
+Name a real observation that could confirm the limiting stage; the model's entered capacities do not establish it.
 
 {{ import "site/includes/saturation-boundary-demo.html" }}
 
@@ -151,8 +162,10 @@ A Deployment can declare a replica count and pod template, while a Service gives
 ### Orchestration control-loop lab
 
 The lab below runs [Webernetes](https://github.com/ngrok/webernetes), a partial browser-based port of Kubernetes intended for interactive teaching.
-Change the desired replica count, send requests through a service, terminate a pod, and perform a rolling update.
+Change the desired replica count, send requests through a service, terminate a pod, and inspect a rolling update.
 Watch for the distinction between the operator's instruction, the temporary mismatch, and the controller action that restores the declared state.
+The deliberately broken release adds a second question: can the replica count converge while application requests fail?
+Inspect the response evidence and roll back, keeping running replicas separate from accepted application outcomes.
 
 {{ import "site/includes/orchestration-demo.html" }}
 
@@ -197,6 +210,8 @@ Justify multi-region architecture against the project's latency, availability, a
 The demonstration below treats latency as a budget.
 Some of the budget is bounded by physics: a signal cannot cross distance instantly, and real networks add routing and protocol overhead.
 Some of the budget is architectural: every sequential database round trip adds another wait.
+Choose distances independently of the server and database execution times; each timing is a stated hypothetical input unless you supply a sourced observation.
+Distance alone does not determine a primary/replica design or a hardware class.
 
 {{ import "site/includes/latency-budget-demo.html" }}
 

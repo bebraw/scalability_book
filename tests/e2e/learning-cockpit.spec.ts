@@ -141,19 +141,15 @@ test("every demo enters the same cockpit and supplies its own actual snapshot on
     expect(context.source.anchor).toBe(demo.id);
     expect(context.readingActivity.contract.demoId).toBe(demo.id);
     expect(context.readingActivity.turn.observation.kind).toBe(
-      demo.id === "demo-queue-balance-lab"
-        ? "browser-queue-snapshot"
-        : "browser-demo-snapshot",
+      "browser-demo-snapshot",
     );
-    if (demo.id !== "demo-queue-balance-lab") {
-      expect(context.readingActivity.turn.observation.demoId).toBe(demo.id);
-      expect(
-        context.readingActivity.turn.observation.visibleText.length,
-      ).toBeGreaterThan(0);
-      expect(
-        context.readingActivity.turn.observation.visibleText,
-      ).not.toContain("My prediction or uncertainty");
-    }
+    expect(context.readingActivity.turn.observation.demoId).toBe(demo.id);
+    expect(
+      context.readingActivity.turn.observation.visibleText.length,
+    ).toBeGreaterThan(0);
+    expect(context.readingActivity.turn.observation.visibleText).not.toContain(
+      "My prediction or uncertainty",
+    );
     expect(context.selectedNotes).toEqual([]);
   }
   expect(model.requests).toHaveLength(demoResources.length);

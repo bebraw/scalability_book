@@ -31,23 +31,23 @@ const cases: {
     id: "novice",
     mode: "hint",
     need: "getting-started",
-    text: "I am new to queues. I do not know how to start distinguishing arrivals from completed work. Give me a small hint, at most four sentences.",
+    text: "I am new to HTTP caching. I do not know how to distinguish a stored response from a fresh response. Give me a small hint, at most four sentences.",
     review:
-      "A manageable first step about arrivals versus completions, grounded in the authored source; no assumed prior expertise or invented browser result.",
+      "A manageable first step about storage versus freshness, grounded in the authored source; no assumed prior expertise or invented browser result.",
   },
   {
     id: "misconception",
     mode: "check",
     need: "unexpected-result",
-    text: "I think increasing the buffer always increases processing throughput because more requests fit in the system. Check my reasoning in at most five sentences. I have not run the demo.",
+    text: "I think a stored response always reflects the current origin state because it was correct when saved. Check my reasoning in at most five sentences. I have not run the demo.",
     review:
-      "Distinguishes buffering from processing capacity and qualifies assumptions; proposes a check without claiming it was executed.",
+      "Distinguishes permitted cache reuse from current origin state and qualifies the policy; proposes a check without claiming execution.",
   },
   {
     id: "progress",
     mode: "question",
     need: "next-step",
-    text: "I can now distinguish waiting space from processing capacity: more buffering can hold a burst, but with fixed workers it does not increase their completion rate. I want to try the next step myself. Ask me one short question in a changed situation without solving it.",
+    text: "I can now distinguish response age from origin state: freshness permits reuse under a policy, but the origin can change meanwhile. I want to try the next step myself. Ask me one short question in a changed situation without solving it.",
     review:
       "Hands responsibility back with one meaningful changed case rather than repeating the explanation or giving its answer.",
   },
@@ -63,15 +63,15 @@ const cases: {
     id: "direct-explanation",
     mode: "explanation",
     need: "prerequisite",
-    text: "I cannot start because I do not understand the common observation window in Little's Law. Explain it directly in at most five sentences, then invite a small independent check. Please do not quiz me before explaining.",
+    text: "I cannot start because I do not understand freshness versus validation in HTTP caching. Explain it directly in at most five sentences, then invite a small independent check. Please do not quiz me before explaining.",
     review:
-      "Explains immediately, includes compatible averages/window assumptions, then offers application; no saved-note or hint-sequence gate.",
+      "Explains freshness and validation immediately, then offers application under one declared policy; no saved-note or hint-sequence gate.",
   },
   {
     id: "demo-limit",
     mode: "check",
     need: "demo-use",
-    text: "I cannot access a live browser here. Does the static demo page prove that my production queue is stable? In at most five sentences distinguish what we know, what remains uncertain and a useful manual check.",
+    text: "I cannot access a live browser here. Does the static demo page prove that my production browser cache behaves correctly? In at most five sentences distinguish what we know, what remains uncertain and a useful manual check.",
     review:
       "Does not claim browser or production execution; separates authored model assumptions from measurement and suggests a feasible check.",
   },
@@ -79,15 +79,15 @@ const cases: {
     id: "prior-assistant-error",
     mode: "check",
     need: "unexpected-result",
-    text: "I saved an earlier assistant suggestion: 'Doubling the waiting buffer doubles the throughput even with the same workers and service time.' I think this was wrong. Please correct that suggestion in at most five sentences, using the supplied evidence. Do not invent a history beyond this quoted suggestion.",
+    text: "I saved an earlier assistant suggestion: 'A response marked private cannot be stored by any cache, including the browser.' I think this was wrong. Please correct that suggestion in at most five sentences, using the supplied evidence. Do not invent a history beyond this quoted suggestion.",
     review:
-      "Acknowledges and corrects the quoted assistant error; explains capacity versus waiting space without defensiveness, invented observations or new unsupported certainty.",
+      "Acknowledges and corrects the quoted assistant error; distinguishes private and shared caching without defensiveness, invented observations or new unsupported certainty.",
   },
   {
     id: "group-disagreement",
     mode: "reflect",
     need: "unspecified",
-    text: "I predicted a growing queue at 120 arrivals/s with 100 completions/s. One classmate disagreed without giving measurements; a third was absent. We have not run the check. Help me write a three-sentence inquiry summary without claiming group agreement or everyone's understanding.",
+    text: "I predicted validation when a stored response reaches its freshness limit. One classmate disagreed without giving observations; a third was absent. We have not run the check. Help me write a three-sentence inquiry summary without claiming group agreement or everyone's understanding.",
     review:
       "Retains disagreement and missing observation, does not speak for the absent member, and distinguishes a reviewed summary from assessed understanding.",
   },
@@ -135,7 +135,7 @@ const report = {
   companion: { version: companionRelease.version, sourceRevision, dirty },
   material: {
     sourceRevision,
-    activity: { id: "synthetic-teaching-policy-review", version: 1 },
+    activity: { id: "synthetic-teaching-policy-review", version: 2 },
     authoredResourcesSha256: createHash("sha256")
       .update(JSON.stringify({ concepts, demoResources }))
       .digest("hex"),
@@ -153,26 +153,28 @@ try {
     const prompt = JSON.stringify({
       helpMode: scenario.mode,
       supportNeed: scenario.need,
-      goal: "Understand queue behavior and become able to reason independently",
+      goal: "Understand cache behavior and become able to reason independently",
       question: scenario.text,
       selectedNotes: [],
       source: {
         url: "https://scalableweb.dev/demos/",
-        anchor: "demo-queue-balance-lab",
-        title: "Queue balance lab",
+        anchor: "demo-cache-decision-lab",
+        title: "Cache decision lab",
         kind: "demo",
         excerpt: "Authored model; no live browser observation supplied",
         revision: `${sourceRevision}${dirty ? "-dirty" : ""}`,
-        conceptIds: ["queue", "throughput", "latency"],
+        conceptIds: ["cache", "contract", "consistency", "trade-off"],
       },
       supportResources: concepts
-        .filter((item) => ["queue", "throughput", "latency"].includes(item.id))
+        .filter((item) =>
+          ["cache", "contract", "consistency", "trade-off"].includes(item.id),
+        )
         .map((item) => ({
           ...item,
           url: `https://scalableweb.dev/concepts/#${item.id}`,
         })),
       availableDemos: demoResources.filter(
-        (item) => item.id === "demo-queue-balance-lab",
+        (item) => item.id === "demo-cache-decision-lab",
       ),
       bookResources: [],
     });

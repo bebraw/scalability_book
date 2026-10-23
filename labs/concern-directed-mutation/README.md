@@ -12,6 +12,13 @@ The starting requirements are:
 
 ## Establish the starting point
 
+Use Node 24 or newer.
+In the combined course workspace, install once at its root and use `npm run lab -- concern-directed-mutation <mode>`.
+For the standalone download, run `npm ci` in this directory.
+`npm run preflight` checks that Node can parse the supplied TypeScript fixture; it does not assess the learner's assertions.
+No browser installation is needed.
+Read SPEC.md and TASK.md, maintain the specification and record one consequential decision in `decisions/`.
+
 From this lab directory, run the baseline, the storage refactor, and all three mutants:
 
 ```sh

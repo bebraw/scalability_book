@@ -58,3 +58,8 @@ A clean-unpacked ZIP installs from its lockfile; a disposable completed candidat
 The distributed starter retains its implementation gap, passes setup preflight and the browser baseline, and fails the intended feature checks.
 An unescaped candidate fails independent contract checks; the scripted demo's false executed-download claim was reproduced before correction.
 Production publication and learner difficulty remain separate from repository implementation.
+
+## Subsequent scope
+
+[ADR-055](ADR-055-consolidate-local-practice-and-retire-low-value-demo-interactions.md) retires the queue-specific activity and low-value widgets and makes one independent-exercise workspace the primary local download.
+The earlier verification in this record describes its dated scope; the owning guides describe current behavior.

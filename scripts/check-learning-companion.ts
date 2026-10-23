@@ -181,11 +181,11 @@ try {
     source: {
       url: "https://book.test/demos/",
       kind: "demo",
-      anchor: "demo-queue-balance-lab",
-      title: "Queue check",
-      excerpt: "A common boundary",
+      anchor: "demo-cache-decision-lab",
+      title: "Cache check",
+      excerpt: "Response age and freshness",
       revision: "synthetic",
-      conceptIds: ["queue"],
+      conceptIds: ["cache"],
     },
   });
   const busyData = path.join(directory, "busy-port-data");

@@ -30,13 +30,13 @@ for (const native of [false, true])
       const previous = body.messages.at(-2).tool_calls[0];
       const result = JSON.parse(last.content);
       if (previous.function.name === "observe_demo") {
-        const arrival = result.controls.find((control: any) =>
-          /arrival/i.test(control.label),
+        const age = result.controls.find((control: any) =>
+          /Time since response was stored/i.test(control.label),
         );
         return localCall("change_demo", {
-          demoId: "demo-queue-balance-lab",
-          controlId: arrival.id,
-          value: 22,
+          demoId: "demo-cache-decision-lab",
+          controlId: age.id,
+          value: 100,
         });
       }
       return localAnswer(
@@ -89,7 +89,7 @@ for (const native of [false, true])
           }
         });
       });
-      await page.goto("/demos/#demo-queue-balance-lab");
+      await page.goto("/demos/#demo-cache-decision-lab");
       await page
         .locator('.site-header [data-learning-toggle="notebook"]')
         .click();
@@ -106,14 +106,14 @@ for (const native of [false, true])
         await chooseNotebookTool(notebook, "Discuss");
         await assistant
           .getByLabel("Investigation source")
-          .selectOption("demo-queue-balance-lab");
+          .selectOption("demo-cache-decision-lab");
         await assistant
           .getByRole("button", { name: "Save initial thinking" })
           .click();
         await notebook
           .getByLabel("Your thinking")
           .fill(
-            "I predict arrivals at 22 and mean time 0.5 will give expected work in progress of 11. I want to compare the actual output.",
+            "I predict that a stored asset aged 400 days is stale under its 365-day policy. I want to inspect the actual response path.",
           );
         await notebook
           .getByRole("button", { name: "Save note", exact: true })
@@ -151,9 +151,7 @@ for (const native of [false, true])
         ),
       ).toBeVisible();
       if (native) {
-        await expect(
-          page.locator('[data-little-law-input="arrival"]'),
-        ).toHaveValue("20");
+        await expect(page.locator("[data-cache-age]")).toHaveValue("25");
         await expect(
           assistant.getByText(
             "The student declined the proposed change; no changed result was observed.",
@@ -167,12 +165,12 @@ for (const native of [false, true])
             "Observe again and propose the same change; I will approve it.",
           );
         await assistant.getByRole("button", { name: "Send message" }).click();
-        await expect(
-          page.locator('[data-little-law-input="arrival"]'),
-        ).toHaveValue("22", { timeout: 30000 });
-        await expect(
-          page.locator('[data-little-law-metric="expected"]'),
-        ).toHaveText("11.0");
+        await expect(page.locator("[data-cache-age]")).toHaveValue("100", {
+          timeout: 30000,
+        });
+        await expect(page.locator("[data-cache-age-label]")).toHaveText(
+          "400 days",
+        );
         await expect(
           assistant.getByRole("heading", {
             name: "Teaching assistant suggestion",

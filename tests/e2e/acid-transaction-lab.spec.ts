@@ -39,9 +39,6 @@ test.describe("ACID transaction lab", () => {
     await expect(lab).toHaveAttribute("data-acid-result", "broken");
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Finished");
     await expect(lab.locator("[data-acid-event]")).toHaveCount(0);
-    await expect(
-      lab.locator('[data-acid-property="atomicity"]'),
-    ).toHaveAttribute("data-status", "fail");
 
     await lab.locator("[data-acid-mode]").selectOption("transaction");
     await lab.locator("[data-acid-run]").click();
@@ -71,12 +68,6 @@ test.describe("ACID transaction lab", () => {
     await expect(lab.locator("[data-acid-isolation]")).toBeEnabled();
     await lab.locator("[data-acid-run]").click();
     await expect(lab.locator("[data-acid-event]")).toHaveCount(2);
-    await expect(
-      lab.locator('[data-acid-property="atomicity"]'),
-    ).toHaveAttribute("data-status", "pass");
-    await expect(
-      lab.locator('[data-acid-property="isolation"]'),
-    ).toHaveAttribute("data-status", "fail");
 
     await lab.locator("[data-acid-isolation]").selectOption("serializable");
     await lab.locator("[data-acid-run]").click();
@@ -85,9 +76,6 @@ test.describe("ACID transaction lab", () => {
     await expect(lab.locator("[data-acid-acknowledgement]")).toContainText(
       "Bob 409 retry",
     );
-    await expect(
-      lab.locator('[data-acid-property="isolation"]'),
-    ).toHaveAttribute("data-status", "pass");
   });
 
   test("keeps acknowledged state only when the reply follows durable commit", async ({
@@ -99,18 +87,19 @@ test.describe("ACID transaction lab", () => {
     await expect(lab.locator("[data-acid-program]")).toBeHidden();
     await lab.locator("[data-acid-run]").click();
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Initial");
-    await expect(
-      lab.locator('[data-acid-property="durability"]'),
-    ).toHaveAttribute("data-status", "fail");
+    await expect(lab.locator("[data-acid-acknowledgement]")).toContainText(
+      "before commit",
+    );
 
-    await lab.locator("[data-acid-mode]").selectOption("transaction");
+    await expect(lab.locator("[data-acid-mode]")).toBeDisabled();
+    await expect(lab.locator("[data-acid-control-note]")).toContainText(
+      "same durable transaction",
+    );
+    await lab.locator("[data-acid-reply-timing]").selectOption("after");
     await lab.locator("[data-acid-run]").click();
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Active");
     await expect(lab.locator("[data-acid-event='work_started']")).toHaveCount(
       1,
     );
-    await expect(
-      lab.locator('[data-acid-property="durability"]'),
-    ).toHaveAttribute("data-status", "pass");
   });
 });

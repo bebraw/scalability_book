@@ -82,7 +82,11 @@ function initializeStatechartDemo(root: HTMLElement) {
   }
 
   let actor = createDeliveryActor();
-  const observed: Array<{ event: DeliveryEventType; state: string }> = [];
+  const observed: Array<{
+    event: DeliveryEventType;
+    state: string;
+    accepted: boolean;
+  }> = [];
   model.innerHTML = highlight.highlight(exportableDeliveryMachine, {
     language: "typescript",
   }).value;
@@ -117,7 +121,7 @@ function initializeStatechartDemo(root: HTMLElement) {
       ? observed
           .map(
             (entry, index) =>
-              `<li><span>${String(index + 1).padStart(2, "0")}</span><code>${entry.event}</code><small>${entry.state}</small></li>`,
+              `<li><span>${String(index + 1).padStart(2, "0")}</span><code>${entry.event}</code><small>${entry.accepted ? "Accepted" : "Rejected; state unchanged"}: ${entry.state}</small></li>`,
           )
           .join("")
       : '<li class="is-empty">No events sent yet.</li>';
@@ -127,6 +131,12 @@ function initializeStatechartDemo(root: HTMLElement) {
     const snapshot = actor.getSnapshot();
 
     if (!snapshot.can({ type: eventType })) {
+      observed.push({
+        event: eventType,
+        state: formatStateValue(snapshot.value),
+        accepted: false,
+      });
+      render();
       return;
     }
 
@@ -134,6 +144,7 @@ function initializeStatechartDemo(root: HTMLElement) {
     observed.push({
       event: eventType,
       state: formatStateValue(actor.getSnapshot().value),
+      accepted: true,
     });
     render();
   };
@@ -157,6 +168,9 @@ function initializeStatechartDemo(root: HTMLElement) {
     }
   });
   resetButton.addEventListener("click", reset);
+  root
+    .querySelector("[data-statechart-demo-propose-release]")
+    ?.addEventListener("click", () => sendEvent("RELEASE"));
   copyButton.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(exportableDeliveryMachine);

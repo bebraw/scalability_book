@@ -8,12 +8,12 @@ const post: InquiryPost = {
   author: "synthetic:alice",
   name: "Synthetic Alice",
   kind: "check",
-  body: "The modeled queue grew. This is not a measured project result.",
+  body: "The modeled response needed validation. This is not a measured project result.",
   provenance: "Reviewed agent suggestion; Alice ran the model check.",
   links: [
     {
       caption: "Declared model",
-      url: "https://book.test/demos/#demo-queue-balance-lab",
+      url: "https://book.test/demos/#demo-cache-decision-lab",
     },
   ],
   createdAt: "2026-10-07T08:00:00.000Z",

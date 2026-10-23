@@ -48,13 +48,11 @@ The server's instructions, activity pacing and `agentPresentation` guide client 
 No browser interaction, current passage selection or private context is implied by connecting.
 Those remain the companion's separate, explicitly selected-context boundary.
 Every demo returns its shared `activity` contract: stable ID/version, source reading, authored phases, adaptation guidance and bounded browser-observation semantics.
-The catalog currently has 28 demos; the gallery distinguishes reading investigations, optional depth and project worksheets.
-The constraint-loop, fleet-planning, scaling-planning, boundary-trace, cache, API-contract, queue and evaluation activities use version 2 after changes to their interpretation or controls.
-The specialized queue activity's bounds include fractional observed work from 0 to 80; its version is independent of the browser snapshot schema.
-The retired dimensions radar is now a static mapping in its chapter; its conceptual exercise remains available.
-Their assumptions describe scripted results or qualitative preparation explicitly; the downloadable CSV starter is a separate executable exercise.
-Retired demos are absent from current public retrieval and live controls, while existing notebook entries retain their historical source and can use the general learning loop.
-The queue retains its typed numeric fields and units; other demos describe named controls and displayed text.
+The catalog currently has 16 demos in reading investigations and optional depth.
+Authored activity versions follow changes to controls or interpretation independently of the browser snapshot schema.
+All demos describe bounded named controls and displayed text with the same generic snapshot contract.
+Retired widgets and their specialized contracts are removed; their useful questions remain as chapter evidence activities and project templates.
+The [local practice workspace](../labs/README.md) is a separate executable teaching resource with independent CSV, mutation, retry and cache exercises.
 Concept, exploration and passage lookups also expose `learningLoop` for source-led thinking, a check, personal reflection and a next independent check.
 The graph exports these as additive `readingActivities` in schema version 2.
 External clients may present the same predict/experiment/reflect flow, but must obtain actual observations from their own authorized browser tools or the student.
@@ -116,7 +114,7 @@ Keep the activity consistent with the actual demo controls and preserve the dist
 Experiments intentionally omit a model answer.
 
 The agent guide asks for a brief first reply when the student supplies only the guide: acknowledge the material actually retrieved, offer three starting activities, and ask the student to choose.
-The activities follow a reading, connect Queue and Latency, or try the queue balance experiment; the experiment is the suggested starting point for an unsure learner.
+The activities follow a reading, connect Queue and Latency, or try the cache decision experiment; the experiment is the suggested starting point for an unsure learner.
 A student who already has a question, chapter, or passage starts there.
 After choosing, the student explains or predicts before the agent reveals labels or results, then checks a cited passage.
 These instructions guide the student's external agent; the site does not run or control that agent.
@@ -151,7 +149,7 @@ An agent must ask for the student's observations when interaction state is not e
 Generated results are illustrative; they do not become measured project evidence or additional course requirements.
 The guidance preserves the first-question pause and separate worked reasoning.
 
-For example, an agent can help investigate work in progress with the queue balance lab, trace the recorder fixture across restart, or compare reported confidence with reference agreement after a prediction.
+For example, an agent can help investigate reuse and validation with the cache decision lab, trace the recorder fixture across restart, or compare reported confidence with reference agreement after a prediction.
 The public MCP server returns data and guidance; it does not register an embedded MCP Apps UI or host a conversational client.
 Client behavior should be tested with both an interactive-capable client and a text-only client.
 

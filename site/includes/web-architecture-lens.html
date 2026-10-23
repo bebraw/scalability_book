@@ -1,251 +1,94 @@
 <section
   id="demo-web-architecture-lens"
   data-demo-anchor
-  class="scaling-demo architecture-lens"
+  class="architecture-lens"
   data-architecture-lens
   aria-labelledby="architecture-lens-heading"
 >
-  <div class="scaling-demo-header architecture-lens-header demo-header">
+  <div class="architecture-lens-header demo-header">
     <div>
-      <p class="scaling-demo-kicker demo-kicker">Who builds the next view?</p>
-      <h3 id="architecture-lens-heading">Compare web application flows</h3>
+      <p class="demo-kicker">Web architecture lens</p>
+      <h3 id="architecture-lens-heading">
+        What crosses the boundary after an action?
+      </h3>
     </div>
-    <div class="architecture-lens-equation demo-summary" aria-live="polite">
-      <span data-architecture-lens-interaction-badge>MPA</span>
-      <i aria-hidden="true">+</i>
-      <span data-architecture-lens-delivery-badge>SSR</span>
-      <small>application flow + first load</small>
+    <div class="demo-summary">
+      <span>Three modeled update flows</span
+      ><small
+        >No HTTP requests run here; sizes and timing are not measured.</small
+      >
     </div>
   </div>
-
-  <div class="architecture-lens-intro">
-    <strong>Start with the application flow.</strong>
-    <p>
-      Compare a full page, an HTML fragment, and a view built from JSON. HDA
-      keeps views and action controls on the server; the SPA example builds
-      views in the browser. Both can update part of a page.
-    </p>
-  </div>
-
-  <form data-architecture-lens-form>
-    <div class="architecture-lens-controls">
-      <fieldset>
-        <legend><span>01</span> How does the application update?</legend>
-        <div class="architecture-lens-options">
-          <label>
-            <input
-              type="radio"
-              name="interaction"
-              value="mpa"
-              data-architecture-lens-interaction
-              checked
-            />
-            <span
-              ><strong>MPA</strong
-              ><small>Server HTML, full-page navigation</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="interaction"
-              value="hda"
-              data-architecture-lens-interaction
-            />
-            <span
-              ><strong>HDA</strong
-              ><small>Server HTML, targeted updates</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="interaction"
-              value="spa"
-              data-architecture-lens-interaction
-            />
-            <span
-              ><strong>SPA</strong
-              ><small>JSON data, browser builds views</small></span
-            >
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset aria-describedby="architecture-lens-initial-help">
-        <legend><span>02</span> How does the first view arrive?</legend>
-        <div class="architecture-lens-options">
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="ssr"
-              data-architecture-lens-delivery
-              checked
-            />
-            <span
-              ><strong>SSR</strong
-              ><small>HTML rendered for this request</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="isr"
-              data-architecture-lens-delivery
-            />
-            <span
-              ><strong>ISR</strong
-              ><small>Cached HTML, regenerated later</small></span
-            >
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="delivery"
-              value="csr"
-              data-architecture-lens-delivery
-              disabled
-            />
-            <span
-              ><strong>CSR</strong
-              ><small>Browser builds the first view</small></span
-            >
-          </label>
-        </div>
-      </fieldset>
-    </div>
-
-    <p
-      class="architecture-lens-initial-help"
-      id="architecture-lens-initial-help"
+  <p>
+    The first document may be rendered on the server, built ahead of time, or
+    assembled in the browser. That is a separate choice from the later update
+    below. All three examples start from the same loaded activity page.
+  </p>
+  <fieldset class="architecture-lens-controls">
+    <legend>After recording an event</legend>
+    <label
+      ><input
+        type="radio"
+        name="architecture-interaction"
+        value="mpa"
+        data-architecture-lens-interaction
+        checked
+      />Full document (MPA)</label
     >
-      Choosing a flow starts MPA and HDA with SSR, and SPA with CSR. Then vary
-      the first load: an SPA can also start with server HTML. CSR is available
-      only in the SPA example; these are representative flows, not every
-      possible hybrid.
-    </p>
-
-    <div class="architecture-lens-workbench">
-      <div class="architecture-lens-browser" data-architecture-lens-browser>
-        <div class="architecture-lens-browser-bar" aria-hidden="true">
-          <i></i><i></i><i></i><code>/activity</code>
-        </div>
-        <div class="architecture-lens-document">
-          <div class="architecture-lens-document-head">
-            <div>
-              <small>Work activity</small>
-              <strong>Today</strong>
-            </div>
-            <span data-architecture-lens-freshness>Rendered now</span>
-          </div>
-          <ul id="activity-list" data-architecture-lens-events>
-            <li><span>09:15</span>Design review</li>
-            <li><span>10:30</span>API implementation</li>
-          </ul>
-          <label class="architecture-lens-draft">
-            <span>Unsaved local draft <small>DOM state</small></span>
-            <input
-              type="text"
-              value="Compare cache behavior"
-              data-architecture-lens-draft
-            />
-          </label>
-          <button type="button" data-architecture-lens-run>
-            <span aria-hidden="true">+</span> Record “Architecture study”
-          </button>
-        </div>
-        <div class="architecture-lens-browser-status" aria-live="polite">
-          Ready to trace the interaction.
-        </div>
-        <dl class="architecture-lens-receipt" aria-label="Interaction receipt">
-          <div>
-            <dt>Browser requests</dt>
-            <dd data-architecture-lens-receipt="requests">2</dd>
-          </div>
-          <div>
-            <dt>Response content</dt>
-            <dd data-architecture-lens-receipt="artifact">Complete HTML</dd>
-          </div>
-          <div>
-            <dt>Update scope</dt>
-            <dd data-architecture-lens-receipt="scope">Whole document</dd>
-          </div>
-          <div>
-            <dt>Local draft</dt>
-            <dd data-architecture-lens-receipt="state">Reset</dd>
-          </div>
-          <div
-            class="architecture-lens-transfer"
-            data-architecture-lens-transfer
-          >
-            <dt>Modeled response transfer after click</dt>
-            <dd>
-              <strong data-architecture-lens-transfer-label>≈18 KB</strong>
-              <span class="architecture-lens-transfer-track" aria-hidden="true">
-                <i></i>
-              </span>
-              <small data-architecture-lens-transfer-detail
-                >complete document</small
-              >
-            </dd>
-          </div>
-        </dl>
-        <p class="architecture-lens-transfer-note">
-          Illustrative compressed responses after the action. Initial HTML,
-          JavaScript downloads, headers, and the common POST body are excluded.
-        </p>
-        <div class="architecture-lens-session">
-          <label>
-            <span>Initialized session</span>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value="3"
-              data-architecture-lens-session-actions
-            />
-            <output data-architecture-lens-session-count>3 actions</output>
-          </label>
-          <p data-architecture-lens-session-summary>
-            6 requests · ≈54 KB responses · 3 document replacements
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="architecture-lens-trace"
+    <label
+      ><input
+        type="radio"
+        name="architecture-interaction"
+        value="hda"
+        data-architecture-lens-interaction
+      />HTML fragment</label
+    >
+    <label
+      ><input
+        type="radio"
+        name="architecture-interaction"
+        value="spa"
+        data-architecture-lens-interaction
+      />JSON + client render</label
+    >
+  </fieldset>
+  <div class="architecture-lens-workbench">
+    <section class="architecture-lens-panel">
+      <h4 data-architecture-lens-title>Full-document navigation</h4>
+      <p data-architecture-lens-summary></p>
+      <ol
         data-architecture-lens-trace
-        aria-label="Request trace"
-      ></div>
-    </div>
-
-    <div class="architecture-lens-readout">
-      <div>
-        <p class="request-trace-section-label">What this flow means</p>
-        <h4 data-architecture-lens-title>MPA + SSR</h4>
-        <p data-architecture-lens-summary></p>
-      </div>
-      <dl class="architecture-lens-facts">
-        <div>
-          <dt>Initial document</dt>
-          <dd data-architecture-lens-fact="document"></dd>
-        </div>
-        <div>
-          <dt>After the POST</dt>
-          <dd data-architecture-lens-fact="transition"></dd>
-        </div>
-        <div>
-          <dt>Freshness pressure</dt>
-          <dd data-architecture-lens-fact="freshness"></dd>
-        </div>
-        <div>
-          <dt>Client responsibility</dt>
-          <dd data-architecture-lens-fact="client"></dd>
-        </div>
+        aria-label="Modeled request and update sequence"
+      ></ol>
+      <dl>
+        <dt>Response</dt>
+        <dd data-architecture-lens-response></dd>
+        <dt>Replacement scope</dt>
+        <dd data-architecture-lens-scope></dd>
       </dl>
-      <p class="architecture-lens-caution" data-architecture-lens-caution></p>
-    </div>
-  </form>
+    </section>
+    <section class="architecture-lens-panel" data-architecture-lens-browser>
+      <h4>Draft outside the activity list</h4>
+      <label
+        ><span>Unsaved note</span
+        ><input data-architecture-lens-draft value="Compare cache behavior"
+      /></label>
+      <label
+        ><input type="checkbox" data-architecture-lens-restore />Explicitly
+        restore the draft after document navigation</label
+      >
+      <button type="button" data-architecture-lens-run>
+        Reveal modeled update
+      </button>
+      <ul data-architecture-lens-events aria-label="Modeled activity list"></ul>
+      <p class="architecture-lens-browser-status" aria-live="polite"></p>
+    </section>
+  </div>
+  <p class="demo-note">
+    A fragment or client render can also discard state if it replaces the
+    draft's owner. In your project, inspect one real action in DevTools: method,
+    status, content type, replaced DOM region and draft behavior. Make one
+    bounded update with your model, then verify the saved event and draft
+    separately.
+  </p>
 </section>

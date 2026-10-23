@@ -209,7 +209,7 @@ test("native tool round trips contain only validated calls and real callback res
     body.messages.at(-1).role === "tool"
       ? localAnswer("The browser result was supplied by the callback.", true)
       : localCall("change_demo", {
-          demoId: "demo-queue-balance-lab",
+          demoId: "demo-cache-decision-lab",
           controlId: "mean-time",
           value: 0.2,
         }),
@@ -355,12 +355,12 @@ test("conversation owner retains work and note snapshots and never exports priva
   t.after(() => notebook.close());
   const source = {
     url: "https://book.test/demos/",
-    anchor: "demo-queue-balance-lab",
-    title: "Queue",
+    anchor: "demo-cache-decision-lab",
+    title: "Cache decision lab",
     kind: "demo",
     excerpt: "Selected source",
     revision: null,
-    conceptIds: ["queue"],
+    conceptIds: ["cache"],
   };
   const note = notebook.saveEntry({
     kind: "attempt",

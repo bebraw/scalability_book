@@ -52,6 +52,7 @@ import { createSiteRenderer } from "./lib/site-renderer.ts";
 import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
+import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
 import {
   readRequirementEditions,
   rewriteRequirementLinks,
@@ -207,23 +208,11 @@ await compileSiteBundle(
 );
 await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
-await compileSiteScript(
-  "scripts/project-fit-checker.ts",
-  "project-fit-checker.js",
-);
-await compileSiteScript(
-  "scripts/constrain-generate-validate-demo.ts",
-  "constrain-generate-validate-demo.js",
-);
 await compileSiteBundle(
   "scripts/statechart-boundary-demo.ts",
   "statechart-boundary-demo.js",
   "StatechartBoundaryDemo",
   "es2019",
-);
-await compileSiteScript(
-  "scripts/request-trace-demo.ts",
-  "request-trace-demo.js",
 );
 await compileSiteScript(
   "scripts/acid-transaction-lab.ts",
@@ -235,17 +224,8 @@ await compileSiteScript(
   "web-architecture-lens.js",
 );
 await compileSiteScript(
-  "scripts/client-activation-lens.ts",
-  "client-activation-lens.js",
-);
-await compileSiteScript("scripts/api-contract-lens.ts", "api-contract-lens.js");
-await compileSiteScript(
   "scripts/benchmark-simulation-demo.ts",
   "benchmark-simulation-demo.js",
-);
-await compileSiteScript(
-  "scripts/goodhart-challenge-demo.ts",
-  "goodhart-challenge-demo.js",
 );
 await compileSiteScript(
   "scripts/browser-performance-workbench.ts",
@@ -258,21 +238,10 @@ await compileSiteBundle(
   "BookExercises",
   "es2019",
 );
-await compileSiteScript("scripts/model-eval-demo.ts", "model-eval-demo.js");
 await compileSiteScript("scripts/otel-trace-demo.ts", "otel-trace-demo.js");
-await compileSiteScript(
-  "scripts/friction-audit-demo.ts",
-  "friction-audit-demo.js",
-);
-await compileSiteScript("scripts/pressure-map-demo.ts", "pressure-map-demo.js");
 await compileSiteScript(
   "scripts/fleet-trace-debugger.ts",
   "fleet-trace-debugger.js",
-);
-await compileSiteScript("scripts/agent-fleet-demo.ts", "agent-fleet-demo.js");
-await compileSiteScript(
-  "scripts/scaling-pressure-demo.ts",
-  "scaling-pressure-demo.js",
 );
 await compileSiteScript(
   "scripts/saturation-boundary-demo.ts",
@@ -828,13 +797,6 @@ function getDemoGalleryHtml() {
       description:
         "Explore a specific mechanism when it helps answer your question. These models and appendix activities do not add required submissions.",
     },
-    {
-      id: "worksheet",
-      title: "Project worksheets",
-      badge: "Worksheet",
-      description:
-        "Prepare a bounded implementation, investigation or decision. Fill in actual observations from your project; selections alone do not validate a claim.",
-    },
   ];
   let demoIndex = 0;
   const sections = categories
@@ -888,7 +850,7 @@ ${cards}
     .join("\n");
   return `<div class="demo-gallery-lede">
 <p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface. Where practice is available, switch to its tab to check your understanding. Saved results are shared with the chapter exercises.</p>
-<p>For a small local implementation with your own model, download the <a href="/downloads/labs/csv-export.zip">CSV starter lab</a> and run its independent checks.</p>
+<p>For a small local implementation with your own model, download the <a href="/downloads/labs/course-workspace.zip">local exercise workspace</a>. Set up once, choose CSV, test quality, persisted retries or HTTP caching, and run that exercise’s independent checks.</p>
 <dl class="demo-gallery-stats">
 <div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
 <div><dt>Exercises</dt><dd>${exerciseEntries.length}</dd></div>
@@ -1367,19 +1329,9 @@ async function copyStaticAssets() {
 }
 
 async function writeLabDownloads() {
-  const labsDirectory = path.join(root, "labs");
-  const downloadsDirectory = path.join(buildDir, "downloads", "labs");
-  const labs = (await readdir(labsDirectory, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  await Promise.all(
-    labs.map((lab) =>
-      writeDirectoryZip(
-        path.join(labsDirectory, lab.name),
-        path.join(downloadsDirectory, `${lab.name}.zip`),
-      ),
-    ),
+  await writeLabSourceDownloads(
+    path.join(root, "labs"),
+    path.join(buildDir, "downloads", "labs"),
   );
 }
 

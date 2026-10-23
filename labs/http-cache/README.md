@@ -6,6 +6,10 @@ No shared cache, CDN, deployment account or model credential is needed.
 
 ## Setup and implementation
 
+In the combined course workspace, use the root `npm ci` once and run `npm run lab -- http-cache <command>` there.
+Install Chromium once with the root `npm run browser:install`; skip the separate installation below.
+The remaining commands and records still belong to this exercise.
+
 Use Node 24 or newer.
 From this directory:
 

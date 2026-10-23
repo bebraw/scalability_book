@@ -93,9 +93,6 @@ function initializeDurableRetryLab(root: HTMLElement) {
       root.querySelectorAll<HTMLElement>("[data-durable-retry-metric]"),
     ).map((metric) => [metric.dataset.durableRetryMetric ?? "", metric]),
   );
-  const stages = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-durable-retry-stage]"),
-  );
 
   if (
     !form ||
@@ -272,9 +269,7 @@ function initializeDurableRetryLab(root: HTMLElement) {
     crashButton.disabled = controlsLocked || !prediction;
     recoverButton.disabled = phase !== "crashed";
 
-    metrics.get("commands")!.textContent = phase === "ready" ? "0" : "1";
     metrics.get("attempts")!.textContent = String(attempts.length);
-    metrics.get("calls")!.textContent = String(attempts.length);
     metrics.get("effects")!.textContent = String(effectCount);
     metrics.get("completion")!.textContent = phase === "recovered" ? "1" : "0";
 
@@ -319,7 +314,6 @@ function initializeDurableRetryLab(root: HTMLElement) {
           .join("")
       : '<tr class="is-empty"><td colspan="4">No webhook attempts yet.</td></tr>';
 
-    updateDurableRetryStages(stages, phase);
     updateDurableRetryCopy({
       phase,
       activeConfiguration,
@@ -355,7 +349,7 @@ function initializeDurableRetryLab(root: HTMLElement) {
       await navigator.clipboard.writeText(artifact.value);
       copyButton.textContent = "Copied";
       window.setTimeout(() => {
-        copyButton.textContent = "Copy record";
+        copyButton.textContent = "Copy model notes";
       }, 1400);
     } catch {
       copyButton.textContent = "Select text";
@@ -393,7 +387,8 @@ function buildDurableRetryArtifact({
             : "The retry produced a second receiver effect.";
 
   return [
-    "Durable retry failure-window record",
+    "Durable retry — simulated model notes",
+    "Browser-only in-memory simulation; no process crash, HTTP delivery or durable storage was executed.",
     "",
     "Scenario: deliver event E42 to subscriber-7",
     "Fault: worker stops after the receiver effect and before completion is recorded",
@@ -405,7 +400,7 @@ function buildDurableRetryArtifact({
     `- Retry key: ${configuration.keyMode}`,
     `- Receiver deduplication: ${configuration.dedupeMode}`,
     "",
-    "Observed counts:",
+    "Modeled counts:",
     `- Logical commands: ${phase === "ready" ? 0 : 1}`,
     `- Activity attempts: ${attempts.length}`,
     `- Outbound calls: ${attempts.length}`,
@@ -415,32 +410,6 @@ function buildDurableRetryArtifact({
     `Last workflow fact: ${history[history.length - 1]?.event ?? "none"}`,
     `Interpretation: ${interpretation}`,
   ].join("\n");
-}
-
-function updateDurableRetryStages(
-  stages: HTMLElement[],
-  phase: DurableRetryPhase,
-) {
-  const completedByPhase: Record<DurableRetryPhase, string[]> = {
-    ready: [],
-    crashed: ["schedule", "send", "effect"],
-    recovered: ["schedule", "send", "effect", "fault", "recover"],
-    stopped: ["schedule", "send", "effect", "fault"],
-  };
-  const currentByPhase: Record<DurableRetryPhase, string> = {
-    ready: "schedule",
-    crashed: "fault",
-    recovered: "recover",
-    stopped: "recover",
-  };
-
-  for (const stage of stages) {
-    const id = stage.dataset.durableRetryStage ?? "";
-    stage.classList.toggle("is-complete", completedByPhase[phase].includes(id));
-    stage.classList.toggle("is-current", currentByPhase[phase] === id);
-    stage.classList.toggle("is-failed", id === "fault" && phase === "crashed");
-    stage.classList.toggle("is-muted", id === "recover" && phase === "stopped");
-  }
 }
 
 function updateDurableRetryCopy({
@@ -476,9 +445,9 @@ function updateDurableRetryCopy({
       : "Predict the recovery outcome";
     summary.textContent =
       "One command can produce more than one physical attempt.";
-    faultNote.querySelector("span")!.textContent = "Failure injector armed";
+    faultNote.querySelector("span")!.textContent = "Modeled failure window";
     resultMark.textContent = "?";
-    resultLabel.textContent = "Awaiting experiment";
+    resultLabel.textContent = "Awaiting model run";
     result.textContent = prediction
       ? "Prediction recorded. Send the first attempt into the crash window."
       : "Make a prediction, then stop the worker inside the failure window.";
@@ -492,7 +461,7 @@ function updateDurableRetryCopy({
     faultNote.querySelector("span")!.textContent = "Worker stopped at the seam";
     resultPanel.classList.add("is-warning");
     resultMark.textContent = "!";
-    resultLabel.textContent = "Crash injected";
+    resultLabel.textContent = "Modeled crash boundary";
     result.textContent =
       "The receiver committed effect #1, but workflow history still ends at ActivityScheduled #1. Recover from history to learn what the retry contract does.";
     return;

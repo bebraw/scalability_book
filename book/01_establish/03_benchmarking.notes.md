@@ -140,7 +140,7 @@ The point is to show that an eval is a controlled comparison, not a magic score.
 Students can change the task, inspect the complete shared prompt, score two attempts against the task's rubric, and notice how the conclusion changes when quality, latency, and cost are considered together.
 Use the invented samples or instructor-provided outputs before real comparisons are permitted; begin with the large-model baseline and revisit the tasks with the small-model and fleet setups later.
 
-{{ import "site/includes/model-eval-demo.html" }}
+Use [Appendix A’s actual-attempt rubric](/appendices/evaluating-agentic-workflows/#calibrate-a-rubric-on-actual-attempts) for a bounded comparison with sourced outputs.
 
 The sample exercise supports a conclusion about the scored answers, not a claim about a real model's quality, cost, latency, or saved review time.
 For real attempts, record those measurements separately and keep any conclusion local to the task and conditions.

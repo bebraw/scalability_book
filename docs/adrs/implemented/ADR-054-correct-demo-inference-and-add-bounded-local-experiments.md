@@ -75,3 +75,8 @@ Manual phone inspection exposed clipping in the new ACID program panel; its redu
 Code records now remain within the demo and are keyboard-focusable for horizontal scrolling.
 The Goodhart helper-name collision caught by type checking was corrected; build, validation and the published-link check pass, with blocked external targets retained as inconclusive.
 These refinements reuse existing starters and introduce no new course requirement or local harness.
+
+## Subsequent scope
+
+[ADR-055](ADR-055-consolidate-local-practice-and-retire-low-value-demo-interactions.md) retires the queue-specific activity and low-value widgets and makes one independent-exercise workspace the primary local download.
+The earlier verification in this record describes its dated scope; the owning guides describe current behavior.

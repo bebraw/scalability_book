@@ -179,23 +179,36 @@ Use that argument to ask where a fix waits in your own delivery path and who own
 Where would a successful release leave repair work unfinished?
 Give your agent the [remediation starting point](/explore/verify-remediation/agent.md), or [inspect the runtime inventory yourself](/explore/verify-remediation/).
 
-### Pressure map lab
+### Investigate an incident evidence packet
 
-The incident challenge below turns changed assumptions into a pressure map over three rounds.
-Investigate one signal and commit one response before time advances.
-The consequences persist: a response may protect one boundary while moving waiting, cost, correctness risk, or operational work somewhere else.
+:ref[table:incident-evidence-packet]{text="This authored packet"} describes a conference check-in service with an authoritative event store and derived dashboard.
+The values are invented observations for reasoning practice, not measured deployment capacity or predicted effects of a scaling technique.
+Read each record as evidence with a boundary; do not assume it establishes the cause on its own.
 
-{{ import "site/includes/pressure-map-demo.html" }}
+| Time    | Record                                                                                                                                  | Boundary and unresolved question                                                                                                       |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `09:02` | Offered demand rose from 75 to 140 events/s; completed throughput flattened near 110 events/s.                                          | Are these the same population and observation window?                                                                                  |
+| `09:02` | API CPU is 44%; database pool occupancy is 100%; p95 pool wait is 180 ms.                                                               | Work waits for a connection; is the pool too small, or is slow downstream work holding connections?                                    |
+| `09:08` | Four logical check-in IDs appear in fourteen physical attempts; the effect ledger contains fourteen applied effects for those four IDs. | Ten effects are duplicates; which receiver operation failed to preserve logical identity?                                              |
+| `09:10` | After atomic receiver deduplication is enabled, twelve new attempts with four new logical IDs produce four effects.                     | No new duplicate is seen in this cohort; the ten earlier duplicate effects still exist and need reconciliation.                        |
+| `09:14` | Importer work is 94 s old; interactive work is 12 s old and rising; global worker CPU is 58%.                                           | Per-class waiting differs; what service-rate or scheduler evidence would distinguish unfair scheduling from a shared downstream limit? |
+
+::caption[An incident packet separating workload, waiting, attempts and applied effects.]
+::label[table:incident-evidence-packet]
+
+Choose one point in the packet and write four short statements in your existing notes: a hypothesis, its supporting record, a plausible alternative, and the next observation that would distinguish them.
+Then propose one bounded response and name its new obligation.
+For example, limiting admitted work makes some rejection explicit; it does not create capacity or establish which requests should receive priority.
+Deduplication can prevent another duplicate under its key and transaction contract; it does not undo damage already committed.
+
+For optional execution, use `persisted-retry/README.md` in the [course workspace](/downloads/labs/course-workspace.zip) to inspect a failure after the effect but before the worker records completion.
+That experiment addresses the retry boundary; it does not reproduce the invented service's load or tenant scheduling.
 
 {{ import "exercise:pressure-retries" }}
 
 Before revealing the worked answer, explain which promised effect your verdict depends on.
 Then change one assumption: suppose the second record is only a diagnostic request log, while the contract's activity event is recorded once.
 Would your verdict change, and what makes those records different?
-
-Try one path, inspect the debrief, and replay with a different response.
-Use the exported brief to connect the operating pressure to the stressed component, binding limit, likely failure, first signal, and prepared recovery.
-The values are deterministic teaching inputs rather than measured capacity, so the useful evidence is the causal explanation and not the final number.
 
 ## Challenge assumptions without changing the common core
 

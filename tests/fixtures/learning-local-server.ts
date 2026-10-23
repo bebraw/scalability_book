@@ -18,7 +18,7 @@ export function localAnswer(content: string, tools = false) {
 }
 export function localCall(
   name = "observe_demo",
-  args: unknown = { demoId: "demo-queue-balance-lab" },
+  args: unknown = { demoId: "demo-cache-decision-lab" },
 ) {
   return {
     model: syntheticLocalModel,

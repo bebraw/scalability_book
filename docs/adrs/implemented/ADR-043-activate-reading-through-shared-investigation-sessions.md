@@ -78,3 +78,8 @@ The first slice uses the authored queue model and restricted reply renderer, ret
 - [ADR-027: Companion boundary](ADR-027-connect-book-learning-to-student-agents-through-a-local-companion.md)
 - [ADR-034: Separate notebook and assistant](ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md)
 - [ADR-042: Public MCP](ADR-042-expose-public-learning-material-through-stateless-mcp.md)
+
+## Subsequent scope
+
+[ADR-055](ADR-055-consolidate-local-practice-and-retire-low-value-demo-interactions.md) retires the queue-specific activity and low-value widgets and makes one independent-exercise workspace the primary local download.
+The earlier verification in this record describes its dated scope; the owning guides describe current behavior.

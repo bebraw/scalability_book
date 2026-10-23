@@ -68,7 +68,7 @@ Keep this outside the chapter's learning-goal list and the official assessment c
   Ask for the actual served configuration and contextual results when comparing workflows.
 - Keep the project-harness discussion, but distinguish common course material from implementation-specific project memory.
   Decide in the shared specification which project-harness files are supplied, which students author, and which may be carried into later builds.
-- Keep the implementation discovery lab aligned with the shared specification as the project evolves.
+- Keep the implementation-direction prompts aligned with the shared specification as the project evolves.
   It should support reasoning and conversation rather than score whether a group has found the “right” idea.
 
 ## Historical comparison archived during the September 2026 tightening pass

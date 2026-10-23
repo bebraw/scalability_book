@@ -6,116 +6,83 @@ test.describe("saturation boundary demo", () => {
     await expect(page.locator("[data-saturation-boundary-demo]")).toBeVisible();
   });
 
-  test("reveals a binding limit and moves it when capacity expands", async ({
+  test("expansion moves the limit and preserves the before/after comparison", async ({
     page,
   }) => {
     const demo = page.locator("[data-saturation-boundary-demo]");
-
     await expect(
-      demo.locator("[data-saturation-boundary-verdict]"),
-    ).toContainText("Database pool saturated");
+      demo.locator('[data-saturation-boundary-metric="admitted"]'),
+    ).toHaveText("140 ev/s");
     await expect(
-      demo.locator("[data-saturation-boundary-metric='boundary']"),
-    ).toHaveText("DB pool");
+      demo.locator('[data-saturation-boundary-metric="completed"]'),
+    ).toHaveText("110 ev/s");
     await expect(
-      demo.locator("[data-saturation-boundary-diagnosis]"),
-    ).toContainText("hidden work");
-    await expect(
-      demo.locator(
-        "[data-saturation-boundary-pipeline] [data-boundary='true']",
-      ),
-    ).toContainText("Database pool");
-    const initialHeights = await getDemoRegionHeights(demo);
-
+      demo.locator('[data-saturation-boundary-metric="backlog"]'),
+    ).toHaveText("30 ev/s");
     await demo.locator("[data-saturation-boundary-expand]").click();
-
     await expect(
       demo.locator("[data-saturation-boundary-verdict]"),
     ).toContainText("Downstream quota saturated");
     await expect(
-      demo.locator("[data-saturation-boundary-metric='boundary']"),
-    ).toHaveText("Quota");
+      demo.locator('[data-saturation-boundary-metric="completed"]'),
+    ).toHaveText("130 ev/s");
     await expect(
-      demo.locator("[data-saturation-boundary-artifact]"),
-    ).toHaveValue(/First boundary: Downstream quota/);
-    const expandedHeights = await getDemoRegionHeights(demo);
-    expect(expandedHeights).toEqual(initialHeights);
-
-    await demo
-      .locator("[data-saturation-boundary-scenario]")
-      .selectOption("baseline");
+      demo.locator('[data-saturation-boundary-metric="backlog"]'),
+    ).toHaveText("10 ev/s");
     await expect(
-      demo.locator("[data-saturation-boundary-verdict]"),
-    ).toContainText("is closest");
-    const healthyHeights = await getDemoRegionHeights(demo);
-    expect(healthyHeights).toEqual(initialHeights);
+      demo.locator("[data-saturation-boundary-comparison]"),
+    ).toContainText(
+      "Before expansion: Database pool, 110 completed/s. After: Downstream quota, 130 completed/s.",
+    );
+    await demo.locator("[data-saturation-boundary-load]").fill("20");
+    await expect(
+      demo.locator('[data-saturation-boundary-metric="completed"]'),
+    ).toHaveText("20 ev/s");
+    await expect(
+      demo.locator("[data-saturation-boundary-comparison]"),
+    ).toHaveText(
+      "Predict which stage will limit completion after one capacity increase, then compare.",
+    );
   });
 
-  test("makes overload explicit when backpressure is enabled", async ({
+  test("admission limiting changes admitted load but not useful completion", async ({
     page,
   }) => {
     const demo = page.locator("[data-saturation-boundary-demo]");
-
     await demo.locator("[data-saturation-boundary-backpressure]").check();
-
     await expect(
-      demo.locator("[data-saturation-boundary-metric='backlog']"),
+      demo.locator('[data-saturation-boundary-metric="admitted"]'),
+    ).toHaveText("110 ev/s");
+    await expect(
+      demo.locator('[data-saturation-boundary-metric="completed"]'),
+    ).toHaveText("110 ev/s");
+    await expect(
+      demo.locator('[data-saturation-boundary-metric="backlog"]'),
     ).toHaveText("0 ev/s");
     await expect(
-      demo.locator("[data-saturation-boundary-metric='rejected']"),
-    ).not.toHaveText("0 ev/s");
+      demo.locator('[data-saturation-boundary-metric="rejected"]'),
+    ).toHaveText("30 ev/s");
+    await expect(
+      demo.locator("[data-saturation-boundary-pipeline]"),
+    ).toContainText("110 admitted/s");
     await expect(
       demo.locator("[data-saturation-boundary-diagnosis]"),
-    ).toContainText("rejecting");
-    await expect(
-      demo.locator("[data-saturation-boundary-artifact]"),
-    ).toHaveValue(/Ingress backpressure: enabled/);
-
-    await expectElementsInsideDemo(demo, [
-      ".saturation-boundary-instrument",
-      ".saturation-boundary-readout",
-      ".saturation-boundary-actions",
-    ]);
-
-    await page.setViewportSize({ width: 390, height: 844 });
-    await expectElementsInsideDemo(demo, [
-      ".saturation-boundary-instrument",
-      ".saturation-boundary-readout",
-      ".saturation-boundary-actions",
-    ]);
-    const demoOverflow = await demo.evaluate(
-      (element) => element.scrollWidth - element.clientWidth,
-    );
-    expect(demoOverflow).toBeLessThanOrEqual(1);
+    ).toContainText("rejecting 30");
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expectElementsInsideDemo(demo, [
+        ".saturation-boundary-instrument",
+        ".saturation-boundary-readout",
+        ".saturation-boundary-actions",
+      ]);
+      expect(
+        await demo.evaluate(
+          (element) => element.scrollWidth - element.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(1);
+    }
   });
 });
-
-async function getDemoRegionHeights(demo: Locator) {
-  return demo.evaluate((root) => {
-    const selectors = {
-      root: "[data-saturation-boundary-demo]",
-      header: ".scaling-demo-header",
-      controls: ".saturation-boundary-controls",
-      instrument: ".saturation-boundary-instrument",
-      readout: ".saturation-boundary-readout",
-      actions: ".saturation-boundary-actions",
-      workbench: ".saturation-boundary-workbench",
-    };
-
-    return Object.fromEntries(
-      Object.entries(selectors).map(([key, selector]) => {
-        const element =
-          selector === "[data-saturation-boundary-demo]"
-            ? root
-            : root.querySelector(selector);
-        return [
-          key,
-          element ? Math.round(element.getBoundingClientRect().height) : 0,
-        ];
-      }),
-    );
-  });
-}
 
 async function expectElementsInsideDemo(demo: Locator, selectors: string[]) {
   const overflow = await demo.evaluate(

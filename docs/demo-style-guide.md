@@ -51,43 +51,41 @@ An illustrative score does not establish a measured performance improvement or a
 
 ## Learning value and local practice
 
-The shared catalog owns 28 demos grouped into reading investigations, optional depth and project worksheets.
+The shared catalog owns 16 demos grouped into reading investigations and optional depth.
 Give an investigation a concrete prediction or decision, inspectable consequences and a question that transfers to a changed case.
-Use an explicit mechanism or stated formal model for a simulation; keep capacity, productivity and risk claims tied to observed evidence.
-The fleet and scaling worksheets prepare scope, handoffs and trade-offs without forecasting effort or assigning numerical relief scores.
-The recap's static Compare evidence index preserves submission prompts without a separate checklist widget.
-The dimensions chapter uses a static pressure–boundary–signal mapping rather than a weighted radar.
-Boundary trace exposes ownership and failure questions without assigning an overall risk rank.
-The queue model compares fractional entered averages with numerical rounding only; it does not infer a stable observation window or statistical agreement.
-The evaluation worksheet separates sample output from revealed worked scores, accepts sourced run observations and leaves missing elapsed time/cost unknown.
-Replacing an output clears its earlier judgments and observations; cost does not break rubric-score ties.
-The saturation lab distinguishes positive headroom, a limit with no headroom, and overload without inventing backlog at equality.
-The latency map reports calculated component costs and batching savings without ranking unmodeled interventions; its 100-request sum is explicitly serial.
-The contention chart separates an interior peak from the largest displayed value, including the zero-cost linear case.
-Reliability guidance separates a target already met by initial correctness from required repair or insufficient detection, while retaining wrong-result outcomes.
-The ACID concurrency case displays its assumed stale-check/unconditional-write program and a conditional-write alternative; the pseudocode executes no SQL.
+Use an explicit mechanism or stated formal model; keep capacity, productivity and risk claims tied to observed evidence.
+The project direction, friction, fleet delegation and scaling prompts are now editable chapter templates rather than form-driven widgets.
+Boundary traces, API exchanges, activation steps, the Goodhart case and changed-assumption incident are static evidence activities.
+The Little’s Law exercise includes timestamped arrivals/completions and competing observation boundaries; numerical equality alone is not a measurement validation.
+Model evaluation uses the learner’s actual preserved attempts, a frozen rubric and attributed observations; missing elapsed time or cost stays unknown.
 
-Goodhart uses one authored coverage case with a separate prediction and revealed proposal assessment.
-Revealing that assessment does not validate a gate; copied notes preserve this boundary.
-Its optional follow-up reuses the [concern-directed mutation lab](../labs/concern-directed-mutation/README.md): pass baseline, reject a named fault and preserve the harmless storage refactor.
+The tail population exposes all 60 ordered records, nearest-rank p95 at rank 57 and the count missing the objective; it models no concurrency or queue.
+The saturation model separates offered, admitted and completed rates, queue growth and rejection, with before/after capacity changes and separately revealed measurement hints.
+The latency map uses neutral distances and direct hypothetical service timings; batching assumes unchanged results and query execution with at most two dependency rounds.
+The web architecture lens models three exchanges—document, HTML fragment and JSON—with explicit draft restoration and no invented payload sizes.
+The statechart accepts a premature RELEASE proposal and visibly rejects it; supplied TESTS_PASS events are not actual tests.
+Replica convergence in orchestration is separate from simulated HTTP success; running-but-broken v2 returns 500, and rollback restores v1 responses without erasing the failures.
+The contention and reliability models retain their explicit assumptions and corrected boundary interpretations.
 
-The constraint feedback loop explicitly labels its candidates and checks as scripted.
-Its download is an authored example, separate from executed validation.
-The optional [CSV starter](../labs/csv-export/README.md) supplies a working local page, a single serialization gap, a specification and fixed acceptance checks.
-Students use their own model and harness, maintain specifications and decision records, and inspect actual downloaded bytes within existing study time.
-The unfinished starter must fail its feature checks while its setup preflight passes; validation of a completed candidate belongs in a clean disposable copy.
-Do not put a completed solution, model credentials or generated check records in the starter download.
+ACID, retry and telemetry are short orientations.
+ACID separates acknowledgement timing from transaction choice on restart; its ledgers and concurrency programs are authored rather than executed SQL.
+Retry qualifies displayed and copied counts as modeled, then links to persisted process evidence.
+Telemetry starts at a root span, asks for child-span evidence before revealing an interpretation, then offers a bounded instrumentation recipe for an existing project.
+Do not require a local implementation of every model or add telemetry infrastructure for this orientation.
 
-The optional [persisted retry](../labs/persisted-retry/README.md) and [HTTP cache](../labs/http-cache/README.md) starters follow that same bounded pattern.
-The first uses actual receiver/worker processes and separate SQLite ledgers; the second distinguishes browser-visible bodies from origin request/status records.
-Their fixed checks must reject a partial receiver write and a false claim of browser reuse, respectively.
-Retain formal models and short browser orientations without requiring local implementations of every demo.
+The [local practice workspace](../labs/README.md) supplies one setup and four independent exercises: CSV serialization, concern-directed mutation, persisted retry and HTTP cache.
+Students select one exercise, use their own model/harness, maintain its specification and decision notes, and retain actual checks in its own evidence directory.
+One unfinished exercise must not block another; the common preflight checks setup, not completed features.
+Browser installation is optional for the mutation and retry exercises.
+The CSV, retry and cache gaps fail their feature checks initially; the mutation starter needs a strengthened check that rejects a named fault while preserving baseline and the harmless storage refactor.
+Completed candidates belong in disposable copies, never public starter sources.
+Keep solutions, credentials, generated evidence and private reference code out of archives.
 
 Keep the catalog, includes/scripts, preview images, reading embeds and agent-resource metadata consistent when retiring a demo.
-Increment the authored activity version when its meaning changes; browser snapshot schema versions are independent.
-Historical notebook entries retain their recorded sources and use the general learning loop when a specialized activity is retired.
-See [ADR-053](adrs/implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md) for the decision and verification boundary.
-Its follow-up is [ADR-054](adrs/implemented/ADR-054-correct-demo-inference-and-add-bounded-local-experiments.md).
+There are no existing students; remove obsolete contracts and special compatibility paths.
+All retained activities use bounded generic browser snapshots; activity versions describe authored meaning independently of snapshot schemas.
+[ADR-055](adrs/implemented/ADR-055-consolidate-local-practice-and-retire-low-value-demo-interactions.md) records the consolidation and cuts, following [ADR-053](adrs/implemented/ADR-053-focus-demos-on-evidence-and-offer-executable-starters.md) and [ADR-054](adrs/implemented/ADR-054-correct-demo-inference-and-add-bounded-local-experiments.md).
+The exploratory run must still test the learning benefit and time required.
 
 ## Review
 

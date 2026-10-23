@@ -51,6 +51,13 @@
               class="statechart-agent-options"
               data-statechart-demo-events-enabled
             ></div>
+            <button type="button" data-statechart-demo-propose-release>
+              Propose RELEASE now
+            </button>
+            <p>
+              Predict whether RELEASE will be accepted. A rejected proposal
+              leaves the state unchanged.
+            </p>
           </div>
         </div>
       </div>
@@ -124,4 +131,9 @@
       </div>
     </section>
   </form>
+  <p class="demo-note">
+    <code>TESTS_PASS</code> is a supplied event in this executable statechart.
+    This demo runs no application tests; a real workflow must verify test
+    evidence before supplying that event.
+  </p>
 </section>

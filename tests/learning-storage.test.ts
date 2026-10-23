@@ -26,10 +26,10 @@ const source = {
   url: "https://book.test/demos/",
   title: "Synthetic check",
   kind: "demo",
-  anchor: "demo-queue-balance-lab",
+  anchor: "demo-cache-decision-lab",
   excerpt: "Synthetic context",
   revision: "test-source",
-  conceptIds: ["queue"],
+  conceptIds: ["cache"],
 };
 test("per-user defaults are independent of the current folder and cached package version", () => {
   assert.equal(

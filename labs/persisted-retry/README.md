@@ -6,6 +6,10 @@ All data and effects are synthetic and local; the code makes no model calls.
 
 ## Setup
 
+In the combined course workspace, use the root `npm ci` once and run `npm run lab -- persisted-retry <command>` there.
+Skip the separate installation below; this exercise needs no browser download.
+Worker arguments and local data paths remain relative to this exercise folder.
+
 Use Node 24 or newer, including its built-in `node:sqlite` module.
 There are no external dependencies.
 From this directory:

@@ -27,7 +27,9 @@ Course preparation tooling is separate from the website application and course r
 The generic tool does not import the private reference, whose standalone source, SQLite state, adapter, frozen archives and withheld probes stay under ignored `.local/course-preparation/`.
 The site download builder packages only `course-tools/benchmark/`; reference source never enters the public build or download inputs.
 
-Standalone teaching labs under `labs/` are packaged independently of the private course reference.
+The [local practice workspace](labs/README.md) shares installation and command dispatch across four independent teaching exercises, separately from the private course reference.
+[labs/workspace.mjs](labs/workspace.mjs) selects one exercise; [scripts/lib/lab-downloads.ts](scripts/lib/lab-downloads.ts) allowlists the root files and exercise directories for the primary workspace ZIP.
+The root owns no domain state or global feature gate; each exercise owns its specification, gap, fixtures and evidence.
 In [the CSV starter](labs/csv-export/README.md), the browser owns filtering and visible rows, `export.mjs` owns the one missing pure serialization function, and the loopback server serves only the fixed fixture assets.
 Supplied Node and browser checks own literal contract expectations and actual download inspection; generated evidence stays in ignored `test-results/` and is excluded from lab archives.
 The website publishes the source ZIP and links, without executing a student model or depending on the lab server at runtime.
@@ -75,7 +77,7 @@ The browser presents an automated study role and reply metadata, while runtime a
 [learning-cockpit.ts](site/scripts/learning-cockpit.ts) owns the one contextual cockpit, focus switching, recent-loop navigation and explicit entry from reading, exercises, practice, selected Notebook notes and peer context.
 [learning-tutorial.ts](site/scripts/learning-tutorial.ts) owns a replayable authored rehearsal, with independent tab-scoped writing/progress and a browser-local invitation preference; it has no provider or persistence client and uses only explicit connection/Notebook handoffs.
 [learning-investigation.ts](site/scripts/learning-investigation.ts) renders one source-scoped predict/check/reflect loop using the coordinator's existing companion client, restricted reply renderer and reviewed Notebook handoff.
-[learning-investigation-session.ts](site/scripts/learning-investigation-session.ts) owns bounded tab drafts/history, actual demo observation and faithful queue-input restoration; other demo actions are not replayed.
+[learning-investigation-session.ts](site/scripts/learning-investigation-session.ts) owns bounded tab drafts/history and actual generic demo observations; stored snapshots do not replay demo controls or actions.
 The browser owns unsent writing and selected context; submitted turns and snapshots remain with the companion's existing conversation owner.
 Explicit sends select no notebook entries by default, and an active reply can observe only the chosen demo through the existing broker.
 The student operates controls, saving requires the existing Notebook Save action, and public MCP remains stateless.

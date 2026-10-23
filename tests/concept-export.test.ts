@@ -106,12 +106,15 @@ test("visual resources connect concepts to valid images and prediction-led galle
 test("both agent formats carry graphics, demo assumptions, and a prediction before observation", () => {
   const graph = exportConceptGraph("https://scalableweb.dev/", "The book");
   const lab = graph.learningResources.find(
-    ({ id }) => id === "demo-queue-balance-lab",
+    ({ id }) => id === "demo-cache-decision-lab",
   )!;
-  const concept = graph.concepts.find(({ id }) => id === "little-law")!;
+  const concept = graph.concepts.find(({ id }) => id === "cache")!;
   assert.ok(concept.resourceIds.includes(lab.id));
-  assert.match(lab.experiment!.predict, /20 events\/s.*0\.5 to 1 second/);
-  assert.match(lab.assumptions, /stable long-run averages/);
+  assert.match(
+    lab.experiment!.predict,
+    /reuse a response without contacting the origin/,
+  );
+  assert.match(lab.assumptions, /Warm browser and shared entries/);
   const markdown = renderConceptGraphMarkdown(graph);
   for (const resource of graph.learningResources) {
     assert.ok(markdown.includes(resource.images.png));

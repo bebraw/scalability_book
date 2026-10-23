@@ -32,18 +32,35 @@ A lifecycle request, such as `POST /work-items/item-42/transitions`, asks to cha
 Its success boundary must preserve the state change and matching activity event together; a derived summary may catch up later under a declared freshness policy.
 The two paths can share an interface while placing execution, copies, and authority differently.
 
-### Request boundary lab
+### Trace a request across its commit boundary
 
-The demonstration below traces a start-work request through the browser, network, API, storage, and response path.
-Its route, fields, and retry contract are illustrative; the project permits other interfaces that preserve the required lifecycle behavior.
-Each boundary has an owner, a failure mode, and a contract that future clients, humans, and agents may depend on.
+This illustrative start-work sequence separates the browser's knowledge from the authoritative result:
 
-{{ import "site/includes/request-trace-demo.html" }}
+```text
+Browser             API / application boundary          Persistent store
+   | POST start(K)              |                              |
+   |--------------------------->| authorize and validate       |
+   |                            | begin transaction            |
+   |                            |----------------------------->|
+   |                            | state + event + result for K |
+   |                            |<-----------------------------|
+   |                            | commit confirmed             |
+   |        success reply lost  |                              |
+   |             x--------------|                              |
+   | timeout: outcome unknown   |                              |
+```
+
+The browser knows that it did not receive confirmation; it cannot infer that the mutation failed.
+A retry with the same logical-operation key can return the stored result when the receiver atomically preserves that key and effect.
+A new key can describe a new operation, and storing the receipt after the effect leaves a failure window.
+Name the owner of authorization, the transaction and the retry result before drawing a deployment diagram.
+The route and retry contract are examples; the project permits another interface with the same required behavior.
 
 {{ import "exercise:architecture-outcome" }}
 
-Use this trace before drawing the architecture diagram.
-If the request path is unclear, the diagram is likely to hide the most important architectural decisions.
+For an optional executable check, open `persisted-retry/README.md` in the [course workspace](/downloads/labs/course-workspace.zip).
+Its receiver and worker use separate records, so a process interruption can leave the effect committed while the worker's completion record is absent.
+Explain what each record establishes and what remains unknown to the caller.
 
 ### Automated consumers change demand and exposure
 
@@ -105,7 +122,7 @@ HTTP can carry several application interaction styles, including resource-orient
 Each style distributes knowledge and change pressure differently between consumers and providers, but none removes the need to define representations, errors, retries, authorization, and compatibility.
 
 For the project, choose one minimal event-creation and event-query contract, then ask how it changes when requests are retried, devices go offline, workflow states evolve, or consumers need additional data.
-[Appendix C](/appendices/advanced-web-boundaries/#choose-an-application-interaction-style) compares the interaction styles and contains the API contract lens and executable HTTP example.
+[Appendix C](/appendices/advanced-web-boundaries/#choose-an-application-interaction-style) compares the interaction styles and contains annotated API exchanges and an executable HTTP example.
 
 ### Organizational boundaries shape application contracts
 
@@ -140,23 +157,22 @@ Compare the consequences for freshness, server work, navigation, client responsi
 
 ### Web architecture lens
 
-Use the same event-recording interaction across the three flows.
-First choose how the application presents the state after `POST /events`, then vary how its first view arrives.
-The MPA and HDA examples start with server HTML; the SPA example starts with CSR and also supports server-rendered or cached initial HTML.
-Run the trace and watch which artifact crosses the network.
+Use the same event-recording interaction across three flows: a full HTML document, an HTML fragment and a JSON response interpreted by the client.
+Predict which component owns the view update and whether replacing the document preserves an unsent draft.
+Run the trace and inspect the artifact and ownership path; the draft-restoration choice is an explicit application policy.
 
 {{ import "site/includes/web-architecture-lens.html" }}
 
-The ISR behavior in the lab is a simplified stale-while-revalidate model.
-Exact regeneration, invalidation, and [consistency](/concepts/#consistency) behavior depend on the framework and deployment platform.
-That platform-specific contract should be documented as part of the architecture.
+These authored paths expose responsibility; they do not measure framework performance or establish browser state preservation in your project.
+As optional transfer, inspect one actual navigation or form submission in your implementation: preserve the network response, observe the draft, and name the code that restores or discards it.
+Document the resulting contract rather than inferring it from an architectural label.
 
 ### Activation is a separate architectural decision
 
 Rendering and navigation do not explain how delivered HTML becomes interactive.
 Hydration, progressive hydration, islands, and resumability move different amounts of code, state, and startup work across the server-browser boundary.
 Record which regions need behavior, when that behavior becomes available, and which state or communication constraints the approach introduces.
-[Appendix C](/appendices/advanced-web-boundaries/#activate-delivered-interfaces) compares the activation approaches and provides a focused lab.
+[Appendix C](/appendices/advanced-web-boundaries/#activate-delivered-interfaces) compares the activation approaches and gives a sequence to inspect in one real build.
 
 ### Runtime generation adds a control boundary
 
@@ -269,7 +285,8 @@ Then inspect whether the request is served fresh, served stale while validation 
 
 {{ import "site/includes/cache-control-lab.html" }}
 
-The optional [HTTP cache starter](/downloads/labs/http-cache.zip) ([browse lab sources](https://github.com/bebraw/scalability_book/tree/main/labs)) supplies a local origin and browser page, leaving one conditional-response function to implement with your model.
+For optional local practice, open `http-cache/README.md` in the [course workspace](/downloads/labs/course-workspace.zip).
+It supplies a local origin and browser page, leaving one conditional-response function to implement with your model.
 Predict body versions and origin-request counts, then inspect actual browser reuse and network 200/304 records.
 It focuses on private browser caching; shared caches and CDN behavior remain separate investigations.
 Maintain its specification and one decision record within existing practice time, with no additional submission or grading criterion.
