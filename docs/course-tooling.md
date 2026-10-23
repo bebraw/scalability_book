@@ -114,8 +114,42 @@ Omitted or blank labels become the empty string; the ordinary form and JSON API 
 This removes the unintended browser constraint and keeps new length validation outside the first exercise.
 The private `label-comparison-v2/` brief and eight label checks define the next version; the recorded calibration and its six checks remain unchanged.
 
-The next proposed step is one matched pair on fresh reference copies using the verified department model with thinking disabled: one agent versus a coordinator with exactly two workers.
-Give each condition twenty minutes and eighty aggregate inference requests, including every worker and retry, with the same task, checks, tools, context and output limits.
-Freeze the exact configuration, source digests, condition order and intervention policy before either starts; retain calibration outside the pair.
-Compare independent correctness and browser conformance, specification/ADR quality, time, aggregate requests/tokens and coordination failures.
-This comparison is prepared but has not started; one pair provides exploratory evidence for the student discussion.
+The instructor authorized one matched pair on fresh reference copies using the verified department model with thinking disabled: one agent versus a coordinator with exactly two workers.
+Each condition received twenty minutes and eighty aggregate inference requests, including every worker and retry, with the same task, checks, tools, context and output limits.
+Configuration, source digests, condition order and intervention policy were frozen before either attempt; calibration remains outside the pair.
+
+### Completed matched pair
+
+The recorded random order was single agent, then fleet.
+Both started at reference revision `5d670ae60a7c8a0c4c17a47e74b996c8742ea2d5`, used fresh sessions and preserved both supplied test files unchanged.
+Neither condition reached its time or request limit, and neither received human implementation hints or repairs.
+
+| Observation                          | Single agent | Coordinator plus two workers |
+| ------------------------------------ | ------------ | ---------------------------- |
+| Agent attempt through integration    | 8m38s        | 9m36s                        |
+| Aggregate inference requests         | 33           | 64                           |
+| Independent checks                   | 24 passed    | 24 passed                    |
+| Observed output tokens               | 11,585       | At least 18,019              |
+| Post-run long-label browser behavior | Preserved    | Preserved                    |
+| Page width at a 390px viewport       | 1,229px      | 390px                        |
+
+Both updated the maintained specification before implementation and added an ADR and focused tests.
+Both frozen source archives also pass all 29 tests after clean unpack: the 24 supplied checks and five checks generated during that condition.
+Independent browser review confirms form/API preservation of 161-character labels, escaped display, omission handling and ordinary restart.
+It finds horizontal overflow in the single-agent candidate; the fleet candidate adds wrapping and fits the mobile viewport.
+These independent checks and browser inspections occur after each frozen attempt and are recorded separately from the agent clock; human preparation and review effort were not measured.
+
+The fleet spawned exactly two fresh workers with inherited model/provider settings and `fork_context:false`.
+Its coordinator closed the implementation worker while it still reported running, after the files passed checks.
+Forwarded request 61 has no completed response or usage record; its request and dispatch are retained, but the proxy did not retain a partial response on cancellation.
+Fleet token totals are therefore lower bounds; all 64 forwarded requests count toward its allowance.
+The trace also retains shell-quoting failures in the single-agent attempt and a decorative shell separator that failed in the coordinator's review command.
+
+Candidate source archives, configuration, independent validation, resource observations, screenshots and the curated student evidence packet stay under the private `label-comparison-v2/matched-2026-10-23/` directory.
+The packet includes the task, check descriptions, compact execution evidence, outcomes and accounting limits; it excludes reference source, credentials and raw prompts/tool output.
+The audit reference and recorded candidates remain unchanged.
+
+The observations show a trade-off in this task: the fleet used more time and requests and produced a better mobile result, with an incomplete worker handoff and usage gap.
+One sequential pair does not establish a general orchestration advantage; shared service load, uncontrolled caching and the prescribed decomposition limit the comparison.
+Shell tools also used temporary helper files outside the allocated application directory; recorded commands write their own helpers before executing them, but filesystem isolation was not complete.
+Use the evidence packet in the student discussion before choosing additional task difficulty; the required course outcomes and grading remain unchanged.

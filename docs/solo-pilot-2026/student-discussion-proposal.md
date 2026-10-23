@@ -11,7 +11,10 @@ We would like to calibrate the difficulty before choosing additional technical s
 A preliminary Qwen3.5 9B attempt showed substantial effort spent reading and rebuilding context around a change involving retries, persistence and concurrency.
 The instructor interrupted that attempt before its full time or request allowance; it is an early observation, not a completed comparison or a general result about small models.
 A subsequent department-hosted Qwen3.8 27B calibration with thinking disabled implemented the simpler label task and passed 22 independent checks in 6 minutes 24 seconds and 38 requests.
-Browser review still found an unintended form/API length discrepancy, so both the specification and independent acceptance coverage need to agree before the comparison.
+Browser review found an unintended form/API length discrepancy, which led to the explicit label rule and additional checks below.
+The subsequent matched pair passed all 24 independent checks in both conditions: one agent took 8m38s and 33 requests; a coordinator with two workers took 9m36s and 64 requests.
+The fleet preserved a usable mobile layout, while the single-agent candidate overflowed; it also closed a still-running worker, leaving one request without complete usage accounting.
+These are observations from one exploratory pair, with [configuration and measurement limits](../course-tooling.md#completed-matched-pair).
 
 ## Start with one small change
 
@@ -38,9 +41,9 @@ If the first task is manageable, choose one next step: input validation, a filte
 Introduce concurrency and recovery questions separately so each investigation has a clear question and observable checks.
 The existing course briefs retain their required investigations; this staged exercise helps choose a suitable task size and optional depth.
 
-A later comparison can give one agent and a coordinator with two workers the same agreed task, fresh copies, checks and aggregate limits.
-The next proposed instructor preparation uses the verified department model with thinking disabled and gives each condition twenty minutes and eighty aggregate requests, including all workers and retries.
-Compare correctness, specification/ADR quality, time, requests and coordination problems, retaining partial outcomes and keeping the calibration outside the pair.
+The instructor-prepared pair uses the verified department model with thinking disabled and gives each condition twenty minutes and eighty aggregate requests, including all workers and retries.
+Review its evidence before adding difficulty: compare correctness, specification/ADR quality, time, requests and coordination problems, and explain what the automated checks missed.
+The calibration is separate from the matched pair, and the recorded candidates remain unchanged for analysis.
 Further model trials can then help investigate whether a difficulty comes from the task, model configuration or orchestration.
 The student's own matched experiment remains optional; the required supplied-trace analysis supports full credit.
 
