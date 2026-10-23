@@ -269,6 +269,7 @@ const activities: Record<string, Activity> = {
       "Locate the state-and-event commit, the point where the outcome becomes ambiguous, and the retry-safety rule.",
   },
   "ACID transaction lab": {
+    activityVersion: 2,
     conceptIds: [
       "transaction",
       "invariant",
@@ -284,10 +285,10 @@ const activities: Record<string, Activity> = {
       "Read committed or serializable isolation",
     ],
     assumptions:
-      "The lab models selected database guarantees. Actual transaction and isolation semantics must be checked for the deployed store.",
+      "The concurrency case assumes a stale application check followed by an unconditional write; the displayed conditional-write alternative is pseudocode, not executed SQL. Check the deployed store's guarantees.",
     predict:
       "Which invariant could fail between two application-managed writes?",
-    try: "Run the same disturbance with separate writes and with a transaction; vary isolation for concurrency.",
+    try: "Run the same disturbance with separate writes and a transaction; for concurrency, inspect the assumed program before varying isolation and compare its conditional-write alternative.",
     observe:
       "Inspect the lifecycle and activity ledger together rather than inferring correctness from a response.",
   },
@@ -399,29 +400,24 @@ const activities: Record<string, Activity> = {
       "Compare the average, p95, and outcome population rather than only the average.",
   },
   "Goodhart pressure test": {
-    conceptIds: [
-      "goodhart-law",
-      "acceptance-criteria",
-      "throughput",
-      "benchmark",
-      "eval",
-    ],
+    activityVersion: 2,
+    conceptIds: ["goodhart-law", "acceptance-criteria", "benchmark", "eval"],
     caption:
-      "Apply optimization pressure to a proxy and inspect the intended outcome separately.",
+      "Predict one authored coverage case, examine a proposed safeguard, then challenge an actual check locally.",
     controls: [
-      "Proxy metric",
       "Prediction",
-      "Target pressure",
-      "Outcome checks",
-      "Measurement contract",
+      "Reveal authored outcome",
+      "Proposed safeguard",
+      "Reveal case assessment",
+      "Case notes and reset",
     ],
     assumptions:
-      "Authored scenarios expose proxy failure modes; a metric is not automatically invalid merely because it is a target.",
+      "One authored line-coverage failure case; revealing the assessment executes no gate or model. Targets can stay useful when their relation to the intended outcome is checked.",
     predict:
-      "How might the selected proxy improve while the intended outcome becomes worse?",
-    try: "Apply pressure, then compare a selected-success audit with an independent outcome gate.",
+      "Could raising line coverage make the report look better without making assertions detect more faults?",
+    try: "Predict, reveal the coverage case, and examine a safeguard. Optionally use the existing mutation starter with your model to strengthen one black-box check.",
     observe:
-      "Inspect the excluded work and the evidence used to judge the actual outcome.",
+      "Separate authored reasoning from executed evidence. In the local lab, pass baseline, reject a named faulty variant and pass the harmless storage refactor; explain the distinction.",
   },
   "Browser performance workbench": {
     conceptIds: ["benchmark", "latency", "measurement-boundary", "rendering"],
@@ -599,6 +595,7 @@ const activities: Record<string, Activity> = {
       "Inspect how the packet changes between an investigation and a code change; distinguish preparation from completed-run evidence.",
   },
   "Reliability chain lab": {
+    activityVersion: 2,
     conceptIds: [
       "lusser-law",
       "reliability",
@@ -619,7 +616,7 @@ const activities: Record<string, Activity> = {
       "How will doubling the required step count affect end-to-end success if per-step behavior stays fixed?",
     try: "Keep correctness, detection, and repair fixed; compare two critical step counts.",
     observe:
-      "Separate per-step success from chain success and examine the independence assumption.",
+      "Separate per-step success, chain success and wrong results; distinguish an already-met target from absent detection or required repair.",
   },
   "Sequential work bound": {
     conceptIds: ["amdahl-law", "agent-fleet", "review-budget", "throughput"],
@@ -660,6 +657,7 @@ const activities: Record<string, Activity> = {
       "Connect each response to a signal; distinguish the state-and-event commit from deferred summaries and faster acknowledgment.",
   },
   "Saturation boundary lab": {
+    activityVersion: 2,
     conceptIds: [
       "saturation",
       "throughput",
@@ -683,9 +681,10 @@ const activities: Record<string, Activity> = {
       "If you raise only the database capacity, which stage will bind next and can retries change the conclusion?",
     try: "Inspect the current limit, raise its capacity, then vary retry amplification and admission control.",
     observe:
-      "Track useful completions, backlog or explicit rejection, and the newly limiting stage.",
+      "Distinguish spare capacity, zero headroom at the limit and excess demand; inspect backlog or explicit rejection and the newly limiting stage.",
   },
   "Contention curve lab": {
+    activityVersion: 2,
     conceptIds: ["contention", "throughput", "saturation", "amdahl-law"],
     caption:
       "Explore a modeled capacity curve as contention and coherency costs change.",
@@ -698,9 +697,9 @@ const activities: Record<string, Activity> = {
       "A parameterized Universal Scalability Law model. Coefficients require workload-specific evidence before predicting real capacity.",
     predict:
       "Will adding workers always increase capacity when coherency cost is nonzero?",
-    try: "Hold coefficients fixed and move concurrency through and beyond the curve's peak.",
+    try: "Vary concurrency with fixed costs; then set both costs to zero and distinguish an interior peak from the largest displayed value.",
     observe:
-      "Identify plateau or decline and distinguish this model from Amdahl's ideal bound.",
+      "Identify plateau or decline where shown; a rising chart endpoint is not an optimum. Distinguish this model from Amdahl's ideal bound.",
   },
   "Orchestration control loop": {
     conceptIds: [
@@ -768,6 +767,7 @@ const activities: Record<string, Activity> = {
       "Record acknowledgments, state divergence, and what reconciliation can and cannot fix.",
   },
   "Latency budget map": {
+    activityVersion: 2,
     conceptIds: [
       "latency",
       "measurement-boundary",
@@ -790,7 +790,7 @@ const activities: Record<string, Activity> = {
       "Which will matter more in your scenario: faster query execution or fewer sequential remote round trips?",
     try: "Keep placement fixed and vary query count; then keep work fixed and move the database.",
     observe:
-      "Compare contributions within the declared response boundary and identify omitted costs.",
+      "Compare network and execution contributions, the calculated batching saving and omitted costs. The 100-request total assumes serial requests, not a page-load boundary.",
   },
 };
 

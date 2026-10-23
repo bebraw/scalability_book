@@ -60,3 +60,18 @@ Retry verifies five contract tests and two process cases; HTTP verifies six cont
 Autocommit-only receiver, always-200 and no-store candidates are rejected by the supplied checks.
 Build and local validation pass; the full published-link check reports no broken targets, with blocked external requests retained as inconclusive.
 Production publication remains separate from repository implementation.
+
+### Further demo review
+
+The next pass retained all 28 demos and corrected four further explanations: capacity equality has no spare headroom, calculated batching savings do not rank unmodeled interventions, a finite chart endpoint is not necessarily an optimum, and an already-met reliability target needs no additional repair.
+The latency map's 100-request sum now declares serial execution.
+Goodhart is one authored coverage case with a revealed proposal assessment and an optional transfer to the existing mutation lab; it does not report that a gate was executed or validated.
+The ACID concurrency example displays the assumed unconditional-write program and a conditional-write alternative, qualified as pseudocode with database-specific semantics.
+Six affected authored activities advance to version 2; browser observation schema remains version 1.
+
+Four focused browser regressions reproduced the original errors before correction.
+The full unit suite passes 193 tests, and affected browser flows, gallery checks, all-demo theme/accessibility checks and Chromium/WebKit observation bridges pass.
+Manual phone inspection exposed clipping in the new ACID program panel; its reduced regression failed with 236 pixels of overflow before the grid-child and scroll-container correction.
+Code records now remain within the demo and are keyboard-focusable for horizontal scrolling.
+The Goodhart helper-name collision caught by type checking was corrected; build, validation and the published-link check pass, with blocked external targets retained as inconclusive.
+These refinements reuse existing starters and introduce no new course requirement or local harness.

@@ -211,10 +211,16 @@ function initializeSaturationBoundaryDemo(root: HTMLElement) {
 
     effectiveLoad.textContent = `${demand} ev/s`;
     pipeline.innerHTML = buildSaturationPipeline(demand, capacities);
-    root.dataset.saturationState = result.saturated ? "saturated" : "healthy";
+    root.dataset.saturationState = result.saturated
+      ? "saturated"
+      : result.atLimit
+        ? "at-limit"
+        : "healthy";
     verdict.textContent = result.saturated
       ? `${result.boundary.label} saturated`
-      : `${result.boundary.label} is closest`;
+      : result.atLimit
+        ? `${result.boundary.label} at capacity`
+        : `${result.boundary.label} is closest`;
     summary.textContent = result.saturated
       ? `${Math.abs(result.headroom)} ev/s above current capacity.`
       : `${result.headroom} ev/s of headroom remains.`;
@@ -340,6 +346,7 @@ function analyzeSaturationBoundary(
     next: next.stage,
     nextCapacity: next.capacity,
     headroom,
+    atLimit: headroom === 0,
     saturated: headroom < 0,
     backlog: backpressure ? 0 : excess,
     rejected: backpressure ? excess : 0,
@@ -387,6 +394,9 @@ function buildSaturationDiagnosis(
   result: ReturnType<typeof analyzeSaturationBoundary>,
   backpressure: boolean,
 ) {
+  if (result.atLimit) {
+    return `${result.boundary.label} is at capacity with no headroom. Declared demand equals the limit; this rate model has no excess to queue or reject.`;
+  }
   if (!result.saturated) {
     return `${result.boundary.label} is closest to its limit, but all modeled stages have spare capacity.`;
   }
@@ -443,6 +453,7 @@ function buildSaturationArtifact({
     "",
     `First boundary: ${result.boundary.label}`,
     `Declared capacity: ${result.boundaryCapacity} events/s`,
+    `Capacity state: ${result.saturated ? "Overloaded" : result.atLimit ? "At capacity — no headroom" : "Spare capacity"}`,
     `Headroom: ${result.headroom} events/s`,
     `Hidden backlog growth: ${result.backlog} events/s`,
     `Explicitly rejected: ${result.rejected} events/s`,

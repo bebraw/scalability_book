@@ -50,14 +50,17 @@
     const isolation = query<HTMLSelectElement>(root, "[data-acid-isolation]");
     const reset = query<HTMLButtonElement>(root, "[data-acid-reset]");
     const controlNote = query<HTMLElement>(root, "[data-acid-control-note]");
+    const program = query<HTMLDetailsElement>(root, "[data-acid-program]");
 
     const updateControls = () => {
       const isConcurrent = readScenario(scenario.value) === "concurrent";
       const usesTransaction = readMode(mode.value) === "transaction";
       isolation.disabled = !isConcurrent || !usesTransaction;
+      program.hidden = !isConcurrent;
+      program.open = isConcurrent;
       controlNote.textContent = isConcurrent
         ? usesTransaction
-          ? "Both requests read the initial state before either commits. Change the isolation level to decide whether both transactions may commit."
+          ? "Both requests read initial before either commits, then write unconditionally as shown below. Vary isolation for this program; compare the conditional-write alternative separately."
           : "Separate application-managed writes do not share an isolation boundary."
         : "Isolation is not varied in this disturbance; the experiment focuses on the selected failure boundary.";
       resetOutput(root);
@@ -184,7 +187,7 @@
         result: "protected",
         stages: stages("complete", "complete", "complete", "complete"),
         summary:
-          "One transaction committed and the conflicting transaction retried.",
+          "One transaction committed; the conflicting transaction must retry.",
         trace: [
           trace("pass", "T1 + T2", "Alice and Bob both read initial"),
           trace("pass", "T1 COMMIT", "Alice stores active + work_started"),
@@ -201,7 +204,7 @@
 
     const transactionText =
       mode === "transaction"
-        ? "Each transaction was atomic, but read committed allowed both application checks to observe initial before either transition committed."
+        ? "Each transaction was atomic, but both application checks read initial before either committed. The modeled UPDATE checks only the item ID, so the second caller writes active again and appends another event."
         : "Both requests checked the initial state outside a shared transaction boundary, then persisted their writes independently.";
 
     return {

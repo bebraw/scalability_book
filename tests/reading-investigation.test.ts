@@ -194,6 +194,12 @@ test("changed demo activities reject stale turns while keeping their current evi
     "demo-api-contract-lens",
     "demo-queue-balance-lab",
     "demo-model-evaluation-lab",
+    "demo-acid-transaction-lab",
+    "demo-goodhart-pressure-test",
+    "demo-reliability-chain-lab",
+    "demo-saturation-boundary-lab",
+    "demo-contention-curve-lab",
+    "demo-latency-budget-map",
   ]) {
     const activity = readingActivities.find((item) => item.demoId === id)!;
     const selected = {

@@ -64,6 +64,51 @@
       Isolation applies when concurrent work shares a transaction boundary.
     </p>
 
+    <details class="acid-lab-program" data-acid-program hidden>
+      <summary>
+        The concurrent program and a conditional-write alternative
+      </summary>
+      <p>
+        The simulation uses this read/check/unconditional-write program. Both
+        callers read initial before either writes. The isolation choice changes
+        the result for this program; read committed does not inherently require
+        duplicate transitions.
+      </p>
+      <pre
+        tabindex="0"
+        aria-label="Modeled unconditional-write program"
+      ><code>BEGIN
+state = SELECT state FROM work_items WHERE id = :id
+IF state = 'initial':
+  UPDATE work_items SET state = 'active' WHERE id = :id
+  INSERT work_started INTO activity_events
+COMMIT</code></pre>
+      <p>
+        A different program can check the current state in the authoritative
+        write. In PostgreSQL, a competing updater waits and rechecks its WHERE
+        condition after the other update commits. Only the caller whose update
+        returns a row appends an event, inside the same transaction:
+      </p>
+      <pre tabindex="0" aria-label="Conditional-write alternative"><code>BEGIN
+changed = UPDATE work_items SET state = 'active'
+          WHERE id = :id AND state = 'initial' RETURNING id
+IF changed has one row:
+  INSERT work_started INTO activity_events
+  COMMIT
+ELSE:
+  ROLLBACK
+  reject transition</code></pre>
+      <p>
+        This is illustrative pseudocode, not executed SQL. Event-insert failure
+        must roll back the state update. Check the chosen database's guarantees;
+        see
+        <a
+          href="https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED"
+          >PostgreSQL read committed</a
+        >.
+      </p>
+    </details>
+
     <ol class="acid-lab-rail" aria-label="Transaction execution trace">
       <li data-acid-stage="read">
         <span>01</span>
@@ -191,6 +236,9 @@
   <p class="acid-lab-note">
     This is a deterministic transaction model, not a benchmark of a particular
     database. Real isolation and durability depend on the database, transaction
-    boundaries, constraints, storage configuration, and failure model.
+    boundaries, constraints, storage configuration, and failure model. For
+    actual atomic rollback and process-restart records, try the optional
+    <a href="/downloads/labs/persisted-retry.zip">persisted retry starter</a>.
+    It does not reproduce the isolation-level comparison.
   </p>
 </section>

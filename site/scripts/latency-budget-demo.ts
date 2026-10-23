@@ -506,23 +506,8 @@ function buildLatencyBreakdown(
 function buildLatencyInterpretation(
   result: ReturnType<typeof calculateLatencyBudget>,
 ) {
-  if (result.dbRttFloor >= 5 && result.databaseRoundtrips >= 4) {
-    return "The database is far enough away that repeated sequential queries dominate. Moving the database closer helps, but batching or removing round trips is the larger architectural fix.";
-  }
-
-  if (result.avoidable >= 40) {
-    return "Most of the avoidable time comes from repeated database waits. This is the shape of an N+1 query problem or an endpoint that asks the database one question at a time.";
-  }
-
-  if (result.userRttFloor >= 50) {
-    return "The user is far from the application. Even perfect code cannot remove the physical floor; edge caching or regional placement may matter for read-heavy paths.";
-  }
-
-  if (result.total <= 120) {
-    return "This path is within a modest latency budget. Further scaling work should be justified by measurement rather than intuition.";
-  }
-
-  return "The request is over a typical interactive budget. Check whether distance, database round trips, or query execution dominates before choosing a scaling technique.";
+  const databaseNetwork = result.databaseRoundtrips * result.dbNetworkPerTrip;
+  return `Modeled user-to-application network wait is ${formatLatency(result.userNetwork)} ms; database network wait is ${formatLatency(databaseNetwork)} ms; server execution is ${formatLatency(result.serverExecution)} ms. Batching into at most two trips saves ${formatLatency(result.avoidable)} ms of repeated database network wait while keeping query execution unchanged. Compare placement and query changes separately, including their correctness and operating obligations, before choosing an intervention.`;
 }
 
 function formatLatency(value: number) {

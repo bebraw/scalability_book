@@ -1,6 +1,28 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("ACID transaction lab", () => {
+  test("keeps the expanded concurrency program readable within a phone-width demo", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/demos/#demo-acid-transaction-lab");
+    const lab = page.locator("[data-acid-lab]");
+    await lab.locator("[data-acid-scenario]").selectOption("concurrent");
+    await expect(lab.locator("[data-acid-program]")).toBeVisible();
+    const layout = await lab.evaluate((root) => {
+      const bounds = root.getBoundingClientRect();
+      const program = root
+        .querySelector("[data-acid-program]")!
+        .getBoundingClientRect();
+      return {
+        overflow: root.scrollWidth - root.clientWidth,
+        programRight: program.right,
+        demoRight: bounds.right,
+      };
+    });
+    expect(layout.overflow).toBeLessThanOrEqual(1);
+    expect(layout.programRight).toBeLessThanOrEqual(layout.demoRight);
+  });
   test.beforeEach(async ({ page }) => {
     await page.goto(
       "/appendices/advanced-web-boundaries/#demo-acid-transaction-lab",
@@ -38,6 +60,13 @@ test.describe("ACID transaction lab", () => {
     const lab = page.locator("[data-acid-lab]");
 
     await lab.locator("[data-acid-scenario]").selectOption("concurrent");
+    await expect(lab.locator("[data-acid-program]")).toBeVisible();
+    await expect(lab.locator("[data-acid-program] code").first()).toContainText(
+      "SET state = 'active' WHERE id = :id",
+    );
+    await expect(lab.locator("[data-acid-program] code").last()).toContainText(
+      "AND state = 'initial' RETURNING id",
+    );
     await lab.locator("[data-acid-mode]").selectOption("transaction");
     await expect(lab.locator("[data-acid-isolation]")).toBeEnabled();
     await lab.locator("[data-acid-run]").click();
@@ -67,6 +96,7 @@ test.describe("ACID transaction lab", () => {
     const lab = page.locator("[data-acid-lab]");
 
     await lab.locator("[data-acid-scenario]").selectOption("restart");
+    await expect(lab.locator("[data-acid-program]")).toBeHidden();
     await lab.locator("[data-acid-run]").click();
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Initial");
     await expect(

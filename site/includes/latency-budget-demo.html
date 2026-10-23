@@ -301,10 +301,15 @@
             <dd data-latency-demo-metric="avoidable">0 ms</dd>
           </div>
           <div>
-            <dt>100-request page cost</dt>
+            <dt>100 serial requests</dt>
             <dd data-latency-demo-metric="hundred">0 s</dd>
           </div>
         </dl>
+        <p class="latency-demo-note">
+          The serial total adds 100 identical response times. Page elapsed time
+          also depends on concurrency and request dependencies, which this model
+          does not include.
+        </p>
       </div>
       <div class="scaling-demo-impact">
         <h4>Interpretation</h4>

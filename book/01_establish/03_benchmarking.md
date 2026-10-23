@@ -202,15 +202,17 @@ Structural and rendering checks could establish that a deck was valid; they coul
 
 ### Goodhart pressure test
 
-The challenge below turns that four-part review into two decisions.
-First choose a proxy and predict how an optimizer will respond when the number becomes a target.
-Then inspect the displaced cost and revise the gate so that improving the proxy cannot compensate for losing the intended outcome.
-The scenarios use deterministic illustrative values to make the feedback loop visible; they are not empirical comparisons between tools or teams.
+The worked coverage case below turns that four-part review into a prediction and a proposed gate.
+Predict how an optimizer could respond to a line-coverage target, inspect the displaced cost, and choose a safeguard to examine.
+Revealing its authored assessment does not execute or validate the proposed gate.
+The values illustrate one failure mode; they are not empirical comparisons between tools or teams.
 
 {{ import "site/includes/goodhart-challenge-demo.html" }}
 
-Try at least two targets.
-Notice that monitoring the proxy is still useful after the repair, but it no longer decides success alone.
+For optional executed evidence, use the [concern-directed mutation lab](/downloads/labs/concern-directed-mutation.zip) with your model and harness.
+Strengthen one black-box assertion so that it passes the baseline, rejects a named faulty variant, and still passes the harmless storage refactor.
+Explain the behavior it distinguishes in your existing specification and decision notes.
+Monitoring the proxy can remain useful; the independent behavior check tests a different claim.
 
 ### Resource proxies are not the outcome
 

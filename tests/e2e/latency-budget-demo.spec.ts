@@ -83,7 +83,7 @@ test.describe("latency budget demo", () => {
     );
     await expect(
       demo.locator("[data-latency-demo-interpretation]"),
-    ).toContainText("database is far enough away");
+    ).toContainText("56 ms of repeated database network wait");
     await expect(demo.locator("[data-latency-demo-next]")).toBeDisabled();
     await expectElementsInsideDemo(demo, [".scaling-demo-tradeoff-step"]);
   });
@@ -110,7 +110,7 @@ test.describe("latency budget demo", () => {
     ).toContainText("70 ms");
     await expect(
       demo.locator("[data-latency-demo-interpretation]"),
-    ).toContainText("user is far from the application");
+    ).toContainText("user-to-application network wait is 98 ms");
   });
 });
 

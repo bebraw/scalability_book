@@ -251,10 +251,12 @@ function initializeLusserLaw(root: HTMLElement) {
 
     if (reading) {
       const targetGuidance =
-        requiredCoverage > detection + 0.000_001
-          ? `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step and ${formatLawPercent(requiredCoverage, 2)} combined detection and repair. Detection at ${detectionPercent.toFixed(0)}% cannot reach that target even with perfect repair.`
-          : `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step; the current detection path can reach it if repair after detection is at least ${formatLawPercent(detection > 0 ? requiredCoverage / detection : 1, 1)}.`;
-      reading.textContent = `At ${formatLawPercent(stepReliability, 3)} per step, ${steps} independent critical steps complete correctly ${formatLawPercent(correctWorkflow)} of the time. ${formatLawPercent(stoppedWorkflow)} stop safely and ${formatLawPercent(wrongWorkflow)} return a wrong result. ${targetGuidance}`;
+        requiredCoverage === 0
+          ? "Initial correctness already meets the 95% workflow completion target without repair. Wrong results remain a separate outcome to inspect."
+          : requiredCoverage > detection
+            ? `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step and ${formatLawPercent(requiredCoverage, 2)} combined detection and repair. Detection at ${detectionPercent.toFixed(0)}% cannot reach that target even with perfect repair.`
+            : `A 95% workflow target needs ${formatLawPercent(requiredStep, 3)} per step; the current detection path can reach it if repair after detection is at least ${formatLawPercent(requiredCoverage / detection, 1)}.`;
+      reading.textContent = `At ${formatLawPercent(stepReliability, 3)} per step, ${steps} independent critical step${steps === 1 ? "" : "s"} complete${steps === 1 ? "s" : ""} correctly ${formatLawPercent(correctWorkflow)} of the time. ${formatLawPercent(stoppedWorkflow)} stop safely and ${formatLawPercent(wrongWorkflow)} return a wrong result. ${targetGuidance}`;
     }
   };
 
@@ -490,7 +492,8 @@ function initializeUsl(root: HTMLElement) {
     );
     const next = points[selectedN] ?? selected;
     const nextHelps = next.capacity > selected.capacity + 0.001;
-    const atPeak = selected.concurrency === peak.concurrency;
+    const hasInteriorPeak = peak.concurrency < points.length;
+    const atPeak = hasInteriorPeak && selected.concurrency === peak.concurrency;
     const verdict = root.querySelector<HTMLElement>("[data-usl-verdict]");
     const reading = root.querySelector<HTMLElement>("[data-usl-reading]");
 
@@ -517,7 +520,7 @@ function initializeUsl(root: HTMLElement) {
       "[data-usl-metric='next']",
       selectedN === 32 ? "not shown" : nextHelps ? "helps" : "hurts",
     );
-    renderUslChart(root, points, selected, peak);
+    renderUslChart(root, points, selected, peak, hasInteriorPeak);
 
     root.classList.toggle("is-law-warning", !nextHelps && !atPeak);
     if (selectedN === 32) {
@@ -532,13 +535,21 @@ function initializeUsl(root: HTMLElement) {
     }
 
     if (reading) {
-      reading.textContent = `At ${selectedN} worker${selectedN === 1 ? "" : "s"}, modeled relative capacity is ${selected.capacity.toFixed(2)}×. The curve peaks at ${peak.concurrency}; ${
-        selectedN < peak.concurrency
-          ? "additional concurrency still helps, but with diminishing return."
-          : selectedN === peak.concurrency
-            ? "this is the modeled balance point for the chosen costs."
-            : "contention and coherency costs now outweigh the added worker."
-      } Fit α and β from measurements before treating this as a prediction.`;
+      const rangeReading =
+        alpha === 0 && beta === 0
+          ? "Zero scaling costs give linear capacity C(N) = N with no finite optimum in this ideal model."
+          : !hasInteriorPeak
+            ? beta === 0
+              ? "This curve keeps rising beyond the displayed range; no finite peak exists with these costs."
+              : "No interior peak is shown. The largest displayed value is at 32; inspect a wider range before locating the optimum."
+            : `The curve peaks at ${peak.concurrency}; ${
+                selectedN < peak.concurrency
+                  ? "additional concurrency still helps, but with diminishing return."
+                  : selectedN === peak.concurrency
+                    ? "this is the modeled balance point for the chosen costs."
+                    : "contention and coherency costs now outweigh the added worker."
+              }`;
+      reading.textContent = `At ${selectedN} worker${selectedN === 1 ? "" : "s"}, modeled relative capacity is ${selected.capacity.toFixed(2)}×. ${rangeReading} Fit α and β from measurements before treating this as a prediction.`;
     }
   };
 
@@ -558,6 +569,7 @@ function renderUslChart(
   points: UslPoint[],
   selected: UslPoint,
   peak: UslPoint,
+  hasInteriorPeak: boolean,
 ) {
   const chart = root.querySelector<SVGElement>("[data-usl-chart]");
   if (!chart) return;
@@ -589,10 +601,10 @@ function renderUslChart(
 <line class="usl-selected-guide" x1="${x(selected)}" y1="${top}" x2="${x(selected)}" y2="${top + height}" />
 <circle class="usl-peak-point" cx="${x(peak)}" cy="${y(peak)}" r="6" />
 <circle class="usl-selected-point" cx="${x(selected)}" cy="${y(selected)}" r="7" />
-<text class="usl-peak-label" x="${Math.min(x(peak) + 10, 560)}" y="${Math.max(y(peak) - 10, 15)}">peak N=${peak.concurrency}</text>`;
+<text class="usl-peak-label" x="${Math.min(x(peak) + 10, 560)}" y="${Math.max(y(peak) - 10, 15)}">${hasInteriorPeak ? "peak" : "best shown"} N=${peak.concurrency}</text>`;
   chart.setAttribute(
     "aria-label",
-    `Relative capacity curve. Selected concurrency ${selected.concurrency} has ${selected.capacity.toFixed(2)} times capacity. Peak is ${peak.capacity.toFixed(2)} times at ${peak.concurrency} workers.`,
+    `Relative capacity curve from 1 to ${points.length} workers. Selected concurrency ${selected.concurrency} has ${selected.capacity.toFixed(2)} times capacity. ${hasInteriorPeak ? "Peak is" : "Largest displayed value is"} ${peak.capacity.toFixed(2)} times at ${peak.concurrency} workers.`,
   );
 }
 

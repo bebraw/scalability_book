@@ -61,6 +61,15 @@ Boundary trace exposes ownership and failure questions without assigning an over
 The queue model compares fractional entered averages with numerical rounding only; it does not infer a stable observation window or statistical agreement.
 The evaluation worksheet separates sample output from revealed worked scores, accepts sourced run observations and leaves missing elapsed time/cost unknown.
 Replacing an output clears its earlier judgments and observations; cost does not break rubric-score ties.
+The saturation lab distinguishes positive headroom, a limit with no headroom, and overload without inventing backlog at equality.
+The latency map reports calculated component costs and batching savings without ranking unmodeled interventions; its 100-request sum is explicitly serial.
+The contention chart separates an interior peak from the largest displayed value, including the zero-cost linear case.
+Reliability guidance separates a target already met by initial correctness from required repair or insufficient detection, while retaining wrong-result outcomes.
+The ACID concurrency case displays its assumed stale-check/unconditional-write program and a conditional-write alternative; the pseudocode executes no SQL.
+
+Goodhart uses one authored coverage case with a separate prediction and revealed proposal assessment.
+Revealing that assessment does not validate a gate; copied notes preserve this boundary.
+Its optional follow-up reuses the [concern-directed mutation lab](../labs/concern-directed-mutation/README.md): pass baseline, reject a named fault and preserve the harmless storage refactor.
 
 The constraint feedback loop explicitly labels its candidates and checks as scripted.
 Its download is an authored example, separate from executed validation.

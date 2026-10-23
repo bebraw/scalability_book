@@ -1,39 +1,28 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-test.describe("Goodhart pressure test", () => {
+test.describe("Goodhart coverage case", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/demos/#demo-goodhart-pressure-test");
-    await expect(page.locator("[data-goodhart-demo]")).toBeVisible();
   });
 
-  test("reveals proxy success and outcome damage only after a prediction", async ({
+  test("requires a prediction before revealing the authored outcome", async ({
     page,
   }) => {
     const demo = page.locator("[data-goodhart-demo]");
-    const apply = demo.locator("[data-goodhart-apply]");
-
-    await expect(apply).toBeDisabled();
-    await demo
-      .locator('input[name="goodhart-target"][value="coverage"]')
-      .check();
-    await expect(demo.locator("[data-goodhart-contract-note]")).toContainText(
-      "important behavior is checked",
-    );
+    const reveal = demo.locator("[data-goodhart-apply]");
+    await expect(reveal).toBeDisabled();
     await expect(demo.locator('[data-goodhart-measure-before="0"]')).toHaveText(
       "72%",
     );
     await expect(demo.locator('[data-goodhart-measure-after="0"]')).toHaveText(
       "?",
     );
-    await expect(apply).toBeDisabled();
-
     await demo
-      .locator('input[name="goodhart-prediction"][value="diverges"]')
+      .getByLabel("Proxy and intended outcome improve together")
       .check();
-    await apply.click();
-
+    await reveal.click();
     await expect(demo.locator("[data-goodhart-status]")).toContainText(
-      "Prediction confirmed",
+      "differs from the authored case",
     );
     await expect(demo.locator('[data-goodhart-measure-after="0"]')).toHaveText(
       "96%",
@@ -41,101 +30,86 @@ test.describe("Goodhart pressure test", () => {
     await expect(demo.locator('[data-goodhart-measure-after="1"]')).toHaveText(
       "87%",
     );
-    await expect(demo.locator("[data-goodhart-repair]")).toBeVisible();
     await expect(demo.locator("[data-goodhart-gaming-path]")).toContainText(
       "shallow tests",
     );
-    await expect(demo.locator('[data-goodhart-step="pressure"]')).toHaveClass(
-      /is-active/,
-    );
+    await expect(demo.locator("[data-goodhart-test]")).toBeDisabled();
   });
 
-  test("lets a leaking gate be revised into an independent outcome gate", async ({
+  test("keeps the assessment authored and invalidates it when the proposal changes", async ({
     page,
   }) => {
     const demo = page.locator("[data-goodhart-demo]");
-    await pressureTarget(demo, "latency");
-
+    await demo.getByLabel("Proxy improves while the outcome degrades").check();
+    await demo.locator("[data-goodhart-apply]").click();
     await demo
       .locator('input[name="goodhart-safeguard"][value="more-pressure"]')
       .check();
-    await demo.locator("[data-goodhart-test]").click();
-    await expect(demo.locator("[data-goodhart-gate-result]")).toHaveText(
-      "GATE LEAKS",
+    await demo
+      .getByRole("button", { name: "Reveal the case assessment" })
+      .click();
+    await expect(demo.locator("[data-goodhart-debrief]")).toContainText(
+      "leaves the gaming path open",
     );
     await expect(demo.locator("[data-goodhart-artifact]")).toHaveValue(
-      /Gate assessment: LEAKS/,
+      /Chosen proposal: Raise the target to 99%/,
     );
 
     await demo
       .locator('input[name="goodhart-safeguard"][value="paired"]')
       .check();
-    await demo.locator("[data-goodhart-test]").click();
-    await expect(demo.locator("[data-goodhart-status]")).toContainText(
-      "Gate repaired",
-    );
+    await expect(demo.locator("[data-goodhart-debrief]")).toBeHidden();
+    await expect(demo.locator("[data-goodhart-artifact]")).toHaveValue("");
+    await demo
+      .getByRole("button", { name: "Reveal the case assessment" })
+      .click();
     await expect(demo.locator("[data-goodhart-gate-result]")).toHaveText(
-      "GATE HOLDS",
+      "CASE ASSESSMENT",
+    );
+    await expect(demo.locator("[data-goodhart-debrief]")).toContainText(
+      "still needs executed checks",
     );
     await expect(demo.locator("[data-goodhart-artifact]")).toHaveValue(
-      /valid-request acceptance ≥ 98%/,
+      /No model, revised gate or acceptance check was executed/,
     );
-    await expect(demo.locator("[data-goodhart-artifact]")).toHaveValue(
-      /deterministic illustrative values/,
-    );
+    await expect(
+      demo.getByRole("link", {
+        name: "concern-directed mutation lab",
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/downloads/labs/concern-directed-mutation.zip");
   });
 
-  test("supports every proxy, reset, and a narrow mobile viewport", async ({
+  test("resets prediction, outcome and assessment on a narrow screen", async ({
     page,
   }) => {
     const demo = page.locator("[data-goodhart-demo]");
-
-    await pressureTarget(demo, "agent-pass");
-    await expect(demo.locator('[data-goodhart-measure-after="0"]')).toHaveText(
-      "94%",
-    );
-    await expect(demo.locator("[data-goodhart-gaming-path]")).toContainText(
-      "visible judge",
-    );
-
+    await page.setViewportSize({ width: 390, height: 844 });
+    await demo.getByLabel("Proxy improves while the outcome degrades").check();
+    await demo.locator("[data-goodhart-apply]").click();
     await demo
-      .locator('input[name="goodhart-safeguard"][value="paired"]')
+      .locator('input[name="goodhart-safeguard"][value="selective"]')
       .check();
     await demo.locator("[data-goodhart-test]").click();
-    await demo.locator("[data-goodhart-reset]").click();
+    await expect(demo.locator("[data-goodhart-debrief]")).toContainText(
+      "hide shallow assertions",
+    );
+    const overflow = await demo.evaluate((root) => ({
+      demo: root.scrollWidth - root.clientWidth,
+      page: document.documentElement.scrollWidth - innerWidth,
+    }));
+    expect(overflow.demo).toBeLessThanOrEqual(1);
+    expect(overflow.page).toBeLessThanOrEqual(1);
+    await demo.getByRole("button", { name: "Reset the case" }).click();
     await expect(demo.locator("[data-goodhart-repair]")).toBeHidden();
-    await expect(demo.locator('[data-goodhart-measure-before="0"]')).toHaveText(
-      "—",
+    await expect(demo.locator("[data-goodhart-artifact]")).toHaveValue("");
+    await expect(demo.locator('[data-goodhart-measure-after="0"]')).toHaveText(
+      "?",
     );
     await expect(demo.locator("[data-goodhart-apply]")).toBeDisabled();
-
-    await page.setViewportSize({ width: 390, height: 844 });
-    await expectNoHorizontalOverflow(demo);
+    await demo
+      .getByLabel("Proxy and intended outcome improve together")
+      .check();
+    await expect(demo.locator("[data-goodhart-apply]")).toBeEnabled();
   });
 });
-
-async function pressureTarget(demo: Locator, target: string) {
-  await demo
-    .locator(`input[name="goodhart-target"][value="${target}"]`)
-    .check();
-  await demo
-    .locator('input[name="goodhart-prediction"][value="diverges"]')
-    .check();
-  await demo.locator("[data-goodhart-apply]").click();
-  await expect(demo.locator("[data-goodhart-repair]")).toBeVisible();
-}
-
-async function expectNoHorizontalOverflow(demo: Locator) {
-  const overflow = await demo.evaluate((root: HTMLElement) => {
-    const rootRect = root.getBoundingClientRect();
-    return {
-      root: root.scrollWidth - root.clientWidth,
-      page: document.documentElement.scrollWidth - window.innerWidth,
-      right: rootRect.right - window.innerWidth,
-    };
-  });
-
-  expect(overflow.root).toBeLessThanOrEqual(1);
-  expect(overflow.page).toBeLessThanOrEqual(1);
-  expect(overflow.right).toBeLessThanOrEqual(1);
-}

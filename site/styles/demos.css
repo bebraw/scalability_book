@@ -12471,8 +12471,7 @@
   }
 }
 
-/* Goodhart pressure test: an industrial calibration card that visibly splits
-   a winning dashboard from a degrading outcome. */
+/* One authored Goodhart coverage case, with a separate local verification path. */
 .goodhart-demo {
   --goodhart-rule: color-mix(in srgb, var(--border) 76%, transparent);
   --goodhart-paper: color-mix(in srgb, var(--panel) 96%, var(--warning) 4%);
@@ -12688,7 +12687,6 @@
   line-height: 1.15;
 }
 
-.goodhart-targets,
 .goodhart-predictions,
 .goodhart-safeguards {
   border: 0;
@@ -12697,7 +12695,6 @@
   padding: 0;
 }
 
-.goodhart-targets legend,
 .goodhart-predictions legend,
 .goodhart-safeguards legend {
   color: var(--muted);
@@ -12708,12 +12705,6 @@
   text-transform: uppercase;
 }
 
-.goodhart-targets {
-  display: grid;
-  gap: 0.48rem;
-}
-
-.goodhart-targets label,
 .goodhart-safeguards label {
   align-items: center;
   background: var(--bg);
@@ -12726,19 +12717,16 @@
   position: relative;
 }
 
-.goodhart-targets label:hover,
 .goodhart-safeguards label:hover {
   border-color: color-mix(in srgb, var(--warning) 70%, var(--border));
 }
 
-.goodhart-targets label:has(input:checked),
 .goodhart-safeguards label:has(input:checked) {
   background: color-mix(in srgb, var(--warning) 10%, var(--panel));
   border-color: var(--warning);
   box-shadow: inset 0.22rem 0 0 var(--warning);
 }
 
-.goodhart-targets input,
 .goodhart-predictions input,
 .goodhart-safeguards input {
   accent-color: var(--warning);
@@ -12747,30 +12735,17 @@
   margin: 0;
 }
 
-.goodhart-target-mark {
-  background: color-mix(in srgb, var(--warning) 14%, var(--panel));
-  border: 1px solid color-mix(in srgb, var(--warning) 46%, var(--border));
-  color: var(--warning);
-  font: 850 var(--demo-font-label)/1 var(--font-mono);
-  min-inline-size: 2.55rem;
-  padding: 0.38rem 0.3rem;
-  text-align: center;
-}
-
-.goodhart-targets label > span:last-child,
 .goodhart-safeguards label > span:last-child {
   display: grid;
   gap: 0.17rem;
   min-inline-size: 0;
 }
 
-.goodhart-targets strong,
 .goodhart-safeguards strong {
   font-size: 0.84rem;
   line-height: 1.25;
 }
 
-.goodhart-targets small,
 .goodhart-safeguards small {
   color: var(--muted);
   font-size: var(--demo-font-label);
@@ -12782,6 +12757,11 @@
   border: 1px dashed color-mix(in srgb, var(--accent) 55%, var(--border));
   margin-block-start: 0.8rem;
   padding: 0.7rem 0.8rem;
+}
+
+.goodhart-local {
+  margin: 0;
+  padding: 1rem 1.5rem;
 }
 
 .goodhart-contract-note span {
@@ -13044,12 +13024,14 @@
   background: var(--bg);
 }
 
-.goodhart-demo[data-goodhart-gate="repaired"] .goodhart-debrief-heading > span {
+.goodhart-demo[data-goodhart-gate="addresses"]
+  .goodhart-debrief-heading
+  > span {
   border-color: var(--success);
   color: var(--success);
 }
 
-.goodhart-demo[data-goodhart-gate="leaking"] .goodhart-debrief-heading > span {
+.goodhart-demo[data-goodhart-gate="open"] .goodhart-debrief-heading > span {
   border-color: var(--danger);
   color: var(--danger);
 }
@@ -13407,6 +13389,32 @@
   font: var(--demo-font-label)/1.4 var(--font-mono);
   margin: -0.35rem 0 0;
   max-width: none;
+}
+
+.acid-lab-program {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  min-inline-size: 0;
+  padding: 0.85rem;
+}
+
+.acid-lab-program summary {
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.prose .acid-lab-program p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.acid-lab-program pre {
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
+.acid-lab-program :is(pre, code) {
+  font: var(--demo-font-label)/1.5 var(--font-mono);
 }
 
 .acid-lab-rail {
