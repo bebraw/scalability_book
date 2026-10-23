@@ -1,6 +1,6 @@
 # Proposal: calibrate the small-model task in stages
 
-**For student discussion — 22 October 2026.**
+**For student discussion — updated 23 October 2026.**
 
 The proposed independent route is the full **5 ECTS / 135-hour course**, assessed on the existing **1–5 scale**.
 It retains three fresh builds, maintained specifications and decision records, instructor discussions and the required audits.
@@ -10,6 +10,8 @@ The [study agreement](study-agreement.md) gives the proposed calendar, workload 
 We would like to calibrate the difficulty before choosing additional technical scope.
 A preliminary Qwen3.5 9B attempt showed substantial effort spent reading and rebuilding context around a change involving retries, persistence and concurrency.
 The instructor interrupted that attempt before its full time or request allowance; it is an early observation, not a completed comparison or a general result about small models.
+A subsequent department-hosted Qwen3.8 27B calibration with thinking disabled implemented the simpler label task and passed 22 independent checks in 6 minutes 24 seconds and 38 requests.
+Browser review still found an unintended form/API length discrepancy, so both the specification and independent acceptance coverage need to agree before the comparison.
 
 ## Start with one small change
 
@@ -18,6 +20,8 @@ On a disposable copy of an already working application, ask the model to add an 
 - Enter the label when creating an item.
 - Save it and show it beside the item after an ordinary restart.
 - Keep existing behavior when the label is omitted.
+- Trim edge whitespace; omitted or blank means no label.
+- Preserve the same text through the ordinary form and JSON API, with no label-specific character limit within the existing whole-request bound.
 - Retain the existing checks and add focused evidence for the new behavior.
 
 Keep the change to this single path through input, storage and display.
@@ -35,7 +39,9 @@ Introduce concurrency and recovery questions separately so each investigation ha
 The existing course briefs retain their required investigations; this staged exercise helps choose a suitable task size and optional depth.
 
 A later comparison can give one agent and a coordinator with two workers the same agreed task, fresh copies, checks and aggregate limits.
-A larger-model attempt can then help investigate whether a difficulty comes from the task, model configuration or orchestration.
+The next proposed instructor preparation uses the verified department model with thinking disabled and gives each condition twenty minutes and eighty aggregate requests, including all workers and retries.
+Compare correctness, specification/ADR quality, time, requests and coordination problems, retaining partial outcomes and keeping the calibration outside the pair.
+Further model trials can then help investigate whether a difficulty comes from the task, model configuration or orchestration.
 The student's own matched experiment remains optional; the required supplied-trace analysis supports full credit.
 
 ## Commitments to agree

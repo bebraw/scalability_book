@@ -43,7 +43,7 @@ Using one codebase for multiple audits creates familiarity, which belongs in the
 
 ## Matched-experiment preparation
 
-The instructor selected Qwen3.5 9B through LM Studio for the preparation experiment: one agent versus a coordinator with two workers, using Codex CLI on both sides.
+The initial preparation selected Qwen3.5 9B through LM Studio: one agent versus a coordinator with two workers, using Codex CLI on both sides.
 Freeze the actual quantization, loaded context, reasoning mode and route after tool-use preflight; a model's advertised maximum context does not establish its loaded context.
 The earlier Luna candidate was rejected by the installed CLI's ChatGPT access route before any timed attempt.
 Codex documents [local providers](https://learn.chatgpt.com/docs/config-file/config-advanced#oss-mode-local-providers), and LM Studio documents [Responses compatibility](https://lmstudio.ai/docs/developer/openai-compat/responses).
@@ -81,3 +81,41 @@ This is interrupted exploratory evidence, with no completed matched contrast or 
 The [student discussion proposal](solo-pilot-2026/student-discussion-proposal.md) starts with one ordinary input/storage/display change and adds retry, concurrency and recovery questions in stages.
 Resume with a separately identified task, fresh copies and frozen independent checks after discussing scope with the student.
 The completed supplied-trace package remains preparation work.
+
+## Department-hosted calibration — 23 October 2026
+
+Department gateway access is verified for `Qwen/Qwen3.8-27B-FP8`.
+The credential remains in the ignored local environment file and the private HTTPS bridge; coding processes and recorded request bodies do not receive it.
+Run-specific configuration and observations stay under ignored `.local/course-preparation/department-2026-10-23/`, separately from the unchanged interrupted 9B experiment.
+The gateway advertises a 262,144-token context; the client uses 32,768, and server hardware, weight revision and maximum usable context have not been independently established.
+
+The first label calibration ended after 5 minutes 24 seconds and eight requests without code changes.
+Its last response spent all 4,096 output tokens on reasoning and reported `incomplete`, while Codex exited zero.
+Neither the twenty-minute nor forty-request condition limit was exhausted; preserve this observed termination behavior instead of treating it as a full-budget task failure.
+
+A separately recorded configuration with native thinking disabled passes the complete coordinator-and-two-worker tool preflight in 61 seconds and fourteen aggregate requests; all returned preflight responses report zero reasoning tokens.
+On a fresh reference copy, one agent then implements the simpler label task in 6 minutes 24 seconds and 38 of forty requests, with no human implementation hints or repairs.
+All sixteen existing and six independently authored label checks pass, and both supplied test files remain unchanged.
+The maintained specification was updated before implementation, and the candidate includes a new ADR.
+
+Browser review confirms ordinary form creation, escaped label display and a mobile layout without horizontal overflow.
+It also finds an uncovered discrepancy: the form limits labels to 160 characters while the API accepts 161 and the maintained specification states no length validation.
+Retain the candidate and that finding unchanged; passing automated checks does not establish full contract conformance.
+The trace also retains failed form-patch attempts and test pipelines that report shell success despite failed checks; final independent validation invokes the test runner directly.
+
+These are calibration and routing observations, not a completed matched comparison or a model-size effect.
+Before a separate matched pair, settle the label rule and acceptance coverage, predeclare a shared aggregate budget informed by the nearly exhausted single-agent allowance, and freeze fresh copies and configuration.
+Keep the calibration outside that pair and discuss the exercise scope with the student.
+
+### Label rule and next comparison
+
+The first exercise uses optional trimmed text with no label-specific character limit, within the existing whole-request size bound.
+Omitted or blank labels become the empty string; the ordinary form and JSON API must preserve the same value, including text longer than 160 characters.
+This removes the unintended browser constraint and keeps new length validation outside the first exercise.
+The private `label-comparison-v2/` brief and eight label checks define the next version; the recorded calibration and its six checks remain unchanged.
+
+The next proposed step is one matched pair on fresh reference copies using the verified department model with thinking disabled: one agent versus a coordinator with exactly two workers.
+Give each condition twenty minutes and eighty aggregate inference requests, including every worker and retry, with the same task, checks, tools, context and output limits.
+Freeze the exact configuration, source digests, condition order and intervention policy before either starts; retain calibration outside the pair.
+Compare independent correctness and browser conformance, specification/ADR quality, time, aggregate requests/tokens and coordination failures.
+This comparison is prepared but has not started; one pair provides exploratory evidence for the student discussion.
