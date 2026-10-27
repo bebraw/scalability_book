@@ -169,7 +169,7 @@ Negative or unresolved interventions are worth discussing when the baseline, cha
 Reserve most of the session for teams to present implementation C and their A–B–C comparison.
 Ask teams to emphasize:
 
-- the strongest observed evidence, including a finding from implementation C's fleet debugging view;
+- the strongest observed evidence, including a debugging finding from the actual fleet run that produced C; show C's fleet debugging view only if implemented;
 - one important inference and its alternatives;
 - one proposed response that remains untested;
 - the conditional application and development-workflow decision they would make;

@@ -32,7 +32,8 @@ In a small application, several stages may live in one module and deploy togethe
 They remain distinct responsibilities because a mistake at each boundary produces different evidence and a different user-visible failure.
 
 Friction becomes visible when the path is hard to trace, the same rule has several unsynchronized definitions, a local check cannot exercise the changed boundary, or a deployment makes earlier assumptions costly to recover.
-The path also gives the chapter a stable unit of analysis: ask what the category change costs in implementation A, then repeat the same audit for implementation B.
+The category change is an illustration and can serve as an optional controlled comparison: ask what the same request costs in implementations A and B.
+For the required course audits, use the [assigned phase-specific probes](/project/#10-1-change-probe-protocol), whose exact prompts, fields and values are released only after the implementation is submitted.
 
 An independently built client can expose assumptions that the provider's own tests share with its implementation.
 The [optional API-consumer investigation](/explore/temporary-api-consumers/) probes a fixed contract with temporary CSV and summary clients, then separates provider defects from consumer mistakes and confusing documentation.
@@ -243,7 +244,9 @@ For example, in an illustrative pair of accepted changes, 18 baseline person-min
 Neither number establishes future savings or a causal benefit from the intervention.
 Use your own linked observations and account for practice effects, configuration changes and ongoing maintenance.
 
-Apply the same bounded request and acceptance boundary when comparing implementations A and B.
+For an optional controlled comparison, keep the bounded request and acceptance boundary the same across implementations A and B.
+The required audits instead use phase-specific probes with different product language but an equivalent vertical slice and acceptance burden.
+Compare their recorded outcomes under the common audit protocol, accounting for familiarity with earlier probes and any differences in conditions.
 For an implemented choice, mark its commitment point or record that none was reached, name what now depends on it, and identify the evidence that would show reversal succeeded.
 A checked improvement, unchanged or worse result, or justified follow-up can all support an honest friction finding.
 
@@ -259,4 +262,4 @@ Use the chapter's questions about protective friction, reversibility, decision h
 
 Follow one change from the browser through contracts, data, validation, and deployment to locate its largest source of friction.
 Preserve checks that protect accepted behavior, expose the point where reversal becomes a coordinated operation, and move useful feedback earlier where possible.
-Repeat the same audit to see whether the next implementation actually makes the change easier.
+Compare bounded audit outcomes under equivalent conditions to assess whether the next implementation makes this kind of change easier, while accounting for practice and other changed conditions.

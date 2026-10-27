@@ -122,9 +122,9 @@ For implementation B, record:
 - one request and data path;
 - authority and ownership boundaries;
 - the automated-consumer policy;
-- one architectural difference from A;
-- the pressure that difference should improve;
-- the cost or failure mode it may introduce.
+- one consequential architectural choice to preserve or change from A;
+- the pressure that justifies that choice;
+- the cost or failure mode it retains or introduces, and how to check it.
 
 **Question to carry forward:** How difficult is this architecture for a newcomer to change safely?
 

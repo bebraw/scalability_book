@@ -105,11 +105,11 @@ It is a useful starting configuration for these exercises; the four workspace ex
 
 Obtain your own department access through the instructor and use the [gateway documentation](https://llm-gateway.k8s.aalto.fi/docs) for account or service details.
 Keep the key in your local environment or an ignored `.env` file containing `AALTO_KEY=your-key`; it does not belong in a prompt, decision record or evidence archive.
-The API example below reads `.env` with Node, without evaluating it as shell code.
+The API example below uses the exported key or loads `.env` if present, without evaluating the file as shell code.
 It makes one small inference request, so run it only after the instructor confirms your access and allocation:
 
 ```sh
-node --env-file=.env --input-type=module <<'NODE'
+node --env-file-if-exists=.env --input-type=module <<'NODE'
 if (!process.env.AALTO_KEY) throw new Error("AALTO_KEY is missing");
 const response = await fetch("https://llm-gateway.k8s.aalto.fi/api/v1/responses", {
   method: "POST",

@@ -312,6 +312,7 @@ const activities: Record<string, Activity> = {
       "Relate span timing, parentage, and events to the declared request boundary.",
   },
   "Fleet trace debugger": {
+    activityVersion: 2,
     conceptIds: [
       "agent-fleet",
       "authority",
@@ -320,14 +321,14 @@ const activities: Record<string, Activity> = {
       "state-authority",
     ],
     caption:
-      "Reconcile orchestration intent, gateway decisions, and the physical execution ledger.",
+      "Reconcile orchestration intent, gateway decisions, and a resource ledger in a fixed synthetic teaching packet.",
     controls: [
       "Trace inspection",
       "Run attribution",
       "Physical ledger accounting",
     ],
     assumptions:
-      "Count each physical row once, including failed, cancelled, and unmatched work. Missing linking evidence must remain unmatched.",
+      "All logs and costs are synthetic; no models or tools execute in this demo. Count each physical row once, including failed, cancelled, and unmatched work. Missing linking evidence must remain unmatched.",
     predict:
       "Which records prove execution, and which express only an intended or authorized action?",
     try: "Attribute records to R41, R42, or unmatched using the available linking evidence.",
