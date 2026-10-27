@@ -6,7 +6,7 @@ The course uses one common application contract and three phase-specific develop
 2. [Common project specification](00_common_project.md) — required behavior, technical freedom, acceptance scenarios, shared runtime workload, transfer policy, evidence, and cross-team audit.
 3. [Establish](01_establish.md) — implementation A with a large-model single agent.
 4. [Challenge](02_challenge.md) — implementation B with a small-model single agent.
-5. [Compare](03_compare.md) — implementation C with an agent fleet, a trace-based debugging view of the fleet itself, and the final comparison.
+5. [Compare](03_compare.md) — implementation C with an agent fleet, analysis of its actual execution record, and the final comparison; importing the trace into C is optional.
 
 The [course environment sheet](course_environment.md) defines the model, harness, access, budget, privacy, and fallback assignments for the current course run.
 The [assessment rubric](grading.md) defines the project, participation, learning-diary, and self- and peer-assessment scoring.
@@ -34,4 +34,4 @@ Trace import, a student-run matched pair and additional pressure scenarios are o
 When a chapter suggests an optional lab or advanced appendix exercise, it becomes required only if the common or phase specification names it or the instructor announces it before the relevant phase begins.
 
 The behavioral and assessment contracts are defined here.
-Before a course run begins, the instructor still has to replace the **To be announced** fields in the course environment sheet with the supported assignments and publish the course workflow details for that run.
+Before each affected phase begins, the instructor must publish its supported assignments in the course environment sheet and the corresponding workflow details for that run.

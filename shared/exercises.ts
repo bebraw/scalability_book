@@ -392,10 +392,6 @@ export const exercises: Record<string, Exercise> = {
           "The response was lost after the commit; neither rollback nor rejection follows.",
       },
     ],
-    demo: {
-      id: "demo-boundary-trace",
-      label: "Request boundaries",
-    },
   },
   "friction-cycle": {
     version: 1,
@@ -420,10 +416,6 @@ export const exercises: Record<string, Exercise> = {
         explanation: "60 − 55 = 5 minutes.",
       },
     ],
-    demo: {
-      id: "demo-friction-audit",
-      label: "Observed change effort",
-    },
   },
   "pressure-retries": {
     version: 2,
@@ -477,10 +469,6 @@ export const exercises: Record<string, Exercise> = {
           "Reuse a stable command key and atomically enforce it with the state change, activity event, and reusable result at their shared authority.",
       },
     ],
-    demo: {
-      id: "demo-changed-assumptions-map",
-      label: "Retry effects",
-    },
   },
   "fleets-amdahl": {
     version: 2,

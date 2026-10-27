@@ -21,10 +21,9 @@ Use B's small model as the reference configuration; an approved fleet may use sm
 When model assignment also changes, the full B–C builds compare development systems rather than isolate orchestration.
 The supplied matched-trace activity holds the small model fixed; students may optionally run their own matched pair or vary one model assignment with the task graph fixed.
 
-Implementation C also turns its development process into application data.
-The actual fleet run supplies a compact redacted execution record and debugging findings about attempts, failures, handoffs, validation, correction and human intervention.
-Transforming and loading the trace into the Work Activity Tracker is an optional extension.
-Use that view to locate where coordination failed and which correction worked.
+Analyze the actual fleet run through a compact redacted execution record and debugging findings about attempts, failures, handoffs, validation, correction and human intervention.
+A curated log excerpt or table is sufficient.
+As an optional extension, transform and load the trace into the Work Activity Tracker, then use its views to investigate coordination and correction.
 
 ## Compare applications and development systems
 

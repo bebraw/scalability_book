@@ -4,6 +4,16 @@ import { exercises } from "../../shared/exercises.ts";
 import AxeBuilder from "@axe-core/playwright";
 
 test.describe("demo showcase", () => {
+  test("every defined exercise appears exactly once", async ({ page }) => {
+    await page.goto("/demos/");
+    const renderedIds = await page
+      .locator("[data-exercise]")
+      .evaluateAll((elements) =>
+        elements.map((element) => element.getAttribute("data-exercise")),
+      );
+    expect(renderedIds.sort()).toEqual(Object.keys(exercises).sort());
+  });
+
   test("standalone practice is readable and usable on desktop and mobile", async ({
     page,
   }) => {
@@ -49,7 +59,7 @@ test.describe("demo showcase", () => {
         ),
       ).toBeLessThanOrEqual(1);
       await page
-        .locator('[data-exercise="measurement-transfer"]')
+        .locator('[data-exercise="architecture-outcome"]')
         .locator("..")
         .screenshot({
           path: test.info().outputPath(`more-practice-${width}.png`),

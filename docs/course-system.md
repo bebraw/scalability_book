@@ -15,7 +15,8 @@ Late arrivals have recorded catch-up plans and review tasks.
 Submission forms include versioned common/phase checklists and staged technical evidence.
 Teacher simulation has isolated storage, manual controls and preparation/grading-review presets in both runtimes, plus a verified browser walkthrough of all three teaching phases.
 Withdrawals retain history, create group-review tasks and receive no final grade.
-Production login delivery remains disabled pending external verification; incoming email uses server-only forwarding configuration.
+[External mail verification is complete](#course-mail-setup), including a controlled sign-in check; production login delivery remains disabled pending production course storage and institutional rollout.
+Incoming email uses server-only forwarding configuration.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 

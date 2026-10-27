@@ -749,6 +749,14 @@ async function validateDemoAnchors() {
     }
     anchorIds.add(expectedId);
   }
+
+  for (const [id, exercise] of Object.entries(exercises)) {
+    if (exercise.demo && !anchorIds.has(exercise.demo.id)) {
+      throw new Error(
+        `Exercise ${id} references unavailable demo ${exercise.demo.id}; update or remove its demo association.`,
+      );
+    }
+  }
 }
 
 function getDemoGalleryHtml() {

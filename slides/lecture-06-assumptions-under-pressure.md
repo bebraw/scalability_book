@@ -105,12 +105,12 @@ Two implementations do not establish a universal model or tool ranking.
 
 ---
 
-# Complete Challenge with a pressure map
+# Complete Challenge with comparable evidence
 
 Submit:
 
 - comparable primary-pressure evidence for A and B;
-- one focused secondary-pressure analysis;
+- one bounded correctness or recovery case;
 - architecture and ownership consequences;
 - one Little’s Law check at a declared boundary;
 - operational evidence and recovery reasoning;

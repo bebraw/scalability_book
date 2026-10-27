@@ -5,6 +5,12 @@ test.setTimeout(60000);
 
 const chapter = "/chapters/benchmarking/";
 const selector = "#exercise-measurement-boundary";
+const pairedExerciseIds = [
+  "measurement-prediction",
+  "development-gates",
+  "fleets-amdahl",
+  "scaling-bottleneck",
+];
 
 test("chapter answers persist on the server across browser contexts", async ({
   page,
@@ -401,7 +407,7 @@ for (const fixture of chapterPractice) {
     expect(answer.completed).toBe(true);
     if (["fleets-amdahl", "pressure-retries"].includes(fixture.id))
       expect(answer.version).toBe(2);
-    if (fixture.chapter !== "recap") {
+    if (pairedExerciseIds.includes(fixture.id)) {
       const group = page.locator(`[data-exercise-tabs="${fixture.id}"]`);
       await expect(
         group.getByRole("tab", { name: "Practice · Complete" }),
@@ -419,9 +425,14 @@ for (const fixture of chapterPractice) {
       await group.getByRole("tab", { name: "Explore", exact: true }).click();
       await expect(exercise).toBeHidden();
       await expect(group.locator('[role="tabpanel"]:visible')).toHaveCount(1);
+    } else {
+      await expect(
+        page.locator(`[data-exercise-tabs="${fixture.id}"]`),
+      ).toHaveCount(0);
+      await expect(exercise).toBeVisible();
     }
     await page.reload();
-    if (fixture.chapter !== "recap")
+    if (pairedExerciseIds.includes(fixture.id))
       await page
         .locator(`[data-exercise-tabs="${fixture.id}"]`)
         .getByRole("tab", { name: /Practice/ })
@@ -437,10 +448,18 @@ test("showcase includes all exercises and shares saved progress with chapters", 
 }) => {
   await page.goto("/demos/");
   await expect(page.locator("[data-exercise]")).toHaveCount(13);
-  await expect(page.locator(".exercise-tabs")).toHaveCount(9);
+  expect(
+    await page
+      .locator(".exercise-tabs")
+      .evaluateAll((elements) =>
+        elements
+          .map((element) => element.getAttribute("data-exercise-tabs"))
+          .sort(),
+      ),
+  ).toEqual(pairedExerciseIds.toSorted());
   await expect(
     page.locator('.exercise-tabs [role="tab"][aria-selected="true"]'),
-  ).toHaveText(Array(9).fill("Explore"));
+  ).toHaveText(Array(pairedExerciseIds.length).fill("Explore"));
   const group = page.locator('[data-exercise-tabs="fleets-amdahl"]');
   await group.getByRole("tab", { name: /^Practice/ }).click();
   const exercise = group.locator('[data-exercise="fleets-amdahl"]');

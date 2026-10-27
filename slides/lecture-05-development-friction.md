@@ -32,19 +32,19 @@ Repeated friction compounds as contributors and change rate grow.
 
 ---
 
-# Seven friction surfaces expose different limits
+# Friction prompts help locate one bottleneck
 
 1. Setup
 2. Comprehension
 3. Change
 4. Testing
 5. Review
-6. Operations
-7. Coordination
+6. Deployment
+7. Operations
+8. Coordination
 
-Do not collapse them into one impression of “developer experience.”
-
-Measure where the workflow slows, blocks, duplicates work, or loses confidence.
+Use these as optional prompts to find where work slows, blocks, repeats, or loses confidence.
+One evidenced bottleneck is sufficient; measurement of every category is not required.
 
 <!-- [Sources] book/02_challenge/05_friction.md -->
 
@@ -123,13 +123,14 @@ The repository should carry more of the explanation over time.
 
 # Challenge checkpoint
 
-Produce:
+Link in the existing evidence index:
 
-- a standardized friction audit;
-- one cross-team change probe;
-- one verified feedback-loop improvement;
-- the evidence before and after that improvement;
-- a remaining friction boundary the team accepts deliberately.
+- both bounded audits, including their actual setup and change-probe outcomes;
+- one concrete friction finding with supporting observations;
+- a checked response or justified follow-up, with its rationale and remaining uncertainty.
+
+Preserve unchanged or worse results.
+Distinguish a proposed follow-up from an improvement already achieved.
 
 **Question to carry forward:** Which assumptions will fail when runtime pressure changes?
 

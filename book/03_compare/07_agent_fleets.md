@@ -235,8 +235,9 @@ Publishing a patch, deployment, or message requires an accountable human who can
 
 ## Practice failure and correction
 
-The labs expose where a delegated task diverges from its contract and whether the workflow can recover.
-Start with one small mismatch whose effect can be checked through the application.
+Use the actual build to examine where delegated work diverges from its contract and how the workflow responds.
+Retain validation, diagnosis and any corrections as part of the required fleet evidence.
+The optional correction lab below offers further practice with a small mismatch whose effect can be checked through the application.
 Use [Appendix A's coordination research](/appendices/evaluating-agentic-workflows/#research-example-coordination-and-integration) as a catalog of possible failure mechanisms when interpreting the trace.
 A category can organize a diagnosis; the repaired behavior still needs checking.
 
@@ -279,8 +280,9 @@ State why the tasks are sequential or independent and who integrates the result.
 
 ### Correction lab
 
-After the fleet integrates implementation C, select one seeded defect from the table below.
-The instructor can supply a faulty branch, or you can introduce the fault after saving a known-good baseline.
+**Optional practice:** after the fleet integrates implementation C, select one seeded defect from the table below.
+The required fleet evidence can use validation and correction from the actual build; there is no requirement to introduce another defect.
+For this lab, the instructor can supply a faulty branch, or you can introduce the fault after saving a known-good baseline.
 Do not reveal the chosen fault to the diagnosing agent.
 
 | Seeded defect                                       | Why local work may look correct                      | Web-visible or state-visible failure                                     |
@@ -335,7 +337,7 @@ Use the application to inspect the workflow that built it.
 ## Optional extensions
 
 To investigate a specific boundary further, use Appendix D's exercises on [retrieving changed guidance](/appendices/agent-system-security/#retrieve-guidance-after-a-contract-changes), [checking contract completeness](/appendices/agent-system-security/#check-a-contract-against-its-consumers), or [testing a human review gate](/appendices/agent-system-security/#test-a-human-review-gate).
-The walkthrough above provides the required path from decomposition through correction and measured coordination cost.
+The required path connects the actual build’s decomposition, validation, correction and measured coordination cost; the seeded-fault lab and extension exercises are optional.
 
 ### Optional exercise — Vary human work in progress
 
@@ -347,8 +349,8 @@ Give your agent the [work-in-progress starting point](/explore/human-work-in-pro
 In implementation C's existing [Compare evidence package](/project/compare/#what-to-do-and-submit), connect the fleet plan to what actually happened:
 
 - declared model and harness configuration, task dependencies, authority, integration ownership, and stopping rules;
-- the correction probe and comparable measurements through acceptance;
-- the actual-run record and at least two findings explaining coordination failures and successful corrections, with trace import into C as an optional extension.
+- validation and correction evidence from the actual build, with comparable measurements through acceptance;
+- the actual-run record and at least two findings about handoffs, validation, integration, correction or human intervention, with trace import into C as an optional extension.
 
 Preserve consequential changes to the plan and link acceptance to the checked revision.
 The specification defines the complete submission requirements.

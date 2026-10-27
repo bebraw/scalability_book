@@ -55,7 +55,9 @@ Keep the class browsing index focused on technical submissions.
 Give teaching staff access to the private records needed for assessment and each student access to their own results.
 Publish the live and remote participation paths and the completion and correction arrangements for [mandatory individual work](grading.md#mandatory-individual-work).
 Record approved changes to an individual requirement alongside any points adjustment.
-For an approved solo route, publish the phase workload/schedule, instructor discussion arrangements, independent human reviewer and outgoing cross-group or frozen-reference audit assignment before work begins.
+For an approved solo route, publish the phase workload/schedule, instructor discussion arrangements, independent human reviewer and outgoing audit arrangements before work begins.
+Announce whether the student will audit another group or a frozen reference, along with the access and timing rules.
+Release the assigned source or reference and bounded change probe only after the student's implementation is frozen and the audit window opens.
 Keep model access and budgets supported for the solo student, and distinguish a check-in from an announced equivalent lecture activity.
 Before launch, test the access paths as an author, a classmate, and an instructor, including access to a frozen source revision.
 

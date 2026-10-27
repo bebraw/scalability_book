@@ -5,11 +5,13 @@ The clearest next improvements are therefore operational: make the course easier
 
 These are working notes rather than commitments.
 They should be revisited against the first cohort's questions, project evidence, and instructor workload.
+The [course workspace guide](course-system.md) owns implemented behavior; this backlog contains remaining preparation and possible improvements.
 
-## 1. Create a student-facing course cockpit
+## 1. Improve run-specific orientation
 
-Add a course page separate from the book's narrative.
-It should show:
+Use the existing course workspace as the entry point for run-specific work.
+It already provides phase submissions, private portfolios, timed audit and class access, evidence checklists, and scoring records.
+Review whether students can readily find:
 
 - the current phase and next deadline;
 - required reading, optional material, and lecture preparation;
@@ -17,15 +19,13 @@ It should show:
 - the assigned model, harness, access path, budget, privacy rules, and fallback;
 - project-card submissions and the presentation schedule.
 
-The [project introduction](../specifications/00_introduction.md#groups-submissions-and-access) now defines group and individual responsibilities, staged submissions, and course-only browsing.
-Implement those rules in the course platform: one group record per phase, one private individual portfolio per student and phase, and a class submission index linked to frozen technical bundles after the audit window.
-Give assigned auditors access after the implementation deadline and record any prior inspection; open general class browsing after the audit so preparation remains visible in the audit evidence.
-Test source and evidence access as a classmate; a list of repository links alone does not establish that students can inspect the submitted revisions.
-Keep scores, diaries, and confidential assessment reports in the private course records.
+Add missing links or a compact run overview only where this review reveals an actual navigation gap.
+Configure the published run according to the [project introduction](../specifications/00_introduction.md#groups-submissions-and-access), then test its source and evidence access as an author, assigned auditor, classmate, and instructor.
+Verify the audit and class-opening times and the privacy of scores, diaries, and confidential assessment reports with synthetic records before enrollment.
 
-Before the course begins, replace every **To be announced** field in the [course environment sheet](../specifications/course_environment.md).
+Before each affected phase begins, fill its **To be announced** fields in the [course environment sheet](../specifications/course_environment.md).
 Pair this with a small technical preflight in which every student or team reaches the assigned model, runs the harness, completes one bounded change, and executes the supported validation path.
-This should expose access, hardware, account, and environment problems before Establish begins.
+Check Establish access before its work begins, then repeat the preflight when the model or workflow changes for Challenge or Compare.
 
 ## 2. Provide an executable evidence and submission template
 
@@ -46,17 +46,18 @@ It should contrast a strong bounded claim with a plausible but weak claim and sh
 The presentation project card should be generated from the same evidence bundle.
 It must not become another deliverable.
 
-## 3. Reduce the apparent surface area of Compare
+## 3. Support the required Compare path
 
-Keep the existing learning demands, but consolidate the Compare submission into four coherent outputs:
+Use the current brief to help students organize the existing Compare bundle into four coherent parts:
 
 1. runnable implementation C;
 2. fleet evidence package;
 3. scaling-and-deployment experiment; and
 4. final A–B–C decision package.
 
-Provide a trace-loader skeleton and one supported deployment recipe.
-Students should spend their limited time mapping and interpreting coordination evidence, applying formal models, testing a justified scaling response, and defending a decision rather than building generic import or deployment plumbing.
+Provide one supported deployment recipe and check that the guidance makes actual-run analysis and supplied matched-trace analysis possible without trace import into C.
+For students choosing the optional trace-import extension, start from the existing [portable fleet-trace example](../specifications/03_compare.md#optional-import-the-trace-into-c); consider a loader skeleton only if their experience shows it would help.
+Prioritize interpreting coordination evidence, applying formal models, testing a justified scaling response, and defending a decision within the required path.
 
 ## 4. Add a paired first- and last-lecture diagnostic
 
@@ -76,23 +77,23 @@ It does not require changing or displaying the official learning outcomes.
 
 At the maximum cohort size, the current design can produce approximately 51 group-phase submissions, 450 lecture-diary entries, 150 phase-level self- and peer-assessment packages, and 51 stage presentations when about 50 students form 17 groups.
 
-Before launch:
+The workspace already collects three phase portfolios, retains criterion-level scoring, displays the individual passing requirements, and has synthetic grading walkthroughs.
+Use those workflows in a rehearsal with the planned cohort size before launch, then focus remaining preparation on:
 
-- collect diary entries as three phase portfolios while preserving the nine entry-level criteria;
-- automate evidence-presence and link checks without automating judgment;
-- use one scoring sheet across all phases;
-- generate presentation cards from the common evidence template;
-- test the 153-point scheme against several fictional student profiles; and
-- reserve qualitative instructor feedback for the most consequential reasoning, evidence, or collaboration issue.
+- checking whether evidence-presence and link validation would save meaningful review time without automating judgment;
+- generating presentation cards from the common evidence template;
+- calibrating criterion-level feedback against fictional submissions; and
+- reserving qualitative instructor feedback for the most consequential reasoning, evidence, or collaboration issue.
 
 The goal is to preserve formative assessment while preventing bookkeeping from displacing discussion and feedback.
 
 The [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md) examines how published courses require individual work alongside shared project marks.
 The revised rubric requires two completed lecture activities and at least six self- and peer-assessment points per phase, including contribution credit, using already-assessed evidence.
 This closes the earlier case in which 90 shared project points alone could earn grade 1.
-Show the individual requirements alongside total points in the student scoring record and publish any completion or approved absence arrangements before the affected work begins.
+Publish any completion or approved absence arrangements before the affected work begins and record them through the existing individual-arrangement workflow.
 
 ## Suggested priority
 
-The evidence template and course cockpit have the widest effect because they improve project work, comparison, presentations, and assessment together.
-The Compare scaffolds provide the largest scope-risk reduction, while the paired diagnostic is the smallest change that materially improves evidence about learning.
+Prioritize the evidence template, run-specific orientation, and access rehearsal because they support project work, presentations, and assessment together.
+Keep Compare support focused on the required analysis and deployment work; optional import scaffolding has lower priority.
+The paired diagnostic is a small addition that could improve evidence about learning.

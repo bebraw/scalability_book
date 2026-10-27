@@ -104,12 +104,12 @@ The shared behavior stays stable so differences in architecture, evidence, and w
 
 # Establish checkpoint
 
-Before the next lecture, produce:
+Before the next lecture, record two bounded scalability claims in the existing evidence index:
 
-- two bounded scalability claims;
-- the project’s important constraints;
-- an initial implementation A hypothesis;
-- one pressure map for the application and development system.
+- one about runtime demand or data;
+- one about contributors or change.
+
+Use the pressure-record template to include the relevant constraints, initial hypothesis, evidence and limits within each claim.
 
 **Question to carry forward:** What evidence would make your claim credible?
 

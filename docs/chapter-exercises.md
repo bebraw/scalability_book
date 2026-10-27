@@ -94,9 +94,10 @@ Numeric fields accept finite decimal/scientific notation with exact expected val
 
 ## Explore and Practice tabs
 
-Nine demo/exercise pairs are progressively enhanced into accessible tabs, using the optional `demo` ID and label in the exercise definition.
+Demo/exercise pairs are progressively enhanced into accessible tabs, using the optional `demo` ID and label in the exercise definition.
 Place each exercise beside that demo in its chapter.
-The measurement experiment-comparison and final evidence-classification exercises remain inline.
+Exercises without a demo association remain inline.
+When removing a demo, remove or update its exercise associations; the site build rejects references to unavailable demos.
 Tabs move existing DOM nodes, retaining demo settings and unsaved responses.
 Arrow keys and Home/End switch tabs; chapter hashes and browser history reveal the referenced panel.
 Explore opens by default; direct links to exercises open Practice.
@@ -104,7 +105,8 @@ Each exercise gets its own tab rather than an exercise count.
 Practice shows completion after checking, and edits clear that completion indicator.
 Without JavaScript and when printing, both demo and exercise remain in the reading flow.
 
-The `/demos/` showcase renders the same exercise definitions and Explore/Practice pairs, plus the four standalone exercises.
+The `/demos/` showcase renders every defined exercise exactly once, either beside its associated demo or as standalone practice.
+The browser regression checks complete exercise coverage independently of demo associations.
 Stable exercise IDs share saved progress with the chapter versions.
 Links return to each exercise in its chapter.
 The gallery's **More practice** section has its own full-width exercise cards, a direct `#more-practice` link and an index of the standalone questions.

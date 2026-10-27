@@ -73,8 +73,9 @@ This specification primarily describes observable behavior.
 When several interpretations satisfy the requirements, choose one, implement it consistently, and document any assumption that affects how the application is used or evaluated.
 You do not need to make the implementation unusual deliberately; differences are expected to emerge from ordinary design and development decisions.
 
-In Compare, the same model will be applied to the development workflow itself: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events.
-The earlier implementations do not need agent-specific behavior.
+Compare requires analysis of the actual fleet execution record.
+As an optional extension, apply the same domain model to that record: a fleet run can become a workspace, delegated tasks can become work items, and agent or human actions can become activity events.
+Importing or displaying fleet traces is not part of the required application behavior in any phase.
 
 ---
 
