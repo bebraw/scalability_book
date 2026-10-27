@@ -408,7 +408,7 @@
   height: auto;
   display: block;
 }
-.concept-map-graphic line {
+.concept-map-graphic :is(line, [data-concept-line]) {
   stroke: var(--muted);
   stroke-width: 1.5;
 }
@@ -431,7 +431,7 @@
   fill: var(--text);
   font: 600 17px var(--font-ui);
 }
-.concept-map-graphic .is-related line {
+.concept-map-graphic .is-related :is(line, [data-concept-line]) {
   stroke: var(--accent-strong);
   stroke-width: 2.5;
 }
@@ -480,7 +480,10 @@
 .concept-map-graphic .is-selected text {
   fill: var(--panel);
 }
-.is-highlighting-group .concept-map-graphic [data-concept-edge] line {
+.is-highlighting-group
+  .concept-map-graphic
+  [data-concept-edge]
+  :is(line, [data-concept-line]) {
   opacity: 0.16;
 }
 .is-highlighting-group .concept-map-graphic [data-concept-arrow] {
@@ -498,12 +501,18 @@
   [data-concept-arrow] {
   opacity: 0.85;
 }
-.is-highlighting-group .concept-map-graphic .is-group-edge line {
+.is-highlighting-group
+  .concept-map-graphic
+  .is-group-edge
+  :is(line, [data-concept-line]) {
   stroke: var(--accent-strong);
   stroke-width: 3;
   opacity: 1;
 }
-.is-highlighting-group .concept-map-graphic .is-group-bridge line {
+.is-highlighting-group
+  .concept-map-graphic
+  .is-group-bridge
+  :is(line, [data-concept-line]) {
   stroke: var(--accent-strong);
   stroke-width: 2.5;
   stroke-dasharray: 6 4;
@@ -550,7 +559,7 @@
   fill: var(--text);
   font: 600 12px var(--font-ui);
 }
-.concept-map-graphic .concept-edge-label line {
+.concept-map-graphic .concept-edge-label :is(line, [data-concept-line]) {
   stroke: var(--muted);
   stroke-width: 1;
 }
@@ -1019,13 +1028,19 @@
 .concept-map-complete .concept-map-graphic a {
   cursor: pointer;
 }
-.concept-map-complete .concept-map-graphic line {
+.concept-map-complete .concept-map-graphic :is(line, [data-concept-line]) {
   opacity: 0.35;
 }
-.concept-map-complete .concept-map-graphic .is-related line {
+.concept-map-complete
+  .concept-map-graphic
+  .is-related
+  :is(line, [data-concept-line]) {
   opacity: 0.8;
 }
-.concept-map .concept-map-graphic [data-concept-edge].is-previewed line {
+.concept-map
+  .concept-map-graphic
+  [data-concept-edge].is-previewed
+  :is(line, [data-concept-line]) {
   stroke: var(--accent-strong);
   stroke-width: 2.5;
   opacity: 1;
@@ -1097,7 +1112,192 @@
     height: 28rem;
   }
 }
+/* Topic regions describe membership; node color describes editorial role. */
+.concept-map-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.5rem;
+  justify-content: space-between;
+  margin-block: 1rem 0.6rem;
+}
+.concept-role-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font: 500 0.75rem/1.7 var(--font-ui);
+}
+.concept-role-legend li {
+  white-space: nowrap;
+}
+.concept-role-legend li > span {
+  margin-right: 0.25rem;
+}
+.concept-map-graphic .concept-role-organizing,
+.concept-role-legend .concept-role-organizing {
+  color: var(--concept-role-organizing);
+}
+.concept-map-graphic .concept-role-property,
+.concept-role-legend .concept-role-property {
+  color: var(--concept-role-property);
+}
+.concept-map-graphic .concept-role-mechanism,
+.concept-role-legend .concept-role-mechanism {
+  color: var(--concept-role-mechanism);
+}
+.concept-map-graphic .concept-role-practice,
+.concept-role-legend .concept-role-practice {
+  color: var(--concept-role-practice);
+}
+.concept-map-graphic .concept-role-model,
+.concept-role-legend .concept-role-model {
+  color: var(--concept-role-model);
+}
+.concept-detail-control {
+  font: 600 0.75rem/1.5 var(--font-ui);
+}
+.concept-detail-control select {
+  margin-left: 0.5rem;
+  font-weight: 400;
+}
+.concept-map .concept-semantic-status {
+  color: var(--muted);
+  font: 400 0.8rem/1.6 var(--font-ui);
+  min-height: 1.6em;
+}
+.concept-semantic-status:empty {
+  display: none;
+}
+.concept-map-graphic [data-concept-line] {
+  fill: none;
+  stroke-linejoin: round;
+}
+.concept-map-graphic .concept-node-card {
+  stroke: currentColor;
+}
+.concept-map-graphic .concept-node-role-mark,
+.concept-map-graphic .concept-node-dot {
+  fill: currentColor;
+  stroke: none;
+}
+.concept-map-graphic .concept-node-dot {
+  display: none;
+}
+.concept-map-graphic .concept-node-role {
+  fill: var(--muted);
+  font-size: 9px;
+  font-weight: 500;
+}
+.concept-map-graphic
+  :is(.is-current, .is-selected, .is-group-member)
+  .concept-node-role {
+  fill: var(--panel);
+}
+.concept-map-graphic .concept-cluster > rect {
+  fill: var(--panel);
+  fill-opacity: 0.65;
+  stroke: var(--border);
+  stroke-width: 2;
+}
+.concept-map-graphic .concept-cluster-title {
+  fill: var(--text);
+  font: 600 22px var(--font-ui);
+}
+.concept-map-graphic .concept-cluster-count {
+  fill: var(--muted);
+  font: 400 15px var(--font-ui);
+}
+.concept-map-graphic .concept-cluster[role="button"] {
+  cursor: zoom-in;
+}
+.concept-map-graphic .concept-cluster:hover > rect,
+.concept-map-graphic .concept-cluster:focus-visible > rect {
+  stroke: var(--accent-strong);
+  stroke-width: 3;
+}
+.concept-map-graphic .concept-cluster:focus-visible {
+  outline: none;
+}
+.concept-map-graphic .concept-cluster-connection {
+  display: none;
+}
+.concept-map-graphic [data-concept-summary-line] {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.6;
+}
+.concept-map-graphic .concept-cluster-connection rect {
+  fill: var(--panel);
+  stroke: var(--border);
+}
+.concept-map-graphic[data-detail="overview"] .concept-cluster-connection {
+  display: block;
+}
+.concept-map-graphic[data-detail="overview"] [data-concept-edge],
+.concept-map-graphic[data-detail="overview"] .concept-edge-label,
+.concept-map-graphic[data-detail="overview"] .concept-node-card,
+.concept-map-graphic[data-detail="overview"] .concept-node-role-mark,
+.concept-map-graphic[data-detail="overview"] .concept-node-title,
+.concept-map-graphic[data-detail="overview"] .concept-node-role {
+  display: none;
+}
+.concept-map-graphic[data-detail="overview"] .concept-node-dot {
+  display: block;
+}
+.is-highlighting-group
+  .concept-map-graphic[data-detail="overview"]
+  .is-group-member
+  .concept-node-dot {
+  stroke: var(--accent-strong);
+  stroke-width: 10;
+}
+.is-highlighting-group
+  .concept-map-graphic[data-detail="overview"]
+  .is-group-context
+  .concept-node-dot {
+  opacity: 0.25;
+}
+.concept-map-graphic[data-detail="overview"] a:focus-visible .concept-node-dot {
+  stroke: var(--text);
+  stroke-width: 4;
+}
+.concept-map-graphic[data-detail="concepts"]
+  .is-cross-group:not(.is-previewed):not(.is-group-bridge) {
+  opacity: 0.12;
+}
+@media (max-width: 760px) {
+  .concept-map-canvas > .concept-map-navigation,
+  .concept-map-complete .concept-map-canvas > .concept-map-graphic {
+    grid-area: auto;
+  }
+  .concept-map-navigation {
+    position: static;
+    margin: 0 0 0.5rem;
+    gap: 0;
+  }
+  .concept-map-navigation button {
+    padding-inline: 0.6rem;
+  }
+}
 @media print {
+  .concept-map-graphic[data-detail] [data-concept-edge],
+  .concept-map-graphic[data-detail] .concept-node-card,
+  .concept-map-graphic[data-detail] .concept-node-title,
+  .concept-map-graphic[data-detail] .concept-node-role-mark,
+  .concept-map-graphic[data-detail] .concept-node-role {
+    display: inline;
+  }
+  .concept-map-graphic[data-detail] .concept-node-dot,
+  .concept-map-graphic[data-detail] .concept-cluster-connection,
+  .concept-detail-control,
+  .concept-semantic-status {
+    display: none;
+  }
   .concept-map-controls,
   .concept-map-navigation,
   .concept-view-switch,

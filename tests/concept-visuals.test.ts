@@ -41,3 +41,20 @@ test("a downloaded graph renders as XML with accessible text and visible arrow g
   const png = await sharp(Buffer.from(framed)).png().toBuffer();
   assert.equal((await sharp(png).metadata()).format, "png");
 });
+
+test("the clustered overview export remains a complete standalone SVG", async () => {
+  const svg = renderConceptGraph("reference-concepts").match(
+    /<svg\b[\s\S]*?<\/svg>/,
+  )![0];
+  const resource = graphResources.find(({ id }) => id === "graph-complete")!;
+  const framed = frameVisual(
+    svg,
+    resource,
+    "text { font-family: sans-serif; }",
+    true,
+  );
+  assert.equal((svg.match(/data-concept-cluster=/g) || []).length, 4);
+  assert.equal((svg.match(/data-concept-node=/g) || []).length, 45);
+  assert.equal((svg.match(/data-concept-edge=/g) || []).length, 109);
+  assert.ok((await sharp(Buffer.from(framed)).metadata()).width! > 0);
+});

@@ -370,13 +370,13 @@ test("group highlighting preserves context before an explicit group-only view", 
   await graphic.press("ArrowRight");
   await graphic.press("ArrowDown");
   const before = await viewport();
-  await group.selectOption("Models");
+  await group.selectOption("Evidence");
   await expect(nodes).toHaveCount(concepts.length);
   await expect(map.locator("[data-concept-edge]:not(.is-hidden)")).toHaveCount(
     conceptRelationships.length,
   );
   await expect(map.locator("[data-concept-node].is-group-member")).toHaveCount(
-    4,
+    11,
   );
   expect(
     await map
@@ -384,13 +384,25 @@ test("group highlighting preserves context before an explicit group-only view", 
       .evaluateAll((items) =>
         items.map((item) => item.getAttribute("data-concept-node")).sort(),
       ),
-  ).toEqual(["amdahl-law", "contention", "little-law", "lusser-law"]);
+  ).toEqual([
+    "benchmark",
+    "change-probe",
+    "eval",
+    "goodhart-law",
+    "latency",
+    "little-law",
+    "lusser-law",
+    "measurement-boundary",
+    "observability",
+    "reliability",
+    "throughput",
+  ]);
   await expect(
     map.locator('[data-concept-node="reliability"]'),
   ).toHaveAttribute("data-group", "Evidence");
   expect(await viewport()).toEqual(before);
   await expect(map.locator("[data-concept-map-status]")).toContainText(
-    "4 Models highlighted",
+    "11 Evidence highlighted",
   );
   await expect(map.locator("[data-concept-group-help]")).toContainText(
     "dashed lines connect to other groups",
@@ -402,7 +414,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   ).toBeGreaterThan(0);
   await expect(
     page.locator("[data-concept-group-tag]:not([hidden])"),
-  ).toHaveCount(4);
+  ).toHaveCount(11);
   await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
     concepts.length,
   );
@@ -414,9 +426,9 @@ test("group highlighting preserves context before an explicit group-only view", 
   );
   const labeledViewport = await viewport();
   await only.check();
-  await expect(nodes).toHaveCount(4);
+  await expect(nodes).toHaveCount(11);
   await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
-    4,
+    11,
   );
   await expect(
     map.locator("[data-concept-edge].is-group-bridge:not(.is-hidden)"),
@@ -435,9 +447,9 @@ test("group highlighting preserves context before an explicit group-only view", 
 
   await only.check();
   await page.reload();
-  await expect(group).toHaveValue("Models");
+  await expect(group).toHaveValue("Evidence");
   await expect(only).toBeChecked();
-  await expect(nodes).toHaveCount(4);
+  await expect(nodes).toHaveCount(11);
   await highlight.check();
   await map
     .getByRole("combobox", { name: "Reading", exact: true })
@@ -447,7 +459,7 @@ test("group highlighting preserves context before an explicit group-only view", 
     0,
   );
   await expect(map.locator("[data-concept-group-help]")).toContainText(
-    "No Models concepts in this view",
+    "No Evidence concepts in this view",
   );
   await only.check();
   await expect(nodes).toHaveCount(0);
@@ -515,6 +527,7 @@ test("arrows express qualified relationships and focus reveals labels without ch
 }) => {
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
+  await map.getByLabel("Graph detail", { exact: true }).selectOption("all");
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
   await expect(map.locator('[data-direction="directed"]')).toHaveCount(
     conceptRelationships.filter(({ direction }) => direction === "directed")
@@ -948,6 +961,9 @@ test("graph labels have breathing room in both themes and viewport sizes", async
     for (const theme of ["light", "dark"]) {
       await page.goto("/concepts/?view=all");
       await page.locator("[data-theme-picker]").selectOption(theme);
+      await page
+        .getByRole("button", { name: "Use readable graph size" })
+        .click();
       await page.evaluate(() => document.fonts.ready);
       const assertPadding = async (selector: string) => {
         const cramped = await page.locator(selector).evaluateAll((nodes) =>
@@ -1221,7 +1237,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await map.getByRole("button", { name: "Reset view" }).click();
   await map
     .getByRole("combobox", { name: "Topic group", exact: true })
-    .selectOption("Models");
+    .selectOption("Development");
   await map.getByRole("radio", { name: "Show only", exact: true }).check();
   await assertDirectoryMatches();
   await expect(

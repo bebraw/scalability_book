@@ -148,7 +148,31 @@ Every connection has a short authored label alongside its explanation.
 “Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and affects only the graph where it is toggled.
 Labeled views make additional room for captions without covering concept nodes.
 Its view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `group-view`, and `view=all`.
-A deterministic layout is generated from the registry by `shared/concept-graph.ts`; no per-concept coordinates need maintenance.
+A deterministic layout is generated from the registry by `scripts/lib/concept-layout.ts`.
+ELK places concepts inside each topic independently, then packs topic rectangles with a preference for readable fitted scale and shorter cross-topic connections.
+The four-region map compares all 24 topic orders; the search remains bounded if the taxonomy grows.
+`scripts/lib/concept-routing.ts` uses pinned libavoid at build time to choose side attachment points and route orthogonal connections around unrelated concept boxes and region headings.
+Returned routes and arrows retain the original authored endpoints and proposition direction; geometric placement implies no global sequence.
+No per-concept coordinates need maintenance, and no layout engine is downloaded by the reader.
+
+The four topic groups are Evidence, Development, Architecture and Operations.
+Little's Law and Lusser's Law live in Evidence, Amdahl's Law in Development, and Contention in Operations.
+There is no separate Models topic: laws retain their explanatory-model role alongside the subject matter they explain, and contention remains a phenomenon.
+These memberships produce 64 within-topic and 45 cross-topic connections for the current 45-concept graph.
+
+`shared/concept-presentation.ts` separately assigns an editorial role to each concept: organizing idea, property or phenomenon, mechanism or response, practice or artifact, or explanatory model.
+Color, a text legend, and short role labels identify these roles; they are independent of topic membership and do not establish a prerequisite or abstraction hierarchy.
+Presentation roles do not change the public graph schema, concept identities, or authored relationships.
+
+The complete graph initially fits the available canvas.
+With “Adapt as I zoom”, the fitted overview shows topic regions, colored concept markers, and one counted connection per pair of groups.
+Counts summarize the actual cross-group relationships without asserting a single proposition or direction between whole groups.
+Zooming closer reveals concept cards and their roles, then emphasizes the full connection network; hovering or focusing a concept reveals its authored labels.
+Selecting a region zooms to it; when the region cannot expose readable cards on a compact canvas, the same action opens the existing group-only view.
+Keyboard focus on a concept reveals its readable card, and “All concepts” overrides automatic detail adaptation.
+Scoped reading, search, and focused views retain their complete concept cards and existing filtering behavior.
+Panning, zooming, expansion, and Graph/List switching preserve the camera; Fit, Reset, or a new filtered view deliberately reframes it.
+The SVG and exported images retain every concept and authored connection without JavaScript or semantic zoom.
 The filtered text list and relationship explanations provide the same navigation without relying on the diagram.
 Static SVG links, reference passages, and relationship text remain available without JavaScript.
 
@@ -165,7 +189,8 @@ Concept teaching locations can link directly to local practice instructions, inc
 Use ordinary Markdown links such as `[idempotency](/concepts/#idempotency)` at useful teaching occurrences, rather than automatically linking every mention.
 Build-time integration inserts the scoped index before the first second-level heading without changing source offsets used by paragraph feedback.
 Concept reference links are excluded from paragraph identity hashes so adding these reading aids preserves existing feedback targets.
-The registry tests check published-page coverage, relationship integrity, and caption spacing in overview, focused, and scoped layouts.
+The registry tests check published-page coverage, relationship integrity, role coverage, topic decomposition, separate regions, fitted scale and canvas occupancy, routed endpoint identity, obstacle avoidance, crossing reduction, and caption spacing in overview, focused, and scoped layouts.
+`tests/e2e/concept-semantic-zoom.spec.ts` covers fitted overview counts, stable positions across detail transitions, role labels, keyboard entry, explicit detail override, compact group entry, and theme accessibility in Chromium and WebKit.
 Browser checks verify every curated teaching anchor, agent resources and retrieval, search and navigation, local label toggles, contrast in all themes, mobile overflow, accessibility, keyboard dismissal, and the static fallback.
 
 The `measurement-transfer` and `scaling-model-choice` exercises reuse the existing checking and private-save system.

@@ -33,6 +33,7 @@ export default defineConfig({
         "orchestration-demo.spec.ts",
         "course-workspace.spec.ts",
         "concept-navigation.spec.ts",
+        "concept-semantic-zoom.spec.ts",
         "theme-initialization.spec.ts",
         "learning-workspace.spec.ts",
         "learning-demo-bridge.spec.ts",

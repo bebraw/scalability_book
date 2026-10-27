@@ -59,6 +59,7 @@
     "hast-util-from-html": "2.0.3",
     "highlight.js": "11.11.1",
     "katex": "0.19.0",
+    "libavoid-js": "0.4.5",
     "marked": "18.0.2",
     "scholarmark": "0.9.1",
     "vite": "8.0.10",

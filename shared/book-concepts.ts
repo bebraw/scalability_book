@@ -934,7 +934,7 @@ export const bookConcepts: Concept[] = [
   concept(
     "contention",
     "Contention",
-    "Models",
+    "Operations",
     "Competition for shared resources or coordination that makes additional parallel workers spend more time waiting or synchronizing.",
     "Declare the workload and shared resource. Fit or compare a contention model only with suitable measurements; its parameters are not universal constants.",
     "More event workers compete for the same database lock. Parallelism increases, but completed throughput can plateau or fall as coordination grows.",
@@ -955,7 +955,7 @@ export const bookConcepts: Concept[] = [
   concept(
     "lusser-law",
     "Lusser's Law",
-    "Models",
+    "Evidence",
     "For a chain that requires every stage to succeed, independent stage success probabilities multiply to give the chain's success probability.",
     "Define an eligible end-to-end attempt and the success criterion at each stage. Independence is a strong assumption; conditional stage success can describe a chain without assuming independence.",
     "If three required stages each independently succeed with probability 0.99, chain success is 0.99³, about 0.9703. A shared outage invalidates the independence assumption.",

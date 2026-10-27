@@ -1,6 +1,61 @@
 export type GraphPoint = { id: string; x: number; y: number };
 export type GraphEdge = { source: string; target: string };
 
+export type RoutePoint = { x: number; y: number };
+
+export function routePath(points: readonly RoutePoint[]) {
+  return points
+    .map((point, index) => `${index ? "L" : "M"} ${point.x} ${point.y}`)
+    .join(" ");
+}
+
+export function routeConnection(points: readonly RoutePoint[]) {
+  const route = points.map((point) => ({ ...point }));
+  const start = route[0]!,
+    next = route[1]!;
+  const end = route.at(-1)!,
+    previous = route.at(-2)!;
+  const startLength = Math.hypot(next.x - start.x, next.y - start.y);
+  const endLength = Math.hypot(end.x - previous.x, end.y - previous.y);
+  start.x += ((next.x - start.x) / startLength) * Math.min(3, startLength / 3);
+  start.y += ((next.y - start.y) / startLength) * Math.min(3, startLength / 3);
+  const angle = Math.atan2(end.y - previous.y, end.x - previous.x);
+  end.x -= Math.cos(angle) * Math.min(6, endLength / 3);
+  end.y -= Math.sin(angle) * Math.min(6, endLength / 3);
+  return {
+    path: routePath(route),
+    x2: end.x,
+    y2: end.y,
+    angle: (angle * 180) / Math.PI,
+  };
+}
+
+function nearestRoutePoint(point: RoutePoint, route: readonly RoutePoint[]) {
+  let best = route[0]!,
+    distance = Infinity;
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1]!,
+      b = route[i]!;
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
+    const t = Math.max(
+      0,
+      Math.min(
+        1,
+        ((point.x - a.x) * dx + (point.y - a.y) * dy) /
+          (dx * dx + dy * dy || 1),
+      ),
+    );
+    const candidate = { x: a.x + t * dx, y: a.y + t * dy };
+    const d = Math.hypot(candidate.x - point.x, candidate.y - point.y);
+    if (d < distance) {
+      best = candidate;
+      distance = d;
+    }
+  }
+  return best;
+}
+
 // Stop at the node boundary so arrowheads remain visible outside its box.
 export function layoutConnection(
   a: { x: number; y: number },
@@ -86,7 +141,7 @@ export function layoutNeighborhood(ids: string[], focus = "", labels = false) {
 // their edge, avoiding node boxes and earlier captions where space permits.
 export function layoutEdgeLabels(
   points: GraphPoint[],
-  edges: (GraphEdge & { label: string })[],
+  edges: (GraphEdge & { label: string; route?: RoutePoint[] })[],
   bounds: { width: number; height: number },
   focus = "",
 ) {
@@ -185,129 +240,13 @@ export function layoutEdgeLabels(
         }
       }
     }
+    if (edge.route) {
+      const anchor = nearestRoutePoint(best, edge.route);
+      best.anchorX = anchor.x;
+      best.anchorY = anchor.y;
+    }
     const caption = { ...edge, ...best, width };
     placed.push(caption);
     return caption;
   });
-}
-
-// The overview uses the actual authored edges, with mild thematic attraction.
-// Repulsion and rectangle collision keep labels apart. No fixed node IDs or
-// manually maintained coordinates are needed as the reference grows.
-export function layoutOverview(
-  nodes: { id: string; group: string }[],
-  edges: readonly (GraphEdge & { label?: string })[],
-  groups: readonly string[],
-) {
-  const width = 1800,
-    height = 1400;
-  const separationX = 240,
-    separationY = 108;
-  const points = nodes.map((node, index) => {
-    const group = groups.indexOf(node.group);
-    const angle = -Math.PI / 2 + (group * Math.PI * 2) / groups.length;
-    const offset = index * 2.399963;
-    return {
-      id: node.id,
-      x: width / 2 + 480 * Math.cos(angle) + 170 * Math.cos(offset),
-      y: height / 2 + 390 * Math.sin(angle) + 170 * Math.sin(offset),
-      group,
-      vx: 0,
-      vy: 0,
-    };
-  });
-  const byId = new Map(points.map((point) => [point.id, point]));
-  for (let iteration = 0; iteration < 420; iteration++) {
-    for (let i = 0; i < points.length; i++) {
-      const a = points[i]!;
-      for (let j = i + 1; j < points.length; j++) {
-        const b = points[j]!;
-        const dx = a.x - b.x || 0.1,
-          dy = a.y - b.y || 0.1;
-        const distance = Math.max(20, Math.hypot(dx, dy));
-        const force = 12000 / (distance * distance);
-        a.vx += (dx / distance) * force;
-        a.vy += (dy / distance) * force;
-        b.vx -= (dx / distance) * force;
-        b.vy -= (dy / distance) * force;
-        if (Math.abs(dx) < separationX && Math.abs(dy) < separationY) {
-          const sx = (separationX - Math.abs(dx)) / separationX;
-          const sy = (separationY - Math.abs(dy)) / separationY;
-          if (sx < sy) {
-            const push = Math.sign(dx) * (separationX - Math.abs(dx)) * 0.15;
-            a.vx += push;
-            b.vx -= push;
-          } else {
-            const push = Math.sign(dy) * (separationY - Math.abs(dy)) * 0.15;
-            a.vy += push;
-            b.vy -= push;
-          }
-        }
-      }
-    }
-    for (const edge of edges) {
-      const a = byId.get(edge.source),
-        b = byId.get(edge.target);
-      if (!a || !b) continue;
-      const dx = b.x - a.x,
-        dy = b.y - a.y;
-      const distance = Math.max(1, Math.hypot(dx, dy));
-      // Account for the node widths and the linking phrase between them.
-      const preferredLength = Math.max(
-        360,
-        190 + (edge.label?.length ?? 0) * 7 + 64,
-      );
-      const force = (distance - preferredLength) * 0.003;
-      a.vx += (dx / distance) * force;
-      a.vy += (dy / distance) * force;
-      b.vx -= (dx / distance) * force;
-      b.vy -= (dy / distance) * force;
-    }
-    for (const point of points) {
-      const angle = -Math.PI / 2 + (point.group * Math.PI * 2) / groups.length;
-      point.vx += (width / 2 + 510 * Math.cos(angle) - point.x) * 0.0025;
-      point.vy += (height / 2 + 420 * Math.sin(angle) - point.y) * 0.0025;
-      point.vx *= 0.65;
-      point.vy *= 0.65;
-      point.x = Math.max(110, Math.min(width - 110, point.x + point.vx));
-      point.y = Math.max(50, Math.min(height - 50, point.y + point.vy));
-    }
-  }
-  // Finish with collision-only relaxation so attractive edges cannot leave
-  // two labels overlapping in the published overview.
-  for (let pass = 0; pass < 160; pass++) {
-    for (let i = 0; i < points.length; i++) {
-      const a = points[i]!;
-      for (let j = i + 1; j < points.length; j++) {
-        const b = points[j]!;
-        const dx = a.x - b.x || 0.1,
-          dy = a.y - b.y || 0.1;
-        const overlapX = separationX - Math.abs(dx),
-          overlapY = separationY - Math.abs(dy);
-        if (overlapX <= 0 || overlapY <= 0) continue;
-        if (overlapX < overlapY) {
-          const push = (Math.sign(dx) * (overlapX + 0.5)) / 2;
-          a.x += push;
-          b.x -= push;
-        } else {
-          const push = (Math.sign(dy) * (overlapY + 0.5)) / 2;
-          a.y += push;
-          b.y -= push;
-        }
-        for (const point of [a, b]) {
-          point.x = Math.max(110, Math.min(width - 110, point.x));
-          point.y = Math.max(50, Math.min(height - 50, point.y));
-        }
-      }
-    }
-  }
-  return {
-    width,
-    height,
-    points: points.map(({ id, x, y }) => ({
-      id,
-      x: Math.round(x),
-      y: Math.round(y),
-    })),
-  };
 }

@@ -77,7 +77,10 @@ export function frameVisual(
     .replace(/^<svg\b[^>]*>/, "")
     .replace(/<\/svg>\s*$/, "")
     // HTML permits bare data attributes; standalone XML SVG requires values.
-    .replace(/\bdata-concept-arrow(?=\s)/g, 'data-concept-arrow=""');
+    .replace(
+      /\b(data-concept-(?:arrow|line|cluster-heading))(?=[\s/>])/g,
+      '$1=""',
+    );
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="resource-title resource-description" class="${graph ? "concept-map has-connection-labels" : ""}">
 <title id="resource-title">${escapeHtml(resource.title)}</title>
 <desc id="resource-description">${escapeHtml(`${resource.caption} ${resource.assumptions}`)}</desc>

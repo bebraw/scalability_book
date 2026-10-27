@@ -58,6 +58,9 @@ test("expanded and fitted graphs pan in both directions, including from a concep
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   await graphic.scrollIntoViewIfNeeded();
   const node = map.getByRole("link", { name: "Explore Queue", exact: true });
+  // Keyboard entry reveals the readable card from the fitted group overview.
+  await node.focus();
+  await graphic.focus();
   const box = (await node.boundingBox())!;
   const before = await camera(graphic);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

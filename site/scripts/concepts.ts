@@ -3,9 +3,13 @@ import {
   layoutEdgeLabels,
   layoutLabeledOverview,
   layoutConnection,
+  routeConnection,
+  labeledOverviewScale,
+  type RoutePoint,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
+import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
 
 (() => {
   const agentUrl = document.querySelector<HTMLInputElement>(
@@ -98,6 +102,9 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
     const viewport = complete ? new ConceptViewport(graphic, svg) : null;
+    const semantic = viewport
+      ? new ConceptSemanticZoom(map, graphic, viewport)
+      : null;
     const navigation = map.querySelector<HTMLElement>(
       "[data-concept-navigation]",
     );
@@ -122,6 +129,9 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
         target: target!,
         direction: edge.dataset.direction!,
         label: captions[index]!.dataset.label!,
+        ...(edge.dataset.route
+          ? { route: JSON.parse(edge.dataset.route) as RoutePoint[] }
+          : {}),
       };
     });
     const status = map.querySelector<HTMLElement>("[data-concept-map-status]")!;
@@ -205,9 +215,16 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
         });
         node.addEventListener("focus", () => {
           focusedNode = id;
+          if (semantic?.overview) viewport?.readable();
           const point = graphPoints.find((point) => point.id === id);
           if (point) viewport?.reveal(point);
           previewConnections();
+          // Safari may scroll toward the SVG link's pre-zoom position after
+          // focus. Keep keyboard entry on the revealed camera viewport.
+          requestAnimationFrame(() => {
+            graphic.scrollTo(0, 0);
+            graphic.scrollIntoView({ block: "nearest" });
+          });
         });
         node.addEventListener("blur", () => {
           focusedNode = "";
@@ -364,6 +381,8 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
       overviewVisible =
         complete && !focus && !query && !reading?.value && !onlyGroup;
       labeledOverview = overviewVisible && labels.checked;
+      const revealingLabels =
+        labels.checked && !map.classList.contains("has-connection-labels");
       map.classList.toggle("has-connection-labels", labels.checked);
       practiceLabels.textContent = labels.checked
         ? "Hide labels to try"
@@ -436,7 +455,7 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
         const b = nodes.find(
           (node) => node.dataset.conceptNode === relation.target,
         )!;
-        const line = edge.querySelector("line")!;
+        const line = edge.querySelector("[data-concept-line]")!;
         const start = points.get(relation.source) || {
             x: Number(a.dataset.x),
             y: Number(a.dataset.y),
@@ -446,13 +465,31 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
             y: Number(b.dataset.y),
           };
         const connection = layoutConnection(start, end);
-        for (const key of ["x1", "y1", "x2", "y2"] as const)
-          line.setAttribute(key, String(connection[key]));
+        let arrow = connection;
+        if (complete) {
+          if (overviewVisible) {
+            const factor = labeledOverview ? labeledOverviewScale : 1;
+            relation.route = (
+              JSON.parse(edge.dataset.route!) as RoutePoint[]
+            ).map((point) => ({ x: point.x * factor, y: point.y * factor }));
+            const route = routeConnection(relation.route);
+            line.setAttribute("d", route.path);
+            arrow = { ...connection, ...route };
+          } else {
+            delete relation.route;
+            line.setAttribute(
+              "d",
+              `M ${connection.x1} ${connection.y1} L ${connection.x2} ${connection.y2}`,
+            );
+          }
+        } else
+          for (const key of ["x1", "y1", "x2", "y2"] as const)
+            line.setAttribute(key, String(connection[key]));
         edge
           .querySelector("[data-concept-arrow]")
           ?.setAttribute(
             "transform",
-            `translate(${connection.x2} ${connection.y2}) rotate(${connection.angle})`,
+            `translate(${arrow.x2} ${arrow.y2}) rotate(${arrow.angle})`,
           );
       }
       graphPoints = visibleNodes.map(
@@ -509,6 +546,19 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
       };
       if (viewport) viewport.setBounds(bounds);
       else svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+      semantic?.setContext(
+        overviewVisible,
+        labels.checked,
+        labeledOverview ? labeledOverviewScale : 1,
+      );
+      // Asking to read every proposition should not leave two-pixel captions.
+      if (
+        revealingLabels &&
+        overviewVisible &&
+        viewport &&
+        viewport.scale < 0.65
+      )
+        viewport.readable();
       previewConnections();
       graphic.hidden = visible.size === 0;
       if (navigation) navigation.hidden = visible.size === 0;
@@ -531,11 +581,7 @@ import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
         groupViewport = null;
       } else if (complete && !preserveViewport) {
         if (presentation === "list") needsFit = true;
-        else if (overviewVisible) {
-          viewport!.x = bounds.width / 2;
-          viewport!.y = bounds.height / 2;
-          viewport!.readable();
-        } else fit();
+        else fit();
       }
       if (complete && presentation === "graph" && needsFit) {
         fit();

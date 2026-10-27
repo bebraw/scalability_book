@@ -218,6 +218,17 @@ export class ConceptViewport {
   readable() {
     this.zoom(this.bounds.width);
   }
+  focusBounds(bounds: Bounds & Point) {
+    this.scale = this.clamp(
+      Math.min(
+        (this.graphic.clientWidth - 48) / bounds.width,
+        (this.graphic.clientHeight - 48) / bounds.height,
+      ),
+    );
+    this.x = bounds.x + bounds.width / 2;
+    this.y = bounds.y + bounds.height / 2;
+    this.render();
+  }
   reveal(point: Point) {
     const halfWidth = this.graphic.clientWidth / this.scale / 2;
     const halfHeight = this.graphic.clientHeight / this.scale / 2;
@@ -249,9 +260,10 @@ export class ConceptViewport {
       "[data-concept-zoom-level]",
     );
     if (level) level.textContent = `${Math.round(this.scale * 100)}%`;
+    this.graphic.dispatchEvent(new Event("concept-camera-change"));
   }
   private clamp(scale: number) {
-    return Math.max(0.08, Math.min(4, scale));
+    return Math.max(0.02, Math.min(4, scale));
   }
   private local(event: { clientX: number; clientY: number }): Point {
     const rect = this.graphic.getBoundingClientRect();

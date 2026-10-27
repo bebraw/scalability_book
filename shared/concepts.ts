@@ -5,7 +5,6 @@ export const conceptGroups = [
   "Development",
   "Architecture",
   "Operations",
-  "Models",
 ] as const;
 export type ConceptGroup = (typeof conceptGroups)[number];
 
@@ -175,7 +174,7 @@ const pilotConcepts: Concept[] = [
   },
   {
     id: "little-law",
-    group: "Models",
+    group: "Evidence",
     title: "Little's Law",
     definition:
       "For a stable conserved-work boundary, average work in progress L equals completion rate λ multiplied by average time in the boundary W: L = λW.",
@@ -202,7 +201,7 @@ const pilotConcepts: Concept[] = [
   },
   {
     id: "amdahl-law",
-    group: "Models",
+    group: "Development",
     title: "Amdahl's Law",
     definition:
       "For a fixed workload with parallelizable fraction p and n workers, ideal speedup is S(n) = 1 / ((1 − p) + p/n). The sequential fraction bounds the gain.",

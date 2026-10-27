@@ -11,16 +11,25 @@ import {
 import {
   layoutNeighborhood,
   layoutEdgeLabels,
-  layoutOverview,
   layoutLabeledOverview,
   layoutConnection,
+  routeConnection,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
 import { explorations, explorationUrl } from "../../shared/explorations.ts";
+import { layoutOverview } from "./concept-layout.ts";
+import {
+  conceptRoleById,
+  conceptRoles,
+} from "../../shared/concept-presentation.ts";
 
-const overview = layoutOverview(concepts, conceptRelationships, conceptGroups);
+const overview = await layoutOverview(
+  concepts,
+  conceptRelationships,
+  conceptGroups,
+);
 const byId = new Map(concepts.map((concept) => [concept.id, concept]));
 const conceptLink = (concept: Concept) =>
   `<a href="/concepts/#${concept.id}">${escapeHtml(concept.title)}</a>`;
@@ -173,19 +182,53 @@ export function renderConceptGraph(
       : overview
     : layoutNeighborhood(ids, focus, true);
   const points = new Map(layout.points.map((point) => [point.id, point]));
+  const factor = labelledOverview ? 1.7 : 1;
+  const routedRelations = relations.map((relation) => ({
+    ...relation,
+    ...(complete
+      ? {
+          route: overview.routes
+            .find(
+              (route) =>
+                route.source === relation.source &&
+                route.target === relation.target,
+            )!
+            .points.map((point) => ({
+              x: point.x * factor,
+              y: point.y * factor,
+            })),
+        }
+      : {}),
+  }));
+  const clusters = complete
+    ? overview.clusters
+        .map(
+          (cluster) =>
+            `<g class="concept-cluster" data-concept-cluster="${cluster.group}" data-bounds='${JSON.stringify(cluster)}' transform="translate(${cluster.x * factor} ${cluster.y * factor})"><rect width="${cluster.width * factor}" height="${cluster.height * factor}" rx="20"/><g data-concept-cluster-heading transform="translate(28 38)"><text class="concept-cluster-title">${cluster.group}</text><text class="concept-cluster-count" y="25">${cluster.count} concepts</text></g></g>`,
+        )
+        .join("")
+    : "";
   const edges = relations
-    .map((relation) => {
+    .map((relation, index) => {
       const a = points.get(relation.source)!,
         b = points.get(relation.target)!;
       const line = layoutConnection(a, b);
+      const route = complete
+        ? routeConnection(routedRelations[index]!.route!)
+        : null;
       const proposition =
         relation.direction === "directed"
           ? `${byId.get(relation.source)!.title} ${relation.label} ${byId.get(relation.target)!.title}`
           : `${byId.get(relation.source)!.title} — ${byId.get(relation.target)!.title}: ${relation.label}`;
-      return `<g data-concept-edge="${relation.source} ${relation.target}" data-direction="${relation.direction}"><title>${escapeHtml(`${proposition}. ${relation.explanation}`)}</title><line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}"/>${relation.direction === "directed" ? `<path data-concept-arrow d="M -8 -4 L 0 0 L -8 4 Z" transform="translate(${line.x2} ${line.y2}) rotate(${line.angle})" aria-hidden="true"/>` : ""}</g>`;
+      return `<g class="${byId.get(relation.source)!.group !== byId.get(relation.target)!.group ? "is-cross-group" : "is-within-group"}" data-concept-edge="${relation.source} ${relation.target}" data-direction="${relation.direction}"${complete ? ` data-route='${JSON.stringify(overview.routes.find((edge) => edge.source === relation.source && edge.target === relation.target)!.points)}'` : ""}><title>${escapeHtml(`${proposition}. ${relation.explanation}`)}</title>${route ? `<path data-concept-line d="${route.path}"/>` : `<line data-concept-line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}"/>`}${relation.direction === "directed" ? `<path data-concept-arrow d="M -8 -4 L 0 0 L -8 4 Z" transform="translate(${route?.x2 ?? line.x2} ${route?.y2 ?? line.y2}) rotate(${route?.angle ?? line.angle})" aria-hidden="true"/>` : ""}</g>`;
     })
     .join("");
-  const captions = layoutEdgeLabels(layout.points, relations, layout, focus)
+  const captions = layoutEdgeLabels(
+    layout.points,
+    routedRelations,
+    layout,
+    focus,
+  )
     .map(
       (caption) =>
         `<g class="concept-edge-label" data-concept-edge-label="${caption.source} ${caption.target}" data-label="${escapeAttribute(caption.label)}" aria-hidden="true" transform="translate(${caption.x} ${caption.y})"><line x1="0" y1="0" x2="${caption.anchorX - caption.x}" y2="${caption.anchorY - caption.y}"/><rect x="${-caption.width / 2}" y="-11" width="${caption.width}" height="22" rx="5"/><text text-anchor="middle" dominant-baseline="middle">${escapeHtml(caption.label)}</text></g>`,
@@ -194,6 +237,7 @@ export function renderConceptGraph(
   const nodes = items
     .map((concept) => {
       const point = points.get(concept.id)!;
+      const role = conceptRoleById[concept.id]!;
       const words = concept.title.split(" ");
       const lines = [""];
       for (const word of words) {
@@ -203,7 +247,7 @@ export function renderConceptGraph(
         if (current && candidate.length > 17) lines.push(word);
         else lines[lines.length - 1] = candidate;
       }
-      return `<a href="/concepts/#${concept.id}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}"${concept.id === focus ? ' class="is-current"' : ""} aria-label="Explore ${escapeAttribute(concept.title)}"><g transform="translate(${point.x} ${point.y})"><rect x="-95" y="-30" width="190" height="60" rx="12"/><text text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${(index - (lines.length - 1) / 2) * 19}">${escapeHtml(line)}</tspan>`).join("")}</text></g></a>`;
+      return `<a href="/concepts/#${concept.id}" class="concept-role-${role}${concept.id === focus ? " is-current" : ""}" data-concept-role="${role}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}" aria-label="Explore ${escapeAttribute(concept.title)}"><title>${escapeHtml(concept.title)} · ${conceptRoles[role].label}</title><g transform="translate(${point.x} ${point.y})"><rect class="concept-node-card" x="-95" y="-30" width="190" height="60" rx="12"/><rect class="concept-node-role-mark" x="-93" y="-20" width="4" height="40" rx="2"/><circle class="concept-node-dot" r="10"/><text class="concept-node-title" text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${-2 + (index - (lines.length - 1) / 2) * 16}">${escapeHtml(line)}</tspan>`).join("")}</text><text class="concept-node-role" text-anchor="middle" y="25">${conceptRoles[role].short}</text></g></a>`;
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : " has-connection-labels"}" data-concept-map data-focus="${focus}" data-complete="${complete}">
@@ -219,8 +263,22 @@ export function renderConceptGraph(
   ${complete ? "</details>" : ""}
   ${complete ? `<p class="concept-map-status" data-concept-map-status role="status">${items.length} concepts · ${relations.length} connections</p><div id="${prefix}-graph-panel" data-concept-graph-panel>` : ""}
   <p${complete ? " data-concept-map-intro" : ""}>${complete ? "Search or choose a reading to narrow both views. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
+  ${
+    complete
+      ? `<div class="concept-map-key"><ul class="concept-role-legend" aria-label="Concept roles">${Object.entries(
+          conceptRoles,
+        )
+          .map(
+            ([role, value]) =>
+              `<li class="concept-role-${role}"><span aria-hidden="true">●</span> ${value.label}</li>`,
+          )
+          .join(
+            "",
+          )}</ul><label class="concept-detail-control" hidden data-concept-detail-control>Graph detail <select data-concept-detail aria-label="Graph detail"><option value="auto">Adapt as I zoom</option><option value="all">All concepts</option></select></label></div><p class="concept-semantic-status" data-concept-semantic-status></p>`
+      : ""
+  }
   ${complete ? `<div class="concept-map-canvas"><div class="concept-map-navigation" role="group" aria-label="Graph navigation" data-concept-navigation hidden><span data-concept-zoom-level>100%</span><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button><button type="button" data-concept-zoom="readable" aria-label="Use readable graph size">Readable</button></div>` : ""}
-  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Interactive concept graph" aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${edges}${captions}${nodes}</svg></div>
+  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Interactive concept graph" aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${edges}${captions}${nodes}</svg></div>
   ${complete ? `</div><p class="concept-map-help" id="${prefix}-help">Drag anywhere or scroll to move the map. Ctrl/⌘ + scroll or pinch to zoom. Fit shows the whole map; Readable restores the text size. With the map focused, arrow keys move it, +/− zoom, and 0 fits. Every topic and connection is also available as text below.</p>` : ""}
   <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels. A selected topic keeps its labels visible; press Escape in the map to clear them." : ""}</p>
   ${!complete ? `<p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>` : ""}
