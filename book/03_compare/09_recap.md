@@ -32,20 +32,22 @@ Determine whether delegation reduced completion time through acceptance or moved
 
 ## How the loops affect one another
 
-Consider adding a [queue](/concepts/#queue) to protect event ingestion during a traffic spike.
+Consider adding a [queue](/concepts/#queue) for derived workspace-summary updates during a traffic spike.
+Each accepted work-item creation or transition still commits its state change and matching activity event together; only the derived summary work is deferred.
 The response affects all three loops:
 
-| Perspective                   | Consequence of the queue                                                                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Application loop              | Burst absorption improves, but freshness lag, backlog growth, duplicates, and worker saturation become possible                             |
-| Development loop              | The project gains worker code, retry and idempotency rules, new local setup, deployment, tests, and ownership                               |
-| Agentic loop                  | Tasks may decompose around producer, consumer, and verification boundaries, but their shared event contract must settle first               |
-| Evidence connecting all three | Queue age, end-to-end event visibility, duplicate rate, failure recovery, review effort, and trace history show whether the response worked |
+| Perspective                   | Consequence of the queue                                                                                                                      |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Application loop              | Summary-work spikes can be buffered, but summary lag, backlog growth, duplicate effects, and worker saturation become possible                |
+| Development loop              | The project gains worker code, retry and idempotency rules, new local setup, deployment, tests, and ownership                                 |
+| Agentic loop                  | Tasks may decompose around producer, consumer, and verification boundaries, but their summary-update contract must settle first               |
+| Evidence connecting all three | Queue age, time to an updated summary, duplicate effects, failure recovery, review effort, and trace history show whether the response worked |
 
 ::caption[One scaling response interpreted through all three loops.]
 ::label[table:queue-three-loop-example]
 
-A faster request path may leave events waiting longer for processing and make the system harder to operate.
+A faster request path may leave summaries waiting longer for updates and make the system harder to operate.
+Request completion and summary completion are separate observation boundaries; a pending summary does not make the required state change or activity event pending.
 Evaluate both the pressure relieved and the new obligations.
 
 > **Sustainability angle**

@@ -51,6 +51,8 @@ Predict the outcome, inject the crash, then compare retry keys and receiver enfo
 The simulation holds the failure point constant.
 It demonstrates how one bounded retry contract behaves; it does not establish that every receiver, workflow engine, or external operation exposes the same enforcement boundary.
 
+### Local practice: persisted retry
+
 For actual process and SQLite records, open `persisted-retry/README.md` in the optional [course workspace](/downloads/labs/course-workspace.zip).
 The supplied receiver, worker and interruption harness leave one atomic receiver operation to implement with your model.
 Predict the ledger counts, interrupt the worker, restart both processes and compare stable versus fresh retry keys.

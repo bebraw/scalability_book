@@ -109,7 +109,7 @@ export const bookConcepts: Concept[] = [
     "Architecture",
     "A choice that improves one desired property while imposing a cost, risk, or obligation elsewhere.",
     "State which goal improves, who pays the cost, and under which conditions the choice remains worthwhile. Compare alternatives under compatible conditions.",
-    "Acknowledging events before processing shortens acknowledgment latency, but creates a pending state, queue, drain procedure, and a second completion boundary.",
+    "Queueing derived-summary updates after committing work-item state and its matching activity event can shorten request latency, but introduces summary lag, a backlog, a drain procedure, and a separate summary-completion boundary.",
     "A faster benchmark establishes the best design. Correctness, recovery, operating cost, and maintainability may change the decision.",
     [
       [
@@ -128,10 +128,10 @@ export const bookConcepts: Concept[] = [
     "benchmark",
     "Benchmark protocol",
     "Evidence",
-    "A reproducible procedure that tests a specific performance claim with a declared workload, environment, boundaries, and success criteria.",
-    "Record versions, input distribution, warm-up, concurrency or arrival schedule, repetitions, failures, and unfinished work. Check that the generator is able to offer the intended load.",
-    "Run the same activity-feed workload against A, B, and C, preserving logical operation boundaries and reporting valid completions separately from overload rejections.",
-    "A single requests-per-second number ranks implementations. Different work, failure accounting, or generator behavior can make the numbers incomparable.",
+    "A reproducible procedure for comparing systems or testing a claim using declared tasks or workloads, environments, measurement boundaries, and outcome criteria.",
+    "Record versions, task or input selection, resource limits, repetitions, outcome grading, failures, and unfinished work. For load tests, also declare warm-up and concurrency or arrival schedule, and check that the generator can offer the intended load.",
+    "Run the same activity-feed workload against A, B, and C, preserving logical operation boundaries and reporting valid completions separately from overload rejections. An agent benchmark instead fixes tasks, allowed tools, and graders across the compared configurations.",
+    "A single score ranks systems. Different tasks, grading rules, resource limits, or failure accounting can make the scores incomparable.",
     [
       [
         "Measurement: test a claim",
@@ -142,6 +142,11 @@ export const bookConcepts: Concept[] = [
         "Project: common workload",
         "/project/#7-1-shared-baseline-workload",
         "Hold logical operations constant across implementations.",
+      ],
+      [
+        "Appendix A: tasks, trials, and graders",
+        "/appendices/evaluating-agentic-workflows/#anatomy-of-an-agent-evaluation",
+        "Distinguish a shared comparison suite from its tasks, individual trials, and outcome checks.",
       ],
     ],
   ),
@@ -247,9 +252,9 @@ export const bookConcepts: Concept[] = [
         "Identify the observation–action loop.",
       ],
       [
-        "Fleets: choose a coordination structure",
-        "/chapters/agent-fleets/#choose-a-coordination-structure",
-        "Explain the coordination obligations of each option.",
+        "Local practice: implement CSV export",
+        "/chapters/scalable-development/#constraint-feedback-through-an-actual-export",
+        "Use your own permitted model to implement the serializer, preserve the first failed check, inspect a real download, and revise the specification or agent context.",
       ],
     ],
     {
@@ -697,7 +702,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Local practice: commit effect and receipt together",
-        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "/appendices/durable-workflows/#local-practice-persisted-retry",
         "Implement the persisted-retry starter's SQLite receiver operation and check rollback and process restart; this does not test distributed atomicity.",
       ],
     ],
@@ -744,7 +749,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Local practice: implement HTTP cache policy",
-        "/chapters/architecture/#cache-decision-lab",
+        "/chapters/architecture/#local-practice-http-caching",
         "Use the optional HTTP-cache starter to inspect actual browser reuse, origin requests and conditional responses; shared caches are outside its scope.",
       ],
     ],
@@ -780,7 +785,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Local practice: compare stable and fresh keys",
-        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "/appendices/durable-workflows/#local-practice-persisted-retry",
         "Implement the persisted-retry receiver and inspect effect and receipt records after interruption and restart.",
       ],
     ],
@@ -806,7 +811,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Local practice: retry an uncertain outcome",
-        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "/appendices/durable-workflows/#local-practice-persisted-retry",
         "Run the persisted-retry starter across real process restarts and compare operation identity with physical attempts.",
       ],
     ],
@@ -921,7 +926,7 @@ export const bookConcepts: Concept[] = [
       ],
       [
         "Local practice: inspect effect and completion records",
-        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "/appendices/durable-workflows/#local-practice-persisted-retry",
         "Use the persisted-retry starter's separate worker and receiver ledgers to distinguish resumed coordination from effect safety.",
       ],
     ],

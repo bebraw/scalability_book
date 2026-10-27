@@ -285,6 +285,8 @@ Then inspect whether the request is served fresh, served stale while validation 
 
 {{ import "site/includes/cache-control-lab.html" }}
 
+### Local practice: HTTP caching
+
 For optional local practice, open `http-cache/README.md` in the [course workspace](/downloads/labs/course-workspace.zip).
 It supplies a local origin and browser page, leaving one conditional-response function to implement with your model.
 Predict body versions and origin-request counts, then inspect actual browser reuse and network 200/304 records.
