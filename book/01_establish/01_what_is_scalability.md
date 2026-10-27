@@ -191,7 +191,7 @@ Use one causal chain before choosing a scaling technique:
 
 For a runtime example, concurrent event submissions may exhaust the database connection pool before CPU becomes scarce.
 Admission control or buffering might protect accepted writes, but it can add waiting and require an explicit pending state.
-A useful evaluation would inspect success, duplication, [tail latency](/concepts/#tail-latency), queue age, and recovery as the workload changes rather than only count server instances.
+A useful evaluation would inspect success, duplication, [tail latency](/concepts/#latency), queue age, and recovery as the workload changes rather than only count server instances.
 
 For a development example, parallel agent tasks may produce changes faster than people can review them.
 Smaller task boundaries, executable contracts, and automated checks might move repeatable findings earlier, but maintaining those controls also consumes time.

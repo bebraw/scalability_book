@@ -121,8 +121,8 @@ Chapter indexes include an ungraded connection prompt; selected terms in the pro
 The nine self-study modules link to the matching view of the complete graph.
 
 `shared/concepts.ts` and `shared/book-concepts.ts` own definitions, assumptions, worked examples, common mistakes, and curated teaching locations.
-`shared/concept-relationships.ts` and `shared/book-concept-relationships.ts` own explained, undirected teaching connections.
-They are not inferred prerequisites or causal claims.
+`shared/concept-relationships.ts` and `shared/book-concept-relationships.ts` own explained teaching connections, with directed propositions and undirected comparisons.
+Direction follows the qualified authored statement; it does not imply a prerequisite or an unconditional causal claim.
 `shared/concept-pages.ts` separately records where ideas are discussed and the chapter connection prompts.
 Co-occurrence does not create a conceptual edge.
 
@@ -130,13 +130,13 @@ The site build generates `/concepts/graph.json`, `/concepts/graph.md`, `/concept
 Both graph formats include the complete authored definitions, qualifications, relationship explanations, and reading locations.
 The JSON contract has `schemaVersion: 2` and a deterministic content revision; resource and citation URLs use the publication origin or the local preview origin.
 The revision identifies authored content, not an archived reading snapshot.
-These are read-only HTTP and downloadable file resources; the site does not expose an MCP server endpoint.
-The guide describes search, undirected neighbor traversal, and reading retrieval so students can use existing retrieval tools or build their own integration.
+These read-only HTTP and downloadable resources are also available through the public `/mcp` endpoint described in [agent learning resources](agent-learning-resources.md#public-mcp-server).
+The guide describes search, neighbor traversal that preserves proposition direction, and reading retrieval so students can use existing retrieval tools or build their own integration.
 Students choose a question, state an initial explanation, inspect retrieved passages, and record what they accepted or challenged.
 Agents should cite actual retrieved material, preserve usage notes and assumptions, and distinguish the book's authored connections from their own inferences.
 
 The chapters provide the narrative path; optional investigations now have task-based starting points at `/explore/`.
-Five recent activities live outside the reading flow, with brief invitations in their original passages and links from course tasks and relevant concepts.
+Seven activities live outside the reading flow, with brief invitations in their original passages and links from course tasks and relevant concepts.
 Each provides a self-contained `/explore/<id>/agent.md` URL, a direct reading page, and separately retrievable worked reasoning.
 The graph carries `explorations` and concept-level `explorationIds` without adding relationships or required deliverables.
 See [agent learning resources](agent-learning-resources.md) for the source and conversation contract.
@@ -157,6 +157,9 @@ Modified clicks retain normal browser navigation.
 The reference page itself is complete static HTML and needs no library fetch.
 
 To add an idea, author its passages and teaching locations, add relationships with short labels and explanations, and assign relevant reading memberships.
+Keep a separate concept only when it adds a distinct explanation or reasoning task: mean and tail latency share one Latency card, while the tail-latency simulator remains a separate practice activity.
+Resource associations describe what the current activity teaches, rather than every topic mentioned in its surrounding chapter.
+Concept teaching locations can link directly to local practice instructions, including HTTP caching and persisted retry, without treating a downloadable lab as a browser demo.
 Use ordinary Markdown links such as `[idempotency](/concepts/#idempotency)` at useful teaching occurrences, rather than automatically linking every mention.
 Build-time integration inserts the scoped index before the first second-level heading without changing source offsets used by paragraph feedback.
 Concept reference links are excluded from paragraph identity hashes so adding these reading aids preserves existing feedback targets.

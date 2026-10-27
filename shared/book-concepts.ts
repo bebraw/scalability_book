@@ -146,27 +146,6 @@ export const bookConcepts: Concept[] = [
     ],
   ),
   concept(
-    "tail-latency",
-    "Tail latency",
-    "Evidence",
-    "The slow end of the elapsed-time distribution, often described by a percentile such as p95 or p99.",
-    "State the percentile convention, population, sample size, and failure treatment. A small sample cannot precisely characterize rare slow outcomes.",
-    "Eighteen requests at 40 ms and two at 240 ms have a 60 ms mean and a nearest-rank p95 of 240 ms. The mean hides the slow minority.",
-    "A good mean implies a good tail, or p95 can replace average time in Little's Law. These statistics answer different questions.",
-    [
-      [
-        "Measurement: compare mean and tail",
-        "/chapters/benchmarking/#exercise-measurement-prediction",
-        "Calculate how a slow minority affects the result.",
-      ],
-      [
-        "Scaling: budget latency",
-        "/chapters/scaling/#latency-budget-lab",
-        "Account for the journey across stages.",
-      ],
-    ],
-  ),
-  concept(
     "observability",
     "Observability",
     "Evidence",
@@ -199,7 +178,7 @@ export const bookConcepts: Concept[] = [
       [
         "Measurement: challenge the metric",
         "/chapters/benchmarking/#measurements-can-lead-you-astray",
-        "Use the Goodhart pressure test to inspect the proxy.",
+        "Use the worked coverage case and metric-review questions to inspect the proxy.",
       ],
       [
         "Fleets: measure accepted output",
@@ -716,6 +695,11 @@ export const bookConcepts: Concept[] = [
         "/appendices/advanced-web-boundaries/#preserve-durable-invariants-with-transactions",
         "Test concurrency and failure assumptions.",
       ],
+      [
+        "Local practice: commit effect and receipt together",
+        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "Implement the persisted-retry starter's SQLite receiver operation and check rollback and process restart; this does not test distributed atomicity.",
+      ],
     ],
   ),
   concept(
@@ -758,6 +742,11 @@ export const bookConcepts: Concept[] = [
         "/chapters/reality/#field-note-when-caching-complexity-became-an-availability-risk",
         "Trace faulty caching into an availability failure.",
       ],
+      [
+        "Local practice: implement HTTP cache policy",
+        "/chapters/architecture/#cache-decision-lab",
+        "Use the optional HTTP-cache starter to inspect actual browser reuse, origin requests and conditional responses; shared caches are outside its scope.",
+      ],
     ],
   ),
   concept(
@@ -789,6 +778,11 @@ export const bookConcepts: Concept[] = [
         "/appendices/durable-workflows/#audit-the-effect-boundary",
         "Place deduplication at the authority for the effect.",
       ],
+      [
+        "Local practice: compare stable and fresh keys",
+        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "Implement the persisted-retry receiver and inspect effect and receipt records after interruption and restart.",
+      ],
     ],
   ),
   concept(
@@ -809,6 +803,11 @@ export const bookConcepts: Concept[] = [
         "Appendix F: retry-safe effects",
         "/appendices/durable-workflows/#audit-the-effect-boundary",
         "Distinguish workflow progress from effect safety.",
+      ],
+      [
+        "Local practice: retry an uncertain outcome",
+        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "Run the persisted-retry starter across real process restarts and compare operation identity with physical attempts.",
       ],
     ],
   ),
@@ -921,9 +920,9 @@ export const bookConcepts: Concept[] = [
         "Separate durable coordination from effect semantics.",
       ],
       [
-        "Slideotter: artifact authority",
-        "/case-studies/slideotter/#the-project-found-durable-authority-boundaries",
-        "Locate the artifact that generation may replace.",
+        "Local practice: inspect effect and completion records",
+        "/appendices/durable-workflows/#durable-effect-retry-lab",
+        "Use the persisted-retry starter's separate worker and receiver ledgers to distinguish resumed coordination from effect safety.",
       ],
     ],
   ),
@@ -972,7 +971,7 @@ export const bookConcepts: Concept[] = [
   concept(
     "reliability",
     "Reliability",
-    "Models",
+    "Evidence",
     "The probability or observed proportion of successful outcomes under a declared workload, environment, time horizon, and success criterion.",
     "Include all eligible attempts in the denominator and state uncertainty. Agent first-attempt success and eventual success with retries answer different questions.",
     "A task succeeds on 18 of 20 independent trials under one fixed configuration. Report the trials and uncertainty rather than claiming a general 90% guarantee.",

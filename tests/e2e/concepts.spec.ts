@@ -1,6 +1,8 @@
 import { test, expect, type Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { conceptPages } from "../../shared/concept-pages.ts";
+import { concepts } from "../../shared/concepts.ts";
+import { conceptRelationships } from "../../shared/concept-relationships.ts";
 import type { LearningResource } from "../../shared/learning-resources.ts";
 
 test("the entry page offers agent access and lookup before the complete graph", async ({
@@ -64,19 +66,19 @@ test("the entry page offers agent access and lookup before the complete graph", 
   await lookup.getByLabel("Find a concept").fill("");
   await expect(
     page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(45);
+  ).toHaveCount(concepts.length);
   await expect(page).toHaveURL(/view=all/);
   await explorer.locator(":scope > summary").click();
   await expect(page).toHaveURL(/\/concepts\/$/);
   await explorer.locator(":scope > summary").click();
   await expect(
     page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(45);
+  ).toHaveCount(concepts.length);
   await expect(page).toHaveURL(/view=all/);
   await page.reload();
   await expect(
     page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(45);
+  ).toHaveCount(concepts.length);
 });
 
 test("students can retrieve the graph and check its evidence with their own tools", async ({
@@ -118,8 +120,10 @@ test("students can retrieve the graph and check its evidence with their own tool
   const graph = await dataResponse.json();
   expect(graph.schemaVersion).toBe(2);
   expect(graph.revision).toMatch(/^[a-f0-9]{64}$/);
-  expect(graph.concepts).toHaveLength(46);
-  expect(graph.relationships).toHaveLength(110);
+  expect(graph.concepts.map(({ id }: { id: string }) => id).sort()).toEqual(
+    concepts.map(({ id }) => id).sort(),
+  );
+  expect(graph.relationships).toEqual(conceptRelationships);
   expect(graph.readings).toHaveLength(conceptPages.length);
   expect(graph.semantics.relationships).toContain("undirected");
   expect(
@@ -297,7 +301,9 @@ test("the graph expands into the display without changing the exploration", asyn
     "Development",
   );
   await expect(labels).toBeChecked();
-  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(45);
+  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(
+    concepts.length,
+  );
   await expect(page).toHaveURL(contextUrl);
   expect(
     await page.evaluate(
@@ -365,12 +371,12 @@ test("group highlighting preserves context before an explicit group-only view", 
   await graphic.press("ArrowDown");
   const before = await viewport();
   await group.selectOption("Models");
-  await expect(nodes).toHaveCount(45);
+  await expect(nodes).toHaveCount(concepts.length);
   await expect(map.locator("[data-concept-edge]:not(.is-hidden)")).toHaveCount(
-    102,
+    conceptRelationships.length,
   );
   await expect(map.locator("[data-concept-node].is-group-member")).toHaveCount(
-    5,
+    4,
   );
   expect(
     await map
@@ -378,16 +384,13 @@ test("group highlighting preserves context before an explicit group-only view", 
       .evaluateAll((items) =>
         items.map((item) => item.getAttribute("data-concept-node")).sort(),
       ),
-  ).toEqual([
-    "amdahl-law",
-    "contention",
-    "little-law",
-    "lusser-law",
-    "reliability",
-  ]);
+  ).toEqual(["amdahl-law", "contention", "little-law", "lusser-law"]);
+  await expect(
+    map.locator('[data-concept-node="reliability"]'),
+  ).toHaveAttribute("data-group", "Evidence");
   expect(await viewport()).toEqual(before);
   await expect(map.locator("[data-concept-map-status]")).toContainText(
-    "5 Models highlighted",
+    "4 Models highlighted",
   );
   await expect(map.locator("[data-concept-group-help]")).toContainText(
     "dashed lines connect to other groups",
@@ -399,19 +402,21 @@ test("group highlighting preserves context before an explicit group-only view", 
   ).toBeGreaterThan(0);
   await expect(
     page.locator("[data-concept-group-tag]:not([hidden])"),
-  ).toHaveCount(5);
+  ).toHaveCount(4);
   await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
-    45,
+    concepts.length,
   );
   await expect(page).toHaveURL(/group-view=highlight/);
 
   await map.getByRole("checkbox", { name: "Show connection labels" }).check();
-  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(
+    conceptRelationships.length,
+  );
   const labeledViewport = await viewport();
   await only.check();
-  await expect(nodes).toHaveCount(5);
+  await expect(nodes).toHaveCount(4);
   await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
-    5,
+    4,
   );
   await expect(
     map.locator("[data-concept-edge].is-group-bridge:not(.is-hidden)"),
@@ -425,14 +430,14 @@ test("group highlighting preserves context before an explicit group-only view", 
   );
   await expect(page).toHaveURL(/group-view=only/);
   await highlight.check();
-  await expect(nodes).toHaveCount(45);
+  await expect(nodes).toHaveCount(concepts.length);
   expect(await viewport()).toEqual(labeledViewport);
 
   await only.check();
   await page.reload();
   await expect(group).toHaveValue("Models");
   await expect(only).toBeChecked();
-  await expect(nodes).toHaveCount(5);
+  await expect(nodes).toHaveCount(4);
   await highlight.check();
   await map
     .getByRole("combobox", { name: "Reading", exact: true })
@@ -448,7 +453,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   await expect(nodes).toHaveCount(0);
   await expect(graphic).not.toBeVisible();
   await map.getByRole("button", { name: "Reset view", exact: true }).click();
-  await expect(nodes).toHaveCount(45);
+  await expect(nodes).toHaveCount(concepts.length);
   await expect(group).toHaveValue("");
   await expect(highlight).toBeChecked();
   await expect(highlight).toBeDisabled();
@@ -472,7 +477,9 @@ test("group highlighting and isolation are accessible on mobile", async ({
   const highlight = map.getByRole("radio", { name: "Highlight", exact: true });
   const only = map.getByRole("radio", { name: "Show only", exact: true });
   await expect(highlight).toBeChecked();
-  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(45);
+  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(
+    concepts.length,
+  );
   await expect(map.locator("[data-concept-node].is-group-member")).toHaveCount(
     9,
   );
@@ -490,7 +497,9 @@ test("group highlighting and isolation are accessible on mobile", async ({
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(9);
   await only.press("ArrowLeft");
   await expect(highlight).toBeChecked();
-  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(45);
+  await expect(map.locator("[data-concept-node]:visible")).toHaveCount(
+    concepts.length,
+  );
   expect(
     (await new AxeBuilder({ page }).include("#concept-graph").analyze())
       .violations,
@@ -507,8 +516,14 @@ test("arrows express qualified relationships and focus reveals labels without ch
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
-  await expect(map.locator('[data-direction="directed"]')).toHaveCount(74);
-  await expect(map.locator('[data-direction="undirected"]')).toHaveCount(28);
+  await expect(map.locator('[data-direction="directed"]')).toHaveCount(
+    conceptRelationships.filter(({ direction }) => direction === "directed")
+      .length,
+  );
+  await expect(map.locator('[data-direction="undirected"]')).toHaveCount(
+    conceptRelationships.filter(({ direction }) => direction === "undirected")
+      .length,
+  );
   await expect(
     map.locator('[data-direction="undirected"] [data-concept-arrow]'),
   ).toHaveCount(0);
@@ -575,7 +590,7 @@ test("arrows express qualified relationships and focus reveals labels without ch
   await pane
     .getByRole("button", { name: "Compare with the labels", exact: true })
     .click();
-  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(6);
+  await expect(pane.locator(".concept-edge-label:visible")).toHaveCount(7);
   await pane
     .locator(".concept-connection-practice")
     .evaluate((element: HTMLDetailsElement) => {
@@ -629,7 +644,9 @@ test("connection labels stay local while following concepts across graph views",
     });
   const beforeCenter = await center();
   await toggle.check();
-  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(102);
+  await expect(map.locator(".concept-edge-label:visible")).toHaveCount(
+    conceptRelationships.length,
+  );
   await expect(
     page.locator("#decision-log [data-concept-labels]"),
   ).toBeChecked();
@@ -992,7 +1009,7 @@ test("the compact directory opens concepts without losing the browsing position"
   await page.goto("/concepts/?view=list");
   const directory = page.locator(".concept-directory");
   await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
-    45,
+    concepts.length,
   );
   await expect(directory.locator("[data-concept-card]:visible")).toHaveCount(0);
   expect(
@@ -1058,7 +1075,9 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const status = map.locator("[data-concept-map-status]");
-  await expect(status).toHaveText("45 concepts · 102 connections");
+  await expect(status).toHaveText(
+    `${concepts.length} concepts · ${conceptRelationships.length} connections`,
+  );
   const graphic = map.locator(".concept-map-graphic");
   const directory = page.locator(".concept-directory");
   const assertDirectoryMatches = async () => {
@@ -1076,7 +1095,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     ).toEqual(ids);
     await expect(
       directory.locator("[data-concept-directory-count]"),
-    ).toHaveText(`${ids.length} of 45 topics in this view`);
+    ).toHaveText(`${ids.length} of ${concepts.length} topics in this view`);
   };
   const camera = () =>
     graphic.evaluate((element) => JSON.parse(element.dataset.camera!));
@@ -1391,7 +1410,9 @@ test("static graph and curated chapter links remain usable without JavaScript", 
     .filter({ visible: true })
     .click();
   await expect(page).toHaveURL(/concepts\/#queue$/);
-  await expect(page.locator("[data-concept-card]")).toHaveCount(45);
+  await expect(page.locator("[data-concept-card]")).toHaveCount(
+    concepts.length,
+  );
   await expect(page.locator("[data-concept-card]:visible")).toHaveCount(1);
   await expect(page.locator("#queue")).toBeVisible();
   await expect(page.locator("#queue")).toContainText(

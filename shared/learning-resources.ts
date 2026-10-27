@@ -241,13 +241,7 @@ const activities: Record<string, Activity> = {
   },
   "Web architecture lens": {
     activityVersion: 2,
-    conceptIds: [
-      "rendering",
-      "contract",
-      "state-authority",
-      "latency",
-      "trade-off",
-    ],
+    conceptIds: ["rendering", "contract", "state-authority", "trade-off"],
     caption:
       "Compare page navigation, HTML fragments, and browser-built views for the same operation.",
     controls: [
@@ -266,12 +260,7 @@ const activities: Record<string, Activity> = {
   },
   "Tail latency simulator": {
     activityVersion: 2,
-    conceptIds: [
-      "latency",
-      "tail-latency",
-      "benchmark",
-      "measurement-boundary",
-    ],
+    conceptIds: ["latency", "benchmark", "measurement-boundary"],
     caption:
       "Compare average latency and p95 when a minority of requests take a slow path.",
     controls: [
@@ -498,13 +487,7 @@ const activities: Record<string, Activity> = {
   },
   "Latency budget map": {
     activityVersion: 3,
-    conceptIds: [
-      "latency",
-      "measurement-boundary",
-      "consistency",
-      "trade-off",
-      "cache",
-    ],
+    conceptIds: ["latency", "measurement-boundary", "trade-off"],
     caption:
       "Estimate latency contributions from geography, round trips, and execution time.",
     controls: [

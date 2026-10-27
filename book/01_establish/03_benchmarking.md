@@ -62,7 +62,7 @@ Which buffer meets your declared update deadline, and what further observation w
 ### Simulated benchmark lab
 
 The demonstration below supplies 60 authored request durations for an event-recording endpoint.
-Change the share that takes a slow storage path and the [p95 latency](/concepts/#tail-latency) objective.
+Change the share that takes a slow storage path and the [p95 latency](/concepts/#latency) objective.
 Inspect the ordered records, the percentile rank and how many requests miss the objective.
 This is a deterministic percentile investigation; it does not model concurrency, queueing or a system's capacity.
 

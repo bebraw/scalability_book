@@ -395,7 +395,7 @@ For every measured repetition, record:
 
 - implementation identifier, commit, environment, configuration, adapter version, and operation-order seed;
 - elapsed time, scheduled and dispatched counts, completed valid operations, and [valid completions per second](/concepts/#throughput);
-- median and [95th-percentile latency](/concepts/#tail-latency) for completed valid operations, clearly labeled as conditional on completion, plus their sample counts and the percentile calculation;
+- median and [95th-percentile latency](/concepts/#latency) for completed valid operations, clearly labeled as conditional on completion, plus their sample counts and the percentile calculation;
 - separate counts for not-started, unfinished, and timed-out operations, including their known waiting durations or deadline lower bounds;
 - expected rejections separately from timeouts, crashes, invalid responses, and other unexpected errors;
 - post-run checks for state, event, filter, and summary correctness;

@@ -87,13 +87,13 @@ const pilotConcepts: Concept[] = [
     group: "Evidence",
     title: "Latency",
     definition:
-      "Elapsed time between a declared start and completion event. End-to-end latency can include waiting, processing, network transfer, and rendering.",
+      "Elapsed time between a declared start and completion event. End-to-end latency can include waiting, processing, network transfer, and rendering. Tail latency describes the slow end of its distribution, often summarized as p95 or p99.",
     assumptions:
-      "State the timing boundary and population. Averages and percentiles answer different questions; Little's Law uses an average, not p95. A timeout is a deadline lower bound, not an observed completion time.",
+      "State the timing boundary, population, sample size, percentile convention, and treatment of failed or unfinished requests. Averages and percentiles answer different questions; Little's Law uses an average, not p95. A timeout is a deadline lower bound, not an observed completion time.",
     example:
       "Of 20 requests, 18 take 40 ms and two take 240 ms. Mean latency is 60 ms; nearest-rank p95 is 240 ms. A goal below 120 ms passes for the mean and fails for p95.",
     misconception:
-      "A lower average guarantees a better experience for everyone. A slow minority, failures, or work omitted from the timer can be hidden by that average.",
+      "A lower average guarantees a better experience for everyone. A slow minority, failures, or work omitted from the timer can be hidden by that average. Small samples cannot precisely characterize rare slow outcomes.",
     contexts: [
       {
         label: "Measurement: calculate the average and tail",
@@ -104,6 +104,11 @@ const pilotConcepts: Concept[] = [
         label: "Scaling: latency and geography",
         href: "/chapters/scaling/#latency-and-geography",
         description: "Follow time across network and consistency boundaries.",
+      },
+      {
+        label: "Scaling: budget latency",
+        href: "/chapters/scaling/#latency-budget-lab",
+        description: "Account for the journey across stages.",
       },
     ],
   },
