@@ -31,6 +31,7 @@ MCP makes no model calls and stores no learner/session data.
 
 Results include structured data plus equivalent text for clients that only consume text.
 The two MCP resources expose the existing guide and graph; the `start_investigation` prompt offers a question-led starting workflow.
+Without a supplied question, it offers a reading, a Queue–Latency connection, or the Cache decision lab with its retrievable demo ID, matching the guide's starting choices.
 Tools are read-only, with bounded schemas and a 64 KiB request limit.
 Passage retrieval does not fetch arbitrary URLs.
 Requests without an Origin header support server clients; browser requests accept the current site origin, `https://chatgpt.com` and `https://claude.ai`, with matching CORS headers.
@@ -59,7 +60,7 @@ External clients may present the same predict/experiment/reflect flow, but must 
 These public fields contain no current phase, prediction, snapshot or conversation identity.
 The website's [learning cockpit](learning-workspace.md#explore-an-idea-in-the-reading) implements that contract through the local companion.
 
-Verification uses the official client against both protocol eras, including passage retrieval, a qualified Queue → Latency connection, demo guidance, separate discussions, resource/prompt discovery, invalid inputs and private-path rejection.
+Verification uses the official client against both protocol eras, including passage retrieval, a qualified Queue → Latency connection, demo guidance, separate discussions, resource/prompt discovery, retrieval of the default prompt's recommended experiment, invalid inputs and private-path rejection.
 These checks establish retrieval and protocol behavior, not model selection quality, ChatGPT UI rendering or learner outcomes.
 
 ## Authored resources

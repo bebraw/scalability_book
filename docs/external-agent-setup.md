@@ -39,7 +39,7 @@ This is a connection to a public server, not an entry in the public plugin direc
 - **Find a passage.** Ask “Find where the book explains stable averages and read the relevant passage.” Check the citation yourself.
 - **Connect two ideas.** Predict how a queue might affect latency.
   Ask the agent to check the authored connection and its conditions.
-- **Try an experiment.** Ask for the queue balance lab.
+- **Try an experiment.** Ask for the [Cache decision lab](/chapters/architecture/#demo-cache-decision-lab).
   Make a prediction before opening it, change one control, then explain the observation.
 
 The tools provide concepts, assumptions, common mistakes, passages, activities, graphics and demo instructions.

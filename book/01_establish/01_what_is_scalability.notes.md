@@ -17,13 +17,13 @@
 6. Distinguish performance, scalability, elasticity, resilience, and efficiency.
 7. Use the causal chain `pressure → binding limit → response → trade-off → evidence` for runtime and development examples.
 8. Explain premature scaling as choosing a response before identifying the pressure, goal, or limit.
-9. Use the dimensions lab to form claims rather than recommend architecture.
+9. Use the pressure table and scalability-contract exercise to form a claim and identify an observation that could reject it.
 10. Produce one runtime and one development-system claim for implementation A.
 
 ## Scope and consistency notes
 
-- Keep the four pressure labels aligned across the reader table, interactive lab, project artifact, and later comparison rubric.
-- The lab uses deterministic teaching weights and must not imply that independent dimensions can be reduced to one measured score.
+- Keep the four pressure labels aligned across the reader tables, scalability-contract exercise, project artifact, and later comparison rubric.
+- Keep the dimensions as separate claims; the chapter does not calculate a weighted scalability score or recommend an architecture from one.
 - Business value, sustainability, privacy, regulation, cost, hardware, time, and expertise remain constraints or outcome criteria rather than growth axes in this taxonomy.
 - Architecture and infrastructure may themselves become complex, but in this chapter they are treated as response surfaces so students do not confuse a mechanism with the pressure it addresses.
 - Agents appear in two roles: as web consumers that can increase demand and as development contributors that can increase coordination pressure.
@@ -33,7 +33,7 @@
 
 - Connect the two scalability claims directly to fields in the common specification and final comparison rubric.
 - Decide whether the Establish project discussion should require every group to show one challenged claim and explain which assumed limit was wrong.
-- Add a compact visual only if students struggle to distinguish the four pressures from response surfaces and constraints; the table and lab currently cover that relationship.
+- Add a compact visual only if students struggle to distinguish the four pressures from response surfaces and constraints; the tables and claim exercise currently cover that relationship.
 - Keep model configuration, hardware, privacy, availability, context, and latency visible as constraints in both assigned environments.
   Treat model size and inference location as separate variables; both assigned models may be department-hosted.
 - Use the chapter's multiple dimensions to prevent the AI comparison from swallowing runtime behavior.

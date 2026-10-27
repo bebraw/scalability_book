@@ -63,7 +63,8 @@ The audit is complete only when every denied, failed, retried, cancelled, or suc
 When computing cost per accepted outcome, include spend from every attempt in the fixed cohort.
 Use accepted delegated runs—not internal calls—as the denominator, and label missing or estimated costs rather than treating them as zero.
 
-For the required bounded single-agent/fleet comparison, keep any gateway pinned to the same small-model configuration and routing policy.
+For an [optional live single-agent/fleet comparison](/project/compare/#optional-run-a-matched-single-agent-fleet-probe), keep any gateway pinned to the same small-model configuration and routing policy.
+In the required supplied matched-trace analysis, check that the recorded configurations and routes support this comparison and identify any gaps.
 For a declared mixed-model C fleet, preserve the model actually used for each attempt and check substitutions against the approved assignment and fallback rules.
 Changing model assignment as well as orchestration makes the full B–C builds a comparison of development systems.
 

@@ -227,7 +227,7 @@ export function createPublicBookServer(
           role: "user",
           content: {
             type: "text",
-            text: `${publicBookInstructions}\n\n${question ? `My question: ${question}` : "Offer three brief choices: follow a reading, connect queue and latency, or try the queue balance experiment. Recommend the experiment if unsure. End with one choice question and wait."}`,
+            text: `${publicBookInstructions}\n\n${question ? `My question: ${question}` : "Offer three brief choices: follow a reading, connect queue and latency, or try the Cache decision lab (get_demo ID `demo-cache-decision-lab`). Recommend the experiment if unsure. End with one choice question and wait."}`,
           },
         },
       ],

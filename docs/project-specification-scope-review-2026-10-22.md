@@ -2,6 +2,10 @@
 
 **Agreed scope — 22 October 2026.**
 
+This is a dated decision and verification record.
+Its preparation and deployment statements describe the state on 22 October, before the later reference, runner and matched-pair work.
+For current implementation evidence and release obligations, use the [course preparation tooling guide](course-tooling.md#completed-matched-pair) and [pilot instructor checklist](solo-pilot-2026/instructor-guide.md#prepare-the-private-arrangement).
+
 Keep **three fresh implementations** of the Work Activity Tracker: large-model single-agent A, small-model single-agent B and fleet-built C.
 Offer a **course benchmark runner as optional tooling**, while allowing students to implement their own runner under the same measurement protocol.
 Keep actual fleet-trace analysis required and make transformation and import into C an optional extension.
@@ -19,8 +23,8 @@ The scope decisions are settled and incorporated in the course contracts and pil
 
 The application has a reasonable correctness core, with the surrounding measurement, integration and analysis work remaining important to the workload review.
 The owning specifications, evidence checklist and unused `2026-10-v2` snapshots carry the revised contract; no real run used the earlier draft, as confirmed by the instructor.
-The course runner has not yet been implemented.
-The instructor will perform the incoming human audits, and a dedicated reference implementation will be built after the specification review.
+At this review, the course runner had not yet been implemented, and the dedicated reference implementation was still to be built after the specification review.
+The instructor agreed to perform the incoming human audits.
 
 ## Where the workload accumulates
 
@@ -281,15 +285,17 @@ The instructor confirmed that no existing runs require legacy preservation, so t
 The numeric rubric and passing minima are unchanged.
 The specifications, chapter checkpoints, plans, checklist, snapshots, operating guidance and pilot materials are updated together.
 
-Next prepare and verify the dedicated private reference, optional course benchmark runner and supplied matched-trace evidence package.
+The next preparation work identified at the review was to build and verify the dedicated private reference, optional course benchmark runner and supplied matched-trace evidence package.
 Complete the actual model assignments, configuration versions, access, budgets, private channels and dated commitments before the affected student work begins.
 These operational tasks remain separate from adoption of the course contract.
 
 ## Verification
+
+The following checks describe the candidate reviewed on 22 October 2026.
 
 The requirement/checklist tests pass, including owner and snapshot digest checks and every evidence link to its owning fragment.
 The Worker build and HTML/type validation pass; 74 rendered pages contain 6,617 valid local links.
 All 14 affected Chromium checks pass, covering course submission and grading, the final-reflection demo, canonical and archived briefs, fragments and rubric layout at three widths.
 The full link check found no broken links across 242 external URLs; 15 destinations were inconclusive because of access restrictions or a fetch failure.
 The revised archived briefs and ownership card were inspected in the browser.
-The changes are prepared in the repository and have not been deployed.
+At the time of this review, the changes were prepared in the repository and had not been deployed.

@@ -213,7 +213,9 @@ Would your verdict change, and what makes those records different?
 ## Challenge assumptions without changing the common core
 
 Implementation B should not be framed as “make the app bigger” or as an extension of implementation A.
-Apply the same production pressures to both independent implementations while keeping their required behavior stable:
+Repeat A's primary pressure against B using the same workload and procedure where practical, and investigate one bounded correctness or recovery case.
+Keep the required behavior stable across the two independent implementations.
+The broader catalog offers optional investigations within the phase budget:
 
 - many concurrent tenants, projects, groups, locations, or other domain instances,
 - tens or hundreds of thousands of users,

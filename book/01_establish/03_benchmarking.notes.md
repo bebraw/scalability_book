@@ -96,9 +96,9 @@ Each eval should define:
 
 Development ideas:
 
-- Define a small set of project-specific tasks during implementation A and record the large-model baseline.
-  Rerun the same tasks with the small-model and fleet workflows when implementations B and C become available.
-- Use instructor-provided outputs if a lecture demonstration needs two-model comparison before students are allowed to use the small model.
+- For an optional comparison, define a small set of project-specific tasks during implementation A and record the large-model baseline.
+  Rerun the same tasks with permitted small-model and fleet workflows when those environments become available, within the existing phase budget.
+- Use instructor-provided actual outputs with retained provenance when a lecture demonstration needs a comparison outside the currently assigned environment.
 - Include at least one deterministic check where possible, such as whether the answer names required files, produces valid JSON, or passes a test.
 - Use human review for quality judgments that require understanding of the project.
 - Ask students to report confidence carefully: "model A did better on these tasks" is defensible; "model A is better" is usually not.
@@ -133,31 +133,30 @@ Models were compared on the actual summaries, action items, and questions needed
 Since the comparison used a small task set and one pass per model, it should not be generalized into a universal ranking.
 Its defensible lesson is that product-specific output quality, latency, and cost have to be measured together.
 
-### Small eval demonstration
+### Calibrate a rubric on actual attempts
 
-A simple classroom demonstration can be interactive.
-The point is to show that an eval is a controlled comparison, not a magic score.
-Students can change the task, inspect the complete shared prompt, score two attempts against the task's rubric, and notice how the conclusion changes when quality, latency, and cost are considered together.
-Use the invented samples or instructor-provided outputs before real comparisons are permitted; begin with the large-model baseline and revisit the tasks with the small-model and fleet setups later.
+Use [Appendix A’s actual-attempt rubric](/appendices/evaluating-agentic-workflows/#calibrate-a-rubric-on-actual-attempts) for a bounded classroom comparison with sourced outputs.
+Freeze the task, shared context and rubric before inspecting two permitted attempts; retain the exact prompt, responses, configuration, source records, corrections and acceptance decisions.
+Where another person prepares the records, conceal model identities until scoring is complete.
+Compare criterion-level evidence and preserve disagreement rather than treating an authored answer as the only acceptable wording.
+Without model access, use the supplied matched-trace records and retain their stated provenance and missing evidence.
 
-Use [Appendix A’s actual-attempt rubric](/appendices/evaluating-agentic-workflows/#calibrate-a-rubric-on-actual-attempts) for a bounded comparison with sourced outputs.
-
-The sample exercise supports a conclusion about the scored answers, not a claim about a real model's quality, cost, latency, or saved review time.
-For real attempts, record those measurements separately and keep any conclusion local to the task and conditions.
+Two attempts support a comparison of those outputs, not a general model ranking or a reliable success-rate estimate.
+Record elapsed time, cost and review effort only when observed with a stated boundary and source; missing observations remain unknown.
 Run deterministic checks separately where useful: did the answer name a real file, include all required headings, or produce valid JSON?
 To make it more statistically careful, run more examples and compare failure patterns instead of relying on one average score.
 
 ### Short eval lab
 
-Use the demonstration above or a small script to evaluate three to five outputs from one real project task.
-The lab should take about 20–30 minutes:
+As optional practice, use the actual-attempt activity above or a small script to evaluate three to five outputs from one real project task.
+Keep the lab within about 20–30 minutes of existing study time:
 
-1. Define the task, shared context, expected evidence, and one narrow rubric.
+1. Freeze the task, shared context, expected evidence, and one narrow rubric before generating or inspecting outputs.
 2. Write at least one deterministic probe before adding any fuzzy scoring.
 3. Score two attempts, then inspect the lowest-scoring row and name the property that failed.
 4. If an LLM judge is available, reverse the order of the attempts and run the judgment again.
    A changed verdict is evidence about the judge, not the attempts.
-5. Save the failure as a regression fixture and write one local conclusion that the evidence supports.
+5. Retain all attempts and corrections, save a meaningful failure as a regression fixture, and write one local conclusion that the evidence supports.
 
 A defensible conclusion is specific: "the smaller model omitted confirming measurements in three of five benchmark plans." A claim such as "the larger model is better" exceeds the evidence.
 If the class uses the companion repository, its offline mock mode is sufficient for demonstrating the judge traps; no API key or RAG system is needed.
@@ -177,13 +176,14 @@ Important distinction:
 - Monitoring tells you whether known conditions are healthy.
 - Observability helps you investigate unknown conditions.
 
-### Observability signal picker
+### Choose evidence before inspecting a trace
 
-The demonstration below asks students to choose evidence for a concrete operational symptom.
+Use the chapter's prediction prompt to choose evidence for a concrete operational symptom before opening the simulated OpenTelemetry trace explorer.
 The useful signal depends on the question: the right first signal for stale summaries is not always the right first signal for missing events or a slow dashboard.
 
 Ask which specific log, metric or trace observation could distinguish the proposed explanations.
-Use the current chapter’s trace explorer and incident challenge to inspect evidence before choosing a response.
+Inspect the trace and its parent-child relationships before choosing a response; retain the earlier failed attempt even when the final HTTP response succeeds.
+For optional local practice, instrument one operation, retain original and changed records, and check trace IDs, links and timer boundaries as described in the chapter.
 
 Use the result as a starting point for an observability plan.
 A good plan names the symptom, the first signal to inspect, and what that signal can or cannot prove.

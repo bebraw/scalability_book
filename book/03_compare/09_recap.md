@@ -72,7 +72,7 @@ Use the earlier phase records and the implementation, fleet, and scaling/deploym
 | ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | Accepted browser behavior      | Acceptance results, escaped defects, and correction evidence                                  | Which differences affected users rather than only repository structure?         |
 | Architecture and contracts     | Request trace and key boundary decisions                                                      | Which boundaries made independent change safer or harder?                       |
-| Pressure and saturation        | Pressure map and first predicted or observed limit                                            | How did each architecture respond to the same growth scenario?                  |
+| Pressure and saturation        | Existing pressure record and first predicted or observed limit                                | How did each architecture respond to the shared primary pressure?               |
 | Measurement and recovery       | Benchmark, operational signals, and recovery result                                           | What was directly observed, and what remained invisible?                        |
 | Development friction           | Cross-team audit and [change effort](/concepts/#change-probe)                                 | Which setup, test, or coupling cost would dominate the next change?             |
 | Human–agent workflow           | Execution trace, interventions, and review effort; include handoffs and backlog for the fleet | Which allocation produced accepted work at a sustainable correction cost?       |
@@ -124,7 +124,7 @@ A useful decision connects a constraint to evidence and an owner:
 > **[Owner]** accepts the operational and correction obligations; revisit the choice when **[signal or pressure]** changes.
 
 In the queue example, faster HTTP acknowledgment alone would not justify the decision.
-The argument must also account for event-visibility delay, recovery behavior, and the effort to maintain and review the new worker path.
+The argument must also account for summary-update delay, recovery behavior, and the effort to maintain and review the new worker path.
 Use the same evidence to explain both the benefit and its price.
 
 The same reasoning applies to adopting an agent workflow.

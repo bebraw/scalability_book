@@ -17,22 +17,21 @@
 6. Reduce friction through versioned environments, traceable responsibilities, and explicit contracts without hiding boundaries.
 7. Show how agents can move friction into review, debugging, operations, and ownership.
 8. Match the feedback ladder to the changed boundary.
-9. Apply the workflow and friction audits to implementations A and B.
+9. Reuse workflow and bounded audit evidence to record one bottleneck, response and check result or justified next step per phase.
 
 ## Notes for further development
 
 - Connect this chapter to the peer assessment process: friction is often felt by teammates first.
 - Consider including a small before/after example where a tangled event handler is split into clearer validation, storage, and presentation pieces.
-- Turn the friction audit into a standardized instrument applied to every build.
-  Keep the same setup, comprehension, change, testing, review, operational, and coordination categories so cross-build comparisons are meaningful.
+- Use the common audit protocol for every build, and retain one compact evidenced friction entry per phase.
+  Setup, comprehension, change, testing, review, deployment, operational and coordination categories are optional prompts, not mandatory measurements or separate reports.
 - Make the bounded cross-team audit the primary source of setup and comprehension evidence.
   Authors are poor judges of their own hidden context.
 - Use the defined thirty-minute change probes and audit rubric.
   Keep the product language phase-specific while holding the affected creation, validation, persistence, display, and testing path stable.
 - Separate generated-code friction from workflow friction.
   A clean final repository may still have required excessive retries, prompt repair, integration, or human review to produce.
-- For implementation C, add fleet-specific coordination friction without changing the base audit rubric.
-  This makes the cost of handoffs and parallel work visible as an additional dimension.
+- For implementation C, use fleet handoffs and parallel work as possible sources of the required finding without changing the base audit rubric or requiring another category report.
 - Obsidian candidate: `Clippings/_Processed/Harness engineering for coding agent users.md` could strengthen the chapter's feedback-loop framing.
   The feedforward/feedback distinction maps well to setup instructions, tests, linters, architecture notes, and review prompts as friction reducers.
 - Obsidian candidate: `Clippings/_Processed/Every layer of review makes you 10x slower.md` could support a short section on review friction.
@@ -86,7 +85,7 @@ Possible techniques:
 ### Exercise ideas
 
 - Ask students to perform a friction audit of implementation A.
-- Have them identify the three most expensive changes they can imagine making.
+- As an optional prediction exercise, identify a plausible expensive change, then name the observation that could test the prediction.
 - Ask them to improve one feedback loop: setup, tests, linting, seed data, logging, or documentation.
 - Ask them to time one focused, affected, baseline, and boundary-specific validation path and explain what distinct evidence each adds.
 - Use the optional review-evidence exercise in Appendix A when compressed diffs or repeated agent review are relevant to the project.

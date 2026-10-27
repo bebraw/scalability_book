@@ -22,7 +22,7 @@ Follow the [common specification](../../specifications/00_common_project.md) and
 The milestones below summarize the work; the briefs define the complete deliverables and permitted transfer between implementations.
 The required work supports full credit, including grade 5.
 Additional pressure scenarios, trace transformation and import into C, and running your own matched pair are optional explorations within the same budget, with no separate points.
-Use a course-provided benchmark runner when available or your own implementation under the identical measurement protocol.
+Use the course-provided benchmark runner or your own implementation under the identical measurement protocol.
 Keep both audits and one evidenced development bottleneck with a checked improvement or justified follow-up per phase; the eight friction categories are prompts.
 Reference the exact retained course configuration, confirm actual models, routes and environment, and record deviations and material exposed settings, marking unavailable details honestly.
 Keep optional features and extension reading within the available time.
@@ -77,7 +77,7 @@ It supports the current architecture and phase-specific ownership criteria, with
 
 ## Benchmark tooling
 
-A course benchmark runner is planned as optional tooling.
+The optional [course benchmark runner](https://scalableweb.dev/downloads/project/benchmark-runner.zip) is implemented and validated; its [instructions](../../course-tools/benchmark/README.md) describe setup and the application adapter you supply.
 You may use it or implement your own runner, following the same fixture, measurement boundary, workload profiles, repetitions, outcome accounting and correctness checks in the common specification.
 Provide a reproducible setup and retain the required observations whichever runner you use.
 The assessment concerns the measurements and reasoning; creating another runner has no separate point allocation.

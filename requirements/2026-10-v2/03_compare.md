@@ -271,7 +271,7 @@ Build the decision narrative around four steps:
 1. **Establish the comparison.** State what the common specification kept stable and what differed across A, B, and C, including optional scope and measurement gaps.
 2. **Explain the consequential results.** Compare application architecture under the shared and selected pressures and development effort through acceptance; use the fleet debugging findings to show what final code or a raw transcript concealed.
 3. **Bound the explanation.** Separate A–B–C observations from hypotheses about model capability, practice, architecture, and orchestration.
-   Use the bounded paired task for the narrower workflow contrast, stating what was controlled and what remains unresolved; neither one pair nor the three builds establishes a general effect.
+   Use the required supplied matched-trace analysis and, if completed, the optional live pair for the narrower workflow contrast, stating what was controlled and what remains unresolved; neither one pair nor the three builds establishes a general effect.
 4. **Choose and set a revisit condition.** For stated project constraints, choose an architecture and a large-model single agent, small-model single agent, or declared fleet configuration; explain rejected alternatives, responsibilities that remained human across the phases, ownership of operations and correction, and the next saturation signal or measurement that would change the decision.
 
 Label important claims as observed, inferred, or proposed.
@@ -285,7 +285,7 @@ This phase emphasizes:
 
 - a bounded and inspectable fleet;
 - successful integration and validation;
-- a useful self-observation loop in which implementation C exposes the workflow that produced it;
+- a compact actual-run record and at least two supported fleet debugging findings, with trace import and application-based views optional;
 - evidence about coordination cost as well as throughput;
 - application of scalability concepts to both software and workflow;
 - causal humility in the three-way comparison;

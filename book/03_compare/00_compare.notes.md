@@ -23,9 +23,9 @@ Preserve a negative result when it is informative instead of spending the remain
   This should tie back to technical debt: missing instructions, unclear architecture, weak tests, and undocumented conventions are forms of friction that agents amplify.
 - Introduce a small agent fleet with roles such as `scout`, `planner`, `implementer`, and `reviewer`.
   Keep the first version deliberately small so students learn orchestration and integration instead of trying to automate everything.
-- Use Pi prompt templates for repeatable workflows.
+- Use the assigned harness's templates or equivalent maintained instructions for repeatable workflows.
   Good examples: investigate a subsystem, implement a bounded change, review a diff, summarize architectural risks, and prepare a pull request.
-- Use Pi's session history or export features as evidence.
+- Use the assigned harness's session history, trace export or an equivalent compact actual-run record as evidence.
   Students should submit a short trace or reflection showing how the fleet worked, where it failed, and how they intervened.
 - Discuss containment explicitly: limited tools, read-only exploration, small write scopes, branch isolation, test gates, and human review.
   The point is to teach students that an agent fleet is a socio-technical system, not merely concurrent prompting.
@@ -43,7 +43,7 @@ Preserve a negative result when it is informative instead of spending the remain
 
 ## Tool examples to develop
 
-Use Pi, Acolyte, and Mastra as complementary examples rather than as competing tools.
+Pi, Acolyte, and Mastra are optional examples for distinct concerns; they do not replace the assigned harness or add installation requirements.
 The useful framing is a stack of concerns:
 
 - [Pi](https://pi.dev/) as local development orchestration.
@@ -79,7 +79,7 @@ The goal is not to maximize automation, but to make delegation safe, inspectable
 Suggested deliverables:
 
 - Project instructions for agents.
-- At least three agent roles with clearly scoped responsibilities.
+- At least two independently operating agent instances or delegated executions with clearly scoped responsibilities, as required by the Compare brief.
 - One reusable prompt template or workflow.
 - One change implemented through the workflow.
 - Evidence of review, such as test output, a diff review, or an exported session.

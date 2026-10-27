@@ -2,7 +2,7 @@
 
 - Give students a practical vocabulary for scaling web applications.
 - Analyze documented production cases without assuming their results transfer unchanged.
-- Compare how implementations A, B, and C respond to the same scaling pressures.
+- Compare how implementations A, B, and C respond to the shared primary pressure under a comparable protocol.
 - Apply formal scalability models to application and development-workflow decisions.
 - Show that scaling choices have costs in complexity, consistency, operations, and development speed.
 - Prepare the transition from application scaling to development-process fortification.
@@ -10,7 +10,7 @@
 ## Notes for further development
 
 - Connect the end of the chapter to the recap: once architecture grows, scalability becomes a technical, organizational, and development-process concern.
-- Apply the same pressure set to all three implementations before recommending changes.
+- Repeat the shared primary pressure for all three implementations before recommending changes; identify further pressure scenarios as optional investigations within the phase budget.
   The chapter should compare how each architecture responds rather than assuming implementation B is the sole object of analysis.
 - Keep the formal-model requirement tied to observed or explicitly proposed limits rather than accepting decorative calculations added after the design.
 - Ask whether the fleet-generated implementation is architecturally more scalable or merely larger.
@@ -25,7 +25,7 @@
 ## Drafting scaffold moved from reader content
 
 - By this point in the course, students have produced three implementations, inspected their friction, measured their behavior, and seen how reality changes their assumptions.
-- This chapter applies the same pressures to all three architectures before synthesizing a justified target design.
+- This chapter compares the shared primary-pressure evidence across all three architectures before synthesizing a justified target design; broader proposed responses remain explicitly labeled.
 - It develops technical scaling techniques without turning them into a catalog of cloud products.
 - Development idea: reuse the event tracking system and map each pressure to a possible response, regardless of whether the chosen theme is a conference, shop, workflow, game, or something else.
 

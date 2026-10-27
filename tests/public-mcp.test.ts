@@ -307,6 +307,22 @@ for (const era of ["modern", "legacy"] as const)
         uri: `${origin}/concepts/agent-guide.md`,
       });
       assert.match(guide.contents[0]!.text as string, /Your first reply/);
+      const start = await client.getPrompt({
+        name: "start_investigation",
+        arguments: {},
+      });
+      const startText = start.messages[0]!.content.text as string;
+      const starterId = /`(demo-[a-z0-9-]+)`/.exec(startText)?.[1];
+      assert.ok(
+        starterId,
+        "The starting prompt must identify a demo to retrieve.",
+      );
+      const starter = await call("get_demo", { id: starterId });
+      assert.ok(
+        (guide.contents[0]!.text as string).includes(starter.demo.url),
+        "The recommended experiment must also be available from the agent guide.",
+      );
+      assert.equal(starter.nextActions[0].action, "ask_prediction");
       const prompt = await client.getPrompt({
         name: "start_investigation",
         arguments: { question: "Why does a queue add latency?" },

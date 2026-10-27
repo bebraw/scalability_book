@@ -90,6 +90,22 @@ for (const era of ["modern", "legacy"] as const) {
       name: "start_investigation",
       arguments: { question: "How does review affect useful throughput?" },
     });
+    const start = await client.getPrompt({
+      name: "start_investigation",
+      arguments: {},
+    });
+    const startContent = start.messages[0]!.content;
+    assert.equal(startContent.type, "text");
+    const starterId = /`(demo-[a-z0-9-]+)`/.exec(
+      startContent.text as string,
+    )?.[1];
+    assert.ok(
+      starterId,
+      "The starting prompt must identify a demo to retrieve.",
+    );
+    const starter = await call("get_demo", { id: starterId });
+    assert.ok(guideContent.text.includes(starter.demo.url));
+    assert.equal(starter.nextActions[0].action, "ask_prediction");
     for (const url of ["/api/learning/answers", "https://example.com/"]) {
       const result = await client.callTool({
         name: "read_passage",
@@ -111,6 +127,7 @@ for (const era of ["modern", "legacy"] as const) {
           "prediction-led experiment metadata",
           "separate discussion",
           "resources and prompt",
+          "retrieve the default prompt's experiment",
           "reject private and external URLs",
         ],
       }),

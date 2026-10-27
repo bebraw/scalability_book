@@ -3,7 +3,8 @@
 **Draft for instructor review — 22 October 2026.**
 
 This arrangement offers the full 5 ECTS course to one student working independently, with all student work due on 16 December and assessment targeted for 18 December 2026.
-The planning budget is 135 student hours and approximately 16–23 instructor hours for delivery and assessment, plus preparation of the reference application, optional runner and supplied matched-trace package.
+The planning budget is 135 student hours and approximately 16–23 instructor hours for delivery and assessment.
+The reference application, optional runner and supplied matched-trace package have been prepared separately; automated elapsed time does not establish the instructor effort spent on that preparation.
 Begin with 6–8 hours of independent reading and orientation in late October, followed by a proposed kickoff during 2–4 November.
 Finishing by 16 December then needs approximately 20–21 student hours per week after kickoff, with the final phase approaching 22–25 hours per week.
 Dates and support commitments become operative when agreed with the student and entered in the private course records.
@@ -30,16 +31,16 @@ The student's outgoing reference audits remain separate work; private frozen pac
 
 ## Agreed reference preparation
 
-Build a dedicated reference implementation after critically reviewing and settling the project specifications.
+The dedicated reference implementation and frozen audit packages are prepared following the specification review.
 The [scope review](../project-specification-scope-review-2026-10-22.md) records the settled choices, now reflected in the course contracts, checklist, snapshots and this pack.
-Building the reference and its audit packages needs additional preparation beyond the current instructor allowance, which assumed suitable references were available.
+Their preparation is outside the current instructor allowance, which assumes suitable references are available.
 The [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records the frozen reference, clean-unpack verification and release limitations.
 
 ## Agreed builds and benchmark tooling
 
 Keep three fresh implementations: large-model single-agent A, small-model single-agent B and fleet-built C.
 Provide a course benchmark runner as optional tooling; students may implement their own runner under the same measurement and evidence protocol.
-The optional runner is implemented and validated against the private reference; its public download is built with the site.
+The optional runner is implemented and validated against the private reference; its [public download](https://scalableweb.dev/downloads/project/benchmark-runner.zip) is published with the site.
 The scope choices are settled; model assignments and operational preparations remain open.
 
 ## Agreed trace extension

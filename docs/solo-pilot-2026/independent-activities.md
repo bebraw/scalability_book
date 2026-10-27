@@ -28,7 +28,7 @@ Activity completion and the two diary criteria are scored separately under the [
 ### Activity 1 Scalability claims
 
 Read [Chapter 1](../../book/01_establish/01_what_is_scalability.md).
-Before using the chapter's scalability dimensions lab, describe what must remain true as demand or data grows.
+Before attempting [Connect a pressure to a scalability claim](../../book/01_establish/01_what_is_scalability.md#connect-a-pressure-to-a-scalability-claim), describe what must remain true as demand or data grows.
 Explore a second pressure and explain why the same response might not address it.
 Keep two bounded claims for A, with the pressure, maintained goal, relevant signal and evidence that could contradict each claim.
 
@@ -44,7 +44,8 @@ Link any consequential design choice to the evolving ADR-style decision log.
 ### Activity 3 Measurement and boundaries
 
 Read [Chapter 3](../../book/01_establish/03_benchmarking.md).
-Predict a queue or latency result, investigate it with the chapter's queue balance or simulated benchmark lab, and calculate a Little's Law relationship with explicit units and assumptions.
+Predict a latency result and investigate it with the [simulated benchmark lab](../../book/01_establish/03_benchmarking.md#simulated-benchmark-lab).
+Use the [worked queue observation window](../../book/01_establish/03_benchmarking.md#derive-averages-from-one-observation-window) to calculate a Little's Law relationship with explicit units and assumptions.
 Compare the lesson with A's existing baseline: identify the measured boundary, workload, distributions, errors and one conclusion the evidence cannot support.
 Keep the calculation and a link to the baseline, distinguishing simulated observations from application measurements.
 
@@ -54,7 +55,7 @@ Keep the calculation and a link to the baseline, distinguishing simulated observ
 
 Read [Chapter 4](../../book/02_challenge/04_architecture.md).
 Trace an existing A user action through browser, request handling, authoritative state and visible result.
-Use the request boundary or cache decision lab to examine an alternative placement of work or data.
+Use [Trace a request across its commit boundary](../../book/02_challenge/04_architecture.md#trace-a-request-across-its-commit-boundary) or the [cache decision lab](../../book/02_challenge/04_architecture.md#cache-decision-lab) to examine an alternative placement of work or data.
 Keep the request path, one correctness obligation and a falsifiable architecture hypothesis for B.
 Revisit a relevant A decision in the log and explain why it is retained, revised or rejected for B.
 Review and improve the relevant specification using the implementation and audit lessons, keeping the common behavioral requirements stable.
@@ -62,9 +63,9 @@ Review and improve the relevant specification using the implementation and audit
 ### Activity 5 Development friction
 
 Read [Chapter 5](../../book/02_challenge/05_friction.md).
-Investigate the workflow loop or friction audit lab and predict where one apparently small change creates waiting, review or rework.
+Follow [Trace one web change from the browser to production](../../book/02_challenge/05_friction.md#trace-one-web-change-from-the-browser-to-production) and predict where the apparently small change creates waiting, review or rework.
 Compare this with your outgoing reference audit, separating setup time from change time and unfamiliarity from missing instructions.
-Reuse the phase's evidenced friction finding and response: a checked improvement or a justified follow-up decision, distinguishing the observed result from a proposed next step.
+Use [Record one evidenced bottleneck](../../book/02_challenge/05_friction.md#record-one-evidenced-bottleneck) to reuse the phase's friction finding and response: a checked improvement or a justified follow-up decision, distinguishing the observed result from a proposed next step.
 The actual reference audit follows the instructor's separately released protocol and time box.
 
 ### Activity 6 Failure and recovery
@@ -82,7 +83,7 @@ Link the existing A–B pressure evidence and explain one alternative to attribu
 ### Activity 7 Fleet coordination
 
 Read [Chapter 7](../../book/03_compare/07_agent_fleets.md).
-Predict whether additional agents improve accepted output, then examine the chapter's Amdahl example and a delegation or correction lab.
+Predict whether additional agents improve accepted output, then examine the chapter's [Amdahl example](../../book/03_compare/07_agent_fleets.md#amdahls-law-and-the-sequential-bottleneck) and [delegation packet](../../book/03_compare/07_agent_fleets.md#prepare-a-delegation-packet) or [correction lab](../../book/03_compare/07_agent_fleets.md#correction-lab).
 Apply the reasoning to C's task graph, integration boundary and human review capacity.
 Before inspecting the supplied matched single-agent/fleet traces, predict an outcome for their task.
 Then compare the recorded controls, acceptance outcomes, elapsed time, human effort, resources and corrections; explain provenance, missing observations and what the pair cannot establish.

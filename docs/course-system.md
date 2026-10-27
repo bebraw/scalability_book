@@ -119,7 +119,7 @@ Local development always uses mock mail.
 Request a link in the anonymous browser, then use **Open local mock inbox** from the instructor's Students view and follow its link in that browser.
 The inbox is staff-only, retains the latest 1,000 messages locally, and is unavailable in the production Worker.
 The deployed request route reports that email is not configured until both the `COURSE_MAIL` binding and `COURSE_EMAIL_ENABLED: "true"` are present; it never uses the local mock inbox as a fallback.
-This local flow is not yet the isolated teacher simulation in ADR-007.
+This local flow is separate from the isolated [teacher simulation](#teacher-simulation).
 
 ## Late arrivals and catch-up
 
@@ -325,7 +325,8 @@ Keep both bounded audits and one evidenced friction finding with a checked impro
 Actual fleet-run analysis and supplied matched-trace analysis remain required; trace import, student-run matched pairs and additional pressure scenarios are optional and unnecessary for grade 5.
 Students may reference an exact retained course-configuration version, confirming actual models, routes and environment and recording deviations and material exposed settings.
 The optional course benchmark runner and dedicated private audit reference are locally implemented and validated; [course-tooling.md](course-tooling.md) owns their boundaries, release preparation and evidence.
-The supplied matched-trace package still needs preparation; local tooling validation does not establish a completed model experiment or released audit assignment.
+The [matched pair and curated student evidence packet](course-tooling.md#completed-matched-pair) are complete and retained privately; instructor review and release of the packet, reference backup and actual audit assignments remain pending.
+The recorded pair supports a bounded task comparison, not a general claim about model or fleet performance.
 The workspace's project guide, rubric and checklist links open the archived documents for that edition.
 **Course settings** shows the edition; ordinary administration cannot replace it on an existing run.
 See [requirements/README.md](../requirements/README.md) for publication/versioning.

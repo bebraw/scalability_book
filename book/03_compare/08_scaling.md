@@ -67,7 +67,7 @@ Naming the saturated resource prevents "add more servers" from becoming the defa
 Saturation can create reinforcing [feedback loops](/concepts/#feedback-loop): overload causes timeouts, timeouts cause retries, and retries add load.
 Synchronous fan-out can overload an internal service, and blocked threads can make a CPU-based autoscaler misread demand.
 A resource leak may separate the causal change from the eventual failure by hours or months.
-These dynamics explain why a locally sensible mechanism can worsen a system-wide incident and why the pressure map must identify both the first limit and what happens after it is reached :citep[hochstein2026saturation].
+These dynamics explain why a locally sensible mechanism can worsen a system-wide incident and why the existing pressure record should identify both the first limit and what happens after it is reached :citep[hochstein2026saturation].
 
 ### Saturation boundary lab
 
@@ -288,11 +288,13 @@ The goal is to balance work that prevents known failures with work that improves
 
 ## Project artifact
 
-Produce three connected deliverables:
+Connect these three elements in the existing Compare evidence index:
 
-1. **Three-way comparison.** Apply the same pressure set to implementations A, B, and C.
-   Mark each result as observed in running code or proposed.
-2. **Implemented response.** Preserve the before-and-after revisions, unchanged workload and acceptance checks, observed result, new failure or recovery obligation, and conclusion.
+1. **Three-way comparison.** Compare the shared primary pressure across implementations A, B, and C using the same workload and procedure where practical.
+   Link the measured results and B's bounded correctness or recovery case from the existing pressure record.
+   Further scenarios are optional; distinguish their measurements and projections from the required evidence, and make missing measurements explicit.
+2. **Implemented response.** In one selected implementation, preserve the before-and-after revisions, unchanged workload and acceptance checks, measured result, new failure or recovery obligation, and conclusion.
+   A proposed improvement does not replace this experiment; an unsuccessful measured response remains useful evidence.
 3. **Target design.** Justify the selected responses and explain why simpler alternatives are insufficient.
 
 Across the package:

@@ -203,7 +203,7 @@ Before committing a decision, the request path must authenticate and authorize t
 Malformed deserialization, mutation, or unsafe casts can bypass the representation, while concurrency and retries can violate surrounding invariants even when each individual value is valid.
 
 **Selected-invariant check.**
-In the existing `specs/{feature}/spec.md`, show one broad record or result and one contradictory value it permits.
+In the specification or acceptance material you maintain, show one broad record or result and one contradictory value it permits.
 Replace it with a stack-native tagged union, sealed hierarchy, or guarded constructor.
 Where the stack supports checked variants, add a compile-fail type fixture; add a runtime test for any parser or guarded constructor at a data boundary, and reuse an existing supported-behavior test.
 Record one important invariant that remains enforced elsewhere, such as authorization or atomic concurrent transition.

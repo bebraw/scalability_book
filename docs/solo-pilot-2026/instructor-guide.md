@@ -9,14 +9,14 @@ Use the [study agreement](study-agreement.md) for the calendar and commitments.
 
 | Instructor work                                                                   |   Allowance |
 | --------------------------------------------------------------------------------- | ----------: |
-| Agreement, activity review, kickoff, environment checks and reference preparation |       4–6 h |
+| Agreement, activity review, kickoff, environment checks and reference assignments |       4–6 h |
 | Three human audits, discussions and phase assessments                             |      9–12 h |
 | Asynchronous support                                                              |       2–3 h |
 | Final grade reconciliation, registration and pilot conclusions                    |       1–2 h |
 | **Total**                                                                         | **16–23 h** |
 
-Building the dedicated reference implementation and audit packages is agreed, following the [specification scope review](../project-specification-scope-review-2026-10-22.md).
-This work, the optional benchmark runner, supplied matched-trace package and any model infrastructure setup are preparation beyond the allowance above.
+The dedicated reference implementation, frozen audit packages, optional benchmark runner and supplied matched-trace package are prepared following the [specification scope review](../project-specification-scope-review-2026-10-22.md).
+This preparation and any model infrastructure setup are outside the allowance above; remaining student access, private release and run-specific setup still need scheduling.
 The reference and runner are now locally validated; the [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records their evidence and remaining release work.
 The [department model baseline and matched pair](../course-tooling.md#department-model-configuration) are now verified for the bounded label task; student access, phase assignments and private evidence release remain to be arranged.
 Do not count automated development elapsed time as measured instructor effort.
@@ -52,7 +52,7 @@ Confirm the audit windows before fixing the dates with the student.
 - [ ] Review and release the curated matched-trace packet through the private student channel.
 - [ ] Confirm the student's department credentials and allocation, then use the [published model access and tool preflight](../../labs/README.md#department-model-baseline) with the student's actual coding harness.
 - [x] Implement and validate the optional course runner, document its protocol and result format, and explain equivalent compliance for a student-built runner.
-- [ ] Publish the reviewed runner download with the site and verify the deployed archive before directing the student to it.
+- [x] Publish the runner download with the site: the deployed archive returned HTTP 200 and passed integrity and expected-content checks on 27 October 2026.
 - [ ] Confirm 6–8 student orientation hours before kickoff, approximately 20–21 hours per week afterward and 22–25 hours per week during the final phase.
 - [ ] Select a kickoff time during 2–4 November and confirm the proposed 16 November, 30 November and 15 December reviews.
 - [ ] Agree the study agreement, independent activities, solo assessment equivalents and correction policy; retain the agreed copy privately.
