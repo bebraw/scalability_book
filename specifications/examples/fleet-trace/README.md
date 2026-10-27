@@ -1,7 +1,11 @@
 # Portable Fleet Trace Example
 
-This fixture shows the minimum portable shape expected by the Compare project.
-It is a transformation target, not a universal export format for agent tools and not a required database schema for implementation C.
+This fixture supports Compare's [optional trace-import extension](https://scalableweb.dev/project/compare/#optional-import-the-trace-into-c).
+It illustrates a portable transformation target; another documented portable format is acceptable.
+It does not prescribe implementation C's internal storage schema.
+
+The [required actual-run analysis](https://scalableweb.dev/project/compare/#analyze-the-actual-fleet-run) accepts a compact redacted log or table with at least two supported debugging findings.
+Machine-readable normalization, trace import and application-based views are not required for full credit.
 
 The example contains one accepted fleet run, two agents, one human integration owner, and three dependent tasks.
 Its events include delegation, start, handoff, failure, retry, validation, review, human intervention, and completion.

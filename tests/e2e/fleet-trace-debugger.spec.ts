@@ -16,7 +16,8 @@ test.describe("fleet trace debugger", () => {
 
   test("joins retries and fallback once and rolls up the fixed cohort", async ({
     page,
-  }) => {
+    context,
+  }, testInfo) => {
     const lab = page.locator("[data-fleet-trace]");
     const reconcile = lab.locator("[data-fleet-trace-reconcile]");
 
@@ -62,6 +63,28 @@ test.describe("fleet trace debugger", () => {
     );
     await expect(lab.locator("[data-fleet-trace-artifact]")).toHaveValue(
       /Cost per accepted run: 0.44 EUR \+ 1 unpriced resource row/,
+    );
+
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await lab
+      .getByText("Export the reconciliation record", { exact: true })
+      .click();
+    await lab.locator("[data-fleet-trace-copy]").click();
+    await expect(lab.locator("[data-fleet-trace-copy]")).toHaveText("Copied");
+    const copiedRecord = await page.evaluate(() =>
+      navigator.clipboard.readText(),
+    );
+    await testInfo.attach("copied-fleet-trace-record", {
+      body: copiedRecord,
+      contentType: "text/plain",
+    });
+    expect(copiedRecord).toBe(
+      await lab.locator("[data-fleet-trace-artifact]").inputValue(),
+    );
+    expect(copiedRecord).toMatch(/fixed synthetic teaching packet/i);
+    expect(copiedRecord).toMatch(/no models or tools execute/i);
+    expect(copiedRecord).toContain(
+      "https://scalableweb.dev/appendices/agent-system-security/#fleet-trace-debugger",
     );
   });
 

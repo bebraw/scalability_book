@@ -70,10 +70,11 @@ Before and after the response, keep stable:
 
 - acceptance behavior;
 - workload and dataset;
-- environment and revision identity;
+- environment;
 - warm-up and repetition rules;
-- collected distributions, errors, and resource signals.
+- measurement definitions for distributions, errors, and resource signals.
 
+Record the baseline and changed revision separately, linking each to its measurements.
 Report all repetitions and negative results.
 A response that does not help is still useful evidence.
 

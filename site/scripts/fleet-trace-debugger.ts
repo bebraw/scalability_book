@@ -601,6 +601,8 @@ function buildFleetTraceArtifact(
 
   return [
     "Fleet trace reconciliation — FLT-17A",
+    "Fixed synthetic teaching packet. All logs and costs are synthetic; no models or tools execute in this demo.",
+    "Source: https://scalableweb.dev/appendices/agent-system-security/#fleet-trace-debugger",
     "",
     "Evidence window: 09:14:00–09:18:00",
     "Gateway export: complete for the evidence window",
