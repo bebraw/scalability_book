@@ -22,7 +22,11 @@ const controls = (root: HTMLElement) =>
       !control.hasAttribute("data-learning-capture") &&
       (control instanceof HTMLSelectElement ||
         control instanceof HTMLTextAreaElement ||
-        (control instanceof HTMLButtonElement && control.type === "button") ||
+        (control instanceof HTMLButtonElement &&
+          (control.type === "button" ||
+            (control.type === "submit" &&
+              control.form !== null &&
+              root.contains(control.form)))) ||
         (control instanceof HTMLInputElement &&
           ["range", "number", "text", "checkbox", "radio"].includes(
             control.type,
@@ -50,7 +54,9 @@ function descriptor(control: Control) {
         ? "select"
         : control instanceof HTMLTextAreaElement
           ? "text"
-          : control.type,
+          : control instanceof HTMLButtonElement
+            ? "button"
+            : control.type,
   };
   if (
     control instanceof HTMLInputElement &&

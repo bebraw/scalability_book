@@ -402,6 +402,9 @@ Each observed demo declares its source, assumptions, activity prompts, actual en
 Control IDs identify DOM elements for that browser lifetime; callers observe again when availability changes.
 Changes accept a declared option, boolean, bounded/stepped number, text up to 1,024 characters, or a button click with a null value.
 They accept no arbitrary selector, script, remote URL or machine command.
+Submit buttons whose form belongs to the current demo are declared as button actions; the native click preserves form validation and the demo's existing submit handler.
+Hidden or disabled controls remain unavailable, including run buttons waiting for a prediction.
+An action can start asynchronous work; observe again to read its progress and completed result.
 Observations cover DOM values/text, not inferred canvas pixels or production measurements.
 
 Agent requests bind to the initiating connection session and browser, expire after two minutes and report unavailable/declined actions honestly.
