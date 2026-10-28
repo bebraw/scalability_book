@@ -106,7 +106,8 @@ No accepted decisions await implementation.
 | [ADR-055](implemented/ADR-055-consolidate-local-practice-and-retire-low-value-demo-interactions.md) | Share one local-practice setup, retire twelve widgets and retain sixteen focused demonstrations.                                                            |
 | [ADR-056](implemented/ADR-056-align-browser-support-with-site-requirements.md)                      | Align explicit browser floors, all site JavaScript targets and eager/lazy bundle checks with current platform requirements.                                 |
 | [ADR-057](implemented/ADR-057-present-concepts-through-topic-regions-and-semantic-zoom.md)          | Lay out concept regions and routes at build time, color independent editorial roles and reveal detail through semantic zoom.                                |
-| [ADR-058](implemented/ADR-058-pack-topic-regions-and-route-connections-separately.md)               | Keep four subject-based concept regions, pack them for readable scale and reroute authored connections with build-only libavoid.                            |
+| [ADR-058](implemented/ADR-058-pack-topic-regions-and-route-connections-separately.md)               | Placement superseded by ADR-059; retain four subject-based regions and build-only libavoid routing.                                                         |
+| [ADR-059](implemented/ADR-059-organize-concepts-in-aligned-subcategory-rows.md)                     | Align equal topic regions, organize concepts into editorial subcategory rows and expose readable overview/filter navigation.                                |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

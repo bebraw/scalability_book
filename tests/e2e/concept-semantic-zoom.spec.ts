@@ -9,6 +9,28 @@ test("the fitted overview expands into stable, color-coded concepts", async ({
   const graphic = map.locator(".concept-map-graphic");
   await expect(graphic).toHaveAttribute("data-detail", "overview");
   await expect(map.locator("[data-concept-cluster]:visible")).toHaveCount(4);
+  await expect(
+    map.locator("[data-concept-subgroup-target]:visible"),
+  ).toHaveCount(13);
+  const subgroupLabels = await map
+    .locator(".concept-subgroup-title")
+    .evaluateAll((labels) =>
+      labels.map((label) => {
+        const rect = label.getBoundingClientRect();
+        const band = label
+          .closest("[data-concept-subgroup-target]")!
+          .querySelector("rect")!
+          .getBoundingClientRect();
+        return {
+          height: rect.height,
+          fits: rect.left >= band.left && rect.right <= band.right,
+        };
+      }),
+    );
+  for (const label of subgroupLabels) {
+    expect(label.height).toBeGreaterThanOrEqual(12);
+    expect(label.fits).toBe(true);
+  }
   await expect(map.locator(".concept-cluster-connection:visible")).toHaveCount(
     6,
   );

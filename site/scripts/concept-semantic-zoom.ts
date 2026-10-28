@@ -48,6 +48,7 @@ export class ConceptSemanticZoom {
   private factor = 1;
   private groupFocusScale = 0;
   private regions;
+  private subgroups;
   private detail;
   private status;
   private summaries: {
@@ -68,6 +69,39 @@ export class ConceptSemanticZoom {
       element,
       bounds: JSON.parse(element.dataset.bounds!) as Region,
     }));
+    this.subgroups = [
+      ...svg.querySelectorAll<SVGGElement>("[data-concept-subgroup-target]"),
+    ].map((element) => ({
+      element,
+      bounds: JSON.parse(element.dataset.bounds!) as Pick<
+        Region,
+        "x" | "y" | "width" | "height"
+      >,
+    }));
+    for (const { element } of this.subgroups) {
+      element.setAttribute("role", "button");
+      element.setAttribute("tabindex", "0");
+      const title = element.querySelector(
+        ".concept-subgroup-title",
+      )!.textContent;
+      element.setAttribute(
+        "aria-label",
+        `Explore ${title}, ${element.dataset.count} concepts`,
+      );
+      const activate = () =>
+        map.dispatchEvent(
+          new CustomEvent("concept-subgroup-select", {
+            detail: { id: element.dataset.conceptSubgroupTarget },
+          }),
+        );
+      element.addEventListener("click", activate);
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          activate();
+        }
+      });
+    }
     this.detail = map.querySelector<HTMLSelectElement>(
       "[data-concept-detail]",
     )!;
@@ -99,6 +133,9 @@ export class ConceptSemanticZoom {
             "[data-concept-group]",
           )!;
           select.value = bounds.group;
+          map.querySelector<HTMLSelectElement>(
+            "[data-concept-subgroup]",
+          )!.value = "";
           map.querySelector<HTMLInputElement>(
             '[data-concept-group-mode][value="only"]',
           )!.checked = true;
@@ -229,10 +266,18 @@ export class ConceptSemanticZoom {
             ? "concepts"
             : "relationships";
     this.graphic.dataset.detail = detail;
+    const compactOverview =
+      detail === "overview" &&
+      this.subgroups.some(
+        ({ bounds }) => bounds.width * this.factor * scale < 230,
+      );
+    this.graphic.dataset.compactOverview = String(compactOverview);
     this.status.textContent = !this.enabled
       ? ""
       : detail === "overview"
-        ? "Overview · Numbers count connections between topic groups. Select a group or zoom in to explore its concepts."
+        ? compactOverview
+          ? "Choose a main topic to explore its subcategories and concepts. Lines count connections between topics."
+          : "Choose a subcategory to explore its concepts. Lines count connections between the main topics."
         : detail === "concepts"
           ? "Concepts · Color and labels identify each idea’s role. Zoom closer or focus a concept to follow its connections."
           : "Connections · Hover or focus a concept to read its relationship labels.";
@@ -266,7 +311,7 @@ export class ConceptSemanticZoom {
       heading.querySelector<SVGTextElement>(
         ".concept-cluster-title",
       )!.style.fontSize =
-        `${(detail === "overview" ? Math.min(18, (pixelWidth - 2 * margin) / (bounds.group.length * 0.62)) : 18) * size}px`;
+        `${(detail === "overview" ? Math.min(22, (pixelWidth - 2 * margin) / (bounds.group.length * 0.58)) : 24) * size}px`;
       const count = heading.querySelector<SVGTextElement>(
         ".concept-cluster-count",
       )!;
@@ -274,7 +319,59 @@ export class ConceptSemanticZoom {
       count.setAttribute(
         "y",
         String(
-          (detail === "overview" ? Math.min(19, pixelHeight * 0.3) : 19) * size,
+          (detail === "overview" && pixelWidth >= 260
+            ? 0
+            : detail === "overview"
+              ? Math.min(19, pixelHeight * 0.3)
+              : 19) * size,
+        ),
+      );
+      count.setAttribute(
+        "x",
+        String(
+          detail === "overview" && pixelWidth >= 260
+            ? bounds.width * this.factor - 2 * margin * size
+            : 0,
+        ),
+      );
+      count.setAttribute(
+        "text-anchor",
+        detail === "overview" && pixelWidth >= 260 ? "end" : "start",
+      );
+    }
+    for (const { element, bounds } of this.subgroups) {
+      const compact =
+        detail === "overview" && bounds.width * this.factor * scale < 230;
+      const shown = this.enabled && !compact;
+      element.classList.toggle("is-hidden", !shown);
+      element.setAttribute("tabindex", shown ? "0" : "-1");
+      element.setAttribute("aria-hidden", String(!shown));
+      element.setAttribute(
+        "transform",
+        `translate(${bounds.x * this.factor} ${bounds.y * this.factor})`,
+      );
+      const surface = element.querySelector("rect")!;
+      surface.setAttribute("width", String(bounds.width * this.factor));
+      surface.setAttribute("height", String(bounds.height * this.factor));
+      const heading = element.querySelector<SVGGElement>(
+        "[data-concept-subgroup-heading]",
+      )!;
+      const size = detail === "overview" ? 1 / scale : 1;
+      heading.setAttribute(
+        "transform",
+        `translate(${detail === "overview" ? 6 * size : 0} ${(detail === "overview" ? 13 : 18) * size})`,
+      );
+      heading.querySelector<SVGTextElement>(
+        ".concept-subgroup-title",
+      )!.style.fontSize = `${(detail === "overview" ? 13 : 18) * size}px`;
+      const count = heading.querySelector<SVGTextElement>(
+        ".concept-subgroup-count",
+      )!;
+      count.style.fontSize = `${(detail === "overview" ? 11 : 14) * size}px`;
+      count.setAttribute(
+        "x",
+        String(
+          bounds.width * this.factor - (detail === "overview" ? 12 * size : 0),
         ),
       );
     }

@@ -23,6 +23,7 @@ import { layoutOverview } from "./concept-layout.ts";
 import {
   conceptRoleById,
   conceptRoles,
+  conceptSubgroups,
 } from "../../shared/concept-presentation.ts";
 
 const overview = await layoutOverview(
@@ -208,6 +209,19 @@ export function renderConceptGraph(
         )
         .join("")
     : "";
+  const subgroups = complete
+    ? overview.subgroups
+        .map((subgroup) => {
+          const bounds = {
+            x: subgroup.x,
+            y: subgroup.y,
+            width: subgroup.width,
+            height: subgroup.height,
+          };
+          return `<g class="concept-subgroup" data-concept-subgroup-target="${subgroup.id}" data-bounds='${JSON.stringify(bounds)}' data-count="${subgroup.conceptIds.length}" transform="translate(${subgroup.x * factor} ${subgroup.y * factor})"><rect class="concept-subgroup-surface" width="${subgroup.width * factor}" height="${subgroup.height * factor}" rx="8"/><g data-concept-subgroup-heading="" transform="translate(0 18)"><text class="concept-subgroup-title">${escapeHtml(subgroup.title)}</text><text class="concept-subgroup-count" x="${subgroup.width * factor}" text-anchor="end">${subgroup.conceptIds.length}</text></g></g>`;
+        })
+        .join("")
+    : "";
   const edges = relations
     .map((relation, index) => {
       const a = points.get(relation.source)!,
@@ -257,7 +271,7 @@ export function renderConceptGraph(
     ${complete ? `<label for="${prefix}-reading">Reading<select id="${prefix}-reading" data-concept-reading><option value="">Whole book</option>${conceptPages.map((page) => `<option value="${page.url}" data-ids="${page.concepts.join(" ")}" data-prompt="${escapeAttribute(page.prompt || "")}">${escapeHtml(page.title)}</option>`).join("")}</select></label>` : ""}
     ${!focus ? `<label for="${prefix}-focus">Focus on<select id="${prefix}-focus" data-concept-focus><option value="">${complete ? "All concepts" : "All connections"}</option>${items.map((concept) => `<option value="${concept.id}">${escapeHtml(concept.title)}</option>`).join("")}</select></label>` : ""}
     ${complete ? `<div class="concept-map-actions"><button type="button" data-concept-reset>Reset view</button></div>` : ""}
-    ${complete ? `<div class="concept-map-group-controls"><label for="${prefix}-group">Topic group<select id="${prefix}-group" data-concept-group><option value="">All groups</option>${conceptGroups.map((group) => `<option>${group}</option>`).join("")}</select></label><fieldset class="concept-group-view" data-concept-group-controls disabled aria-describedby="${prefix}-group-help"><legend>Group view</legend><div><label><input type="radio" name="${prefix}-group-view" value="highlight" data-concept-group-mode checked><span>Highlight</span></label><label><input type="radio" name="${prefix}-group-view" value="only" data-concept-group-mode><span>Show only</span></label></div></fieldset><p class="concept-group-help" id="${prefix}-group-help" data-concept-group-help>Choose a group to highlight its members in context.</p></div>` : ""}
+    ${complete ? `<div class="concept-map-group-controls"><label for="${prefix}-group">Topic group<select id="${prefix}-group" data-concept-group><option value="">All groups</option>${conceptGroups.map((group) => `<option>${group}</option>`).join("")}</select></label><label for="${prefix}-subgroup" data-concept-subgroup-control hidden>Subcategory<select id="${prefix}-subgroup" data-concept-subgroup><option value="">All subcategories</option>${conceptSubgroups.map((subgroup) => `<option value="${subgroup.id}" data-group="${subgroup.group}" data-ids="${subgroup.conceptIds.join(" ")}">${escapeHtml(subgroup.title)}</option>`).join("")}</select></label><fieldset class="concept-group-view" data-concept-group-controls disabled aria-describedby="${prefix}-group-help"><legend>Group view</legend><div><label><input type="radio" name="${prefix}-group-view" value="highlight" data-concept-group-mode checked><span>Highlight</span></label><label><input type="radio" name="${prefix}-group-view" value="only" data-concept-group-mode><span>Show only</span></label></div></fieldset><p class="concept-group-help" id="${prefix}-group-help" data-concept-group-help>Choose a group to highlight its members in context.</p></div>` : ""}
     <label class="concept-map-label-toggle"><input type="checkbox" data-concept-labels${complete ? "" : " checked"}>Show connection labels</label>
   </div>
   ${complete ? "</details>" : ""}
@@ -278,7 +292,7 @@ export function renderConceptGraph(
       : ""
   }
   ${complete ? `<div class="concept-map-canvas"><div class="concept-map-navigation" role="group" aria-label="Graph navigation" data-concept-navigation hidden><span data-concept-zoom-level>100%</span><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button><button type="button" data-concept-zoom="readable" aria-label="Use readable graph size">Readable</button></div>` : ""}
-  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Interactive concept graph" aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${edges}${captions}${nodes}</svg></div>
+  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Interactive concept graph" aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
   ${complete ? `</div><p class="concept-map-help" id="${prefix}-help">Drag anywhere or scroll to move the map. Ctrl/⌘ + scroll or pinch to zoom. Fit shows the whole map; Readable restores the text size. With the map focused, arrow keys move it, +/− zoom, and 0 fits. Every topic and connection is also available as text below.</p>` : ""}
   <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels. A selected topic keeps its labels visible; press Escape in the map to clear them." : ""}</p>
   ${!complete ? `<p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>` : ""}

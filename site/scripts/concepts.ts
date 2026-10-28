@@ -56,6 +56,12 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       "[data-concept-reading]",
     );
     const group = map.querySelector<HTMLSelectElement>("[data-concept-group]");
+    const subgroup = map.querySelector<HTMLSelectElement>(
+      "[data-concept-subgroup]",
+    );
+    const subgroupControl = map.querySelector<HTMLElement>(
+      "[data-concept-subgroup-control]",
+    );
     const groupModes = [
       ...map.querySelectorAll<HTMLInputElement>("[data-concept-group-mode]"),
     ];
@@ -258,6 +264,9 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         ? reading.selectedOptions[0]!.textContent!
         : "";
       const focusedTitle = select?.selectedOptions[0]?.textContent || "";
+      const subgroupTitle = subgroup?.value
+        ? subgroup.selectedOptions[0]!.textContent
+        : "";
       context.hidden = !(
         query ||
         readingTitle ||
@@ -273,7 +282,9 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
           ? `Results for “${query}”`
           : select?.value
             ? focusedTitle
-            : group?.value || "");
+            : subgroupTitle
+              ? `${group?.value} · ${subgroupTitle}`
+              : group?.value || "");
       const reflection = readingTitle
         ? reading!.selectedOptions[0]!.dataset.prompt
         : "";
@@ -299,7 +310,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         readingTitle ? "Concepts in this reading" : "Concepts and connections";
     }
     function clearFilters() {
-      for (const control of [select, search, reading, group])
+      for (const control of [select, search, reading, group, subgroup])
         if (control) control.value = "";
       groupViewport = null;
       isolatingGroup = false;
@@ -339,6 +350,26 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       const focus = select?.value || fixedFocus;
       const query = search?.value.trim().toLowerCase() || "";
       const groupName = group?.value || "";
+      if (subgroup) {
+        if (subgroup.selectedOptions[0]?.dataset.group !== groupName)
+          subgroup.value = "";
+        for (const option of subgroup.options) {
+          const unavailable = Boolean(
+            option.value && option.dataset.group !== groupName,
+          );
+          option.hidden = unavailable;
+          option.disabled = unavailable;
+        }
+        subgroup.disabled = !groupName;
+      }
+      if (subgroupControl) subgroupControl.hidden = !groupName;
+      const subgroupOption = subgroup?.value
+        ? subgroup.selectedOptions[0]!
+        : null;
+      const subgroupIds = subgroupOption
+        ? new Set(subgroupOption.dataset.ids!.split(" "))
+        : null;
+      const groupTitle = subgroupOption?.textContent || groupName;
       if (!groupName && groupModes[0]) groupModes[0].checked = true;
       const onlyGroup = Boolean(
         groupName && groupModes.find((mode) => mode.checked)?.value === "only",
@@ -366,7 +397,10 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         focused
           ? focused.has(node.dataset.conceptNode!)
           : (!readingIds || readingIds.has(node.dataset.conceptNode!)) &&
-            (!onlyGroup || groupName === node.dataset.group) &&
+            (!onlyGroup ||
+              (groupName === node.dataset.group &&
+                (!subgroupIds ||
+                  subgroupIds.has(node.dataset.conceptNode!)))) &&
             (!query || node.dataset.search!.includes(query)),
       );
       const visible = new Set(
@@ -375,7 +409,11 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       if (!visible.has(selectedNode)) selectedNode = "";
       const members = new Set(
         visibleNodes
-          .filter((node) => node.dataset.group === groupName)
+          .filter(
+            (node) =>
+              node.dataset.group === groupName &&
+              (!subgroupIds || subgroupIds.has(node.dataset.conceptNode!)),
+          )
           .map((node) => node.dataset.conceptNode!),
       );
       overviewVisible =
@@ -566,16 +604,16 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         groupHelp.textContent = !groupName
           ? "Choose a group to highlight its members in context."
           : onlyGroup
-            ? `Showing ${members.size} ${groupName} concepts. Connections to other groups are hidden.`
+            ? `Showing ${members.size} ${groupTitle} concepts. Connections ${subgroupOption ? "outside this subcategory" : "to other groups"} are hidden.`
             : members.size
-              ? `${members.size} ${groupName} concepts highlighted. ${presentation === "list" ? "Marked cards are group members; other concepts remain available." : "Filled nodes are members; dashed lines connect to other groups."}`
-              : `No ${groupName} concepts in this view. Clear the search or choose another reading to find members.`;
+              ? `${members.size} ${groupTitle} concepts highlighted. ${presentation === "list" ? "Marked cards are group members; other concepts remain available." : `Filled nodes are members; dashed lines connect ${subgroupOption ? "to other concepts" : "to other groups"}.`}`
+              : `No ${groupTitle} concepts in this view. Clear the search or choose another reading to find members.`;
       status.textContent =
         visible.size === 0
           ? "No topics match. Clear the search or reset the view."
           : focus
             ? `${nodes.find((node) => node.dataset.conceptNode === focus)!.dataset.title} · ${count} connections`
-            : `${visible.size} concepts · ${count} connections${groupName ? ` · ${onlyGroup ? `${groupName} only` : `${members.size} ${groupName} highlighted`}` : ""}${reading?.value ? ` · ${reading.selectedOptions[0]!.textContent}` : ""}`;
+            : `${visible.size} concepts · ${count} connections${groupName ? ` · ${onlyGroup ? `${groupTitle} only` : `${members.size} ${groupTitle} highlighted`}` : ""}${reading?.value ? ` · ${reading.selectedOptions[0]!.textContent}` : ""}`;
       if (complete && restoreGroupViewport) {
         viewport!.restore(restoreGroupViewport);
         groupViewport = null;
@@ -604,6 +642,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
           ["q", query],
           ["reading", reading?.value],
           ["theme", group?.value],
+          ["subtopic", subgroup?.value],
           ["group-view", groupName ? (onlyGroup ? "only" : "highlight") : ""],
         ] as const) {
           if (value) url.searchParams.set(key, value);
@@ -618,6 +657,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       [select, "topic"],
       [reading, "reading"],
       [group, "theme"],
+      [subgroup, "subtopic"],
     ] as const) {
       const value = params?.get(parameter);
       if (
@@ -627,7 +667,13 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       )
         control.value = value;
     }
-    if (params?.get("group-view") === "only" && groupModes[1])
+    if (subgroup?.value && group)
+      group.value = subgroup.selectedOptions[0]!.dataset.group!;
+    if (
+      (params?.get("group-view") === "only" ||
+        (subgroup?.value && params?.get("group-view") !== "highlight")) &&
+      groupModes[1]
+    )
       groupModes[1].checked = true;
     if (explorer) {
       const target = location.hash
@@ -716,6 +762,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         if (search) search.value = "";
         if (reading) reading.value = "";
         if (group) group.value = "";
+        if (subgroup) subgroup.value = "";
       }
       groupViewport = null;
       isolatingGroup = false;
@@ -739,6 +786,38 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       const wasFocused = Boolean(select?.value);
       if (select) select.value = "";
       update(!wasFocused && !isolatingGroup);
+    });
+    function selectSubgroup(id: string) {
+      if (!subgroup || !group) return;
+      const option = [...subgroup.options].find(
+        (candidate) => candidate.value === id,
+      );
+      if (!option) return;
+      subgroup.value = id;
+      if (id) {
+        group.value = option.dataset.group!;
+        const only = groupModes.find((mode) => mode.value === "only");
+        if (only) only.checked = true;
+        for (const control of [select, search, reading])
+          if (control) control.value = "";
+        selectedNode = "";
+        hoveredNode = "";
+        focusedNode = "";
+        // A previous concept fragment must not replace this selection when
+        // the shared URL is reopened in List view.
+        if (location.hash) {
+          const url = new URL(location.href);
+          url.hash = "";
+          history.replaceState(history.state, "", url);
+        }
+      }
+      if (explorer) explorer.open = true;
+      update();
+    }
+    subgroup?.addEventListener("change", () => selectSubgroup(subgroup.value));
+    map.addEventListener("concept-subgroup-select", (event) => {
+      const id = (event as CustomEvent<{ id: string }>).detail?.id;
+      if (typeof id === "string") selectSubgroup(id);
     });
     for (const mode of groupModes)
       mode.addEventListener("change", () => update());

@@ -1,8 +1,11 @@
 # ADR-058: Pack topic regions and route connections separately
 
-**Status:** Implemented
+**Status:** Superseded by ADR-059
 
 **Date:** 2026-10-27
+
+[ADR-059](ADR-059-organize-concepts-in-aligned-subcategory-rows.md) replaces the placement and packing decision with aligned topic regions and subcategory rows.
+The four topic memberships and build-only libavoid routing remain in effect.
 
 ## Context
 

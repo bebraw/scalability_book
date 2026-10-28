@@ -39,10 +39,10 @@ Its direct HTTP checks verify response behavior; isolated browser checks verify 
 These fixtures do not import production course state, share an application runtime with the Worker or expose a model execution service.
 
 Browser code lives in typed modules under `site/scripts/`; templates and styles live under `site/`.
-The concept graph's authored registries remain separate from [editorial presentation roles](shared/concept-presentation.ts).
-[The build-only layout adapter](scripts/lib/concept-layout.ts) uses ELK to place concepts within topic regions and pack those regions for fitted scale and shorter connections.
-[The routing adapter](scripts/lib/concept-routing.ts) uses pinned libavoid WebAssembly only during the build to route authored connections around concept boxes and region headings, preserving proposition endpoints and direction.
-[The camera](site/scripts/concept-viewport.ts) owns pan/zoom state; [semantic zoom](site/scripts/concept-semantic-zoom.ts) owns counted group summaries and detail presentation, while [concepts.ts](site/scripts/concepts.ts) retains filters, reading navigation and reference panes.
+The concept graph's authored registries remain separate from [editorial subcategories and presentation roles](shared/concept-presentation.ts).
+[The build-only layout adapter](scripts/lib/concept-layout.ts) places equally sized topic regions in an aligned grid, with regular concept rows inside named subcategories and dimensions derived from their membership.
+[The routing adapter](scripts/lib/concept-routing.ts) uses pinned libavoid WebAssembly only during the build to route authored connections around concept boxes and topic/subcategory headings, preserving proposition endpoints and direction.
+[The camera](site/scripts/concept-viewport.ts) owns pan/zoom state; [semantic zoom](site/scripts/concept-semantic-zoom.ts) owns counted group summaries, subcategory entry and detail presentation, while [concepts.ts](site/scripts/concepts.ts) retains filters, shareable subcategory selection, reading navigation and reference panes.
 These presentation owners do not change the public graph schema or require a browser layout engine.
 [The explicit browser floors](package.json) drive every site-owned JavaScript transform through [browser-targets.ts](scripts/lib/browser-targets.ts), including lazy vendor bundles.
 CSS is inlined without compatibility transformation; the browser baseline covers its required features as well as JavaScript and DOM APIs.

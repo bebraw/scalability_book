@@ -50,6 +50,9 @@ test("the Coding agent card and agent guide retain distinct accessible names wit
 test("expanded and fitted graphs pan in both directions, including from a concept", async ({
   page,
 }) => {
+  // Smooth focus scrolling can move the graphic between pointerdown and
+  // pointermove. Keep the surface stationary for these exact drag distances.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 2560, height: 1440 });
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");

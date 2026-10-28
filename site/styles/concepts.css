@@ -966,7 +966,8 @@
   overscroll-behavior: contain;
 }
 .concept-map-canvas {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   margin-top: 1rem;
 }
 .concept-map-canvas > .concept-map-graphic,
@@ -978,17 +979,16 @@
 }
 .concept-map-navigation {
   align-items: center;
-  align-self: start;
+  align-self: end;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 0.35rem;
   display: flex;
   gap: 0.25rem;
   justify-self: end;
-  margin: 0.5rem;
+  margin: 0 0 0.65rem;
   padding: 0.25rem;
-  position: sticky;
-  top: 5rem;
+  position: static;
   z-index: 2;
 }
 .concept-map-navigation span {
@@ -1204,7 +1204,7 @@
 }
 .concept-map-graphic .concept-cluster-title {
   fill: var(--text);
-  font: 600 22px var(--font-ui);
+  font: 500 24px var(--font-serif);
 }
 .concept-map-graphic .concept-cluster-count {
   fill: var(--muted);
@@ -1222,6 +1222,42 @@
   outline: none;
 }
 .concept-map-graphic .concept-cluster-connection {
+  display: none;
+}
+.concept-map-graphic .concept-subgroup-surface {
+  fill: transparent;
+  stroke: none;
+}
+.concept-map-graphic .concept-subgroup-title {
+  fill: var(--text);
+  font: 600 18px var(--font-ui);
+}
+.concept-map-graphic .concept-subgroup-count {
+  display: none;
+  fill: var(--muted);
+  font: 400 14px var(--font-ui);
+}
+.concept-map-graphic .concept-subgroup[role="button"] {
+  cursor: pointer;
+}
+.concept-map-graphic .concept-subgroup:hover .concept-subgroup-title,
+.concept-map-graphic .concept-subgroup:focus-visible .concept-subgroup-title {
+  fill: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.concept-map-graphic .concept-subgroup:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 6px;
+}
+.concept-map-graphic[data-detail="overview"] .concept-subgroup-surface {
+  fill: var(--bg);
+  fill-opacity: 0.35;
+}
+.concept-map-graphic[data-detail="overview"] .concept-subgroup-count {
+  display: block;
+}
+.concept-map-controls [data-concept-subgroup-control][hidden] {
   display: none;
 }
 .concept-map-graphic [data-concept-summary-line] {
@@ -1248,6 +1284,9 @@
 }
 .concept-map-graphic[data-detail="overview"] .concept-node-dot {
   display: block;
+}
+.concept-map-graphic[data-compact-overview="true"] .concept-node-dot {
+  display: none;
 }
 .is-highlighting-group
   .concept-map-graphic[data-detail="overview"]

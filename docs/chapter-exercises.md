@@ -147,11 +147,12 @@ The complete graph supports topic search, reading and theme filters, neighborhoo
 Every connection has a short authored label alongside its explanation.
 “Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and affects only the graph where it is toggled.
 Labeled views make additional room for captions without covering concept nodes.
-Its view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `group-view`, and `view=all`.
+Its view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, `group-view`, and `view=all`.
 A deterministic layout is generated from the registry by `scripts/lib/concept-layout.ts`.
-ELK places concepts inside each topic independently, then packs topic rectangles with a preference for readable fitted scale and shorter cross-topic connections.
-The four-region map compares all 24 topic orders; the search remains bounded if the taxonomy grows.
-`scripts/lib/concept-routing.ts` uses pinned libavoid at build time to choose side attachment points and route orthogonal connections around unrelated concept boxes and region headings.
+Equally sized topic regions form an aligned two-column grid: Architecture and Development above Operations and Evidence.
+Named subcategories form rows inside each region; regular concept positions and region dimensions are derived from their membership.
+This editorial order favors a predictable reading structure over choosing the shortest connection arrangement on each build.
+`scripts/lib/concept-routing.ts` uses pinned libavoid at build time to choose side attachment points and route orthogonal connections around unrelated concept boxes and topic/subcategory headings.
 Returned routes and arrows retain the original authored endpoints and proposition direction; geometric placement implies no global sequence.
 No per-concept coordinates need maintenance, and no layout engine is downloaded by the reader.
 
@@ -164,11 +165,29 @@ These memberships produce 64 within-topic and 45 cross-topic connections for the
 Color, a text legend, and short role labels identify these roles; they are independent of topic membership and do not establish a prerequisite or abstraction hierarchy.
 Presentation roles do not change the public graph schema, concept identities, or authored relationships.
 
+The same presentation registry assigns each concept one subcategory within its existing main topic:
+
+| Main topic   | Subcategories                                                                   |
+| ------------ | ------------------------------------------------------------------------------- |
+| Architecture | Behavior & correctness; State & coordination; Delivery & trade-offs             |
+| Development  | Change & decisions; Project foundations; Agent feedback; Parallel work & review |
+| Operations   | Pressure & capacity; Flow control; Failure & recovery                           |
+| Evidence     | Measurement & flow; Evaluation & proxies; Reliability                           |
+
+These are reading and navigation homes, not exclusive classifications or additional teaching relationships.
+Ideas such as Trade-off, Observability and Action authorization still connect beyond their assigned subcategory.
+Subcategories and editorial roles remain independent, and neither changes the public graph schema.
+
 The complete graph initially fits the available canvas.
-With “Adapt as I zoom”, the fitted overview shows topic regions, colored concept markers, and one counted connection per pair of groups.
-Counts summarize the actual cross-group relationships without asserting a single proposition or direction between whole groups.
+With “Adapt as I zoom”, the fitted overview shows aligned topic regions, readable subcategory names and concept counts where space permits, colored concept markers, and one counted connection per pair of groups.
+Compact overviews keep the main topic headings and counts; subcategory names and role markers appear when there is room to separate them clearly.
+Connection counts summarize the actual cross-group relationships without asserting a single proposition or direction between whole groups.
+The zoom toolbar sits above the drawing so it does not cover its labels.
 Zooming closer reveals concept cards and their roles, then emphasizes the full connection network; hovering or focusing a concept reveals its authored labels.
 Selecting a region zooms to it; when the region cannot expose readable cards on a compact canvas, the same action opens the existing group-only view.
+Selecting a subcategory opens its concepts in the filtered graph and list; the parent topic's Subcategory control provides the same selection on compact screens.
+This selection clears the current search, reading and concept focus, sets its parent topic and Show only mode, and can be shared through `subtopic`.
+Highlight can show the selected subcategory in context; clearing it returns to the parent topic, while Reset clears both.
 Keyboard focus on a concept reveals its readable card, and “All concepts” overrides automatic detail adaptation.
 Scoped reading, search, and focused views retain their complete concept cards and existing filtering behavior.
 Panning, zooming, expansion, and Graph/List switching preserve the camera; Fit, Reset, or a new filtered view deliberately reframes it.
@@ -182,15 +201,16 @@ The reference library is fetched once when needed on reading pages; failed fetch
 Modified clicks retain normal browser navigation.
 The reference page itself is complete static HTML and needs no library fetch.
 
-To add an idea, author its passages and teaching locations, add relationships with short labels and explanations, and assign relevant reading memberships.
+To add an idea, author its passages and teaching locations, add relationships with short labels and explanations, and assign relevant reading memberships, a presentation role and a subcategory within its main topic.
 Keep a separate concept only when it adds a distinct explanation or reasoning task: mean and tail latency share one Latency card, while the tail-latency simulator remains a separate practice activity.
 Resource associations describe what the current activity teaches, rather than every topic mentioned in its surrounding chapter.
 Concept teaching locations can link directly to local practice instructions, including HTTP caching and persisted retry, without treating a downloadable lab as a browser demo.
 Use ordinary Markdown links such as `[idempotency](/concepts/#idempotency)` at useful teaching occurrences, rather than automatically linking every mention.
 Build-time integration inserts the scoped index before the first second-level heading without changing source offsets used by paragraph feedback.
 Concept reference links are excluded from paragraph identity hashes so adding these reading aids preserves existing feedback targets.
-The registry tests check published-page coverage, relationship integrity, role coverage, topic decomposition, separate regions, fitted scale and canvas occupancy, routed endpoint identity, obstacle avoidance, crossing reduction, and caption spacing in overview, focused, and scoped layouts.
+The registry tests check published-page coverage, relationship integrity, role coverage, complete and unique subcategory membership, topic decomposition, separate regions, fitted scale and canvas occupancy, routed endpoint identity, obstacle avoidance, crossing reduction, and caption spacing in overview, focused, and scoped layouts.
 `tests/e2e/concept-semantic-zoom.spec.ts` covers fitted overview counts, stable positions across detail transitions, role labels, keyboard entry, explicit detail override, compact group entry, and theme accessibility in Chromium and WebKit.
+`tests/e2e/concept-subgroups.spec.ts` covers subcategory entry, exact filtered membership, Graph/List parity, shared URLs, parent changes and reset behavior.
 Browser checks verify every curated teaching anchor, agent resources and retrieval, search and navigation, local label toggles, contrast in all themes, mobile overflow, accessibility, keyboard dismissal, and the static fallback.
 
 The `measurement-transfer` and `scaling-model-choice` exercises reuse the existing checking and private-save system.

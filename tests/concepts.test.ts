@@ -208,6 +208,47 @@ test("clustered routing preserves all endpoints, avoids nodes and reduces crossi
     "The same registry produces the same static layout",
   );
   const byId = new Map(layout.points.map((point) => [point.id, point]));
+  // Equal columns and aligned rows reject the ragged packed rectangles that
+  // made the whole-book overview difficult to scan.
+  const region = new Map(
+    layout.clusters.map((cluster) => [cluster.group, cluster]),
+  );
+  assert.equal(
+    new Set(layout.clusters.map((cluster) => cluster.width)).size,
+    1,
+  );
+  assert.equal(
+    new Set(layout.clusters.map((cluster) => cluster.height)).size,
+    1,
+  );
+  assert.equal(region.get("Architecture")!.x, region.get("Operations")!.x);
+  assert.equal(region.get("Development")!.x, region.get("Evidence")!.x);
+  assert.equal(region.get("Architecture")!.y, region.get("Development")!.y);
+  assert.equal(region.get("Operations")!.y, region.get("Evidence")!.y);
+  for (const subgroup of layout.subgroups) {
+    const parent = region.get(subgroup.group)!;
+    assert.ok(
+      subgroup.x >= parent.x &&
+        subgroup.x + subgroup.width <= parent.x + parent.width,
+    );
+    assert.ok(
+      subgroup.y >= parent.y &&
+        subgroup.y + subgroup.height <= parent.y + parent.height,
+    );
+    for (const id of subgroup.conceptIds) {
+      const point = byId.get(id)!;
+      assert.ok(
+        point.x - 95 >= subgroup.x &&
+          point.x + 95 <= subgroup.x + subgroup.width,
+        id,
+      );
+      assert.ok(
+        point.y - 30 >= subgroup.y &&
+          point.y + 30 <= subgroup.y + subgroup.height,
+        id,
+      );
+    }
+  }
   const aspect = layout.width / layout.height;
   const occupied =
     layout.clusters.reduce(
@@ -220,12 +261,12 @@ test("clustered routing preserves all endpoints, avoids nodes and reduces crossi
     `Unbalanced overview aspect: ${aspect}`,
   );
   assert.ok(
-    occupied >= 0.58,
+    occupied >= 0.7,
     `Topic regions occupy only ${Math.round(occupied * 100)}% of the canvas`,
   );
   assert.ok(
-    Math.min(1086 / layout.width, 558 / layout.height) > 0.25,
-    "The reviewed desktop canvas should fit the map above 25% scale",
+    Math.min(1086 / layout.width, 558 / layout.height) > 0.3,
+    "The reviewed desktop canvas should fit the map above 30% scale",
   );
   assert.equal(layout.routes.length, conceptRelationships.length);
   for (const cluster of layout.clusters) {

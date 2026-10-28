@@ -5,10 +5,12 @@ let initialized: Promise<void> | undefined;
 
 // Build-only visibility-graph/A* routing. Nodes and region headings are
 // obstacles; equivalent side pins allow a choice of attachment positions.
+// Extra heading boxes reserve subgroup labels without blocking entire rows.
 export async function routeConcepts(
   points: GraphPoint[],
   edges: readonly GraphEdge[],
   regions: { x: number; y: number; width: number; height: number }[],
+  headings: { x: number; y: number; width: number; height: number }[] = [],
 ) {
   await (initialized ??= AvoidLib.load());
   const avoid = AvoidLib.getInstance();
@@ -39,6 +41,8 @@ export async function routeConcepts(
     };
     for (const region of regions)
       rectangle(region.x + 12, region.y + 12, region.width - 24, 60);
+    for (const heading of headings)
+      rectangle(heading.x, heading.y, heading.width, heading.height);
     const shapes = new Map(
       points.map((point) => {
         const shape = rectangle(point.x - 95, point.y - 30, 190, 60);
