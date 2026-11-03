@@ -3,6 +3,8 @@
 A private local notebook and optional Codex or local-model connection for [scalableweb.dev](https://scalableweb.dev).
 Use Node.js 24 or newer.
 Version 0.3.0 is prepared in the repository and has not yet been published.
+Notebook-only use needs no Codex installation or model account.
+Codex replies require the separate Codex CLI; the companion does not install or bundle it.
 
 ```sh
 npx @scalableweb/companion@0.3.0 setup --notebook
@@ -16,12 +18,16 @@ Starting the companion authorizes its configured website to create browser sessi
 Your notebook is stored in your per-user application data directory, independently of the current folder and npm's cache.
 Stop the companion with Ctrl+C before backing up or migrating its directory.
 
-For optional Codex access, install the verified Codex CLI 0.154.0 and use a dedicated profile:
+For optional Codex access, install the verified [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) 0.154.0 and ensure `codex --version` works in the same terminal as the companion.
+It should print `codex-cli 0.154.0`; if the command is missing, check the installation and your terminal's `PATH`.
+Stop any running companion, then install the CLI if needed and use a dedicated profile:
 
 ```sh
 npm install -g @openai/codex@0.154.0
+codex --version
 npx @scalableweb/companion@0.3.0 setup --codex
 npx @scalableweb/companion@0.3.0 login
+npx @scalableweb/companion@0.3.0 doctor
 npx @scalableweb/companion@0.3.0 start
 ```
 
@@ -41,6 +47,10 @@ A changed endpoint/model/tool mode requires a new conversation; context omission
 LM Studio is the first verified runner; Ollama, llama.cpp and Windows remain unverified.
 
 Run `doctor` for local checks, or `doctor --json` for a report you choose whether to share.
+The report identifies the selected mode and always checks Codex CLI availability; `doctor` uses the saved provider choice and otherwise selects notebook-only mode.
+A missing or unverified Codex CLI is informational in notebook-only and local-model modes, but fails the check when Codex is selected.
+Use `npx @scalableweb/companion@0.3.0 doctor --codex` to require the Codex CLI and check dedicated-profile sign-in before choosing that provider.
+Pass the same directory/profile options you intend to use; this diagnostic does not change the saved provider choice.
 Provider diagnostics, credentials, notes, conversations and connection tokens are excluded from that report.
 `--directory`, `--port`, repeated `--origin`, `--codex-home`, `--model` and the local options above allow explicit overrides.
 `start --notebook` uses your notes without starting a model.

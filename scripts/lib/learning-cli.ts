@@ -59,37 +59,37 @@ export async function checkLearningPort(port: number) {
     );
   }
 }
-function providerCheck(home: string): Check[] {
-  const env = learningCodexEnvironment(home);
+function codexVersionCheck(home: string): Check {
   const version = learningCodexVersion(home);
   const compatible = version === companionRelease.codexVersion;
-  const checks: Check[] = [
-    {
-      name: "Codex version",
-      ok: compatible,
-      message: compatible
-        ? `Verified CLI ${version}.`
-        : version
-          ? `CLI ${version} has not been verified with this release. Install @openai/codex@${companionRelease.codexVersion}.`
-          : `Codex is unavailable. Install @openai/codex@${companionRelease.codexVersion}, then run setup --codex.`,
-    },
-  ];
-  if (compatible) {
-    const auth = spawnSync(
-      "codex",
-      ["login", "status", "-c", 'cli_auth_credentials_store="file"'],
-      { env, stdio: "ignore", timeout: 8000 },
-    );
-    checks.push({
-      name: "Codex sign-in",
-      ok: auth.status === 0,
-      message:
-        auth.status === 0
-          ? "Dedicated profile reports signed in; account access is checked on the first reply."
-          : "Run login with this same directory/profile, then start again. Your ordinary Codex profile is unchanged.",
-    });
-  }
-  return checks;
+  return {
+    name: "Codex version",
+    ok: compatible,
+    message: compatible
+      ? `Verified CLI ${version}.`
+      : version
+        ? `CLI ${version} has not been verified with this release. Install with npm install -g @openai/codex@${companionRelease.codexVersion}, then check codex --version.`
+        : `Codex is unavailable on PATH or could not report its version. Install with npm install -g @openai/codex@${companionRelease.codexVersion}, then check codex --version.`,
+  };
+}
+function codexSignInCheck(home: string): Check {
+  const auth = spawnSync(
+    "codex",
+    ["login", "status", "-c", 'cli_auth_credentials_store="file"'],
+    { env: learningCodexEnvironment(home), stdio: "ignore", timeout: 8000 },
+  );
+  return {
+    name: "Codex sign-in",
+    ok: auth.status === 0,
+    message:
+      auth.status === 0
+        ? "Dedicated profile reports signed in; account access is checked on the first reply."
+        : "Run login with this same directory/profile, then start again. Your ordinary Codex profile is unchanged.",
+  };
+}
+function providerCheck(home: string): Check[] {
+  const version = codexVersionCheck(home);
+  return version.ok ? [version, codexSignInCheck(home)] : [version];
 }
 export async function runLearningCli(
   argv: string[],
@@ -385,9 +385,11 @@ export async function runLearningCli(
         });
       }
       if (codex) {
+        const version = codexVersionCheck(home);
+        checks.push(version);
         try {
           await validateLearningCodexProfile(home, false);
-          checks.push(...providerCheck(home));
+          if (version.ok) checks.push(codexSignInCheck(home));
         } catch (error) {
           checks.push({
             name: "Dedicated profile",
@@ -416,6 +418,8 @@ export async function runLearningCli(
           });
         }
       }
+      const optionalChecks =
+        command === "doctor" && !codex ? [codexVersionCheck(home)] : [];
       const report = {
         release: { ...companionRelease, sourceRevision },
         connection: { origins },
@@ -423,16 +427,21 @@ export async function runLearningCli(
         provider: codex ? "Codex" : local ? "Local model" : null,
         ...(localInfo ? { localModel: localInfo, toolMode: local!.tools } : {}),
         checks,
+        ...(optionalChecks.length ? { optionalChecks } : {}),
       };
       if (command === "doctor") {
         if (values.json) console.log(JSON.stringify(report, null, 2));
         else {
           console.log(
-            `Storage: ${directory}\nPackage ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook/archive schema 1\nAllowed websites: ${origins.join(", ")}`,
+            `Storage: ${directory}\nPackage ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook/archive schema 1\nMode: ${codex ? "Codex" : local ? "Local model" : "Notebook only"}\nAllowed websites: ${origins.join(", ")}`,
           );
           for (const check of checks)
             console.log(
               `${check.ok ? "OK" : "ACTION"} ${check.name}: ${check.message}`,
+            );
+          for (const check of optionalChecks)
+            console.log(
+              `${check.ok ? "OK (optional)" : "OPTIONAL"} ${check.name}: ${check.message} Codex CLI is needed only for Codex assistant replies. Run doctor --codex to check that mode; setup --codex selects it.`,
             );
           console.log(
             "If connecting fails: check the address and exact allowed website origin, and allow the browser's local-network request. Choose Connect companion again after a restart or expired session. A browser network error alone cannot identify its cause.",

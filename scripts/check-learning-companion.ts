@@ -94,11 +94,12 @@ try {
   mkdirSync(a);
   mkdirSync(b);
   const args = ["--port", "18894", "--origin", "https://book.test"];
-  const run = (command: string, extra: string[] = []) =>
+  const withoutCodex = { ...env, PATH: a };
+  const run = (command: string, extra: string[] = [], commandEnv = env) =>
     execFileSync(process.execPath, [bin, command, ...args, ...extra], {
       cwd: a,
       encoding: "utf8",
-      env,
+      env: commandEnv,
     });
   const release = JSON.parse(
     readFileSync(path.join(pkg, "dist/release.json"), "utf8"),
@@ -107,8 +108,23 @@ try {
     run("--version").trim(),
     `${companionRelease.name} ${companionRelease.version} (${release.sourceRevision}${release.dirty ? "+working-tree" : ""})`,
   );
-  run("setup", ["--notebook"]);
-  const diagnostic = JSON.parse(run("doctor", ["--json"]));
+  const freshDiagnostic = JSON.parse(run("doctor", ["--json"], withoutCodex));
+  assert.equal(freshDiagnostic.provider, null);
+  assert.ok(
+    freshDiagnostic.optionalChecks?.some(
+      (check: { name: string; ok: boolean; message: string }) =>
+        check.name === "Codex version" &&
+        !check.ok &&
+        /npm install -g @openai\/codex@0\.154\.0/.test(check.message),
+    ),
+    "Default doctor must report a missing optional Codex CLI with its install command.",
+  );
+  const freshText = run("doctor", [], withoutCodex);
+  assert.match(freshText, /Mode: Notebook only/);
+  assert.match(freshText, /OPTIONAL Codex version:.*Codex is unavailable/);
+  assert.equal(existsSync(path.join(data, "codex")), false);
+  run("setup", ["--notebook"], withoutCodex);
+  const diagnostic = JSON.parse(run("doctor", ["--json"], withoutCodex));
   assert.equal(diagnostic.storage, data);
   assert.equal(diagnostic.release.protocol, companionRelease.protocol);
   assert.equal(
@@ -227,6 +243,29 @@ try {
     unavailable.stdout,
     /Codex is unavailable.*@openai\/codex@0\.154\.0/,
   );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(data, "companion-settings.json"), "utf8"))
+      .provider,
+    "notebook",
+    "doctor --codex must not change the saved provider.",
+  );
+  const codexData = path.join(directory, "codex-data");
+  run("setup", ["--codex", "--directory", codexData], withoutCodex);
+  const savedCodex = spawnSync(
+    process.execPath,
+    [bin, "doctor", ...args, "--directory", codexData, "--json"],
+    { cwd: b, env: withoutCodex, encoding: "utf8" },
+  );
+  assert.equal(savedCodex.status, 1);
+  const savedCodexReport = JSON.parse(savedCodex.stdout);
+  assert.equal(savedCodexReport.provider, "Codex");
+  assert.ok(
+    savedCodexReport.checks.some(
+      (check: { name: string; ok: boolean }) =>
+        check.name === "Codex version" && !check.ok,
+    ),
+    "Saved Codex mode must fail doctor when the CLI is missing, without another --codex flag.",
+  );
   writeFileSync(
     path.join(a, "codex"),
     `#!${process.execPath}\nconsole.log("codex-cli 0.0.1");\n`,
@@ -239,6 +278,36 @@ try {
   );
   assert.equal(unsupported.status, 1);
   assert.match(unsupported.stdout, /0\.0\.1 has not been verified/);
+  const optionalUnsupported = JSON.parse(
+    run("doctor", ["--json"], withoutCodex),
+  );
+  assert.ok(
+    optionalUnsupported.optionalChecks.some(
+      (check: { ok: boolean; message: string }) =>
+        !check.ok && /0\.0\.1 has not been verified/.test(check.message),
+    ),
+  );
+  const codexCalls = path.join(directory, "codex-calls.jsonl");
+  writeFileSync(
+    path.join(a, "codex"),
+    `#!${process.execPath}\nconst fs = require("node:fs");\nconst args = process.argv.slice(2);\nfs.appendFileSync(${JSON.stringify(codexCalls)}, JSON.stringify(args) + "\\n");\nif (args.length !== 1 || args[0] !== "--version") process.exit(72);\nconsole.log("codex-cli 0.154.0");\n`,
+    { mode: 0o700 },
+  );
+  const optionalInstalled = JSON.parse(run("doctor", ["--json"], withoutCodex));
+  assert.ok(
+    optionalInstalled.optionalChecks.some(
+      (check: { name: string; ok: boolean }) =>
+        check.name === "Codex version" && check.ok,
+    ),
+  );
+  assert.deepEqual(
+    readFileSync(codexCalls, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line)),
+    [["--version"]],
+    "Optional availability diagnosis must not inspect Codex authentication.",
+  );
   const readonly = path.join(directory, "readonly-data");
   mkdirSync(readonly);
   chmodSync(readonly, 0o500);
@@ -308,6 +377,13 @@ try {
     ).stdout,
   );
   assert.equal(localDiagnostic.provider, "Local model");
+  assert.ok(
+    localDiagnostic.optionalChecks.some(
+      (check: { name: string; ok: boolean }) =>
+        check.name === "Codex version" && !check.ok,
+    ),
+    "Local-model doctor must report the missing optional CLI without requiring it.",
+  );
   assert.equal(localDiagnostic.localModel.model, localServer.options.model);
   assert.equal(
     localDiagnostic.checks.every((check: { ok: boolean }) => check.ok),

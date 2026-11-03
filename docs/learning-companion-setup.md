@@ -14,7 +14,10 @@ The standalone package is [@scalableweb/companion](https://www.npmjs.com/package
 Code-free connection is prepared in version 0.3.0 and has not yet been published to npm.
 Use the book checkout for now; [repository development](#repository-development) explains how to install it.
 The published 0.2.0 package uses the previous pairing contract and cannot connect to this updated website client.
-With Node.js 24 or 26 and the repository dependencies installed, run:
+You need Node.js 24 or 26 and the repository dependencies for the notebook.
+Codex replies additionally require a separate [Codex CLI installation](#connect-your-agent); the companion does not install or bundle Codex.
+Notebook-only use and the local-model option do not require Codex.
+To start with the notebook only, run:
 
 ```sh
 npm run companion -- setup --notebook
@@ -127,16 +130,27 @@ Existing audio/video diary options remain available.
 ## Connect your agent
 
 Choose Codex or a locally loaded model.
-For Codex, the adapter was verified with CLI version 0.154.0.
-Install that version if you do not already have it:
+Codex replies require the [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) installed separately and available as `codex` in the terminal where you run the companion.
+The adapter was verified with CLI version 0.154.0.
+Install that version if needed, then check that the command works:
 
 ```sh
 npm install -g @openai/codex@0.154.0
-npm run companion -- setup --codex
-npm run companion -- login
+codex --version
 ```
 
-Stop the notebook-only companion, then start it with your dedicated Codex profile:
+The version check should print `codex-cli 0.154.0`.
+If the terminal cannot find `codex`, check the CLI installation and your terminal's `PATH` before continuing.
+Installing the companion alone does not supply this command.
+Stop any running companion, then configure and sign in to its dedicated Codex profile:
+
+```sh
+npm run companion -- setup --codex
+npm run companion -- login
+npm run companion -- doctor
+```
+
+After the checks pass, start the companion with your dedicated Codex profile:
 
 ```sh
 npm run companion -- start
@@ -252,6 +266,18 @@ npm run companion -- doctor
 ```
 
 It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites or the local endpoint/model/context configuration.
+The report identifies the selected mode and always checks whether the Codex CLI version is available.
+Without a saved provider choice or an explicit option, `doctor` uses notebook-only mode.
+In notebook-only and local-model modes, Codex is optional: a missing or unverified CLI is informational and does not fail the check.
+When Codex is selected, a missing or unverified CLI fails the check.
+To require the Codex CLI and check dedicated-profile sign-in before selecting Codex, run:
+
+```sh
+npm run companion -- doctor --codex
+```
+
+Use the same `--directory` and `--codex-home` options as your intended setup.
+This diagnostic does not change your saved provider choice.
 Install the displayed verified provider version when it is missing or unsupported; run `login` for missing dedicated-profile authentication.
 An account's access is checked on its first real reply.
 Use `start --notebook` to continue writing without a provider.
