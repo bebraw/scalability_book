@@ -8,16 +8,28 @@ The trial adds no assessment criterion, required report or activity quota.
 
 ## A short first investigation
 
-Let each learner choose a question they actually need to understand.
-For an example, use the [cache decision lab](https://scalableweb.dev/demos/#demo-cache-decision-lab): predict whether a response can be reused, change its age, inspect the result, then question which policy and storage assumptions make that result hold.
-Include a changed situation, such as a changed origin representation or a private response requiring validation.
-The guide offers canonical changed-situation exercises and a reading/project application elsewhere in the book.
-Record the activity ID/version and source revision from the learner's chosen entry, and distinguish their own case from a reviewed agent suggestion.
-Ask learners to explain the change independently before returning to the agent or worked reasoning.
-Ask them to return after a delay of their choosing and use Notes → Revisit, recalling before opening the earlier explanation.
-Compare what they can justify now, continuing uncertainty, and where they ask for support again; a saved independent attempt does not prove that no help was used.
+Use two short visits within ordinary study time: approximately 20–30 minutes for an investigation and 5–10 minutes for a return visit, if those budgets suit the learner.
+Agree a feasible return date, such as one week later; these are planning suggestions, not participation requirements.
+The [topic-learning experiment by Contractor and Reyes](https://arxiv.org/html/2607.08849v2) found a positive immediate effect of randomized AI access and a smaller, less certain delayed advantage.
+Its tutoring and outsourcing groups were self-selected, so use help modes as questions to investigate rather than a proven ranking.
 
-Try capture without a model first, then one chosen agent help mode, an actual demo check and a short reflection.
+1. **Prepare a question and two changed cases.** Let the learner choose something they need to understand.
+   The [cache decision lab](https://scalableweb.dev/demos/#demo-cache-decision-lab), for example, asks whether a response can be reused as its age changes.
+   Use the authored activity to select two further situations, such as an origin change or a private response requiring validation.
+   Before seeing learner responses, identify the relevant assumptions and acceptable reasoning from the authored material; the assisting model's answer is not the answer key.
+2. **Investigate with chosen support.** Capture an initial prediction without a model, then try one chosen help mode, an actual demo check and a short reflection.
+   Record activity/version, source revision, actual help used, and learner/facilitator time through the existing selected-evidence process.
+   Keep a learner's own case distinguishable from an agent suggestion.
+3. **Check immediate application.** Ask the learner to explain the first changed case before returning to the agent or worked reasoning.
+   Look for the relevant condition, predicted behavior and justification, including uncertainty; a correct choice alone is insufficient.
+4. **Return before rereading.** Use Notes → Revisit to recall the explanation before opening it, then try the second changed case without the agent or transcript.
+   Record the actual delay and any intervening practice or help the learner chooses to report.
+   Compare recall, application and support needed; a saved attempt does not itself prove that no help was used.
+
+The two changed cases serve different checks; their difficulty and intervening practice can affect the result.
+This voluntary pilot finds problems with support and evaluation, without estimating a causal learning effect or comparing self-selected modes as if they were randomized.
+Retain skipped follow-ups and uncertainty in the report, and offer ordinary help after each independent attempt.
+
 In a group, save individual explanations before revealing inquiry; compare predictions, retain consequential disagreement and rotate the existing operator/challenger/validator roles.
 Try the optional inquiry outline and a summary assembled from deliberately selected contributions.
 Include a member who is absent for the check and one who needs more help; do not infer their agreement or understanding from a shared decision.

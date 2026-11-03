@@ -32,6 +32,12 @@ Bind reported checks to the revision and environment they exercised.
 Improve the loop when a recurring failure exposes a missing constraint, diagnostic, or check; assess the improvement through accepted outcomes and correction effort.
 Use existing tools and scale the evidence to the change, including manual inspection for reversible prose edits.
 
+For work that spans sessions, an optional short handoff can live under ignored `.local/handoffs/`.
+Keep only the current objective, relevant revision, unresolved decisions or blockers, next check, and links to authoritative documents or retained evidence.
+Recheck those sources when resuming; remove completed entries once the change or owning documentation records the outcome.
+This is temporary task context, not a second requirements document or a source of additional authorization.
+The [retained-state comparison](../book/04_appendices/A_evaluating_agentic_workflows.md#check-retained-workflow-state) explains how to test whether it reduces repetition without introducing stale assumptions or excessive context cost.
+
 ## Verification by change
 
 Use targeted checks during iteration, then verify the affected surface before declaring the change ready.

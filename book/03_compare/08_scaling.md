@@ -152,6 +152,7 @@ Read each case through the same questions:
 > Scaling techniques have resource profiles.
 > Caches, queues, replicas, CDNs, shards, and multi-region deployments can improve user experience, but each adds infrastructure and operational cost.
 > Ask which pressure justifies the extra resource use.
+> For an AI-assisted optimization, [compare its development energy with its lifetime execution savings](/appendices/evaluating-agentic-workflows/#check-whether-an-optimization-repays-its-energy-cost).
 
 ## Orchestration maintains declared capacity
 

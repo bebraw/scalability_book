@@ -34,6 +34,22 @@ Use **Read revised text only** to hide the old wording, filter by any part of a 
 **Expand all** and **Collapse all** affect the files currently visible through the filter.
 The revised-text view still shows only the changed passages and their context, not the complete book.
 
+## Compare alternatives before implementation
+
+When a consequential choice is still open, use a small comparison to make its effects reviewable.
+Start from the same revision and state the decision, relevant constraints, alternatives, and a bounded exploration budget.
+Use a diagram for state or ownership, a rendered preview for presentation, or an isolated prototype when execution is needed to settle the question.
+Choose the smallest artifact that exposes the tradeoff; routine edits do not need multiple implementations.
+
+Show the affected behavior and a failure case for each option, with links to the code or observations supporting the comparison.
+Distinguish measured results, predictions, and illustrative examples, and retain failed checks.
+Let the reviewer inspect a changed assumption and explain what would make an option unsuitable before asking for a decision.
+Record the selected option, rationale, remaining uncertainty, and decision owner in the existing change description or ADR when its criteria apply.
+Use comprehension, later corrections, and total preparation/review effort to judge whether the comparison helped.
+The [planning-interface exercise](../book/04_appendices/A_evaluating_agentic_workflows.md#evaluate-a-planning-interface) provides a more formal optional comparison.
+
+Serve any HTML comparison from a dedicated loopback directory and inspect it using the same workflow as the highlighted report.
+
 ## Useful comparisons
 
 | Task                                      | Command                                                             |

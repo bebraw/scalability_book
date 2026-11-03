@@ -63,6 +63,32 @@ Passing the refactor adds evidence that the test tolerates this particular inter
 It does not prove the mutant is realistic, that the baseline has no related defect, or that the system satisfies the broader security or reliability requirement.
 One correct variant also cannot establish that a test tolerates every valid implementation.
 
+### Optional: inspect a test that preserves a defect
+
+A test can also pass faulty behavior and fail when that behavior is corrected.
+Explore this direction in a separate local copy of the exercise, starting with the original `starter.test.ts` so you preserve your completed work.
+Keep `tracker.ts`, `run.ts` and the contract unchanged.
+
+1. Write down the required result of repeating the same command from `SPEC.md` before inspecting the faulty result.
+2. Ask your permitted agent to propose a regression assertion from the observed behavior of `retry-duplication`.
+   Treat the assertion as a candidate to inspect, not a new requirement.
+   Retain the prompt, supplied context and first response, including any warning that the behavior violates the contract.
+3. Put the candidate in `starter.test.ts` and run it unchanged with `retry-duplication`, `baseline` and `storage-refactor`, using the commands above.
+   The baseline represents correcting the selected fault without changing the required behavior.
+4. Inspect the new test's assertion outcomes against the contract:
+
+| Faulty variant | Baseline | Interpretation for the selected fault                    |
+| -------------- | -------- | -------------------------------------------------------- |
+| Fails          | Passes   | Detects the fault                                        |
+| Passes         | Passes   | Does not distinguish the fault                           |
+| Passes         | Fails    | May preserve the fault; inspect the expected value       |
+| Fails          | Fails    | Investigate the assertion, setup and fixture assumptions |
+
+Preserve the candidate and results in `test-results/` before correcting a wrong expectation.
+Then check that the revised test passes both correct variants and rejects the selected fault through a relevant assertion.
+Do not force the first attempt into a particular category or count setup errors as evidence.
+This visible-fixture exercise illustrates how to inspect an expectation; one attempt does not measure a model's general reliability.
+
 ### Optional: hold back defects when evaluating the tests
 
 If you compare ways of generating tests, let a reviewer prepare additional contract-violating variants that the test-producing agent has not seen.

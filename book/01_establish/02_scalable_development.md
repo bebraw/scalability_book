@@ -104,6 +104,13 @@ Agent-generated checks need scrutiny too.
 In one workshop report, screenshot tests did not exercise the application, supposed passkey authentication accepted a username, and stored data disappeared after restart :citep[talwar2026llms].
 Those failures suggest concrete checks: launch the real application, challenge authentication, and verify persistence across restart.
 
+Two recent preprints distinguish tests that miss a defect from tests that preserve it.
+In a coverage-guided regression-testing study, some generated tests passed an implementation with a seeded fault and failed the reference implementation: the assertion encoded the faulty behavior :citep[charoosaei2026regression].
+The study selected artificial faults that survived existing tests and rewarded generated tests for passing the faulty implementation; its results do not estimate how often production bugs are preserved by all test-generation methods.
+TestSuiteBench instead generated tests from detailed specifications and found valid tests that missed targeted defects, including a multiple-file requirement tested with only one file :citep[egashira2026testsuitebench].
+A test can therefore have a wrong expectation or an expectation that never distinguishes the defect.
+Inspect both what it asserts and which wrong behavior it rejects.
+
 A reversible mutation can strengthen this relationship by checking that a test distinguishes the accepted implementation from one named fault.
 That contrast does not prove the mutant is realistic or the broader requirement is satisfied, but it is stronger than coverage alone.
 Tests must also tolerate correct changes.
@@ -127,6 +134,23 @@ Keep failures reproducible, use focused checks during repair, and run broader ch
 Passing checks still leaves ownership, dependency boundaries, and future change costs to review.
 Judge a loop improvement by accepted behavior and the correction effort it requires, including failed attempts.
 [Appendix A](/appendices/evaluating-agentic-workflows/#design-the-verification-loop) develops check selection, failure preservation, and the limits of the evidence.
+
+### Field note — A predicate that matched the wrong row
+
+Jepsen's ParticleDB evaluation supplies a concrete example of checking behavior independently :citep[kingsbury2026particledb].
+The following adapts its small SQL reproduction:
+
+```sql
+CREATE TABLE records (id int PRIMARY KEY, value int);
+INSERT INTO records VALUES (4, 5), (5, 6);
+SELECT * FROM records WHERE 4 = 5;
+```
+
+The predicate is false, so the expected result is no rows.
+ParticleDB versions 1.1.4 through 1.1.17 instead treated this equality as a primary-key lookup and returned the row `(5, 6)`; the report records the defect as fixed by 1.1.18.4.
+Jepsen generated SQL, compared ParticleDB with PostgreSQL, and reduced disagreements to small examples, while distinguishing genuine defects from permissible semantic differences.
+This was a single-node evaluation, so the example establishes a version-specific query defect rather than a finding about replication.
+An assertion copied from the faulty query result would preserve the error; the independently justified empty result exposes it.
 
 ### Constraint feedback through an actual export
 
@@ -188,6 +212,42 @@ Publishing an issue or patch also creates work for an external maintainer, so so
 
 What would turn a working demo into a tool someone can operate and own?
 Give your agent the [prototype starting point](/explore/prototype-to-shared-use/agent.md) to investigate one decision at a time, or [read the scenario yourself](/explore/prototype-to-shared-use/).
+
+## Agent harnesses and workspaces
+
+The agent harness controls a model's context and tool loop.
+A development workspace can sit around one or more harnesses, helping a person start sessions, inspect changes, answer questions, and move between machines.
+Some products also supply the execution runtime or coordinate delegated work.
+Identify which responsibilities a tool owns before attributing its behavior to the model.
+
+:ref[table:agent-workspace-examples]{text="The table below"} compares examples from product documentation checked on November 3, 2026.
+These descriptions identify useful capabilities to investigate; they are not comparative measurements of productivity or reliability.
+
+| Example                                                          | Responsibility illustrated                                                                                                                                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Herdr](https://herdr.dev/)                                      | Runs persistent terminals with local or SSH-connected access through [herdr-core](https://herdr.dev/core/) and its native app; the original [Herdr TUI](https://herdr.dev/tui/) uses a separate server. |
+| [T3 Code](https://t3.codes/)                                     | Presents several coding-agent harnesses through one interface, with per-thread branches, inline diff review, and commit/push/pull-request actions using existing accounts.                              |
+| [OpenChamber](https://docs.openchamber.dev/)                     | Provides a visual workspace around OpenCode, including parallel model runs and diff walkthroughs; it starts or connects to an [OpenCode server](https://docs.openchamber.dev/opencode-server/).         |
+| [Sesh](https://sesh.codes/)                                      | Brings persistent sessions on paired machines into one interface and surfaces questions and approvals across desktop and mobile clients.                                                                |
+| [OpenHands Agent Canvas](https://github.com/OpenHands/OpenHands) | Separates the user interface from Agent Server/SDK execution backends and an Automation Server for scheduled or event-driven work.                                                                      |
+
+::caption[Examples of interfaces, runtimes, and orchestration around coding agents; documented capabilities as of November 3, 2026.]
+::label[table:agent-workspace-examples]
+
+Persistence needs a precise failure boundary.
+Closing a client can leave work running on an awake host; host sleep, process failure, and machine restart are different events.
+For example, Herdr's native-app documentation says that closing the window leaves terminals running in herdr-core, but stopping that runtime or rebooting stops the programs; restored panes do not automatically resume the agents.
+The app and TUI have separate sessions, so their recovery claims cannot be used interchangeably.
+
+Likewise, a branch names a development history, while a worktree gives work a separate checkout.
+Neither alone restricts a process's filesystem, credential, or network access.
+Check the selected execution backend and permissions, and trace whether cancellation and approval decisions reach the actual worker.
+An interface that gathers several agents in one place still needs a coordination rule for shared files, dependencies, and acceptance; the [Agent Fleets chapter](/chapters/agent-fleets/#choose-a-coordination-structure) develops those decisions.
+
+Choose a workspace around a concrete difficulty: losing sessions, switching between agents, finding blocked work, or understanding changes.
+Try one representative task and record the installed versions, where work and session state live, recovery after a client disconnect, and the effort required to inspect and accept the result.
+Count interruptions, failed attempts, and review effort alongside accepted outcomes.
+The repository's instructions and checks remain the project harness whichever interface presents them.
 
 ## The project harness
 
@@ -305,7 +365,8 @@ Choose assistance according to the result you need, the skills you need to retai
 ::label[table:assistance-outcomes]
 
 Randomized studies of programmers learning an unfamiliar library and students practicing mathematics found that AI access could reduce subsequent unaided performance :citep[shen2026skill,bastani2025learning].
-The tasks and assistance designs differ; [Appendix A](/appendices/evaluating-agentic-workflows/#evaluate-assistance-and-retained-competence) explains what these short-term findings support and leave open.
+A randomized undergraduate topic-learning experiment instead found an immediate benefit from AI access, with a smaller, less certain advantage one week later :citep[contractor2026learning].
+The tasks and assistance designs differ; [Appendix A](/appendices/evaluating-agentic-workflows/#evaluate-assistance-and-retained-competence) explains what these task-specific findings support and leave open.
 
 Learning, investigating with colleagues, and enjoying implementation can be purposes of the work.
 Choose what to delegate in light of those purposes as well as the result's quality and cost.

@@ -10,6 +10,7 @@ Read [evaluation anatomy](#anatomy-of-an-agent-evaluation), [task selection](#ca
 Add other sections when the decision requires them:
 
 - [Retained competence](#evaluate-assistance-and-retained-competence) for comparing assistance modes when learning is part of the task's purpose.
+- [Planning interfaces](#evaluate-a-planning-interface) for checking whether a person can understand and revise a proposed decision.
 - [Temporary API consumers](#probe-an-api-with-temporary-clients) for checking integration behavior and API usability.
 - [Verification loops](#design-the-verification-loop) for choosing checks an agent can use during implementation and challenging their assumptions.
 - [Repair evidence](#compare-repair-evidence) for comparing task feedback, raw telemetry, and a diagnostic brief.
@@ -137,7 +138,12 @@ A short library-learning session also cannot establish long-term professional sk
 In a classroom trial with nearly a thousand high-school mathematics students, :citet[bastani2025learning] found that unrestricted AI access improved assisted practice but reduced subsequent unaided performance.
 A tutor using teacher-designed safeguards largely avoided that harm without establishing a positive unaided effect.
 The mathematics tasks and tutoring design limit transfer to university programming.
-Together, these studies motivate checking unaided competence separately; they do not establish one best assistance mode for every learner.
+
+The preprint by :citet[contractor2026learning] supplies a positive comparison: undergraduates randomly assigned AI access while studying unfamiliar topics performed better on an immediate unaided test.
+The estimated advantage one week later was smaller and less statistically certain.
+Students chose how to use AI; the reported differences between tutoring and outsourcing therefore do not establish a causal effect of either mode.
+This short topic-learning experiment does not measure long-term software-engineering expertise.
+Across these different tasks and assistance designs, the useful question is which support helps a particular learner retain and apply knowledge; neither inevitable skill loss nor automatic learning gains follow from AI access alone.
 
 In a personal essay, :citet[stewart2026alienation] describes missing the investigation and decisions involved in implementation even when the result passes his checks.
 :citet[mollick2026overhang] offers a complementary perspective: human knowledge, taste, and initiative can turn agent capability into projects a person would otherwise struggle to attempt.
@@ -163,6 +169,22 @@ Task differences and practice order can explain a result from one pair, so use t
 
 As an optional reflection in your learning diary or discussion, name an activity you wanted to retain, whether the assistance mode preserved it, and what mode you would choose next time.
 Your preference is separate from the behavioral checks and later unaided performance.
+
+## Evaluate a planning interface
+
+:citet[appleton2026planning] proposes shared plans with inspectable alternatives, working prototypes, and direct editing to help people reason about agent work.
+Her examples and the related Chopin prototype illustrate a design direction; they do not establish that richer interfaces improve decisions, and the visual explanations required substantial author guidance.
+
+For an optional comparison, choose one bounded decision, such as where to enforce retry deduplication.
+Prepare a text explanation and an inspectable state diagram or small prototype from the same starting revision, alternatives, assumptions, and checks.
+Hold the available evidence and preparation budget explicit; label any behavior that is only illustrated rather than executed.
+An interactive view should let the reviewer examine the consequence of a changed assumption, such as a crash between recording an effect and acknowledging it.
+
+Before revealing a preferred option, ask the reviewer to explain each alternative's failure case, select an approach, and state what evidence would change that choice.
+Then introduce a changed requirement and ask them to revise the decision.
+Record misunderstandings, justified revisions, unresolved assumptions, review time, and the cost of producing each presentation.
+Keep decision quality separate from visual appeal and approval speed.
+Comparisons across people or tasks need balanced assignment and independent scoring; showing both views of the same case to one person introduces learning and order effects.
 
 ## The eval suite is also software
 
@@ -262,6 +284,17 @@ In particular, adoption counts cannot establish productivity, and a benchmark im
 For a local comparison, hold the task, starting revision, model and tools, acceptance checks, and resource limits stable while changing one loop decision.
 Record accepted outcomes, unsuccessful attempts, elapsed time, resource use, and human correction or review.
 The [uncertainty guidance](#report-uncertainty-not-only-point-estimates) explains why one successful task remains a case comparison.
+
+### Check retained workflow state
+
+In a practitioner account, :citet[niska2026outerloop] maintains current decisions, open questions, plans, and blockers outside the coordinator's conversation.
+Completed work leaves that record when Git or project documentation owns it.
+The account motivates testing continuity across sessions, but does not establish that another coordination layer saves effort.
+
+For a bounded trial, resume the same synthetic task from a short current-state record and from the existing handoff method.
+Include an obsolete assumption and a blocker that has since cleared; check whether the resumed agent consults the authoritative source before acting.
+Measure repeated work, missed constraints, correction effort, and all context/retrieval cost.
+Keep standing authority in the project's owning instructions: a remembered plan is evidence of an earlier decision, not permission to widen the task.
 
 ## Design the verification loop
 
@@ -454,6 +487,32 @@ Report human review and other unpriced resources separately when they are outsid
 When interpreting cache savings, distinguish the median cache-hit rate across runs from the fraction of all input tokens served from cache.
 A few long runs can dominate token-weighted usage, and a high cache-hit rate can coexist with expensive failures.
 Before transferring a ranking to your project, test representative tasks with repeated fresh trials and the model, gateway, and cache conditions you intend to use.
+
+### Check whether an optimization repays its energy cost
+
+A faster implementation does not establish an energy saving.
+Compare a correct current implementation with an accepted candidate under the same workload and declared measurement boundary.
+Measure the additional energy spent producing the change, including generation, profiling, tests, and failed candidates, as `E_change`.
+Let `e_before` and `e_after` be energy per execution with equivalent behavior and service quality.
+After `N` executions, the net saving is:
+
+```text
+net saving = N × (e_before − e_after) − E_change
+```
+
+When `e_before > e_after`, break-even requires at least `ceil(E_change / (e_before − e_after))` executions.
+With positive change energy and zero or negative per-execution savings, there is no finite energy break-even.
+
+For an invented example, suppose generation and rejected candidates use 18,000 J, while profiling and validation use another 6,000 J.
+An accepted change reduces energy from 1.2 J to 0.9 J per execution, saving 0.3 J each time.
+Recovering the 24,000 J investment requires 80,000 executions.
+If the implementation will run only 20,000 times before replacement, it saves 6,000 J in operation but increases total energy by 18,000 J.
+This arithmetic assumes stable savings and no additional maintenance or infrastructure energy; include those costs when they differ between alternatives.
+
+:citet[emami2026greencode] measure generation and execution energy for iterative code optimization on a Python benchmark.
+Their reference programs are efficient competitive-programming solutions, and their refinement loop does not select candidates by execution energy.
+The study motivates measuring both costs; it does not predict the return from optimizing a particular production service.
+Use the expected lifetime workload and a plausible range of measured savings to judge your own change, and report unavailable energy measurements rather than substituting token counts or elapsed time.
 
 ## From evaluation to routing
 

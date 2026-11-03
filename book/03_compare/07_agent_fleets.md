@@ -42,6 +42,7 @@ When comparing your own workflows, separate cold and warm operation and distingu
 ::label[table:fleet-coordination-options]
 
 Inspect the coordination controls supplied by the chosen harness before adding custom orchestration.
+The [workspace examples in Chapter 2](/chapters/scalable-development/#agent-harnesses-and-workspaces) distinguish terminal persistence, shared interfaces, and execution backends in tools such as Herdr, T3 Code, and OpenHands.
 Check separate execution contexts and workspace isolation, result return and inter-agent messaging, shared task state, permission inheritance, cancellation, and recovery.
 Labels such as "subagent" or "team" do not establish which controls are available.
 [Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) documents one arrangement; verify the capabilities and limits of the configuration you actually run.
