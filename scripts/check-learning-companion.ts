@@ -43,7 +43,6 @@ try {
       "--prefix",
       directory,
       "--ignore-scripts",
-      "--offline",
       "--no-audit",
       "--no-fund",
       artifact,
