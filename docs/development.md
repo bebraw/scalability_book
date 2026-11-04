@@ -367,25 +367,49 @@ The repository prepares 0.3.0 (browser protocol 2) with code-free connection; it
 The browser and setup guide use the checkout until registry availability is verified.
 For an isolated iteration artifact, set `COMPANION_CHECK_ARTIFACT` to its absolute path in both the checker and onboarding browser test.
 The publisher is bebraw, with access to the `scalableweb` npm organization.
-Authenticate through `npm login --scope=@scalableweb`, then verify `npm whoami` without reading credentials into logs.
-After the artifact, matrix and provider checks pass, publish that exact tarball with public access:
+From a clean, committed and pushed `main`, run the complete publication command:
 
 ```sh
-npm publish ./.local/companion-release/scalableweb-companion-0.3.0.tgz --access public
+npm run companion:release
 ```
 
-If npm requires a browser/2FA step, complete its own authentication flow and rerun publishing.
-That interactive flow needs both stdin and stdout attached to a terminal.
-On macOS, a coding-agent terminal can use `rtk proxy script -q /dev/null npm publish ./.local/companion-release/scalableweb-companion-0.3.0.tgz --access public` to provide a full terminal through RTK.
-The scope must already exist as an npm organization; a free organization supports this public package.
-Staged publishing is an optional separate flow: use `npm stage publish ./.local/companion-release/scalableweb-companion-0.3.0.tgz --access public`, inspect `npm stage list @scalableweb/companion` and approve the reviewed stage through npm's own 2FA flow or the account's Staged Packages page.
-Staging requires npm 11.15.0 or newer; direct publishing uses `npm publish`.
-A `0.0.0-stage` placeholder does not establish that the requested version is available; verify the actual version and integrity in the registry before updating student instructions.
-See [npm's staged publishing instructions](https://docs.npmjs.com/staged-publishing/).
-After registry publication, run `gh workflow run learning-companion.yml -f verify-published=true` and confirm that the registry tarball passes the matrix as well.
-Source-built tarballs can have different bytes across build installations; this explicit check verifies the exact distributed artifact.
-Record the release's source revision, tarball integrity and verification in ADR-030, and remove any pending-publication wording from the student guide only after registry availability is verified.
-Future releases update the package manifest and shared release metadata together, explain compatible protocol/schema/provider changes, and repeat the packed-artifact checks.
+Use Node.js 24 or 26, Python 3, Git, npm and an authenticated GitHub CLI (`gh auth login`).
+The command uses the version already prepared in `packages/learning-companion/package.json` and `shared/learning-connection.ts`.
+It checks that both versions agree and the current commit is the remote `main`, builds and tests the tarball, waits for the four source-package jobs, completes npm login when needed, publishes that exact artifact, verifies the downloaded registry bytes, and waits for all four published-package jobs.
+If no source workflow exists for that commit, it starts one; a failed job stops publication.
+Npm retains its normal browser/2FA prompts, so run the command in a regular interactive terminal.
+The helper does not read or save authentication tokens.
+
+For a rehearsal that builds and checks the package without login, publication or workflow dispatch:
+
+```sh
+npm run companion:release -- --dry-run
+```
+
+Interrupted releases resume by rerunning the same command from the same clean revision.
+The ignored `.local/companion-release/` receipt records the source commit, artifact integrity and exact workflow IDs; keep it with the tested tarball until the release is verified.
+If npm accepted a publish before the terminal lost its response, matching registry integrity lets the command continue without publishing again.
+A different artifact already published under that version, changed source, a modified tarball or an unknown registry response stops the command with recovery guidance.
+If a workflow dispatch loses its response before returning a run ID, the receipt records that uncertainty and requires inspection of GitHub Actions before retrying; the command does not guess a run or dispatch another automatically.
+For a failed matrix, inspect the linked run, rerun it in GitHub after addressing the failure, and rerun the release command.
+The helper will not move the `latest` tag backwards or choose a replacement version automatically.
+
+The package workflow accepts paired `release-version` and `release-integrity` inputs for published verification.
+It checks them against the checked-out version and the actual downloaded tarball before running installation tests.
+This matters because source-built tarballs can have different bytes across build installations; the published matrix verifies the exact distributed artifact.
+The unit checks for release orchestration use synthetic npm/GitHub responses and temporary files, never a real publication.
+Run `node --test tests/learning-release.test.ts` when changing the release owner.
+
+Version selection and announcements remain reviewed source changes.
+For the next release, update the package manifest and shared release metadata together, update pinned package README examples, explain protocol/schema/provider changes, and commit/push before running `companion:release`.
+The command does not certify real-provider behavior: complete the provider smoke tests described above before release.
+Once the published checks pass, record their source revision, integrity and workflow evidence in ADR-030 and update the website's pending-publication wording and student commands.
+These website changes follow the normal commit, deployment and live-verification process.
+
+For manual recovery, the existing `companion:pack` and `companion:check` commands remain available.
+Publish an explicitly verified tarball using `npm publish ./.local/companion-release/scalableweb-companion-<version>.tgz --access public --registry=https://registry.npmjs.org`.
+See [npm publishing](https://docs.npmjs.com/cli/v11/commands/npm-publish/) for its authentication flow.
+Staged publishing is a separate optional npm feature; this release command uses direct publishing.
 
 ## Feedback Review
 

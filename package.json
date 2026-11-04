@@ -15,6 +15,7 @@
     "companion:build": "node scripts/build-learning-companion.ts",
     "companion:pack": "npm run companion:build && node scripts/pack-learning-companion.ts",
     "companion:check": "node scripts/check-learning-companion.ts",
+    "companion:release": "node scripts/release-learning-companion.ts",
     "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

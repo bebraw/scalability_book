@@ -29,6 +29,14 @@ on:
         description: Verify the current package version's registry tarball on the same matrix
         type: boolean
         default: false
+      release-version:
+        description: Expected published version; requires release-integrity and verify-published
+        type: string
+        default: ""
+      release-integrity:
+        description: Expected published SHA-512 integrity; requires release-version and verify-published
+        type: string
+        default: ""
 permissions:
   contents: read
 jobs:
@@ -45,15 +53,61 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+      - name: Validate release verification inputs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          COMPANION_VERIFY_PUBLISHED: ${{ inputs.verify-published }}
+          COMPANION_EXPECTED_VERSION: ${{ inputs.release-version }}
+          COMPANION_EXPECTED_INTEGRITY: ${{ inputs.release-integrity }}
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { companionRelease } from './shared/learning-connection.ts';
+          const version = process.env.COMPANION_EXPECTED_VERSION || '';
+          const integrity = process.env.COMPANION_EXPECTED_INTEGRITY || '';
+          assert.equal(Boolean(version), Boolean(integrity), 'Supply release-version and release-integrity together.');
+          if (version) {
+            assert.equal(process.env.COMPANION_VERIFY_PUBLISHED, 'true', 'Release metadata requires verify-published=true.');
+            assert.equal(version, companionRelease.version, 'Expected release version differs from the checked-out shared version.');
+            assert.match(integrity, /^sha512-[A-Za-z0-9+/]{86}==$/, 'Expected integrity must be a SHA-512 SRI value.');
+          }
+          const manifest = JSON.parse(readFileSync('packages/learning-companion/package.json', 'utf8'));
+          assert.equal(manifest.version, companionRelease.version, 'Package and shared versions differ.');
+          NODE
       - run: npm ci
       # Unit and packaged CLI tests inject synthetic credential stores. Native
       # binding import is checked below without requiring a desktop keychain.
-      - run: node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/learning-local.test.ts tests/learning-api.test.ts tests/learning-api-credentials.test.ts tests/learning-keychain.test.ts tests/learning-codex-login.test.ts tests/learning-cli.test.ts tests/reading-investigation.test.ts
+      - run: node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/learning-local.test.ts tests/learning-api.test.ts tests/learning-api-credentials.test.ts tests/learning-keychain.test.ts tests/learning-release.test.ts tests/learning-codex-login.test.ts tests/learning-cli.test.ts tests/reading-investigation.test.ts
       - run: npm run companion:pack
       - run: npm run companion:check
-      - if: github.event_name == 'workflow_dispatch' && inputs.verify-published
+      - name: Verify published package
+        if: github.event_name == 'workflow_dispatch' && inputs.verify-published
+        env:
+          COMPANION_EXPECTED_VERSION: ${{ inputs.release-version }}
+          COMPANION_EXPECTED_INTEGRITY: ${{ inputs.release-integrity }}
         run: |
-          mkdir -p .local/published-companion
-          COMPANION_PACKAGE_VERSION="$(node -p "JSON.parse(require('node:fs').readFileSync('packages/learning-companion/package.json', 'utf8')).version")"
-          npm pack "@scalableweb/companion@${COMPANION_PACKAGE_VERSION}" --pack-destination .local/published-companion
-          COMPANION_CHECK_ARTIFACT="$PWD/.local/published-companion/scalableweb-companion-${COMPANION_PACKAGE_VERSION}.tgz" npm run companion:check
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { execFileSync } from 'node:child_process';
+          import { createHash } from 'node:crypto';
+          import { mkdirSync, readFileSync } from 'node:fs';
+          import path from 'node:path';
+          import { companionRelease } from './shared/learning-connection.ts';
+          const directory = path.resolve('.local/published-companion');
+          mkdirSync(directory, { recursive: true });
+          const results = JSON.parse(execFileSync('npm', ['pack', `${companionRelease.name}@${companionRelease.version}`, '--json', '--ignore-scripts', '--registry=https://registry.npmjs.org', '--@scalableweb:registry=https://registry.npmjs.org', '--pack-destination', directory], { encoding: 'utf8' }));
+          assert.equal(results.length, 1, 'Expected exactly one registry tarball.');
+          const packed = results[0];
+          assert.equal(packed.name, companionRelease.name, 'Registry package name differs.');
+          assert.equal(packed.version, companionRelease.version, 'Registry package version differs.');
+          assert.equal(packed.filename, `scalableweb-companion-${companionRelease.version}.tgz`, 'Unexpected registry tarball filename.');
+          const artifact = path.join(directory, packed.filename);
+          const integrity = `sha512-${createHash('sha512').update(readFileSync(artifact)).digest('base64')}`;
+          assert.equal(packed.integrity, integrity, 'Registry pack metadata does not match the downloaded tarball.');
+          if (process.env.COMPANION_EXPECTED_VERSION) {
+            assert.equal(packed.version, process.env.COMPANION_EXPECTED_VERSION, 'Published version differs from the requested release.');
+            assert.equal(integrity, process.env.COMPANION_EXPECTED_INTEGRITY, 'Published tarball differs from the requested release integrity.');
+          }
+          execFileSync('npm', ['run', 'companion:check'], { stdio: 'inherit', env: { ...process.env, COMPANION_CHECK_ARTIFACT: artifact } });
+          NODE

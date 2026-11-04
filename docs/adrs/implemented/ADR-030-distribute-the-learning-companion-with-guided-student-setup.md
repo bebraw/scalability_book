@@ -80,6 +80,16 @@ An older release must reject a newer unsupported schema without rewriting it.
 Document rollback limits and restoration rather than promising that every older binary can open an upgraded database.
 Package removal or replacement does not remove the student's records or provider profile.
 
+### Maintainer release command
+
+The maintainer publishes a prepared version with `npm run companion:release` from a clean pushed revision of `main`.
+The release owner composes existing build/installation checks, source and registry package matrices, and npm's own interactive authentication.
+It binds verification to the exact source commit and tarball SHA-512 rather than selecting the latest successful run or rebuilding an artifact after testing.
+An ignored local receipt preserves the tested artifact and workflow identities so an interrupted publication can resume without overwriting or republishing an immutable version.
+Registry errors do not imply that a version is available: only a confirmed absence permits first publication, and only matching bytes permit resumption.
+Version bumps, provider acceptance and website announcements remain reviewed source changes; the command does not stage unrelated work or infer approval of a new version.
+A dry run performs local checks and read-only remote checks without login, publication or workflow dispatch.
+
 ### First learning session
 
 Offer an optional first investigation from the book after pairing: save initial thinking, inspect an actual demo, record a reflection and reopen the saved note.
@@ -137,6 +147,11 @@ The default data paths are `~/Library/Application Support/scalableweb-companion/
 The repository entry retains its original `.local/learning-companion/` default.
 Package version 0.2.0, browser protocol 1, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
 Windows is not advertised as supported.
+
+The [maintainer release command](../../../scripts/release-learning-companion.ts) and [release owner](../../../scripts/lib/learning-release.ts) automate publication and verify the distributed bytes.
+[Release tests](../../../tests/learning-release.test.ts) exercise the publication boundary with synthetic GitHub/npm responses and temporary artifacts; no npm publication is part of automated checks.
+The package workflow rejects mismatched expected versions or integrity before installing a registry tarball.
+The command's successful completion proves artifact and matrix checks, not real-provider behavior or independent student outcomes.
 
 ### Initial release 0.1.0
 
