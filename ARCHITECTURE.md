@@ -56,6 +56,7 @@ The optional local learning companion exposes the private notebook API independe
 [learning-connection.ts](shared/learning-connection.ts) distinguishes package, browser protocol, storage/archive and compatible-provider versions.
 Package assembly bundles existing state/provider owners and authored resource registries; the runtime has no website-build or provider-SDK dependency.
 The maintainer entry [release-learning-companion.ts](scripts/release-learning-companion.ts) composes [learning-release.ts](scripts/lib/learning-release.ts), existing artifact checks, GitHub Actions and npm; student runtime modules never depend on release tooling.
+The [version preparation owner](scripts/lib/learning-release-prepare.ts) edits and commits only the explicit package/shared/README version changes before a normal push; it rejects unrelated working-tree changes.
 The release owner binds a clean pushed revision, tested tarball integrity and exact source/published workflow runs in an ignored local receipt under `.local/companion-release/`, preserving the tested artifact across retries.
 The pinned `@napi-rs/keyring` runtime dependency provides native OS credential storage, loaded only for saved API credentials.
 [Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and origin-gated browser sessions.

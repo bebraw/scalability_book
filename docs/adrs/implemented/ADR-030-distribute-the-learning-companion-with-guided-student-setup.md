@@ -82,13 +82,16 @@ Package removal or replacement does not remove the student's records or provider
 
 ### Maintainer release command
 
-The maintainer publishes a prepared version with `npm run companion:release` from a clean pushed revision of `main`.
+The maintainer publishes with `npm run companion:release -- <version>` from a clean `main`; the explicit version updates and commits only the package manifest, shared metadata and pinned README commands, then uses a normal push.
+Omitting the argument publishes the already prepared, pushed version.
+Repeating an explicit version resumes that version without bumping again.
 The release owner composes existing build/installation checks, source and registry package matrices, and npm's own interactive authentication.
 It binds verification to the exact source commit and tarball SHA-512 rather than selecting the latest successful run or rebuilding an artifact after testing.
 An ignored local receipt preserves the tested artifact and workflow identities so an interrupted publication can resume without overwriting or republishing an immutable version.
 Registry errors do not imply that a version is available: only a confirmed absence permits first publication, and only matching bytes permit resumption.
-Version bumps, provider acceptance and website announcements remain reviewed source changes; the command does not stage unrelated work or infer approval of a new version.
-A dry run performs local checks and read-only remote checks without login, publication or workflow dispatch.
+The version argument explicitly selects the intended release; the command does not guess an increment, stage unrelated work or force-push.
+Provider acceptance and website announcements remain reviewed source changes.
+A dry run performs local checks and read-only remote checks without login, publication or workflow dispatch; an explicit version previews preparation without committing or pushing it.
 
 ### First learning session
 

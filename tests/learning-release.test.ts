@@ -592,6 +592,27 @@ test("a published registry artifact with a failed distribution job remains incom
   );
 });
 
+test("dry-run checks an existing registry version without authorizing republication", async (t) => {
+  const f = fixture(t);
+  f.state.registryStatus = 200;
+  f.state.registryIntegrity = integrity(
+    Buffer.from("a previously published artifact"),
+  );
+  const result = await f.execute(true);
+  assert.equal(result.published, false);
+  assert.equal(f.checked.length, 1);
+  assert.equal(f.published.length, 0);
+  assert.equal(f.dispatches.length, 0);
+  assert.equal(existsSync(f.receipt), false);
+  assert.ok(
+    f.logs.some((message) =>
+      /cannot republish the existing version/.test(message),
+    ),
+  );
+  await assert.rejects(f.execute(), /already exists in npm without a matching/);
+  assert.equal(f.published.length, 0);
+});
+
 test("a newer failed source run cannot fall back to an older green run or silently dispatch again", async (t) => {
   const f = fixture(t);
   f.state.sourceConclusion = "failure";
@@ -649,8 +670,25 @@ test("release argument parsing accepts documented inspection flags and rejects u
     help: false,
     dryRun: true,
   });
-  for (const flag of ["--yes", "--skip-ci", "publish"])
+  assert.deepEqual(parseReleaseArgs(["0.3.1"]), {
+    help: false,
+    dryRun: false,
+    version: "0.3.1",
+  });
+  assert.deepEqual(parseReleaseArgs(["--dry-run", "0.3.1"]), {
+    help: false,
+    dryRun: true,
+    version: "0.3.1",
+  });
+  for (const flag of ["--yes", "--skip-ci"])
     assert.throws(() => parseReleaseArgs([flag]), /Usage:/);
+  for (const args of [
+    ["0.3.1", "0.3.2"],
+    ["0.3.1-rc.1"],
+    ["01.3.1"],
+    ["publish"],
+  ])
+    assert.throws(() => parseReleaseArgs(args));
 });
 
 test("the global release lease rejects an active owner and recovers an abandoned owner", async (t) => {

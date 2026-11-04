@@ -363,30 +363,37 @@ Build the companion first, then run `npx playwright test tests/e2e/learning-loca
 The model responses in that browser check are synthetic; [the evaluation guide](learning-workspace-evaluation.md) owns the real LM Studio/Gemma teaching review and its limits.
 To verify a freshly installed tarball, set `LEARNING_COMPANION_BIN` to its launcher and `LEARNING_CODEX_HOME` to its dedicated authenticated profile when running the opt-in browser check.
 
-The repository prepares 0.3.0 (browser protocol 2) with code-free connection; it is not yet published.
-The browser and setup guide use the checkout until registry availability is verified.
+Companion uses browser protocol 2 for code-free connection.
+The browser and setup guide switch to a published version only after registry availability and the distributed-artifact checks are verified.
 For an isolated iteration artifact, set `COMPANION_CHECK_ARTIFACT` to its absolute path in both the checker and onboarding browser test.
 The publisher is bebraw, with access to the `scalableweb` npm organization.
-From a clean, committed and pushed `main`, run the complete publication command:
+From a clean `main`, select the next version and run the complete publication command:
 
 ```sh
-npm run companion:release
+npm run companion:release -- 0.3.1
 ```
 
+The explicit version updates the package manifest, shared release metadata and pinned package README commands, commits only those version changes, pushes `main`, and continues through publication.
+Repeating the same version resumes it without another bump or version commit.
+It rejects a dirty checkout, an older version or an already published new target before editing files.
+If the version is already prepared and pushed, omit the argument: `npm run companion:release`.
+
 Use Node.js 24 or 26, Python 3, Git, npm and an authenticated GitHub CLI (`gh auth login`).
-The command uses the version already prepared in `packages/learning-companion/package.json` and `shared/learning-connection.ts`.
+The package manifest and `shared/learning-connection.ts` must agree on the prepared version.
 It checks that both versions agree and the current commit is the remote `main`, builds and tests the tarball, waits for the four source-package jobs, completes npm login when needed, publishes that exact artifact, verifies the downloaded registry bytes, and waits for all four published-package jobs.
 If no source workflow exists for that commit, it starts one; a failed job stops publication.
 Npm retains its normal browser/2FA prompts, so run the command in a regular interactive terminal.
 The helper does not read or save authentication tokens.
 
-For a rehearsal that builds and checks the package without login, publication or workflow dispatch:
+For a rehearsal of the current revision that builds and checks the package without login, publication or workflow dispatch:
 
 ```sh
 npm run companion:release -- --dry-run
 ```
 
-Interrupted releases resume by rerunning the same command from the same clean revision.
+Add a version to `--dry-run` to preview its preparation without editing, committing or pushing it.
+An already published current version can be built and checked in dry-run mode; this does not authorize publishing replacement bytes.
+Interrupted releases resume by rerunning the same explicit version from the same clean revision.
 The ignored `.local/companion-release/` receipt records the source commit, artifact integrity and exact workflow IDs; keep it with the tested tarball until the release is verified.
 If npm accepted a publish before the terminal lost its response, matching registry integrity lets the command continue without publishing again.
 A different artifact already published under that version, changed source, a modified tarball or an unknown registry response stops the command with recovery guidance.
@@ -400,8 +407,10 @@ This matters because source-built tarballs can have different bytes across build
 The unit checks for release orchestration use synthetic npm/GitHub responses and temporary files, never a real publication.
 Run `node --test tests/learning-release.test.ts` when changing the release owner.
 
-Version selection and announcements remain reviewed source changes.
-For the next release, update the package manifest and shared release metadata together, update pinned package README examples, explain protocol/schema/provider changes, and commit/push before running `companion:release`.
+Choose the version explicitly; the command never guesses a patch, minor or major increment.
+Commit substantive changes and explain protocol/schema/provider changes before running it.
+If a version commit or push fails, its changes remain available for inspection; the command does not roll back or force-push.
+Website announcements remain reviewed source changes.
 The command does not certify real-provider behavior: complete the provider smoke tests described above before release.
 Once the published checks pass, record their source revision, integrity and workflow evidence in ADR-030 and update the website's pending-publication wording and student commands.
 These website changes follow the normal commit, deployment and live-verification process.

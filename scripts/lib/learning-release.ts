@@ -99,7 +99,9 @@ function integrity(bytes: Uint8Array): string {
   return `sha512-${createHash("sha512").update(bytes).digest("base64")}`;
 }
 
-async function execute(command: ReleaseCommand): Promise<ReleaseCommandResult> {
+export async function executeReleaseCommand(
+  command: ReleaseCommand,
+): Promise<ReleaseCommandResult> {
   return new Promise((resolve, reject) => {
     const child = spawn(command.file, command.args, {
       cwd: command.cwd,
@@ -155,12 +157,63 @@ async function execute(command: ReleaseCommand): Promise<ReleaseCommandResult> {
 export function parseReleaseArgs(args: string[]): {
   help: boolean;
   dryRun: boolean;
+  version?: string;
 } {
+  const versions = args.filter((argument) => !argument.startsWith("--"));
   assert(
-    args.every((argument) => argument === "--help" || argument === "--dry-run"),
-    "Usage: npm run companion:release -- [--dry-run | --help]. Prepare and commit version changes separately.",
+    versions.length <= 1 &&
+      args.every(
+        (argument) =>
+          argument === "--help" ||
+          argument === "--dry-run" ||
+          argument === versions[0],
+      ),
+    "Usage: npm run companion:release -- [VERSION] [--dry-run | --help].",
   );
-  return { help: args.includes("--help"), dryRun: args.includes("--dry-run") };
+  if (versions[0]) stableVersion(versions[0]);
+  return {
+    help: args.includes("--help"),
+    dryRun: args.includes("--dry-run"),
+    ...(versions[0] ? { version: versions[0] } : {}),
+  };
+}
+
+/** Both preparation and publication own this lock while changing release state. */
+export function acquireLearningReleaseLock(directory: string): () => void {
+  mkdirSync(directory, { recursive: true });
+  const lockPath = path.join(directory, "release.lock");
+  if (existsSync(lockPath)) {
+    const pid = Number(readFileSync(lockPath, "utf8"));
+    assert(
+      Number.isSafeInteger(pid) && pid > 0,
+      `Invalid release lock; inspect ${lockPath}.`,
+    );
+    try {
+      process.kill(pid, 0);
+      throw new Error(`Another release is running (PID ${pid}).`);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+      unlinkSync(lockPath);
+    }
+  }
+  const lock = openSync(lockPath, "wx");
+  writeFileSync(lock, String(process.pid));
+  closeSync(lock);
+  return () => unlinkSync(lockPath);
+}
+
+export function assertLearningReleaseRuntime(
+  platform: NodeJS.Platform = process.platform,
+  nodeVersion = process.versions.node,
+): void {
+  assert(
+    ["darwin", "linux"].includes(platform),
+    "Companion releases require macOS or Linux.",
+  );
+  assert(
+    [24, 26].includes(Number(nodeVersion.replace(/^v/, "").split(".")[0])),
+    "Companion releases require Node.js 24 or 26.",
+  );
 }
 
 export async function runLearningCompanionRelease(
@@ -168,7 +221,7 @@ export async function runLearningCompanionRelease(
 ) {
   const root = path.resolve(options.root),
     { name, version } = options.release,
-    run = options.run ?? execute,
+    run = options.run ?? executeReleaseCommand,
     fetcher = options.fetch ?? globalThis.fetch,
     sleep =
       options.sleep ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms))),
@@ -182,20 +235,7 @@ export async function runLearningCompanionRelease(
     "Unexpected Companion package name.",
   );
   stableVersion(version);
-  assert(
-    ["darwin", "linux"].includes(options.platform ?? process.platform),
-    "Companion releases require macOS or Linux.",
-  );
-  assert(
-    [24, 26].includes(
-      Number(
-        (options.nodeVersion ?? process.versions.node)
-          .replace(/^v/, "")
-          .split(".")[0],
-      ),
-    ),
-    "Companion releases require Node.js 24 or 26.",
-  );
+  assertLearningReleaseRuntime(options.platform, options.nodeVersion);
   const command = async (
     file: string,
     args: string[],
@@ -276,26 +316,8 @@ export async function runLearningCompanionRelease(
 
   const directory = path.join(root, ".local/companion-release"),
     artifact = path.join(directory, `scalableweb-companion-${version}.tgz`),
-    receiptPath = path.join(directory, `release-${version}.json`),
-    lockPath = path.join(directory, "release.lock");
-  mkdirSync(directory, { recursive: true });
-  if (existsSync(lockPath)) {
-    const pid = Number(readFileSync(lockPath, "utf8"));
-    assert(
-      Number.isSafeInteger(pid) && pid > 0,
-      `Invalid release lock; inspect ${lockPath}.`,
-    );
-    try {
-      process.kill(pid, 0);
-      throw new Error(`Another release is running (PID ${pid}).`);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
-      unlinkSync(lockPath);
-    }
-  }
-  const lock = openSync(lockPath, "wx");
-  writeFileSync(lock, String(process.pid));
-  closeSync(lock);
+    receiptPath = path.join(directory, `release-${version}.json`);
+  const unlock = acquireLearningReleaseLock(directory);
   let receipt: Receipt | undefined;
   const save = () => {
     writeFileSync(
@@ -478,11 +500,11 @@ export async function runLearningCompanionRelease(
     );
     const latest = await registryVersion("latest");
     assert(
-      !latest || !olderThan(version, latest.version),
+      options.dryRun || !latest || !olderThan(version, latest.version),
       `Version ${version} is older than npm latest ${latest?.version}; refusing to move latest backwards.`,
     );
     assert(
-      !registered || receipt,
+      !registered || receipt || options.dryRun,
       `Version ${version} already exists in npm without a matching local release receipt. It will not be republished.`,
     );
     if (receipt) {
@@ -520,6 +542,10 @@ export async function runLearningCompanionRelease(
     );
     await cleanSource();
     if (options.dryRun) {
+      if (registered)
+        log(
+          `Registry already contains ${name}@${version}; a dry run checks this source but cannot republish the existing version.`,
+        );
       const sourceRun = await existingSourceRun();
       const passed =
         sourceRun?.status === "completed" && sourceRun.conclusion === "success";
@@ -688,6 +714,6 @@ export async function runLearningCompanionRelease(
       publishedRunId: receipt.publishedRunId,
     };
   } finally {
-    unlinkSync(lockPath);
+    unlock();
   }
 }
