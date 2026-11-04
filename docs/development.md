@@ -76,7 +76,11 @@ Repository check requirements and independently configured automatic deployment 
 
 External requests have bounded concurrency and timeouts, with one retry for network errors, rate limits, or server errors.
 Bot blocks, authentication responses, timeouts, and other non-success responses besides `404`/`410` are reported as **inconclusive**, not silently counted as verified links or treated as proof of a missing page.
-Inspect these warnings and the report when accepting a publication.
+The checker identifies confirmed Cloudflare challenges through the documented [`cf-mitigated: challenge` response header](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/challenge-pages/detect-response/), regardless of HTTP status.
+A plain `403` remains access denied with an unconfirmed cause; the server name alone does not establish bot protection.
+Console warnings group inconclusive results by final destination host, status and reason, so a publisher's challenge after a DOI redirect is attributed to the publisher.
+The JSON report retains every original URL, final destination, referring page and check result for inspection.
+Inspect these warnings and the report when accepting a publication; a challenge is neither retried nor counted as a verified destination.
 External fragments, soft-404 pages returning `200`, and whether a working destination supports the surrounding claim still need editorial review.
 Run `node --test tests/link-check.test.ts` when changing the checker.
 

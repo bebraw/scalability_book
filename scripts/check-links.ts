@@ -1,6 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { inspectPublishedLinks, checkExternalLinks } from "./lib/link-check.ts";
+import {
+  inspectPublishedLinks,
+  checkExternalLinks,
+  summarizeInconclusiveLinks,
+} from "./lib/link-check.ts";
 import { parseJsonc } from "./lib/text.ts";
 
 const config = parseJsonc(await readFile("site.config.jsonc", "utf8")) as {
@@ -43,8 +47,8 @@ for (const result of missing)
   console.error(
     `ERROR HTTP ${result.status}: ${result.url} (from ${result.sources.join(", ")})`,
   );
-for (const result of inconclusive)
-  console.warn(`INCONCLUSIVE ${result.status ?? result.detail}: ${result.url}`);
+for (const summary of summarizeInconclusiveLinks(inconclusive))
+  console.warn(summary);
 console.log(
   `${local.pages} pages, ${local.localLinks} local links, ${external.length} external URLs: ${local.errors.length + missing.length} broken, ${inconclusive.length} inconclusive. Report: ${reportPath}`,
 );

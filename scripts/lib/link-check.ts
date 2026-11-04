@@ -139,7 +139,10 @@ export async function checkExternalLinks(
             },
           });
           await response.body?.cancel();
+          const challenged =
+            response.headers.get("cf-mitigated") === "challenge";
           if (
+            !challenged &&
             attempt === 1 &&
             (response.status === 429 || response.status >= 500)
           )
@@ -149,11 +152,18 @@ export async function checkExternalLinks(
             sources: [...sources].sort(),
             status: response.status,
             finalUrl: response.url || url,
-            outcome: [404, 410].includes(response.status)
-              ? "missing"
-              : response.ok
-                ? "ok"
-                : "inconclusive",
+            outcome: challenged
+              ? "inconclusive"
+              : [404, 410].includes(response.status)
+                ? "missing"
+                : response.ok
+                  ? "ok"
+                  : "inconclusive",
+            ...(challenged
+              ? { detail: "Cloudflare challenge" }
+              : response.status === 403
+                ? { detail: "Access denied; cause not confirmed" }
+                : {}),
             attempts: attempt,
           });
           break;
@@ -172,4 +182,37 @@ export async function checkExternalLinks(
   }
   await Promise.all(Array.from({ length: options.concurrency ?? 6 }, worker));
   return results.sort((a, b) => a.url.localeCompare(b.url));
+}
+
+export function summarizeInconclusiveLinks(
+  results: ExternalLinkResult[],
+): string[] {
+  const groups = new Map<
+    string,
+    {
+      host: string;
+      status: number | undefined;
+      detail: string | undefined;
+      count: number;
+    }
+  >();
+  for (const result of results) {
+    if (result.outcome !== "inconclusive") continue;
+    const host = new URL(result.finalUrl ?? result.url).hostname;
+    const key = JSON.stringify([host, result.status, result.detail]);
+    const group = groups.get(key) ?? {
+      host,
+      status: result.status,
+      detail: result.detail,
+      count: 0,
+    };
+    group.count++;
+    groups.set(key, group);
+  }
+  return [...groups.values()]
+    .map(
+      ({ host, status, detail, count }) =>
+        `INCONCLUSIVE ${host}: ${count} URL${count === 1 ? "" : "s"} — ${[status === undefined ? undefined : `HTTP ${status}`, detail].filter(Boolean).join("; ")}`,
+    )
+    .sort((a, b) => a.localeCompare(b));
 }

@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   inspectPublishedLinks,
   checkExternalLinks,
+  summarizeInconclusiveLinks,
 } from "../scripts/lib/link-check.ts";
 
 test("published links resolve pages, encoded anchors and downloads, retaining broken-link sources", async () => {
@@ -56,6 +57,92 @@ test("published links resolve pages, encoded anchors and downloads, retaining br
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("challenge headers distinguish bot checks from ordinary access denial regardless of status", async () => {
+  const cases = [
+    { name: "challenge", status: 403, challenge: true },
+    { name: "challenge-success", status: 200, challenge: true },
+    { name: "challenge-missing", status: 404, challenge: true },
+    { name: "challenge-unavailable", status: 503, challenge: true },
+    { name: "forbidden", status: 403, challenge: false },
+  ];
+  const results = await checkExternalLinks(
+    new Map(
+      cases.map(({ name }) => [
+        `https://publisher.example/${name}`,
+        new Set(["chapter/index.html"]),
+      ]),
+    ),
+    {
+      fetch: async (input) => {
+        const fixture = cases.find(({ name }) =>
+          String(input).endsWith(`/${name}`),
+        )!;
+        return new Response(null, {
+          status: fixture.status,
+          headers: {
+            server: "cloudflare",
+            ...(fixture.challenge ? { "cf-mitigated": "challenge" } : {}),
+          },
+        });
+      },
+    },
+  );
+  assert.ok(results.every((result) => result.outcome === "inconclusive"));
+  assert.equal(
+    results.find((result) => result.url.endsWith("/challenge"))?.detail,
+    "Cloudflare challenge",
+  );
+  assert.equal(
+    results.find((result) => result.url.endsWith("/forbidden"))?.detail,
+    "Access denied; cause not confirmed",
+  );
+  assert.ok(results.every((result) => result.attempts === 1));
+});
+
+test("inconclusive summaries group by actual destination and cause without losing source URLs", () => {
+  const results = [
+    {
+      url: "https://doi.org/10.1/a",
+      finalUrl: "https://publisher.example/paper/a",
+      sources: ["chapter/index.html"],
+      status: 403,
+      detail: "Cloudflare challenge",
+      outcome: "inconclusive" as const,
+      attempts: 1,
+    },
+    {
+      url: "https://doi.org/10.1/b",
+      finalUrl: "https://publisher.example/paper/b",
+      sources: ["appendix/index.html"],
+      status: 403,
+      detail: "Cloudflare challenge",
+      outcome: "inconclusive" as const,
+      attempts: 1,
+    },
+    {
+      url: "https://publisher.example/restricted",
+      sources: ["chapter/index.html"],
+      status: 403,
+      detail: "Access denied; cause not confirmed",
+      outcome: "inconclusive" as const,
+      attempts: 1,
+    },
+    {
+      url: "https://publisher.example/removed",
+      sources: ["chapter/index.html"],
+      status: 404,
+      outcome: "missing" as const,
+      attempts: 1,
+    },
+  ];
+  const before = JSON.stringify(results);
+  assert.deepEqual(summarizeInconclusiveLinks(results), [
+    "INCONCLUSIVE publisher.example: 1 URL — HTTP 403; Access denied; cause not confirmed",
+    "INCONCLUSIVE publisher.example: 2 URLs — HTTP 403; Cloudflare challenge",
+  ]);
+  assert.equal(JSON.stringify(results), before);
 });
 
 test("an empty build cannot silently pass link validation", async () => {
