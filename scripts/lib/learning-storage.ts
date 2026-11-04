@@ -9,7 +9,8 @@ import {
   rmSync,
   rmdirSync,
   readdirSync,
-  cpSync,
+  copyFileSync,
+  constants,
   renameSync,
   chmodSync,
 } from "node:fs";
@@ -124,6 +125,30 @@ function privateTree(directory: string) {
     else chmodSync(file, 0o600);
   }
 }
+/** Copy learning state without externally created Codex credential files. */
+function copyMigrationTree(source: string, destination: string, root = true) {
+  for (const name of readdirSync(source)) {
+    // Some supported filesystems resolve credential names case-insensitively.
+    const credentialName = name.toLowerCase();
+    if (
+      credentialName === "auth.json" ||
+      (root &&
+        (name === "companion.lock" || name === "companion-settings.json"))
+    )
+      continue;
+    const from = path.join(source, name);
+    const to = path.join(destination, name);
+    const state = lstatSync(from);
+    learningAssert(
+      !state.isSymbolicLink() && (state.isFile() || state.isDirectory()),
+      "Migration requires regular local files and directories.",
+    );
+    if (state.isDirectory()) {
+      mkdirSync(to, { mode: 0o700 });
+      copyMigrationTree(from, to, false);
+    } else copyFileSync(from, to, constants.COPYFILE_EXCL);
+  }
+}
 export function migrateLearningDirectory(
   source: string,
   destination: string,
@@ -164,17 +189,14 @@ export function migrateLearningDirectory(
         path.join(source, "local-provider.sqlite"),
         "local-provider",
       );
+    if (existsSync(path.join(source, "api-provider.sqlite")))
+      inspectLearningDatabase(
+        path.join(source, "api-provider.sqlite"),
+        "api-provider",
+      );
     mkdirSync(path.dirname(destination), { recursive: true });
     ensureLearningDirectory(stage);
-    for (const name of readdirSync(source)) {
-      if (name === "companion.lock" || name === "companion-settings.json")
-        continue;
-      cpSync(path.join(source, name), path.join(stage, name), {
-        recursive: true,
-        errorOnExist: true,
-        force: false,
-      });
-    }
+    copyMigrationTree(source, stage);
     privateTree(stage);
     // An empty destination may have been created by setup; check again at publication.
     if (existsSync(destination)) {
@@ -188,13 +210,17 @@ export function migrateLearningDirectory(
     return {
       source,
       destination,
+      credentials:
+        "Saved keys remain in the OS credential store. API credential identity was retained when present; sign in on another computer. Codex auth.json was not copied; a relocated Codex profile requires login. The source was retained.",
       providerContinuity: existsSync(
-        path.join(destination, "local-provider.sqlite"),
+        path.join(destination, "api-provider.sqlite"),
       )
-        ? "Local transcripts copied; configure the same endpoint/model/tool mode to resume. Retain any Codex profile for its conversations."
-        : existsSync(path.join(destination, "codex"))
-          ? "Profile copied; verify sign-in and thread resume."
-          : "No provider profile copied; use --codex-home for the retained profile or sign in again.",
+        ? "API transcripts copied; configure the same provider/endpoint/model/tool mode to resume. Retain any local transcripts and Codex profile for their conversations."
+        : existsSync(path.join(destination, "local-provider.sqlite"))
+          ? "Local transcripts copied; configure the same endpoint/model/tool mode to resume. Retain any Codex profile for its conversations."
+          : existsSync(path.join(destination, "codex"))
+            ? "Profile threads copied without credentials; sign in at the new profile path before resuming."
+            : "No provider profile copied; use --codex-home for the retained profile or sign in again.",
     };
   } finally {
     if (existsSync(stage)) rmSync(stage, { recursive: true });

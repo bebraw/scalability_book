@@ -358,7 +358,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       "p",
       options.provider
         ? `${options.provider} enabled. Send a message to check that it can reply.`
-        : "Notebook-only connection. Enable Codex or a local model for assistant replies. Your message stays here while you set up the provider.",
+        : "Notebook-only connection. Choose Codex, an API key provider or a local model for assistant replies. Your message stays here while you set up the provider.",
     ),
   );
   if (!options.provider)

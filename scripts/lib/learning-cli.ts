@@ -8,9 +8,7 @@ import {
   accessSync,
   constants,
 } from "node:fs";
-import { spawnSync, spawn } from "node:child_process";
 import { createServer } from "node:net";
-import { createInterface } from "node:readline/promises";
 import { once } from "node:events";
 import { companionRelease } from "../../shared/learning-connection.ts";
 import {
@@ -25,8 +23,8 @@ import {
 } from "./learning-storage.ts";
 import { inspectLearningDatabase } from "./learning-database.ts";
 import {
-  learningCodexEnvironment,
   learningCodexVersion,
+  learningCodexSignedIn,
   validateLearningCodexProfile,
 } from "./learning-codex.ts";
 import {
@@ -39,6 +37,19 @@ import {
   type LocalModelOptions,
 } from "./learning-local-model.ts";
 import { startLearningCompanion } from "./learning-companion-server.ts";
+import {
+  loginLearningCodex,
+  logoutLearningCodex,
+} from "./learning-codex-login.ts";
+import { inspectApiModel, type ApiModelOptions } from "./learning-api-model.ts";
+import {
+  readLearningApiKey,
+  deleteLearningApiKey,
+  saveLearningApiKey,
+  validateLearningApiKey,
+} from "./learning-api-credentials.ts";
+import { learningQuestion, learningNextCommand } from "./learning-setup.ts";
+import { configureLearningApi } from "./learning-api-setup.ts";
 
 declare const __LEARNING_SOURCE_REVISION__: string;
 const sourceRevision =
@@ -73,18 +84,13 @@ function codexVersionCheck(home: string): Check {
   };
 }
 function codexSignInCheck(home: string): Check {
-  const auth = spawnSync(
-    "codex",
-    ["login", "status", "-c", 'cli_auth_credentials_store="file"'],
-    { env: learningCodexEnvironment(home), stdio: "ignore", timeout: 8000 },
-  );
+  const signedIn = learningCodexSignedIn(home);
   return {
     name: "Codex sign-in",
-    ok: auth.status === 0,
-    message:
-      auth.status === 0
-        ? "Dedicated profile reports signed in; account access is checked on the first reply."
-        : "Run login with this same directory/profile, then start again. Your ordinary Codex profile is unchanged.",
+    ok: signedIn,
+    message: signedIn
+      ? "Dedicated OS keychain reports signed in; account access is checked on the first reply."
+      : "Unlock your OS keychain and run login with this same directory/profile, then start again. Codex requires an available credential store; Linux also needs a Secret Service session.",
   };
 }
 function providerCheck(home: string): Check[] {
@@ -100,12 +106,20 @@ export async function runLearningCli(
       args: argv,
       allowPositionals: true,
       options: {
-        port: { type: "string", default: "8788" },
+        port: { type: "string" },
         origin: { type: "string", multiple: true },
         directory: { type: "string" },
         codex: { type: "boolean" },
         notebook: { type: "boolean" },
         local: { type: "boolean" },
+        api: { type: "boolean" },
+        "api-provider": { type: "string" },
+        "api-url": { type: "string" },
+        "api-context": { type: "string" },
+        "api-output": { type: "string" },
+        "api-tools": { type: "string" },
+        "api-key-env": { type: "string" },
+        "with-api-key": { type: "boolean" },
         "local-url": { type: "string" },
         "local-tools": { type: "string" },
         "local-context": { type: "string" },
@@ -127,40 +141,25 @@ export async function runLearningCli(
     const command = positionals[0] ?? "start";
     if (values.help) {
       console.log(
-        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, start (default), doctor, migrate\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --local, --codex-home <path>, --model <name>, --local-url <loopback /v1 URL>, --local-tools none|native, --local-context <loaded tokens>\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json\nSetup starts notebook-only unless you choose Codex or Local model. Local defaults to discussion-only; native tools require verification on your model. Start trusts only https://scalableweb.dev by default; use --origin for local development. Connect from the book without a code. Stop with Ctrl+C; your work remains local.`,
+        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, logout, start (default), doctor, migrate\nRun setup in a terminal for guided provider selection and authentication.\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --local, --api, --codex-home <path>, --model <name>\nLocal model: --local-url <loopback /v1 URL>, --local-tools none|native, --local-context <loaded tokens>\nAPI: --api-provider openai|anthropic|gemini|openrouter|compatible, --api-url <HTTPS base URL>, --api-context <tokens>, --api-output <tokens>, --api-tools none|native, --api-key-env <variable name>\nAuthentication: login --with-api-key reads a key from stdin for the selected Codex/API provider; setup --api --with-api-key also accepts stdin. Keys are stored in the OS keychain, or read from --api-key-env. Never put the key in an argument. Logout removes the selected stored credential.\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json (no paid generation)\nLocal and API models default to discussion-only; native tools require verification on your model. Setup retains your origin and port. Start trusts only https://scalableweb.dev before setup; use --origin for local development. Connect from the book without a code. Stop with Ctrl+C; your work remains local.`,
       );
       return;
     }
     learningAssert(
       positionals.length <= 1 &&
-        ["setup", "login", "start", "doctor", "migrate"].includes(command),
-      "Choose setup, login, start, doctor or migrate; use --help for options.",
+        ["setup", "login", "logout", "start", "doctor", "migrate"].includes(
+          command,
+        ),
+      "Choose setup, login, logout, start, doctor or migrate; use --help for options.",
     );
     learningAssert(
-      [values.codex, values.notebook, values.local].filter(Boolean).length <= 1,
-      "Choose one of --codex, --notebook or --local.",
+      [values.codex, values.notebook, values.local, values.api].filter(Boolean)
+        .length <= 1,
+      "Choose one of --codex, --notebook, --local or --api.",
     );
     const directory = path.resolve(
       values.directory ?? defaults.defaultDirectory ?? learningDataDirectory(),
     );
-    const port = Number(values.port);
-    learningAssert(
-      Number.isInteger(port) && port >= 1024 && port <= 65535,
-      "Choose a port from 1024 to 65535.",
-    );
-    const origins = values.origin ?? ["https://scalableweb.dev"];
-    for (const origin of origins) {
-      let valid = false;
-      try {
-        valid = new URL(origin).origin === origin && /^https?:/.test(origin);
-      } catch {
-        /* Report invalid origins without echoing arbitrary input. */
-      }
-      learningAssert(
-        valid,
-        "Configure exact HTTP(S) origins, such as https://scalableweb.dev.",
-      );
-    }
     const settingsFile = path.join(directory, "companion-settings.json");
     let settings: LearningSettings = {};
     if (existsSync(settingsFile)) {
@@ -175,17 +174,53 @@ export async function runLearningCli(
         );
       }
     }
-    let mode: "notebook" | "codex" | "local" = values.notebook
+    const port = Number(values.port ?? settings.port ?? 8788);
+    learningAssert(
+      Number.isInteger(port) && port >= 1024 && port <= 65535,
+      "Choose a port from 1024 to 65535.",
+    );
+    const origins = values.origin ??
+      settings.origins ?? ["https://scalableweb.dev"];
+    for (const origin of origins) {
+      let valid = false;
+      try {
+        valid = new URL(origin).origin === origin && /^https?:/.test(origin);
+      } catch {
+        /* Report no arbitrary input. */
+      }
+      learningAssert(
+        valid,
+        "Configure exact HTTP(S) origins, such as https://scalableweb.dev.",
+      );
+    }
+    let mode: "notebook" | "codex" | "local" | "api" = values.notebook
       ? "notebook"
       : values.codex
         ? "codex"
         : values.local
           ? "local"
-          : (settings.provider ?? (settings.codex ? "codex" : "notebook"));
+          : values.api
+            ? "api"
+            : (settings.provider ?? (settings.codex ? "codex" : "notebook"));
+    learningAssert(
+      !values["with-api-key"] ||
+        command === "login" ||
+        (command === "setup" && mode === "api"),
+      "Use --with-api-key with login, or setup --api, and pipe the key on stdin.",
+    );
+    learningAssert(
+      !values["api-key-env"] ||
+        /^[A-Za-z_][A-Za-z0-9_]{0,127}$/.test(values["api-key-env"]),
+      "Choose a valid environment variable name with --api-key-env.",
+    );
+    learningAssert(
+      !(values["api-key-env"] && values["with-api-key"]),
+      "Choose an environment variable or a key from stdin, not both.",
+    );
     let localModel = values.model ?? settings.local?.model;
     let localUrl =
       values["local-url"] ?? settings.local?.url ?? "http://127.0.0.1:1234/v1";
-    const home = path.resolve(
+    const profileDirectory = path.resolve(
       values["codex-home"] ??
         settings.codexHome ??
         path.join(directory, "codex"),
@@ -219,41 +254,49 @@ export async function runLearningCli(
       throw new LearningProblem(
         `An existing repository notebook was found at ${legacy}. Run migrate --from "${legacy}" --confirm-stopped, or explicitly choose --directory. Your old work has not moved.`,
       );
-    if (
+    const guided =
       command === "setup" &&
       values.codex === undefined &&
       values.notebook === undefined &&
       values.local === undefined &&
-      process.stdin.isTTY
-    ) {
-      const input = createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-      try {
-        const answer = await input.question(
-          "Choose 1 for notebook-only, 2 for Codex, 3 for Local model, or Enter to cancel: ",
-        );
-        if (!answer) return;
-        learningAssert(
-          ["1", "2", "3"].includes(answer),
-          "Choose 1, 2 or 3 and rerun setup.",
-        );
-        mode = answer === "2" ? "codex" : answer === "3" ? "local" : "notebook";
-        if (mode === "local") {
-          localUrl =
-            (await input.question(`Local API URL [${localUrl}]: `)).trim() ||
-            localUrl;
-          localModel =
-            (
-              await input.question(
-                `Loaded language-model identifier${localModel ? ` [${localModel}]` : ""}: `,
-              )
-            ).trim() || localModel;
-        }
-      } finally {
-        input.close();
-      }
+      values.api === undefined &&
+      process.stdin.isTTY &&
+      process.stdout.isTTY;
+    let codexApiLogin = false;
+    if (guided) {
+      console.log(
+        "Choose how to use Companion:\n  1. Notebook only — no model account\n  2. Codex with ChatGPT sign-in\n  3. Codex with an OpenAI API key\n  4. API key directly — OpenAI, Anthropic, Gemini, OpenRouter or a compatible service; no Codex required\n  5. A local model in LM Studio\nAPI key usage is billed by your provider. Setup checks access without generating a paid reply.",
+      );
+      const answer = (
+        await learningQuestion("Choice (1–5, or Enter to cancel): ")
+      ).trim();
+      if (!answer) return;
+      learningAssert(
+        ["1", "2", "3", "4", "5"].includes(answer),
+        "Choose 1–5 and rerun setup.",
+      );
+      mode =
+        answer === "1"
+          ? "notebook"
+          : answer === "4"
+            ? "api"
+            : answer === "5"
+              ? "local"
+              : "codex";
+      codexApiLogin = answer === "3";
+    }
+    if (command === "setup" && mode === "local" && process.stdin.isTTY) {
+      if (!values["local-url"])
+        localUrl =
+          (await learningQuestion(`Local API URL [${localUrl}]: `)).trim() ||
+          localUrl;
+      if (!values.model)
+        localModel =
+          (
+            await learningQuestion(
+              `Loaded language-model identifier${localModel ? ` [${localModel}]` : ""}: `,
+            )
+          ).trim() || localModel;
     }
     const codex = mode === "codex";
     const local: LocalModelOptions | undefined =
@@ -279,66 +322,171 @@ export async function runLearningCli(
       "Choose --local when configuring local-model options.",
     );
     if (local) validateLocalModelOptions(local);
+    learningAssert(
+      mode === "api" ||
+        ![
+          values["api-provider"],
+          values["api-url"],
+          values["api-context"],
+          values["api-output"],
+          values["api-tools"],
+          values["api-key-env"],
+        ].some((value) => value !== undefined),
+      "Choose --api when configuring API provider options.",
+    );
+    learningAssert(
+      !values["with-api-key"] || codex || mode === "api",
+      "API key login is available only for Codex or an API provider. Run setup to choose a provider.",
+    );
+    let api: ApiModelOptions | undefined;
+    let apiKey: string | undefined;
+    let apiKeyEnv: string | undefined;
+    let newApiKey = false;
+    if (command === "login" || command === "logout") {
+      learningAssert(
+        mode === "codex" || mode === "api",
+        "Notebook-only and local-model modes need no provider login or logout. Run setup to choose a provider.",
+      );
+      learningAssert(
+        ![
+          values["api-provider"],
+          values["api-url"],
+          values["api-context"],
+          values["api-output"],
+          values["api-tools"],
+          values.model,
+        ].some((value) => value !== undefined),
+        "Use setup to change the provider, endpoint, model or context. Login and logout use your saved provider configuration.",
+      );
+      learningAssert(
+        mode !== "api" || (settings.provider === "api" && settings.api),
+        "Run setup --api with the provider and model before updating its credentials with login.",
+      );
+    }
+    learningAssert(
+      command !== "logout" || !values["api-key-env"],
+      "Logout uses your saved credential source. Run setup to change it.",
+    );
     ensureLearningDirectory(directory);
     accessSync(directory, constants.W_OK);
     const release =
       command === "start" ? null : lockLearningDirectory(directory);
     try {
+      if (mode === "api")
+        ({ api, apiKey, apiKeyEnv, newApiKey } = await configureLearningApi({
+          command,
+          guided: Boolean(guided),
+          directory,
+          settings,
+          values,
+        }));
+      if (command === "logout") {
+        if (api) {
+          learningAssert(
+            !apiKeyEnv,
+            "This setup reads an environment variable. Unset that variable in your terminal or revoke the key with your provider; no stored key was removed.",
+          );
+          const removed = await deleteLearningApiKey(directory, api.url);
+          console.log(
+            removed
+              ? "Removed the selected API key from the OS keychain. Your notes and conversations were retained."
+              : "No API key was stored for this notebook and endpoint.",
+          );
+        } else {
+          const version = codexVersionCheck(profileDirectory);
+          learningAssert(version.ok, version.message);
+          await logoutLearningCodex({ profileDirectory });
+          console.log(
+            "Removed Companion's Codex keychain credentials. Your notes and conversations were retained.",
+          );
+        }
+        return;
+      }
       if (command === "setup") {
         await checkLearningPort(port);
-        if (codex) await validateLearningCodexProfile(home, false);
+        if (codex) {
+          await validateLearningCodexProfile(profileDirectory);
+          if (guided) {
+            const version = codexVersionCheck(profileDirectory);
+            learningAssert(version.ok, version.message);
+            if (codexApiLogin) {
+              const key = validateLearningApiKey(
+                (
+                  await learningQuestion(
+                    "OpenAI API key (hidden; stored in Companion's OS keychain entry): ",
+                    true,
+                  )
+                ).trim(),
+              );
+              await loginLearningCodex({ profileDirectory, apiKey: key });
+            } else await loginLearningCodex({ profileDirectory });
+          }
+        }
         const localInfo = local ? await inspectLocalModel(local) : null;
+        const apiInfo = api ? await inspectApiModel(api, apiKey!) : null;
+        if (api && newApiKey)
+          await saveLearningApiKey(directory, api.url, apiKey!);
         const stage = `${settingsFile}.next`;
         writeFileSync(
           stage,
           JSON.stringify({
             provider: mode,
+            port,
+            origins,
             ...(codex
               ? {
-                  codexHome: home,
+                  codexHome: profileDirectory,
                   ...((values.model ?? settings.model)
                     ? { model: values.model ?? settings.model }
                     : {}),
                 }
               : {}),
             ...(local ? { local } : {}),
+            ...(api ? { api, ...(apiKeyEnv ? { apiKeyEnv } : {}) } : {}),
           }),
           { mode: 0o600 },
         );
         renameSync(stage, settingsFile);
         console.log(
-          `Storage: ${directory}\nPackage: ${companionRelease.version}; protocol: ${companionRelease.protocol}\n${codex ? `Dedicated Codex profile: ${home}\nRun doctor --codex, then login if needed.` : localInfo ? `Local model: ${localInfo.model}; context budget ${localInfo.contextWindow} tokens; tools ${local!.tools}. No Codex sign-in needed.` : "Notebook-only setup is ready."}\nRun start with these same directory options, then connect in https://scalableweb.dev/notebook/setup/.`,
+          `Storage: ${directory}\nPackage: ${companionRelease.version}; protocol: ${companionRelease.protocol}\n${codex ? `Dedicated Codex profile: ${profileDirectory}` : localInfo ? `Local model: ${localInfo.model}; context budget ${localInfo.contextWindow} tokens; tools ${local!.tools}. No Codex sign-in needed.` : apiInfo ? `API model: ${apiInfo.model}; context budget ${apiInfo.contextWindow} tokens; tools ${api!.tools}. No Codex installation needed.` : "Notebook-only setup is ready."}\nAllowed websites: ${origins.join(", ")}\nNext, start Companion and keep this terminal open:\n${learningNextCommand(directory, Boolean(defaults.defaultDirectory))}\nThen open Notebook → Connect in the book and use http://127.0.0.1:${port}. Send your first question to verify model access; setup has not generated a reply.`,
         );
         if (codex)
-          for (const check of providerCheck(home))
+          for (const check of providerCheck(profileDirectory))
             console.log(
               `${check.ok ? "OK" : "ACTION"} ${check.name}: ${check.message}`,
             );
         return;
       }
       if (command === "login") {
+        if (api) {
+          await inspectApiModel(api, apiKey!);
+          if (newApiKey) await saveLearningApiKey(directory, api.url, apiKey!);
+          // Switching from an environment reference to a saved key is deliberate.
+          if (newApiKey || values["api-key-env"] !== undefined) {
+            if (apiKeyEnv) settings.apiKeyEnv = apiKeyEnv;
+            else delete settings.apiKeyEnv;
+            const stage = `${settingsFile}.next`;
+            writeFileSync(stage, JSON.stringify(settings), { mode: 0o600 });
+            renameSync(stage, settingsFile);
+          }
+          console.log(
+            "API model listed and credential choice saved. Send your first question to check generation access; no paid reply was generated during setup.",
+          );
+          return;
+        }
         learningAssert(
           !local,
           "Local models need no Codex sign-in. Start LM Studio and load your chosen model instead.",
         );
-        await validateLearningCodexProfile(home, false);
-        const version = providerCheck(home)[0]!;
+        const version = codexVersionCheck(profileDirectory);
         learningAssert(version.ok, version.message);
-        const profileRelease = lockLearningDirectory(home);
-        try {
-          const child = spawn(
-            "codex",
-            ["login", "-c", 'cli_auth_credentials_store="file"'],
-            { env: learningCodexEnvironment(home), stdio: "inherit" },
-          );
-          const [code] = await once(child, "exit");
-          learningAssert(
-            code === 0,
-            "Codex sign-in did not complete. Rerun login; your notebook was retained.",
-          );
-        } finally {
-          profileRelease();
-        }
+        await loginLearningCodex({
+          profileDirectory,
+          withApiKey: values["with-api-key"] ?? false,
+        });
+        console.log(
+          "Codex authentication saved in Companion's OS keychain entry. Start Companion, then send a question in the book.",
+        );
         return;
       }
       const checks: Check[] = [];
@@ -346,6 +494,7 @@ export async function runLearningCli(
         ["notebook.sqlite", "notebook"],
         ["conversations.sqlite", "conversations"],
         ["local-provider.sqlite", "local-provider"],
+        ["api-provider.sqlite", "api-provider"],
       ] as const) {
         if (existsSync(path.join(directory, file))) {
           try {
@@ -385,11 +534,11 @@ export async function runLearningCli(
         });
       }
       if (codex) {
-        const version = codexVersionCheck(home);
+        const version = codexVersionCheck(profileDirectory);
         checks.push(version);
         try {
-          await validateLearningCodexProfile(home, false);
-          if (version.ok) checks.push(codexSignInCheck(home));
+          await validateLearningCodexProfile(profileDirectory);
+          if (version.ok) checks.push(codexSignInCheck(profileDirectory));
         } catch (error) {
           checks.push({
             name: "Dedicated profile",
@@ -418,14 +567,44 @@ export async function runLearningCli(
           });
         }
       }
+      let apiInfo: Awaited<ReturnType<typeof inspectApiModel>> | undefined;
+      if (api) {
+        try {
+          apiKey = await readLearningApiKey(directory, api.url, apiKeyEnv);
+          apiInfo = await inspectApiModel(api, apiKey);
+          checks.push({
+            name: "API model",
+            ok: true,
+            message: `${apiInfo.model}; budget ${apiInfo.contextWindow}; tools ${api.tools}. Model listing succeeded; the first question checks generation access. No paid reply was generated.`,
+          });
+        } catch (error) {
+          checks.push({
+            name: "API model",
+            ok: false,
+            message:
+              error instanceof LearningProblem
+                ? error.message
+                : "API diagnosis failed; your work was retained.",
+          });
+        }
+      }
       const optionalChecks =
-        command === "doctor" && !codex ? [codexVersionCheck(home)] : [];
+        command === "doctor" && !codex
+          ? [codexVersionCheck(profileDirectory)]
+          : [];
       const report = {
         release: { ...companionRelease, sourceRevision },
-        connection: { origins },
+        connection: { origins, port },
         storage: directory,
-        provider: codex ? "Codex" : local ? "Local model" : null,
+        provider: codex
+          ? "Codex"
+          : local
+            ? "Local model"
+            : api
+              ? "API model"
+              : null,
         ...(localInfo ? { localModel: localInfo, toolMode: local!.tools } : {}),
+        ...(apiInfo ? { apiModel: apiInfo, toolMode: api!.tools } : {}),
         checks,
         ...(optionalChecks.length ? { optionalChecks } : {}),
       };
@@ -433,7 +612,7 @@ export async function runLearningCli(
         if (values.json) console.log(JSON.stringify(report, null, 2));
         else {
           console.log(
-            `Storage: ${directory}\nPackage ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook/archive schema 1\nMode: ${codex ? "Codex" : local ? "Local model" : "Notebook only"}\nAllowed websites: ${origins.join(", ")}`,
+            `Storage: ${directory}\nPackage ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook/archive schema 1\nMode: ${codex ? "Codex" : local ? "Local model" : api ? "API model" : "Notebook only"}\nAllowed websites: ${origins.join(", ")}`,
           );
           for (const check of checks)
             console.log(
@@ -465,8 +644,9 @@ export async function runLearningCli(
       port,
       origins,
       sourceRevision,
-      ...(codex ? { codexHome: home } : {}),
+      ...(codex ? { codexHome: profileDirectory } : {}),
       ...(local ? { local } : {}),
+      ...(api ? { api, apiKey: apiKey! } : {}),
       ...(codex && (values.model ?? settings.model)
         ? { model: values.model ?? settings.model! }
         : {}),

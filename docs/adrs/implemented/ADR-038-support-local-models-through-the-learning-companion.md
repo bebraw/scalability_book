@@ -86,6 +86,7 @@ Do not silently retry a failed tool workflow as discussion-only while presenting
 Configure the upstream in the CLI, not from browser/provider-generated URLs.
 Initially accept only literal loopback HTTP endpoints, with no URL credentials/query/fragment and no redirects.
 Keep API keys unnecessary for the verified credential-free LM Studio setup; authenticated or remote endpoints require a separately specified configuration contract.
+[ADR-060](ADR-060-support-student-api-keys-and-guided-companion-setup.md) now supplies that separate HTTPS API contract while retaining these loopback constraints.
 The browser needs no direct model-server CORS permission because the companion makes the request.
 Keep [ADR-037](../implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md)'s configured website trust and origin-bound sessions.
 Do not equate a loopback URL with guaranteed local inference: a runner can proxy remote/cloud models.

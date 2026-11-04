@@ -7,6 +7,8 @@ import {
   readdirSync,
   copyFileSync,
   writeFileSync,
+  mkdirSync,
+  existsSync,
 } from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
@@ -159,4 +161,90 @@ test("explicit migration retains the source and revisions, rejects conflicts and
   moved.close();
   assert.throws(() => migrateLearningDirectory(old, next, true), /not empty/);
   assert.deepEqual(readFileSync(path.join(old, "notebook.sqlite")), original);
+});
+
+test("directory migration retains credential identity and history while excluding Codex credential files", (t) => {
+  const directory = mkdtempSync(
+    path.join(tmpdir(), "book-keychain-migration-"),
+  );
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const old = path.join(directory, "old");
+  const next = path.join(directory, "next");
+  const notebook = openLearningNotebook(old);
+  const entry = notebook.saveEntry({
+    kind: "reflection",
+    source,
+    title: "Private reasoning",
+    body: "Synthetic retained notebook work",
+  });
+  notebook.close();
+  const identity = JSON.stringify({
+    version: 1,
+    id: "45e5df9b-a407-4eaa-9b2c-c55f1c59536e",
+  });
+  writeFileSync(path.join(old, "credential-identity.json"), identity, {
+    mode: 0o600,
+  });
+  const api = openLearningDatabase(
+    path.join(old, "api-provider.sqlite"),
+    "api-provider",
+    "CREATE TABLE api_sessions (id TEXT PRIMARY KEY, body TEXT NOT NULL)",
+  );
+  api
+    .prepare("INSERT INTO api_sessions VALUES (?,?)")
+    .run("api-synthetic", "Synthetic API conversation");
+  api.close();
+  mkdirSync(path.join(old, "codex", "sessions"), { recursive: true });
+  const thread = "Synthetic Codex thread context";
+  writeFileSync(path.join(old, "codex", "sessions", "thread.jsonl"), thread);
+  writeFileSync(
+    path.join(old, "companion-settings.json"),
+    JSON.stringify({ provider: "api" }),
+  );
+  const secretFiles = ["auth.json", "codex/sessions/AUTH.JSON"];
+  for (const filename of secretFiles)
+    writeFileSync(path.join(old, filename), "synthetic-secret-never-copy", {
+      mode: 0o600,
+    });
+  const originalNotebook = readFileSync(path.join(old, "notebook.sqlite"));
+  const originalApi = readFileSync(path.join(old, "api-provider.sqlite"));
+  const result = migrateLearningDirectory(old, next, true);
+  assert.match(result.credentials, /another computer/);
+  assert.match(result.credentials, /relocated Codex profile requires login/);
+  assert.equal(
+    JSON.stringify(result).includes("synthetic-secret-never-copy"),
+    false,
+  );
+  for (const filename of secretFiles) {
+    assert.equal(existsSync(path.join(next, filename)), false, filename);
+    assert.equal(
+      readFileSync(path.join(old, filename), "utf8"),
+      "synthetic-secret-never-copy",
+      filename,
+    );
+  }
+  assert.equal(
+    readFileSync(path.join(next, "credential-identity.json"), "utf8"),
+    identity,
+  );
+  assert.equal(
+    readFileSync(path.join(next, "codex", "sessions", "thread.jsonl"), "utf8"),
+    thread,
+  );
+  assert.equal(existsSync(path.join(next, "companion-settings.json")), false);
+  assert.deepEqual(
+    readFileSync(path.join(next, "notebook.sqlite")),
+    originalNotebook,
+  );
+  assert.deepEqual(
+    readFileSync(path.join(next, "api-provider.sqlite")),
+    originalApi,
+  );
+  assert.deepEqual(
+    readFileSync(path.join(old, "notebook.sqlite")),
+    originalNotebook,
+  );
+  const restored = openLearningNotebook(next);
+  assert.deepEqual(restored.entry(entry.id), entry);
+  restored.close();
 });

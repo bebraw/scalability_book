@@ -6,9 +6,12 @@ import { createCodexProvider } from "./learning-codex.ts";
 import type { LearningProvider } from "./learning-provider.ts";
 import { createLocalProvider } from "./learning-local.ts";
 import type { LocalModelOptions } from "./learning-local-model.ts";
+import { createApiProvider } from "./learning-api.ts";
+import type { ApiModelOptions } from "./learning-api-model.ts";
 import { openLearningConversations } from "./learning-conversations.ts";
 import { lockLearningDirectory } from "./learning-storage.ts";
 import { companionRelease } from "../../shared/learning-connection.ts";
+import { learningAssert } from "../../shared/learning-workspace.ts";
 export async function startLearningCompanion(options: {
   directory: string;
   port: number;
@@ -16,9 +19,15 @@ export async function startLearningCompanion(options: {
   codexHome?: string;
   model?: string;
   local?: LocalModelOptions;
+  api?: ApiModelOptions;
+  apiKey?: string;
   sourceRevision: string;
 }) {
   const { directory, port, origins } = options;
+  learningAssert(
+    [options.codexHome, options.local, options.api].filter(Boolean).length <= 1,
+    "Choose one model provider for this companion.",
+  );
   const release = lockLearningDirectory(directory);
   let notebook: ReturnType<typeof openLearningNotebook> | undefined;
   let conversations: ReturnType<typeof openLearningConversations> | undefined;
@@ -34,7 +43,13 @@ export async function startLearningCompanion(options: {
         })
       : options.local
         ? await createLocalProvider({ ...options.local, directory })
-        : null;
+        : options.api
+          ? await createApiProvider({
+              ...options.api,
+              directory,
+              apiKey: options.apiKey ?? "",
+            })
+          : null;
     notebook = openLearningNotebook(directory);
     conversations = openLearningConversations(directory, notebook, provider);
     const companion = createCompanionHandler({
@@ -54,6 +69,7 @@ export async function startLearningCompanion(options: {
           conversations: 1,
           archive: 1,
           ...(options.local ? { localProvider: 1 } : {}),
+          ...(options.api ? { apiProvider: 1 } : {}),
         },
       },
     });

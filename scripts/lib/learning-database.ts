@@ -3,7 +3,11 @@ import { existsSync, lstatSync, chmodSync, rmSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { learningAssert } from "../../shared/learning-workspace.ts";
 
-type DatabaseKind = "notebook" | "conversations" | "local-provider";
+type DatabaseKind =
+  | "notebook"
+  | "conversations"
+  | "local-provider"
+  | "api-provider";
 const schemas = {
   notebook: {
     notebook_records: ["kind", "id", "revision", "body"],
@@ -11,6 +15,7 @@ const schemas = {
   },
   conversations: { conversations: ["id", "body"] },
   "local-provider": { local_sessions: ["id", "body"] },
+  "api-provider": { api_sessions: ["id", "body"] },
 };
 export function inspectLearningDatabase(filename: string, kind: DatabaseKind) {
   const state = lstatSync(filename);

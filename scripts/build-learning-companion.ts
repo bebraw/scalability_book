@@ -38,7 +38,10 @@ await build({
     outDir: path.join(directory, "dist"),
     emptyOutDir: true,
     minify: false,
-    rolldownOptions: { output: { entryFileNames: "companion.js" } },
+    rolldownOptions: {
+      external: ["@napi-rs/keyring"],
+      output: { entryFileNames: "companion.js" },
+    },
   },
 });
 await mkdir(path.join(directory, "dist"), { recursive: true });

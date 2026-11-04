@@ -1,10 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, rm, writeFile, copyFile, chmod } from "node:fs/promises";
+import {
+  mkdtemp,
+  rm,
+  writeFile,
+  readFile,
+  copyFile,
+  chmod,
+} from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
-import { createCodexProvider } from "../scripts/lib/learning-codex.ts";
+import {
+  createCodexProvider,
+  learningCodexEnvironment,
+  validateLearningCodexProfile,
+} from "../scripts/lib/learning-codex.ts";
 import type { LearningProvider } from "../scripts/lib/learning-provider.ts";
 import { openLearningConversations } from "../scripts/lib/learning-conversations.ts";
 import { openLearningNotebook } from "../scripts/lib/learning-notebook.ts";
@@ -31,7 +42,6 @@ const waitUntil = async (fn: () => boolean) => {
 };
 test("Codex adapter initializes, resumes, uses bounded dynamic tools, declines machine approval and retains disconnect errors", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "book-codex-test-"));
-  await writeFile(path.join(directory, "auth.json"), "{}", { mode: 0o600 });
   const binary = path.join(directory, "fake-codex");
   await copyFile(
     new URL("./fixtures/learning-codex-app-server.mjs", import.meta.url),
@@ -57,6 +67,24 @@ test("Codex adapter initializes, resumes, uses bounded dynamic tools, declines m
       };
     };
     await writeFile(`${binary}.reject-initialize`, "");
+    for (const prefix of ["local", "api"]) {
+      const foreign = `${prefix}-11111111-1111-4111-8111-111111111111`;
+      assert.throws(
+        () => provider.validateThread!(foreign),
+        /another model provider/,
+      );
+      await assert.rejects(
+        provider.run(
+          foreign,
+          "Keep this private history with its provider",
+          tool,
+          () => {},
+        ),
+        /other provider's history was retained/,
+      );
+    }
+    // The initialization-rejection flag remains unused: neither foreign ID
+    // started the app-server or sent a resume request.
     await assert.rejects(
       provider.run(null, "initialization failure", tool, () => {}),
       /rejected/,
@@ -174,7 +202,6 @@ test("policy metadata describes each applied exchange without rewriting earlier 
 test("dedicated profile refuses inherited configuration and custom skills", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "book-profile-test-"));
   try {
-    await writeFile(path.join(directory, "auth.json"), "{}");
     await writeFile(path.join(directory, "config.toml"), "");
     await assert.rejects(
       createCodexProvider({ home: directory }),
@@ -183,6 +210,61 @@ test("dedicated profile refuses inherited configuration and custom skills", asyn
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("profile validation allows new keyring profiles and rejects unexpected plaintext without reading it", async (t) => {
+  const directory = await mkdtemp(path.join(tmpdir(), "book-keyring-profile-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  await validateLearningCodexProfile(directory);
+  const plaintext = path.join(directory, "auth.json");
+  await writeFile(
+    plaintext,
+    "not JSON; the validator must not parse credentials",
+  );
+  await assert.rejects(
+    validateLearningCodexProfile(directory),
+    /new empty --codex-home/,
+  );
+  assert.equal(
+    await readFile(plaintext, "utf8"),
+    "not JSON; the validator must not parse credentials",
+  );
+});
+
+test("the Codex environment keeps provider secrets isolated while preserving Linux keyring session discovery", (t) => {
+  const original = new Map(
+    [
+      "DBUS_SESSION_BUS_ADDRESS",
+      "XDG_RUNTIME_DIR",
+      "OPENAI_API_KEY",
+      "GNOME_KEYRING_CONTROL",
+    ].map((name) => [name, process.env[name]]),
+  );
+  t.after(() => {
+    for (const [name, value] of original) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  });
+  process.env.DBUS_SESSION_BUS_ADDRESS = "unix:path=/synthetic/session-bus";
+  process.env.XDG_RUNTIME_DIR = "/synthetic/runtime";
+  process.env.OPENAI_API_KEY = "synthetic-provider-secret";
+  process.env.GNOME_KEYRING_CONTROL = "/synthetic/unneeded-legacy-keyring";
+  const environment = learningCodexEnvironment("/synthetic/dedicated-profile");
+  assert.equal(environment.OPENAI_API_KEY, undefined);
+  assert.equal(environment.GNOME_KEYRING_CONTROL, undefined);
+  assert.equal(environment.CODEX_HOME, "/synthetic/dedicated-profile");
+  assert.equal(environment.HOME, "/synthetic/dedicated-profile");
+  assert.equal(
+    environment.DBUS_SESSION_BUS_ADDRESS,
+    process.platform === "linux"
+      ? process.env.DBUS_SESSION_BUS_ADDRESS
+      : undefined,
+  );
+  assert.equal(
+    environment.XDG_RUNTIME_DIR,
+    process.platform === "linux" ? process.env.XDG_RUNTIME_DIR : undefined,
+  );
 });
 test("conversations persist independently, send only selected notes, and bound observations to the initiating session and browser", async () => {
   const directory = await mkdtemp(

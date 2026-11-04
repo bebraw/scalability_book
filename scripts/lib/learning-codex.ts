@@ -21,10 +21,7 @@ import {
 } from "./learning-provider.ts";
 
 type Json = Record<string, unknown>;
-export async function validateLearningCodexProfile(
-  home: string,
-  requireAuth = true,
-) {
+export async function validateLearningCodexProfile(home: string) {
   await mkdir(home, { recursive: true, mode: 0o700 });
   const directoryState = await lstat(home);
   learningAssert(
@@ -32,7 +29,10 @@ export async function validateLearningCodexProfile(
     "Use a regular dedicated Codex profile directory.",
   );
   const exists = async (name: string) =>
-    lstat(path.join(home, name)).catch(() => null);
+    lstat(path.join(home, name)).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return null;
+      throw error;
+    });
   for (const name of [
     "config.toml",
     "AGENTS.md",
@@ -57,12 +57,10 @@ export async function validateLearningCodexProfile(
       "Use a dedicated profile without custom skills.",
     );
   const auth = await exists("auth.json");
-  const authenticated = Boolean(auth?.isFile() && !auth.isSymbolicLink());
   learningAssert(
-    !requireAuth || authenticated,
-    "Sign in to the dedicated Codex profile first; see /notebook/setup/.",
+    !auth,
+    "This dedicated Codex profile contains unexpected plaintext auth.json. Choose a new empty --codex-home for operating system keyring authentication. Companion will not read or remove this file.",
   );
-  return authenticated;
 }
 export function learningCodexEnvironment(home: string) {
   const env: Record<string, string> = {};
@@ -81,8 +79,22 @@ export function learningCodexEnvironment(home: string) {
     "NODE_EXTRA_CA_CERTS",
   ])
     if (process.env[name]) env[name] = process.env[name]!;
+  // Linux's persistent keyring reaches Secret Service over the user's session
+  // bus. These identify that session without importing provider credentials.
+  if (process.platform === "linux")
+    for (const name of ["DBUS_SESSION_BUS_ADDRESS", "XDG_RUNTIME_DIR"])
+      if (process.env[name]) env[name] = process.env[name]!;
   Object.assign(env, { CODEX_HOME: home, HOME: home, USERPROFILE: home });
   return env as NodeJS.ProcessEnv;
+}
+/** Only Codex reads its keyring entry; status output can contain credentials. */
+export function learningCodexSignedIn(home: string, binary = "codex") {
+  const auth = spawnSync(
+    binary,
+    ["login", "status", "-c", 'cli_auth_credentials_store="keyring"'],
+    { env: learningCodexEnvironment(home), stdio: "ignore", timeout: 8000 },
+  );
+  return auth.status === 0;
 }
 export function learningCodexVersion(home: string, binary = "codex") {
   const cli = spawnSync(binary, ["--version"], {
@@ -105,6 +117,10 @@ export async function createCodexProvider(options: {
 }): Promise<LearningProvider> {
   const home = path.resolve(options.home);
   await validateLearningCodexProfile(home);
+  learningAssert(
+    learningCodexSignedIn(home, options.binary),
+    "Codex is not signed in through the operating system credential store. Unlock or enable its keyring, then run login with this same dedicated profile. Plaintext credential fallback is disabled.",
+  );
   const workspace = path.join(home, "book-workspace");
   await mkdir(workspace, { recursive: true, mode: 0o700 });
   learningAssert(
@@ -119,7 +135,7 @@ export async function createCodexProvider(options: {
   );
   await writeFile(marker, "", { mode: 0o600 });
   const config: Json = {
-    cli_auth_credentials_store: "file",
+    cli_auth_credentials_store: "keyring",
     web_search: "disabled",
     project_root_markers: [".book-learning-root"],
     history: { persistence: "none" },
@@ -399,8 +415,8 @@ export async function createCodexProvider(options: {
     ...(options.model ? { model: options.model } : {}),
     validateThread(threadId) {
       learningAssert(
-        !threadId?.startsWith("local-"),
-        "This conversation belongs to a local model. Start a new conversation for Codex; its history was retained.",
+        !threadId || !/^(?:local|api)-/.test(threadId),
+        "This conversation belongs to another model provider. Start a new conversation for Codex; its history was retained.",
         409,
       );
     },
@@ -411,8 +427,8 @@ export async function createCodexProvider(options: {
         409,
       );
       learningAssert(
-        !threadId?.startsWith("local-"),
-        "Start a new conversation for Codex; this local-model history was retained.",
+        !threadId || !/^(?:local|api)-/.test(threadId),
+        "Start a new conversation for Codex; this other provider's history was retained.",
         409,
       );
       await start();

@@ -198,6 +198,21 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   color: var(--muted);
   font-size: 0.8rem;
 }
+.learning-setup-choices {
+  padding-left: 1.25rem;
+}
+.learning-setup-choices li + li {
+  margin-top: 0.45rem;
+}
+.learning-setup-command {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
 .learning-context {
   border-left: 3px solid var(--accent);
   padding-left: 0.9rem;

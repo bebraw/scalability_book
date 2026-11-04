@@ -172,7 +172,7 @@ export function openLearningConversations(
     send(id: string, input: unknown, session: string, origin: string) {
       learningAssert(
         provider,
-        "Enable Codex or a local model in companion setup; notebook writing works without a model.",
+        "Choose Codex, an API provider or a local model in companion setup; notebook writing works without a model.",
         503,
       );
       learningAssert(

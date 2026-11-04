@@ -924,69 +924,113 @@ export function createLearningPane(
       ),
     );
   }
-  function renderStartCommand(codex = false) {
-    const command = node("pre");
+  function renderCompanionCommand(action: "setup" | "start") {
+    const command = node("pre", "", "learning-setup-command");
     // Use the checkout until the code-free standalone release is published.
     const quote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
     const port = new URL(client.base).port || "80";
-    const retained =
-      codex && connected
-        ? `${port === "8788" ? "" : ` --port ${port}`}${companionStatus?.storage ? ` --directory ${quote(companionStatus.storage)}` : ""}`
-        : "";
-    const startCommand = `npm run companion -- ${codex ? "--codex " : ""}--origin ${quote(location.origin)}${retained}`;
-    command.append(node("code", startCommand));
+    const retained = connected
+      ? `${port === "8788" ? "" : ` --port ${port}`}${companionStatus?.storage ? ` --directory ${quote(companionStatus.storage)}` : ""}`
+      : "";
+    const text = `npm run companion -- ${action} --origin ${quote(location.origin)}${retained}`;
+    command.append(node("code", text));
     container.append(
-      node(
-        "p",
-        "Run this command from the book checkout. See setup for release availability.",
-        "learning-hint",
-      ),
       command,
-      button(codex ? "Copy Codex command" : "Copy command", async () => {
-        try {
-          await navigator.clipboard.writeText(startCommand);
-          status.textContent =
-            "Companion command copied. Paste it in a terminal from the book checkout.";
-        } catch {
-          const selection = window.getSelection();
-          const range = document.createRange();
-          range.selectNodeContents(command);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-          status.textContent =
-            "Copy is unavailable here. The command is selected; copy it using your keyboard.";
-        }
-      }),
+      button(
+        action === "setup" ? "Copy setup command" : "Copy start command",
+        async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+            status.textContent = `Companion ${action} command copied. Paste it in a terminal from the book checkout.`;
+          } catch {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(command);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+            status.textContent =
+              "Copy is unavailable here. The command is selected; copy it using your keyboard.";
+          }
+        },
+      ),
     );
   }
   function renderConnection() {
+    const needsSetup = !connected || !companionStatus?.provider;
     container.append(
       node(
         "p",
         connected
           ? "Your private notebook is connected. You can work without a model connection."
-          : "Start the learning companion on your computer, then choose Connect companion.",
+          : "Connect your private notebook and choose whether you want assistant replies. Website sign-in is separate.",
       ),
     );
-    renderStartCommand();
+    if (needsSetup) {
+      container.append(
+        node(
+          "h3",
+          connected ? "Enable assistant replies" : "1. Choose your setup",
+        ),
+        node(
+          "p",
+          connected
+            ? "Stop the current companion, then run setup in its terminal. Your notes and message draft are retained."
+            : "From the book checkout, run setup and choose how you want to work. Already set up? Go to step 2.",
+        ),
+      );
+      const choices = node("ul", "", "learning-setup-choices");
+      choices.append(
+        node("li", "Notebook only — private writing without a model account."),
+      );
+      for (const [label, href, detail] of [
+        [
+          "Codex",
+          "/notebook/setup/#connect-your-agent",
+          " — use ChatGPT sign-in or an OpenAI API key.",
+        ],
+        [
+          "API key",
+          "/notebook/setup/#use-an-api-key",
+          " — OpenAI, Claude, Gemini, OpenRouter or a compatible service; no Codex needed.",
+        ],
+        [
+          "Local model",
+          "/notebook/setup/#use-a-local-model",
+          " — use a model loaded on your computer.",
+        ],
+      ] as const) {
+        const choice = node("li");
+        choice.append(link(label, href), document.createTextNode(detail));
+        choices.append(choice);
+      }
+      container.append(
+        choices,
+        node(
+          "p",
+          "Enter API keys only in the terminal. API usage is billed by your provider.",
+          "learning-hint",
+        ),
+      );
+      renderCompanionCommand("setup");
+      container.append(
+        node(
+          "h3",
+          connected ? "Restart and reconnect" : "2. Start the companion",
+        ),
+        node(
+          "p",
+          connected
+            ? "After setup, start the companion again with this command. Choose Check connection and reconnect if asked."
+            : "Keep this command running while you use the notebook or assistant.",
+        ),
+      );
+    }
+    renderCompanionCommand("start");
     container.append(
       link("Companion setup and notebook backups", "/notebook/setup/"),
     );
-    if (connected && !companionStatus?.provider) {
-      container.append(
-        node("h3", "Enable assistant replies"),
-        node(
-          "p",
-          "For Codex, complete the dedicated-profile setup and sign in if needed. Stop the current companion, restart it with this command, then choose Check connection and Connect companion again. Your notes and message draft are retained.",
-        ),
-        link("Set up Codex", "/notebook/setup/#connect-your-agent"),
-      );
-      renderStartCommand(true);
-      container.append(
-        link("Set up a local model", "/notebook/setup/#use-a-local-model"),
-      );
-    }
     if (!connected) {
+      container.append(node("h3", "3. Connect in the book"));
       const address = node("input");
       address.value = client.base;
       address.type = "url";

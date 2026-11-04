@@ -54,7 +54,8 @@ The optional local learning companion exposes the private notebook API independe
 [learning-cli.ts](scripts/lib/learning-cli.ts) owns setup, authentication entry, startup and local diagnostics for both the repository command and the built [npm package](packages/learning-companion/package.json).
 [learning-storage.ts](scripts/lib/learning-storage.ts) owns stable per-user directories, directory leases and explicit copy migration; [learning-database.ts](scripts/lib/learning-database.ts) validates schemas read-only and backs up atomic upgrades.
 [learning-connection.ts](shared/learning-connection.ts) distinguishes package, browser protocol, storage/archive and compatible-provider versions.
-Package assembly bundles existing state/provider owners and authored resource registries with Node built-ins; the runtime has no website-build or provider-SDK dependency.
+Package assembly bundles existing state/provider owners and authored resource registries; the runtime has no website-build or provider-SDK dependency.
+The pinned `@napi-rs/keyring` runtime dependency provides native OS credential storage, loaded only for saved API credentials.
 [Its shared contract](shared/learning-workspace.ts), [SQLite owner](scripts/lib/learning-notebook.ts) and [HTTP boundary](scripts/lib/learning-companion-http.ts) separate learning records, local persistence and origin-gated browser sessions.
 The HTTP boundary binds to loopback, accepts session bootstrap only from an exact configured website origin and issues an origin-bound token for private API routes.
 The CLI trusts only `https://scalableweb.dev` by default; local development requires explicit `--origin`.
@@ -67,10 +68,19 @@ The shared book layout exposes separate lazy Notebook and Teaching assistant ent
 The notebook and lower-right assistant can be visible together on larger screens; compact screens retain both open states while displaying the selected foreground panel.
 Preparing a handoff does not save or send; the student reviews the source and deliberately selected notes or notebook draft.
 [learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-provider.ts](scripts/lib/learning-provider.ts) owns the provider port and three bounded tool schemas.
-[learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile; [learning-local.ts](scripts/lib/learning-local.ts) adapts a student-operated loopback OpenAI-compatible model server.
+[learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile, with browser or stdin API-key authentication owned by [learning-codex-login.ts](scripts/lib/learning-codex-login.ts) and stored through Codex's OS keyring mode.
+[learning-local.ts](scripts/lib/learning-local.ts) adapts a student-operated loopback OpenAI-compatible model server; [learning-api.ts](scripts/lib/learning-api.ts) adapts the documented HTTPS Chat Completions interfaces of OpenAI, Anthropic, Gemini, OpenRouter and explicitly configured compatible services.
+[learning-chat.ts](scripts/lib/learning-chat.ts) shares bounded context, replay, cancellation and validated tools across both direct transports, while each adapter owns its request dialect and endpoint checks.
+[learning-api-model.ts](scripts/lib/learning-api-model.ts) owns API diagnostics and safe transport errors; [learning-api-credentials.ts](scripts/lib/learning-api-credentials.ts) owns endpoint-bound OS keychain entries, a stable nonsecret credential identity and explicit environment references.
+[learning-keychain.ts](scripts/lib/learning-keychain.ts) owns lazy native access and requires a persistent Secret Service store on Linux; unavailable or denied storage never falls back to a file.
+The terminal setup owners [learning-setup.ts](scripts/lib/learning-setup.ts) and [learning-api-setup.ts](scripts/lib/learning-api-setup.ts) keep credentials out of browser flows, settings, reports and notebook archives.
+Setup retains trusted website origins and port in the existing settings owner; no model generation follows from setup or connection.
 [learning-provider-context.ts](scripts/lib/learning-provider-context.ts) builds selected turn context, with relevant authored navigation for local models.
 [learning-local-model.ts](scripts/lib/learning-local-model.ts) owns endpoint validation and read-only model diagnostics, while [learning-local-history.ts](scripts/lib/learning-local-history.ts) retains exact private context/message snapshots in schema-1 `local-provider.sqlite`.
-Local transcripts belong to the companion directory lease and full-directory migration/backup, independently of portable notebook archives.
+The shared [chat history owner](scripts/lib/learning-chat-history.ts) retains separate local and API schema-1 databases and thread namespaces.
+Both transcript stores and nonsecret `credential-identity.json` belong to the companion directory lease and directory migration/backup, independently of portable notebook archives.
+Directory migration recursively excludes externally created Codex `auth.json` files, preserving profile threads without copying those secrets.
+API keychain identity survives a same-machine directory move; another computer requires login, and Codex's path-bound keyring identity requires login after relocating its profile.
 Local sessions bind to endpoint/model/tool mode; context budgeting omits whole completed turns visibly, preserves current selections and rejects oversized current/tool context.
 Discussion-only is the local default; an explicit native-tool mode uses the same browser broker and approval boundary, with no automatic model downloads, Codex sign-in or model-server browser connection.
 The shared [agent contract](shared/learning-agent.ts) owns the provider-independent teaching policy, role, manner, policy identity/version and student-selected help needs.

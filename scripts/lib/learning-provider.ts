@@ -10,7 +10,7 @@ export interface LearningProvider {
   version?: string | null;
   model?: string;
   teaching?: TeachingPolicyIdentity;
-  /** Local models receive relevant authored navigation rather than all catalogs. */
+  /** Direct chat providers receive relevant navigation rather than all catalogs. */
   focusedContext?: boolean;
   capabilities?: { tools: "none" | "native"; contextWindow: number };
   validateThread?(threadId: string | null): void;

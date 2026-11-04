@@ -20,8 +20,8 @@ Only an existing companion session is checked when opening the account view; no 
 **Open connection settings** opens the existing notebook Connect section on pages that provide learning tools; other pages link to companion setup.
 Provider status reports configuration and connection, while an actual assistant reply establishes provider availability.
 Discuss shows this status beside the message composer.
-A notebook-only connection disables Send and offers **Set up assistant replies**; Connect provides a copyable Codex restart command and links for dedicated-profile setup and local models.
-The Codex restart command retains the connected companion's port and reported notebook directory, quoting filesystem paths for the shell.
+A notebook-only connection disables Send and offers **Set up assistant replies**; Connect provides guided setup/start commands and links for Codex, direct API keys and local models.
+Both commands retain the connected companion's port and reported notebook directory, quoting filesystem paths for the shell.
 Checking the connection after enabling a provider retains the unsent question.
 
 Checked chapter exercises offer **Discuss my answer** and a preview of the exact prompt, exercise ID/version, attempt and checker feedback.
@@ -77,8 +77,8 @@ Assistant replies display a supported Markdown subset with readable links, lists
 [learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
 Unsupported equations retain their original notation.
 Conversation storage and reviewed notebook drafts retain the original reply text; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records this presentation boundary.
-Optional Codex and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
-Codex and explicitly selected native local tools use the same bounded browser broker; local discussion has no live tools.
+Optional Codex, API and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
+Codex and explicitly selected native API/local tools use the same bounded browser broker; discussion-only providers have no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 Peer sign-in opens the shared account view in place and carries the source anchor/activity through email confirmation.
 A single accessible run is selected automatically; otherwise the reader chooses the run explicitly.
@@ -227,9 +227,9 @@ There is no `/pair` route, code generator or manual-pairing option.
 
 ### Distribution, diagnostics and storage recovery
 
-[learning-cli.ts](../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`.
-Setup offers notebook-only, Codex or Local model use, creates required directories and stores the chosen provider/profile/model configuration in `companion-settings.json`.
-Port/origin overrides remain explicit command options; model and local endpoint/tool/context preferences are saved by setup and can be overridden explicitly.
+[learning-cli.ts](../scripts/lib/learning-cli.ts) owns `setup`, `login`, `logout`, `start`, `doctor` and directory `migrate`.
+Setup offers notebook-only, Codex, direct API or Local model use, creates required directories and stores the chosen provider/profile/model configuration in `companion-settings.json`.
+Setup retains port/origin and provider preferences; explicit command options override them for that invocation.
 CLI storage/schema checks occur before opening the writing stores.
 An unavailable port, denied storage permission, unsupported provider version or missing dedicated-profile authentication provides a concrete next step while retaining records.
 The dedicated Codex CLI authentication result is a prerequisite check; a real reply establishes account/provider availability.
@@ -245,12 +245,15 @@ Expired sessions lead back to Connect; network feedback names the possible proce
 [learning-storage.ts](../scripts/lib/learning-storage.ts) owns per-user path selection, exclusive process leases and explicit migration.
 Migration requires `--from` and `--confirm-stopped`, validates regular files/supported schemas and copies privately through an atomic staged-directory rename.
 It retains the source and rejects occupied destinations or active writers.
-Notebook/conversation identities, histories and `local-provider.sqlite` are copied intact; included provider profiles are copied, while external profiles need an explicit `--codex-home`.
+Notebook/conversation identities, histories, local/API transcript databases and nonsecret `credential-identity.json` are copied intact; included provider threads are copied, while external profiles need an explicit `--codex-home`.
+Recursive copying excludes externally created Codex `auth.json` files; the original source is retained.
+API credentials remain in the OS store and the copied identity can locate them on the same machine; another computer requires login.
+Codex's keyring identity includes its canonical profile path, so a relocated profile requires fresh login even on the same machine.
 Setup preferences are not copied because their absolute profile path may identify the old directory; select the mode again after migration.
 Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
-Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation/local-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation/local-provider/API-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
 Release 0.3.0 retains the previous storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
@@ -360,7 +363,7 @@ Notebook records remain independent of these provider threads.
 Portable notebook export includes accepted assistance history but excludes raw conversations and credentials.
 Stopped/restarted conversations retain their messages and provider thread identity, with an explicit interrupted-state message before resuming.
 
-The dedicated Codex home accepts file authentication and no custom configuration, hooks, plugins, rules or custom skills.
+The dedicated Codex home uses Codex's OS keyring authentication and accepts no custom configuration, hooks, plugins, rules or custom skills.
 An otherwise empty workspace contains a project root marker that stops ancestor instruction discovery.
 Shell, unified execution, apps, browser/computer use, multi-agent and image tools are disabled; the thread uses read-only sandboxing and denied machine/permission approvals.
 Codex's local tool host remains available for the three declared callbacks.
@@ -380,6 +383,33 @@ The default discussion-only limitation appears before sending and beside local r
 On 2026-10-07, actual Gemma `google/gemma-4-12b-qat` responses passed packed discussion/restart/resume checks at loaded context 8,192 and returned all eight synthetic teaching scenarios; native calls remain unverified on this configuration.
 Teaching review identified qualification and source-link gaps, recorded in the evaluation guide; these checks do not certify instructional reliability.
 Other compatibility runners are potential targets, not verified support claims.
+
+### Direct API providers and onboarding
+
+The terminal's guided `setup` adds OpenAI, Anthropic, Gemini and OpenRouter API keys without requiring Codex.
+The browser shows one setup command, the next start command and explicit connection; it contains no key input and preserves an unsent assistant draft while students configure a provider.
+Settings retain exact trusted origins and the port across restarts; explicit command options override them for that invocation.
+Codex users can choose ChatGPT authentication or `login --with-api-key` in their dedicated profile.
+
+The separate [API transport](../scripts/lib/learning-api-model.ts) accepts HTTPS, binds named presets to their official endpoints, rejects embedded credentials and redirects, and returns sanitized failures.
+The [credential owner](../scripts/lib/learning-api-credentials.ts) reads only the explicitly selected environment variable or the OS keychain entry bound to the notebook's stable identity and exact normalized endpoint.
+`credential-identity.json` contains a versioned UUID, never a key; API entry identifiers combine that UUID and a SHA-256 endpoint hash under the `dev.scalableweb.companion` service.
+The lazy [keychain adapter](../scripts/lib/learning-keychain.ts) uses pinned `@napi-rs/keyring`, requires durable Secret Service on Linux and reports unavailable/locked/denied access without falling back to plaintext or transient storage.
+Settings retain the environment variable name, never its value.
+Keys do not enter browser status, diagnostic reports, notebook exports or provider transcripts.
+Private directory backups include credential identifiers and raw API transcripts, not OS keychain entries.
+`logout` removes the selected endpoint's keychain entry; environment-backed use instead explains how to unset/revoke the external key without changing the parent environment or deleting another stored entry.
+
+[The shared chat engine](../scripts/lib/learning-chat.ts) preserves the local adapter's behavior and gives API providers the same selected context, bounded history, interruption handling and validated tool broker.
+`api-provider.sqlite` uses schema 1 and separate `api-` thread identities; provider, endpoint, model and tool mode must match before an old transcript is sent.
+Key rotation at the same backend retains conversations.
+Direct API discussion uses plain text replies and defaults to a 16,384-token estimated context budget with a 4,096-token output allowance; `--api-context` and `--api-output` configure these within model limits.
+Reasoning may consume output tokens; truncation retains the student's work and reports failure instead of accepting a partial reply.
+
+Setup and `doctor` only request a model catalog.
+Catalogs can be public; listing does not establish credential validity, inference access, teaching quality or tool reliability.
+The first deliberate question checks actual generation access and may incur provider charges.
+Automatic provider tests use synthetic HTTP responses; live account/model verification is separate from repository implementation and package publication.
 
 Authenticated companion routes:
 

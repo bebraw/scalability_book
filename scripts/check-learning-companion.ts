@@ -56,7 +56,15 @@ try {
   );
   assert.equal(manifest.name, companionRelease.name);
   assert.equal(manifest.version, companionRelease.version);
-  assert.equal(manifest.dependencies, undefined);
+  const nativeDependencies = { "@napi-rs/keyring": "2.1.2" };
+  assert.deepEqual(manifest.dependencies, nativeDependencies);
+  const sourceManifest = JSON.parse(
+    readFileSync(path.join(root, "package.json"), "utf8"),
+  );
+  assert.equal(
+    sourceManifest.dependencies["@napi-rs/keyring"],
+    nativeDependencies["@napi-rs/keyring"],
+  );
   assert.deepEqual(readdirSync(pkg).sort(), [
     "LICENSE",
     "README.md",
@@ -69,13 +77,50 @@ try {
     "release.json",
   ]);
   const bundle = readFileSync(path.join(pkg, "dist/companion.js"), "utf8");
+  const imports = [
+    ...bundle.matchAll(
+      /(?:^\s*import\s+(?:[\s\S]*?\s+from\s+)?|import\(\s*)["']([^"']+)["']/gm,
+    ),
+  ].map((match) => match[1]!);
   assert.ok(
-    bundle
-      .split("\n")
-      .filter((line) => line.startsWith("import "))
-      .every((line) => /from ["']node:/.test(line)),
-    "The release must import only Node built-ins.",
+    imports.length > 0 &&
+      imports.every(
+        (specifier) =>
+          specifier.startsWith("node:") || specifier === "@napi-rs/keyring",
+      ),
+    "The release may import only Node built-ins and the pinned OS keyring binding.",
   );
+  assert.ok(
+    imports.includes("@napi-rs/keyring"),
+    "The packaged runtime must retain its native keyring dependency.",
+  );
+  // Import the installed platform binary without constructing an entry or
+  // reading/writing any OS credentials. Credential behavior uses a fake module
+  // in the installed CLI tests below; native entry smoke is separately opt-in.
+  const nativeImport = JSON.parse(
+    execFileSync(
+      process.execPath,
+      [
+        "--input-type=module",
+        "-e",
+        `
+    import { createRequire } from "node:module";
+    import { readFileSync, realpathSync } from "node:fs";
+    import path from "node:path";
+    const require = createRequire(import.meta.url);
+    const resolved = require.resolve("@napi-rs/keyring");
+    if (!resolved.startsWith(realpathSync(process.argv[1]) + path.sep)) throw new Error("Native dependency resolved outside the clean installation");
+    const manifest = JSON.parse(readFileSync(require.resolve("@napi-rs/keyring/package.json"), "utf8"));
+    const native = await import("@napi-rs/keyring");
+    if (typeof native.AsyncEntry !== "function") throw new Error("Installed native keyring binding did not load");
+    console.log(JSON.stringify({ version: manifest.version, loaded: true }));
+  `,
+        directory,
+      ],
+      { cwd: pkg, encoding: "utf8" },
+    ),
+  );
+  assert.deepEqual(nativeImport, { version: "2.1.2", loaded: true });
   assert.ok(
     !/\.local\/learning-companion\/codex|auth\.json.*access_token/.test(bundle),
     "Local credentials must not enter the bundle.",
@@ -344,7 +389,10 @@ try {
       { cwd: b, encoding: "utf8" },
     ),
   );
-  assert.deepEqual(report.connection, { origins: ["https://scalableweb.dev"] });
+  assert.deepEqual(report.connection, {
+    origins: ["https://scalableweb.dev"],
+    port: 18895,
+  });
   assert.doesNotMatch(
     JSON.stringify(report),
     /My initial prediction|Bearer|Pairing code/,
@@ -432,8 +480,23 @@ try {
   assert.equal(localServer.requests[1].messages.length, 4);
   assert.equal(existsSync(path.join(data, "local-provider.sqlite")), true);
   await stop();
+  await localServer.close();
+  localServer = undefined;
+  // Run the same onboarding/authentication contracts against the installed
+  // artifact. Synthetic API responses cannot incur charges or use real keys.
+  const apiChecks = await asyncExec(
+    process.execPath,
+    ["--test", path.join(root, "tests/learning-cli.test.ts")],
+    {
+      cwd: a,
+      env: { ...env, LEARNING_COMPANION_BIN: bin },
+      timeout: 120_000,
+      maxBuffer: 1_000_000,
+    },
+  );
+  process.stdout.write(apiChecks.stdout);
   console.log(
-    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, built-only runtime, setup/diagnostics, code-free connection, local-model replies/resume and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
+    `Packed ${companionRelease.name}@${companionRelease.version} passed clean installation, native-binding import, guided/API-key setup, diagnostics, code-free connection, model replies/resume and retained work across folders on ${process.platform} / Node ${process.versions.node}.`,
   );
 } finally {
   const running = currentChild();

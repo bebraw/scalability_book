@@ -108,6 +108,8 @@ No accepted decisions await implementation.
 | [ADR-057](implemented/ADR-057-present-concepts-through-topic-regions-and-semantic-zoom.md)          | Lay out concept regions and routes at build time, color independent editorial roles and reveal detail through semantic zoom.                                |
 | [ADR-058](implemented/ADR-058-pack-topic-regions-and-route-connections-separately.md)               | Placement superseded by ADR-059; retain four subject-based regions and build-only libavoid routing.                                                         |
 | [ADR-059](implemented/ADR-059-organize-concepts-in-aligned-subcategory-rows.md)                     | Align equal topic regions, organize concepts into editorial subcategory rows and expose readable overview/filter navigation.                                |
+| [ADR-060](implemented/ADR-060-support-student-api-keys-and-guided-companion-setup.md)               | Add named API providers and guided setup; plaintext credential decisions superseded by ADR-061.                                                             |
+| [ADR-061](implemented/ADR-061-store-companion-credentials-in-the-os-keychain.md)                    | Store saved API/Codex credentials in OS stores, retain nonsecret API identity and require explicit environment references for headless use.                 |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

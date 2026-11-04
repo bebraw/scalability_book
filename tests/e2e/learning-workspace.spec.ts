@@ -118,6 +118,94 @@ test("the conversation picker immediately follows new discussions and retains a 
   );
 });
 
+test("first connection offers guided provider setup without sending a model request", async ({
+  page,
+  baseURL,
+}) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    const target = new URL(request.url());
+    if (
+      target.hostname === "127.0.0.1" &&
+      target.origin !== new URL(baseURL!).origin
+    )
+      requests.push(request.url());
+  });
+  await page.goto("/chapters/benchmarking/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Notebook", exact: true })
+    .click();
+  const panel = activeLearningPanel(page);
+  await expect(
+    panel.getByRole("heading", { name: "1. Choose your setup" }),
+  ).toBeVisible();
+  await expect(
+    panel.getByText("Notebook only — private writing without a model account."),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("link", { name: "Codex", exact: true }),
+  ).toHaveAttribute("href", "/notebook/setup/#connect-your-agent");
+  await expect(
+    panel.getByRole("link", { name: "API key", exact: true }),
+  ).toHaveAttribute("href", "/notebook/setup/#use-an-api-key");
+  await expect(
+    panel.locator(".learning-setup-choices li").filter({
+      has: page.getByRole("link", { name: "API key", exact: true }),
+    }),
+  ).toContainText("OpenAI, Claude, Gemini, OpenRouter");
+  await expect(
+    panel.getByRole("link", { name: "Local model", exact: true }),
+  ).toHaveAttribute("href", "/notebook/setup/#use-a-local-model");
+  await expect(
+    panel.getByText(
+      "Enter API keys only in the terminal. API usage is billed by your provider.",
+    ),
+  ).toBeVisible();
+  const setup = `npm run companion -- setup --origin '${new URL(baseURL!).origin}'`;
+  await expect(
+    panel.locator("code").filter({ hasText: "-- setup " }),
+  ).toHaveText(setup);
+  await expect(
+    panel.locator("code").filter({ hasText: "-- start " }),
+  ).toHaveText(
+    `npm run companion -- start --origin '${new URL(baseURL!).origin}'`,
+  );
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new Error("Clipboard unavailable");
+        },
+      },
+    });
+  });
+  await panel
+    .getByRole("button", { name: "Copy setup command", exact: true })
+    .click();
+  await expect(panel.getByRole("status")).toContainText(
+    "The command is selected",
+  );
+  expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
+    setup,
+  );
+  await expect(panel.locator('input[type="password"]')).toHaveCount(0);
+  expect(requests).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const bounds = await panel.boundingBox();
+  expect(bounds!.width).toBeLessThanOrEqual(390);
+  expect(
+    await panel
+      .locator(".learning-content")
+      .evaluate((element) => element.scrollWidth <= element.clientWidth),
+  ).toBe(true);
+  expect(
+    (await new AxeBuilder({ page }).include(".learning-workspace").analyze())
+      .violations,
+  ).toEqual([]);
+});
+
 test("notebook-only connections explain setup before sending and retain the question", async ({
   page,
   baseURL,
@@ -163,22 +251,19 @@ test("notebook-only connections explain setup before sending and retain the ques
   await expect(
     panel.getByRole("heading", { name: "Enable assistant replies" }),
   ).toBeVisible();
+  for (const action of ["setup", "start"]) {
+    await expect(
+      panel.locator("code").filter({ hasText: `-- ${action} ` }),
+    ).toHaveText(
+      `npm run companion -- ${action} --origin '${new URL(baseURL!).origin}' --port 18888 --directory '/private/tmp/synthetic learner'\\''s notebook'`,
+    );
+  }
   await expect(
-    panel.locator("code").filter({ hasText: "--codex" }),
-  ).toContainText(
-    `npm run companion -- --codex --origin '${new URL(baseURL!).origin}'`,
-  );
-  await expect(
-    panel.locator("code").filter({ hasText: "--codex" }),
-  ).toContainText(
-    "--port 18888 --directory '/private/tmp/synthetic learner'\\''s notebook'",
-  );
-  await expect(
-    panel.getByRole("button", { name: "Copy Codex command", exact: true }),
+    panel.getByRole("button", { name: "Copy setup command", exact: true }),
   ).toBeVisible();
   await expect(
-    panel.getByRole("link", { name: "Set up Codex", exact: true }),
-  ).toHaveAttribute("href", "/notebook/setup/#connect-your-agent");
+    panel.getByRole("link", { name: "API key", exact: true }),
+  ).toHaveAttribute("href", "/notebook/setup/#use-an-api-key");
   await advertiseProvider(page);
   await panel
     .getByRole("button", { name: "Check connection", exact: true })

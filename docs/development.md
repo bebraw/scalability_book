@@ -306,7 +306,20 @@ See [the learning-workspace guide](learning-workspace.md) for code-free connecti
 Use `npm run companion -- --codex --origin http://127.0.0.1:3000` for the optional first provider after following [the dedicated-profile setup](learning-companion-setup.md).
 For direct local models, load a language model in LM Studio and use `npm run companion -- setup --local --model <exact-model-id>`, then start with the required `--origin`.
 Local mode defaults to discussion-only; `--local-url`, `--local-context` and `--local-tools none|native` configure the explicit loopback provider.
-The CLI also supports `setup`, `login`, `doctor` and `migrate`; for example, `npm run companion -- setup --codex` creates the development profile before `npm run companion -- login`.
+The CLI also supports `setup`, `login`, `logout`, `doctor` and `migrate`; for example, `npm run companion -- setup --codex` creates the development profile before `npm run companion -- login`.
+Run `npm run companion -- setup` in a terminal for guided notebook, Codex ChatGPT/API-key, direct API or local-model setup.
+Setup retains the chosen `--origin` and `--port` for subsequent startup and diagnosis; explicit startup flags override the saved values without changing them.
+Direct API setup offers OpenAI, Anthropic, Gemini and OpenRouter presets, plus an explicit compatible HTTPS endpoint; see [API key setup](learning-companion-setup.md#use-an-api-key).
+Keys are entered in a hidden terminal prompt, piped with `--with-api-key`, or referenced by `--api-key-env`; never put key values in arguments.
+Saved API keys use the OS credential store through pinned `@napi-rs/keyring`; Codex explicitly uses its own keyring credential store.
+Linux API storage requires an available Secret Service session; there is no transient keyutils or plaintext-file fallback.
+For headless/API environments, explicitly select `--api-key-env`; notebook-only, local-model and environment-backed API use do not load the native keychain module.
+Directory migration retains API credential identity and transcripts while excluding Codex `auth.json` files at every depth; moved Codex profiles and another computer require login.
+The [student guide](learning-companion-setup.md#use-an-api-key) owns keychain setup, recovery and local logout instructions.
+The API model catalog check does not establish inference access or generate a paid reply.
+Focused API/authentication checks are `node --test tests/learning-api.test.ts tests/learning-api-credentials.test.ts tests/learning-codex-login.test.ts tests/learning-cli.test.ts`.
+The CLI suite includes a synthetic terminal setup journey using Python 3's standard `pty` module on macOS/Linux; automatic checks use synthetic provider responses and injected credential stores, never personal keychain entries.
+Native keychain smoke checks, when run, must use a fresh isolated service/account and synthetic value, verify readback/removal and retain their platform-specific limits; they do not verify provider inference.
 Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
 Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
@@ -327,7 +340,8 @@ See [the inline activity contract](learning-workspace.md#explore-an-idea-in-the-
 `packages/learning-companion/` owns `@scalableweb/companion`; its executable is `scalableweb-companion`.
 The package is built from the same CLI, notebook, conversation, provider and authored-resource modules as the repository command.
 Its per-user default is independent of the repository's development directory.
-The package has no runtime dependencies; its `files` allowlist includes only the launcher, compiled module, release metadata, README and license.
+The package declares pinned `@napi-rs/keyring` as a runtime dependency, with its matching platform-native package installed by npm; its own `files` allowlist includes only the launcher, compiled module, release metadata, README and license.
+The native binding stays external to the bundled CLI and is loaded lazily; package checks must inspect the actual installed dependency, not rely on the checkout's `node_modules`.
 
 ```sh
 npm run companion:pack
@@ -338,6 +352,7 @@ The first command bundles the runtime and records its Git revision in `packages/
 Both generated locations are ignored.
 Dirty builds are marked explicitly and are useful for iteration; publish only from a clean committed revision.
 The checker installs that tarball into a clean temporary directory, uses an isolated per-user home, launches without this checkout's dependencies and verifies retained notes across working directories, code-free connection and prerequisite failures.
+The checker also runs the CLI authentication, hidden terminal setup and synthetic API conversation contracts against the installed launcher; these checks require Python 3 on macOS/Linux.
 The onboarding browser check also installs the actual tarball, so pack it before running that test.
 
 [The package workflow](../.github/workflows/learning-companion.yml) runs focused tests, packing and clean installation on macOS/Linux with Node 24/26.

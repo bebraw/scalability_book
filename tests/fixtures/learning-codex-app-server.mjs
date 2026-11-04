@@ -5,6 +5,12 @@ if (process.argv.includes("--version")) {
   console.log("codex-cli 0.154.0");
   process.exit(0);
 }
+if (process.argv[2] === "login" && process.argv[3] === "status")
+  process.exit(
+    process.argv.includes('cli_auth_credentials_store="keyring"') ? 0 : 2,
+  );
+if (!process.argv.includes('cli_auth_credentials_store="keyring"'))
+  process.exit(2);
 let waiting;
 const send = (value) => process.stdout.write(JSON.stringify(value) + "\n");
 for await (const line of createInterface({ input: process.stdin })) {

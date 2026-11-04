@@ -1,4 +1,4 @@
-# Set up your learning notebook
+# Set up your notebook and assistant
 
 Your notebook is a private space for questions, observations and reflection across the book.
 You choose which material becomes a course submission or a shared contribution.
@@ -12,32 +12,61 @@ Reading the book does not require a companion or a model account.
 
 The standalone package is [@scalableweb/companion](https://www.npmjs.com/package/@scalableweb/companion), maintained by bebraw.
 Code-free connection is prepared in version 0.3.0 and has not yet been published to npm.
-Use the book checkout for now; [repository development](#repository-development) explains how to install it.
+Use the book checkout for now.
 The published 0.2.0 package uses the previous pairing contract and cannot connect to this updated website client.
-You need Node.js 24 or 26 and the repository dependencies for the notebook.
-Codex replies additionally require a separate [Codex CLI installation](#connect-your-agent); the companion does not install or bundle Codex.
-Notebook-only use and the local-model option do not require Codex.
-To start with the notebook only, run:
+You need Node.js 24 or 26.
+Install the checkout once, then work from its directory:
 
 ```sh
-npm run companion -- setup --notebook
-npm run companion
+git clone https://github.com/bebraw/scalability_book.git
+cd scalability_book
+npm ci
 ```
 
-Keep the companion running while you use your notebook.
+Codex replies additionally require a separate [Codex CLI installation](#connect-your-agent); the companion does not install or bundle Codex.
+Notebook-only use, direct API keys and local models do not require Codex.
+Run the guided setup in your terminal:
+
+```sh
+npm run companion -- setup
+npm run companion -- start
+```
+
+Setup offers these choices:
+
+| Choice                       | What you need                                                                                         |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Notebook only                | No model account; you can enable replies later.                                                       |
+| Codex with ChatGPT           | Codex CLI and a ChatGPT account with Codex access.                                                    |
+| Codex with an OpenAI API key | Codex CLI and your OpenAI API key.                                                                    |
+| API key directly             | An OpenAI, Anthropic (Claude), Gemini, OpenRouter or compatible service's key; no Codex installation. |
+| Local model                  | LM Studio running a model you have loaded.                                                            |
+
+Setup guides sign-in or key entry, checks your selected configuration and prints the exact start command for your notebook.
+API keys are entered in a hidden terminal prompt; do not paste them into the book website.
+Saved keys go into your operating system's credential store.
+If that store is locked or unavailable, setup explains how to unlock it or explicitly use an environment variable; it never saves a plaintext fallback.
+API usage is billed by your provider.
+Setup and `doctor` do not generate a paid reply; your first deliberate message checks whether the model can answer.
+For notebook-only setup without questions, use `npm run companion -- setup --notebook`.
+
+Keep the start command running while you use your notebook or assistant.
 It prints a local address and the websites it allows.
 In the book, choose **Notebook → Connect**, enter the address if needed, and choose **Connect companion**.
-The connection instructions include **Copy command** for the startup command with this website's exact origin.
+The connection instructions offer **Copy setup command** and **Copy start command** with this website's exact origin.
+When you already have a connected notebook, both commands retain its directory and port.
 If clipboard access is unavailable, the command is selected for keyboard copying.
 No pairing code is needed.
 If your browser requests permission to reach the local companion, allow it for the book website.
 After disconnect, expiry or restart, choose **Connect companion** again; the running companion does not need a restart for reconnection.
 
-The only default website is `https://scalableweb.dev`.
+Before setup, the only default website is `https://scalableweb.dev`.
+Setup saves your chosen website origins and port for subsequent starts.
 For local development, pass its exact origin explicitly:
 
 ```sh
-npm run companion -- --origin http://127.0.0.1:3000
+npm run companion -- setup --origin http://127.0.0.1:3000
+npm run companion -- start
 ```
 
 Repeat `--origin` to trust several exact websites; supplying it replaces the default list.
@@ -129,8 +158,8 @@ Existing audio/video diary options remain available.
 
 ## Connect your agent
 
-Choose Codex or a locally loaded model.
-Codex replies require the [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) installed separately and available as `codex` in the terminal where you run the companion.
+Choose Codex, [a direct API key](#use-an-api-key) or [a locally loaded model](#use-a-local-model).
+For Codex, install the [Codex CLI](https://learn.chatgpt.com/docs/developer-commands?surface=cli) separately and make it available as `codex` in the terminal where you run the companion.
 The adapter was verified with CLI version 0.154.0.
 Install that version if needed, then check that the command works:
 
@@ -142,13 +171,26 @@ codex --version
 The version check should print `codex-cli 0.154.0`.
 If the terminal cannot find `codex`, check the CLI installation and your terminal's `PATH` before continuing.
 Installing the companion alone does not supply this command.
-Stop any running companion, then configure and sign in to its dedicated Codex profile:
+Stop any running companion, run `npm run companion -- setup`, and choose **Codex with ChatGPT sign-in** or **Codex with an OpenAI API key**.
+The guided setup completes the selected authentication flow in Companion's dedicated profile.
+For explicit ChatGPT setup commands, use:
 
 ```sh
 npm run companion -- setup --codex
 npm run companion -- login
 npm run companion -- doctor
 ```
+
+For explicit API key login, first run `setup --codex`, then pipe a key already available in your terminal environment:
+
+```sh
+printenv OPENAI_API_KEY | npm run companion -- login --with-api-key
+npm run companion -- doctor
+```
+
+The key goes through standard input and Codex stores it in the OS keyring for the dedicated profile; it is never a command argument.
+Simply setting `OPENAI_API_KEY` does not authenticate Companion's Codex profile.
+See [OpenAI's authentication guide](https://learn.chatgpt.com/docs/auth) for API account and billing details.
 
 After the checks pass, start the companion with your dedicated Codex profile:
 
@@ -159,14 +201,14 @@ npm run companion -- start
 Choose **Connect companion** again in the book.
 Setup creates the dedicated profile before login and retains your provider choice.
 Login uses Codex's own authentication flow; do not send credentials to the website or a support request.
-The dedicated profile separates this learning space from your ordinary coding environment.
+The dedicated profile separates this learning space from your ordinary coding environment; its credentials are held in the OS keyring.
 It must not contain custom configuration, hooks, plugins, rules or custom skills.
 You can choose a profile with `--codex-home` or a model available to your account with `--model`.
 
 In **Teaching assistant → Discuss**, write your question and choose **Send message**.
 The provider notice beside your message identifies whether replies are enabled.
-For a notebook-only connection, Send is disabled; **Set up assistant replies** opens Connect with setup links and a copyable Codex start command.
-The copied Codex command includes your connected port and notebook directory so a custom location stays selected.
+For a notebook-only connection, Send is disabled; **Set up assistant replies** opens Connect with provider choices and copyable setup/start commands.
+Both commands include your connected port and notebook directory so a custom location stays selected.
 After enabling the provider, choose **Check connection** and reconnect if asked; your unsent question stays in the tab.
 The **Help: … · Settings** disclosure shows the current help choice and contains conversation/source controls, your optional learning goal and support preferences.
 Choose a help mode there: a question, hint, direct explanation, reasoning check or reflection support.
@@ -185,11 +227,75 @@ Companion 0.3.0 retains the supplied note identities on each new turn, applies t
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.
 
-With Codex or a verified local native-tool configuration, open **Help: … · Settings** for a demo investigation, select its source and use **Save initial thinking** to write a notebook note first.
+With Codex or a verified API/local native-tool configuration, open **Help: … · Settings** for a demo investigation, select its source and use **Save initial thinking** to write a notebook note first.
 Select that note and choose **Discuss selected notes**, then ask your teaching assistant to inspect the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
 Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
+
+## Use an API key
+
+Use this option for assistant replies directly through OpenAI, Anthropic (Claude), Gemini, OpenRouter or another compatible HTTPS service.
+No Codex installation or ChatGPT subscription is required.
+Stop the companion, run `npm run companion -- setup`, and choose **API key directly**.
+
+Choose your provider, enter its key at the hidden prompt, then choose a text model by number or exact identifier.
+Setup shows the first twenty model identifiers returned by the provider; you can enter another exact identifier from that provider's catalog.
+For a compatible service, supply its HTTPS API base URL when asked.
+Custom services must provide an OpenAI-compatible model list and Chat Completions API.
+The named provider choices supply their own supported endpoints; use a key issued for the provider and project or workspace you intend to use.
+For Anthropic, use a workspace-scoped key; Companion has no option to select a workspace through a custom request header.
+
+Start with the command printed by setup, connect in the book, and send a short question in **Teaching assistant → Discuss**.
+Setup checks that the configured model is listed.
+Some providers publish their model catalog without authentication, so this does not establish that the key works, that it has generation access or that the model can reliably follow the teaching instructions.
+The provider may charge for that first question and later messages.
+Only your sent message, selected source/context and retained conversation context are supplied to it.
+
+Direct API mode defaults to **discussion-only** with an estimated context budget of 16,384 tokens and an output allowance of 4,096 tokens.
+It cannot inspect a live demo in this mode; share a saved observation or use Chapter guide.
+Earlier completed turns may be omitted with a notice to keep within the budget; oversized current selections are rejected while retaining your work.
+Change the budget with `--api-context <tokens>` within the selected model's supported context.
+Use `--api-output <tokens>` to change the output allowance; models that spend output tokens on reasoning may need more room before they produce a visible answer.
+Use `--api-tools native` only after verifying function calls for that model and provider; it uses the existing student approval boundary for demo changes.
+The API transport and conversation checks use synthetic responses; actual replies and native-tool reliability across these providers have not yet been verified for this release.
+
+For scripts, supply the name of an environment variable that already contains your key:
+
+```sh
+npm run companion -- setup --api --api-provider openai --model '<exact-model-id>' --api-key-env OPENAI_API_KEY
+npm run companion -- start
+```
+
+Keep that variable available whenever you run setup, `doctor` or start the companion.
+Only its name is saved in settings.
+The named provider values are `openai`, `anthropic`, `gemini` and `openrouter`.
+Use `--api-provider compatible --api-url https://your-provider.example/v1` for another service.
+Replace the example model and URL with your provider's values.
+Alternatively, pipe the key on standard input to store it in this computer's OS credential store:
+
+```sh
+printenv OPENAI_API_KEY | npm run companion -- setup --api --api-provider openai --model '<exact-model-id>' --with-api-key
+```
+
+To replace a saved key after API setup, stop the companion and run `npm run companion -- login` for a hidden prompt, or pipe the replacement into `login --with-api-key`.
+When setup uses an environment variable, `login` keeps that source and does not prompt for a key.
+Piping a key into `login --with-api-key` explicitly switches from the environment variable to a saved key for subsequent starts.
+Saved API keys are held in the OS credential store and are reused only for their configured endpoint and notebook identity.
+The companion directory contains `credential-identity.json`, a nonsecret identifier used to find those entries.
+The keys are excluded from browser status, setup preferences, diagnostic reports and portable notebook archives.
+On Linux, saved API keys require an available Secret Service credential store in your login session.
+If OS credential storage is unavailable or access is denied, unlock or enable it and retry.
+For a headless terminal, use the explicit `--api-key-env` option above; Companion never falls back to a plaintext file.
+If you change the endpoint, model or tool mode, start a new conversation or restore the original configuration; an old transcript is not silently sent to the new backend.
+
+### Remove saved access
+
+To remove saved access from this computer, stop the companion and run `npm run companion -- logout` with the same directory.
+For API mode this removes the selected endpoint's keychain entry; for Codex it uses Codex's keyring logout.
+Copies of an API notebook that retain the same credential identity on this computer share that entry.
+With an environment-backed API setup, logout explains how to unset the variable in your terminal instead.
+Removing a local credential does not revoke the provider's API key; revoke it in your provider account when needed.
 
 ## Use a local model
 
@@ -265,10 +371,11 @@ Stop the companion, then run the same release and directory/port options with `d
 npm run companion -- doctor
 ```
 
-It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites or the local endpoint/model/context configuration.
+It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites, local endpoint/model/context configuration, or a supplied API key and model listing.
+An available model catalog does not prove the key has generation access; only a deliberately sent message checks that.
 The report identifies the selected mode and always checks whether the Codex CLI version is available.
 Without a saved provider choice or an explicit option, `doctor` uses notebook-only mode.
-In notebook-only and local-model modes, Codex is optional: a missing or unverified CLI is informational and does not fail the check.
+In notebook-only, direct API and local-model modes, Codex is optional: a missing or unverified CLI is informational and does not fail the check.
 When Codex is selected, a missing or unverified CLI fails the check.
 To require the Codex CLI and check dedicated-profile sign-in before selecting Codex, run:
 
@@ -280,6 +387,9 @@ Use the same `--directory` and `--codex-home` options as your intended setup.
 This diagnostic does not change your saved provider choice.
 Install the displayed verified provider version when it is missing or unsupported; run `login` for missing dedicated-profile authentication.
 An account's access is checked on its first real reply.
+For API authentication errors, rerun API setup or `login`; for credit or quota errors, check your provider's billing and limits.
+For a keychain error, unlock or enable your OS credential store and retry; headless API users can explicitly select `--api-key-env`.
+If a provider rejects a listed model, check its Chat Completions support and choose a compatible text model.
 Use `start --notebook` to continue writing without a provider.
 If a port is busy, stop the other process or select `--port 8789` and connect to that address.
 For a storage permission error, select a writable private directory; do not reset the database.
@@ -315,18 +425,22 @@ Your course membership does not give teachers or peers access to the private not
 Before updating, export a backup, stop the companion/provider and privately copy its directory and any separately configured profile.
 To update an existing notebook, start the updated checkout with the same directory, profile, origin and port options, then connect again.
 Release 0.3.0 retains your storage location, setup preferences, dedicated profile and records; the archive and database schemas remain version 1, and the browser connection uses protocol 2.
-You do not need to repeat setup or create a new profile for this update.
+Existing notebook/provider preferences remain available.
 Startup validates database schemas before writing and saves a `.before-schema-1-<id>.backup` snapshot when converting the original unversioned database to schema 1.
 An interrupted conversion can be retried after stopping every writer; the backup remains available.
 Older releases may reject newer schemas.
 To roll back, stop the companion/provider and restore the full pre-update directory copy, retaining the upgraded copy separately; use its compatible release.
-For a single schema conversion, privately retain the current database, copy its matching `.backup` file back as `notebook.sqlite`, `conversations.sqlite` or `local-provider.sqlite`, then use a compatible release.
+For a single schema conversion, privately retain the current database, copy its matching `.backup` file back under its original database filename, then use a compatible release.
 Restoring a backup loses subsequent changes in that restored copy; keep exports/current files so you can review and recover them separately.
 Keep the verified Codex version until a newer version has passed the documented provider check.
 
 Portable notebook archives do not include credentials or raw conversations.
-Conversations are stored separately in `conversations.sqlite`, with Codex threads in the dedicated profile and exact local-model wire context in `local-provider.sqlite` (schema 1).
+Conversations are stored separately in `conversations.sqlite`, with Codex threads in the dedicated profile, exact local-model context in `local-provider.sqlite` and API conversation context in `api-provider.sqlite` (both schema 1).
 To preserve conversation continuity as well, stop the companion and privately back up its directory and any separately configured profile.
+The backup retains `credential-identity.json` and conversation data, while saved keys remain in the OS credential store.
+Keep the backup private because it contains your learning records.
+On another computer, restore your records and sign in again or supply your API key through the configured environment variable.
+Moving a Codex profile to another path requires sign-in again even on the same computer.
 Restoring only the portable notebook lets you start a new conversation from selected notes without depending on an old provider session.
 
 ### Move an existing repository notebook
@@ -340,24 +454,18 @@ npm run companion -- migrate --from /absolute/path/to/old-notebook --directory /
 
 The command shows source/destination, retains the source, and rejects a nonempty destination.
 Use `--directory /absolute/path/to/new-location` when you need another destination.
-It copies notebook history, conversations, local-model transcripts and an included dedicated profile without changing record identities.
-After migration, run `setup --notebook`, `setup --codex` for the copied profile, or `setup --local` with the same endpoint/model/tool mode for local conversation continuity, then run `doctor`.
+It copies notebook history, conversations, local/API transcripts, nonsecret API credential identity and included Codex profile threads without changing record identities.
+It excludes externally created Codex `auth.json` files, including nested copies, while retaining the original source.
+Setup preferences are not copied; run `setup --directory /absolute/path/to/new-notebook`, then `doctor` with that same directory.
+Choose the original provider/endpoint/model/tool mode for local or API conversation continuity, and restore any configured API key environment variable in the new terminal.
+The API identity can locate existing keychain entries on the same computer; another computer requires login.
+Codex login is required after moving its profile to a new path.
 For a separately located profile, keep it and pass `--codex-home /absolute/path/to/profile` during setup.
 Verify sign-in and resumed conversations before removing any old copy.
 If continuity is unavailable, keep conversations backed up and start a new conversation from selected retained notes.
 
 ### Repository development
 
-The book checkout retains the same companion for development:
-
-```sh
-git clone https://github.com/bebraw/scalability_book.git
-cd scalability_book
-npm ci
-npm run companion -- setup --notebook
-npm run companion
-```
-
-This development command retains `.local/learning-companion/` as its default.
-Use `npm run companion -- setup --codex`, then `npm run companion -- login` for its dedicated provider profile.
+The checkout installation and guided setup above use `.local/learning-companion/` by default.
+Use `--directory` to retain a notebook stored elsewhere, and `setup --origin` to save a local development website's exact origin.
 Export and privately copy that directory/profile before updating with `git pull --ff-only` and `npm ci`, or before removing the checkout.

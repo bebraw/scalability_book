@@ -8,6 +8,7 @@ export const companionRelease = {
   notebookSchema: 1,
   conversationSchema: 1,
   localProviderSchema: 1,
+  apiProviderSchema: 1,
   codexVersion: "0.154.0",
 } as const;
 export interface CompanionStatus {
@@ -25,5 +26,6 @@ export interface CompanionStatus {
     conversations: number;
     archive: number;
     localProvider?: number;
+    apiProvider?: number;
   };
 }
