@@ -286,8 +286,15 @@ In an experiment with 199 participants making nutrition decisions, :citet[bucinc
 That task does not establish a security guarantee for deployment approvals.
 When evaluating a review interaction, measure correct acceptance and rejection, effort, and usability; neither an explanation nor an extra click establishes effective oversight by itself.
 
+An optional paper exercise can test the wording around a decision.
+Prepare two synthetic change requests: one meeting the declared acceptance criteria and one failing them.
+Create neutral and emotionally framed versions of each, keeping its technical evidence, alternatives, and requested authority identical.
+Randomly assign reviewers to a wording condition so each sees both requests without seeing both versions of either request.
+Record acceptance, rejection, and whether reviewers can explain the evidence and consequences; approval rate alone cannot distinguish better judgment from greater compliance.
+Treat any difference as a finding about these cases, not proof of general persuasion or lost expertise.
+
 A review marker makes a decision visible, but an unresolved-marker check cannot detect a required marker the producing agent omitted.
-Use this exercise to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).
+Use the following fixture to test the [authority boundary in the fleet plan](/chapters/agent-fleets/#map-authority-and-acceptance).
 
 In a disposable branch or review fixture, declare that changing an existing endpoint's authorization or adding a new endpoint requires human review before acceptance.
 Check both cases: a rule limited to modified existing handlers would miss the new endpoint.

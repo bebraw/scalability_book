@@ -125,6 +125,9 @@ The next attempt should begin with better information about the failure.
 
 In a practitioner essay, :citet[osmani2026verification] emphasizes giving agents executable feedback during implementation.
 Verification is one part of loop engineering: decide what evidence justifies accepting the result.
+Agents can also construct machine-checked proofs, so verification effort need not remain fixed as implementation accelerates :citep[lucas2026formal].
+Separate whether the evidence is valid from whether it covers the intended behavior of the artifact that will run.
+The [proof-scope example in Appendix A](/appendices/evaluating-agentic-workflows/#check-what-a-proof-establishes) shows why both questions matter.
 
 For CSV export, observing a download establishes less than inspecting its rows against the permitted events and fields.
 An agent that writes both the exporter and its checks can repeat the same mistaken access rule in both.

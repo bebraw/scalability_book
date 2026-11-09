@@ -296,6 +296,12 @@ Include an obsolete assumption and a blocker that has since cleared; check wheth
 Measure repeated work, missed constraints, correction effort, and all context/retrieval cost.
 Keep standing authority in the project's owning instructions: a remembered plan is evidence of an earlier decision, not permission to widen the task.
 
+Also include a requirement stated early but needed only after the handoff.
+For the CSV exporter, require a particular field order, complete an unrelated change, then resume export work from the compact state with the original contract still retrievable.
+Check the downloaded header against the independently retained order and record whether the agent preserved or recovered the requirement before acting.
+Keep source access the same in both conditions so the comparison tests the handoff rather than access to different evidence.
+This proposed trial can expose a delayed dependency lost during summarization; no outcome is assumed.
+
 ## Design the verification loop
 
 The [Scalable Development chapter](/chapters/scalable-development/#loop-engineering) introduces loop engineering; this section develops its verification decisions.
@@ -338,6 +344,23 @@ An executable difference still needs adjudication: the reference can be wrong, o
 Preserve disputed expectations alongside the witness.
 If an audit changes the acceptance suite, version it and re-evaluate every compared candidate against the same suite.
 The existing mutation lab provides a smaller local way to challenge a check before trusting its passes.
+
+### Check what a proof establishes
+
+Anthropic and Theorem report Rocq-checked proofs for 239 OSS-Fuzz entry points across 123 libraries :citep[lucas2026formal].
+The claims cover absence of crashes, including sanitizer failures and failed assertions, for inputs below 64 MB under specified machine and process semantics.
+They concern single-threaded, statically linked RISC-V/musl binaries with a fixed memory budget, rather than every behavior or deployment of those libraries.
+Confidence still depends on the theorem statements, platform models, and proof checker.
+
+The workflow allowed agents to patch code and regenerate specifications.
+Removing intended work could make crash freedom easier to prove; the authors report patch penalties and audits to discourage that shortcut.
+The result demonstrates progress in proof construction without establishing which part of delivery consumes the most effort.
+
+For an invented CSV example, an exporter that always returns only the header could satisfy a claim that it never exports a forbidden event.
+It would still violate a requirement to include every permitted event matching the filter.
+Write those two obligations independently, then ask whether the theorem states both; a checker can accept a valid proof of an incomplete requirement.
+Retain the exact proved artifact, specification, assumptions, and checker result, and compare them with the artifact and environment being deployed.
+Assess changes to the specification against the original need alongside changes to the code.
 
 ### Make repair repeatable and acceptance explicit
 
@@ -439,6 +462,11 @@ A shorter agent-facing view does not by itself establish a lower total bill or a
 In a SWE-agent workshop study, observation masking and model-generated summaries reduced cost in most of five tested model configurations, but its paired analysis found that both significantly lowered solve rate in one reasoning-model configuration :citep[lindenbauer2025complexity].
 On controlled long-horizon tool-use benchmarks, ACON reduced peak input tokens while largely retaining task performance :citep[kang2026acon].
 Neither study validates every command filter; together they show that context reduction is a behavior change to test, not free efficiency.
+
+A later preprint broadens this evidence: frequent compaction largely preserves accuracy across tested long-horizon tasks, with some losses :citep[belcak2026context].
+Its long-input experiments also replace full-input presentation with selective filesystem reading, so their gains cannot be attributed to summarization alone.
+The reported optimized retail savings use a pricing model; they do not establish the bill or latency of a deployed workflow.
+Use the [retained-state trial](#check-retained-workflow-state) to test delayed requirements alongside retrieval and total cost before choosing a compaction policy.
 
 > **Compact the working view; preserve the raw record**
 >
