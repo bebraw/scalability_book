@@ -27,6 +27,12 @@ Course preparation tooling is separate from the website application and course r
 The generic tool does not import the private reference, whose standalone source, SQLite state, adapter, frozen archives and withheld probes stay under ignored `.local/course-preparation/`.
 The site download builder packages only `course-tools/benchmark/`; reference source never enters the public build or download inputs.
 
+The optional [course project starter](course-tools/project-starter/README.md) owns a first-session walkthrough, shared student specifications and decision history, and three independent application stubs.
+Each phase's `server.mjs` is its own loopback HTTP entry point and owns no domain state; no phase imports runtime code, configuration or tests from another.
+The shared documents carry behavioral intent and reasoning, while each phase owns its implementation, architecture and evidence.
+[project-starter-download.ts](scripts/lib/project-starter-download.ts) packages an explicit file allowlist and a generated source/contract provenance manifest at `/downloads/project/project-starter.zip`.
+The archive is an optional setup aid, separate from immutable course requirement editions and the private audit reference; its smoke checks establish setup only.
+
 The [local practice workspace](labs/README.md) shares installation and command dispatch across four independent teaching exercises, separately from the private course reference.
 [labs/workspace.mjs](labs/workspace.mjs) selects one exercise; [scripts/lib/lab-downloads.ts](scripts/lib/lab-downloads.ts) allowlists the root files and exercise directories for the primary workspace ZIP.
 The root owns no domain state or global feature gate; each exercise owns its specification, gap, fixtures and evidence.

@@ -110,6 +110,7 @@ No accepted decisions await implementation.
 | [ADR-059](implemented/ADR-059-organize-concepts-in-aligned-subcategory-rows.md)                     | Align equal topic regions, organize concepts into editorial subcategory rows and expose readable overview/filter navigation.                                |
 | [ADR-060](implemented/ADR-060-support-student-api-keys-and-guided-companion-setup.md)               | Add named API providers and guided setup; plaintext credential decisions superseded by ADR-061.                                                             |
 | [ADR-061](implemented/ADR-061-store-companion-credentials-in-the-os-keychain.md)                    | Store saved API/Codex credentials in OS stores, retain nonsecret API identity and require explicit environment references for headless use.                 |
+| [ADR-062](implemented/ADR-062-provide-a-course-starter-with-independent-phase-stubs.md)             | Provide an optional executable course starter with shared reasoning and three independent phase stubs.                                                      |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

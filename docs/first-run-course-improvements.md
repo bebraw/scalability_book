@@ -29,18 +29,13 @@ Check Establish access before its work begins, then repeat the preflight when th
 
 ## 2. Provide an executable evidence and submission template
 
-Turn the common submission contract into a downloadable repository or bundle instead of asking each team to translate the specification into a new structure.
-A minimum template could contain:
+The optional [course project starter](../course-tools/project-starter/README.md) now supplies independent runnable phase stubs, shared specifications and ADR prompts, and a single evidence index per phase.
+Its first-session walkthrough begins with a setup smoke check and a bounded persistent-feature task.
+The [tooling guide](course-tooling.md#student-project-starter) owns its distribution and rehearsal instructions.
+Try that walkthrough with the pilot student and record where setup, the task brief or validation still needs instructor intervention before expanding the starter.
+Availability and automated setup checks do not establish an observed improvement in student onboarding.
 
-- `evidence/claims.md`;
-- `evidence/workload.md`;
-- `evidence/architecture.md`;
-- `evidence/ai-use-log.md`;
-- `evidence/friction-audit.md`;
-- `evidence/project-card.md`; and
-- `evidence/manifest.json` tying the evidence to an implementation and revision.
-
-Include a small worked example from a domain other than the course project.
+Consider a small worked example from a domain other than the course project if evidence writing remains an obstacle.
 It should contrast a strong bounded claim with a plausible but weak claim and show how an observation, interpretation, limitation, and next measurement differ.
 
 The presentation project card should be generated from the same evidence bundle.

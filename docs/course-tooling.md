@@ -1,6 +1,6 @@
 # Course preparation tooling
 
-This guide owns the operational boundary between the instructor's private audit reference and the optional public workload runner.
+This guide owns the optional student project starter and the operational boundary between the instructor's private audit reference and the optional public workload runner.
 The [common specification](../specifications/00_common_project.md) owns course behavior and measurements; this tooling does not prescribe student URLs, storage or architecture.
 
 ## Ownership
@@ -28,6 +28,31 @@ node course-tools/benchmark/cli.mjs /path/to/adapter.mjs /path/to/new-report.jso
 The supplied runner is optional; custom tools must follow the same course protocol.
 Its tests exercise reporting with synthetic adapters, not an application performance claim.
 Full reference validation needs the actual private app and adapter and is recorded separately.
+
+## Student project starter
+
+The optional [project starter](../course-tools/project-starter/README.md) is published at `/downloads/project/project-starter.zip` and linked from the project pages.
+It provides a first-session walkthrough, shared maintained-specification and ADR prompts, and independent Establish, Challenge and Compare directories with phase-specific evidence indexes.
+Each directory starts from identical dependency-free Node HTTP code and smoke checks; no Work Activity Tracker behavior, persistence, application-specific workload adapter or model integration is supplied.
+Node is a supported starting option, not a change to the course's stack freedom or assessment requirements.
+
+Students retain the original download and its generated `starter-manifest.json`, then initialize each phase from that pristine source rather than their evolved earlier application.
+The manifest records the base source and contract revisions, dirty-state indicators, and SHA-256 hashes for the exported files and referenced contract files.
+A dirty or unversioned build is not an exact Git release; retain the archive bytes and record that limitation.
+Shared specifications describe intent and decisions retain reasoning; each phase records its own implementation status, evidence, known gaps and readable snapshots.
+Agent instructions restrict work to the active phase and deliberately supplied shared context, but are not an operating-system sandbox.
+Configure actual model routes, delegation limits and access through the published course environment and the chosen harness.
+
+The build packages only the explicit source-file allowlist in [project-starter-download.ts](../scripts/lib/project-starter-download.ts), rejecting missing files and symbolic links.
+It neither traverses the private reference nor imports another phase's runtime.
+Local state, credentials, dependencies and generated reports are not download inputs.
+Adding a file to the starter therefore requires an explicit packaging decision and a download test update.
+The project-page download action is supplementary navigation; frozen requirement documents and grading contracts remain unchanged.
+
+For a first-session rehearsal, unpack the ZIP outside the book repository, follow its README, and run each phase's smoke checks independently.
+Check that the starter identifies the application as unfinished, that the first persistent-feature brief is actionable, and that later phases can run when earlier project directories are absent.
+Record student onboarding observations separately: a passing setup check is not evidence that the student completed the first feature or that the starter improved learning.
+See [development verification](development.md#course-project-starter) for the maintainer commands and [ADR-062](adrs/implemented/ADR-062-provide-a-course-starter-with-independent-phase-stubs.md) for the decision.
 
 ## Private reference and release
 

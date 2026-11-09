@@ -1,6 +1,37 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("project specification", () => {
+  test("offers a self-contained starter from the project introduction", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/project/introduction/");
+    const link = page.getByRole("link", {
+      name: /Download project starter/,
+    });
+    await expect(link).toHaveAttribute(
+      "href",
+      "/downloads/project/project-starter.zip",
+    );
+    const response = await request.get((await link.getAttribute("href"))!);
+    expect(response.status()).toBe(200);
+    const archive = await response.body();
+    expect(
+      archive.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])),
+    ).toBe(true);
+    for (const required of [
+      "project-starter/README.md",
+      "project-starter/starter-manifest.json",
+      "project-starter/specifications/application.md",
+      "project-starter/docs/adrs/template.md",
+      ...["01-establish", "02-challenge", "03-compare"].map(
+        (phase) => `project-starter/projects/${phase}/server.mjs`,
+      ),
+    ]) {
+      expect(archive.includes(Buffer.from(required))).toBe(true);
+    }
+  });
+
   test("offers the optional runner download without the private audit source", async ({
     page,
     request,

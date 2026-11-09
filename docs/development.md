@@ -117,6 +117,27 @@ Course brief tables share the spacing, borders, and row styling of captioned boo
 Assessment tables give numeric columns room for a single line; compact tables scroll horizontally when needed.
 The grade-threshold table uses a compact width and left-aligned percentage ranges, with a narrow right-aligned grade column.
 
+## Course project starter
+
+The optional [student starter](../course-tools/project-starter/README.md) is separate from the book runtime and the short practice labs.
+Its three phase directories each run with Node's standard library and have no installation step or shared application dependency.
+Use the pinned `.nvmrc` runtime when rehearsing the student setup.
+
+```sh
+node --test tests/project-starter-download.test.ts tests/zip.test.ts
+cd course-tools/project-starter/projects/01-establish
+npm test
+npm start
+```
+
+Repeat the smoke check in `02-challenge` and `03-compare`.
+Build with `npm run worker:build`, then unpack `build/downloads/project/project-starter.zip` into a clean directory outside the repository and run all three copies, including one phase with its siblings absent.
+The tests cover the explicit archive boundary, provenance and independent runtime baseline; the smoke checks establish only setup, not application acceptance.
+Keep generated rehearsal files under `.local/` or a temporary directory.
+Run `npm run validate`, `npm run check:links`, and the affected `tests/e2e/project-specification.spec.ts` browser check for changes to its public download entry.
+Inspect the rendered project page and the stub in a browser.
+The [tooling guide](course-tooling.md#student-project-starter) owns the distribution and first-session workflow.
+
 ## Downloadable labs
 
 The [local practice workspace](../labs/README.md) groups CSV export, concern-directed mutation, persisted retry and HTTP cache under one npm setup and exercise index.

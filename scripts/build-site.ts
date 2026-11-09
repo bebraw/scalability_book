@@ -53,6 +53,7 @@ import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
+import { writeProjectStarterDownload } from "./lib/project-starter-download.ts";
 import { getBrowserBuildTargets } from "./lib/browser-targets.ts";
 import {
   readRequirementEditions,
@@ -1323,6 +1324,10 @@ async function writeLabDownloads() {
 async function writeProjectDownloads() {
   const downloadsDirectory = path.join(buildDir, "downloads", "project");
 
+  await writeProjectStarterDownload(
+    root,
+    path.join(downloadsDirectory, "project-starter.zip"),
+  );
   await writeDirectoryZip(
     path.join(root, "specifications", "examples", "fleet-trace"),
     path.join(downloadsDirectory, "fleet-trace-example.zip"),
