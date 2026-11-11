@@ -18,10 +18,47 @@ The phase specifications define additional constraints and deliverables.
 This common specification applies to all three phases.
 Read the [project introduction](00_introduction.md#guidelines-for-course-work) before starting work; it explains submission checkpoints, evidence records, external contributions, and learning expectations.
 
+## Working as a three-person team
+
+Use three rotating human responsibilities to keep everyone involved in the engineering decisions.
+The **operator** leads the current task and works with the agent; the **challenger** examines assumptions and alternatives; the **validator** checks the result against the contract and explains whether it is ready to accept.
+All three contribute technical reasoning, and everyone remains responsible for understanding the submitted work.
+
+The table gives a suggested working pattern throughout each project.
+The [shared engineering session](#shared-engineering-sessions) below is the required minimum; this guidance helps organize ordinary project work within the same time budget.
+
+| Stage                   | Operator                                                                                           | Challenger                                                                             | Validator                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Plan a small task       | Turn the agreed behavior into a bounded request with the relevant context.                         | Question the proposed scope and design; identify an alternative or likely failure.     | Define an observable acceptance check from the contract before implementation.              |
+| Build and integrate     | Work with the permitted agent setup, inspect changes, and explain consequential human corrections. | Trace assumptions through the design and code; investigate a concrete counterexample.  | Inspect the changes and run checks; question whether the tests could pass despite a defect. |
+| Measure and interpret   | Run the agreed workload and retain its configuration and results.                                  | Look for confounding factors and alternative explanations for a result.                | Check correctness alongside performance and whether the evidence supports the claim.        |
+| Audit another group     | Attempt setup and the assigned change probe on the frozen revision.                                | Trace unfamiliar boundaries and record assumptions, questions, and friction.           | Check the observed behavior and retain reproducible evidence for the joint report.          |
+| Complete the submission | Assemble the revision and evidence links; coordinate the response to incoming audit findings.      | Check that the explanation includes failures, trade-offs, and unresolved disagreement. | Reproduce the documented checks and confirm that claims refer to the submitted revision.    |
+
+For audits, follow the [bounded audit protocol](#10-bounded-cross-team-audit), including its timing and tool policy.
+Distributing the work does not give each member a separate audit time allowance.
+Your team's validator does not replace the independent audit of your implementation by another group or assigned human reviewer.
+
+### Rotate responsibility and hand over context
+
+For the required sessions, a simple rotation is: in Establish, member 1 operates, member 2 challenges, and member 3 validates; in Challenge, member 2 operates, member 3 challenges, and member 1 validates; in Compare, member 3 operates, member 1 challenges, and member 2 validates.
+You can also switch responsibilities between bounded tasks within a phase so everyone gets direct practice with the code, checks, and evidence.
+Avoid leaving one person permanently in charge of prompting, testing, or writing the report.
+
+At a handoff, point the next person to the current revision, intended behavior, checks already run, unresolved question, and next action in the existing task notes or decision log.
+A useful handoff ends with the incoming person explaining the next check.
+Between meetings, divide bounded tasks with an agreed reviewer and integration point; bring uncertain decisions back to the group.
+Record contributions through the existing evidence and private individual assessments rather than adding a role report.
+
+These human responsibilities apply with either one agent or a fleet.
+In Establish and Challenge, only one coding agent may run at a time across the group; peers can still inspect code, plan, and run deterministic checks while the operator uses it.
+In Compare, the humans supervise the declared fleet and its integrated result; three students working together do not themselves constitute an agent fleet.
+The phase briefs describe the [Establish](01_establish.md#team-focus-in-this-phase), [Challenge](02_challenge.md#team-focus-in-this-phase), and [Compare](03_compare.md#team-focus-in-this-phase) focus for each responsibility.
+
 ## Shared engineering sessions
 
 Each group must hold one shared engineering session of approximately 30 minutes per phase, within its existing project work.
-Use three responsibilities: **operator** works with the agent and explains the request; **challenger** questions assumptions and proposes alternatives; **validator** inspects the implementation, runs checks, and explains the acceptance decision.
+Assign the **operator**, **challenger**, and **validator** responsibilities described above.
 Rotate these responsibilities across phases so each student practices all three.
 For an approved pair, combine challenger and validator and rotate the operator; for a larger group, divide active investigation and validation tasks so everyone contributes.
 

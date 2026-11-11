@@ -6,27 +6,27 @@
     {
       "document": "introduction",
       "file": "specifications/00_introduction.md",
-      "sha256": "ad7a4750a05510e908c40a534a8dbbe94d9589b6ff025e3027952907390db07c"
+      "sha256": "24270e207e23f11fa8998b1be6c98552479a8f17be06588a84a04b02a87fe60b"
     },
     {
       "document": "common",
       "file": "specifications/00_common_project.md",
-      "sha256": "90a33fdeae143547263054c251176868a4179f8d2200fac24f0f33800bfbbacb"
+      "sha256": "6a6ece87051a410cfc8b57d3e88459b6f544af2bbeea72f65556cc70c6773c35"
     },
     {
       "document": "establish",
       "file": "specifications/01_establish.md",
-      "sha256": "eb7d22ec0aab3ce56498b57a5c2c3c9c9076c931345e4ffde8cbc16afe41a409"
+      "sha256": "6815c24cc9939251ef736f2b5dd1d15a5569e177153439a8596667c5364afe93"
     },
     {
       "document": "challenge",
       "file": "specifications/02_challenge.md",
-      "sha256": "85b1597549059ce9a51777bd1a66ba56297ee141bdeebd3fe504738a326f48d1"
+      "sha256": "bb2b599d71fd21c6a04b442b72dd4382a0af87baed485280bd526b81a63bbb81"
     },
     {
       "document": "compare",
       "file": "specifications/03_compare.md",
-      "sha256": "46f0f566a14db9fccad1743bc4db670e054454d295b12233c89f2607a74aad62"
+      "sha256": "f5a6f06397c7ea0720f99178a60c2854034b4851d039d121f1a6e4431d1396b2"
     },
     {
       "document": "grading",

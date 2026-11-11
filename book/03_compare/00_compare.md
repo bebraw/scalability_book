@@ -16,6 +16,7 @@ Complete Compare with implementation C and its fleet trace, a three-way applicat
 ## Implementation C — Work Activity Tracker
 
 The [Compare project specification](/project/compare/) defines the third fresh implementation and its bounded fleet workflow.
+Use its [team guidance](/project/compare/#team-focus-in-this-phase) to rotate human responsibility for coordinating the fleet, challenging its decisions, and checking the integrated result.
 The common behavior, permitted acceptance material, pressures, and reporting categories remain stable while delegation, orchestration, authority allocation, integration, and fleet controls vary deliberately.
 Use B's small model as the reference configuration; an approved fleet may use small models, large models, or a mixture with declared role or task assignments.
 When model assignment also changes, the full B–C builds compare development systems rather than isolate orchestration.

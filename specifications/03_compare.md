@@ -8,6 +8,17 @@
 The [common project specification](00_common_project.md) applies throughout.
 Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
 
+## Team focus in this phase
+
+Rotate the [human responsibilities](/project/#working-as-a-three-person-team) again, now overseeing both the fleet and the final comparison:
+
+- **Operator:** coordinate the declared task graph, agent handoffs, and integration; retain evidence of actual attempts and human interventions.
+- **Challenger:** question task boundaries, shared assumptions, and coordination costs; examine whether model assignment or accumulated practice could explain an apparent improvement.
+- **Validator:** check the integrated application, inspect evidence behind the fleet's completion claims, and verify the scaling response and deployment measurements against their declared revisions and environments.
+
+For example, trace a change across an agent handoff and check the integrated behavior even when each delegated task reports success.
+Every group member contributes to the final decision about which application and workflow fit the evidence.
+
 ## What to do and submit
 
 Organize one evidence index into the four sections below.

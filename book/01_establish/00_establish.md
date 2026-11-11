@@ -16,6 +16,7 @@ Bind implementation A to a declared revision and evidence package so later compa
 ## Implementation A — Work Activity Tracker
 
 The [Establish project specification](/project/establish/) defines the implementation and evidence requirements.
+Use its [team guidance](/project/establish/#team-focus-in-this-phase) to share the first build and baseline checks among the operator, challenger, and validator.
 Choose a domain interpretation, stack, and architecture that fit the [common contract](/concepts/#contract) and one question you want to investigate.
 Record the assumptions and [trade-offs](/concepts/#trade-off) that later builds should test.
 Follow the [shared transfer policy](/project/#8-permitted-transfer-between-implementations) when carrying material into those fresh implementations.

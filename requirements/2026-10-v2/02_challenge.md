@@ -8,6 +8,17 @@
 The [common project specification](00_common_project.md) applies throughout.
 Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
 
+## Team focus in this phase
+
+Rotate the [human responsibilities](/project/#working-as-a-three-person-team) and use A's evidence to challenge a fresh B:
+
+- **Operator:** give the small-model agent bounded tasks using the permitted specifications and lessons from A; record where clarification or manual correction is needed.
+- **Challenger:** examine one architecture assumption under concurrency or failure, and consider practice, context, and architecture as alternative explanations for differences from A.
+- **Validator:** repeat the common checks and A's primary pressure, check the bounded correctness or recovery case, and keep failed attempts visible in the comparison.
+
+For example, agree what two concurrent attempts at the same transition should do before running them, then compare the observed state and events with that expectation.
+Keep human collaboration within the single-agent constraint across the group.
+
 ## What to do and submit
 
 Use one [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation B.

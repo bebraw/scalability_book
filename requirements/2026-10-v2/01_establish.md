@@ -8,6 +8,17 @@
 The [common project specification](00_common_project.md) applies throughout.
 Follow the [staged submission process](00_introduction.md#submit-each-phase-in-stages), including your private individual portfolio.
 
+## Team focus in this phase
+
+Use the [rotating human responsibilities](/project/#working-as-a-three-person-team) to establish a baseline everyone can explain:
+
+- **Operator:** guide the large-model agent through one complete work-item transition and its activity event, then extend the working core in bounded steps.
+- **Challenger:** question the domain interpretation and stack assumptions; try an invalid transition or another case the proposed design may mishandle.
+- **Validator:** check the browser-visible result and persisted state, then establish repeatable acceptance checks and workload measurements tied to A's revision.
+
+Choose acceptance checks together before asking the agent to implement the behavior.
+Use the recorded results to decide what to accept and what to revisit in B.
+
 ## What to do and submit
 
 Use one [common submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence) for implementation A.

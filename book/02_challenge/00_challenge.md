@@ -14,6 +14,7 @@ The three chapters form one progression:
 ## Implementation B — Work Activity Tracker
 
 Use the [Challenge specification](/project/challenge/) and [shared transfer policy](/project/#8-permitted-transfer-between-implementations).
+Rotate the operator, challenger, and validator responsibilities using the [Challenge team guidance](/project/challenge/#team-focus-in-this-phase) to examine assumptions and compare B with A.
 Keep the common behavior, pressures, and reporting categories stable while testing a revised architecture hypothesis.
 Record what you learned from A's public discussion and distinguish that practice effect from model or workflow differences where the evidence permits.
 

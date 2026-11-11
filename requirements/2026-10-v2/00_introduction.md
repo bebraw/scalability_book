@@ -39,6 +39,9 @@ It does not change deadlines or passing requirements unless the instructor separ
 Keep the group stable across Establish, Challenge, and Compare where practical; agree membership changes with the teaching staff and record which group each student belongs to for the affected phase.
 One member submits the group bundle on behalf of the registered group, and every member remains responsible for understanding and accepting its work.
 
+Use the [three-person teamwork guide](00_common_project.md#working-as-a-three-person-team) to share planning, implementation, measurement, audit, and submission work through rotating operator, challenger, and validator responsibilities.
+Each phase brief explains how those responsibilities change focus as you move from the first baseline to the small-model build and then the fleet comparison.
+
 Each group receives one project score per phase, which every registered member receives.
 Individual contribution is assessed through the self- and peer-assessment criteria, while participation and learning diaries are also scored individually.
 
