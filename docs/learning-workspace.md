@@ -185,7 +185,7 @@ Only **Save note** creates a durable notebook entry; no cockpit action judges ma
 ## Start the companion
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
-Published release 0.3.1 uses code-free connection and browser protocol 2; it also preserves the macOS home directory required by Codex's OS keychain.
+Published release 0.4.0 adds the guided course project launcher while retaining code-free connection, browser protocol 2 and the macOS home directory required by Codex's OS keychain.
 The older 0.2.0 artifact uses the previous connection contract and is not supported by this updated browser client.
 [ADR-030](adrs/implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) retains its release evidence; [ADR-037](adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records the new trust boundary.
 For local development, use the checkout command; it keeps the repository's installed dependencies and existing default:
@@ -227,7 +227,8 @@ There is no `/pair` route, code generator or manual-pairing option.
 
 ### Course project launcher
 
-The terminal-only `project` command is an unreleased addition, available from the updated checkout or a prepared package; registry 0.3.1 does not contain it.
+The terminal-only `project` command ships in companion 0.4.0.
+Run `npx --yes @scalableweb/companion@0.4.0 project` for guided phase and project-directory selection, or use `npm run companion -- project` from the checkout.
 It wraps the declared course coding configurations in a guided phase/directory choice, Codex selection, endpoint-bound credential lookup, disposable tool check and interactive launch.
 It prefers the first executable `codex` on `PATH` if a credential-free probe reports a stable version at least 0.154.0; a missing, older, prerelease, unparseable or failed candidate selects the private pinned 0.154.0 fallback without changing a global installation.
 `--managed-codex` explicitly selects the private baseline.
@@ -282,7 +283,7 @@ Sign-in/thread continuity must be checked before removing the source; retained n
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
 Package release, browser protocol 2, portable archive 1 and notebook/conversation/local-provider/API-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
-Release 0.3.1 retains the previous storage location, setup preferences and compatible records without a new schema migration.
+Release 0.4.0 retains the previous storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
 Interrupted migration retains a recoverable snapshot and can be retried once writers stop.
@@ -383,7 +384,7 @@ The metadata identifies applied instructions, not proof that a reply complies; l
 **About this reply** shows recorded versions, with an explicit unknown-history message for legacy replies; reviewed notebook handoffs retain that provenance.
 Policy changes update the policy version alongside the instructions and their evaluation evidence.
 Teaching metadata is additive in the version 1 conversation database and portable notebook/archive schemas.
-The prepared companion uses HTTP protocol 2 for code-free connection; existing record histories remain valid.
+The published companion uses HTTP protocol 2 for code-free connection; existing record histories remain valid.
 Providers that do not advertise a policy are treated as unversioned, rather than being assigned today's policy by the conversation owner.
 [learning-codex.ts](../scripts/lib/learning-codex.ts) adapts the [Codex app-server protocol](https://learn.chatgpt.com/docs/app-server) over local stdio.
 [learning-conversations.ts](../scripts/lib/learning-conversations.ts) owns `conversations.sqlite`, selected context and the browser request broker.

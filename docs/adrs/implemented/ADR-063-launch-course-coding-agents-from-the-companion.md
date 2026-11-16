@@ -96,7 +96,8 @@ That failure was retained; the corrected validator permits only strictly parsed 
 The installed-CLI selection was also verified against the existing macOS Codex 0.154.0 installation: Challenge passed in 8.66 seconds, recorded the installed executable and version, and created no private harness installation.
 Synthetic checks cover newer stable versions, outdated and broken candidates, executable/version cache invalidation, isolated version probes, explicit managed selection and failure without an automatic model rerun.
 These checks establish local setup and handoff for that baseline, not compatibility of newer Codex releases, course-application correctness, upstream cancellation or Windows support.
-The current registry release 0.3.1 does not include the launcher; source implementation and package publication are separate milestones.
+The launcher ships in companion 0.4.0.
+[ADR-030](ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-040) records the published artifact, source revision and macOS/Linux Node 24/26 verification; the real-model checks above remain specific to the tested Codex baseline.
 
 ## References
 

@@ -144,11 +144,11 @@ The present step distributes the existing local companion while preserving stude
 
 ## Implementation and verification
 
-The repository ships [@scalableweb/companion@0.3.1](https://www.npmjs.com/package/@scalableweb/companion/v/0.3.1), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
+The repository ships [@scalableweb/companion@0.4.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.4.0), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
 [The CLI](../../../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`; [the package workflow](../../../.github/workflows/learning-companion.yml) verifies its compiled tarball on macOS/Linux with Node 24 and 26.
 The default data paths are `~/Library/Application Support/scalableweb-companion/` on macOS and an absolute `$XDG_DATA_HOME/scalableweb-companion/` or `~/.local/share/scalableweb-companion/` on Linux.
 The repository entry retains its original `.local/learning-companion/` default.
-Package version 0.3.1, browser protocol 2, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
+Package version 0.4.0, browser protocol 2, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified study provider is Codex CLI 0.154.0.
 Windows is not advertised as supported.
 
 The [maintainer release command](../../../scripts/release-learning-companion.ts) and [release owner](../../../scripts/lib/learning-release.ts) automate publication and verify the distributed bytes.
@@ -219,6 +219,22 @@ The updated regression checks use a synthetic parent home, verify macOS home pre
 Local checks passed all 149 focused release tests, type checking and clean tarball installation on macOS with Node 26.13.0.
 The same packaged artifact passed the real Codex CLI 0.154.0 Chromium journey with a newly authenticated keychain profile: actual browser observations, an approved demo change, a resumed conversation and a reviewed notebook draft.
 Student instructions and the browser's setup/start commands pin the verified 0.3.1 release.
+
+### Release 0.4.0
+
+Published on 2026-11-16, release 0.4.0 records clean source revision [59ad9f7cf995bbf0674ac7d903db7b434fb66d89](https://github.com/bebraw/scalability_book/commit/59ad9f7cf995bbf0674ac7d903db7b434fb66d89).
+It adds [ADR-063's course project launcher](ADR-063-launch-course-coding-agents-from-the-companion.md): guided phase and directory selection, Aalto credential reuse, installed Codex eligibility checks, a private pinned fallback and independently checked file/tool preflights.
+The browser protocol and existing notebook/archive/conversation schemas remain unchanged; project profiles and traces use separate private state.
+
+Registry metadata and downloaded bytes match the tested artifact: SHA-1 `9f49e6b60f37475ec2725403d2cb6ae85b7f4685`, integrity `sha512-wDZxwjb0KXCcEkec//XPcE4waUj3c7lFWHfS45mOBDQrcmg3BGeUY92t0UXYrh1dQcLq5eUtQqwX1ZyMiQWDRQ==`.
+All four [source-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/43850351258) and all four [published-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/43851454918) passed on macOS/Linux with Node 24/26, including selector/process/configuration-boundary checks and 42 packaged CLI/authentication checks.
+Npm accepted the upload before serving it; the initial confirmation window expired, and read-only polling established availability before the retained receipt resumed verification without a second upload.
+A fresh-cache npm execution returned version 0.4.0 and the recorded source revision, and its Challenge command preview selected the correct model without creating project state.
+Npm's `latest` tag resolves to 0.4.0.
+
+Local pre-release checks passed 403 unit tests with one opt-in native-keychain check skipped, type checking and package installation.
+ADR-063 retains the real Aalto model checks and terminal rehearsal, including the installed Codex 0.154.0 reuse check; newer eligible Codex versions still require their own phase preflight.
+The general student setup and browser commands now pin 0.4.0; course project work starts with `npx --yes @scalableweb/companion@0.4.0 project`.
 
 ## Open questions
 

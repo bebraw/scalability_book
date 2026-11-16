@@ -347,7 +347,7 @@ The opt-in real-provider check and voluntary learner evaluation are documented i
 
 ### Course project launcher
 
-The unreleased terminal launcher wraps the course harness with a verified 0.154.0 fallback; it does not add project execution to browser study messages.
+The terminal launcher in companion 0.4.0 wraps the course harness with a verified 0.154.0 fallback; it does not add project execution to browser study messages.
 From the checkout, use `npm run companion -- project` for guided phase and workspace selection.
 Use `npm run companion -- project establish --workspace /absolute/project/path --print` to inspect the selection policy and conditional commands without probing Codex, creating files, reading credentials, installing a harness or contacting the model.
 `--check` runs the disposable tool check and stops; normal launch reuses a successful check for the same configuration, actual executable source/path/version, runtime and fixture version.
@@ -372,7 +372,7 @@ Verify installed-version selection and fallback, credential-free probes, distinc
 Check that receipts identify the actual executable and that a failed installed-harness preflight cannot trigger another model run through the fallback.
 For a live Aalto check, use synthetic inputs, the assigned model, a disposable workspace and an explicit environment reference or endpoint-bound keychain entry; retain first failures and inspect actual worker output for Compare.
 Do not claim real-model, platform or package verification from a printed plan alone.
-The [student guide](learning-companion-setup.md#start-a-course-coding-project) distinguishes source/prepared-package use from registry 0.3.1, which lacks this command.
+The [student guide](learning-companion-setup.md#start-a-course-coding-project) starts with the published 0.4.0 command and includes checkout usage.
 
 ### Learning cockpit and reading investigations
 
@@ -420,7 +420,7 @@ The publisher is bebraw, with access to the `scalableweb` npm organization.
 From a clean `main`, select the next version and run the complete publication command:
 
 ```sh
-npm run companion:release -- 0.3.1
+npm run companion:release -- 0.4.0
 ```
 
 The explicit version updates the package manifest, shared release metadata and pinned package README commands, commits only those version changes, pushes `main`, and continues through publication.

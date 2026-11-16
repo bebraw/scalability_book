@@ -162,14 +162,14 @@ test("first connection offers guided provider setup without sending a model requ
       "Enter API keys only in the terminal. API usage is billed by your provider.",
     ),
   ).toBeVisible();
-  const setup = `npx --yes @scalableweb/companion@0.3.1 setup --origin '${new URL(baseURL!).origin}'`;
+  const setup = `npx --yes @scalableweb/companion@0.4.0 setup --origin '${new URL(baseURL!).origin}'`;
   await expect(
     panel.locator("code").filter({ hasText: " setup --origin " }),
   ).toHaveText(setup);
   await expect(
     panel.locator("code").filter({ hasText: " start --origin " }),
   ).toHaveText(
-    `npx --yes @scalableweb/companion@0.3.1 start --origin '${new URL(baseURL!).origin}'`,
+    `npx --yes @scalableweb/companion@0.4.0 start --origin '${new URL(baseURL!).origin}'`,
   );
   await page.evaluate(() => {
     Object.defineProperty(navigator, "clipboard", {
@@ -255,7 +255,7 @@ test("notebook-only connections explain setup before sending and retain the ques
     await expect(
       panel.locator("code").filter({ hasText: ` ${action} --origin ` }),
     ).toHaveText(
-      `npx --yes @scalableweb/companion@0.3.1 ${action} --origin '${new URL(baseURL!).origin}' --port 18888 --directory '/private/tmp/synthetic learner'\\''s notebook'`,
+      `npx --yes @scalableweb/companion@0.4.0 ${action} --origin '${new URL(baseURL!).origin}' --port 18888 --directory '/private/tmp/synthetic learner'\\''s notebook'`,
     );
   }
   await expect(

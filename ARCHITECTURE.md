@@ -70,7 +70,7 @@ Installed CLI profiles append `-installed-<version>` to the phase profile name, 
 The exact configuration/harness/runtime/fixture identity bounds each successful preflight receipt, including the actual executable source, path and version.
 Version eligibility alone does not establish compatibility: the selected harness must pass the phase preflight, and failures retain their evidence and stop launch without automatic model retries through another harness.
 New project keys use the project credential identity in the OS store; an existing book Aalto key may be read without changing book settings.
-The launcher is unreleased and introduces no browser machine-execution API; [ADR-063](docs/adrs/implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) records that boundary.
+The launcher ships in companion 0.4.0 and introduces no browser machine-execution API; [ADR-063](docs/adrs/implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) records that boundary.
 [learning-storage.ts](scripts/lib/learning-storage.ts) owns stable per-user directories, directory leases and explicit copy migration; [learning-database.ts](scripts/lib/learning-database.ts) validates schemas read-only and backs up atomic upgrades.
 [learning-connection.ts](shared/learning-connection.ts) distinguishes package, browser protocol, storage/archive and compatible-provider versions.
 Package assembly bundles existing state/provider owners and authored resource registries; the runtime has no website-build or provider-SDK dependency.

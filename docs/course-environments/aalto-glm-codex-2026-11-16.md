@@ -9,11 +9,11 @@ You need Aalto VPN, the instructor-provided departmental API key, Node.js and Co
 You do not need to host the model, clone the book repository, sign in to ChatGPT or install the book's learning companion.
 The optional [book assistant](../learning-companion-setup.md) has its own setup and profile.
 
-The companion now has a prepared [guided project launcher](../learning-companion-setup.md#start-a-course-coding-project) that automates installation, this profile, secure key entry, the setup check and launch.
-It is not yet in the published 0.3.1 package; use a locally built package or the source command until the next release.
-From this repository, run `npm run companion -- project establish --workspace /path/to/projects/01-establish`.
-Use `project establish --print` to inspect the plan without downloading, reading credentials or changing files.
-The steps below remain the transparent manual setup for students using the published package or managing their harness themselves.
+Companion 0.4.0 includes a [guided project launcher](../learning-companion-setup.md#start-a-course-coding-project) that selects Codex, prepares this profile, obtains the key securely, runs the setup check and launches the project agent.
+Run `npx --yes @scalableweb/companion@0.4.0 project establish --workspace /path/to/projects/01-establish`.
+From this repository, the equivalent is `npm run companion -- project establish --workspace /path/to/projects/01-establish`.
+Add `--print` to inspect the plan without downloading, reading credentials or changing files.
+The steps below remain the transparent manual setup for students managing their harness themselves.
 
 ## 1. Install the coding agent
 

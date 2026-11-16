@@ -10,19 +10,20 @@ Reading the book does not require a companion or a model account.
 
 ## Start on your computer
 
-The standalone package is [@scalableweb/companion@0.3.1](https://www.npmjs.com/package/@scalableweb/companion/v/0.3.1), maintained by bebraw.
+The standalone package is [@scalableweb/companion@0.4.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.4.0), maintained by bebraw.
 You need Node.js 24 or 26.
 Run the published package from any directory; npm downloads it when needed.
-Version 0.3.1 includes code-free connection and fixes Codex authentication on macOS by preserving the home directory needed by the OS keychain.
+Version 0.4.0 adds the [guided course project launcher](#start-a-course-coding-project), while retaining code-free connection and the macOS Codex authentication fix from 0.3.1.
 The older 0.2.0 package uses the previous pairing contract and cannot connect to this website client.
 
-Codex study replies additionally require a separate [Codex CLI installation](#connect-your-agent); published 0.3.1 does not install or bundle Codex.
+Codex study replies additionally require a separate [Codex CLI installation](#connect-your-agent).
+The course project launcher manages its own Codex selection.
 Notebook-only use, direct API keys and local models do not require Codex.
 Run the guided setup in your terminal:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Setup offers these choices:
@@ -41,7 +42,7 @@ Saved keys go into your operating system's credential store.
 If that store is locked or unavailable, setup explains how to unlock it or explicitly use an environment variable; it never saves a plaintext fallback.
 API usage is billed by your provider.
 Setup and `doctor` do not generate a paid reply; your first deliberate message checks whether the model can answer.
-For notebook-only setup without questions, use `npx --yes @scalableweb/companion@0.3.1 setup --notebook`.
+For notebook-only setup without questions, use `npx --yes @scalableweb/companion@0.4.0 setup --notebook`.
 
 Keep the start command running while you use your notebook or assistant.
 It prints a local address and the websites it allows.
@@ -58,8 +59,8 @@ Setup saves your chosen website origins and port for subsequent starts.
 For local development, pass its exact origin explicitly:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --origin http://127.0.0.1:3000
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup --origin http://127.0.0.1:3000
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Repeat `--origin` to trust several exact websites; supplying it replaces the default list.
@@ -73,7 +74,7 @@ The packaged companion uses a stable directory independently of your current fol
 | macOS  | `~/Library/Application Support/scalableweb-companion/`                                                     |
 | Linux  | `$XDG_DATA_HOME/scalableweb-companion/`, or `~/.local/share/scalableweb-companion/` when unset or relative |
 
-Published 0.3.1 passed clean-installation checks on macOS and Linux with Node 24 and 26.
+Published 0.4.0 passed clean-installation checks on macOS and Linux with Node 24 and 26.
 Windows support has not been verified.
 The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
 Keep the companion running while using the book; Ctrl+C stops it without removing your work.
@@ -149,16 +150,15 @@ Existing audio/video diary options remain available.
 
 ## Start a course coding project
 
-**Unreleased: available from the updated checkout or a prepared companion package; published 0.3.1 does not include this command.**
-
-The guided `project` command prepares the course coding agent and opens it in your application directory.
-From the updated checkout, run:
+The guided `project` command in companion 0.4.0 prepares the course coding agent and opens it in your application directory.
+Run it from any directory:
 
 ```sh
-npm run companion -- project
+npx --yes @scalableweb/companion@0.4.0 project
 ```
 
-With a prepared package installed, the command is `scalableweb-companion project`.
+From the checkout, use `npm run companion -- project`.
+If you have installed the package directly, use `scalableweb-companion project`.
 Choose **Establish**, **Challenge** or **Compare**, then your existing project directory.
 Connect to Aalto VPN and have the departmental API key ready.
 The command displays the selected model, project, private profile and commands before running them.
@@ -179,12 +179,12 @@ Students already using OpenCode or another harness may keep it with the assigned
 To choose the phase and directory directly, or inspect the plan without changing anything:
 
 ```sh
-scalableweb-companion project establish --workspace /path/to/projects/01-establish
-scalableweb-companion project challenge --workspace /path/to/projects/02-challenge --print
-scalableweb-companion project compare --workspace /path/to/projects/03-compare --check
+npx --yes @scalableweb/companion@0.4.0 project establish --workspace /path/to/projects/01-establish
+npx --yes @scalableweb/companion@0.4.0 project challenge --workspace /path/to/projects/02-challenge --print
+npx --yes @scalableweb/companion@0.4.0 project compare --workspace /path/to/projects/03-compare --check
 ```
 
-For checkout use, replace `scalableweb-companion` with `npm run companion --`.
+For checkout use, replace `npx --yes @scalableweb/companion@0.4.0` with `npm run companion --`.
 `--print` displays the plan, configuration, selection policy and conditional commands without probing Codex, creating files, installing software, reading a key or generating a reply.
 `--check` reruns the disposable setup check and stops without opening the project agent.
 Normal launch reuses a successful check for the exact phase configuration, executable source/path/version, runtime and fixture version.
@@ -199,7 +199,7 @@ Saved keys use the OS credential store.
 If `AALTO_LLM_API_KEY` is already exported, it can be used directly; `--api-key-env <name>` selects another existing variable without storing its value.
 The key is supplied only to the coding process, after version probing and any installation, and excluded from ordinary shell-tool environments.
 Use `--login` to replace the saved project key at a hidden prompt and repeat the check.
-`scalableweb-companion project --forget-key` removes only the launcher-owned saved key; a key reused from the book companion remains under that companion's existing logout flow.
+`npx --yes @scalableweb/companion@0.4.0 project --forget-key` removes only the launcher-owned saved key; a key reused from the book companion remains under that companion's existing logout flow.
 For scripts, `--with-api-key` reads a key from standard input and is available only with `--check`; it saves the key in the OS credential store.
 Existing Notebook settings, study conversations and teaching-assistant permissions remain unchanged.
 Project profiles and check records live in a separate directory beside the companion's data directory, with `-projects` appended to its name; the command prints its exact path.
@@ -230,21 +230,21 @@ codex --version
 The version check should print `codex-cli 0.154.0`.
 If the terminal cannot find `codex`, check the CLI installation and your terminal's `PATH` before continuing.
 Installing the companion alone does not supply this command.
-Stop any running companion, run `npx --yes @scalableweb/companion@0.3.1 setup`, and choose **Codex with ChatGPT sign-in** or **Codex with an OpenAI API key**.
+Stop any running companion, run `npx --yes @scalableweb/companion@0.4.0 setup`, and choose **Codex with ChatGPT sign-in** or **Codex with an OpenAI API key**.
 The guided setup completes the selected authentication flow in Companion's dedicated profile.
 For explicit ChatGPT setup commands, use:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --codex
-npx --yes @scalableweb/companion@0.3.1 login
-npx --yes @scalableweb/companion@0.3.1 doctor
+npx --yes @scalableweb/companion@0.4.0 setup --codex
+npx --yes @scalableweb/companion@0.4.0 login
+npx --yes @scalableweb/companion@0.4.0 doctor
 ```
 
 For explicit API key login, first run `setup --codex`, then pipe a key already available in your terminal environment:
 
 ```sh
-printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.3.1 login --with-api-key
-npx --yes @scalableweb/companion@0.3.1 doctor
+printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.4.0 login --with-api-key
+npx --yes @scalableweb/companion@0.4.0 doctor
 ```
 
 The key goes through standard input and Codex stores it in the OS keyring for the dedicated profile; it is never a command argument.
@@ -254,7 +254,7 @@ See [OpenAI's authentication guide](https://learn.chatgpt.com/docs/auth) for API
 After the checks pass, start the companion with your dedicated Codex profile:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Choose **Connect companion** again in the book.
@@ -282,7 +282,7 @@ You can reopen saved conversations, stop a reply, or keep using the notebook wit
 **Write a takeaway** opens a blank personal draft; **Use as a notebook draft** prepares the selected suggestion for review and revision.
 Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
 Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
-Companion 0.3.1 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
+Companion 0.4.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.
 
@@ -296,7 +296,7 @@ A demo that is absent, starting or unavailable cannot be treated as an executed 
 
 Use this option for assistant replies directly through OpenAI, Anthropic (Claude), Gemini, OpenRouter or another compatible HTTPS service.
 No Codex installation or ChatGPT subscription is required.
-Stop the companion, run `npx --yes @scalableweb/companion@0.3.1 setup`, and choose **API key directly**.
+Stop the companion, run `npx --yes @scalableweb/companion@0.4.0 setup`, and choose **API key directly**.
 
 Choose your provider, enter its key at the hidden prompt, then choose a text model by number or exact identifier.
 Setup shows the first twenty model identifiers returned by the provider; you can enter another exact identifier from that provider's catalog.
@@ -322,8 +322,8 @@ The API transport and conversation checks use synthetic responses; actual replie
 For scripts, supply the name of an environment variable that already contains your key:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --api --api-provider openai --model '<exact-model-id>' --api-key-env OPENAI_API_KEY
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup --api --api-provider openai --model '<exact-model-id>' --api-key-env OPENAI_API_KEY
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Keep that variable available whenever you run setup, `doctor` or start the companion.
@@ -334,10 +334,10 @@ Replace the example model and URL with your provider's values.
 Alternatively, pipe the key on standard input to store it in this computer's OS credential store:
 
 ```sh
-printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.3.1 setup --api --api-provider openai --model '<exact-model-id>' --with-api-key
+printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.4.0 setup --api --api-provider openai --model '<exact-model-id>' --with-api-key
 ```
 
-To replace a saved key after API setup, stop the companion and run `npx --yes @scalableweb/companion@0.3.1 login` for a hidden prompt, or pipe the replacement into `login --with-api-key`.
+To replace a saved key after API setup, stop the companion and run `npx --yes @scalableweb/companion@0.4.0 login` for a hidden prompt, or pipe the replacement into `login --with-api-key`.
 When setup uses an environment variable, `login` keeps that source and does not prompt for a key.
 Piping a key into `login --with-api-key` explicitly switches from the environment variable to a saved key for subsequent starts.
 Saved API keys are held in the OS credential store and are reused only for their configured endpoint and notebook identity.
@@ -350,7 +350,7 @@ If you change the endpoint, model or tool mode, start a new conversation or rest
 
 ### Remove saved access
 
-To remove saved access from this computer, stop the companion and run `npx --yes @scalableweb/companion@0.3.1 logout` with the same directory.
+To remove saved access from this computer, stop the companion and run `npx --yes @scalableweb/companion@0.4.0 logout` with the same directory.
 For API mode this removes the selected endpoint's keychain entry; for Codex it uses Codex's keyring logout.
 Copies of an API notebook that retain the same credential identity on this computer share that entry.
 With an environment-backed API setup, logout explains how to unset the variable in your terminal instead.
@@ -363,8 +363,8 @@ Choose its exact identifier from LM Studio; the companion does not download or l
 Stop the companion before changing its saved provider choice, then run:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Use your own loaded model identifier in place of this verified Gemma example.
@@ -427,7 +427,7 @@ Solo learners can continue the Chapter guide and the existing independent human 
 Stop the companion, then run the same release and directory/port options with `doctor`:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 doctor
+npx --yes @scalableweb/companion@0.4.0 doctor
 ```
 
 It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites, local endpoint/model/context configuration, or a supplied API key and model listing.
@@ -439,7 +439,7 @@ When Codex is selected, a missing or unverified CLI fails the check.
 To require the Codex CLI and check dedicated-profile sign-in before selecting Codex, run:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 doctor --codex
+npx --yes @scalableweb/companion@0.4.0 doctor --codex
 ```
 
 Use the same `--directory` and `--codex-home` options as your intended setup.
@@ -475,15 +475,15 @@ Identical records are retained once; imports with conflicting existing work are 
 Keep both copies and start a separate notebook if you need to inspect a conflict:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 start --directory /absolute/path/to/another-notebook
+npx --yes @scalableweb/companion@0.4.0 start --directory /absolute/path/to/another-notebook
 ```
 
 Keep a backup outside the companion's directory.
 Your course membership does not give teachers or peers access to the private notebook.
 
 Before updating, export a backup, stop the companion/provider and privately copy its directory and any separately configured profile.
-To update an existing notebook, run `npx --yes @scalableweb/companion@0.3.1 start` with the same directory, profile, origin and port options, then connect again.
-Release 0.3.1 retains your storage location, setup preferences, dedicated profile and records; the archive and database schemas remain version 1, and the browser connection uses protocol 2.
+To update an existing notebook, run `npx --yes @scalableweb/companion@0.4.0 start` with the same directory, profile, origin and port options, then connect again.
+Release 0.4.0 retains your storage location, setup preferences, dedicated profile and records; the archive and database schemas remain version 1, and the browser connection uses protocol 2.
 Existing notebook/provider preferences remain available.
 Startup validates database schemas before writing and saves a `.before-schema-1-<id>.backup` snapshot when converting the original unversioned database to schema 1.
 An interrupted conversion can be retried after stopping every writer; the backup remains available.
@@ -508,7 +508,7 @@ Stop the old companion and its Codex process.
 Before running packaged setup in the destination, migrate the old directory:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 migrate --from /absolute/path/to/old-notebook --directory /absolute/path/to/new-notebook --confirm-stopped
+npx --yes @scalableweb/companion@0.4.0 migrate --from /absolute/path/to/old-notebook --directory /absolute/path/to/new-notebook --confirm-stopped
 ```
 
 The command shows source/destination, retains the source, and rejects a nonempty destination.
@@ -535,7 +535,7 @@ npm run companion -- setup
 npm run companion -- start
 ```
 
-For the checkout, replace `npx --yes @scalableweb/companion@0.3.1` in the commands above with `npm run companion --`.
+For the checkout, replace `npx --yes @scalableweb/companion@0.4.0` in the commands above with `npm run companion --`.
 The checkout uses `.local/learning-companion/` by default.
 Use `--directory` to retain a notebook stored elsewhere, and `setup --origin` to save a local development website's exact origin.
 Export and privately copy that directory/profile before updating with `git pull --ff-only` and `npm ci`, or before removing the checkout.

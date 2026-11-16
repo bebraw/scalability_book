@@ -8,11 +8,12 @@ Only the Codex configuration below was verified here.
 The [Establish guide](aalto-glm-codex-2026-11-16.md) uses GLM; this guide uses `Qwen/Qwen3.8-27B-FP8` directly through Aalto for Challenge and Compare.
 The book's optional teaching assistant currently provides study help, not project file editing or command execution.
 
-The companion's prepared [guided project launcher](../learning-companion-setup.md#start-a-course-coding-project) automates the setup below.
-It is not yet in published companion 0.3.1; use a locally built package or, from this repository, `npm run companion -- project challenge --workspace /path/to/projects/02-challenge`.
+Companion 0.4.0 includes a [guided project launcher](../learning-companion-setup.md#start-a-course-coding-project) that automates the setup below.
+Run `npx --yes @scalableweb/companion@0.4.0 project challenge --workspace /path/to/projects/02-challenge`.
+From this repository, the equivalent is `npm run companion -- project challenge --workspace /path/to/projects/02-challenge`.
 Use `compare` and the fresh `03-compare` directory for Compare.
 The command selects the phase profile, checks it in a disposable directory and launches Codex; `--print` shows the plan without running it and `--check` repeats only the setup check.
-The manual instructions below remain available for the published package and other harness arrangements.
+The manual instructions below remain available for students managing their harness themselves.
 
 ## 1. Install once and select the phase
 

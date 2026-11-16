@@ -932,7 +932,7 @@ export function createLearningPane(
     const retained = connected
       ? `${port === "8788" ? "" : ` --port ${port}`}${companionStatus?.storage ? ` --directory ${quote(companionStatus.storage)}` : ""}`
       : "";
-    const text = `npx --yes @scalableweb/companion@0.3.1 ${action} --origin ${quote(location.origin)}${retained}`;
+    const text = `npx --yes @scalableweb/companion@0.4.0 ${action} --origin ${quote(location.origin)}${retained}`;
     command.append(node("code", text));
     container.append(
       command,
