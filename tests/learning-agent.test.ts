@@ -231,13 +231,14 @@ test("profile validation allows new keyring profiles and rejects unexpected plai
   );
 });
 
-test("the Codex environment keeps provider secrets isolated while preserving Linux keyring session discovery", (t) => {
+test("the Codex environment keeps provider secrets isolated while preserving OS keyring discovery", (t) => {
   const original = new Map(
     [
       "DBUS_SESSION_BUS_ADDRESS",
       "XDG_RUNTIME_DIR",
       "OPENAI_API_KEY",
       "GNOME_KEYRING_CONTROL",
+      "HOME",
     ].map((name) => [name, process.env[name]]),
   );
   t.after(() => {
@@ -250,11 +251,18 @@ test("the Codex environment keeps provider secrets isolated while preserving Lin
   process.env.XDG_RUNTIME_DIR = "/synthetic/runtime";
   process.env.OPENAI_API_KEY = "synthetic-provider-secret";
   process.env.GNOME_KEYRING_CONTROL = "/synthetic/unneeded-legacy-keyring";
+  process.env.HOME = "/synthetic/user-home";
   const environment = learningCodexEnvironment("/synthetic/dedicated-profile");
   assert.equal(environment.OPENAI_API_KEY, undefined);
   assert.equal(environment.GNOME_KEYRING_CONTROL, undefined);
   assert.equal(environment.CODEX_HOME, "/synthetic/dedicated-profile");
-  assert.equal(environment.HOME, "/synthetic/dedicated-profile");
+  assert.equal(environment.USERPROFILE, "/synthetic/dedicated-profile");
+  assert.equal(
+    environment.HOME,
+    process.platform === "darwin"
+      ? "/synthetic/user-home"
+      : "/synthetic/dedicated-profile",
+  );
   assert.equal(
     environment.DBUS_SESSION_BUS_ADDRESS,
     process.platform === "linux"
@@ -265,6 +273,18 @@ test("the Codex environment keeps provider secrets isolated while preserving Lin
     environment.XDG_RUNTIME_DIR,
     process.platform === "linux" ? process.env.XDG_RUNTIME_DIR : undefined,
   );
+});
+test("the Codex environment uses the dedicated profile when HOME is absent", (t) => {
+  const originalHome = process.env.HOME;
+  t.after(() => {
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+  });
+  delete process.env.HOME;
+  const environment = learningCodexEnvironment("/synthetic/dedicated-profile");
+  assert.equal(environment.HOME, "/synthetic/dedicated-profile");
+  assert.equal(environment.CODEX_HOME, "/synthetic/dedicated-profile");
+  assert.equal(environment.USERPROFILE, "/synthetic/dedicated-profile");
 });
 test("conversations persist independently, send only selected notes, and bound observations to the initiating session and browser", async () => {
   const directory = await mkdtemp(

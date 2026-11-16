@@ -38,6 +38,7 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   const directory = await mkdtemp(path.join(tmpdir(), "book-codex-login-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const profileDirectory = path.join(directory, "dedicated profile");
+  const parentHome = path.join(directory, "synthetic user home");
   const binary = path.join(directory, "synthetic-codex");
   await writeFile(
     binary,
@@ -67,7 +68,9 @@ input = input.trim();
 writeFileSync(path.join(profileDirectory, "invocation.json"), JSON.stringify({
   args,
   environment: Object.keys(process.env).sort(),
-  profileMatches: process.env.HOME === profileDirectory && process.env.USERPROFILE === profileDirectory,
+  home: process.env.HOME,
+  codexHome: process.env.CODEX_HOME,
+  userProfile: process.env.USERPROFILE,
 }));
 if (withApiKey) {
   // Deliberately hostile diagnostics prove the wrapper does not echo a key.
@@ -86,6 +89,7 @@ if (input !== "synthetic-no-keyring-key") {
   );
   return {
     profileDirectory,
+    parentHome,
     binary,
     keyring: `${binary}.keyring`,
     login(mode: "pipe" | "prompt" | "browser" | "logout", key = syntheticKey) {
@@ -98,6 +102,7 @@ if (input !== "synthetic-no-keyring-key") {
           timeout: 10_000,
           env: {
             ...process.env,
+            HOME: parentHome,
             OPENAI_API_KEY: "synthetic-inherited-key-must-not-be-forwarded",
             ANTHROPIC_API_KEY: "synthetic-unrelated-key-must-not-be-forwarded",
             LEARNING_PROMPTED_KEY: key,
@@ -124,7 +129,12 @@ for (const mode of ["pipe", "prompt"] as const) {
       "-c",
       'cli_auth_credentials_store="keyring"',
     ]);
-    assert.equal(invocation.profileMatches, true);
+    assert.equal(invocation.codexHome, f.profileDirectory);
+    assert.equal(invocation.userProfile, f.profileDirectory);
+    assert.equal(
+      invocation.home,
+      process.platform === "darwin" ? f.parentHome : f.profileDirectory,
+    );
     for (const key of [
       "OPENAI_API_KEY",
       "ANTHROPIC_API_KEY",
@@ -168,7 +178,12 @@ test("browser login preserves the interactive flow and keyring credential isolat
     "-c",
     'cli_auth_credentials_store="keyring"',
   ]);
-  assert.equal(invocation.profileMatches, true);
+  assert.equal(invocation.codexHome, f.profileDirectory);
+  assert.equal(invocation.userProfile, f.profileDirectory);
+  assert.equal(
+    invocation.home,
+    process.platform === "darwin" ? f.parentHome : f.profileDirectory,
+  );
 });
 
 test("failed API key login retains existing credentials and releases the profile for retry", async (t) => {

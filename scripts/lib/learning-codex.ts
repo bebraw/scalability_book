@@ -84,11 +84,11 @@ export function learningCodexEnvironment(home: string) {
   if (process.platform === "linux")
     for (const name of ["DBUS_SESSION_BUS_ADDRESS", "XDG_RUNTIME_DIR"])
       if (process.env[name]) env[name] = process.env[name]!;
+  // macOS keychain discovery needs the user's HOME; CODEX_HOME still isolates
+  // the dedicated provider profile.
   Object.assign(env, {
     CODEX_HOME: home,
-    HOME: process.platform === "darwin"
-      ? (process.env.HOME ?? home)
-      : home,
+    HOME: process.platform === "darwin" ? (process.env.HOME ?? home) : home,
     USERPROFILE: home,
   });
   return env as NodeJS.ProcessEnv;
