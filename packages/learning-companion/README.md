@@ -9,8 +9,8 @@ Use Node.js 24 or 26.
 Registry installation uses the pinned version:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Version 0.2.0 uses the previous pairing contract and cannot connect to the updated website.
@@ -27,7 +27,7 @@ npm run companion -- setup
 npm run companion -- start
 ```
 
-The examples below use the registry package; from the checkout, replace `npx --yes @scalableweb/companion@0.3.1` with `npm run companion --`.
+The examples below use the registry package; from the checkout, replace `npx --yes @scalableweb/companion@0.4.0` with `npm run companion --`.
 
 Guided setup offers notebook-only use, Codex with ChatGPT sign-in, Codex with an OpenAI API key, direct API keys, and a local model in LM Studio.
 It guides authentication and model selection, saves your origin/port preferences and prints the exact start command.
@@ -92,8 +92,8 @@ Public catalogs can be read without a valid key, so successful listing alone doe
 For scripts, use a key already supplied through your environment:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --api --api-provider openai --model '<exact-model-id>' --api-key-env OPENAI_API_KEY
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup --api --api-provider openai --model '<exact-model-id>' --api-key-env OPENAI_API_KEY
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 The named `--api-provider` choices are `openai`, `anthropic`, `gemini` and `openrouter`.
@@ -126,7 +126,7 @@ For explicit ChatGPT setup, use `setup --codex`, then `login`.
 For explicit API key setup, use `setup --codex`, then pipe the key:
 
 ```sh
-printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.3.1 login --with-api-key
+printenv OPENAI_API_KEY | npx --yes @scalableweb/companion@0.4.0 login --with-api-key
 ```
 
 Setting that variable alone does not authenticate the dedicated profile.
@@ -136,8 +136,8 @@ See [OpenAI's authentication guide](https://learn.chatgpt.com/docs/auth) for the
 Start LM Studio's server, load a model, then choose local setup or run:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
-npx --yes @scalableweb/companion@0.3.1 start
+npx --yes @scalableweb/companion@0.4.0 setup --local --local-url http://127.0.0.1:1234/v1 --model google/gemma-4-12b-qat
+npx --yes @scalableweb/companion@0.4.0 start
 ```
 
 Replace the verified Gemma example with your loaded model's exact identifier.
@@ -148,7 +148,7 @@ LM Studio is the first verified runner; Ollama, llama.cpp and Windows remain unv
 
 ## Check and retain your work
 
-Stop the companion and run `npx --yes @scalableweb/companion@0.3.1 doctor` for checks, or add `--json` for a diagnostic report you choose whether to share.
+Stop the companion and run `npx --yes @scalableweb/companion@0.4.0 doctor` for checks, or add `--json` for a diagnostic report you choose whether to share.
 The report identifies the saved provider choice, storage, origin/port and prerequisite results without credentials, notes, conversations, remote provider diagnostics or connection tokens.
 Codex is optional in notebook-only, direct API and local-model modes.
 Use `doctor --codex` to require its installation and dedicated-profile sign-in; diagnostics do not change the saved provider choice.
@@ -164,7 +164,7 @@ Restore your records and sign in again on another computer; a relocated Codex pr
 To migrate a notebook, stop its companion/provider and select a new empty destination:
 
 ```sh
-npx --yes @scalableweb/companion@0.3.1 migrate --from /absolute/path/to/old-notebook --directory /absolute/path/to/new-notebook --confirm-stopped
+npx --yes @scalableweb/companion@0.4.0 migrate --from /absolute/path/to/old-notebook --directory /absolute/path/to/new-notebook --confirm-stopped
 ```
 
 Migration retains the source and rejects a nonempty destination.
@@ -173,7 +173,7 @@ Setup preferences are left for explicit setup in the destination.
 Choose the original provider/endpoint/model/tool mode to resume conversations, restore any key environment variable, and run `doctor` with the destination directory.
 An unsupported newer database schema is rejected without rewriting it.
 
-`npx --yes @scalableweb/companion@0.3.1 logout` removes the selected API endpoint's OS entry or uses Codex's keyring logout; it retains notebook and conversation records.
+`npx --yes @scalableweb/companion@0.4.0 logout` removes the selected API endpoint's OS entry or uses Codex's keyring logout; it retains notebook and conversation records.
 Same-machine API notebook copies with the same credential identity share that keychain entry.
 Environment-backed API logout explains how to unset or revoke the external key without changing the parent environment.
 
