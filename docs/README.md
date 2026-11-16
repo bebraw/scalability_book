@@ -12,6 +12,8 @@ The [architecture map](../ARCHITECTURE.md) identifies runtime and state owners; 
 | Enrollment, submissions, audits, grading and simulation            | [Course system](course-system.md)                                                                                                            |
 | Private reference, public benchmark runner and matched experiments | [Course preparation tooling](course-tooling.md)                                                                                              |
 | Independent course schedule, commitments and activities            | [2026 solo pilot](solo-pilot-2026/README.md)                                                                                                 |
+| Pilot Establish coding-agent installation and configuration        | [Aalto GLM and Codex](course-environments/aalto-glm-codex-2026-11-16.md)                                                                     |
+| Pilot Challenge and Compare coding-agent setup                     | [Aalto Qwen and Codex](course-environments/aalto-qwen-codex-2026-11-16.md)                                                                   |
 | Learning workspace and companion contracts                         | [Learning workspace](learning-workspace.md)                                                                                                  |
 | Student notebook and model setup                                   | [Companion setup](learning-companion-setup.md)                                                                                               |
 | External agents and public retrieval                               | [Agent setup](external-agent-setup.md), [resource contracts](agent-learning-resources.md)                                                    |
@@ -24,6 +26,7 @@ The [architecture map](../ARCHITECTURE.md) identifies runtime and state owners; 
 
 These records contain planning context, research rationale or follow-up work; current requirements and implementation belong to the guides and specifications above.
 
+- [Student feedback follow-ups](student-feedback-followups-2026-11-16.md): remaining assistant, notebook, feedback-audience and Chapters 1–3 usability/editorial tasks from the November pilot review.
 - [First-run improvements](first-run-course-improvements.md) and [text-tightening review](text-tightening-review-2026-09-15.md): operational and editorial proposals to revisit against current material.
 - [Project scope review](project-specification-scope-review-2026-10-22.md): the agreed simplifications and remaining preparation for the pilot.
 - [Latest Obsidian intake](obsidian-content-review-2026-10-19.md): the 19 October source-review checkpoint for the next intake.
