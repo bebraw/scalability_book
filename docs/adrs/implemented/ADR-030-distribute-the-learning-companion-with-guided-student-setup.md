@@ -144,11 +144,11 @@ The present step distributes the existing local companion while preserving stude
 
 ## Implementation and verification
 
-The repository ships [@scalableweb/companion@0.2.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.2.0), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
+The repository ships [@scalableweb/companion@0.3.1](https://www.npmjs.com/package/@scalableweb/companion/v/0.3.1), with the `scalableweb-companion` executable and bebraw as publisher/owner in the free `scalableweb` npm organization.
 [The CLI](../../../scripts/lib/learning-cli.ts) owns `setup`, `login`, `start`, `doctor` and `migrate`; [the package workflow](../../../.github/workflows/learning-companion.yml) verifies its compiled tarball on macOS/Linux with Node 24 and 26.
 The default data paths are `~/Library/Application Support/scalableweb-companion/` on macOS and an absolute `$XDG_DATA_HOME/scalableweb-companion/` or `~/.local/share/scalableweb-companion/` on Linux.
 The repository entry retains its original `.local/learning-companion/` default.
-Package version 0.2.0, browser protocol 1, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
+Package version 0.3.1, browser protocol 2, archive schema 1 and notebook/conversation schemas 1 are reported separately; the verified provider is Codex CLI 0.154.0.
 Windows is not advertised as supported.
 
 The [maintainer release command](../../../scripts/release-learning-companion.ts) and [release owner](../../../scripts/lib/learning-release.ts) automate publication and verify the distributed bytes.
@@ -201,6 +201,24 @@ Student setup and the browser's pairing command now use verified release 0.2.0; 
 
 Use the voluntary individual/group trial in [the evaluation guide](../../learning-workspace-evaluation.md) to measure setup friction, independent understanding, existing submission preparation and actual course progress.
 Successful onboarding alone does not establish improved learning or completion.
+
+### Release 0.3.1
+
+Published on 2026-11-16, release 0.3.1 records clean source revision [20e05c0329bdbcf4dbcdc4916fc10da2b38004af](https://github.com/bebraw/scalability_book/commit/20e05c0329bdbcf4dbcdc4916fc10da2b38004af).
+It fixes Codex authentication on macOS by preserving the user's `HOME` for OS keychain discovery while retaining the dedicated `CODEX_HOME` profile.
+Browser protocol 2 and the existing schema-1 notebook, archive and conversation formats remain compatible.
+The six-file package allowlist includes the bundled runtime and release metadata; its pinned `@napi-rs/keyring@2.1.2` dependency supplies native credential storage.
+
+The registry metadata and downloaded tarball match the tested artifact byte-for-byte: SHA-1 `7cdecc82545ce5321d464bd157143554bec17ba4`, integrity `sha512-BCzknabEuiaWxpltsf9wi54Y+AsDlMcJzS1h+vbk6S4CFp/eMwd1Oe/eH35rrXrZ5rsD6Ry90R8tNnrIn4ecxw==`.
+All four [source-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/43823454391) and all four [published-artifact jobs](https://github.com/bebraw/scalability_book/actions/runs/43824266566) passed on macOS/Linux with Node 24/26.
+Npm initially accepted the upload before serving the version; after processing exceeded the helper's confirmation window, the saved receipt reconciled the identical registry bytes without a second upload.
+A fresh-cache npm execution returned version 0.3.1 and the recorded source revision; npm's `latest` tag resolves to 0.3.1.
+
+The earlier [source matrix](https://github.com/bebraw/scalability_book/actions/runs/43683128535) failed on macOS because four assertions still required `HOME` to equal the dedicated profile.
+The updated regression checks use a synthetic parent home, verify macOS home preservation alongside dedicated-profile and secret isolation, and cover fallback when `HOME` is absent.
+Local checks passed all 149 focused release tests, type checking and clean tarball installation on macOS with Node 26.13.0.
+The same packaged artifact passed the real Codex CLI 0.154.0 Chromium journey with a newly authenticated keychain profile: actual browser observations, an approved demo change, a resumed conversation and a reviewed notebook draft.
+Student instructions and the browser's setup/start commands pin the verified 0.3.1 release.
 
 ## Open questions
 

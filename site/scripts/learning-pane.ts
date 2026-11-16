@@ -926,13 +926,13 @@ export function createLearningPane(
   }
   function renderCompanionCommand(action: "setup" | "start") {
     const command = node("pre", "", "learning-setup-command");
-    // Use the checkout until the code-free standalone release is published.
+    // Pin the verified npm release independently of future source versions.
     const quote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
     const port = new URL(client.base).port || "80";
     const retained = connected
       ? `${port === "8788" ? "" : ` --port ${port}`}${companionStatus?.storage ? ` --directory ${quote(companionStatus.storage)}` : ""}`
       : "";
-    const text = `npm run companion -- ${action} --origin ${quote(location.origin)}${retained}`;
+    const text = `npx --yes @scalableweb/companion@0.3.1 ${action} --origin ${quote(location.origin)}${retained}`;
     command.append(node("code", text));
     container.append(
       command,
@@ -941,7 +941,7 @@ export function createLearningPane(
         async () => {
           try {
             await navigator.clipboard.writeText(text);
-            status.textContent = `Companion ${action} command copied. Paste it in a terminal from the book checkout.`;
+            status.textContent = `Companion ${action} command copied. Paste it in a terminal.`;
           } catch {
             const selection = window.getSelection();
             const range = document.createRange();
@@ -975,7 +975,7 @@ export function createLearningPane(
           "p",
           connected
             ? "Stop the current companion, then run setup in its terminal. Your notes and message draft are retained."
-            : "From the book checkout, run setup and choose how you want to work. Already set up? Go to step 2.",
+            : "Run setup in your terminal and choose how you want to work. Already set up? Go to step 2.",
         ),
       );
       const choices = node("ul", "", "learning-setup-choices");
