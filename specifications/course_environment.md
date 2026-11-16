@@ -8,6 +8,37 @@ Large and small are relative course assignments; publish the model identities an
 Both models may be hosted by the department, and both may be foundation models.
 Hosting, serving configuration, context, and orchestration are recorded separately from model size.
 
+## November 2026 pilot: model assignments and setup
+
+**Model assignments confirmed 16 November 2026.**
+
+| Phase     | Assigned model          | Development arrangement           | Setup status                                           |
+| --------- | ----------------------- | --------------------------------- | ------------------------------------------------------ |
+| Establish | `zai-org/GLM-5.3-Flash` | One coding agent                  | Verified direct Codex setup linked below               |
+| Challenge | `Qwen/Qwen3.8-27B-FP8`  | One coding agent                  | Verified direct Codex setup linked below               |
+| Compare   | `Qwen/Qwen3.8-27B-FP8`  | Qwen coordinator and Qwen workers | Verified coordinator and two-worker setup linked below |
+
+Use [configuration `aalto-glm-codex-2026-11-16`](../docs/course-environments/aalto-glm-codex-2026-11-16.md) for the pilot's Establish coding agent: exact model `zai-org/GLM-5.3-Flash` through the Aalto gateway, with Codex CLI 0.154.0 and native delegation disabled.
+The guide provides installation, the credential-free profile, a file-and-command setup check, evidence guidance, shared-resource expectations and support paths.
+The pilot has no fixed GLM quota; students must use the shared departmental infrastructure considerately.
+Keep personal notes private and report general problems through [the book issue tracker](https://github.com/bebraw/scalability_book/issues).
+These guides provide a supported beginner path, not a mandatory harness.
+The companion's [prepared project launcher](../docs/learning-companion-setup.md#start-a-course-coding-project) automates the tested installation, profiles and checks; it requires a locally built package until the next companion release.
+Students may use OpenCode or another preferred harness with the assigned model and phase rules, recording the actual configuration and verifying its tools before substantive work.
+The coding-agent setup is separate from the optional book assistant, which currently has no project file-editing or command-execution tools.
+
+Use [configuration `aalto-qwen-codex-2026-11-16`](../docs/course-environments/aalto-qwen-codex-2026-11-16.md) for the supported Challenge and Compare setups.
+Direct single-agent and two-worker coding checks passed with Codex CLI 0.154.0 and `model_reasoning_effort="none"`, with zero reported reasoning tokens.
+The Compare profile permits the coordinator plus two concurrent workers, disables native further delegation and retains attributed session traces; workers share one project directory.
+An active-worker cancellation check also stopped its local command; cancellation at the upstream inference service remains unverified.
+The guide records setup, accounting, workspace boundaries and verification limits.
+The [earlier Qwen proxy experiment](../docs/course-tooling.md#department-model-configuration) remains a separate configuration that explicitly disabled native thinking; these direct runs do not establish identical serving behavior.
+The gateway metadata checked on 16 November still advertises this exact Qwen model as 27B with FP8 quantization and a 262,144-token context; the exact weight revision and usable context length have not been independently established.
+
+Using the same Qwen model and serving settings in Challenge and Compare keeps model choice fixed while investigating coordination.
+The fresh full builds still differ in experience and implementation decisions; use the supplied matched traces for the bounded single-agent/fleet comparison.
+The tables below remain the publication template for each run, including actual student setup results, deviations and private operational details.
+
 ## Publication rule
 
 The instructor must complete and publish the table below before the affected project begins.

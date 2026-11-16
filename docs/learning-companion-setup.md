@@ -16,7 +16,7 @@ Run the published package from any directory; npm downloads it when needed.
 Version 0.3.1 includes code-free connection and fixes Codex authentication on macOS by preserving the home directory needed by the OS keychain.
 The older 0.2.0 package uses the previous pairing contract and cannot connect to this website client.
 
-Codex replies additionally require a separate [Codex CLI installation](#connect-your-agent); the companion does not install or bundle Codex.
+Codex study replies additionally require a separate [Codex CLI installation](#connect-your-agent); published 0.3.1 does not install or bundle Codex.
 Notebook-only use, direct API keys and local models do not require Codex.
 Run the guided setup in your terminal:
 
@@ -147,8 +147,76 @@ Download or copy the draft and review it against the course requirements before 
 Preparation does not expose your other notes or submit anything automatically.
 Existing audio/video diary options remain available.
 
+## Start a course coding project
+
+**Unreleased: available from the updated checkout or a prepared companion package; published 0.3.1 does not include this command.**
+
+The guided `project` command prepares the course coding agent and opens it in your application directory.
+From the updated checkout, run:
+
+```sh
+npm run companion -- project
+```
+
+With a prepared package installed, the command is `scalableweb-companion project`.
+Choose **Establish**, **Challenge** or **Compare**, then your existing project directory.
+Connect to Aalto VPN and have the departmental API key ready.
+The command displays the selected model, project, private profile and commands before running them.
+It reuses your installed Codex when eligible, reuses an available Aalto key or asks for it at a hidden prompt, and checks a small disposable file task before opening Codex.
+You do not need to install Codex globally, copy configuration files, set `CODEX_HOME` or sign in to ChatGPT.
+
+The launcher checks the first executable `codex` on your `PATH` without giving it the model key.
+A stable version of 0.154.0 or newer is eligible; if Codex is missing, older, a prerelease, reports an unrecognized version or fails the version probe, the launcher uses a private copy of the verified 0.154.0 baseline.
+It never updates your global installation.
+Newer versions still need to pass the selected phase's setup check; the version number alone does not prove compatibility.
+
+Establish uses one `zai-org/GLM-5.3-Flash` agent.
+Challenge uses one `Qwen/Qwen3.8-27B-FP8` agent; Compare uses the same Qwen model with a coordinator and at most two workers.
+After Codex opens, give it one bounded task, inspect its file changes and run your application checks yourself.
+The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) links the manual GLM and Qwen guides with full configurations, phase rules and evidence limits.
+Students already using OpenCode or another harness may keep it with the assigned model, phase rules and a checked, recorded configuration.
+
+To choose the phase and directory directly, or inspect the plan without changing anything:
+
+```sh
+scalableweb-companion project establish --workspace /path/to/projects/01-establish
+scalableweb-companion project challenge --workspace /path/to/projects/02-challenge --print
+scalableweb-companion project compare --workspace /path/to/projects/03-compare --check
+```
+
+For checkout use, replace `scalableweb-companion` with `npm run companion --`.
+`--print` displays the plan, configuration, selection policy and conditional commands without probing Codex, creating files, installing software, reading a key or generating a reply.
+`--check` reruns the disposable setup check and stops without opening the project agent.
+Normal launch reuses a successful check for the exact phase configuration, executable source/path/version, runtime and fixture version.
+The setup check uses the departmental model and retains its result; it does not establish that your application is correct.
+If it fails, the launcher keeps the evidence and stops without switching Codex versions and repeating model calls automatically.
+To deliberately use the private 0.154.0 baseline, for example after an installed-version compatibility failure, add `--managed-codex` to your command.
+If a managed profile's course settings were changed, or your project has Codex configuration that could override them, the launcher stops and leaves those files unchanged.
+Review the reported file and use your manual harness setup, or deliberately move the conflicting configuration aside before retrying.
+Codex's own saved project-trust choices are permitted; project `AGENTS.md` instructions still apply.
+
+Saved keys use the OS credential store.
+If `AALTO_LLM_API_KEY` is already exported, it can be used directly; `--api-key-env <name>` selects another existing variable without storing its value.
+The key is supplied only to the coding process, after version probing and any installation, and excluded from ordinary shell-tool environments.
+Use `--login` to replace the saved project key at a hidden prompt and repeat the check.
+`scalableweb-companion project --forget-key` removes only the launcher-owned saved key; a key reused from the book companion remains under that companion's existing logout flow.
+For scripts, `--with-api-key` reads a key from standard input and is available only with `--check`; it saves the key in the OS credential store.
+Existing Notebook settings, study conversations and teaching-assistant permissions remain unchanged.
+Project profiles and check records live in a separate directory beside the companion's data directory, with `-projects` appended to its name; the command prints its exact path.
+This lets the book companion keep running while the project agent is open.
+Notebook migration and portable archives do not include these separate project records.
+Within that directory, `profiles/` retains phase profiles and Codex sessions; `checks/` retains each disposable attempt and its result.
+Installed Codex versions use their own phase profiles, separate from the private baseline and your normal Codex profile.
+Check receipts record the executable source, path and version actually used.
+
+Use Codex's own interruption and exit controls while it is open; interrupted work may have already changed files.
+Keep the printed evidence location private and share only relevant, redacted results.
+Report setup problems through [the book issue tracker](https://github.com/bebraw/scalability_book/issues), including the phase, configuration version and error, without credentials.
+The project launcher currently targets macOS and Linux; Windows is unsupported.
+
 ## Connect your agent
 
+This section configures the optional book study assistant; the course `project` command above needs none of these additional steps.
 Choose Codex, [a direct API key](#use-an-api-key) or [a locally loaded model](#use-a-local-model).
 For Codex, install the [Codex CLI](https://learn.chatgpt.com/docs/developer-commands?surface=cli) separately and make it available as `codex` in the terminal where you run the companion.
 The adapter was verified with CLI version 0.154.0.
@@ -423,7 +491,7 @@ Older releases may reject newer schemas.
 To roll back, stop the companion/provider and restore the full pre-update directory copy, retaining the upgraded copy separately; use its compatible release.
 For a single schema conversion, privately retain the current database, copy its matching `.backup` file back under its original database filename, then use a compatible release.
 Restoring a backup loses subsequent changes in that restored copy; keep exports/current files so you can review and recover them separately.
-Keep the verified Codex version until a newer version has passed the documented provider check.
+For the book study assistant's Codex adapter, keep the verified version until a newer version has passed the documented provider check.
 
 Portable notebook archives do not include credentials or raw conversations.
 Conversations are stored separately in `conversations.sqlite`, with Codex threads in the dedicated profile, exact local-model context in `local-provider.sqlite` and API conversation context in `api-provider.sqlite` (both schema 1).

@@ -18,7 +18,7 @@ Use the [study agreement](study-agreement.md) for the calendar and commitments.
 The dedicated reference implementation, frozen audit packages, optional benchmark runner and supplied matched-trace package are prepared following the [specification scope review](../project-specification-scope-review-2026-10-22.md).
 This preparation and any model infrastructure setup are outside the allowance above; remaining student access, private release and run-specific setup still need scheduling.
 The reference and runner are now locally validated; the [tooling guide](../course-tooling.md#preparation-status--22-october-2026) records their evidence and remaining release work.
-The [department model baseline and matched pair](../course-tooling.md#department-model-configuration) are now verified for the bounded label task; student access, phase assignments and private evidence release remain to be arranged.
+The [department model baseline and matched pair](../course-tooling.md#department-model-configuration) are now verified for the bounded label task; student setup verification, remaining harness details and private evidence release remain to be arranged.
 Do not count automated development elapsed time as measured instructor effort.
 Confirm the audit windows before fixing the dates with the student.
 
@@ -50,7 +50,7 @@ Confirm the audit windows before fixing the dates with the student.
 - [x] Reflect [ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) in the evidence contract, environment publication rule, checklist and pilot agreement.
 - [x] Prepare and verify the supplied matched traces, retaining provenance, brief, configurations, checks, outcomes and accounting gaps.
 - [ ] Review and release the curated matched-trace packet through the private student channel.
-- [ ] Confirm the student's department credentials and allocation, then use the [published model access and tool preflight](../../labs/README.md#department-model-baseline) with the student's actual coding harness.
+- [ ] Verify the student's [Establish Aalto GLM/Codex setup](../course-environments/aalto-glm-codex-2026-11-16.md) through its file-and-command check; retain the student's actual result separately from instructor verification.
 - [x] Implement and validate the optional course runner, document its protocol and result format, and explain equivalent compliance for a student-built runner.
 - [x] Publish the runner download with the site: the deployed archive returned HTTP 200 and passed integrity and expected-content checks on 27 October 2026.
 - [ ] Confirm 6–8 student orientation hours before kickoff, approximately 20–21 hours per week afterward and 22–25 hours per week during the final phase.
@@ -66,15 +66,21 @@ Confirm the audit windows before fixing the dates with the student.
       Store operational records in the private course workspace and give the student the supported access instructions.
 
 The working optional-practice baseline is `Qwen/Qwen3.8-27B-FP8` with thinking disabled, under configuration `aalto-qwen38-27b-2026-10-23`.
-This establishes a starting point for orientation; phase model assignments, access allocations, budgets and operational policies still need publication.
-Complete the following decisions for Establish before substantive work, for Challenge by 17 November and for Compare by 1 December:
+Establish now uses [configuration `aalto-glm-codex-2026-11-16`](../course-environments/aalto-glm-codex-2026-11-16.md): `zai-org/GLM-5.3-Flash`, Codex CLI 0.154.0, one agent and no fixed pilot quota, with considerate use of shared departmental resources.
+Its guide provides technical setup and support guidance; keep the actual student check, submission arrangement and other private run records separately.
+Challenge and Compare now have a [verified direct Qwen/Codex setup](../course-environments/aalto-qwen-codex-2026-11-16.md), using `Qwen/Qwen3.8-27B-FP8` for one Challenge agent or a Compare coordinator with at most two concurrent workers and no further delegation.
+The synthetic repair checks passed with protected specifications and checkers unchanged; the fleet retained separate worker identities, edits, closure and integrated checks.
+Codex is the supported starter for beginners; students may use OpenCode or another preferred harness with the assigned model and phase rules after recording and verifying its actual configuration.
+The November direct configuration is separate from the earlier thinking-disabled Qwen proxy evidence.
+Workers share a directory; file assignments do not provide isolation, and interrupted-request usage must remain unknown when unavailable.
+Verify the student's setup before substantive work, and complete the remaining private arrangements for Challenge by 17 November and Compare by 1 December:
 
-| Decision                       | Establish                                                           | Challenge                                                           | Compare                                                                              |
-| ------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Model assignment               | Approved large model; identity and revision to select               | Approved small model; identity and revision to select               | Approved model set and role assignments to select; B's small model is the reference  |
-| Harness and orchestration      | Version to select; single agent                                     | Version to select; single agent                                     | Version, concurrency limit, routing, isolation and trace export to select            |
-| Supported access and resources | Endpoint, environment, cost basis and allocation to confirm         | Endpoint, environment, cost basis and allocation to confirm         | Endpoints, aggregate budget and accounting to confirm                                |
-| Operational policy             | Data boundary, tool limits, support contact and fallback to confirm | Data boundary, tool limits, support contact and fallback to confirm | Data boundary, external-action limits, cancellation, support and fallback to confirm |
+| Decision                       | Establish                                                                 | Challenge                                                                 | Compare                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Model assignment               | `zai-org/GLM-5.3-Flash`; exact weight revision unavailable                | `Qwen/Qwen3.8-27B-FP8`; exact weight revision unavailable                 | Same `Qwen/Qwen3.8-27B-FP8` for coordinator and workers; B's model is the reference       |
+| Supported starter harness      | Codex CLI 0.154.0; native delegation disabled; one session                | Codex CLI 0.154.0; native delegation disabled; one session                | Codex CLI 0.154.0; coordinator and at most two workers; shared directory                  |
+| Supported access and resources | Aalto VPN and departmental key; no fixed quota; considerate shared use    | Aalto VPN and departmental key; considerate shared use                    | Same Aalto route; aggregate usage across coordinator and workers; no automatic retries    |
+| Operational policy             | Published setup guide; confirm student check and private run arrangements | Published setup guide; confirm student check and private run arrangements | Published setup guide; confirm student checks, private arrangements and accounting limits |
 
 Run one small preflight task with each assigned configuration and retain its trace.
 For A and B, verify that automatic delegation and unapproved model routes are disabled.

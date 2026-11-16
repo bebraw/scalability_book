@@ -50,6 +50,7 @@ import {
 } from "./learning-api-credentials.ts";
 import { learningQuestion, learningNextCommand } from "./learning-setup.ts";
 import { configureLearningApi } from "./learning-api-setup.ts";
+import { runLearningProjectCli } from "./learning-project.ts";
 
 declare const __LEARNING_SOURCE_REVISION__: string;
 const sourceRevision =
@@ -102,6 +103,10 @@ export async function runLearningCli(
   defaults: { defaultDirectory?: string } = {},
 ) {
   try {
+    if (argv[0] === "project") {
+      await runLearningProjectCli(argv.slice(1), defaults);
+      return;
+    }
     const { values, positionals } = parseArgs({
       args: argv,
       allowPositionals: true,
@@ -141,7 +146,7 @@ export async function runLearningCli(
     const command = positionals[0] ?? "start";
     if (values.help) {
       console.log(
-        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, logout, start (default), doctor, migrate\nRun setup in a terminal for guided provider selection and authentication.\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --local, --api, --codex-home <path>, --model <name>\nLocal model: --local-url <loopback /v1 URL>, --local-tools none|native, --local-context <loaded tokens>\nAPI: --api-provider openai|anthropic|gemini|openrouter|compatible, --api-url <HTTPS base URL>, --api-context <tokens>, --api-output <tokens>, --api-tools none|native, --api-key-env <variable name>\nAuthentication: login --with-api-key reads a key from stdin for the selected Codex/API provider; setup --api --with-api-key also accepts stdin. Keys are stored in the OS keychain, or read from --api-key-env. Never put the key in an argument. Logout removes the selected stored credential.\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json (no paid generation)\nLocal and API models default to discussion-only; native tools require verification on your model. Setup retains your origin and port. Start trusts only https://scalableweb.dev before setup; use --origin for local development. Connect from the book without a code. Stop with Ctrl+C; your work remains local.`,
+        `scalableweb-companion ${companionRelease.version}\nCommands: setup, login, logout, start (default), doctor, migrate, project\nProject coding: project [establish|challenge|compare] --workspace <path>; project --help for the guided course launcher.\nRun setup in a terminal for guided provider selection and authentication.\nOptions: --directory <path>, --port <port>, --origin <exact-origin> (repeatable), --codex, --notebook, --local, --api, --codex-home <path>, --model <name>\nLocal model: --local-url <loopback /v1 URL>, --local-tools none|native, --local-context <loaded tokens>\nAPI: --api-provider openai|anthropic|gemini|openrouter|compatible, --api-url <HTTPS base URL>, --api-context <tokens>, --api-output <tokens>, --api-tools none|native, --api-key-env <variable name>\nAuthentication: login --with-api-key reads a key from stdin for the selected Codex/API provider; setup --api --with-api-key also accepts stdin. Keys are stored in the OS keychain, or read from --api-key-env. Never put the key in an argument. Logout removes the selected stored credential.\nMigration: migrate --from <old-directory> --confirm-stopped\nDiagnosis: doctor --json (no paid generation)\nLocal and API models default to discussion-only; native tools require verification on your model. Setup retains your origin and port. Start trusts only https://scalableweb.dev before setup; use --origin for local development. Connect from the book without a code. Stop with Ctrl+C; your work remains local.`,
       );
       return;
     }

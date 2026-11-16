@@ -112,6 +112,8 @@ No accepted decisions await implementation.
 | [ADR-061](implemented/ADR-061-store-companion-credentials-in-the-os-keychain.md)                    | Store saved API/Codex credentials in OS stores, retain nonsecret API identity and require explicit environment references for headless use.                 |
 | [ADR-062](implemented/ADR-062-provide-a-course-starter-with-independent-phase-stubs.md)             | Provide an optional executable course starter with shared reasoning and three independent phase stubs.                                                      |
 
+| [ADR-063](implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) | Provide a guided terminal launcher for the verified course coding harness while preserving study-assistant permissions and harness choice. |
+
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 
 ## Authoring and maintenance

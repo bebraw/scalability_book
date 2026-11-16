@@ -11,14 +11,16 @@ Dates and support commitments become operative when agreed with the student and 
 
 ## Documents to review
 
-| Document                                                                          | Audience               | Purpose                                                                                                |
-| --------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
-| [Specification scope review](../project-specification-scope-review-2026-10-22.md) | Instructor             | Agreed scope and preparation boundaries for the reference and study contract.                          |
-| [Study agreement](study-agreement.md)                                             | Student and instructor | Scope, dated milestones, responsibilities, grading and correction arrangements.                        |
-| [Student discussion proposal](student-discussion-proposal.md)                     | Student and instructor | A staged small-model exercise to calibrate difficulty before choosing further scope.                   |
-| [Department model baseline](../../labs/README.md#department-model-baseline)       | Student and instructor | Exact known-working model and request settings, access check, harness preflight and evidence limits.   |
-| [Independent activities](independent-activities.md)                               | Student and instructor | Nine concrete equivalents for the lecture activities, using the existing reading and project evidence. |
-| [Instructor guide](instructor-guide.md)                                           | Instructor             | Preparation, reference audits, phase reviews, assessment and evaluation of the pilot.                  |
+| Document                                                                                          | Audience               | Purpose                                                                                                       |
+| ------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Specification scope review](../project-specification-scope-review-2026-10-22.md)                 | Instructor             | Agreed scope and preparation boundaries for the reference and study contract.                                 |
+| [Study agreement](study-agreement.md)                                                             | Student and instructor | Scope, dated milestones, responsibilities, grading and correction arrangements.                               |
+| [Student discussion proposal](student-discussion-proposal.md)                                     | Student and instructor | A staged small-model exercise to calibrate difficulty before choosing further scope.                          |
+| [Department model baseline](../../labs/README.md#department-model-baseline)                       | Student and instructor | Exact known-working model and request settings, access check, harness preflight and evidence limits.          |
+| [Establish coding-agent setup](../course-environments/aalto-glm-codex-2026-11-16.md)              | Student and instructor | Verified Aalto GLM/Codex configuration, setup check, usage guidance and issue-reporting path.                 |
+| [Challenge and Compare coding-agent setup](../course-environments/aalto-qwen-codex-2026-11-16.md) | Student and instructor | Verified direct Qwen profiles for one agent or a coordinator with two workers, with trace and usage guidance. |
+| [Independent activities](independent-activities.md)                                               | Student and instructor | Nine concrete equivalents for the lecture activities, using the existing reading and project evidence.        |
+| [Instructor guide](instructor-guide.md)                                                           | Instructor             | Preparation, reference audits, phase reviews, assessment and evaluation of the pilot.                         |
 
 Review the agreement first, then the activities and instructor checklist.
 Share the agreement and activities with the student after completing the run details below.
@@ -41,7 +43,11 @@ The [tooling guide](../course-tooling.md#preparation-status--22-october-2026) re
 Keep three fresh implementations: large-model single-agent A, small-model single-agent B and fleet-built C.
 Provide a course benchmark runner as optional tooling; students may implement their own runner under the same measurement and evidence protocol.
 The optional runner is implemented and validated against the private reference; its [public download](https://scalableweb.dev/downloads/project/benchmark-runner.zip) is published with the site.
-The scope choices are settled; model assignments and operational preparations remain open.
+The scope choices are settled.
+[Establish's Aalto GLM/Codex setup](../course-environments/aalto-glm-codex-2026-11-16.md) and [Challenge/Compare's direct Qwen/Codex setup](../course-environments/aalto-qwen-codex-2026-11-16.md) provide a supported starting option for students new to coding agents.
+Challenge uses `Qwen/Qwen3.8-27B-FP8` with one agent, and Compare uses the same model for its coordinator and at most two concurrent workers, as recorded in the [course environment sheet](../../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup).
+Students may use OpenCode or another preferred harness with the assigned model and phase rules, recording its actual configuration and verifying file, command and coordination behavior before substantive work.
+Only the documented Codex profiles have been verified here; student access checks and private operational arrangements remain to be confirmed.
 
 ## Agreed trace extension
 
@@ -107,14 +113,19 @@ The conceptual work, numeric rubric and passing minima remain; the course contra
 Link the exact retained course-configuration version, confirm actual models, routes and environment, and record deviations and material exposed settings.
 Mark unavailable details honestly and reference unchanged published fields through the retained snapshot.
 [ADR-051](../adrs/implemented/ADR-051-reference-versioned-course-configurations-in-student-evidence.md) records the publication rule.
-Configuration [`aalto-qwen38-27b-2026-10-23`](../course-tooling.md#department-model-configuration) records the working departmental Qwen baseline for optional practice; phase assignments, student allocation and operational policies still need publication.
+Configuration [`aalto-qwen38-27b-2026-10-23`](../course-tooling.md#department-model-configuration) records the working departmental Qwen baseline for optional practice.
+Establish uses [`aalto-glm-codex-2026-11-16`](../course-environments/aalto-glm-codex-2026-11-16.md), with no fixed pilot quota and considerate use of shared departmental resources.
+Challenge and Compare use the published [direct Qwen setup](../course-environments/aalto-qwen-codex-2026-11-16.md), with separate single-agent and fleet profiles.
+Its synthetic repair checks verified actual edits and independent results; the fleet used two attributed workers and closed both before the coordinator's check.
+Workers share a project directory, and interrupted requests may have unknown usage; retain these limits in the evidence.
+The earlier Qwen evidence used native thinking disabled and a private proxy, so keep that provenance distinct from the November direct configuration.
 
 ## Decisions needed before starting
 
 - Confirm that the student can reserve 6–8 orientation hours before kickoff, approximately 20–21 hours per week afterward, and 22–25 hours per week during the final phase.
 - Select the kickoff time during 2–4 November and confirm the proposed 16 November, 30 November and 15 December reviews, instructor availability during the audit windows, and the local deadline for registering the grade.
-- Choose the supported models, harnesses, execution environments, budgets and fallbacks using the [course environment sheet](../../specifications/course_environment.md).
-  Establish must be ready before its project work begins; prepare Challenge and Compare before their respective phases.
+- Verify the student's [Establish setup](../course-environments/aalto-glm-codex-2026-11-16.md) and [Challenge/Compare setup](../course-environments/aalto-qwen-codex-2026-11-16.md) before their respective phases, retaining the actual configuration and preflight trace in the [course environment sheet](../../specifications/course_environment.md) records.
+  Apply the same checks if the student chooses another harness.
 - Retain an instructor-controlled backup of the prepared private reference packages and record each outgoing audit assignment, holding phase-specific probes back until the audit window.
   Confirm supported model access and any remaining preparation budget, then review and release the retained supplied matched-trace package.
 - Confirm the private submission, communication and feedback channels, and the proposed two-working-day response to blockers.

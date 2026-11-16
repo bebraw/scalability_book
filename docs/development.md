@@ -345,6 +345,35 @@ Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-c
 Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
 
+### Course project launcher
+
+The unreleased terminal launcher wraps the course harness with a verified 0.154.0 fallback; it does not add project execution to browser study messages.
+From the checkout, use `npm run companion -- project` for guided phase and workspace selection.
+Use `npm run companion -- project establish --workspace /absolute/project/path --print` to inspect the selection policy and conditional commands without probing Codex, creating files, reading credentials, installing a harness or contacting the model.
+`--check` runs the disposable tool check and stops; normal launch reuses a successful check for the same configuration, actual executable source/path/version, runtime and fixture version.
+Unlike `doctor`, this preflight deliberately generates model responses.
+An installed version that passes the minimum-version gate must still pass the phase check; failures retain evidence and stop without an automatic fallback and model retry.
+Use `--managed-codex` to explicitly select the private pinned baseline for a subsequent run.
+
+The launcher stores project state beside the selected companion directory, in `<directory>-projects`, with its own lease so the book companion can keep running.
+`learning-project-config.ts` bundles the phase configuration and check fixtures; package runtime must not read a checkout-only documentation path.
+`learning-project-codex.ts` selects the first executable `codex` on `PATH` only when its credential-free version probe reports a stable version at least 0.154.0.
+Missing, older, prerelease, unparseable or failed candidates use the private pinned 0.154.0 fallback; no global installation is changed.
+Version probes use the isolated `harness-probe/` directory; installed CLI profiles append `-installed-<version>` to the existing phase profile name, preserving the fallback profile.
+`learning-project-process.ts` installs the pinned CLI privately with npm lifecycle scripts disabled and a credential-free environment, verifies its version and launches the exact installed entry.
+Only the coding process receives the Aalto key, and its configuration excludes that key from ordinary shell tools.
+`learning-project.ts` owns the prompt/explicit-option flow, profile preservation, credential lookup and launch; keep it independent of notebook settings and the browser tool broker.
+`learning-project-preflight.ts` owns disposable execution, worker-session inspection and success/failure receipts.
+`learning-project-boundary.ts` rejects Codex-loaded project configuration from the workspace through the nearest valid `.git` root, following the pinned CLI's default discovery; `AGENTS.md` discovery remains available.
+The profile validator accepts only the exact course settings plus strictly parsed Codex project trust records, so ordinary trust decisions can persist without admitting changed model or execution settings.
+
+Run `node --test tests/learning-project*.test.ts` for launcher and process behavior, followed by `npm run companion:pack` and `npm run companion:check` against the distributed artifact.
+Verify installed-version selection and fallback, credential-free probes, distinct installed profiles, forced managed selection, changed profiles, failed or tampered checks and interrupted processes through observable launch/refusal behavior; automatic checks use synthetic commands and credentials.
+Check that receipts identify the actual executable and that a failed installed-harness preflight cannot trigger another model run through the fallback.
+For a live Aalto check, use synthetic inputs, the assigned model, a disposable workspace and an explicit environment reference or endpoint-bound keychain entry; retain first failures and inspect actual worker output for Compare.
+Do not claim real-model, platform or package verification from a printed plan alone.
+The [student guide](learning-companion-setup.md#start-a-course-coding-project) distinguishes source/prepared-package use from registry 0.3.1, which lacks this command.
+
 ### Learning cockpit and reading investigations
 
 For shared learning loops, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts tests/e2e/learning-cockpit.spec.ts --project=chromium --project=webkit`.

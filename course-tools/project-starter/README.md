@@ -40,6 +40,10 @@ It does not implement the course application.
    No hosted Git account is needed for these local commands.
 
 5. Before AI-assisted project work, obtain your run's published model and harness assignment from the instructor through the [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md).
+   New users can follow the [Aalto GLM and Codex setup guide](https://github.com/bebraw/scalability_book/blob/main/docs/course-environments/aalto-glm-codex-2026-11-16.md) for Establish, including a small file-and-command check before application work.
+   The [Aalto Qwen guide](https://github.com/bebraw/scalability_book/blob/main/docs/course-environments/aalto-qwen-codex-2026-11-16.md) supplies the later Challenge and Compare profiles.
+   The [companion setup guide](https://scalableweb.dev/notebook/setup/) records the guided project launcher's release status; when available in your installed version, `scalableweb-companion project` guides you through phase, directory, key and setup verification.
+   You may keep OpenCode or another preferred harness with the assigned model and phase rules; record its actual configuration and verify its tools before substantive work.
    Verify the approved large-model route and one-agent configuration, with unapproved fallback and automatic delegation disabled or failing closed.
    A missing assignment is not permission to choose another model or pay for a service.
 

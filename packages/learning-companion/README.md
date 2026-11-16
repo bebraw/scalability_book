@@ -47,6 +47,39 @@ The checkout uses `.local/learning-companion/`; the standalone package uses a st
 Use `--directory` to keep an existing notebook at another location.
 Ctrl+C stops the companion without removing your work.
 
+## Start a course coding project
+
+Run `scalableweb-companion project` with this package installed, or `npm run companion -- project` from the checkout.
+Choose the phase and existing project directory.
+The launcher displays the selected model, commands and private file locations, selects Codex, obtains your Aalto key securely, and runs a disposable setup check before opening the project agent.
+You need Node.js, npm, Aalto VPN and the departmental key; no global Codex installation or ChatGPT sign-in is required.
+The first executable `codex` on `PATH` is eligible when it reports a stable version of 0.154.0 or newer.
+If it is missing, older, a prerelease, reports an unrecognized version or fails its version probe, the launcher uses a private pinned 0.154.0 copy without updating your global installation.
+Newer versions must still pass the phase's setup check; add `--managed-codex` to explicitly use the verified private baseline.
+
+```sh
+scalableweb-companion project establish --workspace /path/to/projects/01-establish
+scalableweb-companion project challenge --workspace /path/to/projects/02-challenge --print
+scalableweb-companion project compare --workspace /path/to/projects/03-compare --check
+```
+
+`--print` displays the plan, configuration, selection policy and conditional commands without probing Codex, creating files, reading credentials, installing software or calling a model.
+`--check` reruns the file/tool check and stops; normal launch reuses a successful check for the exact configuration, executable source/path/version, runtime and fixture version.
+Failed checks retain their evidence and stop launch without automatically switching harnesses and repeating model calls.
+Changed managed course settings or applicable project-local Codex configuration block launch without overwriting the files; use the reported path to review the conflict or continue with a manual harness.
+Codex may retain its own narrowly validated project-trust records, and project `AGENTS.md` instructions still apply.
+Establish uses one GLM agent, Challenge one Qwen agent, and Compare the same Qwen model with a coordinator and at most two workers.
+Other harnesses remain welcome under the assigned model and phase rules.
+
+An existing `AALTO_LLM_API_KEY`, an explicit `--api-key-env <name>` or an endpoint-bound saved key can supply access; otherwise the hidden prompt saves the key in your OS credential store.
+Version probing and installation run without the model key, and ordinary Codex shell tools exclude it from their environment.
+Project profiles and check records use a separate sibling of the selected companion directory, named with a `-projects` suffix, so the book companion can stay running.
+Installed Codex versions use separate phase profiles, preserving the private fallback's profile; receipts record the actual executable source, path and version.
+Notebook migration and portable archives do not include these project records.
+The teaching assistant's browser permissions and provider settings are unchanged.
+The launcher targets macOS/Linux; Windows is unsupported.
+See [the setup guide](https://scalableweb.dev/notebook/setup/#start-a-course-coding-project) for the complete workflow and manual configuration references.
+
 ## Choose a provider
 
 **Direct API keys** need no Codex installation or ChatGPT subscription.
@@ -80,7 +113,7 @@ Adjust these with `--api-context` and `--api-output` within your model's limits;
 `--api-tools native` is an explicit choice for a model/provider whose function calling you have verified.
 Transport and conversation checks use synthetic responses; real replies and native-tool reliability across these providers are not yet verified for this release.
 
-**Codex** requires the separately installed [Codex CLI](https://learn.chatgpt.com/docs/developer-commands?surface=cli), verified at version 0.154.0:
+**Codex for the book study assistant** requires the separately installed [Codex CLI](https://learn.chatgpt.com/docs/developer-commands?surface=cli), verified at version 0.154.0:
 
 ```sh
 npm install -g @openai/codex@0.154.0

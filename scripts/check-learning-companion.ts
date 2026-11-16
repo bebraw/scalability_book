@@ -485,7 +485,11 @@ try {
   // artifact. Synthetic API responses cannot incur charges or use real keys.
   const apiChecks = await asyncExec(
     process.execPath,
-    ["--test", path.join(root, "tests/learning-cli.test.ts")],
+    [
+      "--test",
+      path.join(root, "tests/learning-cli.test.ts"),
+      path.join(root, "tests/learning-project.test.ts"),
+    ],
     {
       cwd: a,
       env: { ...env, LEARNING_COMPANION_BIN: bin },

@@ -116,6 +116,11 @@ It distinguishes gateway access, coding-tool verification and the book's separat
 The exercise runtime has no provider dependency; the experimental bridge, private reference and credentials are excluded from the workspace.
 Students may use their own coding harness, recording its version and checking actual tool execution before attempting an exercise.
 
+For the November 2026 pilot, `Qwen/Qwen3.8-27B-FP8` is now assigned to single-agent Challenge and to Compare's coordinator and workers.
+The [course environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) owns those assignments; the [verified direct Codex setup](course-environments/aalto-qwen-codex-2026-11-16.md) provides a supported beginner option for both phases.
+Students may use another harness with the same assigned model and phase rules, after recording and checking its actual configuration.
+The dated private experiment below remains its own configuration and evidence record.
+
 | Field                            | Recorded value                                                                                                       |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Gateway                          | `https://llm-gateway.k8s.aalto.fi/api/v1`                                                                            |

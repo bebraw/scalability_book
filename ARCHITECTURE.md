@@ -58,6 +58,19 @@ Local targets and fragments are checked during validation; external missing-page
 See [the development guide](docs/development.md#published-link-checks) for failure criteria and inconclusive external responses.
 The optional local learning companion exposes the private notebook API independently of course storage and model providers.
 [learning-cli.ts](scripts/lib/learning-cli.ts) owns setup, authentication entry, startup and local diagnostics for both the repository command and the built [npm package](packages/learning-companion/package.json).
+Its terminal-only `project` entry delegates to [learning-project.ts](scripts/lib/learning-project.ts) for course phase selection, credential reuse, profile preparation and interactive coding-agent launch.
+[learning-project-config.ts](scripts/lib/learning-project-config.ts) owns the bundled phase configurations, prompts, checker and strict validation of Codex-appended project trust records.
+[learning-project-codex.ts](scripts/lib/learning-project-codex.ts) owns credential-free version probing and selection: prefer the first executable `codex` on `PATH` when it reports a stable version at least 0.154.0, otherwise use the private pinned 0.154.0 fallback; `--managed-codex` explicitly selects that fallback.
+[learning-project-process.ts](scripts/lib/learning-project-process.ts) owns private pinned Codex installation and child-process lifecycle; selection never updates a global installation.
+[learning-project-preflight.ts](scripts/lib/learning-project-preflight.ts) owns disposable checks, worker-session attribution and receipt caching; [learning-project-boundary.ts](scripts/lib/learning-project-boundary.ts) rejects project-local Codex configuration in the pinned CLI's applicable project range while preserving `AGENTS.md` discovery.
+Conflicting configuration remains untouched for review or manual harness use; the managed course fields cannot be replaced by appended settings.
+These project owners depend on shared credential/storage primitives, while the notebook, browser tool broker and teaching-provider adapters remain independent of project execution.
+Project state has its own lease in the sibling `<companion-directory>-projects`: `tools/` holds the managed CLI, `harness-probe/` isolates version-probe state, `profiles/` holds versioned phase profiles and session traces, and `checks/` retains individual check inputs, events and summaries.
+Installed CLI profiles append `-installed-<version>` to the phase profile name, keeping their state separate from the pinned fallback.
+The exact configuration/harness/runtime/fixture identity bounds each successful preflight receipt, including the actual executable source, path and version.
+Version eligibility alone does not establish compatibility: the selected harness must pass the phase preflight, and failures retain their evidence and stop launch without automatic model retries through another harness.
+New project keys use the project credential identity in the OS store; an existing book Aalto key may be read without changing book settings.
+The launcher is unreleased and introduces no browser machine-execution API; [ADR-063](docs/adrs/implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) records that boundary.
 [learning-storage.ts](scripts/lib/learning-storage.ts) owns stable per-user directories, directory leases and explicit copy migration; [learning-database.ts](scripts/lib/learning-database.ts) validates schemas read-only and backs up atomic upgrades.
 [learning-connection.ts](shared/learning-connection.ts) distinguishes package, browser protocol, storage/archive and compatible-provider versions.
 Package assembly bundles existing state/provider owners and authored resource registries; the runtime has no website-build or provider-SDK dependency.

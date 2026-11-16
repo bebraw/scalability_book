@@ -185,10 +185,10 @@ Only **Save note** creates a durable notebook entry; no cockpit action judges ma
 ## Start the companion
 
 The packaged entry needs Node 24 or 26 and no checkout or website dependencies.
-The repository prepares release 0.3.0 with code-free connection and browser protocol 2; it has not been published to npm.
-The published 0.2.0 artifact uses the previous connection contract and is not supported by this updated browser client.
+Published release 0.3.1 uses code-free connection and browser protocol 2; it also preserves the macOS home directory required by Codex's OS keychain.
+The older 0.2.0 artifact uses the previous connection contract and is not supported by this updated browser client.
 [ADR-030](adrs/implemented/ADR-030-distribute-the-learning-companion-with-guided-student-setup.md#release-020) retains its release evidence; [ADR-037](adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records the new trust boundary.
-For now use the checkout command; it keeps the repository's installed dependencies and existing default:
+For local development, use the checkout command; it keeps the repository's installed dependencies and existing default:
 
 ```bash
 npm run companion -- --origin http://127.0.0.1:3000
@@ -225,6 +225,34 @@ Session responses are private and uncached; CORS preflight is origin-gated, incl
 The companion does not log notes, provider credentials or session tokens.
 There is no `/pair` route, code generator or manual-pairing option.
 
+### Course project launcher
+
+The terminal-only `project` command is an unreleased addition, available from the updated checkout or a prepared package; registry 0.3.1 does not contain it.
+It wraps the declared course coding configurations in a guided phase/directory choice, Codex selection, endpoint-bound credential lookup, disposable tool check and interactive launch.
+It prefers the first executable `codex` on `PATH` if a credential-free probe reports a stable version at least 0.154.0; a missing, older, prerelease, unparseable or failed candidate selects the private pinned 0.154.0 fallback without changing a global installation.
+`--managed-codex` explicitly selects the private baseline.
+The [student guide](learning-companion-setup.md#start-a-course-coding-project) owns the commands; [ADR-063](adrs/implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) records the execution boundary.
+`--print` shows the selection policy and conditional commands without probing Codex, creating files, accessing credentials or making model calls; `--check` deliberately repeats the disposable model/tool check without launching project work.
+Successful checks are reused only for the matching configuration, actual executable source/path/version, runtime and fixture version.
+A newer installed version is only a candidate until its phase check passes; failed checks retain their evidence and prevent launch without switching harnesses and repeating model calls automatically.
+Managed profiles accept the exact course settings plus strictly validated project trust records appended by Codex itself.
+Changed course settings or project-local Codex configuration that the pinned CLI would load block managed launch and remain untouched for review or manual harness use.
+Project `AGENTS.md` instructions still apply.
+
+The launcher owns a separate sibling `<companion-directory>-projects` with its own lease, profiles, private installed harness, isolated `harness-probe/` directory and check records.
+Installed Codex profiles append `-installed-<version>` to the phase profile name so they cannot rewrite the pinned fallback's profile.
+The book companion can keep its notebook lease and remain running.
+Existing endpoint-bound Aalto credentials can be read without changing the book's provider settings; newly entered project credentials use the project identity and OS keychain, with no plaintext fallback.
+The model key is excluded from version probing, installation and ordinary coding-agent shell environments.
+Project records are outside notebook migration and portable archives and need their own private retention.
+
+Only the terminal launch grants project access to the external coding harness.
+Connecting the website or sending a study message does not launch a project process, expose project files or grant machine commands to the browser tool broker.
+The existing study Codex adapter remains read-only with shell and delegation disabled.
+The project profiles instead use workspace-write permissions and on-request approvals; Compare workers share the selected project directory.
+Harness interruption can stop active work but does not undo edits or attest cancellation at the upstream model service.
+This launcher is one supported beginner path; the course permits other harnesses that follow the assigned model and phase rules and retain equivalent evidence.
+
 ### Distribution, diagnostics and storage recovery
 
 [learning-cli.ts](../scripts/lib/learning-cli.ts) owns `setup`, `login`, `logout`, `start`, `doctor` and directory `migrate`.
@@ -253,8 +281,8 @@ Setup preferences are not copied because their absolute profile path may identif
 Sign-in/thread continuity must be checked before removing the source; retained notes can begin a new conversation when provider continuity is unavailable.
 
 [learning-database.ts](../scripts/lib/learning-database.ts) owns database compatibility.
-Prepared package 0.3.0, browser protocol 2, portable archive 1 and notebook/conversation/local-provider/API-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
-Release 0.3.0 retains the previous storage location, setup preferences and compatible records without a new schema migration.
+Package release, browser protocol 2, portable archive 1 and notebook/conversation/local-provider/API-provider database schemas 1 are separate contracts in [learning-connection.ts](../shared/learning-connection.ts).
+Release 0.3.1 retains the previous storage location, setup preferences and compatible records without a new schema migration.
 The original unversioned schema 0 is accepted only with recognized tables, snapshotted as `<database>.before-schema-1-<id>.backup` and marked schema 1 in a transaction.
 New databases start at schema 1; unsupported schemas are rejected read-only before changing bytes.
 Interrupted migration retains a recoverable snapshot and can be retried once writers stop.

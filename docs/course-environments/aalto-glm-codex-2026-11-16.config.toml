@@ -1,0 +1,36 @@
+# Establish configuration aalto-glm-codex-2026-11-16; Codex CLI 0.154.0.
+model = "zai-org/GLM-5.3-Flash"
+review_model = "zai-org/GLM-5.3-Flash"
+model_provider = "aalto"
+model_context_window = 32768
+model_auto_compact_token_limit = 24576
+model_reasoning_summary = "none"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+allow_login_shell = false
+web_search = "disabled"
+
+[features]
+multi_agent = false
+apps = false
+plugins = false
+hooks = false
+memories = false
+goals = false
+view_image = false
+unbounded_connection_retries = false
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false
+filters = { AALTO_LLM_API_KEY = "exclude", AALTO_KEY = "exclude" }
+
+[model_providers.aalto]
+name = "Aalto GLM"
+base_url = "https://llm-gateway.k8s.aalto.fi/api/v1"
+env_key = "AALTO_LLM_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+request_max_retries = 0
+stream_max_retries = 0
+stream_idle_timeout_ms = 90000
