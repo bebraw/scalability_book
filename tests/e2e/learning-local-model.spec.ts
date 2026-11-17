@@ -178,7 +178,7 @@ for (const native of [false, true])
           }),
         ).toHaveCount(2, { timeout: 30000 });
         await expect(
-          assistant.getByText("Browser observation", { exact: true }),
+          assistant.locator(".learning-evidence-observation"),
         ).toHaveCount(3);
       } else {
         expect(model.requests[0].tools).toBeUndefined();

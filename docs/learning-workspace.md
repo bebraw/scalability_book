@@ -76,6 +76,13 @@ Either handoff asks before replacing unfinished writing; only the student's Save
 Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
 Long code lines scroll within their code block; each block is a named keyboard focus target with a visible focus indicator, so arrow keys can reveal the complete text and Tab can leave the block.
 Expanded browser observations wrap within the assistant panel and retain their full recorded text.
+Replies with recorded browser observations show **View browser evidence**, including the observation count, directly above the explanation.
+The native disclosure labels its contents as recorded browser output, separate from the assistant's interpretation; it can be opened and closed with pointer or keyboard.
+Only observations preceding that reply in the same response are grouped with it; a later reply without new observations does not inherit an earlier reply's evidence.
+Completed observations from a pending or interrupted response remain available on their own in the conversation.
+Polling preserves an evidence disclosure's open state and keyboard focus as observations arrive and the reply appears.
+These records cover successful browser observations and approved demo changes, not a complete trace of source retrievals, pending requests or declined/failed tool calls.
+[learning-evidence.ts](../site/scripts/learning-evidence.ts) owns this grouping and disclosure presentation; conversation storage and tool execution remain unchanged.
 [learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
 Unsupported equations retain their original notation.
 Conversation storage and reviewed notebook drafts retain the original reply text; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records this presentation boundary.

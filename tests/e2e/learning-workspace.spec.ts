@@ -12,7 +12,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { conceptPages } from "../../shared/concept-pages.ts";
-import type { LearningConversation } from "../../shared/learning-agent.ts";
+import type {
+  AgentMessage,
+  LearningConversation,
+} from "../../shared/learning-agent.ts";
 
 let child: ChildProcess;
 let directory: string;
@@ -143,10 +146,12 @@ for (const width of [1440, 390]) {
     await panel
       .getByRole("button", { name: "Send message", exact: true })
       .click();
-    const disclosure = panel.locator("details.learning-note");
+    const disclosure = panel.locator("details.learning-evidence");
     await disclosure.locator("summary").click();
     await expect(disclosure).toHaveAttribute("open", "");
-    await expect(disclosure.locator("p")).toHaveText(observation);
+    await expect(disclosure.locator(".learning-evidence-output")).toHaveText(
+      observation,
+    );
     const pre = panel.locator(".learning-reply pre");
     await expect(pre.locator("code")).toHaveText(observation);
     await pre.scrollIntoViewIfNeeded();
@@ -154,7 +159,7 @@ for (const width of [1440, 390]) {
       const content = element.querySelector(".learning-content")!;
       const body = element.querySelector(".learning-body")!;
       const pre = element.querySelector(".learning-reply pre")!;
-      const observation = element.querySelector("details.learning-note > p")!;
+      const observation = element.querySelector(".learning-evidence-output")!;
       const rect = body.getBoundingClientRect();
       return {
         panelExcess: element.scrollWidth - element.clientWidth,
@@ -207,6 +212,308 @@ for (const width of [1440, 390]) {
     ).toBeFocused();
   });
 }
+
+function recordedMessage(
+  role: AgentMessage["role"],
+  text: string,
+): AgentMessage {
+  return { id: crypto.randomUUID(), role, text, at: new Date().toISOString() };
+}
+
+async function routeSyntheticDiscussion(
+  page: import("@playwright/test").Page,
+  reply: (
+    conversation: LearningConversation,
+    text: string,
+  ) => LearningConversation,
+) {
+  await advertiseProvider(page);
+  let conversation: LearningConversation;
+  let reads = 0;
+  await page.route(`${companionAddress}/agent/conversations`, async (route) => {
+    const response = await route.fetch();
+    if (route.request().method() === "POST")
+      conversation = await response.json();
+    await route.fulfill({ response });
+  });
+  await page.route(
+    `${companionAddress}/agent/conversations/*`,
+    async (route) => {
+      if (route.request().method() === "POST")
+        conversation = reply(conversation, route.request().postDataJSON().text);
+      else reads += 1;
+      if (conversation) await route.fulfill({ json: conversation });
+      else await route.continue();
+    },
+  );
+  return {
+    reads: () => reads,
+    update: (update: (value: LearningConversation) => LearningConversation) => {
+      conversation = update(conversation);
+    },
+  };
+}
+
+async function connectSyntheticDiscussion(
+  page: import("@playwright/test").Page,
+) {
+  await page.goto("/chapters/benchmarking/");
+  await page
+    .locator(".site-header")
+    .getByRole("button", { name: "Teaching assistant", exact: true })
+    .click();
+  const panel = activeLearningPanel(page);
+  await panel.getByLabel("Companion address").fill(companionAddress);
+  await panel
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  return panel;
+}
+
+for (const width of [1440, 390]) {
+  test(`browser evidence belongs to its reply and retains literal observations at ${width}px`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const observations = [
+      '{"demoId":"synthetic-demo","visibleText":"Actual displayed value: 12"}',
+      'Legacy result: {unclosed JSON\n<img src="https://example.org/evidence.png">\nComplete final line.',
+    ];
+    let requests = 0;
+    await routeSyntheticDiscussion(page, (conversation, text) => ({
+      ...conversation,
+      state: "idle",
+      messages: [
+        ...conversation.messages,
+        recordedMessage("student", text),
+        ...(requests++ === 0
+          ? observations.map((text) => recordedMessage("observation", text))
+          : []),
+        recordedMessage(
+          "agent",
+          requests === 1
+            ? "This is an interpretation of the recorded results."
+            : "This later explanation did not add a browser observation.",
+        ),
+      ],
+    }));
+    const panel = await connectSyntheticDiscussion(page);
+    await panel
+      .getByLabel("Message to the teaching assistant")
+      .fill("Explain the recorded results.");
+    await panel
+      .getByRole("button", { name: "Send message", exact: true })
+      .click();
+    const firstReply = panel
+      .locator("article.learning-note")
+      .filter({
+        has: page.getByRole("heading", {
+          name: "Teaching assistant suggestion",
+          exact: true,
+        }),
+      })
+      .first();
+    const evidence = firstReply.locator("details.learning-evidence");
+    const summary = evidence.locator("summary");
+    await expect(summary).toHaveText("View browser evidence (2 observations)");
+    await expect(evidence).not.toHaveAttribute("open", "");
+    await expect(firstReply.locator(".learning-reply")).toBeVisible();
+    expect(
+      await evidence.evaluate((element) =>
+        Boolean(
+          element.compareDocumentPosition(
+            element.parentElement!.querySelector(".learning-reply")!,
+          ) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+      ),
+    ).toBe(true);
+    await summary.focus();
+    await page.keyboard.press("Enter");
+    await expect(evidence).toHaveAttribute("open", "");
+    await expect(evidence.locator(".learning-evidence-output")).toHaveText(
+      observations,
+    );
+    await expect(evidence).toContainText(/recorded|captured/i);
+    await expect(evidence).toContainText(/interpretation|explanation/i);
+    await expect(evidence.locator("img")).toHaveCount(0);
+    expect(
+      await summary.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (
+          style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0
+        );
+      }),
+    ).toBe(true);
+    expect(
+      (await new AxeBuilder({ page }).include(".learning-evidence").analyze())
+        .violations,
+    ).toEqual([]);
+    await page.screenshot({
+      path: testInfo.outputPath("reply-browser-evidence.png"),
+    });
+    await page.keyboard.press("Space");
+    await expect(evidence).not.toHaveAttribute("open", "");
+    await summary.click();
+    await expect(evidence).toHaveAttribute("open", "");
+
+    await panel
+      .getByLabel("Message to the teaching assistant")
+      .fill("Explain that without inspecting the browser again.");
+    await panel
+      .getByRole("button", { name: "Send message", exact: true })
+      .click();
+    const replies = panel.locator("article.learning-note").filter({
+      has: page.getByRole("heading", {
+        name: "Teaching assistant suggestion",
+        exact: true,
+      }),
+    });
+    await expect(replies).toHaveCount(2);
+    await expect(
+      replies.nth(1).locator("details.learning-evidence"),
+    ).toHaveCount(0);
+    await expect(
+      replies.first().locator(".learning-evidence-output"),
+    ).toHaveText(observations);
+    await expect(panel.locator("details.learning-evidence")).toHaveCount(1);
+  });
+}
+
+test("browser evidence stays open and focused through polling and remains available without a reply", async ({
+  page,
+}, testInfo) => {
+  const first = recordedMessage("observation", "First completed observation.");
+  const second = recordedMessage(
+    "observation",
+    "Second completed observation.",
+  );
+  let turns = 0;
+  const fixture = await routeSyntheticDiscussion(page, (conversation, text) => {
+    turns += 1;
+    return {
+      ...conversation,
+      state: turns === 1 ? "working" : turns === 2 ? "failed" : "idle",
+      error:
+        turns === 2 ? "The reply stopped after a completed observation." : null,
+      messages: [
+        ...conversation.messages,
+        recordedMessage("student", text),
+        turns === 1
+          ? first
+          : turns === 2
+            ? recordedMessage(
+                "observation",
+                "Completed before the interrupted reply.",
+              )
+            : recordedMessage(
+                "agent",
+                "A new reply without a new observation.",
+              ),
+      ],
+    };
+  });
+  const panel = await connectSyntheticDiscussion(page);
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Inspect the demo.");
+  await panel
+    .getByRole("button", { name: "Send message", exact: true })
+    .click();
+  const evidence = panel.locator("details.learning-evidence").first();
+  const summary = evidence.locator("summary");
+  await expect(summary).toHaveText("View browser evidence (1 observation)");
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  await expect(evidence).toHaveAttribute("open", "");
+  const before = fixture.reads();
+  await expect.poll(fixture.reads).toBeGreaterThan(before);
+  await expect(summary).toBeFocused();
+  await expect(evidence).toHaveAttribute("open", "");
+
+  fixture.update((value) => ({
+    ...value,
+    messages: [...value.messages, second],
+  }));
+  await expect(summary).toHaveText("View browser evidence (2 observations)");
+  await expect(summary).toBeFocused();
+  await expect(evidence).toHaveAttribute("open", "");
+  await expect(evidence.locator(".learning-evidence-output")).toHaveText([
+    first.text,
+    second.text,
+  ]);
+  fixture.update((value) => ({
+    ...value,
+    state: "idle",
+    messages: [
+      ...value.messages,
+      recordedMessage("agent", "Interpretation after both observations."),
+    ],
+  }));
+  const reply = panel.locator("article.learning-note").filter({
+    has: page.getByRole("heading", {
+      name: "Teaching assistant suggestion",
+      exact: true,
+    }),
+  });
+  await expect(reply).toHaveCount(1);
+  await expect(reply.locator("details.learning-evidence")).toHaveAttribute(
+    "open",
+    "",
+  );
+  await expect(
+    reply.locator("details.learning-evidence > summary"),
+  ).toBeFocused();
+
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Inspect once more.");
+  await panel
+    .getByRole("button", { name: "Send message", exact: true })
+    .click();
+  await expect(
+    panel.getByText("The reply stopped after a completed observation.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(panel.locator("details.learning-evidence")).toHaveCount(2);
+  const incompleteEvidence = panel.locator("details.learning-evidence").last();
+  expect(
+    await incompleteEvidence.evaluate((element) =>
+      Boolean(element.closest("article")),
+    ),
+  ).toBe(false);
+  await incompleteEvidence.locator("summary").click();
+  await expect(
+    incompleteEvidence.locator(".learning-evidence-output"),
+  ).toHaveText("Completed before the interrupted reply.");
+  await expect(reply.locator(".learning-evidence-output")).toHaveText([
+    first.text,
+    second.text,
+  ]);
+  await page.screenshot({
+    path: testInfo.outputPath("interrupted-reply-evidence.png"),
+  });
+
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Start a new explanation without inspecting the demo.");
+  await panel
+    .getByRole("button", { name: "Send message", exact: true })
+    .click();
+  await expect(reply).toHaveCount(2);
+  await expect(reply.last().locator("details.learning-evidence")).toHaveCount(
+    0,
+  );
+  await expect(panel.locator("details.learning-evidence")).toHaveCount(2);
+  expect(
+    await incompleteEvidence.evaluate((element) =>
+      Boolean(element.closest("article")),
+    ),
+  ).toBe(false);
+  await expect(
+    incompleteEvidence.locator(".learning-evidence-output"),
+  ).toHaveText("Completed before the interrupted reply.");
+});
 
 test("the conversation picker immediately follows new discussions and retains a reopened selection", async ({
   page,

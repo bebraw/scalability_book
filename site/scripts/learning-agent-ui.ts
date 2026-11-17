@@ -7,6 +7,12 @@ import {
 import type { AssistantDraft } from "./learning-session.ts";
 import { renderLearningReply } from "./learning-reply.ts";
 import {
+  captureLearningEvidence,
+  groupLearningMessages,
+  renderLearningEvidence,
+  restoreLearningEvidenceFocus,
+} from "./learning-evidence.ts";
+import {
   helpModes,
   supportNeeds,
   supportNeedLabels,
@@ -415,10 +421,23 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     }),
   );
   container.append(actions, messages);
+  let renderedMessages = "";
   function draw() {
     drawContext();
     const current = conversation?.source ?? draft.source;
     pageOption.textContent = `${current.kind === "passage" ? "Selected passage" : current.kind === "demo" ? "Investigation" : "Current reading"} · ${current.title}`;
+    const snapshot = JSON.stringify(
+      conversation && {
+        id: conversation.id,
+        source: conversation.source,
+        messages: conversation.messages,
+        state: conversation.state,
+        error: conversation.error,
+      },
+    );
+    if (snapshot === renderedMessages) return;
+    renderedMessages = snapshot;
+    const evidenceState = captureLearningEvidence(messages);
     messages.replaceChildren();
     if (!conversation) {
       messages.append(
@@ -434,21 +453,27 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     url.hash = conversation.source.anchor;
     sourceLink.href = url.href;
     messages.append(sourceLink);
-    for (const message of conversation.messages) {
-      const card = element(
-        message.role === "observation" ? "details" : "article",
-      );
+    for (const { message, observations } of groupLearningMessages(
+      conversation.messages,
+    )) {
+      const evidence = observations.length
+        ? renderLearningEvidence(observations, evidenceState)
+        : null;
+      if (!message) {
+        messages.append(evidence!);
+        continue;
+      }
+      const card = element("article");
       card.className = "learning-note";
       card.append(
         element(
-          message.role === "observation" ? "summary" : "h3",
+          "h3",
           message.role === "student"
             ? "Your thinking"
-            : message.role === "agent"
-              ? "Teaching assistant suggestion"
-              : "Browser observation",
+            : "Teaching assistant suggestion",
         ),
       );
+      if (evidence) card.append(evidence);
       const body =
         message.role === "agent"
           ? renderLearningReply(message.text)
@@ -516,6 +541,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
         ),
       );
     if (conversation.error) messages.append(element("p", conversation.error));
+    restoreLearningEvidenceFocus(messages, evidenceState);
   }
   async function poll() {
     if (!options.active() || !conversation) return;

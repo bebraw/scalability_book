@@ -191,6 +191,7 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
 }
 .learning-workspace button:focus-visible,
 .learning-workspace a:focus-visible,
+.learning-evidence > summary:focus-visible,
 .learning-reply pre:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -268,6 +269,34 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   padding: 0.8rem 0;
 }
 .learning-note p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.learning-evidence {
+  margin: 0.7rem 0;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: var(--panel);
+}
+.learning-evidence > summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-weight: 600;
+}
+.learning-evidence > .learning-hint {
+  white-space: normal;
+}
+.learning-evidence-observation + .learning-evidence-observation {
+  border-top: 1px solid var(--border);
+}
+.learning-evidence-observation h4 {
+  margin: 0.7rem 0 0.3rem;
+  font-size: 0.85rem;
+}
+.learning-evidence-output {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

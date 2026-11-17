@@ -113,9 +113,9 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
         exact: true,
       }),
     ).toBeVisible({ timeout: 30_000 });
-    await expect(
-      panel.getByText("Browser observation", { exact: true }),
-    ).toHaveCount(2);
+    await expect(panel.locator(".learning-evidence-observation")).toHaveCount(
+      2,
+    );
     await expect(page.locator("[data-cache-age-label]")).toHaveText("400 days");
     console.log(
       "Observed teaching reply:",

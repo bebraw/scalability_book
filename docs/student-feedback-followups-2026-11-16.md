@@ -56,14 +56,24 @@ Reopen it if a specific failing page, payload or theme state is identified.
 
 ## 3. Make tool evidence easier to find and interpret
 
-**Status: open; reported usability concern, without a completed student retest.** The control for inspecting a trace or tool observation was not sufficiently discoverable.
+**Status: interface improvement implemented on 17 November 2026; first-time learner walkthrough pending.** The earlier concern was that the observation control was not sufficiently discoverable.
 
-Revisit its wording, placement and collapsed summary with a synthetic reply that used a tool.
-The entry should explain what the student can inspect, distinguish recorded observations from the assistant's interpretation, and preserve readable evidence without overwhelming the reply.
-Use the existing [assistant presentation owner](../site/scripts/learning-agent-ui.ts) and [workspace contract](learning-workspace.md); no new tracing backend is implied.
+Replies with recorded browser observations now show **View browser evidence** and the observation count directly above the explanation.
+One native disclosure exposes the complete literal records and explicitly separates browser output from the assistant's interpretation.
+The disclosure stays open and retains keyboard focus as polling adds observations and the reply arrives.
+Interrupted or orphaned observations remain accessible, and a later student turn cannot attach an earlier response's evidence to its reply.
 
-Done when a first-time reader can find the evidence from the reply, open and close it with keyboard or pointer, and identify what the tool actually returned.
-Verify the interface behavior automatically where stable, and record the outcome of a short learner walkthrough separately from those checks.
+[The evidence presentation owner](../site/scripts/learning-evidence.ts) groups and renders these records; [the assistant owner](../site/scripts/learning-agent-ui.ts) retains conversation state and polling.
+The [workspace contract](learning-workspace.md) documents that this is successful browser evidence, not a complete trace of source retrievals, pending requests or declined/failed calls.
+No storage, provider or tool-execution change was needed.
+
+Ten focused Chromium/WebKit checks passed at desktop/mobile widths, including literal legacy output, correct reply association, interrupted responses, keyboard open/close, polling continuity, visible focus, scoped accessibility and the existing long-output checks.
+Four packaged-companion browser checks also passed, including actual demo observations and declined/approved changes with a synthetic model.
+The production build, type checks, HTML/local-link validation and formatting passed; the initial missing-control failure and passing results are retained under ignored `.local/reviews/assistant-evidence-2026-11-17/`.
+
+Manual browser inspection confirms the control's placement and readable evidence, but does not establish first-time learner discoverability.
+Keep this item open until a learner walkthrough confirms that a reader can find the evidence from the reply, open/close it and distinguish the actual output from the assistant's explanation.
+Record that outcome separately from the automated checks.
 
 ## 4. Clarify the notebook-only capture path
 
