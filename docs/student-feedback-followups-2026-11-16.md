@@ -19,6 +19,8 @@ That verification did reproduce a keyboard-access defect: WebKit skipped the rep
 Code blocks now have a named Tab focus target and visible focus indicator.
 The focused browser regression retains full observation/code text, checks the panel bounds, scrolls code with an arrow key and verifies that Tab leaves the block.
 The first worktree startup failure, unchanged-layout results and failing/passing keyboard checks are retained under ignored `.local/reviews/assistant-output-2026-11-16/evidence/`.
+The keyboard fix was committed and deployed as `8b8f193` on 17 November; link CI and deployment passed, followed by live Chromium keyboard checks at both widths with local-network permission granted.
+Live WebKit connectivity failed before reaching the code block; [task 9](#9-verify-the-live-companion-connection-in-safari) records that separate finding.
 
 Reproduce with a synthetic conversation containing long JSON keys, URLs and nested output, then expand the relevant observation or trace in the assistant.
 Inspect the panel and its scroll containers before changing [workspace styles](../site/styles/learning-workspace.css), [reply rendering](../site/scripts/learning-reply.ts) or [conversation presentation](../site/scripts/learning-agent-ui.ts).
@@ -28,14 +30,29 @@ Add a browser regression at that boundary with a long synthetic payload; a short
 
 ## 2. Make preformatted assistant output readable in every theme
 
-**Status: open; observed during the earlier visual review.** Preformatted assistant output was difficult to read in light, sepia and calm themes.
-No exact contrast ratio is retained in this ledger; measure the rendered foreground/background pair when reproducing it.
+**Status: closed after current-path verification on 17 November 2026; no style change required.** The earlier visual review reported difficult-to-read preformatted output in light, sepia and calm themes, without retaining exact color measurements.
+That problem did not reproduce on revision `8b8f193`.
 
-Check both fenced code in a reply and displayed observation/tool output, including the interaction between [book code styles](../site/styles/book.css) and [workspace styles](../site/styles/learning-workspace.css).
-Choose colors from the existing theme contract rather than fixing one theme with a hard-coded pair.
+The actual assistant panel is mounted under the page body, outside `.prose`.
+Its fenced replies and saved guide observations inherit the theme's `--text` foreground on `--panel`; recorded browser observations use `--text` on `--bg`.
+The separate [book code styles](../site/styles/book.css) therefore do not supply a conflicting foreground to the [assistant's code blocks](../site/styles/learning-workspace.css).
 
-Done when ordinary-size preformatted text meets a 4.5:1 contrast target in every supported theme and remains legible in the actual assistant panel.
-Keep screenshots and computed color measurements for the failing cases and the correction; also inspect normal book code blocks for regressions.
+An isolated companion and synthetic conversation exercised the real reply renderer, expanded browser observations and the Chapter guide's **Save demo result** flow without a model request.
+Chromium and WebKit passed all 80 surface/theme/viewport measurements at 1440 px and 390 px, covering all five themes and ordinary highlighted book code as well.
+The same audit passed all 40 live Chromium measurements with matching ratios after granting local-network permission in the disposable browser context; live WebKit was blocked by the separate connection issue in [task 9](#9-verify-the-live-companion-connection-in-safari).
+The following minimum contrast ratios exceed the 4.5:1 acceptance target; screenshots were also inspected for legibility.
+
+| Theme         | Fenced reply / saved guide output | Recorded browser observation | Sampled highlighted book code |
+| ------------- | --------------------------------- | ---------------------------- | ----------------------------- |
+| Light         | 16.66:1                           | 15.41:1                      | 9.02:1                        |
+| Dark          | 14.51:1                           | 16.33:1                      | 11.65:1                       |
+| Sepia         | 15.19:1                           | 13.43:1                      | 8.96:1                        |
+| High contrast | 20.38:1                           | 21.00:1                      | 12.60:1                       |
+| Calm          | 15.79:1                           | 14.59:1                      | 9.16:1                        |
+
+The audit script, per-sample computed colors, revision and screenshots are retained under ignored `.local/reviews/assistant-contrast-2026-11-17/`.
+This closes the current contrast check, without claiming to have identified or corrected the historical rendering.
+Reopen it if a specific failing page, payload or theme state is identified.
 
 ## 3. Make tool evidence easier to find and interpret
 
@@ -109,6 +126,23 @@ The retained local observations are `.local/reviews/establish-glm-setup/project-
 
 Done when the page has no document-level horizontal overflow at 390 px and nearby compact widths, while heading anchors, focus outlines and code-block scrolling remain usable.
 Check another reading page if the correction touches shared heading or layout styles.
+
+## 9. Verify the live companion connection in Safari
+
+**Status: open; discovered during the 17 November deployment check.** Playwright WebKit blocked requests from `https://scalableweb.dev` to an isolated HTTP loopback companion as insecure mixed content.
+The same engine completed the notebook and assistant workflows from a local HTTP site.
+This establishes a live-origin test failure, not a confirmed result for branded Safari or iOS Safari.
+
+Chromium's initial live connection also failed, but its diagnostic identified denied local-network permission; granting that permission in the disposable test context allowed the live desktop and mobile keyboard checks to pass.
+Keep that permission case separate from WebKit's mixed-content rejection.
+The initial failures and browser diagnostics are retained under ignored `.local/reviews/assistant-output-2026-11-17/` and `.local/reviews/assistant-contrast-2026-11-17/live/`.
+
+Rehearse the documented HTTPS-site connection in supported Safari versions with a disposable notebook and no provider key.
+Check the actual browser/version and permission behavior against [the browser-support scope](development.md#browser-support), [the setup guide](learning-companion-setup.md) and [the existing origin boundary](learning-workspace.md).
+
+Done when the supported live-site connection path and its browser limitations are verified and documented, with a regression at the HTTPS-to-loopback boundary where automation can represent it.
+Do not infer live connectivity from HTTP-only tests or recommend disabling browser security to make a test pass.
+If a transport change is required, evaluate it separately under the repository's architecture and ADR rules.
 
 ## Closing tasks
 
