@@ -980,6 +980,20 @@ export function createLearningPane(
           : "Connect your private notebook and choose whether you want assistant replies. Website sign-in is separate.",
       ),
     );
+    if (!connected && location.protocol === "https:") {
+      const browsers = node(
+        "p",
+        "For this website's local companion connection, use current Chrome on the same computer and allow local-network access when prompted. Safari can block this connection. ",
+        "learning-hint",
+      );
+      browsers.append(
+        link(
+          "Browser connection help",
+          "/notebook/setup/#browser-connection-support",
+        ),
+      );
+      container.append(browsers);
+    }
     if (needsSetup) {
       container.append(
         node(

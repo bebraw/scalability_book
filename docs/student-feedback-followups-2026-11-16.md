@@ -190,20 +190,32 @@ These local layout checks do not establish live Safari connectivity, which remai
 
 ## 9. Verify the live companion connection in Safari
 
-**Status: open; discovered during the 17 November deployment check.** Playwright WebKit blocked requests from `https://scalableweb.dev` to an isolated HTTP loopback companion as insecure mixed content.
-The same engine completed the notebook and assistant workflows from a local HTTP site.
-This establishes a live-origin test failure, not a confirmed result for branded Safari or iOS Safari.
+**Status: closed on 17 November 2026 with a verified connection limitation and recovery path.** A disposable session in actual Safari 27.2 (22625.2.8.11.9), on macOS 27.2.1, failed to connect from `https://scalableweb.dev` to a notebook-only HTTP loopback companion.
+No request, including preflight, reached the companion during that attempt.
+The same Safari session connected and saved synthetic writing from an allowed local HTTP site.
+Playwright WebKit 26.4 reproduced the live failure and explicitly reported blocked mixed content.
+This confirms the installed Safari connection limitation, not a result for every historical Safari version or iOS.
 
-Chromium's initial live connection also failed, but its diagnostic identified denied local-network permission; granting that permission in the disposable test context allowed the live desktop and mobile keyboard checks to pass.
-Keep that permission case separate from WebKit's mixed-content rejection.
-The initial failures and browser diagnostics are retained under ignored `.local/reviews/assistant-output-2026-11-17/` and `.local/reviews/assistant-contrast-2026-11-17/live/`.
+Chrome 157.0.8103.79 and Playwright Chromium 148.0.7778.96 connected from the deployed HTTPS site with local-network permission granted, saved synthetic notes and reopened their exact writing after reload.
+The existing denied-permission finding remains distinct from Safari's pre-request failure.
+The [setup guide](learning-companion-setup.md#browser-connection-support) and HTTPS connection screen now direct students to current Chrome on the same computer.
+Changing browsers can reuse the same running companion and stored notebook; unsaved drafts must be copied from the original tab.
+Safari remains within the ordinary reading/course browser baseline, but is not supported for this companion connection.
+The [workspace contract](learning-workspace.md) and [browser verification guidance](development.md#browser-to-companion-connection) record that scope.
+Network-error guidance retains uncertainty and explains that `doctor` checks local setup, not browser access.
 
-Rehearse the documented HTTPS-site connection in supported Safari versions with a disposable notebook and no provider key.
-Check the actual browser/version and permission behavior against [the browser-support scope](development.md#browser-support), [the setup guide](learning-companion-setup.md) and [the existing origin boundary](learning-workspace.md).
+A new Chromium regression presents the real reading client at a synthetic HTTPS origin while leaving all companion HTTP requests unmocked.
+It verifies exact Origin/CORS handling, notebook saving, disconnect/reload/reconnect, readable persisted writing and absence of model requests.
+Only website resources are fulfilled from the local development server; this exercises browser origin policy rather than TLS certificates, the deployed host or Safari.
+The independent live audit covers the deployed host with normal browser security and no provider credentials.
+The client check and HTTPS regression passed; four desktop/mobile inspections verified the guidance and help link in both panels without horizontal overflow.
+The rendered setup guidance, Worker build, types, HTML/local links and formatting also passed inspection or validation.
 
-Done when the supported live-site connection path and its browser limitations are verified and documented, with a regression at the HTTPS-to-loopback boundary where automation can represent it.
-Do not infer live connectivity from HTTP-only tests or recommend disabling browser security to make a test pass.
-If a transport change is required, evaluate it separately under the repository's architecture and ADR rules.
+Evidence, browser versions, request metadata and screenshots are retained under ignored `.local/reviews/safari-connection-2026-11-17/`.
+The Safari rehearsal uses programmatic DOM controls after WebDriver's native click did not open the panel; it verifies transport and persistence rather than native input usability.
+Retained audit failures also include a case-sensitive save-status check and an incorrect expectation that collapsed note text would be visible; the corrected read check opens Edit and inspects the writing field.
+The regression's first run omitted the nondefault address after Disconnect cleared it; the corrected fixture enters the same address again.
+No real student records, provider calls or browser-security overrides were used.
 
 ## 10. Wrap long tokens in paragraph feedback
 

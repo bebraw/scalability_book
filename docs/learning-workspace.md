@@ -206,6 +206,9 @@ npm run companion -- --origin http://127.0.0.1:3000
 ```
 
 The process binds to `127.0.0.1:8788` and prints its address and allowed website origins.
+The deployed HTTPS site's companion connection currently uses Chrome on that same computer, with local-network permission when requested.
+Safari can block this HTTP loopback transport; [browser connection support](learning-companion-setup.md#browser-connection-support) owns the student recovery path and [the development guide](development.md#browser-to-companion-connection) records verification limits.
+Changing browsers reconnects to the same stored notebook, but unsaved drafts remain in their original browser tab.
 In either panel's **Connect** section, enter that address if different from the default and choose **Connect companion**.
 No pairing code is generated or entered.
 The only default allowed website is `https://scalableweb.dev`; specify an exact origin for every development address.

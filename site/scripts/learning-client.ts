@@ -59,7 +59,7 @@ export class LearningClient {
       });
     } catch {
       throw new LearningConnectionError(
-        "The browser could not reach the companion. Check that it is running at this address, that this exact website origin is allowed, and that your browser permits local-network access. The browser cannot tell us which of these caused the failure. Run doctor in your terminal for local checks.",
+        "The browser could not reach the companion. Check that it is running at this address, that this exact website origin is allowed, and that your browser permits the website's local connection. The browser cannot tell us which of these caused the failure. Run doctor in your terminal for local setup checks; it cannot check browser access. See the connection help in the setup guide.",
         "network",
       );
     } finally {

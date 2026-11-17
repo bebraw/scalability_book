@@ -12,6 +12,7 @@ Reading the book does not require a companion or a model account.
 
 The standalone package is [@scalableweb/companion@0.4.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.4.0), maintained by bebraw.
 You need Node.js 24 or 26.
+For the notebook or assistant connection from `scalableweb.dev`, use current Chrome on the same computer as the companion; see [browser connection support](#browser-connection-support).
 Run the published package from any directory; npm downloads it when needed.
 Version 0.4.0 adds the [guided course project launcher](#start-a-course-coding-project), while retaining code-free connection and the macOS Codex authentication fix from 0.3.1.
 The older 0.2.0 package uses the previous pairing contract and cannot connect to this website client.
@@ -78,6 +79,18 @@ Published 0.4.0 passed clean-installation checks on macOS and Linux with Node 24
 Windows support has not been verified.
 The CLI prints your actual storage path; `--directory /absolute/path` selects a separate notebook.
 Keep the companion running while using the book; Ctrl+C stops it without removing your work.
+
+### Browser connection support
+
+Use current Chrome for the connection from this website to the companion, and allow local-network access when prompted.
+Safari is not currently supported for this connection: it can block the HTTPS book website from reaching the companion's local HTTP address.
+You can still read the book and use its online course features in Safari.
+The companion must run on the same computer as the browser; its `127.0.0.1` address on a phone refers to the phone, not your computer.
+
+If you have already started the companion, leave it running, open the book in Chrome and connect to the same address.
+Saved notes remain in that companion's notebook; you do not need another installation or a new notebook.
+Copy any unsaved writing before changing browsers because drafts belong to the original browser tab.
+Keep normal browser security settings enabled.
 
 ### Try the learning tutorial
 
@@ -444,6 +457,7 @@ npx --yes @scalableweb/companion@0.4.0 doctor
 ```
 
 It checks storage/schema compatibility, the loopback port, and your chosen provider: Codex prerequisites, local endpoint/model/context configuration, or a supplied API key and model listing.
+It does not run in your browser or test whether the book website can reach the companion; a successful report does not establish that connection.
 An available model catalog does not prove the key has generation access; only a deliberately sent message checks that.
 The report identifies the selected mode and always checks whether the Codex CLI version is available.
 Without a saved provider choice or an explicit option, `doctor` uses notebook-only mode.
@@ -469,8 +483,9 @@ For a storage permission error, select a writable private directory; do not rese
 In **Connect**, **Check connection** shows the package/protocol versions and storage path after connecting.
 After an expired session or restart, choose **Connect companion** again; your notebook and unsaved browser draft remain available.
 For an incompatible protocol, use the version shown in this guide and reload the book.
-Browser network errors cannot reliably distinguish a stopped process, an origin mismatch or denied local-network access.
+Browser network errors cannot reliably distinguish a stopped process, an origin mismatch, denied local-network access or a browser restriction on HTTPS-to-HTTP connections.
 Check that the companion is running, that its allowed websites include the exact book origin, and that your browser permits local access.
+For Safari or a persistent browser-side failure, follow [browser connection support](#browser-connection-support).
 
 `doctor --json` produces a local report containing versions, paths, allowed website origins and check results, without notes, conversations, provider diagnostics, credentials or connection tokens.
 Review its filesystem paths before deliberately sharing it for support.

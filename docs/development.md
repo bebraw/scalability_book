@@ -295,6 +295,30 @@ The runtime journeys use the installed Playwright Chromium and WebKit; they do n
 Passing them must not be reported as minimum-version certification.
 [ADR-056](adrs/implemented/ADR-056-align-browser-support-with-site-requirements.md) records the baseline rationale and evidence.
 
+### Browser-to-companion connection
+
+The site baseline does not establish support for the optional HTTPS-site connection to the HTTP loopback companion.
+The student path currently uses Chrome on the same computer, with local-network access allowed when requested.
+Safari is not supported for this connection; this restriction does not change the reading or online course baseline.
+See [the setup guide](learning-companion-setup.md#browser-connection-support) for recovery without moving the notebook.
+
+On 17 November 2026, Safari 27.2 on macOS failed to connect from the deployed HTTPS site before any request reached the companion, while the same browser connected and saved a synthetic note from an allowed local HTTP site.
+Playwright WebKit reproduced the live failure and explicitly reported blocked mixed content.
+Chrome 157.0.8103.79 and Playwright Chromium 148.0.7778.96 connected, saved and reopened synthetic notes through the deployed site with local-network permission granted.
+These results are consistent with [WebKit's open loopback mixed-content issue](https://bugs.webkit.org/show_bug.cgi?id=171934); they do not certify historical Safari versions or iOS.
+The separate `doctor` command checks local prerequisites, not browser network policy.
+
+Run the browser-origin regression with:
+
+```bash
+npx playwright test tests/e2e/learning-https-companion.spec.ts --project=chromium
+```
+
+It fulfills only website assets at a synthetic HTTPS origin and uses the real HTTP companion for connection, saving, disconnecting and reconnecting, with explicit local-network permission.
+This checks browser origin policy and the production client/server boundary; it does not test TLS certificates, the deployed host or Safari.
+For release verification, also rehearse the deployed HTTPS site with normal browser security, a disposable notebook and no model provider, recording the actual browser version and permission state.
+The routine HTTP-only journeys cannot replace that check.
+
 Run all configured browser-level checks with:
 
 ```bash
