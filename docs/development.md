@@ -233,6 +233,9 @@ The deployed site remains read-only because the editing API exists only in the l
 
 The standalone `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
 Keep code blocks and tables within that reading column at wide and narrow widths.
+The guide's minimum inline gutter reserves room for hanging heading links and their keyboard focus outlines.
+Long prose links can wrap within the guide's reading column.
+Neither guide should create document-level horizontal scrolling; long code remains scrollable inside its own block.
 Run `npx playwright test tests/e2e/book-layout.spec.ts --project=chromium --grep 'setup guides'` for the focused layout regression.
 
 ### Theme initialization

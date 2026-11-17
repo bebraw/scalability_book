@@ -67,10 +67,11 @@ test.describe("book reading layout", () => {
   test("keeps setup guides centered with contained code on wide and narrow screens", async ({
     page,
   }) => {
-    for (const width of [1600, 390]) {
+    for (const width of [390, 320, 375, 414, 1600]) {
       await page.setViewportSize({ width, height: 900 });
       for (const route of ["/agents/", "/notebook/setup/"]) {
         await page.goto(route);
+        await page.evaluate(() => document.fonts.ready);
         const main = page.getByRole("main");
         await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
         const mainBox = await main.boundingBox();
@@ -90,7 +91,90 @@ test.describe("book reading layout", () => {
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
         );
-        expect(overflow).toBeLessThanOrEqual(1);
+        expect(overflow, `${route} at ${width}px`).toBe(0);
+
+        const anchors = main.locator(".heading-anchor");
+        const anchorBounds = await anchors.evaluateAll((links) =>
+          links.map((link) => {
+            const box = link.getBoundingClientRect();
+            return {
+              label: link.getAttribute("aria-label"),
+              left: box.left,
+              right: box.right,
+            };
+          }),
+        );
+        expect(anchorBounds.length).toBeGreaterThan(0);
+        for (const bounds of anchorBounds) {
+          expect(
+            bounds.left,
+            bounds.label || "heading link",
+          ).toBeGreaterThanOrEqual(0);
+          expect(
+            bounds.right,
+            bounds.label || "heading link",
+          ).toBeLessThanOrEqual(width);
+        }
+
+        const anchor = main.locator("h2 .heading-anchor").first();
+        await anchor.focus();
+        await page.keyboard.press("Shift+Tab");
+        await page.keyboard.press("Tab");
+        await expect(anchor).toBeFocused();
+        await expect
+          .poll(() =>
+            anchor.evaluate((link) => Number(getComputedStyle(link).opacity)),
+          )
+          .toBeGreaterThan(0);
+        const focused = await anchor.evaluate((link) => {
+          const style = getComputedStyle(link);
+          const box = link.getBoundingClientRect();
+          const clearance =
+            parseFloat(style.outlineWidth) +
+            Math.max(0, parseFloat(style.outlineOffset));
+          return {
+            left: box.left - clearance,
+            right: box.right + clearance,
+            outline: style.outlineStyle,
+            outlineWidth: parseFloat(style.outlineWidth),
+          };
+        });
+        expect(focused.outline).not.toBe("none");
+        expect(focused.outlineWidth).toBeGreaterThan(0);
+        expect(focused.left).toBeGreaterThanOrEqual(0);
+        expect(focused.right).toBeLessThanOrEqual(width);
+        const destination = new URL(
+          (await anchor.getAttribute("href"))!,
+          page.url(),
+        ).href;
+        await page.keyboard.press("Tab");
+        await expect(anchor).not.toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(anchor).toBeFocused();
+        await page.keyboard.press("Enter");
+        await expect(page).toHaveURL(destination);
+
+        if (width < 600) {
+          const blocks = main.locator("pre");
+          const index = await blocks.evaluateAll((elements) =>
+            elements.findIndex(
+              (element) => element.scrollWidth > element.clientWidth,
+            ),
+          );
+          expect(
+            index,
+            `Expected a long code example on ${route}`,
+          ).toBeGreaterThanOrEqual(0);
+          const code = blocks.nth(index);
+          await expect(code).toHaveCSS("overflow-x", /auto|scroll/);
+          await code.evaluate((element) => {
+            element.scrollLeft = element.scrollWidth;
+          });
+          expect(
+            await code.evaluate((element) => element.scrollLeft),
+          ).toBeGreaterThan(0);
+          expect(await page.evaluate(() => window.scrollX)).toBe(0);
+        }
       }
     }
   });

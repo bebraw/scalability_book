@@ -167,15 +167,26 @@ Record any remaining confusion before closing this item; [run-specific orientati
 
 ## 8. Remove the setup guide's small mobile overflow
 
-**Status: open; reproduced during the setup-guide browser review.** At a 390 px viewport, the document reported a 391 px scroll width.
-Removing the new course-project section did not remove the extra pixel, so the issue predates that section.
-Heading-anchor positioning is a suspected cause, not a confirmed diagnosis.
+**Status: closed on 17 November 2026 after reproducing and correcting the guide layout.** Both `/notebook/setup/` and `/agents/` reported a 391 px scroll width at a 390 px viewport in Chromium and WebKit.
+The hanging heading link extended to 390.97 px because the guide's 16 px gutter did not reserve enough space for it.
+A reduced heading-only example reproduced the overflow; hiding the link removed it.
+The course-project section was not the cause.
 
-Reproduce on `/notebook/setup/` at that width, identify the element crossing the document boundary and reduce the cause before editing shared layout.
-The retained local observations are `.local/reviews/establish-glm-setup/project-setup-browser.json` and `.local/course-preparation/companion-codex-reuse-2026-11-16/browser-review.log`.
+The [guide container](../site/styles/layout.css) now reserves a minimum 24 px inline gutter, keeping the link and its visible keyboard focus outline inside the viewport.
+A separate 320 px check exposed an unbroken prose URL on `/agents/`; guide prose links can now wrap within the reading column.
+Long code remains horizontally scrollable within its own block.
+The [layout contract](development.md#setup-guide-layout) records these requirements.
 
-Done when the page has no document-level horizontal overflow at 390 px and nearby compact widths, while heading anchors, focus outlines and code-block scrolling remain usable.
-Check another reading page if the correction touches shared heading or layout styles.
+The focused browser regression replaces its former one-pixel overflow tolerance with an exact zero check, and verifies heading-link bounds, keyboard entry/exit, visible focus, fragment activation and contained code scrolling at five widths on both guides.
+All ten route/width combinations passed.
+An additional Chromium/WebKit audit passed all 28 cases: both guides at 320, 360, 375, 390, 414 and 1600 px, plus an ordinary reading chapter at 390 and 1600 px in both engines.
+The audit also exercised horizontal wheel scrolling inside long code blocks without moving the page.
+Mobile and desktop screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+
+Evidence is retained under ignored `.local/reviews/setup-overflow-2026-11-17/`, including the original one-pixel regression and the narrower long-URL failure.
+Diagnostic failures are retained separately from product failures: a reduced-motion probe read padding during its transition, and an initial keyboard check assumed that Enter preserved anchor focus after fragment navigation.
+The corrected checks wait for settled layout and check keyboard exit before activation; WebKit uses its observed Option-Tab link-navigation mode.
+These local layout checks do not establish live Safari connectivity, which remains [task 9](#9-verify-the-live-companion-connection-in-safari).
 
 ## 9. Verify the live companion connection in Safari
 
