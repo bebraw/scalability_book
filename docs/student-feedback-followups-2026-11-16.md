@@ -219,12 +219,25 @@ No real student records, provider calls or browser-security overrides were used.
 
 ## 10. Wrap long tokens in paragraph feedback
 
-**Status: open; reproduced during the 17 November audience check.** At 1440 × 900, a synthetic unbroken token such as `PRIVATE_BROWSER_chromium-desktop` expands a related-feedback card and its grid track beyond the 238 px panel interior, producing a 287 px scroll width and clipping nearby controls.
-The same result occurred with the baseline `84b98f5` comment renderer and the audience-copy change; ordinary spaced feedback stayed within the panel.
+**Status: closed on 17 November 2026 after reproducing and correcting intrinsic text sizing.** At 1440 × 900, `PRIVATE_BROWSER_chromium-desktop` expanded the related-feedback panel's single grid column to 262.77 px, producing a 287 px scroll width inside its 238 px interior in both Chromium and WebKit.
+A reduced panel containing one card reproduced the cause independently of the page layout and comment scripts.
+Removing the card's automatic minimum width alone left overflowing text; `overflow-wrap: break-word` alone retained the oversized grid column.
 
-Reduce the card's minimum-content sizing in [feedback styles](../site/styles/feedback.css) before choosing a wrapping or layout correction.
-Done when long words, URLs and author names remain readable without pushing the related-feedback panel or its controls sideways on desktop and compact screens.
-The baseline/candidate screenshots and measurements are retained as `overflow-comparison.json` and `*-long-token-overflow.png` under ignored `.local/reviews/feedback-audience-2026-11-17/`.
+[Feedback cards](../site/styles/feedback.css) now use `overflow-wrap: anywhere`, which both reduces their minimum-content width and permits long text to wrap.
+Nested reply bodies and author names inherit that behavior.
+The panel now reports matching 238 px client and scroll widths on desktop, with every text line contained and the header and moderation controls reachable.
+The complete literal writing, URLs and names are retained, as required by [the feedback contract](feedback-setup.md#5-student-feedback-flow).
+
+Six new browser cases cover the original moderate token and a long URL/author/reply fixture at 1440, 390 and 320 px.
+Five failed before the correction; the original token already fitted at 390 px.
+The checks reject clipped-text workarounds by inspecting visible text and its line bounds, and exercise keyboard navigation, moderation controls, closing and adding another comment.
+All 14 feedback and moderation browser tests passed after the correction.
+An independent audit through the actual Worker handlers passed all 12 Chromium/WebKit cases across those widths for both authors and administrators, using synthetic records and no external requests.
+Screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+
+The reduced comparisons, failing and passing checks, measurements and screenshots are retained under ignored `.local/reviews/feedback-overflow-2026-11-17/`; the earlier baseline comparison remains under `.local/reviews/feedback-audience-2026-11-17/`.
+One post-fix keyboard assertion exposed 0.17 px of stable vertical rounding at the Feature button after native scrolling; its corrected vertical check waits for smooth focus scrolling to settle and allows one CSS pixel while horizontal containment remains exact.
+This is separate from the original horizontal overflow; the failure and measured bounds are retained.
 
 ## 11. Check logged-out access to public Reader notes
 

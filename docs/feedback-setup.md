@@ -124,6 +124,7 @@ Opening the form focuses the audience explanation so it stays in view; Tab then 
 The anonymous checkbox changes the displayed name to **Anonymous student**; its description states that the GitHub identity remains stored in KV and accessible to feedback administrators.
 It does not remove identity from the stored record or its admin API response.
 After posting, a visible confirmation in the related-feedback panel says the feedback was sent to the book's feedback team and that replies can be read there.
+Long words, URLs and author names wrap within feedback cards and their replies, preserving the complete text without widening the related-feedback panel or pushing its controls sideways.
 
 Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs.
 These are stored as chapter-level feedback.

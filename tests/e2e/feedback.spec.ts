@@ -134,6 +134,180 @@ test.describe("paragraph feedback", () => {
     await target.click({ position: { x: 12, y: 12 } });
     await expect(target).not.toHaveClass(/is-feedback-selected/);
   });
+
+  for (const width of [1440, 390, 320]) {
+    for (const fixture of [
+      {
+        name: "an ordinary unbroken token",
+        body: "PRIVATE_BROWSER_chromium-desktop: Synthetic paragraph feedback.",
+        author: "synthetic-reader",
+        replies: [],
+      },
+      {
+        name: "a long URL, author and reply",
+        body: `https://example.invalid/feedback/${"a".repeat(96)}?trace=${"b".repeat(64)}`,
+        author: "syntheticstudentwithaverylongloginname",
+        replies: [
+          {
+            author: { login: "syntheticreviewerwithaverylongloginname" },
+            body: `SYNTHETIC_REPLY_${"trace".repeat(18)}`,
+            createdAt: "2026-11-17T08:00:00.000Z",
+          },
+        ],
+      },
+    ]) {
+      test(`contains ${fixture.name} in related feedback at ${width}px`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        const paragraphId = await page
+          .locator("[data-comment-button]")
+          .first()
+          .getAttribute("data-comment-button");
+        expect(paragraphId).toBeTruthy();
+        await page.route("**/api/comments?chapter=introduction", (route) =>
+          route.fulfill({
+            json: [
+              {
+                id: "synthetic-overflow-comment",
+                chapter: "introduction",
+                paragraphId,
+                category: "missing-example",
+                body: fixture.body,
+                author: { login: fixture.author },
+                createdAt: "2026-11-17T07:00:00.000Z",
+                replies: fixture.replies,
+              },
+            ],
+          }),
+        );
+        await page.reload();
+        await waitForFeedback(page);
+        await page.evaluate(() => document.fonts.ready);
+        await page.locator(`[data-comment-button="${paragraphId}"]`).click();
+        const panel = page.locator("[data-paragraph-feedback-panel]");
+        const card = panel.locator(".paragraph-feedback-card");
+        await expect(card.locator(":scope > p")).toHaveText(fixture.body);
+        await expect(card.locator(":scope > p")).toBeVisible();
+        await expect(card.locator(":scope > .comment-meta strong")).toHaveText(
+          fixture.author,
+        );
+        if (fixture.replies.length) {
+          await expect(card.locator(".comment-reply p")).toHaveText(
+            fixture.replies[0].body,
+          );
+          await expect(card.locator(".comment-reply p")).toBeVisible();
+          await expect(
+            card.locator(".comment-reply .comment-meta strong"),
+          ).toHaveText(fixture.replies[0].author.login);
+        }
+        const geometry = await panel.evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+          const lines = Array.from(
+            element.querySelectorAll(".comment-card p, .comment-meta strong"),
+          ).flatMap((text) => {
+            const range = document.createRange();
+            range.selectNodeContents(text);
+            return Array.from(range.getClientRects(), (rect) => ({
+              left: rect.left,
+              right: rect.right,
+            }));
+          });
+          return {
+            left: bounds.left,
+            right: bounds.right,
+            client: element.clientWidth,
+            scroll: element.scrollWidth,
+            pageClient: document.documentElement.clientWidth,
+            pageScroll: document.documentElement.scrollWidth,
+            lines,
+          };
+        });
+        expect(geometry.scroll).toBe(geometry.client);
+        expect(geometry.pageScroll).toBe(geometry.pageClient);
+        expect(geometry.left).toBeGreaterThanOrEqual(0);
+        expect(geometry.right).toBeLessThanOrEqual(width);
+        expect(geometry.lines.length).toBeGreaterThan(0);
+        for (const line of geometry.lines) {
+          expect(line.left).toBeGreaterThanOrEqual(geometry.left);
+          expect(line.right).toBeLessThanOrEqual(geometry.right);
+        }
+
+        const reply = card.getByRole("button", { name: "Reply", exact: true });
+        await reply.focus();
+        await expect(reply).toBeFocused();
+        await expect(reply).toBeInViewport({ ratio: 1 });
+        await page.keyboard.press("Tab");
+        const more = card.locator("summary");
+        await expect(more).toBeFocused();
+        await expect(more).toBeInViewport({ ratio: 1 });
+        await page.keyboard.press("Enter");
+        await page.keyboard.press("Tab");
+        const feature = card.getByRole("button", {
+          name: "Feature",
+          exact: true,
+        });
+        await expect(feature).toBeFocused();
+        await expect(feature).toBeInViewport();
+        const readControl = () =>
+          feature.evaluate((button) => {
+            const bounds = button.getBoundingClientRect();
+            const panel = button.closest("[data-paragraph-feedback-panel]")!;
+            const parent = panel.getBoundingClientRect();
+            const style = getComputedStyle(panel);
+            return {
+              left: bounds.left,
+              right: bounds.right,
+              top: bounds.top,
+              bottom: bounds.bottom,
+              visibleLeft: Math.max(
+                0,
+                parent.left + parseFloat(style.borderLeftWidth),
+              ),
+              visibleRight: Math.min(
+                innerWidth,
+                parent.right - parseFloat(style.borderRightWidth),
+              ),
+              visibleTop: Math.max(
+                0,
+                parent.top + parseFloat(style.borderTopWidth),
+              ),
+              visibleBottom: Math.min(
+                innerHeight,
+                parent.bottom - parseFloat(style.borderBottomWidth),
+              ),
+            };
+          });
+        const control = await readControl();
+        expect(control.left).toBeGreaterThanOrEqual(control.visibleLeft);
+        expect(control.right).toBeLessThanOrEqual(control.visibleRight);
+        // Native focus scrolling rounds scrollTop to whole pixels. Allow only
+        // that vertical rounding after scrolling settles; horizontal containment
+        // remains exact.
+        await expect
+          .poll(async () => {
+            const settled = await readControl();
+            return Math.max(
+              0,
+              settled.visibleTop - settled.top,
+              settled.bottom - settled.visibleBottom,
+            );
+          })
+          .toBeLessThanOrEqual(1);
+        expect(await panel.evaluate((element) => element.scrollLeft)).toBe(0);
+        await panel
+          .getByRole("button", { name: "Close related feedback" })
+          .click();
+        await expect(panel).toHaveCount(0);
+        await page.locator(`[data-comment-button="${paragraphId}"]`).click();
+        await page
+          .locator("[data-paragraph-feedback-panel]")
+          .getByRole("button", { name: "Add comment" })
+          .click();
+        await expect(page.locator("[data-comment-form]")).toBeVisible();
+      });
+    }
+  }
 });
 
 test("hides reflection prompts for logged-out readers", async ({ page }) => {
