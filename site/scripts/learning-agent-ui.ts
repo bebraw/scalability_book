@@ -4,7 +4,11 @@ import {
   type LearningSource,
   type NotebookEntry,
 } from "../../shared/learning-workspace.ts";
-import type { AssistantDraft } from "./learning-session.ts";
+import type {
+  AssistantDraft,
+  NotebookDraftPreview,
+} from "./learning-session.ts";
+import { mountLearningNotePreview } from "./learning-note-preview.ts";
 import { renderLearningReply } from "./learning-reply.ts";
 import {
   captureLearningEvidence,
@@ -63,6 +67,8 @@ interface Options {
   connect: () => void;
   toolMode?: "none" | "native";
   draft: AssistantDraft;
+  preview: () => NotebookDraftPreview | null;
+  previewChanged: (preview: NotebookDraftPreview) => void;
   source: () => LearningSource;
   selected: () => string[];
   entries: NotebookEntry[];
@@ -420,7 +426,13 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       options.status("Stopped. Your saved thinking is retained.");
     }),
   );
-  container.append(actions, messages);
+  const previewContainer = element("div");
+  container.append(actions, previewContainer, messages);
+  const notePreview = mountLearningNotePreview(previewContainer, {
+    read: options.preview,
+    changed: options.previewChanged,
+    accept: options.accept,
+  });
   let renderedMessages = "";
   function draw() {
     drawContext();
@@ -453,8 +465,9 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     url.hash = conversation.source.anchor;
     sourceLink.href = url.href;
     messages.append(sourceLink);
+    const selectedConversation = conversation;
     for (const { message, observations } of groupLearningMessages(
-      conversation.messages,
+      selectedConversation.messages,
     )) {
       const evidence = observations.length
         ? renderLearningEvidence(observations, evidenceState)
@@ -503,32 +516,40 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
           card.append(
             Object.assign(element("p", notice), { className: "learning-hint" }),
           );
-        const student = conversation.messages
-          .slice(0, conversation.messages.indexOf(message))
+        const student = selectedConversation.messages
+          .slice(0, selectedConversation.messages.indexOf(message))
           .reverse()
           .find((item) => item.role === "student");
         const relatedIds = student?.noteIds ?? [];
         const teaching = message.teaching
           ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}${message.teaching.provider.model ? `; model ${message.teaching.provider.model}` : ""}`
           : "; teaching policy not recorded";
-        const provenance = `Assistant suggestion; conversation ${conversation.id}; message ${message.id}${teaching}; reviewed by student before saving`;
+        const prepare = button("Use as a notebook draft", () =>
+          notePreview.open({
+            conversationId: selectedConversation.id,
+            replyId: message.id,
+            studentId: student?.id ?? null,
+            source: selectedConversation.source,
+            relatedIds,
+            teaching,
+            studentText: student?.text ?? "",
+            replyText: message.text,
+            includeStudent: Boolean(student),
+            includeReply: true,
+            open: true,
+          }),
+        );
+        prepare.dataset.learningNotebookReply = message.id;
         card.append(
           button("Write a takeaway", () =>
             options.accept(
               "",
-              `Student-written takeaway after discussion; conversation ${conversation!.id}; message ${message.id}${teaching}`,
-              conversation!.source,
+              `Student-written takeaway after discussion; conversation ${selectedConversation.id}; message ${message.id}${teaching}`,
+              selectedConversation.source,
               relatedIds,
             ),
           ),
-          button("Use as a notebook draft", () =>
-            options.accept(
-              message.text,
-              provenance,
-              conversation!.source,
-              relatedIds,
-            ),
-          ),
+          prepare,
         );
       }
       messages.append(card);

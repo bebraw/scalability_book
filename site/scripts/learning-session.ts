@@ -1,7 +1,9 @@
 import {
+  learningAssert,
   learningObject,
   learningText,
   learningId,
+  learningList,
   noteKinds,
   parseLearningSource,
   type LearningSource,
@@ -42,6 +44,19 @@ export interface AssistantDraft {
   mode: HelpMode;
   supportNeed: SupportNeed;
 }
+export interface NotebookDraftPreview {
+  conversationId: string;
+  replyId: string;
+  studentId: string | null;
+  source: LearningSource;
+  relatedIds: string[];
+  teaching: string;
+  studentText: string;
+  replyText: string;
+  includeStudent: boolean;
+  includeReply: boolean;
+  open: boolean;
+}
 export type NotebookSection = "write" | "notes" | "concepts" | "prepare";
 export type AssistantSection = "agent" | "guide" | "peers";
 export const notebookSections: NotebookSection[] = [
@@ -75,11 +90,42 @@ export interface SessionState {
   assistantPaneView: AssistantSection | "connect";
   assistantSelected: string[];
   editor: NotebookEditor | null;
+  notePreview: NotebookDraftPreview | null;
   assistance: string | null;
   preparation: string;
   selected: string[];
 }
 const key = "book-learning-workspace";
+function parseNotebookDraftPreview(value: unknown): NotebookDraftPreview {
+  const saved = learningObject(value);
+  const text = (value: unknown, maximum: number): string => {
+    learningAssert(
+      typeof value === "string" && value.length <= maximum,
+      `Preview text must fit within ${maximum} characters.`,
+    );
+    // Preserve editable text verbatim, including unfinished whitespace.
+    return value;
+  };
+  learningAssert(
+    typeof saved.includeStudent === "boolean" &&
+      typeof saved.includeReply === "boolean" &&
+      typeof saved.open === "boolean",
+    "Preview choices must be boolean values.",
+  );
+  return {
+    conversationId: learningId(saved.conversationId),
+    replyId: learningId(saved.replyId),
+    studentId: saved.studentId === null ? null : learningId(saved.studentId),
+    source: parseLearningSource(saved.source),
+    relatedIds: learningList(saved.relatedIds, 100).map(learningId),
+    teaching: text(saved.teaching, 2000),
+    studentText: text(saved.studentText, 32_000),
+    replyText: text(saved.replyText, 32_000),
+    includeStudent: saved.includeStudent,
+    includeReply: saved.includeReply,
+    open: saved.open,
+  };
+}
 export function readNotebookSession(): SessionState {
   const fallback: SessionState = {
     open: false,
@@ -94,6 +140,7 @@ export function readNotebookSession(): SessionState {
     assistantPaneView: "agent",
     assistantSelected: [],
     editor: null,
+    notePreview: null,
     assistance: null,
     preparation: "",
     selected: [],
@@ -166,6 +213,13 @@ export function readNotebookSession(): SessionState {
     } catch {
       /* An unusable assistant draft does not discard notebook writing. */
     }
+    let notePreview: NotebookDraftPreview | null = null;
+    try {
+      if (value.notePreview != null)
+        notePreview = parseNotebookDraftPreview(value.notePreview);
+    } catch {
+      /* An unusable preview does not discard either independent draft. */
+    }
     const experience =
       value.experience === "assistant" || value.experience === "notebook"
         ? value.experience
@@ -223,6 +277,7 @@ export function readNotebookSession(): SessionState {
       ),
       assistant,
       editor,
+      notePreview,
       assistance:
         typeof value.assistance === "string"
           ? value.assistance.slice(0, 2000)
@@ -247,6 +302,7 @@ export function saveNotebookSession(
     | "notebookPaneView"
     | "assistantPaneView"
     | "assistantSelected"
+    | "notePreview"
   > &
     Partial<
       Pick<
@@ -260,6 +316,7 @@ export function saveNotebookSession(
         | "notebookPaneView"
         | "assistantPaneView"
         | "assistantSelected"
+        | "notePreview"
       >
     >,
 ) {

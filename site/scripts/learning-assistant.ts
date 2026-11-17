@@ -5,7 +5,11 @@ import type {
   LearningSource,
 } from "../../shared/learning-workspace.ts";
 import type { LearningClient } from "./learning-client.ts";
-import type { AssistantDraft, AssistantSection } from "./learning-session.ts";
+import type {
+  AssistantDraft,
+  AssistantSection,
+  NotebookDraftPreview,
+} from "./learning-session.ts";
 import { currentReading, pageSource } from "./learning-context.ts";
 import { mountLearningGuide } from "./learning-guide.ts";
 import { mountLearningAgent } from "./learning-agent-ui.ts";
@@ -19,6 +23,8 @@ interface Options {
   toolMode?: "none" | "native";
   entries: NotebookEntry[];
   draft: AssistantDraft;
+  preview: () => NotebookDraftPreview | null;
+  previewChanged: (preview: NotebookDraftPreview) => void;
   source: () => LearningSource;
   selected: () => string[];
   active: () => boolean;
@@ -95,6 +101,8 @@ export function mountLearningAssistant(
       connect: options.connect,
       ...(options.toolMode ? { toolMode: options.toolMode } : {}),
       draft: options.draft,
+      preview: options.preview,
+      previewChanged: options.previewChanged,
       source: pageSource,
       entries: options.entries,
       selected: options.selected,
@@ -109,14 +117,21 @@ export function mountLearningAssistant(
           question: "",
           noteIds: options.selected(),
         }),
-      accept: (body, assistance, source, relatedIds) =>
+      accept: (body, assistance, source, relatedIds) => {
+        if (body.length > 16_000) {
+          options.status(
+            "Shorten the notebook draft to 16,000 characters before preparing it.",
+          );
+          return;
+        }
         options.write({
           source,
           relatedIds,
           kind: "reflection",
           title: `Takeaway: ${source.title}`.slice(0, 300),
-          body: body.slice(0, 16_000),
+          body,
           assistance,
-        }),
+        });
+      },
     });
 }

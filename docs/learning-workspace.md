@@ -60,6 +60,8 @@ Independent open states, foreground experience, remembered sections, unfinished 
 Assistant state also retains the captured source, active conversation ID and initiating browser identity for resuming bounded requests after navigation.
 Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant and restore their single open experience.
 Additive version 1 fields retain both panels and independent selections without migrating notebook or conversation databases.
+A separate optional `notePreview` retains one selected-exchange preview, its source/message identities, choices and editable text across reloads and navigation, independently of the active discussion.
+Each text field is bounded at 32,000 characters so an over-limit reply can be reviewed without truncation; an invalid preview is discarded without discarding Notebook writing or the assistant message draft.
 Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
 This includes **Notes → Edit** and **Notes → Revisit**; cancelling preserves the unfinished draft, while accepting clears the previous save confirmation.
 Guide and concept choices follow the current reading; peer inquiry uses the current page or its captured passage.
@@ -73,8 +75,16 @@ There is no experience chooser within the panels.
 Checking notes in Notebook does not change the assistant's selected context; an explicit discussion handoff supplies the chosen set.
 Shared record refreshes preserve the assistant's unsent message and ongoing discussion.
 **Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
-An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
-Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
+An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft**, which previews the chosen reply with its nearest preceding student question or response.
+The learner can edit or omit either part; a legacy reply without a preceding student turn offers only the recorded reply.
+The preview retains the selected exchange's full source, actual turn-supplied note IDs and recorded teaching provenance, excluding other turns and browser observations.
+If reply metadata would exceed the existing 2,000-character assistance-history limit, the preview explains that the metadata will be marked as shortened; conversation/message identities are retained and the original reply remains the source for its full metadata.
+It stays outside the polling message list so later replies cannot overwrite its edits or move focus; selecting another exchange asks before replacing it.
+Closing the preview retains its edits in the tab, and reopening that exchange restores them.
+**Prepare notebook draft** hands over the selected literal text with speaker labels, without saving; the displayed 16,000-character limit includes those labels and blocks an over-limit handoff until the learner shortens or omits text.
+No draft text is silently truncated.
+Either handoff asks before replacing unfinished Notebook writing; declining replacement preserves both drafts, and only the student's **Save note** action creates the notebook record.
+[learning-note-preview.ts](../site/scripts/learning-note-preview.ts) owns this presentation within the existing selected-evidence boundary of ADR-034; no companion schema, protocol or provider change is required.
 Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
 Long code lines scroll within their code block; each block is a named keyboard focus target with a visible focus indicator, so arrow keys can reveal the complete text and Tab can leave the block.
 Expanded browser observations wrap within the assistant panel and retain their full recorded text.
@@ -87,7 +97,7 @@ These records cover successful browser observations and approved demo changes, n
 [learning-evidence.ts](../site/scripts/learning-evidence.ts) owns this grouping and disclosure presentation; conversation storage and tool execution remain unchanged.
 [learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
 Unsupported equations retain their original notation.
-Conversation storage and reviewed notebook drafts retain the original reply text; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records this presentation boundary.
+Conversation storage retains the original reply text, and notebook previews start from that literal text before the learner's edits and selection; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records the reply presentation boundary.
 Optional Codex, API and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
 Codex and explicitly selected native API/local tools use the same bounded browser broker; discussion-only providers have no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.

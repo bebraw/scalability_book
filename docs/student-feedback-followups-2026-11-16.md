@@ -20,6 +20,10 @@ The trace-reading disclosure was pushed as `35fe859` on 17 November; all six CI/
 Eight live Chrome/WebKit checks passed across the chapter and gallery at desktop/mobile widths using actual published assets, with no production API writes.
 Evidence is retained under ignored `.local/reviews/deployment-35fe859-2026-11-17/`.
 
+The trace-record containment fix was pushed as `727dad2` on 17 November; published-link CI and Cloudflare deployment passed for that commit.
+Twelve live Chromium/WebKit checks passed across the chapter and gallery at 1440, 390 and 320 px, verifying full records, contained scrolling, keyboard access and span replacement with the published assets and no production API writes.
+Evidence is retained under ignored `.local/reviews/deployment-727dad2-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -322,31 +326,68 @@ The separate WebKit audit reproduced a missed instantaneous synthetic arrow pres
 Held keys and observed animation completion reached the last character without changing the page's keyboard behavior; the corrected audit uses that bounded sequence.
 Initial failures, reduced comparisons, exact geometry, successful checks and screenshots are retained under ignored `.local/reviews/trace-record-2026-11-17/`.
 
+## 14. Preserve the learner's thinking in a reviewed notebook draft
+
+**Status: implemented on 17 November 2026 with explicit exchange review.** The selected-suggestion handoff copied only the assistant reply, losing the learner's question or response from the proposed note.
+It also silently cut reply text to the Notebook's 16,000-character limit.
+
+**Use as a notebook draft** now opens a preview of the selected reply and its nearest preceding student turn, with separate editable fields and inclusion controls.
+**Prepare notebook draft** retains the chosen text with speaker labels, the original source and available supplied-note relationships; other turns and browser observations are excluded.
+The preview counts the complete body including labels and blocks an over-limit handoff until the learner edits or omits material.
+**Write a takeaway** still opens a blank personal draft, and only **Save note** creates a notebook record.
+
+[Preview presentation](../site/scripts/learning-note-preview.ts) owns the selected exchange; the existing tab session preserves its edits independently of polling, navigation and the active discussion.
+Closing and reopening the same preview retains the edits, and selecting another exchange asks before replacement.
+The existing Notebook replacement guard preserves both drafts when cancelled.
+The [workspace contract](learning-workspace.md) and [setup guide](learning-companion-setup.md#capture-and-revisit-your-thinking) document the flow within ADR-034's selected-evidence boundary; no companion release or provider change is required.
+
+Nine unit checks passed for session continuity, literal text, selected speakers, legacy replies, exact assistance-history boundaries and explicit shortening of oversized metadata while retaining message identities.
+Eight focused Chromium/WebKit browser checks passed, including polling/reload continuity, replacement cancellation, full source/context retention, actual save/export and the exact 16,000/16,001-character boundary.
+Six additional panel/session continuity checks passed; two existing **New note** visibility checks failed in both browsers and reproduced unchanged on the pushed revision, as recorded in [task 26](#26-bring-new-note-context-into-the-visible-notebook-area).
+Four built-page desktop/mobile checks passed across both engines, including eight scoped accessibility checks, horizontal containment, editable/omitted parts and an actual notebook save without preview-triggered writes or model requests.
+Screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+The full link check found no broken links and 14 inconclusive external destinations due to access blocks or service errors.
+
+Three baseline cases reached the old reply-only handoff and failed for the missing preview; the fourth stopped at a fixture connection race, so it is not evidence of the product defect.
+Later fixture corrections waited for connection/save completion and reselected an omitted field before editing it; the disabled-field behavior remains intentional.
+Initial failures and passing checks are retained under ignored `.local/reviews/notebook-exchange-2026-11-17/`.
+The opt-in real-provider test was updated for the new review step but was not run; synthetic conversations and disposable notebook storage supplied all records.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
 These are open review items, not accepted feature designs or assertions that the current implementation is defective.
 Reproduce each behavior or review the current teaching contract before choosing a change.
 
-| Task | Finding and next check                                                                                                                                                           | Relevant owner                                                                                                          |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 14   | Review an explicit, previewable notebook handoff that includes the learner's questions and responses; the selected-suggestion contract currently copies only the assistant reply | [Assistant presentation](../site/scripts/learning-agent-ui.ts) and [workspace contract](learning-workspace.md)          |
-| 15   | Check whether Chapter 1's concept link supplies a practical method for deciding whether an architectural choice is reversible                                                    | [Chapter 1](../book/01_establish/01_what_is_scalability.md)                                                             |
-| 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                            | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
-| 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                             | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
-| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                                     | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |
-| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                                      | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)         |
-| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                         | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                            |
-| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                                  | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)             |
-| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests          | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts)    |
-| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                            | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
-| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                                  | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
-| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                          | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                          |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 15   | Check whether Chapter 1's concept link supplies a practical method for deciding whether an architectural choice is reversible                                           | [Chapter 1](../book/01_establish/01_what_is_scalability.md)                                                             |
+| 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                   | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
+| 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                    | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
+| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |
+| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)         |
+| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                            |
+| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)             |
+| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts)    |
+| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                         | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                 | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
 
 The kickoff feedback also reported a GitHub OAuth 404.
 The anonymous live entry check on 17 November followed Account → GitHub authorization → GitHub sign-in with statuses 302 → 302 → 200, so the reported 404 did not reproduce.
 No sign-in, consent or callback was performed; a completed authenticated round trip remains unverified by this check, and no historical cause is inferred.
 Sanitized evidence is retained under ignored `.local/reviews/github-signin-2026-11-17/` without OAuth state, cookies or credentials.
+
+## 26. Bring New note context into the visible Notebook area
+
+**Status: open; discovered during task 14's continuity checks on 17 November 2026.** With both panels open at 1280 × 720, choosing **New note** resets the Notebook's scroll position to zero, but the **Note context** section remains below its visible area.
+The reduced Chromium/WebKit reproduction measured the Notebook content viewport at y=223.0–341.4 and the context starting at y=343.8/343.7 respectively.
+The context is still reachable by scrolling; the existing test expects it to be in view immediately after the action.
+
+The same reproduction on exact revision `727dad2` produced identical geometry, establishing that this predates the exchange preview.
+Review the [Notebook presentation](../site/scripts/learning-pane.ts) reset/scroll target and its [workspace layout](../site/styles/learning-workspace.css), including the existing introductory content, before choosing a correction.
+Keep the failed assertion; done means the new note's source is visibly presented after the action at this height and compact widths, without losing the independent assistant state or keyboard focus.
+The failed continuity run and reduced working-copy/HEAD comparison are retained under ignored `.local/reviews/notebook-exchange-2026-11-17/continuity-diagnosis/`.
 
 ## Closing tasks
 

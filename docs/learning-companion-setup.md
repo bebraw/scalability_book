@@ -305,9 +305,13 @@ Use **Notes → Discuss this note** to discuss one note, or select entries and c
 Discuss shows the source and selected notebook context before sending; choosing another chapter does not retarget a retained conversation silently.
 Sending a question shares that source and those selected entries with your model provider.
 You can reopen saved conversations, stop a reply, or keep using the notebook without a model.
-**Write a takeaway** opens a blank personal draft; **Use as a notebook draft** prepares the selected suggestion for review and revision.
-Both retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
-Choose **Save note** to keep your own account; a conversation is not saved as a reflection automatically.
+**Write a takeaway** opens a blank personal draft.
+**Use as a notebook draft** previews your question or response alongside the selected assistant reply.
+Edit either part or uncheck it, then choose **Prepare notebook draft**; the draft keeps speaker labels so your thinking and the assistant's suggestion remain distinguishable.
+The preview shows the complete text and its count, and asks you to shorten or omit material if the draft exceeds 16,000 characters.
+Both paths retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
+Choose **Save note** to keep your reviewed account.
+Your preview stays in this browser tab as you navigate, reload or close the preview; save the note before closing the tab.
 Companion 0.4.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.

@@ -1,8 +1,9 @@
-import test from "node:test";
+import test, { type TestContext } from "node:test";
 import assert from "node:assert/strict";
 import {
   readNotebookSession,
   saveNotebookSession,
+  type NotebookDraftPreview,
 } from "../site/scripts/learning-session.ts";
 
 test("tab continuity retains unfinished writing and preparation, rejecting unusable sources without rewriting the stored record", (t) => {
@@ -63,6 +64,7 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
   assert.equal(restored.experience, "notebook");
   assert.equal(restored.notebookView, "write");
   assert.equal(restored.assistant, null);
+  assert.equal(restored.notePreview, null);
   assert.equal(restored.notebookOpen, true);
   assert.equal(restored.assistantOpen, false);
   const legacy = JSON.parse(record!);
@@ -71,6 +73,7 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
   assert.equal(readNotebookSession().experience, "assistant");
   assert.equal(readNotebookSession().assistantView, "guide");
   assert.equal(readNotebookSession().assistantOpen, true);
+  assert.equal(readNotebookSession().notePreview, null);
   assert.equal(readNotebookSession().notebookOpen, false);
   const current = {
     ...legacy,
@@ -131,4 +134,171 @@ test("tab continuity retains unfinished writing and preparation, rejecting unusa
   assert.equal(readNotebookSession().open, false);
   assert.equal(readNotebookSession().editor, null);
   assert.equal(record, unchanged);
+});
+
+function mockSessionStorage(t: TestContext) {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "sessionStorage",
+  );
+  let record: string | null = null;
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    value: {
+      getItem: () => record,
+      setItem: (_key: string, value: string) => {
+        record = value;
+      },
+    },
+  });
+  t.after(() => {
+    if (descriptor)
+      Object.defineProperty(globalThis, "sessionStorage", descriptor);
+    else Reflect.deleteProperty(globalThis, "sessionStorage");
+  });
+  return {
+    read: () => record,
+    write: (value: unknown) => {
+      record = JSON.stringify(value);
+    },
+  };
+}
+
+function previewSnapshot(): NotebookDraftPreview {
+  return {
+    conversationId: "c0000000-0000-4000-8000-000000000001",
+    replyId: "c0000000-0000-4000-8000-000000000002",
+    studentId: "c0000000-0000-4000-8000-000000000003",
+    source: {
+      url: "https://book.example/chapters/example/",
+      title: "Synthetic chapter",
+      kind: "passage",
+      anchor: "synthetic-passage",
+      excerpt: "The source passage.",
+      revision: "synthetic-revision",
+      conceptIds: ["queue"],
+    },
+    relatedIds: ["c0000000-0000-4000-8000-000000000004"],
+    teaching: "A synthetic authored explanation",
+    studentText: "My unfinished question. ",
+    replyText: "A synthetic reply.\n",
+    includeStudent: false,
+    includeReply: true,
+    open: true,
+  };
+}
+
+test("note preview round trips full review text and source independently of a new Assistant discussion", (t) => {
+  mockSessionStorage(t);
+  const preview = previewSnapshot();
+  preview.studentText = " \n" + "s".repeat(31_996) + "\n ";
+  preview.replyText = " \n" + "r".repeat(31_996) + "\n ";
+  preview.teaching = "t".repeat(2000);
+  preview.relatedIds = Array.from(
+    { length: 100 },
+    (_, i) => `d0000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`,
+  );
+  saveNotebookSession({ ...readNotebookSession(), notePreview: preview });
+  const restored = readNotebookSession();
+  assert.deepEqual(restored.notePreview, preview);
+  saveNotebookSession({
+    ...restored,
+    assistant: {
+      source: { ...preview.source, title: "Another discussion source" },
+      conversationId: null,
+      browserId: "c0000000-0000-4000-8000-000000000005",
+      question: "A different unfinished question.",
+      goal: "",
+      mode: "question",
+      supportNeed: "unspecified",
+    },
+  });
+  assert.deepEqual(readNotebookSession().notePreview, preview);
+  const closed = {
+    ...preview,
+    studentId: null,
+    includeStudent: true,
+    includeReply: false,
+    open: false,
+  };
+  saveNotebookSession({ ...readNotebookSession(), notePreview: closed });
+  assert.deepEqual(readNotebookSession().notePreview, closed);
+});
+
+test("unusable note previews do not discard Notebook writing or the Assistant draft", (t) => {
+  const storage = mockSessionStorage(t);
+  const preview = previewSnapshot();
+  const state = {
+    ...readNotebookSession(),
+    editor: {
+      id: "",
+      expected: "",
+      kind: "scratch" as const,
+      title: "Keep my title ",
+      body: "Keep this unfinished writing. ",
+      relatedIds: [],
+      source: preview.source,
+    },
+    assistant: {
+      source: preview.source,
+      conversationId: preview.conversationId,
+      browserId: "c0000000-0000-4000-8000-000000000005",
+      question: "Keep this unfinished question. ",
+      goal: "A chosen goal",
+      mode: "explanation" as const,
+      supportNeed: "prerequisite" as const,
+    },
+  };
+  const invalidPreviews = [
+    { label: "not an object", value: [] },
+    {
+      label: "conversation UUID",
+      value: { ...preview, conversationId: "invalid" },
+    },
+    {
+      label: "reply UUID version",
+      value: { ...preview, replyId: "c0000000-0000-1000-8000-000000000002" },
+    },
+    { label: "student UUID", value: { ...preview, studentId: "invalid" } },
+    {
+      label: "source",
+      value: {
+        ...preview,
+        source: { ...preview.source, url: "javascript:synthetic" },
+      },
+    },
+    { label: "related UUID", value: { ...preview, relatedIds: ["invalid"] } },
+    {
+      label: "too many related IDs",
+      value: { ...preview, relatedIds: Array(101).fill(preview.replyId) },
+    },
+    {
+      label: "teaching length",
+      value: { ...preview, teaching: "t".repeat(2001) },
+    },
+    {
+      label: "student text length",
+      value: { ...preview, studentText: "s".repeat(32_001) },
+    },
+    {
+      label: "reply text length",
+      value: { ...preview, replyText: "r".repeat(32_001) },
+    },
+    { label: "text type", value: { ...preview, studentText: 12 } },
+    {
+      label: "student selection type",
+      value: { ...preview, includeStudent: "true" },
+    },
+    { label: "reply selection type", value: { ...preview, includeReply: 1 } },
+    { label: "open type", value: { ...preview, open: "false" } },
+  ];
+  for (const { label, value } of invalidPreviews) {
+    storage.write({ version: 1, ...state, notePreview: value });
+    const original = storage.read();
+    const restored = readNotebookSession();
+    assert.equal(restored.notePreview, null, label);
+    assert.deepEqual(restored.editor, state.editor, label);
+    assert.deepEqual(restored.assistant, state.assistant, label);
+    assert.equal(storage.read(), original, label);
+  }
 });

@@ -136,6 +136,10 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await panel
       .getByRole("button", { name: "Use as a notebook draft" })
       .click();
+    await panel
+      .getByRole("region", { name: "Notebook draft preview", exact: true })
+      .getByRole("button", { name: "Prepare notebook draft", exact: true })
+      .click();
     await expect(panel.getByRole("status")).toContainText("Choose Save note");
     await panel.getByRole("button", { name: "Save note", exact: true }).click();
     await chooseNotebookTool(panel, "Discuss");
@@ -167,7 +171,7 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await chooseNotebookTool(panel, "Notes");
     await panel.getByText("1 saved revision", { exact: true }).first().click();
     await expect(
-      panel.getByText(/Assistant suggestion; conversation/),
+      panel.getByText(/Reviewed discussion draft; conversation/),
     ).toBeVisible();
     await expect(
       panel.getByText(/policy scalableweb-study-assistant v1/),

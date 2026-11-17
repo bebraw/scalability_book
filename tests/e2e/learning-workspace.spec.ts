@@ -16,6 +16,7 @@ import type {
   AgentMessage,
   LearningConversation,
 } from "../../shared/learning-agent.ts";
+import type { NotebookEntry } from "../../shared/learning-workspace.ts";
 
 let child: ChildProcess;
 let directory: string;
@@ -1214,9 +1215,21 @@ Inline \(L = \lambda W\) and $L$.
   await expect(panel.locator(".learning-messages")).toContainText(
     "Synthetic suggestion",
   );
-  page.once("dialog", (dialog) => dialog.dismiss());
   await panel.getByRole("button", { name: "Use as a notebook draft" }).click();
+  const preview = panel.getByRole("region", { name: "Notebook draft preview" });
+  await expect(preview).toBeVisible();
+  await expect(
+    preview.getByLabel("Your question or response", { exact: true }),
+  ).toHaveValue(supplied[0]!.text);
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await preview
+    .getByRole("button", { name: "Prepare notebook draft", exact: true })
+    .click();
+  await expect(preview).toBeVisible();
   await expect(panel).toHaveAttribute("aria-label", "Teaching assistant");
+  await preview
+    .getByRole("button", { name: "Close draft preview", exact: true })
+    .click();
   await chooseNotebookTool(panel, "Write");
   await expect(panel.getByLabel("Your thinking")).toHaveValue(
     "Keep this separate unfinished note.",
@@ -1263,6 +1276,384 @@ Inline \(L = \lambda W\) and $L$.
     relatedIds: [chosen.id],
     body: "My own reviewed explanation, rather than the transcript.",
   });
+});
+
+for (const width of [1440, 390]) {
+  test(`notebook draft preview keeps the selected exchange and reviewed writing at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const contextNotes: NotebookEntry[] = [];
+    const thinking = recordedMessage(
+      "student",
+      "My first question: does a timeout prove that nothing was written?\nI predict that the outcome may be unknown.",
+    );
+    const suggestion = recordedMessage(
+      "agent",
+      String.raw`First suggestion: retain the **uncertainty**.\n\n<script>literal source, not executable</script>\n\n~~~text\ncheck the original event ID\n~~~`,
+    );
+    suggestion.teaching = {
+      policy: {
+        id: "synthetic-recorded-policy",
+        version: "7",
+        name: "Recorded teaching policy",
+      },
+      provider: { name: "Synthetic", version: "recorded-version" },
+    };
+    const secondThinking = recordedMessage(
+      "student",
+      "My later response concerns a different retry.",
+    );
+    const secondSuggestion = recordedMessage(
+      "agent",
+      "Second suggestion belongs only to the later retry.",
+    );
+    const observation = recordedMessage(
+      "observation",
+      "OBSERVATION MUST NOT BECOME NOTE TEXT",
+    );
+    const fixture = await routeSyntheticDiscussion(page, (conversation) => ({
+      ...conversation,
+      source: contextNotes[0]!.source,
+      state: "working",
+      messages: [
+        { ...thinking, noteIds: [contextNotes[0]!.id] },
+        observation,
+        suggestion,
+        { ...secondThinking, noteIds: [contextNotes[1]!.id] },
+        secondSuggestion,
+      ],
+    }));
+    const writes: string[] = [];
+    page.on("request", (request) => {
+      if (
+        request.url().startsWith(companionAddress) &&
+        !["GET", "OPTIONS"].includes(request.method())
+      )
+        writes.push(request.url());
+    });
+    const panel = await connectSyntheticDiscussion(page);
+    await expect(panel.getByRole("status")).toContainText("Connected");
+    await chooseNotebookTool(panel, "Write");
+    await selectReading(page);
+    await panel
+      .getByRole("button", { name: "Use selected text", exact: true })
+      .click();
+    for (const [title, body] of [
+      [
+        "First turn context",
+        "My initial prediction for the selected exchange.",
+      ],
+      ["Other turn context", "PRIVATE OTHER TURN NOTE"],
+    ]) {
+      if (contextNotes.length)
+        await panel
+          .getByRole("button", { name: "New note", exact: true })
+          .click();
+      await panel.getByLabel("Title", { exact: true }).fill(title!);
+      await panel.getByLabel("Your thinking", { exact: true }).fill(body!);
+      const saved = page.waitForResponse(
+        (response) =>
+          response.url() === `${companionAddress}/entries` &&
+          response.request().method() === "POST",
+      );
+      await panel
+        .getByRole("button", { name: "Save note", exact: true })
+        .click();
+      contextNotes.push(await (await saved).json());
+    }
+    expect(contextNotes[0]!.source.excerpt).not.toBe("");
+    await panel.getByRole("button", { name: "New note", exact: true }).click();
+    await panel
+      .getByLabel("Your thinking", { exact: true })
+      .fill("Keep my separate unfinished writing.");
+    await chooseNotebookTool(panel, "Discuss");
+    await panel
+      .getByLabel("Message to the teaching assistant")
+      .fill("Open the synthetic two-exchange discussion.");
+    await panel
+      .getByRole("button", { name: "Send message", exact: true })
+      .click();
+    const replies = panel.locator("article.learning-note").filter({
+      has: page.getByRole("heading", {
+        name: "Teaching assistant suggestion",
+        exact: true,
+      }),
+    });
+    await expect(replies).toHaveCount(2);
+    const before = writes.length;
+    await replies
+      .first()
+      .getByRole("button", { name: "Use as a notebook draft", exact: true })
+      .click();
+    const preview = panel.getByRole("region", {
+      name: "Notebook draft preview",
+      exact: true,
+    });
+    const ownText = preview.getByLabel("Your question or response", {
+      exact: true,
+    });
+    const assistantText = preview.getByLabel("Assistant suggestion to review", {
+      exact: true,
+    });
+    await expect(preview).toBeVisible();
+    await expect(ownText).toHaveValue(thinking.text);
+    await expect(assistantText).toHaveValue(suggestion.text);
+    await expect(
+      preview.getByRole("checkbox", {
+        name: "Include your thinking",
+        exact: true,
+      }),
+    ).toBeChecked();
+    await expect(
+      preview.getByRole("checkbox", {
+        name: "Include assistant suggestion",
+        exact: true,
+      }),
+    ).toBeChecked();
+    const sourceUrl = new URL(contextNotes[0]!.source.url);
+    sourceUrl.hash = contextNotes[0]!.source.anchor;
+    await expect(
+      preview.getByRole("link", {
+        name: contextNotes[0]!.source.title,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", sourceUrl.href);
+    await expect(preview.locator("img, iframe, script")).toHaveCount(0);
+    const revisedThinking =
+      "My reviewed question still distinguishes failure from an unknown outcome.\nThis is my selected wording.";
+    await ownText.fill(revisedThinking);
+    await preview
+      .getByRole("checkbox", {
+        name: "Include assistant suggestion",
+        exact: true,
+      })
+      .uncheck();
+    await ownText.focus();
+    const reads = fixture.reads();
+    fixture.update((value) => ({
+      ...value,
+      state: "idle",
+      messages: [
+        ...value.messages,
+        recordedMessage("student", "LATER POLLED QUESTION"),
+        recordedMessage("agent", "LATER POLLED ANSWER"),
+      ],
+    }));
+    await expect.poll(fixture.reads).toBeGreaterThan(reads);
+    await expect(replies).toHaveCount(3);
+    await expect(ownText).toBeFocused();
+    await expect(ownText).toHaveValue(revisedThinking);
+    await expect(assistantText).toHaveValue(suggestion.text);
+    await expect(
+      preview.getByRole("checkbox", {
+        name: "Include assistant suggestion",
+        exact: true,
+      }),
+    ).not.toBeChecked();
+    await page.reload();
+    await expect(preview).toBeVisible();
+    await expect(ownText).toHaveValue(revisedThinking);
+    await expect(assistantText).toHaveValue(suggestion.text);
+    await expect(
+      preview.getByRole("checkbox", {
+        name: "Include assistant suggestion",
+        exact: true,
+      }),
+    ).not.toBeChecked();
+    await expect(
+      preview.getByRole("link", {
+        name: contextNotes[0]!.source.title,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", sourceUrl.href);
+    const reviewedSuggestion = `${suggestion.text}\n\nOnly this selected suggestion is retained.`;
+    await preview
+      .getByRole("checkbox", {
+        name: "Include assistant suggestion",
+        exact: true,
+      })
+      .check();
+    await assistantText.fill(reviewedSuggestion);
+    page.once("dialog", (dialog) => dialog.dismiss());
+    await preview
+      .getByRole("button", { name: "Prepare notebook draft", exact: true })
+      .click();
+    await expect(preview).toBeVisible();
+    await expect(ownText).toHaveValue(revisedThinking);
+    await expect(
+      page
+        .locator("#learning-notebook")
+        .getByLabel("Your thinking", { exact: true }),
+    ).toHaveValue("Keep my separate unfinished writing.");
+    expect(writes.length).toBe(before);
+    page.once("dialog", (dialog) => dialog.accept());
+    await preview
+      .getByRole("button", { name: "Prepare notebook draft", exact: true })
+      .click();
+    const expectedBody = `Your question or response:\n\n${revisedThinking}\n\nTeaching assistant suggestion:\n\n${reviewedSuggestion}`;
+    await expect(
+      panel.getByLabel("Your thinking", { exact: true }),
+    ).toHaveValue(expectedBody);
+    expect(writes.length).toBe(before);
+    const savedResponse = page.waitForResponse(
+      (response) =>
+        response.url() === `${companionAddress}/entries` &&
+        response.request().method() === "POST",
+    );
+    await panel.getByRole("button", { name: "Save note", exact: true }).click();
+    const saved: NotebookEntry = await (await savedResponse).json();
+    expect(saved.body).toBe(expectedBody);
+    expect(saved.source).toEqual(contextNotes[0]!.source);
+    expect(saved.relatedIds).toEqual([contextNotes[0]!.id]);
+    expect(saved.history[0]!.assistance).toContain(thinking.id);
+    expect(saved.history[0]!.assistance).toContain(suggestion.id);
+    expect(saved.history[0]!.assistance).toContain(
+      "synthetic-recorded-policy v7",
+    );
+    expect(saved.body).not.toContain(observation.text);
+    expect(saved.body).not.toContain(secondThinking.text);
+    expect(saved.body).not.toContain("LATER POLLED");
+    await chooseNotebookTool(panel, "Connect");
+    const download = page.waitForEvent("download");
+    await panel
+      .getByRole("button", { name: "Export notebook backup", exact: true })
+      .click();
+    const archive = JSON.parse(
+      await (
+        await import("node:fs/promises")
+      ).readFile((await (await download).path())!, "utf8"),
+    );
+    expect(
+      archive.entries.find((entry: NotebookEntry) => entry.id === saved.id),
+    ).toMatchObject({
+      body: expectedBody,
+      source: contextNotes[0]!.source,
+      relatedIds: [contextNotes[0]!.id],
+      history: saved.history,
+    });
+
+    await chooseNotebookTool(panel, "Discuss");
+    let replacedPreview = false;
+    page.once("dialog", (dialog) => {
+      replacedPreview = true;
+      return dialog.accept();
+    });
+    await replies
+      .nth(1)
+      .getByRole("button", { name: "Use as a notebook draft", exact: true })
+      .click();
+    expect(replacedPreview).toBe(true);
+    await expect(ownText).toHaveValue(secondThinking.text);
+    await preview
+      .getByRole("checkbox", { name: "Include your thinking", exact: true })
+      .uncheck();
+    const beforePrepare = writes.length;
+    await preview
+      .getByRole("button", { name: "Prepare notebook draft", exact: true })
+      .click();
+    await expect(
+      panel.getByLabel("Your thinking", { exact: true }),
+    ).toHaveValue(`Teaching assistant suggestion:\n\n${secondSuggestion.text}`);
+    expect(writes.length).toBe(beforePrepare);
+  });
+}
+
+test("notebook draft preview retains an oversized legacy reply until the learner shortens it", async ({
+  page,
+}) => {
+  const original = `Original beginning\n${"long synthetic reply ".repeat(900)}\nCOMPLETE ORIGINAL END`;
+  await routeSyntheticDiscussion(page, (conversation) => ({
+    ...conversation,
+    state: "idle",
+    messages: [recordedMessage("agent", original)],
+  }));
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.url().startsWith(companionAddress) &&
+      !["GET", "OPTIONS"].includes(request.method())
+    )
+      writes.push(request.url());
+  });
+  const panel = await connectSyntheticDiscussion(page);
+  await panel
+    .getByLabel("Message to the teaching assistant")
+    .fill("Reopen the synthetic legacy reply.");
+  await panel
+    .getByRole("button", { name: "Send message", exact: true })
+    .click();
+  await expect(panel.locator(".learning-reply")).toContainText(
+    "COMPLETE ORIGINAL END",
+  );
+  const before = writes.length;
+  await panel
+    .getByRole("button", { name: "Use as a notebook draft", exact: true })
+    .click();
+  const preview = panel.getByRole("region", {
+    name: "Notebook draft preview",
+    exact: true,
+  });
+  await expect(preview).toBeVisible();
+  await expect(
+    preview.getByLabel("Your question or response", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    preview.getByRole("checkbox", {
+      name: "Include your thinking",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  const suggestion = preview.getByLabel("Assistant suggestion to review", {
+    exact: true,
+  });
+  await expect(suggestion).toHaveValue(original);
+  const prepare = preview.getByRole("button", {
+    name: "Prepare notebook draft",
+    exact: true,
+  });
+  await expect(prepare).toBeDisabled();
+  await expect(preview).toContainText(/16[ ,]?000/);
+  const atLimit = "x".repeat(
+    16_000 - "Teaching assistant suggestion:\n\n".length,
+  );
+  await suggestion.fill(atLimit);
+  await expect(prepare).toBeEnabled();
+  await expect(preview).toContainText("16,000 of 16,000 characters");
+  await suggestion.fill(`${atLimit}x`);
+  await expect(prepare).toBeDisabled();
+  await expect(suggestion).toHaveValue(`${atLimit}x`);
+  const shortened =
+    "Selected literal excerpt: <script>not executed</script>\nThe complete selected ending.";
+  await suggestion.fill(shortened);
+  await expect(prepare).toBeEnabled();
+  await preview
+    .getByRole("checkbox", {
+      name: "Include assistant suggestion",
+      exact: true,
+    })
+    .uncheck();
+  await expect(prepare).toBeDisabled();
+  await preview
+    .getByRole("checkbox", {
+      name: "Include assistant suggestion",
+      exact: true,
+    })
+    .check();
+  await preview
+    .getByRole("button", { name: "Close draft preview", exact: true })
+    .click();
+  await expect(preview).toBeHidden();
+  expect(writes.length).toBe(before);
+  await panel
+    .getByRole("button", { name: "Use as a notebook draft", exact: true })
+    .click();
+  await expect(suggestion).toHaveValue(shortened);
+  await prepare.click();
+  await expect(panel.getByLabel("Your thinking", { exact: true })).toHaveValue(
+    `Teaching assistant suggestion:\n\n${shortened}`,
+  );
+  expect(writes.length).toBe(before);
 });
 
 test("optional changed cases preserve drafts and separate linked attempts without an agent", async ({

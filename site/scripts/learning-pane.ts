@@ -82,6 +82,7 @@ export function createLearningPane(
   let notebookView = restored.notebookView;
   let assistantView = restored.assistantView;
   let assistant = restored.assistant;
+  let notePreview = restored.notePreview;
   let companionStatus: CompanionStatus | null = null;
   let connected = false;
   const entries: NotebookEntry[] = [];
@@ -117,6 +118,7 @@ export function createLearningPane(
             assistantPaneView: view as SessionState["assistantPaneView"],
             assistantView,
             assistant,
+            notePreview,
             assistantSelected: [...selected],
           },
     );
@@ -396,6 +398,11 @@ export function createLearningPane(
             : {}),
           entries,
           draft: activeDraft,
+          preview: () => notePreview,
+          previewChanged: (value) => {
+            notePreview = value;
+            persist();
+          },
           source: readingSource,
           selected: () => [...selected],
           active: () =>
