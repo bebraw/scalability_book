@@ -1974,6 +1974,23 @@
 .otel-demo-controls label {
   min-width: 0;
 }
+.otel-demo-case-reading {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  scroll-margin-block: 6rem;
+}
+.otel-demo-case-reading:focus {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+.prose .otel-demo-case-reading :is(h4, p) {
+  margin: 0;
+  max-width: none;
+}
+.prose .otel-demo-case-reading p {
+  margin-block-start: 0.5rem;
+}
 .otel-demo-workbench {
   display: grid;
   gap: 1rem;

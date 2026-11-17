@@ -45,9 +45,28 @@
         <option value="retry">Request C · 171 ms</option>
       </select>
     </label>
-    <button type="button" data-otel-demo-reveal disabled>
+    <button
+      type="button"
+      data-otel-demo-reveal
+      aria-expanded="false"
+      aria-controls="otel-demo-case-reading"
+      disabled
+    >
       Reveal authored case reading
     </button>
+    <section
+      id="otel-demo-case-reading"
+      class="otel-demo-case-reading"
+      data-otel-demo-case-reading
+      aria-labelledby="otel-demo-case-reading-heading"
+      tabindex="-1"
+      hidden
+    >
+      <h4 id="otel-demo-case-reading-heading">Authored case reading</h4>
+      <p><strong data-otel-demo-case-verdict></strong></p>
+      <p>Selected span: <strong data-otel-demo-case-span></strong></p>
+      <p data-otel-demo-span-note></p>
+    </section>
   </div>
 
   <div class="otel-demo-workbench">
@@ -105,7 +124,7 @@
           contain several spans.
         </p>
       </details>
-      <p class="demo-note" data-otel-demo-span-note>
+      <p class="demo-note">
         Use duration, parentage and status to choose evidence. What does this
         span show, and what is still unknown?
       </p>

@@ -12,6 +12,10 @@ Changes through `4fbee6e` were pushed on 17 November 2026; published-link CI and
 Eleven live Chrome checks passed for feedback wrapping/audience, compact setup guides, chapter examples, optional practice, notebook guidance and browser-evidence disclosure.
 They used the deployed assets with synthetic feedback responses and a disposable companion, without production writes or model calls; evidence is retained under ignored `.local/reviews/deployment-4fbee6e-2026-11-17/`.
 
+The Reader note correction was pushed as `15794a3` on the same date; published-link CI and Cloudflare deployment succeeded.
+Live desktop/mobile Chrome checks verified public reading, the sign-in handoff and retention of the note after closing Account, with synthetic responses and no production writes.
+Evidence is retained under ignored `.local/reviews/deployment-15794a3-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -19,6 +23,9 @@ Treat that measurement as the earlier observation, not an assertion that every c
 
 Current-path verification on 16 November did not reproduce that overflow: an expanded **Browser observation** and an assistant reply with long JSON keys and URLs stayed inside the panel at 1440 px and 390 px in Chromium and WebKit.
 The original 83 px finding remains open until its exact affected route and payload are identified; no overflow layout fix is claimed.
+An artifact and history audit on 17 November found the measurement first recorded in the initial ledger, without the original route, payload, browser, viewport or measured element.
+Later verification records repeat the number but do not recover that trigger.
+The original feedback also names overflowing JSON in the separate trace demo; task 13 below tracks that concrete surface without assuming it explains this measurement.
 That verification did reproduce a keyboard-access defect: WebKit skipped the reply's horizontally scrolling code block, preventing keyboard users from reaching the complete lines.
 Code blocks now have a named Tab focus target and visible focus indicator.
 The focused browser regression retains full observation/code text, checks the panel bounds, scrolls code with an arrow key and verifies that Tab leaves the block.
@@ -264,6 +271,56 @@ Desktop/mobile screenshots were inspected; the Worker build, types, HTML/local-l
 Initial failures, corrected checks, API projections and screenshots are retained under ignored `.local/reviews/public-reader-note-2026-11-17/`; the earlier reproduction remains under `.local/reviews/feedback-audience-2026-11-17/`.
 The first post-fix test expected a bare GitHub sign-in URL; the existing Account contract appends the reading's return destination, so the corrected assertion preserves that behavior.
 No production feedback or real student records were used.
+
+## 12. Make the trace demo's revealed reading visible
+
+**Status: closed on 17 November 2026 after reproducing the offscreen result and making it an explicit disclosure.** The original Chapter 3 feedback identified a reveal action that appeared to do nothing; the initial ledger omitted it.
+In the current demo, selecting a child span and activating **Reveal authored case reading** changed a header verdict and an inspector note, then disabled the button and lost focus.
+In the 390 px WebKit click reproduction, the verdict was above the viewport and the explanation below it, while the disabled button remained visible.
+The same check found offscreen explanations in desktop and compact Chromium.
+
+The reading now opens directly after the control as a labelled region containing the request verdict, selected span and complete authored interpretation.
+Opening it brings it into view and focuses it; the button reports its expanded state and can hide or reopen it.
+Selecting another span updates the interpretation; selecting another request hides it and requires new child-span evidence.
+The [resource contract](agent-learning-resources.md#public-mcp-server) records these controls as trace activity version 3.
+The authored cases, timings and interpretation remain unchanged.
+
+Four new chapter/gallery regressions at desktop/mobile widths failed before the change because no visible reading region existed.
+The earlier test passed because it only checked the changed header text.
+All five Chromium regressions passed after the change.
+Eight built-page checks passed in Chromium and WebKit across both routes and widths, covering pointer/keyboard reveal, a fully visible focused reading, full interpretation, close/reopen, selected-span updates and request reset.
+Screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+The full link check found no broken links and 13 inconclusive external destinations due to access blocks or service errors.
+The first WebKit audit incorrectly assumed plain Shift+Tab included native buttons; a reduced page confirmed that its default navigation uses Option+Shift+Tab, which the corrected check uses without changing browser preferences or native button semantics.
+Retained reproduction measurements, screenshots and test logs live under ignored `.local/reviews/trace-reveal-2026-11-17/`.
+These checks verify the disclosure and keyboard behavior, not first-time learner comprehension.
+
+## Remaining original feedback to review individually
+
+A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
+These are open review items, not accepted feature designs or assertions that the current implementation is defective.
+Reproduce each behavior or review the current teaching contract before choosing a change.
+
+| Task | Finding and next check                                                                                                                                                           | Relevant owner                                                                                                          |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 13   | Reproduce overflowing **Inspect conceptual span record** JSON on desktop and compact screens independently of task 1, retaining complete readable output                         | [Trace demo styles](../site/styles/demos.css) and [browser regression](../tests/e2e/otel-trace-demo.spec.ts)            |
+| 14   | Review an explicit, previewable notebook handoff that includes the learner's questions and responses; the selected-suggestion contract currently copies only the assistant reply | [Assistant presentation](../site/scripts/learning-agent-ui.ts) and [workspace contract](learning-workspace.md)          |
+| 15   | Check whether Chapter 1's concept link supplies a practical method for deciding whether an architectural choice is reversible                                                    | [Chapter 1](../book/01_establish/01_what_is_scalability.md)                                                             |
+| 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                            | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
+| 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                             | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
+| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                                     | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |
+| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                                      | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)         |
+| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                         | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                            |
+| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                                  | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)             |
+| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests          | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts)    |
+| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                            | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                                  | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                          | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+
+The kickoff feedback also reported a GitHub OAuth 404.
+The anonymous live entry check on 17 November followed Account → GitHub authorization → GitHub sign-in with statuses 302 → 302 → 200, so the reported 404 did not reproduce.
+No sign-in, consent or callback was performed; a completed authenticated round trip remains unverified by this check, and no historical cause is inferred.
+Sanitized evidence is retained under ignored `.local/reviews/github-signin-2026-11-17/` without OAuth state, cookies or credentials.
 
 ## Closing tasks
 

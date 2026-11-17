@@ -51,6 +51,10 @@ Those remain the companion's separate, explicitly selected-context boundary.
 Every demo returns its shared `activity` contract: stable ID/version, source reading, authored phases, adaptation guidance and bounded browser-observation semantics.
 The catalog currently has 16 demos in reading investigations and optional depth.
 Authored activity versions follow changes to controls or interpretation independently of the browser snapshot schema.
+The trace explorer (activity version 3) requires a child-span selection before **Reveal authored case reading** opens a labelled reading beside the control.
+Opening it moves keyboard focus to the reading and brings it into view; **Hide authored case reading** closes it without discarding the selected evidence.
+The reading identifies the request's authored verdict and the selected span's interpretation, updating as another span is selected.
+Choosing another request hides the reading and requires new child-span evidence before revealing it again.
 All demos describe bounded named controls and displayed text with the same generic snapshot contract.
 Retired widgets and their specialized contracts are removed; their useful questions remain as chapter evidence activities and project templates.
 The [local practice workspace](../labs/README.md) is a separate executable teaching resource with independent CSV, mutation, retry and cache exercises.

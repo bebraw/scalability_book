@@ -120,6 +120,9 @@ function initializeOtelTraceDemo(root: HTMLElement) {
   const reveal = root.querySelector<HTMLButtonElement>(
     "[data-otel-demo-reveal]",
   );
+  const reading = root.querySelector<HTMLElement>(
+    "[data-otel-demo-case-reading]",
+  );
 
   const render = () => {
     renderTrace(root, scenario, selectedSpanId);
@@ -130,13 +133,15 @@ function initializeOtelTraceDemo(root: HTMLElement) {
         ? scenario.verdict
         : "Inspect a child span before revealing the case reading",
     );
-    if (reveal) reveal.disabled = !evidenceSelected || revealed;
-    if (!revealed)
-      setText(
-        root,
-        "[data-otel-demo-span-note]",
-        "Use duration, parentage and status to choose evidence. What does this span show, and what is still unknown?",
-      );
+    if (reveal) {
+      reveal.disabled = !evidenceSelected;
+      reveal.setAttribute("aria-expanded", String(revealed));
+      reveal.textContent = revealed
+        ? "Hide authored case reading"
+        : "Reveal authored case reading";
+    }
+    if (reading) reading.hidden = !revealed;
+    setText(root, "[data-otel-demo-case-verdict]", scenario.verdict);
   };
 
   select.addEventListener("change", () => {
@@ -164,8 +169,12 @@ function initializeOtelTraceDemo(root: HTMLElement) {
 
   reveal?.addEventListener("click", () => {
     if (!evidenceSelected) return;
-    revealed = true;
+    revealed = !revealed;
     render();
+    if (revealed && reading) {
+      reading.focus({ preventScroll: true });
+      reading.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
   });
 
   render();
@@ -239,6 +248,7 @@ function renderSpanInspector(
   setText(root, "[data-otel-demo-span-duration]", `${span.duration} ms`);
   setText(root, "[data-otel-demo-span-status]", span.status);
   setText(root, "[data-otel-demo-span-source]", span.source);
+  setText(root, "[data-otel-demo-case-span]", span.name);
   setText(root, "[data-otel-demo-span-note]", span.note);
 
   const attributes = root.querySelector<HTMLElement>(

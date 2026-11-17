@@ -294,14 +294,14 @@ const activities: Record<string, Activity> = {
       "Compare distributions and timer boundaries before claiming an improvement in user-visible response.",
   },
   "OpenTelemetry trace explorer": {
-    activityVersion: 2,
+    activityVersion: 3,
     conceptIds: ["observability", "latency", "measurement-boundary", "retry"],
     caption:
       "Inspect spans, timing, and retries within a simulated server request trace.",
     controls: [
       "Request A, B, or C",
       "Span selection",
-      "Reveal authored interpretation",
+      "Reveal or hide authored case reading",
     ],
     assumptions:
       "The timeline covers server handling, excluding browser work and time outside the server span. No incoming parent context is modeled. Literal OTLP uses typed values and a more verbose envelope; a trace is not proof of every user-visible outcome.",
