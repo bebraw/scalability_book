@@ -30,6 +30,21 @@ The frame prevents one successful observation from becoming a universal promise.
 A browser measurement says little about database recovery; one load level does not prove behavior at another; and a fast generated change does not prove that another contributor can understand or reverse it.
 The [Benchmarking chapter](/chapters/benchmarking/) develops how to produce bounded evidence for these claims.
 
+### Worked claim — A growing activity feed
+
+Suppose we want to keep the event tracker's recent-activity view useful as history grows.
+The following is a hypothesis to test; its numbers are illustrative, not measured results or required project targets.
+
+> With one application process and one database on the same machine, increase retained history from 1,000 to 10,000 events.
+> At each size, four clients repeatedly request the latest 20 events for five minutes, each waiting for its previous response before requesting again.
+> Every response must contain the expected events in the declared order, at least 95% must arrive and pass validation within 200 ms, and no request may fail or remain unfinished.
+
+Here the pressure is **data volume**, while the client count and deployment stay fixed.
+The timing boundary runs from sending a request to validating its response; it excludes browser rendering.
+Seed each history with known events so the expected latest 20 can be checked independently of the feed query.
+Fast responses containing stale or missing events would reject the claim just as slow responses would.
+Passing at these two sizes would support only those observations: it would not establish behavior at a million events, with more clients, or after a database failure.
+
 ## Four pressures organize the course
 
 Many taxonomies of scalability are possible.

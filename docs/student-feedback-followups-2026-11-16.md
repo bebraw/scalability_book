@@ -117,18 +117,27 @@ This verifies the access boundary and interface behavior, without claiming a fir
 
 ## 6. Review the examples and diagrams in Chapters 1–3
 
-**Status: open; editorial concerns from the feedback review.** More concrete explanation was requested, but the exact passage-level changes still need to be selected against the current chapters.
-Do not treat this as a request to add a diagram to every section or expand the reading indiscriminately.
+**Status: closed after focused editorial changes and rendered inspection on 17 November 2026.** Each chapter already had examples and visuals; the selected additions connect their abstract explanations to one concrete decision.
 
-Review these chapters separately:
+- [Chapter 1](../book/01_establish/01_what_is_scalability.md): **What observation could reject my scalability claim?** The existing claim frame, pressure taxonomy and pressure-to-evidence diagram explain the reasoning structure.
+  A new growing-feed hypothesis supplies data sizes, a fixed deployment and client count, a timing boundary, correctness and latency goals, and explicit exclusions.
+  It shows why a fast but incorrect result rejects the claim.
+- [Chapter 2](../book/01_establish/02_scalable_development.md): **What does the model do, what does the harness do, and what remains my decision?** The anatomy table, CSV failure and release-statechart example already cover components, verification and authority.
+  A short handoff walkthrough now connects the student's export requirement, model requests, permitted harness operations, repository checks, retained failure and human acceptance, reusing the existing CSV case.
+- [Chapter 3](../book/01_establish/03_benchmarking.md): **How can two different durations describe the same operation?** The percentile simulation, browser workbench, queue example and trace explorer already cover individual measurement techniques.
+  A new four-checkpoint table follows one work-item creation, deriving a 60 ms request interval and a 160 ms browser journey.
+  It locates the remaining intervals without inferring their cause, and separates timing from correctness, persistence and generalization.
 
-- [Chapter 1: What is scalability?](../book/01_establish/01_what_is_scalability.md): whether an example makes the path from pressure, through a system boundary, to a measurable claim clear.
-- [Chapter 2: Scalable development](../book/01_establish/02_scalable_development.md): whether the agent, harness and verification-loop explanations show the student's decisions and responsibilities through a concrete case.
-- [Chapter 3: Benchmarking](../book/01_establish/03_benchmarking.md): whether examples and visuals make the workload, measurement boundary and interpretation of an observed result understandable together.
+The numerical claim and timeline are explicitly invented examples, not measured results or new project targets.
+The existing diagrams and assessment requirements remain unchanged.
+Independent editorial review checked the reasoning and arithmetic against the common project contract.
+Eight desktop/mobile layout checks passed: all three passages in Chromium and the new table in WebKit, at 1440 px and 390 px, including the CSV forward link and numbered table reference.
+The rendered passages and table were visually inspected; the build, types, HTML/local-link validation and formatting passed.
+The full link check found no broken links and 14 inconclusive external destinations (access blocks or service errors).
 
-For each selected passage, record the learner question, what the existing example or diagram already covers, and the smallest missing explanation.
-Done when the revised passage enables the intended reasoning with a worked example or visual where useful, its assumptions and evidence limits are explicit, and the result is inspected in the published layout.
-Use the [publishing conventions](development.md) and a highlighted review; avoid tests that merely repeat prose.
+The highlighted review, screenshots and check records are retained under ignored `.local/reviews/chapter-examples-2026-11-17/`.
+The first browser script incorrectly expected an ID on a fourth-level heading; its failure is preserved alongside the corrected inspection of the rendered passage.
+These checks establish the editorial and rendering result, not a learner comprehension study.
 
 ## 7. Make the role of optional exercises explicit
 

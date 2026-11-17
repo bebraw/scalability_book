@@ -94,6 +94,31 @@ A Playwright test can prove that filtering the event list produces the expected 
 A Lighthouse navigation can diagnose initial page load, but it does not prove that the application's business flow works.
 Lighthouse user flows can audit interactions, although they require browser automation outside the page; a normal web page cannot grant itself the required browser-control privileges.
 
+#### Read two durations from one operation
+
+Consider an invented observation of creating a work item in a seeded workspace, with no other clients active.
+:ref[table:operation-timer-boundaries]{text="The checkpoints below"} use the same browser clock.
+These are illustrative values, not measured results or project targets.
+
+| Checkpoint                                                                       | Time since activation |
+| -------------------------------------------------------------------------------- | --------------------: |
+| The user activates Create                                                        |                  0 ms |
+| The browser sends the creation request                                           |                 20 ms |
+| The browser receives and validates the accepted response                         |                 80 ms |
+| The browser check finds the new item and its creation event in the activity view |                160 ms |
+
+::caption[Two timer boundaries within one authored work-item creation journey.]
+::label[table:operation-timer-boundaries]
+
+A timer from request dispatch to response validation records `80 − 20 = 60 ms`; one from activation to the successful activity-view check records `160 − 0 = 160 ms`.
+The results agree because they measure different intervals.
+The extra 100 ms lies outside the first timer: 20 ms before dispatch and 80 ms after response validation.
+The checkpoints locate those intervals but do not identify the work responsible for them.
+
+If the question is how long until a created item appears in the activity view, the 60 ms result cannot answer it.
+The successful browser check supplies outcome evidence for this observation; neither duration alone establishes persistence or uniqueness.
+Repeat the declared workload, retain failed checks and report its duration distribution before generalizing beyond this single journey.
+
 #### Browser performance workbench
 
 The workbench below runs completely in the current page.

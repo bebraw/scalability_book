@@ -27,8 +27,15 @@ Software-engineering agent research describes related perception, memory, and ac
 ::caption[Parts of a coding agent and the development choices that shape them.]
 ::label[table:coding-agent-anatomy]
 
-Observations can be incomplete, tools can fail, and the stated goal can omit something the user needs.
-Improving an agent therefore involves its environment and feedback as well as its model and prompt.
+For an illustrative CSV-export task, you first specify which events and fields may leave the application and what a correct row contains.
+The model might request the serializer's source, propose an edit, and request a check.
+The agent harness executes those permitted file, edit, and command operations and returns their results.
+The repository supplies the check and its expected values, which you ground in the agreed export requirement.
+
+If the check reports an extra field, preserve that failed result and revise the candidate against the agreed format.
+You still inspect the actual download and decide whether to accept the change.
+[The worked export example](#constraint-feedback-through-an-actual-export) follows such a failure.
+Incomplete observations or failed tools may call for better context or checks as well as a different model.
 
 ## What changes when agents implement code?
 
