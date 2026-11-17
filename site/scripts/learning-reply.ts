@@ -156,6 +156,9 @@ function appendTokens(parent: HTMLElement, tokens: Token[]) {
         code.textContent = token.text as string;
         if (token.type === "code") {
           const pre = document.createElement("pre");
+          pre.tabIndex = 0;
+          pre.setAttribute("role", "region");
+          pre.setAttribute("aria-label", "Code block");
           pre.append(code);
           parent.append(pre);
         } else parent.append(code);

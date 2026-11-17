@@ -74,6 +74,8 @@ Shared record refreshes preserve the assistant's unsent message and ongoing disc
 An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft** (a reviewed suggestion), retaining its source and supplied-note relationships.
 Either handoff asks before replacing unfinished writing; only the student's Save note action creates the notebook record.
 Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
+Long code lines scroll within their code block; each block is a named keyboard focus target with a visible focus indicator, so arrow keys can reveal the complete text and Tab can leave the block.
+Expanded browser observations wrap within the assistant panel and retain their full recorded text.
 [learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
 Unsupported equations retain their original notation.
 Conversation storage and reviewed notebook drafts retain the original reply text; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records this presentation boundary.

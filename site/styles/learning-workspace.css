@@ -190,7 +190,8 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   opacity: 0.55;
 }
 .learning-workspace button:focus-visible,
-.learning-workspace a:focus-visible {
+.learning-workspace a:focus-visible,
+.learning-reply pre:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }

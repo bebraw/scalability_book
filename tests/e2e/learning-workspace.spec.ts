@@ -8,7 +8,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { conceptPages } from "../../shared/concept-pages.ts";
@@ -67,6 +67,144 @@ async function advertiseProvider(page: import("@playwright/test").Page) {
     await route.fulfill({
       json: { ...(await response.json()), provider: "Synthetic" },
     });
+  });
+}
+
+for (const width of [1440, 390]) {
+  test(`expanded assistant observations and code stay inside the panel at ${width}px`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await advertiseProvider(page);
+    const token = "synthetic-request-" + "abcdef0123456789".repeat(24);
+    const observation = JSON.stringify(
+      {
+        tool: "observe_demo",
+        result: {
+          [token]: {
+            url: `https://example.org/observations/${token}`,
+            result: ["complete synthetic output", "no model request was made"],
+          },
+        },
+      },
+      null,
+      2,
+    );
+    let conversation: LearningConversation;
+    await page.route(
+      `${companionAddress}/agent/conversations`,
+      async (route) => {
+        const response = await route.fetch();
+        if (route.request().method() === "POST")
+          conversation = await response.json();
+        await route.fulfill({ response });
+      },
+    );
+    await page.route(
+      `${companionAddress}/agent/conversations/*`,
+      async (route) => {
+        if (route.request().method() === "POST") {
+          conversation = {
+            ...conversation,
+            state: "idle",
+            messages: [
+              {
+                id: "c0000000-0000-4000-8000-000000000001",
+                role: "observation",
+                text: observation,
+                at: new Date().toISOString(),
+              },
+              {
+                id: "c0000000-0000-4000-8000-000000000002",
+                role: "agent",
+                text: `Recorded output follows.\n\n~~~json\n${observation}\n~~~`,
+                at: new Date().toISOString(),
+              },
+            ],
+          };
+        }
+        if (conversation) await route.fulfill({ json: conversation });
+        else await route.continue();
+      },
+    );
+    await page.goto("/chapters/benchmarking/");
+    await page
+      .locator(".site-header")
+      .getByRole("button", { name: "Teaching assistant", exact: true })
+      .click();
+    const panel = activeLearningPanel(page);
+    await panel.getByLabel("Companion address").fill(companionAddress);
+    await panel
+      .getByRole("button", { name: "Connect companion", exact: true })
+      .click();
+    await panel
+      .getByLabel("Message to the teaching assistant")
+      .fill("Inspect the synthetic output.");
+    await panel
+      .getByRole("button", { name: "Send message", exact: true })
+      .click();
+    const disclosure = panel.locator("details.learning-note");
+    await disclosure.locator("summary").click();
+    await expect(disclosure).toHaveAttribute("open", "");
+    await expect(disclosure.locator("p")).toHaveText(observation);
+    const pre = panel.locator(".learning-reply pre");
+    await expect(pre.locator("code")).toHaveText(observation);
+    await pre.scrollIntoViewIfNeeded();
+    const geometry = await panel.evaluate((element) => {
+      const content = element.querySelector(".learning-content")!;
+      const body = element.querySelector(".learning-body")!;
+      const pre = element.querySelector(".learning-reply pre")!;
+      const observation = element.querySelector("details.learning-note > p")!;
+      const rect = body.getBoundingClientRect();
+      return {
+        panelExcess: element.scrollWidth - element.clientWidth,
+        contentExcess: content.scrollWidth - content.clientWidth,
+        bodyExcess: body.scrollWidth - body.clientWidth,
+        preRight: pre.getBoundingClientRect().right - rect.right,
+        observationRight:
+          observation.getBoundingClientRect().right - rect.right,
+        codeExcess: pre.scrollWidth - pre.clientWidth,
+        preOverflow: getComputedStyle(pre).overflowX,
+      };
+    });
+    const evidence = testInfo.outputPath("expanded-output-geometry.json");
+    await writeFile(evidence, JSON.stringify(geometry, null, 2));
+    await testInfo.attach("expanded-output-geometry", {
+      path: evidence,
+      contentType: "application/json",
+    });
+    await page.screenshot({ path: testInfo.outputPath("expanded-output.png") });
+    expect(geometry.panelExcess).toBe(0);
+    expect(geometry.contentExcess).toBe(0);
+    expect(geometry.bodyExcess).toBe(0);
+    expect(geometry.preRight).toBeLessThanOrEqual(0);
+    expect(geometry.observationRight).toBeLessThanOrEqual(0);
+    expect(geometry.codeExcess).toBeGreaterThan(0);
+    expect(geometry.preOverflow).toMatch(/^(auto|scroll)$/);
+    await disclosure.locator("summary").focus();
+    await page.keyboard.press("Tab");
+    await expect(pre).toBeFocused();
+    await expect(pre).toHaveAccessibleName("Code block");
+    expect(
+      await pre.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (
+          style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0
+        );
+      }),
+    ).toBe(true);
+    // Let native scrolling start before keyup; WebKit ignores a zero-duration press.
+    await page.keyboard.press("ArrowRight", { delay: 100 });
+    await expect
+      .poll(() => pre.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(0);
+    await page.screenshot({
+      path: testInfo.outputPath("keyboard-code-focus.png"),
+    });
+    await page.keyboard.press("Tab");
+    await expect(
+      panel.getByText("About this reply", { exact: true }),
+    ).toBeFocused();
   });
 }
 
