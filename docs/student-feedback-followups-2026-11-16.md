@@ -95,14 +95,25 @@ These checks use synthetic text and programmatic selection; they do not establis
 
 ## 5. Explain who can read paragraph feedback before submission
 
-**Status: open; reported clarity concern.** Students should be able to distinguish private paragraph feedback from notebook writing and course peer discussion.
+**Status: closed on 17 November 2026 after audience guidance and access verification.** The form previously gave no audience explanation, and its anonymous label did not explain that administrators retained access to the stored GitHub identity.
+The posting confirmation appeared only inside the closed Tools menu.
 
-Review the feedback form and confirmation against [the existing audience contract](feedback-setup.md): a student sees their own comments and staff replies; staff can review comments, and curated reader notes can be featured publicly.
-Anonymous presentation in the teacher-facing interface does not remove the stored identity.
-Inspect [comment controls](../site/scripts/comments.ts) and [feedback styles](../site/styles/feedback.css); this task does not authorize changing visibility rules.
+[Comment controls](../site/scripts/comments.ts) now explain that the author and the book's feedback team can read the thread, and that the team may publish a curated Reader note without the author's name or private replies.
+The form distinguishes Notebook writing and Peer discussion, and the anonymous option explains that only the displayed name changes.
+The audience and anonymity explanations are associated with their inputs for assistive technology.
+The form initially focuses the audience explanation; Tab moves into Category and the remaining fields.
+This fixes a reproduced Chromium case at 1440 × 900 where focusing the textarea scrolled the new audience text above the panel's visible area.
+After posting, the open related-feedback panel confirms delivery to the feedback team and explains where to read replies.
+The [owning contract](feedback-setup.md) documents this presentation; access rules and storage are unchanged.
 
-Done when the form explains the actual audience and relevant anonymity/featuring behavior before a student posts, and the confirmation agrees with it.
-Use synthetic author, other-student and staff accounts to verify the existing access boundary while checking the revised wording.
+An isolated audit made 27 requests through the actual production Worker handlers, using synthetic signed sessions and in-memory KV.
+It verified private author/admin access, exclusion of other students and separately configured course staff, retained anonymous identity, curated public Reader notes without private replies, and hidden-record exclusion.
+All eight Chromium feedback/moderation tests passed, including regressions that first failed for the missing inline confirmation and initial focus.
+Four Worker-backed Chromium/WebKit rehearsals at 1440 × 900 and 390 × 844 verified the fully visible audience explanation, Tab navigation, reachable controls, anonymous posting, inline confirmation, author replies and another student's curated Reader note.
+Desktop/mobile screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+The audit also identified separate follow-ups for long-token wrapping and logged-out Reader note access, recorded in [task 10](#10-wrap-long-tokens-in-paragraph-feedback) and [task 11](#11-check-logged-out-access-to-public-reader-notes).
+Evidence and initial failures are retained under ignored `.local/reviews/feedback-audience-2026-11-17/`; no real student records or production feedback were used.
+This verifies the access boundary and interface behavior, without claiming a first-time learner comprehension study.
 
 ## 6. Review the examples and diagrams in Chapters 1–3
 
@@ -158,6 +169,25 @@ Check the actual browser/version and permission behavior against [the browser-su
 Done when the supported live-site connection path and its browser limitations are verified and documented, with a regression at the HTTPS-to-loopback boundary where automation can represent it.
 Do not infer live connectivity from HTTP-only tests or recommend disabling browser security to make a test pass.
 If a transport change is required, evaluate it separately under the repository's architecture and ADR rules.
+
+## 10. Wrap long tokens in paragraph feedback
+
+**Status: open; reproduced during the 17 November audience check.** At 1440 × 900, a synthetic unbroken token such as `PRIVATE_BROWSER_chromium-desktop` expands a related-feedback card and its grid track beyond the 238 px panel interior, producing a 287 px scroll width and clipping nearby controls.
+The same result occurred with the baseline `84b98f5` comment renderer and the audience-copy change; ordinary spaced feedback stayed within the panel.
+
+Reduce the card's minimum-content sizing in [feedback styles](../site/styles/feedback.css) before choosing a wrapping or layout correction.
+Done when long words, URLs and author names remain readable without pushing the related-feedback panel or its controls sideways on desktop and compact screens.
+The baseline/candidate screenshots and measurements are retained as `overflow-comparison.json` and `*-long-token-overflow.png` under ignored `.local/reviews/feedback-audience-2026-11-17/`.
+
+## 11. Check logged-out access to public Reader notes
+
+**Status: open; reproduced on 17 November with a synthetic featured note.** The Worker correctly returns the curated Reader note to a logged-out browser, and the paragraph badge shows one note.
+Clicking the badge requests sign-in before commenting, opens no related-feedback panel and leaves the public note unreadable there.
+The paragraph button's handler checks authentication before checking for existing visible notes.
+
+Inspect [paragraph controls](../site/scripts/comments.ts) against the [public Reader note contract](feedback-setup.md).
+Done when a logged-out reader can open the public note through the paragraph control while creating private feedback still requires sign-in; verify that the public response and rendered panel omit private identity and replies.
+The reproduction and screenshots are retained as `public-note-repro.json` and `public-note-*.png` under ignored `.local/reviews/feedback-audience-2026-11-17/`.
 
 ## Closing tasks
 

@@ -391,17 +391,20 @@ if (commentsRoot) {
     form.className = "paragraph-comment-form";
     form.dataset.commentForm = paragraphId;
     form.innerHTML = `
+      <p id="paragraph-feedback-audience" class="comment-form-help" tabindex="-1"><strong>Who can read this?</strong> Your comment and replies are visible to you and the book’s feedback team. The team may publish a curated Reader note without your name or private replies.</p>
+      <p class="comment-form-help">Use Notebook for notes to yourself and Peer discussion to share with classmates.</p>
       <label>
         <span>Category</span>
         <select name="category" required>
           ${feedbackCategories.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}
         </select>
       </label>
-      <textarea name="body" required maxlength="4000" aria-label="Comment text"></textarea>
+      <textarea name="body" required maxlength="4000" aria-label="Comment text" aria-describedby="paragraph-feedback-audience"></textarea>
       <label class="inline-option">
-        <input type="checkbox" name="anonymous" />
-        <span>Show as anonymous to teacher</span>
+        <input type="checkbox" name="anonymous" aria-describedby="paragraph-feedback-anonymity" />
+        <span>Show as anonymous to the feedback team</span>
       </label>
+      <p id="paragraph-feedback-anonymity" class="comment-form-help">Only the displayed name changes. Your GitHub identity remains stored and accessible to feedback administrators.</p>
       <div>
         <button type="submit">Post comment</button>
         <button type="button" data-comment-cancel>Cancel</button>
@@ -440,8 +443,10 @@ if (commentsRoot) {
         });
         form.remove();
         await loadComments();
-        showParagraphFeedbackPanel(paragraphId);
-        setStatus("Comment posted.");
+        const confirmation =
+          "Feedback sent to the book’s feedback team. You can read their replies here.";
+        showParagraphFeedbackPanel(paragraphId, confirmation);
+        setStatus(confirmation);
       } catch (error) {
         setStatus(errorMessage(error));
         submit.disabled = false;
@@ -459,7 +464,10 @@ if (commentsRoot) {
     positionCommentForm(form, paragraph);
     markFeedbackSource(paragraph);
     paragraph.insertAdjacentElement("afterend", form);
-    form.elements.body.focus();
+    requireElement(
+      form.querySelector<HTMLElement>("#paragraph-feedback-audience"),
+      "feedback audience explanation",
+    ).focus();
   }
 
   function positionCommentForm(form: HTMLElement, paragraph: Element): void {
@@ -469,13 +477,19 @@ if (commentsRoot) {
     form.style.setProperty("--comment-form-top", `${top}px`);
   }
 
-  function showParagraphFeedbackPanel(paragraphId: string): void {
+  function showParagraphFeedbackPanel(
+    paragraphId: string,
+    confirmation?: string,
+  ): void {
     activeFeedbackParagraphId = paragraphId;
     document.querySelector("[data-comment-form]")?.remove();
-    renderParagraphFeedbackPanel(paragraphId);
+    renderParagraphFeedbackPanel(paragraphId, confirmation);
   }
 
-  function renderParagraphFeedbackPanel(paragraphId: string): void {
+  function renderParagraphFeedbackPanel(
+    paragraphId: string,
+    confirmation?: string,
+  ): void {
     closeParagraphFeedbackPanel(false);
 
     const paragraph = document.querySelector<HTMLElement>(
@@ -509,6 +523,12 @@ if (commentsRoot) {
     close.addEventListener("click", () => closeParagraphFeedbackPanel());
     header.append(title, add, close);
     panel.append(header);
+    if (confirmation) {
+      const message = document.createElement("p");
+      message.setAttribute("role", "status");
+      message.textContent = confirmation;
+      panel.append(message);
+    }
     panel.append(renderParagraphContext(paragraph, paragraphId));
 
     if (!relatedComments.length) {

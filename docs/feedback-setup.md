@@ -10,7 +10,7 @@ This site has two feedback modes:
 Resolved local comments are synced back to Cloudflare KV with an explicit command.
 Local editing does not silently write to production.
 
-Course-backed peer inquiry is a separate opt-in surface at **Notebook → Peers**.
+Course-backed peer inquiry is a separate opt-in surface at **Teaching assistant → Peer discussion**.
 [Its contract](learning-workspace.md#peer-inquiry-contract) uses course membership and explicit group/cohort audiences, without migrating private feedback.
 Public inquiry offers require author consent and course-staff review; reviewed Markdown is handed to the existing book-editor workflow.
 This does not change the visibility or featuring rules for existing feedback.
@@ -114,10 +114,16 @@ Students use the deployed site:
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 
-Students can see their own comments after posting and any admin replies to those comments.
-They cannot see comments from other students.
-Students may choose to show an individual comment as anonymous in the teacher-facing UI; the underlying GitHub identity remains stored in KV for abuse handling.
-Admin users can see all comments and can feature curated reader notes for public display.
+Students can see their own visible comments after posting and any admin replies to those comments.
+Other readers can see only curated Reader notes that feedback admins explicitly feature for public display.
+Public Reader notes omit the author's identity and private replies.
+Admin users can see all feedback records, including the stored author identity when a comment is displayed as anonymous.
+
+Before posting, the form explains this audience and the possibility of a public Reader note, and distinguishes feedback from private Notebook writing and course Peer discussion.
+Opening the form focuses the audience explanation so it stays in view; Tab then moves to Category and the remaining fields.
+The anonymous checkbox changes the displayed name to **Anonymous student**; its description states that the GitHub identity remains stored in KV and accessible to feedback administrators.
+It does not remove identity from the stored record or its admin API response.
+After posting, a visible confirmation in the related-feedback panel says the feedback was sent to the book's feedback team and that replies can be read there.
 
 Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs.
 These are stored as chapter-level feedback.

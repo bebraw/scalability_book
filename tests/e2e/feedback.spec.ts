@@ -37,6 +37,7 @@ test.describe("paragraph feedback", () => {
   test("opens the side comment form and posts feedback for a paragraph", async ({
     page,
   }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     const target = page.locator("[data-comment-target]").first();
     const button = target.locator("[data-comment-button]");
 
@@ -49,6 +50,14 @@ test.describe("paragraph feedback", () => {
 
     const form = page.locator("[data-comment-form]");
     await expect(form).toBeVisible();
+    const audience = form.locator("#paragraph-feedback-audience");
+    await expect(audience).toBeFocused();
+    await expect(audience).toBeInViewport({ ratio: 1 });
+    await page.keyboard.press("Tab");
+    await expect(
+      form.getByRole("combobox", { name: "Category" }),
+    ).toBeFocused();
+    await expect(page.locator("[data-tools-panel]")).toBeHidden();
     await expect(page.locator("[data-paragraph-feedback-panel]")).toHaveCount(
       0,
     );
@@ -57,11 +66,13 @@ test.describe("paragraph feedback", () => {
     await form.getByRole("button", { name: "Post comment" }).click();
 
     const panel = page.locator("[data-paragraph-feedback-panel]");
-    await expect(page.locator("[data-comments-status]")).toContainText(
-      "Comment posted.",
-    );
     await expect(form).toHaveCount(0);
     await expect(panel).toBeVisible();
+    const confirmation = panel.getByRole("status");
+    await expect(confirmation).toBeVisible();
+    await expect(confirmation).toContainText(/sent.*feedback team/i);
+    await expect(confirmation).toContainText(/replies here/i);
+    await expect(page.locator("[data-tools-panel]")).toBeHidden();
     await expect(panel).toContainText("Related feedback");
     await expect(panel).toContainText("This paragraph needs a clearer hook.");
     await expect(target.locator("[data-comment-button]")).toHaveAttribute(

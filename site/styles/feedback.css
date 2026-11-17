@@ -230,6 +230,14 @@
   max-width: 68ch;
   padding: 0.75rem;
 }
+.paragraph-comment-form .comment-form-help {
+  color: var(--text);
+  font: 400 0.85rem/1.45 var(--font-ui);
+  margin: 0;
+}
+.comment-form-help strong {
+  display: block;
+}
 .paragraph-feedback-panel {
   background: var(--bg);
   border: 1px solid var(--border);
