@@ -39,6 +39,8 @@ Escape or the panel's close button returns keyboard focus to that experience's l
 Opening either experience captures the selection before loading/focusing the interface.
 Notebook offers **Use selected text** and Teaching assistant offers **Discuss selected text** when already open.
 Notebook captures a private writing context; assistant selection prepares a source without sending a message.
+Notebook's Write view states that no assistant or model account is needed and explains how to attach a reading selection before the selection-only control appears.
+When the panel covers the reading, the guidance points to closing it, selecting the passage and reopening Notebook.
 A chapter note keeps the reading link and authored concept membership without copying the chapter text.
 The source is visible in Write; **Preview the selected source** reveals a bounded quote while its full captured text remains in the saved record.
 Writing and Save actions precede kind/title details.

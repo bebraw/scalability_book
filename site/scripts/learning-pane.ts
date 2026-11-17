@@ -429,6 +429,13 @@ export function createLearningPane(
     }
   }
   function renderEditor() {
+    container.append(
+      node(
+        "p",
+        "Notebook works without an assistant or model account. Write your own note and choose Save note to keep it.",
+        "learning-hint",
+      ),
+    );
     const context = node("section", undefined, "learning-context");
     context.setAttribute("aria-label", "Note context");
     context.append(
@@ -441,6 +448,14 @@ export function createLearningPane(
       ),
       link(editor.source.title, sourceLink(editor.source)),
     );
+    if (editor.source.kind !== "passage")
+      context.append(
+        node(
+          "p",
+          "To attach a passage, select text in the reading and choose Use selected text. If Notebook covers the passage, close it and reopen it after selecting.",
+          "learning-hint",
+        ),
+      );
     if (editor.source.excerpt) {
       const preview = node("details");
       preview.append(

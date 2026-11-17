@@ -77,16 +77,21 @@ Record that outcome separately from the automated checks.
 
 ## 4. Clarify the notebook-only capture path
 
-**Status: open; reported workflow confusion, not a confirmed absence of capture capability.** The feedback suggested that capturing learning material required the assistant.
-The current [workspace contract](learning-workspace.md) already supports opening Notebook with a reading selection and using **Use selected text** without sending a model message.
+**Status: closed on 17 November 2026 after workflow verification and clearer guidance.** The feedback suggested that capturing learning material required the assistant, but the existing capture paths worked with a notebook-only connection.
+The empty Write view did not explain how to attach a passage; **Use selected text** appeared only after selection.
 
-Rehearse passage capture, personal writing and saving with a notebook-only connection and no model configured.
-Also distinguish this path from deliberately turning an assistant reply into a reviewed notebook draft.
-Inspect [selection capture](../site/scripts/learning-selection.ts), [Notebook presentation](../site/scripts/learning-pane.ts) and first-use guidance only where the rehearsal reveals a gap.
+[Notebook presentation](../site/scripts/learning-pane.ts) now states that no assistant or model account is needed, explains passage capture before that control appears, and points to closing/reopening the panel when it covers the reading.
+The [setup guide](learning-companion-setup.md#capture-and-revisit-your-thinking) gives a four-step capture/preview/write/save walkthrough and distinguishes the optional assistant-reply handoff.
+The [workspace contract](learning-workspace.md) records the guidance; selection and saving behavior are unchanged.
 
-Done when a student can discover and complete passage-to-note capture without opening or configuring the assistant, and the saved note retains its source.
-Verify that the path makes no model request and that a draft is not saved until the student chooses Save.
-If current behavior already satisfies the task, close it with the observed walkthrough and any necessary wording change rather than adding another capture mechanism.
+All eight rehearsal cases passed before and after the wording change: select before opening/connecting Notebook or select while it is open, at 1440 px and 390 px in Chromium and WebKit.
+Each used an isolated companion with no provider, never opened Assistant and made no `/agent` request.
+Captured source remained separate from personal writing; the notebook stayed empty until **Save note**, then retained the exact writing, full captured passage, page URL and anchor.
+Desktop/mobile notebook and rendered-guide screenshots were inspected, and the build, types, HTML/local-link validation and formatting passed.
+The full link check found no broken links; 12 external destinations denied automated access and remain inconclusive.
+
+Evidence and scripts are retained under ignored `.local/reviews/notebook-capture-2026-11-17/`, including the initial audit-script endpoint mistake and its correction to the existing `/notebook` read API.
+These checks use synthetic text and programmatic selection; they do not establish native touch-selection usability or first-time learner comprehension.
 
 ## 5. Explain who can read paragraph feedback before submission
 

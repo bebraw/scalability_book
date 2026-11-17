@@ -113,10 +113,23 @@ Restart an older companion from the updated checkout if the cockpit asks for the
 
 ## Capture and revisit your thinking
 
+Notebook works without opening the assistant or configuring a model account.
+Choose **Notebook only** during setup and connect the companion as described above.
 The header's **Notebook** button is always available for connecting or working on the current page.
 Without a text selection, **Write** starts a note about that chapter/page and keeps its reading link.
-To attach a passage, select text in the reading, then open **Notebook**; if it is already open, choose **Use selected text**.
-Write shows the source; **Preview the selected source** reveals a short quote without copying the whole chapter into your note.
+
+To keep a passage with your own thinking:
+
+1. Select text in the reading, then open **Notebook**.
+   If the panel is already open, choose **Use selected text**; if it covers the passage, close it before selecting and reopen it afterwards.
+2. Check the reading link and **Preview the selected source**.
+   The captured passage stays with the source, separately from your writing.
+3. Write a question, observation or explanation in **Your thinking**.
+4. Choose **Save note**.
+   Only this action saves the note; selecting a passage or writing a draft does not save it or send a model message.
+
+The source preview shows a short quote; the saved note retains the full captured passage.
+Turning an assistant reply into a reviewed notebook draft is a separate, optional path.
 Your writing and Save action come before the note's kind and title, so you can start with your thought and add details later.
 The open notebook follows you between chapters, and **Notes** initially shows the current reading's entries; choose **Whole notebook** to see the rest.
 Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
