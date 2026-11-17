@@ -2145,6 +2145,7 @@
 .otel-demo-record {
   border: 1px solid var(--border);
   color: var(--text);
+  min-inline-size: 0;
 }
 .otel-demo-record summary {
   cursor: pointer;

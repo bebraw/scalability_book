@@ -55,6 +55,7 @@ The trace explorer (activity version 3) requires a child-span selection before *
 Opening it moves keyboard focus to the reading and brings it into view; **Hide authored case reading** closes it without discarding the selected evidence.
 The reading identifies the request's authored verdict and the selected span's interpretation, updating as another span is selected.
 Choosing another request hides the reading and requires new child-span evidence before revealing it again.
+Its expanded conceptual span record stays within the inspector, retaining the complete literal JSON in a named, keyboard-focusable viewer with internal horizontal and vertical scrolling when needed.
 All demos describe bounded named controls and displayed text with the same generic snapshot contract.
 Retired widgets and their specialized contracts are removed; their useful questions remain as chapter evidence activities and project templates.
 The [local practice workspace](../labs/README.md) is a separate executable teaching resource with independent CSV, mutation, retry and cache exercises.

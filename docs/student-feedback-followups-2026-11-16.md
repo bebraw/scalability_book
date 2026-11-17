@@ -16,6 +16,10 @@ The Reader note correction was pushed as `15794a3` on the same date; published-l
 Live desktop/mobile Chrome checks verified public reading, the sign-in handoff and retention of the note after closing Account, with synthetic responses and no production writes.
 Evidence is retained under ignored `.local/reviews/deployment-15794a3-2026-11-17/`.
 
+The trace-reading disclosure was pushed as `35fe859` on 17 November; all six CI/deployment checks passed, including Cloudflare deployment and companion package checks.
+Eight live Chrome/WebKit checks passed across the chapter and gallery at desktop/mobile widths using actual published assets, with no production API writes.
+Evidence is retained under ignored `.local/reviews/deployment-35fe859-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -295,6 +299,29 @@ The first WebKit audit incorrectly assumed plain Shift+Tab included native butto
 Retained reproduction measurements, screenshots and test logs live under ignored `.local/reviews/trace-reveal-2026-11-17/`.
 These checks verify the disclosure and keyboard behavior, not first-time learner comprehension.
 
+## 13. Keep the trace inspector's JSON inside its panel
+
+**Status: closed on 17 November 2026 after reproducing and correcting the disclosure's minimum width.** Opening **Inspect conceptual span record** expanded the inspector's implicit grid column to the long JSON line's width.
+On the 1440 px chapter page, the inspector had a 300 px client width but a 384 px scroll width in Chromium and 393 px in WebKit.
+The same cause reproduced on the chapter and gallery at 390 and 320 px.
+This is the concrete trace-demo finding, separate from task 1's unattributed assistant observation.
+
+A reduced inspector containing only the disclosure reproduced the overflow in both engines.
+Limiting only the preformatted viewer's maximum width left the oversized grid column unchanged.
+The [record disclosure](../site/styles/demos.css) now has `min-inline-size: 0`, allowing the existing viewer's internal scrolling to contain the complete literal record.
+Its named keyboard target and focus indicator already existed; the record data, interpretation and activity version are unchanged.
+The [resource contract](agent-learning-resources.md#public-mcp-server) records the containment and scrolling behavior.
+
+All six new chapter/gallery regressions failed before the fix after successfully parsing the full authored JSON.
+All 11 Chromium trace-demo tests now pass, including inspector/page containment, complete record fields, visible keyboard focus, arrow-key scrolling, Tab exit and replacement when another span is selected.
+Twelve built-page Chromium/WebKit cases passed across both routes and all three widths, including reaching the final characters horizontally without losing the literal text.
+Screenshots were inspected; the Worker build, types, HTML/local-link validation, formatting and diff checks passed.
+
+The first post-fix regression run exposed 0.23–0.45 px of native vertical focus-scroll rounding; the corrected check allows one CSS pixel vertically while retaining exact horizontal containment.
+The separate WebKit audit reproduced a missed instantaneous synthetic arrow press in a standalone native scroll box, and a rapid key sequence stopped short at 320 px.
+Held keys and observed animation completion reached the last character without changing the page's keyboard behavior; the corrected audit uses that bounded sequence.
+Initial failures, reduced comparisons, exact geometry, successful checks and screenshots are retained under ignored `.local/reviews/trace-record-2026-11-17/`.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
@@ -303,7 +330,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                           | Relevant owner                                                                                                          |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 13   | Reproduce overflowing **Inspect conceptual span record** JSON on desktop and compact screens independently of task 1, retaining complete readable output                         | [Trace demo styles](../site/styles/demos.css) and [browser regression](../tests/e2e/otel-trace-demo.spec.ts)            |
 | 14   | Review an explicit, previewable notebook handoff that includes the learner's questions and responses; the selected-suggestion contract currently copies only the assistant reply | [Assistant presentation](../site/scripts/learning-agent-ui.ts) and [workspace contract](learning-workspace.md)          |
 | 15   | Check whether Chapter 1's concept link supplies a practical method for deciding whether an architectural choice is reversible                                                    | [Chapter 1](../book/01_establish/01_what_is_scalability.md)                                                             |
 | 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                            | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
