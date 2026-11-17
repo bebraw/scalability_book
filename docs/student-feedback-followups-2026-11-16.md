@@ -24,6 +24,11 @@ The trace-record containment fix was pushed as `727dad2` on 17 November; publish
 Twelve live Chromium/WebKit checks passed across the chapter and gallery at 1440, 390 and 320 px, verifying full records, contained scrolling, keyboard access and span replacement with the published assets and no production API writes.
 Evidence is retained under ignored `.local/reviews/deployment-727dad2-2026-11-17/`.
 
+The notebook exchange preview was pushed as `b6acd8c` on 17 November; all six CI/deployment checks passed, including Cloudflare deployment and companion package checks.
+Four live desktop/mobile Chromium/WebKit cases passed, with eight scoped accessibility checks and explicit saves to disposable local notebook storage, using the published assets and synthetic conversations without production writes or model calls.
+Chromium used the native companion connection; WebKit's previously documented native connection failure was preserved, and its UI checks used a local transport bridge rather than establishing native Safari support.
+Evidence and that limitation are retained under ignored `.local/reviews/deployment-b6acd8c-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -353,6 +358,25 @@ Later fixture corrections waited for connection/save completion and reselected a
 Initial failures and passing checks are retained under ignored `.local/reviews/notebook-exchange-2026-11-17/`.
 The opt-in real-provider test was updated for the new review step but was not run; synthetic conversations and disposable notebook storage supplied all records.
 
+## 15. Give Chapter 1 a practical reversibility check
+
+**Status: closed after focused editorial changes and rendered inspection on 17 November 2026.** Chapter 1 introduced decision reversibility and linked its definition, but gave no procedure for applying it to a project choice.
+The concept entry already named dependencies, durable effects, cost and recovery evidence, and Chapter 5 already developed commitment points and decision records.
+
+[Chapter 1](../book/01_establish/01_what_is_scalability.md) now supplies four steps at first use: define a safe result, identify dependencies that outlive code, describe reversal work and cost, and rehearse the uncertain part on disposable state.
+An illustrative optional category field connects a cheap isolated trial to accepted data and independently deployed clients.
+The example rejects a code revert that makes records unreadable or hides their category values, and describes preserving those values while clients transition.
+It distinguishes a bounded rehearsal from production recovery evidence and links the existing decision log and Chapter 5 treatment.
+Course deliverables, assessment requirements and the concept definition are unchanged.
+
+Independent editorial review checked the method against Chapter 5 and the existing project decision-record requirements; its correction made preservation of category values and treatment of existing clients explicit.
+Four rendered Chromium/WebKit checks passed at 1440 and 390 px, covering the four steps, text containment and the forward link's actual destination; screenshots were inspected.
+The Worker build, types, HTML/local-link validation, formatting and diff checks passed.
+The full link check found no broken links and 13 inconclusive external destinations due to access blocks or service errors.
+The first inspection script assumed a fourth-level heading rendered as a semantic heading; the book renders it as bold text, so the corrected inspection locates the actual passage without changing presentation.
+Evidence and the initial inspection failure are retained under ignored `.local/reviews/reversibility-2026-11-17/`.
+These checks establish the editorial and rendering result, not a learner comprehension study.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
@@ -361,7 +385,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                          |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 15   | Check whether Chapter 1's concept link supplies a practical method for deciding whether an architectural choice is reversible                                           | [Chapter 1](../book/01_establish/01_what_is_scalability.md)                                                             |
 | 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                   | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
 | 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                    | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
 | 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |

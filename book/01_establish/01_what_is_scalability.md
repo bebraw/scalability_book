@@ -113,6 +113,38 @@ Change scalability is the ability to keep making justified changes without turni
 It depends on visible boundaries, useful tests, staged evolution, and recovery paths, but no design eliminates the need to understand what has already become a commitment.
 Planning for [decision reversibility](/concepts/#decision-reversibility) makes explicit which choices remain cheap to revise and which now require coordinated change.
 
+#### Check a decision's reversibility
+
+Assess one concrete choice under its current conditions, rather than labelling an entire architecture “reversible.”
+A useful check has four steps:
+
+1. **Define a safe result.** If you changed your mind, what must still work and what information must survive?
+   Name the users, accepted data and behavior that the change back must preserve.
+2. **Find what would outlive the code.** List stored representations, independently deployed consumers, queued work and external effects that could depend on the choice.
+   Identify who controls each dependency; changing your repository cannot update every consumer or undo an action elsewhere.
+3. **Describe the route back and its cost.** Name the code changes, data conversion, compatibility period and coordination needed, including time, service interruption and any information that cannot be recovered.
+   Compare that work with the time and resources available; a small patch can still have an unaffordable reversal cost.
+4. **Rehearse the uncertain part.** On disposable state, try the proposed reversal with representative records and consumers from before and after the change.
+   Check the safe result from step 1, record what failed and distinguish observed recovery from assumptions that remain untested.
+
+For an illustrative event-tracker change, suppose we introduce an optional category field.
+Our safe result is that accepted events and their recorded category values remain readable, and clients that omit the field can still submit events.
+While the trial uses an isolated branch and disposable synthetic events, we can discard both without affecting anyone else's accepted work.
+Once real events store categories or another client depends on them, the same choice requires a different reversal plan.
+
+To investigate, create synthetic events with and without categories, then try the previous reader against both, check the returned values and send a submission from a client that omits the field.
+If the old reader rejects the new records or hides their categories, a successful code revert has not restored the safe result.
+A possible route is to retain the stored categories and support for reading them, while continuing to honor category-bearing submissions until their clients migrate.
+Only then could new category input be explicitly rejected; silently accepting and discarding it would violate the safe result.
+Test this transition with both kinds of client.
+Deleting the field or restoring an older backup would not be a safe shortcut if it loses accepted information.
+Passing this small rehearsal would establish only the tested cases, not recovery time at production data volumes.
+
+Keep the planned route, evidence and remaining assumptions in the existing [decision log](/concepts/#decision-log).
+Name a revisit trigger, such as the first persistent use or adoption by an independently deployed client, before that dependency makes reversal harder.
+A costly commitment may still be justified; the aim is to make its cost visible while alternatives remain available.
+The [Friction chapter](/chapters/friction/#find-the-commitment-point) develops these commitment points and shows a decision-record example.
+
 #### Field note — When agent speed made me the bottleneck
 
 Before AI-assisted development, I thought about scalability mainly through the conventional pressures of demand and data.
