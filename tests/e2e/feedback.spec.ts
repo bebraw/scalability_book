@@ -334,6 +334,125 @@ test("hides reflection prompts for logged-out readers", async ({ page }) => {
   await expect(page.locator("[data-feedback-admin-link]")).toBeHidden();
 });
 
+for (const width of [1440, 390]) {
+  test(`logged-out readers open public Reader notes before signing in at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const loginUrl = "/api/auth/github/start";
+    await page.route("**/api/auth/status", (route) =>
+      route.fulfill({
+        json: {
+          available: true,
+          authenticated: false,
+          admin: false,
+          user: null,
+          loginUrl,
+        },
+      }),
+    );
+    await page.route("**/api/account/status", (route) =>
+      route.fulfill({
+        json: {
+          local: false,
+          github: { available: true, user: null, loginUrl },
+          course: { available: false, emailAvailable: false, user: null },
+          answers: null,
+        },
+      }),
+    );
+    const writes: string[] = [];
+    let notes: object[] = [];
+    await page.route("**/api/comments**", (route) => {
+      if (route.request().method() === "GET")
+        return route.fulfill({ json: notes });
+      writes.push(route.request().method());
+      return route.fulfill({
+        status: 401,
+        json: { message: "Sign in before commenting." },
+      });
+    });
+    await page.goto(chapterPath);
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-comments-ready",
+      "false",
+    );
+    const paragraphId = await page
+      .locator("[data-comment-button]")
+      .first()
+      .getAttribute("data-comment-button");
+    expect(paragraphId).toBeTruthy();
+    const body =
+      "Curated public explanation: separate latency from throughput.";
+    // Match the Worker's public projection, not its private stored record.
+    notes = [
+      {
+        id: "featured-synthetic-public-source",
+        sourceId: "synthetic-public-source",
+        chapter: "introduction",
+        paragraphId,
+        body,
+        author: { login: "Reader note", avatarUrl: null, url: null },
+        createdAt: "2026-11-17T08:00:00.000Z",
+        featuredAt: "2026-11-17T08:00:00.000Z",
+        publicNote: true,
+        replies: [],
+      },
+    ];
+    await page.reload();
+    const badge = page.locator(`[data-comment-button="${paragraphId}"]`);
+    await expect(badge).toHaveAttribute("data-comment-count", "1");
+    await expect(badge).toBeVisible();
+    await badge.focus();
+    await page.keyboard.press("Enter");
+    const panel = page.locator("[data-paragraph-feedback-panel]");
+    await expect(panel).toBeVisible();
+    await expect(panel.locator(".paragraph-feedback-card > p")).toHaveText(
+      body,
+    );
+    await expect(panel.locator(".comment-meta strong")).toHaveText(
+      "Reader note",
+    );
+    await expect(panel.locator(".comment-replies")).toHaveCount(0);
+    await expect(panel.locator(".comment-card-actions")).toHaveCount(0);
+    await expect(page.locator("[data-comment-form]")).toHaveCount(0);
+    const account = page.getByRole("dialog", {
+      name: "Account & connections",
+      exact: true,
+    });
+    await expect(account).not.toBeVisible();
+    await panel.getByRole("button", { name: "Close related feedback" }).click();
+    await expect(panel).toHaveCount(0);
+    await badge.click();
+    await panel
+      .getByRole("button", { name: "Sign in to comment", exact: true })
+      .click();
+    await expect(account).toBeVisible();
+    await expect(
+      account.getByRole("link", { name: "Sign in with GitHub", exact: true }),
+    ).toHaveAttribute(
+      "href",
+      `${loginUrl}?returnTo=${encodeURIComponent(chapterPath)}`,
+    );
+    await expect(page.locator("[data-comment-form]")).toHaveCount(0);
+    await account
+      .getByRole("button", { name: "Close account and connections" })
+      .click();
+    await expect(panel).toContainText(body);
+
+    notes = [];
+    await page.reload();
+    await expect(badge).toHaveAttribute("data-comment-count", "");
+    await expect(badge).toBeHidden();
+    // Exercise the empty-paragraph handler even though the logged-out UI hides it.
+    await badge.evaluate((button) => button.click());
+    await expect(account).toBeVisible();
+    await expect(page.locator("[data-comment-form]")).toHaveCount(0);
+    await expect(panel).toHaveCount(0);
+    expect(writes).toEqual([]);
+  });
+}
+
 async function waitForFeedback(page: Page) {
   await expect(page.locator("html")).toHaveAttribute(
     "data-comments-ready",

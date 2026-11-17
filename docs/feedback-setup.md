@@ -117,6 +117,9 @@ Comments are stored under KV keys named `comments:<chapter-slug>`.
 Students can see their own visible comments after posting and any admin replies to those comments.
 Other readers can see only curated Reader notes that feedback admins explicitly feature for public display.
 Public Reader notes omit the author's identity and private replies.
+Readers can open a public note through its paragraph badge without signing in.
+The related-feedback panel offers **Sign in to comment** to logged-out readers; it opens Account before any comment form appears.
+Closing Account leaves the public note available to read.
 Admin users can see all feedback records, including the stored author identity when a comment is displayed as anonymous.
 
 Before posting, the form explains this audience and the possibility of a public Reader note, and distinguishes feedback from private Notebook writing and course Peer discussion.

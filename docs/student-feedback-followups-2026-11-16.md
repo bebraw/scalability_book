@@ -8,6 +8,10 @@ The supported coding-agent entry is implemented in [ADR-063](adrs/implemented/AD
 Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) owns the student instructions, and the [development guide](development.md#course-project-launcher) owns release and compatibility checks.
 Completion of that setup work does not close the items below.
 
+Changes through `4fbee6e` were pushed on 17 November 2026; published-link CI and Cloudflare deployment succeeded for that commit.
+Eleven live Chrome checks passed for feedback wrapping/audience, compact setup guides, chapter examples, optional practice, notebook guidance and browser-evidence disclosure.
+They used the deployed assets with synthetic feedback responses and a disposable companion, without production writes or model calls; evidence is retained under ignored `.local/reviews/deployment-4fbee6e-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -241,13 +245,25 @@ This is separate from the original horizontal overflow; the failure and measured
 
 ## 11. Check logged-out access to public Reader notes
 
-**Status: open; reproduced on 17 November with a synthetic featured note.** The Worker correctly returns the curated Reader note to a logged-out browser, and the paragraph badge shows one note.
-Clicking the badge requests sign-in before commenting, opens no related-feedback panel and leaves the public note unreadable there.
-The paragraph button's handler checks authentication before checking for existing visible notes.
+**Status: closed on 17 November 2026 after separating public reading from authenticated commenting.** The Worker already returned the curated Reader note to a logged-out browser, but the paragraph button checked authentication before looking for visible notes.
+Both new desktop/mobile regressions reproduced the visible one-note badge opening no panel.
 
-Inspect [paragraph controls](../site/scripts/comments.ts) against the [public Reader note contract](feedback-setup.md).
-Done when a logged-out reader can open the public note through the paragraph control while creating private feedback still requires sign-in; verify that the public response and rendered panel omit private identity and replies.
-The reproduction and screenshots are retained as `public-note-repro.json` and `public-note-*.png` under ignored `.local/reviews/feedback-audience-2026-11-17/`.
+[Paragraph controls](../site/scripts/comments.ts) now open existing visible feedback first.
+The shared form entry checks authentication before creating or removing interface elements, covering both an empty paragraph and the related-feedback panel's action.
+Logged-out readers see **Sign in to comment**, which opens the existing Account dialog; closing it leaves the public note available.
+The [feedback contract](feedback-setup.md#5-student-feedback-flow) records this behavior.
+Worker authorization, public projection and stored records are unchanged.
+
+The regression covers keyboard opening, closing and reopening the public note, its Reader note label without private replies or moderation controls, visible GitHub sign-in, and no form or write from either unauthenticated entry point.
+All 16 feedback and moderation browser tests passed.
+An independent audit through the actual Worker passed four Chromium/WebKit cases at 1440 and 390 px using synthetic author/admin/public sessions and in-memory KV.
+It verified that the author retains the original private question and reply, while both the public API response and rendered note omit them and the private identities.
+The public UI made no feedback writes, and a separate unauthenticated API POST returned 401 without changing the note.
+Desktop/mobile screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
+
+Initial failures, corrected checks, API projections and screenshots are retained under ignored `.local/reviews/public-reader-note-2026-11-17/`; the earlier reproduction remains under `.local/reviews/feedback-audience-2026-11-17/`.
+The first post-fix test expected a bare GitHub sign-in URL; the existing Account contract appends the reading's return destination, so the corrected assertion preserves that behavior.
+No production feedback or real student records were used.
 
 ## Closing tasks
 

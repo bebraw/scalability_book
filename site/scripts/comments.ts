@@ -281,14 +281,6 @@ if (commentsRoot) {
       button.addEventListener("click", () => {
         const paragraphId = button.dataset.commentButton;
 
-        if (!auth.authenticated && !auth.admin) {
-          (commentsControls || feedbackRoot).scrollIntoView({
-            block: "start",
-          });
-          setStatus("Sign in with GitHub before commenting.");
-          return;
-        }
-
         if (!paragraphId) {
           return;
         }
@@ -377,6 +369,12 @@ if (commentsRoot) {
   }
 
   function openForm(paragraphId: string): void {
+    if (!auth.authenticated && !auth.admin) {
+      setStatus("Sign in with GitHub before commenting.");
+      openAccount();
+      return;
+    }
+
     document.querySelector("[data-comment-form]")?.remove();
     closeParagraphFeedbackPanel();
     const paragraph = document.querySelector<HTMLElement>(
@@ -514,7 +512,8 @@ if (commentsRoot) {
     title.textContent = "Related feedback";
     const add = document.createElement("button");
     add.type = "button";
-    add.textContent = "Add comment";
+    add.textContent =
+      auth.authenticated || auth.admin ? "Add comment" : "Sign in to comment";
     add.addEventListener("click", () => openForm(paragraphId));
     const close = document.createElement("button");
     close.type = "button";
