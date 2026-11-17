@@ -266,7 +266,7 @@ Energy use is harder to measure than latency or transferred bytes, and neither o
 
 An optimization must preserve the intended behavior as well as improve the selected resource measure.
 
-Run one bounded optimization experiment:
+For optional practice, run one bounded optimization experiment in a working project you control:
 
 1. Choose one representative Playwright journey and preserve its baseline.
 2. Make one targeted AI-assisted frontend optimization.
@@ -277,6 +277,8 @@ Run one bounded optimization experiment:
 5. For a deterministic measure such as built asset size, report one value per condition.
    For a run-varying measure, report the median and range.
 6. Re-run the functional checks, inspect for visual or accessibility regressions, note rejected suggestions or regressions, and state what the comparison cannot establish.
+
+Keep the before/after comparison, functional checks and one limitation in your existing learning notes; this practice adds no separate submission.
 
 ## Measurement alone cannot explain behavior
 
@@ -322,6 +324,8 @@ The TeleGen preprint links browser actions to runtime observations and compresse
 It reports gains on two web-generation benchmarks with different success measures; those results do not establish lower production maintenance cost.
 
 The [optional repair-evidence investigation](/explore/telemetry-guided-repair/) compares task feedback alone, raw telemetry, and a brief for the same failure.
+Start by checking what the supplied save-and-reload packet establishes.
+Keep independent acceptance cases and a plan for comparing the three repair conditions in existing notes; a paper plan is sufficient.
 [Appendix A](/appendices/evaluating-agentic-workflows/#compare-repair-evidence) explains the controls and acceptance boundary.
 
 ## Observe the agentic workflow too

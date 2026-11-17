@@ -2,6 +2,8 @@
 
 This fixture is a non-executing review exercise for an imported agent capability.
 It contains reserved example domains and an inert credential name so you can inspect requested behavior and effective authority without loading the candidate as a skill or running its instructions.
+This is optional, ungraded practice; the course brief defines the required work.
+Keep the adoption decision and remaining questions in your existing learning notes, with no separate submission.
 
 ## Safety boundary
 

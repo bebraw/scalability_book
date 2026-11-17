@@ -221,7 +221,10 @@ Publishing an issue or patch also creates work for an external maintainer, so so
 ### Optional exercise — Move a prototype into shared use
 
 What would turn a working demo into a tool someone can operate and own?
-Give your agent the [prototype starting point](/explore/prototype-to-shared-use/agent.md) to investigate one decision at a time, or [read the scenario yourself](/explore/prototype-to-shared-use/).
+Read the [invented CSV scenario](/explore/prototype-to-shared-use/) and first separate what the demo establishes from what remains untested.
+You can also give your agent the [prototype starting point](/explore/prototype-to-shared-use/agent.md) to discuss one decision at a time.
+Keep a proposed trial, its owner and remaining unknowns in your existing learning notes.
+The paper exercise needs no live data or deployment.
 
 ## Agent harnesses and workspaces
 
@@ -314,7 +317,11 @@ Package a reusable capability with its fit criteria, files, dependencies, integr
 
 [Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
 Imported capabilities also create a trust boundary because instructions or bundled code may influence tools operating with the agent's authority.
-[Appendix D's imported-capability review](/appendices/agent-system-security/#imported-capabilities-are-development-dependencies) develops these security implications, while the skill-adoption lab provides a bounded review exercise; [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption) or [download the standalone lab](/downloads/labs/skill-adoption.zip).
+[Appendix D's imported-capability review](/appendices/agent-system-security/#imported-capabilities-are-development-dependencies) develops these security implications.
+
+For optional practice, [download the skill-adoption lab](/downloads/labs/skill-adoption.zip) and start with `README.md`, or [read its source](https://github.com/bebraw/scalability_book/tree/main/labs/skill-adoption).
+Review the candidate and host profile as text, without loading or executing the candidate as a skill.
+Keep a short adoption decision, its restrictions and remaining uncertainty in your existing learning notes.
 
 ## When generation outruns comprehension
 
@@ -351,6 +358,8 @@ These are proposed aids to inspection; a model that writes both the explanation 
 For a consequential claim, predict an observable result, inspect the complete relevant code, and check that prediction against behavior.
 Separate what the implementation guarantees from conditions the explanation assumes, such as a worker staying alive or a request reaching the same instance.
 The [optional explanation challenge](/explore/challenge-an-explanation/) uses a small event recorder to practice finding and correcting an overstatement.
+Start by predicting the stored event count before and after a recorder restart.
+Keep the checked event counts and your corrected guarantee in existing learning notes.
 
 ### Field note — Kirjolab
 

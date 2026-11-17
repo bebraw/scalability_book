@@ -141,14 +141,29 @@ These checks establish the editorial and rendering result, not a learner compreh
 
 ## 7. Make the role of optional exercises explicit
 
-**Status: open; reported orientation concern.** Review whether readers can tell which exercises are optional practice, how to start them and what they should learn or retain.
+**Status: guidance implemented on 17 November 2026; next pilot walkthrough pending.** The review covered the practice questions in Chapters 1–3, their prose activities and linked investigations, against [the exercise contract](chapter-exercises.md) and [course requirements](../specifications/README.md).
 
-Start with the optional exercises encountered in Chapters 1–3, their linked investigations and the relevant course brief.
-Compare the wording with [the exercise contract](chapter-exercises.md), the [course requirements](../specifications/README.md) and the existing [run-orientation backlog](first-run-course-improvements.md#1-improve-run-specific-orientation).
-Preserve required assessment and submission rules; a practice activity should not silently become an additional deliverable.
+The shared question cards now say **Optional practice**, explain attempting/checking/comparing an answer without an account or assistant, and distinguish optional private saving from the course brief's required submissions.
+Their existing titles and prompts identify the reasoning to practice.
+This shared presentation also keeps the same questions consistent in later chapters and the demo gallery; question text, versions and answer ownership are unchanged.
 
-Done when each reviewed activity names its purpose, starting point and expected outcome, and readers can distinguish optional practice from required course evidence.
-Check links and the rendered reading path, then record any remaining confusion from the next pilot walkthrough.
+The linked explorations already supplied scenarios, questions and specific outcomes, but their opening panel emphasized using an agent.
+It now explains independent reading first and keeps the agent starting URL as an optional discussion route.
+The completion guidance points to changed reasoning and one next check in existing notes, as documented in [the resource contract](agent-learning-resources.md#authored-resources).
+
+Five Chapter 2–3 invitations now name a starting action and retained outcome: prototype ownership, skill adoption, explanation checking, resource optimization and repair evidence.
+The optimization experiment and skill-adoption lab are explicitly optional; the downloadable lab repeats that status.
+The existing CSV, coverage, local telemetry and Navigator instructions already supplied sufficient purpose, entry steps and outcomes, so their instructions remain unchanged.
+Required **Project artifact** checkpoints, grading and submission rules remain governed by the course specifications.
+
+Nine existing unit checks and six Chromium browser cases passed, covering checked answers, private saves/restoration, anonymous and no-JavaScript reading, keyboard/tab navigation, print behavior, source links and desktop/mobile accessibility.
+Additional desktop/mobile inspection confirmed the optional guidance, reachable worked answers, independent exploration path and revised invitations; the built skill-adoption ZIP contains the revised README.
+Build, types, HTML/local links and formatting passed.
+The full link check found no broken links and 15 inconclusive external destinations due to access blocks or service errors.
+Logs, screenshots and the highlighted review are retained under ignored `.local/reviews/optional-practice-2026-11-17/`.
+
+At the next pilot walkthrough, ask a learner to choose one optional activity, find its first step, explain what they would retain and distinguish it from the required Establish evidence.
+Record any remaining confusion before closing this item; [run-specific orientation](first-run-course-improvements.md#1-improve-run-specific-orientation) remains a separate preparation task.
 
 ## 8. Remove the setup guide's small mobile overflow
 

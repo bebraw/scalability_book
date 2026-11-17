@@ -16,6 +16,10 @@
 .book-exercise h3 {
   margin-top: 0;
 }
+.book-exercise .exercise-guidance {
+  color: var(--muted);
+  font: 0.85rem/1.5 var(--font-ui);
+}
 .exercise-field > label {
   display: block;
   margin-block: 1rem 0.5rem;

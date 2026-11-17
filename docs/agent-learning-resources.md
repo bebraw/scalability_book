@@ -73,6 +73,10 @@ The build generates one student page and two Markdown resources per activity:
 - `/explore/<id>/agent.md`: self-contained conversation guidance, the scenario, prompts, and absolute source links, with no worked answer.
 - `/explore/<id>/discussion.md`: authored worked reasoning, retrieved after the student's attempt or explicit request.
 
+The student page opens with an independent study path: **Read the exercise**, make a prediction or explanation, then compare with **Show worked reasoning**.
+The agent starting URL is an optional discussion route.
+Completion guidance asks students to keep what changed in their reasoning and one next check in their existing evidence or learning notes; the activity's own prompts define its specific outcome.
+
 Students can give an activity URL directly to their agent without first using the general guide.
 The guide and both graph formats link to the catalog; concepts carry `explorationIds`.
 The first response introduces the chosen scenario and asks one relevant question, then waits.

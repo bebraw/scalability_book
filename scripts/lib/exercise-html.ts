@@ -23,8 +23,9 @@ export function renderExercise(id: string): string {
     })
     .join("");
   return `<section class="book-exercise" id="exercise-${id}" data-exercise="${id}" data-version="${exercise.version}" aria-labelledby="${id}-title">
-  <p class="exercise-kicker">Pause &amp; think</p>
+  <p class="exercise-kicker">Optional practice</p>
   <h3 id="${id}-title">${escape(exercise.title)}</h3>
+  <p class="exercise-guidance">Try the question, then use Check answer or Show worked answer to compare your reasoning. No account or assistant is needed. Saving is optional and private; the <a href="/project/">course brief</a> defines required submissions.</p>
   ${prompt}
   <div class="exercise-work" hidden>
     ${fields}

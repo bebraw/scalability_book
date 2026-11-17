@@ -7,6 +7,14 @@ The demos and explanatory prose remain in their original chapter locations.
 The lecture plan links the two cumulative questions for short discussions.
 The earlier standalone modules are retained for comparison while this direction is reviewed; the homepage now points into the chapter.
 
+Each question is labeled **Optional practice** and explains the starting sequence: attempt the question, check the answer or compare with the worked answer, and optionally save a private result.
+The guidance states that no account or assistant is needed and links to the course brief for required submissions.
+It remains visible without JavaScript; the existing fallback explains how to work on paper and reveal the worked answer.
+Question titles, prompts and adjacent prose name the specific reasoning to practice.
+Saving or completing these formative questions does not submit project evidence.
+The [course specifications](../specifications/README.md#how-chapter-artifacts-become-submissions) retain authority over required work, including any optional activity explicitly assigned before a phase begins.
+These presentation instructions do not change question versions or saved-answer ownership.
+
 ## Content and versions
 
 `shared/exercises.ts` is the canonical source for question text, discussion, stable ID, and version.
