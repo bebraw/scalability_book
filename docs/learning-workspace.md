@@ -334,6 +334,10 @@ HTTP imports are limited to 16 MB; other JSON requests are limited to 96 KB.
 Selected-note preparation produces readable Markdown for review and use in the existing diary/portfolio workflow.
 It sends no notebook record to the course application and includes no unselected notes.
 Students remain responsible for selecting the material and submitting it under the existing course requirements.
+The [course introduction](../specifications/00_introduction.md#personal-notes-and-learning-diaries) makes tool choice explicit: Notebook and Teaching assistant are optional, and students may use other note-taking tools without importing their work here.
+**Prepare** supplies current selected writing and source links, not a complete portfolio or a rubric assessment; **Copy draft** and **Download Markdown** are manual export steps, while **Open course workspace** only navigates to `/course/`.
+The [student walkthrough](learning-companion-setup.md#prepare-material-for-your-portfolio) distinguishes local writing from course drafts/files visible to the student and staff, and names the course's explicit **Submit portfolio** action.
+The whole-notebook JSON backup retains private revision/source/concept history and is separate from this selected-material export.
 
 Developed written reflections show a suggested target of 400 characters and representative examples.
 This is guidance, not a minimum or a quality score; short scratch notes and the existing audio/video diary options remain valid.

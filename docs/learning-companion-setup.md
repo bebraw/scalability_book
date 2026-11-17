@@ -1,6 +1,8 @@
 # Set up your notebook and assistant
 
-Your notebook is a private space for questions, observations and reflection across the book.
+The book's optional Notebook is a private space for questions, observations and reflection across the book.
+You may instead keep your notes in Obsidian, plain files or another preferred tool; you do not need to copy them into Notebook for course credit.
+The [course introduction](/project/introduction/#personal-notes-and-learning-diaries) explains the existing diary and portfolio requirements, whichever tool you use.
 You choose which material becomes a course submission or a shared contribution.
 The header offers a notebook icon labelled **Notebook** for keeping your thinking and a question-bubble icon labelled **Assistant** for guidance and discussion.
 The panel identifies the second experience as **Teaching assistant** and shows its reading context.
@@ -169,10 +171,33 @@ Try explaining it from memory and applying it to a changed situation before rere
 **Concepts** records your own revisable judgment and the notebook evidence behind it.
 These markers do not grade or certify your understanding.
 
-Select notes, then use **Prepare** to build and revise material for your existing diary or portfolio.
-Download or copy the draft and review it against the course requirements before submitting through the course workspace.
-Preparation does not expose your other notes or submit anything automatically.
-Existing audio/video diary options remain available.
+### Prepare material for your portfolio
+
+**Prepare** is an optional way to assemble selected notes for your existing diary or portfolio.
+It copies their current writing and source links into editable Markdown; it does not produce all required portfolio answers or assess their quality.
+If you already use another notes tool, select and review your material there and go directly to the course submission step.
+
+1. In **Notes**, select the entries you want to use and choose **Prepare selected notes**, then **Build submission draft**.
+   You can also reach **Prepare** through **More learning tools**.
+2. Review and revise the text, checking its sources, your explanation and the relevant course requirements.
+   Only the selected notes enter this draft; the rest of your notebook is excluded.
+3. Choose **Copy draft** or **Download Markdown**.
+   The downloaded `.md` file is plain text you can edit in another tool.
+4. Choose **Open course workspace**, sign in, select your course and phase, and open **My portfolio**.
+   This link only opens the workspace; it does not transfer your writing.
+   Paste relevant material into the portfolio fields, or use **Attach written, audio or video evidence** for reviewed files, select the uploaded attachment and describe its relevance in the appropriate fields.
+   Complete the remaining lecture and assessment fields under the published requirements.
+5. Choose **Submit portfolio** and check the displayed submission status.
+   Before submission, **Save draft** and uploading a file do not submit the portfolio.
+   After submission, use **Resubmit portfolio** for a correction under the course's announced correction rules.
+
+Your local Notebook records are separate from course records.
+Saving a course portfolio draft or uploading its files makes that material available to you and course staff; it stays outside the class's technical-submission index.
+Keep personal working notes and confidential peer feedback out of the group's technical bundle.
+The existing audio/video diary options remain available.
+
+**Connect → Export notebook backup** serves a different purpose: it downloads the whole notebook as JSON, including saved revisions, source context and concept judgments.
+Keep that backup private for recovery or transfer to another companion notebook; use reviewed selected material for course submissions.
 
 ## Start a course coding project
 

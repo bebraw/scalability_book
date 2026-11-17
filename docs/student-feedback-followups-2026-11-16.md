@@ -29,6 +29,10 @@ Four live desktop/mobile Chromium/WebKit cases passed, with eight scoped accessi
 Chromium used the native companion connection; WebKit's previously documented native connection failure was preserved, and its UI checks used a local transport bridge rather than establishing native Safari support.
 Evidence and that limitation are retained under ignored `.local/reviews/deployment-b6acd8c-2026-11-17/`.
 
+The Chapter 1 reversibility guidance was pushed as `813a97b` on 17 November; published-link CI and Cloudflare deployment passed for that commit.
+Four live Chromium/WebKit checks passed at 1440 and 390 px, covering the four steps, preserved category values, client transition, containment and the Friction chapter link with actual published assets and no production writes.
+Evidence is retained under ignored `.local/reviews/deployment-813a97b-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -377,6 +381,32 @@ The first inspection script assumed a fourth-level heading rendered as a semanti
 Evidence and the initial inspection failure are retained under ignored `.local/reviews/reversibility-2026-11-17/`.
 These checks establish the editorial and rendering result, not a learner comprehension study.
 
+## 16. Explain note-tool choice and the submission handoff
+
+**Status: closed after guidance changes and current-workflow verification on 17 November 2026.** The course introduction did not explicitly say students could use another notes tool, while Notebook's preparation guidance did not explain the manual handoff or the different draft audiences.
+The existing implementation already exported selected material without submitting it.
+
+The [course introduction](../specifications/00_introduction.md#personal-notes-and-learning-diaries) now explicitly permits preferred note tools, explains the existing learning-diary criteria and separates private individual portfolios from the group's technical bundle.
+The [course environment sheet](../specifications/course_environment.md#publish-the-course-workflow) links that guidance separately from coding-agent setup.
+The [setup walkthrough](learning-companion-setup.md#prepare-material-for-your-portfolio) explains selecting, building, reviewing and copying/downloading Markdown, then completing the appropriate course portfolio fields and explicitly submitting.
+It distinguishes local Notebook writing, course drafts/uploads visible to the student and staff, initial submission, later correction and whole-notebook JSON backups.
+Other notes tools can join at the course submission step without importing their material into Notebook.
+
+The [workspace contract](learning-workspace.md#notebook-and-portability) records these existing boundaries.
+The sole pre-course requirement edition's introduction and digest were regenerated with the owner under the existing publication policy; the checklist, rubric, deliverables and application behavior are unchanged.
+No companion release or UI change is needed.
+
+Four requirement/evidence unit checks and four existing Chromium/WebKit notebook/course workflow cases passed.
+Two additional real-companion audits selected one of two synthetic notes, edited and downloaded the exact Markdown, excluded the other note and confirmed no course/model request from preparation.
+Opening the course workspace transferred no note text or IDs; actual course submission/privacy was verified separately on the local application server rather than inferred from static-page navigation.
+Twelve rendered checks passed across the current introduction, archived introduction and setup guide in both browsers at 1440 and 390 px; screenshots were inspected.
+The Worker build, types, HTML/local-link validation, formatting and diff checks passed; the full link check found no broken links and 13 inconclusive external destinations due to access blocks or service errors.
+
+The first link check found that the unpublished environment sheet could not be reached through a relative website link; the corrected owner and snapshot use its existing GitHub publication route.
+The first rendered inspection incorrectly required heading accessible names without their permalink labels; the corrected check uses the actual section IDs and verifies their text.
+These failures and successful checks are retained under ignored `.local/reviews/note-tools-2026-11-17/`, using synthetic records and no production writes.
+This verifies the guidance against the implemented workflow, not first-time learner comprehension.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
@@ -385,7 +415,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                          |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 16   | Clarify using other note tools and how private submission drafts relate to actual submissions, reviewing course orientation as well as Notebook setup                   | [Course environment](../specifications/course_environment.md) and [setup guide](learning-companion-setup.md)            |
 | 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                    | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
 | 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |
 | 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)         |
@@ -411,6 +440,12 @@ The same reproduction on exact revision `727dad2` produced identical geometry, e
 Review the [Notebook presentation](../site/scripts/learning-pane.ts) reset/scroll target and its [workspace layout](../site/styles/learning-workspace.css), including the existing introductory content, before choosing a correction.
 Keep the failed assertion; done means the new note's source is visibly presented after the action at this height and compact widths, without losing the independent assistant state or keyboard focus.
 The failed continuity run and reduced working-copy/HEAD comparison are retained under ignored `.local/reviews/notebook-exchange-2026-11-17/continuity-diagnosis/`.
+
+## 27. Align the environment sheet's launcher release wording
+
+**Status: open; found during task 16's guidance review.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) still calls the project launcher prepared and says it requires a locally built package until the next release.
+The [setup guide](learning-companion-setup.md#start-a-course-coding-project) already identifies the published 0.4.0 launcher.
+Check the remaining release-status references and align the student entry instructions with the verified publication; this does not require another package release or model re-verification.
 
 ## Closing tasks
 
