@@ -241,10 +241,14 @@ The paper exercise needs no live data or deployment.
 The agent harness controls a model's context and tool loop.
 A development workspace can sit around one or more harnesses, helping a person start sessions, inspect changes, answer questions, and move between machines.
 Some products also supply the execution runtime or coordinate delegated work.
-Identify which responsibilities a tool owns before attributing its behavior to the model.
 
-:ref[table:agent-workspace-examples]{text="The table below"} compares examples from product documentation checked on November 3, 2026.
-These descriptions identify useful capabilities to investigate; they are not comparative measurements of productivity or reliability.
+For the course project, you do not need to install or compare any workspace in :ref[table:agent-workspace-examples]{text="the table below"}.
+If this is your first coding agent, start with the companion's [guided project launcher](/notebook/setup/#start-a-course-coding-project).
+Choose your phase and project directory; the launcher sets up and checks Codex for you.
+If you already use OpenCode or another harness, you can keep it: follow the [model and agent rules for your phase](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md), verify that its tools work, and record the configuration you used.
+
+Read the examples to see where each tool fits: which part keeps the session running, which executes the model's requests, and which lets you review the changes?
+The descriptions come from product documentation checked on November 3, 2026; they do not measure productivity or reliability.
 
 | Example                                                          | Responsibility illustrated                                                                                                                                                                              |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -267,10 +271,10 @@ Neither alone restricts a process's filesystem, credential, or network access.
 Check the selected execution backend and permissions, and trace whether cancellation and approval decisions reach the actual worker.
 An interface that gathers several agents in one place still needs a coordination rule for shared files, dependencies, and acceptance; the [Agent Fleets chapter](/chapters/agent-fleets/#choose-a-coordination-structure) develops those decisions.
 
-Choose a workspace around a concrete difficulty: losing sessions, switching between agents, finding blocked work, or understanding changes.
+If you decide to try another workspace, choose one concrete difficulty to investigate: losing sessions, switching between agents, finding blocked work, or understanding changes.
 Try one representative task and record the installed versions, where work and session state live, recovery after a client disconnect, and the effort required to inspect and accept the result.
 Count interruptions, failed attempts, and review effort alongside accepted outcomes.
-The repository's instructions and checks remain the project harness whichever interface presents them.
+Whichever workspace you use, each project implementation still needs its own [setup instructions and repeatable checks](/project/#6-minimum-project-harness).
 
 ## The project harness
 

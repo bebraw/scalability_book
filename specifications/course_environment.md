@@ -23,7 +23,7 @@ The guide provides installation, the credential-free profile, a file-and-command
 The pilot has no fixed GLM quota; students must use the shared departmental infrastructure considerately.
 Keep personal notes private and report general problems through [the book issue tracker](https://github.com/bebraw/scalability_book/issues).
 These guides provide a supported beginner path, not a mandatory harness.
-The companion's [prepared project launcher](../docs/learning-companion-setup.md#start-a-course-coding-project) automates the tested installation, profiles and checks; it requires a locally built package until the next companion release.
+The [guided project launcher](https://scalableweb.dev/notebook/setup/#start-a-course-coding-project) in the published `@scalableweb/companion@0.4.0` package sets up Codex for your phase, checks its tools on a disposable task, and opens it in your project directory.
 Students may use OpenCode or another preferred harness with the assigned model and phase rules, recording the actual configuration and verifying its tools before substantive work.
 The coding-agent setup is separate from the optional book assistant, which currently has no project file-editing or command-execution tools.
 

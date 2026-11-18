@@ -484,11 +484,20 @@ On the live site, Chromium and WebKit opened the two distinct definitions from t
 
 ## 20. Show when to repair the code and when to ask
 
-**Status: implemented for review.** The student asked what an escalation rule looks like and whether feedback has to wait until implementation is complete.
+**Status: deployed and verified on 18 November 2026.** The student asked what an escalation rule looks like and whether feedback has to wait until implementation is complete.
 The [Generate stage of the coding loop](../book/01_establish/02_scalable_development.md#constrain-generate-validate-revise) now follows two decisions about the event export.
 A parsed row with four fields instead of the agreed two gives the agent enough information to repair the quoting and rerun the check.
 Adding an event ID changes the two-column contract, so the agent pauses that change and asks the export owner to decide.
 The optional lab still specifies two columns; the example does not change its requirements.
+Both checks passed for `c8524c1`.
+Desktop Chromium and mobile WebKit showed the live Generate passage and followed its link to the worked export example.
+
+## 21. Separate workspace examples from project setup
+
+**Status: implemented for review.** The student could not tell whether Chapter 2 was comparing tools to explain their roles or asking students to choose one for the project.
+Before the [workspace table](../book/01_establish/02_scalable_development.md#agent-harnesses-and-workspaces), the chapter now points beginners to the guided launcher and students using another harness to the phase rules.
+Trying another workspace is optional.
+The repository's [minimum project harness](../specifications/00_common_project.md#6-minimum-project-harness) is required with either route.
 
 ## Remaining original feedback to review individually
 
@@ -498,7 +507,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)          |
 | 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts) |
 | 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
 | 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                         | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
@@ -522,9 +530,9 @@ The failed continuity run and reduced working-copy/HEAD comparison are retained 
 
 ## 27. Align the environment sheet's launcher release wording
 
-**Status: open; found during task 16's guidance review.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) still calls the project launcher prepared and says it requires a locally built package until the next release.
-The [setup guide](learning-companion-setup.md#start-a-course-coding-project) already identifies the published 0.4.0 launcher.
-Check the remaining release-status references and align the student entry instructions with the verified publication; this does not require another package release or model re-verification.
+**Status: corrected alongside task 21; awaiting publication.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) now links to the published [project launcher instructions](https://scalableweb.dev/notebook/setup/#start-a-course-coding-project).
+The npm registry confirms companion 0.4.0 is available.
+Building the package from a local checkout is optional.
 
 ## 28. Make linked setup headings reliably visible
 
