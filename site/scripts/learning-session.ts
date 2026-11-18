@@ -59,6 +59,10 @@ export interface NotebookDraftPreview {
 }
 export type NotebookSection = "write" | "notes" | "concepts" | "prepare";
 export type AssistantSection = "agent" | "guide" | "peers";
+export interface NotebookSize {
+  width: number | null;
+  height: number | null;
+}
 export const notebookSections: NotebookSection[] = [
   "write",
   "notes",
@@ -89,6 +93,7 @@ export interface SessionState {
   notebookPaneView: NotebookSection | "connect";
   assistantPaneView: AssistantSection | "connect";
   assistantSelected: string[];
+  notebookSize: NotebookSize | null;
   editor: NotebookEditor | null;
   notePreview: NotebookDraftPreview | null;
   assistance: string | null;
@@ -139,6 +144,7 @@ export function readNotebookSession(): SessionState {
     notebookPaneView: "write",
     assistantPaneView: "agent",
     assistantSelected: [],
+    notebookSize: null,
     editor: null,
     notePreview: null,
     assistance: null,
@@ -244,6 +250,25 @@ export function readNotebookSession(): SessionState {
             .filter((id): id is string => typeof id === "string")
             .slice(0, 5000)
         : [];
+    // Presentation preferences must never invalidate either unfinished draft.
+    let notebookSize: NotebookSize | null = null;
+    if (
+      value.notebookSize &&
+      typeof value.notebookSize === "object" &&
+      !Array.isArray(value.notebookSize)
+    ) {
+      const saved = value.notebookSize as Record<string, unknown>;
+      const dimension = (size: unknown) =>
+        typeof size === "number" &&
+        Number.isFinite(size) &&
+        size > 0 &&
+        size <= 10_000
+          ? size
+          : null;
+      const width = dimension(saved.width);
+      const height = dimension(saved.height);
+      if (width !== null || height !== null) notebookSize = { width, height };
+    }
     return {
       open: value.open === true,
       view,
@@ -275,6 +300,7 @@ export function readNotebookSession(): SessionState {
       assistantSelected: selectedIds(
         value.assistantSelected ?? (assistant ? value.selected : []),
       ),
+      notebookSize,
       assistant,
       editor,
       notePreview,
@@ -303,6 +329,7 @@ export function saveNotebookSession(
     | "assistantPaneView"
     | "assistantSelected"
     | "notePreview"
+    | "notebookSize"
   > &
     Partial<
       Pick<
@@ -317,6 +344,7 @@ export function saveNotebookSession(
         | "assistantPaneView"
         | "assistantSelected"
         | "notePreview"
+        | "notebookSize"
       >
     >,
 ) {

@@ -33,6 +33,12 @@ The Chapter 1 reversibility guidance was pushed as `813a97b` on 17 November; pub
 Four live Chromium/WebKit checks passed at 1440 and 390 px, covering the four steps, preserved category values, client transition, containment and the Friction chapter link with actual published assets and no production writes.
 Evidence is retained under ignored `.local/reviews/deployment-813a97b-2026-11-17/`.
 
+The note-tool and explicit-submission guidance was pushed as `8c31c37` on 17 November; published-link CI and Cloudflare deployment passed for that commit.
+All modified wording, correct rubric editions/link destinations and horizontal containment were verified on the deployed current introduction, archived introduction and setup guide in Chromium/WebKit at 1440 and 390 pixels.
+The full twelve-case navigation audit had ten passes and two WebKit walkthrough-anchor positioning failures; instrumented diagnostic passes did not establish a fix, and desktop sticky-header occlusion was also observed.
+These anchor limitations remain open in [task 28](#28-make-linked-setup-headings-reliably-visible).
+Evidence is retained under ignored `.local/reviews/deployment-8c31c37-2026-11-17/`.
+
 ## 1. Keep expanded tool output inside the assistant panel
 
 **Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
@@ -407,23 +413,56 @@ The first rendered inspection incorrectly required heading accessible names with
 These failures and successful checks are retained under ignored `.local/reviews/note-tools-2026-11-17/`, using synthetic records and no production writes.
 This verifies the guidance against the implemented workflow, not first-time learner comprehension.
 
+## 17. Adjust Notebook size after comparing reading space
+
+**Status: resizing implemented and verified locally on 17 November 2026; navigation remains task 29.** The student requested a resizable Notebook, less unused reading/navigation space and simultaneous Book/Page navigation.
+The layout comparison used the same built revision `8c31c37`, synthetic writing and a disposable companion in Chromium at 1440 × 900, 1280 × 720, 1024 × 900 and 390 × 844.
+It compared the existing overlay, a 24rem Notebook and a desktop prototype reserving a 25rem column with 12rem navigation, with Notebook alone and both tools open.
+
+At 1280 × 720, narrowing Notebook reduced overlap with the visible paragraph bounding box from 25% to 3%, and with the trace demo from 52% to 39%.
+These are box intersections, including whitespace, rather than counts of hidden words.
+The narrower Notebook cleared the request selector and reveal control when open alone; Assistant still covered those controls when both were open.
+The reserved-column prototype removed Notebook-only overlap but reduced the demo from 835 to 584 pixels and clipped long navigation labels; it also left a small Assistant overlap because that panel was wider than the reserved column.
+It retained the original overlay below 1200 pixels and did not address compact navigation access.
+These bounded prototypes expose tradeoffs, not an exhaustive evaluation of possible layouts.
+
+Selected change: native width/height sliders and Reset size, retaining [ADR-036's stable book geometry](adrs/implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md).
+The assistant selected this focused implementation within the instructor's authorized feedback work.
+The preferred size is browser tab state; effective size fits the viewport and the space above Assistant, with the existing mobile layout and automatic defaults preserved.
+This gives control over the requested window size; it does not establish unobscured side-by-side reading at every width.
+No companion, model, course or portable-notebook contract changes are needed.
+
+Book/Page navigation remains a separate [task 29](#29-improve-book-and-page-navigation-access).
+The short simultaneous-panel allocation remains relevant to [task 26](#26-bring-new-note-context-into-the-visible-notebook-area): at 1280 × 720 Notebook had only 118 pixels of content height, which a width change cannot increase.
+Comparison scripts, measurements, synthetic screenshots and the interactive HTML comparison are retained under ignored `.local/reviews/notebook-layout-2026-11-17/`.
+
+Six focused Chromium/WebKit cases passed for keyboard/pointer resizing, reset, accessibility, mobile focus/fallback, unchanged book and assistant geometry, and retained independent drafts/sources/preferences across navigation, reload and temporary clamping.
+Resizing and reopening made no companion writes or model requests.
+Four session checks passed, including malformed/legacy size fields without loss of unfinished writing; eight additional Chromium visual cases covered 1440, 1280, 1024 and 390 pixel widths.
+The first two keyboard cases exposed a real interaction with the global reduced-motion transition duration: the input handler read the old width and temporarily reset the slider value.
+Event tracing reproduced it twenty times; twelve differential cases confirmed that immediate Notebook geometry removed the cause, and the final tests wait for exact keyboard destinations before measuring dimensions.
+The original failures and event traces are retained alongside the passing results.
+
+Production build, type checks, formatting and validation of 74 HTML files and 6,590 local links passed.
+The final full link check found no broken links and 33 inconclusive external URLs, including nineteen GitHub HTTP 503 responses and access challenges elsewhere.
+An earlier full check incorrectly overlapped the build and saw incomplete generated output; its 43 missing-file results are retained separately from the stable-build verification.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
 These are open review items, not accepted feature designs or assertions that the current implementation is defective.
 Reproduce each behavior or review the current teaching contract before choosing a change.
 
-| Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                          |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 17   | Observe reading/navigation space and compare layouts before choosing a resizable Notebook capability                                                                    | [Notebook presentation](../site/scripts/learning-pane.ts) and [workspace styles](../site/styles/learning-workspace.css) |
-| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                              |
-| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)         |
-| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                            |
-| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)             |
-| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts)    |
-| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
-| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                         | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
-| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                 | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                    |
+| Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                           |
+| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)      |
+| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                         |
+| 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)          |
+| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts) |
+| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
+| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                         | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
+| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                 | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
 
 The kickoff feedback also reported a GitHub OAuth 404.
 The anonymous live entry check on 17 November followed Account → GitHub authorization → GitHub sign-in with statuses 302 → 302 → 200, so the reported 404 did not reproduce.
@@ -446,6 +485,29 @@ The failed continuity run and reduced working-copy/HEAD comparison are retained 
 **Status: open; found during task 16's guidance review.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) still calls the project launcher prepared and says it requires a locally built package until the next release.
 The [setup guide](learning-companion-setup.md#start-a-course-coding-project) already identifies the published 0.4.0 launcher.
 Check the remaining release-status references and align the student entry instructions with the verified publication; this does not require another package release or model re-verification.
+
+## 28. Make linked setup headings reliably visible
+
+**Status: open; found during task 16's live deployment verification.** Two WebKit cases followed the correct link from the current/archived course introduction to `/notebook/setup/#prepare-a-submission-from-your-notes`, but the target heading remained outside the viewport.
+Four later instrumented WebKit cases reached it without a production change, so those passes do not explain the original failures.
+The desktop diagnostic also placed the heading at approximately y=0 beneath the sticky header: a viewport-intersection assertion alone missed the occlusion.
+The changed wording and correct destinations were verified; anchor placement remains unverified for consistent visibility.
+
+Reduce navigation, load timing and sticky-header positioning against the published assets before choosing a correction.
+Done means clicking the links exposes the intended heading after navigation in Chromium and WebKit at desktop and compact widths, without relying only on the URL or DOM presence.
+The first failures, screenshots and diagnostics are retained under ignored `.local/reviews/deployment-8c31c37-2026-11-17/`.
+
+## 29. Improve Book and Page navigation access
+
+**Status: open; separated from task 17's Notebook resizing.** The original request was to see Book and Page navigation together and give useful space back to the material.
+At 1440 and 1280 pixels the current tabs remained reachable beside Notebook, and pointer/arrow-key switching worked; this establishes operation rather than resolving the extra switching.
+At 1024 pixels both lists were in the page flow above the chapter; at 390 pixels navigation began collapsed and the header launchers scrolled away with the page.
+Changing Notebook width does not alter those navigation behaviors.
+
+Compare access to another chapter and to a section of the current chapter while reading lower on the page, including a compact viewport and folded desktop navigation.
+Review [book navigation](../site/scripts/book-nav.ts), [layout](../site/styles/layout.css) and [responsive styles](../site/styles/responsive.css) before choosing simultaneous lists, a different placement or another access control.
+Preserve the reader's explicit collapse preference; do not silently change it when opening Notebook.
+The baseline navigation observations and alternative screenshots are retained with task 17's comparison evidence.
 
 ## Closing tasks
 

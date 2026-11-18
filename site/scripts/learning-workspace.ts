@@ -80,6 +80,7 @@ function syncPanels() {
     document.body.dataset.learningAssistantOpen = String(
       !panes.assistant.panel.hidden,
     );
+    panes.notebook.syncSize();
   } finally {
     syncing = false;
   }

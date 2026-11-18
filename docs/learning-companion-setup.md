@@ -150,6 +150,12 @@ The open notebook follows you between chapters, and **Notes** initially shows th
 Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
 The assistant remembers its own section, unsent question and active conversation across chapter navigation, with its original source shown explicitly.
 Each panel stays open as you move between chapters until you close it.
+
+On larger screens, choose **Size** at the top of Notebook to adjust its width and height with the sliders; arrow keys work too.
+Your preferred size follows you between chapters in this tab, and **Reset size** returns to automatic sizing.
+Notebook fits the available space: close Assistant if you need more height.
+On small screens Notebook uses the full width; your larger-screen size returns when there is room.
+
 The header highlights each visible tool; choose its icon again to close just that panel, or use its close button or Escape.
 On smaller screens one panel is visible at a time.
 Use the other header icon to bring that panel forward; both retain your unfinished work.

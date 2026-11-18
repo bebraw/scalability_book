@@ -1,6 +1,7 @@
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import { mountLearningAssistant } from "./learning-assistant.ts";
 import { mountLearningNavigation } from "./learning-navigation.ts";
+import { mountNotebookSize } from "./learning-notebook-size.ts";
 import { currentReading, pageSource, textOf } from "./learning-context.ts";
 import {
   readingSelection,
@@ -75,6 +76,12 @@ export function createLearningPane(
   const container = panel.querySelector<HTMLDivElement>(".learning-body")!;
   const status = panel.querySelector<HTMLElement>(".learning-status")!;
   const restored = services.session;
+  const syncSize =
+    experience === "notebook"
+      ? mountNotebookSize(panel, restored.notebookSize, (notebookSize) =>
+          services.save({ notebookSize }),
+        )
+      : () => {};
   let view: NotebookView =
     experience === "notebook"
       ? restored.notebookPaneView
@@ -1256,6 +1263,7 @@ export function createLearningPane(
   mountLearningNavigation(panel, experience, view, navigate);
   return {
     panel,
+    syncSize,
     open,
     navigate,
     beginNote,

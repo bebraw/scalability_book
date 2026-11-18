@@ -302,3 +302,63 @@ test("unusable note previews do not discard Notebook writing or the Assistant dr
     assert.equal(storage.read(), original, label);
   }
 });
+
+test("Notebook size preferences retain independent dimensions without invalidating unfinished writing", (t) => {
+  const storage = mockSessionStorage(t);
+  const source = previewSnapshot().source;
+  const state = {
+    ...readNotebookSession(),
+    editor: {
+      id: "",
+      expected: "",
+      kind: "scratch" as const,
+      title: "Unfinished note ",
+      body: "Keep my writing. ",
+      relatedIds: [],
+      source,
+    },
+    assistant: {
+      source,
+      conversationId: null,
+      browserId: "c0000000-0000-4000-8000-000000000005",
+      question: "Keep my question. ",
+      goal: "",
+      mode: "question" as const,
+      supportNeed: "unspecified" as const,
+    },
+  };
+  const cases = [
+    { saved: undefined, expected: null },
+    { saved: null, expected: null },
+    {
+      saved: { width: 384, height: 640 },
+      expected: { width: 384, height: 640 },
+    },
+    {
+      saved: { width: 512.5, height: null },
+      expected: { width: 512.5, height: null },
+    },
+    {
+      saved: { width: -1, height: 600 },
+      expected: { width: null, height: 600 },
+    },
+    {
+      saved: { width: 384, height: "600" },
+      expected: { width: 384, height: null },
+    },
+    { saved: { width: 10001, height: 0 }, expected: null },
+    { saved: [384, 600], expected: null },
+    { saved: "wide", expected: null },
+  ];
+  for (const { saved, expected } of cases) {
+    storage.write({ version: 1, ...state, notebookSize: saved });
+    const original = storage.read();
+    const restored = readNotebookSession();
+    assert.deepEqual(restored.notebookSize, expected);
+    assert.deepEqual(restored.editor, state.editor);
+    assert.deepEqual(restored.assistant, state.assistant);
+    assert.equal(storage.read(), original);
+    saveNotebookSession(restored);
+    assert.deepEqual(readNotebookSession().notebookSize, expected);
+  }
+});

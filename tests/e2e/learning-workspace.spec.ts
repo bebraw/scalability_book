@@ -4,7 +4,7 @@ import {
   selectReading,
   chooseNotebookTool,
 } from "./learning-notebook.helpers.ts";
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
@@ -72,6 +72,40 @@ async function advertiseProvider(page: import("@playwright/test").Page) {
       json: { ...(await response.json()), provider: "Synthetic" },
     });
   });
+}
+
+async function openNotebookSize(panel: Locator) {
+  const width = panel.getByRole("slider", {
+    name: "Notebook width",
+    exact: true,
+  });
+  if (!(await width.isVisible()))
+    await panel.getByLabel("Notebook size", { exact: true }).click();
+  await expect(width).toBeVisible();
+  return {
+    width,
+    height: panel.getByRole("slider", {
+      name: "Notebook height",
+      exact: true,
+    }),
+    reset: panel.getByRole("button", { name: "Reset size", exact: true }),
+  };
+}
+
+async function expectNotebookSize(
+  panel: Locator,
+  width: number,
+  height: number,
+) {
+  await expect
+    .poll(async () => {
+      const bounds = (await panel.boundingBox())!;
+      return Math.max(
+        Math.abs(bounds.width - width),
+        Math.abs(bounds.height - height),
+      );
+    })
+    .toBeLessThan(1);
 }
 
 for (const width of [1440, 390]) {
@@ -942,6 +976,302 @@ test("concurrent panels retain independent context and drafts across reload, res
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(assistant).toBeVisible();
   await expect(notebook).toBeHidden();
+});
+
+test("Notebook size responds to keyboard and pointer controls without moving the book or assistant", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await advertiseProvider(page);
+  await page.goto("/chapters/benchmarking/");
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator('.site-header [data-learning-toggle="notebook"]').click();
+  const notebook = page.locator("#learning-notebook");
+  await notebook.getByLabel("Companion address").fill(companionAddress);
+  await notebook
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  await expect(notebook.getByRole("status")).toContainText("Connected");
+  const automatic = (await notebook.boundingBox())!;
+  const bookGeometry = () =>
+    page.evaluate(() =>
+      [
+        ".book-shell",
+        ".chapter-main",
+        ".prose",
+        ".prose > p:not(.chapter-kicker)",
+        "[data-otel-trace-demo]",
+      ].map((selector) => {
+        const rect = document.querySelector(selector)!.getBoundingClientRect();
+        return [rect.x + scrollX, rect.y + scrollY, rect.width, rect.height];
+      }),
+    );
+  const originalBook = await bookGeometry();
+  const expectUnchangedBook = async () => {
+    await expect
+      .poll(async () => {
+        const current = await bookGeometry();
+        return Math.max(
+          ...current.flatMap((bounds, index) =>
+            bounds.map((value, coordinate) =>
+              Math.abs(value - originalBook[index]![coordinate]!),
+            ),
+          ),
+        );
+      })
+      .toBeLessThan(1);
+  };
+  const size = await openNotebookSize(notebook);
+  await size.width.focus();
+  await page.keyboard.press("Home");
+  await expect(size.width).toHaveValue((await size.width.getAttribute("min"))!);
+  const narrowWidth = Number(await size.width.inputValue());
+  expect(narrowWidth).toBeLessThan(automatic.width);
+  await expectNotebookSize(notebook, narrowWidth, automatic.height);
+  await page.keyboard.press("ArrowRight");
+  await expect(size.width).toHaveValue(
+    String(narrowWidth + Number(await size.width.getAttribute("step"))),
+  );
+  const keyboardWidth = Number(await size.width.inputValue());
+  expect(keyboardWidth).toBeGreaterThan(narrowWidth);
+  await expectNotebookSize(notebook, keyboardWidth, automatic.height);
+
+  const sliderBounds = (await size.width.boundingBox())!;
+  await size.width.click({
+    position: { x: sliderBounds.width * 0.7, y: sliderBounds.height / 2 },
+  });
+  await expect
+    .poll(async () => Number(await size.width.inputValue()))
+    .toBeGreaterThan(keyboardWidth);
+  const pointerWidth = Number(await size.width.inputValue());
+  expect(pointerWidth).toBeGreaterThan(keyboardWidth);
+  await expectNotebookSize(notebook, pointerWidth, automatic.height);
+  await size.height.focus();
+  await page.keyboard.press("Home");
+  await expect(size.height).toHaveValue(
+    (await size.height.getAttribute("min"))!,
+  );
+  const shortHeight = Number(await size.height.inputValue());
+  expect(shortHeight).toBeLessThan(automatic.height);
+  await expectNotebookSize(notebook, pointerWidth, shortHeight);
+  await page.keyboard.press("End");
+  await expect(size.height).toHaveValue(
+    (await size.height.getAttribute("max"))!,
+  );
+  await expectNotebookSize(
+    notebook,
+    pointerWidth,
+    Number(await size.height.inputValue()),
+  );
+  await expectUnchangedBook();
+  await size.reset.click();
+  await expectNotebookSize(notebook, automatic.width, automatic.height);
+
+  await page.locator('.site-header [data-learning-toggle="assistant"]').click();
+  const assistant = page.locator("#learning-assistant");
+  await expect(assistant).toBeVisible();
+  const assistantBefore = (await assistant.boundingBox())!;
+  const stackedAutomatic = (await notebook.boundingBox())!;
+  const stackedSize = await openNotebookSize(notebook);
+  await stackedSize.width.focus();
+  await page.keyboard.press("Home");
+  await expect(stackedSize.width).toHaveValue(
+    (await stackedSize.width.getAttribute("min"))!,
+  );
+  await stackedSize.height.focus();
+  await page.keyboard.press("Home");
+  await expect(stackedSize.height).toHaveValue(
+    (await stackedSize.height.getAttribute("min"))!,
+  );
+  await expectNotebookSize(
+    notebook,
+    Number(await stackedSize.width.inputValue()),
+    Number(await stackedSize.height.inputValue()),
+  );
+  const resized = (await notebook.boundingBox())!;
+  expect(resized.x).toBeGreaterThanOrEqual(0);
+  expect(resized.y).toBeGreaterThanOrEqual(0);
+  expect(resized.x + resized.width).toBeLessThanOrEqual(1440);
+  expect(resized.y + resized.height).toBeLessThan(assistantBefore.y);
+  const assistantAfter = (await assistant.boundingBox())!;
+  for (const coordinate of ["x", "y", "width", "height"] as const)
+    expect(
+      Math.abs(assistantAfter[coordinate] - assistantBefore[coordinate]),
+    ).toBeLessThan(1);
+  await expectUnchangedBook();
+  expect(
+    (await new AxeBuilder({ page }).include("#learning-notebook").analyze())
+      .violations,
+  ).toEqual([]);
+  await page.screenshot({
+    path: test.info().outputPath("notebook-size-controls.png"),
+  });
+  await stackedSize.reset.focus();
+  await page.keyboard.press("Enter");
+  await expectNotebookSize(
+    notebook,
+    stackedAutomatic.width,
+    stackedAutomatic.height,
+  );
+  await assistant
+    .getByRole("button", { name: "Close teaching assistant" })
+    .click();
+  await expectNotebookSize(notebook, automatic.width, automatic.height);
+  await expectUnchangedBook();
+  const restoredSize = await openNotebookSize(notebook);
+  await restoredSize.width.focus();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(
+    notebook.getByLabel("Notebook size", { exact: true }),
+  ).toBeHidden();
+  await expect(
+    notebook.getByRole("button", { name: "Close notebook" }),
+  ).toBeFocused();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expectNotebookSize(notebook, automatic.width, automatic.height);
+});
+
+test("Notebook size preferences survive clamping, navigation and reload with independent unsent drafts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await advertiseProvider(page);
+  await page.goto("/chapters/benchmarking/");
+  const notebookLauncher = page.locator(
+    '.site-header [data-learning-toggle="notebook"]',
+  );
+  const assistantLauncher = page.locator(
+    '.site-header [data-learning-toggle="assistant"]',
+  );
+  await notebookLauncher.click();
+  const notebook = page.locator("#learning-notebook");
+  const assistant = page.locator("#learning-assistant");
+  await notebook.getByLabel("Companion address").fill(companionAddress);
+  await notebook
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  await expect(notebook.getByRole("status")).toContainText("Connected");
+  const mutations: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.url().startsWith(companionAddress) &&
+      !["GET", "OPTIONS"].includes(request.method())
+    )
+      mutations.push(`${request.method()} ${request.url()}`);
+  });
+  const thinking =
+    "My unsaved explanation keeps accepted events separate from response timing.";
+  const question =
+    "My unsent question asks which observation establishes durability.";
+  await notebook
+    .getByLabel("Title", { exact: true })
+    .fill("Synthetic size continuity");
+  await notebook.getByLabel("Your thinking", { exact: true }).fill(thinking);
+  const originalSource = await notebook
+    .getByRole("region", { name: "Note context", exact: true })
+    .getByRole("link")
+    .getAttribute("href");
+  const size = await openNotebookSize(notebook);
+  for (const range of [size.width, size.height]) {
+    await range.focus();
+    await page.keyboard.press("End");
+    const maximum = Number(await range.getAttribute("max"));
+    await expect(range).toHaveValue(String(maximum));
+    await page.keyboard.press("ArrowLeft");
+    await expect(range).toHaveValue(
+      String(maximum - Number(await range.getAttribute("step"))),
+    );
+  }
+  const preferredWidth = Number(await size.width.inputValue());
+  const preferredHeight = Number(await size.height.inputValue());
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await assistantLauncher.click();
+  await assistant
+    .getByLabel("Message to the teaching assistant")
+    .fill(question);
+  const assistantSource = await assistant
+    .getByRole("region", { name: "Assistant context", exact: true })
+    .getByRole("link")
+    .getAttribute("href");
+  const firstClamped = (await notebook.boundingBox())!;
+  expect(firstClamped.height).toBeLessThan(preferredHeight);
+  expect(firstClamped.width).toBe(preferredWidth);
+  await assistant
+    .getByRole("button", { name: "Close teaching assistant" })
+    .click();
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await chooseNotebookTool(notebook, "Notes");
+  await chooseNotebookTool(notebook, "Write");
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await page.locator('a[href="/chapters/architecture/"]').first().click();
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await page.reload();
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await expect(
+    notebook
+      .getByRole("region", { name: "Note context", exact: true })
+      .getByRole("link"),
+  ).toHaveAttribute("href", originalSource!);
+  await assistantLauncher.click();
+  await expect(
+    assistant.getByLabel("Message to the teaching assistant"),
+  ).toHaveValue(question);
+  await expect(
+    assistant
+      .getByRole("region", { name: "Assistant context", exact: true })
+      .getByRole("link"),
+  ).toHaveAttribute("href", assistantSource!);
+  await expectNotebookSize(notebook, preferredWidth, firstClamped.height);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(assistant).toBeVisible();
+  await expect(notebook).toBeHidden();
+  await notebookLauncher.click();
+  await expect(notebook).toBeVisible();
+  await expect(assistant).toBeHidden();
+  await expectNotebookSize(notebook, 390, 844 * 0.8);
+  await expect(
+    notebook.getByLabel("Notebook size", { exact: true }),
+  ).toBeHidden();
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  await page.screenshot({
+    path: test.info().outputPath("notebook-size-mobile-fallback.png"),
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(assistant).toBeVisible();
+  await expectNotebookSize(notebook, preferredWidth, firstClamped.height);
+  const stacked = (await notebook.boundingBox())!;
+  const assistantBounds = (await assistant.boundingBox())!;
+  expect(stacked.y + stacked.height).toBeLessThan(assistantBounds.y);
+  await assistant
+    .getByRole("button", { name: "Close teaching assistant" })
+    .click();
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  await notebook.getByRole("button", { name: "Close notebook" }).click();
+  await notebookLauncher.click();
+  await expectNotebookSize(notebook, preferredWidth, preferredHeight);
+  await expect(
+    notebook.getByLabel("Your thinking", { exact: true }),
+  ).toHaveValue(thinking);
+  expect(mutations).toEqual([]);
+  await page.screenshot({
+    path: test.info().outputPath("notebook-size-restored.png"),
+  });
 });
 
 test("notebook and assistant retain separate drafts and use reviewed source-linked handoffs", async ({

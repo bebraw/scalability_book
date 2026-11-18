@@ -51,6 +51,10 @@ Each open panel follows book navigation and retains its active section.
 Closing both keeps later pages lazy, with no companion request until reopening.
 Opening either experience preserves the book's existing widths and positions, including its navigation, reading column and wider demos.
 The fixed notebook uses the upper-right margin and the smaller assistant sits at the lower right.
+Notebook's **Size** control offers labelled width and height sliders for pointer or keyboard use, plus **Reset size** to restore automatic sizing.
+Preferred dimensions stay in the tab session across chapter navigation and reload; the displayed size is clamped to the current viewport and the space above an open assistant, without replacing the preference.
+At widths up to 640 CSS pixels the existing full-width mobile panel applies and size controls are hidden; returning to a larger viewport restores the preference.
+Resizing changes only Notebook's overlay and does not save writing, send a message or change the book or assistant geometry.
 Both can remain visible without overlapping on screens wider than 68rem and taller than 42rem; the notebook shortens to leave room for the assistant.
 On more compact screens only the foreground panel is visible, while the other retains its open state and draft.
 Its header launcher brings it forward; closing the foreground panel reveals the other if it remains open.
