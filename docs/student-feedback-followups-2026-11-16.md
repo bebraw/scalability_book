@@ -415,7 +415,7 @@ This verifies the guidance against the implemented workflow, not first-time lear
 
 ## 17. Adjust Notebook size after comparing reading space
 
-**Status: resizing implemented and verified locally on 17 November 2026; navigation remains task 29.** The student requested a resizable Notebook, less unused reading/navigation space and simultaneous Book/Page navigation.
+**Status: resizing deployed and verified on 18 November 2026; navigation remains task 29.** The student requested a resizable Notebook, less unused reading/navigation space and simultaneous Book/Page navigation.
 The layout comparison used the same built revision `8c31c37`, synthetic writing and a disposable companion in Chromium at 1440 × 900, 1280 × 720, 1024 × 900 and 390 × 844.
 It compared the existing overlay, a 24rem Notebook and a desktop prototype reserving a 25rem column with 12rem navigation, with Notebook alone and both tools open.
 
@@ -447,6 +447,22 @@ Production build, type checks, formatting and validation of 74 HTML files and 6,
 The final full link check found no broken links and 33 inconclusive external URLs, including nineteen GitHub HTTP 503 responses and access challenges elsewhere.
 An earlier full check incorrectly overlapped the build and saw incomplete generated output; its 43 missing-file results are retained separately from the stable-build verification.
 
+Commit `7081b9a` passed all six deployment and CI checks.
+In production, Chrome and WebKit retained the chosen width after reload and restored the desktop size after switching to mobile; Reset returned to the default.
+Chrome briefly showed panel overlap while Assistant opened, then settled with a 16px gap.
+Evidence: `.local/reviews/deployment-7081b9a-2026-11-18/`.
+
+## 18. Offer a harder follow-up to three introductory exercises
+
+**Status: implemented for review.** The student singled out the scaling contract, release gates and average-versus-tail exercises.
+Each now has an optional problem with a self-check that can be solved on paper:
+
+- [Chapter 1](../book/01_establish/01_what_is_scalability.md): choose the missing comparison before recommending a history cap.
+- [Chapter 2](../book/01_establish/02_scalable_development.md): trace a second patch through review and decide whether a late test result belongs to it.
+- [Chapter 3](../book/01_establish/03_benchmarking.md): compare the dashboard's completed-response p95 with the fraction of all offered requests that met the user's deadline.
+
+The checked exercises and project submission requirements are unchanged.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
@@ -455,7 +471,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 18   | Review the request for more demanding follow-up practice in Chapters 1–3; task 7 clarified optionality without evaluating challenge or depth                            | [Exercise contract](chapter-exercises.md) and Chapters 1–3                                                           |
 | 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)      |
 | 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                         |
 | 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)          |

@@ -279,9 +279,23 @@ Use :ref[table:scalability-pressure-signals] to frame a check that could reject 
 
 {{ import "exercise:scalability-contract" }}
 
-Choose one leading dimension and write its pressure, maintained goal, likely first limit, and first useful signal.
-Then add a second pressure and explain whether you would investigate a different boundary.
-Preserve the dimensions as separate claims instead of averaging them into a single scalability score.
+### Optional follow-up — Two pressures change at once
+
+Suppose a team promises that the activity feed's p95 will stay below 150 ms.
+With four readers and 1,000 stored events, p95 is 80 ms.
+With eight readers and 10,000 events, it is 180 ms.
+All responses are correct, and the requests and deployment are otherwise the same.
+The team wants to cap the history at 1,000 events.
+What do the two runs establish, and what do they leave open?
+
+Now suppose eight readers with 1,000 events give a p95 of 105 ms.
+Which combination would you run next to find out whether a larger history can miss the goal even with fewer readers?
+Explain how your conclusion would change if that run passed or failed.
+
+**Check your reasoning:** Try four readers with 10,000 events.
+A miss there shows that eight readers were not necessary for the observed failure.
+A pass would leave the combination of eight readers and the larger history as the only miss in these four runs.
+Neither outcome identifies the slow operation or establishes where to set a permanent cap.
 
 ## Project artifact
 
