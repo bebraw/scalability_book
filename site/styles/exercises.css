@@ -81,8 +81,20 @@
   padding-top: 1rem;
   border-top: 1px solid var(--border);
 }
-.book-exercise summary {
+.book-exercise summary,
+.book-follow-up > summary {
   cursor: pointer;
+}
+.book-follow-up {
+  margin-block: 1.5rem;
+}
+.book-follow-up > summary {
+  width: fit-content;
+  font-weight: 600;
+}
+.book-follow-up > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 .exercise-old-answer {
   white-space: pre-wrap;

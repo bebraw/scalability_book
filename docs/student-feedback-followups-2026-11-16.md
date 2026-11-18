@@ -461,7 +461,14 @@ Each now has an optional problem with a self-check that can be solved on paper:
 - [Chapter 2](../book/01_establish/02_scalable_development.md): trace a second patch through review and decide whether a late test result belongs to it.
 - [Chapter 3](../book/01_establish/03_benchmarking.md): compare the dashboard's completed-response p95 with the fraction of all offered requests that met the user's deadline.
 
+The problems were committed as `8ad1dfc`.
+In a separate presentation pass, each title opens the problem and its self-check in a [chapter disclosure](chapter-exercises.md#optional-follow-ups-in-chapter-prose).
 The checked exercises and project submission requirements are unchanged.
+
+**Pending upstream release:** [ScholarMark's native disclosure](https://github.com/bebraw/scholarmark/pull/1) is in the `v0.10.0` source tag, but npm's `0.10.0` tarball contains the old renderer and rejects `:::details`.
+Keep the working blockquote convention until a corrected package is published ([packaging fix](https://github.com/bebraw/scholarmark/pull/2)).
+Then pin the new version, convert the three follow-ups to `:::details[Title]`, and remove the local blockquote transform.
+The prepared migration against `8ad1dfc` is retained under ignored `.local/reviews/scholarmark-0.10.0-disclosures/native-migration.patch`; its package pin must be updated before use.
 
 ## Remaining original feedback to review individually
 

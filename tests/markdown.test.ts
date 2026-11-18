@@ -2,6 +2,52 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderMarkdown } from "../scripts/lib/markdown.ts";
 
+test("an optional follow-up folds only its quoted practice and keeps its feedback targets", () => {
+  const prompt =
+    "Trace the first patch.\nWhich `TESTS_PASS` belongs to this revision?";
+  const answer = "**Check your reasoning:** Look at the revision.";
+  const after = "Continue with the project.";
+  const label = "Optional follow-up — Can the revised patch ship?";
+  const prose = [prompt, answer, after].join("\n\n");
+  const quote = [`**${label}**`, prompt, answer]
+    .join("\n\n")
+    .replace(/^/gm, "> ");
+  const chapter = { number: "2" };
+  const { content } = renderMarkdown(`${quote}\n\n${after}`, chapter);
+  const details = content.match(/<details\b([^>]*)>([\s\S]*?)<\/details>/);
+  assert.ok(details);
+  assert.match(details[1]!, /class="book-follow-up"/);
+  assert.doesNotMatch(details[1]!, /\bopen\b/);
+  assert.equal(
+    details[2]!.match(/<summary\b[^>]*>(.*?)<\/summary>/)?.[1],
+    label,
+  );
+  assert.match(details[2]!, /<code[^>]*>TESTS_PASS<\/code>/);
+  assert.match(details[2]!, /Check your reasoning:/);
+  assert.doesNotMatch(details[2]!, /Continue with the project/);
+  assert.ok(content.indexOf(after) > content.indexOf("</details>"));
+  const targets = (html: string) =>
+    [...html.matchAll(/data-comment-target="([^"]+)"/g)].map(
+      (match) => match[1],
+    );
+  assert.deepEqual(
+    targets(content),
+    targets(renderMarkdown(prose, chapter).content),
+  );
+});
+
+test("ordinary blockquotes and title-only labels stay visible", () => {
+  for (const quote of [
+    "> **Sustainability angle**\n>\n> A useful note.",
+    "> Optional follow-up — This is quoted prose.\n>\n> Still quoted.",
+    "> **Optional follow-up — Title with no body**",
+  ]) {
+    const { content } = renderMarkdown(quote, { number: "2" });
+    assert.match(content, /<blockquote\b/);
+    assert.doesNotMatch(content, /<details\b/);
+  }
+});
+
 test("concept references preserve paragraph feedback identity", () => {
   const original = renderMarkdown(
     "# Chapter\n\nA **coding agent** needs a harness and **saturation** evidence.",

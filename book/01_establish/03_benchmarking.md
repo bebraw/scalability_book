@@ -79,22 +79,22 @@ They can omit workload mixes, client behavior, cache histories, data shapes, pro
 A result therefore supports a claim only for its declared conditions.
 Compare synthetic evidence with field telemetry where available, and revise the protocol when real behavior exposes a missing condition.
 
-#### Optional follow-up — Which requests counted?
-
-In the fixed practice sample, 18 requests took 40 ms and two took 240 ms.
-A second run offers the same 20 requests: 18 finish in 40 ms and two reach a 300 ms timeout with no response.
-The dashboard calculates p95 from completed responses only.
-Using nearest rank, what p95 does it show for each run?
-
-The user cares about receiving a response in under 120 ms.
-Count how many of the 20 offered requests met that goal in each run.
-Would you report the second run as an improvement?
-Give the dashboard number and the user outcome side by side.
-
-**Check your reasoning:** In the first run, rank 19 of 20 is 240 ms.
-In the second, rank 18 of 18 is 40 ms.
-Both runs returned 18 of 20 responses within the target; the other two were late in the first run and never reached the client before timeout in the second.
-The lower reported p95 does not show that more users met their goal.
+> **Optional follow-up — Which requests counted?**
+>
+> In the fixed practice sample, 18 requests took 40 ms and two took 240 ms.
+> A second run offers the same 20 requests: 18 finish in 40 ms and two reach a 300 ms timeout with no response.
+> The dashboard calculates p95 from completed responses only.
+> Using nearest rank, what p95 does it show for each run?
+>
+> The user cares about receiving a response in under 120 ms.
+> Count how many of the 20 offered requests met that goal in each run.
+> Would you report the second run as an improvement?
+> Give the dashboard number and the user outcome side by side.
+>
+> **Check your reasoning:** In the first run, rank 19 of 20 is 240 ms.
+> In the second, rank 18 of 18 is 40 ms.
+> Both runs returned 18 of 20 responses within the target; the other two were late in the first run and never reached the client before timeout in the second.
+> The lower reported p95 does not show that more users met their goal.
 
 ### Benchmark browser journeys with Playwright and Lighthouse
 

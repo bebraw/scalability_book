@@ -24,6 +24,23 @@ Separate prediction, setup, and calculation instructions with a blank line in th
 Increment the version when changing what the question asks, and keep its stable ID.
 Earlier saved versions retain their original prompt and answer and appear in a disclosure below the current exercise.
 
+## Optional follow-ups in chapter prose
+
+When a chapter offers an extra problem after an exercise, give readers a short title they can open when they want the challenge.
+Start a Markdown blockquote with a bold, plain-text title in this form, then keep the prompt and its self-check inside the same quote:
+
+```md
+> **Optional follow-up — What would you measure next?**
+>
+> Which comparison would separate the two explanations?
+>
+> **Check your reasoning:** Change one condition and keep the other fixed.
+```
+
+The website shows only the title until the reader opens it, including when JavaScript is disabled.
+The book PDF expands disclosures for reading on paper.
+End the quote before returning to the main explanation or giving project instructions.
+
 ## Private answers
 
 Reading, discussion reveals, and experiments require no account.
