@@ -172,7 +172,9 @@ The complete graph supports topic search, reading and theme filters, neighborhoo
 Every connection has a short authored label alongside its explanation.
 “Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and affects only the graph where it is toggled.
 Labeled views make additional room for captions without covering concept nodes.
-Its view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, `group-view`, and `view=all`.
+In each reading’s “Follow an idea” map, “Enlarge map” increases the drawing size within a scrollable region and preserves the reader's concept selection.
+Readers can reach the region with Tab, pan with the arrow keys, and uncheck the box to fit the whole map again.
+The complete graph's view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, `group-view`, and `view=all`.
 A deterministic layout is generated from the registry by `scripts/lib/concept-layout.ts`.
 Equally sized topic regions form an aligned two-column grid: Architecture and Development above Operations and Evidence.
 Named subcategories form rows inside each region; regular concept positions and region dimensions are derived from their membership.

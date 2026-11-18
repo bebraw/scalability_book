@@ -101,7 +101,7 @@ Real trials require a student-controlled local application and actual observatio
 
 The concept JSON and Markdown include a curated learning-resource catalog.
 Each concept's `resourceIds` refer to entries in `learningResources`.
-The catalog includes a labelled neighborhood image for every concept, the complete graph, the five book diagrams, and all gallery demos.
+The catalog includes a labelled neighborhood image for every concept, the complete graph, book diagrams such as Chapter 2's CSV coding loop, and all gallery demos.
 Resource membership helps discover teaching aids; it does not create a new concept relationship.
 Concept `contexts` also link to optional local practice instructions in the book, including HTTP caching and persisted retry.
 These links lead to the shared workspace download and exercise scope; they do not advertise a runnable browser demo or an MCP execution tool.

@@ -64,6 +64,9 @@ The saturation model separates offered, admitted and completed rates, queue grow
 The latency map uses neutral distances and direct hypothetical service timings; batching assumes unchanged results and query execution with at most two dependency rounds.
 The web architecture lens models three exchanges—document, HTML fragment and JSON—with explicit draft restoration and no invented payload sizes.
 The statechart accepts a premature RELEASE proposal and visibly rejects it; supplied TESTS_PASS events are not actual tests.
+After an accepted transition, the diagram scrolls horizontally to show the active states together when they fit.
+On a narrow screen it brings a newly active state into view.
+The configuration below the diagram names both parallel states, and a rejected proposal preserves the reader's scroll position.
 Replica convergence in orchestration is separate from simulated HTTP success; running-but-broken v2 returns 500, and rollback restores v1 responses without erasing the failures.
 The contention and reliability models retain their explicit assumptions and corrected boundary interpretations.
 

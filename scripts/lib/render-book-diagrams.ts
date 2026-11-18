@@ -1,3 +1,4 @@
+import { renderCodingLoopDiagram } from "./render-coding-loop-diagram.ts";
 import {
   dependencyFailureDiagram,
   pressureEvidenceDiagram,
@@ -24,6 +25,7 @@ export function renderBookDiagrams(): ReadonlyMap<string, string> {
       dependencyFailureDiagram.id,
       renderLinearFlowDiagram(dependencyFailureDiagram),
     ],
+    ["coding-loop", renderCodingLoopDiagram()],
     ["shared-knowledge-boundary", renderKnowledgeBoundaryDiagram()],
     ["three-connected-loops", renderThreeLoopsDiagram()],
   ]);

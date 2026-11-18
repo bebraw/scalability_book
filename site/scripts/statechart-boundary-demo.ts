@@ -51,6 +51,7 @@ function initializeStatechartDemo(root: HTMLElement) {
   const configuration = root.querySelector<HTMLElement>(
     "[data-statechart-demo-configuration]",
   );
+  const chart = root.querySelector<HTMLElement>("[data-statechart-demo-chart]");
   const explanation = root.querySelector<HTMLElement>(
     "[data-statechart-demo-explanation]",
   );
@@ -72,6 +73,7 @@ function initializeStatechartDemo(root: HTMLElement) {
     !agentState ||
     !enabledEvents ||
     !configuration ||
+    !chart ||
     !explanation ||
     !verdict ||
     !summary ||
@@ -91,7 +93,7 @@ function initializeStatechartDemo(root: HTMLElement) {
     language: "typescript",
   }).value;
 
-  const render = () => {
+  const render = (previous?: StateValue) => {
     const snapshot = actor.getSnapshot();
     const stateValue = snapshot.value;
     const accepted = getAcceptedEvents(snapshot);
@@ -102,6 +104,7 @@ function initializeStatechartDemo(root: HTMLElement) {
       const path = node.dataset.statePath?.split(".") ?? [];
       node.classList.toggle("is-current", hasStatePath(stateValue, path));
     }
+    if (previous !== undefined) revealActiveStates(chart, previous);
 
     const configurationText = formatStateValue(stateValue);
     agentState.textContent = configurationText;
@@ -146,14 +149,15 @@ function initializeStatechartDemo(root: HTMLElement) {
       state: formatStateValue(actor.getSnapshot().value),
       accepted: true,
     });
-    render();
+    render(snapshot.value);
   };
 
   const reset = () => {
+    const previous = actor.getSnapshot().value;
     actor.stop();
     actor = createDeliveryActor();
     observed.length = 0;
-    render();
+    render(previous);
   };
 
   form.addEventListener("submit", (event) => event.preventDefault());
@@ -189,6 +193,31 @@ function initializeStatechartDemo(root: HTMLElement) {
   });
 
   render();
+}
+
+function revealActiveStates(chart: HTMLElement, previous: StateValue) {
+  const leaves = Array.from(
+    chart.querySelectorAll<SVGGElement>(".is-current:is(.is-state, .is-final)"),
+  );
+  if (!leaves.length) return;
+
+  const bounds = leaves.map((leaf) => leaf.getBoundingClientRect());
+  let left = Math.min(...bounds.map((rect) => rect.left));
+  let right = Math.max(...bounds.map((rect) => rect.right));
+  const padding = 8;
+  if (right - left + 2 * padding > chart.clientWidth) {
+    // Parallel leaves can be farther apart than a phone is wide.
+    const changed = leaves.findIndex(
+      (leaf) => !hasStatePath(previous, leaf.dataset.statePath!.split(".")),
+    );
+    ({ left, right } = bounds[Math.max(0, changed)]!);
+  }
+
+  const start = chart.getBoundingClientRect().left + chart.clientLeft;
+  if (left < start + padding || right > start + chart.clientWidth - padding) {
+    // Pan only the diagram; the event control and the page stay in place.
+    chart.scrollLeft += (left + right) / 2 - start - chart.clientWidth / 2;
+  }
 }
 
 function createDeliveryActor() {

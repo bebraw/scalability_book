@@ -136,6 +136,16 @@ const figures = [
       "Ownership boundaries describe these two products. Evaluate whether the same split fits another system rather than copying it automatically.",
   },
   {
+    id: "coding-loop",
+    title: "One iteration of a CSV export",
+    conceptIds: ["loop-engineering", "feedback-loop", "acceptance-criteria"],
+    url: "/chapters/scalable-development/#figure-coding-loop",
+    caption:
+      "An unquoted title, “Build, measure, learn”, splits one field into three. Quote the title and check the next download for exactly two fields.",
+    assumptions:
+      "The export includes only title and location. A reviewer checks the actual download against the agreed criteria before accepting the change.",
+  },
+  {
     id: "three-connected-loops",
     title: "Three connected scalability loops",
     conceptIds: [

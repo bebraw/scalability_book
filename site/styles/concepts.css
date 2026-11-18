@@ -408,6 +408,23 @@
   height: auto;
   display: block;
 }
+.concept-map-enlarge {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.5rem;
+  font: 0.85rem/1.6 var(--font-ui);
+  margin-block: 0 0.5rem;
+}
+@media screen {
+  .concept-map-enlarge:has(:checked) + .concept-map-graphic {
+    max-height: 65vh;
+    overflow: auto;
+  }
+  .concept-map-enlarge:has(:checked) + .concept-map-graphic svg {
+    width: max(125%, 36rem);
+    max-width: none;
+  }
+}
 .concept-map-graphic :is(line, [data-concept-line]) {
   stroke: var(--muted);
   stroke-width: 1.5;
@@ -856,7 +873,8 @@
   gap: 0.5rem;
   font-size: 0.85rem;
 }
-.concept-map-controls input[type="checkbox"] {
+.concept-map-controls input[type="checkbox"],
+.concept-map-enlarge input {
   width: 1rem;
   height: 1rem;
   padding: 0;
@@ -1338,6 +1356,7 @@
     display: none;
   }
   .concept-map-controls,
+  .concept-map-enlarge,
   .concept-map-navigation,
   .concept-view-switch,
   .concept-map-heading-actions button,

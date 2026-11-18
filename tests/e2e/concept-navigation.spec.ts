@@ -16,6 +16,46 @@ const camera = (graphic: Locator) =>
 const sameScreenPosition = (actual: number, expected: number, scale: number) =>
   expect(Math.abs(actual - expected) * scale).toBeLessThan(1);
 
+test("students can enlarge and scroll the chapter map on a narrow screen", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/chapters/scalable-development/");
+  const reading = page.getByRole("navigation", {
+    name: "Concepts in this reading",
+  });
+  await reading
+    .getByText("Explore concept connections", { exact: true })
+    .click();
+  const focus = reading.getByLabel("Focus on");
+  await focus.selectOption("agent");
+  const graphic = reading.getByRole("region", {
+    name: "Concept map for this reading",
+  });
+  const drawing = graphic.locator("svg");
+  const fitted = (await drawing.boundingBox())!.width;
+  const enlarge = reading.getByLabel("Enlarge map");
+  await enlarge.check();
+  await expect
+    .poll(async () => (await drawing.boundingBox())!.width)
+    .toBeGreaterThan(fitted * 1.2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    390,
+  );
+  await graphic.focus();
+  // WebKit scrolls while the native navigation key is held.
+  await page.keyboard.down("ArrowRight");
+  await expect
+    .poll(() => graphic.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(0);
+  await page.keyboard.up("ArrowRight");
+  await enlarge.uncheck();
+  await expect
+    .poll(async () => (await drawing.boundingBox())!.width)
+    .toBeCloseTo(fitted);
+  await expect(focus).toHaveValue("agent");
+});
+
 test("the Coding agent card and agent guide retain distinct accessible names without JavaScript", async ({
   browser,
   baseURL,

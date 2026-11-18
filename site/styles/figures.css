@@ -73,6 +73,11 @@
   min-width: 62rem;
 }
 
+.coding-loop-figure {
+  inline-size: 100%;
+  max-width: 31rem;
+}
+
 .linear-flow-connectors path,
 .linear-flow-feedback path {
   fill: none;

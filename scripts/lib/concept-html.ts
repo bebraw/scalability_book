@@ -170,6 +170,7 @@ export function renderConceptGraph(
   labelledOverview = false,
 ): string {
   const complete = prefix === "reference-concepts";
+  const reading = prefix === "chapter-concepts";
   const items = ids.map((id) => byId.get(id)!);
   const relations = conceptRelationships.filter(
     (relation) =>
@@ -292,7 +293,8 @@ export function renderConceptGraph(
       : ""
   }
   ${complete ? `<div class="concept-map-canvas"><div class="concept-map-navigation" role="group" aria-label="Graph navigation" data-concept-navigation hidden><span data-concept-zoom-level>100%</span><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button><button type="button" data-concept-zoom="readable" aria-label="Use readable graph size">Readable</button></div>` : ""}
-  <div class="concept-map-graphic"${complete ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="Interactive concept graph" aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
+  ${reading ? `<label class="concept-map-enlarge"><input type="checkbox" aria-controls="${prefix}-graphic">Enlarge map</label>` : ""}
+  <div class="concept-map-graphic"${complete || reading ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="${reading ? "Concept map for this reading" : "Interactive concept graph"}"` : ""}${complete ? ` aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
   ${complete ? `</div><p class="concept-map-help" id="${prefix}-help">Drag anywhere or scroll to move the map. Ctrl/⌘ + scroll or pinch to zoom. Fit shows the whole map; Readable restores the text size. With the map focused, arrow keys move it, +/− zoom, and 0 fits. Every topic and connection is also available as text below.</p>` : ""}
   <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels. A selected topic keeps its labels visible; press Escape in the map to clear them." : ""}</p>
   ${!complete ? `<p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>` : ""}

@@ -494,10 +494,27 @@ Desktop Chromium and mobile WebKit showed the live Generate passage and followed
 
 ## 21. Separate workspace examples from project setup
 
-**Status: implemented for review.** The student could not tell whether Chapter 2 was comparing tools to explain their roles or asking students to choose one for the project.
+**Status: deployed and verified on 18 November 2026.** The student could not tell whether Chapter 2 was comparing tools to explain their roles or asking students to choose one for the project.
 Before the [workspace table](../book/01_establish/02_scalable_development.md#agent-harnesses-and-workspaces), the chapter now points beginners to the guided launcher and students using another harness to the phase rules.
 Trying another workspace is optional.
 The repository's [minimum project harness](../specifications/00_common_project.md#6-minimum-project-harness) is required with either route.
+The link check and Cloudflare deployment passed for `f6afd7b`.
+Desktop Chromium and mobile WebKit followed the launcher, phase rules, and minimum project harness links from the live chapter.
+
+## 22. Make Chapter 2's diagrams easier to follow
+
+**Status: implemented for review.** The student wanted to see how a coding loop repeats, read the chapter's concept connections at a larger size, and follow the active step in the release diagram.
+
+- A [four-stage coding loop](../book/01_establish/02_scalable_development.md#constrain-generate-validate-revise) follows an event title containing two commas.
+  A CSV reader exposes the quoting error, and the failing row becomes a check for the next iteration.
+  The full loop fits a phone screen.
+- In the chapter map, “Enlarge map” lets the reader pan while keeping their selected concept.
+  At a 390-pixel viewport in WebKit, Chapter 2's connection labels grew from 8.7 to 15.7 pixels.
+  Desktop Chromium and mobile WebKit kept the page width fixed.
+- In the [release diagram](../site/includes/statechart-boundary-demo.html), both active states used to move out of view after `PATCH_READY`.
+  The diagram now pans to the highlighted states after an accepted transition.
+  On a phone it shows a newly active state when both cannot fit.
+  A rejected proposal leaves the reader where they were.
 
 ## Remaining original feedback to review individually
 
@@ -505,12 +522,11 @@ A second pass over the original feedback on 17 November identified the following
 These are open review items, not accepted feature designs or assertions that the current implementation is defective.
 Reproduce each behavior or review the current teaching contract before choosing a change.
 
-| Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts) |
-| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
-| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information                                                         | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
-| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks                                                 | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
+| Task | Finding and next check                                                                                                  | Relevant owner                                       |
+| ---- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                   | [Chapter 3](../book/01_establish/03_benchmarking.md) |
+| 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information         | [Chapter 3](../book/01_establish/03_benchmarking.md) |
+| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks | [Chapter 3](../book/01_establish/03_benchmarking.md) |
 
 The kickoff feedback also reported a GitHub OAuth 404.
 The anonymous live entry check on 17 November followed Account → GitHub authorization → GitHub sign-in with statuses 302 → 302 → 200, so the reported 404 did not reproduce.
@@ -530,7 +546,7 @@ The failed continuity run and reduced working-copy/HEAD comparison are retained 
 
 ## 27. Align the environment sheet's launcher release wording
 
-**Status: corrected alongside task 21; awaiting publication.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) now links to the published [project launcher instructions](https://scalableweb.dev/notebook/setup/#start-a-course-coding-project).
+**Status: published and verified with task 21 on 18 November 2026.** The [pilot environment sheet](../specifications/course_environment.md#november-2026-pilot-model-assignments-and-setup) now links to the published [project launcher instructions](https://scalableweb.dev/notebook/setup/#start-a-course-coding-project).
 The npm registry confirms companion 0.4.0 is available.
 Building the package from a local checkout is optional.
 

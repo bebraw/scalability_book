@@ -83,6 +83,8 @@ For the event tracker, consider adding CSV export.
 The task must settle which events are included, which fields may leave the application, and how the exported values are checked.
 A working download button alone leaves those decisions unresolved.
 
+{{ import "site/includes/coding-loop-figure.html" }}
+
 :ref[table:agent-development-loop]{text="The table below"} identifies the evidence needed to advance each stage.
 
 | Stage     | Governing question                          | Main action                                                                  | Exit evidence                                           |

@@ -2,6 +2,10 @@ import { expect, test } from "@playwright/test";
 
 const diagrams = [
   {
+    id: "coding-loop",
+    route: "/chapters/scalable-development/#figure-coding-loop",
+  },
+  {
     id: "pressure-evidence",
     route: "/chapters/what-is-scalability/#reason-from-pressure-to-evidence",
   },
@@ -114,7 +118,7 @@ for (const { id, route } of diagrams) {
         };
       });
 
-    expect(mobile.hasInternalOverflow).toBe(true);
+    expect(mobile.hasInternalOverflow).toBe(id !== "coding-loop");
     expect(mobile.pageOverflow).toBeLessThanOrEqual(1);
   });
 }

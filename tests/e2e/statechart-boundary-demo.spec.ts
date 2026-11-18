@@ -157,6 +157,53 @@ test.describe("statechart boundary demo", () => {
     }
   });
 
+  for (const viewportWidth of [1280, 390]) {
+    test(`keeps the active step in the diagram viewport at ${viewportWidth}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: viewportWidth, height: 900 });
+      const demo = page.locator("[data-statechart-demo]");
+      const chart = demo.locator("[data-statechart-demo-chart]");
+      const send = async (event: string) =>
+        demo.locator(`[data-statechart-demo-event="${event}"]`).click();
+      const fits = async (path: string) => {
+        const node = chart.locator(`[data-state-path="${path}"] > rect`);
+        const [box, area] = await Promise.all([
+          node.boundingBox(),
+          chart.boundingBox(),
+        ]);
+        expect(box!.x).toBeGreaterThanOrEqual(area!.x);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(area!.x + area!.width);
+      };
+
+      await send("PLAN_APPROVED");
+      await fits("active.implementing");
+      await send("PATCH_READY");
+      await fits("active.verifying.checks.running");
+      if (viewportWidth === 1280) await fits("active.verifying.review.waiting");
+      await send("REVIEW_START");
+      await fits("active.verifying.review.reviewing");
+      await send("TESTS_PASS");
+      await fits("active.verifying.checks.passed");
+
+      // A rejected proposal should not undo a reader's manual pan.
+      await chart.evaluate((element) => {
+        element.scrollLeft = 0;
+      });
+      await demo.locator("[data-statechart-demo-propose-release]").click();
+      await expect
+        .poll(() => chart.evaluate((element) => element.scrollLeft))
+        .toBe(0);
+
+      await send("APPROVE");
+      await fits("active.ready");
+      await send("RELEASE");
+      await fits("released");
+      await demo.locator("[data-statechart-demo-reset]").click();
+      await fits("active.planning");
+    });
+  }
+
   test("keeps state and transition labels at readable rendered sizes", async ({
     page,
   }) => {
