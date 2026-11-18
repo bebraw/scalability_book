@@ -165,22 +165,35 @@ Repeat the declared workload, retain failed checks and report its duration distr
 
 #### Browser performance workbench
 
-The workbench below runs completely in the current page.
-It builds and filters an event list either as one uninterrupted task or in batches that yield to the browser.
-It measures from the start of the work through two animation-frame callbacks after the DOM work, repeats the same flow five times, and reports total elapsed time and the longest instrumented JavaScript slice.
-The callbacks provide rendering opportunities, not a timestamp proving that pixels reached the display ([HTML rendering algorithm](https://html.spec.whatwg.org/multipage/webappapis.html#update-the-rendering)).
+Imagine clicking a button while a page is building a long event list.
+The JavaScript that adds rows and the JavaScript that handles the click share the page's **main thread**.
+The click handler has to wait until the running code gives control back to the browser.
+
+The workbench builds a list in the DOM, the browser's tree of page elements.
+At the default setting, both strategies create the same 1,000 event rows and apply the same filter.
+
+- **One task** builds, filters, and adds all 1,000 rows in one pass before returning control to the browser.
+- **Yield between batches** adds 100 rows at a time.
+  Between groups, the code pauses until the next animation-frame callback, giving the browser a chance to handle input or draw before all ten groups finish.
+
+Which strategy do you predict will finish the whole list sooner?
+Which will keep the main thread busy for a shorter stretch at a time?
+Keep the event count at 1,000.
+Choose **Run five trials** and record two readings before switching strategies and repeating.
+**Median total** is the middle of the five elapsed times, including waits.
+For **Longest JS slice (median)**, the workbench takes the longest measured stretch of row-building JavaScript in each trial and reports the middle of those five times.
 
 {{ import "site/includes/browser-performance-workbench.html" }}
 
-Before each measurement, predict which strategy will finish sooner and which will leave the main thread available sooner.
-Run both strategies with the same number of events.
-Then increase the workload and check whether the conclusion remains the same.
+Increase the event count and check whether your comparison still holds on this device.
+Total elapsed time starts when the work begins and includes the final layout calculation and two animation-frame callbacks after the list update.
+Those callbacks give the browser opportunities to draw.
+They cannot tell us exactly when the new rows appeared on screen ([HTML rendering algorithm](https://html.spec.whatwg.org/multipage/webappapis.html#update-the-rendering)).
 
-This is a real measurement, but it is deliberately narrow.
-The timer includes work performed by this demo on this browser and device; it is not a Lighthouse score, INP measurement, or claim about other users.
-The chunked strategy may take longer overall while shortening the measured JavaScript segments and leaving opportunities for other browser work.
-The longest-slice metric excludes the forced layout after those segments and other rendering work; the demo does not measure input delay, so it cannot by itself establish improved responsiveness.
-This distinction between throughput and responsiveness is often more useful than asking which version is simply "faster."
+A batch can occupy the main thread for less time even when the complete list takes longer.
+The slice timer covers the code that builds, filters, and adds rows.
+It excludes the layout calculation that follows.
+To find out how long a user's click actually waits, measure input delay during an interaction on the devices of interest.
 
 For client-side collection in a real application, the small [web-vitals](https://github.com/GoogleChrome/web-vitals) library implements LCP, INP, CLS, FCP, and TTFB using browser APIs and follows the same measurement rules used by Google's web-performance tools.
 Those measurements describe actual page visits.

@@ -531,7 +531,7 @@ Desktop Chromium and mobile WebKit verified the send times, queue counts, and st
 
 ## 24. Give the buffer comparison a concrete first step
 
-**Status: implemented for review.** The student could not tell how to start the [Campfire comparison](../book/01_establish/03_benchmarking.md#worked-case--a-larger-buffer-changes-the-result).
+**Status: deployed and verified on 18 November 2026.** The student could not tell how to start the [Campfire comparison](../book/01_establish/03_benchmarking.md#worked-case--a-larger-buffer-changes-the-result).
 The worked case begins with the published table.
 Readers compare the slowest delivery in each row with an illustrative 30-second deadline, then check the share delivered.
 The two measurements are visible together on a phone.
@@ -539,16 +539,18 @@ The maximum for the larger buffer shows that at least one delivery was late.
 Its on-time share remains unknown.
 The caption records the missing implementation revisions.
 An optional follow-up gives a baseline and a second run that changes only the buffer capacity, with a check for missed messages after reconnect.
+Both checks passed for `449bf64`.
+Desktop Chromium and mobile WebKit verified the comparison and the optional protocol with JavaScript disabled.
+The full table and caption fit at 320, 390, and 1280 pixels.
 
-## Remaining original feedback to review individually
+## 25. Explain the two update strategies before the browser workbench
 
-A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
-These are open review items, not accepted feature designs or assertions that the current implementation is defective.
-Reproduce each behavior or review the current teaching contract before choosing a change.
+**Status: implemented for review.** The student needed more context to distinguish the workbench's two choices before predicting their effects.
+The [Chapter 3 introduction](../book/01_establish/03_benchmarking.md#browser-performance-workbench) follows the same 1,000 event rows and filter through one uninterrupted pass or ten batches of 100.
+It explains why a click handler may have to wait and asks the reader to predict total elapsed time and the longest stretch of row-building JavaScript separately.
+The timing discussion identifies what counts toward each reading and what an actual input-delay measurement would require.
 
-| Task | Finding and next check                                                                                                  | Relevant owner                                       |
-| ---- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks | [Chapter 3](../book/01_establish/03_benchmarking.md) |
+## Kickoff sign-in observation
 
 The kickoff feedback also reported a GitHub OAuth 404.
 The anonymous live entry check on 17 November followed Account → GitHub authorization → GitHub sign-in with statuses 302 → 302 → 200, so the reported 404 did not reproduce.
