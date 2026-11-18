@@ -105,6 +105,16 @@ Runtime configuration, context, tools, hardware, routing, and fallback can chang
 [Appendix A](/appendices/evaluating-agentic-workflows/#qualify-the-served-configuration) explains how to identify the configuration that actually served a task.
 Focused retrieval can reduce irrelevant context, but lossy views can hide decisive facts; keep important raw output retrievable and test the reduction policy.
 
+Feedback starts while the agent is writing the exporter.
+A quick check parses a row with the unquoted title `Build, measure, learn` and finds four fields where the contract calls for two.
+The agent can fix the quoting and rerun the check immediately.
+At validation you still [inspect the actual download](#constraint-feedback-through-an-actual-export).
+
+An **escalation rule** tells the agent when the next step needs a human decision.
+Suppose a teammate wants to distinguish otherwise identical events, but the agreed CSV header is `title,location`.
+Before adding a column, pause and ask the person who owns the export: “Should the file keep its two columns, or may I add the event ID?” Keep the two-column format unless the owner approves the change.
+If they approve it, update the specification and expected header before editing the exporter.
+
 **Validate.** Check the candidate against the intended behavior and inspect the artifact the user will consume.
 The [Webernetes case](/case-studies/webernetes/) compares behavior with an independent implementation; [Slideotter](/case-studies/slideotter/) checks geometry and rendered output.
 Agent-generated checks need scrutiny too.

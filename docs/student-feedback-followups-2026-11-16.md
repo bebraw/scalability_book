@@ -475,10 +475,20 @@ The prepared migration against `8ad1dfc` is retained under ignored `.local/revie
 
 ## 19. Link the first use of agent harness to its own definition
 
-**Status: implemented for review.** Chapter 2 defined _agent harness_ in the text, but readers looking it up could find only _Project harness_ in the concept reference.
+**Status: deployed and verified on 18 November 2026.** Chapter 2 defined _agent harness_ in the text, but readers looking it up could find only _Project harness_ in the concept reference.
 The [first occurrence in Chapter 2](../book/01_establish/02_scalable_development.md#what-is-an-agent) now links to the Agent harness entry.
 The concept reference connects the two roles through the same CSV example: the project supplies a check, and the agent harness runs it and returns the result to the model.
 The existing Project harness link remains `/concepts/#harness`; the new entry has its own address, `/concepts/#agent-harness`.
+All six checks passed for `78f6ad9`.
+On the live site, Chromium and WebKit opened the two distinct definitions from the chapter and followed the glossary links with JavaScript disabled.
+
+## 20. Show when to repair the code and when to ask
+
+**Status: implemented for review.** The student asked what an escalation rule looks like and whether feedback has to wait until implementation is complete.
+The [Generate stage of the coding loop](../book/01_establish/02_scalable_development.md#constrain-generate-validate-revise) now follows two decisions about the event export.
+A parsed row with four fields instead of the agreed two gives the agent enough information to repair the quoting and rerun the check.
+Adding an event ID changes the two-column contract, so the agent pauses that change and asks the export owner to decide.
+The optional lab still specifies two columns; the example does not change its requirements.
 
 ## Remaining original feedback to review individually
 
@@ -488,7 +498,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                         |
 | 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)          |
 | 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts) |
 | 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                                                                   | [Chapter 3](../book/01_establish/03_benchmarking.md)                                                                 |
