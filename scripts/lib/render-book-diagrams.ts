@@ -1,3 +1,4 @@
+import { renderArrivalModelsDiagram } from "./render-arrival-models-diagram.ts";
 import { renderCodingLoopDiagram } from "./render-coding-loop-diagram.ts";
 import {
   dependencyFailureDiagram,
@@ -26,6 +27,7 @@ export function renderBookDiagrams(): ReadonlyMap<string, string> {
       renderLinearFlowDiagram(dependencyFailureDiagram),
     ],
     ["coding-loop", renderCodingLoopDiagram()],
+    ["arrival-models", renderArrivalModelsDiagram()],
     ["shared-knowledge-boundary", renderKnowledgeBoundaryDiagram()],
     ["three-connected-loops", renderThreeLoopsDiagram()],
   ]);

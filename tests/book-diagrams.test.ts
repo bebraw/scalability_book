@@ -15,6 +15,7 @@ test("book diagram registry renders every configured accessible SVG", () => {
       "pressure-evidence",
       "dependency-failure",
       "coding-loop",
+      "arrival-models",
       "shared-knowledge-boundary",
       "three-connected-loops",
     ],

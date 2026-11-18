@@ -29,8 +29,18 @@ A **closed-loop** worker waits for a result before issuing its next operation; a
 Suppose four closed-loop workers immediately repeat requests with no think time or overhead.
 At 0.1 seconds per request they offer about 40 requests per second; at one second they offer only four.
 The same concurrency setting has reduced demand just when the application became slower.
-By contrast, an independent stream of 20 requests per second facing a service capacity of four creates about 16 additional waiting or rejected requests per second, under this simplified constant-rate model.
-Neither experiment substitutes for the other: the [open-versus-closed workload study by Schroeder, Wierman, and Harchol-Balter](https://www.usenix.org/conference/nsdi-06/open-versus-closed-cautionary-tale) demonstrates why the arrival model changes the interpretation.
+
+Picture the first second of two runs.
+Each starts with an empty service that can process four requests at once and takes one second per request.
+In the closed-loop run, all four workers send at time zero.
+In the open-loop run, the generator sends one request every 50 milliseconds, starting at zero.
+Every request arrives on schedule and the service admits them all.
+
+{{ import "site/includes/arrival-models-figure.html" }}
+
+If the open-loop run continues at 20 arrivals per second and the service completes four per second, the queue grows by 16 requests per second.
+With a bounded queue, some of those arrivals may be rejected once it fills.
+The [open-versus-closed workload study by Schroeder, Wierman, and Harchol-Balter](https://www.usenix.org/conference/nsdi-06/open-versus-closed-cautionary-tale) examines how the arrival model changes the interpretation of a benchmark.
 
 The [shared project baseline](/project/#7-1-shared-baseline-workload) uses a small closed-loop workload and fixes the timing boundary, deadlines, outcome counts, and percentile rule.
 Its higher-concurrency profile is not evidence of sustaining an independent production arrival rate.

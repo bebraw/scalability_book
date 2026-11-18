@@ -73,9 +73,34 @@
   min-width: 62rem;
 }
 
-.coding-loop-figure {
+.coding-loop-figure,
+.arrival-models-figure {
   inline-size: 100%;
   max-width: 31rem;
+}
+
+.arrival-serving {
+  fill: var(--accent-strong);
+}
+
+.arrival-waiting {
+  fill: var(--panel);
+  stroke: var(--text);
+  stroke-width: 1.8;
+}
+
+.arrival-axis,
+.arrival-guide {
+  fill: none;
+  stroke: var(--muted);
+}
+
+.arrival-guide {
+  stroke-dasharray: 3 4;
+}
+
+.arrival-tick {
+  font-size: 15px;
 }
 
 .linear-flow-connectors path,

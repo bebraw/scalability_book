@@ -146,6 +146,16 @@ const figures = [
       "The export includes only title and location. A reviewer checks the actual download against the agreed criteria before accepting the change.",
   },
   {
+    id: "arrival-models",
+    title: "Open-loop and closed-loop arrivals",
+    conceptIds: ["benchmark", "throughput", "queue", "saturation"],
+    url: "/chapters/benchmarking/#figure-arrival-models",
+    caption:
+      "Just before the first reply, four requests are in service in each run. Four closed-loop workers have no requests waiting. The open-loop generator has another sixteen waiting.",
+    assumptions:
+      "Each run starts empty with four service slots. Service takes one second, dispatch is on time, and every request is admitted. Closed-loop workers send again on reply. Open-loop sends are 50 milliseconds apart.",
+  },
+  {
     id: "three-connected-loops",
     title: "Three connected scalability loops",
     conceptIds: [

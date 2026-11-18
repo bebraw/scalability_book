@@ -503,7 +503,7 @@ Desktop Chromium and mobile WebKit followed the launcher, phase rules, and minim
 
 ## 22. Make Chapter 2's diagrams easier to follow
 
-**Status: implemented for review.** The student wanted to see how a coding loop repeats, read the chapter's concept connections at a larger size, and follow the active step in the release diagram.
+**Status: deployed and verified on 18 November 2026.** The student wanted to see how a coding loop repeats, read the chapter's concept connections at a larger size, and follow the active step in the release diagram.
 
 - A [four-stage coding loop](../book/01_establish/02_scalable_development.md#constrain-generate-validate-revise) follows an event title containing two commas.
   A CSV reader exposes the quoting error, and the failing row becomes a check for the next iteration.
@@ -516,6 +516,17 @@ Desktop Chromium and mobile WebKit followed the launcher, phase rules, and minim
   On a phone it shows a newly active state when both cannot fit.
   A rejected proposal leaves the reader where they were.
 
+All six checks passed for `f30aca7`.
+Desktop Chromium and mobile WebKit verified the live coding loop and its SVG and PNG exports, concept selection and keyboard panning, and release-state tracking.
+
+## 23. Show how requests accumulate under two arrival models
+
+**Status: implemented for review.** The student asked to see what happens to the requests as the service slows down.
+The [Chapter 3 comparison](../book/01_establish/03_benchmarking.md#check-whether-the-generator-hides-overload) shows every send in the first second of two runs against the same four service slots.
+Just before the first reply, four closed-loop workers have sent four requests.
+A generator sending every 50 ms has already sent twenty.
+The diagram distinguishes the four requests in service in each run from the sixteen waiting in the open-loop run, assuming on-time dispatch and admission of every request.
+
 ## Remaining original feedback to review individually
 
 A second pass over the original feedback on 17 November identified the following findings omitted from the initial ledger or not fully answered by its broader tasks.
@@ -524,7 +535,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                  | Relevant owner                                       |
 | ---- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| 23   | Review whether a visual example would make open-loop and closed-loop arrivals clearer                                   | [Chapter 3](../book/01_establish/03_benchmarking.md) |
 | 24   | Make the first step of the buffer comparison clear while preserving its stated missing reproduction information         | [Chapter 3](../book/01_establish/03_benchmarking.md) |
 | 25   | Review the background needed before the browser update-strategy demo, separately from its timing and correctness checks | [Chapter 3](../book/01_establish/03_benchmarking.md) |
 

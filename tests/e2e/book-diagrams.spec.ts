@@ -2,6 +2,10 @@ import { expect, test } from "@playwright/test";
 
 const diagrams = [
   {
+    id: "arrival-models",
+    route: "/chapters/benchmarking/#figure-arrival-models",
+  },
+  {
     id: "coding-loop",
     route: "/chapters/scalable-development/#figure-coding-loop",
   },
@@ -118,7 +122,8 @@ for (const { id, route } of diagrams) {
         };
       });
 
-    expect(mobile.hasInternalOverflow).toBe(id !== "coding-loop");
+    const fitsOnMobile = id === "coding-loop" || id === "arrival-models";
+    expect(mobile.hasInternalOverflow).toBe(!fitsOnMobile);
     expect(mobile.pageOverflow).toBeLessThanOrEqual(1);
   });
 }
