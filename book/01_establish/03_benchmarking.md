@@ -50,24 +50,41 @@ Timeouts supply deadline lower bounds, not observed completion times; report the
 
 ### Worked case — A larger buffer changes the result
 
-In an October 11, 2026 investigation of Campfire rewrites, :citet[sarnacki2026campfire] reports changing a Rust implementation's notification buffer at a fixed arrival rate of 100 POSTs per second.
-:ref[table:campfire-buffer-tradeoff]{text="The table below"} contains his reported observations.
-The article does not pin the implementation commits; treat this as a case to interpret, with incomplete reproduction information.
+In an October 11, 2026 investigation of Campfire rewrites, :citet[sarnacki2026campfire] changed how many recent chat notifications the Rust implementation's buffer holds for clients catching up.
+The load generator offered 100 POSTs per second in both runs.
 
-| Buffer capacity | Notifications delivered | Maximum latency       |
+Suppose a chat notification needs to arrive within 30 seconds.
+Start with the first row of :ref[table:campfire-buffer-tradeoff]{text="the table below"}.
+Did the slowest delivery meet that deadline?
+What share of the expected notifications reached the client at all?
+Ask the same two questions for the larger buffer.
+
+| Buffer capacity | Notifications delivered | Longest delivery time |
 | --------------- | ----------------------- | --------------------- |
 | 256             | About 14%               | 11 seconds            |
 | 16,384          | About 90%               | More than 130 seconds |
 
-::caption[Reported buffer trade-off in Sarnacki's Campfire investigation; these are practitioner observations, not measurements reproduced for this book.]
+::caption[Live notification delivery as reported by Sarnacki. The article does not identify the exact implementation commits used for these runs.]
 ::label[table:campfire-buffer-tradeoff]
 
-More delivered notifications can coexist with updates too late to use.
-A missing notification also does not establish lost durable data: the described client reconnects and fetches current messages.
-Specify persistence, timely visibility, and reconnect recovery separately before benchmarking a replacement.
+With the smaller buffer, every delivered notification arrived within 11 seconds.
+Those deliveries made up only about 14% of the expected notifications.
+With the larger buffer, about 90% arrived and at least one took more than 130 seconds.
+To tell which buffer delivered a larger share on time, we still need to know how many of those deliveries arrived within 30 seconds.
 
-For your own comparison, pin both implementations and the load script, hold offered load fixed, and report admissions, errors, update latency, memory, and recovered event IDs.
-Which buffer meets your declared update deadline, and what further observation would establish recovery?
+A client can miss a live notification for a message that was stored successfully.
+In the reported system, a reconnecting client fetches the latest messages.
+Check the IDs of the messages it fetches to see which missed updates it recovered.
+
+> **Optional follow-up — Run your own buffer comparison**
+>
+> Choose one implementation with an adjustable notification buffer.
+> Record its commit and the version of your load script.
+>
+> Start with capacity 256 at 100 POSTs per second.
+> Repeat the same workload from the same starting state with capacity 16,384, changing only the buffer capacity.
+> For each run, record admissions, errors, and memory use.
+> Match message IDs and timestamps to count notifications delivered by your deadline, then check which missed IDs the client fetches on reconnect.
 
 ### Simulated benchmark lab
 
