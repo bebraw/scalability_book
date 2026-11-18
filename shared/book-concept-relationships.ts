@@ -364,7 +364,21 @@ const connections: [
     "agent",
     "directed",
     "supplies context for",
-    "An agent's useful capability depends on the project context, tools, checks, and commands supplied by its harness.",
+    "Repository instructions, examples, and checks give a coding agent project-specific guidance about what to change and how to check it.",
+  ],
+  [
+    "agent",
+    "agent-harness",
+    "directed",
+    "acts through",
+    "When a model requests a tool call, the agent harness runs the permitted operation and returns the result so the agent can choose its next step.",
+  ],
+  [
+    "harness",
+    "agent-harness",
+    "directed",
+    "supplies checks to",
+    "The project harness supplies the test command and its expected result. The agent harness can invoke that command and return the actual result to the model.",
   ],
   [
     "authority",

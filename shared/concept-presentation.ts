@@ -54,7 +54,7 @@ export const conceptSubgroups: readonly ConceptSubgroup[] = [
     id: "agent-feedback",
     group: "Development",
     title: "Agent feedback",
-    conceptIds: ["agent", "loop-engineering", "feedback-loop"],
+    conceptIds: ["agent", "agent-harness", "loop-engineering", "feedback-loop"],
   },
   {
     id: "parallel-work-review",
@@ -136,6 +136,7 @@ export const conceptRoleById: Record<string, ConceptRole> = {
   eval: "practice",
   "change-probe": "practice",
   agent: "mechanism",
+  "agent-harness": "mechanism",
   "loop-engineering": "practice",
   harness: "practice",
   "acceptance-criteria": "practice",

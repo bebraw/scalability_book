@@ -1032,7 +1032,7 @@ test("the compact directory opens concepts without losing the browsing position"
     await page.evaluate(() => document.documentElement.scrollHeight),
   ).toBeLessThan(8000);
   await expect(directory.locator("[data-concept-directory-count]")).toHaveText(
-    "45 of 45 topics in this view",
+    `${concepts.length} of ${concepts.length} topics in this view`,
   );
   const summary = directory.locator('[data-concept-select="queue"]');
   await summary.scrollIntoViewIfNeeded();

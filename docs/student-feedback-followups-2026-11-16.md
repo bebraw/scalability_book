@@ -454,7 +454,7 @@ Evidence: `.local/reviews/deployment-7081b9a-2026-11-18/`.
 
 ## 18. Offer a harder follow-up to three introductory exercises
 
-**Status: implemented for review.** The student singled out the scaling contract, release gates and average-versus-tail exercises.
+**Status: deployed and verified on 18 November 2026.** The student singled out the scaling contract, release gates and average-versus-tail exercises.
 Each now has an optional problem with a self-check that can be solved on paper:
 
 - [Chapter 1](../book/01_establish/01_what_is_scalability.md): choose the missing comparison before recommending a history cap.
@@ -464,11 +464,21 @@ Each now has an optional problem with a self-check that can be solved on paper:
 The problems were committed as `8ad1dfc`.
 In a separate presentation pass, each title opens the problem and its self-check in a [chapter disclosure](chapter-exercises.md#optional-follow-ups-in-chapter-prose).
 The checked exercises and project submission requirements are unchanged.
+Both CI and deployment checks passed for `f5fdc55`.
+On the live site all three titles started closed and opened and closed by keyboard and pointer in Chromium and WebKit at desktop and mobile widths with JavaScript disabled.
+The following section stayed visible in each case.
 
 **Pending upstream release:** [ScholarMark's native disclosure](https://github.com/bebraw/scholarmark/pull/1) is in the `v0.10.0` source tag, but npm's `0.10.0` tarball contains the old renderer and rejects `:::details`.
 Keep the working blockquote convention until a corrected package is published ([packaging fix](https://github.com/bebraw/scholarmark/pull/2)).
 Then pin the new version, convert the three follow-ups to `:::details[Title]`, and remove the local blockquote transform.
 The prepared migration against `8ad1dfc` is retained under ignored `.local/reviews/scholarmark-0.10.0-disclosures/native-migration.patch`; its package pin must be updated before use.
+
+## 19. Link the first use of agent harness to its own definition
+
+**Status: implemented for review.** Chapter 2 defined _agent harness_ in the text, but readers looking it up could find only _Project harness_ in the concept reference.
+The [first occurrence in Chapter 2](../book/01_establish/02_scalable_development.md#what-is-an-agent) now links to the Agent harness entry.
+The concept reference connects the two roles through the same CSV example: the project supplies a check, and the agent harness runs it and returns the result to the model.
+The existing Project harness link remains `/concepts/#harness`; the new entry has its own address, `/concepts/#agent-harness`.
 
 ## Remaining original feedback to review individually
 
@@ -478,7 +488,6 @@ Reproduce each behavior or review the current teaching contract before choosing 
 
 | Task | Finding and next check                                                                                                                                                  | Relevant owner                                                                                                       |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 19   | Check glossary coverage and first-use links for “agent harness” without confusing it with the project's measurement harness                                             | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept registry](../shared/book-concepts.ts)      |
 | 20   | Check the coding loop's explanation of feedback during implementation against a concrete escalation example and actionable stop/ask rule                                | [Chapter 2](../book/01_establish/02_scalable_development.md)                                                         |
 | 21   | Explain whether workspace/harness comparisons are conceptual examples or choices needed for the project, connecting them to the supported setup                         | [Chapter 2](../book/01_establish/02_scalable_development.md) and [setup guide](learning-companion-setup.md)          |
 | 22   | Review concept-map and release-diagram readability and the request for a coding-loop diagram; task 6's prose examples did not individually settle these visual requests | [Chapter 2](../book/01_establish/02_scalable_development.md) and [concept presentation](../site/scripts/concepts.ts) |

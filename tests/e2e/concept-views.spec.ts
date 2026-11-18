@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { concepts } from "../../shared/concepts.ts";
 
 test("graph and list share one search, filters, and a persistent camera", async ({
   page,
@@ -63,7 +64,7 @@ test("graph and list share one search, filters, and a persistent camera", async 
   await expect(graphic).not.toBeVisible();
   await expect(map.locator("[data-concept-labels]")).not.toBeVisible();
   await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
-    45,
+    concepts.length,
   );
   await expect(
     map.getByRole("button", { name: "Restore graph size" }),
@@ -113,7 +114,7 @@ test("graph and list share one search, filters, and a persistent camera", async 
   await map.getByRole("button", { name: "Reset view", exact: true }).click();
   await expect(list).toHaveAttribute("aria-selected", "true");
   await expect(directory.locator("[data-concept-result]:visible")).toHaveCount(
-    45,
+    concepts.length,
   );
   await expect(page).toHaveURL(/view=list/);
   await page.reload();

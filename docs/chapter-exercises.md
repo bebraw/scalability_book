@@ -184,7 +184,8 @@ No per-concept coordinates need maintenance, and no layout engine is downloaded 
 The four topic groups are Evidence, Development, Architecture and Operations.
 Little's Law and Lusser's Law live in Evidence, Amdahl's Law in Development, and Contention in Operations.
 There is no separate Models topic: laws retain their explanatory-model role alongside the subject matter they explain, and contention remains a phenomenon.
-These memberships produce 64 within-topic and 45 cross-topic connections for the current 45-concept graph.
+Chapter 2's Agent harness belongs to Agent feedback: it runs the model and executes permitted tool calls.
+Project harness belongs to Project foundations: it supplies the repository's instructions and checks.
 
 `shared/concept-presentation.ts` separately assigns an editorial role to each concept: organizing idea, property or phenomenon, mechanism or response, practice or artifact, or explanatory model.
 Color, a text legend, and short role labels identify these roles; they are independent of topic membership and do not establish a prerequisite or abstraction hierarchy.

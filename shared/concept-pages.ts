@@ -43,6 +43,7 @@ export const conceptPages: ConceptPage[] = [
     title: "2 · Scalable development",
     concepts: [
       "agent",
+      "agent-harness",
       "loop-engineering",
       "harness",
       "decision-log",
@@ -196,6 +197,7 @@ export const conceptPages: ConceptPage[] = [
     title: "A · Agent evaluation",
     concepts: [
       "eval",
+      "agent-harness",
       "loop-engineering",
       "benchmark",
       "acceptance-criteria",

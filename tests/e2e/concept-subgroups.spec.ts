@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { concepts } from "../../shared/concepts.ts";
 
 test("compact parent entry opens the entire topic after highlighting a subcategory", async ({
   page,
@@ -92,13 +93,13 @@ test("subcategories share their exact concept subset between Graph, List and a s
   await expect(page).not.toHaveURL(/subtopic=/);
   await expect(
     page.locator(".concept-directory [data-concept-result]:visible"),
-  ).toHaveCount(15);
+  ).toHaveCount(concepts.filter(({ group }) => group === "Development").length);
   await map.getByRole("button", { name: "Reset view", exact: true }).click();
   await expect(group).toHaveValue("");
   await expect(control).not.toBeVisible();
   await expect(
     page.locator(".concept-directory [data-concept-result]:visible"),
-  ).toHaveCount(45);
+  ).toHaveCount(concepts.length);
   await expect(page).not.toHaveURL(/theme=|subtopic=|group-view=/);
 });
 

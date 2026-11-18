@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { concepts } from "../../shared/concepts.ts";
 
 test("the fitted overview expands into stable, color-coded concepts", async ({
   page,
@@ -66,7 +67,7 @@ test("the fitted overview expands into stable, color-coded concepts", async ({
   const initial = await positions();
   await map
     .getByRole("button", {
-      name: "Zoom to Development, 15 concepts",
+      name: `Zoom to Development, ${concepts.filter(({ group }) => group === "Development").length} concepts`,
       exact: true,
     })
     .focus();
@@ -137,12 +138,16 @@ test("detail override, filters and the list retain access to the complete graph"
   await detail.selectOption("all");
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   await expect(graphic).toHaveAttribute("data-detail", "relationships");
-  await expect(map.locator(".concept-node-title:visible")).toHaveCount(45);
+  await expect(map.locator(".concept-node-title:visible")).toHaveCount(
+    concepts.length,
+  );
   await detail.selectOption("auto");
   await expect(graphic).toHaveAttribute("data-detail", "overview");
   const camera = await graphic.getAttribute("data-camera");
   await map.getByRole("tab", { name: "List", exact: true }).click();
-  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(45);
+  await expect(page.locator("[data-concept-result]:visible")).toHaveCount(
+    concepts.length,
+  );
   await map.getByRole("tab", { name: "Graph", exact: true }).click();
   await expect(graphic).toHaveAttribute("data-camera", camera!);
   await map

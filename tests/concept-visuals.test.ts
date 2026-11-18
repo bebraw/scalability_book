@@ -8,6 +8,8 @@ import {
   resolveVisualStyles,
 } from "../scripts/lib/concept-visuals.ts";
 import { graphResources } from "../shared/learning-resources.ts";
+import { concepts } from "../shared/concepts.ts";
+import { conceptRelationships } from "../shared/concept-relationships.ts";
 
 test("standalone styles freeze theme tokens and mixed colors without an external stylesheet", () => {
   const theme = readFileSync("site/styles/theme.css", "utf8");
@@ -54,7 +56,13 @@ test("the clustered overview export remains a complete standalone SVG", async ()
     true,
   );
   assert.equal((svg.match(/data-concept-cluster=/g) || []).length, 4);
-  assert.equal((svg.match(/data-concept-node=/g) || []).length, 45);
-  assert.equal((svg.match(/data-concept-edge=/g) || []).length, 109);
+  assert.equal(
+    (svg.match(/data-concept-node=/g) || []).length,
+    concepts.length,
+  );
+  assert.equal(
+    (svg.match(/data-concept-edge=/g) || []).length,
+    conceptRelationships.length,
+  );
   assert.ok((await sharp(Buffer.from(framed)).metadata()).width! > 0);
 });

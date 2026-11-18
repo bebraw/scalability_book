@@ -10,7 +10,7 @@ The model applies both to physical robots and to programs acting in information 
 
 In this book, a **[coding agent](/concepts/#agent)** repeatedly observes a development environment and acts through tools to pursue a requested outcome.
 LLM practitioners vary in whether predefined workflows count as agents; this book uses the model-directed action loop as its working definition.
-Its Large Language Model (LLM) operates inside an **agent harness** that assembles context, exposes tools, carries state, invokes the model, and returns action results as feedback.
+Its Large Language Model (LLM) operates inside an **[agent harness](/concepts/#agent-harness)** that assembles context, exposes tools, carries state, invokes the model, and returns action results as feedback.
 Software-engineering agent research describes related perception, memory, and action modules around the LLM :citep[wang2025agentsse].
 
 :ref[table:coding-agent-anatomy]{text="The table below"} shows the parts a developer can tune.
@@ -60,7 +60,7 @@ Across these patterns, a requested outcome still has to become a checked change 
 
 **[Loop engineering](/concepts/#loop-engineering)** is the design of control structures that repeatedly direct agent work toward a declared goal, using observations, retained state, bounded actions and resources, and explicit acceptance, stopping, and escalation rules.
 A [feedback loop](/concepts/#feedback-loop) describes how effects influence subsequent behavior.
-An agent harness runs the model-and-tool cycle; a project harness supplies maintained project knowledge and checks.
+An agent harness runs the model-and-tool cycle; a [project harness](/concepts/#harness) supplies maintained project knowledge and checks.
 Loop engineering connects these controls to decisions about starting work, continuing after an observation, retaining progress, and returning a result for acceptance.
 
 Osmani's practitioner account and IBM's industry explainer frame the practice around systems that direct agent work with less repeated human prompting :citep[osmani2026loop,belcic2026loop].

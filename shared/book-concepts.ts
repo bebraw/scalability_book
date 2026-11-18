@@ -268,6 +268,27 @@ export const bookConcepts: Concept[] = [
     },
   ),
   concept(
+    "agent-harness",
+    "Agent harness",
+    "Development",
+    "The software around a model that gives it context and tools, runs permitted tool calls, and returns their results for the model's next decision.",
+    "The same model can behave differently when the harness gives it different files, tool permissions, or results from earlier steps.",
+    "The model asks to run a CSV export check. The agent harness runs the repository's test command and returns the failing row; the model uses that row to revise the export.",
+    "A benchmark script can run a workload and record timings without a model. It can be a tool the agent harness invokes; it does not manage the model's next step.",
+    [
+      [
+        "Development: follow a tool call",
+        "/chapters/scalable-development/#what-is-an-agent",
+        "Trace the model's request through the harness to the repository check and back.",
+      ],
+      [
+        "Appendix A: distinguish evaluation roles",
+        "/appendices/evaluating-agentic-workflows/#anatomy-of-an-agent-evaluation",
+        "Separate the harness running the agent from the infrastructure that sets up and grades a trial.",
+      ],
+    ],
+  ),
+  concept(
     "loop-engineering",
     "Loop engineering",
     "Development",
