@@ -43,6 +43,8 @@ Notebook's Write view states that no assistant or model account is needed and ex
 When the panel covers the reading, the guidance points to closing it, selecting the passage and reopening Notebook.
 A chapter note keeps the reading link and authored concept membership without copying the chapter text.
 The source is visible in Write; **Preview the selected source** reveals a bounded quote while its full captured text remains in the saved record.
+Choosing **New note** or **New note for this reading** brings the new draft's source link into view and puts keyboard focus on it.
+Cancelling a replacement keeps the unfinished draft and lets keyboard users continue from the same button.
 Writing and Save actions precede kind/title details.
 Discuss puts the message before optional conversation/goal/support controls in the **Help: … · Settings** disclosure, whose summary identifies the current help mode.
 Saved conversation labels include their last-updated time in the reader's locale to help distinguish discussions from the same chapter.

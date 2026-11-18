@@ -545,10 +545,14 @@ The full table and caption fit at 320, 390, and 1280 pixels.
 
 ## 25. Explain the two update strategies before the browser workbench
 
-**Status: implemented for review.** The student needed more context to distinguish the workbench's two choices before predicting their effects.
+**Status: deployed and verified on 18 November 2026.** The student needed more context to distinguish the workbench's two choices before predicting their effects.
 The [Chapter 3 introduction](../book/01_establish/03_benchmarking.md#browser-performance-workbench) follows the same 1,000 event rows and filter through one uninterrupted pass or ten batches of 100.
 It explains why a click handler may have to wait and asks the reader to predict total elapsed time and the longest stretch of row-building JavaScript separately.
 The timing discussion identifies what counts toward each reading and what an actual input-delay measurement would require.
+Published links passed for `0c8b5d3`.
+Cloudflare's first asset upload failed to start (error 10013), then the same revision deployed successfully on retry.
+In production, desktop Chromium and mobile WebKit showed the explanation before the controls with JavaScript disabled.
+With JavaScript enabled, both strategies completed five trials on 1,000 events in each browser, displayed all four timings, and returned the same 221 matching rows in order.
 
 ## Kickoff sign-in observation
 
@@ -559,14 +563,17 @@ Sanitized evidence is retained under ignored `.local/reviews/github-signin-2026-
 
 ## 26. Bring New note context into the visible Notebook area
 
-**Status: open; discovered during task 14's continuity checks on 17 November 2026.** With both panels open at 1280 × 720, choosing **New note** resets the Notebook's scroll position to zero, but the **Note context** section remains below its visible area.
-The reduced Chromium/WebKit reproduction measured the Notebook content viewport at y=223.0–341.4 and the context starting at y=343.8/343.7 respectively.
-The context is still reachable by scrolling; the existing test expects it to be in view immediately after the action.
+**Status: implemented for review.** Task 14's continuity check first reproduced this on 17 November, including on revision `727dad2`.
+With both panels open at 1280 × 720, **New note** reset the Notebook to the top.
+The source link began at y=365, below the scrollable area's bottom at y=341.4.
+Activating the button by keyboard also left focus on the document body in Chromium and WebKit.
+At 320 and 390 pixels wide, the source was visible but keyboard focus was still lost.
 
-The same reproduction on exact revision `727dad2` produced identical geometry, establishing that this predates the exchange preview.
-Review the [Notebook presentation](../site/scripts/learning-pane.ts) reset/scroll target and its [workspace layout](../site/styles/learning-workspace.css), including the existing introductory content, before choosing a correction.
-Keep the failed assertion; done means the new note's source is visibly presented after the action at this height and compact widths, without losing the independent assistant state or keyboard focus.
-The failed continuity run and reduced working-copy/HEAD comparison are retained under ignored `.local/reviews/notebook-exchange-2026-11-17/continuity-diagnosis/`.
+The [Notebook](../site/scripts/learning-pane.ts) now focuses the new draft's source link after either **New note** or **New note for this reading**.
+A reader can check the source and continue with the keyboard.
+Cancelling a draft replacement keeps the current writing and keyboard position.
+The original failure is retained under ignored `.local/reviews/notebook-exchange-2026-11-17/continuity-diagnosis/`.
+The new reproduction and review are under `.local/reviews/new-note-context-2026-11-18/`.
 
 ## 27. Align the environment sheet's launcher release wording
 
@@ -596,6 +603,23 @@ Compare access to another chapter and to a section of the current chapter while 
 Review [book navigation](../site/scripts/book-nav.ts), [layout](../site/styles/layout.css) and [responsive styles](../site/styles/responsive.css) before choosing simultaneous lists, a different placement or another access control.
 Preserve the reader's explicit collapse preference; do not silently change it when opening Notebook.
 The baseline navigation observations and alternative screenshots are retained with task 17's comparison evidence.
+
+## 30. Update the assistant setup check for a companion without a model
+
+**Status: open; found while checking task 26.** In Chromium and WebKit the [task-support browser test](../tests/e2e/learning-workspace.spec.ts) successfully sent the student's chosen support request, then failed while checking the companion's reply.
+It expects “Enable Codex or a local model”.
+The current reply directs the reader to companion setup, which also supports an API provider, and explains that notebook writing works without a model.
+This wording has been in the companion since `de95c36`.
+Update the check to verify that a student gets setup guidance and can continue writing, then run the journey in both browsers.
+
+## 31. Keep the panels separate while Teaching assistant opens
+
+**Status: open; reproduced on `0c8b5d3` while checking task 26.** With reduced motion enabled in Chromium at 1440 × 1000, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
+By the next frame the panels had a 16-pixel gap.
+The Notebook sizing test sometimes records the assistant's top during that transition and compares it with the Notebook's bottom after resizing.
+In the failing run those positions came from different frames.
+Check the opening transition and verify that the panels remain separate during opening and after resizing, using both panels' positions from the same frame.
+The original failure and the frame measurements are retained under `.local/reviews/new-note-context-2026-11-18/`.
 
 ## Closing tasks
 

@@ -2648,12 +2648,12 @@ test("selected context is explicit and the notebook follows chapters without los
     "Saved in your private notebook.",
   );
   await panel.getByRole("button", { name: "New note", exact: true }).click();
-  await expect(
-    panel.getByRole("region", { name: "Note context" }),
-  ).toBeInViewport();
-  await expect(
-    panel.getByRole("region", { name: "Note context" }).getByRole("link"),
-  ).toHaveAttribute("href", /\/chapters\/scaling\//);
+  const newSource = panel
+    .getByRole("region", { name: "Note context" })
+    .getByRole("link");
+  await expect(newSource).toHaveAttribute("href", /\/chapters\/scaling\//);
+  await expect(newSource).toBeInViewport({ ratio: 1 });
+  await expect(newSource).toBeFocused();
   await page.screenshot({
     path: test.info().outputPath("chapter-writing.png"),
     fullPage: false,
@@ -2673,6 +2673,60 @@ test("selected context is explicit and the notebook follows chapters without los
     .click();
   await page.goto("/chapters/introduction/");
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
+});
+
+test("a compact Notebook keeps keyboard focus when cancelling or starting a note for the current reading", async ({
+  page,
+}) => {
+  await page.goto("/chapters/introduction/");
+  const launchers = page.getByRole("group", { name: "Learning tools" });
+  const notebookLauncher = launchers.getByRole("button", {
+    name: "Notebook",
+    exact: true,
+  });
+  const notebook = page.locator("#learning-notebook");
+  const assistant = page.locator("#learning-assistant");
+  const body = notebook.getByLabel("Your thinking");
+  const source = notebook
+    .getByRole("region", { name: "Note context" })
+    .getByRole("link");
+  const question = assistant.getByLabel("Message to the teaching assistant");
+  await notebookLauncher.click();
+  await notebook.getByLabel("Companion address").fill(companionAddress);
+  await notebook
+    .getByRole("button", { name: "Connect companion", exact: true })
+    .click();
+  await body.fill("Keep my introduction draft.");
+  await launchers
+    .getByRole("button", { name: "Teaching assistant", exact: true })
+    .click();
+  await question.fill("Keep my unsent question.");
+  await page.locator('a[href="/chapters/architecture/"]').first().click();
+  await expect(question).toHaveValue("Keep my unsent question.");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await notebookLauncher.click();
+  await expect(assistant).toBeHidden();
+
+  const newNote = notebook.getByRole("button", {
+    name: "New note for this reading",
+  });
+  await newNote.focus();
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.keyboard.press("Enter");
+  await expect(newNote).toBeFocused();
+  await expect(body).toHaveValue("Keep my introduction draft.");
+  await expect(source).toHaveAttribute("href", /\/chapters\/introduction\//);
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.keyboard.press("Enter");
+  await expect(body).toHaveValue("");
+  await expect(source).toHaveAttribute("href", /\/chapters\/architecture\//);
+  await expect(source).toBeInViewport({ ratio: 1 });
+  await expect(source).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(notebookLauncher).toBeFocused();
+  await expect(assistant).toBeVisible();
+  await expect(question).toHaveValue("Keep my unsent question.");
 });
 
 test("a restored open notebook explains unavailable or expired connections and retains writing", async ({

@@ -182,6 +182,19 @@ export function createLearningPane(
       )
     );
   }
+  function newNoteButton(label: string) {
+    const trigger = node("button", label);
+    trigger.type = "button";
+    // Keep the trigger focusable while the reader decides whether to replace a draft.
+    trigger.addEventListener("click", () => {
+      if (beginNote()) {
+        container
+          .querySelector<HTMLAnchorElement>(".learning-context > a")!
+          .focus();
+      }
+    });
+    return trigger;
+  }
   function writeHandoff(value: NotebookHandoff) {
     if (experience !== "notebook") {
       services.write(value);
@@ -497,9 +510,7 @@ export function createLearningPane(
           "This note still belongs to its original reading. The notebook header shows the page you are visiting now.",
           "learning-hint",
         ),
-        button("New note for this reading", () => {
-          beginNote();
-        }),
+        newNoteButton("New note for this reading"),
       );
     container.append(context);
     const kind = node("select");
@@ -619,11 +630,7 @@ export function createLearningPane(
         "learning-primary",
       ),
     );
-    actions.append(
-      button("New note", () => {
-        beginNote();
-      }),
-    );
+    actions.append(newNoteButton("New note"));
   }
   let notesScope = "page";
   function renderNotes() {
