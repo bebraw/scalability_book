@@ -239,6 +239,13 @@ Long prose links can wrap within the guide's reading column.
 Neither guide should create document-level horizontal scrolling; long code remains scrollable inside its own block.
 Run `npx playwright test tests/e2e/book-layout.spec.ts --project=chromium --grep 'setup guides'` for the focused layout regression.
 
+Links to guide headings should land with the whole heading visible.
+The heading's scroll margin leaves room for the sticky site header, including the extra row its controls can occupy on narrower screens.
+On phones the header scrolls away with the page.
+The shared reduced-motion rule uses a zero transition duration.
+A positive duration, even 0.01ms, lets WebKit measure an intermediate layout when following a fragment on a fresh page.
+Run `npx playwright test tests/e2e/setup-guide-navigation.spec.ts` to follow the submission walkthrough links from both editions of the course introduction in Chromium and WebKit.
+
 ### Theme initialization
 
 The shared layout runs [the inline theme bootstrap](../scripts/lib/theme-bootstrap.ts) before loading stylesheets.

@@ -5,6 +5,10 @@
   }
 }
 @media (max-width: 76rem) {
+  .guide-main {
+    /* The sticky header's controls can wrap onto another row. */
+    --guide-heading-offset: 10rem;
+  }
   .header-actions {
     column-gap: 0.9rem;
   }
@@ -87,6 +91,9 @@
   }
 }
 @media (max-width: 48rem) {
+  .guide-main {
+    --guide-heading-offset: 1rem;
+  }
   body {
     font-size: 16px;
   }
@@ -275,6 +282,7 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* WebKit can land a fragment in the wrong section if layout is still transitioning. */
+    transition-duration: 0s !important;
   }
 }

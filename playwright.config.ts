@@ -36,6 +36,7 @@ export default defineConfig({
         "concept-semantic-zoom.spec.ts",
         "concept-subgroups.spec.ts",
         "theme-initialization.spec.ts",
+        "setup-guide-navigation.spec.ts",
         "learning-workspace.spec.ts",
         "learning-demo-bridge.spec.ts",
         "learning-peer-inquiry.spec.ts",

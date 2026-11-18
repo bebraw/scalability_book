@@ -563,7 +563,7 @@ Sanitized evidence is retained under ignored `.local/reviews/github-signin-2026-
 
 ## 26. Bring New note context into the visible Notebook area
 
-**Status: implemented for review.** Task 14's continuity check first reproduced this on 17 November, including on revision `727dad2`.
+**Status: deployed and verified on 18 November 2026.** Task 14's continuity check first reproduced this on 17 November, including on revision `727dad2`.
 With both panels open at 1280 × 720, **New note** reset the Notebook to the top.
 The source link began at y=365, below the scrollable area's bottom at y=341.4.
 Activating the button by keyboard also left focus on the document body in Chromium and WebKit.
@@ -574,6 +574,10 @@ A reader can check the source and continue with the keyboard.
 Cancelling a draft replacement keeps the current writing and keyboard position.
 The original failure is retained under ignored `.local/reviews/notebook-exchange-2026-11-17/continuity-diagnosis/`.
 The new reproduction and review are under `.local/reviews/new-note-context-2026-11-18/`.
+Published links passed and Cloudflare deployed `77bba7c` on the first attempt.
+Desktop Chromium and mobile WebKit exercised both controls on the live site with a disposable notebook fixture.
+Both browsers preserved the draft and trigger focus on cancellation.
+After confirmation, Tab reached the writing field and Escape returned to the Notebook launcher with the assistant's draft and the book's scroll position intact.
 
 ## 27. Align the environment sheet's launcher release wording
 
@@ -583,14 +587,25 @@ Building the package from a local checkout is optional.
 
 ## 28. Make linked setup headings reliably visible
 
-**Status: open; found during task 16's live deployment verification.** Two WebKit cases followed the correct link from the current/archived course introduction to `/notebook/setup/#prepare-a-submission-from-your-notes`, but the target heading remained outside the viewport.
-Four later instrumented WebKit cases reached it without a production change, so those passes do not explain the original failures.
-The desktop diagnostic also placed the heading at approximately y=0 beneath the sticky header: a viewport-intersection assertion alone missed the occlusion.
-The changed wording and correct destinations were verified; anchor placement remains unverified for consistent visibility.
+**Status: implemented for review.** Both editions of the course introduction link to [Prepare material for your portfolio](https://scalableweb.dev/notebook/setup/#prepare-material-for-your-portfolio).
+On the published site the link placed the heading at the very top of the viewport.
+The sticky header covered it completely at desktop widths.
+At 1440 pixels the header was 76 pixels tall.
+At 960 pixels its controls wrapped and it grew to 147 pixels, enough to cover the heading even with a 6rem scroll margin.
 
-Reduce navigation, load timing and sticky-header positioning against the published assets before choosing a correction.
-Done means clicking the links exposes the intended heading after navigation in Chromium and WebKit at desktop and compact widths, without relying only on the URL or DOM presence.
-The first failures, screenshots and diagnostics are retained under ignored `.local/reviews/deployment-8c31c37-2026-11-17/`.
+The [guide layout](development.md#setup-guide-layout) now gives native heading links room for each header layout.
+On a phone the heading lands about 16 pixels below the top edge.
+The browser regression follows both links and checks that the top and bottom of the heading can be reached at their screen coordinates.
+Delayed-stylesheet and streamed-HTML checks also left the whole heading visible in Chromium and WebKit.
+
+Two earlier WebKit clicks landed several sections away despite reaching the correct URL.
+The original journey reproduced this with a cold cache and reduced motion enabled.
+The shared reduced-motion rule gave ordinary layout changes a positive transition duration.
+WebKit could position the fragment using an intermediate layout and leave the heading below the screen after the page settled.
+With the header clearance alone, 11 of 12 cold-cache clicks still missed the heading.
+Giving reduced-motion transitions zero duration kept all 12 clicks on the heading.
+Increasing the duration in a comparison brought the failure back.
+The first failures are retained under `.local/reviews/deployment-8c31c37-2026-11-17/` and the comparisons under `.local/reviews/setup-heading-2026-11-18/`.
 
 ## 29. Improve Book and Page navigation access
 
@@ -614,12 +629,15 @@ Update the check to verify that a student gets setup guidance and can continue w
 
 ## 31. Keep the panels separate while Teaching assistant opens
 
-**Status: open; reproduced on `0c8b5d3` while checking task 26.** With reduced motion enabled in Chromium at 1440 × 1000, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
+**Status: opening overlap resolved by task 28 in the review build.** With reduced motion enabled in Chromium at 1440 × 1000 on `0c8b5d3`, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
 By the next frame the panels had a 16-pixel gap.
 The Notebook sizing test sometimes records the assistant's top during that transition and compares it with the Notebook's bottom after resizing.
 In the failing run those positions came from different frames.
-Check the opening transition and verify that the panels remain separate during opening and after resizing, using both panels' positions from the same frame.
-The original failure and the frame measurements are retained under `.local/reviews/new-note-context-2026-11-18/`.
+With the shared reduced-motion transition duration set to zero, simultaneous measurements in Chromium and WebKit showed a 16-pixel gap from opening through the first five frames and a 104-pixel gap after resizing.
+The assistant stayed in place.
+The existing sizing journey passed twice in each browser.
+Its assertion still compares positions sampled at different times.
+The original failure is under `.local/reviews/new-note-context-2026-11-18/` and the same-frame checks are under `.local/reviews/setup-heading-2026-11-18/reduced-motion-sizing/`.
 
 ## Closing tasks
 

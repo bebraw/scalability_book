@@ -735,6 +735,9 @@
 .guide-main > .prose a {
   overflow-wrap: anywhere;
 }
+.guide-main :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-block-start: var(--guide-heading-offset, 6rem);
+}
 @media (min-width: 76.0625rem) {
   .book-shell[data-layout-ready="true"] {
     transition:
