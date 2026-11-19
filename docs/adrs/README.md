@@ -113,6 +113,7 @@ No accepted decisions await implementation.
 | [ADR-062](implemented/ADR-062-provide-a-course-starter-with-independent-phase-stubs.md)             | Provide an optional executable course starter with shared reasoning and three independent phase stubs.                                                      |
 
 | [ADR-063](implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) | Provide a guided terminal launcher for the verified course coding harness while preserving study-assistant permissions and harness choice. |
+| [ADR-064](implemented/ADR-064-expose-reader-feedback-through-a-private-editorial-mcp.md) | Expose read-only reader feedback through an opt-in owner credential with account identities omitted. |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

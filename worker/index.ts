@@ -5,6 +5,7 @@ import { assetManifest } from "./generated/asset-manifest.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { agentResourceHeaders } from "../shared/agent-resource-headers.ts";
 import { handlePublicMcp } from "./public-mcp.ts";
+import { handleFeedbackMcp } from "./feedback-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
@@ -61,6 +62,7 @@ type Env = {
   GITHUB_CLIENT_SECRET?: string;
   SESSION_SECRET?: string;
   ADMIN_GITHUB_LOGINS?: string;
+  FEEDBACK_MCP_CREDENTIAL?: string;
   COURSE_ADMIN_GITHUB_LOGINS?: string;
   COURSE_DB?: CourseBindings["COURSE_DB"];
   COURSE_FILES?: CourseBindings["COURSE_FILES"];
@@ -131,6 +133,22 @@ export default {
           return asset.text();
         },
         url.origin,
+      );
+    }
+
+    if (url.pathname === "/api/admin/feedback/mcp") {
+      const namespace = env.COMMENTS_KV;
+      return handleFeedbackMcp(
+        request,
+        env.FEEDBACK_MCP_CREDENTIAL,
+        (login) => isAdmin(login, env),
+        namespace
+          ? {
+              readChapter: (chapter) => getChapterComments(env, chapter),
+              readAll: () => getAllFeedbackComments(env, namespace),
+              pageUrl: (chapter) => feedbackPageUrl(chapter, url.origin),
+            }
+          : null,
       );
     }
 
@@ -652,17 +670,7 @@ async function handleAdminCommentsRequest(
     );
   }
 
-  const chapterKeys = await listCommentKeys(env.COMMENTS_KV);
-  const commentsByChapter = await Promise.all(
-    chapterKeys.map((key) =>
-      getChapterComments(env, key.name.replace(/^comments:/, "")),
-    ),
-  );
-
-  return json(
-    { comments: commentsByChapter.flat() },
-    { headers: { "Cache-Control": "private, no-store" } },
-  );
+  return json({ comments: await getAllFeedbackComments(env, env.COMMENTS_KV) });
 }
 
 async function handleStuckRequest(
@@ -977,6 +985,26 @@ async function getChapterComments(env: Env, chapter: string) {
   const stored = await env.COMMENTS_KV?.get(`comments:${chapter}`, "json");
 
   return Array.isArray(stored) ? dedupeActiveStuckMarkers(stored) : [];
+}
+
+async function getAllFeedbackComments(env: Env, namespace: KVNamespace) {
+  const chapterKeys = await listCommentKeys(namespace);
+  const commentsByChapter = await Promise.all(
+    chapterKeys.map((key) =>
+      getChapterComments(env, key.name.slice("comments:".length)),
+    ),
+  );
+  return commentsByChapter.flat();
+}
+
+function feedbackPageUrl(chapter: string, origin: string) {
+  for (const section of ["chapters", "appendices", "parts"]) {
+    const pathname = `/${section}/${chapter}/`;
+    if (assetManifest.some(({ path }) => path === `${pathname}index.html`)) {
+      return new URL(pathname, origin);
+    }
+  }
+  return null;
 }
 
 function dedupeActiveStuckMarkers(comments: any[]) {

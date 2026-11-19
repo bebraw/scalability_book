@@ -19,6 +19,7 @@ It uses npm and the Node version range in [package.json](package.json).
 | Formative exercises          | [shared/exercises.ts](shared/exercises.ts), [worker/learning.ts](worker/learning.ts)                                                             | Render versioned canonical questions and privately persist checked answers independently of course grades.              |
 | Concepts and agent resources | [scripts/lib/concept-export.ts](scripts/lib/concept-export.ts), [shared/explorations.ts](shared/explorations.ts)                                 | Publish authored concept connections, visuals, and optional activity resources for readers and external agents.         |
 | Public learning MCP          | [worker/public-mcp.ts](worker/public-mcp.ts), [shared/book-retrieval.ts](shared/book-retrieval.ts)                                               | Serve stateless public retrieval at `/mcp` through the Worker and local server, independently of private learner state. |
+| Private feedback MCP         | [worker/feedback-mcp.ts](worker/feedback-mcp.ts), [worker/index.ts](worker/index.ts)                                                             | Serve read-only editorial feedback from `COMMENTS_KV` through an optional owner credential.                             |
 | Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                                                              | Build pinned public learning bundles without hosting the authoring service.                                             |
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                               |
 
@@ -207,6 +208,10 @@ The public MCP server reads the deployment's graph, rendered prose index and act
 The local server supplies files from its current build and the Worker supplies its `ASSETS` binding; domain behavior is shared.
 There is no MCP conversation/session database or model invocation.
 [The resource contract](docs/agent-learning-resources.md#public-mcp-server) owns the tools and limits; [the published setup guide](docs/external-agent-setup.md) owns connection instructions.
+
+The private feedback MCP at `/api/admin/feedback/mcp` checks the dedicated credential and current feedback-admin allowlist before opening the MCP transport.
+It reuses the Worker's feedback readers and returns an explicit projection of comment and reply fields.
+[Feedback setup](docs/feedback-setup.md#private-feedback-mcp) defines access, tools, and provisioning.
 
 | Data                                    | Local storage                                     | Production storage                                       |
 | --------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- |

@@ -1,3 +1,8 @@
+import {
+  feedbackStatus,
+  matchesFeedbackStatus,
+} from "../../shared/feedback-status.ts";
+
 type AdminFeedbackAuthor = {
   login?: string;
 };
@@ -157,8 +162,8 @@ function setupDashboard(
   const render = () => {
     const visible = filterComments(sortedComments, filters, chapterBySlug);
     const status = filters.elements.status.value;
-    const statusTotal = sortedComments.filter(
-      (comment) => status === "all" || matchesStatus(comment, status),
+    const statusTotal = sortedComments.filter((comment) =>
+      matchesFeedbackStatus(comment, status),
     ).length;
 
     updateMetrics(root, sortedComments);
@@ -258,7 +263,7 @@ function filterComments(
   const chapter = filters.elements.chapter.value;
 
   return comments.filter((comment) => {
-    if (status !== "all" && !matchesStatus(comment, status)) {
+    if (!matchesFeedbackStatus(comment, status)) {
       return false;
     }
 
@@ -287,26 +292,6 @@ function filterComments(
 
     return searchable.includes(query);
   });
-}
-
-function matchesStatus(comment: AdminFeedbackComment, status: string): boolean {
-  if (status === "open") {
-    return !comment.resolvedAt && !comment.hiddenAt;
-  }
-
-  if (status === "resolved") {
-    return Boolean(comment.resolvedAt);
-  }
-
-  if (status === "hidden") {
-    return Boolean(comment.hiddenAt);
-  }
-
-  if (status === "featured") {
-    return Boolean(comment.featuredAt);
-  }
-
-  return true;
 }
 
 function renderComments(
@@ -638,11 +623,12 @@ function labelForCategory(category: string | undefined): string {
 }
 
 function commentStatus(comment: AdminFeedbackComment): string {
-  if (comment.hiddenAt) {
+  const status = feedbackStatus(comment);
+  if (status === "hidden") {
     return "Hidden";
   }
 
-  if (comment.resolvedAt) {
+  if (status === "resolved") {
     return (
       (comment.resolutionReason &&
         resolutionLabels.get(comment.resolutionReason)) ||

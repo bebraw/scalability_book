@@ -193,6 +193,55 @@ You can avoid passing `--namespace-id` each time by exporting:
 export COMMENTS_KV_NAMESPACE_ID=<comments-kv-namespace-id>
 ```
 
+## Private feedback MCP
+
+The Worker serves a read-only Streamable HTTP MCP endpoint at
+`https://scalableweb.dev/api/admin/feedback/mcp` for editorial work in local Codex.
+It reads the live feedback store.
+`list_feedback` defaults to open issues and returns excerpts with stable IDs, chapter slugs, and links.
+Pass `chapter`, `status`, `limit` (up to 20), and `offset` to narrow or page through results.
+`get_feedback` takes the `chapter` and `id` from that list and returns the comment, resolution reason, and up to ten replies.
+Use `nextReplyOffset` as `replyOffset` to continue.
+Threads include the stored paragraph anchor when the page is still published, and reflections link to the chapter.
+Older threads can refer to a passage that has since moved.
+
+The tool responses omit reader and moderator account fields.
+Comment and reply text can still contain identifying details supplied by their authors.
+Review any proposed book edits in the normal editorial workflow.
+Use [the feedback dashboard](https://scalableweb.dev/admin/feedback/) to record a resolution or send a reply.
+
+### Enable access for the owner
+
+Set the optional Worker secret `FEEDBACK_MCP_CREDENTIAL` to a JSON object with two keys.
+`login` is the single GitHub login authorized for this integration and must already be in `ADMIN_GITHUB_LOGINS`.
+`sha256` is the hexadecimal SHA-256 of a locally generated 32-byte base64url bearer token.
+For example, in a private terminal, replacing `YOUR_GITHUB_LOGIN`:
+
+```bash
+export SCALABLEWEB_FEEDBACK_MCP_TOKEN="$(node -p 'require("node:crypto").randomBytes(32).toString("base64url")')"
+node -e 'const { createHash } = require("node:crypto"); process.stdout.write(JSON.stringify({ login: process.argv[1], sha256: createHash("sha256").update(process.env.SCALABLEWEB_FEEDBACK_MCP_TOKEN).digest("hex") }));' YOUR_GITHUB_LOGIN \
+  | npx wrangler secret put FEEDBACK_MCP_CREDENTIAL
+```
+
+Keep the bearer token in your local credential store and supply it to the Codex host as `SCALABLEWEB_FEEDBACK_MCP_TOKEN`.
+Add the server to your local Codex configuration:
+
+```bash
+codex mcp add scalableweb-feedback \
+  --url https://scalableweb.dev/api/admin/feedback/mcp \
+  --bearer-token-env-var SCALABLEWEB_FEEDBACK_MCP_TOKEN
+```
+
+Use a Codex session whose process receives that environment variable.
+For a desktop client launched outside that shell, a local Codex `http_headers_helper` can read the token from your credential store and supply the `Authorization` header.
+Keep the token out of the repository and conversation.
+The Worker denies access when the secret is absent or invalid or the configured owner loses feedback-admin access.
+Rotate access by replacing the Worker secret and local token together.
+Deleting the Worker secret disables the endpoint.
+
+After deployment and setup, verify that an anonymous request receives `401` and an authenticated Codex client discovers exactly `list_feedback` and `get_feedback`.
+Use the first tool to select an open issue and the second to verify its thread and passage link.
+
 ## 8. Troubleshooting
 
 If the feedback controls say login is not configured, check `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `SESSION_SECRET`.

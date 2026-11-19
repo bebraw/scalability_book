@@ -194,7 +194,11 @@ await compileSiteBundle(
   "BookToc",
 );
 await compileSiteBundle("scripts/comments.ts", "comments.js", "BookFeedback");
-await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
+await compileSiteBundle(
+  "scripts/feedback-admin.ts",
+  "feedback-admin.js",
+  "BookFeedbackAdmin",
+);
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");
 await compileSiteBundle(
   "scripts/statechart-boundary-demo.ts",
