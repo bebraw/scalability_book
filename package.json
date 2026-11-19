@@ -10,6 +10,7 @@
     "comments:pull": "node scripts/sync-comments.ts pull",
     "comments:push": "node scripts/sync-comments.ts push",
     "comments:sync": "node scripts/sync-comments.ts sync",
+    "backup:book": "node scripts/backup-book.ts",
     "dev": "node scripts/dev-site.ts",
     "companion": "node scripts/learning-companion.ts",
     "companion:build": "node scripts/build-learning-companion.ts",

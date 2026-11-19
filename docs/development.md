@@ -540,6 +540,8 @@ Staged publishing is a separate optional npm feature; this release command uses 
 
 ## Feedback Review
 
+The [book backup and recovery runbook](backups.md) covers production feedback, exercise answers, and local-only project data.
+
 The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured.
 Students sign in with GitHub, use the paragraph comment control, and post comments.
 The feedback sign-in button opens the shared Account view; reader feedback continues to use its GitHub identity, independently of a course email session.

@@ -226,6 +226,9 @@ The MCP and dashboard write resolutions to per-issue keys in `COMMENTS_KV`, and 
 | Private agent conversations             | `conversations.sqlite` in that directory          | Student's local companion; excluded from notebook export |
 | Shared learning inquiries and offers    | Course record/history store                       | Existing `COURSE_DB`; source-scoped paginated reads      |
 
+The [backup runbook](docs/backups.md) covers the active production feedback and exercise stores, the book source, and the owner's default local project data.
+Snapshots are verified locally and copied to a private EU R2 bucket with a checksum manifest.
+
 The course bindings remain commented configuration examples in `wrangler.jsonc`; repository support does not establish that production resources have been provisioned.
 The book can run without course storage.
 Inquiry records use the existing course identity and allocation authority, with record revision checks and an atomic course revision guard.
