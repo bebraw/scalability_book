@@ -1,12 +1,30 @@
 # Student feedback follow-ups — 16 November 2026
 
-This ledger preserves the unfinished work from the pilot feedback review while the course coding-agent setup is released.
+This ledger tracks the November pilot feedback and records how each finding was checked.
 Work through the items individually, reproducing the current behavior before deciding the smallest change.
 The private feedback and student notes remain private; the tasks below summarize product and teaching concerns without copying those records.
 
 The supported coding-agent entry is implemented in [ADR-063](adrs/implemented/ADR-063-launch-course-coding-agents-from-the-companion.md): guided phase selection, Aalto credentials, verified GLM/Qwen profiles, installed Codex reuse and a private pinned fallback.
 Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) owns the student instructions, and the [development guide](development.md#course-project-launcher) owns release and compatibility checks.
-Completion of that setup work does not close the items below.
+
+## Issue status on 19 November 2026
+
+Of the 32 numbered tasks, 27 have met their recorded acceptance checks.
+Five remain open.
+
+- **Next engineering task.** [Task 31](#31-keep-the-panels-separate-while-teaching-assistant-opens) needs a browser regression that measures Notebook and Teaching assistant in the same frame as the assistant opens and after resizing.
+  The reduced-motion fix is deployed.
+- **Next layout issue.** [Task 32](#32-reconcile-the-compact-homepage-header-with-its-layout-check) needs a decision about the compact homepage header.
+  At 390 pixels wide, Account wraps onto a third row and the header exceeds the test's height limit.
+- **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
+  The current long-output checks pass.
+- **Waiting for a learner walkthrough.** For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
+  For [task 7](#7-make-the-role-of-optional-exercises-explicit), ask a learner to choose an optional activity, identify the first step and explain what to keep for their notes versus the required Establish submission.
+
+The separate [kickoff sign-in observation](#kickoff-sign-in-observation) reached GitHub's sign-in page.
+An authenticated return to the book is still unverified.
+
+## Deployment history
 
 Changes through `4fbee6e` were pushed on 17 November 2026; published-link CI and Cloudflare deployment succeeded for that commit.
 Eleven live Chrome checks passed for feedback wrapping/audience, compact setup guides, chapter examples, optional practice, notebook guidance and browser-evidence disclosure.
@@ -36,12 +54,12 @@ Evidence is retained under ignored `.local/reviews/deployment-813a97b-2026-11-17
 The note-tool and explicit-submission guidance was pushed as `8c31c37` on 17 November; published-link CI and Cloudflare deployment passed for that commit.
 All modified wording, correct rubric editions/link destinations and horizontal containment were verified on the deployed current introduction, archived introduction and setup guide in Chromium/WebKit at 1440 and 390 pixels.
 The full twelve-case navigation audit had ten passes and two WebKit walkthrough-anchor positioning failures; instrumented diagnostic passes did not establish a fix, and desktop sticky-header occlusion was also observed.
-These anchor limitations remain open in [task 28](#28-make-linked-setup-headings-reliably-visible).
+[Task 28](#28-make-linked-setup-headings-reliably-visible) subsequently fixed the heading placement and verified it on the deployed site.
 Evidence is retained under ignored `.local/reviews/deployment-8c31c37-2026-11-17/`.
 
 ## 1. Keep expanded tool output inside the assistant panel
 
-**Status: open; reproduced during the earlier browser review.** Expanded JSON/tool output produced approximately 83 px of desktop overflow.
+**Status: open, awaiting the original page and output.** The earlier browser review recorded approximately 83 px of desktop overflow when expanding JSON or tool output.
 Treat that measurement as the earlier observation, not an assertion that every current page or viewport fails.
 
 Current-path verification on 16 November did not reproduce that overflow: an expanded **Browser observation** and an assistant reply with long JSON keys and URLs stayed inside the panel at 1440 px and 390 px in Chromium and WebKit.
@@ -56,11 +74,8 @@ The first worktree startup failure, unchanged-layout results and failing/passing
 The keyboard fix was committed and deployed as `8b8f193` on 17 November; link CI and deployment passed, followed by live Chromium keyboard checks at both widths with local-network permission granted.
 Live WebKit connectivity failed before reaching the code block; [task 9](#9-verify-the-live-companion-connection-in-safari) records that separate finding.
 
-Reproduce with a synthetic conversation containing long JSON keys, URLs and nested output, then expand the relevant observation or trace in the assistant.
-Inspect the panel and its scroll containers before changing [workspace styles](../site/styles/learning-workspace.css), [reply rendering](../site/scripts/learning-reply.ts) or [conversation presentation](../site/scripts/learning-agent-ui.ts).
-
-Done when the expanded output stays within the panel on desktop and compact screens, remains readable and keyboard-scrollable where needed, and does not move the page or hide controls.
-Add a browser regression at that boundary with a long synthetic payload; a short reply that already fits is insufficient.
+If the original page and output become available, reproduce the overflow with a synthetic equivalent and check it against the existing regression on desktop and compact screens.
+Verify that the complete output is reachable by keyboard and stays inside the panel without moving the page or hiding its controls.
 
 ## 2. Make preformatted assistant output readable in every theme
 
@@ -220,7 +235,7 @@ Mobile and desktop screenshots were inspected; the Worker build, types, HTML/loc
 Evidence is retained under ignored `.local/reviews/setup-overflow-2026-11-17/`, including the original one-pixel regression and the narrower long-URL failure.
 Diagnostic failures are retained separately from product failures: a reduced-motion probe read padding during its transition, and an initial keyboard check assumed that Enter preserved anchor focus after fragment navigation.
 The corrected checks wait for settled layout and check keyboard exit before activation; WebKit uses its observed Option-Tab link-navigation mode.
-These local layout checks do not establish live Safari connectivity, which remains [task 9](#9-verify-the-live-companion-connection-in-safari).
+[Task 9](#9-verify-the-live-companion-connection-in-safari) separately verified the live Safari connection limitation and the Chrome recovery path.
 
 ## 9. Verify the live companion connection in Safari
 
@@ -343,7 +358,7 @@ Initial failures, reduced comparisons, exact geometry, successful checks and scr
 
 ## 14. Preserve the learner's thinking in a reviewed notebook draft
 
-**Status: implemented on 17 November 2026 with explicit exchange review.** The selected-suggestion handoff copied only the assistant reply, losing the learner's question or response from the proposed note.
+**Status: deployed and verified on 17 November 2026 in `b6acd8c`.** The selected-suggestion handoff copied only the assistant reply, losing the learner's question or response from the proposed note.
 It also silently cut reply text to the Notebook's 16,000-character limit.
 
 **Use as a notebook draft** now opens a preview of the selected reply and its nearest preceding student turn, with separate editable fields and inclusion controls.
@@ -358,7 +373,8 @@ The [workspace contract](learning-workspace.md) and [setup guide](learning-compa
 
 Nine unit checks passed for session continuity, literal text, selected speakers, legacy replies, exact assistance-history boundaries and explicit shortening of oversized metadata while retaining message identities.
 Eight focused Chromium/WebKit browser checks passed, including polling/reload continuity, replacement cancellation, full source/context retention, actual save/export and the exact 16,000/16,001-character boundary.
-Six additional panel/session continuity checks passed; two existing **New note** visibility checks failed in both browsers and reproduced unchanged on the pushed revision, as recorded in [task 26](#26-bring-new-note-context-into-the-visible-notebook-area).
+Six additional panel/session continuity checks passed.
+Two existing **New note** visibility checks failed in both browsers on the pushed revision. [Task 26](#26-bring-new-note-context-into-the-visible-notebook-area) subsequently fixed and verified the new-note focus and visibility in production.
 Four built-page desktop/mobile checks passed across both engines, including eight scoped accessibility checks, horizontal containment, editable/omitted parts and an actual notebook save without preview-triggered writes or model requests.
 Screenshots were inspected; the Worker build, types, HTML/local-link validation and formatting passed.
 The full link check found no broken links and 14 inconclusive external destinations due to access blocks or service errors.
@@ -415,7 +431,7 @@ This verifies the guidance against the implemented workflow, not first-time lear
 
 ## 17. Adjust Notebook size after comparing reading space
 
-**Status: resizing deployed and verified on 18 November 2026; navigation remains task 29.** The student requested a resizable Notebook, less unused reading/navigation space and simultaneous Book/Page navigation.
+**Status: resizing deployed and verified on 18 November 2026.** The student requested a resizable Notebook, less unused reading/navigation space and simultaneous Book/Page navigation.
 The layout comparison used the same built revision `8c31c37`, synthetic writing and a disposable companion in Chromium at 1440 × 900, 1280 × 720, 1024 × 900 and 390 × 844.
 It compared the existing overlay, a 24rem Notebook and a desktop prototype reserving a 25rem column with 12rem navigation, with Notebook alone and both tools open.
 
@@ -432,8 +448,8 @@ The preferred size is browser tab state; effective size fits the viewport and th
 This gives control over the requested window size; it does not establish unobscured side-by-side reading at every width.
 No companion, model, course or portable-notebook contract changes are needed.
 
-Book/Page navigation remains a separate [task 29](#29-improve-book-and-page-navigation-access).
-The short simultaneous-panel allocation remains relevant to [task 26](#26-bring-new-note-context-into-the-visible-notebook-area): at 1280 × 720 Notebook had only 118 pixels of content height, which a width change cannot increase.
+[Task 29](#29-improve-book-and-page-navigation-access) delivered and verified simultaneous Book/Page navigation on 19 November.
+At 1280 × 720, Notebook had only 118 pixels of content height with both panels open. [Task 26](#26-bring-new-note-context-into-the-visible-notebook-area) verified that the new draft's source comes into view in that layout.
 Comparison scripts, measurements, synthetic screenshots and the interactive HTML comparison are retained under ignored `.local/reviews/notebook-layout-2026-11-17/`.
 
 Six focused Chromium/WebKit cases passed for keyboard/pointer resizing, reset, accessibility, mobile focus/fallback, unchanged book and assistant geometry, and retained independent drafts/sources/preferences across navigation, reload and temporary clamping.
@@ -647,7 +663,7 @@ Evidence is under `.local/reviews/deployment-b9b35f2-navigation/README.md`.
 
 ## 30. Update the assistant setup check for a companion without a model
 
-**Status: browser check corrected and verified on 19 November 2026.** On `72af714` the [task-support browser test](../tests/e2e/learning-workspace.spec.ts) sent the student's chosen request and failed in Chromium and WebKit because it expected an outdated list of model providers.
+**Status: corrected and verified locally in `3ea05af` on 19 November 2026.** On `72af714` the [task-support browser test](../tests/e2e/learning-workspace.spec.ts) sent the student's chosen request and failed in Chromium and WebKit because it expected an outdated list of model providers.
 The test advertises a provider to the browser so the student can send a request.
 The disposable companion has no model configured and returns its real setup guidance.
 The revised check verifies that the assistant directs the student to companion setup, explains that notebook writing works without a model, and retains the typed question.
@@ -658,11 +674,12 @@ The original failures and passing results are under `.local/reviews/task-support
 
 ## 31. Keep the panels separate while Teaching assistant opens
 
-**Status: opening overlap resolved by task 28 in the review build.** With reduced motion enabled in Chromium at 1440 × 1000 on `0c8b5d3`, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
+**Status: reduced-motion fix deployed in `10648ad`.
+Same-frame browser regression still open.** With reduced motion enabled in Chromium at 1440 × 1000 on `0c8b5d3`, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
 By the next frame the panels had a 16-pixel gap.
 The Notebook sizing test sometimes records the assistant's top during that transition and compares it with the Notebook's bottom after resizing.
 In the failing run those positions came from different frames.
-With the shared reduced-motion transition duration set to zero, simultaneous measurements in Chromium and WebKit showed a 16-pixel gap from opening through the first five frames and a 104-pixel gap after resizing.
+In the local check of the shared reduced-motion fix, simultaneous measurements in Chromium and WebKit showed a 16-pixel gap from opening through the first five frames and a 104-pixel gap after resizing.
 The assistant stayed in place.
 The existing sizing journey passed twice in each browser.
 Its assertion still compares positions sampled at different times.
