@@ -20,6 +20,7 @@ Only explicitly featured notes are published to anonymous readers.
 
 Anonymous presentation in the teacher interface does not remove the retained underlying identity used for abuse handling.
 Moderation supports replies, reasons, resolution, hiding, and curated public notes, with a separate all-chapter dashboard.
+Acknowledged threads leave the open queue and remain visible to their authors at the passage.
 Keep server-side write checks and the implemented feedback rate limits; proposed hardening remains separate from implemented protection.
 
 Pull feedback explicitly for local review.

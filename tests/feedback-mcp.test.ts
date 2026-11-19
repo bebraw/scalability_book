@@ -124,11 +124,11 @@ function workerFixture(resolve = false) {
   return { env, storageCalls, resolutions };
 }
 
-function adminCookie(env: { SESSION_SECRET: string }) {
+function sessionCookie(env: { SESSION_SECRET: string }, login: string) {
   const payload = Buffer.from(
     JSON.stringify({
       exp: Date.now() + 600_000,
-      user: { login: "fixture-owner" },
+      user: { login },
     }),
   ).toString("base64url");
   const signature = createHmac("sha256", env.SESSION_SECRET)
@@ -139,7 +139,7 @@ function adminCookie(env: { SESSION_SECRET: string }) {
 
 test("feedback MCP denies all requests before reading KV unless the owner credential is valid", async () => {
   const { env, storageCalls } = workerFixture();
-  const cookie = adminCookie(env);
+  const cookie = sessionCookie(env, "fixture-owner");
   const adminApi = new URL("/api/admin/comments", endpoint);
 
   const denied = [
@@ -355,12 +355,17 @@ test("the owner can resolve individual issues without changing chapter comments 
     assert.equal((await close("hidden-issue", "fixed")).isError, true);
     assert.equal(resolutions.size, 0);
 
-    const [fixed, answered] = await Promise.all([
+    const [fixed, acknowledged] = await Promise.all([
       close("open-issue", "fixed"),
-      close("open-older", "answered"),
+      close("open-older", "acknowledged"),
     ]);
     assert.equal(fixed.isError, undefined);
-    assert.equal(answered.isError, undefined);
+    assert.equal(acknowledged.isError, undefined);
+    assert.equal(
+      (acknowledged.structuredContent?.issue as Record<string, unknown>)
+        .resolutionReason,
+      "acknowledged",
+    );
     assert.doesNotMatch(
       JSON.stringify(fixed),
       /Fixture-Owner|fixture-reader-login|resolvedBy/,
@@ -378,7 +383,7 @@ test("the owner can resolve individual issues without changing chapter comments 
 
     const overview = await worker.fetch(
       new Request(new URL("/api/admin/comments", endpoint), {
-        headers: { cookie: adminCookie(env) },
+        headers: { cookie: sessionCookie(env, "fixture-owner") },
       }),
       env,
     );
@@ -391,6 +396,26 @@ test("the owner can resolve individual issues without changing chapter comments 
     assert.equal(issue.resolutionReason, "fixed");
     assert.equal(issue.body, openIssue.body);
     assert.deepEqual(issue.replies, replies);
+    const chapterUrl = new URL(
+      `/api/comments?chapter=${knownChapter}`,
+      endpoint,
+    );
+    const reader = await worker.fetch(
+      new Request(chapterUrl, {
+        headers: { cookie: sessionCookie(env, author.login) },
+      }),
+      env,
+    );
+    assert.equal(reader.status, 200);
+    const readerComments = await reader.json();
+    const reflection = readerComments.find(
+      ({ id }: { id: string }) => id === "open-older",
+    );
+    assert.equal(reflection?.resolutionReason, "acknowledged");
+    assert.deepEqual(reflection?.replies, replies);
+    const publicResponse = await worker.fetch(new Request(chapterUrl), env);
+    assert.equal(publicResponse.status, 200);
+    assert.deepEqual(await publicResponse.json(), []);
     const open = await client.callTool({
       name: "list_feedback",
       arguments: { chapter: knownChapter },

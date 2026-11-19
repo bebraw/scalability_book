@@ -131,6 +131,70 @@ test("collects feedback from across the book into one review view", async ({
   expect(pageWidth.scroll).toBeLessThanOrEqual(pageWidth.client);
 });
 
+test("archives acknowledged feedback while keeping it at the passage for its author", async ({
+  page,
+}) => {
+  const chapterPath = "/chapters/benchmarking/";
+  const paragraphId = await paragraphIdFor(page, chapterPath);
+  const body = "The chapter helped me explain a trade-off.";
+  const seed = await page.request.post("/api/comments", {
+    data: {
+      chapter: "benchmarking",
+      paragraphId,
+      category: "reflection",
+      body,
+    },
+  });
+  expect(seed.ok()).toBe(true);
+  const chapterBody = "The chapter reflection helped me connect two examples.";
+  const chapterSeed = await page.request.post("/api/comments", {
+    data: {
+      chapter: "benchmarking",
+      paragraphId: "p-chapter-reflection",
+      category: "reflection",
+      body: chapterBody,
+    },
+  });
+  expect(chapterSeed.ok()).toBe(true);
+  const { id } = await chapterSeed.json();
+  const chapterResolution = await page.request.post(
+    `/api/comments/${id}/resolve`,
+    { data: { reason: "acknowledged" } },
+  );
+  expect(chapterResolution.ok()).toBe(true);
+
+  await page.goto("/admin/feedback/");
+  const card = page.locator(".feedback-admin-card", { hasText: body });
+  await card.getByRole("button", { name: "Resolve", exact: true }).click();
+  await card
+    .getByLabel("Resolution outcome")
+    .selectOption({ label: "Acknowledged" });
+  await card.getByRole("button", { name: "Resolve and archive" }).click();
+  await expect(card).toHaveCount(0);
+  await page.locator('select[name="status"]').selectOption("resolved");
+  await expect(card.getByText("Acknowledged", { exact: true })).toBeVisible();
+
+  await page.goto(chapterPath);
+  await page.getByRole("button", { name: "Tools" }).click();
+  await page.locator("[data-comments-view]").selectOption("student");
+  const badge = page.locator(`[data-comment-button="${paragraphId}"]`);
+  await expect(badge).toHaveAttribute("data-comment-count", "1");
+  await badge.click();
+  const thread = page
+    .locator("[data-paragraph-feedback-panel] .paragraph-feedback-card")
+    .filter({ hasText: body });
+  await expect(thread.getByText("Reflection", { exact: true })).toBeVisible();
+  await expect(thread.getByText("Acknowledged", { exact: true })).toBeVisible();
+  const chapterFeedback = page.locator("[data-chapter-reflections]");
+  await chapterFeedback.getByText("Chapter feedback", { exact: true }).click();
+  const chapterThread = chapterFeedback
+    .locator(".paragraph-feedback-card")
+    .filter({ hasText: chapterBody });
+  await expect(
+    chapterThread.getByText("Acknowledged", { exact: true }),
+  ).toBeVisible();
+});
+
 test("keeps private feedback hidden from non-admin readers", async ({
   page,
 }) => {

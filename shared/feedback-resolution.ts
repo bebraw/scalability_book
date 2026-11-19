@@ -1,6 +1,7 @@
 export const feedbackResolutionReasons = [
   "fixed",
   "answered",
+  "acknowledged",
   "duplicate",
   "not-actionable",
   "planned",
@@ -8,6 +9,16 @@ export const feedbackResolutionReasons = [
 
 export type FeedbackResolutionReason =
   (typeof feedbackResolutionReasons)[number];
+
+export const feedbackResolutionLabels = {
+  fixed: "Fixed",
+  answered: "Answered",
+  acknowledged: "Acknowledged",
+  duplicate: "Duplicate",
+  "not-actionable": "Not actionable",
+  planned: "Planned",
+} satisfies Record<FeedbackResolutionReason, string>;
+
 export type FeedbackResolution = {
   resolvedAt: string;
   resolvedBy: string;

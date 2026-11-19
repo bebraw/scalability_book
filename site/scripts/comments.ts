@@ -1,3 +1,7 @@
+import {
+  feedbackResolutionLabels,
+  feedbackResolutionReasons,
+} from "../../shared/feedback-resolution.ts";
 import type { SiteAccount } from "../../shared/site-account.ts";
 import { openAccount } from "./account-client.ts";
 
@@ -26,7 +30,7 @@ type FeedbackComment = {
   hiddenAt?: string;
   hiddenBy?: string;
   resolvedAt?: string;
-  resolutionReason?: string;
+  resolutionReason?: string | null;
   featuredAt?: string;
   featuredText?: string;
   publicNote?: boolean;
@@ -52,6 +56,7 @@ type CommentForm = HTMLFormElement & {
 const commentsRoot = document.querySelector<HTMLElement>(
   "[data-comments-root]",
 );
+const chapterReflectionId = "p-chapter-reflection";
 
 if (commentsRoot) {
   const feedbackRoot = commentsRoot;
@@ -64,13 +69,6 @@ if (commentsRoot) {
     ["broken-link-code", "Broken link or code"],
     ["stuck", "Stuck here"],
     ["reflection", "Reflection"],
-  ];
-  const resolutionReasons: FeedbackOption[] = [
-    ["fixed", "Fixed"],
-    ["answered", "Answered"],
-    ["duplicate", "Duplicate"],
-    ["not-actionable", "Not actionable"],
-    ["planned", "Planned"],
   ];
   const commentsControls = document.querySelector<HTMLElement>(
     "[data-comments-controls]",
@@ -108,6 +106,9 @@ if (commentsRoot) {
   );
   const reflectionButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>("[data-reflection-button]"),
+  );
+  const chapterReflections = document.querySelector<HTMLDetailsElement>(
+    "[data-chapter-reflections]",
   );
   let auth: FeedbackAuth = { authenticated: false, admin: false };
   let comments: FeedbackComment[] = [];
@@ -176,7 +177,7 @@ if (commentsRoot) {
     document.documentElement.dataset.commentsAdmin = "false";
     if (reflectionPrompts) reflectionPrompts.hidden = true;
     closeParagraphFeedbackPanel();
-    updateParagraphBadges();
+    updateFeedbackThreads();
     updateAuthControls();
     updateViewControl();
     syncPreviewMode();
@@ -236,7 +237,7 @@ if (commentsRoot) {
     viewMode = viewSelect.value;
     localStorage.setItem("comments-view-mode", viewMode);
     syncPreviewMode();
-    updateParagraphBadges();
+    updateFeedbackThreads();
     if (activeFeedbackParagraphId) {
       renderParagraphFeedbackPanel(activeFeedbackParagraphId);
     }
@@ -264,7 +265,7 @@ if (commentsRoot) {
     );
     if (own !== authRevision) return;
     comments = next;
-    updateParagraphBadges();
+    updateFeedbackThreads();
     if (activeFeedbackParagraphId) {
       renderParagraphFeedbackPanel(activeFeedbackParagraphId);
     }
@@ -570,7 +571,10 @@ if (commentsRoot) {
       new Date(comment.createdAt).toLocaleString();
     requireElement(card.querySelector("p"), "comment body").textContent =
       comment.body;
-    renderCategory(card, comment.category);
+    appendCommentLabel(card, labelFor(feedbackCategories, comment.category));
+    if (isAcknowledged(comment)) {
+      appendCommentLabel(card, feedbackResolutionLabels.acknowledged);
+    }
     renderReplies(card, comment);
 
     if (auth.admin && viewMode === "admin" && !comment.publicNote) {
@@ -699,7 +703,7 @@ if (commentsRoot) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chapter: chapterSlug,
-            paragraphId: "p-chapter-reflection",
+            paragraphId: chapterReflectionId,
             category: "reflection",
             body,
           }),
@@ -742,12 +746,7 @@ if (commentsRoot) {
     card.append(replyList);
   }
 
-  function renderCategory(
-    card: HTMLElement,
-    category: string | undefined,
-  ): void {
-    const label = labelFor(feedbackCategories, category);
-
+  function appendCommentLabel(card: HTMLElement, label: string): void {
     if (!label) {
       return;
     }
@@ -763,7 +762,8 @@ if (commentsRoot) {
   function getVisibleComments(): FeedbackComment[] {
     if (auth.admin && viewMode === "admin") {
       return comments.filter(
-        (comment) => !comment.resolvedAt || comment.featuredAt,
+        (comment) =>
+          !comment.resolvedAt || comment.featuredAt || isAcknowledged(comment),
       );
     }
 
@@ -781,7 +781,7 @@ if (commentsRoot) {
       (comment) =>
         !comment.hiddenAt &&
         comment.author?.login === userLogin &&
-        (!comment.resolvedAt || comment.featuredAt),
+        (!comment.resolvedAt || comment.featuredAt || isAcknowledged(comment)),
     );
     const ownIds = new Set(own.map((comment) => comment.id));
 
@@ -791,6 +791,12 @@ if (commentsRoot) {
         (comment) => !comment.sourceId || !ownIds.has(comment.sourceId),
       ),
     ];
+  }
+
+  function isAcknowledged(comment: FeedbackComment): boolean {
+    return (
+      Boolean(comment.resolvedAt) && comment.resolutionReason === "acknowledged"
+    );
   }
 
   function publicNotesFromComments(
@@ -820,7 +826,7 @@ if (commentsRoot) {
 
   async function resolveComment(id: string): Promise<void> {
     const reason = window.prompt(
-      `Resolution reason: ${resolutionReasons.map(([, label]) => label).join(", ")}`,
+      `Resolution reason: ${feedbackResolutionReasons.join(", ")}`,
       "fixed",
     );
 
@@ -831,7 +837,7 @@ if (commentsRoot) {
     await fetchJson(`/api/comments/${encodeURIComponent(id)}/resolve`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reason }),
+      body: JSON.stringify({ reason: reason.trim().toLowerCase() }),
     });
     await loadComments();
     setStatus("Comment resolved.");
@@ -911,15 +917,27 @@ if (commentsRoot) {
     setStatus("Clarification appended to Markdown.");
   }
 
-  function updateParagraphBadges(): void {
-    const counts = getVisibleComments().reduce<Map<string, number>>(
+  function updateFeedbackThreads(): void {
+    const visibleComments = getVisibleComments();
+    if (chapterReflections) {
+      const reflections = visibleComments.filter(
+        (comment) => comment.paragraphId === chapterReflectionId,
+      );
+      requireElement(
+        chapterReflections.querySelector<HTMLElement>(
+          "[data-chapter-reflection-cards]",
+        ),
+        "chapter reflection cards",
+      ).replaceChildren(...reflections.map(renderCompactComment));
+      chapterReflections.hidden = reflections.length === 0;
+    }
+
+    const counts = visibleComments.reduce<Map<string, number>>(
       (result, comment) => {
-        if (!comment.resolvedAt || comment.featuredAt) {
-          result.set(
-            comment.paragraphId,
-            (result.get(comment.paragraphId) || 0) + 1,
-          );
-        }
+        result.set(
+          comment.paragraphId,
+          (result.get(comment.paragraphId) || 0) + 1,
+        );
 
         return result;
       },
@@ -933,7 +951,7 @@ if (commentsRoot) {
       button.setAttribute(
         "aria-label",
         count > 0
-          ? `Comment on this paragraph. ${count} unresolved ${count === 1 ? "comment" : "comments"}.`
+          ? `Comment on this paragraph. ${count} related ${count === 1 ? "comment" : "comments"}.`
           : "Comment on this paragraph",
       );
     }
@@ -941,9 +959,7 @@ if (commentsRoot) {
 
   function hasVisibleComments(paragraphId: string): boolean {
     return getVisibleComments().some(
-      (comment) =>
-        comment.paragraphId === paragraphId &&
-        (!comment.resolvedAt || comment.featuredAt),
+      (comment) => comment.paragraphId === paragraphId,
     );
   }
 
@@ -1025,7 +1041,7 @@ if (commentsRoot) {
   }
 
   function paragraphLabel(paragraphId: string): string {
-    if (paragraphId === "p-chapter-reflection") {
+    if (paragraphId === chapterReflectionId) {
       return "Chapter reflection";
     }
 

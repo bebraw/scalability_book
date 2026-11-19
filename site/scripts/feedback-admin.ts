@@ -1,4 +1,8 @@
 import {
+  feedbackResolutionLabels,
+  feedbackResolutionReasons,
+} from "../../shared/feedback-resolution.ts";
+import {
   feedbackStatus,
   matchesFeedbackStatus,
 } from "../../shared/feedback-status.ts";
@@ -70,13 +74,12 @@ const categoryLabels = new Map([
   ["stuck", "Stuck here"],
   ["reflection", "Reflection"],
 ]);
-const resolutionLabels = new Map([
-  ["fixed", "Fixed"],
-  ["answered", "Answered"],
-  ["duplicate", "Duplicate"],
-  ["not-actionable", "Not actionable"],
-  ["planned", "Planned"],
-]);
+const resolutionLabels = new Map<string, string>(
+  feedbackResolutionReasons.map((reason) => [
+    reason,
+    feedbackResolutionLabels[reason],
+  ]),
+);
 const adminRoot = document.querySelector<HTMLElement>("[data-feedback-admin]");
 
 if (adminRoot) {

@@ -118,6 +118,9 @@ The dashboard and MCP combine them with the chapter records and continue to read
 Each new resolution writes only its own key, so it can run alongside replies, new comments, and resolutions of other issues.
 
 Students can see their own visible comments after posting and any admin replies to those comments.
+Use **Acknowledged** for feedback the team has reviewed and can archive without a change, such as a reader reflection.
+The thread moves out of the open queue and stays visible to its author at the original passage.
+It also shows the acknowledgement alongside the original feedback category.
 Other readers can see only curated Reader notes that feedback admins explicitly feature for public display.
 Public Reader notes omit the author's identity and private replies.
 Readers can open a public note through its paragraph badge without signing in.
@@ -133,7 +136,7 @@ After posting, a visible confirmation in the related-feedback panel says the fee
 Long words, URLs and author names wrap within feedback cards and their replies, preserving the complete text without widening the related-feedback panel or pushing its controls sideways.
 
 Each chapter also has reflection prompts for unclear points, missing examples, and learned trade-offs.
-These are stored as chapter-level feedback.
+Readers can revisit their chapter-wide reflections under **Chapter feedback** below the prompts.
 
 Admins can use the feedback view selector in the navigation header to preview three modes:
 
@@ -213,7 +216,7 @@ The tool responses omit reader and moderator account fields.
 Comment and reply text can still contain identifying details supplied by their authors.
 Review any proposed book edits in the normal editorial workflow.
 With resolution access enabled, `resolve_feedback` closes one open issue by `chapter` and `id`.
-Specify `fixed`, `answered`, `duplicate`, `not-actionable`, or `planned` as the reason.
+Specify `fixed`, `answered`, `acknowledged`, `duplicate`, `not-actionable`, or `planned` as the reason.
 The issue moves to the dashboard's resolved archive.
 A retry on a resolved issue returns its existing resolution.
 Use [the feedback dashboard](https://scalableweb.dev/admin/feedback/) to reply, feature, or hide a comment.
