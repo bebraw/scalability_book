@@ -3,7 +3,7 @@
   id="book-navigation"
   aria-label="Book navigation"
 >
-  <details data-book-navigation open>
+  <details data-book-navigation>
     <summary>
       <span class="book-panel-label">Navigation</span>
       <svg class="book-panel-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -11,56 +11,35 @@
         <path d="M8.5 4v16M5.8 8h.01M5.8 12h.01M5.8 16h.01" />
       </svg>
     </summary>
-    <div
-      class="book-navigation-tabs"
-      role="tablist"
-      aria-label="Navigation view"
-    >
-      <button
-        type="button"
-        id="book-navigation-tab"
-        role="tab"
-        aria-selected="true"
-        aria-controls="book-contents-panel"
-        data-book-navigation-tab="book"
+    <div class="book-navigation-lists">
+      <nav
+        class="book-navigation-panel book-sidebar"
+        id="book-contents-panel"
+        aria-labelledby="book-contents-heading"
+        data-book-navigation-panel="book"
       >
-        Book
-      </button>
-      <button
-        type="button"
-        id="page-navigation-tab"
-        role="tab"
-        aria-selected="false"
-        aria-controls="page-outline-panel"
-        data-book-navigation-tab="page"
+        <h2 id="book-contents-heading" class="book-navigation-heading">
+          Book contents
+        </h2>
+        <div class="book-navigation-links">
+          <Raw &html="(resolve bookContents)"></Raw>
+        </div>
+      </nav>
+      <nav
+        class="book-navigation-panel local-toc"
+        id="page-outline-panel"
+        aria-labelledby="page-outline-heading"
+        data-book-navigation-panel="page"
       >
-        Page
-      </button>
+        <h2 id="page-outline-heading" class="book-navigation-heading">
+          On this page
+        </h2>
+        <ol class="book-navigation-links" &foreach="(resolve headings)">
+          <li &class="(resolve className)">
+            <a &href="(resolve href)" &children="(resolve text)"></a>
+          </li>
+        </ol>
+      </nav>
     </div>
-    <section
-      class="book-navigation-panel book-sidebar"
-      id="book-contents-panel"
-      role="tabpanel"
-      aria-labelledby="book-navigation-tab"
-      data-book-navigation-panel="book"
-    >
-      <h2 class="book-navigation-mobile-heading">Book contents</h2>
-      <Raw &html="(resolve bookContents)"></Raw>
-    </section>
-    <section
-      class="book-navigation-panel local-toc"
-      id="page-outline-panel"
-      role="tabpanel"
-      aria-labelledby="page-navigation-tab"
-      data-book-navigation-panel="page"
-      hidden
-    >
-      <h2 class="book-navigation-mobile-heading">On this page</h2>
-      <ol &foreach="(resolve headings)">
-        <li &class="(resolve className)">
-          <a &href="(resolve href)" &children="(resolve text)"></a>
-        </li>
-      </ol>
-    </section>
   </details>
 </aside>

@@ -186,9 +186,13 @@ await compileSiteBundle(
     ),
   },
 );
-await compileSiteScript("scripts/book-nav.ts", "book-nav.js");
+await compileSiteBundle("scripts/book-nav.ts", "book-nav.js", "BookNavigation");
 await compileSiteBundle("scripts/concepts.ts", "concepts.js", "BookConcepts");
-await compileSiteScript("scripts/toc-highlight.ts", "toc-highlight.js");
+await compileSiteBundle(
+  "scripts/toc-highlight.ts",
+  "toc-highlight.js",
+  "BookToc",
+);
 await compileSiteBundle("scripts/comments.ts", "comments.js", "BookFeedback");
 await compileSiteScript("scripts/feedback-admin.ts", "feedback-admin.js");
 await compileSiteScript("scripts/demo-anchors.ts", "demo-anchors.js");

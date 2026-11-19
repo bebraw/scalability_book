@@ -1,131 +1,120 @@
-type NavigationView = "book" | "page";
+import { keepLinkInView } from "./navigation-scroll.ts";
 
-const bookShell = document.querySelector<HTMLElement>(".book-shell");
-const navigationDetails = document.querySelector<HTMLDetailsElement>(
+const panel = document.querySelector<HTMLDetailsElement>(
   "[data-book-navigation]",
 );
+if (panel) enableBookNavigation(panel);
 
-if (bookShell && navigationDetails) {
-  const shell = bookShell;
-  const panel = navigationDetails;
-  const summary = requiredElement<HTMLElement>(panel, "summary");
-  const tabs = Array.from(
-    panel.querySelectorAll<HTMLButtonElement>("[data-book-navigation-tab]"),
-  );
-  const views = Array.from(
-    panel.querySelectorAll<HTMLElement>("[data-book-navigation-panel]"),
-  );
-  const wideLayout = window.matchMedia("(min-width: 76.0625rem)");
-  const compactNavigation = window.matchMedia("(max-width: 48rem)");
-  let activeView = readViewPreference();
-  let syncing = false;
+function enableBookNavigation(panel: HTMLDetailsElement) {
+  const summary = panel.querySelector("summary")!;
+  const wide = matchMedia("(min-width: 76.0625rem)");
+  let desktopOpen = true;
+  try {
+    desktopOpen = localStorage.getItem("book-navigation-collapsed") !== "true";
+  } catch {
+    // The disclosure also works without browser storage.
+  }
 
-  panel.addEventListener("toggle", syncFromPanel);
-  wideLayout.addEventListener("change", applyLayoutPreferences);
-  compactNavigation.addEventListener("change", applyLayoutPreferences);
+  function applyLayout() {
+    panel.open = wide.matches && desktopOpen;
+    updateDisclosure();
+  }
 
-  for (const tab of tabs) {
-    tab.addEventListener("click", () => {
-      activeView = getView(tab);
-      writePreference("book-navigation-view", activeView);
-      renderLayout();
-    });
+  function updateDisclosure() {
+    const action = panel.open ? "Hide navigation" : "Show navigation";
+    summary.setAttribute("aria-label", action);
+    summary.title = action;
+    if (panel.open) {
+      const current = panel.querySelector<HTMLElement>(
+        'a[aria-current="page"]',
+      );
+      const list = current?.closest<HTMLElement>(".book-navigation-links");
+      if (current && list) keepLinkInView(current, list);
+    }
+    // Let the outline and chapter demos measure the new layout.
+    window.dispatchEvent(new Event("resize"));
+  }
 
-    tab.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-        return;
+  panel.addEventListener("toggle", () => {
+    if (wide.matches && desktopOpen !== panel.open) {
+      desktopOpen = panel.open;
+      try {
+        localStorage.setItem("book-navigation-collapsed", String(!desktopOpen));
+      } catch {
+        // Keep the choice for this page when storage is unavailable.
       }
+    }
+    updateDisclosure();
+  });
 
+  summary.addEventListener("click", () => {
+    if (!wide.matches || window.scrollY === 0) return;
+    // Resizing chapter figures can move the passage a reader is following.
+    const passage = document
+      .elementFromPoint(innerWidth / 2, innerHeight / 2)
+      ?.closest(".prose > *");
+    if (!passage) return;
+    const top = passage.getBoundingClientRect().top;
+    requestAnimationFrame(() => {
+      window.scrollBy({
+        top: passage.getBoundingClientRect().top - top,
+        behavior: "instant",
+      });
+    });
+  });
+
+  panel.addEventListener("click", (event) => {
+    if (
+      wide.matches ||
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    const link =
+      event.target instanceof Element
+        ? event.target.closest<HTMLAnchorElement>('.local-toc a[href^="#"]')
+        : null;
+    if (!link) return;
+    const heading = document.getElementById(
+      decodeURIComponent(link.hash.slice(1)),
+    );
+    if (heading) {
+      panel.open = false;
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  });
+
+  panel.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !wide.matches && panel.open) {
       event.preventDefault();
-      activeView = activeView === "book" ? "page" : "book";
-      writePreference("book-navigation-view", activeView);
-      renderLayout();
-      tabs.find((candidate) => getView(candidate) === activeView)?.focus();
-    });
-  }
-
-  applyLayoutPreferences();
-
-  function applyLayoutPreferences(): void {
-    syncing = true;
-    panel.open = wideLayout.matches
-      ? !readBooleanPreference("book-navigation-collapsed")
-      : !compactNavigation.matches;
-    syncing = false;
-    renderLayout();
-  }
-
-  function syncFromPanel(): void {
-    if (!syncing && wideLayout.matches) {
-      writePreference("book-navigation-collapsed", String(!panel.open));
+      event.stopPropagation();
+      panel.open = false;
+      summary.focus();
     }
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (
+      !wide.matches &&
+      panel.open &&
+      event.target instanceof Node &&
+      !panel.contains(event.target)
+    )
+      panel.open = false;
+  });
+  panel.addEventListener("focusout", (event) => {
+    if (
+      !wide.matches &&
+      event.relatedTarget instanceof Node &&
+      !panel.contains(event.relatedTarget)
+    )
+      panel.open = false;
+  });
 
-    renderLayout();
-  }
-
-  function renderLayout(): void {
-    shell.dataset.navigationCollapsed = String(!panel.open);
-
-    const action = panel.open ? "Hide" : "Show";
-    summary.setAttribute("aria-label", `${action} navigation`);
-    summary.title = `${action} navigation`;
-
-    for (const tab of tabs) {
-      const selected = getView(tab) === activeView;
-      tab.setAttribute("aria-selected", String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-    }
-
-    for (const view of views) {
-      view.hidden = wideLayout.matches && getView(view) !== activeView;
-    }
-
-    window.requestAnimationFrame(() => {
-      shell.dataset.layoutReady = "true";
-      window.dispatchEvent(new Event("resize"));
-    });
-  }
-}
-
-function requiredElement<T extends Element>(
-  root: ParentNode,
-  selector: string,
-): T {
-  const element = root.querySelector<T>(selector);
-  if (!element) {
-    throw new Error(`Missing book navigation element: ${selector}`);
-  }
-  return element;
-}
-
-function getView(element: HTMLElement): NavigationView {
-  const value =
-    element.dataset.bookNavigationTab || element.dataset.bookNavigationPanel;
-  return value === "page" ? "page" : "book";
-}
-
-function readBooleanPreference(key: string): boolean {
-  try {
-    return window.localStorage.getItem(key) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function readViewPreference(): NavigationView {
-  try {
-    return window.localStorage.getItem("book-navigation-view") === "page"
-      ? "page"
-      : "book";
-  } catch {
-    return "book";
-  }
-}
-
-function writePreference(key: string, value: string): void {
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // The navigation still works when storage is blocked.
-  }
+  wide.addEventListener("change", applyLayout);
+  applyLayout();
 }

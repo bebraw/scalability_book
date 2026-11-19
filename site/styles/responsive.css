@@ -5,9 +5,9 @@
   }
 }
 @media (max-width: 76rem) {
-  .guide-main {
+  :is(.guide-main, .book-shell) {
     /* The sticky header's controls can wrap onto another row. */
-    --guide-heading-offset: 10rem;
+    --reading-heading-offset: 10rem;
   }
   .header-actions {
     column-gap: 0.9rem;
@@ -18,36 +18,33 @@
   }
   .book-shell {
     --book-demo-inline-extension: 0rem;
-    grid-template-areas:
-      "navigation"
-      "chapter";
+    grid-template-areas: "chapter";
     grid-template-columns: minmax(0, 1fr);
   }
   .book-shell::after {
     display: none;
   }
   .book-navigation {
-    order: 1;
+    position: fixed;
+    inset: auto auto max(0.75rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
+    z-index: 6;
   }
-  .chapter-main {
-    order: 2;
-  }
-  .book-navigation {
-    max-height: none;
-    position: static;
-  }
-  .book-navigation {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    padding: 1rem;
+  .book-navigation:has(details[open]) {
+    /* An explicitly opened list must be usable in front of the learning tools. */
+    z-index: 81;
   }
   .book-navigation summary {
     align-items: center;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0;
+    display: inline-flex;
+    gap: 0.6rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    box-shadow: var(--shadow);
+    min-block-size: 2.75rem;
+    margin: 0;
+    padding: 0.5rem 0.8rem;
   }
   .book-navigation summary::after {
     color: var(--accent);
@@ -55,44 +52,31 @@
     font-size: 1rem;
     line-height: 1;
   }
-  .book-navigation details[open] summary {
-    margin-bottom: 0.75rem;
-  }
   .book-navigation details[open] summary::after {
     content: "-";
   }
-  .book-navigation-tabs {
-    display: none;
+  .book-navigation-lists {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-end: calc(100% + 0.4rem);
+    inline-size: min(36rem, calc(100vw - 2rem));
+    block-size: min(60dvh, 29rem);
+    padding: 0.65rem 0.9rem 0.9rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
   }
-  .book-navigation-mobile-heading {
-    color: var(--muted);
-    display: block;
-    font: 750 0.72rem/1.2 var(--font-ui);
-    letter-spacing: 0.08em;
-    margin: 0 0 0.75rem;
-    text-transform: uppercase;
-  }
-  .book-navigation-panel + .book-navigation-panel {
-    border-top: 1px solid var(--border);
-    margin-top: 1.2rem;
-    padding-top: 1.2rem;
-  }
-  .local-toc ol {
-    display: grid;
-    gap: 0.2rem;
-  }
-  .book-sidebar-part ol {
-    display: grid;
-    gap: 0.35rem 0.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
-  }
-  .book-sidebar h2 {
-    margin-bottom: 0.55rem;
+  @media (min-width: 36rem) {
+    .book-navigation-lists:has(.local-toc li) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: minmax(0, 1fr);
+    }
   }
 }
 @media (max-width: 48rem) {
-  .guide-main {
-    --guide-heading-offset: 1rem;
+  :is(.guide-main, .book-shell) {
+    --reading-heading-offset: 1rem;
   }
   body {
     font-size: 16px;
@@ -262,9 +246,6 @@
     box-shadow: none;
     display: grid;
     padding: 0.8rem;
-  }
-  .book-sidebar-part ol {
-    grid-template-columns: 1fr;
   }
   .chapter-pagination {
     grid-template-columns: 1fr;

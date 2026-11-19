@@ -37,6 +37,7 @@ export default defineConfig({
         "concept-subgroups.spec.ts",
         "theme-initialization.spec.ts",
         "setup-guide-navigation.spec.ts",
+        "toc-highlight.spec.ts",
         "learning-workspace.spec.ts",
         "learning-demo-bridge.spec.ts",
         "learning-peer-inquiry.spec.ts",

@@ -2342,10 +2342,7 @@ test("opening either experience preserves book, reading and demo widths with exp
     for (const collapsed of width > 1216 ? [false, true] : [false]) {
       const isCollapsed = (await navigation.getAttribute("open")) === null;
       if (isCollapsed !== collapsed) await toggle.click();
-      await expect(shell).toHaveAttribute(
-        "data-navigation-collapsed",
-        String(collapsed),
-      );
+      await expect(navigation).toHaveJSProperty("open", !collapsed);
       // Let the navigation's own layout settle before measuring the baseline.
       await page.evaluate(
         () =>

@@ -587,7 +587,7 @@ Building the package from a local checkout is optional.
 
 ## 28. Make linked setup headings reliably visible
 
-**Status: implemented for review.** Both editions of the course introduction link to [Prepare material for your portfolio](https://scalableweb.dev/notebook/setup/#prepare-material-for-your-portfolio).
+**Status: deployed and verified on 18 November 2026.** Both editions of the course introduction link to [Prepare material for your portfolio](https://scalableweb.dev/notebook/setup/#prepare-material-for-your-portfolio).
 On the published site the link placed the heading at the very top of the viewport.
 The sticky header covered it completely at desktop widths.
 At 1440 pixels the header was 76 pixels tall.
@@ -606,18 +606,34 @@ With the header clearance alone, 11 of 12 cold-cache clicks still missed the hea
 Giving reduced-motion transitions zero duration kept all 12 clicks on the heading.
 Increasing the duration in a comparison brought the failure back.
 The first failures are retained under `.local/reviews/deployment-8c31c37-2026-11-17/` and the comparisons under `.local/reviews/setup-heading-2026-11-18/`.
+Published links passed and Cloudflare deployed `10648ad` on the first attempt.
+All 18 live visits from the current and archived introductions landed on the readable heading at 390, 960, and 1440 pixels.
+This included 12 cold-cache WebKit visits with reduced motion enabled.
+Evidence is under `.local/reviews/deployment-10648ad-setup-heading/`.
 
 ## 29. Improve Book and Page navigation access
 
-**Status: open; separated from task 17's Notebook resizing.** The original request was to see Book and Page navigation together and give useful space back to the material.
-At 1440 and 1280 pixels the current tabs remained reachable beside Notebook, and pointer/arrow-key switching worked; this establishes operation rather than resolving the extra switching.
-At 1024 pixels both lists were in the page flow above the chapter; at 390 pixels navigation began collapsed and the header launchers scrolled away with the page.
-Changing Notebook width does not alter those navigation behaviors.
+**Status: implemented for review.** The student wanted to see the chapter list and the page outline together and give more space to the reading.
+The desktop tabs hid one list while the reader used the other.
+Lower in the Architecture chapter at 1024 and 390 pixels, even the navigation control had scrolled off screen.
 
-Compare access to another chapter and to a section of the current chapter while reading lower on the page, including a compact viewport and folded desktop navigation.
-Review [book navigation](../site/scripts/book-nav.ts), [layout](../site/styles/layout.css) and [responsive styles](../site/styles/responsive.css) before choosing simultaneous lists, a different placement or another access control.
-Preserve the reader's explicit collapse preference; do not silently change it when opening Notebook.
-The baseline navigation observations and alternative screenshots are retained with task 17's comparison evidence.
+The comparison used the same reading position and revision for three layouts: the published tabs, two lists in a narrower sidebar, and a floating navigation button.
+The narrower desktop sidebar gave the chapter 64 more pixels at 1280 and 1440 while keeping the paragraph width steady.
+A floating control occupied less space on small screens but cost an extra action on desktop.
+The [chapter navigation](development.md#chapter-navigation) combines those results.
+On desktop the reader can see both lists, scroll them separately and fold the sidebar to widen a demo.
+On compact screens **Navigation** stays in the lower left while reading and opens both lists.
+On a phone with learning tools open, the control moves above the sheet.
+The reader's desktop fold preference survives a visit to the compact layout.
+
+Chromium and WebKit followed both types of link from lower in a chapter, including keyboard use with JavaScript disabled.
+The browser checks also cover the current section, focus after closing navigation, a folded demo's width and opening Notebook with the sidebar in either state.
+The first browser run caught an unbundled import.
+A subsequent check found that folding the sidebar narrowed the Saturation boundary lab inside its exercise.
+The built scripts and the exercise layout were corrected before the final passing checks.
+The comparisons, screenshots and browser results are under `.local/reviews/book-page-navigation-2026-11-18/`.
+On the Architecture chapter, reopening the folded sidebar kept the measured section at the same screen position at both desktop widths.
+Both browsers followed the section link with Notebook or Teaching assistant open at 320 × 568 and 844 × 390. On compact screens the open menu temporarily covers part of the reading.
 
 ## 30. Update the assistant setup check for a companion without a model
 
@@ -638,6 +654,15 @@ The assistant stayed in place.
 The existing sizing journey passed twice in each browser.
 Its assertion still compares positions sampled at different times.
 The original failure is under `.local/reviews/new-note-context-2026-11-18/` and the same-frame checks are under `.local/reviews/setup-heading-2026-11-18/reduced-motion-sizing/`.
+
+## 32. Reconcile the compact homepage header with its layout check
+
+**Status: open; found during task 29's wider layout checks.** At 390 × 844 the [homepage theme-picker test](../tests/e2e/book-layout.spec.ts) expects a header under 96 pixels tall.
+Chromium measured 146.45 pixels on both revision `10648ad` and the task 29 build.
+The theme picker was 36 pixels wide.
+The Account button occupied a third row below primary navigation.
+Review the space needed by the current header controls, then check its height, keyboard access and theme switching against the intended compact layout.
+The original failure and matching measurements are under `.local/reviews/book-page-navigation-2026-11-18/`.
 
 ## Closing tasks
 

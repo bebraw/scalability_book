@@ -230,6 +230,22 @@ npm run serve
 The production build emits a static site to `build/` for `scalableweb.dev`.
 The deployed site remains read-only because the editing API exists only in the local dev server.
 
+### Chapter navigation
+
+The [chapter navigation](../site/components/BookNavigation.html) contains the chapter list and the current page's outline in one native disclosure.
+On wide screens both lists scroll independently in the sidebar.
+Folding the sidebar gives figures and demos more room.
+The [navigation script](../site/scripts/book-nav.ts) remembers the reader's desktop fold choice across chapters.
+At 76rem and below, **Navigation** opens the same lists from a button in the lower left.
+When a learning tool occupies the bottom of a phone screen, the button sits just above it.
+Opening navigation keeps the learning tool available after a section is selected.
+Following a section link closes the panel and moves keyboard focus to its heading.
+Escape returns focus to **Navigation**.
+With JavaScript disabled, the native disclosure and both sets of links still work.
+The [outline](../site/scripts/toc-highlight.ts) marks the current section as the reader scrolls.
+Any scrolling needed to reveal the active link belongs to its own list.
+Run `npx playwright test tests/e2e/toc-highlight.spec.ts` for the chapter and section journeys, including keyboard and native disclosure use.
+
 ### Setup guide layout
 
 The standalone `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.

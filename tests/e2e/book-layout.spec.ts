@@ -386,44 +386,33 @@ test.describe("book reading layout", () => {
     );
   });
 
-  test("switches navigation views and expands demos when folded", async ({
+  test("shows both navigation lists and expands demos when folded", async ({
     page,
   }) => {
-    await page.goto("/chapters/scaling/#scaling-pressure-lab");
+    await page.goto("/chapters/scaling/#saturation-boundary-lab");
 
-    const shell = page.locator(".book-shell");
     const main = page.locator(".chapter-main");
-    const demo = page.locator("[data-scaling-demo]");
+    const demo = page.locator("[data-saturation-boundary-demo]");
     const bodyParagraph = page
       .locator(".prose > p:not(.chapter-kicker)")
       .first();
     const navigation = page.locator("#book-navigation");
     const navigationPanel = navigation.locator("details");
     const navigationToggle = navigation.locator("summary");
-    const tabs = navigation.locator("[role='tablist']");
-    const bookTab = navigation.locator("[data-book-navigation-tab='book']");
-    const pageTab = navigation.locator("[data-book-navigation-tab='page']");
-    const bookView = navigation.locator("[data-book-navigation-panel='book']");
-    const pageView = navigation.locator("[data-book-navigation-panel='page']");
+    const bookContents = navigation.getByRole("heading", {
+      name: "Book contents",
+    });
+    const pageOutline = navigation.getByRole("heading", {
+      name: "On this page",
+    });
 
     await expect(navigation).toBeVisible();
     await expect(navigationPanel).toHaveAttribute("open", "");
-    await expect(bookTab).toHaveAttribute("aria-selected", "true");
-    await expect(bookView).toBeVisible();
-    await expect(pageView).toBeHidden();
+    await expect(bookContents).toBeInViewport();
+    await expect(pageOutline).toBeInViewport();
     const defaultMainWidth = await elementWidth(main);
     const defaultDemoWidth = await elementWidth(demo);
     expect(await rightEdgeExtension(demo, main)).toBeGreaterThan(180);
-
-    await pageTab.click();
-    await expect(pageTab).toHaveAttribute("aria-selected", "true");
-    await expect(bookView).toBeHidden();
-    await expect(pageView).toBeVisible();
-    await expect(pageView.getByText("Scaling pressure lab")).toBeVisible();
-
-    await page.reload();
-    await expect(pageTab).toHaveAttribute("aria-selected", "true");
-    await expect(pageView).toBeVisible();
 
     const bodyGeometryDuringFold = await navigationToggle.evaluate(
       async (toggle) => {
@@ -482,10 +471,12 @@ test.describe("book reading layout", () => {
     await expect(navigationPanel).not.toHaveAttribute("open", "");
 
     await page.setViewportSize({ width: 1100, height: 844 });
-    await expect(navigationPanel).toHaveAttribute("open", "");
-    await expect(tabs).toBeHidden();
-    await expect(bookView).toBeVisible();
-    await expect(pageView).toBeVisible();
+    await expect(navigationPanel).not.toHaveAttribute("open", "");
+    await navigationToggle.click();
+    await expect(bookContents).toBeInViewport();
+    await expect(pageOutline).toBeInViewport();
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(navigationPanel).not.toHaveAttribute("open", "");
   });
 });
 

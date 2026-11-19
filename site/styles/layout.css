@@ -297,16 +297,17 @@
   text-transform: uppercase;
 }
 .book-navigation summary {
-  cursor: default;
+  cursor: pointer;
   list-style: none;
+}
+.book-navigation :is(summary, a):focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: -2px;
 }
 .book-navigation summary::-webkit-details-marker {
   display: none;
 }
 .book-panel-icon {
-  display: none;
-}
-.book-navigation-mobile-heading {
   display: none;
 }
 .primary-link {
@@ -572,11 +573,16 @@
   text-align: right;
 }
 .book-shell {
-  --book-demo-inline-extension: calc(18rem + clamp(1rem, 3vw, 2rem));
+  --book-rail-width: 16rem;
+  --book-demo-inline-extension: calc(
+    var(--book-rail-width) + clamp(1rem, 3vw, 2rem)
+  );
   display: grid;
   gap: clamp(1rem, 3vw, 2rem);
   grid-template-areas: "navigation chapter balance";
-  grid-template-columns: 18rem minmax(0, 1fr) 18rem;
+  grid-template-columns: var(--book-rail-width) minmax(0, 1fr) var(
+      --book-rail-width
+    );
   margin: 0 auto;
   max-width: 92rem;
   padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem;
@@ -588,34 +594,36 @@
 .book-navigation {
   align-self: start;
   grid-area: navigation;
-  max-height: calc(100vh - 6rem);
-  overflow: auto;
   position: sticky;
   top: 5rem;
 }
-.book-navigation-tabs {
-  border: 1px solid var(--border);
+.book-navigation-lists {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-bottom: 1rem;
-  padding: 0.2rem;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 0.8rem;
+  block-size: calc(100dvh - 8rem);
 }
-.book-navigation-tabs button {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+.book-navigation-panel {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--border);
+}
+.book-navigation-panel > .book-navigation-heading {
   color: var(--muted);
-  cursor: pointer;
-  font: 750 0.72rem/1.2 var(--font-ui);
-  padding: 0.5rem 0.65rem;
+  font: 750 0.72rem/1.3 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0.65rem 0 0.45rem;
 }
-.book-navigation-tabs button[aria-selected="true"] {
-  background: var(--accent-strong);
-  color: var(--panel);
+.book-navigation-panel:has(> ol:empty) {
+  display: none;
 }
-.book-navigation-tabs button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent) 42%, transparent);
-  outline-offset: 2px;
+.book-navigation-links {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 .book-sidebar ol,
 .local-toc ol {
@@ -626,18 +634,16 @@
 .book-sidebar-part + .book-sidebar-part {
   margin-top: 1.2rem;
 }
-.book-sidebar h2 {
+.book-sidebar-part h2 {
   color: var(--text);
   font-size: 0.9rem;
   font-weight: 650;
   line-height: 1.25;
   margin: 0 0 0.2rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.book-sidebar h2 a {
+.book-sidebar-part h2 a {
   color: inherit;
+  display: block;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.16em;
@@ -717,6 +723,12 @@
 .local-toc a.is-current::before {
   background: var(--accent);
 }
+.book-navigation .local-toc a {
+  padding-inline: 0.55rem;
+}
+.book-navigation .local-toc a::before {
+  inset-inline-start: 0;
+}
 .local-toc .toc-level-3 {
   padding-left: 1.35rem;
 }
@@ -735,28 +747,10 @@
 .guide-main > .prose a {
   overflow-wrap: anywhere;
 }
-.guide-main :is(h1, h2, h3, h4, h5, h6)[id] {
-  scroll-margin-block-start: var(--guide-heading-offset, 6rem);
+:is(.guide-main, .book-shell) .prose :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-block-start: var(--reading-heading-offset, 6rem);
 }
 @media (min-width: 76.0625rem) {
-  .book-shell[data-layout-ready="true"] {
-    transition:
-      grid-template-columns 260ms cubic-bezier(0.22, 1, 0.36, 1),
-      max-width 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .book-navigation {
-    overflow-x: clip;
-  }
-  .book-navigation details::details-content {
-    opacity: 0;
-    transition:
-      content-visibility 180ms allow-discrete,
-      opacity 140ms ease;
-  }
-  .book-navigation details[open]::details-content {
-    opacity: 1;
-    transition-delay: 80ms;
-  }
   .book-navigation summary {
     align-items: center;
     cursor: pointer;
@@ -799,14 +793,23 @@
   .book-navigation details:not([open]) summary::after {
     display: none;
   }
-  .book-shell[data-navigation-collapsed="true"] {
+  .book-shell:has([data-book-navigation]:not([open])) {
     --book-demo-inline-extension: 0rem;
     grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
     max-width: 112rem;
   }
-  .book-shell[data-navigation-collapsed="true"] .prose > .book-diagram-figure {
+  .book-shell:has([data-book-navigation]:not([open]))
+    .prose
+    > .book-diagram-figure {
     grid-column: 1 / -1;
     inline-size: min(100%, 64rem);
+    justify-self: center;
+  }
+  .book-shell:has([data-book-navigation]:not([open]))
+    .prose
+    > :is([data-demo-anchor], .exercise-tabs) {
+    grid-column: 1 / -1;
+    inline-size: min(100%, 80rem);
     justify-self: center;
   }
   .book-shell .prose {

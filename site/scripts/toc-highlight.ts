@@ -1,3 +1,5 @@
+import { keepLinkInView } from "./navigation-scroll.ts";
+
 const tocLinks = Array.from(
   document.querySelectorAll<HTMLAnchorElement>('.local-toc a[href^="#"]'),
 );
@@ -13,11 +15,17 @@ const tocLinkById = new Map(
 );
 
 let pendingFrame = 0;
+let activeLink: HTMLAnchorElement | undefined;
 
 if (tocLinkById.size > 0) {
   window.addEventListener("scroll", scheduleTocHighlight, { passive: true });
   window.addEventListener("resize", scheduleTocHighlight);
   window.addEventListener("hashchange", scheduleTocHighlight);
+  document
+    .querySelector("[data-book-navigation]")
+    ?.addEventListener("toggle", () => {
+      if (activeLink) revealActiveLink(activeLink);
+    });
   scheduleTocHighlight();
 }
 
@@ -27,20 +35,14 @@ function scheduleTocHighlight() {
 }
 
 function updateTocHighlight() {
-  const activeId = getActiveHeadingId();
-
-  tocLinkById.forEach((link, id) => {
-    const active = id === activeId;
-
-    link.classList.toggle("is-current", active);
-
-    if (active) {
-      link.setAttribute("aria-current", "location");
-      keepTocLinkVisible(link);
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
+  const next = tocLinkById.get(getActiveHeadingId());
+  if (!next || next === activeLink) return;
+  activeLink?.classList.remove("is-current");
+  activeLink?.removeAttribute("aria-current");
+  activeLink = next;
+  next.classList.add("is-current");
+  next.setAttribute("aria-current", "location");
+  revealActiveLink(next);
 }
 
 function getActiveHeadingId() {
@@ -49,13 +51,25 @@ function getActiveHeadingId() {
   if (hashId && tocLinkById.has(hashId)) {
     const heading = headingById.get(hashId);
 
-    if (heading && Math.abs(heading.getBoundingClientRect().top) < 24) {
+    if (
+      heading &&
+      Math.abs(
+        heading.getBoundingClientRect().top -
+          (parseFloat(getComputedStyle(heading).scrollMarginBlockStart) || 0),
+      ) < 2
+    ) {
       return hashId;
     }
   }
 
+  if (
+    scrollY > 0 &&
+    scrollY + innerHeight >= document.documentElement.scrollHeight - 1
+  ) {
+    return [...tocLinkById.keys()].at(-1)!;
+  }
   const activationLine = Math.min(180, window.innerHeight * 0.28);
-  let activeId = tocLinkById.keys().next().value as string | undefined;
+  let activeId = tocLinkById.keys().next().value!;
 
   tocLinkById.forEach((_link, id) => {
     const heading = headingById.get(id);
@@ -68,12 +82,8 @@ function getActiveHeadingId() {
   return activeId;
 }
 
-function keepTocLinkVisible(link: HTMLAnchorElement) {
-  const toc = link.closest<HTMLElement>(".local-toc");
-
-  if (!toc || toc.scrollHeight <= toc.clientHeight) {
-    return;
-  }
-
-  link.scrollIntoView({ block: "nearest" });
+function revealActiveLink(link: HTMLAnchorElement) {
+  const list = link.closest<HTMLElement>(".book-navigation-links, .local-toc");
+  if (list && !list.contains(document.activeElement))
+    keepLinkInView(link, list);
 }
