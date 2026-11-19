@@ -468,10 +468,14 @@ Both CI and deployment checks passed for `f5fdc55`.
 On the live site all three titles started closed and opened and closed by keyboard and pointer in Chromium and WebKit at desktop and mobile widths with JavaScript disabled.
 The following section stayed visible in each case.
 
-**ScholarMark migration prepared for review on 19 November 2026.** The `0.10.0` and `0.10.1` npm archives shipped the older renderer. [Upstream packaging fix](https://github.com/bebraw/scholarmark/pull/2)
+**ScholarMark migration deployed and verified on 19 November 2026.** The `0.10.0` and `0.10.1` npm archives shipped the older renderer. [Upstream packaging fix](https://github.com/bebraw/scholarmark/pull/2)
 The published `0.10.2` archive rendered a titled disclosure with a formatted body and returned no diagnostics. [ScholarMark 0.10.2 registry entry](https://registry.npmjs.org/scholarmark/0.10.2)
 The book now pins that version and uses `:::details[Title]` for these three follow-ups and the buffer comparison added in [task 24](#24-give-the-buffer-comparison-a-concrete-first-step).
 ScholarMark renders all four directly, replacing the book's blockquote conversion.
+All six checks passed for `72af714`.
+All four disclosures opened and closed on the live site in Chromium and WebKit at desktop and phone widths, with JavaScript enabled and disabled.
+The three chapters retained all 201 paragraph feedback targets and 33 citation links.
+The browser results are under `.local/reviews/deployment-72af714-disclosures/`.
 
 ## 19. Link the first use of agent harness to its own definition
 
@@ -643,11 +647,14 @@ Evidence is under `.local/reviews/deployment-b9b35f2-navigation/README.md`.
 
 ## 30. Update the assistant setup check for a companion without a model
 
-**Status: open; found while checking task 26.** In Chromium and WebKit the [task-support browser test](../tests/e2e/learning-workspace.spec.ts) successfully sent the student's chosen support request, then failed while checking the companion's reply.
-It expects “Enable Codex or a local model”.
-The current reply directs the reader to companion setup, which also supports an API provider, and explains that notebook writing works without a model.
-This wording has been in the companion since `de95c36`.
-Update the check to verify that a student gets setup guidance and can continue writing, then run the journey in both browsers.
+**Status: browser check corrected and verified on 19 November 2026.** On `72af714` the [task-support browser test](../tests/e2e/learning-workspace.spec.ts) sent the student's chosen request and failed in Chromium and WebKit because it expected an outdated list of model providers.
+The test advertises a provider to the browser so the student can send a request.
+The disposable companion has no model configured and returns its real setup guidance.
+The revised check verifies that the assistant directs the student to companion setup, explains that notebook writing works without a model, and retains the typed question.
+The student then saves a private note and reopens its full text in Notes.
+Both browsers passed on the first run after the correction.
+The first-connection and notebook-only setup journeys also passed in both browsers.
+The original failures and passing results are under `.local/reviews/task-support-no-model-2026-11-19/`.
 
 ## 31. Keep the panels separate while Teaching assistant opens
 

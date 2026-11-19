@@ -2415,7 +2415,7 @@ test("opening either experience preserves book, reading and demo widths with exp
 test("students choose task support and direct explanations without a saved initial note", async ({
   page,
 }) => {
-  // A configured provider may still fail when contacted; retain the request.
+  // The browser sees a provider, but the companion has none when asked to reply.
   await advertiseProvider(page);
   await page.goto("/chapters/benchmarking/");
   await page
@@ -2434,11 +2434,10 @@ test("students choose task support and direct explanations without a saved initi
   await panel
     .getByLabel("My learning goal")
     .fill("Understand the measurement window");
-  await panel
-    .getByLabel("Message to the teaching assistant")
-    .fill(
-      "I do not know what a common observation window means. Please explain directly.",
-    );
+  const question =
+    "I do not know what a common observation window means. Please explain directly.";
+  const message = panel.getByLabel("Message to the teaching assistant");
+  await message.fill(question);
   const request = page.waitForRequest(
     (request) =>
       request.url().startsWith(companionAddress + "/agent/conversations/") &&
@@ -2452,9 +2451,10 @@ test("students choose task support and direct explanations without a saved initi
     noteIds: [],
   });
   expect(sent.text).toContain("Support requested: A prerequisite concept.");
-  await expect(panel.getByRole("status")).toContainText(
-    "Enable Codex or a local model",
-  );
+  const status = panel.getByRole("status");
+  await expect(status).toContainText(/companion setup/i);
+  await expect(status).toContainText(/notebook writing works without a model/i);
+  await expect(message).toHaveValue(question);
   await panel.getByLabel("Where I want support").selectOption("next-step");
   await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
   await chooseNotebookTool(panel, "Notes");
@@ -2469,9 +2469,9 @@ test("students choose task support and direct explanations without a saved initi
   await panel
     .getByRole("button", { name: "Help me get started", exact: true })
     .click();
-  await expect(
-    panel.getByLabel("Message to the teaching assistant"),
-  ).toHaveValue("I am unsure which inputs describe the same window.");
+  await expect(message).toHaveValue(
+    "I am unsure which inputs describe the same window.",
+  );
   await expect(
     panel.getByLabel("Investigation source").locator("option").first(),
   ).toContainText("Investigation ·");
@@ -2479,6 +2479,17 @@ test("students choose task support and direct explanations without a saved initi
     "getting-started",
   );
   await expect(panel.getByLabel("How I want help")).toHaveValue("hint");
+
+  const note =
+    "Compare the arrival and completion counts over the same interval.";
+  await chooseNotebookTool(panel, "Write");
+  await panel.getByLabel("Title", { exact: true }).fill("Measurement window");
+  await panel.getByLabel("Your thinking").fill(note);
+  await panel.getByRole("button", { name: "Save note", exact: true }).click();
+  await expect(status).toContainText("Saved in your private notebook");
+  await chooseNotebookTool(panel, "Notes");
+  await panel.getByText("Read note", { exact: true }).click();
+  await expect(panel.getByText(note, { exact: true })).toBeVisible();
 });
 
 test("selected context is explicit and the notebook follows chapters without losing a draft", async ({
