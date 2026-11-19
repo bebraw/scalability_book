@@ -262,6 +262,14 @@ The shared reduced-motion rule uses a zero transition duration.
 A positive duration, even 0.01ms, lets WebKit measure an intermediate layout when following a fragment on a fresh page.
 Run `npx playwright test tests/e2e/setup-guide-navigation.spec.ts` to follow the submission walkthrough links from both editions of the course introduction in Chromium and WebKit.
 
+### Compact site header
+
+At 48rem and below, the book title and primary navigation share a row when there is room.
+On a narrower phone the title gets its own line.
+The next row groups Cockpit, Notebook, Teaching assistant, Account, Theme and any available Tools in keyboard order.
+The controls can wrap and their labels stay visible.
+The compact homepage checks in [the theme browser suite](../tests/e2e/theme-initialization.spec.ts) cover the 390-pixel height budget, keyboard access and theme selection.
+
 ### Theme initialization
 
 The shared layout runs [the inline theme bootstrap](../scripts/lib/theme-bootstrap.ts) before loading stylesheets.

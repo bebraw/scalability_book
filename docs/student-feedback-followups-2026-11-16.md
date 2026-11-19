@@ -9,11 +9,11 @@ Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) own
 
 ## Issue status on 19 November 2026
 
-Of the 32 numbered tasks, 28 have met their recorded acceptance checks.
-Four remain open.
+Of the 34 numbered tasks, 29 have met their recorded acceptance checks.
+Five remain open.
 
-- **Next engineering task.** [Task 32](#32-reconcile-the-compact-homepage-header-with-its-layout-check) needs a decision about the compact homepage header.
-  At 390 pixels wide, Account wraps onto a third row and the header exceeds the test's height limit.
+- **Next engineering task.** [Task 33](#33-keep-homepage-card-links-inside-the-viewport) tracks the two homepage card links that extend beyond the right edge at 769 pixels.
+- **Chapter navigation.** [Task 34](#34-keep-the-selected-chapter-section-in-view-with-javascript-disabled) tracks an intermittent Chromium keyboard jump when JavaScript is disabled.
 - **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
   The current long-output checks pass.
 - **Waiting for a learner walkthrough.** For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
@@ -685,15 +685,44 @@ WebKit passed with that declaration.
 With the deployed CSS, the revised test passed twice in each browser.
 Four independent production runs measured a 16-pixel opening gap and a 104-pixel gap after resizing, with the assistant in the same position throughout.
 The failing comparison and local and live results are under `.local/reviews/panel-separation-2026-11-19/`.
+The regression and the task 30 correction were pushed to `main` through `3a0a7a5`.
+Published links and deployment passed.
+Four post-deployment browser checks confirmed the same opening and resized gaps.
+Evidence is under `.local/reviews/deployment-3a0a7a5-panels/`.
 
 ## 32. Reconcile the compact homepage header with its layout check
 
-**Status: open; found during task 29's wider layout checks.** At 390 × 844 the [homepage theme-picker test](../tests/e2e/book-layout.spec.ts) expects a header under 96 pixels tall.
-Chromium measured 146.45 pixels on both revision `10648ad` and the task 29 build.
-The theme picker was 36 pixels wide.
-The Account button occupied a third row below primary navigation.
-Review the space needed by the current header controls, then check its height, keyboard access and theme switching against the intended compact layout.
-The original failure and matching measurements are under `.local/reviews/book-page-navigation-2026-11-18/`.
+**Status: implemented and verified locally on 19 November 2026.** On `3a0a7a5` the homepage header measured 146.45 pixels at 390 × 844 in Chromium and WebKit.
+Account occupied a third row below the primary navigation.
+The Theme control already fit.
+The [compact header](development.md#compact-site-header) follows its keyboard order.
+The book title and primary links come first, followed by the learning tools, Account, Theme and any available Tools.
+At 375 and 390 pixels wide the header now measures 94.08 pixels, including when staff Tools is available.
+At 320 pixels the title gets its own line and all five public utility controls share a row.
+Staff Tools can wrap onto another line.
+The [browser regression](../tests/e2e/theme-initialization.spec.ts) checks the 390-pixel height budget, brand readability, keyboard access, control placement and native theme selection.
+The comparison and interaction checks are under `.local/reviews/compact-homepage-header-2026-11-19/`.
+
+## 33. Keep homepage card links inside the viewport
+
+**Status: open, reproduced while checking task 32.** At 769 pixels wide, Chromium and WebKit measured 26 pixels of horizontal page overflow on the homepage.
+The two project cards place **Start with measurement** and **Start the course project** beyond the right edge.
+The header fits.
+The overflow also occurs on `3a0a7a5`.
+The element bounds are recorded in `.local/reviews/compact-homepage-header-2026-11-19/baseline/overflow-769.json`.
+Check the [project card layout](../site/styles/layout.css) around the transition out of its single-column phone layout.
+Both links and their arrows should fit and remain usable without horizontal page scrolling.
+
+## 34. Keep the selected chapter section in view with JavaScript disabled
+
+**Status: open, reproduced on the pre-header build.** At 390 × 844 in Chromium with JavaScript disabled, open the scalability chapter at **Summary** and use the keyboard to follow **Four pressures organize the course** in the chapter navigation.
+The URL can change to the correct fragment while its heading stays outside the viewport.
+The [native navigation test](../tests/e2e/toc-highlight.spec.ts) recorded the failure during the header checks.
+Across eight independent visits per build, the heading stayed outside the viewport twice on the frozen `3a0a7a5` site and twice with the revised header.
+In a failing visit, Chromium still showed **Summary** and reported smooth scrolling.
+The test requested reduced motion at the top level of `test.use`, but Playwright expects that preference under `contextOptions`.
+The first failure is under `.local/reviews/compact-homepage-header-2026-11-19/tests/navigation/` and the comparisons are under `.local/reviews/compact-homepage-header-2026-11-19/tests/native/`.
+Verify that keyboard activation brings the selected heading into view from deep in the chapter with both the default and reduced-motion preferences.
 
 ## Closing tasks
 

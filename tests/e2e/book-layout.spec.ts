@@ -204,35 +204,6 @@ test.describe("book reading layout", () => {
     expect(Math.abs(listGap - paragraphGap)).toBeLessThan(1);
   });
 
-  test("keeps the theme picker compact on narrow screens", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
-
-    const header = page.locator(".site-header");
-    const brand = page.locator(".brand");
-    const navigation = page.locator('.site-header nav[aria-label="Primary"]');
-    const picker = page.getByRole("combobox", { name: "Theme" });
-    const pickerControl = page.locator(".theme-picker");
-
-    await expect(picker).toBeVisible();
-    const headerBox = await header.boundingBox();
-    const brandBox = await brand.boundingBox();
-    const navigationBox = await navigation.boundingBox();
-    const pickerBox = await pickerControl.boundingBox();
-
-    expect(headerBox).not.toBeNull();
-    expect(brandBox).not.toBeNull();
-    expect(navigationBox).not.toBeNull();
-    expect(pickerBox).not.toBeNull();
-    expect(headerBox!.height).toBeLessThan(96);
-    expect(pickerBox!.width).toBeLessThanOrEqual(44);
-    expect(Math.abs(brandBox!.y - pickerBox!.y)).toBeLessThan(8);
-    expect(navigationBox!.y).toBeGreaterThan(brandBox!.y);
-
-    await picker.selectOption("dark");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  });
-
   test("ships theme-aware syntax highlighting as generated HTML", async ({
     page,
     request,

@@ -1,5 +1,91 @@
 import { expect, test } from "@playwright/test";
 
+for (const width of [390, 320]) {
+  test(`compact homepage header keeps navigation, learning actions, Account and Theme usable at ${width}px`, async ({
+    page,
+    browserName,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.route("**/api/auth/status", (route) =>
+      route.fulfill({
+        json: { available: true, authenticated: false, admin: false },
+      }),
+    );
+    await page.goto("/");
+    const header = page.locator(".site-header");
+    const nav = header.getByRole("navigation", { name: "Primary" });
+    const brand = header.getByRole("link", {
+      name: "Elements of Scalable Web Development",
+    });
+    const links = ["Contents", "Project", "Cases", "Demos", "Concepts"].map(
+      (name) => nav.getByRole("link", { name, exact: true }),
+    );
+    const buttons = [
+      "Learning cockpit",
+      "Notebook",
+      "Teaching assistant",
+      "Account",
+    ].map((name) => header.getByRole("button", { name, exact: true }));
+    const picker = header.getByRole("combobox", { name: "Theme" });
+    for (const button of buttons) await expect(button).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const headerBox = (await header.boundingBox())!;
+    if (width === 390) expect(headerBox.height).toBeLessThan(96);
+    const brandText = await brand.evaluate((link) => {
+      const style = getComputedStyle(link);
+      const context = document.createElement("canvas").getContext("2d")!;
+      context.font = style.font;
+      return {
+        available:
+          link.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight),
+        firstWord: context.measureText("Elements").width,
+      };
+    });
+    expect(brandText.available).toBeGreaterThanOrEqual(brandText.firstWord);
+
+    // On macOS, Option-Tab includes links in Safari’s keyboard navigation.
+    const tab =
+      browserName === "webkit" && process.platform === "darwin"
+        ? "Alt+Tab"
+        : "Tab";
+    await page.getByRole("link", { name: "Skip to content" }).focus();
+    const boxes = [];
+    for (const control of [brand, ...links, ...buttons, picker]) {
+      await page.keyboard.press(tab);
+      await expect(control).toBeFocused();
+      await control.click({ trial: true, timeout: 5_000 });
+      const box = (await control.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      expect(box.y + box.height).toBeLessThanOrEqual(
+        headerBox.y + headerBox.height,
+      );
+      boxes.push(box);
+    }
+    const primary = boxes.slice(0, 1 + links.length);
+    const actions = boxes.slice(primary.length);
+    expect(
+      Math.max(...primary.map((box) => box.y + box.height)),
+    ).toBeLessThanOrEqual(Math.min(...actions.map((box) => box.y)));
+    for (const row of [primary, actions]) {
+      for (const [i, box] of row.slice(1).entries()) {
+        const previous = row[i];
+        const startsNewLine = box.y >= previous.y + previous.height;
+        if (width === 390 || !startsNewLine) {
+          expect(box.x).toBeGreaterThanOrEqual(previous.x + previous.width);
+        }
+      }
+    }
+    expect((await picker.boundingBox())!.width).toBeLessThanOrEqual(44);
+    await page.keyboard.press("d");
+    await expect(picker).toHaveValue("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  });
+}
+
 type ThemeFrame = { theme?: string; scheme: string; background: string };
 type ThemeWindow = Window & { themeFrames: ThemeFrame[] };
 
