@@ -9,13 +9,13 @@ Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) own
 
 ## Issue status on 19 November 2026
 
-Of the 34 numbered tasks, 31 have met their recorded acceptance checks.
-Three remain open.
+Of the 34 numbered tasks, 32 are resolved.
+The two remaining items need a first-time learner walkthrough.
 
-- **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
-  The current long-output checks pass.
-- **Waiting for a learner walkthrough.** For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
-  For [task 7](#7-make-the-role-of-optional-exercises-explicit), ask a learner to choose an optional activity, identify the first step and explain what to keep for their notes versus the required Establish submission.
+- For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
+  Record the outcome in [issue #4](https://github.com/bebraw/scalability_book/issues/4).
+- For [task 7](#7-make-the-role-of-optional-exercises-explicit), ask a learner to choose an optional activity, identify the first step and explain what to keep for their notes versus the required Establish submission.
+  Record the outcome in [issue #5](https://github.com/bebraw/scalability_book/issues/5).
 
 The separate [kickoff sign-in observation](#kickoff-sign-in-observation) reached GitHub's sign-in page.
 An authenticated return to the book is still unverified.
@@ -55,23 +55,25 @@ Evidence is retained under ignored `.local/reviews/deployment-8c31c37-2026-11-17
 
 ## 1. Keep expanded tool output inside the assistant panel
 
-**Status: open, awaiting the original page and output.** The earlier browser review recorded approximately 83 px of desktop overflow when expanding JSON or tool output.
-Treat that measurement as the earlier observation, not an assertion that every current page or viewport fails.
+**Status: closed on 19 November 2026.** The ledger originally attributed the 83 px overflow to Teaching assistant.
+The original screenshot shows the expanded **Inspect conceptual span record** for Request B's **POST /events** in the [Benchmarking trace explorer](https://scalableweb.dev/chapters/benchmarking/#demo-opentelemetry-trace-explorer).
+The 16 November browser review measured the same disclosure after selecting **acquire connection** and revealing the case reading.
+At 1440 × 1000 the inspector ended at x = 1350.99 and the record at x = 1433.59, an 82.60 px overrun.
+At 500 px the stacked record fit.
+[Task 13](#13-keep-the-trace-inspectors-json-inside-its-panel) fixed this defect in `727dad2`.
+On 19 November, live Chromium and WebKit kept both the root and child records inside the inspector at both widths.
+The original browser measurements and live comparisons are under `.local/reviews/trace-overflow-provenance-2026-11-19/`.
 
-Current-path verification on 16 November did not reproduce that overflow: an expanded **Browser observation** and an assistant reply with long JSON keys and URLs stayed inside the panel at 1440 px and 390 px in Chromium and WebKit.
-The original 83 px finding remains open until its exact affected route and payload are identified; no overflow layout fix is claimed.
-An artifact and history audit on 17 November found the measurement first recorded in the initial ledger, without the original route, payload, browser, viewport or measured element.
-Later verification records repeat the number but do not recover that trigger.
-The original feedback also names overflowing JSON in the separate trace demo; task 13 below tracks that concrete surface without assuming it explains this measurement.
-That verification did reproduce a keyboard-access defect: WebKit skipped the reply's horizontally scrolling code block, preventing keyboard users from reaching the complete lines.
+The assistant checks independently found that WebKit skipped the reply's horizontally scrolling code block, preventing keyboard users from reaching the complete lines.
 Code blocks now have a named Tab focus target and visible focus indicator.
 The focused browser regression retains full observation/code text, checks the panel bounds, scrolls code with an arrow key and verifies that Tab leaves the block.
 The first worktree startup failure, unchanged-layout results and failing/passing keyboard checks are retained under ignored `.local/reviews/assistant-output-2026-11-16/evidence/`.
 The keyboard fix was committed and deployed as `8b8f193` on 17 November; link CI and deployment passed, followed by live Chromium keyboard checks at both widths with local-network permission granted.
 Live WebKit connectivity failed before reaching the code block; [task 9](#9-verify-the-live-companion-connection-in-safari) records that separate finding.
 
-If the original page and output become available, reproduce the overflow with a synthetic equivalent and check it against the existing regression on desktop and compact screens.
-Verify that the complete output is reachable by keyboard and stays inside the panel without moving the page or hiding its controls.
+A 19 November check compared the same synthetic reply with its browser evidence collapsed, expanded and closed again at 1440 and 390 px.
+In both Chromium and WebKit the page and assistant panel kept their widths, and the long code lines scrolled inside their own block.
+The measurements are under `.local/reviews/assistant-overflow-followup-2026-11-19/`.
 
 ## 2. Make preformatted assistant output readable in every theme
 
@@ -334,7 +336,7 @@ These checks verify the disclosure and keyboard behavior, not first-time learner
 **Status: closed on 17 November 2026 after reproducing and correcting the disclosure's minimum width.** Opening **Inspect conceptual span record** expanded the inspector's implicit grid column to the long JSON line's width.
 On the 1440 px chapter page, the inspector had a 300 px client width but a 384 px scroll width in Chromium and 393 px in WebKit.
 The same cause reproduced on the chapter and gallery at 390 and 320 px.
-This is the concrete trace-demo finding, separate from task 1's unattributed assistant observation.
+The recovered 16 November measurements confirm this disclosure was the source of the 83 px overflow first logged under [task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel).
 
 A reduced inspector containing only the disclosure reproduced the overflow in both engines.
 Limiting only the preformatted viewer's maximum width left the oversized grid column unchanged.
@@ -720,7 +722,7 @@ The live evidence is under `.local/reviews/deployment-d947b2f-homepage-cards/`.
 
 ## 34. Keep the selected chapter section in view with JavaScript disabled
 
-**Status: implemented and verified locally on 19 November 2026.** At 390 × 844 with JavaScript disabled, opening the scalability chapter at **Summary** started a smooth scroll.
+**Status: deployed and verified on 19 November 2026.** At 390 × 844 with JavaScript disabled, opening the scalability chapter at **Summary** started a smooth scroll.
 If a reader then selected **Four pressures organize the course** with the keyboard, Chromium could update the URL but finish scrolling to **Summary**.
 This happened twice in ten default-motion visits on `d947b2f`.
 The earlier failure is recorded under `.local/reviews/compact-homepage-header-2026-11-19/tests/native/`.
@@ -731,6 +733,11 @@ The chapter and [setup guide](../tests/e2e/setup-guide-navigation.spec.ts) tests
 All 24 repeated native journeys passed in Chromium and WebKit across default and reduced motion.
 The full chapter and setup navigation suites passed all 26 cases.
 The original and revised scroll positions, screenshots and test results are under `.local/reviews/native-section-navigation-2026-11-19/`.
+Published links and Cloudflare deployment passed for `2172aec`.
+One visit just after deployment did not see the new style.
+All 12 subsequent live keyboard journeys received the revised HTML and kept the selected heading in view.
+All 24 scrolling checks on chapter, homepage and setup pages also passed.
+The first run and the verified responses are under `.local/reviews/deployment-2172aec-native-navigation/`.
 
 ## Closing tasks
 
