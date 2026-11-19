@@ -8,11 +8,13 @@ Upstream: [bebraw/scholarmark](https://github.com/bebraw/scholarmark)
 
 Originally tested package: `scholarmark@0.1.0`
 
-Integrated package: `scholarmark@0.9.1`
+The book pins `scholarmark@0.10.2`.
 
 The requested sanitized-HAST and rendered-heading APIs shipped in `0.2.0` and now power the book renderer.
 The current integration uses postfix labels, native and independently numbered table or figure captions, captioned-block metadata, local reference metadata, host-provided cross-document reference targets, and the Citation.js bibliography-parser adapter from the `0.9.1` API.
 ScholarMark `0.9.1` also exposes a browser entry, injectable bibliography parsing, portable line comments, language-service metadata, and bounded native figures for consumers that need them.
+The published `0.10.2` renderer handles `:::details[Title]` as a closed HTML disclosure with a plain-text summary and a Markdown body. [Upstream disclosure feature](https://github.com/bebraw/scholarmark/pull/1)
+The book uses it for optional chapter follow-ups and adds its paragraph feedback controls to the rendered body. [Authoring example](chapter-exercises.md#optional-follow-ups-in-chapter-prose)
 The remainder of this document preserves the original upstream request and its rationale for reference.
 
 ## Summary

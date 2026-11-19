@@ -468,10 +468,10 @@ Both CI and deployment checks passed for `f5fdc55`.
 On the live site all three titles started closed and opened and closed by keyboard and pointer in Chromium and WebKit at desktop and mobile widths with JavaScript disabled.
 The following section stayed visible in each case.
 
-**Pending upstream release:** [ScholarMark's native disclosure](https://github.com/bebraw/scholarmark/pull/1) is in the `v0.10.0` source tag, but npm's `0.10.0` tarball contains the old renderer and rejects `:::details`.
-Keep the working blockquote convention until a corrected package is published ([packaging fix](https://github.com/bebraw/scholarmark/pull/2)).
-Then pin the new version, convert the three follow-ups to `:::details[Title]`, and remove the local blockquote transform.
-The prepared migration against `8ad1dfc` is retained under ignored `.local/reviews/scholarmark-0.10.0-disclosures/native-migration.patch`; its package pin must be updated before use.
+**ScholarMark migration prepared for review on 19 November 2026.** The `0.10.0` and `0.10.1` npm archives shipped the older renderer. [Upstream packaging fix](https://github.com/bebraw/scholarmark/pull/2)
+The published `0.10.2` archive rendered a titled disclosure with a formatted body and returned no diagnostics. [ScholarMark 0.10.2 registry entry](https://registry.npmjs.org/scholarmark/0.10.2)
+The book now pins that version and uses `:::details[Title]` for these three follow-ups and the buffer comparison added in [task 24](#24-give-the-buffer-comparison-a-concrete-first-step).
+ScholarMark renders all four directly, replacing the book's blockquote conversion.
 
 ## 19. Link the first use of agent harness to its own definition
 
@@ -613,7 +613,7 @@ Evidence is under `.local/reviews/deployment-10648ad-setup-heading/`.
 
 ## 29. Improve Book and Page navigation access
 
-**Status: implemented for review.** The student wanted to see the chapter list and the page outline together and give more space to the reading.
+**Status: deployed and verified on 19 November 2026.** The student wanted to see the chapter list and the page outline together and give more space to the reading.
 The desktop tabs hid one list while the reader used the other.
 Lower in the Architecture chapter at 1024 and 390 pixels, even the navigation control had scrolled off screen.
 
@@ -634,6 +634,12 @@ The built scripts and the exercise layout were corrected before the final passin
 The comparisons, screenshots and browser results are under `.local/reviews/book-page-navigation-2026-11-18/`.
 On the Architecture chapter, reopening the folded sidebar kept the measured section at the same screen position at both desktop widths.
 Both browsers followed the section link with Notebook or Teaching assistant open at 320 × 568 and 844 × 390. On compact screens the open menu temporarily covers part of the reading.
+
+Published links passed and Cloudflare deployed `b9b35f2` on the first attempt.
+All 18 live navigation checks passed in Chromium and WebKit.
+Four used touch input with Notebook open in portrait and landscape.
+Tapping **Project artifact** focused the visible heading and kept Notebook open.
+Evidence is under `.local/reviews/deployment-b9b35f2-navigation/README.md`.
 
 ## 30. Update the assistant setup check for a companion without a model
 

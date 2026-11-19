@@ -76,15 +76,16 @@ A client can miss a live notification for a message that was stored successfully
 In the reported system, a reconnecting client fetches the latest messages.
 Check the IDs of the messages it fetches to see which missed updates it recovered.
 
-> **Optional follow-up — Run your own buffer comparison**
->
-> Choose one implementation with an adjustable notification buffer.
-> Record its commit and the version of your load script.
->
-> Start with capacity 256 at 100 POSTs per second.
-> Repeat the same workload from the same starting state with capacity 16,384, changing only the buffer capacity.
-> For each run, record admissions, errors, and memory use.
-> Match message IDs and timestamps to count notifications delivered by your deadline, then check which missed IDs the client fetches on reconnect.
+:::details[Optional follow-up — Run your own buffer comparison]
+
+Choose one implementation with an adjustable notification buffer.
+Record its commit and the version of your load script.
+
+Start with capacity 256 at 100 POSTs per second.
+Repeat the same workload from the same starting state with capacity 16,384, changing only the buffer capacity.
+For each run, record admissions, errors, and memory use.
+Match message IDs and timestamps to count notifications delivered by your deadline, then check which missed IDs the client fetches on reconnect.
+:::
 
 ### Simulated benchmark lab
 
@@ -106,22 +107,23 @@ They can omit workload mixes, client behavior, cache histories, data shapes, pro
 A result therefore supports a claim only for its declared conditions.
 Compare synthetic evidence with field telemetry where available, and revise the protocol when real behavior exposes a missing condition.
 
-> **Optional follow-up — Which requests counted?**
->
-> In the fixed practice sample, 18 requests took 40 ms and two took 240 ms.
-> A second run offers the same 20 requests: 18 finish in 40 ms and two reach a 300 ms timeout with no response.
-> The dashboard calculates p95 from completed responses only.
-> Using nearest rank, what p95 does it show for each run?
->
-> The user cares about receiving a response in under 120 ms.
-> Count how many of the 20 offered requests met that goal in each run.
-> Would you report the second run as an improvement?
-> Give the dashboard number and the user outcome side by side.
->
-> **Check your reasoning:** In the first run, rank 19 of 20 is 240 ms.
-> In the second, rank 18 of 18 is 40 ms.
-> Both runs returned 18 of 20 responses within the target; the other two were late in the first run and never reached the client before timeout in the second.
-> The lower reported p95 does not show that more users met their goal.
+:::details[Optional follow-up — Which requests counted?]
+
+In the fixed practice sample, 18 requests took 40 ms and two took 240 ms.
+A second run offers the same 20 requests: 18 finish in 40 ms and two reach a 300 ms timeout with no response.
+The dashboard calculates p95 from completed responses only.
+Using nearest rank, what p95 does it show for each run?
+
+The user cares about receiving a response in under 120 ms.
+Count how many of the 20 offered requests met that goal in each run.
+Would you report the second run as an improvement?
+Give the dashboard number and the user outcome side by side.
+
+**Check your reasoning:** In the first run, rank 19 of 20 is 240 ms.
+In the second, rank 18 of 18 is 40 ms.
+Both runs returned 18 of 20 responses within the target; the other two were late in the first run and never reached the client before timeout in the second.
+The lower reported p95 does not show that more users met their goal.
+:::
 
 ### Benchmark browser journeys with Playwright and Lighthouse
 

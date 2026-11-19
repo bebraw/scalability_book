@@ -326,20 +326,21 @@ The [Architecture chapter](/chapters/architecture/) develops the related control
 
 The [Temper case study](/case-studies/temper/) extends this pattern to agent-authored state machines and compares their verification boundary with Datadog's system testing and bounded live optimization.
 
-> **Optional follow-up — Can the revised patch ship?**
->
-> Patch A passes its checks, but the reviewer requests changes.
-> The agent revises the patch, sends `PATCH_READY` for patch B, and the reviewer starts a fresh review and approves B.
-> Predict what happens if the agent proposes `RELEASE` now.
-> Trace both the checks and the review on paper or in the demo.
->
-> Suppose a delayed `TESTS_PASS` for A arrives at that point.
-> What will the diagram do?
-> What would you want the real release workflow to check before accepting that event?
->
-> **Check your reasoning:** B's review is approved, but B entered verification with checks running, so the first release proposal leaves the state unchanged.
-> The diagram accepts `TESTS_PASS` without a patch identity and moves to ready.
-> A real workflow should match the test result to B's revision and wait for B's own passing result before allowing release.
+:::details[Optional follow-up — Can the revised patch ship?]
+
+Patch A passes its checks, but the reviewer requests changes.
+The agent revises the patch, sends `PATCH_READY` for patch B, and the reviewer starts a fresh review and approves B.
+Predict what happens if the agent proposes `RELEASE` now.
+Trace both the checks and the review on paper or in the demo.
+
+Suppose a delayed `TESTS_PASS` for A arrives at that point.
+What will the diagram do?
+What would you want the real release workflow to check before accepting that event?
+
+**Check your reasoning:** B's review is approved, but B entered verification with checks running, so the first release proposal leaves the state unchanged.
+The diagram accepts `TESTS_PASS` without a patch identity and moves to ready.
+A real workflow should match the test result to B's revision and wait for B's own passing result before allowing release.
+:::
 
 ### Reuse practices without cloning the whole project harness
 

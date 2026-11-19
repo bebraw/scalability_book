@@ -406,17 +406,8 @@ function decorateElement(
   paragraphCounts: Map<string, number>,
   numbered: boolean,
 ): void {
-  if (element.tagName === "blockquote") {
-    decorateFollowUp(element);
-  }
-
   if (element.tagName === "p") {
-    decorateParagraph(
-      element,
-      source,
-      paragraphCounts,
-      isElement(parent, "details") && hasClass(parent, "book-follow-up"),
-    );
+    decorateParagraph(element, source, paragraphCounts);
   }
 
   if (/^h[1-3]$/.test(element.tagName)) {
@@ -434,33 +425,6 @@ function decorateElement(
   if (element.tagName === "code" && isElement(parent, "pre")) {
     decorateCode(element);
   }
-}
-
-function decorateFollowUp(quote: HastElement): void {
-  const [title, ...body] = quote.children.filter(
-    (child) => child.type !== "text" || child.value.trim(),
-  );
-  if (title?.type !== "element" || title.tagName !== "p" || !body.length)
-    return;
-  const [bold] = title.children;
-  if (
-    title.children.length !== 1 ||
-    bold?.type !== "element" ||
-    bold.tagName !== "strong"
-  )
-    return;
-  const [label] = bold.children;
-  if (
-    bold.children.length !== 1 ||
-    label?.type !== "text" ||
-    !/^Optional follow-up — \S[^\n]*$/.test(label.value)
-  )
-    return;
-
-  quote.tagName = "details";
-  addClass(quote, "book-follow-up");
-  title.tagName = "summary";
-  title.children = [label];
 }
 
 function linkCitationsToBibliography(
@@ -556,7 +520,6 @@ function decorateParagraph(
   paragraph: HastElement,
   source: string,
   paragraphCounts: Map<string, number>,
-  followUpBody: boolean,
 ): void {
   const from = numericProperty(paragraph, "dataSourceFrom");
   const to = numericProperty(paragraph, "dataSourceTo");
@@ -566,12 +529,7 @@ function decorateParagraph(
       : source.slice(from, to);
   // Adding a concept reference is a reading aid, not a new paragraph. Keep
   // existing feedback attached when plain or emphasized words gain a link.
-  // A disclosure's Markdown quote prefix on continuation lines is presentation,
-  // not a change to the paragraph learners may already have commented on.
-  const unwrapped = followUpBody
-    ? authored.replace(/\n {0,3}>[ \t]?/g, "\n")
-    : authored;
-  const identitySource = unwrapped.replace(
+  const identitySource = authored.replace(
     /\[([^\]]+)\]\(\/concepts\/#[a-z-]+\)/g,
     "$1",
   );

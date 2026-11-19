@@ -27,19 +27,20 @@ Earlier saved versions retain their original prompt and answer and appear in a d
 ## Optional follow-ups in chapter prose
 
 When a chapter offers an extra problem after an exercise, give readers a short title they can open when they want the challenge.
-Start a Markdown blockquote with a bold, plain-text title in this form, then keep the prompt and its self-check inside the same quote:
+Use a ScholarMark disclosure.
+Put the plain-text title in square brackets and write the prompt and self-check as ordinary Markdown inside the fence.
 
 ```md
-> **Optional follow-up — What would you measure next?**
->
-> Which comparison would separate the two explanations?
->
-> **Check your reasoning:** Change one condition and keep the other fixed.
+:::details[Optional follow-up — What would you measure next?]
+Which comparison would separate the two explanations?
+
+**Check your reasoning:** Change one condition and keep the other fixed.
+:::
 ```
 
 The website shows only the title until the reader opens it, including when JavaScript is disabled.
 The book PDF expands disclosures for reading on paper.
-End the quote before returning to the main explanation or giving project instructions.
+Put the closing `:::` on its own line before returning to the main explanation or giving project instructions.
 
 ## Private answers
 
