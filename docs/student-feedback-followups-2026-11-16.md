@@ -9,10 +9,9 @@ Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) own
 
 ## Issue status on 19 November 2026
 
-Of the 34 numbered tasks, 30 have met their recorded acceptance checks.
-Four remain open.
+Of the 34 numbered tasks, 31 have met their recorded acceptance checks.
+Three remain open.
 
-- **Next engineering task.** [Task 34](#34-keep-the-selected-chapter-section-in-view-with-javascript-disabled) tracks an intermittent Chromium keyboard jump when JavaScript is disabled.
 - **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
   The current long-output checks pass.
 - **Waiting for a learner walkthrough.** For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
@@ -707,24 +706,31 @@ The live results are under `.local/reviews/deployment-c418eed-compact-header/`.
 
 ## 33. Keep homepage card links inside the viewport
 
-**Status: implemented and verified locally on 19 November 2026.** At 769 pixels wide, **Start with measurement** and **Start the course project** extended beyond the right edge of the homepage on `c418eed`.
+**Status: deployed and verified on 19 November 2026.** At 769 pixels wide, **Start with measurement** and **Start the course project** extended beyond the right edge of the homepage on `c418eed`.
 Chromium and WebKit measured 26 pixels of horizontal page overflow.
 At 820 pixels the page fit, but both links still crossed their card borders.
 The [project cards](development.md#homepage-project-cards) now let their heading and description columns shrink enough to keep the whole link, including the arrow, inside the card padding.
 The [browser regression](../tests/e2e/book-layout.spec.ts) checks each card on both sides of the 768-pixel layout change and at 820 pixels.
 It failed against the original build and passed against the revision in both browsers.
 Before-and-after screenshots, viewport measurements and activation checks are under `.local/reviews/homepage-card-overflow-2026-11-19/`.
+Published links and Cloudflare deployment passed for `d947b2f`.
+On the live homepage, both links and arrows fit at all seven tested widths in Chromium and WebKit.
+All 16 keyboard and touch checks reached their destinations.
+The live evidence is under `.local/reviews/deployment-d947b2f-homepage-cards/`.
 
 ## 34. Keep the selected chapter section in view with JavaScript disabled
 
-**Status: open, reproduced on the pre-header build.** At 390 × 844 in Chromium with JavaScript disabled, open the scalability chapter at **Summary** and use the keyboard to follow **Four pressures organize the course** in the chapter navigation.
-The URL can change to the correct fragment while its heading stays outside the viewport.
-The [native navigation test](../tests/e2e/toc-highlight.spec.ts) recorded the failure during the header checks.
-Across eight independent visits per build, the heading stayed outside the viewport twice on the frozen `3a0a7a5` site and twice with the revised header.
-In a failing visit, Chromium still showed **Summary** and reported smooth scrolling.
-The test requested reduced motion at the top level of `test.use`, but Playwright expects that preference under `contextOptions`.
-The first failure is under `.local/reviews/compact-homepage-header-2026-11-19/tests/navigation/` and the comparisons are under `.local/reviews/compact-homepage-header-2026-11-19/tests/native/`.
-Verify that keyboard activation brings the selected heading into view from deep in the chapter with both the default and reduced-motion preferences.
+**Status: implemented and verified locally on 19 November 2026.** At 390 × 844 with JavaScript disabled, opening the scalability chapter at **Summary** started a smooth scroll.
+If a reader then selected **Four pressures organize the course** with the keyboard, Chromium could update the URL but finish scrolling to **Summary**.
+This happened twice in ten default-motion visits on `d947b2f`.
+The earlier failure is recorded under `.local/reviews/compact-homepage-header-2026-11-19/tests/native/`.
+
+Pages with [chapter navigation](development.md#chapter-navigation) now jump directly to the selected section when JavaScript is disabled.
+The [native navigation test](../tests/e2e/toc-highlight.spec.ts) verifies the browser's motion preference, follows the link, checks both edges of the selected heading and continues to the next chapter.
+The chapter and [setup guide](../tests/e2e/setup-guide-navigation.spec.ts) tests now request reduced motion through Playwright's browser context.
+All 24 repeated native journeys passed in Chromium and WebKit across default and reduced motion.
+The full chapter and setup navigation suites passed all 26 cases.
+The original and revised scroll positions, screenshots and test results are under `.local/reviews/native-section-navigation-2026-11-19/`.
 
 ## Closing tasks
 

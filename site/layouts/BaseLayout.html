@@ -27,6 +27,13 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" &href="(resolve mainStylesheetUrl)" />
     <Raw &html="(resolve stylesheetTags)"></Raw>
+    <noscript>
+      <style>
+        html:has(#book-navigation) {
+          scroll-behavior: auto;
+        }
+      </style>
+    </noscript>
     <script &src="(resolve themeScriptUrl)" defer></script>
     <Raw &html="(resolve scriptTags)"></Raw>
   </head>

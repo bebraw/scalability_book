@@ -242,9 +242,12 @@ Opening navigation keeps the learning tool available after a section is selected
 Following a section link closes the panel and moves keyboard focus to its heading.
 Escape returns focus to **Navigation**.
 With JavaScript disabled, the native disclosure and both sets of links still work.
+The [shared layout](../site/layouts/BaseLayout.html) disables smooth scrolling on pages with book navigation when JavaScript is disabled.
+This lets a reader follow a second section link immediately, even after opening a deep link near the end of a chapter.
 The [outline](../site/scripts/toc-highlight.ts) marks the current section as the reader scrolls.
 Any scrolling needed to reveal the active link belongs to its own list.
 Run `npx playwright test tests/e2e/toc-highlight.spec.ts` for the chapter and section journeys, including keyboard and native disclosure use.
+The native keyboard check opens the chapter at **Summary**, selects **Four pressures organize the course** and checks that the heading is on screen with both default and reduced motion.
 
 ### Setup guide layout
 

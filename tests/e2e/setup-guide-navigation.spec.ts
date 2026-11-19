@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test.use({ reducedMotion: "reduce" });
+test.use({ contextOptions: { reducedMotion: "reduce" } });
 
 for (const [edition, introduction] of [
   ["current", "/project/introduction/"],

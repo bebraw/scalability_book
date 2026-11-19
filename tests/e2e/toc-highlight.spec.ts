@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const chapter = "/chapters/what-is-scalability/";
 const nextChapter = "/chapters/benchmarking/";
 
-test.use({ reducedMotion: "reduce" });
+test.use({ contextOptions: { reducedMotion: "reduce" } });
 
 test("tracks the current section while reading and keeps both lists in reach beside Notebook", async ({
   page,
@@ -103,33 +103,45 @@ for (const [width, height] of [
   });
 }
 
-test.describe("without JavaScript", () => {
-  test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
-
-  test("the native disclosure offers working chapter and section links", async ({
-    page,
-  }) => {
-    await page.goto(chapter + "#summary");
-    const navigation = page.locator("#book-navigation");
-    const sectionLink = navigation.getByRole("link", {
-      name: "Four pressures organize the course",
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test.describe(`without JavaScript, motion preference ${reducedMotion}`, () => {
+    test.use({
+      javaScriptEnabled: false,
+      viewport: { width: 390, height: 844 },
+      contextOptions: { reducedMotion },
     });
-    const toggle = navigation.locator("summary");
-    await expect(sectionLink).toBeHidden();
-    await expect(toggle).toBeInViewport({ ratio: 1 });
-    await expectUncoveredHeading(page.locator("h2:target"));
-    await toggle.press("Enter");
-    await sectionLink.press("Enter");
-    await expect(page).toHaveURL(
-      chapter + "#four-pressures-organize-the-course",
-    );
-    await expectUncoveredHeading(page.locator("h2:target"));
-    const next = navigation.locator(`a[href="${nextChapter}"]`);
-    if (!(await next.isVisible())) await toggle.press("Enter");
-    await next.press("Enter");
-    await expect(page).toHaveURL(nextChapter);
+
+    test("the native disclosure offers working chapter and section links", async ({
+      page,
+    }) => {
+      await page.goto(chapter + "#summary");
+      expect(
+        await page.evaluate(
+          () => matchMedia("(prefers-reduced-motion: reduce)").matches,
+        ),
+      ).toBe(reducedMotion === "reduce");
+      const navigation = page.locator("#book-navigation");
+      const sectionLink = navigation.getByRole("link", {
+        name: "Four pressures organize the course",
+      });
+      const toggle = navigation.locator("summary");
+      await expect(sectionLink).toBeHidden();
+      await expect(toggle).toBeInViewport({ ratio: 1 });
+      await expectUncoveredHeading(page.locator("h2:target"));
+      await toggle.press("Enter");
+      await sectionLink.press("Enter");
+      await expect(page).toHaveURL(
+        chapter + "#four-pressures-organize-the-course",
+      );
+      // Sample the first position after the native jump, before any polling.
+      expect(await headingIsUncovered(page.locator("h2:target"))).toBe(true);
+      const next = navigation.locator(`a[href="${nextChapter}"]`);
+      if (!(await next.isVisible())) await toggle.press("Enter");
+      await next.press("Enter");
+      await expect(page).toHaveURL(nextChapter);
+    });
   });
-});
+}
 
 async function openNotebook(page: Page) {
   await page
@@ -143,14 +155,15 @@ async function openNotebook(page: Page) {
 
 async function expectUncoveredHeading(heading: Locator) {
   await expect(heading).toBeInViewport({ ratio: 1 });
-  await expect
-    .poll(() =>
-      heading.evaluate((element) => {
-        const box = element.getBoundingClientRect();
-        return element.contains(
-          document.elementFromPoint(box.left + box.width / 2, box.top + 1),
-        );
-      }),
-    )
-    .toBe(true);
+  await expect.poll(() => headingIsUncovered(heading)).toBe(true);
+}
+
+function headingIsUncovered(heading: Locator) {
+  return heading.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    return [box.top + 1, box.bottom - 1].every((y) =>
+      element.contains(document.elementFromPoint(x, y)),
+    );
+  });
 }
