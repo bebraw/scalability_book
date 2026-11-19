@@ -1068,11 +1068,53 @@ test("Notebook size responds to keyboard and pointer controls without moving the
   await size.reset.click();
   await expectNotebookSize(notebook, automatic.width, automatic.height);
 
+  // Arm the sampler before the click so Playwright cannot skip the opening frame.
+  const panels = await page.evaluateHandle(() => {
+    const notebook =
+      document.querySelector<HTMLDialogElement>("#learning-notebook")!;
+    const assistant = document.querySelector<HTMLDialogElement>(
+      "#learning-assistant",
+    )!;
+    function bounds(panel: HTMLDialogElement) {
+      const { x, y, width, height } = panel.getBoundingClientRect();
+      return { x, y, width, height };
+    }
+    const measure = () => ({
+      notebook: bounds(notebook),
+      assistant: bounds(assistant),
+    });
+    type Frame = ReturnType<typeof measure>;
+    const opening = new Promise<Frame[]>((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (!assistant.open) return;
+        observer.disconnect();
+        const frames: Frame[] = [];
+        function sample() {
+          frames.push(measure());
+          if (frames.length === 5) resolve(frames);
+          else requestAnimationFrame(sample);
+        }
+        requestAnimationFrame(sample);
+      });
+      observer.observe(assistant, {
+        attributes: true,
+        attributeFilter: ["open"],
+      });
+    });
+    return { opening, measure };
+  });
   await page.locator('.site-header [data-learning-toggle="assistant"]').click();
   const assistant = page.locator("#learning-assistant");
   await expect(assistant).toBeVisible();
-  const assistantBefore = (await assistant.boundingBox())!;
-  const stackedAutomatic = (await notebook.boundingBox())!;
+  const opening = await panels.evaluate((panels) => panels.opening);
+  for (const [index, frame] of opening.entries()) {
+    expect(frame.notebook.height).toBeGreaterThan(0);
+    expect(frame.assistant.height).toBeGreaterThan(0);
+    const gap = frame.assistant.y - (frame.notebook.y + frame.notebook.height);
+    expect(gap, `panel gap on opening frame ${index + 1}`).toBeGreaterThan(0);
+  }
+  const { notebook: stackedAutomatic, assistant: assistantBefore } =
+    opening.at(-1)!;
   const stackedSize = await openNotebookSize(notebook);
   await stackedSize.width.focus();
   await page.keyboard.press("Home");
@@ -1089,12 +1131,13 @@ test("Notebook size responds to keyboard and pointer controls without moving the
     Number(await stackedSize.width.inputValue()),
     Number(await stackedSize.height.inputValue()),
   );
-  const resized = (await notebook.boundingBox())!;
+  const { notebook: resized, assistant: assistantAfter } =
+    await panels.evaluate((panels) => panels.measure());
+  await panels.dispose();
   expect(resized.x).toBeGreaterThanOrEqual(0);
   expect(resized.y).toBeGreaterThanOrEqual(0);
   expect(resized.x + resized.width).toBeLessThanOrEqual(1440);
-  expect(resized.y + resized.height).toBeLessThan(assistantBefore.y);
-  const assistantAfter = (await assistant.boundingBox())!;
+  expect(resized.y + resized.height).toBeLessThan(assistantAfter.y);
   for (const coordinate of ["x", "y", "width", "height"] as const)
     expect(
       Math.abs(assistantAfter[coordinate] - assistantBefore[coordinate]),

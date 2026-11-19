@@ -9,12 +9,10 @@ Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) own
 
 ## Issue status on 19 November 2026
 
-Of the 32 numbered tasks, 27 have met their recorded acceptance checks.
-Five remain open.
+Of the 32 numbered tasks, 28 have met their recorded acceptance checks.
+Four remain open.
 
-- **Next engineering task.** [Task 31](#31-keep-the-panels-separate-while-teaching-assistant-opens) needs a browser regression that measures Notebook and Teaching assistant in the same frame as the assistant opens and after resizing.
-  The reduced-motion fix is deployed.
-- **Next layout issue.** [Task 32](#32-reconcile-the-compact-homepage-header-with-its-layout-check) needs a decision about the compact homepage header.
+- **Next engineering task.** [Task 32](#32-reconcile-the-compact-homepage-header-with-its-layout-check) needs a decision about the compact homepage header.
   At 390 pixels wide, Account wraps onto a third row and the header exceeds the test's height limit.
 - **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
   The current long-output checks pass.
@@ -674,16 +672,19 @@ The original failures and passing results are under `.local/reviews/task-support
 
 ## 31. Keep the panels separate while Teaching assistant opens
 
-**Status: reduced-motion fix deployed in `10648ad`.
-Same-frame browser regression still open.** With reduced motion enabled in Chromium at 1440 × 1000 on `0c8b5d3`, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
+**Status: fix deployed in `10648ad`, with regression coverage and live verification on 19 November 2026.** With reduced motion enabled in Chromium at 1440 × 1000 on `0c8b5d3`, the first frame after opening Teaching assistant over an open Notebook showed 112 pixels of overlap.
 By the next frame the panels had a 16-pixel gap.
-The Notebook sizing test sometimes records the assistant's top during that transition and compares it with the Notebook's bottom after resizing.
-In the failing run those positions came from different frames.
-In the local check of the shared reduced-motion fix, simultaneous measurements in Chromium and WebKit showed a 16-pixel gap from opening through the first five frames and a 104-pixel gap after resizing.
-The assistant stayed in place.
-The existing sizing journey passed twice in each browser.
-Its assertion still compares positions sampled at different times.
+The original sizing test compared the assistant's top during opening with the Notebook's bottom after resizing, so it could miss that overlap.
 The original failure is under `.local/reviews/new-note-context-2026-11-18/` and the same-frame checks are under `.local/reviews/setup-heading-2026-11-18/reduced-motion-sizing/`.
+
+The [Notebook sizing test](../tests/e2e/learning-workspace.spec.ts) now measures both visible panels together in each of the first five animation frames and again after keyboard resizing.
+It checks for a positive gap and verifies that resizing leaves the assistant in place.
+Restoring the original `0.01ms` transition duration in an isolated copy reliably reproduced 112 pixels of overlap in Chromium.
+The revised check failed on opening frame 1.
+WebKit passed with that declaration.
+With the deployed CSS, the revised test passed twice in each browser.
+Four independent production runs measured a 16-pixel opening gap and a 104-pixel gap after resizing, with the assistant in the same position throughout.
+The failing comparison and local and live results are under `.local/reviews/panel-separation-2026-11-19/`.
 
 ## 32. Reconcile the compact homepage header with its layout check
 
