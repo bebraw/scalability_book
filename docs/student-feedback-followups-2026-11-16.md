@@ -9,11 +9,10 @@ Its [setup guide](learning-companion-setup.md#start-a-course-coding-project) own
 
 ## Issue status on 19 November 2026
 
-Of the 34 numbered tasks, 29 have met their recorded acceptance checks.
-Five remain open.
+Of the 34 numbered tasks, 30 have met their recorded acceptance checks.
+Four remain open.
 
-- **Next engineering task.** [Task 33](#33-keep-homepage-card-links-inside-the-viewport) tracks the two homepage card links that extend beyond the right edge at 769 pixels.
-- **Chapter navigation.** [Task 34](#34-keep-the-selected-chapter-section-in-view-with-javascript-disabled) tracks an intermittent Chromium keyboard jump when JavaScript is disabled.
+- **Next engineering task.** [Task 34](#34-keep-the-selected-chapter-section-in-view-with-javascript-disabled) tracks an intermittent Chromium keyboard jump when JavaScript is disabled.
 - **Waiting for a reproducible report.** [Task 1](#1-keep-expanded-tool-output-inside-the-assistant-panel) needs the page and assistant output that produced the original 83-pixel overflow.
   The current long-output checks pass.
 - **Waiting for a learner walkthrough.** For [task 3](#3-make-tool-evidence-easier-to-find-and-interpret), observe whether a first-time reader can find the browser evidence and tell it apart from the assistant's interpretation.
@@ -692,7 +691,7 @@ Evidence is under `.local/reviews/deployment-3a0a7a5-panels/`.
 
 ## 32. Reconcile the compact homepage header with its layout check
 
-**Status: implemented and verified locally on 19 November 2026.** On `3a0a7a5` the homepage header measured 146.45 pixels at 390 × 844 in Chromium and WebKit.
+**Status: deployed and verified on 19 November 2026.** On `3a0a7a5` the homepage header measured 146.45 pixels at 390 × 844 in Chromium and WebKit.
 Account occupied a third row below the primary navigation.
 The Theme control already fit.
 The [compact header](development.md#compact-site-header) follows its keyboard order.
@@ -702,16 +701,19 @@ At 320 pixels the title gets its own line and all five public utility controls s
 Staff Tools can wrap onto another line.
 The [browser regression](../tests/e2e/theme-initialization.spec.ts) checks the 390-pixel height budget, brand readability, keyboard access, control placement and native theme selection.
 The comparison and interaction checks are under `.local/reviews/compact-homepage-header-2026-11-19/`.
+Published links and Cloudflare deployment passed for `c418eed`.
+Twelve live Chromium and WebKit checks confirmed the public header dimensions, control access and keyboard order.
+The live results are under `.local/reviews/deployment-c418eed-compact-header/`.
 
 ## 33. Keep homepage card links inside the viewport
 
-**Status: open, reproduced while checking task 32.** At 769 pixels wide, Chromium and WebKit measured 26 pixels of horizontal page overflow on the homepage.
-The two project cards place **Start with measurement** and **Start the course project** beyond the right edge.
-The header fits.
-The overflow also occurs on `3a0a7a5`.
-The element bounds are recorded in `.local/reviews/compact-homepage-header-2026-11-19/baseline/overflow-769.json`.
-Check the [project card layout](../site/styles/layout.css) around the transition out of its single-column phone layout.
-Both links and their arrows should fit and remain usable without horizontal page scrolling.
+**Status: implemented and verified locally on 19 November 2026.** At 769 pixels wide, **Start with measurement** and **Start the course project** extended beyond the right edge of the homepage on `c418eed`.
+Chromium and WebKit measured 26 pixels of horizontal page overflow.
+At 820 pixels the page fit, but both links still crossed their card borders.
+The [project cards](development.md#homepage-project-cards) now let their heading and description columns shrink enough to keep the whole link, including the arrow, inside the card padding.
+The [browser regression](../tests/e2e/book-layout.spec.ts) checks each card on both sides of the 768-pixel layout change and at 820 pixels.
+It failed against the original build and passed against the revision in both browsers.
+Before-and-after screenshots, viewport measurements and activation checks are under `.local/reviews/homepage-card-overflow-2026-11-19/`.
 
 ## 34. Keep the selected chapter section in view with JavaScript disabled
 

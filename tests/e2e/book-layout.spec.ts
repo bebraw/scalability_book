@@ -11,6 +11,38 @@ test.describe("book reading layout", () => {
     );
   });
 
+  test("keeps homepage project links and their arrows inside each card", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    for (const width of [768, 769, 820]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const name of [
+        "Predict. Experiment. Explain.",
+        "One contract. Three fresh builds.",
+      ]) {
+        const card = page.getByRole("region", { name });
+        const link = card.getByRole("link");
+        const arrow = link.getByText("→", { exact: true });
+        await expect(arrow).toBeVisible();
+        const cardBox = (await card.boundingBox())!;
+        for (const target of [link, arrow]) {
+          const box = (await target.boundingBox())!;
+          expect(box.x, `${name} at ${width}px`).toBeGreaterThanOrEqual(
+            cardBox.x,
+          );
+          expect(
+            box.x + box.width,
+            `${name} at ${width}px`,
+          ).toBeLessThanOrEqual(cardBox.x + cardBox.width);
+        }
+      }
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+    }
+  });
+
   test("shows Git creation and update dates below the chapter title", async ({
     page,
   }) => {

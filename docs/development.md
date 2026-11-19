@@ -270,6 +270,12 @@ The next row groups Cockpit, Notebook, Teaching assistant, Account, Theme and an
 The controls can wrap and their labels stay visible.
 The compact homepage checks in [the theme browser suite](../tests/e2e/theme-initialization.spec.ts) cover the 390-pixel height budget, keyboard access and theme selection.
 
+### Homepage project cards
+
+The two [homepage cards](../site/layouts/siteIndex.html) stack the heading, description and link at widths up to 48rem.
+Above that width, the heading and description share the space left by the link so its label and arrow fit inside the card.
+Run `npx playwright test tests/e2e/book-layout.spec.ts --grep 'homepage project links'` to check both sides of the layout change.
+
 ### Theme initialization
 
 The shared layout runs [the inline theme bootstrap](../scripts/lib/theme-bootstrap.ts) before loading stylesheets.

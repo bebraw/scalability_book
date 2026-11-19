@@ -386,7 +386,7 @@
   box-shadow: var(--shadow);
   display: grid;
   gap: clamp(1rem, 3vw, 2.5rem);
-  grid-template-columns: minmax(14rem, 0.9fr) minmax(18rem, 1.35fr) auto;
+  grid-template-columns: 0.9fr 1.35fr auto;
   margin: 0 0 clamp(2.5rem, 6vw, 5rem);
   padding: clamp(1.1rem, 2.5vw, 1.75rem);
 }
