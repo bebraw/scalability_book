@@ -19,7 +19,7 @@ It uses npm and the Node version range in [package.json](package.json).
 | Formative exercises          | [shared/exercises.ts](shared/exercises.ts), [worker/learning.ts](worker/learning.ts)                                                             | Render versioned canonical questions and privately persist checked answers independently of course grades.              |
 | Concepts and agent resources | [scripts/lib/concept-export.ts](scripts/lib/concept-export.ts), [shared/explorations.ts](shared/explorations.ts)                                 | Publish authored concept connections, visuals, and optional activity resources for readers and external agents.         |
 | Public learning MCP          | [worker/public-mcp.ts](worker/public-mcp.ts), [shared/book-retrieval.ts](shared/book-retrieval.ts)                                               | Serve stateless public retrieval at `/mcp` through the Worker and local server, independently of private learner state. |
-| Private feedback MCP         | [worker/feedback-mcp.ts](worker/feedback-mcp.ts), [worker/index.ts](worker/index.ts)                                                             | Serve read-only editorial feedback from `COMMENTS_KV` through an optional owner credential.                             |
+| Private feedback MCP         | [worker/feedback-mcp.ts](worker/feedback-mcp.ts), [worker/index.ts](worker/index.ts)                                                             | Serve editorial feedback and optional issue resolution through an owner credential backed by `COMMENTS_KV`.             |
 | Self-study export            | [scripts/lib/study-build.ts](scripts/lib/study-build.ts), [study/](study/README.md)                                                              | Build pinned public learning bundles without hosting the authoring service.                                             |
 | Portable editions            | [scripts/build-pdf.ts](scripts/build-pdf.ts), [scripts/build-lecture-pdfs.ts](scripts/build-lecture-pdfs.ts)                                     | Generate reading and lecture PDFs from versioned content.                                                               |
 
@@ -211,6 +211,7 @@ There is no MCP conversation/session database or model invocation.
 
 The private feedback MCP at `/api/admin/feedback/mcp` checks the dedicated credential and current feedback-admin allowlist before opening the MCP transport.
 It reuses the Worker's feedback readers and returns an explicit projection of comment and reply fields.
+The MCP and dashboard write resolutions to per-issue keys in `COMMENTS_KV`, and local synchronization uses the same resolution format.
 [Feedback setup](docs/feedback-setup.md#private-feedback-mcp) defines access, tools, and provisioning.
 
 | Data                                    | Local storage                                     | Production storage                                       |

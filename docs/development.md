@@ -548,8 +548,8 @@ Students see only their own comments and admin replies to those comments.
 Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, reply to comments, resolve comments, hide comments that should not be shown back to students, and feature curated reader notes publicly.
 Admins can open `/admin/feedback/` (or choose `Review all` from a chapter's feedback controls) to search and filter feedback from across the whole book.
 
-The [private feedback MCP](feedback-setup.md#private-feedback-mcp) gives the configured book owner read-only access from Codex.
-Run `node --test tests/feedback-mcp.test.ts tests/public-mcp.test.ts` to check private authorization, issue retrieval, and the independent public endpoint with synthetic records.
+The [private feedback MCP](feedback-setup.md#private-feedback-mcp) gives the configured book owner access from Codex, with issue resolution enabled explicitly on the credential.
+Run `node --test tests/feedback-mcp.test.ts tests/public-mcp.test.ts` to check private authorization, issue retrieval and resolution, and the independent public endpoint with synthetic records.
 
 Local editing stores feedback data in `.local/comments.json`.
 To review production feedback locally, pull from Cloudflare KV first:

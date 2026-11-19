@@ -3,6 +3,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  applyFeedbackResolutions,
+  feedbackResolutionKey,
+  feedbackResolutionMetadata,
+  feedbackResolutionPrefix,
+} from "../shared/feedback-resolution.ts";
 
 const execFileAsync = promisify(execFile);
 const root = process.cwd();
@@ -59,12 +65,28 @@ async function pushModerationState() {
         continue;
       }
 
+      const resolution = feedbackResolutionMetadata(localComment);
+      if (
+        resolution &&
+        (!remoteComment.resolvedAt ||
+          Date.parse(resolution.resolvedAt) >
+            Date.parse(remoteComment.resolvedAt))
+      ) {
+        await wrangler([
+          "kv",
+          "key",
+          "put",
+          feedbackResolutionKey(chapter, remoteComment.id),
+          "1",
+          "--metadata",
+          JSON.stringify(resolution),
+        ]);
+        updated++;
+      }
+
       const fields = [
         "type",
         "anonymous",
-        "resolvedAt",
-        "resolvedBy",
-        "resolutionReason",
         "category",
         "hiddenAt",
         "hiddenBy",
@@ -99,7 +121,15 @@ async function pushModerationState() {
 }
 
 async function readRemoteComments() {
-  const keys = await listRemoteKeys();
+  const [keys, resolutionKeys] = await Promise.all([
+    listRemoteKeys("comments:"),
+    listRemoteKeys(feedbackResolutionPrefix),
+  ]);
+  const resolutions = new Map();
+  for (const key of resolutionKeys) {
+    const resolution = feedbackResolutionMetadata(key.metadata);
+    if (resolution) resolutions.set(key.name, resolution);
+  }
   const comments = {};
 
   for (const key of keys) {
@@ -108,15 +138,19 @@ async function readRemoteComments() {
     const chapterComments = JSON.parse(value || "[]");
 
     if (Array.isArray(chapterComments)) {
-      comments[chapter] = chapterComments;
+      comments[chapter] = applyFeedbackResolutions(
+        chapterComments,
+        chapter,
+        resolutions,
+      );
     }
   }
 
   return comments;
 }
 
-async function listRemoteKeys() {
-  const output = await wrangler(["kv", "key", "list", "--prefix", "comments:"]);
+async function listRemoteKeys(prefix) {
+  const output = await wrangler(["kv", "key", "list", "--prefix", prefix]);
   const keys = JSON.parse(output || "[]");
 
   return Array.isArray(keys) ? keys : [];

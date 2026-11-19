@@ -60,8 +60,9 @@ const fixture = {
   ],
 };
 
-function workerFixture() {
+function workerFixture(resolve = false) {
   const storageCalls: string[] = [];
+  const resolutions = new Map<string, object>();
   const env = {
     ASSETS: {
       fetch: async () => {
@@ -73,6 +74,7 @@ function workerFixture() {
     FEEDBACK_MCP_CREDENTIAL: JSON.stringify({
       login: "Fixture-Owner",
       sha256: createHash("sha256").update(token).digest("hex"),
+      ...(resolve ? { resolve } : {}),
     }),
     COMMENTS_KV: {
       async get(key: string) {
@@ -82,6 +84,17 @@ function workerFixture() {
         );
       },
       async list(options?: { prefix?: string; cursor?: string }) {
+        if (options?.prefix?.startsWith("feedback-resolution:")) {
+          const prefix = options.prefix;
+          storageCalls.push(prefix);
+          return {
+            keys: Array.from(resolutions, ([name, metadata]) => ({
+              name,
+              metadata,
+            })).filter(({ name }) => name.startsWith(prefix)),
+            list_complete: true as const,
+          };
+        }
         assert.equal(options?.prefix, "comments:");
         storageCalls.push("list");
         return options?.cursor
@@ -95,16 +108,23 @@ function workerFixture() {
               cursor: "next",
             };
       },
-      async put() {
-        assert.fail("The feedback MCP must never write to KV");
+      async put(key: string, _value: string, options?: { metadata?: object }) {
+        assert.ok(resolve, "Read-only fixture must never write to KV");
+        assert.match(
+          key,
+          /^feedback-resolution:/,
+          "A resolution must not rewrite a chapter's comments",
+        );
+        assert.ok(options?.metadata);
+        storageCalls.push(`put:${key}`);
+        resolutions.set(key, options.metadata);
       },
     },
   };
-  return { env, storageCalls };
+  return { env, storageCalls, resolutions };
 }
 
-test("feedback MCP denies all requests before reading KV unless the owner credential is valid", async () => {
-  const { env, storageCalls } = workerFixture();
+function adminCookie(env: { SESSION_SECRET: string }) {
   const payload = Buffer.from(
     JSON.stringify({
       exp: Date.now() + 600_000,
@@ -114,7 +134,12 @@ test("feedback MCP denies all requests before reading KV unless the owner creden
   const signature = createHmac("sha256", env.SESSION_SECRET)
     .update(payload)
     .digest("base64url");
-  const cookie = `scalableweb_session=${payload}.${signature}`;
+  return `scalableweb_session=${payload}.${signature}`;
+}
+
+test("feedback MCP denies all requests before reading KV unless the owner credential is valid", async () => {
+  const { env, storageCalls } = workerFixture();
+  const cookie = adminCookie(env);
   const adminApi = new URL("/api/admin/comments", endpoint);
 
   const denied = [
@@ -212,6 +237,18 @@ for (const era of ["modern", "legacy"] as const) {
       ]);
       assert.ok(tools.every(({ annotations }) => annotations?.readOnlyHint));
       assert.deepEqual(storageCalls, []);
+      await assert.rejects(
+        client.callTool({
+          name: "resolve_feedback",
+          arguments: {
+            chapter: knownChapter,
+            id: "open-issue",
+            reason: "fixed",
+          },
+        }),
+        /Tool resolve_feedback not found/,
+      );
+      assert.deepEqual(storageCalls, []);
 
       const call = async (name: string, args: Record<string, unknown>) => {
         const result = await client.callTool({ name, arguments: args });
@@ -264,7 +301,10 @@ for (const era of ["modern", "legacy"] as const) {
         createdAt: timestamp,
       });
       assert.equal(issue.nextReplyOffset, 10);
-      assert.deepEqual(storageCalls, [`comments:${knownChapter}`]);
+      assert.deepEqual(storageCalls, [
+        `comments:${knownChapter}`,
+        `feedback-resolution:${knownChapter}:`,
+      ]);
       const remaining = await call("get_feedback", {
         ...input,
         replyOffset: 10,
@@ -284,3 +324,79 @@ for (const era of ["modern", "legacy"] as const) {
     }
   });
 }
+
+test("the owner can resolve individual issues without changing chapter comments or previous resolutions", async () => {
+  const { env, resolutions, storageCalls } = workerFixture(true);
+  const client = new Client({ name: "resolve-test", version: "1" });
+  await client.connect(
+    new StreamableHTTPClientTransport(endpoint, {
+      requestInit: { headers: { authorization } },
+      fetch: (input, init) => worker.fetch(new Request(input, init), env),
+    }),
+    { prior: { kind: "legacy" } },
+  );
+  try {
+    const tools = (await client.listTools()).tools;
+    assert.equal(
+      tools.find(({ name }) => name === "resolve_feedback")?.annotations
+        ?.readOnlyHint,
+      false,
+    );
+    const close = (id: string, reason: string, chapter = knownChapter) =>
+      client.callTool({
+        name: "resolve_feedback",
+        arguments: { chapter, id, reason },
+      });
+    assert.equal((await close("open-issue", "invented")).isError, true);
+    assert.equal(
+      (await close("open-issue", "fixed", "retired-chapter")).isError,
+      true,
+    );
+    assert.equal((await close("hidden-issue", "fixed")).isError, true);
+    assert.equal(resolutions.size, 0);
+
+    const [fixed, answered] = await Promise.all([
+      close("open-issue", "fixed"),
+      close("open-older", "answered"),
+    ]);
+    assert.equal(fixed.isError, undefined);
+    assert.equal(answered.isError, undefined);
+    assert.doesNotMatch(
+      JSON.stringify(fixed),
+      /Fixture-Owner|fixture-reader-login|resolvedBy/,
+    );
+    assert.equal(resolutions.size, 2);
+    const receipt = fixed.structuredContent?.issue as Record<string, unknown>;
+    assert.equal(receipt.status, "resolved");
+    assert.equal(receipt.resolutionReason, "fixed");
+    const retry = await close("open-issue", "planned");
+    assert.deepEqual(retry.structuredContent, fixed.structuredContent);
+    assert.equal(
+      storageCalls.filter((key) => key.startsWith("put:")).length,
+      2,
+    );
+
+    const overview = await worker.fetch(
+      new Request(new URL("/api/admin/comments", endpoint), {
+        headers: { cookie: adminCookie(env) },
+      }),
+      env,
+    );
+    assert.equal(overview.status, 200);
+    const { comments } = await overview.json();
+    const issue = comments.find(
+      ({ id }: { id: string }) => id === "open-issue",
+    );
+    assert.equal(issue.resolvedBy, "Fixture-Owner");
+    assert.equal(issue.resolutionReason, "fixed");
+    assert.equal(issue.body, openIssue.body);
+    assert.deepEqual(issue.replies, replies);
+    const open = await client.callTool({
+      name: "list_feedback",
+      arguments: { chapter: knownChapter },
+    });
+    assert.deepEqual(open.structuredContent, { issues: [], nextOffset: null });
+  } finally {
+    await client.close();
+  }
+});

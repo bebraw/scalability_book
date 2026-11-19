@@ -6,6 +6,15 @@ import { studyHeaders } from "../shared/study-headers.ts";
 import { agentResourceHeaders } from "../shared/agent-resource-headers.ts";
 import { handlePublicMcp } from "./public-mcp.ts";
 import { handleFeedbackMcp } from "./feedback-mcp.ts";
+import {
+  applyFeedbackResolutions,
+  feedbackResolutionKey,
+  feedbackResolutionMetadata,
+  feedbackResolutionPrefix,
+  isFeedbackResolutionReason,
+  type FeedbackResolution,
+  type FeedbackResolutionReason,
+} from "../shared/feedback-resolution.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { handleCourses } from "./courses.ts";
 import { courseSessionUser, handleCourseAuth } from "./course-auth.ts";
@@ -25,7 +34,10 @@ import {
 type Fetcher = {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
 };
-type KVNamespaceListKey<Key extends string = string> = { name: Key };
+type KVNamespaceListKey<Key extends string = string> = {
+  name: Key;
+  metadata?: unknown;
+};
 type KVNamespaceListResult<Key extends string = string> =
   | {
       keys: KVNamespaceListKey<Key>[];
@@ -50,7 +62,7 @@ type KVNamespace<Key extends string = string> = {
   put(
     key: Key,
     value: string,
-    options?: { expirationTtl?: number },
+    options?: { expirationTtl?: number; metadata?: object },
   ): Promise<void>;
 };
 
@@ -90,13 +102,6 @@ const feedbackCategories = new Set([
   "broken-link-code",
   "stuck",
   "reflection",
-]);
-const resolutionReasons = new Set([
-  "fixed",
-  "answered",
-  "duplicate",
-  "not-actionable",
-  "planned",
 ]);
 const feedbackRateLimitWindowSeconds = 10 * 60;
 const feedbackRateLimits = [
@@ -147,6 +152,16 @@ export default {
               readChapter: (chapter) => getChapterComments(env, chapter),
               readAll: () => getAllFeedbackComments(env, namespace),
               pageUrl: (chapter) => feedbackPageUrl(chapter, url.origin),
+              resolve: (chapter, id, reason, login) =>
+                resolveChapterFeedback(
+                  env,
+                  namespace,
+                  chapter,
+                  id,
+                  reason,
+                  login,
+                  "open-only",
+                ),
             }
           : null,
       );
@@ -780,27 +795,23 @@ async function handleResolveRequest(
   const id = decodeURIComponent(encodedId);
   const body = (await request.json().catch(() => ({}))) as { reason?: string };
 
-  if (!isValidResolutionReason(body.reason)) {
+  if (!isFeedbackResolutionReason(body?.reason)) {
     return json({ message: "Invalid resolution reason" }, { status: 400 });
   }
 
   const chapterKeys = await listCommentKeys(env.COMMENTS_KV);
 
   for (const key of chapterKeys) {
-    const chapter = key.name.replace(/^comments:/, "");
-    const comments = await getChapterComments(env, chapter);
-    const comment = comments.find((item) => item.id === id);
-
-    if (!comment) {
-      continue;
-    }
-
-    comment.resolvedAt = new Date().toISOString();
-    comment.resolvedBy = user.login;
-    comment.resolutionReason = body.reason;
-    await putChapterComments(env, chapter, comments);
-
-    return json(comment);
+    const chapter = key.name.slice("comments:".length);
+    const comment = await resolveChapterFeedback(
+      env,
+      env.COMMENTS_KV,
+      chapter,
+      id,
+      body.reason,
+      user.login,
+    );
+    if (comment) return json(comment);
   }
 
   return json({ message: "Unknown comment" }, { status: 404 });
@@ -981,20 +992,75 @@ async function handleUnfeatureRequest(
   return updated || json({ message: "Unknown comment" }, { status: 404 });
 }
 
-async function getChapterComments(env: Env, chapter: string) {
+async function getChapterComments(
+  env: Env,
+  chapter: string,
+  resolutions?: ReadonlyMap<string, FeedbackResolution>,
+) {
   const stored = await env.COMMENTS_KV?.get(`comments:${chapter}`, "json");
-
-  return Array.isArray(stored) ? dedupeActiveStuckMarkers(stored) : [];
+  if (!env.COMMENTS_KV || !Array.isArray(stored) || !stored.length) return [];
+  return dedupeActiveStuckMarkers(
+    applyFeedbackResolutions(
+      stored,
+      chapter,
+      resolutions ??
+        (await readFeedbackResolutions(
+          env.COMMENTS_KV,
+          `${feedbackResolutionPrefix}${chapter}:`,
+        )),
+    ),
+  );
 }
 
 async function getAllFeedbackComments(env: Env, namespace: KVNamespace) {
-  const chapterKeys = await listCommentKeys(namespace);
+  const [chapterKeys, resolutions] = await Promise.all([
+    listCommentKeys(namespace),
+    readFeedbackResolutions(namespace, feedbackResolutionPrefix),
+  ]);
   const commentsByChapter = await Promise.all(
     chapterKeys.map((key) =>
-      getChapterComments(env, key.name.slice("comments:".length)),
+      getChapterComments(env, key.name.slice("comments:".length), resolutions),
     ),
   );
   return commentsByChapter.flat();
+}
+
+async function readFeedbackResolutions(namespace: KVNamespace, prefix: string) {
+  const resolutions = new Map<string, FeedbackResolution>();
+  for (const key of await listCommentKeys(namespace, prefix)) {
+    const resolution = feedbackResolutionMetadata(key.metadata);
+    if (resolution) resolutions.set(key.name, resolution);
+  }
+  return resolutions;
+}
+
+async function resolveChapterFeedback(
+  env: Env,
+  namespace: KVNamespace,
+  chapter: string,
+  id: string,
+  reason: FeedbackResolutionReason,
+  login: string,
+  mode: "open-only" | "any" = "any",
+) {
+  const comments = await getChapterComments(env, chapter);
+  const comment = comments.find((item) => item.id === id);
+  if (
+    !comment ||
+    (mode === "open-only" && (comment.resolvedAt || comment.hiddenAt))
+  ) {
+    return comment ?? null;
+  }
+
+  const resolution: FeedbackResolution = {
+    resolvedAt: new Date().toISOString(),
+    resolvedBy: login,
+    resolutionReason: reason,
+  };
+  await namespace.put(feedbackResolutionKey(chapter, id), "1", {
+    metadata: resolution,
+  });
+  return { ...comment, ...resolution };
 }
 
 function feedbackPageUrl(chapter: string, origin: string) {
@@ -1058,13 +1124,13 @@ async function mutateComment(
   return null;
 }
 
-async function listCommentKeys(namespace: KVNamespace) {
+async function listCommentKeys(namespace: KVNamespace, prefix = "comments:") {
   const keys: KVNamespaceListKey[] = [];
   let cursor: string | undefined;
 
   do {
     const page = await namespace.list({
-      prefix: "comments:",
+      prefix,
       ...(cursor ? { cursor } : {}),
     });
     keys.push(...page.keys);
@@ -1287,10 +1353,6 @@ function isValidParagraphId(value: unknown): value is string {
 
 function isValidFeedbackCategory(value: unknown): value is string {
   return typeof value === "string" && feedbackCategories.has(value);
-}
-
-function isValidResolutionReason(value: unknown): value is string {
-  return typeof value === "string" && resolutionReasons.has(value);
 }
 
 function getCookie(request: Request, name: string) {

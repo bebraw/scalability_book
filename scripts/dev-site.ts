@@ -11,6 +11,7 @@ import { handlePublicMcp } from "../worker/public-mcp.ts";
 import { siteAccount } from "../shared/site-account.ts";
 import { studyHeaders } from "../shared/study-headers.ts";
 import { agentResourceHeaders } from "../shared/agent-resource-headers.ts";
+import { isFeedbackResolutionReason } from "../shared/feedback-resolution.ts";
 import { localCourseStores } from "./lib/local-courses.ts";
 import { localCourseSimulation } from "./lib/local-course-simulation.ts";
 import {
@@ -66,13 +67,6 @@ const feedbackCategories = new Set([
   "broken-link-code",
   "stuck",
   "reflection",
-]);
-const resolutionReasons = new Set([
-  "fixed",
-  "answered",
-  "duplicate",
-  "not-actionable",
-  "planned",
 ]);
 
 let chapters = await loadChapters();
@@ -536,7 +530,7 @@ async function handleResolveRequest(request, response, encodedId) {
   const id = decodeURIComponent(encodedId);
   const body = await readJsonBody(request);
 
-  if (!resolutionReasons.has(body.reason)) {
+  if (!isFeedbackResolutionReason(body?.reason)) {
     return sendJson(response, { message: "Invalid resolution reason" }, 400);
   }
 

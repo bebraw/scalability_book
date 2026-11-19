@@ -113,6 +113,9 @@ Students use the deployed site:
 4. Choose a feedback category and post feedback.
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
+New resolutions are stored under `feedback-resolution:<chapter-slug>:<comment-id>` in the same namespace.
+The dashboard and MCP combine them with the chapter records and continue to read historical resolutions stored on the comment.
+Each new resolution writes only its own key, so it can run alongside replies, new comments, and resolutions of other issues.
 
 Students can see their own visible comments after posting and any admin replies to those comments.
 Other readers can see only curated Reader notes that feedback admins explicitly feature for public display.
@@ -180,6 +183,7 @@ npm run comments:push -- --namespace-id <comments-kv-namespace-id>
 
 This command only copies local moderation fields and admin replies to matching remote comments.
 It does not overwrite comment bodies and does not delete remote comments.
+It publishes local resolutions that are newer than the remote resolution, preserving changes already made through the dashboard or MCP after an earlier pull.
 
 To push local moderation state and then refresh `.local/comments.json` from KV:
 
@@ -195,7 +199,7 @@ export COMMENTS_KV_NAMESPACE_ID=<comments-kv-namespace-id>
 
 ## Private feedback MCP
 
-The Worker serves a read-only Streamable HTTP MCP endpoint at
+The Worker serves a Streamable HTTP MCP endpoint at
 `https://scalableweb.dev/api/admin/feedback/mcp` for editorial work in local Codex.
 It reads the live feedback store.
 `list_feedback` defaults to open issues and returns excerpts with stable IDs, chapter slugs, and links.
@@ -208,13 +212,18 @@ Older threads can refer to a passage that has since moved.
 The tool responses omit reader and moderator account fields.
 Comment and reply text can still contain identifying details supplied by their authors.
 Review any proposed book edits in the normal editorial workflow.
-Use [the feedback dashboard](https://scalableweb.dev/admin/feedback/) to record a resolution or send a reply.
+With resolution access enabled, `resolve_feedback` closes one open issue by `chapter` and `id`.
+Specify `fixed`, `answered`, `duplicate`, `not-actionable`, or `planned` as the reason.
+The issue moves to the dashboard's resolved archive.
+A retry on a resolved issue returns its existing resolution.
+Use [the feedback dashboard](https://scalableweb.dev/admin/feedback/) to reply, feature, or hide a comment.
 
 ### Enable access for the owner
 
-Set the optional Worker secret `FEEDBACK_MCP_CREDENTIAL` to a JSON object with two keys.
+Set the optional Worker secret `FEEDBACK_MCP_CREDENTIAL` to a JSON object.
 `login` is the single GitHub login authorized for this integration and must already be in `ADMIN_GITHUB_LOGINS`.
 `sha256` is the hexadecimal SHA-256 of a locally generated 32-byte base64url bearer token.
+`resolve` is optional and must be `true` to add resolution access.
 For example, in a private terminal, replacing `YOUR_GITHUB_LOGIN`:
 
 ```bash
@@ -239,8 +248,9 @@ The Worker denies access when the secret is absent or invalid or the configured 
 Rotate access by replacing the Worker secret and local token together.
 Deleting the Worker secret disables the endpoint.
 
-After deployment and setup, verify that an anonymous request receives `401` and an authenticated Codex client discovers exactly `list_feedback` and `get_feedback`.
+After deployment and setup, verify that an anonymous request receives `401` and an authenticated Codex client discovers `list_feedback` and `get_feedback`, plus `resolve_feedback` if enabled.
 Use the first tool to select an open issue and the second to verify its thread and passage link.
+Exercise resolution with a synthetic comment in a local Worker.
 
 ## 8. Troubleshooting
 
