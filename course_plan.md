@@ -114,6 +114,10 @@ Collect this assessment and the phase's lecture diary entries in one private ind
 During the course, the students are expected to maintain a learning diary that should contain an entry per lecture about what they learned.
 There will also be additional reading available related to each lecture besides the course book.
 Note that the entries don't have to be written but can also be provided in an audio or video format.
+In Lectures 1 and 9, students use five minutes of reflection time to decide what they would need to know before recommending a workspace cache.
+They record their own reasoning before consulting an agent or discussing it with others.
+Midway through the course, [Lecture 5](lecture_plan.md#5-development-friction) gives students a chance to reopen one of their own Establish predictions and use what they have since observed to decide what to try in Challenge.
+The [closing lecture](lecture_plan.md#9-compare-presentations-and-course-reflection) returns to the cache case and adds a new observation so students can explain which evidence changes or supports their recommendation.
 
 ## Grading
 

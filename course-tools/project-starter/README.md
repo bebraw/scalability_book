@@ -81,6 +81,7 @@ Work in `projects/01-establish`; open that directory as your coding-agent worksp
 
 This milestone is deliberately smaller than the complete product loop required by Establish.
 Next, implement the work-item lifecycle and its activity events, then the remaining common behavior and validation before collecting the required baseline measurements.
+When you reach the workspace summary, try [clarifying a shift lead’s request](https://scalableweb.dev/chapters/scalable-development/#clarify-a-handover-request) before writing the agent brief.
 
 ## Where work belongs
 

@@ -443,6 +443,23 @@ Use the common evidence bundle to show:
 
 These are checkpoints within the [existing submission bundle](/project/#9-common-submission-bundle-and-comparable-evidence), not additional standalone deliverables.
 
+### Clarify a handover request
+
+Try this when designing your workspace summary in Establish.
+A shift lead asks, “At handover, how much work is left?”
+The workspace has two items waiting to start and one in progress.
+Before consulting the agent, ask a teammate playing the shift lead what decision the number will help them make.
+Which items should count for that decision?
+
+If your summary counts events by type, ask which handover question those totals could answer.
+Include an item that has both started and finished so the count of starts differs from the number of items still in progress.
+Put the agreed example and expected answer in your project specification, then use them to brief the agent.
+
+Once the summary runs, give a teammate the handover question and let them answer from the screen without coaching.
+Ask what they would do next.
+If their reading differs from what the shift lead intended, decide whether the label, the calculation or your assumption needs to change.
+If you work solo, record your question and provisional assumption before briefing the agent, then ask the instructor to try the summary during your scheduled phase discussion.
+
 ## Summary
 
 The development loop turns a requested outcome into a checked, maintainable change.

@@ -54,19 +54,18 @@ Provide one supported deployment recipe and check that the guidance makes actual
 For students choosing the optional trace-import extension, start from the existing [portable fleet-trace example](../specifications/03_compare.md#optional-import-the-trace-into-c); consider a loader skeleton only if their experience shows it would help.
 Prioritize interpreting coordination evidence, applying formal models, testing a justified scaling response, and defending a decision within the required path.
 
-## 4. Add a paired first- and last-lecture diagnostic
+## 4. Pilot the paired first- and last-lecture diagnostic
 
-Keep the opening and closing word clouds as shared discussion artifacts.
-Add a short individual case in Lectures 1 and 9 that asks each student to:
+The [opening lecture](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability) and [closing lecture](../lecture_plan.md#9-compare-presentations-and-course-reflection) now include five minutes for an individual cache decision before discussion.
+The word clouds capture the group's vocabulary, and the diary entries show how each student reasons about the same decision over time.
 
-- form one bounded scalability claim;
-- identify the likely first limit;
-- choose the first useful signal;
-- propose a response and its trade-off; and
-- state what evidence would change the conclusion.
-
-Revisiting the same case would give students concrete material for final reflection and provide stronger evidence of changing reasoning than the word cloud alone.
-It does not require changing or displaying the official learning outcomes.
+When reviewing the diaries, compare the two answers to the original prompt first.
+What can the student now say about the measurement they would choose and why?
+Then read the response to the handover observation.
+Look for a connection between the shift lead's decision, the measurement the student proposes and the result that would change their advice.
+Keeping the cache and removing it can both be defensible.
+Use a recurring gap to choose an example for the next run.
+This follows Albluwi and colleagues' distinction between judgments students demonstrate independently and work they can carry out with an agent. [Computing Education When Writing Code Is No Longer the Challenge](https://doi.org/10.1145/3808702)
 
 ## 5. Protect instructor attention
 
@@ -91,4 +90,4 @@ Publish any completion or approved absence arrangements before the affected work
 
 Prioritize the evidence template, run-specific orientation, and access rehearsal because they support project work, presentations, and assessment together.
 Keep Compare support focused on the required analysis and deployment work; optional import scaffolding has lower priority.
-The paired diagnostic is a small addition that could improve evidence about learning.
+After Lecture 9, use the paired diary responses to decide whether the cache case needs revision.

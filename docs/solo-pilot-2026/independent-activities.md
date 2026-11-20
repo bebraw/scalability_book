@@ -65,6 +65,8 @@ Review and improve the relevant specification using the implementation and audit
 Read [Chapter 5](../../book/02_challenge/05_friction.md).
 Follow [Trace one web change from the browser to production](../../book/02_challenge/05_friction.md#trace-one-web-change-from-the-browser-to-production) and predict where the apparently small change creates waiting, review or rework.
 Compare this with your outgoing reference audit, separating setup time from change time and unfamiliarity from missing instructions.
+For your diary, you could reopen an Establish note or decision.
+What did you expect to slow you down then, and what will you keep or change in B given what you have since observed?
 Use [Record one evidenced bottleneck](../../book/02_challenge/05_friction.md#record-one-evidenced-bottleneck) to reuse the phase's friction finding and response: a checked improvement or a justified follow-up decision, distinguishing the observed result from a proposed next step.
 The actual reference audit follows the instructor's separately released protocol and time box.
 

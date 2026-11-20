@@ -15,6 +15,21 @@ What must the system continue to do?
 
 ---
 
+# Would you keep the cache?
+
+A team added a cache to its workspace summary.
+It now reuses a saved copy and the team reports that the page loads twice as fast.
+
+> What would you need to know before recommending that they keep the cache?
+
+Take five minutes on your own, before using an agent or discussing the case.
+In your private lecture diary, record your provisional recommendation, what you would measure first and why.
+Save this entry for Lecture 9.
+
+<!-- [Sources] lecture_plan.md -->
+
+---
+
 # Scalability is a relationship, not a size
 
 **Pressure changes**

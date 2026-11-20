@@ -114,6 +114,34 @@ The decision should name who owns its operational and correction obligations.
 
 ---
 
+# Would you keep the cache?
+
+A team added a cache to its workspace summary.
+It now reuses a saved copy and the team reports that the page loads twice as fast.
+
+> What would you need to know before recommending that they keep the cache?
+
+Take two minutes on your own, before using an agent or rereading any earlier entry.
+In your private lecture diary, record your provisional recommendation, what you would measure first and why.
+
+<!-- [Sources] lecture_plan.md -->
+
+---
+
+# What changes at handover?
+
+During shift handover, completed items sometimes still appear as active in the summary.
+
+Would you keep the cache?
+What would you measure next, and how would the result affect your decision?
+
+Take three minutes to finish your diary response on your own.
+For discussion, compare with your Lecture 1 reasoning if you have it, or name one uncertainty the handover observation raised.
+
+<!-- [Sources] lecture_plan.md -->
+
+---
+
 # Finish with the next boundary
 
 Use four bundles in one evidence index:

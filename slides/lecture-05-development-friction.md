@@ -105,19 +105,18 @@ Rerun the same probe before claiming improvement.
 
 # Compare author intent with newcomer evidence
 
-The useful gap is not “who was right?”
+Reopen an earlier diary note, prediction or decision from Establish about how someone would set up, change or check your application.
 
-Compare:
+1. What did you expect them to do, and why?
+2. What did an auditor actually do or see?
+   If you're waiting for the audit, use one observation from your own check.
+3. Does your expectation still hold?
+   What will you keep, change or test in implementation B as a result?
 
-- the path authors expected;
-- the path the auditor discovered;
-- assumptions that remained undocumented;
-- duplicated or unnecessary work;
-- checks that did or did not establish acceptance.
+Use your private lecture diary for the response.
+You choose what to share in discussion.
 
-The repository should carry more of the explanation over time.
-
-<!-- [Sources] book/02_challenge/05_friction.md -->
+<!-- [Sources] lecture_plan.md; book/02_challenge/05_friction.md -->
 
 ---
 

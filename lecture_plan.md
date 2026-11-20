@@ -42,6 +42,17 @@ Schedule the bounded cross-team audit after each submission within the existing 
 
 ### 1. Course introduction and a common view of scalability
 
+Use five minutes of the opening reflection for an individual case, before the word cloud or group discussion.
+Use the same prompt for the announced remote equivalent.
+
+> A team added a cache to its workspace summary.
+> It now reuses a saved copy and the team reports that the page loads twice as fast.
+> What would you need to know before recommending that they keep the cache?
+
+Ask students to record their provisional recommendation, the first thing they would measure and why in their private lecture diary, using their usual written, audio or video format.
+Let them answer on their own before consulting an agent or comparing ideas.
+Keep this first response for Lecture 9.
+
 Possible elements:
 
 - introduce the course, related work, practical arrangements, and the three-project structure;
@@ -62,7 +73,7 @@ Possible elements:
 - collect teams' first impressions, surprises, problems, and questions from working with coding agents;
 - use these experiences to open the chapter's discussion of intent, constraints, validation, correction, ownership, and development throughput;
 - compare places where agents accelerated work with places where they moved effort into review or debugging;
-- demonstrate a bounded agent-supported development task live;
+- demonstrate a bounded agent-supported task live, such as [clarifying a handover request](https://scalableweb.dev/chapters/scalable-development/#clarify-a-handover-request) before briefing the agent;
 - discuss what evidence would be needed before accepting the demonstrated result;
 - connect the demonstration to the required reproducible harness, validation commands, and decision and AI-use records;
 - introduce the shared engineering-session protocol for use during Establish project work.
@@ -104,9 +115,15 @@ Finish with a concise introduction to Challenge, the expectations for a fresh im
 
 ### 5. Development friction
 
+Open the discussion by asking students to find one expectation they recorded during Establish in a diary entry or project decision.
+Ask them to recall why they thought so and set that expectation beside one thing they have since observed in their own work, an audit or another team's demonstration.
+For example, a student might have expected setup to slow a newcomer down, then watched a reviewer start the app in a minute and spend twenty finding where a work item is saved.
+In their usual diary entry, students explain how that observation supports or changes their expectation and what they will do or check in implementation B.
+If the evidence leaves the question open, identify the observation that would help settle it.
+Use the same prompt for remote reflection and invite students to share whichever example they choose in discussion.
+
 Possible elements:
 
-- capture how students currently understand development friction, for example through another word cloud;
 - discuss setup, comprehension, change, testing, review, deployment, operational, and coordination friction;
 - use experiences from Establish to distinguish protective friction from repeated work that adds little confidence;
 - trace one apparently small web change across browser, contract, validation, data, and deployment boundaries;
@@ -176,6 +193,19 @@ Ask teams to emphasize:
 - the first boundary or question they would investigate next.
 
 Use the presentations to recap the connections among application scalability, development scalability, architecture, measurement, pressure, formal models, and engineering judgment.
+
+Use five minutes of the closing reflection to revisit the Lecture 1 cache case individually.
+Give the same two prompts in order in the remote equivalent.
+
+1. Show the original case.
+   Give students two minutes to answer independently in their private lecture diary, with any earlier entry closed and before using an agent.
+   Ask for their provisional recommendation, first measurement and reason.
+2. Then reveal what staff saw during shift handover.
+   Completed items sometimes still appear as active in the summary.
+   Give students three minutes to explain whether they would keep the cache, what they would measure next and how the result would affect their decision.
+
+During the discussion, invite students to compare with their opening entry if they have it, or identify an uncertainty the handover observation raised.
+When reviewing the diaries, look for a connection between a user's decision, an observable effect and evidence that could change the student's recommendation.
 
 Repeat the opening scalability word cloud or another equivalent activity.
 Compare the two views and discuss:
