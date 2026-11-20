@@ -66,17 +66,19 @@ README, feature specification, architecture note, agent instructions, and execut
 
 ---
 
-# Validation should climb a ladder
+# Can a retry record the event twice?
 
-1. Static checks catch local representation errors.
-2. Unit and component checks protect bounded behavior.
-3. Integration checks exercise contracts and persistence.
-4. Browser journeys test user-visible outcomes.
-5. Operational evidence tests the running system under declared conditions.
+Read the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/).
+An agent says it prevents duplicates even after a worker restart.
 
-No single rung proves the whole application.
+1. On your own, predict the event count after the first call, a retry on the same worker and a retry after restart.
+   Which state survives?
+2. Ask the agent for a test of its claim.
+   Does the test restart the recorder, keep the event store and inspect the stored events?
+3. Correct the test if needed and run it.
+   What guarantee would you now state?
 
-<!-- [Sources] book/01_establish/02_scalable_development.md -->
+<!-- [Sources] book/01_establish/02_scalable_development.md; explorations/challenge-an-explanation.md -->
 
 ---
 

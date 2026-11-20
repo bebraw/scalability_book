@@ -76,10 +76,15 @@ Use those workflows in a rehearsal with the planned cohort size before launch, t
 
 - checking whether evidence-presence and link validation would save meaningful review time without automating judgment;
 - generating presentation cards from the common evidence template;
-- calibrating criterion-level feedback against fictional submissions; and
+- calibrating criterion-level feedback against fictional submissions, starting with the [Lecture 3 benchmark case](../lecture_plan.md#3-measurement-and-observability); and
 - reserving qualitative instructor feedback for the most consequential reasoning, evidence, or collaboration issue.
 
-The goal is to preserve formative assessment while preventing bookkeeping from displacing discussion and feedback.
+For the benchmark case, give instructors two fictional conclusions from the same data.
+One says that lowering p95 from 240 ms to 40 ms improved service.
+The other reports the drop in p95 for completed responses, notes that both runs met the user's deadline for 18 of 20 requests, and identifies the two timeouts in the second run.
+Have instructors compare the feedback they would give under the [scalability evidence and reasoning criterion](../specifications/grading.md#common-criteria-20-points).
+Which observation makes the second conclusion defensible?
+What would the first author need to check before claiming an improvement?
 
 The [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md) examines how published courses require individual work alongside shared project marks.
 The revised rubric requires two completed lecture activities and at least six self- and peer-assessment points per phase, including contribution credit, using already-assessed evidence.

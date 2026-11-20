@@ -107,23 +107,27 @@ They can omit workload mixes, client behavior, cache histories, data shapes, pro
 A result therefore supports a claim only for its declared conditions.
 Compare synthetic evidence with field telemetry where available, and revise the protocol when real behavior exposes a missing condition.
 
-:::details[Optional follow-up — Which requests counted?]
+::::details[Optional follow-up — Which requests counted?]
 
-In the fixed practice sample, 18 requests took 40 ms and two took 240 ms.
-A second run offers the same 20 requests: 18 finish in 40 ms and two reach a 300 ms timeout with no response.
-The dashboard calculates p95 from completed responses only.
-Using nearest rank, what p95 does it show for each run?
+The same 20 requests were offered in each of two benchmark runs.
+::label[which-requests-counted]
 
-The user cares about receiving a response in under 120 ms.
-Count how many of the 20 offered requests met that goal in each run.
-Would you report the second run as an improvement?
-Give the dashboard number and the user outcome side by side.
+In the first run, 18 requests finished in 40 ms and two finished in 240 ms.
+In the second run, 18 again finished in 40 ms, but the other two timed out at 300 ms without a response.
+The dashboard calculates p95 from completed responses only, using nearest rank.
+The user's goal is a response in under 120 ms.
+For each run, calculate the dashboard p95 and count how many of the 20 offered requests met the user's goal.
 
-**Check your reasoning:** In the first run, rank 19 of 20 is 240 ms.
-In the second, rank 18 of 18 is 40 ms.
-Both runs returned 18 of 20 responses within the target; the other two were late in the first run and never reached the client before timeout in the second.
-The lower reported p95 does not show that more users met their goal.
+An assistant summarizes these results as “The change improved service for users.”
+Would you publish that conclusion?
+Write one sentence the measurements support.
+
+:::details[Check your reasoning]
+In the first run, rank 19 of 20 completed responses is 240 ms.
+In the second, rank 18 of 18 completed responses is 40 ms.
+One possible report is “Among completed responses, p95 fell from 240 ms to 40 ms, but 18 of 20 requests met the 120 ms goal in each run and timeouts rose from zero to two.”
 :::
+::::
 
 ### Benchmark browser journeys with Playwright and Lighthouse
 
@@ -293,6 +297,26 @@ For an important target, record four things:
 Keep raw distributions and failed examples available instead of retaining only an aggregate score.
 Review the proxy when the workload, system, incentives, or development process changes.
 An effective metric is not permanently valid; it is a hypothesis that must survive contact with the behavior it influences.
+
+### Should the tracker rank contributors?
+
+A team lead asks the Work Activity Tracker to rank each person's contribution by counting the items they marked finished.
+In a fictional week, Ari marked three items finished and Kim marked one.
+Kim also reviewed all three of Ari's items and helped unblock them.
+Those reviews took place outside the tracker.
+What exactly would the ranking measure?
+What would you ask the lead before agreeing to build it?
+
+Suppose the lead explains, “I need to know where to offer help this afternoon.”
+Using the tracker’s item states and event timestamps, suggest a measure for that decision and one question the lead would still need to ask a person.
+
+:::details[One way to answer the lead]
+The counts tell us who marked each item finished.
+They leave Kim's review work invisible.
+For today's decision, list unfinished items by time since their last state change and ask the team about the oldest one.
+An item that has spent two days in progress might be blocked or might be going as planned.
+Its age tells the lead where to ask first.
+:::
 
 ### Field note — Slideotter
 

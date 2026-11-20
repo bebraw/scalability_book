@@ -74,7 +74,10 @@ Possible elements:
 - use these experiences to open the chapter's discussion of intent, constraints, validation, correction, ownership, and development throughput;
 - compare places where agents accelerated work with places where they moved effort into review or debugging;
 - demonstrate a bounded agent-supported task live, such as [clarifying a handover request](https://scalableweb.dev/chapters/scalable-development/#clarify-a-handover-request) before briefing the agent;
-- discuss what evidence would be needed before accepting the demonstrated result;
+- open the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/) for live review and let students predict the stored count after the first call, a retry on the same worker and a retry after restart;
+- ask the agent for a test of its restart claim.
+  Have students decide which state the test needs to preserve and which it needs to recreate before running it.
+  Use the sample test in the exercise if an agent is unavailable;
 - connect the demonstration to the required reproducible harness, validation commands, and decision and AI-use records;
 - introduce the shared engineering-session protocol for use during Establish project work.
 
@@ -86,7 +89,11 @@ It is more useful to expose observation, failure, correction, and validation tha
 Possible elements:
 
 - establish the practical vocabulary teams need for workloads, load, latency, throughput, errors, distributions, resource use, logs, metrics, and traces;
-- discuss two or three concrete measurement or observability cases;
+- show the two runs in [Which requests counted?](https://scalableweb.dev/chapters/benchmarking/#which-requests-counted) and let students check both the dashboard's p95 and the user's deadline.
+  Then give them the sample assistant conclusion and ask for one sentence they would publish;
+- discuss [a request to rank contributors by completed items](https://scalableweb.dev/chapters/benchmarking/#should-the-tracker-rank-contributors).
+  Ask what decision the lead needs to make and whose work the log leaves out.
+  If the aim is to offer help, ask which items students would inspect and whom they would talk to;
 - introduce Little's Law as a way to check whether measurements at one declared boundary are coherent;
 - use the book's [event-to-review question](https://scalableweb.dev/chapters/benchmarking/#exercise-measurement-transfer) for a brief individual calculation, then compare boundaries and assumptions in pairs;
 - demonstrate a benchmark, browser measurement, request trace, or observability workflow;

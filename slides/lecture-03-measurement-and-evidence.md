@@ -14,20 +14,19 @@ A number becomes evidence only after its question and boundary are clear.
 
 ---
 
-# Start with the decision the measurement supports
+# Should the tracker rank contributors?
 
-Define:
+A team lead asks the Work Activity Tracker to rank each person's contribution by counting the items they marked finished.
+In a fictional week, Ari marked three items finished and Kim marked one.
+Kim also reviewed and helped unblock all three of Ari's items outside the tracker.
 
-- the user or engineering question;
-- the system boundary;
-- the workload and environment;
-- the observable signal;
-- the comparison or threshold;
-- what the result cannot establish.
+What does the count establish?
+What would you ask the lead before agreeing to build the ranking?
 
-Collecting available metrics first often produces precise answers to the wrong question.
+If the lead wants to know where to offer help this afternoon, what could the item states and timestamps tell them?
+What would they still need to ask someone?
 
-<!-- [Sources] book/01_establish/03_benchmarking.md -->
+<!-- [Sources] book/01_establish/03_benchmarking.md#should-the-tracker-rank-contributors -->
 
 ---
 
@@ -46,20 +45,22 @@ Collecting available metrics first often produces precise answers to the wrong q
 
 ---
 
-# Distributions reveal what averages hide
+# Which requests counted?
 
-A mean latency can improve while the slowest accepted requests become worse.
+| Run | Outcomes for 20 offered requests               |
+| --- | ---------------------------------------------- |
+| A   | 18 responses in 40 ms, two responses in 240 ms |
+| B   | 18 responses in 40 ms, two timeouts at 300 ms  |
 
-Report:
+The dashboard uses nearest-rank p95 for completed responses.
+Users want a response in under 120 ms.
+Calculate p95 and count how many requests met the goal in each run.
 
-- the full set of repetitions;
-- median or another declared center;
-- tail values such as p95 or p99 when relevant;
-- fastest-to-slowest range;
-- errors and discarded runs;
-- the exact revision and environment.
+An assistant summarizes these results as “The change improved service for users.”
+Would you publish that conclusion?
+Write one sentence the measurements support.
 
-<!-- [Sources] book/01_establish/03_benchmarking.md -->
+<!-- [Sources] book/01_establish/03_benchmarking.md#which-requests-counted -->
 
 ---
 
