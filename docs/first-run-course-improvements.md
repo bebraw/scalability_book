@@ -85,6 +85,7 @@ The other reports the drop in p95 for completed responses, notes that both runs 
 Have instructors compare the feedback they would give under the [scalability evidence and reasoning criterion](../specifications/grading.md#common-criteria-20-points).
 Which observation makes the second conclusion defensible?
 What would the first author need to check before claiming an improvement?
+For a learner who chose benchmarking, the [return-visit prompts](learning-workspace-evaluation.md#return-visit-for-a-learner-who-chose-benchmarking) use the same assistant claim twice and change the outcomes of two requests.
 
 The [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md) examines how published courses require individual work alongside shared project marks.
 The revised rubric requires two completed lecture activities and at least six self- and peer-assessment points per phase, including contribution credit, using already-assessed evidence.

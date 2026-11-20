@@ -37,6 +37,38 @@ Ask each consenting learner to explain the related case individually, using thei
 Ask whether explaining, challenging and validating helped, whether a different private conclusion was easy to keep, and whether the prompts or summary preparation increased workload.
 Select useful material for an existing diary/portfolio entry instead of producing a separate trial report.
 
+### Return visit for a learner who chose benchmarking
+
+Use these prompts during the 5–10 minute return visit after a learner has tried [Chapter 3’s “Which requests counted?” exercise](../book/01_establish/03_benchmarking.md#simulated-benchmark-lab).
+Show one prompt at a time.
+Let the learner give a verdict and a reason for each before opening their notes or discussing either answer.
+
+**First prompt**
+
+> Each run received 20 requests.
+> The goal was a response in under 120 ms.
+> In run A, 18 requests finished in 40 ms and two finished in 240 ms.
+> In run B, 18 finished in 40 ms and two timed out at 300 ms.
+>
+> An assistant writes, “A higher share of requests met the 120 ms deadline in run B.”
+> Would you publish that sentence?
+> Which observation supports your verdict?
+
+**Second prompt**
+
+> Keep run A and the deadline the same.
+> In run B, the two requests that previously timed out also finish in 40 ms.
+>
+> An assistant writes, “A higher share of requests met the 120 ms deadline in run B.”
+> Would you publish that sentence?
+> Which observation supports your verdict?
+
+**Facilitator debrief.** In the first case, both runs met the deadline for 18 of 20 requests, so the claim of a higher share is false.
+In the second, run B met the deadline for 20 of 20 against run A’s 18 of 20, so the same sentence is accurate for these runs.
+Run B’s completed-response p95 is 40 ms in both versions.
+Ask which two outcomes account for the difference.
+Listen for whether the learner includes the timeouts among the 20 offered requests when judging the first case.
+
 ## Evidence to collect deliberately
 
 ### Finding and using the tools
