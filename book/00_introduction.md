@@ -2,98 +2,105 @@
 
 _Architecture, measurement, scaling pressure, and agentic workflows_
 
-[Scalability](/concepts/#scalability) describes the relationship between changing pressure and the behavior people expect a system to maintain.
-For a web application, that pressure may come from users, data, traffic, failures, geography, or new requirements.
-The response may involve architecture and infrastructure, but it can also change cost, complexity, ownership, and the speed at which the application can evolve.
+When you open your team's activity feed on Monday morning, you want to know what changed since Friday.
+You still want a quick, accurate answer when the feed holds a year of history.
+To keep it fast, a developer might cache the latest entries.
 
-This book therefore studies two connected systems.
-The first is the web application that receives requests, moves data, preserves authority, and produces browser-visible behavior.
-The second is the development system of people, agents, tools, instructions, tests, and review that changes the application.
-Scaling one while ignoring the limits of the other does not create a scalable project.
+Now suppose the team wants completed work to appear first.
+A developer can change the query and still leave readers looking at entries in the old order.
+The same cache that made the feed fast has made it harder to change.
 
-The central question is how application behavior and the development process can continue to meet their goals as pressure grows.
+This book studies [scalability](/concepts/#scalability) in two connected systems.
+The application has to keep serving its readers as the history grows.
+The people and agents who develop it need tools and practices that let them change a rule and check what readers see, even as the design grows more complex.
 
 > **Sustainability angle**
 >
-> Scalability also has an environmental dimension.
-> More traffic, more data, more retries, more logs, and more infrastructure all consume resources.
-> Throughout the book, you can ask whether a design scales efficiently, not only whether it scales at all.
+> Serving a quick, accurate feed takes computation, storage, and network traffic.
+> As demand grows, how much of each does it take to serve one useful result?
 
 ## Why this book now
 
-If I had written this book only a few years ago, it would have focused strictly on web technologies rather than development itself.
+If I had written this book a few years ago, I would have focused on web technologies.
 [Coding agents](/concepts/#agent) changed that.
-Developers can now delegate substantial parts of implementation, moving more of their attention toward specification, architecture, validation, and ownership.
-Agents are also becoming consumers of web applications through browsers, APIs, and tools.
-This step up in abstraction brings its own opportunities and challenges, and this book examines how web development changes when agents participate on both sides of the application boundary.
+An agent can implement a feature, leaving the developer to decide what it should do, where it belongs, and whether the result is fit to maintain.
+An agent can also be a user of that feature, reaching it through a browser, an API, or a tool.
 
-[Loop engineering](/concepts/#loop-engineering) is a central practice in that development system: designing how agent work starts, uses feedback and retained progress, stays within authority and resource limits, and stops or escalates.
-The book follows these choices from one agent's repair loop through fleet coordination and the evidence needed to accept a change.
+[Loop engineering](/concepts/#loop-engineering) starts with decisions you face even with one coding agent.
+When a check fails, you decide what feedback the agent receives, what it carries into its next attempt, and when it must stop for a person's decision.
+The same questions recur when several agents work on a change that someone must review and accept.
 
 While developing this book, I built projects whose complexity would previously have kept me from attempting them.
-The case studies examine several of them, including [Slideotter](/case-studies/slideotter/), [Kirjolab](/case-studies/kirjolab/), and [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/).
-Each taught me something different: generation can outpace product judgment, architecture can lag behind implementation, and deliberately narrow scope can turn the same capability into dependable software.
-Reading about other people's experience helps, but there is also value in making bounded mistakes of your own and forming your own judgment.
+With [Slideotter](/case-studies/slideotter/), I could generate and export slide decks before I knew which authoring workflow was worth pursuing.
+In [Kirjolab](/case-studies/kirjolab/), tests could tell me whether the editor worked.
+They gave me less help deciding where the next change belonged.
+With [Thesis Journey Tracker](/case-studies/thesis-journey-tracker/), I kept the scope small enough to put a tool to work in my own thesis supervision.
 
-While the book was developed to support a course I run at Aalto University, I have tried to keep the chapters independent so that you can use it as reference material.
-The course project complements the book and lets you experience different ways of developing web applications with agents.
+I wrote the chapters so you can consult them independently.
+In the course I run at Aalto University, the project gives you room to make mistakes on a small application and form your own judgment about working with agents.
 
-The book uses established vocabulary where possible.
-Terminology around coding agents and harnesses is still developing, and some labels describe this course's protocols or organizing framework.
-The [concept reference](/concepts/) gives working definitions, related sources, and “Usage in this book” notes where scope or terminology needs explanation.
+Terminology around coding agents and harnesses is still developing.
+The [concept reference](/concepts/) gives working definitions and sources.
+Its “Usage in this book” notes explain where a term has a particular meaning in the course.
 
 ## How this book was made
 
 I developed this book with GPT-5.5 and GPT-5.6 through the iterative human–agent workflow it studies.
-The collaboration let me explore more material and build interactive demonstrations; validation and curation remained my central editorial work.
-Type and browser checks helped validate the publishing system; I reviewed the argument, source interpretation, and rendered teaching material.
-This account reflects my experience rather than a controlled comparison of productivity or learning outcomes.
-The online edition remains a living book whose feedback tools support continuing review.
+The collaboration let me explore more material and build interactive demonstrations.
+I used type and browser checks to verify the publishing system.
+I reviewed the arguments, checked how the text used its sources, and read the material as it appeared on the page.
+Measuring the effect of that collaboration on productivity or student learning would take a separate study.
+Readers can use the online edition's feedback tools to flag passages that still need work.
 
 ## One application, three development systems
 
-The [course project](/project/introduction/) implements the same [Work Activity Tracker specification](/project/) three times.
-The required browser-visible behavior remains substantially stable while product interpretation, stack, rendering, storage, interfaces, and architecture remain open to justified choices.
+In the [course project](/project/introduction/), you build the same [Work Activity Tracker](/project/) three times.
+What users must be able to do through the browser stays much the same.
+You choose how to represent their work, where to store it, and how to serve it.
+Each phase starts with a fresh implementation.
 
-Each phase begins from a fresh implementation and changes the development setup deliberately:
-
-1. **Establish:** an approved large model in a single-agent workflow produces implementation A and its evidence baseline.
-2. **Challenge:** an approved small model in a single-agent workflow produces implementation B while the course exposes architectural assumptions and development friction.
-3. **Compare:** a declared fleet of small models, large models, or a mixture produces implementation C before all three applications and development workflows are compared.
+1. **Establish.** Build A with one agent using an approved large model.
+   Record how the application behaves and what it took to build.
+2. **Challenge.** Build B with one agent using an approved small model.
+   Test an architectural assumption from A and see which development practices carry over.
+3. **Compare.** Build C with a fleet and declare which models it uses.
+   Compare the three applications and the work it took to produce them.
 
 {{ import "site/includes/course-progression-figure.html" }}
 
-Large and small describe the relative model configurations assigned for the course.
-The [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) is the template for the model identities, size basis, access, and limits the instructor must publish before each phase.
-Use the completed assignment for your course run; “To be announced” is not a usable model configuration.
-Both may be hosted by the department; hosting location is separate from size.
-Neither hosting location nor model size establishes which workflow will perform better on the course tasks.
-The large-model first phase gives students a starting environment for learning the workflow; the small-model phase tests which practices transfer, and the fleet phase investigates coordination and model assignment.
-Whether those choices improve accepted quality, time, or cost remains a question for the evidence.
+“Large” and “small” are relative to the models assigned for your course.
+The department may host both.
+Before each phase, the instructor publishes the model identities, the basis for the size comparison, and the access arrangements and limits.
+Use the completed [environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) for your run.
+A fleet may use approved small models, large models, or a mixture.
+Whether coordination or model choice improves the quality of the accepted work, saves time, or reduces cost is something to investigate.
 
-The comparison is bounded rather than perfectly controlled.
-You enter each later phase with greater domain knowledge; implementations may make different design choices, and model or tool configurations can change.
-The shared specification, acceptance material, pressures, and reporting categories make those differences discussable without pretending that the course establishes a universal ranking.
+By the third build, you know things about the application that you had to discover during the first.
+If a change comes more easily this time, experience is one possible explanation.
+Your design, model, or tools may also have changed.
+The shared specification, acceptance checks, pressures, and reporting categories give you a way to examine which explanation fits the evidence you collected.
 
 ## How the argument develops
 
 ### [Establish — Build and measure a baseline](/parts/establish/)
 
-1. [What does scalability mean for web development?](/chapters/what-is-scalability/) defines scalability through maintained goals, pressures, constraints, and evidence.
-2. [How can coding agents support scalable development?](/chapters/scalable-development/) examines how intent, authority, validation, correction, and ownership shape agent-assisted work.
-3. [How can we measure web applications and development workflows?](/chapters/benchmarking/) creates comparable runtime and development evidence for implementation A.
+1. [What does scalability mean for web development?](/chapters/what-is-scalability/) Specify how quickly a growing feed must return the right entries and what evidence would convince you that it does.
+2. [How can coding agents support scalable development?](/chapters/scalable-development/) Follow an agent's change from the first instructions through review and correction.
+3. [How can we measure web applications and development workflows?](/chapters/benchmarking/) See how a load generator can hide the slowdown you set out to measure, and how counting completed tasks can mislead you about a development workflow.
 
 ### [Challenge — Expose architectural assumptions](/parts/challenge/)
 
-4. [How does web architecture shape scalability?](/chapters/architecture/) traces how responsibility moves across servers, cloud, edge, rendering, data, and caches.
-5. [How does development friction limit web projects?](/chapters/friction/) follows the cost of changing one web behavior across those boundaries.
-6. [Which web application assumptions fail under pressure?](/chapters/reality/) uses documented incidents and the course project to connect failed assumptions, signals, and recovery.
+4. [How does web architecture shape scalability?](/chapters/architecture/) Trace a request from the browser to the service that decides which data is current.
+5. [How does development friction limit web projects?](/chapters/friction/) Follow one optional category field from a browser form through storage, filtering, and deployment.
+6. [Which web application assumptions fail under pressure?](/chapters/reality/) Work through a lost response.
+   The user may be about to retry a write that already succeeded.
 
 ### [Compare — Evaluate workflows and scaling responses](/parts/compare/)
 
-7. [When do agent fleets improve web development?](/chapters/agent-fleets/) selects coordination structures for bounded work and makes integration and correction part of the workflow.
-8. [How should web applications respond to scaling pressure?](/chapters/scaling/) selects architectural responses from measured limits rather than from a technique catalog.
-9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) synthesizes a justified target architecture and development workflow from the three builds.
+7. [When do agent fleets improve web development?](/chapters/agent-fleets/) Split a feature among agents and check that their changes work together.
+8. [How should web applications respond to scaling pressure?](/chapters/scaling/) Find the first limit under load, try one response, and measure the cost it introduces.
+9. [What do three agent-assisted implementations teach us about web scalability?](/chapters/recap/) Use the three builds to choose an architecture and a way of working.
+   Identify the result that would make you reconsider.
 
 The main chapters provide the shortest path through the argument.
 Let your current task or question guide deeper exploration through the [concept graph](/concepts/) and [curated starting points](/explore/).

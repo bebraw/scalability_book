@@ -1,16 +1,17 @@
 # How can coding agents support scalable development?
 
-Coding agents increase the rate at which requirements become candidate implementations.
-Development scales when people can understand, validate, integrate, and maintain those changes as the project evolves.
+A coding agent can write a patch in less time than it takes a teammate to decide whether to merge it.
+How quickly the team can deliver changes depends on who can check the work, explain how it fits the application, and maintain it once it is accepted.
 
 ## What is an agent?
 
 In classical AI, an agent observes an environment, chooses an action, and uses its effects to decide what to do next.
 The model applies both to physical robots and to programs acting in information environments :citep[poole2023artificial].
 
-In this book, a **[coding agent](/concepts/#agent)** repeatedly observes a development environment and acts through tools to pursue a requested outcome.
-LLM practitioners vary in whether predefined workflows count as agents; this book uses the model-directed action loop as its working definition.
-Its Large Language Model (LLM) operates inside an **[agent harness](/concepts/#agent-harness)** that assembles context, exposes tools, carries state, invokes the model, and returns action results as feedback.
+Here, a **[coding agent](/concepts/#agent)** uses a large language model (LLM) to work toward a requested outcome in a development environment.
+The model chooses a tool action, observes the result, and decides what to do next.
+Some practitioners also include workflows in which the next action is predefined.
+The **[agent harness](/concepts/#agent-harness)** supplies context and tools, invokes the model, keeps the session state, and returns the results of each action to the model.
 Software-engineering agent research describes related perception, memory, and action modules around the LLM :citep[wang2025agentsse].
 
 :ref[table:coding-agent-anatomy]{text="The table below"} shows the parts a developer can tune.
@@ -27,10 +28,11 @@ Software-engineering agent research describes related perception, memory, and ac
 ::caption[Parts of a coding agent and the development choices that shape them.]
 ::label[table:coding-agent-anatomy]
 
-For an illustrative CSV-export task, you first specify which events and fields may leave the application and what a correct row contains.
-The model might request the serializer's source, propose an edit, and request a check.
-The agent harness executes those permitted file, edit, and command operations and returns their results.
-The repository supplies the check and its expected values, which you ground in the agreed export requirement.
+Suppose you ask an agent to add CSV export to the event tracker.
+You specify which events a reader may export and which fields belong in each row.
+The model might ask to read the serializer, edit it, and run the project's check.
+The harness carries out the permitted actions and reports the results.
+The check compares the exported fields with the values the project expects under the agreed format.
 
 If the check reports an extra field, preserve that failed result and revise the candidate against the agreed format.
 You still inspect the actual download and decide whether to accept the change.
@@ -58,10 +60,11 @@ Across these patterns, a requested outcome still has to become a checked change 
 
 ## Loop engineering
 
-**[Loop engineering](/concepts/#loop-engineering)** is the design of control structures that repeatedly direct agent work toward a declared goal, using observations, retained state, bounded actions and resources, and explicit acceptance, stopping, and escalation rules.
-A [feedback loop](/concepts/#feedback-loop) describes how effects influence subsequent behavior.
-An agent harness runs the model-and-tool cycle; a [project harness](/concepts/#harness) supplies maintained project knowledge and checks.
-Loop engineering connects these controls to decisions about starting work, continuing after an observation, retaining progress, and returning a result for acceptance.
+When the CSV check reports an extra field, should the agent repair the serializer, ask the owner to clarify the format, or stop because it has spent its retry budget?
+Designing the rules for how an agent starts, continues, and stops work on a goal is **[loop engineering](/concepts/#loop-engineering)**.
+The check closes a [feedback loop](/concepts/#feedback-loop) when its result guides the next action.
+The agent harness runs the model and its tools.
+The [project harness](/concepts/#harness) supplies the agreed format and the checks the agent can run against it.
 
 Osmani's practitioner account and IBM's industry explainer frame the practice around systems that direct agent work with less repeated human prompting :citep[osmani2026loop,belcic2026loop].
 An exploratory research preprint uses a narrower definition requiring scheduled or event-triggered recurring runs :citep[lulla2026loop].
@@ -74,14 +77,14 @@ The [research discussion in Appendix A](/appendices/evaluating-agentic-workflows
 
 ### Constrain, generate, validate, revise
 
-Agentic development follows a [repeated loop](/concepts/#feedback-loop): constrain the task, generate a candidate, validate it, and revise both the result and the project's durable knowledge.
-This is a corrective feedback loop: evidence of a deviation informs the next revision.
-Feedback can also reinforce a change, as when timeouts trigger retries that increase load and cause more timeouts; the [Scaling chapter](/chapters/scaling/#name-the-saturation-boundary) examines that case.
-Useful [throughput](/concepts/#throughput) is **accepted change**: work that someone can explain, validate against the intended behavior and architecture, integrate, and remain willing to own.
+The CSV example illustrates a corrective [feedback loop](/concepts/#feedback-loop).
+You set the export rules, the agent generates a candidate, and you use the check and the downloaded file to decide what needs revising.
+The lesson from a failed attempt can also change the guidance the next contributor finds in the repository.
+Feedback can amplify a problem too.
+In the [Scaling chapter](/chapters/scaling/#name-the-saturation-boundary), timeouts trigger retries that add load and cause further timeouts.
 
-For the event tracker, consider adding CSV export.
-The task must settle which events are included, which fields may leave the application, and how the exported values are checked.
-A working download button alone leaves those decisions unresolved.
+To measure the loop's [throughput](/concepts/#throughput), count **accepted changes** over a stated period.
+A change counts when someone can explain it, check it against the intended behavior and architecture, integrate it, and take responsibility for it.
 
 {{ import "site/includes/coding-loop-figure.html" }}
 
@@ -127,12 +130,13 @@ Two recent preprints distinguish tests that miss a defect from tests that preser
 In a coverage-guided regression-testing study, some generated tests passed an implementation with a seeded fault and failed the reference implementation: the assertion encoded the faulty behavior :citep[charoosaei2026regression].
 The study selected artificial faults that survived existing tests and rewarded generated tests for passing the faulty implementation; its results do not estimate how often production bugs are preserved by all test-generation methods.
 TestSuiteBench instead generated tests from detailed specifications and found valid tests that missed targeted defects, including a multiple-file requirement tested with only one file :citep[egashira2026testsuitebench].
-A test can therefore have a wrong expectation or an expectation that never distinguishes the defect.
-Inspect both what it asserts and which wrong behavior it rejects.
+A reviewer can ask two questions of either test.
+Where did the expected result come from?
+Which wrong implementation would the test reject?
 
-A reversible mutation can strengthen this relationship by checking that a test distinguishes the accepted implementation from one named fault.
-That contrast does not prove the mutant is realistic or the broader requirement is satisfied, but it is stronger than coverage alone.
-Tests must also tolerate correct changes.
+To investigate the second question, introduce a named fault you can reverse and see whether the test catches it.
+If the test catches the fault, you still have to judge how plausible that fault is and which other cases the requirement covers.
+A test should also tolerate correct changes.
 :citet[bromley2026tests] illustrates generated tests that copy implementation logic or accept either outcome; a complementary check is whether the same tests accept a behavior-preserving refactor.
 The concern-directed mutation lab lets you apply both checks to authorization, retry, or archived-state behavior: pass the baseline, fail the selected fault, and pass a variant that stores the events differently.
 Open `concern-directed-mutation/README.md` in the [course workspace](/downloads/labs/course-workspace.zip), or [study its source](https://github.com/bebraw/scalability_book/tree/main/labs/concern-directed-mutation).
@@ -183,10 +187,11 @@ title,location
 Build, measure, learn,Main hall
 ```
 
-It looks readable, but a CSV reader sees four fields in the data row instead of two.
-Quoting the title as `"Build, measure, learn"` addresses this case; it does not establish correct handling of quotation marks, line breaks, filtering or empty results.
-Write the expected fields before asking a model to repair the serializer, then check the downloaded bytes independently.
-An instruction to preserve those fields is a requirement, not evidence that the generated code satisfies it.
+Read the data row as a CSV parser would.
+Each comma in this unquoted row starts another field, so the parser finds four where you expected two.
+Quoting the title as `"Build, measure, learn"` keeps its commas inside the first field.
+Write down the two expected fields before asking the model to repair the serializer, then parse the downloaded file and compare the values.
+Quotation marks, line breaks, filtering, and empty results each need their own checks.
 
 For optional practice, download the [course workspace](/downloads/labs/course-workspace.zip) and open `csv-export/README.md`.
 Its working page supplies filtering and download handling; `TASK.md` scopes the missing serialization function and the supplied checks retain their own expected values.
@@ -280,9 +285,8 @@ Whichever workspace you use, each project implementation still needs its own [se
 
 ## The project harness
 
-The **[project harness](/concepts/#harness)** is the versioned material that lets humans and agents change a repository: instructions, specifications, architecture notes, setup, examples, and validation commands.
-Project harness is the book's working label for that bundle of repository guidance and executable development controls; harness terminology varies between sources.
-It supplies project knowledge to the agent harness introduced earlier.
+When a new contributor takes over the export task, where can they find the agreed format and the command that checks it?
+The **[project harness](/concepts/#harness)** is our term for the versioned instructions, specifications, architecture notes, setup, examples, and checks that answer questions like these for people and agents alike.
 
 | Term               | Scope                                   | What it includes                                                                                              | Governing question                                                |
 | ------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -293,7 +297,8 @@ It supplies project knowledge to the agent harness introduced earlier.
 ::caption[Three related control layers in agentic development.]
 ::label[table:agentic-development-control-layers]
 
-A useful project harness lets a new contributor clone the project, locate the relevant behavior, run the checks, and make a small change without oral rescue.
+Try the harness from a fresh checkout.
+Can a teammate find the exporter, run its checks, and make a small change using the instructions in the repository?
 The [common project specification](/project/#6-minimum-project-harness) defines the required artifacts.
 [vibe-template](https://github.com/bebraw/vibe-template) provides one example of keeping starter code, instructions, architecture rules, and validation together.
 The [Friction chapter](/chapters/friction/) develops fresh-checkout validation and the choice between focused and broader checks.

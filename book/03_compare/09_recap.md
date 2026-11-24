@@ -1,13 +1,16 @@
 # What do three agent-assisted implementations teach us about web scalability?
 
 [Scalability](/concepts/#scalability) is the ability to keep a system useful while its conditions change.
-The three implementations show how application behavior, the cost of change, and the development workflow constrain one another.
-Use their evidence to choose an architecture and workflow for a stated future scenario.
+The course project gives you three implementations of the same tracker to compare.
+Suppose one handled the most traffic, but its next change took the longest to get through review.
+Which would you choose if traffic doubled?
+Would your answer change if the team expected to revise the tracker's lifecycle rules every month?
+The decision asks you to connect what the application can handle with what it takes to change and operate it.
 
 ## One system, three connected loops
 
-A scaling response changes the application and becomes a development task.
-The development workflow determines whether people and agents can implement it safely; the resulting system creates the next set of observations.
+When the application reaches a limit, someone has to decide what to change.
+People and agents implement the change, check it, and measure how the revised application behaves under pressure.
 
 {{ import "site/includes/three-connected-loops-figure.html" }}
 
@@ -46,9 +49,10 @@ The response affects all three loops:
 ::caption[One scaling response interpreted through all three loops.]
 ::label[table:queue-three-loop-example]
 
-A faster request path may leave summaries waiting longer for updates and make the system harder to operate.
-Request completion and summary completion are separate observation boundaries; a pending summary does not make the required state change or activity event pending.
-Evaluate both the pressure relieved and the new obligations.
+Measure two times from the user's action.
+When did the client receive confirmation that the change had committed?
+When did the updated count appear in the summary?
+A queue can shorten the first wait while lengthening the second, and the team now has a worker to operate.
 
 > **Sustainability angle**
 >
@@ -57,10 +61,12 @@ Evaluate both the pressure relieved and the new obligations.
 
 ## Apply the map to the three implementations
 
-A establishes the large-model single-agent baseline, B rebuilds the same required behavior with a small-model single agent, and C introduces a declared agent fleet with approved model assignments.
-The common brief and protocol make their differences inspectable.
-They do not isolate every cause: the team learns between builds, and architectures, tools, hardware, optional scope, or reporting may differ.
-Record those differences when interpreting a result.
+The team builds A with one agent using a large model, then B with one agent using a small model.
+For C, it coordinates a fleet with approved model assignments.
+The common brief and protocol give you a basis for comparing the three.
+Along the way, the team learns more about the tracker.
+The architecture, tools, hardware, optional scope, or reporting may also change.
+Record which of those differences could explain the result you observed.
 
 ### Build the evidence matrix
 
@@ -81,10 +87,10 @@ Use the earlier phase records and the implementation, fleet, and scaling/deploym
 ::caption[Evidence matrix for synthesizing the three implementations through the three feedback loops.]
 ::label[table:final-evidence-matrix]
 
-Do not turn absent evidence into a favorable score.
-If a build was not load-tested, state that its saturation behavior is proposed rather than observed.
-If model usage was not captured, do not infer efficiency from elapsed time.
-If implementation C produced more branches but required more review and correction, count both the activity and the acceptance cost.
+Missing evidence narrows the claims you can make.
+For a build you never load-tested, mark the measurement as missing and explain what supports any prediction about saturation.
+If all you recorded was elapsed time, you can compare duration but model efficiency remains unknown.
+If implementation C produced more branches and took more review and correction, count both the activity and the cost of accepting it.
 
 ### Separate observation, inference, and proposal
 
@@ -123,9 +129,8 @@ A useful decision connects a constraint to evidence and an owner:
 > Reject **[alternative]** because **[cost or unsupported assumption]**.
 > **[Owner]** accepts the operational and correction obligations; revisit the choice when **[signal or pressure]** changes.
 
-In the queue example, faster HTTP acknowledgment alone would not justify the decision.
-The argument must also account for summary-update delay, recovery behavior, and the effort to maintain and review the new worker path.
-Use the same evidence to explain both the benefit and its price.
+In the queue example, a team could accept a short delay in the summary to keep writes responsive during a burst.
+To defend that choice, show how long a reader waited for the updated count, how the worker recovered from failure, and what it took to review and maintain the worker.
 
 The same reasoning applies to adopting an agent workflow.
 Better software outcomes can coexist with more review and maintenance work, fewer opportunities to learn, or less valued participation.
@@ -186,16 +191,14 @@ Link the other three bundles and earlier phase records, mark missing evidence an
 
 ## Author perspective — Learn where to look
 
-I do not expect you to become an expert in every topic covered here.
-I want the book to help you recognize which questions deserve attention and where to learn more.
-An agent can produce a plausible implementation quickly, but you still need to notice the product, architecture, accessibility, security, operational, and maintenance concerns it leaves unresolved.
+As in art, part of the skill is knowing where to look.
+An agent can quickly produce a tracker that appears to work.
+It still takes someone to ask whether a reader can use the form with a keyboard or who will recover a failed update.
+To judge the tracker's sustainability, I might start by asking what it recomputes on every request and who uses the result.
+I want the book to help you notice a question like that and recognize when you need someone else's expertise to answer it.
 
-Like in art, part of the skill is knowing where to look.
-Sustainability is easy to ignore if it is absent from your mental map.
-Recognizing it as a concern tells you when to ask a better question, gather evidence, or seek expertise.
-
-Developing this book has also exposed gaps in my understanding.
-Learning how to question claims, compare evidence, and revise a judgment is a skill I expect to keep practicing as tools and assumptions change.
+Writing this book has brought gaps in my own understanding to light.
+As the tools change, I expect to keep asking what evidence would lead me to change my mind.
 
 ## Summary
 

@@ -1,14 +1,17 @@
 # How can we measure web applications and development workflows?
 
-A page that feels fast on one developer's machine may behave differently under another workload, device, or network.
-Benchmarking makes that comparison explicit; [observability](/concepts/#observability) helps investigate the result.
-Both need checks that the measured property still represents the outcome people want.
+When someone clicks Create in the event tracker, should the timer stop when the server replies or when the new item appears in the activity view?
+A quick reply can still leave the person waiting to see their item.
+A benchmark lets you compare that wait across workloads, devices, or networks.
+[Observability](/concepts/#observability) helps you investigate what took the time.
 
 ## Benchmark to test a claim
 
 A **measurement** records a value for a property using a stated procedure.
 A **[benchmark](/concepts/#benchmark)** uses declared conditions to compare that property across workloads, systems, or revisions.
-Begin with the decision the comparison should support: for example, whether the event tracker still records events within an agreed [latency](/concepts/#latency) objective as concurrent demand increases.
+Start with a decision the result could change.
+If the tracker takes too long to record events when several people submit at once, the team may need to revise the write path.
+Agree on the [latency](/concepts/#latency) objective and the range of demand before testing that claim.
 
 Define the protocol before selecting a runner:
 
@@ -25,10 +28,12 @@ An agent can help draft a script, but the generated workload, metrics, threshold
 
 ### Check whether the generator hides overload
 
-A **closed-loop** worker waits for a result before issuing its next operation; an **open-loop** generator schedules arrivals independently of completions.
+A **closed-loop** worker waits for a result before issuing its next operation.
+An **open-loop** generator schedules arrivals independently of completions.
 Suppose four closed-loop workers immediately repeat requests with no think time or overhead.
-At 0.1 seconds per request they offer about 40 requests per second; at one second they offer only four.
-The same concurrency setting has reduced demand just when the application became slower.
+When each request takes 0.1 seconds, each worker sends ten per second, for a total of 40.
+When each request takes one second, the same four workers send only four per second between them.
+The slower the application responds, the less work the generator offers it.
 
 Picture the first second of two runs.
 Each starts with an empty service that can process four requests at once and takes one second per request.
@@ -139,10 +144,12 @@ Three related tools expose different parts of that work:
 - [Playwright](https://playwright.dev/) drives a real browser through a repeatable user journey and checks whether the expected behavior occurred.
 - [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/) audits a page in a controlled lab setup and reports performance metrics and diagnostics.
 
-These tools are complementary rather than interchangeable.
-A Playwright test can prove that filtering the event list produces the expected rows, but its elapsed test time is not a Web Vital.
-A Lighthouse navigation can diagnose initial page load, but it does not prove that the application's business flow works.
-Lighthouse user flows can audit interactions, although they require browser automation outside the page; a normal web page cannot grant itself the required browser-control privileges.
+A Playwright test can check that filtering the event list produces the expected rows.
+Its timer covers whatever steps the test runs.
+To report a Web Vital, collect it using that metric's measurement rules.
+A Lighthouse navigation audit can help explain a slow initial load.
+To audit later interactions, Lighthouse user flows require automation with browser-control privileges outside the page.
+If the question is when the reader can use a correctly filtered list, measure that interval and check the rows.
 
 #### Read two durations from one operation
 
@@ -160,14 +167,14 @@ These are illustrative values, not measured results or project targets.
 ::caption[Two timer boundaries within one authored work-item creation journey.]
 ::label[table:operation-timer-boundaries]
 
-A timer from request dispatch to response validation records `80 − 20 = 60 ms`; one from activation to the successful activity-view check records `160 − 0 = 160 ms`.
-The results agree because they measure different intervals.
-The extra 100 ms lies outside the first timer: 20 ms before dispatch and 80 ms after response validation.
-The checkpoints locate those intervals but do not identify the work responsible for them.
+From request dispatch to response validation, the operation took `80 − 20 = 60 ms`.
+From the click until the browser check found the new item and its event, it took `160 − 0 = 160 ms`.
+Of the extra 100 ms, 20 came before dispatch and 80 after validation.
+To explain what occupied either interval, you would need more detailed timing.
 
-If the question is how long until a created item appears in the activity view, the 60 ms result cannot answer it.
-The successful browser check supplies outcome evidence for this observation; neither duration alone establishes persistence or uniqueness.
-Repeat the declared workload, retain failed checks and report its duration distribution before generalizing beyond this single journey.
+For this journey, the browser found the expected item by 160 ms.
+Persistence and uniqueness would need separate checks.
+To see how much that wait varies under these conditions, repeat the workload, retain failed checks, and report the distribution of durations.
 
 #### Browser performance workbench
 
@@ -283,10 +290,6 @@ Consider a few examples:
 - Agent task pass rate can rise because tasks, judges, or outputs become tailored to the evaluation set rather than because the workflow handles new work better.
 - Commit count, generated lines, and closed tickets can all increase while review and maintenance costs grow elsewhere.
 
-Goodhart's law does not imply that targets or metrics are useless.
-It means that the measurement system changes once people or agents can adapt to it.
-A quality gate should therefore be treated as a partial model of the desired outcome, not as the outcome itself.
-
 For an important target, record four things:
 
 1. **Outcome:** What user or operational result is the metric intended to represent?
@@ -294,9 +297,8 @@ For an important target, record four things:
 3. **Gaming path:** How could the number improve without the outcome improving?
 4. **Counterevidence:** Which second signal, failure review, or qualitative check would expose that divergence?
 
-Keep raw distributions and failed examples available instead of retaining only an aggregate score.
-Review the proxy when the workload, system, incentives, or development process changes.
-An effective metric is not permanently valid; it is a hypothesis that must survive contact with the behavior it influences.
+Keep the raw distributions and failed examples so you can investigate a score that improves while users' experience gets worse.
+Revisit the proxy when the workload, system, incentives, or development process changes.
 
 ### Should the tracker rank contributors?
 
@@ -365,13 +367,16 @@ Keep the before/after comparison, functional checks and one limitation in your e
 
 ## Measurement alone cannot explain behavior
 
-A benchmark can reveal that the request distribution changed, but it does not necessarily explain why one request was slow.
-Telemetry provides evidence about a running system through signals such as traces, metrics, and logs.
-Observability is the broader capability to use that evidence to investigate system behavior, including failures you did not predict in advance.
+Suppose the slowest event submissions now take twice as long.
+Are those requests waiting for a database connection, or does the write itself take longer?
+The benchmark can reveal the slowdown.
+To tell those explanations apart, you need evidence about what happened inside the request.
+Traces, metrics, and logs are forms of telemetry.
+Observability is the ability to use such evidence to investigate a running system, including failures you did not predict.
 
 [OpenTelemetry](https://opentelemetry.io/docs/what-is-opentelemetry/) is a vendor-neutral framework for generating, processing, and exporting telemetry.
-It supplies APIs, SDKs, semantic conventions, and a Collector, but it is not itself a storage or visualization backend.
-That distinction matters: instrumenting an application creates evidence, while operating the pipeline and asking useful questions turns that evidence into an observability practice.
+Its APIs, SDKs, semantic conventions, and Collector help you produce and route that evidence.
+Storing and visualizing it are jobs for a backend.
 
 Before opening a trace, choose the first signal you would inspect for a slow request, stale summary or missing event.
 State which observation could distinguish competing explanations; the name of a signal alone does not establish a cause.

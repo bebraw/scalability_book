@@ -1,18 +1,15 @@
 # Which web application assumptions fail under pressure?
 
-A web application that works locally has shown that one implementation can satisfy one workload in one controlled environment.
-Production changes the environment: browser applications and integrations [retry](/concepts/#retry), networks delay or lose responses, live data accumulates, shared dependencies slow down, deployments change running systems, and operators have to recover without discarding [authoritative state](/concepts/#state-authority).
-
-Production failures expose architectural assumptions that do not hold under actual operating conditions.
-Reconstruct the failure chain, locate the earliest useful signal, and identify a path back to useful service.
+The browser times out just after the server records an event.
+Should it [retry](/concepts/#retry)?
+The user sees the same timeout whether the request or the reply went missing.
+To retry safely, the application has to account for what may already be in its [authoritative state](/concepts/#state-authority).
 
 ## Local correctness leaves production assumptions untested
 
-Production is not simply a larger version of a developer's laptop.
-It contains independently changing consumers, intermediaries, services, data stores, providers, and operational tools.
-A failure can cross several of these boundaries before a user sees an error.
-
-Consider five assumptions that local development can easily hide:
+In a local run, you may control the client, server, database, and workload all at once.
+In production, any one of them can change while the others keep running.
+Consider what can happen between a successful local test and the same operation in production.
 
 - **Consumer behavior:** a browser, integration, or agent may retry after an ambiguous timeout or reconnect in a synchronized burst.
 - **Network behavior:** a request can reach the authority even when its response never reaches the consumer.
@@ -20,8 +17,7 @@ Consider five assumptions that local development can easily hide:
 - **Data behavior:** replicas can lag, writes can conflict, queues can age, and a restored endpoint can still return stale or incomplete state.
 - **Operational behavior:** the dashboard, deployment system, credentials, status page, or rollback mechanism may depend on the service being repaired.
 
-These are architectural assumptions because they determine where authority, waiting, retries, and [recovery](/concepts/#recovery) live.
-Testing the happy path proves none of them.
+Trace one of these failures far enough to see what the user experiences, which component can detect it first, and what has to keep working for [recovery](/concepts/#recovery) to succeed.
 
 > **Sustainability angle**
 >
@@ -40,7 +36,8 @@ During the incident, I debugged the behavior with LLM assistance and found one f
 After the quota reset, traffic exposed a second path with the same problem, causing another period of downtime.
 
 We eventually removed the GitHub dependency because it had also become unstable for our needs.
-In retrospect, load testing should have revealed that site traffic was being amplified into API traffic, while monitoring should have warned us before the quota became an availability boundary.
+In retrospect, a load test comparing page requests with calls to GitHub could have shown us how quickly we would exhaust the quota.
+An alert on the remaining quota could have given us time to act.
 
 {{ import "site/includes/dependency-failure-figure.html" }}
 
@@ -73,10 +70,10 @@ Treat each reported number as evidence about that system and use the transfer qu
 Use one incident to identify the earliest point where a prepared control could have interrupted propagation.
 Then test that reasoning against a smaller event-tracker failure.
 
-A systematic study complements these company accounts.
 :citet[yuan2014failures] examined 198 severe, developer-confirmed failures in five distributed data systems, including 48 classified as catastrophic.
 Incorrect handling of explicitly signaled errors featured in 92% of that catastrophic subset.
-That is not a claim that unit tests prevent 92% of all outages: the study separately analyzes preventability, and its selected systems and issue reports limit generalization.
+The percentage describes error handling in those 48 selected reports.
+The authors examined separately which failures tests could have prevented.
 In the existing pressure probe, follow one dependency error through the handler, retry or fallback, durable state, and user-visible result.
 Checking that an error was detected establishes less than checking how the application recovered from it.
 
@@ -95,18 +92,21 @@ Consider a deliberately small event-tracker scenario:
 6. A cached activity view briefly shows neither event and later shows both.
 7. Request-success metrics look healthy even though one user intent produced duplicate durable state.
 
-No individual observation explains the whole failure.
-The timeout is a consumer symptom, the lost response is a network event, the retry is a policy, the duplicate is an authority failure, and the stale view is a derived-state delay.
-Useful evidence has to connect them through a stable command identifier, [request trace](/concepts/#observability), commit result, cache status, and user-visible outcome.
+The browser can tell you when it timed out.
+The store can tell you which writes committed.
+To connect those observations, you need to recognize two attempts at the same command.
+A stable command identifier lets you match each attempt's [request trace](/concepts/#observability) to its commit result.
+Cache status on the subsequent reads can explain why both events became visible together.
 
 [Idempotency](/concepts/#idempotency) is a property of the intended effect: repeating one logical operation must have the same effect at the declared boundary as performing it once.
 First name every outcome the application contract promises, then check whether repeating the operation preserves them together.
 An unchanged work-item status is insufficient when the same command also promises one activity event for that transition.
 The [retry exercise](#exercise-pressure-retries) asks you to inspect both; [Appendix C](/appendices/advanced-web-boundaries/#distinguish-http-method-semantics-from-domain-retry-safety) develops the specific HTTP method semantics.
 
-The corrective design is similarly cross-boundary.
-The consumer reuses one idempotency key, the authority stores the mutation and reusable result atomically, and the interface makes a pending or confirmed outcome visible.
-Retries may then recover from transport ambiguity without inventing a second domain action.
+Give each logical operation its own idempotency key and reuse that key on retry.
+Have the authority record the key, the mutation, and the result in one transaction.
+If the first reply is lost, the receiver can return the recorded result when the consumer tries again.
+Until the consumer gets confirmation, the interface can show the operation as pending.
 
 ## From failed assumptions to useful signals
 
@@ -135,23 +135,22 @@ This framing turns “Will it scale?” into four more useful questions:
 
 ## Connect failed assumptions to response patterns
 
-For the lost-response example, the response is an idempotent command: preserve one operation identity and return its recorded result on retry.
-The new obligation is atomic storage of the state change and reusable result.
-Other pressures call for different responses; [Chapter 8's response guide](/chapters/scaling/#start-with-the-pressure) connects them to the operating contracts they introduce.
-First check whether the measurements describe a coherent failure.
-
-The Little's Law relationship introduced in the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) can check one [queue](/concepts/#queue) or in-flight boundary.
+For a duplicate event, comparing the command identity and the committed effects can show where a retry went wrong.
+For a delay, first ask whether the amount of waiting is consistent with the work you see in the system.
+Use Little's Law from the [Benchmarking chapter](/chapters/benchmarking/#check-measurements-against-a-model) to check one [queue](/concepts/#queue) or one stage of in-flight work.
 If a stable event-processing stage contains an average of 120 waiting or active events and completes an average of 8 events per second, the implied average time in the stage is `W = L / λ = 120 / 8 = 15 seconds`.
-That calculation does not explain the delay, but it can expose incompatible measurements or show that a claimed user-visible completion time cannot fit the observed backlog and throughput.
+If a dashboard reports that the same events finished in two seconds on average, check where its timer starts.
+It may omit time spent waiting.
 If arrivals and completions are not approximately balanced during the observation window, record the system as changing or overloaded instead of forcing the averages into the law.
 
 For implementations A and B, select one queue, pool, request path, or other conserved-work boundary.
-State its boundary, estimate or measure average work in progress, completion rate, and average time in the system over one consistent window, then explain whether `L = λW` is approximately coherent and what the relationship leaves unexplained.
+Over the same observation window, estimate or measure average work in progress, completion rate, and average time inside that boundary.
+Explain whether the three averages fit `L = λW` and what the relationship leaves unexplained.
+[Chapter 8's response guide](/chapters/scaling/#start-with-the-pressure) connects the pressure you identify to the operating obligations of each response.
 
 ## Recovery is part of the architecture
 
-Recovery is not a generic command executed after diagnosis.
-The available response depends on what has already become externally visible or durably authoritative.
+Before choosing how to recover, find out what the system has already committed and what users have already seen.
 
 | Recovery mode         | What it protects                                        | Required preparation                                                                              | Main risk                                                                                  |
 | --------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -165,18 +164,16 @@ The available response depends on what has already become externally visible or 
 ::caption[Recovery modes and the preparation each requires before an incident.]
 ::label[table:web-recovery-modes]
 
-Two boundaries deserve particular attention.
-First, recovery tooling should not depend entirely on the component it is meant to repair.
-Second, **service restored** and **recovery complete** are different states.
-Traffic may succeed while replicas lag, caches remain stale, queues grow, notifications wait, and user-visible inconsistencies still require reconciliation.
+If the normal deployment tool depends on the service that just failed, how will the operator reach a known-good build?
+An operator can report **service restored** once requests succeed again, even while users see old data or wait for notifications.
+Before declaring **recovery complete**, check replica lag, cache freshness, queued work, and outstanding reconciliation.
 
 ### Follow a fix through affected deployments
 
-An accepted patch and a successful release report progress at different boundaries from verified remediation of affected deployments.
+A team can merge a fix, publish a release, and still have users running the affected version.
 The practitioner critique [Everybody's Lost Their Minds](https://www.netmeister.org/blog/everybodys-lost-their-minds.html) argues that getting affected systems updated can remain the limiting step even when vulnerability discovery and patch preparation become faster.
-Use that argument to ask where a fix waits in your own delivery path and who owns the remaining work.
-
-Where would a successful release leave repair work unfinished?
+Trace one fix from release to deployment.
+Where does it wait, who owns the update, and how can they tell which systems have received it?
 Give your agent the [remediation starting point](/explore/verify-remediation/agent.md), or [inspect the runtime inventory yourself](/explore/verify-remediation/).
 
 ### Investigate an incident evidence packet

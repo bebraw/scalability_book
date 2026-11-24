@@ -1,13 +1,15 @@
 # How does web architecture shape scalability?
 
-Web architecture connects consumers, representations, computation, and authoritative data across networks.
-Servers, cloud services, programmable edges, and browsers offer different places to put that work, with different latency, trust, cost, and failure consequences.
-Ask which pressure justifies moving a responsibility and which contract must remain stable when it moves.
+One user opens the Work Activity Tracker to read recent events.
+Another marks an item as started.
+A nearby cache might answer the first request.
+To confirm the second, the application must record what changed.
+Where can the application handle each request, and which promises to users must still hold if the work moves?
 
 ## A conceptual model: separate roles from locations
 
-A framework-shaped label such as “serverless application” or “single-page application” combines several decisions that can be examined separately.
-Begin with four architectural roles:
+Labels such as “serverless application” and “single-page application” describe only part of a request's path.
+For either request, identify :ref[table:web-architecture-roles]{text="four architectural roles"} before deciding where the work should run.
 
 | Role                                              | Question it answers                                      | Typical examples                                                       |
 | ------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -19,18 +21,18 @@ Begin with four architectural roles:
 ::caption[Four roles that remain useful as web deployment locations change.]
 ::label[table:web-architecture-roles]
 
-Roles are not machines.
-One machine may perform several roles, and one role may be distributed across many machines.
-An **origin server** serves the resource in an HTTP exchange, rather than forwarding the request as an intermediary; the role need not be one physical machine.
+One machine can perform several roles, and several machines can share a role.
+In an HTTP exchange, an intermediary can forward a request to the **origin server** that serves the requested resource.
+A cluster can perform the origin-server role.
 In web security and HTTP URI terminology, an **origin** is the normalized scheme, host, and port tuple, such as `https`, `example.org`, and `443` ([RFC 9110, section 4.3.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-4.3.1)).
 CDN discussions also use “origin” as shorthand for the upstream origin server or backend; this placement alone does not identify the authoritative data store.
 Likewise, an edge function may execute application logic without becoming the authority for the data it reads.
 
-Use the Work Activity Tracker to keep the model concrete.
-A `GET /events` request asks for a representation and may be answered from a browser [cache](/concepts/#cache), an edge cache, or the origin.
+In the tracker, `GET /events` asks for a representation.
+A browser [cache](/concepts/#cache), an edge cache, or the origin may supply it, depending on the freshness policy.
 A lifecycle request, such as `POST /work-items/item-42/transitions`, asks to change an item's state.
-Its success boundary must preserve the state change and matching activity event together; a derived summary may catch up later under a declared freshness policy.
-The two paths can share an interface while placing execution, copies, and authority differently.
+Before confirming success, the application must commit the state change and its matching activity event together.
+A derived summary may catch up later if its freshness policy allows it.
 
 ### Trace a request across its commit boundary
 
@@ -126,14 +128,15 @@ For the project, choose one minimal event-creation and event-query contract, the
 
 ### Organizational boundaries shape application contracts
 
-An application contract is also a communication contract between its owners.
-In his original 1968 paper, [Melvin Conway](https://www.melconway.com/Home/pdf/committees.pdf) observed that organizations tend to produce system structures shaped by their communication structures.
-For web architecture, this means that a shared API or data model can become the place where several teams must coordinate, while a nominally independent service can remain tightly coupled when every change still requires the same people to agree.
+In 1968, [Melvin Conway](https://www.melconway.com/Home/pdf/committees.pdf) observed that the structure of a system tends to reflect how the people designing it communicate.
+Consider two teams that deploy their services separately but share a data model.
+If one team wants to rename a field the other reads, the two have to agree on how to migrate.
 
-Do not create a service boundary merely to imitate an organizational chart.
-Instead, identify a capability with coherent authority and change reasons, give its owners enough control to evolve its internals, and keep the consumer contract small enough that other teams can depend on it without joining every implementation decision.
-When one workflow crosses several owners, record who may change the contract, how compatibility is checked, how consumers learn about deprecation or migration, and which decision requires cross-team agreement.
-The ownership card later in this chapter should therefore name both the code boundary and the communication boundary that maintains it.
+Choose a capability whose owners can make most changes themselves.
+Give consumers a small, explicit contract so they can tell which changes affect them.
+On the ownership card, name the code each team owns and the decisions they need to make together.
+Who may change the contract?
+How do they check compatibility, and how will consumers learn when they need to migrate?
 
 ## Rendering moves work across time and place
 
@@ -355,9 +358,9 @@ Use the table to compare architectures without treating any option as a universa
 ::caption[Architectural dimensions to examine when designing or comparing web applications.]
 ::label[table:web-architectural-dimensions]
 
-The rows interact.
-Moving rendering to the edge may require a cache-freshness policy; moving interaction to the browser may require a new API contract; moving compute into replaceable cloud instances may require state to leave process memory; and moving reads near users may lengthen the path to authoritative writes.
-Check that the consequences of those choices agree.
+Suppose the tracker serves its activity summary from an edge cache but still sends writes to a central database.
+After a user starts a work item, how long might the summary show the old state?
+The answer depends on the execution placement, the authoritative write path, and the cache's freshness policy together.
 
 ## Project artifact
 

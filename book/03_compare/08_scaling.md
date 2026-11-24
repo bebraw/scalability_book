@@ -1,11 +1,13 @@
 # How should web applications respond to scaling pressure?
 
-Scaling changes a system in response to a specific [pressure](/concepts/#pressure).
-Each response should relieve an identified limit while making its new costs and failure modes visible.
+Suppose a workspace feed takes longer to open as its history grows.
+From the browser, a request that spends a second waiting for a database connection can look just like one that spends a second running a query.
+Choosing a response to that [pressure](/concepts/#pressure) starts with finding out where the time went.
 
 ## Start with the pressure
 
-Use the primary-pressure and bounded correctness or recovery evidence from Challenge to select a response hypothesis.
+Return to the primary pressure you tested in Challenge and the correctness or recovery behavior you checked.
+Which limit did the workload expose, and what must still work after you change the system?
 :ref[table:scaling-response-patterns]{text="The table below"} connects common pressures to the contracts each response adds.
 
 | Pressure or failed assumption                               | Response pattern worth considering                                   | New obligation and evidence                                                                  |
@@ -38,9 +40,9 @@ New failure, freshness or recovery obligation:
 Result, uncertainty and reversal condition:
 ```
 
-For example, a slow workspace feed may justify testing an index that matches its filter and ordering.
-Inspect the query plan and repeat the declared workload; also check result ordering and the added write or storage cost.
-The existence of an index is not evidence of useful improvement.
+If the feed request spends its time in the query, inspect the query plan.
+An index that matches the feed's filter and ordering is one change you can test.
+Repeat the workload, check that the items still appear in the right order, and weigh any time saved on reads against the cost of writing and storing the index.
 
 Each accepted work-item creation or transition must preserve its state change and matching activity event together.
 Queueing may defer derived summaries after that commit; a faster acknowledgment must not conceal a pending core operation.
@@ -121,22 +123,11 @@ Fit its parameters to representative throughput measurements before using it for
 
 ## Three documented cases of web scaling pressure
 
-Scaling techniques become useful in combinations rather than as isolated vocabulary.
-The cases below begin with published production accounts from GitHub, Spotify, and Shopify.
-They provide observed pressures, interventions, and outcomes that a fictional scenario cannot.
-They are still company-authored retrospectives rather than controlled experiments: they report what each organization measured in its own system, and several changes may have occurred together.
-Treat their reported outcomes as evidence about those systems, not as performance promises for another application.
+GitHub, Spotify, and Shopify each describe what their users experienced, how engineers located the pressure, and what they changed.
+Several things can change at once in a production system, which limits how confidently a company can attribute an improvement to any one intervention.
 
-Read each case through the same questions:
-
-1. What did users experience?
-2. Which resource or boundary approached saturation?
-3. What evidence exposed that boundary?
-4. What did the organization change?
-5. What improved, and what new trade-off appeared?
-6. Which part transfers to the event-tracking project, and which part does not?
-
-:ref[table:documented-scaling-cases]{text="The table below"} previews the evidence and the transfer question in each case.
+Use :ref[table:documented-scaling-cases]{text="the table below"} to trace each symptom to the resource under pressure and examine what the response cost.
+Before borrowing Shopify's response, for example, check whether any of the tracker's workers keep doing expensive work after the client disconnects and whether that work can safely stop.
 
 | Production case                                                                                                                                                 | Observed pressure                                                    | Intervention described by the source                                     | Reported evidence                                                                 | Transfer question for the tracker                                     |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -156,9 +147,9 @@ Read each case through the same questions:
 
 ## Orchestration maintains declared capacity
 
-Horizontal scaling is not merely the instruction to "run more servers".
-An orchestrator repeatedly compares a declared desired state with the state it observes and takes action to close the gap.
-A Deployment can declare a replica count and pod template, while a Service gives clients a stable route as individual pods change.
+If you declare that three replicas should be running and one disappears, who notices?
+An orchestrator repeatedly compares the state it observes with the desired state and acts to close the gap.
+In Kubernetes, a Deployment declares a replica count and pod template, while a Service gives clients a stable route as individual pods change.
 
 ### Orchestration control-loop lab
 
@@ -216,9 +207,8 @@ Distance alone does not determine a primary/replica design or a hardware class.
 
 {{ import "site/includes/latency-budget-demo.html" }}
 
-The point is not to memorize exact numbers.
-Real latency depends on providers, routing, congestion, TLS, database load, and query plans.
-The useful lesson is the shape of the problem: distance creates a lower bound, and repeated sequential database access multiplies that bound.
+Real latency also depends on providers, routing, congestion, TLS, database load, and query plans.
+Distance sets a lower bound on each round trip, and a handler that makes three database calls in sequence pays that cost three times.
 
 ## Trade-offs
 
@@ -275,7 +265,8 @@ Design can expand the competence envelope, but finite systems always retain anot
 Graceful degradation keeps selected functions useful when capacity is constrained.
 **Graceful extensibility** is a complementary idea: when an unanticipated condition exceeds the designed envelope, the sociotechnical system can adapt its capabilities and recover :citep[woods2018graceful].
 
-That ability requires optionality prepared before the incident:
+What can responders change while the system is under pressure?
+Their options depend on what the team has prepared.
 
 - dynamic configuration and feature flags that expose understood controls;
 - fast, practiced paths to restart, scale, shed work, roll back, or fix forward;
@@ -283,9 +274,8 @@ That ability requires optionality prepared before the incident:
 - people who understand the system and have authority to act;
 - exercises that keep rarely used recovery paths discoverable and safe.
 
-More controls are not automatically better.
-An undocumented switch or unsafe manual path creates another failure mode.
-The goal is to balance work that prevents known failures with work that improves the ability to respond when the design encounters a surprise.
+An undocumented switch can create another failure mode if the person on call has to guess what it does.
+Practicing with those controls gives responders options when a failure takes a form the team did not anticipate.
 
 ## Project artifact
 

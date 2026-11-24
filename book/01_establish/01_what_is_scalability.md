@@ -1,34 +1,33 @@
 # What does scalability mean for web development?
 
-A web application may cope with more requests while becoming harder to modify, accept more events while making old events too slow to query, or let more agents produce code while overwhelming review and integration.
+An event tracker might keep accepting writes as its history grows, even as readers wait longer to see the latest events.
+Its developers can face a similar problem when agents produce patches faster than the team can review them.
 In this book, **[scalability](/concepts/#scalability)** means a system's ability to continue meeting a stated goal as a named [pressure](/concepts/#pressure) grows or changes.
-The goal, pressure, system boundary, and evidence are all part of the claim.
-Without them, scalability becomes a vague synonym for “large” or “well engineered.”
-
-This framing is especially useful for the web because one user outcome can cross a browser, a network, an application boundary, persistent data, caches, external services, and operational tooling.
-The system also has to keep changing as browsers, consumers, requirements, dependencies, developers, and development agents evolve independently.
-Runtime scale and development scale are therefore related without being interchangeable.
+To evaluate a claim, you also need to know which part of the system it covers and what evidence would show that the goal still holds.
 
 ## Begin with the goal that must continue to hold
 
-Consider the event tracker at the center of the course project.
-At its smallest useful scale, a consumer records an event, the application validates and authorizes the request, accepted state becomes durable, and a later activity view exposes the result.
-A baseline should state which parts of that behavior matter rather than merely report that the application runs.
+Follow one event through the course project.
+A user marks a work item as finished.
+The tracker checks that the item is active, then saves the new state and its completion event together.
+Later, someone opens the activity view and expects to find that event.
+Which of those promises should your baseline check?
 
 Different goals produce different scalability claims:
 
 - A successful submission should still create one accepted event when many consumers submit concurrently.
 - Recent activity should remain useful as retained history grows.
 - A bounded feature change should remain understandable and reviewable as more people or agents contribute.
-- An HTTP or data contract should remain evolvable as clients and requirements change independently.
+- Clients on different release schedules should still be able to use the service as its HTTP or data contract changes.
 
 Each claim can be expressed through the same frame:
 
 > As **pressure P** changes within **range or scenario R**, the system within **boundary B** continues to meet **goal G**, as shown by **evidence E**, under **constraints C**.
 
-The frame prevents one successful observation from becoming a universal promise.
-A browser measurement says little about database recovery; one load level does not prove behavior at another; and a fast generated change does not prove that another contributor can understand or reverse it.
-The [Benchmarking chapter](/chapters/benchmarking/) develops how to produce bounded evidence for these claims.
+Changing the goal changes the evidence you need.
+A request timer measures the wait for a response.
+To estimate how long the database takes to recover from failure, time a recovery rehearsal.
+The [Benchmarking chapter](/chapters/benchmarking/) shows how to design a measurement around the claim.
 
 ### Worked claim — A growing activity feed
 
@@ -40,17 +39,16 @@ The following is a hypothesis to test; its numbers are illustrative, not measure
 > Every response must contain the expected events in the declared order, at least 95% must arrive and pass validation within 200 ms, and no request may fail or remain unfinished.
 
 Here the pressure is **data volume**, while the client count and deployment stay fixed.
-The timing boundary runs from sending a request to validating its response; it excludes browser rendering.
-Seed each history with known events so the expected latest 20 can be checked independently of the feed query.
-Fast responses containing stale or missing events would reject the claim just as slow responses would.
-Passing at these two sizes would support only those observations: it would not establish behavior at a million events, with more clients, or after a database failure.
+The timer starts when a client sends a request and stops when it validates the response, before any browser rendering.
+Seed each history with known events so you can identify the latest 20 independently of the feed query.
+Even the fastest response fails the correctness check if an event is missing.
+A million events, a fifth client, or a database failure would each call for another test.
 
 ## Four pressures organize the course
 
-Many taxonomies of scalability are possible.
-This book uses four pressures that can be applied consistently to the event tracker and to its three independent implementations: demand, data, contributors, and change.
-These are the course's organizing dimensions, not an exhaustive or universally adopted taxonomy.
-Claims about contributors and change also concern maintainability, evolvability, and coordination; name the property being maintained rather than treating every dimension as one performance measure.
+We use four pressures to compare the three independent implementations of the event tracker.
+Demand and data raise questions such as how quickly the feed loads and how much history it can hold.
+Contributors and change raise different questions, such as whether a new teammate can safely revise a contract while older clients still use it.
 
 | Pressure     | What grows or changes                                                                   | Goal that may need to hold                                             | Early signals in a web project                                                     |
 | ------------ | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -159,15 +157,14 @@ Task difficulty, repository familiarity, and tool configuration could also expla
 To challenge the hypothesis, I could alternate rapid generation and bounded changes on comparable tasks, recording review effort, defects found after acceptance, and whether I can explain the change unaided.
 If greater speed did not reduce understanding or increase missed defects under those conditions, speed alone would be a poor explanation for the risk I describe.
 
-This book is an example.
-Agents and I are developing it together, but I still own its vision and remain responsible for whether it forms a coherent book for my students.
-The agents can help research, draft, restructure, and check it; they cannot take over that responsibility.
-For me, scaling agent-assisted work means preserving that ownership while taking advantage of the speed.
+Writing this book puts my own review capacity to the test.
+Agents help me research, draft, restructure, and check individual passages.
+I am still responsible for deciding what my students need from the book and whether the chapters fit together.
 
 ## One pressure can cross the whole web system
 
-Suppose a domain-specific event causes many consumers to submit events during the same short interval.
-That one demand pressure can affect several boundaries:
+Suppose several teams finish a shift at the same time and everyone records their last updates in the tracker.
+Follow the burst of submissions from the screen to the activity feed.
 
 1. The browser must keep the interaction responsive and communicate pending, accepted, or failed state.
 2. The HTTP boundary must handle concurrency, timeouts, retries, authentication, and request limits.
@@ -176,14 +173,11 @@ That one demand pressure can affect several boundaries:
 5. Queries and cached activity views must expose an acceptable level of freshness.
 6. Operators need signals that distinguish user-visible failure from waiting, overload, duplication, or stale derived state.
 
-Adding application servers helps only if application execution is the binding limit and the rest of the path can absorb the new work.
-Optimizing the browser helps only the work that occurs there.
-The response has to follow the pressure to the first limit that threatens the stated goal.
-
-The same reasoning applies to development pressure.
-Adding agents can increase candidate changes while review or integration remains fixed.
-The result may be more waiting and rework rather than more accepted behavior.
-The scalable unit is therefore the complete path to a useful outcome, not the amount of activity at one stage.
+If submissions are waiting for an application worker, another server may help.
+If every worker is already waiting for the database, another server can add more requests to the same queue.
+Trace the wait to the first limit that threatens the goal.
+During development, that limit might be the person who reviews patches from several agents.
+Giving the agents more tasks can lengthen the wait for review even if each agent finishes on time.
 
 ## Separate pressures, responses, and constraints
 

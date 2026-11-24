@@ -1,14 +1,15 @@
 # When do agent fleets improve web development?
 
-An **[agent fleet](/concepts/#agent-fleet)** coordinates independently operating agents on parts of a larger task.
-It is a cooperative multi-agent system used for development; fleet is the book's working label for the coordination, integration, and acceptance arrangement described here.
-The broader term multi-agent system also covers agents with different goals and agents that do not use LLMs.
-Each has its own execution context and tool actions; an orchestration layer assigns work, routes results, and controls shared state.
-Writing several roles into one prompt does not create those separate executions.
+One agent can build the form for changing a work item's status while another implements the API that accepts the change.
+They can work in parallel once they agree on which transitions are valid and what the form should show when the API rejects one.
+Someone still has to bring the two changes together and check what the user sees.
 
-A web feature can expose parallel work across interface, API, and persistence code, but those parts must agree on the same behavior.
-This chapter follows a fleet from task decomposition through integration, correction, and measurement.
-“Fleet” here belongs to the development system; agents running inside the delivered application have separate users, data, and operational obligations.
+This book uses **[agent fleet](/concepts/#agent-fleet)** for a group of agents that cooperate on a development task.
+Each agent runs in its own context and can call tools independently.
+An orchestration layer assigns work, routes results, and controls shared state.
+Several roles in one prompt still share a single execution context.
+The broader term _multi-agent system_ also covers agents with different goals and agents that do not use LLMs.
+Agents running inside a delivered application have their own users, data, and operational obligations.
 
 > **Sustainability angle**
 >
@@ -18,8 +19,7 @@ This chapter follows a fleet from task decomposition through integration, correc
 ## Choose a coordination structure
 
 [Loop engineering](/concepts/#loop-engineering) governs how agent work starts, retains progress, uses checks, and stops or escalates.
-A fleet is one possible execution arrangement within that design; single-agent loops also need those controls.
-A fleet should be an answer to the shape of the work, not the starting assumption.
+Those controls apply whether one agent does the work or several share it.
 Begin with the smallest coordination structure that can complete the task.
 
 The Engineering Sustainable Agents preprint compares non-agentic through multi-agent configurations on five selected developer tasks :citep[astekin2026sustainable].
@@ -48,19 +48,18 @@ Labels such as "subagent" or "team" do not establish which controls are availabl
 [Claude Code's delegation guide](https://code.claude.com/docs/en/agent-teams#compare-with-subagents) documents one arrangement; verify the capabilities and limits of the configuration you actually run.
 The [course environment sheet](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md) defines what the instructor must publish before each phase; use your course run's completed assignment to identify the configuration and its limitations.
 
-Sequential delegation fits work whose next step depends on an earlier result.
-A read-only scout maps the relevant routes, components, data flow, and tests; an implementer then receives the compressed findings and a bounded objective.
-This keeps noisy reconnaissance out of the implementation context without pretending that dependent work can happen simultaneously.
-An implementer followed by a reviewer is another sequential pattern: the reviewer receives a concrete diff and validation evidence rather than guessing what might change.
+Some handoffs have to happen in order.
+A read-only scout can follow a request through the relevant routes, components, and tests, then hand the implementer a short account of what it found.
+The implementer can use those findings to make its assigned change without rereading the whole search.
+A reviewer who follows the implementer can inspect the actual diff and its validation results.
 
-Parallel implementation becomes reasonable after a shared decision has settled the seam between tasks.
-For implementation C, one possible dependency graph is:
+In implementation C, a shared contract can open up two branches of work.
 
 `reconnaissance → shared domain and API contract → interface work ∥ data work → integration → browser acceptance`
 
 The interface and data branches may run together because both depend on the same contract.
-The contract itself, integration, and end-to-end [acceptance](/concepts/#acceptance-criteria) remain sequential.
-If both branches need to reinterpret the lifecycle, edit the same schema, or wait for the same person, their apparent parallelism merely moves waiting and conflict downstream.
+Both branches must finish before the integrator can check the complete browser journey against its [acceptance criteria](/concepts/#acceptance-criteria).
+If both agents need to change the same schema or ask the same person what a transition means, expect one to wait or the integrator to reconcile two interpretations.
 
 What can one worker tell another that changes where it looks next?
 In the s³ study, four agents searched copies of the same network of rooms for an exit.
@@ -148,9 +147,9 @@ The comparison with a single agent must include failed attempts and human review
 
 ### Field note — Different reviewers expose different blind spots
 
-A colleague's review with a different model surfaced issues that my usual reviewer had missed.
-Some findings overstated an issue or preferred a different design.
-The disagreement made assumptions visible; resolving it still required a judgment about the intended behavior and the simpler workable design.
+A colleague reviewed my work with a different model and found issues my usual reviewer had missed.
+Other findings overstated a problem or reflected a design preference.
+To decide which ones to act on, I had to ask what the software should do and which design would get it there most simply.
 
 I usually ask the agent to implement a fix once I agree with its reasoning.
 Different reviewers can broaden the search, but I remain responsible for accepting the direction.
@@ -183,9 +182,10 @@ Treat optional guidance as a workflow hypothesis.
 For an optional comparison, use representative tasks in fresh copies with and without that extra guidance, keeping mandatory permissions and project constraints fixed.
 Record accepted behavior, effort, and cost; following more instructions does not itself establish a better outcome.
 
-Project memory needs a lifecycle.
-Keep unresolved questions and temporary findings in a working artifact; record consequential choices in a [decision log](/concepts/#decision-log); promote settled behavior into the relevant specification or architecture document; and connect it to executable checks.
-A discovery transcript should not silently become the specification, and parallel agents should not work from different generations of the same contract.
+Keep unresolved questions in working notes, where a tentative answer can change.
+When the team settles a consequential choice, record its reasoning in the [decision log](/concepts/#decision-log).
+Put the agreed behavior in the specification or architecture document and connect it to executable checks.
+Both agents can then work from the same contract even if only one took part in the discussion.
 Repeatable review or debugging workflows can become small project skills, while clear mechanical rules belong in linters or tests.
 
 ### Define the web task graph
@@ -205,7 +205,7 @@ Then assign bounded work such as:
 ::label[table:web-fleet-tasks]
 
 Role names are illustrative.
-Grade whether every task has an objective, allowed files and tools, expected output, validation commands, non-goals, owner, and stopping condition.
+Before assigning a task, specify its objective, allowed files and tools, expected output, validation commands, non-goals, owner, and stopping condition.
 If two roles must edit the same shared contract, resolve that decision before they branch or reduce the fleet.
 Use separate workspaces or worktrees for concurrent writers.
 The Challenge small model is the reference configuration; an approved C fleet may assign small models, large models, or a mixture to its roles or tasks.

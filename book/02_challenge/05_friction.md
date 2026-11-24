@@ -1,22 +1,20 @@
 # How does development friction limit web projects?
 
-A web application does not have to serve more users before it encounters a scaling problem.
-It can first become difficult to change.
-A feature that sounds local may cross a browser form, an HTTP contract, server-side validation, persistent data, a query, a cached representation, and a deployment path.
-Each boundary adds knowledge, evidence, and coordination that the change must preserve.
+A web application can become hard to change long before it runs out of capacity.
+A user asks for a filter on the activity page.
+From the browser it looks like one new control.
+For the developer, the change can reach all the way back to records written before the filter existed.
 
 **[Development friction](/concepts/#development-friction)** is the resistance a team feels when trying to set up, understand, change, test, review, deploy, or operate that system.
-It is the everyday experience of [technical debt](/concepts/#technical-debt), hidden coupling, and weak feedback.
-A system with high friction may still be useful, but each change requires more effort than its behavior alone would suggest.
-
-Friction accumulates as a change crosses interfaces, teams, and commitments that are costly to reverse.
-Some of that friction protects users, data, and collaborators; some merely repeats work.
-The goal is not to remove every constraint, but to move useful evidence earlier and remove resistance that provides no corresponding control.
+[Technical debt](/concepts/#technical-debt), hidden dependencies, and slow feedback all contribute.
+Some steps earn their cost.
+A compatibility check can reveal that old records disappear even when the filter is off.
+A day spent reconstructing an undocumented test environment delays that discovery.
 
 ## Trace one web change from the browser to production
 
-Consider one change to the event tracker: add an optional event category and let users filter the activity view by category.
-The visible request is small, but its implementation can follow this path:
+To support the filter, the event tracker needs an optional category for each event.
+Follow the change from the form to the running service.
 
 1. **Browser form:** add a control, preserve accessible labels and error states, and decide what an omitted category means.
 2. **HTTP contract:** extend the event representation without breaking an older client or independently implemented consumer.
@@ -26,10 +24,10 @@ The visible request is small, but its implementation can follow this path:
 6. **Cache:** include the filter in the cache identity and invalidate or tolerate previously derived representations.
 7. **Deployment:** run compatible versions together, observe the new path, and preserve a safe way to stop or reverse the change.
 
-This path is not a prescription for seven separate components.
-It is a way to find where one behavior is represented and who owns it.
-In a small application, several stages may live in one module and deploy together.
-They remain distinct responsibilities because a mistake at each boundary produces different evidence and a different user-visible failure.
+Several stages can live in one module and deploy together.
+They still need different checks.
+If a filtered view shows the wrong events, the query might have selected the wrong rows, or the cache might have served the result of a different filter.
+Inspecting the query result helps distinguish the two.
 
 Friction becomes visible when the path is hard to trace, the same rule has several unsynchronized definitions, a local check cannot exercise the changed boundary, or a deployment makes earlier assumptions costly to recover.
 The category change is an illustration and can serve as an optional controlled comparison: ask what the same request costs in implementations A and B.
@@ -83,42 +81,34 @@ Follow the links for the architecture and migration details, then use the transf
 ::caption[Documented cases interpreted as forms of web-development friction.]
 ::label[table:documented-web-friction-cases]
 
-The migration case exposes a question that setup speed alone cannot answer: when does a change stop being safely reversible through code alone?
+Take the migration question back to the tracker.
+If you remove the filter tomorrow, what happens to the categories users entered today?
 
 ## Find the commitment point
 
-Fast generation can make a change cheap to introduce without making it cheap to reverse.
-In a repository study of ten open-source database applications, schema revisions often co-evolved with dependent application code, illustrating how a local data-model choice can acquire a wider change footprint :citep[qiu2013coevolution].
+In a study of ten open-source database applications, researchers found that schema revisions often went hand in hand with changes to the code that depended on them :citep[qiu2013coevolution].
 
 For the category change, the **commitment point** is the first moment when an ordinary code revert no longer restores the prior state.
 This may occur when persistent production data adopts the new representation, an independently deployed consumer relies on the extended contract, a queued job carries the new value, or a cached artifact can outlive the deployment.
 Beyond that point, reversal becomes a coordinated change involving compatibility, migration, invalidation, reconciliation, or communication.
 
-A commitment is not automatically technical debt.
-The audit asks whether its future coordination cost was visible and justified.
-Before the point, deleting a candidate implementation may be enough.
-Near the point, expand-and-contract changes, mixed-version tests, staged rollout, and observation add protective friction because they preserve options.
-After the point, “roll back” must name what happens to accepted data and dependent consumers rather than only which code artifact is deployed.
+Before that point, reverting the code may be enough.
+As the change approaches production, mixed-version tests and a staged rollout can keep old and new consumers working during an expand-and-contract migration.
+Once users have saved categories, a rollback plan must say what happens to those values and what older clients will see.
 
 The [Reality chapter](/chapters/reality/) returns to compatibility, migration, rollback, and fix-forward under production pressure.
-Here, make the asymmetry between introduction and safe reversal visible.
 
 ### Plan soft and hard decisions
 
-Use **[decision reversibility](/concepts/#decision-reversibility)** when planning a change.
-Soft and hard are the book's shorthand for low and high reversal cost, related to the [one-way/two-way-door distinction](https://www.aboutamazon.com/news/company-news/2016-letter-to-shareholders).
-A **soft decision** is still cheap to revise or undo because few durable effects or external dependencies rely on it.
-A **hard decision** requires more coordination or recovery to change safely because accepted data, consumers, or operating commitments depend on it.
-Soft and hard describe a spectrum, and the same decision can become harder as those dependencies accumulate.
+To judge **[decision reversibility](/concepts/#decision-reversibility)**, ask what it would take to undo the choice safely.
+Trying a category representation on an isolated branch is a **soft decision**.
+Only the code and test data on that branch need to change.
+It becomes a **hard decision** when changing it requires migrating stored events or coordinating with people who maintain independent clients.
+The terms are related to the [one-way/two-way-door distinction](https://www.aboutamazon.com/news/company-news/2016-letter-to-shareholders), but reversal cost can rise gradually as dependencies accumulate.
 
-Trying a category representation in an isolated branch can remain a soft decision.
-Once production events store that representation and independently deployed clients rely on it, changing the same choice may require compatibility and migration.
-The amount of code changed does not tell you how much freedom remains.
-A hard decision can be necessary and justified; its reversal cost alone does not make it technical debt.
-
-Keep uncertain choices soft while a bounded experiment can still answer the question.
-Before crossing the commitment point, record what makes the choice hard, the evidence that justifies committing, and how you would revise it safely.
-Ask: what can we change locally today, who or what will depend on it tomorrow, and what evidence would show that reversal succeeded?
+A hard decision can be worth making.
+Before committing, record who or what will depend on the choice, what evidence justifies that cost, and how you would check that a reversal succeeded.
+While an isolated trial can still answer the question, keep the choice soft.
 
 ### Keep a decision log
 
@@ -180,21 +170,18 @@ Developing Kirjolab exposed a shared need: source material and provenance should
 The [Kirjolab case study](/case-studies/kirjolab/#what-i-would-do-differently) develops that proposed split.
 Faster generation moved my work from producing features to deciding what each project should own.
 
-This cost can be visible even when final behavior is unchanged.
 :citet[trivedi2026cleanliness] compared matched clean and deliberately degraded repositories across 660 agent trials.
 Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often.
-The result does not show that every clean-code rule improves every task, but it supports a narrower claim: maintainability can affect the operational footprint of agentic development, not only human preference.
+In those trials, looking only at completed tasks would have missed the extra work agents did in the degraded repositories.
 
 ## Match feedback to the changed boundary
 
-This is a [loop engineering](/concepts/#loop-engineering) decision: choose observations and repair steps that resolve uncertainty while keeping final acceptance explicit.
-Validation can itself become a source of friction.
-A ten-minute clean-install or browser suite may provide valuable release evidence while being a poor response to every saved file.
-Conversely, a fast test that never crosses the changed boundary can create confidence without useful coverage.
-
-For the category change, a focused validation-rule test can return the first failure quickly.
-An HTTP contract check can then cover serialization and compatibility; a database migration test can cover existing and new rows; a browser check can cover the filter interaction; and a deployed-boundary check can cover the actual cache and rollout behavior.
-Running the most expensive stage first wastes feedback time, while stopping at the focused stage leaves the web change unverified.
+When you change which category values are allowed, a focused validation test can tell you within seconds whether the rule works.
+You still need to know whether older clients can send events, existing rows survive the migration, and users see the right events when they select a filter.
+An HTTP contract check, a migration test, and a browser check answer those questions.
+Checking the deployed service tells you what the cache actually serves during rollout.
+Choosing when to run each check is part of [loop engineering](/concepts/#loop-engineering).
+Put the quickest informative check early enough to guide the edit, and identify the checks you need before accepting the change.
 
 Agent review can keep producing candidate findings after the useful ones are exhausted.
 Count independently confirmed findings and the human time needed to adjudicate them, and stop against an explicit risk threshold; [Appendix A](/appendices/evaluating-agentic-workflows/#compressed-evidence-and-repeated-review) develops the full review-evidence exercise.
