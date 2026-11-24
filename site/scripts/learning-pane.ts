@@ -1,3 +1,4 @@
+import { legacyRecovery } from "./learning-diary.ts";
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import { mountLearningAssistant } from "./learning-assistant.ts";
 import { mountLearningNavigation } from "./learning-navigation.ts";
@@ -20,6 +21,7 @@ import { requestLearning } from "./learning-actions.ts";
 import { concepts } from "../../shared/concepts.ts";
 import {
   sourceLink,
+  notebookMarkdown,
   reflectionPrompts,
   reflectionExamples,
   suggestedReflectionCharacters,
@@ -41,7 +43,8 @@ export interface LearningPaneServices {
   client: LearningClient;
   session: SessionState;
   save: (patch: Partial<SessionState>) => void;
-  refresh: () => Promise<void>;
+  refresh: (readAttempts?: boolean) => Promise<void>;
+  recordAttempt: (entry: NotebookEntry) => void;
   connection: (connected: boolean) => void;
   open: (experience: LearningExperience) => void;
   raise: (experience: LearningExperience) => void;
@@ -86,8 +89,15 @@ export function createLearningPane(
     experience === "notebook"
       ? restored.notebookPaneView
       : restored.assistantPaneView;
-  let notebookView = restored.notebookView;
+  let notebookView =
+    legacyRecovery &&
+    !restored.editor?.body.trim() &&
+    !restored.editor?.title.trim()
+      ? ("notes" as const)
+      : restored.notebookView;
   let assistantView = restored.assistantView;
+  if (!legacyRecovery && view === "guide") view = "agent";
+  if (!legacyRecovery && assistantView === "guide") assistantView = "agent";
   let assistant = restored.assistant;
   let notePreview = restored.notePreview;
   let companionStatus: CompanionStatus | null = null;
@@ -341,6 +351,10 @@ export function createLearningPane(
     await services.refresh();
   }
   function navigate(next: NotebookView) {
+    if (!legacyRecovery && next === "guide") {
+      requestLearning({ kind: "investigate", activityId: "learning-loop" });
+      return;
+    }
     const owner = experienceForView(next);
     if (owner && owner !== experience) {
       services.navigate(owner, next);
@@ -351,6 +365,11 @@ export function createLearningPane(
     if (experience === "assistant" && owner)
       assistantView = next as typeof assistantView;
     view = next;
+    if (next === "peers" && connected && !legacyRecovery)
+      void run(async () => {
+        await services.refresh(true);
+        if (view === "peers") render();
+      });
     services.open(experience);
     render();
     panel.querySelector(".learning-content")!.scrollTop = 0;
@@ -389,7 +408,7 @@ export function createLearningPane(
           "p",
           experience === "notebook"
             ? "Connect your local companion to save and revisit your private notes. Reading the book does not require a connection."
-            : "Connect the shared local companion to use the chapter guide and discuss your questions. Enable your chosen provider for assistant replies; notebook writing works without a model.",
+            : "Connect your local companion and choose a provider to discuss this reading.",
         ),
         button(
           "Connect companion",
@@ -417,6 +436,11 @@ export function createLearningPane(
             ? { toolMode: companionStatus.capabilities.tools }
             : {}),
           entries,
+          loadAttempts: async () => {
+            await services.refresh(true);
+            status.textContent =
+              "Matching attempts appear under the book source. Check an attempt to include it in your message.";
+          },
           draft: activeDraft,
           preview: () => notePreview,
           previewChanged: (value) => {
@@ -431,7 +455,8 @@ export function createLearningPane(
           write: writeHandoff,
           help: discussHandoff,
           discuss: () => navigate("agent"),
-          notes: () => navigate("notes"),
+          notes: () =>
+            legacyRecovery ? navigate("notes") : location.assign("/diary/"),
           close,
           status: (text) => {
             status.textContent = text;
@@ -448,7 +473,8 @@ export function createLearningPane(
                 relatedIds,
               },
             );
-            await refresh();
+            if (legacyRecovery) await refresh();
+            else services.recordAttempt(entry);
             return entry;
           },
         },
@@ -632,7 +658,7 @@ export function createLearningPane(
     );
     actions.append(newNoteButton("New note"));
   }
-  let notesScope = "page";
+  let notesScope = legacyRecovery ? "all" : "page";
   function renderNotes() {
     container.append(
       node(
@@ -996,9 +1022,11 @@ export function createLearningPane(
     container.append(
       node(
         "p",
-        connected
-          ? "Your private notebook is connected. You can work without a model connection."
-          : "Connect your private notebook and choose whether you want assistant replies. Website sign-in is separate.",
+        legacyRecovery
+          ? "Connect the companion that holds your previous notebook to recover your work."
+          : connected
+            ? "Your teaching assistant companion is connected."
+            : "Connect your local companion to use the teaching assistant. Choose a provider during setup.",
       ),
     );
     if (!connected && location.protocol === "https:") {
@@ -1024,14 +1052,18 @@ export function createLearningPane(
         node(
           "p",
           connected
-            ? "Stop the current companion, then run setup in its terminal. Your notes and message draft are retained."
+            ? "Stop the current companion, then run setup in its terminal. Your message draft stays here."
             : "Run setup in your terminal and choose how you want to work. Already set up? Go to step 2.",
         ),
       );
       const choices = node("ul", "", "learning-setup-choices");
-      choices.append(
-        node("li", "Notebook only — private writing without a model account."),
-      );
+      if (legacyRecovery)
+        choices.append(
+          node(
+            "li",
+            "Notebook only — recover writing without a model account.",
+          ),
+        );
       for (const [label, href, detail] of [
         [
           "Codex",
@@ -1071,14 +1103,12 @@ export function createLearningPane(
           "p",
           connected
             ? "After setup, start the companion again with this command. Choose Check connection and reconnect if asked."
-            : "Keep this command running while you use the notebook or assistant.",
+            : "Keep this command running while you use the companion.",
         ),
       );
     }
     renderCompanionCommand("start");
-    container.append(
-      link("Companion setup and notebook backups", "/notebook/setup/"),
-    );
+    container.append(link("Companion setup guide", "/notebook/setup/"));
     if (!connected) {
       container.append(node("h3", "3. Connect in the book"));
       const address = node("input");
@@ -1091,7 +1121,7 @@ export function createLearningPane(
           async () => {
             await client.connect(address.value);
             await refresh();
-            status.textContent = "Connected to your private notebook.";
+            status.textContent = "Connected to your local companion.";
             navigate(experience === "assistant" ? assistantView : notebookView);
           },
           "learning-primary",
@@ -1102,7 +1132,7 @@ export function createLearningPane(
         container.append(
           node(
             "p",
-            `Companion ${companionStatus.release?.version ?? "legacy"}; protocol ${companionStatus.version}; ${companionStatus.provider ? `${companionStatus.provider} enabled` : "notebook-only"}.`,
+            `Companion ${companionStatus.release?.version ?? "legacy"}; protocol ${companionStatus.version}; ${companionStatus.provider ? `${companionStatus.provider} enabled` : "no assistant provider"}.`,
             "learning-hint",
           ),
         );
@@ -1126,7 +1156,7 @@ export function createLearningPane(
           setup.href = "/notebook/setup/";
           container.append(setup);
         }
-        if (companionStatus.storage)
+        if (legacyRecovery && companionStatus.storage)
           container.append(
             node(
               "p",
@@ -1144,47 +1174,62 @@ export function createLearningPane(
         }),
         button("Explore this reading", () => navigate("guide")),
       );
-      container.append(
-        button("Export notebook backup", async () => {
-          const archive = await client.request<unknown>("/export");
-          download(
-            "learning-notebook.json",
-            JSON.stringify(archive, null, 2),
-            "application/json",
-          );
-        }),
-      );
-      const file = node("input");
-      file.type = "file";
-      file.accept = "application/json,.json";
-      file.addEventListener(
-        "change",
-        () =>
-          void run(async () => {
-            const selectedFile = file.files?.[0];
-            if (!selectedFile) return;
-            if (selectedFile.size > 16_000_000)
-              throw new Error("Choose a notebook archive smaller than 16 MB.");
-            const result = await client.request<{ added: number }>(
-              "/import",
-              "POST",
-              JSON.parse(await selectedFile.text()),
+      if (legacyRecovery) {
+        container.append(
+          button("Download previous notes as Markdown", () => {
+            if (!entries.length) {
+              status.textContent =
+                "There are no saved notebook entries to download.";
+              return;
+            }
+            download(
+              "previous-learning-notes.md",
+              notebookMarkdown(entries),
+              "text/markdown",
             );
-            await refresh();
-            status.textContent = `Imported ${result.added} notes. Existing conflicting records are never replaced.`;
-            render();
           }),
-      );
+          button("Export notebook backup", async () => {
+            const archive = await client.request<unknown>("/export");
+            download(
+              "learning-notebook.json",
+              JSON.stringify(archive, null, 2),
+              "application/json",
+            );
+          }),
+        );
+        const file = node("input");
+        file.type = "file";
+        file.accept = "application/json,.json";
+        file.addEventListener(
+          "change",
+          () =>
+            void run(async () => {
+              const selectedFile = file.files?.[0];
+              if (!selectedFile) return;
+              if (selectedFile.size > 16_000_000)
+                throw new Error(
+                  "Choose a notebook archive smaller than 16 MB.",
+                );
+              const result = await client.request<{ added: number }>(
+                "/import",
+                "POST",
+                JSON.parse(await selectedFile.text()),
+              );
+              await refresh();
+              status.textContent = `Imported ${result.added} notes. Existing conflicting records are never replaced.`;
+              render();
+            }),
+        );
+        container.append(field("Import a portable notebook", file));
+      }
       container.append(
-        field("Import a portable notebook", file),
         button("Disconnect", async () => {
           await client.disconnect();
           setConnected(false);
           entries.length = 0;
           judgments.length = 0;
           selected.clear();
-          status.textContent =
-            "Disconnected. Your notebook remains on your computer.";
+          status.textContent = "Disconnected from the local companion.";
           render();
         }),
       );
@@ -1204,11 +1249,24 @@ export function createLearningPane(
   });
   panel.addEventListener("pointerdown", () => services.raise(experience));
   panel.addEventListener("focusin", () => services.raise(experience));
-  async function open(selection: ReadingSelection | null, resume: boolean) {
+  async function open(
+    selection: ReadingSelection | null,
+    resume: boolean,
+    currentReading = false,
+  ) {
     await run(async () => {
       // The coordinator already checked the shared connection during restore.
       if (!resume && client.token && !connected) await refresh();
-      if (selection && experience === "assistant")
+      if (currentReading && experience === "assistant") {
+        const reading = pageSource(selection);
+        if (
+          assistant?.source.url !== reading.url ||
+          assistant.source.anchor !== reading.anchor
+        )
+          discussHandoff({ source: reading, question: "", noteIds: [] });
+        assistantView = "agent";
+        view = "agent";
+      } else if (selection && experience === "assistant")
         discussHandoff({
           source: pageSource(selection),
           question: "",

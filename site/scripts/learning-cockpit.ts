@@ -34,7 +34,7 @@ type Services = Omit<
   Parameters<typeof mountReadingInvestigation>[1],
   "source" | "activity" | "handoff" | "next"
 > & {
-  notebook: () => void;
+  diary: () => void;
   assistant: () => void;
 };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
@@ -124,7 +124,7 @@ export function createLearningCockpit(services: Services) {
     const resources = node("nav");
     resources.setAttribute("aria-label", "Learning workspace");
     for (const [label, action] of [
-      ["Notebook", services.notebook],
+      ["Diary guide", services.diary],
       ["Assistant", services.assistant],
     ] as const) {
       const button = node("button", label);
@@ -235,7 +235,7 @@ export function createLearningCockpit(services: Services) {
       list,
       node(
         "p",
-        "Up to 30 learning loops are kept in this tab. Prepare a Notebook takeaway to keep a reflection beyond this browser session.",
+        "Up to 30 learning loops are kept in this tab. Download a takeaway as Markdown to keep it in your diary.",
       ),
     );
     root.append(recent);

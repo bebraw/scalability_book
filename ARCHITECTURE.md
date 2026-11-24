@@ -57,7 +57,7 @@ CSS is inlined without compatibility transformation; the browser baseline covers
 [The published-link checker](scripts/check-links.ts) reads the candidate static build through [its inspection and HTTP-check module](scripts/lib/link-check.ts), independently of runtime application state.
 Local targets and fragments are checked during validation; external missing-page checks run before explicit deployment and through [CI](.github/workflows/links.yml), with generated reports kept in `.local/`.
 See [the development guide](docs/development.md#published-link-checks) for failure criteria and inconclusive external responses.
-The optional local learning companion exposes the private notebook API independently of course storage and model providers.
+The optional local learning companion exposes the legacy notebook and private study-activity API independently of course storage and model providers.
 [learning-cli.ts](scripts/lib/learning-cli.ts) owns setup, authentication entry, startup and local diagnostics for both the repository command and the built [npm package](packages/learning-companion/package.json).
 Its terminal-only `project` entry delegates to [learning-project.ts](scripts/lib/learning-project.ts) for course phase selection, credential reuse, profile preparation and interactive coding-agent launch.
 [learning-project-config.ts](scripts/lib/learning-project-config.ts) owns the bundled phase configurations, prompts, checker and strict validation of Codex-appended project trust records.
@@ -83,17 +83,23 @@ The pinned `@napi-rs/keyring` runtime dependency provides native OS credential s
 The HTTP boundary binds to loopback, accepts session bootstrap only from an exact configured website origin and issues an origin-bound token for private API routes.
 The CLI trusts only `https://scalableweb.dev` by default; local development requires explicit `--origin`.
 [ADR-037](docs/adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records that website trust boundary and the removal of manual pairing.
-The shared book layout exposes separate lazy Notebook and Teaching assistant entry points through [learning-loader.ts](site/scripts/learning-loader.ts).
-[learning-workspace.ts](site/scripts/learning-workspace.ts) owns the shared companion client, connection snapshot, tab session and independent panel visibility.
-[learning-pane.ts](site/scripts/learning-pane.ts) creates a scoped notebook or assistant panel with its own navigation, drafts and selected context; notebook capture, reflection, concept judgments and selective preparation stay in that presentation boundary.
-[learning-notebook-size.ts](site/scripts/learning-notebook-size.ts) owns Notebook's size controls, projecting optional tab-session dimensions into the existing bounded overlay without changing book layout or companion records.
-[learning-navigation.ts](site/scripts/learning-navigation.ts) owns each panel's section presentation and launcher state, while [learning-assistant.ts](site/scripts/learning-assistant.ts) composes discussion, chapter guidance and human peer inquiry through the provider-independent handoff types in the shared workspace contract.
-[learning-reply.ts](site/scripts/learning-reply.ts) owns the untrusted reply presentation boundary: parsed Markdown becomes permitted DOM elements and bounded KaTeX MathML, with literal raw HTML, no images and HTTP(S)-only links.
-[learning-evidence.ts](site/scripts/learning-evidence.ts) groups recorded browser observations with the following reply without crossing a student-message boundary, renders literal evidence disclosures and preserves their expansion/focus across polling redraws; conversation state and polling stay in [learning-agent-ui.ts](site/scripts/learning-agent-ui.ts).
-[learning-note-preview.ts](site/scripts/learning-note-preview.ts) prepares a selected reply and its preceding student turn as separately editable, labelled notebook material, using a source/identity snapshot independent of subsequent conversation updates.
-The existing tab session owns one bounded preview; the Notebook handoff still owns replacement confirmation and explicit saving, with no provider or persistence request from preview editing.
-The notebook and lower-right assistant can be visible together on larger screens; compact screens retain both open states while displaying the selected foreground panel.
-Preparing a handoff does not save or send; the student reviews the source and deliberately selected notes or notebook draft.
+The [course diary guide](docs/course-diary.md) and [five numbered notes](docs/diary-pilot/) are the entry point for student writing.
+The site build packages those notes and the optional [desktop Obsidian plugin](packages/obsidian-course-diary/) in a [downloadable vault](scripts/lib/course-diary-download.ts).
+The student's files own diary entries and private portfolio drafts.
+The plugin operates on the named phase files and explicitly chosen excerpts.
+Its commands call Obsidian's editor, vault and workspace APIs.
+The dependency on the book runs through public reading links and source-linked Markdown. [Highlight capture](site/scripts/learning-highlight.ts) uses the page selection and offers copy or download without a companion.
+The book's [learning loader](site/scripts/learning-loader.ts) opens the existing teaching assistant on request.
+The plugin can display that page beside the diary or open the default browser.
+Only the public reading address enters the URL.
+Students paste and send any question themselves.
+The book owns exercise checking, interactive demos and TA presentation.
+The local companion owns agent conversations, connection settings and prior Notebook records.
+The course workspace owns submissions.
+The historical Notebook and its exports are reachable through the [recovery instructions](docs/course-diary.md#bring-over-an-existing-notebook).
+[Learning panes](site/scripts/learning-pane.ts) and [navigation](site/scripts/learning-navigation.ts) coordinate the assistant and the recovery interface. [Reply rendering](site/scripts/learning-reply.ts) restricts assistant Markdown, and [browser evidence](site/scripts/learning-evidence.ts) keeps observations with the associated turn.
+[The selected exchange preview](site/scripts/learning-note-preview.ts) retains one editable question and reply in the tab.
+Normal reading flows export selected material to Markdown.
 [learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-provider.ts](scripts/lib/learning-provider.ts) owns the provider port and three bounded tool schemas.
 [learning-codex.ts](scripts/lib/learning-codex.ts) adapts the local Codex app-server through a dedicated profile, with browser or stdin API-key authentication owned by [learning-codex-login.ts](scripts/lib/learning-codex-login.ts) and stored through Codex's OS keyring mode.
 [learning-local.ts](scripts/lib/learning-local.ts) adapts a student-operated loopback OpenAI-compatible model server; [learning-api.ts](scripts/lib/learning-api.ts) adapts the documented HTTPS Chat Completions interfaces of OpenAI, Anthropic, Gemini, OpenRouter and explicitly configured compatible services.
@@ -120,12 +126,12 @@ The browser presents an automated study role and reply metadata, while runtime a
 [learning-guide.ts](site/scripts/learning-guide.ts) uses the current reading's authored prompt and rendered demos for optional prediction, actual demo observation and private reflection after connecting.
 [reading-investigation.ts](shared/reading-investigation.ts) owns the versioned general learning loop, derived authored demo activities and validated reported-evidence/browser-snapshot contracts, published through the concept graph and public MCP lookups.
 [learning-cockpit.ts](site/scripts/learning-cockpit.ts) owns the one contextual cockpit, focus switching, recent-loop navigation and explicit entry from reading, exercises, practice, selected Notebook notes and peer context.
-[learning-tutorial.ts](site/scripts/learning-tutorial.ts) owns a replayable authored rehearsal, with independent tab-scoped writing/progress and a browser-local invitation preference; it has no provider or persistence client and uses only explicit connection/Notebook handoffs.
-[learning-investigation.ts](site/scripts/learning-investigation.ts) renders one source-scoped predict/check/reflect loop using the coordinator's existing companion client, restricted reply renderer and reviewed Notebook handoff.
+[learning-tutorial.ts](site/scripts/learning-tutorial.ts) owns a replayable authored rehearsal, with independent tab-scoped writing/progress and a browser-local invitation preference; it offers a Markdown takeaway at the end.
+[learning-investigation.ts](site/scripts/learning-investigation.ts) renders one source-scoped predict/check/reflect loop using the coordinator's existing companion client, restricted reply renderer and reviewed Markdown download.
 [learning-investigation-session.ts](site/scripts/learning-investigation-session.ts) owns bounded tab drafts/history and actual generic demo observations; stored snapshots do not replay demo controls or actions.
 The browser owns unsent writing and selected context; submitted turns and snapshots remain with the companion's existing conversation owner.
 Explicit sends select no notebook entries by default, and an active reply can observe only the chosen demo through the existing broker.
-The student operates controls, saving requires the existing Notebook Save action, and public MCP remains stateless.
+The student operates controls, diary takeaways download as Markdown, and public MCP remains stateless.
 The student course workspace exposes a private loop without capturing or submitting course records; administrative pages remain outside the learning interface.
 [learning-practice.ts](site/scripts/learning-practice.ts) presents optional independent cases from [learning-activities.ts](shared/learning-activities.ts), snapshots their versions into portable sources and links separately saved attempts/reflections.
 [course-inquiry.ts](shared/course-inquiry.ts) owns peer audiences and historical access, and [the inquiry handler](worker/course-inquiry.ts) enforces them through the existing course API in both local development and the Worker.
@@ -214,17 +220,18 @@ It reuses the Worker's feedback readers and returns an explicit projection of co
 The MCP and dashboard write resolutions to per-issue keys in `COMMENTS_KV`, and local synchronization uses the same resolution format.
 [Feedback setup](docs/feedback-setup.md#private-feedback-mcp) defines access, tools, and provisioning.
 
-| Data                                    | Local storage                                     | Production storage                                       |
-| --------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
-| Course records and revision history     | `.local/course.sqlite`                            | Dedicated `COURSE_DB` D1 binding                         |
-| Course source archives and attachments  | `.local/course-files/`                            | Private `COURSE_FILES` R2 binding                        |
-| Teacher simulation and revision history | `.local/course-simulation/course.sqlite`          | Separate `COURSE_SIMULATION_DB` D1 binding               |
-| Simulation archives and attachments     | `.local/course-simulation/course-files/`          | Separate `COURSE_SIMULATION_FILES` R2 binding            |
-| Reader feedback                         | `.local/comments.json`                            | `COMMENTS_KV`                                            |
-| Chapter exercise answers                | `.local/learning.sqlite` by default               | Dedicated `LEARNING_DB` D1 database (EU jurisdiction)    |
-| Private learning notebook               | `notebook.sqlite` in the companion data directory | Student's local companion; never Worker storage          |
-| Private agent conversations             | `conversations.sqlite` in that directory          | Student's local companion; excluded from notebook export |
-| Shared learning inquiries and offers    | Course record/history store                       | Existing `COURSE_DB`; source-scoped paginated reads      |
+| Data                                        | Local storage                                     | Production storage                                       |
+| ------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
+| Course records and revision history         | `.local/course.sqlite`                            | Dedicated `COURSE_DB` D1 binding                         |
+| Course source archives and attachments      | `.local/course-files/`                            | Private `COURSE_FILES` R2 binding                        |
+| Teacher simulation and revision history     | `.local/course-simulation/course.sqlite`          | Separate `COURSE_SIMULATION_DB` D1 binding               |
+| Simulation archives and attachments         | `.local/course-simulation/course-files/`          | Separate `COURSE_SIMULATION_FILES` R2 binding            |
+| Reader feedback                             | `.local/comments.json`                            | `COMMENTS_KV`                                            |
+| Chapter exercise answers                    | `.local/learning.sqlite` by default               | Dedicated `LEARNING_DB` D1 database (EU jurisdiction)    |
+| Private learning diary and portfolio drafts | Markdown in the student’s vault                   | Student-managed files                                    |
+| Legacy Notebook and private study records   | `notebook.sqlite` in the companion data directory | Student's local companion; never Worker storage          |
+| Private agent conversations                 | `conversations.sqlite` in that directory          | Student's local companion; excluded from notebook export |
+| Shared learning inquiries and offers        | Course record/history store                       | Existing `COURSE_DB`; source-scoped paginated reads      |
 
 The [backup runbook](docs/backups.md) covers the active production feedback and exercise stores, the book source, and the owner's default local project data.
 Snapshots are verified locally and copied to a private EU R2 bucket with a checksum manifest.

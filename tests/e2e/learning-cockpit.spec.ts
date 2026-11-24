@@ -1,3 +1,4 @@
+import { downloadedMarkdown } from "./learning-notebook.helpers.ts";
 import { test as base, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
@@ -243,38 +244,18 @@ test("reading loops retain independent thinking, reflection and a next check acr
     (await new AxeBuilder({ page }).include("#learning-cockpit").analyze())
       .violations,
   ).toEqual([]);
-  await cockpit(page)
-    .getByRole("button", { name: "Prepare notebook takeaway" })
-    .click();
-  const notebook = page.locator("#learning-notebook");
-  await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-    /Next independent check: Inspect one runtime inventory/,
+  const markdown = await downloadedMarkdown(
+    cockpit(page).getByRole("button", {
+      name: "Download takeaway as Markdown",
+    }),
   );
-  await notebook
-    .getByRole("button", { name: "Save note", exact: true })
-    .click();
-  await expect(notebook.getByRole("status")).toContainText(
-    "Saved in your private notebook",
+  expect(markdown).toContain(
+    "Next independent check: Inspect one runtime inventory",
   );
-  await notebook.getByRole("button", { name: "Notes", exact: true }).click();
-  await notebook
-    .getByRole("button", { name: "Explore and reflect", exact: true })
-    .click();
-  await expect(cockpit(page).getByLabel("What I noticed")).toHaveValue(
-    /Help me revisit this selected note/,
+  expect(markdown).toContain(
+    "[Book source](https://scalableweb.dev/chapters/reality/",
   );
   expect(model.requests).toHaveLength(sent);
-  await cockpit(page)
-    .getByRole("button", { name: "Explain directly", exact: true })
-    .click();
-  await expect(
-    cockpit(page).locator(".reading-investigation-messages strong"),
-  ).toBeVisible();
-  await expect.poll(() => model.requests.length).toBe(sent + 1);
-  expect(lastContext(model).selectedNotes).toHaveLength(1);
-  expect(lastContext(model).selectedNotes[0].body).toContain(
-    "Release success does not establish",
-  );
   await cockpit(page).getByRole("button", { name: "03 / Reflect" }).click();
   await cockpit(page)
     .getByRole("button", { name: "Start my next check" })
@@ -285,7 +266,7 @@ test("reading loops retain independent thinking, reflection and a next check acr
   await expect(
     cockpit(page).getByLabel("My prediction or uncertainty"),
   ).toHaveValue("");
-  expect(model.requests).toHaveLength(sent + 1);
+  expect(model.requests).toHaveLength(sent);
 });
 
 test("a checked exercise enters a reviewed loop without worked answers or automatic messages", async ({
@@ -328,19 +309,9 @@ test("a checked exercise enters a reviewed loop without worked answers or automa
   await assistant
     .getByRole("button", { name: "Chapter guide", exact: true })
     .click();
-  await assistant
-    .getByLabel("My explanation of the changed case")
-    .fill("I need to compare one changed boundary before generalizing.");
-  await assistant
-    .getByRole("button", {
-      name: "Explore this case in the learning cockpit",
-      exact: true,
-    })
-    .click();
-  await expect(cockpit(page).getByLabel("What I noticed")).toHaveValue(
-    /compare one changed boundary/,
-  );
-  await expect(assistant).toBeHidden();
+  await expect(
+    cockpit(page).getByLabel("My prediction or uncertainty"),
+  ).toBeVisible();
   expect(model.requests).toHaveLength(1);
 });
 

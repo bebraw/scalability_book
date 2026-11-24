@@ -264,10 +264,10 @@ function initialize(toggle: HTMLButtonElement) {
     body.append(button("Check sign-in again", refresh));
   }
   async function renderConnections(own: number) {
-    const connections = section("Private notebook & assistant");
+    const connections = section("Teaching assistant");
     const description = node(
       "p",
-      "The companion connects your private notebook and chosen assistant provider on this computer. Website sign-in is optional for these tools.",
+      "The local companion connects the book to your chosen assistant provider.",
     );
     connections.append(description);
     const client = new LearningClient();
@@ -276,13 +276,13 @@ function initialize(toggle: HTMLButtonElement) {
       try {
         const result = await client.status();
         if (own !== revision) return;
-        description.textContent = `Notebook connected${result.storage ? ` · ${result.storage}` : ""}.`;
+        description.textContent = "Companion connected.";
         connections.append(
           node(
             "p",
             result.provider
               ? `Assistant provider: ${result.teaching?.provider.name ?? result.provider}${result.teaching?.provider.model ? ` · ${result.teaching.provider.model}` : ""}. Connection checked; a reply confirms provider availability.`
-              : "Assistant provider is not enabled. Notebook writing is available.",
+              : "Assistant provider is not enabled. Choose a provider in companion setup to start a discussion.",
           ),
         );
       } catch (error) {
@@ -294,19 +294,19 @@ function initialize(toggle: HTMLButtonElement) {
       connections.append(
         node(
           "p",
-          "Notebook is not connected in this tab. Connect the companion to begin.",
+          "Connect the companion in this tab to use the teaching assistant.",
         ),
       );
     if (own !== revision) return;
     if (
-      document.querySelector('[data-learning-toggle="notebook"]:not([hidden])')
+      document.querySelector('[data-learning-toggle="assistant"]:not([hidden])')
     )
       connections.append(
         button("Open connection settings", () => {
           close();
           requestLearning({
             kind: "navigate",
-            experience: "notebook",
+            experience: "assistant",
             view: "connect",
           });
         }),

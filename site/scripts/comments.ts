@@ -391,7 +391,7 @@ if (commentsRoot) {
     form.dataset.commentForm = paragraphId;
     form.innerHTML = `
       <p id="paragraph-feedback-audience" class="comment-form-help" tabindex="-1"><strong>Who can read this?</strong> Your comment and replies are visible to you and the book’s feedback team. The team may publish a curated Reader note without your name or private replies.</p>
-      <p class="comment-form-help">Use Notebook for notes to yourself and Peer discussion to share with classmates.</p>
+      <p class="comment-form-help">Keep personal reflections in your <a href="/diary/">learning diary</a>. Use Peer discussion to share with classmates.</p>
       <label>
         <span>Category</span>
         <select name="category" required>

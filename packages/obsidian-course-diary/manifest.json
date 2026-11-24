@@ -1,0 +1,10 @@
+{
+  "id": "scalableweb-course-diary",
+  "name": "Course diary",
+  "version": "0.1.0",
+  "minAppVersion": "1.8.3",
+  "description": "Keep source-linked highlights, discuss a reading and prepare selected portfolio excerpts for Elements of Scalable Web Development.",
+  "author": "Elements of Scalable Web Development",
+  "authorUrl": "https://scalableweb.dev/",
+  "isDesktopOnly": true
+}

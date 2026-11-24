@@ -9,15 +9,23 @@ Implemented status identifies verified software behavior; production rollout and
 [ADR-035](adrs/implemented/ADR-035-ground-the-teaching-assistant-in-a-shared-teaching-policy.md) defines the shared versioned teaching policy, recognizable manner and separate evaluation of usability, support and independent learning.
 [ADR-036](adrs/implemented/ADR-036-open-notebook-and-assistant-as-independent-panels.md) refines their presentation into independent panels with one shared connection.
 
-## Current implementation
+## Diary, assistant and existing Notebook records
+
+[ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) moves the recommended diary into a local Obsidian vault.
+The [student guide](course-diary.md) covers the numbered starter, linked highlights, optional desktop commands, discussion beside the note, portfolio preparation and Notebook recovery.
+The book and plugin exchange public reading links and Markdown.
+Students control which writing enters a question or course portfolio.
+The book continues to own exercises, interactive demos, peer inquiry and the teaching assistant.
+
+### Account and teaching assistant
 
 **Account → Account & connections** shows website sign-in, course access, the exercise-answer owner and private companion/provider connection together.
 GitHub and course email sign-in retain separate sessions; enrolled students can request email links directly from this view without leaving their reading or unfinished writing.
 If email opens in another tab, confirm it there and return to the original tab to keep its drafts; **Check sign-in again** refreshes the account explicitly.
 The email link returns to the initiating passage/activity after confirmation.
-The website account is optional for notebook writing and assistant discussion.
+A student can write in the local vault and discuss a reading with their companion without a website account.
 Only an existing companion session is checked when opening the account view; no notebook contents or model replies are requested.
-**Open connection settings** opens the existing notebook Connect section on pages that provide learning tools; other pages link to companion setup.
+**Open connection settings** opens the teaching assistant’s Connect section on pages that provide learning tools; other pages link to companion setup.
 Provider status reports configuration and connection, while an actual assistant reply establishes provider availability.
 Discuss shows this status beside the message composer.
 A notebook-only connection disables Send and offers **Set up assistant replies**; Connect provides guided setup/start commands and links for Codex, direct API keys and local models.
@@ -30,67 +38,19 @@ The student reviews and sends it, then can use the existing reviewed takeaway ac
 An unfinished assistant message is protected by the existing replacement confirmation.
 The source and prepared message survive companion connection recovery and book navigation in tab state.
 
-The local companion provides an authenticated private notebook API: note capture and revision history, concept self-assessment, portable export/import and selected-note submission drafts.
-The whole-book Notebook and Teaching assistant entry points load the shared coordinator and independently rendered panels on demand on reading, concept, exploration and demo pages, independently of feedback sign-in.
-Notebook and Assistant remain available beside the Cockpit entry; passage context comes from an explicit selection in the reading, without paragraph Note buttons.
-The header groups compact notebook and question-bubble icons after primary navigation, with visible **Cockpit**, **Notebook** and **Assistant** captions and full accessible names.
-Each visible panel highlights its launcher and exposes its expanded state; choosing it again closes only that panel without discarding drafts.
-Escape or the panel's close button returns keyboard focus to that experience's launcher when focus was inside the panel.
-Opening either experience captures the selection before loading/focusing the interface.
-Notebook offers **Use selected text** and Teaching assistant offers **Discuss selected text** when already open.
-Notebook captures a private writing context; assistant selection prepares a source without sending a message.
-Notebook's Write view states that no assistant or model account is needed and explains how to attach a reading selection before the selection-only control appears.
-When the panel covers the reading, the guidance points to closing it, selecting the passage and reopening Notebook.
-A chapter note keeps the reading link and authored concept membership without copying the chapter text.
-The source is visible in Write; **Preview the selected source** reveals a bounded quote while its full captured text remains in the saved record.
-Choosing **New note** or **New note for this reading** brings the new draft's source link into view and puts keyboard focus on it.
-Cancelling a replacement keeps the unfinished draft and lets keyboard users continue from the same button.
-Writing and Save actions precede kind/title details.
-Discuss puts the message before optional conversation/goal/support controls in the **Help: … · Settings** disclosure, whose summary identifies the current help mode.
-Saved conversation labels include their last-updated time in the reader's locale to help distinguish discussions from the same chapter.
-Starting or sending a new conversation immediately adds and selects it in the picker; changing the investigation source clears that selection.
-Each open panel follows book navigation and retains its active section.
-Closing both keeps later pages lazy, with no companion request until reopening.
-Opening either experience preserves the book's existing widths and positions, including its navigation, reading column and wider demos.
-The fixed notebook uses the upper-right margin and the smaller assistant sits at the lower right.
-Notebook's **Size** control offers labelled width and height sliders for pointer or keyboard use, plus **Reset size** to restore automatic sizing.
-Preferred dimensions stay in the tab session across chapter navigation and reload; the displayed size is clamped to the current viewport and the space above an open assistant, without replacing the preference.
-At widths up to 640 CSS pixels the existing full-width mobile panel applies and size controls are hidden; returning to a larger viewport restores the preference.
-Resizing changes only Notebook's overlay and does not save writing, send a message or change the book or assistant geometry.
-Both can remain visible without overlapping on screens wider than 68rem and taller than 42rem; the notebook shortens to leave room for the assistant.
-On more compact screens only the foreground panel is visible, while the other retains its open state and draft.
-Its header launcher brings it forward; closing the foreground panel reveals the other if it remains open.
-The panels overlay the reading area when the right margin is insufficient; close them to reach covered passages or demo controls.
-Each has independently scrollable content beneath its navigation.
-Independent open states, foreground experience, remembered sections, unfinished notebook writing, separate notebook/assistant selected note IDs, submission preparation and assistant message/goal/help choices live in this website's tab session independently of the connection token.
-Assistant state also retains the captured source, active conversation ID and initiating browser identity for resuming bounded requests after navigation.
-Legacy version 1 tab records map Guide/Agent/Peers to Teaching assistant and restore their single open experience.
-Additive version 1 fields retain both panels and independent selections without migrating notebook or conversation databases.
-A separate optional `notePreview` retains one selected-exchange preview, its source/message identities, choices and editable text across reloads and navigation, independently of the active discussion.
-Each text field is bounded at 32,000 characters so an over-limit reply can be reviewed without truncation; an invalid preview is discarded without discarding Notebook writing or the assistant message draft.
-Unsaved notes retain their original source across navigation; starting a replacement requires confirmation when writing would be lost.
-This includes **Notes → Edit** and **Notes → Revisit**; cancelling preserves the unfinished draft, while accepting clears the previous save confirmation.
-Guide and concept choices follow the current reading; peer inquiry uses the current page or its captured passage.
-Discuss retains its own chosen source across navigation and saved-conversation selection, independently of an unfinished notebook note; **Discuss the current reading** prepares a deliberate replacement.
-Only Save note creates or revises a durable companion record; tab continuity is not a notebook backup and does not survive closing the tab.
-Notes defaults to the current chapter/page, with Whole notebook available for cross-book review.
-Notebook presents **Write**, **Notes** and **Concepts**; **Prepare** and the shared **Connect** settings live under **More learning tools**.
-Teaching assistant presents **Discuss**, **Chapter guide** and **Peer discussion**, with the same connection settings.
-Opening or bringing either panel forward does not save, send a message or require a second connection.
-There is no experience chooser within the panels.
-Checking notes in Notebook does not change the assistant's selected context; an explicit discussion handoff supplies the chosen set.
-Shared record refreshes preserve the assistant's unsent message and ongoing discussion.
-**Discuss this note** supplies exactly that note; **Discuss selected notes** supplies the chosen set, with bounded source/note previews before sending.
-An assistant reply offers **Write a takeaway** (a blank personal draft) and **Use as a notebook draft**, which previews the chosen reply with its nearest preceding student question or response.
-The learner can edit or omit either part; a legacy reply without a preceding student turn offers only the recorded reply.
-The preview retains the selected exchange's full source, actual turn-supplied note IDs and recorded teaching provenance, excluding other turns and browser observations.
-If reply metadata would exceed the existing 2,000-character assistance-history limit, the preview explains that the metadata will be marked as shortened; conversation/message identities are retained and the original reply remains the source for its full metadata.
-It stays outside the polling message list so later replies cannot overwrite its edits or move focus; selecting another exchange asks before replacing it.
-Closing the preview retains its edits in the tab, and reopening that exchange restores them.
-**Prepare notebook draft** hands over the selected literal text with speaker labels, without saving; the displayed 16,000-character limit includes those labels and blocks an over-limit handoff until the learner shortens or omits text.
-No draft text is silently truncated.
-Either handoff asks before replacing unfinished Notebook writing; declining replacement preserves both drafts, and only the student's **Save note** action creates the notebook record.
-[learning-note-preview.ts](../site/scripts/learning-note-preview.ts) owns this presentation within the existing selected-evidence boundary of ADR-034; no companion schema, protocol or provider change is required.
+The local companion stores private conversations and earlier Notebook records.
+The reading header's **Diary** link opens the getting-started guide.
+Selecting a passage on a reading offers **Copy highlight** and **Download Markdown** with a public source link.
+The book's tutorial and learning loop can also download a takeaway.
+The **Teaching assistant** launcher opens discussion in the book.
+A public reading URL with `?assistant=1` opens the same panel without sending a question or reading the vault.
+The student chooses a source and provider context before sending.
+The plugin can open this page in Obsidian's desktop Web viewer or in the default browser.
+Chrome on the companion's computer is the supported route when the embedded connection is unavailable.
+The assistant retains the chosen reading and unsent draft across navigation in the same tab.
+Reviewing a selected exchange keeps attribution and lets the student edit the excerpt for the diary.
+The [legacy recovery link](course-diary.md#bring-over-an-existing-notebook) opens the old Notebook with its existing storage, full JSON backup and selected Markdown export.
+
 Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
 Long code lines scroll within their code block; each block is a named keyboard focus target with a visible focus indicator, so arrow keys can reveal the complete text and Tab can leave the block.
 Expanded browser observations wrap within the assistant panel and retain their full recorded text.
@@ -130,7 +90,7 @@ The website/Worker never owns this private notebook or provider credentials.
 
 The first cockpit opening offers **Try the tutorial**, with **Not now** leaving the learning loop available immediately.
 **Cockpit → Tutorial** reopens it at any time; the [setup guide's tutorial link](/notebook/setup/#try-the-learning-tutorial) also opens it directly.
-Five optional steps rehearse a prediction, a bounded queue illustration, an explicitly authored example reply, personal reflection and a preview of Notebook saving.
+Five optional steps rehearse a prediction, a bounded queue illustration, an explicitly authored example reply, personal reflection and a preview of a Markdown takeaway.
 The tutorial works without a companion, makes no model calls and does not change real demo controls or actual learning-loop writing.
 It explains source/evidence boundaries, selected assistant context, explicit saving, independent next checks, recent loops, peer sharing and the separation of website sign-in from companion connection.
 
@@ -138,9 +98,8 @@ The browser owns tutorial progress and bounded writing in its tab session, indep
 A browser-local preference remembers dismissing or finishing the invitation; it contains no tutorial writing and is independent of sign-in.
 Exiting retains the current step for replay across book navigation; finishing starts replay from the beginning while retaining the rehearsal writing in the tab.
 Unavailable browser storage falls back to the mounted rehearsal's memory.
-Only **Prepare this as a real Notebook draft** invokes the existing reviewed handoff, using a tutorial-labelled source and preserving the unfinished-note confirmation.
-An enabled model is not required for that handoff; a connected notebook companion is.
-Only **Save note** persists a Notebook entry, and tutorial completion does not imply learning mastery or a course completion mark.
+The final download includes the learner’s writing and tutorial source.
+It works before connecting a companion.
 
 ### Your own learning loop
 
@@ -202,11 +161,8 @@ Tab continuity is not durable storage or a notebook backup.
 Pausing or switching focus alone does not cancel the provider's turn.
 Connection failures retain writing; **Start a new conversation** retains writing and leaves the prior conversation in companion history.
 
-In Reflect, write **My takeaway** and optionally **My next independent check**, then choose **Prepare notebook takeaway**.
-The handoff initializes Notebook, protects its existing unfinished-writing confirmation and prepares an editable reflection containing the student's own takeaway, initial thinking, evidence, last sent snapshot and next check.
-Explicit selected notes become related-note references; activity/conversation assistance provenance is retained.
-**Start my next check** opens a separate draft from the chosen next check and the student-written takeaway, retaining the previous loop and sending nothing automatically.
-Only **Save note** creates a durable notebook entry; no cockpit action judges mastery, marks a concept, submits coursework or changes a grade.
+In Reflect, students can download their takeaway, evidence and next check as Markdown.
+The tab retains the unfinished learning loop for a return visit. **Start my next check** opens a separate draft based on the student's own writing.
 [ADR-044](adrs/implemented/ADR-044-generalize-the-learning-loop-through-a-contextual-cockpit.md) generalizes the first queue slice recorded in [ADR-043](adrs/implemented/ADR-043-activate-reading-through-shared-investigation-sessions.md).
 
 ## Start the companion
@@ -322,6 +278,9 @@ The student guide owns the concrete recovery steps and limits.
 
 ## Notebook and portability
 
+This section covers existing records accessed through [Notebook recovery](course-diary.md#bring-over-an-existing-notebook).
+For new writing, use the [diary guide](course-diary.md).
+
 Notes retain their original source URL, anchor, excerpt and available revision.
 On the current page, passage notes compare the captured excerpt with the live source text.
 Demo notes check that their anchored demo exists, because authored captions and saved observations need not match its changing controls/output.
@@ -340,7 +299,7 @@ HTTP imports are limited to 16 MB; other JSON requests are limited to 96 KB.
 Selected-note preparation produces readable Markdown for review and use in the existing diary/portfolio workflow.
 It sends no notebook record to the course application and includes no unselected notes.
 Students remain responsible for selecting the material and submitting it under the existing course requirements.
-The [course introduction](../specifications/00_introduction.md#personal-notes-and-learning-diaries) makes tool choice explicit: Notebook and Teaching assistant are optional, and students may use other note-taking tools without importing their work here.
+The [course introduction](../specifications/00_introduction.md#personal-notes-and-learning-diaries) recommends Obsidian and accepts written, audio and video entries.
 **Prepare** supplies current selected writing and source links, not a complete portfolio or a rubric assessment; **Copy draft** and **Download Markdown** are manual export steps, while **Open course workspace** only navigates to `/course/`.
 The [student walkthrough](learning-companion-setup.md#prepare-material-for-your-portfolio) distinguishes local writing from course drafts/files visible to the student and staff, and names the course's explicit **Submit portfolio** action.
 The whole-notebook JSON backup retains private revision/source/concept history and is separate from this selected-material export.
@@ -382,8 +341,9 @@ npm run types:check
 ```
 
 The checks cover restart persistence, accepted revisions, stale-write rejection, portable restore/import conflicts, selected-note preparation and the connection/origin/session boundary with synthetic notes.
-Browser checks cover whole-book entry points, lazy loading, capture, revision history, concept judgments, revisit, reconnection, accessibility and mobile dark theme.
-Concurrent-panel checks cover separate selections and unsent work, independent closing, non-overlapping desktop bounds, compact-screen foreground transitions, shared connection recovery and retained sections/drafts across chapter navigation and reload.
+Browser checks exercise reading selections, Markdown downloads, the public TA link, account connection, existing-record recovery, and the separation between a private attempt and a shared peer contribution.
+The starter and plugin tests cover the ZIP contents, reviewed captures, selected portfolio excerpts and the TA handoff.
+The [evaluation guide](learning-workspace-evaluation.md#try-obsidian-as-the-diary-editor) describes a first-use and return-visit rehearsal in a disposable desktop vault.
 The optional real-provider check uses a dedicated authenticated profile and a temporary synthetic notebook:
 
 ```bash

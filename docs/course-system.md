@@ -89,7 +89,7 @@ An instructor's course link supplies the run ID; students can also enter it expl
 A remembered course is a tab navigation preference, not proof of enrollment.
 Email requests from a reading/peer activity retain a validated internal return location; confirmation returns there instead of the course overview.
 Requests from the ordinary course workspace retain its existing overview behavior.
-When email opens another tab, unfinished notebook, assistant and exercise writing remains in the original tab; return there and choose **Check sign-in again** if necessary.
+When email opens another tab, unfinished assistant and exercise writing remains in the original tab; return there and choose **Check sign-in again** if necessary.
 GitHub and course sessions can be signed out independently through Account.
 
 Verified email students can also save private chapter exercise answers under their course run and stable student identity.
@@ -224,7 +224,7 @@ The public grading page publishes the standard group criteria; staff agree any e
 The [October to December 2026 pilot review pack](solo-pilot-2026/README.md) provides a draft study agreement, dated milestones, independent lecture activities and an instructor preparation checklist for a pre-course solo run.
 Complete its operational choices and retain the agreed arrangement privately before using it with a student.
 
-New runs use requirements `2026-10-v2` and rubric `2026-10-solo-equivalence-v2`.
+New runs use requirements `2026-11-v1` and rubric `2026-10-solo-equivalence-v2`.
 Historical runs keep their pinned requirements and rubric; do not rewrite them to enable this route.
 The [project introduction](../specifications/00_introduction.md#approved-solo-route) and all three phase briefs describe the work for an allocated exception; the [assessment equivalents below](#solo-assessment-equivalents) guide the individual agreement.
 The common application, three fresh implementations, workload, points and passing minima remain required.
@@ -317,7 +317,8 @@ Staff must manage storage cleanup outside the UI; no destructive removal of orig
 
 ## Run requirements and evidence checklists
 
-New runs retain the current requirement edition, `2026-10-v2`.
+New runs retain the current requirement edition, `2026-11-v1`.
+October runs retain the introduction and checklist published with `2026-10-v2`.
 The course has not run yet; this is the sole pre-course contract and there are no earlier run contracts to maintain.
 It assigns a large model to Establish, a small model to Challenge, and a declared small/large or mixed-model fleet to Compare.
 The pre-course scope review retains three fresh builds, maintained specifications and an evolving ADR-style log, with a standard six-field ownership card in each phase's evidence index.
@@ -350,6 +351,8 @@ Changing final evidence creates another revision and makes prior project assessm
 Assess one project bundle per group and phase.
 Record its group identifier, frozen membership, assessed implementation revision, criterion scores, brief reasons, and missing evidence.
 Link that result to each member’s individual record rather than assessing duplicate project submissions.
+Students can prepare selected excerpts in their [local diary](course-diary.md#prepare-material-for-your-portfolio).
+Saving a course draft or uploading a file makes it accessible to staff.
 Keep private individual portfolios together by phase, scoring diary entries by lecture and self/peer assessment by criterion.
 
 Release the group project breakdown and feedback to the group, and each student’s individual breakdown, total, and status against every passing requirement to that student.

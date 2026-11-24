@@ -14,19 +14,18 @@ Each later phase also benefits from your growing domain knowledge, so the compar
 
 ## Personal notes and learning diaries
 
-Use a note-taking tool that works for you: Obsidian, plain files, another notes application or the book's optional **Notebook**.
-Notebook and Teaching assistant are optional study aids; neither is required for keeping a learning diary or submitting course work.
-Keep your working notes private and select the material you want to develop into assessed work.
+Start your learning diary with the [Obsidian course starter](/diary/).
+Open the numbered phase note, find the current lecture and use its question to start writing.
+Keep the folder private and outside the group's project repository.
+The starter also works in another Markdown editor.
 
 A learning-diary entry identifies one concrete idea, model, failure or trade-off from a lecture and connects it to project evidence, an earlier assumption or a decision you would revisit.
 Entries may be written, audio or video; the [learning-diary criteria](grading.md#participation-and-learning-diary-3-points-per-lecture) assess specificity and reflection rather than production polish.
 The existing participation, diary and assessment requirements apply whichever tool you use.
 Label entries by lecture and include them with your self- and peer-assessment in the phase's private individual portfolio, separately from the group's technical bundle.
 
-Notebook's **Prepare** tool assembles only selected notes into an editable Markdown draft.
-It is an optional starting point for your existing diary or portfolio, not a complete portfolio or an additional deliverable.
-You review and transfer the relevant material into the announced course submission route yourself; your notes application does not submit it automatically.
-The [setup guide's submission walkthrough](/notebook/setup/#prepare-material-for-your-portfolio) explains that handoff and the difference between private notes, course drafts and submitted work.
+Choose passages from your diary for the matching lecture fields in **My portfolio**, or attach your selected written, audio or video evidence.
+The [setup guide's submission walkthrough](/diary/#prepare-material-for-your-portfolio) explains when course staff can see a draft and how to submit it.
 The instructor publishes submission locations and deadlines in the [course workflow](https://github.com/bebraw/scalability_book/blob/main/specifications/course_environment.md#publish-the-course-workflow).
 
 ## Groups, submissions, and access

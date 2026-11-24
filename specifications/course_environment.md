@@ -73,7 +73,9 @@ The instructor should publish one filled table per course run with the following
 
 Before each phase begins, publish the operational details for the [group and submission workflow](00_introduction.md#groups-submissions-and-access).
 Use one group record per phase and one private individual portfolio per student and phase.
-Students may keep [personal notes and learning diaries](00_introduction.md#personal-notes-and-learning-diaries) in their preferred tool; the book's Notebook and Teaching assistant are optional.
+Recommend the [Obsidian diary starter](https://scalableweb.dev/diary/) and keep other editors and audio or video diaries available.
+The [diary criteria](00_introduction.md#personal-notes-and-learning-diaries) apply whichever tool a student chooses.
+The book's Teaching assistant is optional.
 State the actual submission route separately from note-taking tools and the assigned coding-agent setup.
 
 | Detail         | Required course-run decision                                                                                                                                                                                            |

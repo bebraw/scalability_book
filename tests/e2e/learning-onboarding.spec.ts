@@ -1,17 +1,18 @@
 import {
-  activeLearningPanel,
+  downloadedMarkdown,
   chooseNotebookTool,
 } from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import AxeBuilder from "@axe-core/playwright";
+import { openLearningNotebook } from "../../scripts/lib/learning-notebook.ts";
 import { companionRelease } from "../../shared/learning-connection.ts";
 
-test("a packed companion supports an optional first investigation and retains the student's original work after restart", async ({
+test("an existing packed companion recovers selected diary Markdown and a full backup across restart", async ({
   page,
   baseURL,
 }) => {
@@ -47,7 +48,7 @@ test("a packed companion supports an optional first investigation and retains th
     "--origin",
     new URL(baseURL!).origin,
     "--port",
-    "18896",
+    "18974",
   ];
   let child: ReturnType<typeof spawn> | null = null;
   const start = async () => {
@@ -86,75 +87,75 @@ test("a packed companion supports an optional first investigation and retains th
     }
     child = null;
   };
+  // Seed an existing private notebook before the browser connects to it.
+  const notebook = openLearningNotebook(data);
+  const initial = notebook.saveEntry({
+    kind: "attempt",
+    title: "My cache prediction",
+    body: "I predict the asset will be stale.",
+    source: {
+      url: "https://scalableweb.dev/chapters/benchmarking/#which-requests-counted",
+      title: "Which requests counted?",
+      kind: "passage",
+      anchor: "which-requests-counted",
+      excerpt: "A synthetic observation.",
+      revision: "synthetic",
+      conceptIds: [],
+    },
+  });
+  const latest = notebook.saveEntry({
+    ...initial,
+    expected: initial.revision,
+    body: "At 400 days the asset was stale.",
+  });
+  const privateEntry = notebook.saveEntry({
+    ...initial,
+    id: undefined,
+    title: "Keep private",
+    body: "An unrelated private reflection.",
+  });
+  notebook.close();
   try {
     await start();
-    await page.goto("/demos/#demo-cache-decision-lab");
+    await page.goto("/diary/");
     await page
-      .locator(".site-header")
-      .getByRole("button", { name: "Notebook", exact: true })
+      .getByRole("link", { name: "Notebook recovery", exact: true })
       .click();
-    const panel = activeLearningPanel(page);
-    await panel.getByLabel("Companion address").fill("http://127.0.0.1:18896");
+    const panel = page.locator("#learning-notebook");
+    await panel.getByLabel("Companion address").fill("http://127.0.0.1:18974");
     await expect(panel.getByLabel("Pairing code")).toHaveCount(0);
-    await panel
-      .getByRole("button", { name: "Connect companion", exact: true })
-      .click();
-    await expect(panel.getByRole("status")).toHaveText(
-      "Connected to your private notebook.",
-    );
+    const connect = () =>
+      panel
+        .getByRole("button", { name: "Connect companion", exact: true })
+        .click();
+    await connect();
+    await expect(panel.getByRole("status")).toContainText("Connected");
     await chooseNotebookTool(panel, "Connect");
     await expect(
       panel.getByText(
-        `Companion ${companionRelease.version}; protocol ${companionRelease.protocol}; notebook-only.`,
+        `Companion ${companionRelease.version}; protocol ${companionRelease.protocol}; no assistant provider.`,
       ),
     ).toBeVisible();
-    await panel.getByRole("button", { name: "Explore this reading" }).click();
-    await expect(
-      panel.getByRole("button", { name: "Save demo result" }),
-    ).toBeDisabled();
-    await expect(
-      panel.getByText(
-        "Save a prediction or uncertainty to enable Save demo result.",
-        { exact: true },
-      ),
-    ).toBeVisible();
-    await panel
-      .getByLabel("My prediction or uncertainty")
-      .fill(
-        "I expect the fresh asset to need an origin request when its age exceeds365days.",
-      );
-    await panel.getByRole("button", { name: "Save my starting point" }).click();
-    await page.locator("[data-cache-age]").fill("100");
-    await page.locator("[data-cache-age]").dispatchEvent("input");
-    await panel.getByRole("button", { name: "Save demo result" }).click();
-    await expect(
-      panel.getByRole("status").filter({ hasText: "Demo result saved" }),
-    ).toBeVisible();
-    await expect(panel.locator(".learning-observation")).toContainText(
-      "Inputs saved:",
+    const transfer = page.waitForEvent("download");
+    await panel.getByRole("button", { name: "Export notebook backup" }).click();
+    const file = await (await transfer).path();
+    const archive = JSON.parse(await readFile(file!, "utf8"));
+    expect(archive.entries).toEqual(
+      expect.arrayContaining([latest, privateEntry]),
     );
-    await panel
-      .getByLabel("My reflection on this check")
-      .fill(
-        "At400days the stored asset is stale. I still need actual browser records before making a claim about my application.",
-      );
-    await panel.getByRole("button", { name: "Save my reflection" }).click();
-    await panel.getByRole("button", { name: "Review my saved notes" }).click();
-    await expect(
-      panel.getByRole("heading", {
-        name: "Cache decision lab: initial thinking",
-        exact: true,
+    expect(latest.history.map((item) => item.body)).toEqual([
+      initial.body,
+      latest.body,
+    ]);
+    const bulk = await downloadedMarkdown(
+      panel.getByRole("button", {
+        name: "Download previous notes as Markdown",
       }),
-    ).toBeVisible();
-    await expect(
-      panel.getByRole("heading", {
-        name: "Cache decision lab: reflection",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await chooseNotebookTool(panel, "Connect");
+    );
+    expect(bulk).toContain(latest.body);
+    expect(bulk).toContain(privateEntry.body);
+
     await page.setViewportSize({ width: 390, height: 844 });
-    await expect(panel).toBeVisible();
     const bounds = await panel.boundingBox();
     expect(bounds!.width).toBeLessThanOrEqual(390);
     expect(
@@ -167,37 +168,36 @@ test("a packed companion supports an optional first investigation and retains th
       "cannot tell us which",
     );
     await start();
-    await panel
-      .getByRole("button", { name: "Connect companion", exact: true })
-      .click();
+    await connect();
+    await expect(panel.getByRole("status")).toContainText("Connected");
     await chooseNotebookTool(panel, "Notes");
-    await expect(
-      panel.getByRole("heading", {
-        name: "Cache decision lab: initial thinking",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(
-      panel.getByRole("heading", {
-        name: "Cache decision lab: reflection",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await chooseNotebookTool(panel, "Connect");
-    await panel
-      .getByRole("button", { name: "Disconnect", exact: true })
-      .click();
-    // Reconnection in the same process requires no restart or copied code.
-    await panel
-      .getByRole("button", { name: "Connect companion", exact: true })
-      .click();
+    await panel.getByLabel("Notes to show").selectOption("all");
+    const saved = panel
+      .locator("article")
+      .filter({
+        has: page.getByRole("heading", { name: initial.title, exact: true }),
+      });
+    await saved.getByRole("button", { name: "Edit", exact: true }).click();
+    const edited = "The stale response validated my prediction at 400 days.";
+    await panel.getByLabel("Your thinking").fill(edited);
+    await panel.getByRole("button", { name: "Save note", exact: true }).click();
+    await expect(panel.getByRole("status")).toContainText("Saved");
     await chooseNotebookTool(panel, "Notes");
+    await panel.getByLabel("Notes to show").selectOption("all");
+    await panel
+      .getByLabel("Select My cache prediction", { exact: true })
+      .check();
+    await panel.getByRole("button", { name: "Prepare selected notes" }).click();
+    await panel.getByRole("button", { name: "Build submission draft" }).click();
     await expect(
-      panel.getByRole("heading", {
-        name: "Cache decision lab: reflection",
-        exact: true,
-      }),
-    ).toBeVisible();
+      panel.getByLabel("Review and revise your submission material"),
+    ).toHaveValue(/400 days/);
+    const markdown = await downloadedMarkdown(
+      panel.getByRole("button", { name: "Download Markdown" }),
+    );
+    expect(markdown).toContain(edited);
+    expect(markdown).toContain(initial.source.url);
+    expect(markdown).not.toContain(privateEntry.body);
   } finally {
     await stop();
     await rm(directory, { recursive: true, force: true });

@@ -167,7 +167,7 @@ export function mountLearningPractice(
           answer.textarea.value = "";
           persist();
           feedback.textContent =
-            "Independent attempt saved separately in Notes. Keep your own conclusion; this does not mark a concept understood.";
+            "Your independent attempt was saved in the local companion.";
         } catch (error) {
           feedback.textContent =
             error instanceof Error
@@ -186,7 +186,7 @@ export function mountLearningPractice(
       `I want help with this related case: ${question.textarea.value.trim() || activity.question}\n\nMy thinking so far: ${answer.textarea.value.trim() || "I am unsure how to begin."}`,
     ),
   );
-  const revisit = node("button", "Revisit later in Notes");
+  const revisit = node("button", "Open diary guide");
   const loop = node("button", "Explore this case in the learning cockpit");
   loop.type = "button";
   loop.addEventListener("click", () =>
@@ -220,7 +220,7 @@ export function mountLearningPractice(
     check,
     node(
       "p",
-      "For a later revisit, use Revisit on a saved note and recall the idea before rereading. You choose when.",
+      "For a later revisit, write a question in your diary and try answering it before rereading.",
     ),
     revisit,
   );

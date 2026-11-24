@@ -70,9 +70,8 @@ interface Options {
   preview: () => NotebookDraftPreview | null;
   previewChanged: (preview: NotebookDraftPreview) => void;
   source: () => LearningSource;
-  selected: () => string[];
   entries: NotebookEntry[];
-  notes: () => void;
+  loadAttempts: () => Promise<void>;
   currentReading: () => void;
   changed: () => void;
   active: () => boolean;
@@ -158,6 +157,14 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
   );
   const demoSelect = element("select");
   const reading = draft.source;
+  const selectedAttempts = new Set<string>();
+  const sourceAttempts = (reading: LearningSource) =>
+    options.entries.filter(
+      (entry) =>
+        entry.kind === "attempt" &&
+        entry.source.url === reading.url &&
+        entry.source.anchor === reading.anchor,
+    );
   const context = element("section");
   context.className = "learning-context";
   context.setAttribute("aria-label", "Assistant context");
@@ -179,7 +186,10 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       );
       context.append(passage);
     }
-    if (new URL(reading.url).pathname !== location.pathname)
+    if (
+      new URL(reading.url).pathname !== location.pathname ||
+      reading.anchor !== location.hash.slice(1)
+    )
       context.append(
         element(
           "p",
@@ -187,37 +197,24 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
         ),
         button("Discuss the current reading", options.currentReading),
       );
-    const noteContext = element("details");
-    noteContext.setAttribute("aria-label", "Selected notebook context");
-    noteContext.append(
-      element(
-        "summary",
-        `${options.selected().length} notebook notes selected for context`,
-      ),
-    );
-    for (const id of options.selected()) {
-      const entry = options.entries.find((note) => note.id === id);
-      if (entry) {
-        const link = element("a", entry.source.title);
-        link.href = sourceLink(entry.source);
-        noteContext.append(
-          element("h3", entry.title),
-          link,
-          element(
-            "p",
-            entry.body.slice(0, 300) + (entry.body.length > 300 ? "…" : ""),
-          ),
-        );
-      }
-    }
-    noteContext.append(button("Choose notebook context", options.notes));
     context.append(
-      noteContext,
       element(
         "p",
-        "Only this source and selected notes are sent with your message.",
+        "Sending shares this source, your message and any checked attempt with your companion’s provider.",
       ),
     );
+    for (const entry of sourceAttempts(reading)) {
+      const checkbox = element("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = selectedAttempts.has(entry.id);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) selectedAttempts.add(entry.id);
+        else selectedAttempts.delete(entry.id);
+      });
+      context.append(
+        field(`Include my attempt: ${entry.body.slice(0, 160)}`, checkbox),
+      );
+    }
   }
   container.insertBefore(context, toolbar);
   const pageOption = element(
@@ -357,6 +354,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     ),
   );
   toolbar.append(
+    button("Load my saved attempts for this reading", options.loadAttempts),
     button("Save initial thinking", () =>
       options.initial(conversation?.source ?? source()),
     ),
@@ -370,7 +368,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
       "p",
       options.provider
         ? `${options.provider} enabled. Send a message to check that it can reply.`
-        : "Notebook-only connection. Choose Codex, an API key provider or a local model for assistant replies. Your message stays here while you set up the provider.",
+        : "No assistant provider is connected. Choose Codex, an API key provider or a local model for assistant replies. Your message stays here while you set up the provider.",
     ),
   );
   if (!options.provider)
@@ -404,7 +402,9 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
           goal: draft.goal,
           mode: draft.mode,
           supportNeed: draft.supportNeed,
-          noteIds: options.selected(),
+          noteIds: sourceAttempts(conversation!.source)
+            .filter((entry) => selectedAttempts.has(entry.id))
+            .map((entry) => entry.id),
           browserId: draft.browserId,
         },
       ),
@@ -453,10 +453,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     messages.replaceChildren();
     if (!conversation) {
       messages.append(
-        element(
-          "p",
-          "Start here or reopen a saved conversation. You can take notes without connecting a model.",
-        ),
+        element("p", "Start here or reopen a saved conversation."),
       );
       return;
     }
@@ -524,7 +521,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
         const teaching = message.teaching
           ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}${message.teaching.provider.model ? `; model ${message.teaching.provider.model}` : ""}`
           : "; teaching policy not recorded";
-        const prepare = button("Use as a notebook draft", () =>
+        const prepare = button("Review for diary", () =>
           notePreview.open({
             conversationId: selectedConversation.id,
             replyId: message.id,
@@ -541,7 +538,7 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
         );
         prepare.dataset.learningNotebookReply = message.id;
         card.append(
-          button("Write a takeaway", () =>
+          button("Download a takeaway prompt", () =>
             options.accept(
               "",
               `Student-written takeaway after discussion; conversation ${selectedConversation.id}; message ${message.id}${teaching}`,

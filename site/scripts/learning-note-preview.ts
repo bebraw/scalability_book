@@ -62,7 +62,7 @@ export function mountLearningNotePreview(
 ) {
   const region = element("section");
   region.className = "learning-context learning-note-preview";
-  region.setAttribute("aria-label", "Notebook draft preview");
+  region.setAttribute("aria-label", "Diary exchange preview");
   container.append(region);
   const prefix = `learning-note-preview-${++identity}`;
 
@@ -71,7 +71,7 @@ export function mountLearningNotePreview(
     region.hidden = !preview?.open;
     region.replaceChildren();
     if (!preview?.open) return;
-    const heading = element("h3", "Notebook draft preview");
+    const heading = element("h3", "Diary exchange preview");
     heading.tabIndex = -1;
     const source = element("a", preview.source.title);
     source.href = sourceLink(preview.source);
@@ -79,7 +79,7 @@ export function mountLearningNotePreview(
       heading,
       element(
         "p",
-        "Choose and edit the parts of this exchange to take into Notebook. The draft keeps the speaker labels below. Only Save note keeps it in your notebook.",
+        "Edit the parts of this exchange you want to take into your diary. The Markdown download includes the speaker labels, book source and assistance record.",
       ),
       source,
     );
@@ -87,14 +87,14 @@ export function mountLearningNotePreview(
     count.className = "learning-hint";
     count.id = `${prefix}-count`;
     count.setAttribute("role", "status");
-    const prepare = element("button", "Prepare notebook draft");
+    const prepare = element("button", "Download Markdown");
     prepare.type = "button";
     prepare.setAttribute("aria-describedby", count.id);
     const update = () => {
       const draft = buildNotebookDraft(preview);
       const length = draft.body.length;
       const over = length > 16_000;
-      count.textContent = `${length.toLocaleString("en-US")} of 16,000 characters, including speaker labels.${over ? " Shorten the text or omit a part before preparing the draft; nothing will be cut off automatically." : length ? " Review the draft in Notebook before saving." : " Include some writing to prepare a draft."}`;
+      count.textContent = `${length.toLocaleString("en-US")} of 16,000 characters, including speaker labels.${over ? " Shorten the text or omit a part before preparing the draft; nothing will be cut off automatically." : length ? " Ready to download." : " Include some writing to prepare a draft."}`;
       if (draft.metadataShortened)
         count.textContent +=
           " Reply metadata is too long for the note history; it will be marked as shortened, with message identities retained. Full metadata stays with the original reply.";

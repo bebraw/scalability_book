@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-07
 
+**Superseded in part:** [ADR-066](ADR-066-keep-course-diaries-in-obsidian.md) moves everyday diary writing and the book’s takeaway handoff to student-owned Markdown.
+
 ## Context
 
 [ADR-034](../implemented/ADR-034-separate-the-private-notebook-from-the-teaching-assistant.md) separates private writing from instructional discussion, with explicit reviewed handoffs and one shared companion connection.

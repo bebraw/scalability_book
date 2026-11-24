@@ -1,6 +1,6 @@
 import type { Course, Phase } from "./course.ts";
 
-export const requirementVersion = "2026-10-v2";
+export const requirementVersion = "2026-11-v1";
 export type RequirementDocument = "introduction" | "common" | Phase | "grading";
 export interface RequirementEntry {
   id: string;
@@ -274,26 +274,29 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     ),
   ],
 };
+const octoberChecklist = {
+  common,
+  phases: Object.fromEntries(
+    Object.entries(phaseEntries).map(([phase, entries]) => [
+      phase,
+      [
+        ...entries,
+        entry(
+          `${phase}-solo`,
+          "Approved solo route (when allocated)",
+          "If the instructor allocated the solo route, index the phase-specific solo work, instructor check-in, incoming independent audit, outgoing reference audit and portfolio under the published solo equivalents. Group-route students mark this entry as not applicable with their allocation reference.",
+          phase as Phase,
+          "solo-route",
+        ),
+      ],
+    ]),
+  ) as Record<Phase, RequirementEntry[]>,
+  rubric: "2026-10-solo-equivalence-v2",
+} as const;
+
 export const requirementEditions = {
-  "2026-10-v2": {
-    common,
-    phases: Object.fromEntries(
-      Object.entries(phaseEntries).map(([phase, entries]) => [
-        phase,
-        [
-          ...entries,
-          entry(
-            `${phase}-solo`,
-            "Approved solo route (when allocated)",
-            "If the instructor allocated the solo route, index the phase-specific solo work, instructor check-in, incoming independent audit, outgoing reference audit and portfolio under the published solo equivalents. Group-route students mark this entry as not applicable with their allocation reference.",
-            phase as Phase,
-            "solo-route",
-          ),
-        ],
-      ]),
-    ) as Record<Phase, RequirementEntry[]>,
-    rubric: "2026-10-solo-equivalence-v2",
-  },
+  "2026-10-v2": octoberChecklist,
+  [requirementVersion]: structuredClone(octoberChecklist),
 } as const;
 export function requirementsFor(course: Pick<Course, "requirements">) {
   const version = course.requirements ?? requirementVersion;

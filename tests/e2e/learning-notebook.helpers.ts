@@ -48,3 +48,16 @@ export async function selectReading(page: Page) {
       return (fragment.textContent ?? "").replace(/\s+/g, " ").trim();
     });
 }
+
+export async function downloadedMarkdown(control: Locator) {
+  const [download] = await Promise.all([
+    control.page().waitForEvent("download"),
+    control.click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/\.md$/);
+  const stream = await download.createReadStream();
+  if (!stream) throw new Error("Could not read the downloaded Markdown.");
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString("utf8");
+}

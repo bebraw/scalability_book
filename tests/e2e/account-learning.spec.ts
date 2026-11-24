@@ -350,7 +350,7 @@ test("enrolled email sign-in returns to the exercise, saves private answers and 
   }
 });
 
-test("exercise discussion prepares only the checked attempt and retains notebook writing through account and connection views", async ({
+test("exercise discussion retains the reviewed question through account and companion settings", async ({
   page,
   baseURL,
 }) => {
@@ -404,18 +404,15 @@ test("exercise discussion prepares only the checked attempt and retains notebook
     await account
       .getByRole("button", { name: "Open connection settings", exact: true })
       .click();
-    const notebook = page.locator("#learning-notebook");
-    await notebook
+    const assistant = page.locator("#learning-assistant");
+    await assistant
       .getByLabel("Companion address")
       .fill("http://127.0.0.1:18896");
-    await notebook
+    await assistant
       .getByRole("button", { name: "Connect companion", exact: true })
       .click();
-    await notebook
-      .getByLabel("Your thinking")
-      .fill("Private unfinished notebook writing.");
-    await notebook
-      .getByRole("button", { name: "Close notebook", exact: true })
+    await assistant
+      .getByRole("button", { name: "Close teaching assistant", exact: true })
       .click();
     const exercise = page.locator(`#${exerciseId}`);
     await exercise.locator("input[type=number]").fill("25");
@@ -436,19 +433,18 @@ test("exercise discussion prepares only the checked attempt and retains notebook
     await exercise
       .getByRole("button", { name: "Discuss my answer", exact: true })
       .click();
-    const assistant = page.locator("#learning-assistant");
     await expect(
       assistant.getByLabel("Message to the teaching assistant"),
     ).toHaveValue(/version 2/);
     await expect(
       assistant.getByLabel("Message to the teaching assistant"),
     ).toHaveValue(/25/);
-    await expect(assistant).toContainText(
-      "0 notebook notes selected for context",
-    );
+    const draft = await assistant
+      .getByLabel("Message to the teaching assistant")
+      .inputValue();
     expect(modelRequests).toBe(0);
     await page.getByRole("button", { name: "Account", exact: true }).click();
-    await expect(account).toContainText("Notebook connected");
+    await expect(account).toContainText("Companion connected");
     await expect(account).toContainText("Assistant provider is not enabled");
     await account
       .getByRole("button", {
@@ -456,10 +452,12 @@ test("exercise discussion prepares only the checked attempt and retains notebook
         exact: true,
       })
       .click();
-    await page.getByRole("button", { name: "Notebook", exact: true }).click();
-    await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-      "Private unfinished notebook writing.",
-    );
+    await expect(
+      assistant.getByLabel("Message to the teaching assistant"),
+    ).toHaveValue(draft);
+    await expect(
+      page.getByRole("button", { name: "Notebook", exact: true }),
+    ).toHaveCount(0);
     const exported = await page.evaluate(async () => {
       const connection = JSON.parse(
         sessionStorage.getItem("book-learning-connection")!,

@@ -22,6 +22,7 @@ interface Options {
   connect: () => void;
   toolMode?: "none" | "native";
   entries: NotebookEntry[];
+  loadAttempts: () => Promise<void>;
   draft: AssistantDraft;
   preview: () => NotebookDraftPreview | null;
   previewChanged: (preview: NotebookDraftPreview) => void;
@@ -38,21 +39,59 @@ interface Options {
   status: (text: string) => void;
 }
 
-/** Instructional composition prepares handoffs; the notebook owns their save. */
+/** Compose assistant activities around their reading source and explicit handoffs. */
 export function mountLearningAssistant(
   container: HTMLElement,
   section: AssistantSection,
   options: Options,
 ) {
-  const initial = (source: LearningSource) =>
-    options.write({
-      source,
-      kind: "attempt",
-      title: `Initial thinking: ${source.title}`.slice(0, 300),
-      body: "",
-      relatedIds: [],
-      assistance: null,
+  const initial = (source: LearningSource, saved?: () => void) => {
+    container.querySelector("[data-initial-attempt]")?.remove();
+    const form = document.createElement("form");
+    form.dataset.initialAttempt = "";
+    const label = document.createElement("label");
+    label.textContent = "My initial thinking";
+    const body = document.createElement("textarea");
+    body.required = true;
+    body.maxLength = 16000;
+    label.append(body);
+    const help = document.createElement("p");
+    help.textContent =
+      "This attempt stays in your local companion. Saving it lets you request a demo change or compare ideas with your peers.";
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.textContent = "Save private attempt";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = "Cancel";
+    cancel.addEventListener("click", () => form.remove());
+    form.append(label, help, save, cancel);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!body.value.trim() || save.disabled) return;
+      save.disabled = true;
+      try {
+        await options.save(
+          "attempt",
+          `Initial thinking: ${source.title}`.slice(0, 300),
+          body.value,
+          source,
+        );
+        form.remove();
+        options.status("Initial thinking saved in your local companion.");
+        saved?.();
+      } catch (error) {
+        save.disabled = false;
+        options.status(
+          error instanceof Error
+            ? error.message
+            : "Could not save your attempt.",
+        );
+      }
     });
+    container.prepend(form);
+    body.focus();
+  };
   const help = (source: LearningSource, question: string) =>
     options.help({ source, question, noteIds: options.selected() });
   if (section === "guide")
@@ -105,9 +144,8 @@ export function mountLearningAssistant(
       previewChanged: options.previewChanged,
       source: pageSource,
       entries: options.entries,
-      selected: options.selected,
+      loadAttempts: options.loadAttempts,
       active: options.active,
-      notes: options.notes,
       changed: options.changed,
       status: options.status,
       initial,
@@ -120,7 +158,7 @@ export function mountLearningAssistant(
       accept: (body, assistance, source, relatedIds) => {
         if (body.length > 16_000) {
           options.status(
-            "Shorten the notebook draft to 16,000 characters before preparing it.",
+            "Shorten the exchange to 16,000 characters before downloading it.",
           );
           return;
         }

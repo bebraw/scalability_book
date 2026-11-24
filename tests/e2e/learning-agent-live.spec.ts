@@ -1,6 +1,7 @@
 import {
   activeLearningPanel,
   chooseNotebookTool,
+  downloadedMarkdown,
   openAssistantSettings,
 } from "./learning-notebook.helpers.ts";
 import { test, expect } from "@playwright/test";
@@ -10,7 +11,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import { tmpdir } from "node:os";
 
-test("real Codex observes and changes the browser demo, resumes and offers a student-reviewed notebook draft", async ({
+test("real Codex observes and changes the browser demo, resumes and exports a student-reviewed diary excerpt", async ({
   page,
   baseURL,
 }) => {
@@ -61,7 +62,7 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await page.goto("/demos/#demo-cache-decision-lab");
     await page
       .locator(".site-header")
-      .getByRole("button", { name: "Notebook", exact: true })
+      .getByRole("button", { name: "Teaching assistant", exact: true })
       .click();
     const panel = activeLearningPanel(page);
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18889");
@@ -81,14 +82,12 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
       .selectOption("demo-cache-decision-lab");
     await panel.getByRole("button", { name: "Save initial thinking" }).click();
     await panel
-      .getByLabel("Your thinking")
+      .getByLabel("My initial thinking")
       .fill(
         "I predict that changing the age control to100 gives400days and requires an origin request. I will inspect the actual displayed path.",
       );
-    await panel.getByRole("button", { name: "Save note", exact: true }).click();
-    await chooseNotebookTool(panel, "Notes");
-    await panel.getByRole("checkbox").first().check();
-    await panel.getByRole("button", { name: "Discuss selected notes" }).click();
+    await panel.getByRole("button", { name: "Save private attempt" }).click();
+    await panel.getByRole("checkbox", { name: /Include my attempt/ }).check();
     await openAssistantSettings(panel);
     await panel.getByLabel("How I want help").selectOption("check");
     await panel
@@ -133,16 +132,14 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await page.screenshot({
       path: test.info().outputPath("teaching-assistant-policy.png"),
     });
-    await panel
-      .getByRole("button", { name: "Use as a notebook draft" })
-      .click();
-    await panel
-      .getByRole("region", { name: "Notebook draft preview", exact: true })
-      .getByRole("button", { name: "Prepare notebook draft", exact: true })
-      .click();
-    await expect(panel.getByRole("status")).toContainText("Choose Save note");
-    await panel.getByRole("button", { name: "Save note", exact: true }).click();
-    await chooseNotebookTool(panel, "Discuss");
+    await panel.getByRole("button", { name: "Review for diary" }).click();
+    const markdown = await downloadedMarkdown(
+      panel
+        .getByRole("region", { name: "Diary exchange preview", exact: true })
+        .getByRole("button", { name: "Download Markdown", exact: true }),
+    );
+    expect(markdown).toMatch(/Reviewed discussion draft; conversation/);
+    expect(markdown).toMatch(/policy scalableweb-study-assistant v1/);
     await panel
       .getByLabel("Message to the teaching assistant")
       .fill(
@@ -167,14 +164,6 @@ test("real Codex observes and changes the browser demo, resumes and offers a stu
     await panel.getByText("About this reply", { exact: true }).last().click();
     await expect(
       panel.getByText(/policy scalableweb-study-assistant v1/).last(),
-    ).toBeVisible();
-    await chooseNotebookTool(panel, "Notes");
-    await panel.getByText("1 saved revision", { exact: true }).first().click();
-    await expect(
-      panel.getByText(/Reviewed discussion draft; conversation/),
-    ).toBeVisible();
-    await expect(
-      panel.getByText(/policy scalableweb-study-assistant v1/),
     ).toBeVisible();
   } finally {
     if (child.exitCode === null) {

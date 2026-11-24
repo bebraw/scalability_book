@@ -214,7 +214,7 @@ export function mountReadingInvestigation(
     node("summary", "Shared context: this activity and my selections"),
     node(
       "p",
-      "Sending shares the source shown here, your writing and any displayed demo snapshot with your companion’s provider. During a reply, only this activity’s demo can be inspected. Control changes never start a reply. Notebook entries are included only when explicitly handed off below.",
+      "Sending shares the source shown here, your writing and any displayed demo snapshot with your companion’s provider. During a reply, only this activity’s demo can be inspected. Control changes never start a reply.",
     ),
   );
   privacy.className = "reading-investigation-hint";
@@ -233,8 +233,8 @@ export function mountReadingInvestigation(
   privacy.append(selections, clearSelections);
   function drawSelections() {
     selections.textContent = draft.noteIds.length
-      ? `${draft.noteIds.length} deliberately selected notebook entries will be supplied on send.`
-      : "No notebook entries are selected.";
+      ? `${draft.noteIds.length} selected previous attempts will be supplied on send.`
+      : "";
     clearSelections.hidden = !draft.noteIds.length;
   }
   drawSelections();
@@ -254,7 +254,7 @@ export function mountReadingInvestigation(
     save();
     drawMessages();
   });
-  const write = button("Prepare notebook takeaway", async () => {
+  const write = button("Download takeaway as Markdown", async () => {
     if (!draft.takeaway.trim()) {
       notice.textContent = "Write your takeaway first.";
       return;
@@ -365,7 +365,7 @@ export function mountReadingInvestigation(
         ? "Restart the companion from the updated checkout to enable the learning cockpit. Your writing is retained."
         : status.provider
           ? `${status.provider} connected · Your learning loop stays beside the work.`
-          : "Notebook-only connection. Enable Codex or a local model in Connection settings, then check the connection again.";
+          : "No assistant provider is connected. Enable Codex or a local model in Connection settings, then check the connection again.";
   }
   function drawPhase() {
     const phase = activity.phases.find(({ id }) => id === draft.phase)!;

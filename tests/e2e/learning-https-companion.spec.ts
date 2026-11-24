@@ -71,17 +71,13 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
           method: request.method(),
         });
     });
-    await page.goto(`${website}/chapters/benchmarking/`);
+    await page.goto(`${website}/notebook/setup/?legacy=1`);
     expect(
       await page.evaluate(() => ({
         origin: location.origin,
         secure: window.isSecureContext,
       })),
     ).toEqual({ origin: website, secure: true });
-    await page
-      .locator(".site-header")
-      .getByRole("button", { name: "Notebook", exact: true })
-      .click();
     const panel = page.locator("#learning-notebook");
     await panel.getByLabel("Companion address").fill(companion);
     const connected = page.waitForResponse(`${companion}/connect`);
@@ -95,9 +91,10 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
       website,
     );
     await expect(panel.getByRole("status")).toHaveText(
-      "Connected to your private notebook.",
+      "Connected to your local companion.",
     );
 
+    await chooseNotebookTool(panel, "Write");
     const title = "Synthetic HTTPS notebook note";
     const body = "My private observation survives a new browser session token.";
     await panel.getByLabel("Title", { exact: true }).fill(title);
@@ -117,7 +114,7 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
       .getByRole("button", { name: "Connect companion", exact: true })
       .click();
     await expect(panel.getByRole("status")).toHaveText(
-      "Connected to your private notebook.",
+      "Connected to your local companion.",
     );
     await chooseNotebookTool(panel, "Notes");
     const saved = panel.locator("article").filter({

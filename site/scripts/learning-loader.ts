@@ -1,3 +1,5 @@
+import { legacyRecovery } from "./learning-diary.ts";
+import { mountHighlightCapture } from "./learning-highlight.ts";
 import { readingSelection } from "./learning-selection.ts";
 import { readNotebookSession } from "./learning-session.ts";
 import type { LearningExperience } from "../../shared/learning-workspace.ts";
@@ -5,13 +7,17 @@ import type { LearningAction } from "./learning-actions.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
-async function openLearning(experience: LearningExperience, resume = false) {
+async function openLearning(
+  experience: LearningExperience,
+  resume = false,
+  currentReading = false,
+) {
   // Capture before loading or focusing the notebook can alter the selection.
   const selection = resume ? null : readingSelection();
   if (!(await loadLearning())) return;
   document.dispatchEvent(
     new CustomEvent("book-learning-open", {
-      detail: { selection, resume, experience },
+      detail: { selection, resume, experience, currentReading },
     }),
   );
 }
@@ -46,6 +52,15 @@ document.addEventListener("book-learning-request", (event) => {
       );
   });
 });
+mountHighlightCapture();
+if (legacyRecovery) {
+  const recover = document.createElement("button");
+  recover.type = "button";
+  recover.className = "learning-toggle";
+  recover.textContent = "Recover notes";
+  recover.dataset.learningToggle = "notebook";
+  document.querySelector(".learning-launchers")?.append(recover);
+}
 const buttons = document.querySelectorAll<HTMLButtonElement>(
   "[data-learning-toggle]",
 );
@@ -62,10 +77,14 @@ for (const button of buttons) {
       ),
   );
 }
-// An explicitly opened notebook follows book navigation; other readers keep
-// the workspace unloaded and make no companion requests.
 const session = readNotebookSession();
-if (buttons.length && session.open) void openLearning(session.experience, true);
+const assistantRequested =
+  new URLSearchParams(location.search).get("assistant") === "1";
+if (buttons.length) {
+  if (legacyRecovery) void openLearning("notebook");
+  else if (assistantRequested) void openLearning("assistant", false, true);
+  else if (session.assistantOpen) void openLearning("assistant", true);
+}
 
 const cockpit = document.querySelector<HTMLButtonElement>(
   "[data-learning-cockpit]",
@@ -128,7 +147,7 @@ window.addEventListener("hashchange", () => {
   if (tutorialLink(new URL(location.href))) openTutorial();
 });
 if (tutorialLink(new URL(location.href))) openTutorial();
-else
+else if (!assistantRequested && !legacyRecovery)
   try {
     const saved = JSON.parse(
       sessionStorage.getItem("book-learning-cockpit-active") ?? "null",

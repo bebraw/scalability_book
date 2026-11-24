@@ -24,7 +24,7 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   return element;
 };
 
-/** An authored rehearsal. Only a deliberate reviewed handoff reaches Notebook. */
+/** An authored rehearsal. A reader can download their takeaway as Markdown. */
 export function createLearningTutorial(options: {
   active: (value: boolean) => void;
   returnFocus: () => void;
@@ -128,7 +128,7 @@ export function createLearningTutorial(options: {
     wrapper.append(node("span", label), input);
     return wrapper;
   }
-  function notebookDraft(): NotebookHandoff {
+  function takeawayDraft(): NotebookHandoff {
     return {
       source: {
         kind: "page",
@@ -165,7 +165,7 @@ export function createLearningTutorial(options: {
         heading,
         node(
           "p",
-          "Try a three-minute learning loop: make a prediction, change an example, reflect and preview a Notebook takeaway. No setup needed.",
+          "Try a three-minute learning loop: make a prediction, change an example, reflect and download a diary takeaway. No setup needed.",
         ),
       );
       const actions = node("div");
@@ -317,33 +317,33 @@ export function createLearningTutorial(options: {
       element.append(
         node(
           "p",
-          "Notebook keeps reflections you choose to save. Assistant helps you investigate. The cockpit connects thinking, checks and reflection; Recent learning loops lets you return to unfinished work in this tab.",
+          "Keep reflections in your Obsidian diary. The assistant can help you investigate a question. Recent learning loops lets you return to unfinished work in this tab.",
         ),
       );
       const preview = node("details");
       preview.append(
-        node("summary", "Preview a Notebook takeaway"),
+        node("summary", "Preview a diary takeaway"),
         node(
           "p",
           draft.takeaway
-            ? notebookDraft().body
-            : "Write a takeaway in the previous step to preview your own Notebook draft. Nothing has been saved.",
+            ? takeawayDraft().body
+            : "Write a takeaway in the previous step to preview your own diary takeaway.",
         ),
       );
       preview.className = "tutorial-preview";
       const notice = node("p");
       notice.setAttribute("role", "status");
-      const handoff = button("Prepare this as a real Notebook draft", () => {
+      const handoff = button("Download takeaway as Markdown", () => {
         handoff.disabled = true;
         void Promise.resolve()
-          .then(() => options.write(notebookDraft()))
+          .then(() => options.write(takeawayDraft()))
           .then(() => {
-            // Notebook owns replacement consent and announces an accepted draft.
-            notice.textContent = "";
+            notice.textContent =
+              "Takeaway downloaded. Move the Markdown file into your diary.";
           })
           .catch(() => {
             notice.textContent =
-              "Connect your companion first, then try again. Your tutorial writing is retained.";
+              "The download failed. Your tutorial writing is still here.";
           })
           .finally(() => {
             handoff.disabled = false;
@@ -356,7 +356,7 @@ export function createLearningTutorial(options: {
         notice,
         node(
           "p",
-          "Only Save note keeps a real Notebook entry. Tutorial writing stays in this tab; finishing this walkthrough does not save it.",
+          "Move the downloaded Markdown file into your vault to keep your takeaway after leaving this tab.",
         ),
         button("Set up my companion", () => {
           void options.settings();

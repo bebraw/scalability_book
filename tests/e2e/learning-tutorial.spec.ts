@@ -1,54 +1,6 @@
-import { test as base, expect, type Page } from "@playwright/test";
+import { downloadedMarkdown } from "./learning-notebook.helpers.ts";
+import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
-
-const address = "http://127.0.0.1:18896";
-const test = base.extend<{ companion: string }>({
-  companion: async ({ baseURL }, use) => {
-    const directory = await mkdtemp(path.join(tmpdir(), "book-tutorial-"));
-    const child = spawn(
-      process.execPath,
-      [
-        "scripts/learning-companion.ts",
-        "--directory",
-        directory,
-        "--port",
-        "18896",
-        "--origin",
-        new URL(baseURL!).origin,
-      ],
-      { stdio: ["ignore", "pipe", "pipe"] },
-    );
-    try {
-      await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(
-          () => reject(new Error("Tutorial companion did not start")),
-          8000,
-        );
-        child.once("exit", () => {
-          clearTimeout(timer);
-          reject(new Error("Tutorial companion exited"));
-        });
-        child.stdout!.on("data", (chunk) => {
-          if (String(chunk).includes("Learning companion:")) {
-            clearTimeout(timer);
-            resolve();
-          }
-        });
-      });
-      await use(address);
-    } finally {
-      const stopped = once(child, "exit");
-      child.kill("SIGTERM");
-      await stopped.catch(() => {});
-      await rm(directory, { recursive: true, force: true });
-    }
-  },
-});
 const tutorial = (page: Page) =>
   page.getByRole("region", { name: "Learning tools tutorial" });
 const cockpit = (page: Page) => page.locator("#learning-cockpit");
@@ -205,7 +157,7 @@ test("the complete rehearsal explains real evidence, example replies and reviewe
     .getByRole("button", { name: "Review how saving works" })
     .click();
   await tutorial(page)
-    .getByText("Preview a Notebook takeaway", { exact: true })
+    .getByText("Preview a diary takeaway", { exact: true })
     .click();
   await expect(tutorial(page).locator("details")).toContainText(
     "The illustration preserves one arrival-rate assumption.",
@@ -268,7 +220,7 @@ test("the linked tutorial works when browser storage is unavailable and never re
     .click();
   await expect(
     tutorial(page).getByRole("button", {
-      name: "Prepare this as a real Notebook draft",
+      name: "Download takeaway as Markdown",
     }),
   ).toBeDisabled();
   await tutorial(page)
@@ -283,70 +235,22 @@ test("the linked tutorial works when browser storage is unavailable and never re
   ).toBeFocused();
 });
 
-test("an explicit tutorial handoff protects unfinished notes and only Save note persists the reflection", async ({
-  page,
-  companion,
-}) => {
-  const writes: string[] = [];
-  page.on("request", (request) => {
-    if (request.url().startsWith(companion) && request.method() === "POST")
-      writes.push(new URL(request.url()).pathname);
-  });
+test("a tutorial takeaway downloads without a companion", async ({ page }) => {
   await open(page);
-  await cockpit(page)
-    .getByLabel("Investigation companion address")
-    .fill(companion);
-  await cockpit(page)
-    .getByRole("button", { name: "Connect companion", exact: true })
-    .click();
-  await expect(cockpit(page)).toContainText("Notebook-only connection");
-  await page.locator('.site-header [data-learning-toggle="notebook"]').click();
-  const notebook = page.locator("#learning-notebook");
-  await notebook
-    .getByLabel("Your thinking")
-    .fill("An unfinished real note that must survive cancellation.");
-  await page
-    .getByRole("button", { name: "Learning cockpit", exact: true })
-    .click();
   await tutorial(page)
     .getByRole("button", { name: "Try the tutorial" })
     .click();
   await reflect(page);
-  page.once("dialog", (dialog) => dialog.dismiss());
-  await tutorial(page)
-    .getByRole("button", { name: "Prepare this as a real Notebook draft" })
-    .click();
-  await expect(
+  const markdown = await downloadedMarkdown(
     tutorial(page).getByRole("button", {
-      name: "Prepare this as a real Notebook draft",
+      name: "Download takeaway as Markdown",
     }),
-  ).toBeEnabled();
-  await page.locator('.site-header [data-learning-toggle="notebook"]').click();
-  await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-    "An unfinished real note that must survive cancellation.",
   );
-  await page
-    .getByRole("button", { name: "Learning cockpit", exact: true })
-    .click();
-  page.once("dialog", (dialog) => dialog.accept());
-  await tutorial(page)
-    .getByRole("button", { name: "Prepare this as a real Notebook draft" })
-    .click();
-  await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-    /More waiting does not identify which resource is slow/,
+  expect(markdown).toContain(
+    "More waiting does not identify which resource is slow",
   );
-  await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-    /Next independent check: Find one waiting boundary/,
+  expect(markdown).toContain(
+    "Next independent check: Find one waiting boundary",
   );
-  expect(writes.filter((route) => route.startsWith("/entries"))).toEqual([]);
-  expect(writes.filter((route) => route.startsWith("/agent"))).toEqual([]);
-  await notebook
-    .getByRole("button", { name: "Save note", exact: true })
-    .click();
-  await expect(notebook.getByRole("status")).toContainText(
-    "Saved in your private notebook",
-  );
-  expect(writes.filter((route) => route.startsWith("/entries"))).toHaveLength(
-    1,
-  );
+  await expect(page.locator("#learning-notebook")).toHaveCount(0);
 });

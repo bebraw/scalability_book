@@ -23,10 +23,15 @@ for (const width of [390, 320]) {
     );
     const buttons = [
       "Learning cockpit",
-      "Notebook",
+      "Learning diary",
       "Teaching assistant",
       "Account",
-    ].map((name) => header.getByRole("button", { name, exact: true }));
+    ].map((name) =>
+      header.getByRole(name === "Learning diary" ? "link" : "button", {
+        name,
+        exact: true,
+      }),
+    );
     const picker = header.getByRole("combobox", { name: "Theme" });
     for (const button of buttons) await expect(button).toBeVisible();
     await page.evaluate(() => document.fonts.ready);

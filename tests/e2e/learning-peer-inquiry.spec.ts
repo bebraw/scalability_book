@@ -1,5 +1,6 @@
 import {
   activeLearningPanel,
+  downloadedMarkdown,
   selectReading,
   chooseNotebookTool,
 } from "./learning-notebook.helpers.ts";
@@ -107,9 +108,10 @@ test("students save private initial work before group replies, reflect individua
     });
     const page = await context.newPage();
     await page.goto(`${baseURL}/chapters/benchmarking/`);
+    await selectReading(page);
     await page
       .locator(".site-header")
-      .getByRole("button", { name: "Notebook", exact: true })
+      .getByRole("button", { name: "Teaching assistant", exact: true })
       .click();
     const panel = activeLearningPanel(page);
     await panel
@@ -118,8 +120,6 @@ test("students save private initial work before group replies, reflect individua
     await panel
       .getByRole("button", { name: "Connect companion", exact: true })
       .click();
-    await selectReading(page);
-    await panel.getByRole("button", { name: "Use selected text" }).click();
     return { page, panel };
   }
   async function peers(page: Page) {
@@ -129,8 +129,8 @@ test("students save private initial work before group replies, reflect individua
     return panel;
   }
   try {
-    const alice = await reader(2, 18891),
-      bob = await reader(3, 18892);
+    const alice = await reader(2, 18971),
+      bob = await reader(3, 18972);
     await peers(alice.page);
     await expect(
       alice.panel.getByText("Save initial thinking for this source first.", {
@@ -159,15 +159,15 @@ test("students save private initial work before group replies, reflect individua
       .getByRole("button", { name: "Write my initial thinking" })
       .click();
     await alice.panel
-      .getByLabel("Your thinking")
+      .getByLabel("My initial thinking")
       .fill(
         "Private Alice initial thinking: I expect a common stable interval.",
       );
     await alice.panel
-      .getByRole("button", { name: "Save note", exact: true })
+      .getByRole("button", { name: "Save private attempt", exact: true })
       .click();
     await expect(alice.panel.getByRole("status")).toContainText(
-      "Saved in your private notebook.",
+      "Initial thinking saved in your local companion.",
     );
     await peers(alice.page);
     await expect(alice.panel.getByLabel("Inquiry activity")).toHaveValue(
@@ -227,15 +227,15 @@ test("students save private initial work before group replies, reflect individua
       .getByRole("button", { name: "Write my initial thinking" })
       .click();
     await bob.panel
-      .getByLabel("Your thinking")
+      .getByLabel("My initial thinking")
       .fill(
         "Private Bob initial thinking: I am unsure how to establish stability.",
       );
     await bob.panel
-      .getByRole("button", { name: "Save note", exact: true })
+      .getByRole("button", { name: "Save private attempt", exact: true })
       .click();
     await expect(bob.panel.getByRole("status")).toContainText(
-      "Saved in your private notebook.",
+      "Initial thinking saved in your local companion.",
     );
     await peers(bob.page);
     await bob.panel
@@ -351,30 +351,15 @@ test("students save private initial work before group replies, reflect individua
         exact: true,
       }),
     ).toBeVisible();
-    await alice.panel
-      .getByRole("button", { name: "Reflect privately on this inquiry" })
-      .click();
-    await expect(alice.panel.getByLabel("Your thinking")).toHaveValue(
-      /Discussion reference:/,
+    const alicePrompt = await downloadedMarkdown(
+      alice.panel.getByRole("button", {
+        name: "Download a diary reflection prompt",
+      }),
     );
-    await expect(alice.panel.getByLabel("Your thinking")).not.toHaveValue(
+    expect(alicePrompt).toContain("Discussion reference:");
+    expect(alicePrompt).not.toMatch(
       /I still question whether|I changed a browser model input/,
     );
-    await alice.panel
-      .getByLabel("Your thinking")
-      .fill(
-        "Alice private takeaway: I can justify the modeled relation, but I cannot establish a stable project interval yet.",
-      );
-    await alice.panel
-      .getByRole("button", { name: "Save note", exact: true })
-      .click();
-    await expect(alice.panel.getByRole("status")).toContainText(
-      "Saved in your private notebook.",
-    );
-    await peers(alice.page);
-    await alice.panel
-      .getByRole("button", { name: "Reveal peer inquiry" })
-      .click();
     const relatedCase = alice.panel.locator("details").filter({
       has: alice.page.getByText("Try a related case privately", {
         exact: true,
@@ -406,51 +391,23 @@ test("students save private initial work before group replies, reflect individua
       .getByRole("button", { name: "Save my independent attempt" })
       .click();
     await expect(relatedCase.getByRole("status")).toContainText(
-      "Independent attempt saved separately",
+      "Your independent attempt was saved in the local companion.",
     );
-    await chooseNotebookTool(alice.panel, "Concepts");
-    await expect(
-      alice.panel.getByLabel("Studied", { exact: true }),
-    ).not.toBeChecked();
-    await peers(alice.page);
-    await alice.panel
-      .getByRole("button", { name: "Reveal peer inquiry" })
-      .click();
     await bob.panel.getByRole("button", { name: "Reload inquiry" }).click();
     await bob.panel
       .getByLabel("Select Synthetic student 2 · check for my draft", {
         exact: true,
       })
       .check();
-    await bob.panel
-      .getByRole("button", { name: "Reflect privately on this inquiry" })
-      .click();
-    await expect(bob.panel.getByLabel("Your thinking")).toHaveValue(
-      /Student-operated browser model/,
+    const bobPrompt = await downloadedMarkdown(
+      bob.panel.getByRole("button", {
+        name: "Download a diary reflection prompt",
+      }),
     );
-    await expect(bob.panel.getByLabel("Your thinking")).not.toHaveValue(
-      /Private Alice initial thinking|Alice private takeaway/,
+    expect(bobPrompt).toContain("Student-operated browser model");
+    expect(bobPrompt).not.toMatch(
+      /Private Alice initial thinking|Private Bob initial thinking/,
     );
-    await bob.panel
-      .getByLabel("Your thinking")
-      .fill(
-        "I will now check stability before using the relation. The shared question helped me separate the population from the time window; uncertainty about growth remains.",
-      );
-    await bob.panel
-      .getByRole("button", { name: "Save note", exact: true })
-      .click();
-    await expect(bob.panel.getByRole("status")).toContainText(
-      "Saved in your private notebook.",
-    );
-    await peers(bob.page);
-    await bob.panel
-      .getByRole("button", { name: "Reveal peer inquiry" })
-      .click();
-    await bob.panel
-      .getByLabel("Select Synthetic student 2 · check for my draft", {
-        exact: true,
-      })
-      .check();
     await bob.panel
       .getByRole("button", { name: "Reflect in the learning cockpit" })
       .click();
@@ -480,10 +437,12 @@ test("students save private initial work before group replies, reflect individua
       .getByRole("button", { name: "Offer my text for public review" })
       .first()
       .click();
-    await expect(alice.panel.getByRole("status")).toContainText(
-      "offered for editorial review",
-    );
-    const teacher = await reader(1, 18893);
+    await expect(
+      alice.panel
+        .getByRole("status")
+        .filter({ hasText: "offered for editorial review" }),
+    ).toBeVisible();
+    const teacher = await reader(1, 18973);
     await peers(teacher.page);
     await teacher.panel
       .getByRole("button", { name: "Open inquiry as course staff" })

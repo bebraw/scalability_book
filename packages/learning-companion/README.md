@@ -35,7 +35,7 @@ API keys are entered at a hidden terminal prompt, never in the website.
 Saved keys use the OS credential store; locked or unavailable storage causes an actionable error, with no plaintext fallback.
 Setup and `doctor` do not generate a paid reply; the first message you deliberately send checks generation access and may incur your provider's charges.
 
-Keep the companion running and choose **Notebook → Connect → Connect companion** in the book.
+Keep the companion running and choose **Teaching assistant → More learning tools → Connect → Connect companion** in the book.
 Enter the printed address if you chose a different port.
 No pairing code is needed.
 The website also offers copyable setup and start commands that preserve its exact origin and any connected notebook's directory/port.

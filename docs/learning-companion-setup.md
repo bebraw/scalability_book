@@ -1,27 +1,23 @@
-# Set up your notebook and assistant
+# Teaching assistant setup and Notebook recovery
 
-The book's optional Notebook is a private space for questions, observations and reflection across the book.
-You may instead keep your notes in Obsidian, plain files or another preferred tool; you do not need to copy them into Notebook for course credit.
-The [course introduction](/project/introduction/#personal-notes-and-learning-diaries) explains the existing diary and portfolio requirements, whichever tool you use.
-You choose which material becomes a course submission or a shared contribution.
-The header offers a notebook icon labelled **Notebook** for keeping your thinking and a question-bubble icon labelled **Assistant** for guidance and discussion.
-The panel identifies the second experience as **Teaching assistant** and shows its reading context.
-They share one companion connection; opening either panel does not send a message or save a note.
-On larger screens you can keep both open: the notebook sits above the assistant at the lower right.
-Reading the book does not require a companion or a model account.
+::label[set-up-your-notebook-and-assistant]
+
+For lecture notes, start with the [course diary in Obsidian](/diary/).
+You can keep a diary and save linked highlights using the book and the starter files alone.
+Use this page to connect the optional book teaching assistant, launch a course coding project or [recover notes from the earlier Notebook](/notebook/setup/?legacy=1).
 
 ## Start on your computer
 
 The standalone package is [@scalableweb/companion@0.4.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.4.0), maintained by bebraw.
 You need Node.js 24 or 26.
-For the notebook or assistant connection from `scalableweb.dev`, use current Chrome on the same computer as the companion; see [browser connection support](#browser-connection-support).
+To connect the book to the companion, use current Chrome on the same computer. [Browser connection support](#browser-connection-support)
 Run the published package from any directory; npm downloads it when needed.
 Version 0.4.0 adds the [guided course project launcher](#start-a-course-coding-project), while retaining code-free connection and the macOS Codex authentication fix from 0.3.1.
 The older 0.2.0 package uses the previous pairing contract and cannot connect to this website client.
 
 Codex study replies additionally require a separate [Codex CLI installation](#connect-your-agent).
 The course project launcher manages its own Codex selection.
-Notebook-only use, direct API keys and local models do not require Codex.
+Direct API connections and local models work without Codex. Choose **Notebook only** if you are recovering older notes without a model account.
 Run the guided setup in your terminal:
 
 ```sh
@@ -29,27 +25,30 @@ npx --yes @scalableweb/companion@0.4.0 setup
 npx --yes @scalableweb/companion@0.4.0 start
 ```
 
-Setup offers these choices:
+Choose the option for your provider:
 
-| Choice                       | What you need                                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Notebook only                | No model account; you can enable replies later.                                                       |
-| Codex with ChatGPT           | Codex CLI and a ChatGPT account with Codex access.                                                    |
-| Codex with an OpenAI API key | Codex CLI and your OpenAI API key.                                                                    |
-| API key directly             | An OpenAI, Anthropic (Claude), Gemini, OpenRouter or compatible service's key; no Codex installation. |
-| Local model                  | LM Studio running a model you have loaded.                                                            |
+| Choice                        | What you need                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Notebook only                 | For recovering older notes.                                                                           |
+| Replies can be enabled later. |
+| Codex with ChatGPT            | Codex CLI and a ChatGPT account with Codex access.                                                    |
+| Codex with an OpenAI API key  | Codex CLI and your OpenAI API key.                                                                    |
+| API key directly              | An OpenAI, Anthropic (Claude), Gemini, OpenRouter or compatible service's key; no Codex installation. |
+| Local model                   | LM Studio running a model you have loaded.                                                            |
 
-Setup guides sign-in or key entry, checks your selected configuration and prints the exact start command for your notebook.
+Setup guides sign-in or key entry, checks your selected configuration and prints the exact command to start the companion.
 API keys are entered in a hidden terminal prompt; do not paste them into the book website.
 Saved keys go into your operating system's credential store.
 If that store is locked or unavailable, setup explains how to unlock it or explicitly use an environment variable; it never saves a plaintext fallback.
 API usage is billed by your provider.
 Setup and `doctor` do not generate a paid reply; your first deliberate message checks whether the model can answer.
-For notebook-only setup without questions, use `npx --yes @scalableweb/companion@0.4.0 setup --notebook`.
+For recovery without a provider, use `npx --yes @scalableweb/companion@0.4.0 setup --notebook`.
 
-Keep the start command running while you use your notebook or assistant.
+Keep the start command running while you use the assistant or recover your old notes.
 It prints a local address and the websites it allows.
-In the book, choose **Notebook → Connect**, enter the address if needed, and choose **Connect companion**.
+In the book, choose **Teaching assistant → More learning tools → Connect**, enter the address if needed, and choose **Connect companion**.
+The published 0.4.0 terminal may call this **Notebook → Connect**.
+On the book website, use the **Teaching assistant** menu.
 The connection instructions offer **Copy setup command** and **Copy start command** with this website's exact origin.
 When you already have a connected notebook, both commands retain its directory and port.
 If clipboard access is unavailable, the command is selected for keyboard copying.
@@ -96,114 +95,37 @@ Keep normal browser security settings enabled.
 
 ### Try the learning tutorial
 
-Choose **Cockpit → Tutorial** for a short hands-on introduction, or [open the tutorial](/notebook/setup/#try-the-learning-tutorial) directly.
-Predict what happens when requests take longer, change a small teaching illustration, inspect an authored example reply, reflect and preview a Notebook takeaway.
-It works before connecting a companion and makes no model calls.
-You can skip it, exit at any step or resume it later using **Tutorial**.
-Its writing stays in the current tab; only **Prepare this as a real Notebook draft** hands your reflection to Notebook, where you review it and explicitly **Save note**.
+On a reading, choose **Cockpit → Tutorial**, or [open the tutorial](/notebook/setup/#try-the-learning-tutorial).
+Predict what happens when requests slow down, try the example and download your takeaway as Markdown.
+You can try the tutorial without a model or companion.
 
 ### Optional first investigation
 
-Choose **Cockpit** in the header on any reading, concept, exploration or project page.
-It gives you one place to state your thinking, try a check, reflect and choose your next independent check.
-You can select a passage first, or choose **Explore this idea** below any demo to work beside its controls.
-For a first experiment, open [the cache lab](/demos/#demo-cache-decision-lab) and choose **Explore this idea**.
-Connect your existing companion, write a prediction or uncertainty, then choose **Discuss my prediction**.
-With assistant replies enabled, its explanation appears in the reading.
-Change a control yourself and choose **Discuss this result** to share fresh displayed values; moving controls does not send anything.
-You can always choose **Explain directly**, or reflect without asking for a reply.
-Write **My takeaway** and **My next independent check**, then **Prepare notebook takeaway**.
-Review the editable Notebook draft and choose **Save note** to keep it.
-Only that Save action creates the notebook entry.
-Choose **Start my next check** to begin a fresh loop from your next question while retaining the earlier reflection; it does not invoke an assistant.
-
-**Working on** changes focus while preserving independent drafts.
-**Recent learning loops in this tab** lets you return to unfinished thinking across the book; save a takeaway before closing the tab to retain it durably.
-Checked exercises, independent practice, selected Notebook notes and selected peer contributions have explicit cockpit handoffs.
-Review **Shared context** before sending; no notebook notes are included by default.
-The course page offers the same private loop without copying or submitting course records.
-The separate Chapter guide remains available for its existing step-by-step saving workflow.
-This is optional support, with no required answer, minimum length, completion mark or additional course report.
-Restart an older companion from the updated checkout if the cockpit asks for the new activity support.
+Open [the cache lab](/demos/#demo-cache-decision-lab) and choose **Explore this idea**.
+Predict what a change will do to the result, adjust a control and compare the new reading with your prediction.
+Write what you would check next.
+Choose **Download takeaway as Markdown** to keep the observation in your diary.
 
 ## Capture and revisit your thinking
 
-Notebook works without opening the assistant or configuring a model account.
-Choose **Notebook only** during setup and connect the companion as described above.
-The header's **Notebook** button is always available for connecting or working on the current page.
-Without a text selection, **Write** starts a note about that chapter/page and keeps its reading link.
+Use [the course diary guide](/diary/#bring-a-passage-into-your-diary) to keep a passage from the book and your response together.
+You can follow the source link when you revisit the entry.
 
-To keep a passage with your own thinking:
-
-1. Select text in the reading, then open **Notebook**.
-   If the panel is already open, choose **Use selected text**; if it covers the passage, close it before selecting and reopen it afterwards.
-2. Check the reading link and **Preview the selected source**.
-   The captured passage stays with the source, separately from your writing.
-3. Write a question, observation or explanation in **Your thinking**.
-4. Choose **Save note**.
-   Only this action saves the note; selecting a passage or writing a draft does not save it or send a model message.
-
-The source preview shows a short quote; the saved note retains the full captured passage.
-Turning an assistant reply into a reviewed notebook draft is a separate, optional path.
-Your writing and Save action come before the note's kind and title, so you can start with your thought and add details later.
-The open notebook follows you between chapters, and **Notes** initially shows the current reading's entries; choose **Whole notebook** to see the rest.
-Unfinished writing stays attached to its original source when you navigate, until you save it or deliberately start another note.
-The assistant remembers its own section, unsent question and active conversation across chapter navigation, with its original source shown explicitly.
-Each panel stays open as you move between chapters until you close it.
-
-On larger screens, choose **Size** at the top of Notebook to adjust its width and height with the sliders; arrow keys work too.
-Your preferred size follows you between chapters in this tab, and **Reset size** returns to automatic sizing.
-Notebook fits the available space: close Assistant if you need more height.
-On small screens Notebook uses the full width; your larger-screen size returns when there is room.
-
-The header highlights each visible tool; choose its icon again to close just that panel, or use its close button or Escape.
-On smaller screens one panel is visible at a time.
-Use the other header icon to bring that panel forward; both retain your unfinished work.
-Closing the foreground panel reveals the other if you had left it open.
-These unfinished drafts stay in this browser tab; save your notes before closing the tab.
-**Notebook** has **Write**, **Notes** and **Concepts**.
-**Teaching assistant** has **Discuss**, **Chapter guide** and **Peer discussion**.
-Selecting notes in Notebook does not change an open assistant discussion.
-Choose **Discuss selected notes** to deliberately supply that material as assistant context.
-**More learning tools** contains the shared **Connect** settings and, in Notebook, **Prepare**.
-Quick notes may be short.
-Use **Notes → Revisit** after a delay to recall an idea before rereading your earlier explanation; there is no schedule or completion requirement.
-Developed reflections have prompts and examples to help you capture enough evidence and explanation.
-There is no single correct conclusion: uncertainty, a failed experiment or a better-supported unchanged view can be useful material.
-
-**Notes** lets you review saved revisions and revisit an earlier idea.
-Edit and Revisit ask before replacing unfinished writing; choose Cancel to keep your current draft.
-Try explaining it from memory and applying it to a changed situation before rereading your earlier explanation.
-**Concepts** records your own revisable judgment and the notebook evidence behind it.
-These markers do not grade or certify your understanding.
+To recover existing companion records, start the original companion and [open Notebook recovery](/notebook/setup/?legacy=1).
+Connect to its existing directory.
+In **Notes**, choose **Whole notebook** to find entries across readings.
+Under **More learning tools → Connect**, **Export notebook backup** downloads the notebook as JSON, including saved revisions, source context and concept judgments.
+Keep this file privately in case you need to restore the records.
+For a readable copy of all entries, choose **Download previous notes as Markdown** and move the file into your vault.
 
 ### Prepare material for your portfolio
 
-**Prepare** is an optional way to assemble selected notes for your existing diary or portfolio.
-It copies their current writing and source links into editable Markdown; it does not produce all required portfolio answers or assess their quality.
-If you already use another notes tool, select and review your material there and go directly to the course submission step.
+The [course diary's portfolio walkthrough](/diary/#prepare-material-for-your-portfolio) explains how to choose evidence, attach written, audio or video files, and submit your individual phase portfolio.
 
-1. In **Notes**, select the entries you want to use and choose **Prepare selected notes**, then **Build submission draft**.
-   You can also reach **Prepare** through **More learning tools**.
-2. Review and revise the text, checking its sources, your explanation and the relevant course requirements.
-   Only the selected notes enter this draft; the rest of your notebook is excluded.
-3. Choose **Copy draft** or **Download Markdown**.
-   The downloaded `.md` file is plain text you can edit in another tool.
-4. Choose **Open course workspace**, sign in, select your course and phase, and open **My portfolio**.
-   This link only opens the workspace; it does not transfer your writing.
-   Paste relevant material into the portfolio fields, or use **Attach written, audio or video evidence** for reviewed files, select the uploaded attachment and describe its relevance in the appropriate fields.
-   Complete the remaining lecture and assessment fields under the published requirements.
-5. Choose **Submit portfolio** and check the displayed submission status.
-   Before submission, **Save draft** and uploading a file do not submit the portfolio.
-   After submission, use **Resubmit portfolio** for a correction under the course's announced correction rules.
-
-Your local Notebook records are separate from course records.
-Saving a course portfolio draft or uploading its files makes that material available to you and course staff; it stays outside the class's technical-submission index.
-Keep personal working notes and confidential peer feedback out of the group's technical bundle.
-The existing audio/video diary options remain available.
-
-**Connect → Export notebook backup** serves a different purpose: it downloads the whole notebook as JSON, including saved revisions, source context and concept judgments.
-Keep that backup private for recovery or transfer to another companion notebook; use reviewed selected material for course submissions.
+To export selected entries from the earlier Notebook, open [Notebook recovery](/notebook/setup/?legacy=1), select them under **Notes → Whole notebook** and choose **Prepare selected notes → Build submission draft**.
+Review them and choose **Copy draft** or **Download Markdown**.
+Paste the result into a lecture entry or move the file into your vault.
+These actions leave your course portfolio untouched.
 
 ## Start a course coding project
 
@@ -331,24 +253,18 @@ Choose a help mode there: a question, hint, direct explanation, reasoning check 
 This is automated study support through your chosen provider; your instructor remains responsible for course assessment.
 You can also indicate where you want support, such as a prerequisite, an unexpected result or trying the next step yourself.
 An honest statement of being stuck is enough; you can request a direct explanation immediately and change the amount of help later.
-Chapter guide can prepare a help request from your current question without sending it automatically.
-Use **Notes → Discuss this note** to discuss one note, or select entries and choose **Discuss selected notes**.
-Discuss shows the source and selected notebook context before sending; choosing another chapter does not retarget a retained conversation silently.
-Sending a question shares that source and those selected entries with your model provider.
-You can reopen saved conversations, stop a reply, or keep using the notebook without a model.
-**Write a takeaway** opens a blank personal draft.
-**Use as a notebook draft** previews your question or response alongside the selected assistant reply.
-Edit either part or uncheck it, then choose **Prepare notebook draft**; the draft keeps speaker labels so your thinking and the assistant's suggestion remain distinguishable.
-The preview shows the complete text and its count, and asks you to shorten or omit material if the draft exceeds 16,000 characters.
-Both paths retain the conversation source and available links to the supplied notes, and ask before replacing unfinished writing.
-Choose **Save note** to keep your reviewed account.
-Your preview stays in this browser tab as you navigate, reload or close the preview; save the note before closing the tab.
+Discuss shows the reading and the context for your question.
+Check the source before choosing **Send message**.
+The companion supplies that context to your configured provider.
+You can reopen a saved conversation or stop a reply.
+To keep part of an exchange, choose **Review for diary**, edit the text and choose **Download Markdown**.
+Move the file into your diary and add what you want to check independently.
 Companion 0.4.0 retains the supplied note identities on each new turn, applies the shared teaching policy and records its version on new replies.
 **Connect** identifies the installed policy and **About this reply** shows the recorded setup for a reply; earlier replies retain their original history.
 Updating the website alone does not update your local assistant.
 
-With Codex or a verified API/local native-tool configuration, open **Help: … · Settings** for a demo investigation, select its source and use **Save initial thinking** to write a notebook note first.
-Select that note and choose **Discuss selected notes**, then ask your teaching assistant to inspect the demo.
+With Codex or a verified API/local native-tool configuration, open **Help: … · Settings** for a demo investigation, select its source and use **Save initial thinking** to record your prediction with the companion.
+Choose **Include my attempt** if you want to share the prediction with the provider and ask the assistant to inspect or change the demo.
 Proposed changes ask for your approval and report actual browser controls and textual outputs.
 Keep **Discuss** open during a tool request.
 A demo that is absent, starting or unavailable cannot be treated as an executed experiment; open its linked page or use a manual check and the authored assumptions.
@@ -437,7 +353,7 @@ A loopback address by itself does not establish where inference runs.
 
 Local models default to **discussion-only**.
 The panel explains that they cannot inspect live pages or demos; supply a saved demo result or use **Chapter guide** for an actual observation.
-Your explicitly selected passage/notes and shared teaching instructions are supplied on each turn.
+The current source, your message and the teaching instructions go to the configured model.
 Earlier context is retained privately across restarts, including the original text of notes that you later edit.
 **About this reply** records the model identifier; separate notices show when old completed or interrupted turns were omitted from the model's context.
 Oversized current selections/tool results are rejected with your work retained, so you can select less context or start a new conversation.
@@ -458,7 +374,8 @@ If you change endpoint, model or tool mode, start a new conversation or restore 
 ## Compare with peers
 
 In **Teaching assistant → Peer discussion**, sign in using your course account and choose the course run and inquiry activity.
-Save initial thinking for that source, then choose **Reveal peer inquiry**.
+Choose **Write my initial thinking**, record your prediction or uncertainty and choose **Save private attempt**.
+Then choose **Reveal peer inquiry**.
 Only a declaration that you saved private work reaches the course API; your initial text remains local.
 A concrete uncertainty is enough to begin.
 
@@ -469,10 +386,10 @@ Replies can preserve disagreement and link evidence or tool provenance.
 Use any part or write freely; you need not wait for every member to reply.
 Select contributions you want in a draft, then **Prepare summary from selected contributions** if useful.
 Review contributor identities, disagreement, evidence limits and any agent assistance before using the ordinary share button; an absent member has not endorsed it.
-**Reflect privately on this inquiry** prepares a local draft with a discussion link and personal starters.
+**Download a diary reflection prompt** gives you Markdown with the discussion link and personal prompts for your diary.
 It copies classmates' text only when you deliberately select their contributions.
 **Try a related case privately** lets you apply the idea yourself, save a separate attempt or request more help, regardless of the group's decision.
-Only notes you later select enter an agent conversation or submission draft.
+To discuss your reflection with the TA, paste the excerpt you choose into **Discuss**.
 
 New members do not gain older group threads automatically.
 Students who leave a group or withdraw retain read-only access to their own contributions and can remove their text.
@@ -480,7 +397,7 @@ Public review is a separate opt-in copy of the author's reviewed contribution; i
 Course staff review offers, and book editors decide what to publish through the existing Markdown review workflow.
 Optional session prompts support your existing operator/challenger/validator practice; arrange meetings yourselves.
 For another check, change responsibilities and ask someone other than the operator to explain why the result should be accepted.
-You can keep a different private conclusion and choose your own concept judgment.
+Record your own conclusion in the diary, including where you disagree.
 Solo learners can continue the Chapter guide and the existing independent human review route; peer replies are not a prerequisite.
 
 ## Diagnose a connection
@@ -511,7 +428,7 @@ An account's access is checked on its first real reply.
 For API authentication errors, rerun API setup or `login`; for credit or quota errors, check your provider's billing and limits.
 For a keychain error, unlock or enable your OS credential store and retry; headless API users can explicitly select `--api-key-env`.
 If a provider rejects a listed model, check its Chat Completions support and choose a compatible text model.
-Use `start --notebook` to continue writing without a provider.
+Use `start --notebook` to recover existing Notebook records without a provider.
 If a port is busy, stop the other process or select `--port 8789` and connect to that address.
 For a storage permission error, select a writable private directory; do not reset the database.
 
@@ -528,11 +445,14 @@ Nothing sends the report automatically.
 
 ## Keep your work portable
 
-The packaged notebook lives in the per-user directory printed by the CLI.
+These instructions cover records from the earlier Notebook.
+For your Obsidian diary, back up the vault folder and any separate media files.
+
+The packaged Notebook lives in the per-user directory printed by the CLI.
 Removing a package or clearing npm's cache does not remove it.
 You can read and edit it without a model connection while the companion is running.
 
-Use **Connect → Export notebook backup** to save a portable JSON archive.
+In [Notebook recovery](/notebook/setup/?legacy=1), use **More learning tools → Connect → Export notebook backup** to save a portable JSON archive.
 On another computer, start the companion and use **Import a portable notebook**.
 Identical records are retained once; imports with conflicting existing work are rejected without replacing your notes.
 Keep both copies and start a separate notebook if you need to inspect a conflict:
@@ -563,7 +483,7 @@ The backup retains `credential-identity.json` and conversation data, while saved
 Keep the backup private because it contains your learning records.
 On another computer, restore your records and sign in again or supply your API key through the configured environment variable.
 Moving a Codex profile to another path requires sign-in again even on the same computer.
-Restoring only the portable notebook lets you start a new conversation from selected notes without depending on an old provider session.
+After restoring the portable notebook, you can export selected entries as Markdown and use an excerpt to start a new discussion.
 
 ### Move an existing repository notebook
 

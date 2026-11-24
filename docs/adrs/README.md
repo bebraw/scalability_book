@@ -115,6 +115,7 @@ No accepted decisions await implementation.
 | [ADR-063](implemented/ADR-063-launch-course-coding-agents-from-the-companion.md) | Provide a guided terminal launcher for the verified course coding harness while preserving study-assistant permissions and harness choice. |
 | [ADR-064](implemented/ADR-064-expose-reader-feedback-through-a-private-editorial-mcp.md) | Expose reader feedback and optional issue resolution through an owner credential with account identities omitted. |
 | [ADR-065](implemented/ADR-065-back-up-book-data-to-private-r2.md) | Verify book snapshots locally and keep dated copies in private EU R2. |
+| [ADR-066](implemented/ADR-066-keep-course-diaries-in-obsidian.md) | Keep diaries in student-owned Markdown, link book highlights and discussion, and retain recovery for existing Notebook records. |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

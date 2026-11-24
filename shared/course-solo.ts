@@ -17,7 +17,9 @@ export interface SoloReview {
   reviewedAt: string | null;
 }
 export const soloSupported = (course: Course) =>
-  course.rubric === rubricVersion && course.requirements === "2026-10-v2";
+  course.rubric === rubricVersion &&
+  (course.requirements === "2026-10-v2" ||
+    course.requirements === "2026-11-v1");
 export const soloGroup = (course: Course, phase: Phase, group: string) =>
   course.phases[phase].groups.some(
     (g) => g.id === group && g.route === "solo" && g.members.length === 1,

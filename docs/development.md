@@ -249,13 +249,24 @@ Any scrolling needed to reveal the active link belongs to its own list.
 Run `npx playwright test tests/e2e/toc-highlight.spec.ts` for the chapter and section journeys, including keyboard and native disclosure use.
 The native keyboard check opens the chapter at **Summary**, selects **Four pressures organize the course** and checks that the heading is on screen with both default and reduced motion.
 
+### Course diary starter
+
+To evaluate a change, run `npm run dev` and open `/diary/`.
+Download the ZIP and open its extracted **Course diary** folder as a fresh Obsidian vault.
+Test the plain Markdown walkthrough first, then enable the bundled community plugin and try its commands.
+Use synthetic writing.
+Check that the selected passage reopens its book section and that the portfolio draft contains only the chosen excerpt.
+The [student guide](course-diary.md) describes each action.
+The build reads the five numbered notes from `docs/diary-pilot/` and the plugin from `packages/obsidian-course-diary/`.
+Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records ownership and recovery.
+
 ### Setup guide layout
 
-The standalone `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
+The standalone `/diary/`, `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
 Keep code blocks and tables within that reading column at wide and narrow widths.
 The guide's minimum inline gutter reserves room for hanging heading links and their keyboard focus outlines.
 Long prose links can wrap within the guide's reading column.
-Neither guide should create document-level horizontal scrolling; long code remains scrollable inside its own block.
+The guides should avoid document-level horizontal scrolling; long code remains scrollable inside its own block.
 Run `npx playwright test tests/e2e/book-layout.spec.ts --project=chromium --grep 'setup guides'` for the focused layout regression.
 
 Links to guide headings should land with the whole heading visible.
@@ -269,7 +280,7 @@ Run `npx playwright test tests/e2e/setup-guide-navigation.spec.ts` to follow the
 
 At 48rem and below, the book title and primary navigation share a row when there is room.
 On a narrower phone the title gets its own line.
-The next row groups Cockpit, Notebook, Teaching assistant, Account, Theme and any available Tools in keyboard order.
+The next row groups Cockpit, Diary, Teaching assistant, Account, Theme and any available Tools in keyboard order.
 The controls can wrap and their labels stay visible.
 The compact homepage checks in [the theme browser suite](../tests/e2e/theme-initialization.spec.ts) cover the 390-pixel height budget, keyboard access and theme selection.
 
@@ -385,10 +396,10 @@ The website's Account dialog uses `/api/account/status`, with the same verified-
 `shared/site-account.ts` owns exercise identity selection; keep existing GitHub/local keys and email course namespaces consistent between adapters.
 Development honors explicit test identity overrides for both account status and exercise routes; those headers remain unavailable in the Worker.
 Run `node --test tests/site-account.test.ts tests/learning-auth.test.ts tests/course-auth.test.ts tests/course-mail.test.ts` for account/return-context boundaries, and `npx playwright test tests/e2e/account-learning.spec.ts tests/e2e/chapter-exercises.spec.ts tests/e2e/course-email-signin.spec.ts` for the connected browser journeys.
-The new account journey runs in Chromium and WebKit, including an actual notebook-only companion, cross-tab email confirmation, reviewed exercise context and retained private writing.
+The new account journey runs in Chromium and WebKit, including an actual companion, cross-tab email confirmation and reviewed exercise context.
 Use a fresh `E2E_LOCAL_DATA_DIR` when testing synthetic enrollments; retained simulation directories must not be relabeled or deleted to bypass isolation checks.
 
-Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional local private notebook service beside the development website.
+Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional teaching assistant or Notebook recovery service beside the development website.
 Only `https://scalableweb.dev` is trusted by default; specify exact development origins explicitly.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
 See [the learning-workspace guide](learning-workspace.md) for code-free connection, exact origins, portability and the current implementation boundary.
@@ -446,7 +457,7 @@ The [student guide](learning-companion-setup.md#start-a-course-coding-project) s
 
 For shared learning loops, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts tests/e2e/learning-cockpit.spec.ts --project=chromium --project=webkit`.
 The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, selected-note and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
-Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and an actual notebook-only companion's reviewed save path.
+Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and a local Markdown download.
 The tutorial's example reply is authored; these checks assert no model calls and distinguish preparing a draft from saving a note.
 Use a fresh `E2E_LOCAL_DATA_DIR` for synthetic browser records.
 The browser check runs an actual companion and synthetic local model, checking submitted activity context rather than model teaching quality.

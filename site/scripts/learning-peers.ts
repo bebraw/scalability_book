@@ -35,7 +35,7 @@ type Membership = {
 interface Options {
   source: LearningSource;
   entries: NotebookEntry[];
-  initial: (source: LearningSource) => void;
+  initial: (source: LearningSource, saved?: () => void) => void;
   reflect: (source: LearningSource, body: string, relatedIds: string[]) => void;
   status: (text: string) => void;
   save: GuideSave;
@@ -137,7 +137,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
   container.append(
     node(
       "p",
-      "Peer inquiry follows your own thinking. Save an explanation, prediction or where you are stuck, then compare and reflect. Your initial text stays in your private notebook.",
+      "Peer inquiry follows your own thinking. Save an explanation, prediction or where you are stuck, then compare and reflect. Your initial text stays in your local companion.",
     ),
   );
   container.append(
@@ -218,7 +218,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       gate.append(
         node(
           "p",
-          "Sign in using your course account. The notebook does not link your feedback identity to a course account.",
+          "Sign in with your course account to discuss this passage with your group.",
         ),
       );
       const link = node("a", "Course sign-in");
@@ -285,7 +285,9 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         entry.source.anchor === source.anchor,
     );
     gate.append(
-      button("Write my initial thinking", () => options.initial(source)),
+      button("Write my initial thinking", () =>
+        options.initial(source, () => void act(loadGate)),
+      ),
     );
     if (state.membership.staff) {
       gate.append(button("Open inquiry as course staff", reveal));
@@ -513,7 +515,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       link.href = threadLink(thread);
       card.append(
         link,
-        button("Reflect privately on this inquiry", () =>
+        button("Download a diary reflection prompt", () =>
           options.reflect(
             thread.source,
             `Discussion reference: ${threadLink(thread)}\nThis link does not copy replies or grant access after membership changes.\n\n${selected.size ? `Selected contributions for my review (not group consensus):\n${selectedInquiryText(chosen(), 12000)}\n\n` : ""}My initial view:\n\nWhat I can now justify myself:\n\nWhat remains uncertain or needs more help:\n\nMy next independent check:\n`,

@@ -18,7 +18,7 @@ test("run checklists link every entry to its pinned owner and reject unsupported
   const editions = await readRequirementEditions(process.cwd());
   assert.deepEqual(
     editions.map((edition) => edition.version),
-    [requirementVersion],
+    ["2026-10-v2", requirementVersion],
   );
   const bibliography = await readFile("bibliography.bib", "utf8");
   for (const edition of editions) {
@@ -45,7 +45,7 @@ test("run checklists link every entry to its pinned owner and reject unsupported
         );
     }
   }
-  assert.equal(requirementsFor({}).version, "2026-10-v2");
+  assert.equal(requirementsFor({}).version, "2026-11-v1");
   assert.throws(
     () => requirementsFor({ requirements: "unavailable-edition" }),
     /Unsupported/,

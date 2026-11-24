@@ -1003,3 +1003,47 @@
     grid-template-columns: 1fr;
   }
 }
+
+.diary-highlight-actions {
+  position: fixed;
+  z-index: 30;
+  inset-inline: 0;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  margin-inline: auto;
+  width: fit-content;
+  max-width: calc(100% - 2rem);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+.diary-highlight-actions[hidden] {
+  display: none;
+}
+.diary-highlight-actions button {
+  padding: 0.4rem 0.65rem;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  font: 600 0.85rem/1.4 var(--font-ui);
+  cursor: pointer;
+}
+.diary-highlight-actions button:hover,
+.diary-highlight-actions button:focus-visible {
+  border-color: var(--accent-strong);
+}
+.diary-highlight-actions [role="status"] {
+  font: 0.85rem/1.4 var(--font-ui);
+}
+.diary-highlight-actions [role="status"]:empty {
+  display: none;
+}
+.learning-toggle[data-diary-guide] {
+  text-decoration: none;
+}
