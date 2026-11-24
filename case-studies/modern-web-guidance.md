@@ -1,110 +1,57 @@
 # Modern Web Guidance – Treating current knowledge as a tested dependency
 
-[Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started) is a preview project supported by the Google Chrome and Microsoft Edge teams and the web-development community.
-It packages current web-platform guidance as skills that coding agents can search and retrieve while working.
+A developer asks a coding agent to add a logout confirmation.
+A click outside the dialog should dismiss it.
+A click on the question inside should leave it open.
+An agent can produce a convincing dialog and still get the second click wrong.
+How would we tell whether giving the agent a guide helped?
 
-The case extends the idea of a [project harness](/concepts/#harness) beyond one repository.
-Instead of expecting a model's training data or a permanent prompt to contain the latest HTML, CSS, accessibility, performance, and compatibility practices, a maintained capability supplies a smaller task-relevant guide.
-The project then evaluates whether access to that guide changes checked outcomes.
+This is one of the tasks in Modern Web Guidance, a collection of web-platform guides for coding agents.
+The project released version 1.0 on 10 November 2026, with participation from the Chrome, Edge, and Firefox teams.
+Its maintainers publish both the guidance and the checks they use to judge its effect. [Release announcement](https://developer.chrome.com/blog/modern-web-guidance-v1)
 
-## Case at a glance
+## From a search result to a browser decision
 
-| Design choice          | Current approach                                                                 |
-| ---------------------- | -------------------------------------------------------------------------------- |
-| Knowledge source       | Curated guides and discipline-level skills maintained by domain contributors     |
-| Agent access           | Semantic search followed by retrieval of a selected guide                        |
-| Compatibility boundary | A declared Baseline target; Widely Available is the default                      |
-| Distribution           | A generated installation repository and an npm-based CLI                         |
-| Evaluation contrast    | The same coding tasks run with and without access to the guidance                |
-| Browser evidence       | Playwright assertions calibrated against reference and deliberately flawed pages |
-| Project status         | Preview, with content and tooling still evolving                                 |
+The agent searches for a behavior and retrieves a guide by its identifier.
+A developer can inspect the same search results and guide before installing the skill.
+This lets a project draw on a changing collection while bringing only the relevant material into the task. [Search and retrieval](https://developer.chrome.com/docs/modern-web-guidance/get-started#explore-before-installation)
 
-This is a case about the design of a knowledge dependency and its [evaluation](/concepts/#eval) harness.
-It is not independent proof that every recommendation is correct or that installing the skill improves every web project.
-
-## Retrieval keeps the working context bounded
-
-Modern Web Guidance contains guidance for more than one hundred web-development use cases.
-Its top-level skill instructs an agent to search the collection for the current task and retrieve a matching guide by identifier.
-A developer can also use the same [search and retrieve commands](https://developer.chrome.com/docs/modern-web-guidance/get-started#explore-before-installation) before installation to inspect what would enter the agent's context.
-
-This separation matters for scale.
-The full library can evolve independently, while a task consumes only the patterns it appears to need.
-Descriptions and token counts make selection more inspectable than silently injecting the whole collection.
-Retrieval can still fail: the query may select the wrong guide, relevant guidance may be absent, and a concise result may omit a constraint the application needs.
-The selected guide therefore remains an input to review rather than an authority over the product.
-
-## Browser support becomes a project constraint
-
-The project connects its recommendations to [Baseline](https://web.dev/baseline), a shared definition of when web-platform features become interoperable across major browser engines.
-A repository can state a Baseline year or another support policy in its agent instructions.
-Without a local target, Modern Web Guidance defaults to Baseline Widely Available and expects fallbacks for features outside that boundary.
-
-This turns browser compatibility from an accidental property of generated code into an explicit design input.
-It does not replace testing on the browsers, devices, and assistive technologies used by the product's actual audience.
-A Baseline label describes feature interoperability; it does not establish usability, accessibility, performance, or fit with a particular framework.
+For the logout dialog, the guide recommends opening a native `<dialog>` with `showModal()` and setting `closedby="any"` so the browser handles dismissal.
+Whether the team can rely on that attribute depends on the browsers its readers use.
+The project can declare a Baseline target in its agent instructions.
+Modern Web Guidance defaults to Baseline Widely available.
+For browsers without the attribute, the guide shows how to distinguish a click on the backdrop from one inside the dialog.
+Both paths should produce the same result for the reader. [Dialog guide](https://github.com/GoogleChrome/modern-web-guidance-src/blob/888035b5f606f5366e6c9226e6782ce49af83a6f/guides/ui-behaviors/light-dismiss-a-dialog/guide.md) · [Browser support policy](https://developer.chrome.com/docs/modern-web-guidance/get-started#baseline)
 
 ## The guidance has an evaluation loop
 
-The [source repository](https://github.com/GoogleChrome/modern-web-guidance-src) separates human-authored guidance from the machinery that distributes and evaluates it.
-For an evaluation-ready use case, a subject-matter expert writes the guide, a reference implementation, and natural-language expectations.
-The development pipeline generates a deliberately incorrect page and a Playwright grader, then calibrates the grader so the reference passes and the negative page fails.
+The maintainers can run the same task from the same starting application with and without access to the guidance.
+They calibrate the task checks against implemented solutions and the unmodified application.
+In their published 20 November run, Codex using GPT-6.1-Sol passed 49% of the checks without guidance and 85% with it.
+The run covered 229 tasks and 1,961 checks.
+The 36-percentage-point gain describes what those checks rewarded. [Evaluation method and dated results](https://github.com/GoogleChrome/modern-web-guidance-src/blob/888035b5f606f5366e6c9226e6782ce49af83a6f/README.md#recent-eval-results-snapshot)
 
-The harness can then run the same task from the same base application in two conditions: an agent works without the guidance and with access to it.
-Both outputs are graded with the task's browser assertions.
-This guided-versus-unguided contrast tests whether the capability adds value beyond what the selected agent and model already know, rather than counting whether the agent opened a guide.
+The dialog guide's own grader shows why the distinction matters.
+One check clicks a heading or paragraph inside the open dialog and observes that it stays open.
+Another looks for `getBoundingClientRect` and `.close()` in the page's script text as evidence of a fallback.
+Both strings could be present in a handler that never runs.
+Try three clicks in a browser that needs the fallback.
+The question and the empty padding around it should keep the dialog open.
+Only the backdrop should dismiss it. [Dialog grader](https://github.com/GoogleChrome/modern-web-guidance-src/blob/888035b5f606f5366e6c9226e6782ce49af83a6f/guides/ui-behaviors/light-dismiss-a-dialog/grader.ts)
 
-The method has useful limits:
+## Field note — Updating the guide in Vibe Template
 
-- A generated grader can encode the wrong behavior even after calibration.
-- One positive and one negative page do not cover every incorrect implementation.
-- Natural-language expectations reflect the maintainers' chosen interpretation of the task.
-- The current harness uses small base applications and controlled tasks rather than existing production systems.
-- Results are local to the tested task, agent, model, prompt scaffold, guide revision, and assertions.
+I adopted the guidance in Vibe Template so an agent facing a browser decision could look up the relevant feature.
+The upstream installer can update the guidance automatically.
+I wanted to be able to tell which advice an agent had received, so the template pins the reviewed release and disables telemetry. [Original integration decision](https://github.com/bebraw/vibe-template/blob/4428c4351b98769c4ba839d55bc32672ffe02c8b/docs/adrs/implemented/ADR-052-adopt-scoped-modern-web-guidance.md)
 
-Calibration can reject an obviously broken check.
-It cannot turn the check into independent ground truth, so failures and surprising uplifts still require inspection.
+The upgrade to 1.0.0 offered a way to check that decision.
+The release added a scanner for older web patterns.
+During the upgrade, a test form that marked required fields invalid before the user had interacted with them produced the expected finding.
+The template uses the scanner for explicit modernization reviews.
+A maintainer can keep a flagged fallback when the project's browser policy still calls for it. [November upgrade and verification](https://github.com/bebraw/vibe-template/blob/a6800aee4ca7e400ee839e5346ca4a4a047d7e6e/docs/adrs/implemented/ADR-072-adopt-modern-web-guidance-v1.md)
 
-## Distribution creates an update tradeoff
-
-The project uses two repositories: contributors work in the [source repository](https://github.com/GoogleChrome/modern-web-guidance-src), while a generated [installation repository](https://github.com/GoogleChrome/modern-web-guidance) contains compiled skills and agent-specific packaging.
-The recommended CLI installation supports automatic updates.
-That provides a clear maintenance path for knowledge that should change with the platform.
-
-Automatic currency and [reproducibility](/concepts/#reproducible-environment) pull in different directions.
-An evaluation or consequential change should record the resolved skill version or revision and the project's browser-support target.
-An organization may instead pin updates until review, especially because a skill can influence tool calls made with the agent's existing [authority](/concepts/#authority).
-Official provenance, popularity, and a passing evaluation reduce some uncertainty; none grants the capability permission to override local architecture, security, privacy, or user requirements.
-
-## A practical adoption pattern
-
-A team adopting a living capability can keep the boundary explicit:
-
-1. State the local problem and compatibility target before retrieval.
-2. Inspect the selected guide and its provenance rather than trusting a match score alone.
-3. Record the resolved capability revision or update policy with the change.
-4. Adapt the recommendation to the project's architecture and users.
-5. Validate behavior in the real application and representative browsers.
-6. Re-run a fixed task cohort when the guide, model, agent, or harness changes materially.
-7. Keep a removal or rollback path if the capability stops fitting the project.
-
-This makes the external skill a reviewable development dependency rather than invisible model knowledge.
-
-## Field note — Curate external knowledge without transferring authority
-
-I have not used Modern Web Guidance directly enough to claim that it improved a particular implementation.
-I adopted it into [Vibe Template](https://github.com/bebraw/vibe-template) because I consider current web-platform guidance useful context for an agent to have when a relevant decision appears.
-
-The [recorded integration decision](https://github.com/bebraw/vibe-template/blob/4428c4351b98769c4ba839d55bc32672ffe02c8b/docs/adrs/implemented/ADR-052-adopt-scoped-modern-web-guidance.md) deliberately narrows the upstream capability.
-Retrieval uses a reviewed, pinned version with telemetry disabled, and the skill activates only when browser-facing work requires a platform choice, compatibility interpretation, or fallback.
-Project architecture, specifications, user instructions, and validation remain authoritative over anything retrieved.
-
-An agent should be able to discover that a relevant browser feature, compatibility concern, or native platform pattern exists without loading an entire changing guide into every task or treating external guidance as a project requirement.
-
-For now, this is a reasoned design choice rather than evidence of improved project outcomes.
-The capability still needs to justify itself through the decisions and implementations it influences.
-
-## What Modern Web Guidance teaches
-
-External guidance becomes an inspectable dependency when retrieval, versioning, compatibility, and updates are connected to local checks.
-Paired agent runs can test whether it improves selected tasks; the guide and its grader still leave broader product quality to be evaluated.
+That test establishes that the scanner can find the example we gave it.
+Whether the guide improves a change in the template remains an open question.
+For the next browser change, keep the task, supported browsers, and acceptance checks fixed.
+Give one run the pinned guide and compare the behavior a reader can actually exercise.

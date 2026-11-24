@@ -156,7 +156,7 @@ const groups = [
         "build/case-studies/slideotter/index.html",
       ),
       entry(
-        "Thesis Journey Tracker - Shipping by constraining the problem",
+        "Thesis Journey Tracker - Keeping a supervision dashboard small",
         "case-studies/thesis-journey-tracker",
         "build/case-studies/thesis-journey-tracker/index.html",
       ),
@@ -166,12 +166,12 @@ const groups = [
         "build/case-studies/kirjolab/index.html",
       ),
       entry(
-        "Webernetes - Compatibility through source mapping and shared tests",
+        "Webernetes - Comparing generated behavior with a real cluster",
         "case-studies/webernetes",
         "build/case-studies/webernetes/index.html",
       ),
       entry(
-        "Modern Web Guidance - Keeping web-platform advice current",
+        "Modern Web Guidance - Treating current knowledge as a tested dependency",
         "case-studies/modern-web-guidance",
         "build/case-studies/modern-web-guidance/index.html",
       ),
@@ -610,7 +610,7 @@ const printCss = String.raw`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    margin: -0.7in -0.66in -0.72in;
+    page: cover;
     min-height: 10in;
     padding: 0.75in 0.66in;
   }

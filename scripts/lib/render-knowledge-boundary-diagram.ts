@@ -3,9 +3,10 @@ export function renderKnowledgeBoundaryDiagram(): string {
   const titleId = `${id}-title`;
   const descriptionId = `${id}-description`;
   const markerId = `${id}-arrow`;
-  const title = "One knowledge base, two artifact owners";
+  const title =
+    "Proposed design for sharing sources across a deck and a manuscript";
   const description =
-    "An external knowledge base owns immutable documents, collections, relationships, provenance, and reusable user-owned annotations. Slideotter references exact source revisions while owning presentation metadata, outline variants, slide definitions, themes, and approvals. Kirjolab references exact source and annotation revisions while owning manuscripts, claims, evidence links, prose, and review state.";
+    "One knowledge base would hold documents and their provenance, with annotations shared by their authors. Slideotter would refer to a source revision from a deck. Kirjolab would link a manuscript claim to the source and annotation revisions its author reviewed.";
 
   return `<svg
   class="book-diagram knowledge-boundary-diagram"
@@ -25,7 +26,7 @@ export function renderKnowledgeBoundaryDiagram(): string {
 
   <g class="book-diagram-node knowledge-boundary-source" data-diagram-container="knowledge-base" data-diagram-node="knowledge-base">
     <rect x="70" y="28" width="800" height="166" rx="13"></rect>
-    <text class="book-diagram-kicker" x="94" y="59">REUSABLE SOURCE KNOWLEDGE</text>
+    <text class="book-diagram-kicker" x="94" y="59">PROPOSED SHARED SOURCE STORE</text>
     <text class="book-diagram-title knowledge-boundary-source-title" x="94" y="94">External knowledge base owns</text>
     <text class="book-diagram-detail" x="94" y="130">
       <tspan x="94" dy="0">Immutable documents + collections</tspan>

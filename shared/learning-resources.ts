@@ -131,9 +131,9 @@ const figures = [
     ],
     url: "/case-studies/kirjolab/#figure-shared-knowledge-boundary",
     caption:
-      "Reusable source knowledge stays external; Slideotter and Kirjolab own their artifact-specific decisions.",
+      "In this proposed design, a deck and a manuscript can cite the same annotated paper. Each author approves the wording in their own work.",
     assumptions:
-      "Ownership boundaries describe these two products. Evaluate whether the same split fits another system rather than copying it automatically.",
+      "The projects share paper-import code today. Sharing a live store of sources and annotations is a further design proposal.",
   },
   {
     id: "coding-loop",

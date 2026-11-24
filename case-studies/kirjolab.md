@@ -5,13 +5,14 @@ It connects portable Markdown manuscripts with references, PDF annotations, evid
 I developed the project rapidly with Codex during July 2026.
 
 With GPT-5.6, I revisited an idea combining features of [Zotero](https://www.zotero.org/), [Parsifal](https://www.parsifal.com.br/), and [Overleaf](https://www.overleaf.com/) and reached a working prototype within days.
-Agents helped me build an integration I could not have achieved alone in the same time, but substantial refactoring followed almost immediately.
-The central question is why strong behavioral checks kept the system repairable while its ownership and dependency boundaries became difficult to understand.
+Agents helped me build an integration I could not have achieved alone in the same time.
+Weeks later, I could still run a browser test to check that a writer could edit a manuscript.
+Finding the code responsible for that edit had become much harder.
 
 ## Case at a glance
 
-The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/kirjolab/tree/02141653d503dbf78b0acaf2c4bae67ddd8752b6).
-:ref[table:kirjolab-snapshot]{text="The table below"} records the reviewed interval and development context.
+The [30 July 2026 source snapshot](https://github.com/bebraw/kirjolab/tree/02141653d503dbf78b0acaf2c4bae67ddd8752b6) records the initial build and refactoring summarized in :ref[table:kirjolab-snapshot]{text="the table below"}.
+An August decision and the [23 November source snapshot](https://github.com/bebraw/kirjolab/tree/403cd8109529822d20b481b639afe499099425a3) show what happened to one of the proposed boundaries.
 
 | Evidence                      | Observation                                                     |
 | ----------------------------- | --------------------------------------------------------------- |
@@ -22,101 +23,65 @@ The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/kirjo
 ::caption[Repository evidence from the reviewed Kirjolab snapshot.]
 ::label[table:kirjolab-snapshot]
 
-The project began with a prepared template containing strict TypeScript, coverage and mutation checks, browser tests, affected-file checks, a pre-push gate, local CI, specifications, architecture decision records, and agent instructions.
+## The harness existed before the feature pressure
 
-## What the harness made possible
+A prepared [project harness](/concepts/#harness) gave me strict TypeScript, browser tests, coverage and mutation checks, and a pre-push gate from the start.
+When I moved code out of the editor coordinator, I could run the same browser journeys against the new arrangement.
+Those checks gave me a way to find behavior I had broken during the move.
 
-### The harness existed before the feature pressure
-
-The [project harness](/concepts/#harness) checked types, coverage, browser behavior, security-sensitive boundaries, and mutation resistance as features arrived.
-Existing tests could detect behavioral drift when responsibilities were extracted or dependencies replaced project-owned code.
-That made extensive restructuring possible without relying only on a fresh reading of every change.
-
-The early [architectural vision](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/VISION.md) also fixed durable product rules: portable manuscripts, traceable evidence, rebuildable derived views, and researcher acceptance of model suggestions.
-Those rules survived changes to the internal organization.
-The uncertainty concerned how code responsibilities should be divided as more capabilities arrived.
-
-Specifications, [architecture decision records](/concepts/#decision-log), review notes, and the [Build Week account](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/build-week-2026-submission.md) preserve the decisions and corrections behind the final implementation.
+The product rules were clear early on.
+Manuscripts had to stay portable, a writer had to be able to trace a claim to its evidence, and only the researcher could accept a model's suggestion.
+I kept those rules in the [architectural vision](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/VISION.md) and recorded changes in [architecture decision records](/concepts/#decision-log).
+The [Build Week account](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/build-week-2026-submission.md) traces the decisions behind the prototype.
 
 ## Where architectural understanding fell behind
 
-### Functional correctness did not guarantee navigability
+By 25 July, `src/client/app.ts` had reached 12,495 lines.
+Finding the owner of an editor action meant tracing the element registry, event bindings, rendering, and feature orchestration through one file. [July diagnostic notes](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/dependency-reduction-notes-2026-07-25.md)
 
-The quality gates emphasized whether behavior remained correct.
-They did not initially place equally strong limits on module ownership, fan-in, churn concentration, or directory growth.
+The reference library exposed a different problem.
+Its shared contract was 1,090 lines long and had 82 dependents.
+A contributor changing how the library represented a PDF had to find which of those consumers relied on that part of the contract.
+A passing editor test could tell the contributor whether the editing journey still worked, but it gave little guidance on where to start looking. [July modularization RFC](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/modularization-and-dependency-rfc-2026-07-29.md)
 
-By 25 July, `src/client/app.ts` had reached 12,495 lines and combined a large element registry with event binding, rendering, and feature orchestration.
-The later [modularization RFC](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/modularization-and-dependency-rfc-2026-07-29.md) identified several other mixed authorities:
-
-- a 5,636-line document Durable Object covering collaboration, files, history, export, and persistence;
-- a 2,766-line review-study Durable Object combining commands and SQLite projection;
-- a 2,411-line reference-library Durable Object spanning several persistence lifecycles; and
-- a 1,090-line reference-library contract with 82 dependents.
-
-Passing tests did not tell a contributor where a responsibility belonged or how widely a contract change would propagate.
-File size was a symptom; mixed ownership and dependency reach explained why the next change was becoming harder.
-
-### Scope expanded faster than consolidation
-
-The original vertical slice connected evidence to prose.
-Within days, it also covered structured literature reviews, GitHub synchronization, LaTeX import, citation trails, collaboration, sharing, offline recovery, advanced PDF workflows, and production operations.
-Each capability fit the product direction, but their combined arrival rate left too little time to consolidate ownership.
-Implementation exposed the domains faster than the architecture absorbed them.
-
-### The prepared template had a cost
-
-The initial template also bundled vendored process material, skills, capability kits, and update infrastructure.
-Most of that was not product code.
-Explicit instructions and reusable workflows supported validation while adding navigation cost and search noise.
-Pruning unrelated material would reduce the context a contributor must understand before reaching the product code.
+In the same few weeks, I added structured literature reviews, GitHub synchronization, and LaTeX import to a prototype originally built to connect evidence to prose.
+The template supplied workflows for testing each addition, alongside instructions and skills unrelated to the feature at hand.
+Searching for the owner of a feature also meant sorting through that inherited material.
 
 ## Refactoring was the revision phase
 
-The history shifts from feature implementation on 10–21 July to concentrated refactoring on 25–28 July.
-The corrections addressed specific ownership problems:
+From 25 to 28 July, work shifted toward extracting workflows from the client coordinator, separating PDF analysis from the browser and Worker code that called it, and narrowing the reference-library contracts.
+On 30 July the client and domain files moved into directories named for the capabilities they served.
+A contributor could now start in the directory for a feature.
+The application still ran as before. [ADR-198 on source organization](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/adrs/implemented/ADR-198-organize-source-by-capability.md)
 
-- extracting presentation and workflow owners from the large client coordinator;
-- splitting API and persistence responsibilities;
-- separating pure PDF-analysis mechanics from browser and Worker adapters;
-- narrowing the reference-library contracts; and
-- organizing hundreds of flat source files by product capability.
-
-On 30 July, [ADR-198](https://github.com/bebraw/kirjolab/blob/02141653d503dbf78b0acaf2c4bae67ddd8752b6/docs/adrs/implemented/ADR-198-organize-source-by-capability.md) addressed flat client and domain directories that obscured product boundaries.
-The migration grouped them into shallow product-named directories without adding package or runtime boundaries.
-
-This was the “revise” step of the [development loop](/concepts/#feedback-loop) at repository scale: observed change patterns became boundaries for later work.
-The cost was that structural feedback arrived after substantial functional implementation.
-I carried the lesson back to my template, combining [mutation testing](https://stryker-mutator.io/) with [cognitive-complexity analysis](https://fallow.tools/docs/explanations/health/).
-One challenges whether tests detect behavioral changes; the other identifies code that is becoming difficult to reason about.
+I brought this part of the [development loop](/concepts/#feedback-loop) back into my template. [Mutation testing](https://stryker-mutator.io/) checks whether a test catches a change in behavior.
+I added [cognitive-complexity analysis](https://fallow.tools/docs/explanations/health/) to point me toward code a contributor may struggle to follow while the feature still works.
 
 ## What I would do differently
 
-I would establish ownership boundaries and review the cost of a representative next change before adding another broad capability.
-Separating manuscript ownership from reusable source knowledge gives one concrete example.
-
-An external knowledge base would own source records, relationships among sources, and annotations.
-Annotations would normally belong to their creator, with explicit sharing.
-The same researched material could support [Slideotter](/case-studies/slideotter/) without either product owning the other's workflow.
-
-Every imported PDF would be an immutable, uniquely identified document.
-A collection could reveal related drafts or editions while existing references continue to identify the document originally reviewed.
-Kirjolab would own manuscripts, manuscript-specific claims, evidence links, prose, and review state.
-An evidence link would pin a claim to an exact document and reviewed annotation revision.
-Replacing either would require explicit review.
+Looking back at the July prototype, I would give reusable research material an owner outside the manuscript.
+A writer and a presenter might use the same paper while making different claims about it.
+In that design, an evidence link would identify the exact document and annotation revision the author reviewed.
+A later edition could sit alongside it, and the author could decide whether to update the claim.
+The figure shows that proposal.
 
 {{ import "site/includes/shared-knowledge-boundary-figure.html" }}
 
-That proposed split should justify itself through changes: can a source revision, manuscript edit, or presentation change be explained and implemented within its declared owner?
+On 24 August Kirjolab introduced a separately deployable Research Corpus service for source identity, original files, provenance, and extraction results.
+Manuscripts, claims, and review decisions stayed with Kirjolab.
+By the November snapshot, an upload through the new service and one through the existing library route called the same PDF intake operation.
+Both used the existing library and storage, so adding a client interface did not require copying every researcher's files or reconciling competing writes. [Research Corpus decision](https://github.com/bebraw/kirjolab/blob/403cd8109529822d20b481b639afe499099425a3/docs/adrs/implemented/ADR-227-extract-research-corpus-service.md) · [PDF intake implementation](https://github.com/bebraw/kirjolab/blob/403cd8109529822d20b481b639afe499099425a3/src/library-pdf-ingest.ts)
 
-I would also change the development controls:
+[Slideotter](/case-studies/slideotter/) found a smaller piece it could reuse.
+It uses Kirjolab's paper-import package to inspect a LaTeX archive or extract text from a PDF, lets the presenter review the import, and saves confirmed material with the presentation.
+That workflow shares parsing code.
+Each product still keeps its own project records, and a live corpus shared between them remains a proposal. [Slideotter's import adapter](https://github.com/bebraw/slideotter/blob/6845b401eaa3f30861c771839a7e2bb2aca69bc5/studio/server/services/paper-import/kirjolab-adapter.ts) · [Paper-import decision](https://github.com/bebraw/slideotter/blob/6845b401eaa3f30861c771839a7e2bb2aca69bc5/docs/adr/implemented/0064-reviewed-latex-and-pdf-paper-import.md)
 
-1. **Add structural feedback alongside behavior checks.** Review file size, fan-in, churn, and cross-capability dependencies as signals for investigation.
-2. **Probe the next change.** Trace one representative workflow, identify its owners, and explain the contracts it crosses before expanding scope.
-3. **Prune the harness.** Keep checks and instructions that protect this product; remove unrelated template capabilities and obsolete guidance.
-4. **Revisit boundaries after implementation.** Use newly observed change patterns to correct the ownership model before the next expansion.
+If I were starting again, I would rehearse one likely change before adding the next capability.
+Suppose a PDF arrives in a new edition.
+Who can register it, which claim still points to the old one, and whose approval would move the link?
+The answers give me a reason to keep two responsibilities together or move one out.
 
-## What the evidence supports
-
-At the reviewed point, the repository had one contributor and strong local validation evidence, with little independent evidence about adoption, usability, production reliability, or realistic load.
-The history supports an account of implementation and architectural recovery.
-It does not establish that the revised boundaries will remain maintainable or that the product has succeeded in use.
+The repositories let us trace where such a change would go.
+Measuring what the new boundaries save would take evidence from the maintainers who use them.

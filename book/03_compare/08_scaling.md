@@ -234,8 +234,8 @@ Complete one bounded implementation experiment before finalizing the target desi
 
 ### Field note — Thesis Journey Tracker
 
-[Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) serves only two people, so runtime scale was not the problem.
-The goal was to deliver the project quickly while keeping it easy to maintain and adjust as the supervision workflow changed.
+[Thesis Journey Tracker](/case-studies/thesis-journey-tracker/) began as a dashboard for two people.
+I needed to get it into use quickly and keep it easy to change as our supervision work evolved.
 I deliberately chose a lightweight, server-rendered interface instead of a conventional single-page application.
 The [first agent-generated version](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29) rendered complete pages, but less than two hours later the agent introduced a narrow [HTML-fragment endpoint for the student panel](https://github.com/bebraw/thesis-journey-tracker/commit/e895c2ace4).
 A small browser script replaced that panel without a full refresh and retained ordinary navigation as a fallback.

@@ -1,17 +1,12 @@
 # Webernetes – Comparing generated behavior with a real cluster
 
-[Webernetes](https://github.com/ngrok/webernetes) is an experimental TypeScript implementation of a subset of Kubernetes that runs in a browser without backend cluster infrastructure.
-Sam Rose built it at ngrok to support durable, interactive explanations of Kubernetes rather than to replace a production cluster.
-
-The project is relevant to scalable development because language models produced most of a large port in a short period, while acceptance still depended on human review, explicit porting rules, and behavioral comparison with a real implementation.
-Its [development harness](/concepts/#harness) turns selected compatibility claims into observable contrasts.
-
-The development account follows Rose's [30 June 2026 retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser).
-Repository evidence is fixed to the [13 August 2026 source snapshot](https://github.com/ngrok/webernetes/tree/ccf55325db72e644ad10df60a29e01c70aa8e2b0), which includes later refinements to the porting and test rules.
+Sam Rose wanted readers to be able to restart a container in a browser and see when Kubernetes considered it ready to serve requests.
+At ngrok he built [Webernetes](https://github.com/ngrok/webernetes), an experimental TypeScript port that runs a simulated cluster in the reader's browser.
+To decide whether a model-generated implementation behaved like a real cluster, Rose needed a [development harness](/concepts/#harness) that could ask both clusters the same question.
 
 ## Case at a glance
 
-:ref[table:webernetes-snapshot]{text="The table below"} records the intended use and the limits of the reviewed implementation.
+:ref[table:webernetes-snapshot]{text="The table below"} draws on Rose's [30 June 2026 development retrospective](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser) and the [13 August source snapshot](https://github.com/ngrok/webernetes/tree/ccf55325db72e644ad10df60a29e01c70aa8e2b0), still the head of the public main branch at the November 2026 review.
 
 | Evidence                              | Observation                                                              |
 | ------------------------------------- | ------------------------------------------------------------------------ |
@@ -26,71 +21,57 @@ Repository evidence is fixed to the [13 August 2026 source snapshot](https://git
 
 ## The product boundary made a partial port useful
 
-ngrok wanted visual, interactive Kubernetes content without operating short-lived clusters for every reader.
-Webernetes therefore simulates the parts needed by that content in the browser: an API and storage model, nodes, pods, selected controllers, service discovery, and HTTP communication between simulated containers.
-Images are TypeScript classes registered with the simulator rather than real images fetched from a container registry.
-
-That is a narrower goal than implementing Kubernetes.
-The [README's support inventory](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/README.md#whats-implemented-and-what-isnt) explicitly lists omitted or simplified behavior, including volumes, affinity, resource management, some service types, and much of the network stack.
-The simulator initially focused on the behavior needed to explain probes.
-This scope makes the browser artifact useful while preventing its familiar API from becoming an unsupported claim of production equivalence.
+Running a short-lived cluster for each reader would have left ngrok with infrastructure to operate for the lifetime of the article.
+The browser port implements enough of the API, controllers and network to let a simulated container answer an HTTP probe.
+The article supplies its container images as TypeScript classes registered with the simulator.
+Readers can investigate a pod's readiness even though the simulator omits resource limits and most network protocols. [Supported resources and limits](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/README.md#whats-implemented-and-what-isnt).
 
 ## Generation remained candidate work
 
 Rose reports that language models generated almost all of the code and that he reviewed every line.
-The retrospective also describes recurring failures: models replaced specific upstream structures with simpler ones, introduced locally convenient helpers that obscured comparison, and omitted cases while porting Go table tests.
-Those are especially dangerous in a compatibility project because code can look reasonable while changing the behavior being copied.
+When an agent translated a Go table test, it sometimes left out rows.
+The remaining cases could all pass while one of the behaviors the upstream authors had explicitly checked went untested.
+Rose also had to spot new helpers and simplified data structures that made the code harder to compare.
 
-The reviewed [porting rules](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/porting.md) make reviewability an architectural constraint.
-Ported declarations carry breadcrumbs to a pinned upstream Kubernetes revision, preserve source order and helper boundaries where possible, use shared compatibility primitives for Go concepts such as channels and clocks, and require intentional deviations to be stated.
-The objective is not idiomatic TypeScript in isolation.
-It is a mapping a reviewer can compare with the upstream implementation without reconstructing an unrelated local design.
-
-This is a useful distinction between generation speed and [accepted-change throughput](/concepts/#throughput).
-Models expanded the amount of candidate implementation, but the human still had to understand the mapping, notice unjustified deviations, and decide which subset was worth maintaining.
+The [porting rules](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/porting.md) ask contributors to link each ported declaration to a pinned upstream revision and preserve source order and helper boundaries where possible.
+With the Go and TypeScript files open side by side, a reviewer can follow the same branches and ask why one of them changed or disappeared.
+Counting a port as finished before this review would overstate [accepted-change throughput](/concepts/#throughput).
 
 ## Shared tests created a behavioral contrast
 
-Webernetes exposes a fake client shaped closely enough to `@kubernetes/client-node` that shared integration tests can execute the same calling code against two systems.
-One harness targets a real k3s cluster in Node.js; the other targets Webernetes in a browser.
-If an operation passes against k3s and fails against the simulator, the mismatch becomes a concrete porting problem instead of a model's opinion about its own output.
+Webernetes exposes a client compatible with the operations these tests use from `@kubernetes/client-node`.
+The test body can run against a real k3s cluster from Node.js and against the simulated cluster in a browser.
+One [shared readiness test](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/src/client/tests/probe.test.ts) creates a pod with an HTTP readiness probe, then reads both the container's ready flag and the pod's Ready condition.
+It expects both to be false initially and both to become true once the endpoint responds successfully.
+A simulator that marks every running pod ready immediately would get the final state right and still fail this test.
 
-The [repository instructions](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/AGENTS.md) strengthen that [loop](/concepts/#feedback-loop).
-For Kubernetes-facing behavior, a contributor should first observe the test fail against the simulator and pass against k3s, then implement the fix.
-Simulator time also goes through a controllable cluster clock rather than ambient timers, making scheduling behavior easier to pause and test deterministically.
-
-The comparison is stronger than generated tests alone, but it remains bounded.
-It establishes agreement for the selected operations, assertions, versions, and environments.
-It does not prove complete Kubernetes parity, validate unsupported resources, reveal behavior that both paths or the shared client misunderstand, or make the browser simulator suitable for production workloads.
-Ported unit tests are useful regression evidence, but they are less independent because a model can mistranslate or omit both implementation and test behavior.
+The [repository instructions](https://github.com/ngrok/webernetes/blob/ccf55325db72e644ad10df60a29e01c70aa8e2b0/AGENTS.md) tell contributors to establish the difference before attempting a repair.
+A test of Kubernetes-facing behavior should pass on k3s and expose the missing behavior in the port.
+This [feedback loop](/concepts/#feedback-loop) checks an observable transition independently of the generated implementation.
+Its reach depends on the operations, versions and assertions chosen.
+A transition the shared test never observes can still differ.
 
 ## The artifact eventually tested its product hypothesis
 
-The initial value proposition was interactive Kubernetes education, not the port itself.
-In August 2026, Rose used Webernetes for the interactive demonstrations in [an article about Kubernetes probes](https://ngrok.com/blog/probes).
-He reports checking the demonstrations against k3s and finding a Kubernetes bug during that comparison.
-
-That later use matters because it closes a loop the repository metrics cannot.
-The simulator became part of published teaching material, exercised the behavior it was originally scoped to explain, and produced a concrete discrepancy worth investigating.
-It is still one authored experience rather than evidence that the simulator will fit every educational setting.
+Rose used Webernetes for the demonstrations in his [August 2026 article about probes](https://ngrok.com/blog/probes).
+After a failed liveness probe restarted a container, Kubernetes could run a liveness probe on the replacement before its startup probe had succeeded.
+Rose documented the behavior in [an upstream issue](https://github.com/kubernetes/kubernetes/issues/141155).
+Kubernetes maintainers [merged a fix in September](https://github.com/kubernetes/kubernetes/pull/141342).
+Agreement with a particular cluster version tells you what that version did.
+Here, checking the observation against the documented startup rule exposed a defect in the reference itself.
 
 ## The harness did not make scale free
 
-The retrospective reports a steep increase in model use near the end of the initial build, including more than two billion tokens and about US$1,800 in API-equivalent cost in the final week.
-Those figures depend on the models, accounting method, and work attempted, so they should not be generalized into a cost estimate for other ports.
-
-More importantly, generation did not remove the cost of comprehension.
-Line-by-line review, upstream comparison, test-harness design, scope decisions, and mismatch investigation remained human work.
-The reference implementation reduced uncertainty about selected behaviors; it did not decide which behaviors mattered or who would maintain the result.
+Adding Deployment support took Rose beyond the dependencies his first port had covered.
+He had agents trace and port the missing dependencies, then used more agents to review their work before his own inspection.
+For the week of 15 June he reports about 2.2 billion cached input tokens and US$1,812 in API-equivalent cost across the recorded model use.
+He describes his own time as the largest expense.
+The token figure includes repeated input, and the dollar estimate uses API rates.
+Neither measures how much code a reviewer could accept per hour. [Development retrospective and cost breakdown](https://ngrok.com/blog/i-ported-kubernetes-to-the-browser).
 
 ## What Webernetes teaches
 
-Webernetes shows a strong pattern for agent-assisted compatibility work:
-
-1. Define the useful subset and name unsupported behavior.
-2. Preserve a reviewable mapping to a pinned upstream source.
-3. Exercise the same public operations against the candidate and an independent reference.
-4. Turn mismatches into failing tests before changing the implementation.
-5. Keep human review responsible for scope, fidelity, and the limits of the evidence.
-
-The shared checks make selected compatibility claims inspectable and disagreements reproducible.
+Try the same distinction in [Chapter 8's orchestration lab](/chapters/scaling/#orchestration-control-loop-lab), which runs Webernetes.
+During the broken release, can the controller restore the requested replica count while users still receive failed responses?
+Choose the observation that would answer each half of the question.
+To claim the simulated result also holds on Kubernetes, you would need to run those checks against a named cluster version.

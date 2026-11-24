@@ -254,10 +254,12 @@ Use a disposable clean copy for each attempt, retain failures and human correcti
 This is optional practice within existing study time.
 Without model access, analyze the instructor-supplied records used by the [Compare activity](/project/compare/#supplied-matched-single-agent-fleet-analysis), retaining their stated provenance and missing evidence; do not label an invented answer as an actual run.
 
-[Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance/get-started#how-is-accuracy-ensured) provides a concrete example of evaluating an imported agent capability.
-Its evaluation harness first checks browser assertions against both a reference implementation and a deliberately flawed implementation, then compares agent runs with and without the guidance.
-A project can reproduce the smaller experimental shape: hold the task, model, starting repository, and acceptance checks constant; change whether the capability is available; and compare correctness, retries, cost, and human correction.
-The resulting difference measures performance on that task and those checks, not whether the guidance makes every application better in production.
+The [Modern Web Guidance case study](/case-studies/modern-web-guidance/#the-guidance-has-an-evaluation-loop) follows a browser test that opens a dialog and clicks inside it.
+A second check searches the source for evidence of a fallback.
+A handler that never runs could pass the second check.
+To evaluate a guide on your own project, hold the task, model, starting revision, and acceptance checks constant.
+Give one run access to the guide.
+Compare what the user can do in each version, the cost and retries each took, and the corrections a reviewer had to make.
 
 Literal task completion is not enough for an agent that can take actions.
 Score task success, permission compliance, unnecessary actions, side effects, and clarification quality separately.

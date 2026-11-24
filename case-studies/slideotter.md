@@ -1,99 +1,80 @@
 # Slideotter – Learning faster than the product converged
 
 [Slideotter](https://github.com/bebraw/slideotter) is a local, structured workbench for creating and reviewing presentations with language models.
-I developed it with coding agents between April and June 2026, before beginning Kirjolab.
-It produced a capable application and reusable rendering and review controls, but did not establish a clear first production use.
-The case asks how a project can validate its artifacts thoroughly while learning too little about which product people would repeatedly use.
+I began building it with coding agents in April 2026, before I started Kirjolab.
+By June I could check whether a slide clipped its text in the exported PDF, yet I still had little evidence about which authoring task people would come back to do.
+In August the studio gained a more specific use.
+A presenter could turn a research paper into a talk with a time limit.
 
 ## Case at a glance
 
-The case uses the [24 June 2026 source snapshot](https://github.com/bebraw/slideotter/tree/ab84d4ff679d485640c1774d20b86ad5a650d5a8).
-:ref[table:slideotter-snapshot]{text="The table below"} records the reviewed interval and delivery context.
+:ref[table:slideotter-snapshot]{text="The table below"} distinguishes the [24 June studio](https://github.com/bebraw/slideotter/tree/ab84d4ff679d485640c1774d20b86ad5a650d5a8) from the [26 August implementation](https://github.com/bebraw/slideotter/tree/6845b401eaa3f30861c771839a7e2bb2aca69bc5), the latest public main-branch revision at the November 2026 review.
 
-| Evidence                        | Observation                       |
-| ------------------------------- | --------------------------------- |
-| Development interval reviewed   | 19 April–24 June 2026             |
-| Delivery targets explored       | Local browser, desktop, and cloud |
-| Public product status at review | Alpha                             |
+| Evidence              | Observation                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| Initial build         | 19 April–24 June 2026, including local browser, desktop, and cloud delivery |
+| August addition       | Reviewed paper import and timed outlines in the local studio                |
+| Public product status | The August README describes the studio as alpha                             |
 
 ::caption[Repository evidence from the reviewed Slideotter snapshot.]
 ::label[table:slideotter-snapshot]
 
 ## Validate the rendered artifact
 
-### The project found durable authority boundaries
+The first generator produced PowerPoint files.
+Within a week the project had switched to [PDF generation](https://github.com/bebraw/slideotter/commit/1c52f32b9c356523dbe6bde4095510efad529dd1) and started a browser studio.
+Preview, export, and validation later came to share one DOM renderer.
 
-The first generator produced PowerPoint files, but two days after the initial commit the project [replaced that path with PDF generation](https://github.com/bebraw/slideotter/commit/1c52f32b9c356523dbe6bde4095510efad529dd1).
-Two days later it began a browser studio, then moved preview, export, and validation to a shared DOM renderer.
+If the preview and export wrap a heading differently, approving the preview tells me little about the PDF my audience will see.
+In the [studio architecture](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/ARCHITECTURE.md), the model proposes a change to a structured slide, the DOM runtime renders it, and the server writes the change when the author applies it.
 
-The replacement exposed a durable rule: preview and exported output should use the same rendering authority.
-The [architecture](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/ARCHITECTURE.md) keeps structured slide specifications as content, the DOM runtime as rendering authority, and the server as the file-write boundary.
-Generated changes remain candidates until the author applies them.
-
-### Validation treated the artifact as more than source code
-
-Slide software can typecheck while producing unreadable slides.
-Slideotter therefore checks geometry, text fit, media, visible-text quality, browser workflows, rendered baselines, and PDF output.
-Its [repository instructions](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/AGENTS.md) require visual changes to be inspected in the rendered artifact.
-
-Rules for overlap, clipping, margins, and text fit turn named defects into machine-checkable failures.
-They cannot establish whether a slide communicates well.
-Rendered inspection and editorial judgment remain separate [acceptance steps](/concepts/#acceptance-criteria).
-
-This gives the case its validation lesson: inspect what the author and audience will consume.
-A successful source build leaves the quality of the presentation unresolved.
+The studio checks for overlap, clipping, margins, and text fit.
+The [repository instructions](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/AGENTS.md) ask contributors to inspect visual changes in the rendered deck.
+A slide can pass every geometry check and still give more room to a minor result than to the paper's main finding.
+That is a decision for the author at the [acceptance step](/concepts/#acceptance-criteria).
 
 ## Capability breadth arrived before a stable first use
 
-The first month covered structured slide specifications, multiple model providers, outline and theme generation, variants, deck restructuring, media workflows, presentation mode, PDF and PowerPoint export, an Electron wrapper, and cloud hosting.
-
-These capabilities pursued one broad vision while testing many product assumptions at once.
-Repeated use had not yet shown which workflow deserved priority.
-The [roadmap](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/ROADMAP.md) subsequently made real studio usage the source of future work, after a large solution surface already existed.
-
-The harness grew with that surface: fixtures, baselines, validators, build paths, and agent instructions all needed maintenance.
-Making the checks more precise could improve an implementation without resolving whether its workflow was worth expanding.
+In the first month I explored outline and theme generation, slide variants, media workflows and two export formats.
+Each option added fixtures or renderings to maintain before I knew which workflow someone would use for a second deck.
+The June [roadmap](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/ROADMAP.md) made real studio use the basis for choosing further work.
 
 ## Packaging and hosting multiplied the system boundaries
 
 Local filesystem use, a command-line package, a browser studio, a macOS wrapper, and a cloud deployment each introduce different storage, authentication, rendering, and release requirements.
 Supporting them together broadened the operating model before one delivery path had settled.
 
-At the reviewed point, the [cloud setup guide](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/GETTING_STARTED.md#current-limits) identified production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
+In June, the [cloud setup guide](https://github.com/bebraw/slideotter/blob/ab84d4ff679d485640c1774d20b86ad5a650d5a8/docs/GETTING_STARTED.md#current-limits) identified production workspace authentication, real queued generation and export, and Durable Object serialization as incomplete.
 The Electron path also needed production packaging work.
 A functioning authoring workflow and a dependable delivery path required different evidence.
 
 ## What transferred to Kirjolab
 
-Canonical artifacts, explicit approval, rendered validation, and preserved decisions carried into later work.
-[Kirjolab](/case-studies/kirjolab/) examines the subsequent architectural problem: behavioral checks made correction possible while responsibility boundaries lagged behind feature growth.
+The distinction between an agent's candidate and an author's approved revision carried over to [Kirjolab](/case-studies/kirjolab/).
+By August, code was moving in the other direction as well.
+Slideotter uses [Kirjolab's paper-import package](https://github.com/bebraw/slideotter/blob/6845b401eaa3f30861c771839a7e2bb2aca69bc5/studio/server/services/paper-import/kirjolab-adapter.ts), pinned at version 0.1.3, to inspect a LaTeX archive or extract text from a PDF.
+The studio keeps the reviewed sources, outline and slides in its own workspace.
 
-Slideotter's distinctive unresolved question was product fit.
-Its rendering controls could be reused, but they did not identify the smallest presentation workflow worth operating.
+One [workflow test](https://github.com/bebraw/slideotter/blob/6845b401eaa3f30861c771839a7e2bb2aca69bc5/tests/paper-workflow.test.ts) follows a paper from import to a timed outline.
+The author approves a digest of the paper, and the studio rejects it if its recorded source fingerprint no longer matches the paper.
+For a 20-minute talk, the test reserves 2½ minutes and allocates the remaining 17½ minutes across four planned slides.
+The presenter still has to rehearse to find out whether those slides fit the time.
 
 ## What I would do differently
 
-I would begin with the local browser studio and use real decks to establish one complete authoring loop before adding desktop or cloud delivery.
-With the [shared knowledge-base boundary described in the Kirjolab case](/case-studies/kirjolab/#what-i-would-do-differently), Slideotter would own presentation metadata, outline variants, slide definitions, themes, and approval state while referencing reusable source material.
+I would have started with the local studio and a real speaking deadline before adding desktop or cloud delivery.
+The August [paper-to-talk workflow](https://github.com/bebraw/slideotter/blob/6845b401eaa3f30861c771839a7e2bb2aca69bc5/docs/adr/implemented/0065-timed-paper-to-presentation-creation.md) gives me a way to test that choice.
+I would watch where a presenter edits the approved outline after rehearsal and whether they come back with a second paper.
 
-The first product loop would be:
-
-1. Select or amend the source material and define the audience, purpose, duration, language, and theme.
-2. Develop outline variants that reuse the base metadata, then approve one before expanding it.
-3. Generate and review the slides, including their layout and rendered output.
-4. Bind approval to a reviewed version; later changes produce a new candidate.
+Sharing a live research collection would be a further step beyond using the same importer.
+Under the [design discussed in the Kirjolab case](/case-studies/kirjolab/#what-i-would-do-differently), the studio could reference a passage kept elsewhere while continuing to own its slides and their approval.
 
 I would try keeping a link to the source of a copied result, as Denicek does in its [copied-formula example](https://tomasp.net/denicek/#chapter6).
 Suppose a benchmark table gives the 95th percentile for search latency as 800 ms, and an author writes “95% of searches finished within 0.8 seconds” on a slide.
 If the source figure is corrected to 600 ms, the studio could flag that sentence on the slide and show the corrected table cell beside it.
 The author could change 0.8 to 0.6, keep the wording chosen for the audience, and approve the revised slide.
 
-Time to an approved deck, corrections, outline revisions, regeneration, and repeated use would test product value separately from repository checks.
-Keep the harness focused on provenance, approval state, slide validity, and rendering.
-New delivery targets should follow evidence that this loop is useful.
-
 ## What Slideotter teaches
 
-Slideotter established useful controls for generating and inspecting presentations.
-Its next product decision needed evidence from repeated authoring and use.
-Artifact correctness and product convergence require different feedback, even when the same agents help implement both.
+The studio can check whether a slide fits, whether a plan has spent its time budget, and whether the presenter approved an interpretation of the current paper.
+To decide what to develop next, I would also need to know what survived rehearsal, what the presenter rewrote, and which parts of the workflow they used again.

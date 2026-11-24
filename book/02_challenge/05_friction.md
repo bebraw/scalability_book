@@ -166,9 +166,11 @@ Choose the stack only when the measured benefit survives those ownership costs.
 #### Field note — A boundary discovered across projects
 
 Agents helped me expand Slideotter before its product and backend responsibilities had settled.
-Developing Kirjolab exposed a shared need: source material and provenance should have one owner, while each product owns its writing or presentation workflow.
-The [Kirjolab case study](/case-studies/kirjolab/#what-i-would-do-differently) develops that proposed split.
-Faster generation moved my work from producing features to deciding what each project should own.
+When Kirjolab also needed to read research papers, the two projects had a reason to share code.
+Slideotter now uses Kirjolab’s paper-import package to read a paper and keeps the author’s decision about what belongs in the talk.
+Sharing a library settled who maintains the import code.
+Sharing a researcher’s annotations across a manuscript and a presentation would require a further decision about who stores the annotations and which revision each author approved.
+The [Kirjolab case study](/case-studies/kirjolab/#what-i-would-do-differently) follows that distinction.
 
 :citet[trivedi2026cleanliness] compared matched clean and deliberately degraded repositories across 660 agent trials.
 Cleanliness did not change the task pass rate, but agents working in cleaner repositories used 7–8% fewer tokens and revisited files 34% less often.

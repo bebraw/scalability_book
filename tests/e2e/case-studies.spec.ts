@@ -66,7 +66,7 @@ test.describe("case studies", () => {
     ).toHaveAttribute("href", "/case-studies/slideotter/");
     await expect(
       page.getByRole("link", {
-        name: /Thesis Journey Tracker – Small scope made production success possible/,
+        name: /Thesis Journey Tracker – Keeping a supervision dashboard small/,
       }),
     ).toHaveAttribute("href", "/case-studies/thesis-journey-tracker/");
     await expect(
@@ -102,7 +102,9 @@ test.describe("case studies", () => {
         name: "Slideotter – Learning faster than the product converged",
       }),
     ).toBeVisible();
-    await expect(page.getByText("1,606 commits")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "workflow test" }),
+    ).toHaveAttribute("href", /\/tests\/paper-workflow\.test\.ts$/);
     await expect(
       page.getByRole("link", { name: "View source project" }),
     ).toHaveAttribute("href", "https://github.com/bebraw/slideotter");
@@ -110,10 +112,12 @@ test.describe("case studies", () => {
     await page.goto("/case-studies/thesis-journey-tracker/");
     await expect(
       page.getByRole("heading", {
-        name: "Thesis Journey Tracker – Small scope made production success possible",
+        name: "Thesis Journey Tracker – Keeping a supervision dashboard small",
       }),
     ).toBeVisible();
-    await expect(page.getByText("282 commits")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Backup and restore guide" }),
+    ).toHaveAttribute("href", /\/docs\/backups\.md$/);
     await expect(
       page.getByRole("link", { name: "View source project" }),
     ).toHaveAttribute(
@@ -127,7 +131,9 @@ test.describe("case studies", () => {
         name: "Kirjolab – When code production scaled faster than architecture",
       }),
     ).toBeVisible();
-    await expect(page.getByText("1,433 commits")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Research Corpus decision" }),
+    ).toHaveAttribute("href", /\/ADR-227-extract-research-corpus-service\.md$/);
     await expect(
       page.getByRole("link", { name: "All case studies" }),
     ).toHaveAttribute("href", "/case-studies/");
@@ -141,7 +147,9 @@ test.describe("case studies", () => {
         name: "Webernetes – Comparing generated behavior with a real cluster",
       }),
     ).toBeVisible();
-    await expect(page.getByText("204 integration tests")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "shared readiness test" }),
+    ).toHaveAttribute("href", /\/src\/client\/tests\/probe\.test\.ts$/);
     await expect(
       page.getByRole("link", { name: "View source project" }),
     ).toHaveAttribute("href", "https://github.com/ngrok/webernetes");
@@ -152,7 +160,9 @@ test.describe("case studies", () => {
         name: "Modern Web Guidance – Treating current knowledge as a tested dependency",
       }),
     ).toBeVisible();
-    await expect(page.getByText("Semantic search")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Dialog grader" }),
+    ).toHaveAttribute("href", /\/light-dismiss-a-dialog\/grader\.ts$/);
     await expect(
       page.getByRole("link", { name: "View source project" }),
     ).toHaveAttribute(

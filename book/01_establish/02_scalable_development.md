@@ -351,7 +351,7 @@ A real workflow should match the test result to B's revision and wait for B's ow
 Copying a complete starter repository into an existing project is usually too coarse.
 Package a reusable capability with its fit criteria, files, dependencies, integration instructions, checks, provenance, and update path so a project can adopt the practice without inheriting every source-template decision.
 
-[Modern Web Guidance](/case-studies/modern-web-guidance/) shows how a maintained external capability can package fast-changing domain knowledge with targeted retrieval, compatibility constraints, an update path, and task-level evaluation.
+The [Modern Web Guidance](/case-studies/modern-web-guidance/) case follows a guide for building a logout dialog and asks which browser checks would justify relying on its advice.
 Imported capabilities also create a trust boundary because instructions or bundled code may influence tools operating with the agent's authority.
 [Appendix D's imported-capability review](/appendices/agent-system-security/#imported-capabilities-are-development-dependencies) develops these security implications.
 

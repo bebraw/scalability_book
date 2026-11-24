@@ -1,21 +1,13 @@
-# Thesis Journey Tracker – Small scope made production success possible
+# Thesis Journey Tracker – Keeping a supervision dashboard small
 
-[Thesis Journey Tracker](https://github.com/bebraw/thesis-journey-tracker) is a private dashboard for a small thesis-supervision team.
-It tracks students, thesis phases, meetings, topics, notes, workload, and backups without trying to become a general student information system.
-I developed it with coding agents beginning in March 2026.
-At the time of this case review, I was using it successfully in production.
-
-The project is useful as a counter-case to Slideotter and Kirjolab.
-All three used rapid agent-assisted development and strong validation.
-Thesis Journey Tracker succeeded with a smaller product boundary, a simpler runtime, and production concerns that were allowed to shape later work.
-
-The repository evidence cannot independently establish user satisfaction or long-term reliability.
-The production assessment above is based on my direct use of the deployed application; the repository supports analysis of how it was built and hardened.
+After a supervision meeting I want to record what we agreed and see what to pick up next time.
+That was a small enough workflow to put into use while I was still learning what the dashboard needed.
+I began developing [Thesis Journey Tracker](https://github.com/bebraw/thesis-journey-tracker) with coding agents in March 2026. By July I was using it in production with a team of two.
 
 ## Case at a glance
 
-The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/thesis-journey-tracker/tree/f10a26716cb4e005d37e8885df8fb808806566ba).
-:ref[table:thesis-journey-tracker-snapshot]{text="The table below"} records the reviewed interval and operating context.
+The [30 July 2026 source snapshot](https://github.com/bebraw/thesis-journey-tracker/tree/f10a26716cb4e005d37e8885df8fb808806566ba) records the first four months summarized in :ref[table:thesis-journey-tracker-snapshot]{text="the table below"}.
+The [6 November main-branch snapshot](https://github.com/bebraw/thesis-journey-tracker/tree/3255e95a0c18095cd67f1850f5db631dd4ad0806) shows how the release policy and meeting workflow subsequently changed.
 
 | Evidence                      | Observation                                     |
 | ----------------------------- | ----------------------------------------------- |
@@ -30,111 +22,54 @@ The case uses the [30 July 2026 source snapshot](https://github.com/bebraw/thesi
 ## The first pass was deliberately narrow
 
 The repository began with a README.
-The next commit, explicitly named [“First pass by codex-5.3”](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29), added one Worker, a database migration, basic configuration, and the package setup.
-It was a large first implementation, but the problem was bounded: represent the supervision workflow in one private dashboard.
+The next commit, [“First pass by codex-5.3”](https://github.com/bebraw/thesis-journey-tracker/commit/246884b5e84f99f09c63800b76d1ca6942548b29), added a Worker, a database migration, and the package and deployment configuration.
+That same day, the project moved to TypeScript, extracted database and view code, and added browser tests.
+Three days later it [hardened import for production rollout](https://github.com/bebraw/thesis-journey-tracker/commit/f69e019a36ce5cdc832bba02925ba9b1de548358).
 
-The same day, the history shows rapid correction rather than endless feature expansion.
-The project moved to TypeScript, added security and browser tests, simplified the interface, extracted database and view code, adopted server-rendered HTML components, and added Lighthouse checks.
-Three days later, a commit explicitly [hardened import for production rollout](https://github.com/bebraw/thesis-journey-tracker/commit/f69e019a36ce5cdc832bba02925ba9b1de548358).
+An adviser needed to find a thesis, see its phase, and pick up where the last conversation ended.
+Course registration and grading belonged elsewhere.
+One Cloudflare Worker served the HTML, D1 held the advising records, and small browser scripts handled interactions.
+To change the way a meeting appeared on screen, a contributor could follow the request from the Worker entry point to the feature's route, store, and view. [July README](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/README.md) · [July project structure](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/project-structure.md)
 
-This sequence resembles a spike followed by consolidation.
-The generated first pass made the real workflow concrete, and the following commits converted what was learned into types, modules, tests, and operating controls.
+## What happens after a supervision meeting?
 
-## Why the scope scaled
+The [October usability review](https://github.com/bebraw/thesis-journey-tracker/blob/3255e95a0c18095cd67f1850f5db631dd4ad0806/docs/ux-review.md) identified the regular user's priority as opening a student and recording meeting notes.
+By November, saving a note could advance an internal recurring schedule at the agreed local time, including across a clock change.
+The project had removed its Google Calendar and iCal integration.
+An adviser could still answer “When do we meet again?” while the tracker had fewer credentials and external services to maintain. [Change removing the integration](https://github.com/bebraw/thesis-journey-tracker/commit/3cd58de1a8b59c1af11e290c930846a929ce94a2) · [November workflow](https://github.com/bebraw/thesis-journey-tracker/blob/3255e95a0c18095cd67f1850f5db631dd4ad0806/README.md#what-you-can-do-with-it)
 
-### The product says what it is not
+## Who can put a change into production?
 
-The [README](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/README.md) describes the project as intentionally small and focused on thesis advising rather than a generic student information system.
-That negative boundary is consequential.
+The [July CI workflow](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/.github/workflows/ci.yml) audited dependencies, checked generated Worker types, ran unit and D1-backed integration tests, exercised browser workflows, and enforced a Lighthouse performance threshold.
+An agent could run the same workflow locally before pushing a change.
 
-The application can add more views or improve scheduling without acquiring course registration, grading, messaging, organization-wide identity, or other adjacent institutional concerns.
-Agents therefore receive a smaller decision space, and each feature can be judged against one recognizable workflow.
+The [July deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/deployment.md) called for uploading a Worker version, waiting for CI, and explicitly promoting the version that matched the reviewed commit.
+On 10 August the project restored automatic promotion for the production branch.
+Under the November guide, a successful Cloudflare build from `main` deploys the version to production.
+GitHub Actions runs independently and can still be checking the commit when deployment finishes. [August policy change](https://github.com/bebraw/thesis-journey-tracker/commit/0429f0ba77dbbc73af83b90ab6b9bd1e71510605) · [November deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/3255e95a0c18095cd67f1850f5db631dd4ad0806/docs/deployment.md#continuous-integration)
 
-### The runtime matches the problem
+This changes who holds [production authority](/concepts/#authority).
+In July a person could inspect the CI result before promoting a version.
+Under the later policy, permission to push to `main` can put a change in front of users.
+The release checks the author needs for that decision belong before the push.
 
-The system uses one Cloudflare Worker, D1, server-rendered HTML, and small browser interaction scripts.
-The reviewed [project structure](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/project-structure.md) keeps the Worker entrypoint thin and groups routes, persistence, rendering, authentication, calendar behavior, backups, and student-domain rules by capability.
+## Recovery is a first-class feature
 
-Complexity moved into feature-owned routes and stores rather than remaining in one entrypoint.
-The project still has large modules, but their names and ownership follow the user workflow.
+The backup job writes a JSON export to R2 when the data changes.
+Consider a quiet term when nothing changes for three months.
+If the job skipped every run, the 90-day retention rule could expire the last good backup.
+The job refreshes an unchanged snapshot after 30 days.
+An operator also checks that the lifecycle rule applies to the prefix where the files are actually written. [Backup and restore guide](https://github.com/bebraw/thesis-journey-tracker/blob/3255e95a0c18095cd67f1850f5db631dd4ad0806/docs/backups.md)
 
-### Production use changed the kind of work performed
-
-Later changes are less about adding visible surface area and more about making the existing system dependable.
-The July hardening interval includes strong independent secrets, revocable sessions, bounded request bodies, same-origin mutation checks, encrypted calendar credentials, login throttling, Markdown-injection protection, restricted calendar metadata, pinned CI dependencies, and safer backup retention.
-
-Later commits added structured incident logging and validated database mutation outcomes.
-This is a healthy shift from feature discovery to operational learning.
-Once the application had a real delivery context, security, recovery, and diagnosis became product requirements rather than optional infrastructure.
-
-## The development system supports operation
-
-### CI mirrors a local gate
-
-The [CI workflow](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/.github/workflows/ci.yml) audits dependencies, verifies generated Worker types, typechecks, runs unit and D1-backed integration tests, exercises browser workflows, and enforces a Lighthouse performance threshold.
-The same workflow can run locally through Agent CI.
-
-This alignment reduces the difference between an agent's local evidence and the repository's shared evidence.
-Pinned runner images, restricted installation scripts, read-only workflow permissions, and discarded checkout credentials also treat the build environment as part of the security boundary.
-
-### Deployment is intentionally separate from validation
-
-The [deployment guide](https://github.com/bebraw/thesis-journey-tracker/blob/f10a26716cb4e005d37e8885df8fb808806566ba/docs/deployment.md) separates version upload from production promotion.
-A connected Cloudflare build creates a deployable version, but a reviewed version is promoted explicitly after CI succeeds.
-
-That boundary matters in agentic development.
-Passing a gate authorizes consideration for release; it does not have to grant an agent or build system automatic [production authority](/concepts/#authority).
-The repository also documents migrations, account creation, secret rotation, backup retention, preview-URL exposure, and rollback-relevant version handling.
-
-### Recovery is a first-class feature
-
-The application supports JSON export and restore as well as scheduled R2 backups.
-Backups are written only when data changes, with periodic refresh so retention policies preserve recent restore points.
-The setup instructions require the R2 lifecycle rule to be inspected rather than assuming that a command succeeded.
-
-This is validation applied to operations: the intended safety property is a [recoverable dataset](/concepts/#recovery), not merely a successful backup API call.
-
-## Why this evidence is still bounded
-
-Production use is stronger evidence than a working repository, but it is not universal evidence of [scalability](/concepts/#scalability).
-At review, the application served a private personal or small-team context.
-Its own security documentation accepts residual denial-of-service and cost exposure that would need edge controls under broader traffic.
-
-The repository has one contributor and does not expose adoption, uptime, support burden, or realistic load measurements.
-Several modules remain large, including calendar parsing and complex view components.
-The case therefore demonstrates fit and sustainability at its intended scale, not readiness for an institution-wide deployment.
-
-Evaluate the development and operational model against the demand the system actually serves.
-
-## Comparison with the larger projects
-
-| Project                | Dominant source of learning                            | Result at reviewed point                       |
-| ---------------------- | ------------------------------------------------------ | ---------------------------------------------- |
-| Slideotter             | Broad product and architecture exploration             | Capable alpha; production path still uncertain |
-| Thesis Journey Tracker | Repeated use of one bounded operational workflow       | Working production tool at small-team scale    |
-| Kirjolab               | Very high implementation throughput and later revision | Integrated prototype with major consolidation  |
-
-The key difference is not simply repository size or commit count.
-Thesis Journey Tracker had a narrower answer to “for whom, for what task, and in what operating environment?”
-That answer constrained generation and made production feedback interpretable.
-
-Slideotter and Kirjolab needed implementation to discover more of their product and architecture.
-That exploration was valuable, but it also meant that new code could answer questions that had not yet been prioritized by use.
-
-## What I would preserve and improve
-
-I would preserve the narrow product statement, server-rendered default, capability-owned modules, local/remote CI alignment, manual production promotion, and explicit recovery path.
-
-I would improve the evidence around the deployed system:
-
-1. **Record operational measures.** Availability, error rate, D1 query latency, backup freshness, and restore drills would turn “working well” into inspectable longitudinal evidence.
-2. **Test recovery periodically.** A backup is only proven when a representative restore is rehearsed and checked.
-3. **Track change friction.** Lead time for common workflow changes and churn in the largest modules would show when current boundaries stop scaling.
-4. **Add usage evidence carefully.** Privacy-preserving counts or structured interviews could reveal which views and integrations actually reduce supervision work.
-5. **Reassess the exposure boundary.** If the user population or public reach grows, identity, rate limiting, audit needs, and data governance should be revisited before adding features.
+I would check [recovery](/concepts/#recovery) by restoring a synthetic dataset into an empty instance and verifying that a meeting note and its next scheduled occurrence still agree.
+That would test the part of the backup I expect to rely on at my next meeting.
 
 ## What Thesis Journey Tracker teaches
 
-The tracker became a useful production tool by keeping one supervision workflow small, consolidating the first implementation, and letting use reveal operational requirements.
-That experience supports its fit at the intended small-team scale.
-Broader adoption would need new evidence about availability, load, support, and recovery.
+In Slideotter and Kirjolab, building a feature often helped me discover what the product should become.
+With the tracker I already had a decision waiting at the end of each meeting.
+Recording the next date answered my question.
+Taking responsibility for sending invitations and keeping calendars in sync would add another system to operate, even for a team of two.
+
+My experience supports the design for that small team.
+A [scalability](/concepts/#scalability) claim for an institution with many supervisors would need evidence about demand, access to each thesis, and the work of supporting those users.

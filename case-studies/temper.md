@@ -1,77 +1,84 @@
 # Temper – Contracts, verification, and bounded autonomy
 
-[Chapter 2's deterministic-control example](/chapters/scalable-development/#bound-probabilistic-generation-with-deterministic-controls) lets an agent choose events within an existing state machine.
-[Temper](https://github.com/nerdsane/temper) extends the boundary: an agent can author the state machine itself, subject to verification and authorization controls.
-Anthropic's July 2026 account of Datadog's approach describes agents producing specifications of states, transitions, preconditions, and safety properties for a deterministic kernel to check and execute.
-Data contracts expose the available operations, while a separate authorization engine enforces default-deny policies :citep[segner2026datadogtemper].
+A scheduler reports that its check is complete.
+Does that mean every job that was due actually ran?
 
-The same account traces Temper's development through BitsEvolve and Helix, and describes its role in coordinating agents, building tools, and controlling Helix's lifecycle.
-Datadog's earlier reports make the verification boundaries of those systems more concrete :citep[segner2026datadogtemper, keles2026harnessfirst, chen2026autonomousoptimization].
-
-`agent-authored specification → verification → runtime enforcement`
-
-## Start with system invariants and replayable failures
-
-Datadog's redis-rust and Helix experiments combined explicit invariants, model checking, deterministic fault simulation, and staging telemetry.
-For Helix, the contract included preserving acknowledged messages across leadership changes.
-Seeded network, disk, and node faults made failures replayable; one exposed a log-truncation bug that could lose data after a failed disk sync.
-A redis-rust CPU optimization failed a linearizability check, so a performance gain alone could not authorize acceptance :citep[keles2026harnessfirst].
-
-Observed workloads also challenged the checks.
-Despite comparable latency, redis-rust initially used eight times Redis's memory; tuning reduced that inflated footprint by 87%.
-The reduction was relative to the candidate's starting point.
-This illustrates why a microbenchmark needs an operational comparison and why new observations should revise the harness.
-Humans still defined invariants, strengthened checks, and approved architectural changes :citep[keles2026harnessfirst].
+In [Chapter 2](/chapters/scalable-development/#bound-probabilistic-generation-with-deterministic-controls), an agent chooses among events that an existing state machine allows.
+With [Temper](https://github.com/nerdsane/temper), the agent can also write the machine's states, transitions, and guards.
+A data contract lists the actions a client can request.
+A separate authorization policy denies a request unless a rule permits it.
+Anthropic's July 2026 interview with Datadog describes how the team used Temper to coordinate agents, build tools, and manage the lifecycle of its Helix streaming service :citep[segner2026datadogtemper].
 
 ## Verification and execution share a specification
 
-Temper makes the behavioral contract an artifact the runtime can enforce directly.
-This combines agent authoring with model-driven development and formal methods.
-The project's architecture draft derives the verification model and runtime transition table from the same specification, reducing the maintenance gap between a separate model and implementation.
-The kernel and the translations into those representations remain part of the trusted implementation :citep[nalla2026temper].
+In Temper's Crucible reference application, the scheduler starts in `Idle`.
+The `Start` action moves it to `Checking` and calls a WebAssembly module to inspect the schedules.
+The runtime sends `CheckComplete` when the module returns success and `CheckFailed` when it returns an error.
+Both actions lead back to `Idle` in the [scheduler specification](https://github.com/nerdsane/temper/blob/d7927e6f4586b4968502836442af58aef86454c9/reference-apps/crucible/specs/crucible_scheduler.ioa.toml).
+
+Temper derives both the model it checks and the transition table its runtime uses from the same specification :citep[nalla2026temper].
+Their agreement depends on the translators and the kernel interpreting that specification correctly.
 
 ## Four complementary checks
 
-Symbolic reasoning checks whether guards can be satisfied and transitions preserve declared invariants.
-Model checking explores reachable states within configured bounds.
-Deterministic simulation exercises transitions under seeded faults, and property-based testing samples action sequences and reduces failures to smaller counterexamples.
-Simulation and randomized testing provide evidence from the runs exercised; they do not exhaust every possible execution :citep[nalla2026temper].
+A symbolic checker asks whether a guard can ever be satisfied and whether each modeled step preserves the declared invariants.
+A model checker explores the states reachable within the configured bounds and can return a sequence of actions that violates a property :citep[nalla2026temper].
 
-## Bound live optimization with an independent reference
-
-Datadog's Unicron aggregation service provides a narrower boundary for autonomous code changes.
-BitsEvolve specializes a function for a tenant and configuration, generates alternatives, and returns WebAssembly modules.
-Before activation, each candidate must match the baseline's output on traffic withheld from the evolver.
-The runtime isolates the module and checks its authenticity; existing batches finish on the old version :citep[chen2026autonomousoptimization].
-
-The formal guarantees are specific: Verus checks declared safety properties of codec libraries used by the evolved code.
-Output agreement on held-back traffic is empirical evidence about aggregation behavior.
-Neither establishes equivalence on every possible input.
-
-One reported workload increased throughput from 7,106 to 26,263 messages per second against the generic production baseline.
-The report separates parameter specialization from LLM evolution: their respective 44.5% and 155% gains combine multiplicatively to approximately 270%.
-Compare all three conditions before attributing the result to agent search, and include search and verification costs in the engineering decision :citep[chen2026autonomousoptimization].
+Seeded simulation lets a developer replay the conditions that exposed a failure.
+Property-based tests try sequences of actions and shrink a failing sequence to make the error easier to locate.
+The [verification implementation](https://github.com/nerdsane/temper/blob/d7927e6f4586b4968502836442af58aef86454c9/crates/temper-verify/src/cascade.rs) distinguishes its model simulation from an optional actor simulation that exercises the runtime transition table.
 
 ## What verification leaves outside
 
-Temper's architecture draft documents restricted expressions and limitations in proving eventual progress and interactions between entities.
-A specification can also omit a required rule while satisfying every property it declares.
-The repository includes sandboxed application modules alongside the behavioral contract; checking the lifecycle does not establish the correctness of every module or external effect :citep[nalla2026temper, temper2026runtime].
-Hot reload likewise needs a plan for existing state, compatible consumers, changed permissions, and recovery.
-The [durable-workflow effect audit](/appendices/durable-workflows/#audit-the-effect-boundary) examines the related boundary between recorded progress and external effects.
+The scheduler's WebAssembly module queries the active schedules and attempts to trigger each one with an ID.
+The authors list checking the time specified by the cron expression as future work.
+If one trigger request fails, the module logs the failure, continues with the other schedules, and returns a successful result with a count of how many requests succeeded.
+A legal `CheckComplete` therefore tells you that the check cycle finished.
+To find out whether a particular job ran on time, you need evidence from the schedule and the job itself.
+You can inspect the [module's handling of trigger failures](https://github.com/nerdsane/temper/blob/d7927e6f4586b4968502836442af58aef86454c9/reference-apps/crucible/wasm/crucible_scheduler_check/src/lib.rs) alongside the behavioral contract :citep[temper2026runtime].
+
+The same distinction matters when a worker records progress after calling another service.
+The [durable-workflow effect audit](/appendices/durable-workflows/#audit-the-effect-boundary) follows the records each side can use if the worker stops between those two actions.
+
+## Start with system invariants and replayable failures
+
+Datadog's Helix streaming service promises that a consumer can still read an acknowledged message after a change of leader.
+In a simulation, Helix truncated a log segment in memory before syncing the change to disk.
+An injected disk fault then left the segment unwritten, with no retry.
+The team switched to copy-on-write.
+A test with the same seed could exercise the fix under the same sequence of faults :citep[keles2026harnessfirst].
+
+A different gap appeared when Datadog ran its redis-rust implementation beside Redis 8.4 in staging.
+Both clusters received the same workload and showed similar latency, but redis-rust initially used eight times as much memory.
+After three changes, the team reported an 87% reduction from redis-rust's own starting footprint.
+The shadow comparison exposed a cost the earlier microbenchmark had overlooked :citep[keles2026harnessfirst].
+
+## Bound live optimization with an independent reference
+
+Datadog's Unicron service offered BitsEvolve an existing reference for one narrower task.
+Could it make a tenant's aggregation function faster while preserving its outputs?
+The aggregation server kept some incoming messages out of the optimization process.
+It rejected any candidate WebAssembly module whose output hash on those messages differed from the baseline.
+Verus checked properties of the codec libraries the module called, including bounds on decoding.
+When the server switched modules, in-flight batches finished on the old version :citep[chen2026autonomousoptimization].
+
+For one trial the team scaled down Unicron and measured a workload that summed CPU usage for 100 services over 30-second intervals.
+Throughput rose from 7,106 to 26,263 messages per second.
+The team attributed a 44.5% gain to fixing the tenant and query configuration at compile time, then a further 155% to evolving the specialized code.
+The two steps together account for the roughly 270% increase on that workload :citep[chen2026autonomousoptimization].
 
 ## Evaluate the scalability hypothesis
 
-The development-scalability hypothesis is that a constrained, inspectable contract can reduce the work needed to accept repeated changes.
-Evaluate that hypothesis through accepted outcomes, human review time, escaped defects, and maintenance cost, including the initial modeling effort and ownership of the kernel.
-These company accounts illustrate responses to the verification bottleneck; they do not establish a general productivity gain.
-Compare the cost of building and maintaining the checks with the correction work they avoid.
-Automated acceptance also needs an accountable owner for the reference behavior, permissions, and changes to the harness itself.
+Does a shared executable specification make the _next_ change cheaper to accept?
+Compare successive changes against the same user-visible requirement.
+Record the time spent modeling it, maintaining the checks, reviewing the result, and correcting errors that get through.
+For a change to how the scheduler selects due jobs, include a job due now and one due tomorrow, then check which one actually ran.
+The cost of maintaining that assurance across changes remains open.
 
 ## Optional exercise — Check what the model leaves out
 
-Use a small transition table and runner, or inspect the model by hand; record which method you used.
-This exercise does not require adopting Temper.
+Use a small transition table and runner, or inspect the model by hand.
+Record which method you used.
 
 1. Model the event tracker's `open → in_progress → done` lifecycle from the [common specification](/project/#3-required-behavior).
    Record the required activity events and the rule that a rejected transition changes neither state nor successful-event history.
