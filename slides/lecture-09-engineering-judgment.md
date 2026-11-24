@@ -8,9 +8,10 @@ title: "Lecture 9: Engineering judgment"
 
 ## Lecture 9 · Compare
 
-Evidence supports a conditional decision—not a universal winner.
+Present your team's choice of architecture and development workflow for a specific situation.
+Which observation most influenced that choice?
 
-<!-- [Sources] course_plan.md; book/03_compare/09_recap.md -->
+<!-- [Sources] lecture_plan.md#9-compare-presentations-and-course-reflection; specifications/03_compare.md#final-comparison -->
 
 ---
 
@@ -101,16 +102,35 @@ The decision should name who owns its operational and correction obligations.
 
 ---
 
-# A strong defense answers uncomfortable questions
+# What did the fleet record explain?
 
-- Which result surprised you?
-- Which claim has the weakest evidence?
-- What did the scaling response make worse?
-- Where did agents create review or integration load?
-- Which difference cannot be attributed confidently?
-- What would you measure next before committing more architecture?
+- Present one debugging finding from the actual fleet run that produced C.
+  What would a reader of the final code have missed?
+- Which observation supports your explanation?
+  What else could account for it?
+- Which part of your target design still needs testing?
+  What would you measure next?
 
-<!-- [Sources] book/03_compare/09_recap.md; specifications/03_compare.md -->
+Use the supplied matched pair to discuss what changed under its recorded conditions.
+Keep those results separate from your team's B–C comparison.
+
+<!-- [Sources] lecture_plan.md#9-compare-presentations-and-course-reflection; specifications/03_compare.md#final-comparison -->
+
+---
+
+# Complete the Compare record
+
+C's implementation was due before this lecture.
+After the independent audit, add the report and your response to the same group record.
+
+| In the group's evidence index | What to link                                                                                                                |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Implementation                | Frozen C revision, common checks, engineering session, audit and response, earlier A and B records                          |
+| Fleet evidence                | Plan and run record, two debugging findings, coordination measures, B–C comparison, supplied trace analysis, workflow model |
+| Scaling and deployment        | Application model, scaling change and before-and-after results, new failure or recovery check, deployed workload rerun      |
+| Final decision                | A–B–C matrix, target architecture, trade-offs, owner and revisit condition                                                  |
+
+<!-- [Sources] specifications/00_introduction.md#submit-each-phase-in-stages; specifications/03_compare.md#what-to-do-and-submit -->
 
 ---
 
@@ -142,18 +162,17 @@ For discussion, compare with your Lecture 1 reasoning if you have it, or name on
 
 ---
 
-# Finish with the next boundary
+# Which idea changed for you?
 
-Use four bundles in one evidence index:
+Revisit the opening word cloud.
+Which word would you keep, replace or add after the three builds?
 
-- **Implementation:** C and its common evidence, cross-team audit and response, with links to A and B.
-- **Fleet evidence:** plan, actual-run record, debugging findings, supplied matched-trace analysis, coordination measurements and workflow model.
-- **Scaling and deployment experiment:** application model, implemented and remeasured response, new failure or recovery check, and realistic deployed workload.
-- **Final decision:** evidence matrix, target architecture, trade-offs, ownership, and the next boundary or measurement.
+Submit your **private Compare portfolio** by the published deadline.
+Label each diary entry by lecture.
+In your self- and peer-assessment, link the evidence for a decision you challenged, tested or reviewed and explain the outcome.
+Each phase assessment needs at least 6/12 points, including 1/3 for reliable contribution and shared ownership.
 
-Link existing evidence rather than writing a report for each comparison question.
+Two of the three lecture activities must count in each phase.
+For each, take part live or through the announced remote equivalent and connect one concrete idea in your diary to evidence, an assumption or a decision.
 
-Scalability is not a finish line.
-It is a disciplined way to reason about change.
-
-<!-- [Sources] course_plan.md; book/03_compare/09_recap.md; specifications/03_compare.md -->
+<!-- [Sources] lecture_plan.md#9-compare-presentations-and-course-reflection; specifications/grading.md#mandatory-individual-work; specifications/grading.md -->

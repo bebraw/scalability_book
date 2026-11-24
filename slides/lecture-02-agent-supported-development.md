@@ -52,15 +52,12 @@ The loop ends with accepted evidence—not generated output.
 
 # A project harness makes work inspectable
 
-The repository should answer five questions without oral rescue:
+Could another team run A and explain why a transition produces one event?
 
-1. What behavior is required?
-2. Where do important decisions belong?
-3. How is the application run?
-4. Which checks establish acceptance?
-5. Who owns correction when a result is wrong?
-
-README, feature specification, architecture note, agent instructions, and executable commands form one control surface.
+- Give them setup instructions, run commands and repeatable acceptance checks.
+- Link the maintained specification and architecture notes from the **ownership card** for the core event workflow.
+- Record the stack choice, its risks and what would make you revisit it.
+- Keep one representative agent task, including its configuration, checks, human corrections and acceptance decision.
 
 <!-- [Sources] book/01_establish/02_scalable_development.md; specifications/00_common_project.md -->
 
@@ -68,12 +65,12 @@ README, feature specification, architecture note, agent instructions, and execut
 
 # Can a retry record the event twice?
 
-Read the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/).
+For this class discussion, read the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/).
 An agent says it prevents duplicates even after a worker restart.
 
 1. On your own, predict the event count after the first call, a retry on the same worker and a retry after restart.
    Which state survives?
-2. Ask the agent for a test of its claim.
+2. Ask the agent for a test of its claim, or inspect the sample test.
    Does the test restart the recorder, keep the event store and inspect the stored events?
 3. Correct the test if needed and run it.
    What guarantee would you now state?
@@ -115,14 +112,14 @@ Prompt changes help only when the prompt is the actual bottleneck.
 
 # Establish checkpoint
 
-Make implementation A reviewable through:
+Use one engineering session of **about 30 minutes** to check a work-item transition and its activity event.
+Each person predicts the result before the group uses the agent.
 
-- reproducible setup and run commands;
-- agent instructions and declared constraints;
-- a maintained feature and architecture record;
-- deterministic validation commands;
-- one decision record and a compact AI-use log.
+- The **operator** guides the approved large-model agent.
+- The **challenger** tries a case that could break the claim.
+- The **validator** checks the visible result and stored state.
+  Someone other than the operator explains the acceptance decision.
 
-**Question to carry forward:** What can the project now measure repeatedly?
+Record the roles, predictions, check and decision in your existing decision log or AI-use log. [Session protocol and approved solo equivalent](https://scalableweb.dev/project/#shared-engineering-sessions)
 
-<!-- [Sources] course_plan.md; specifications/01_establish.md -->
+<!-- [Sources] lecture_plan.md; specifications/01_establish.md; specifications/00_common_project.md#shared-engineering-sessions -->

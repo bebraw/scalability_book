@@ -14,6 +14,22 @@ Change capacity is constrained by the slowest feedback and coordination paths.
 
 ---
 
+# What did you expect a newcomer to do?
+
+Reopen an Establish diary entry or project decision about setting up, changing or checking A.
+
+1. What did you expect, and why?
+2. What did you actually see in an audit, your own work or another team’s demonstration?
+3. Which expectation will you keep, revise or test in B?
+   If the question is still open, what would help settle it?
+
+Record your response in your private lecture diary.
+Choose what to share in discussion.
+
+<!-- [Sources] lecture_plan.md#5-development-friction; specifications/grading.md#participation-and-learning-diary-3-points-per-lecture -->
+
+---
+
 # Friction is the work around the intended change
 
 Feature work includes more than editing code:
@@ -52,7 +68,7 @@ One evidenced bottleneck is sufficient; measurement of every category is not req
 
 # The newcomer path is an architectural test
 
-Give an unfamiliar reviewer a runnable checkout and a bounded task.
+In the assigned audit, start from the other implementation’s frozen revision and submitted instructions.
 
 Observe:
 
@@ -65,21 +81,23 @@ Observe:
 
 Author familiarity can hide structural costs.
 
-<!-- [Sources] book/02_challenge/05_friction.md; specifications/audit_change_probes.instructor.md -->
+<!-- [Sources] book/02_challenge/05_friction.md; specifications/00_common_project.md#10-bounded-cross-team-audit -->
 
 ---
 
 # A change probe turns friction into evidence
 
-Use a disposable branch or copy.
+The instructor releases a different probe after each phase freezes.
+Record setup time separately.
+Start the **30-minute probe** when you have the prompt and a runnable checkout.
 
 1. Locate the likely change surface.
 2. Run relevant existing checks.
-3. Make one narrow change.
-4. Add focused evidence when time permits.
-5. Stop at the time box and report the actual outcome.
+3. Attempt the assigned change in a disposable branch or copy.
+4. Add a focused test if time permits.
+5. Stop at 30 minutes and report the actual outcome, including unfinished checks.
 
-“Setup blocked” is evidence when the setup path was followed faithfully.
+If setup blocks you, report the probe as **not attempted because setup blocked it**.
 
 <!-- [Sources] book/02_challenge/05_friction.md; specifications/00_common_project.md -->
 
@@ -97,40 +115,19 @@ Possible responses include:
 - smaller integration boundaries;
 - an explicit recovery or rollback path.
 
-Rerun the same probe before claiming improvement.
+Check the response against the bottleneck you observed.
+If you defer the change, explain why and record the next check.
 
 <!-- [Sources] book/02_challenge/05_friction.md -->
 
 ---
 
-# Compare author intent with newcomer evidence
-
-Reopen an earlier diary note, prediction or decision from Establish about how someone would set up, change or check your application.
-
-1. What did you expect them to do, and why?
-2. What did an auditor actually do or see?
-   If you're waiting for the audit, use one observation from your own check.
-3. Does your expectation still hold?
-   What will you keep, change or test in implementation B as a result?
-
-Use your private lecture diary for the response.
-You choose what to share in discussion.
-
-<!-- [Sources] lecture_plan.md; book/02_challenge/05_friction.md -->
-
----
-
 # Challenge checkpoint
 
-Link in the existing evidence index:
+**While building B**, keep one concrete friction finding in the evidence index. Record what you observed, how you responded and what happened, or why you chose a follow-up.
+An unchanged or worse result still counts as evidence.
 
-- both bounded audits, including their actual setup and change-probe outcomes;
-- one concrete friction finding with supporting observations;
-- a checked response or justified follow-up, with its rationale and remaining uncertainty.
+**After B freezes**, complete the phase record with the audit you performed and the one you received.
+Preserve the actual setup and probe outcomes and add your response to the incoming report.
 
-Preserve unchanged or worse results.
-Distinguish a proposed follow-up from an improvement already achieved.
-
-**Question to carry forward:** Which assumptions will fail when runtime pressure changes?
-
-<!-- [Sources] course_plan.md; specifications/02_challenge.md -->
+<!-- [Sources] specifications/00_introduction.md#submit-each-phase-in-stages; specifications/00_common_project.md#9-4-engineering-explanation; specifications/02_challenge.md -->

@@ -6,28 +6,28 @@ title: "Lecture 4: Web architecture"
 
 # How does web architecture shape scalability?
 
-## Lecture 4 · Challenge
+## Lecture 4 · Establish presentations and Challenge launch
 
-Architecture determines where work, state, authority, and failure can move.
+Present implementation A.
+Which architectural decision would you keep or reconsider in a fresh build?
 
-<!-- [Sources] course_plan.md; book/02_challenge/04_architecture.md -->
+<!-- [Sources] lecture_plan.md#4-establish-presentations-and-challenge-launch; book/02_challenge/04_architecture.md -->
 
 ---
 
-# Architecture is a set of consequential boundaries
+# What did implementation A teach you?
 
-An architecture decides:
+Present from the running project and its evidence.
+Here is one way to do it.
 
-- where computation runs;
-- which representation crosses each interface;
-- where authoritative state lives;
-- who may perform an operation;
-- how failures and changes propagate;
-- which team owns each contract.
+- Show the path from a work-item change to its activity event.
+- Explain one decision that shaped that path.
+- Show a measurement, trace or failure that supports or limits your claim.
 
-A diagram is useful only when it exposes those decisions.
+What question does that evidence leave open for B?
+Use the following architecture prompts where they help explain your decision.
 
-<!-- [Sources] book/02_challenge/04_architecture.md -->
+<!-- [Sources] lecture_plan.md#4-establish-presentations-and-challenge-launch; specifications/01_establish.md -->
 
 ---
 
@@ -117,15 +117,14 @@ Team topology and deployment topology are related, but they are not the same des
 
 # Launch Challenge with an architecture hypothesis
 
-For implementation B, record:
+Build the same tracker from a clean start with the approved small model and one coding agent at a time across the group.
+Keep A’s primary stack unless the instructor approves a change.
+Carry forward specifications, acceptance scenarios and lessons.
+Leave A’s application code and implementation-specific tests behind.
 
-- one request and data path;
-- authority and ownership boundaries;
-- the automated-consumer policy;
-- one consequential architectural choice to preserve or change from A;
-- the pressure that justifies that choice;
-- the cost or failure mode it retains or introduces, and how to check it.
+- Which pressure in A justifies keeping or changing one architectural choice?
+- What new obligation follows, and how will you check whether the choice works?
 
-**Question to carry forward:** How difficult is this architecture for a newcomer to change safely?
+Rotate the team roles and update the capability ownership card for the main event workflow.
 
-<!-- [Sources] course_plan.md; specifications/02_challenge.md -->
+<!-- [Sources] specifications/02_challenge.md#team-focus-in-this-phase; specifications/00_common_project.md#8-permitted-transfer-between-implementations; book/02_challenge/04_architecture.md#project-artifact -->

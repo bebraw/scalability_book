@@ -97,7 +97,8 @@ Every response introduces a cost, constraint, or new failure mode.
 
 Weak: “The application is scalable.”
 
-Stronger: “With 20 concurrent users creating events, p95 accepted-write latency remains below 500 ms on the declared environment, until the database write path saturates.”
+An example to test: “As we increase concurrency from four clients to twenty, at least 95% of valid work-item creations finish within 500 ms.
+Each creates one activity event.”
 
 <!-- [Sources] book/01_establish/01_what_is_scalability.md; specifications/01_establish.md -->
 
@@ -105,26 +106,45 @@ Stronger: “With 20 concurrent users creating events, p95 accepted-write latenc
 
 # One product, three development systems
 
-The course builds the same Work Activity Tracker three times:
+Make three fresh implementations of the same Work Activity Tracker.
 
-1. **Establish:** large model, single-agent workflow.
-2. **Challenge:** small model, single-agent workflow.
-3. **Compare:** declared fleet using small, large, or mixed models.
+1. **Establish (A).** Use the approved large model, one coding agent at a time.
+2. **Challenge (B).** Use the approved small model, one coding agent at a time.
+3. **Compare (C).** Declare the fleet and its approved model assignments.
 
-The shared behavior stays stable so differences in architecture, evidence, and workflow become discussable.
+In A and B, teammates can plan, test and correct the work together.
+Record consequential manual corrections.
+Use only the approved inference route for each build.
 
 <!-- [Sources] book/00_introduction.md; specifications/00_common_project.md -->
 
 ---
 
+# How course credit works
+
+| Work in each phase                   | Points | Minimum to pass each phase                                             |
+| ------------------------------------ | -----: | ---------------------------------------------------------------------- |
+| Shared group project                 |     30 | 10 points                                                              |
+| Individual participation and diaries |      9 | Two of three lecture activities at 3/3 each                            |
+| Private self- and peer-assessment    |     12 | 6 points, including 1/3 for reliable contribution and shared ownership |
+
+A 3-point lecture activity combines live participation or the announced remote equivalent, one concrete idea, and a connection to evidence, an assumption, or a decision.
+
+Meet these minima in **every phase** and earn at least **50% overall**. [Assessment rubric](https://scalableweb.dev/project/grading/)
+
+<!-- [Sources] specifications/grading.md; specifications/00_introduction.md -->
+
+---
+
 # Establish checkpoint
 
-Before the next lecture, record two bounded scalability claims in the existing evidence index:
+Start two claims in your group's evidence index for implementation A:
 
 - one about runtime demand or data;
 - one about contributors or change.
 
-Use the pressure-record template to include the relevant constraints, initial hypothesis, evidence and limits within each claim.
+Use the [pressure record](https://scalableweb.dev/project/#pressure-record-template) to say where each claim applies and what evidence could challenge it.
+Use the runtime claim to choose one pressure you can repeat on B and C.
 
 **Question to carry forward:** What evidence would make your claim credible?
 

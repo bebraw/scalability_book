@@ -94,33 +94,34 @@ It checks consistency; it does not identify the cause of delay.
 
 ---
 
-# A repeatable protocol makes later comparison possible
+# Run the shared baseline on A, B and C
 
-Keep constant where practical:
+| Closed-loop profile | Operations | Concurrent workers | Repetitions  |
+| ------------------- | ---------: | -----------------: | ------------ |
+| Warm-up             |        100 |                  1 | 1 unmeasured |
+| Steady              |        500 |                  4 | 3 measured   |
+| Higher concurrency  |        200 |                 16 | 3 measured   |
 
-- acceptance behavior and workload;
-- warm-up and repetition rules;
-- dataset shape and size;
-- environment and tool versions;
-- collected signals and reporting format.
-
-Record differences rather than hiding them when perfect control is impossible.
+Reset and reseed after warm-up and before each measured repetition.
+Keep the operation mix, timing boundary and deadlines consistent.
+Record environment differences, outcomes, and the resource proxy alongside latency. [Shared workload and reporting rules](https://scalableweb.dev/project/#7-1-shared-baseline-workload)
 
 <!-- [Sources] book/01_establish/03_benchmarking.md; specifications/00_common_project.md -->
 
 ---
 
-# Complete Establish with a baseline
+# Freeze A before Lecture 4
 
-Submit:
+**Group.** One member submits the source archive, full revision, setup and checks, and available evidence.
+Include the shared baseline and two claims.
+Define one repeatable primary pressure.
+Run it if feasible and label any projection.
 
-- a reproducible implementation A;
-- a repeatable runtime workload;
-- development-workflow evidence;
-- operational run evidence;
-- the two bounded claims and their current support;
-- an explicit statement of what the baseline does not prove.
+**After the freeze.** Audit the assigned revision.
+Add the audit evidence, your response to the audit of A, and the completed index to the same group record by the evidence deadline.
 
-**Question to carry forward:** Which architectural assumption created the observed behavior?
+**Individual.** Submit your lecture diaries and self- and peer-assessment in your private portfolio by its published deadline.
 
-<!-- [Sources] course_plan.md; specifications/01_establish.md -->
+[Establish checklist](https://scalableweb.dev/project/establish/) · [Submission stages](https://scalableweb.dev/project/introduction/#submit-each-phase-in-stages)
+
+<!-- [Sources] specifications/01_establish.md; specifications/00_introduction.md#submit-each-phase-in-stages; specifications/00_common_project.md#9-common-submission-bundle-and-comparable-evidence -->

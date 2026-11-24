@@ -14,17 +14,16 @@ Implement the smallest response that can be justified and remeasured.
 
 ---
 
-# Start from the observed limit
+# Which limit justifies a change?
 
-A credible scaling response connects:
+Start with an observed limit or a credible projection you can test.
 
-1. the pressure that changed;
-2. the boundary that saturated or failed;
-3. the behavior that no longer met its goal;
-4. the mechanism expected to change that relationship;
-5. the cost and new obligation introduced.
+1. What pressure changes?
+2. Which part of the system reaches its limit first?
+3. What would a user see when it does?
+4. How would the proposed change help, and what would it cost?
 
-Technique-first architecture produces complexity without a falsifiable reason.
+If the limit is projected, say what observation would confirm or challenge it.
 
 <!-- [Sources] book/03_compare/08_scaling.md -->
 
@@ -58,43 +57,47 @@ Prefer a bounded change such as:
 - one isolation boundary;
 - one graceful-degradation path.
 
-Preserve the accepted baseline so the response can be compared against it.
+Choose A, B, or C.
+Preserve its accepted revision and baseline measurements.
 
 <!-- [Sources] book/03_compare/08_scaling.md -->
 
 ---
 
-# Remeasure under the unchanged question
+# Did the change relieve the pressure?
 
-Before and after the response, keep stable:
+Run the common acceptance scenarios and the selected pressure before and after the change.
+Keep the dataset, workload, environment, warm-up and repetition rules fixed.
 
-- acceptance behavior;
-- workload and dataset;
-- environment;
-- warm-up and repetition rules;
-- measurement definitions for distributions, errors, and resource signals.
+For claims about sustained demand, queue growth or admission control, [schedule arrivals independently of completions](https://scalableweb.dev/project/#7-3-arrival-controlled-overload-and-recovery) and observe recovery as the load drains.
 
-Record the baseline and changed revision separately, linking each to its measurements.
-Report all repetitions and negative results.
-A response that does not help is still useful evidence.
+Compare latency, throughput, errors, correctness and your resource-efficiency measure.
+Link every repetition to its revision, including runs where the change made things worse.
+
+Did the measurements support your prediction, challenge it or leave the question open?
 
 <!-- [Sources] book/03_compare/08_scaling.md; specifications/03_compare.md -->
 
 ---
 
-# Apply formal models at two levels
+# Choose a model for each decision
 
 **Application decision**
 
-Use Little’s Law or another suitable relationship to check a queue, pool, request path, or conserved-work boundary.
+Would a larger connection pool help?
+Suppose 40 checkouts finish per second and each holds a connection for 0.2 seconds on average.
+In a stable interval, Little’s Law gives 8 busy connections on average.
+Check the pool limit and observed waits before resizing it.
 
 **Development-workflow decision**
 
-Use Amdahl’s Law to bound the value of parallel agent work when review or integration remains sequential.
+Would another agent shorten delivery?
+If review takes 30% of a fixed task and must stay sequential, Amdahl’s Law caps ideal speedup at about 3.3×. If the question is how fast patches accumulate, model the review queue.
 
-Models discipline the argument; they do not replace measurement.
+Choose a model for each decision in your project.
+Show the reasoning and where its assumptions limit your conclusion.
 
-<!-- [Sources] course_plan.md; book/03_compare/08_scaling.md -->
+<!-- [Sources] book/03_compare/08_scaling.md; specifications/03_compare.md#compare-one-agent-with-the-fleet; specifications/03_compare.md#analyze-the-three-applications -->
 
 ---
 
@@ -108,7 +111,8 @@ Examples:
 - partitioning needs routing and rebalancing;
 - rate limiting needs identity, fairness, and useful rejection behavior.
 
-Exercise one failure and recovery path after the change.
+Exercise one failure or recovery case the change introduces.
+For a cache, what does a reader see immediately after an update?
 
 <!-- [Sources] book/03_compare/08_scaling.md -->
 
@@ -116,16 +120,14 @@ Exercise one failure and recovery path after the change.
 
 # Compare checkpoint
 
-Submit:
+- Repeat the primary pressure on C.
+  Compare the result with A and B.
+- Link the application and workflow model analyses to the decisions they informed.
+- For the response you tried on A, B or C, show the before-and-after measurements and what happened when you exercised its new failure or recovery case.
+- Deploy the revision you select after the experiment in an instructor-approved, realistic environment outside your development process.
+  Rerun the shared baseline workload and explain what differed from the local run.
 
-- the A-B-C primary-pressure comparison;
-- one implemented before-and-after response;
-- its formal-model calculation;
-- the new failure and recovery obligation;
-- deployed workload evidence;
-- a target architecture and rejected alternatives;
-- the application and workflow trade-off table.
-
-**Question to carry forward:** What can the three builds support as an engineering judgment?
+Use this evidence in your [final matrix and decision narrative](https://scalableweb.dev/project/compare/#final-comparison).
+Which architecture and workflow would you choose, and what measurement would change your mind?
 
 <!-- [Sources] course_plan.md; specifications/03_compare.md -->

@@ -8,26 +8,28 @@ title: "Lecture 7: Agent fleets"
 
 ## Lecture 7 · Compare
 
-Parallel generation helps only when decomposition, integration, and review can keep up.
+Present the difference that mattered most between A and B.
+Then use it to plan the fresh fleet build, C.
 
-<!-- [Sources] course_plan.md; book/03_compare/07_agent_fleets.md -->
+<!-- [Sources] lecture_plan.md#7-challenge-presentations-and-compare-launch; specifications/02_challenge.md; specifications/03_compare.md -->
 
 ---
 
-# A fleet changes the coordination problem
+# What did the second build reveal?
 
-Adding agents can increase:
+Present one consequential difference between large-model A and small-model B.
+Both used a single agent.
 
-- work attempted in parallel;
-- context boundaries and handoffs;
-- duplicated exploration;
-- integration conflicts;
-- review and validation demand;
-- the authority exposed to automated work.
+- Show evidence from both builds.
+  You might compare the same workload, the effort to get a change accepted, or the behavior you observed under failure.
+- What might explain the difference?
+  Which other explanation also fits?
 
-The objective is accepted outcomes per constrained human attention—not maximum activity.
+B's revision was due before this lecture.
+The assigned audit uses that frozen revision.
+Add the audit and your response to the same group record on the announced schedule.
 
-<!-- [Sources] book/03_compare/07_agent_fleets.md -->
+<!-- [Sources] lecture_plan.md#7-challenge-presentations-and-compare-launch; specifications/02_challenge.md#compare-the-two-single-agent-workflows; specifications/00_introduction.md#submit-each-phase-in-stages -->
 
 ---
 
@@ -110,17 +112,30 @@ The fleet is not complete until its outputs converge into one reviewable artifac
 
 ---
 
-# Launch Compare with a falsifiable fleet plan
+# Launch C with a fleet plan
 
-Produce:
+Build the tracker afresh with at least two independently operating agents or delegated executions.
 
-- a task graph and critical path;
-- role, context, tool, and permission boundaries;
-- integration and validation gates;
-- a single-agent counterfactual;
-- one predicted benefit and one predicted coordination cost;
-- a trace that can later explain a failed or corrected task.
+- Give each task a defined output.
+  Show where work passes between agents or joins for review.
+- Declare the approved model for each task or role and any routing or fallback rules.
+  B's small model is the reference.
+  C may use small models, large models, or a mixture.
+- Predict what delegation will improve, where someone may have to wait, and who will check the integrated result.
 
-**Question to carry forward:** Which scaling response is justified by the application evidence?
+<!-- [Sources] specifications/03_compare.md#what-counts-as-a-fleet; specifications/03_compare.md#fleet-plan -->
 
-<!-- [Sources] course_plan.md; specifications/03_compare.md -->
+---
+
+# Which evidence comes from which run?
+
+**Your fleet build.** Keep a compact, redacted record.
+Use it to explain at least two debugging findings, including the checks, corrections or human interventions that support them.
+
+**The supplied matched traces.** Analyze the single-agent and fleet attempts on the same task.
+Compare accepted behavior, elapsed time, human effort, model use and corrections.
+Link the activity analysis in the fleet evidence section.
+
+Running your own matched pair and importing the trace into C are optional.
+
+<!-- [Sources] specifications/03_compare.md#fleet-evidence; specifications/03_compare.md#supplied-matched-single-agent-fleet-analysis -->
