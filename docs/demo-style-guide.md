@@ -63,10 +63,16 @@ The tail population exposes all 60 ordered records, nearest-rank p95 at rank 57 
 The saturation model separates offered, admitted and completed rates, queue growth and rejection, with before/after capacity changes and separately revealed measurement hints.
 The latency map uses neutral distances and direct hypothetical service timings; batching assumes unchanged results and query execution with at most two dependency rounds.
 The web architecture lens models three exchanges—document, HTML fragment and JSON—with explicit draft restoration and no invented payload sizes.
-The statechart accepts a premature RELEASE proposal and visibly rejects it; supplied TESTS_PASS events are not actual tests.
-After an accepted transition, the diagram scrolls horizontally to show the active states together when they fit.
-On a narrow screen it brings a newly active state into view.
-The configuration below the diagram names both parallel states, and a rejected proposal preserves the reader's scroll position.
+The statechart opens with a RELEASE proposal.
+Its outcome appears beside the button, and the header names the current state in each active region.
+Its optional patch B checkpoint replays the events through review approval, then pauses with B's checks still running.
+The reader predicts the outcome before delivering a delayed TESTS_PASS from A and can inspect the resulting state and event history.
+The event carries no revision, and all test results in this lab are supplied inputs.
+The map fits the reading column with planning and implementation above the parallel verification lanes and release below them.
+Both lanes show their active state and their route back to implementation.
+Cancellation applies to the active workflow as a whole.
+The build renders these routes from the same machine configuration that runs the lab.
+The event history and executable model open on demand.
 Replica convergence in orchestration is separate from simulated HTTP success; running-but-broken v2 returns 500, and rollback restores v1 responses without erasing the failures.
 The contention and reliability models retain their explicit assumptions and corrected boundary interpretations.
 

@@ -4,7 +4,7 @@ import { expect, test } from "@playwright/test";
 test.describe("statechart boundary demo", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
-      "/chapters/scalable-development/#the-job-is-to-convert-non-determinism-into-determinism",
+      "/chapters/scalable-development/#demo-deterministic-boundary-lab",
     );
     await expect(page.locator("[data-statechart-demo]")).toBeVisible();
   });
@@ -15,8 +15,14 @@ test.describe("statechart boundary demo", () => {
     const demo = page.locator("[data-statechart-demo]");
     const state = demo.locator("[data-statechart-demo-agent-state]");
     const propose = demo.locator("[data-statechart-demo-propose-release]");
+    const log = demo.locator(".statechart-history");
     await propose.click();
-    await expect(state).toHaveText("active.planning");
+    await expect(state).toHaveText("Planning");
+    await expect(
+      demo.getByRole("status").filter({ hasText: "RELEASE rejected" }),
+    ).toBeVisible();
+    await expect(log.locator("ol")).toBeHidden();
+    await log.getByText("Event history (1)").click();
     await expect(
       demo.locator("[data-statechart-demo-history] li").last(),
     ).toContainText("Rejected; state unchanged: active.planning");
@@ -31,10 +37,59 @@ test.describe("statechart boundary demo", () => {
     for (const event of ["REVIEW_START", "APPROVE"])
       await demo.locator(`[data-statechart-demo-event='${event}']`).click();
     await propose.click();
-    await expect(state).toHaveText("released");
+    await expect(state).toHaveText("Released");
     await expect(
       demo.locator("[data-statechart-demo-history] li").last(),
     ).toContainText("Accepted: released");
+  });
+
+  test("lets the reader deliver A's delayed passing result after B's review", async ({
+    page,
+  }) => {
+    const demo = page.locator("[data-statechart-demo]");
+    const checkpoint = demo.locator("[data-statechart-demo-checkpoint]");
+    const prediction = demo.locator("[data-statechart-demo-prediction]");
+    const deliver = demo.locator("[data-statechart-demo-deliver]");
+    const history = demo.locator("[data-statechart-demo-history]");
+    const feedback = demo.locator("[data-statechart-demo-feedback]");
+    const state = demo.locator("[data-statechart-demo-agent-state]");
+    const release = demo.locator("[data-statechart-demo-event='RELEASE']");
+
+    await checkpoint.click();
+    await expect(state).toHaveText("Checks running · Review approved");
+    await expect(release).toHaveCount(0);
+    await expect(history).toBeHidden();
+    await demo.getByText("Event history (8)").click();
+    await expect(history).toBeVisible();
+    await expect(history).toContainText("REQUEST_CHANGES");
+    await expect(history.locator("li").last()).toContainText(
+      /APPROVE.*Patch B/,
+    );
+    await expect(deliver).toBeDisabled();
+
+    // Expecting the safe outcome must not change the result of the model.
+    await prediction.selectOption("waiting");
+    await deliver.click();
+    await expect(state).toHaveText("Ready");
+    await expect(history.locator("li").last()).toContainText(
+      /TESTS_PASS.*Patch A/,
+    );
+    await expect(feedback).toContainText(/predicted B would wait/i);
+    await expect(feedback).toContainText(/without a patch identity/i);
+    await release.click();
+    await expect(state).toHaveText("Released");
+
+    await checkpoint.click();
+    await expect(state).toHaveText("Checks running · Review approved");
+    await expect(release).toHaveCount(0);
+    await expect(deliver).toBeDisabled();
+    await prediction.selectOption("ready");
+    await deliver.click();
+    await expect(state).toHaveText("Ready");
+    await expect(feedback).toContainText(/predicted B would be ready/i);
+    await demo.locator("[data-statechart-demo-reset]").click();
+    await expect(state).toHaveText("Planning");
+    await expect(history).toContainText("No events sent yet");
   });
 
   test("syntax-highlights the executable TypeScript model", async ({
@@ -75,7 +130,7 @@ test.describe("statechart boundary demo", () => {
     await expect(enabled.locator("button")).toHaveCount(4);
     await expect(
       demo.locator("[data-statechart-demo-agent-state]"),
-    ).toContainText("active.verifying.checks.running + review.waiting");
+    ).toContainText("Checks running · Review waiting");
     await expect(
       demo.locator("[data-transition-event='TESTS_FAIL']"),
     ).toBeVisible();
@@ -102,8 +157,8 @@ test.describe("statechart boundary demo", () => {
     await expect(demo.locator("[data-state-path='released']")).toHaveClass(
       /is-current/,
     );
-    await expect(demo.locator("[data-statechart-demo-verdict]")).toHaveText(
-      "Goal reached: change released",
+    await expect(demo.locator("[data-statechart-demo-result]")).toContainText(
+      "RELEASE accepted",
     );
     await expect(enabled).toContainText("Final state: no events enabled");
   });
@@ -137,155 +192,125 @@ test.describe("statechart boundary demo", () => {
     ).toHaveClass(/is-current/);
   });
 
-  test("renders failure and revision events as backward ELK routes", async ({
+  test("shows where each recovery event returns and when release is possible", async ({
     page,
   }) => {
-    const demo = page.locator("[data-statechart-demo]");
-    await expect(demo.locator("[data-statechart-elk]")).toBeVisible();
-
-    for (const event of ["TESTS_FAIL", "REQUEST_CHANGES"]) {
-      const path = demo.locator(`[data-transition-event='${event}'] path`);
-      const coordinates = (await path.getAttribute("d"))
-        ?.match(/-?[\d.]+/g)
-        ?.map(Number);
-
-      expect(coordinates, `${event} route coordinates`).toBeTruthy();
-      expect(
-        coordinates!.at(-2),
-        `${event} points back to the left`,
-      ).toBeLessThan(coordinates![0]!);
+    const chart = page.getByRole("region", {
+      name: "Patch delivery statechart",
+    });
+    for (const [event, source, target] of [
+      ["TESTS_FAIL", "active.verifying.checks.running", "active.implementing"],
+      [
+        "REQUEST_CHANGES",
+        "active.verifying.review.reviewing",
+        "active.implementing",
+      ],
+      ["CANCEL", "active", "cancelled"],
+      ["both regions final", "active.verifying", "active.ready"],
+      ["RELEASE", "active.ready", "released"],
+    ] as const) {
+      const route = chart.locator(`[data-transition-event="${event}"]`);
+      await expect(route).toBeVisible();
+      await expect(route).toHaveAttribute("data-transition-source", source);
+      await expect(route).toHaveAttribute("data-transition-target", target);
     }
+    await expect(
+      chart.locator('[data-transition-event="TESTS_FAIL"]'),
+    ).toContainText(/implementing/i);
+    await expect(
+      chart.locator('[data-transition-event="REQUEST_CHANGES"]'),
+    ).toContainText(/implementing/i);
   });
 
-  for (const viewportWidth of [1280, 390]) {
-    test(`keeps the active step in the diagram viewport at ${viewportWidth}px`, async ({
+  for (const width of [320, 390, 1280]) {
+    test(`shows the entire delivery path without panning at ${width}px`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width: viewportWidth, height: 900 });
+      await page.setViewportSize({ width, height: 900 });
       const demo = page.locator("[data-statechart-demo]");
-      const chart = demo.locator("[data-statechart-demo-chart]");
-      const send = async (event: string) =>
-        demo.locator(`[data-statechart-demo-event="${event}"]`).click();
-      const fits = async (path: string) => {
-        const node = chart.locator(`[data-state-path="${path}"] > rect`);
-        const [box, area] = await Promise.all([
-          node.boundingBox(),
-          chart.boundingBox(),
-        ]);
-        expect(box!.x).toBeGreaterThanOrEqual(area!.x);
-        expect(box!.x + box!.width).toBeLessThanOrEqual(area!.x + area!.width);
-      };
-
-      await send("PLAN_APPROVED");
-      await fits("active.implementing");
-      await send("PATCH_READY");
-      await fits("active.verifying.checks.running");
-      if (viewportWidth === 1280) await fits("active.verifying.review.waiting");
-      await send("REVIEW_START");
-      await fits("active.verifying.review.reviewing");
-      await send("TESTS_PASS");
-      await fits("active.verifying.checks.passed");
-
-      // A rejected proposal should not undo a reader's manual pan.
-      await chart.evaluate((element) => {
-        element.scrollLeft = 0;
+      const chart = demo.getByRole("region", {
+        name: "Patch delivery statechart",
       });
-      await demo.locator("[data-statechart-demo-propose-release]").click();
-      await expect
-        .poll(() => chart.evaluate((element) => element.scrollLeft))
-        .toBe(0);
-
-      await send("APPROVE");
-      await fits("active.ready");
-      await send("RELEASE");
-      await fits("released");
-      await demo.locator("[data-statechart-demo-reset]").click();
-      await fits("active.planning");
+      await expect(demo.locator("button:visible").first()).toHaveText(
+        "Propose RELEASE",
+      );
+      await expect(
+        chart.locator('[data-state-path="active.planning"]'),
+      ).toBeVisible();
+      const frame = (await demo.boundingBox())!;
+      const diagram = (await chart.boundingBox())!;
+      if (width >= 390)
+        expect(diagram.y + diagram.height - frame.y).toBeLessThan(900);
+      expect(
+        await chart.evaluate((el) => el.scrollWidth - el.clientWidth),
+      ).toBeLessThanOrEqual(1);
+      const expectedLeaves = [
+        "active.planning",
+        "active.implementing",
+        "active.verifying.checks.running",
+        "active.verifying.checks.passed",
+        "active.verifying.review.waiting",
+        "active.verifying.review.reviewing",
+        "active.verifying.review.approved",
+        "active.ready",
+        "released",
+        "cancelled",
+      ];
+      for (const path of expectedLeaves) {
+        const node = chart.locator(`[data-state-path="${path}"]`);
+        await expect(node).toBeVisible();
+        const bounds = (await node.boundingBox())!;
+        expect(bounds.x, path).toBeGreaterThanOrEqual(diagram.x - 1);
+        expect(bounds.x + bounds.width, path).toBeLessThanOrEqual(
+          diagram.x + diagram.width + 1,
+        );
+        expect(
+          await node.evaluate((el) =>
+            parseFloat(getComputedStyle(el).fontSize),
+          ),
+          path,
+        ).toBeGreaterThanOrEqual(14);
+      }
+      // Every arrow keeps its event name legible, including on touch screens.
+      for (const label of await chart.locator(".statechart-edge-label").all()) {
+        const metrics = await label.evaluate((el) => {
+          const style = getComputedStyle(el);
+          const box = el.getBoundingClientRect();
+          const text = document.createRange();
+          text.selectNodeContents(el);
+          const overflow = Math.max(
+            0,
+            ...Array.from(text.getClientRects(), (line) =>
+              Math.max(box.left - line.left, line.right - box.right),
+            ),
+          );
+          return {
+            font: parseFloat(style.fontSize),
+            width: box.width,
+            height: box.height,
+            overflow,
+          };
+        });
+        expect(metrics.font).toBeGreaterThanOrEqual(12);
+        expect(metrics.width).toBeGreaterThan(metrics.font);
+        expect(metrics.height).toBeGreaterThanOrEqual(metrics.font);
+        expect(
+          metrics.overflow,
+          (await label.textContent()) ?? "",
+        ).toBeLessThanOrEqual(1);
+      }
+      await demo.locator("[data-statechart-demo-checkpoint]").click();
+      await expect(
+        chart.locator('[data-state-path="active.verifying.checks.running"]'),
+      ).toHaveAttribute("aria-current", "step");
+      await expect(
+        chart.locator('[data-state-path="active.verifying.review.approved"]'),
+      ).toHaveAttribute("aria-current", "step");
+      expect(
+        await chart.evaluate((el) => el.scrollWidth - el.clientWidth),
+      ).toBeLessThanOrEqual(1);
     });
   }
-
-  test("keeps state and transition labels at readable rendered sizes", async ({
-    page,
-  }) => {
-    const diagram = page.locator("[data-statechart-elk]");
-    const sizes = await diagram.evaluate((svg) => {
-      const effectiveFontSize = (selector: string) => {
-        const element = svg.querySelector<SVGGraphicsElement>(selector);
-        const declared = element
-          ? Number.parseFloat(getComputedStyle(element).fontSize)
-          : 0;
-        const scale = element?.getScreenCTM()?.a ?? 0;
-
-        return declared * scale;
-      };
-
-      return {
-        event: effectiveFontSize(".statechart-elk-edge-label text"),
-        eventPadding: Math.min(
-          ...Array.from(
-            svg.querySelectorAll<SVGGraphicsElement>(
-              ".statechart-elk-edge-label",
-            ),
-          ).map((group) => {
-            const rect = group.querySelector("rect")?.getBoundingClientRect();
-            const text = group.querySelector("text")?.getBoundingClientRect();
-
-            return rect && text
-              ? Math.min(
-                  text.left - rect.left,
-                  rect.right - text.right,
-                  text.top - rect.top,
-                  rect.bottom - text.bottom,
-                )
-              : 0;
-          }),
-        ),
-        finalGap: Math.min(
-          ...Array.from(
-            svg.querySelectorAll<SVGGraphicsElement>(
-              ".statechart-elk-node.is-final",
-            ),
-          ).map((node) => {
-            const dot = node.querySelector("circle")?.getBoundingClientRect();
-            const label = node
-              .querySelector(".statechart-elk-label")
-              ?.getBoundingClientRect();
-
-            return dot && label ? label.left - dot.right : 0;
-          }),
-        ),
-        state: effectiveFontSize(
-          ".statechart-elk-node:not(.is-compound):not(.is-parallel) > .statechart-elk-label",
-        ),
-        statePadding: Math.min(
-          ...Array.from(
-            svg.querySelectorAll<SVGGraphicsElement>(
-              ".statechart-elk-node:not(.is-compound):not(.is-parallel)",
-            ),
-          ).map((node) => {
-            const rect = node
-              .querySelector(":scope > rect")
-              ?.getBoundingClientRect();
-            const label = node
-              .querySelector(":scope > .statechart-elk-label")
-              ?.getBoundingClientRect();
-
-            return rect && label
-              ? Math.min(label.left - rect.left, rect.right - label.right)
-              : 0;
-          }),
-        ),
-        supporting: effectiveFontSize(".statechart-elk-kind"),
-      };
-    });
-
-    expect(sizes.state).toBeGreaterThanOrEqual(14);
-    expect(sizes.event).toBeGreaterThanOrEqual(12);
-    expect(sizes.eventPadding).toBeGreaterThanOrEqual(4);
-    expect(sizes.supporting).toBeGreaterThanOrEqual(10);
-    expect(sizes.finalGap).toBeGreaterThanOrEqual(10);
-    expect(sizes.statePadding).toBeGreaterThanOrEqual(12);
-  });
 
   test("one parent transition cancels from any active child", async ({
     page,
@@ -301,9 +326,9 @@ test.describe("statechart boundary demo", () => {
     await expect(demo.locator("[data-state-path='cancelled']")).toHaveClass(
       /is-current/,
     );
-    await expect(
-      demo.locator("[data-statechart-demo-explanation]"),
-    ).toContainText("parent");
+    await expect(demo.locator("[data-statechart-demo-result]")).toContainText(
+      "parent",
+    );
   });
 
   test("keeps event controls readable in every theme", async ({ page }) => {

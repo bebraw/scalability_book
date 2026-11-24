@@ -156,7 +156,7 @@ const projectSpecificationDefinitions = [
 const demoScriptIncludes = demoCatalog;
 
 await validateDemoAnchors();
-const statechartDiagramHtml = await renderStatechartDiagram();
+const statechartDiagramHtml = renderStatechartDiagram();
 const bookDiagramHtml = renderBookDiagrams();
 
 await rm(buildDir, { recursive: true, force: true });
@@ -731,7 +731,7 @@ function hasDemoInclude(source) {
 
 function injectStatechartDiagram(source) {
   return source.replace(
-    /<div\s+data-statechart-elk-placeholder(?:="")?\s*><\/div>/,
+    /<div\s+data-statechart-map-placeholder(?:="")?\s*><\/div>/,
     statechartDiagramHtml,
   );
 }

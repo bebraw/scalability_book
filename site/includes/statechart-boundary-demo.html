@@ -8,112 +8,85 @@
   <div class="scaling-demo-header demo-header">
     <div>
       <p class="scaling-demo-kicker demo-kicker">Deterministic boundary lab</p>
-      <h3 id="statechart-demo-heading">Limit the agent to valid transitions</h3>
+      <h3 id="statechart-demo-heading">Can this patch ship?</h3>
     </div>
-    <div class="scaling-demo-summary demo-summary" aria-live="polite">
-      <span data-statechart-demo-verdict>Goal: ship a safe change</span>
-      <small data-statechart-demo-summary>
-        The agent can choose only events enabled by the statechart.
-      </small>
+    <div class="scaling-demo-summary demo-summary">
+      <small>Current state</small>
+      <span data-statechart-demo-agent-state>Planning</span>
     </div>
   </div>
 
   <form class="statechart-workflow-layout" data-statechart-demo-form>
-    <section
-      class="statechart-agent-console"
-      aria-labelledby="statechart-agent-heading"
-    >
-      <div class="statechart-demo-section-heading">
-        <span aria-hidden="true">01</span>
-        <div>
-          <h4 id="statechart-agent-heading">Agent choices</h4>
-          <p>One goal can produce different valid routes through the model.</p>
-        </div>
-      </div>
-
-      <div class="statechart-agent-decision" aria-live="polite">
-        <div class="statechart-agent-decision-heading">
-          <div>
-            <span>Current state</span>
-            <code data-statechart-demo-agent-state>active.planning</code>
-            <button
-              class="statechart-agent-reset"
-              type="button"
-              data-statechart-demo-reset
-            >
-              <span aria-hidden="true">↺</span>
-              Reset run
-            </button>
-          </div>
-          <div>
-            <span>Available next events</span>
-            <div
-              class="statechart-agent-options"
-              data-statechart-demo-events-enabled
-            ></div>
-            <button type="button" data-statechart-demo-propose-release>
-              Propose RELEASE now
-            </button>
-            <p>
-              Predict whether RELEASE will be accepted. A rejected proposal
-              leaves the state unchanged.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="statechart-core" aria-labelledby="statechart-core-heading">
-      <div class="statechart-demo-section-heading">
-        <span aria-hidden="true">02</span>
-        <div>
-          <h4 id="statechart-core-heading">
-            Statechart rules <em>XState v5 + ELK</em>
-          </h4>
-          <p>
-            The highlighted states show where the change is now. A transition
-            brings the active step into view. Scroll sideways to inspect other
-            routes.
-          </p>
-        </div>
-      </div>
-
+    <div class="statechart-proposal">
+      <button type="button" data-statechart-demo-propose-release>
+        Propose RELEASE
+      </button>
+      <p role="status" data-statechart-demo-result></p>
+    </div>
+    <div class="statechart-actions">
+      <span id="statechart-next-events">Enabled events</span>
       <div
-        class="statechart-workflow-canvas"
-        data-statechart-demo-chart
-        role="region"
-        aria-label="Statechart diagram"
-        tabindex="0"
-      >
-        <div data-statechart-elk-placeholder></div>
-      </div>
-
-      <div class="statechart-workflow-readout" aria-live="polite">
-        <div>
-          <span>Active configuration</span>
-          <code data-statechart-demo-configuration>active.planning</code>
-        </div>
-        <div>
-          <span>Why this matters</span>
-          <p data-statechart-demo-explanation>
-            The parent state exposes one shared cancellation rule.
-          </p>
-        </div>
-      </div>
-
+        class="statechart-agent-options"
+        role="group"
+        aria-labelledby="statechart-next-events"
+        data-statechart-demo-events-enabled
+      ></div>
+    </div>
+    <div
+      class="statechart-workflow-canvas"
+      data-statechart-demo-chart
+      role="region"
+      aria-label="Patch delivery statechart"
+    >
+      <div data-statechart-map-placeholder></div>
+    </div>
+    <div class="statechart-tools">
+      <button type="button" data-statechart-demo-checkpoint hidden>
+        Load patch B checkpoint
+      </button>
+      <button type="button" data-statechart-demo-reset disabled>
+        Reset run
+      </button>
+    </div>
+    <div
+      class="statechart-checkpoint-controls"
+      data-statechart-demo-prompt
+      hidden
+    >
+      <label>
+        <span
+          >B has review approval. A delayed test pass arrives from patch A. What
+          happens to B?</span
+        >
+        <select data-statechart-demo-prediction>
+          <option value="">Choose your prediction</option>
+          <option value="waiting">Keep waiting for B’s tests</option>
+          <option value="ready">Mark B ready for release</option>
+        </select>
+      </label>
+      <button type="button" data-statechart-demo-deliver disabled>
+        Deliver patch A’s result
+      </button>
+      <p role="status" data-statechart-demo-feedback></p>
+    </div>
+    <div class="statechart-inspect">
+      <details class="statechart-history">
+        <summary>
+          Event history (<span data-statechart-demo-count>0</span>)
+        </summary>
+        <ol data-statechart-demo-history>
+          <li class="is-empty">No events sent yet.</li>
+        </ol>
+      </details>
       <details class="statechart-demo-definition">
-        <summary>Inspect or export the executable model</summary>
+        <summary>Executable model</summary>
         <div class="statechart-demo-definition-actions">
-          <p>
-            Copy the XState machine and paste it into Stately Sketch to inspect
-            or simulate the generated diagram.
-          </p>
-          <div>
-            <button type="button" data-statechart-demo-copy>Copy model</button>
-            <a href="https://sketch.stately.ai" target="_blank" rel="noreferrer"
-              >Open Stately Sketch ↗</a
-            >
-          </div>
+          <button type="button" data-statechart-demo-copy>
+            Copy XState model
+          </button>
+          <a href="https://sketch.stately.ai" target="_blank" rel="noreferrer"
+            >Open Stately Sketch ↗</a
+          >
         </div>
         <pre
           class="statechart-demo-model"
@@ -121,20 +94,7 @@
           aria-label="XState change delivery machine"
         ><code class="hljs language-typescript" data-statechart-demo-model></code></pre>
       </details>
-
-      <div class="statechart-workflow-ledger">
-        <div>
-          <span>Observed events</span>
-        </div>
-        <ol data-statechart-demo-history>
-          <li class="is-empty">No events sent yet.</li>
-        </ol>
-      </div>
-    </section>
+    </div>
   </form>
-  <p class="demo-note">
-    <code>TESTS_PASS</code> is a supplied event in this executable statechart.
-    This demo runs no application tests; a real workflow must verify test
-    evidence before supplying that event.
-  </p>
+  <p class="demo-note">Test results in this lab are simulated inputs.</p>
 </section>

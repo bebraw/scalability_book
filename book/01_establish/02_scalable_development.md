@@ -317,10 +317,9 @@ The demonstration applies that pattern to delivering a code change.
 
 {{ import "exercise:development-gates" }}
 
-Try a premature release and inspect the unchanged state before following a valid route.
-One cancellation rule covers the active state, tests and human review can proceed independently, and either failure can return the workflow to implementation.
-The statechart restricts the available routes; its tests-pass event is supplied input, not an executed test result.
-The actual checks and reviewer still determine whether the code meets the requirement.
+Tests and human review can proceed independently, and either can send a patch back for changes.
+The chart decides whether to accept a supplied event.
+The test runner and reviewer supply the evidence.
 Deterministic controls can encode a wrong or incomplete rule.
 The [Architecture chapter](/chapters/architecture/) develops the related controls around data representation and durable state changes.
 
@@ -331,10 +330,10 @@ The [Temper case study](/case-studies/temper/) extends this pattern to agent-aut
 Patch A passes its checks, but the reviewer requests changes.
 The agent revises the patch, sends `PATCH_READY` for patch B, and the reviewer starts a fresh review and approves B.
 Predict what happens if the agent proposes `RELEASE` now.
-Trace both the checks and the review on paper or in the demo.
+Trace both the checks and the review on paper, or choose **Load patch B checkpoint** in the [boundary lab](#demo-deterministic-boundary-lab) and propose `RELEASE`.
 
 Suppose a delayed `TESTS_PASS` for A arrives at that point.
-What will the diagram do?
+Predict whether B will keep waiting or become ready, then deliver A’s result and open **Event history** to see which patch supplied it.
 What would you want the real release workflow to check before accepting that event?
 
 **Check your reasoning:** B's review is approved, but B entered verification with checks running, so the first release proposal leaves the state unchanged.

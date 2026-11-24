@@ -2200,324 +2200,134 @@
   overflow: hidden;
   position: relative;
 }
-.statechart-demo::after {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0 0.42rem,
-    color-mix(in srgb, var(--accent) 22%, transparent) 0.42rem 0.52rem
-  );
-  content: "";
-  height: 0.22rem;
-  inset: 0 0 auto;
-  position: absolute;
-}
-.statechart-demo-section-heading {
-  align-items: start;
-  display: grid;
-  gap: 0.65rem;
-  grid-template-columns: auto minmax(0, 1fr);
-}
-.statechart-demo-section-heading > span {
-  align-items: center;
-  aspect-ratio: 1;
-  background: var(--statechart-ink);
-  border-radius: 999px;
-  color: var(--bg);
-  display: inline-flex;
-  font-size: var(--demo-font-label);
-  font-weight: 900;
-  justify-content: center;
-  width: 1.75rem;
-}
-.prose .statechart-demo-section-heading h4 {
-  color: var(--text);
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-}
-.statechart-demo-section-heading h4 em {
-  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
-  border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border));
-  border-radius: 999px;
-  color: var(--accent-strong);
-  display: inline-block;
-  font-size: var(--demo-font-label);
-  font-style: normal;
-  letter-spacing: 0.05em;
-  margin-inline-start: 0.28rem;
-  padding: 0.18rem 0.38rem;
-  vertical-align: 0.08rem;
-}
-.prose .statechart-demo-section-heading p {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.76rem;
-  line-height: 1.4;
-  margin: 0.22rem 0 0;
-  max-width: none;
-}
-.statechart-demo-definition {
-  border: 1px solid var(--border);
-  border-radius: 0.3rem;
-  overflow: hidden;
-}
-.statechart-demo-definition summary {
-  background: color-mix(in srgb, var(--text) 4%, var(--panel));
-  color: var(--muted);
-  cursor: pointer;
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  padding: 0.52rem 0.65rem;
-  text-transform: uppercase;
-}
-.statechart-demo button:focus-visible,
-.statechart-demo select:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  outline-offset: 2px;
-}
-
 .statechart-workflow-layout {
   display: grid;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.statechart-agent-console,
-.statechart-core {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 0.35rem;
-  display: grid;
-  gap: 1rem;
-  min-width: 0;
-  padding: clamp(0.85rem, 2vw, 1.15rem);
-}
-.statechart-agent-console {
-  align-items: start;
-  background:
-    radial-gradient(
-      circle at 8% 12%,
-      color-mix(in srgb, var(--accent) 16%, transparent),
-      transparent 28%
-    ),
-    color-mix(in srgb, var(--text) 3%, var(--bg));
-  grid-template-columns: minmax(11rem, 0.55fr) minmax(22rem, 2.45fr);
-}
-.statechart-agent-controls {
-  display: grid;
-  gap: 0.65rem;
-}
-.statechart-agent-controls label > span {
-  color: var(--muted);
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.statechart-agent-proposal {
-  background: var(--statechart-ink);
-  border: 1px solid var(--statechart-ink);
-  border-radius: 0.35rem;
-  box-shadow: 0.38rem 0.38rem 0
-    color-mix(in srgb, var(--accent) 28%, transparent);
-  color: var(--bg);
-  display: grid;
-  gap: 0.52rem;
-  padding: 0.72rem;
-}
-.statechart-agent-proposal > div {
-  align-items: center;
-  display: flex;
-  gap: 0.55rem;
-  justify-content: space-between;
-}
-.statechart-agent-proposal > div span,
-.statechart-agent-proposal > div i {
-  font-size: var(--demo-font-label);
-  font-style: normal;
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.statechart-agent-proposal > div span {
-  color: color-mix(in srgb, var(--bg) 68%, transparent);
-}
-.statechart-agent-proposal > div i {
-  border: 1px solid color-mix(in srgb, var(--accent) 58%, transparent);
-  border-radius: 999px;
-  color: color-mix(in srgb, var(--accent) 72%, white);
-  padding: 0.14rem 0.34rem;
-}
-.statechart-agent-proposal > strong {
-  color: var(--bg);
-  font-family: var(--font-serif);
-  font-size: 1.24rem;
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-}
-.prose .statechart-agent-proposal > p {
-  color: color-mix(in srgb, var(--bg) 70%, transparent);
-  font-family: var(--font-ui);
-  font-size: var(--demo-font-label);
-  line-height: 1.35;
-  margin: 0;
-  max-width: none;
-  min-height: 2rem;
-}
-.statechart-agent-proposal > button,
-.statechart-enabled-events button,
-.statechart-agent-options button,
-.statechart-agent-reset,
-.statechart-workflow-ledger button,
-.statechart-demo-definition-actions button {
-  border: 1px solid var(--statechart-ink);
-  border-radius: 0.28rem;
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-  line-height: 1.2;
-  min-height: 2.2rem;
-  padding: 0.42rem 0.55rem;
-}
-.statechart-agent-proposal > button {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--panel);
-}
-.statechart-agent-proposal > button[disabled] {
-  background: color-mix(in srgb, var(--bg) 15%, transparent);
-  border-color: transparent;
-  color: color-mix(in srgb, var(--bg) 54%, transparent);
-}
-.statechart-enabled-events {
-  display: grid;
   gap: 0.6rem;
+  grid-template-columns: minmax(0, 1fr);
 }
-.statechart-enabled-events > div:first-child {
-  display: grid;
-  gap: 0.15rem;
-}
-.statechart-enabled-events > div:first-child span {
-  color: var(--text);
-  font-size: 0.76rem;
-  font-weight: 850;
-  text-transform: uppercase;
-}
-.statechart-enabled-events > div:first-child small {
-  color: var(--muted);
-  font-size: var(--demo-font-label);
-}
-.statechart-enabled-events > div:last-child {
+.prose .statechart-demo > .demo-header .demo-summary {
+  align-items: baseline;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.1rem 0.55rem;
+  padding: 0.4rem 0.65rem;
 }
-.statechart-enabled-events button {
-  background: var(--panel);
-  border-color: var(--border);
-  color: var(--text);
-  font-size: var(--demo-font-label);
-  min-height: 1.9rem;
+.prose .statechart-demo > .demo-header .demo-summary small {
+  margin: 0;
+}
+.statechart-demo .demo-summary span {
   overflow-wrap: anywhere;
-  padding: 0.34rem 0.42rem;
 }
-.statechart-enabled-events button:last-child {
-  border-color: color-mix(in srgb, #c74c42 45%, var(--border));
-  color: color-mix(in srgb, #c74c42 78%, var(--text));
+.statechart-proposal,
+.statechart-actions,
+.statechart-agent-options,
+.statechart-tools,
+.statechart-checkpoint-controls:not([hidden]) {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
 }
+.prose .statechart-proposal p,
+.prose .statechart-checkpoint-controls p {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+.statechart-proposal p {
+  flex: 1 1 16rem;
+}
+.statechart-proposal p:empty {
+  flex: none;
+}
+.statechart-actions > span,
 .statechart-no-events {
   color: var(--muted);
   font-size: var(--demo-font-label);
-  font-style: italic;
 }
-.statechart-agent-decision {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.35rem;
-  display: grid;
-  gap: 0.65rem;
-  padding: 0.72rem;
-}
-.statechart-agent-decision-heading {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: minmax(9rem, 0.85fr) minmax(12rem, 1.15fr);
-}
-.statechart-agent-decision-heading > div {
-  align-content: start;
-  display: grid;
-  gap: 0.18rem;
-}
-.statechart-agent-decision-heading span {
-  color: var(--muted);
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.statechart-agent-decision-heading code {
-  background: transparent;
-  color: var(--accent-strong);
-  font-size: var(--demo-font-label);
-  overflow-wrap: anywhere;
-  padding: 0;
-}
-.statechart-agent-reset {
-  align-items: center;
-  background: transparent;
-  border-color: color-mix(in srgb, var(--accent-strong) 48%, var(--border));
-  color: var(--text);
-  display: inline-flex;
-  gap: 0.32rem;
-  justify-self: start;
-  margin-top: 0.38rem;
-  min-height: 2.15rem;
-}
-.statechart-agent-reset:hover {
-  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
-  border-color: var(--accent-strong);
-}
-.statechart-agent-reset > span {
-  color: var(--accent-strong);
-  font-size: 0.9rem;
-  letter-spacing: 0;
-  line-height: 1;
-}
-.statechart-agent-decision-heading small {
-  color: var(--muted);
-  font-size: var(--demo-font-label);
+.statechart-actions > span {
+  font-weight: 750;
 }
 .statechart-agent-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.42rem;
+  gap: 0.3rem;
+}
+.statechart-workflow-layout button,
+.statechart-checkpoint-controls select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 650;
+  line-height: 1.3;
+  max-inline-size: 100%;
+  min-block-size: 2.5rem;
+  padding: 0.35rem 0.7rem;
+}
+.statechart-workflow-layout button:hover:enabled,
+.statechart-checkpoint-controls select:hover:enabled {
+  border-color: var(--accent-strong);
+}
+.statechart-workflow-layout:not([data-started]) .statechart-proposal button {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
 }
 .statechart-agent-options button {
-  align-content: center;
   background: var(--bg);
-  border-color: var(--border);
-  color: var(--text);
-  display: grid;
-  gap: 0.12rem;
-  min-height: 2.55rem;
-  overflow-wrap: anywhere;
-  padding: 0.46rem 0.6rem;
-  text-align: start;
-}
-.statechart-agent-options button span {
+  font-family: var(--font-mono);
   font-size: var(--demo-font-label);
-  font-weight: 900;
+  overflow-wrap: anywhere;
 }
-.statechart-agent-options button[data-statechart-demo-event="CANCEL"] {
-  border-color: color-mix(in srgb, #c74c42 55%, var(--border));
-  color: color-mix(in srgb, #c74c42 78%, var(--text));
+.statechart-tools {
+  gap: 0.4rem;
 }
-.statechart-core {
-  border-block-start: 0.3rem solid var(--statechart-ink);
+.statechart-tools button {
+  background: transparent;
 }
-.statechart-workflow-canvas {
+.statechart-checkpoint-controls:not([hidden]) {
+  align-items: end;
+  background: var(--bg);
+  border-inline-start: 0.2rem solid var(--accent-strong);
+  padding: 0.65rem 0.75rem;
+}
+.statechart-checkpoint-controls label {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.25rem;
+  min-inline-size: 0;
+}
+.statechart-checkpoint-controls select {
+  font-weight: 400;
+}
+.statechart-checkpoint-controls [role="status"]:not(:empty) {
+  flex-basis: 100%;
+}
+.statechart-inspect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  min-inline-size: 0;
+}
+.statechart-inspect details {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+.statechart-inspect details[open] {
+  flex-basis: 100%;
+}
+.statechart-inspect summary {
+  align-content: center;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 650;
+  min-block-size: 2.5rem;
+  padding-block: 0.4rem;
+}
+.statechart-inspect details[open] > summary {
+  color: var(--text);
 }
 .statechart-workflow-active {
   background: color-mix(in srgb, var(--text) 2%, var(--panel));
@@ -2932,194 +2742,272 @@
   --statechart-code-string: #ffffff;
   --statechart-code-title: #ffffff;
 }
-.statechart-workflow-ledger {
-  border-block-start: 1px solid var(--border);
+.statechart-history ol {
+  background: var(--panel);
+  border: 1px solid var(--border);
   display: grid;
-  gap: 0.55rem;
-  padding-block-start: 0.75rem;
-}
-.statechart-workflow-ledger > div {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
-}
-.statechart-workflow-ledger button {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--muted);
-  min-height: 1.9rem;
-}
-.statechart-workflow-ledger ol {
-  display: grid;
-  gap: 0.32rem;
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.statechart-workflow-ledger li {
-  align-items: center;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.24rem;
+.statechart-history li {
+  align-items: baseline;
   display: grid;
-  gap: 0.5rem;
-  grid-template-columns: auto minmax(0, 0.75fr) minmax(0, 1.25fr);
-  line-height: 1.2;
-  max-width: none;
-  padding: 0.42rem 0.5rem;
-}
-.statechart-workflow-ledger li span,
-.statechart-workflow-ledger li small {
-  color: var(--muted);
-  font-size: var(--demo-font-label);
-}
-.statechart-workflow-ledger li code {
-  color: var(--text);
-  font-size: var(--demo-font-label);
-  font-weight: 850;
-}
-.statechart-workflow-ledger li small {
+  gap: 0.25rem 0.55rem;
+  grid-template-columns: auto minmax(0, 0.8fr) minmax(0, 1.2fr);
+  line-height: 1.4;
+  margin: 0;
+  max-inline-size: none;
   overflow-wrap: anywhere;
-  text-align: end;
+  padding: 0.4rem 0.55rem;
 }
-.statechart-workflow-ledger li.is-empty {
+.statechart-history li + li {
+  border-block-start: 1px solid var(--border);
+}
+.statechart-history li span,
+.statechart-history li small,
+.statechart-history li.is-empty {
   color: var(--muted);
-  display: block;
   font-size: var(--demo-font-label);
-  font-style: italic;
 }
-
-/* ELK computes the geometry at build time; these rules own the visual language. */
+.statechart-history li.is-empty {
+  display: block;
+}
+.statechart-history li code {
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--demo-font-label);
+  padding: 0;
+}
+/* The delivery map reflows inside either a chapter column or the gallery. */
 .statechart-workflow-canvas {
-  background:
-    linear-gradient(
-      color-mix(in srgb, var(--text) 3%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--text) 3%, transparent) 1px,
-      transparent 1px
-    ),
-    color-mix(in srgb, var(--text) 1.5%, var(--panel));
-  background-size: 1.5rem 1.5rem;
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  display: block;
-  overflow-x: auto;
-  padding: 0.55rem;
+  container-type: inline-size;
+  min-inline-size: 0;
 }
-.statechart-elk-diagram {
-  display: block;
-  height: auto;
-  min-width: 145rem;
-  width: 100%;
-}
-.statechart-elk-node > rect {
-  fill: var(--bg);
-  stroke: var(--statechart-line);
-  stroke-width: 1.5;
-  transition:
-    fill 180ms ease,
-    stroke 180ms ease,
-    stroke-width 180ms ease;
-}
-.statechart-elk-node.is-compound > rect,
-.statechart-elk-node.is-parallel > rect {
-  fill: color-mix(in srgb, var(--text) 2%, var(--panel));
-  stroke-dasharray: 5 4;
-}
-.statechart-elk-node.is-parallel > rect {
-  fill: color-mix(in srgb, var(--accent) 5%, var(--panel));
-}
-.statechart-elk-node.is-current > rect {
-  fill: color-mix(in srgb, var(--accent) 17%, var(--bg));
-  stroke: var(--accent-strong);
-  stroke-width: 3;
-}
-.statechart-elk-label,
-.statechart-elk-kind,
-.statechart-elk-initial,
-.statechart-elk-edge-label text {
+.statechart-map {
+  color: var(--text);
+  display: grid;
   font-family: var(--font-ui);
-  pointer-events: none;
+  font-size: 0.875rem;
+  gap: 0.22rem;
+  line-height: 1.25;
+  padding: 0.65rem 0.85rem;
 }
-.statechart-elk-label {
-  fill: var(--text);
-  font-size: 18px;
-  font-weight: 850;
+.statechart-map-cancel,
+.statechart-lane-flow,
+.statechart-map-edge {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  min-inline-size: 0;
 }
-.statechart-elk-node.is-compound > .statechart-elk-label,
-.statechart-elk-node.is-parallel > .statechart-elk-label {
-  font-size: 18px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.statechart-map-row,
+.statechart-map-link {
+  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7.5rem minmax(0, 1fr);
+  inline-size: min(100%, 27rem);
+  justify-items: center;
+  margin-inline: auto;
 }
-.statechart-elk-kind {
-  fill: var(--muted);
-  font-size: 14px;
+.statechart-map-row + .statechart-map-link > .statechart-map-edge {
+  grid-column: 3;
+}
+.statechart-verification + .statechart-map-link > .statechart-map-edge {
+  grid-column: 1;
+}
+.statechart-map-state {
+  background: var(--panel);
+  border: 1px solid var(--statechart-line);
+  border-radius: 0.25rem;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.22rem 0.45rem;
+  text-align: center;
+}
+.statechart-map-state.is-final {
+  border-style: double;
+  border-width: 3px;
+  padding: calc(0.22rem - 2px) calc(0.45rem - 2px);
+}
+.statechart-map-state.is-current {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
+  outline: 1px solid var(--accent-strong);
+  outline-offset: 1px;
+}
+.statechart-map-edge,
+.statechart-lane-return {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.statechart-map-edge {
+  flex: none;
+  gap: 0.18rem;
+  justify-content: center;
+}
+.statechart-edge-arrow {
+  color: var(--accent-strong);
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.statechart-map-link .statechart-map-edge {
+  position: relative;
+}
+.statechart-map-link .statechart-edge-label {
+  inline-size: max-content;
+  inset-inline-end: calc(100% + 0.3rem);
+  position: absolute;
+  white-space: nowrap;
+}
+.statechart-verification + .statechart-map-link .statechart-edge-label {
+  inset-inline-start: calc(100% + 0.3rem);
+  inset-inline-end: auto;
+}
+.prose .statechart-lane-return code {
+  font-size: inherit;
+}
+.statechart-verification {
+  background: var(--panel);
+  border: 1px solid var(--statechart-line);
+  padding: 0.45rem 0.65rem;
+}
+.statechart-verification.is-current {
+  border-color: var(--accent-strong);
+}
+.statechart-verification-heading {
+  color: var(--text);
   font-weight: 750;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
-.statechart-elk-initial {
-  fill: var(--accent-strong);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.statechart-lane {
+  align-items: center;
+  display: grid;
+  gap: 0.15rem 0.55rem;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  margin-block-start: 0.35rem;
 }
-.statechart-elk-final-mark {
-  fill: var(--statechart-ink);
-  stroke: var(--bg);
-  stroke-width: 3;
+.statechart-lane + .statechart-lane {
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 0.35rem;
 }
-.statechart-elk-edge path {
-  fill: none;
-  stroke: var(--statechart-line);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.6;
+.statechart-lane-name {
+  color: var(--text);
+  font-weight: 650;
 }
-.statechart-elk-edge.is-return path {
-  stroke: var(--accent-strong);
-  stroke-width: 2.4;
+.statechart-lane-return {
+  grid-column: 2;
 }
-.statechart-elk-edge.is-cancel path {
-  stroke: color-mix(in srgb, #c74c42 76%, var(--text));
-  stroke-dasharray: 6 4;
-  stroke-width: 2;
+.statechart-map-cancel {
+  border-block-start: 1px dashed var(--statechart-line);
+  justify-content: center;
+  margin-block-start: 0.2rem;
+  padding-block-start: 0.35rem;
 }
-.statechart-elk-diagram marker path {
-  fill: var(--statechart-line);
+@container (min-width: 45rem) {
+  .statechart-verification {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  }
+  .statechart-verification-heading {
+    grid-column: 1 / -1;
+  }
+  .statechart-lane {
+    align-content: start;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.25rem;
+  }
+  .statechart-lane-flow {
+    gap: 0.25rem;
+  }
+  .statechart-lane + .statechart-lane {
+    border-block-start: 0;
+    border-inline-start: 1px solid var(--border);
+    padding-block-start: 0;
+    padding-inline-start: 0.75rem;
+  }
+  .statechart-lane-return {
+    grid-column: 1;
+  }
 }
-.statechart-elk-diagram marker.is-return path {
-  fill: var(--accent-strong);
+@container (max-width: 35rem) {
+  .statechart-map {
+    padding: 0.4rem;
+  }
+  .statechart-verification {
+    padding: 0.35rem 0.4rem;
+  }
+  .statechart-lane-name,
+  .statechart-lane-flow,
+  .statechart-lane-return {
+    grid-column: 1 / -1;
+  }
+  .statechart-lane {
+    gap: 0.15rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
-.statechart-elk-diagram marker.is-cancel path {
-  fill: color-mix(in srgb, #c74c42 76%, var(--text));
+@container (max-width: 27rem) {
+  .statechart-map-row,
+  .statechart-map-link {
+    grid-template-columns: minmax(0, 1fr) 7.25rem minmax(6.35rem, 1fr);
+  }
+  /* Lay out the parallel paths with each outgoing event directly beneath its source. */
+  .statechart-lane-flow {
+    align-items: start;
+    display: grid;
+    grid-auto-columns: auto;
+    grid-auto-flow: column;
+    grid-template-rows: auto auto;
+    justify-content: start;
+    justify-items: center;
+    gap: 0.1rem 0.25rem;
+  }
+  .statechart-lane-flow > .statechart-map-state {
+    grid-row: 1;
+  }
+  .statechart-lane-flow > .statechart-map-edge {
+    grid-row: 2;
+    max-inline-size: 100%;
+    text-align: center;
+  }
+  .statechart-map-state {
+    padding-inline: 0.2rem;
+  }
+  .statechart-map-state.is-final {
+    padding-inline: calc(0.2rem - 2px);
+  }
 }
-.statechart-elk-edge-label rect {
-  fill: var(--panel);
-  stroke: var(--border);
-  stroke-width: 1;
+@container (min-width: 18.5rem) {
+  .statechart-map-row .statechart-edge-label {
+    inline-size: max-content;
+    white-space: nowrap;
+  }
 }
-.statechart-elk-edge-label text {
-  fill: var(--muted);
-  font-size: 16px;
-  font-weight: 850;
-  letter-spacing: 0.02em;
+@container (max-width: 18.5rem) {
+  .statechart-map-row,
+  .statechart-map-link {
+    grid-template-columns: minmax(4rem, 1fr) 4rem minmax(6.4rem, 1fr);
+  }
+  .statechart-map-row > .statechart-map-edge {
+    display: grid;
+    gap: 0.16rem;
+    justify-items: center;
+    text-align: center;
+  }
 }
-.statechart-elk-edge.is-return .statechart-elk-edge-label rect {
-  fill: color-mix(in srgb, var(--accent) 10%, var(--panel));
-  stroke: var(--accent-strong);
-}
-.statechart-elk-edge.is-return .statechart-elk-edge-label text {
-  fill: var(--accent-strong);
-}
-.statechart-elk-edge.is-cancel .statechart-elk-edge-label text {
-  fill: color-mix(in srgb, #c74c42 76%, var(--text));
+@container (max-width: 16rem) {
+  .statechart-map,
+  .statechart-verification {
+    padding-inline: 0.17rem;
+  }
+  .statechart-lane-flow {
+    column-gap: 0.15rem;
+  }
 }
 
 @keyframes orchestration-pulse {

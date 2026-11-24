@@ -198,13 +198,14 @@ type Activity = {
 // withhold a model answer so the learner can predict before operating the demo.
 const activities: Record<string, Activity> = {
   "Deterministic boundary lab": {
-    activityVersion: 2,
+    activityVersion: 3,
     conceptIds: ["invariant", "authority", "contract", "state-authority"],
     caption:
       "Follow accepted and rejected transitions through a delivery statechart.",
     controls: [
       "Scenario and transition actions",
       "Premature RELEASE proposal",
+      "Patch B checkpoint and delayed test result",
       "Cancellation",
       "Statechart inspection",
     ],
@@ -212,9 +213,9 @@ const activities: Record<string, Activity> = {
       "TESTS_PASS is a supplied event, not an executed application test. The statechart models a declared delivery protocol. It does not by itself authorize real operations or guarantee durable effects.",
     predict:
       "Which state or guard should prevent the next proposed action, and why?",
-    try: "Propose RELEASE before checks pass; inspect the rejected event and unchanged state. Then follow a valid route or cancel.",
+    try: "Propose RELEASE before checks pass and inspect the event history. For a second case, load the patch B checkpoint, predict what the statechart will do, and deliver patch A's delayed result.",
     observe:
-      "Compare state, enabled actions, and the shared parent cancellation rule.",
+      "Which patch was approved? Which patch passed its checks? Compare that evidence with the actions the statechart now permits.",
   },
   "ACID transaction lab": {
     activityVersion: 3,

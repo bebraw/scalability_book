@@ -217,8 +217,17 @@ An optional model-assignment pair keeps the fleet's task graph fixed while assig
 
 CodeCRDT's experiments on six small TypeScript and React tasks achieved textual convergence while preliminary inspection still found semantic conflicts :citep[pugachev2025codecrdt].
 A shared document can merge successfully even when interface and data code disagree about the same event.
-Keep integrated behavior checks after concurrent work.
 [Appendix A](/appendices/evaluating-agentic-workflows/#research-example-coordination-and-integration) examines the study and related coordination evidence, including their limits.
+
+In the Denicek conference example from :citet[petricek2025denicek], Alice adds a speaker to a list where each entry holds a name and an email address separated by a comma.
+Meanwhile, Bob turns the list into a table and splits each entry into name and email cells.
+If Bob's changes land first, what should happen when he merges Alice's addition?
+
+Denicek records the steps Bob applied to every list item.
+During the merge it applies those steps to Alice's new item, giving her speaker a row with both cells.
+Replay both merge orders in the [speaker-list demo](https://tomasp.net/denicek/#chapter3) and check that every speaker appears exactly once with the right email beside their name.
+A formula that extracts an email by looking for the comma would still need a person to update it to read the new email cell.
+Include consumers like that formula when checking the integrated behavior.
 
 ### Map authority and acceptance
 

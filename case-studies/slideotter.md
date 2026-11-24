@@ -83,6 +83,11 @@ The first product loop would be:
 3. Generate and review the slides, including their layout and rendered output.
 4. Bind approval to a reviewed version; later changes produce a new candidate.
 
+I would try keeping a link to the source of a copied result, as Denicek does in its [copied-formula example](https://tomasp.net/denicek/#chapter6).
+Suppose a benchmark table gives the 95th percentile for search latency as 800 ms, and an author writes “95% of searches finished within 0.8 seconds” on a slide.
+If the source figure is corrected to 600 ms, the studio could flag that sentence on the slide and show the corrected table cell beside it.
+The author could change 0.8 to 0.6, keep the wording chosen for the audience, and approve the revised slide.
+
 Time to an approved deck, corrections, outline revisions, regeneration, and repeated use would test product value separately from repository checks.
 Keep the harness focused on provenance, approval state, slide validity, and rendering.
 New delivery targets should follow evidence that this loop is useful.

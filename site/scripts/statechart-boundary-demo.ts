@@ -26,6 +26,19 @@ const deliveryMachine = setup({
   types: { events: {} as DeliveryEvent },
 }).createMachine(deliveryMachineConfig);
 
+// Patch labels identify the source in the ledger. The chart sees only the event type.
+type Patch = "A" | "B";
+const patchBCheckpoint: ReadonlyArray<[DeliveryEventType, Patch?]> = [
+  ["PLAN_APPROVED"],
+  ["PATCH_READY", "A"],
+  ["TESTS_PASS", "A"],
+  ["REVIEW_START", "A"],
+  ["REQUEST_CHANGES", "A"],
+  ["PATCH_READY", "B"],
+  ["REVIEW_START", "B"],
+  ["APPROVE", "B"],
+];
+
 for (const root of document.querySelectorAll<HTMLElement>(
   "[data-statechart-demo]",
 )) {
@@ -48,23 +61,30 @@ function initializeStatechartDemo(root: HTMLElement) {
   const enabledEvents = root.querySelector<HTMLElement>(
     "[data-statechart-demo-events-enabled]",
   );
-  const configuration = root.querySelector<HTMLElement>(
-    "[data-statechart-demo-configuration]",
-  );
   const chart = root.querySelector<HTMLElement>("[data-statechart-demo-chart]");
-  const explanation = root.querySelector<HTMLElement>(
-    "[data-statechart-demo-explanation]",
+  const result = root.querySelector<HTMLElement>(
+    "[data-statechart-demo-result]",
   );
-  const verdict = root.querySelector<HTMLElement>(
-    "[data-statechart-demo-verdict]",
-  );
-  const summary = root.querySelector<HTMLElement>(
-    "[data-statechart-demo-summary]",
-  );
+  const count = root.querySelector<HTMLElement>("[data-statechart-demo-count]");
   const history = root.querySelector<HTMLOListElement>(
     "[data-statechart-demo-history]",
   );
   const model = root.querySelector<HTMLElement>("[data-statechart-demo-model]");
+  const checkpoint = root.querySelector<HTMLButtonElement>(
+    "[data-statechart-demo-checkpoint]",
+  );
+  const prompt = root.querySelector<HTMLElement>(
+    "[data-statechart-demo-prompt]",
+  );
+  const prediction = root.querySelector<HTMLSelectElement>(
+    "[data-statechart-demo-prediction]",
+  );
+  const deliver = root.querySelector<HTMLButtonElement>(
+    "[data-statechart-demo-deliver]",
+  );
+  const feedback = root.querySelector<HTMLElement>(
+    "[data-statechart-demo-feedback]",
+  );
 
   if (
     !form ||
@@ -72,13 +92,16 @@ function initializeStatechartDemo(root: HTMLElement) {
     !copyButton ||
     !agentState ||
     !enabledEvents ||
-    !configuration ||
     !chart ||
-    !explanation ||
-    !verdict ||
-    !summary ||
+    !result ||
+    !count ||
     !history ||
-    !model
+    !model ||
+    !checkpoint ||
+    !prompt ||
+    !prediction ||
+    !deliver ||
+    !feedback
   ) {
     return;
   }
@@ -86,6 +109,7 @@ function initializeStatechartDemo(root: HTMLElement) {
   let actor = createDeliveryActor();
   const observed: Array<{
     event: DeliveryEventType;
+    patch: Patch | undefined;
     state: string;
     accepted: boolean;
   }> = [];
@@ -93,22 +117,28 @@ function initializeStatechartDemo(root: HTMLElement) {
     language: "typescript",
   }).value;
 
-  const render = (previous?: StateValue) => {
+  const render = () => {
     const snapshot = actor.getSnapshot();
     const stateValue = snapshot.value;
     const accepted = getAcceptedEvents(snapshot);
 
-    for (const node of root.querySelectorAll<HTMLElement>(
+    for (const node of chart.querySelectorAll<HTMLElement>(
       "[data-state-path]",
     )) {
       const path = node.dataset.statePath?.split(".") ?? [];
-      node.classList.toggle("is-current", hasStatePath(stateValue, path));
+      const current = hasStatePath(stateValue, path);
+      node.classList.toggle("is-current", current);
+      if (current && node.classList.contains("statechart-map-state")) {
+        node.setAttribute("aria-current", "step");
+      } else {
+        node.removeAttribute("aria-current");
+      }
     }
-    if (previous !== undefined) revealActiveStates(chart, previous);
 
-    const configurationText = formatStateValue(stateValue);
-    agentState.textContent = configurationText;
-    configuration.textContent = configurationText;
+    agentState.textContent = readerState(stateValue);
+    count.textContent = String(observed.length);
+    resetButton.disabled = !observed.length;
+    form.toggleAttribute("data-started", observed.length > 0);
     enabledEvents.innerHTML = accepted.length
       ? accepted
           .map(
@@ -117,49 +147,86 @@ function initializeStatechartDemo(root: HTMLElement) {
           )
           .join("")
       : '<span class="statechart-no-events">Final state: no events enabled</span>';
-    verdict.textContent = buildVerdict(stateValue);
-    summary.textContent = `${accepted.length} legal event${accepted.length === 1 ? "" : "s"} exposed to the agent.`;
-    explanation.textContent = buildExplanation(stateValue);
     history.innerHTML = observed.length
       ? observed
           .map(
             (entry, index) =>
-              `<li><span>${String(index + 1).padStart(2, "0")}</span><code>${entry.event}</code><small>${entry.accepted ? "Accepted" : "Rejected; state unchanged"}: ${entry.state}</small></li>`,
+              `<li><span>${String(index + 1).padStart(2, "0")}</span><code>${entry.event}</code><small>${entry.patch ? `Patch ${entry.patch} · ` : ""}${entry.accepted ? "Accepted" : "Rejected; state unchanged"}: ${entry.state}</small></li>`,
           )
           .join("")
       : '<li class="is-empty">No events sent yet.</li>';
   };
 
-  const sendEvent = (eventType: DeliveryEventType) => {
-    const snapshot = actor.getSnapshot();
-
-    if (!snapshot.can({ type: eventType })) {
-      observed.push({
-        event: eventType,
-        state: formatStateValue(snapshot.value),
-        accepted: false,
-      });
-      render();
-      return;
-    }
-
-    actor.send({ type: eventType });
+  const applyEvent = (eventType: DeliveryEventType, patch?: Patch) => {
+    const event = { type: eventType };
+    const accepted = actor.getSnapshot().can(event);
+    if (accepted) actor.send(event);
     observed.push({
       event: eventType,
+      patch,
       state: formatStateValue(actor.getSnapshot().value),
-      accepted: true,
+      accepted,
     });
-    render(snapshot.value);
+    return accepted;
   };
 
-  const reset = () => {
-    const previous = actor.getSnapshot().value;
+  const sendEvent = (eventType: DeliveryEventType) => {
+    const accepted = applyEvent(eventType);
+    if (accepted) prompt.hidden = true;
+    render();
+    if (!accepted) {
+      result.textContent =
+        actor.getSnapshot().status === "done"
+          ? "RELEASE rejected. This run has ended."
+          : "RELEASE rejected. Release needs passing checks and review approval.";
+    } else if (eventType === "CANCEL") {
+      result.textContent =
+        "CANCEL accepted. The parent rule ends the run from any active state.";
+    } else {
+      result.textContent = `${eventType} accepted. ${agentState.textContent}.`;
+    }
+  };
+
+  const restartActor = () => {
     actor.stop();
     actor = createDeliveryActor();
     observed.length = 0;
-    render(previous);
   };
 
+  checkpoint.hidden = false;
+  checkpoint.addEventListener("click", () => {
+    restartActor();
+    for (const [event, patch] of patchBCheckpoint) applyEvent(event, patch);
+    render();
+    prompt.hidden = false;
+    prediction.value = "";
+    prediction.disabled = false;
+    deliver.disabled = true;
+    feedback.textContent = "";
+    result.textContent = "Checkpoint loaded. B’s checks are running.";
+    prediction.focus();
+  });
+  prediction.addEventListener("change", () => {
+    deliver.disabled = !prediction.value;
+  });
+  deliver.addEventListener("click", () => {
+    applyEvent("TESTS_PASS", "A");
+    render();
+    const ready = actor.getSnapshot().can({ type: "RELEASE" });
+    const expected =
+      prediction.value === "ready"
+        ? "You predicted B would be ready."
+        : "You predicted B would wait.";
+    const outcome = ready
+      ? "The chart made B ready because TESTS_PASS arrived without a patch identity. A release workflow should wait for B’s own pass."
+      : "The chart kept B waiting.";
+    result.textContent = ready
+      ? "TESTS_PASS accepted. B is ready."
+      : "B is still waiting.";
+    feedback.textContent = `${expected} ${outcome}`;
+    prediction.disabled = true;
+    deliver.disabled = true;
+  });
   form.addEventListener("submit", (event) => event.preventDefault());
   enabledEvents.addEventListener("click", (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
@@ -169,9 +236,22 @@ function initializeStatechartDemo(root: HTMLElement) {
 
     if (isDeliveryEventType(eventType)) {
       sendEvent(eventType);
+      const next = enabledEvents.querySelector<HTMLButtonElement>("button");
+      (next ?? resetButton).focus({ preventScroll: true });
     }
   });
-  resetButton.addEventListener("click", reset);
+  resetButton.addEventListener("click", () => {
+    restartActor();
+    prompt.hidden = true;
+    feedback.textContent = "";
+    result.textContent = "";
+    render();
+    root
+      .querySelector<HTMLButtonElement>(
+        "[data-statechart-demo-propose-release]",
+      )
+      ?.focus({ preventScroll: true });
+  });
   root
     .querySelector("[data-statechart-demo-propose-release]")
     ?.addEventListener("click", () => sendEvent("RELEASE"));
@@ -180,7 +260,7 @@ function initializeStatechartDemo(root: HTMLElement) {
       await navigator.clipboard.writeText(exportableDeliveryMachine);
       copyButton.textContent = "Copied";
       window.setTimeout(() => {
-        copyButton.textContent = "Copy model";
+        copyButton.textContent = "Copy XState model";
       }, 1400);
     } catch {
       const selection = window.getSelection();
@@ -193,31 +273,6 @@ function initializeStatechartDemo(root: HTMLElement) {
   });
 
   render();
-}
-
-function revealActiveStates(chart: HTMLElement, previous: StateValue) {
-  const leaves = Array.from(
-    chart.querySelectorAll<SVGGElement>(".is-current:is(.is-state, .is-final)"),
-  );
-  if (!leaves.length) return;
-
-  const bounds = leaves.map((leaf) => leaf.getBoundingClientRect());
-  let left = Math.min(...bounds.map((rect) => rect.left));
-  let right = Math.max(...bounds.map((rect) => rect.right));
-  const padding = 8;
-  if (right - left + 2 * padding > chart.clientWidth) {
-    // Parallel leaves can be farther apart than a phone is wide.
-    const changed = leaves.findIndex(
-      (leaf) => !hasStatePath(previous, leaf.dataset.statePath!.split(".")),
-    );
-    ({ left, right } = bounds[Math.max(0, changed)]!);
-  }
-
-  const start = chart.getBoundingClientRect().left + chart.clientLeft;
-  if (left < start + padding || right > start + chart.clientWidth - padding) {
-    // Pan only the diagram; the event control and the page stay in place.
-    chart.scrollLeft += (left + right) / 2 - start - chart.clientWidth / 2;
-  }
 }
 
 function createDeliveryActor() {
@@ -264,36 +319,16 @@ function formatStateValue(value: StateValue): string {
     .join(" + ");
 }
 
-function buildVerdict(value: StateValue) {
-  if (hasStatePath(value, ["released"])) {
-    return "Goal reached: change released";
-  }
-  if (hasStatePath(value, ["cancelled"])) {
-    return "Run cancelled safely";
-  }
-  if (hasStatePath(value, ["active", "verifying"])) {
-    return "Two verification regions active";
-  }
-  return "Goal: ship a safe change";
-}
-
-function buildExplanation(value: StateValue) {
-  if (hasStatePath(value, ["active", "verifying"])) {
-    return "Tests and review advance independently without inventing combined boolean states.";
-  }
-  if (hasStatePath(value, ["active", "ready"])) {
-    return "The parallel state completes only after checks pass and review approves.";
-  }
-  if (hasStatePath(value, ["released"])) {
-    return "Release became available only after the deterministic completion condition.";
-  }
-  if (hasStatePath(value, ["cancelled"])) {
-    return "One CANCEL transition on the parent handled every active child state.";
-  }
-  if (hasStatePath(value, ["active", "implementing"])) {
-    return "A failed check or review can return here without adding duplicate recovery rules.";
-  }
-  return "The parent state exposes one shared cancellation rule.";
+// The history retains the full model paths. The header names the active leaves.
+function readerState(value: StateValue) {
+  return formatStateValue(value)
+    .replace(/^active\.(?:verifying\.)?/, "")
+    .split(" + ")
+    .map(
+      (path) =>
+        path.charAt(0).toUpperCase() + path.slice(1).replaceAll(".", " "),
+    )
+    .join(" · ");
 }
 
 function isDeliveryEventType(
