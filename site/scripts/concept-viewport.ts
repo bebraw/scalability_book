@@ -22,6 +22,7 @@ export class ConceptViewport {
   constructor(
     private graphic: HTMLElement,
     private svg: SVGSVGElement,
+    private level: HTMLElement,
   ) {
     this.bounds = {
       width: Number(svg.dataset.width),
@@ -256,10 +257,7 @@ export class ConceptViewport {
       `${this.x - width / 2} ${this.y - height / 2} ${width} ${height}`,
     );
     this.graphic.dataset.camera = JSON.stringify(this.snapshot());
-    const level = this.graphic.parentElement?.querySelector<HTMLElement>(
-      "[data-concept-zoom-level]",
-    );
-    if (level) level.textContent = `${Math.round(this.scale * 100)}%`;
+    this.level.textContent = `${Math.round(this.scale * 100)}%`;
     this.graphic.dispatchEvent(new Event("concept-camera-change"));
   }
   private clamp(scale: number) {

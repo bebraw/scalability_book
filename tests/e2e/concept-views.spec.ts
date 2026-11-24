@@ -20,20 +20,53 @@ test("graph and list share one search, filters, and a persistent camera", async 
   );
   await expect(graph).toHaveAttribute("aria-selected", "true");
   await expect(directory).not.toBeVisible();
-  // Hiding the graph-only action must keep the view selector in place.
+  const navigation = map.getByRole("group", { name: "Graph navigation" });
+  const toolbarControls = map
+    .getByRole("tab")
+    .or(map.getByRole("button", { name: "Expand graph", exact: true }))
+    .or(map.getByRole("button", { name: "Filters", exact: true }))
+    .or(navigation.getByRole("button"));
   for (const width of [1280, 760, 620, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
+    await expect(toolbarControls).toHaveCount(8);
+    const boxes = await toolbarControls.evaluateAll((controls) =>
+      controls.map((control) => {
+        const { left, right, top, bottom } = control.getBoundingClientRect();
+        return { left, right, top, bottom };
+      }),
+    );
+    let previousRight = 0;
+    for (const box of boxes) {
+      expect(box.right).toBeGreaterThan(box.left);
+      expect(
+        box.left,
+        `${width}px: controls do not overlap`,
+      ).toBeGreaterThanOrEqual(previousRight);
+      previousRight = box.right;
+      expect(box.right, `${width}px: toolbar right edge`).toBeLessThanOrEqual(
+        width,
+      );
+    }
+    // A line crossing all eight controls excludes a second zoom row.
+    const lastTop = Math.max(...boxes.map((box) => box.top));
+    const firstBottom = Math.min(...boxes.map((box) => box.bottom));
+    expect(lastTop).toBeLessThan(firstBottom);
+    if (width === 1280) {
+      await expect(graphic).toHaveAttribute("data-detail", "overview");
+      await expect(map.locator("[data-concept-semantic-status]")).toBeHidden();
+    }
+    // Hiding graph-only actions must keep the view selector in place.
     const position = () =>
       map.locator("[data-concept-view-switch]").evaluate((element) => {
         const box = element.getBoundingClientRect();
-        const header = element
-          .closest(".concept-map-heading")!
+        const mapBox = element
+          .closest("[data-concept-map]")!
           .getBoundingClientRect();
         return {
-          x: box.x - header.x,
-          y: box.y - header.y,
-          width: header.width,
-          height: header.height,
+          x: box.x - mapBox.x,
+          y: box.y - mapBox.y,
+          width: box.width,
+          height: box.height,
         };
       });
     const before = await position();
@@ -42,16 +75,18 @@ test("graph and list share one search, filters, and a persistent camera", async 
     for (const key of ["x", "y", "width", "height"] as const)
       expect(after[key], `${width}px: ${key}`).toBeCloseTo(before[key], 1);
     await expect(map.locator("[data-concept-expand]")).not.toBeVisible();
+    await expect(navigation).toBeHidden();
     await graph.click();
     expect(await position()).toEqual(before);
     expect(
-      await map
-        .locator(".concept-map-heading")
-        .evaluate((element) => element.scrollWidth <= element.clientWidth + 1),
-      `${width}px: header controls fit`,
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      `${width}px: the map fits without horizontal scrolling`,
     ).toBe(true);
   }
   await page.setViewportSize({ width: 1280, height: 900 });
+  await map.getByText("Filters", { exact: true }).click();
   await graphic.focus();
   await graphic.press("ArrowRight");
   await graphic.press("ArrowDown");

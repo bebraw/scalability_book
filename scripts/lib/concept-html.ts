@@ -127,9 +127,8 @@ function renderConceptSummary(concept: Concept): string {
   const description = concept.definition.split(/(?<=\.)\s/)[0]!;
   return `<li data-concept-result="${concept.id}"><details class="concept-directory-item">
   <summary data-concept-select="${concept.id}" aria-labelledby="summary-${concept.id}-title" aria-describedby="summary-${concept.id}-description">
-    <span class="concept-summary-heading"><span class="concept-summary-title" id="summary-${concept.id}-title">${escapeHtml(concept.title)}</span><span class="concept-summary-group">${concept.group}</span></span>
+    <span class="concept-summary-heading"><span class="concept-summary-title" id="summary-${concept.id}-title">${escapeHtml(concept.title)}</span><span class="concept-summary-group">${concept.group}</span><span class="concept-group-tag" data-concept-group-tag hidden>Group member</span></span>
     <span class="concept-summary-description" id="summary-${concept.id}-description">${escapeHtml(description)}</span>
-    <span class="concept-summary-action">Explore concept <span aria-hidden="true">→</span><span class="concept-group-tag" data-concept-group-tag hidden>Group member</span></span>
   </summary>
   ${renderConceptCard(concept)}
   </details></li>`;
@@ -140,19 +139,15 @@ export function renderConceptPage(
 ): string {
   const guideUrl = new URL("/concepts/agent-guide.md", siteUrl).href;
   return `<main class="concept-reference" id="content">
-  <header class="concept-reference-header"><p class="eyebrow">Ideas across the book</p><h1>Concepts that connect</h1><p>Follow an idea through the book, or bring your own question and agent to the knowledge graph.</p><details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>Definitions use established vocabulary where it fits. Some terms, especially around coding agents and harnesses, are still developing or vary between sources. “Usage in this book” notes explain our working definitions, course protocols, and broader applications of a term.</p><p>The lines are authored teaching connections. Read an arrow as a statement from its source, through the label, to its target. The label and explanation establish the meaning; an arrow alone does not establish causation or a prerequisite. Comparisons and associations use plain lines. Each connection links back to the reading.</p></details></header>
-  <form class="concept-lookup" role="search" aria-label="Concept lookup" data-concept-lookup hidden><label for="concept-lookup">Find a concept</label><div><input id="concept-lookup" type="search" placeholder="Retry, review, latency" data-concept-lookup-input><button type="submit">Search</button></div></form>
-  <section class="concept-agent" aria-labelledby="concept-agent-guide-title">
-    <div class="concept-agent-introduction"><p class="concept-context-label">Your question · your tools</p><h2 id="concept-agent-guide-title">Explore with your own agent</h2><p>Start from your course task, current reading, or a question of your own. <a href="/explore/">Choose a task starting point</a>, <a href="/agents/">connect your agent with MCP</a>, or give it the guide below to explore ideas and experiments through the graph.</p></div>
-    <div class="concept-agent-access"><label for="concept-agent-guide-url">Give your agent this guide</label><div class="concept-agent-copy"><input id="concept-agent-guide-url" type="text" inputmode="url" value="${escapeAttribute(guideUrl)}" readonly data-concept-agent-url><button type="button" data-concept-agent-copy hidden>Copy URL</button></div><p class="concept-agent-status" data-concept-agent-status role="status"></p><p class="concept-agent-files"><a href="/concepts/agent-guide.md">Read the guide</a><a href="/concepts/graph.json">Graph as JSON</a><a href="/concepts/graph.md">Graph as Markdown</a></p></div>
-    <details class="concept-agent-setup"><summary>Connect it, then check it</summary><ol><li><strong>Connect your tools.</strong> Use an agent that can fetch URLs. If it works with files instead, download the guide and either graph format and add them to its context. The guide describes the data and how to follow connections.</li><li><strong>Pick a starting point.</strong> If you are unsure, ask “Read this guide and help me get started.” Choose one of the suggested activities, or bring your own question. State a guess or prediction before asking for an explanation.</li><li><strong>Check the explanation.</strong> Follow a citation yourself. Compare the answer with the passage and its assumptions, and distinguish the book’s connections from connections your agent proposes. Keep a short record of what you accepted, challenged, or could not verify.</li></ol><p>Connecting the graph and judging what your agent retrieves are part of the learning. You can also explore it directly below.</p></details>
-  </section>
+  <header class="concept-reference-header">
+    <h1>Concept explorer</h1>
+    <form class="concept-lookup" role="search" aria-label="Concept lookup" data-concept-lookup hidden><label for="concept-lookup">Find a concept</label><div><input id="concept-lookup" type="search" placeholder="Name or keyword" data-concept-lookup-input><button type="submit">Search</button></div></form>
+  </header>
   <details class="concept-explorer" id="concept-explorer" data-concept-explorer><summary><span data-concept-explorer-title>Explore the whole book</span><span class="concept-explorer-description" data-concept-explorer-description>${concepts.length} concepts and their connections</span></summary>
   <section class="concept-exploration-context" data-concept-context hidden aria-labelledby="concept-context-title"><div class="concept-exploration-heading"><div><p class="concept-context-label" data-concept-context-label></p><h2 id="concept-context-title" tabindex="-1" data-concept-context-title></h2></div><button type="button" data-concept-all>Explore the whole book →</button></div><p class="concept-prediction" data-concept-context-prompt></p><a data-concept-context-reading></a></section>
   <section id="concept-graph" aria-label="Explore concept connections">${renderConceptGraph("reference-concepts")}</section>
   <section class="concept-directory" id="concept-directory" aria-labelledby="concept-directory-title">
     <header class="concept-directory-heading"><div><h2 id="concept-directory-title">Concept list</h2><p data-concept-directory-count>${concepts.length} topics</p></div></header>
-    <p class="concept-directory-help">Choose an idea for its definition, examples, and connections.</p>
     <p class="concept-directory-empty" data-concept-empty hidden>No topics match. Clear the search or reset the view above.</p>
     <ul class="concept-directory-list">${[...concepts]
       .sort((a, b) => a.title.localeCompare(b.title))
@@ -160,6 +155,13 @@ export function renderConceptPage(
       .join("\n")}</ul>
   </section>
   </details>
+  <section class="concept-agent" aria-labelledby="concept-agent-guide-title">
+    <details><summary id="concept-agent-guide-title">Explore with your own agent</summary>
+      <div class="concept-agent-access"><label for="concept-agent-guide-url">Give your agent this guide</label><div class="concept-agent-copy"><input id="concept-agent-guide-url" type="text" inputmode="url" value="${escapeAttribute(guideUrl)}" readonly data-concept-agent-url><button type="button" data-concept-agent-copy hidden>Copy URL</button></div><p class="concept-agent-status" data-concept-agent-status role="status"></p><p class="concept-agent-files"><a href="/concepts/agent-guide.md">Read the guide</a><a href="/concepts/graph.json">Graph as JSON</a><a href="/concepts/graph.md">Graph as Markdown</a></p></div>
+      <ol><li>Give the guide URL to an agent that can open links. For a file-based tool, download the guide and either graph format. You can also <a href="/agents/">connect your agent with MCP</a>.</li><li>Bring a question from your reading or <a href="/explore/">choose a task starting point</a>. Write down what you expect before asking for an explanation.</li><li>Follow a citation back to the book. Which connections did the book's authors make, and which did your agent suggest? Record what you could verify and what remains open.</li></ol>
+    </details>
+  </section>
+  <details class="concept-reference-notes"><summary>About the definitions and connections</summary><p>“Usage in this book” notes explain course-specific terms and how we use words whose meaning varies between sources.</p><p>Read an arrow from its source, through its label, to its target. The explanation tells you when the connection holds. Plain lines mark comparisons and associations. Each connection links back to the reading.</p></details>
 </main>`;
 }
 
@@ -266,37 +268,46 @@ export function renderConceptGraph(
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : " has-connection-labels"}" data-concept-map data-focus="${focus}" data-complete="${complete}">
-  <div class="concept-map-heading"><h2>${complete ? "Concepts and connections" : "Explore the connections"}</h2>${complete ? `<div class="concept-map-heading-actions"><button type="button" data-concept-expand aria-pressed="false" aria-controls="${prefix}-graphic" hidden>Expand graph</button><div class="concept-view-switch" role="tablist" aria-label="Concept view" data-concept-view-switch hidden><button type="button" role="tab" id="${prefix}-view-graph" aria-controls="${prefix}-graph-panel" aria-selected="true" data-concept-view="graph">Graph</button><button type="button" role="tab" id="${prefix}-view-list" aria-controls="concept-directory" aria-selected="false" tabindex="-1" data-concept-view="list">List</button></div></div>` : ""}</div>
-  ${complete ? `<details class="concept-map-tools" data-concept-map-tools hidden open><summary>Adjust the graph and filters</summary>` : ""}
-  <div class="concept-map-controls" hidden data-concept-controls>
+  ${
+    complete
+      ? `<div class="concept-map-toolbar">
+    <p class="concept-map-status" data-concept-map-status role="status">${items.length} concepts · ${relations.length} connections</p>
+    <div class="concept-map-heading-actions">
+      <div class="concept-view-switch" role="tablist" aria-label="Concept view" data-concept-view-switch hidden><button type="button" role="tab" id="${prefix}-view-graph" aria-controls="${prefix}-graph-panel" aria-selected="true" data-concept-view="graph">Graph</button><button type="button" role="tab" id="${prefix}-view-list" aria-controls="concept-directory" aria-selected="false" tabindex="-1" data-concept-view="list">List</button></div>
+      <button type="button" data-concept-map-tools aria-controls="${prefix}-filters" aria-expanded="false" hidden>Filters</button>
+      <button type="button" data-concept-expand aria-pressed="false" aria-controls="${prefix}-graphic" title="Expand graph" hidden><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path class="expand-icon" d="M9 2h5v5M14 2 9 7M7 14H2V9M2 14l5-5"/><path class="restore-icon" d="M14 7H9V2M9 7l5-5M2 9h5v5M7 9l-5 5"/></svg><span>Expand graph</span></button>
+      <div class="concept-map-navigation" role="group" aria-label="Graph navigation" data-concept-navigation hidden>
+        <span data-concept-zoom-level>100%</span><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button><button type="button" data-concept-zoom="readable" aria-label="Use readable graph size" title="Use readable graph size"><span>Readable</span></button>
+      </div>
+    </div>
+  </div>`
+      : '<div class="concept-map-heading"><h2>Explore the connections</h2></div>'
+  }
+  <div class="concept-map-controls"${complete ? ` id="${prefix}-filters"` : ""} hidden data-concept-controls>
     ${complete ? `<label for="${prefix}-reading">Reading<select id="${prefix}-reading" data-concept-reading><option value="">Whole book</option>${conceptPages.map((page) => `<option value="${page.url}" data-ids="${page.concepts.join(" ")}" data-prompt="${escapeAttribute(page.prompt || "")}">${escapeHtml(page.title)}</option>`).join("")}</select></label>` : ""}
     ${!focus ? `<label for="${prefix}-focus">Focus on<select id="${prefix}-focus" data-concept-focus><option value="">${complete ? "All concepts" : "All connections"}</option>${items.map((concept) => `<option value="${concept.id}">${escapeHtml(concept.title)}</option>`).join("")}</select></label>` : ""}
     ${complete ? `<div class="concept-map-actions"><button type="button" data-concept-reset>Reset view</button></div>` : ""}
     ${complete ? `<div class="concept-map-group-controls"><label for="${prefix}-group">Topic group<select id="${prefix}-group" data-concept-group><option value="">All groups</option>${conceptGroups.map((group) => `<option>${group}</option>`).join("")}</select></label><label for="${prefix}-subgroup" data-concept-subgroup-control hidden>Subcategory<select id="${prefix}-subgroup" data-concept-subgroup><option value="">All subcategories</option>${conceptSubgroups.map((subgroup) => `<option value="${subgroup.id}" data-group="${subgroup.group}" data-ids="${subgroup.conceptIds.join(" ")}">${escapeHtml(subgroup.title)}</option>`).join("")}</select></label><fieldset class="concept-group-view" data-concept-group-controls disabled aria-describedby="${prefix}-group-help"><legend>Group view</legend><div><label><input type="radio" name="${prefix}-group-view" value="highlight" data-concept-group-mode checked><span>Highlight</span></label><label><input type="radio" name="${prefix}-group-view" value="only" data-concept-group-mode><span>Show only</span></label></div></fieldset><p class="concept-group-help" id="${prefix}-group-help" data-concept-group-help>Choose a group to highlight its members in context.</p></div>` : ""}
+    ${complete ? `<label class="concept-detail-control" hidden data-concept-detail-control>Graph detail<select aria-label="Graph detail" data-concept-detail><option value="auto">Adapt as I zoom</option><option value="all">All concepts</option></select></label>` : ""}
     <label class="concept-map-label-toggle"><input type="checkbox" data-concept-labels${complete ? "" : " checked"}>Show connection labels</label>
   </div>
-  ${complete ? "</details>" : ""}
-  ${complete ? `<p class="concept-map-status" data-concept-map-status role="status">${items.length} concepts · ${relations.length} connections</p><div id="${prefix}-graph-panel" data-concept-graph-panel>` : ""}
-  <p${complete ? " data-concept-map-intro" : ""}>${complete ? "Search or choose a reading to narrow both views. Focus on an idea to see its neighborhood; select a node to read and continue exploring." : "Select a topic to read its definition and discover connections beyond this reading."}</p>
+  ${complete ? `<div id="${prefix}-graph-panel" data-concept-graph-panel><div class="concept-map-canvas"><p class="concept-semantic-status" data-concept-semantic-status></p>` : "<p>Select a topic to read its definition and discover connections beyond this reading.</p>"}
+  ${reading ? `<label class="concept-map-enlarge"><input type="checkbox" aria-controls="${prefix}-graphic">Enlarge map</label>` : ""}
+  <div class="concept-map-graphic"${complete || reading ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="${reading ? "Concept map for this reading" : "Interactive concept graph"}"` : ""}${complete ? ` aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
   ${
     complete
-      ? `<div class="concept-map-key"><ul class="concept-role-legend" aria-label="Concept roles">${Object.entries(
+      ? `</div><details class="concept-map-guide"><summary>Map guide</summary><p class="concept-map-help" id="${prefix}-help">Drag or scroll to pan. Pinch or use Ctrl/⌘ + scroll to zoom. With keyboard focus on the map, use the arrow keys to pan, +/− to zoom, and 0 to fit the map. Choose Readable to restore the text size.</p><p class="concept-map-help">Colors identify concept roles. Choose a topic or subcategory to explore its concepts. Numbers between topics count their authored connections.</p><ul class="concept-role-legend" aria-label="Concept roles">${Object.entries(
           conceptRoles,
         )
           .map(
             ([role, value]) =>
               `<li class="concept-role-${role}"><span aria-hidden="true">●</span> ${value.label}</li>`,
           )
-          .join(
-            "",
-          )}</ul><label class="concept-detail-control" hidden data-concept-detail-control>Graph detail <select data-concept-detail aria-label="Graph detail"><option value="auto">Adapt as I zoom</option><option value="all">All concepts</option></select></label></div><p class="concept-semantic-status" data-concept-semantic-status></p>`
+          .join("")}</ul>`
       : ""
   }
-  ${complete ? `<div class="concept-map-canvas"><div class="concept-map-navigation" role="group" aria-label="Graph navigation" data-concept-navigation hidden><span data-concept-zoom-level>100%</span><button type="button" data-concept-zoom="out" aria-label="Zoom out">−</button><button type="button" data-concept-zoom="in" aria-label="Zoom in">+</button><button type="button" data-concept-zoom="fit">Fit</button><button type="button" data-concept-zoom="readable" aria-label="Use readable graph size">Readable</button></div>` : ""}
-  ${reading ? `<label class="concept-map-enlarge"><input type="checkbox" aria-controls="${prefix}-graphic">Enlarge map</label>` : ""}
-  <div class="concept-map-graphic"${complete || reading ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="${reading ? "Concept map for this reading" : "Interactive concept graph"}"` : ""}${complete ? ` aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
-  ${complete ? `</div><p class="concept-map-help" id="${prefix}-help">Drag anywhere or scroll to move the map. Ctrl/⌘ + scroll or pinch to zoom. Fit shows the whole map; Readable restores the text size. With the map focused, arrow keys move it, +/− zoom, and 0 fits. Every topic and connection is also available as text below.</p>` : ""}
-  <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a topic to reveal its relationship labels. A selected topic keeps its labels visible; press Escape in the map to clear them." : ""}</p>
+  <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a concept to see its relationship labels. Select a concept to keep its labels visible, or press Escape to clear them." : ""}</p>
+  ${complete ? "</details>" : ""}
   ${!complete ? `<p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>` : ""}
   <details class="concept-map-relationships"><summary>Read the relationships</summary><ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${renderProposition(relation)}</strong><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
   <details class="concept-connection-practice"><summary>Try explaining a connection</summary><p>Hide the labels and choose two connected topics. Write a linking phrase and decide whether the statement needs a direction. Read it as a complete sentence, then compare it with the authored label and explanation. Which assumption makes it hold, and when might it fail?</p><button type="button" data-concept-practice-labels hidden>${complete ? "Compare with the labels" : "Hide labels to try"}</button></details>

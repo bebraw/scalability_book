@@ -207,7 +207,7 @@ for (const scenario of scenarios) {
       await received;
       await expect(
         page.getByRole("heading", {
-          name: "Concepts that connect",
+          name: "Concept explorer",
           exact: true,
         }),
       ).toBeVisible();

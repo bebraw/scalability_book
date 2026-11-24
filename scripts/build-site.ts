@@ -431,7 +431,7 @@ for (let index = 0; index < bookPages.length; index++) {
 await writePage(
   "concepts/index.html",
   renderer.renderLayout({
-    title: `Concepts that connect - ${config.title}`,
+    title: `Concept explorer - ${config.title}`,
     description:
       "Explore concepts across the whole book: definitions, assumptions, examples, and explained connections.",
     currentUrl: "/concepts/",

@@ -5,7 +5,7 @@ import { concepts } from "../../shared/concepts.ts";
 import { conceptRelationships } from "../../shared/concept-relationships.ts";
 import type { LearningResource } from "../../shared/learning-resources.ts";
 
-test("the entry page offers agent access and lookup before the complete graph", async ({
+test("the entry page offers lookup with the explorer and agent guide closed", async ({
   page,
 }) => {
   await page.goto("/concepts/");
@@ -13,19 +13,26 @@ test("the entry page offers agent access and lookup before the complete graph", 
   await expect(
     page.getByRole("search", { name: "Concept lookup" }),
   ).toBeVisible();
+  const agentGuide = page.locator(".concept-agent");
   await expect(
-    page.getByRole("heading", { name: "Explore with your own agent" }),
+    agentGuide.getByText("Explore with your own agent", { exact: true }),
   ).toBeVisible();
+  await expect(
+    agentGuide.getByLabel("Give your agent this guide"),
+  ).toBeHidden();
   await expect(page.locator("[data-concept-question]")).toHaveCount(0);
   await expect(explorer).not.toHaveAttribute("open", "");
   await expect(page.locator("[data-concept-node]:visible")).toHaveCount(0);
   await expect(page.locator("[data-concept-result]:visible")).toHaveCount(0);
+  expect((await explorer.boundingBox())!.y).toBeLessThan(
+    (await agentGuide.boundingBox())!.y,
+  );
   expect(
     (await new AxeBuilder({ page }).include(".concept-reference").analyze())
       .violations,
   ).toEqual([]);
   await page.screenshot({
-    path: test.info().outputPath("concept-agent-desktop.png"),
+    path: test.info().outputPath("concept-entry-desktop.png"),
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -40,7 +47,7 @@ test("the entry page offers agent access and lookup before the complete graph", 
       .violations,
   ).toEqual([]);
   await page.screenshot({
-    path: test.info().outputPath("concept-agent-mobile.png"),
+    path: test.info().outputPath("concept-entry-mobile.png"),
     fullPage: true,
   });
   const lookup = page.getByRole("search", { name: "Concept lookup" });
@@ -49,10 +56,12 @@ test("the entry page offers agent access and lookup before the complete graph", 
     page.locator("#concept-graph [data-concept-node]:visible"),
   ).toHaveCount(1);
   await expect(page.locator(".concept-directory")).not.toBeVisible();
-  await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
-    "open",
-    "",
-  );
+  await expect(
+    page.getByRole("button", { name: "Filters", exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page.locator("#concept-graph [data-concept-controls]"),
+  ).toBeHidden();
   await expect(page).toHaveURL(/q=retry/);
   await page.reload();
   await expect(lookup.getByLabel("Find a concept")).toHaveValue("retry");
@@ -64,22 +73,63 @@ test("the entry page offers agent access and lookup before the complete graph", 
     page.locator("#concept-graph [data-concept-map-status]"),
   ).toContainText("No topics match");
   await lookup.getByLabel("Find a concept").fill("");
-  await expect(
-    page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(concepts.length);
+  const topics = explorer.getByRole("button", { name: /^Zoom to / });
+  await expect(topics).toHaveCount(4);
   await expect(page).toHaveURL(/view=all/);
   await explorer.locator(":scope > summary").click();
   await expect(page).toHaveURL(/\/concepts\/$/);
   await explorer.locator(":scope > summary").click();
-  await expect(
-    page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(concepts.length);
+  await expect(topics).toHaveCount(4);
   await expect(page).toHaveURL(/view=all/);
   await page.reload();
-  await expect(
-    page.locator("#concept-graph [data-concept-node]:visible"),
-  ).toHaveCount(concepts.length);
+  await expect(topics).toHaveCount(4);
+  await explorer.getByRole("tab", { name: "List", exact: true }).click();
+  await expect(explorer.locator("[data-concept-result]:visible")).toHaveCount(
+    concepts.length,
+  );
 });
+
+for (const viewport of [
+  { width: 1280, height: 800 },
+  { width: 390, height: 844 },
+])
+  test(`the map is in the first viewport and secondary controls are discoverable at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/concepts/?view=all");
+    const map = page.locator("#concept-graph");
+    const canvas = map.getByRole("region", {
+      name: "Interactive concept graph",
+    });
+    // Check before focusing or clicking anything that could scroll the page.
+    await expect(canvas).toBeInViewport({ ratio: 0.2 });
+    await expect(
+      canvas
+        .getByRole("button", { name: /^Zoom to Architecture,/ })
+        .locator(".concept-cluster-title"),
+    ).toBeInViewport({ ratio: 1 });
+    const detail = map.getByRole("combobox", {
+      name: "Graph detail",
+      exact: true,
+    });
+    const labels = map.getByLabel("Show connection labels", { exact: true });
+    await expect(detail).toBeHidden();
+    await expect(labels).toBeHidden();
+    const filters = map.getByText("Filters", { exact: true });
+    await filters.focus();
+    await filters.press("Enter");
+    await expect(detail).toBeVisible();
+    await expect(labels).toBeVisible();
+    await filters.press("Enter");
+    const roles = map.getByRole("list", { name: "Concept roles" });
+    await expect(roles).toBeHidden();
+    const guide = map.getByText("Map guide", { exact: true });
+    await guide.focus();
+    await guide.press("Enter");
+    await expect(roles).toBeVisible();
+    await expect(page).toHaveURL(/\/concepts\/\?view=all$/);
+  });
 
 test("students can retrieve the graph and check its evidence with their own tools", async ({
   page,
@@ -88,6 +138,7 @@ test("students can retrieve the graph and check its evidence with their own tool
   baseURL,
 }) => {
   await page.goto("/concepts/");
+  await page.getByText("Explore with your own agent", { exact: true }).click();
   const guideUrl = new URL("/concepts/agent-guide.md", baseURL).href;
   await expect(page.getByLabel("Give your agent this guide")).toHaveValue(
     guideUrl,
@@ -232,6 +283,7 @@ test("copying the guide still works when clipboard access is unavailable", async
     });
   });
   await page.goto("/concepts/");
+  await page.getByText("Explore with your own agent", { exact: true }).click();
   await page.getByRole("button", { name: "Copy URL", exact: true }).click();
   const input = page.getByLabel("Give your agent this guide");
   await expect(input).toBeFocused();
@@ -262,10 +314,12 @@ test("reading links open their concepts and reflection without a new choice", as
   await expect(page.locator("[data-concept-result]:not([hidden])")).toHaveCount(
     10,
   );
-  await expect(page.locator("[data-concept-map-tools]")).not.toHaveAttribute(
-    "open",
-    "",
-  );
+  await expect(
+    page.getByRole("button", { name: "Filters", exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page.locator("#concept-graph [data-concept-controls]"),
+  ).toBeHidden();
 });
 
 test("the graph expands into the display without changing the exploration", async ({
@@ -277,6 +331,7 @@ test("the graph expands into the display without changing the exploration", asyn
   const map = page.locator("#concept-graph [data-concept-map]");
   const graphic = map.locator(".concept-map-graphic");
   const labels = map.getByRole("checkbox", { name: "Show connection labels" });
+  await map.getByText("Filters", { exact: true }).click();
   await labels.check();
   const regular = (await map.boundingBox())!;
   const regularCanvas = (await graphic.boundingBox())!;
@@ -353,6 +408,7 @@ test("group highlighting preserves context before an explicit group-only view", 
   const group = map.getByRole("combobox", { name: "Topic group", exact: true });
   const highlight = map.getByRole("radio", { name: "Highlight", exact: true });
   const only = map.getByRole("radio", { name: "Show only", exact: true });
+  await map.getByText("Filters", { exact: true }).click();
   const nodes = map.locator("[data-concept-node]:visible");
   const graphic = map.locator(".concept-map-graphic");
   const viewport = () =>
@@ -447,6 +503,7 @@ test("group highlighting preserves context before an explicit group-only view", 
 
   await only.check();
   await page.reload();
+  await map.getByText("Filters", { exact: true }).click();
   await expect(group).toHaveValue("Evidence");
   await expect(only).toBeChecked();
   await expect(nodes).toHaveCount(11);
@@ -486,8 +543,29 @@ test("group highlighting and isolation are accessible on mobile", async ({
   await page.goto("/concepts/?theme=Architecture");
   await page.locator("[data-theme-picker]").selectOption("dark");
   const map = page.locator("#concept-graph");
+  const topic = map.getByRole("button", {
+    name: "Zoom to Architecture, 9 concepts",
+    exact: true,
+  });
+  const otherTopic = map.getByRole("button", {
+    name: "Zoom to Operations, 10 concepts",
+    exact: true,
+  });
+  await expect(topic).toHaveAccessibleDescription(
+    /9 Architecture concepts highlighted/,
+  );
+  // Fitted phone maps show topic regions before individual concept cards.
+  const stroke = (region: Locator) =>
+    region
+      .locator(":scope > rect")
+      .evaluate((rect) => getComputedStyle(rect).stroke);
+  expect(await stroke(topic)).not.toBe(await stroke(otherTopic));
   const highlight = map.getByRole("radio", { name: "Highlight", exact: true });
   const only = map.getByRole("radio", { name: "Show only", exact: true });
+  await map.getByText("Filters", { exact: true }).click();
+  await map
+    .getByRole("combobox", { name: "Graph detail", exact: true })
+    .selectOption("all");
   await expect(highlight).toBeChecked();
   await expect(map.locator("[data-concept-node]:visible")).toHaveCount(
     concepts.length,
@@ -527,7 +605,10 @@ test("arrows express qualified relationships and focus reveals labels without ch
 }) => {
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
-  await map.getByLabel("Graph detail", { exact: true }).selectOption("all");
+  await map.getByText("Filters", { exact: true }).click();
+  await map
+    .getByRole("combobox", { name: "Graph detail", exact: true })
+    .selectOption("all");
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
   await expect(map.locator('[data-direction="directed"]')).toHaveCount(
     conceptRelationships.filter(({ direction }) => direction === "directed")
@@ -638,6 +719,7 @@ test("connection labels stay local while following concepts across graph views",
   );
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
+  await map.getByText("Filters", { exact: true }).click();
   const toggle = map.getByRole("checkbox", { name: "Show connection labels" });
   await expect(toggle).not.toBeChecked();
   await expect(map.locator(".concept-edge-label:visible")).toHaveCount(0);
@@ -891,9 +973,14 @@ test("graph labels keep contrast during hover and keyboard focus in every theme"
           context === "complete graph" &&
           (await node.getAttribute("data-concept-node")) === "authority"
         ) {
-          await map.locator("svg").screenshot({
-            path: test.info().outputPath("hover-contrast-dark.png"),
-          });
+          await map
+            .getByRole("group", {
+              name: "All concepts in the book",
+              exact: true,
+            })
+            .screenshot({
+              path: test.info().outputPath("hover-contrast-dark.png"),
+            });
         }
         await page.mouse.move(0, 0);
         await page.keyboard.press("Tab");
@@ -918,6 +1005,7 @@ test("graph labels keep contrast during hover and keyboard focus in every theme"
       }
     };
     const completeMap = page.locator("#concept-graph");
+    await completeMap.getByText("Filters", { exact: true }).click();
     await checkMap(completeMap, "complete graph");
     await completeMap
       .getByRole("combobox", { name: "Topic group", exact: true })
@@ -993,6 +1081,7 @@ test("graph labels have breathing room in both themes and viewport sizes", async
       };
       await assertPadding("#concept-graph [data-concept-node]");
       const map = page.locator("#concept-graph");
+      await map.getByText("Filters", { exact: true }).click();
       await map.getByLabel("Focus on").selectOption("measurement-boundary");
       await map
         .getByRole("link", {
@@ -1189,6 +1278,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
     "hidden",
     "",
   );
+  await map.getByText("Filters", { exact: true }).click();
   await map.getByRole("button", { name: "Reset view" }).click();
   await map
     .getByRole("combobox", { name: "Reading", exact: true })
@@ -1202,7 +1292,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await expect(status).toContainText("4 · Architecture");
   await assertDirectoryMatches();
   await page.reload();
-  await map.getByText("Adjust the graph and filters", { exact: true }).click();
+  await map.getByText("Filters", { exact: true }).click();
   await expect(
     map.getByRole("combobox", { name: "Reading", exact: true }),
   ).toHaveValue("/chapters/architecture/");
@@ -1250,7 +1340,7 @@ test("the complete map supports discovery, filtering, zoom, and shared views", a
   await map.getByText("Read the relationships", { exact: true }).click();
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   await map
-    .getByRole("heading", { name: "Concepts and connections" })
+    .getByRole("tab", { name: "Graph", exact: true })
     .scrollIntoViewIfNeeded();
   await page.screenshot({
     path: test.info().outputPath("complete-graph-desktop.png"),
@@ -1353,6 +1443,7 @@ test("mobile graph, relationships, focus, and reference work in dark mode", asyn
   await page.goto("/concepts/?view=all");
   await page.locator("[data-theme-picker]").selectOption("dark");
   const map = page.locator("#concept-graph");
+  await map.getByText("Filters", { exact: true }).click();
   await map.getByLabel("Focus on").selectOption("queue");
   await map
     .getByRole("link", { name: "Explore Queue", exact: true })
@@ -1406,13 +1497,17 @@ test("static graph and curated chapter links remain usable without JavaScript", 
   const page = await context.newPage();
   await page.goto("/concepts/");
   await expect(page.locator("[data-concept-node]:visible")).toHaveCount(0);
+  await page.getByText("Explore with your own agent", { exact: true }).click();
   await expect(
     page.getByRole("link", { name: "Read the guide", exact: true }),
   ).toHaveAttribute("href", "/concepts/agent-guide.md");
-  await page.getByText("Connect it, then check it", { exact: true }).click();
-  await expect(page.locator(".concept-agent-setup")).toContainText(
-    "download the guide",
-  );
+  await expect(
+    page.locator(".concept-agent").getByText(/download the guide/i),
+  ).toBeVisible();
+  for (const extension of ["json", "md"])
+    await expect(
+      page.locator(`.concept-agent a[href="/concepts/graph.${extension}"]`),
+    ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Copy URL", exact: true }),
   ).not.toBeVisible();

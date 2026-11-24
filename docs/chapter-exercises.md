@@ -141,9 +141,10 @@ Checking, private saves, stable IDs and chapter progress use the same exercise d
 
 ## Concepts across the book
 
-The book's concept reference is published at `/concepts/` and linked from the main navigation.
-Its entry page offers concept lookup and encourages students to choose their own question and connect their own agent to the knowledge graph.
-The complete visual graph and compact concept directory are behind “Explore the whole book”; scoped reading links, searches, and concept fragments open the relevant view directly.
+The main navigation links to `/concepts/`, where readers can search for an idea or open the whole-book explorer.
+Link directly to the map with `/concepts/?view=all` or to the text directory with `/concepts/?view=list`.
+Scoped reading links, searches, and concept fragments open the relevant view directly.
+After the explorer, readers can open **Explore with your own agent** for setup instructions, the agent guide, and graph downloads in JSON and Markdown.
 Every published chapter, appendix, part introduction, case study, and project brief has a scoped “Follow an idea” index.
 Chapter indexes include an ungraded connection prompt; selected terms in the prose also open the reference.
 The nine self-study modules link to the matching view of the complete graph.
@@ -169,13 +170,17 @@ Each provides a self-contained `/explore/<id>/agent.md` URL, a direct reading pa
 The graph carries `explorations` and concept-level `explorationIds` without adding relationships or required deliverables.
 See [agent learning resources](agent-learning-resources.md) for the source and conversation contract.
 
-The complete graph supports topic search, reading and theme filters, neighborhood focus, zoom, and panning.
+Search narrows both the map and the text directory.
+The filters start collapsed.
+Open them to narrow the selection by reading or topic, focus on a concept's neighborhood, or adjust graph detail and connection labels.
+**Map guide** explains the navigation controls, the role colors, and how to read arrows and plain lines.
 Every connection has a short authored label alongside its explanation.
-“Show connection labels” reveals these captions in complete, chapter, and pane graphs; it is off by default and affects only the graph where it is toggled.
+**Show connection labels** affects only the current map.
+The option starts off on the whole-book map and on in chapters and reading panes.
 Labeled views make additional room for captions without covering concept nodes.
 In each reading’s “Follow an idea” map, “Enlarge map” increases the drawing size within a scrollable region and preserves the reader's concept selection.
 Readers can reach the region with Tab, pan with the arrow keys, and uncheck the box to fit the whole map again.
-The complete graph's view can be shared through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, `group-view`, and `view=all`.
+Shared explorer links can also carry search and filter selections through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, and `group-view`.
 A deterministic layout is generated from the registry by `scripts/lib/concept-layout.ts`.
 Equally sized topic regions form an aligned two-column grid: Architecture and Development above Operations and Evidence.
 Named subcategories form rows inside each region; regular concept positions and region dimensions are derived from their membership.
@@ -209,9 +214,11 @@ Subcategories and editorial roles remain independent, and neither changes the pu
 
 The complete graph initially fits the available canvas.
 With “Adapt as I zoom”, the fitted overview shows aligned topic regions, readable subcategory names and concept counts where space permits, colored concept markers, and one counted connection per pair of groups.
-Compact overviews keep the main topic headings and counts; subcategory names and role markers appear when there is room to separate them clearly.
+Compact overviews keep the main topic headings and counts.
+A highlighted group or subcategory marks its parent topic here.
+Subcategory names and role markers appear when there is room to separate them clearly.
 Connection counts summarize the actual cross-group relationships without asserting a single proposition or direction between whole groups.
-The zoom toolbar sits above the drawing so it does not cover its labels.
+The view switch, filters, expand button, and zoom controls share a toolbar above the drawing.
 Zooming closer reveals concept cards and their roles, then emphasizes the full connection network; hovering or focusing a concept reveals its authored labels.
 Selecting a region zooms to it; when the region cannot expose readable cards on a compact canvas, the same action opens the existing group-only view.
 Selecting a subcategory opens its concepts in the filtered graph and list; the parent topic's Subcategory control provides the same selection on compact screens.

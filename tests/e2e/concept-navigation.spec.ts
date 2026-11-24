@@ -280,8 +280,10 @@ for (const device of ["iPhone 13", "iPad (gen 7)"])
       1,
     );
     await expect(page.locator(".concept-pane")).not.toBeVisible();
+    await map.getByText("Filters", { exact: true }).click();
     await map.getByLabel("Focus on").selectOption("queue");
     const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
+    await queue.scrollIntoViewIfNeeded();
     const nodeBox = (await queue.boundingBox())!;
     const nodeX = nodeBox.x + nodeBox.width / 2,
       nodeY = nodeBox.y + nodeBox.height / 2;
@@ -331,6 +333,7 @@ for (const device of ["iPhone 13", "iPad (gen 7)"])
     await page.goto("/concepts/?view=all");
     const map = page.locator("#concept-graph");
     const graphic = map.locator(".concept-map-graphic");
+    await map.getByText("Filters", { exact: true }).click();
     await map.getByLabel("Focus on").selectOption("queue");
     const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
     await queue.scrollIntoViewIfNeeded();

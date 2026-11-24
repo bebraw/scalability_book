@@ -10,6 +10,8 @@ type Region = {
   count: number;
 };
 const ns = "http://www.w3.org/2000/svg";
+const badgeWidth = 24;
+const badgeHeight = 20;
 
 // Return only the part of a routed connection outside its two topic regions.
 function betweenRegions(route: RoutePoint[], source: Region, target: Region) {
@@ -54,7 +56,7 @@ export class ConceptSemanticZoom {
   private summaries: {
     element: SVGGElement;
     points: RoutePoint[];
-    label: RoutePoint;
+    labelPositions: RoutePoint[];
   }[] = [];
 
   constructor(
@@ -219,7 +221,8 @@ export class ConceptSemanticZoom {
       const rect = document.createElementNS(ns, "rect");
       label.append(rect, text);
       element.append(label);
-      // Put the count on the longest segment, away from bends.
+      // Prefer the longest segment's center. Other points on the route let
+      // fixed-size badges move apart as the map shrinks.
       const segments = aggregate.points
         .slice(1)
         .map((b, i) => ({ a: aggregate.points[i]!, b }));
@@ -228,14 +231,15 @@ export class ConceptSemanticZoom {
           Math.hypot(b.b.x - b.a.x, b.b.y - b.a.y) -
           Math.hypot(a.b.x - a.a.x, a.b.y - a.a.y),
       );
-      const segment = segments[0]!;
       this.summaries.push({
         element,
         points: aggregate.points,
-        label: {
-          x: (segment.a.x + segment.b.x) / 2,
-          y: (segment.a.y + segment.b.y) / 2,
-        },
+        labelPositions: segments.flatMap(({ a, b }) =>
+          [0.5, 0.25, 0.75, 0.125, 0.875].map((fraction) => ({
+            x: a.x + (b.x - a.x) * fraction,
+            y: a.y + (b.y - a.y) * fraction,
+          })),
+        ),
       });
       // Summary connections sit in front of region backgrounds and behind nodes.
       this.regions.at(-1)!.element.after(element);
@@ -272,15 +276,12 @@ export class ConceptSemanticZoom {
         ({ bounds }) => bounds.width * this.factor * scale < 230,
       );
     this.graphic.dataset.compactOverview = String(compactOverview);
-    this.status.textContent = !this.enabled
-      ? ""
-      : detail === "overview"
-        ? compactOverview
-          ? "Choose a main topic to explore its subcategories and concepts. Lines count connections between topics."
-          : "Choose a subcategory to explore its concepts. Lines count connections between the main topics."
+    this.status.textContent =
+      !this.enabled || detail === "overview"
+        ? ""
         : detail === "concepts"
-          ? "Concepts · Color and labels identify each idea’s role. Zoom closer or focus a concept to follow its connections."
-          : "Connections · Hover or focus a concept to read its relationship labels.";
+          ? "Zoom in or focus a concept to follow its connections."
+          : "Hover or focus a concept to read the connection labels.";
     for (const { element, bounds } of this.regions) {
       element.classList.toggle("is-hidden", !this.enabled);
       element.setAttribute("tabindex", this.enabled ? "0" : "-1");
@@ -375,6 +376,8 @@ export class ConceptSemanticZoom {
         ),
       );
     }
+    const placed: RoutePoint[] = [];
+    const pixelsPerUnit = scale * this.factor;
     for (const summary of this.summaries) {
       summary.element.classList.toggle("is-hidden", detail !== "overview");
       summary.element.querySelector("path")!.setAttribute(
@@ -387,19 +390,28 @@ export class ConceptSemanticZoom {
         ),
       );
       const label = summary.element.querySelector("g")!;
+      const position =
+        summary.labelPositions.find((p) =>
+          placed.every(
+            (other) =>
+              Math.abs(p.x - other.x) * pixelsPerUnit >= badgeWidth + 3 ||
+              Math.abs(p.y - other.y) * pixelsPerUnit >= badgeHeight + 3,
+          ),
+        ) ?? summary.labelPositions[0]!;
+      placed.push(position);
       label.setAttribute(
         "transform",
-        `translate(${summary.label.x * this.factor} ${summary.label.y * this.factor})`,
+        `translate(${position.x * this.factor} ${position.y * this.factor})`,
       );
       const size = 1 / scale;
       label.querySelector<SVGTextElement>("text")!.style.fontSize =
         `${11 * size}px`;
       const rect = label.querySelector("rect")!;
       for (const [name, value] of Object.entries({
-        x: -12,
-        y: -10,
-        width: 24,
-        height: 20,
+        x: -badgeWidth / 2,
+        y: -badgeHeight / 2,
+        width: badgeWidth,
+        height: badgeHeight,
         rx: 7,
       }))
         rect.setAttribute(name, String(value * size));

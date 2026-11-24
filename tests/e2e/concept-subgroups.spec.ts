@@ -7,6 +7,7 @@ test("compact parent entry opens the entire topic after highlighting a subcatego
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/concepts/?subtopic=flow-control&group-view=highlight");
   const map = page.locator("#concept-graph");
+  await map.getByText("Filters", { exact: true }).click();
   await expect(
     map.getByRole("combobox", { name: "Subcategory", exact: true }),
   ).toHaveValue("flow-control");
@@ -49,6 +50,7 @@ test("subcategories share their exact concept subset between Graph, List and a s
     "throughput",
   ];
 
+  await map.getByText("Filters", { exact: true }).click();
   await expect(control).not.toBeVisible();
   await group.selectOption("Evidence");
   await expect(control).toBeVisible();
@@ -84,6 +86,7 @@ test("subcategories share their exact concept subset between Graph, List and a s
       );
   await expect.poll(listedIds).toEqual(expected);
   await page.reload();
+  await map.getByText("Filters", { exact: true }).click();
   await expect(group).toHaveValue("Evidence");
   await expect(subgroup).toHaveValue("measurement-flow");
   await expect.poll(listedIds).toEqual(expected);
@@ -124,6 +127,7 @@ test("overview subcategory entry and standalone subtopic links select the correc
     );
 
   await page.goto("/concepts/?subtopic=parallel-work-review");
+  await map.getByText("Filters", { exact: true }).click();
   await expect(map.locator("[data-concept-group]")).toHaveValue("Development");
   await expect(map.locator("[data-concept-subgroup]")).toHaveValue(
     "parallel-work-review",

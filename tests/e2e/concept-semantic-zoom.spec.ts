@@ -2,6 +2,51 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { concepts } from "../../shared/concepts.ts";
 
+test("compact overview counts are separated and sit on their topic connections", async ({
+  page,
+}) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/concepts/?view=all");
+    const badges = page.locator(".concept-cluster-connection:visible");
+    await expect(badges).toHaveCount(6);
+    const boxes = await badges.evaluateAll((groups) =>
+      groups.map((group) => {
+        const { x, y, width, height } = group
+          .querySelector("rect")!
+          .getBoundingClientRect();
+        const path = group.querySelector("path")!;
+        const center = new DOMPoint(x + width / 2, y + height / 2);
+        return {
+          x,
+          y,
+          width,
+          height,
+          topicPair: group.querySelector("title")!.textContent,
+          onRoute: path.isPointInStroke(
+            center.matrixTransform(path.getScreenCTM()!.inverse()),
+          ),
+        };
+      }),
+    );
+    for (const [index, a] of boxes.entries()) {
+      expect(a.onRoute, `${width}px: ${a.topicPair}`).toBe(true);
+      for (const b of boxes.slice(index + 1)) {
+        const gap = Math.max(
+          b.x - (a.x + a.width),
+          a.x - (b.x + b.width),
+          b.y - (a.y + a.height),
+          a.y - (b.y + b.height),
+        );
+        expect(
+          gap,
+          `${width}px: ${a.topicPair} / ${b.topicPair}`,
+        ).toBeGreaterThan(1);
+      }
+    }
+  }
+});
+
 test("the fitted overview expands into stable, color-coded concepts", async ({
   page,
 }) => {
@@ -134,7 +179,11 @@ test("detail override, filters and the list retain access to the complete graph"
   await page.goto("/concepts/?view=all");
   const map = page.locator("#concept-graph");
   const graphic = map.locator(".concept-map-graphic");
-  const detail = map.getByLabel("Graph detail", { exact: true });
+  const detail = map.getByRole("combobox", {
+    name: "Graph detail",
+    exact: true,
+  });
+  await map.getByText("Filters", { exact: true }).click();
   await detail.selectOption("all");
   await map.getByRole("button", { name: "Fit", exact: true }).click();
   await expect(graphic).toHaveAttribute("data-detail", "relationships");
@@ -186,6 +235,7 @@ test("compact group navigation and role colors remain accessible in every theme"
     })
     .click();
   await expect(graphic).toHaveAttribute("data-detail", "relationships");
+  await map.getByText("Filters", { exact: true }).click();
   await expect(
     map.getByRole("combobox", { name: "Topic group", exact: true }),
   ).toHaveValue("Architecture");

@@ -48,30 +48,31 @@
   display: none;
 }
 .concept-reference-header {
-  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
+  align-items: end;
+  gap: 1rem 2rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2.25rem);
 }
 .concept-reference h1 {
-  font: 500 clamp(2.5rem, 5vw, 4rem)/1.1 var(--font-serif);
-  margin: 0.7rem 0 1rem;
-}
-.concept-reference-header > p:not(.eyebrow) {
-  font: 1.1rem/1.7 var(--font-serif);
+  font: 500 clamp(2.3rem, 4.7vw, 3.75rem)/1.08 var(--font-serif);
+  margin: 0;
 }
 .concept-reference-notes {
   color: var(--muted);
   font: 0.85rem/1.6 var(--font-ui);
-  max-width: 46rem;
 }
-.concept-reference-notes > summary {
+.concept-reference-notes > summary,
+.concept-agent summary {
   cursor: pointer;
-  padding-block: 0.4rem;
+  padding-block: 0.85rem;
 }
 .concept-reference-notes p {
+  max-width: 46rem;
   margin-block: 0.6rem;
 }
 .concept-lookup {
-  max-width: 35rem;
-  margin-block: 1.5rem 2rem;
+  margin: 0;
   font: 600 0.85rem/1.5 var(--font-ui);
 }
 .concept-lookup > label {
@@ -100,26 +101,20 @@
   padding: 0.75rem 1.1rem;
 }
 .concept-agent {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-strong);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.5rem 2.5rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--border);
+  font: 0.85rem/1.6 var(--font-ui);
 }
-.concept-agent h2 {
-  font: 500 1.75rem/1.3 var(--font-serif);
-  margin: 0 0 0.8rem;
-}
-.concept-agent-introduction > p:last-child {
-  color: var(--muted);
-  font: 1rem/1.65 var(--font-serif);
-  margin: 0;
+.concept-agent summary {
+  color: var(--text);
+  font-weight: 650;
 }
 .concept-agent-access {
   align-self: center;
   min-width: 0;
+}
+.concept-agent .concept-agent-access {
+  max-width: 39rem;
+  margin-block: 0.5rem 1.25rem;
 }
 .concept-agent-access > label {
   display: block;
@@ -163,37 +158,22 @@
   font: 600 0.8rem/1.5 var(--font-ui);
   margin: 0.8rem 0 0;
 }
-.concept-agent-setup {
-  border-top: 1px solid var(--border);
-  grid-column: 1 / -1;
-  font: 0.85rem/1.65 var(--font-ui);
-  padding-top: 0.75rem;
-}
-.concept-agent-setup summary {
-  cursor: pointer;
-  font-weight: 600;
-  padding-block: 0.25rem;
-}
-.concept-agent-setup ol {
-  max-width: 54rem;
+.concept-agent ol {
+  max-width: 44rem;
   padding-left: 1.25rem;
 }
-.concept-agent-setup li + li {
+.concept-agent li + li {
   margin-top: 0.65rem;
-}
-.concept-agent-setup > p {
-  color: var(--muted);
-  margin-bottom: 0;
 }
 .concept-explorer {
   border-block: 1px solid var(--border);
-  margin-block: 2rem;
+  margin: 0;
   scroll-margin-top: 7rem;
 }
 .concept-explorer > summary {
   cursor: pointer;
   font: 650 1rem/1.5 var(--font-ui);
-  padding-block: 1.25rem;
+  padding-block: 0.85rem;
 }
 .concept-explorer > summary::marker {
   color: var(--accent-strong);
@@ -202,6 +182,9 @@
   color: var(--muted);
   font: 400 0.8rem/1.5 var(--font-ui);
   margin-left: 1rem;
+}
+.concept-explorer[open] > summary .concept-explorer-description {
+  display: none;
 }
 .concept-exploration-context {
   margin-block: 1.5rem 2rem;
@@ -249,22 +232,16 @@
 .concept-exploration-context > a {
   font: 600 0.85rem/1.5 var(--font-ui);
 }
-.concept-map-tools > summary {
-  cursor: pointer;
-  font: 600 0.8rem/1.5 var(--font-ui);
-  padding-top: 0.75rem;
-}
 .concept-lookup input:focus-visible,
 .concept-lookup button:focus-visible,
 .concept-agent a:focus-visible,
 .concept-agent-copy input:focus-visible,
 .concept-agent-copy button:focus-visible,
-.concept-agent-setup summary:focus-visible,
+.concept-agent summary:focus-visible,
 .concept-explorer > summary:focus-visible,
 .concept-exploration-heading h2:focus-visible,
 .concept-exploration-heading button:focus-visible,
-.concept-exploration-context > a:focus-visible,
-.concept-map-tools > summary:focus-visible {
+.concept-exploration-context > a:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 4px;
 }
@@ -323,6 +300,7 @@
   margin-block: 0.7rem 1rem;
 }
 .concept-map-disclosure > summary,
+.concept-map-guide > summary,
 .concept-map-relationships > summary {
   cursor: pointer;
   font: 600 0.85rem/1.6 var(--font-ui);
@@ -333,6 +311,23 @@
   background: var(--bg);
   margin-block: 1rem 1.5rem;
   padding: 1rem;
+}
+.concept-map-complete {
+  container-type: inline-size;
+}
+.concept-map-toolbar {
+  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "actions status";
+  gap: 0.5rem 1rem;
+  position: relative;
+}
+.concept-map-toolbar .concept-map-status {
+  grid-area: status;
+  text-align: end;
+  margin: 0;
+  font: 550 0.85rem/1.5 var(--font-ui);
 }
 .concept-map-heading {
   align-items: baseline;
@@ -349,20 +344,26 @@
   font: 0.8rem/1.5 var(--font-ui);
 }
 .concept-map-heading-actions {
+  grid-area: actions;
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
+  gap: 0.5rem;
+  min-height: 2.5rem;
 }
-/* Preserve the header's layout while removing the graph-only action from use. */
-.concept-map-complete.is-list-view [data-concept-expand][hidden] {
-  display: block;
-  visibility: hidden;
+.concept-map-heading-actions button {
+  white-space: nowrap;
+}
+.concept-map-heading-actions [data-concept-expand] svg {
+  display: none;
+}
+.concept-map-heading-actions [data-concept-map-tools][aria-expanded="true"] {
+  border-color: var(--accent-strong);
 }
 .concept-view-switch {
   border: 1px solid var(--border);
   border-radius: 0.25rem;
   display: flex;
+  flex: none;
   overflow: hidden;
 }
 .concept-map-heading-actions .concept-view-switch button {
@@ -612,6 +613,7 @@
   padding: 0.15rem 0.4rem;
 }
 .concept-map-disclosure summary:focus-visible,
+.concept-map-guide summary:focus-visible,
 .concept-map-relationships summary:focus-visible,
 .concept-map select:focus-visible {
   outline: 2px solid var(--accent-strong);
@@ -724,7 +726,6 @@
   font: 0.8rem/1.5 var(--font-ui);
   margin: 0.4rem 0 0;
 }
-.concept-directory-help,
 .concept-directory-empty {
   color: var(--muted);
   font: 0.9rem/1.6 var(--font-ui);
@@ -770,6 +771,19 @@
 .concept-summary-title {
   font: 500 1.35rem/1.3 var(--font-serif);
 }
+.concept-summary-title::after {
+  content: "";
+  display: inline-block;
+  width: 0.3em;
+  height: 0.3em;
+  margin-inline-start: 0.45em;
+  border-block-start: 1.5px solid var(--accent-strong);
+  border-inline-end: 1.5px solid var(--accent-strong);
+  transform: translateY(-0.14em) rotate(45deg);
+}
+.concept-directory-item[open] .concept-summary-title::after {
+  transform: translateY(-0.22em) rotate(135deg);
+}
 .concept-summary-group {
   color: var(--muted);
   font: 600 0.7rem/1.5 var(--font-ui);
@@ -782,10 +796,11 @@
   overflow: hidden;
   font: 0.9rem/1.6 var(--font-ui);
 }
-.concept-summary-action {
-  color: var(--accent-strong);
-  font: 650 0.75rem/1.5 var(--font-ui);
-  align-self: end;
+.concept-directory-item
+  > summary:is(:hover, :focus-visible)
+  .concept-summary-title {
+  text-decoration: underline;
+  text-underline-offset: 0.17em;
 }
 .concept-directory-list > .is-group-member .concept-directory-item {
   border-color: var(--accent-strong);
@@ -872,6 +887,16 @@
   flex: 1 1 100%;
   gap: 0.5rem;
   font-size: 0.85rem;
+}
+.concept-map-complete .concept-map-label-toggle {
+  flex: 1 1 12rem;
+}
+.concept-map-controls .concept-detail-control {
+  flex: 0 1 12rem;
+}
+.concept-map-complete.is-list-view .concept-detail-control,
+.concept-map-controls .concept-detail-control[hidden] {
+  display: none;
 }
 .concept-map-controls input[type="checkbox"],
 .concept-map-enlarge input {
@@ -986,30 +1011,18 @@
 .concept-map-canvas {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
-}
-.concept-map-canvas > .concept-map-graphic,
-.concept-map-navigation {
-  grid-area: 1 / 1;
+  margin-top: 0.6rem;
 }
 .concept-map-complete .concept-map-canvas > .concept-map-graphic {
   margin-top: 0;
 }
 .concept-map-navigation {
   align-items: center;
-  align-self: end;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 0.35rem;
   display: flex;
   gap: 0.25rem;
-  justify-self: end;
-  margin: 0 0 0.65rem;
-  padding: 0.25rem;
-  position: static;
-  z-index: 2;
+  margin-inline-start: 0.5rem;
 }
-.concept-map-navigation span {
+.concept-map-navigation [data-concept-zoom-level] {
   color: var(--muted);
   font: 600 0.75rem/1.4 var(--font-ui);
   padding-inline: 0.4rem;
@@ -1070,6 +1083,14 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
+.concept-map-guide {
+  font: 400 0.85rem/1.6 var(--font-ui);
+  margin-top: 0.5rem;
+}
+.concept-map-guide p {
+  max-width: 50rem;
+  margin: 0.5rem 0;
+}
 .concept-directory [hidden],
 .concept-map-controls .concept-map-label-toggle[hidden],
 .concept-map-controls[hidden] {
@@ -1103,13 +1124,11 @@
   outline-offset: 3px;
 }
 @media (max-width: 760px) {
-  .concept-agent {
+  .concept-reference-header {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.25rem;
   }
   .concept-explorer-description {
-    display: block;
-    margin: 0.35rem 0 0 1rem;
+    margin-left: 0.5rem;
   }
   .concept-map-group-controls > label {
     flex: 1 1 100%;
@@ -1127,18 +1146,10 @@
     -webkit-line-clamp: 3;
   }
   .concept-map-complete .concept-map-graphic {
-    height: 28rem;
+    height: clamp(18rem, 44svh, 28rem);
   }
 }
 /* Topic regions describe membership; node color describes editorial role. */
-.concept-map-key {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.8rem 1.5rem;
-  justify-content: space-between;
-  margin-block: 1rem 0.6rem;
-}
 .concept-role-legend {
   display: flex;
   flex-wrap: wrap;
@@ -1174,17 +1185,10 @@
 .concept-role-legend .concept-role-model {
   color: var(--concept-role-model);
 }
-.concept-detail-control {
-  font: 600 0.75rem/1.5 var(--font-ui);
-}
-.concept-detail-control select {
-  margin-left: 0.5rem;
-  font-weight: 400;
-}
 .concept-map .concept-semantic-status {
   color: var(--muted);
   font: 400 0.8rem/1.6 var(--font-ui);
-  min-height: 1.6em;
+  margin: 0 0 0.5rem;
 }
 .concept-semantic-status:empty {
   display: none;
@@ -1306,6 +1310,15 @@
 .concept-map-graphic[data-compact-overview="true"] .concept-node-dot {
   display: none;
 }
+.concept-map-graphic[data-compact-overview="true"]
+  .concept-cluster.is-highlighted-topic
+  > rect {
+  fill: color-mix(in srgb, var(--accent-strong) 12%, var(--panel));
+  fill-opacity: 1;
+  stroke: var(--accent-strong);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
 .is-highlighting-group
   .concept-map-graphic[data-detail="overview"]
   .is-group-member
@@ -1327,18 +1340,71 @@
   .is-cross-group:not(.is-previewed):not(.is-group-bridge) {
   opacity: 0.12;
 }
-@media (max-width: 760px) {
-  .concept-map-canvas > .concept-map-navigation,
-  .concept-map-complete .concept-map-canvas > .concept-map-graphic {
-    grid-area: auto;
+@container (max-width: 56rem) {
+  .concept-map-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "status" "actions";
+  }
+  .concept-map-toolbar .concept-map-status {
+    text-align: start;
   }
   .concept-map-navigation {
-    position: static;
-    margin: 0 0 0.5rem;
-    gap: 0;
+    margin-inline-start: auto;
   }
-  .concept-map-navigation button {
-    padding-inline: 0.6rem;
+}
+@container (max-width: 38rem) {
+  .concept-map-heading-actions {
+    gap: 0.25rem;
+  }
+  .concept-map-heading-actions button {
+    padding-inline: 0.45rem;
+  }
+  .concept-map-heading-actions [data-concept-expand] svg {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+  }
+  .concept-map-heading-actions [data-concept-expand] {
+    display: grid;
+    place-items: center;
+    min-height: 2.4rem;
+  }
+  .concept-map-heading-actions [data-concept-expand][hidden],
+  .concept-map-heading-actions [data-concept-expand] span,
+  [data-concept-expand][aria-pressed="false"] .restore-icon,
+  [data-concept-expand][aria-pressed="true"] .expand-icon {
+    display: none;
+  }
+}
+@container (max-width: 26rem) {
+  .concept-map-heading-actions,
+  .concept-map-navigation {
+    gap: 0.125rem;
+  }
+  .concept-map-heading-actions button {
+    font-size: 0.75rem;
+    min-width: 1.5rem;
+    padding-inline: 0.3rem;
+  }
+  .concept-map-toolbar .concept-map-status {
+    padding-inline-end: 4.75rem;
+  }
+  .concept-map-navigation [data-concept-zoom-level] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    padding: 0;
+  }
+  .concept-map-navigation [data-concept-zoom-level]::before {
+    content: "Zoom ";
+  }
+}
+@container (max-width: 19rem) {
+  [data-concept-zoom="readable"] span {
+    display: none;
+  }
+  [data-concept-zoom="readable"]::before {
+    content: "Aa";
   }
 }
 @media print {

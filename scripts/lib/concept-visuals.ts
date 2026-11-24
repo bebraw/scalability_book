@@ -58,6 +58,14 @@ function wrap(text: string, limit: number) {
   return lines;
 }
 
+export function extractConceptMapSvg(html: string): string {
+  const svg = html.match(
+    /<div class="concept-map-graphic"[^>]*>\s*(<svg\b[\s\S]*?<\/svg>)\s*<\/div>/,
+  )?.[1];
+  if (!svg) throw new Error("Missing SVG in concept-map-graphic");
+  return svg;
+}
+
 export function frameVisual(
   svg: string,
   resource: LearningResource,
@@ -138,8 +146,7 @@ export async function writeConceptVisuals(
         focus,
         !focus,
       );
-      svg = html.match(/<svg\b[\s\S]*?<\/svg>/)![0];
-      svg = svg.replace(
+      svg = extractConceptMapSvg(html).replace(
         /href="(\/concepts\/#[a-z-]+)"/g,
         (_match, href: string) =>
           `href="${escapeHtml(new URL(href, siteUrl).href)}"`,

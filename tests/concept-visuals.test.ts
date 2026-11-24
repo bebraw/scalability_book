@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import sharp from "sharp";
 import { renderConceptGraph } from "../scripts/lib/concept-html.ts";
 import {
+  extractConceptMapSvg,
   frameVisual,
   resolveVisualStyles,
 } from "../scripts/lib/concept-visuals.ts";
@@ -27,7 +28,7 @@ test("standalone styles freeze theme tokens and mixed colors without an external
 
 test("a downloaded graph renders as XML with accessible text and visible arrow geometry", async () => {
   const html = renderConceptGraph("export", ["queue", "latency"], "latency");
-  const svg = html.match(/<svg\b[\s\S]*?<\/svg>/)![0];
+  const svg = extractConceptMapSvg(html);
   const resource = graphResources.find(({ id }) => id === "graph-latency")!;
   const framed = frameVisual(
     svg,
@@ -45,9 +46,7 @@ test("a downloaded graph renders as XML with accessible text and visible arrow g
 });
 
 test("the clustered overview export remains a complete standalone SVG", async () => {
-  const svg = renderConceptGraph("reference-concepts").match(
-    /<svg\b[\s\S]*?<\/svg>/,
-  )![0];
+  const svg = extractConceptMapSvg(renderConceptGraph("reference-concepts"));
   const resource = graphResources.find(({ id }) => id === "graph-complete")!;
   const framed = frameVisual(
     svg,

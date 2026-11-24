@@ -42,7 +42,17 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       : null;
     const directory = page?.querySelector<HTMLElement>(".concept-directory");
     const controls = map.querySelector<HTMLElement>("[data-concept-controls]")!;
-    controls.hidden = false;
+    const filters = map.querySelector<HTMLButtonElement>(
+      "[data-concept-map-tools]",
+    );
+    controls.hidden = Boolean(filters);
+    if (filters) {
+      filters.hidden = false;
+      filters.addEventListener("click", () => {
+        controls.hidden = !controls.hidden;
+        filters.setAttribute("aria-expanded", String(!controls.hidden));
+      });
+    }
     const labels = map.querySelector<HTMLInputElement>(
       "[data-concept-labels]",
     )!;
@@ -74,10 +84,6 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
     const explorer = page?.querySelector<HTMLDetailsElement>(
       "[data-concept-explorer]",
     );
-    const tools = map.querySelector<HTMLDetailsElement>(
-      "[data-concept-map-tools]",
-    );
-    if (tools) tools.hidden = false;
     const lookup = page?.querySelector<HTMLFormElement>(
       "[data-concept-lookup]",
     );
@@ -107,14 +113,19 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
     }
     const graphic = map.querySelector<HTMLElement>(".concept-map-graphic")!;
     const svg = graphic.querySelector<SVGSVGElement>("svg")!;
-    const viewport = complete ? new ConceptViewport(graphic, svg) : null;
+    const viewport = complete
+      ? new ConceptViewport(
+          graphic,
+          svg,
+          map.querySelector<HTMLElement>("[data-concept-zoom-level]")!,
+        )
+      : null;
     const semantic = viewport
       ? new ConceptSemanticZoom(map, graphic, viewport)
       : null;
     const navigation = map.querySelector<HTMLElement>(
       "[data-concept-navigation]",
     );
-    if (navigation) navigation.hidden = false;
     let bounds = {
       width: Number(svg.dataset.width),
       height: Number(svg.dataset.height),
@@ -306,8 +317,6 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         "[data-concept-explorer-description]",
       )!.textContent =
         `${size} concepts${context.hidden ? " and their connections" : " in this view"}`;
-      map.querySelector<HTMLElement>(".concept-map-heading h2")!.textContent =
-        readingTitle ? "Concepts in this reading" : "Concepts and connections";
     }
     function clearFilters() {
       for (const control of [select, search, reading, group, subgroup])
@@ -326,7 +335,8 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
     expand?.addEventListener("click", () => {
       const expanded = map.classList.toggle("is-expanded");
       expand.setAttribute("aria-pressed", String(expanded));
-      expand.textContent = expanded ? "Restore graph size" : "Expand graph";
+      expand.title = expanded ? "Restore graph size" : "Expand graph";
+      expand.querySelector("span")!.textContent = expand.title;
       // Expansion reveals more of the same view without losing its location.
       viewport?.render();
     });
@@ -389,6 +399,16 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       isolatingGroup = onlyGroup;
       if (groupControls) groupControls.disabled = !groupName;
       map.classList.toggle("is-highlighting-group", highlightingGroup);
+      for (const region of graphic.querySelectorAll<SVGGElement>(
+        "[data-concept-cluster]",
+      )) {
+        const highlighted =
+          highlightingGroup && region.dataset.conceptCluster === groupName;
+        region.classList.toggle("is-highlighted-topic", highlighted);
+        if (highlighted && groupHelp)
+          region.setAttribute("aria-describedby", groupHelp.id);
+        else region.removeAttribute("aria-describedby");
+      }
       const readingIds = reading?.value
         ? new Set(reading.selectedOptions[0]!.dataset.ids!.split(" "))
         : null;
@@ -599,14 +619,15 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         viewport.readable();
       previewConnections();
       graphic.hidden = visible.size === 0;
-      if (navigation) navigation.hidden = visible.size === 0;
+      if (navigation)
+        navigation.hidden = presentation === "list" || visible.size === 0;
       if (groupHelp)
         groupHelp.textContent = !groupName
           ? "Choose a group to highlight its members in context."
           : onlyGroup
             ? `Showing ${members.size} ${groupTitle} concepts. Connections ${subgroupOption ? "outside this subcategory" : "to other groups"} are hidden.`
             : members.size
-              ? `${members.size} ${groupTitle} concepts highlighted. ${presentation === "list" ? "Marked cards are group members; other concepts remain available." : `Filled nodes are members; dashed lines connect ${subgroupOption ? "to other concepts" : "to other groups"}.`}`
+              ? `${members.size} ${groupTitle} concepts highlighted. ${presentation === "list" ? "Marked cards are group members; other concepts remain available." : `The compact map marks their topic. In the detailed map, dashed lines connect ${subgroupOption ? "to other concepts" : "to other groups"}.`}`
               : `No ${groupTitle} concepts in this view. Clear the search or choose another reading to find members.`;
       status.textContent =
         visible.size === 0
@@ -696,7 +717,6 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         params?.get("view") === "list" ||
         (target && explorer.contains(target)),
       );
-      if (tools) tools.open = !(reading?.value || search?.value);
       explorer.addEventListener("toggle", () => {
         if (!explorer.open) clearFilters();
         update();
@@ -705,14 +725,10 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         .querySelector("[data-concept-all]")
         ?.addEventListener("click", () => {
           clearFilters();
-          if (tools) tools.open = true;
           update();
-          map
-            .querySelector<HTMLElement>(".concept-map-heading h2")!
-            .setAttribute("tabindex", "-1");
-          map
-            .querySelector<HTMLElement>(".concept-map-heading h2")!
-            .focus({ preventScroll: true });
+          viewTabs
+            .find((tab) => tab.dataset.conceptView === presentation)
+            ?.focus({ preventScroll: true });
         });
       lookup?.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -778,7 +794,6 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
           search?.value.trim()
         ) {
           explorer.open = true;
-          if (tools) tools.open = false;
         }
         update();
       });
