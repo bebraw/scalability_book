@@ -129,9 +129,7 @@ function initializeOtelTraceDemo(root: HTMLElement) {
     setText(
       root,
       "[data-otel-demo-verdict]",
-      revealed
-        ? scenario.verdict
-        : "Inspect a child span before revealing the case reading",
+      revealed ? scenario.verdict : "Select a child span to investigate",
     );
     if (reveal) {
       reveal.disabled = !evidenceSelected;

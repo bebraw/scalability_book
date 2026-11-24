@@ -48,6 +48,7 @@
       mode.disabled = isRestart;
       mode.closest("label")!.hidden = isRestart;
       timing.closest("label")!.hidden = !isRestart;
+      isolation.closest("label")!.hidden = !isConcurrent;
       const usesTransaction = readMode(mode.value) === "transaction";
       isolation.disabled = !isConcurrent || !usesTransaction;
       program.hidden = !isConcurrent;

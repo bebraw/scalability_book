@@ -245,7 +245,6 @@ function renderLusserChart(
 
   chart.innerHTML = `<g class="lusser-grid">${grid}</g>
 <line class="lusser-target-line" x1="${left}" y1="${y(target)}" x2="${left + width}" y2="${y(target)}" />
-<text class="lusser-target-label" x="${left + 7}" y="${y(target) - 6}">95% target</text>
 <path class="lusser-reliability-path" d="${path}" />
 <line class="lusser-selected-guide" x1="${x(selectedSteps)}" y1="${top}" x2="${x(selectedSteps)}" y2="${top + height}" />
 <circle class="lusser-selected-point" cx="${x(selectedSteps)}" cy="${y(selectedReliability)}" r="7" />`;

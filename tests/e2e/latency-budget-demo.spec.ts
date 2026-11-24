@@ -16,6 +16,8 @@ test.describe("latency budget demo", () => {
     await expect(
       demo.locator('[data-latency-demo-metric="userFloor"]'),
     ).toHaveText("5.0 ms");
+    await demo.getByText("Inspect the latency budget and assumptions").click();
+    await expect(demo.locator(".latency-demo-source")).toBeVisible();
     await expect(demo.locator(".latency-demo-source")).toContainText(
       "BlankMap-World.svg",
     );
@@ -43,7 +45,7 @@ test.describe("latency budget demo", () => {
     ).toHaveText("235 ms");
     await demo.locator("[data-latency-demo-db-roundtrips]").fill("10");
     await expect(
-      demo.locator('[data-latency-demo-metric="roundtripPenalty"]'),
+      demo.locator('[data-latency-demo-metric="avoidable"]'),
     ).toHaveText("56 ms");
     await expect(
       demo.locator("[data-latency-demo-interpretation]"),
@@ -53,9 +55,56 @@ test.describe("latency budget demo", () => {
     ).toContainText("identical results");
     await demo.locator("[data-latency-demo-db-roundtrips]").fill("1");
     await expect(
-      demo.locator('[data-latency-demo-metric="roundtripPenalty"]'),
+      demo.locator('[data-latency-demo-metric="avoidable"]'),
     ).toHaveText("0.0 ms");
-    await expectElementsInsideDemo(demo, [".scaling-demo-tradeoff-step"]);
+    await expectElementsInsideDemo(demo, [
+      ".latency-demo-pair",
+      ".latency-demo-details",
+    ]);
+  });
+
+  test("keeps the map key legible and the response comparison together on a phone", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    const demo = page.locator("[data-latency-demo]");
+    await demo
+      .locator('[data-latency-demo-distance="userApp"]')
+      .selectOption("25");
+    const labels = demo
+      .getByRole("list", { name: "Map markers" })
+      .getByRole("listitem");
+    await expect(labels).toHaveText(["User", "App", "DB"]);
+    const key = await labels.evaluateAll((items) =>
+      items.map((item) => {
+        const box = item.getBoundingClientRect();
+        return {
+          left: box.left,
+          right: box.right,
+          top: box.top,
+          bottom: box.bottom,
+          size: Number.parseFloat(getComputedStyle(item).fontSize),
+        };
+      }),
+    );
+    for (const [i, entry] of key.entries()) {
+      expect(entry.size).toBeGreaterThanOrEqual(12);
+      for (const other of key.slice(0, i)) {
+        expect(entry.left >= other.right || entry.top >= other.bottom).toBe(
+          true,
+        );
+      }
+    }
+    await demo
+      .locator('[data-latency-demo-distance="appDb"]')
+      .selectOption("500");
+    const result = demo.locator(".demo-summary");
+    await expect(
+      result.locator('[data-latency-demo-metric="total"]'),
+    ).toHaveText("110 ms");
+    await expect(
+      result.locator('[data-latency-demo-metric="batchedTotal"]'),
+    ).toHaveText("82 ms");
   });
 
   test("makes intercontinental user distance visible", async ({ page }) => {

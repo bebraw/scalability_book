@@ -35,6 +35,8 @@ test.describe("ACID transaction lab", () => {
   }) => {
     const lab = page.locator("[data-acid-lab]");
 
+    await expect(lab.locator("[data-acid-reply-timing]")).toBeHidden();
+    await expect(lab.locator("[data-acid-isolation]")).toBeHidden();
     await lab.locator("[data-acid-run]").click();
     await expect(lab).toHaveAttribute("data-acid-result", "broken");
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Finished");
@@ -85,6 +87,9 @@ test.describe("ACID transaction lab", () => {
 
     await lab.locator("[data-acid-scenario]").selectOption("restart");
     await expect(lab.locator("[data-acid-program]")).toBeHidden();
+    await expect(lab.locator("[data-acid-mode]")).toBeHidden();
+    await expect(lab.locator("[data-acid-isolation]")).toBeHidden();
+    await expect(lab.locator("[data-acid-reply-timing]")).toBeVisible();
     await lab.locator("[data-acid-run]").click();
     await expect(lab.locator("[data-acid-item-state]")).toHaveText("Initial");
     await expect(lab.locator("[data-acid-acknowledgement]")).toContainText(

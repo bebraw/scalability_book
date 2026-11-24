@@ -775,55 +775,48 @@ function getDemoGalleryHtml() {
       page.source.includes(`import "exercise:${id}"`),
     );
     return chapter
-      ? `<p class="demo-gallery-chapter-link"><a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a></p>`
+      ? `<a href="${escapeAttribute(chapter.url)}#exercise-${escapeAttribute(id)}">Practice in the chapter →</a>`
       : "";
   };
   const categories = [
     {
       id: "reading",
       title: "Reading investigations",
-      badge: "Reading",
-      description:
-        "Use these alongside the main chapters. Predict a result, change one condition and explain what the evidence supports.",
     },
     {
       id: "advanced",
       title: "Optional depth",
-      badge: "Optional",
-      description:
-        "Explore a specific mechanism when it helps answer your question. These models and appendix activities do not add required submissions.",
     },
   ];
-  let demoIndex = 0;
   const sections = categories
     .map((category) => {
       const cards = demoScriptIncludes
         .filter((demo) => demo.category === category.id)
-        .map(({ title, chapter, include }) => {
+        .map(({ title, include }) => {
           const demoId = `demo-${slugify(title)}`;
           const galleryId = `${demoId}-gallery`;
-          const displayIndex = String(++demoIndex).padStart(2, "0");
-          const practice = exerciseEntries
-            .filter(([, exercise]) => exercise.demo?.id === demoId)
-            .map(([id]) => `{{ import "exercise:${id}" }}\n${chapterLink(id)}`)
-            .join("\n");
+          const reading = chapters.find((page) =>
+            page.source.includes(include),
+          );
+          const practice = exerciseEntries.filter(
+            ([, exercise]) => exercise.demo?.id === demoId,
+          );
+          const links = [
+            reading
+              ? `<a href="${escapeAttribute(reading.url)}#${escapeAttribute(demoId)}">Read in context · ${escapeHtml(reading.title)}</a>`
+              : "",
+            ...practice.map(([id]) => chapterLink(id)),
+          ].filter(Boolean);
 
           return `<section class="demo-gallery-item" id="${escapeAttribute(galleryId)}">
-<div class="demo-gallery-item-header">
-<span class="demo-gallery-index" aria-hidden="true">${displayIndex}</span>
-<div>
-<p>${chapter}</p>
-<a href="#${escapeAttribute(demoId)}">${title}</a>
-</div>
-<span class="demo-gallery-status"><i aria-hidden="true"></i> ${category.badge}</span>
-</div>
 {{ import "${include}" }}
-${practice}
+${practice.map(([id]) => `{{ import "exercise:${id}" }}`).join("\n")}
+${links.length ? `<footer class="demo-gallery-chapter-link">${links.join("\n")}</footer>` : ""}
 </section>`;
         })
         .join("\n\n");
       return `<section class="demo-gallery-group" id="${category.id}-demos" aria-labelledby="${category.id}-demos-title">
-<header class="demo-gallery-practice-header"><h2 id="${category.id}-demos-title">${category.title}</h2><p>${category.description}</p></header>
+<header class="demo-gallery-practice-header"><h2 id="${category.id}-demos-title">${category.title}</h2></header>
 ${cards}
 </section>`;
     })
@@ -839,24 +832,30 @@ ${cards}
     )
     .join("\n");
   const standalone = standaloneEntries
-    .map(
-      ([id]) =>
-        `<div class="demo-gallery-practice-item">\n{{ import "exercise:${id}" }}\n${chapterLink(id)}\n</div>`,
-    )
+    .map(([id]) => {
+      const link = chapterLink(id);
+      return `<div class="demo-gallery-practice-item">\n{{ import "exercise:${id}" }}\n${link ? `<div class="demo-gallery-chapter-link">${link}</div>` : ""}\n</div>`;
+    })
     .join("\n");
-  return `<div class="demo-gallery-lede">
-<p>Work through one module at a time: change the inputs, inspect what responds, and connect the result to your own project. Repeat a scenario until you can explain the trade-off without relying on the interface. Where practice is available, switch to its tab to check your understanding. Saved results are shared with the chapter exercises.</p>
-<p>For a small local implementation with your own model, download the <a href="/downloads/labs/course-workspace.zip">local exercise workspace</a>. Set up once, choose CSV, test quality, persisted retries or HTTP caching, and run that exercise’s independent checks.</p>
-<dl class="demo-gallery-stats">
-<div><dt>Modules</dt><dd>${demoScriptIncludes.length}</dd></div>
-<div><dt>Exercises</dt><dd>${exerciseEntries.length}</dd></div>
-<div><dt>Mode</dt><dd>Self-guided</dd></div>
-</dl>
-</div>
-<nav class="demo-gallery-jumps" aria-label="On this page">
-${categories.map((category) => `<a href="#${category.id}-demos">${category.title}</a>`).join("\n")}
+  const demoIndex = categories
+    .map((category) => {
+      const links = demoScriptIncludes
+        .filter((demo) => demo.category === category.id)
+        .map(
+          ({ title }) =>
+            `<li><a href="#demo-${slugify(title)}">${escapeHtml(title)}</a></li>`,
+        )
+        .join("\n");
+      return `<div><strong>${category.title}</strong><ul>${links}</ul></div>`;
+    })
+    .join("\n");
+  return `<p class="demo-gallery-lede">Change one input and inspect the result. Where a demo has a Practice tab, your answers carry over to the chapter.</p>
+<div class="demo-gallery-jumps">
+<details class="demo-gallery-index"><summary>Find a demo (${demoScriptIncludes.length})</summary>
+<nav aria-label="Find a demo">${demoIndex}</nav></details>
 <a href="#more-practice">More practice</a>
-</nav>
+<a href="/downloads/labs/course-workspace.zip">Download the local exercise workspace</a>
+</div>
 
 ${sections}
 <section class="demo-gallery-practice" id="more-practice" aria-labelledby="more-practice-title">

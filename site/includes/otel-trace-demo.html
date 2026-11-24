@@ -13,64 +13,23 @@
       <h3 id="otel-trace-demo-heading">Follow one request, span by span</h3>
     </div>
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
-      <span data-otel-demo-verdict>Inspect the evidence first</span>
+      <span data-otel-demo-verdict>Select a child span</span>
       <small>
-        A client-only trace simulation. No telemetry is collected, exported, or
-        stored.
+        This simulated trace covers one server handling an HTTP request.
       </small>
     </div>
   </div>
 
-  <div class="otel-demo-pipeline" aria-label="OpenTelemetry data path">
-    <span><b>Application</b><small>starts + ends spans</small></span>
-    <i aria-hidden="true">→</i>
-    <span><b>OTel SDK</b><small>batches span records</small></span>
-    <i aria-hidden="true">→</i>
-    <span><b>Collector</b><small>receives OTLP + routes</small></span>
-    <i aria-hidden="true">→</i>
-    <span><b>Backend</b><small>stores + explores</small></span>
-  </div>
-  <p class="otel-demo-pipeline-note">
-    The rows cover one server's handling of an inbound HTTP request. Browser
-    work and time outside this server span are excluded. Select a row to inspect
-    the record the SDK could include in a batched OTLP export.
-  </p>
-
-  <div class="otel-demo-controls">
-    <label>
-      <span>Simulated request</span>
-      <select data-otel-demo-scenario>
-        <option value="healthy">Request A · 48 ms</option>
-        <option value="slow" selected>Request B · 286 ms</option>
-        <option value="retry">Request C · 171 ms</option>
-      </select>
-    </label>
-    <button
-      type="button"
-      data-otel-demo-reveal
-      aria-expanded="false"
-      aria-controls="otel-demo-case-reading"
-      disabled
-    >
-      Reveal authored case reading
-    </button>
-    <section
-      id="otel-demo-case-reading"
-      class="otel-demo-case-reading"
-      data-otel-demo-case-reading
-      aria-labelledby="otel-demo-case-reading-heading"
-      tabindex="-1"
-      hidden
-    >
-      <h4 id="otel-demo-case-reading-heading">Authored case reading</h4>
-      <p><strong data-otel-demo-case-verdict></strong></p>
-      <p>Selected span: <strong data-otel-demo-case-span></strong></p>
-      <p data-otel-demo-span-note></p>
-    </section>
-  </div>
-
   <div class="otel-demo-workbench">
     <section class="scaling-demo-panel otel-demo-trace-panel">
+      <label>
+        <span>Simulated request</span>
+        <select data-otel-demo-scenario>
+          <option value="healthy">Request A · 48 ms</option>
+          <option value="slow" selected>Request B · 286 ms</option>
+          <option value="retry">Request C · 171 ms</option>
+        </select>
+      </label>
       <div class="otel-demo-trace-heading">
         <div>
           <p class="benchmark-demo-eyebrow">Server trace</p>
@@ -78,9 +37,6 @@
         </div>
         <code data-otel-demo-trace-id>4bf92f3577b34da6a3ce929d0e0e4736</code>
       </div>
-      <p class="otel-demo-trace-instruction">
-        Select any span row to inspect its telemetry record.
-      </p>
       <div class="otel-demo-scale" aria-hidden="true">
         <span>0 ms</span><span data-otel-demo-scale-middle>143 ms</span
         ><span data-otel-demo-scale-end>286 ms</span>
@@ -124,12 +80,52 @@
           contain several spans.
         </p>
       </details>
-      <p class="demo-note">
-        Use duration, parentage and status to choose evidence. What does this
-        span show, and what is still unknown?
-      </p>
+      <div class="otel-demo-controls">
+        <p class="demo-note">
+          What can you infer from this span’s duration and status?
+        </p>
+        <button
+          type="button"
+          data-otel-demo-reveal
+          aria-expanded="false"
+          aria-controls="otel-demo-case-reading"
+          disabled
+        >
+          Reveal authored case reading
+        </button>
+        <section
+          id="otel-demo-case-reading"
+          class="otel-demo-case-reading"
+          data-otel-demo-case-reading
+          aria-labelledby="otel-demo-case-reading-heading"
+          tabindex="-1"
+          hidden
+        >
+          <h4 id="otel-demo-case-reading-heading">Authored case reading</h4>
+          <p><strong data-otel-demo-case-verdict></strong></p>
+          <p>Selected span: <strong data-otel-demo-case-span></strong></p>
+          <p data-otel-demo-span-note></p>
+        </section>
+      </div>
     </aside>
   </div>
+  <details class="otel-demo-record">
+    <summary>How a span reaches the trace backend</summary>
+    <div class="otel-demo-pipeline" aria-label="OpenTelemetry data path">
+      <span><b>Application</b><small>starts + ends spans</small></span>
+      <i aria-hidden="true">→</i>
+      <span><b>OTel SDK</b><small>batches span records</small></span>
+      <i aria-hidden="true">→</i>
+      <span><b>Collector</b><small>receives OTLP + routes</small></span>
+      <i aria-hidden="true">→</i>
+      <span><b>Backend</b><small>stores + explores</small></span>
+    </div>
+    <p class="otel-demo-pipeline-note">
+      The SDK can include a span record in a batched OTLP export. This
+      simulation collects, exports and stores no telemetry. Browser work and
+      time outside the server span are excluded.
+    </p>
+  </details>
   <p class="demo-note">
     Try this in your project: instrument one operation, record a normal request
     and a deliberately delayed or failed attempt, then inspect the exported

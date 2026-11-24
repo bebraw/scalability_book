@@ -8,22 +8,13 @@
   <div class="architecture-lens-header demo-header">
     <div>
       <p class="demo-kicker">Web architecture lens</p>
-      <h3 id="architecture-lens-heading">
-        What crosses the boundary after an action?
-      </h3>
+      <h3 id="architecture-lens-heading">Will the update keep your draft?</h3>
     </div>
     <div class="demo-summary">
-      <span>Three modeled update flows</span
-      ><small
-        >No HTTP requests run here; sizes and timing are not measured.</small
-      >
+      <span data-architecture-lens-verdict>Choose an update flow</span>
+      <small>All three flows model an update to the same loaded page.</small>
     </div>
   </div>
-  <p>
-    The first document may be rendered on the server, built ahead of time, or
-    assembled in the browser. That is a separate choice from the later update
-    below. All three examples start from the same loaded activity page.
-  </p>
   <fieldset class="architecture-lens-controls">
     <legend>After recording an event</legend>
     <label
@@ -53,20 +44,6 @@
     >
   </fieldset>
   <div class="architecture-lens-workbench">
-    <section class="architecture-lens-panel">
-      <h4 data-architecture-lens-title>Full-document navigation</h4>
-      <p data-architecture-lens-summary></p>
-      <ol
-        data-architecture-lens-trace
-        aria-label="Modeled request and update sequence"
-      ></ol>
-      <dl>
-        <dt>Response</dt>
-        <dd data-architecture-lens-response></dd>
-        <dt>Replacement scope</dt>
-        <dd data-architecture-lens-scope></dd>
-      </dl>
-    </section>
     <section class="architecture-lens-panel" data-architecture-lens-browser>
       <h4>Draft outside the activity list</h4>
       <label
@@ -80,8 +57,30 @@
       <button type="button" data-architecture-lens-run>
         Reveal modeled update
       </button>
-      <ul data-architecture-lens-events aria-label="Modeled activity list"></ul>
       <p class="architecture-lens-browser-status" aria-live="polite"></p>
+      <ul data-architecture-lens-events aria-label="Modeled activity list"></ul>
+    </section>
+    <section class="architecture-lens-panel">
+      <h4 data-architecture-lens-title>Full-document navigation</h4>
+      <dl>
+        <dt>Response</dt>
+        <dd data-architecture-lens-response></dd>
+        <dt>Replacement scope</dt>
+        <dd data-architecture-lens-scope></dd>
+      </dl>
+      <details>
+        <summary>Follow the modeled exchange</summary>
+        <ol
+          data-architecture-lens-trace
+          aria-label="Modeled request and update sequence"
+        ></ol>
+        <p data-architecture-lens-summary></p>
+        <p>
+          The initial page can be built ahead of time, rendered on the server,
+          or assembled in the browser. This model follows only the later update.
+          No requests run and no payload sizes or timings are measured.
+        </p>
+      </details>
     </section>
   </div>
   <p class="demo-note">

@@ -200,7 +200,7 @@ class OrchestrationLab {
       this.controllerState.textContent = "Converged";
       this.setStatus(
         "Desired and observed state match",
-        "Three pods are running. Try changing the system while watching the feed.",
+        "Three pods are running on release v1.",
       );
       this.addLog("ReplicaSet", "Observed state converged at 3 running pods.");
       this.setBusy(false);

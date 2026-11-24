@@ -47,8 +47,8 @@
         </label>
       </section>
 
-      <section class="scaling-demo-panel saturation-boundary-capacities">
-        <h4>Declared stage capacity</h4>
+      <details class="scaling-demo-panel saturation-boundary-capacities">
+        <summary>Adjust individual stage capacities</summary>
         <label>
           <span>Ingestion API</span>
           <div class="saturation-boundary-range">
@@ -113,10 +113,30 @@
             >
           </div>
         </label>
-      </section>
+      </details>
     </div>
 
     <div class="saturation-boundary-workbench">
+      <section class="scaling-demo-panel saturation-boundary-actions">
+        <label class="saturation-boundary-switch">
+          <input type="checkbox" data-saturation-boundary-backpressure />
+          <span>
+            <strong>Limit admission to bottleneck rate</strong>
+            <small
+              >Reject excess demand explicitly instead of accumulating hidden
+              work.</small
+            >
+          </span>
+        </label>
+        <button type="button" data-saturation-boundary-expand>
+          Add capacity at the limit (+40/s)
+        </button>
+      </section>
+
+      <p class="demo-note" data-saturation-boundary-comparison>
+        Predict which stage will limit completion after one capacity increase,
+        then compare.
+      </p>
       <section class="saturation-boundary-instrument" aria-live="polite">
         <div class="saturation-boundary-demand">
           <span>Offered load</span>
@@ -163,26 +183,6 @@
         </div>
       </section>
 
-      <section class="scaling-demo-panel saturation-boundary-actions">
-        <label class="saturation-boundary-switch">
-          <input type="checkbox" data-saturation-boundary-backpressure />
-          <span>
-            <strong>Limit admission to bottleneck rate</strong>
-            <small
-              >Reject excess demand explicitly instead of accumulating hidden
-              work.</small
-            >
-          </span>
-        </label>
-        <button type="button" data-saturation-boundary-expand>
-          Add capacity at the limit (+40/s)
-        </button>
-      </section>
-
-      <p class="demo-note" data-saturation-boundary-comparison>
-        Predict which stage will limit completion after one capacity increase,
-        then compare.
-      </p>
       <details class="scaling-demo-panel">
         <summary>What would you measure in a real system?</summary>
         <p>

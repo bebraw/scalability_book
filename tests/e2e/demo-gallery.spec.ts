@@ -183,9 +183,6 @@ test.describe("demo showcase", () => {
       has: page.locator("[data-demo-anchor]"),
     });
     await expect(gallery.locator("h1")).toContainText("Demos and exercises");
-    await expect(gallery.locator(".demo-gallery-lede")).toContainText(
-      "Work through one module at a time",
-    );
     await expect(items).toHaveCount(expectedDemoCount);
     await expect(gallery.locator(".demo-gallery-group")).toHaveCount(2);
     await expect(
@@ -200,18 +197,17 @@ test.describe("demo showcase", () => {
       ),
     ).toHaveCount(0);
 
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText(
-      String(expectedDemoCount),
-    );
-    await expect(gallery.locator(".demo-gallery-stats")).toContainText(
-      "Self-guided",
-    );
-    await expect(items.first().locator(".demo-gallery-index")).toHaveText("01");
-    await expect(items.last().locator(".demo-gallery-index")).toHaveText(
-      String(expectedDemoCount).padStart(2, "0"),
-    );
-    await expect(gallery.locator(".demo-gallery-status")).toHaveCount(
-      expectedDemoCount,
+    await gallery.getByText(`Find a demo (${expectedDemoCount})`).click();
+    const index = gallery.getByRole("navigation", { name: "Find a demo" });
+    await expect(index.getByRole("link")).toHaveCount(expectedDemoCount);
+    await index.getByRole("link", { name: "ACID transaction lab" }).click();
+    await expect(page).toHaveURL(/#demo-acid-transaction-lab$/);
+    const acidReading = gallery
+      .locator("#demo-acid-transaction-lab-gallery")
+      .getByRole("link", { name: /Read in context/ });
+    await expect(acidReading).toHaveAttribute(
+      "href",
+      "/appendices/advanced-web-boundaries/#demo-acid-transaction-lab",
     );
     await expect(gallery.locator("[data-demo-anchor]")).toHaveCount(
       expectedDemoCount,
@@ -306,10 +302,6 @@ test.describe("demo showcase", () => {
         );
       expect(headerColumns).toHaveLength(1);
     }
-    await expect(items.first().locator(".demo-gallery-item-header")).toHaveCSS(
-      "position",
-      "static",
-    );
     const pageOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,
     );

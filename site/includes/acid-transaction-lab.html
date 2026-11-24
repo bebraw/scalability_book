@@ -31,8 +31,8 @@
         <span>Disturbance</span>
         <select data-acid-scenario>
           <option value="failure" selected>Failure between two writes</option>
-          <option value="concurrent">Two concurrent start requests</option>
-          <option value="restart">Restart after success response</option>
+          <option value="concurrent">Concurrent start requests</option>
+          <option value="restart">Restart after success reply</option>
         </select>
       </label>
 
@@ -46,7 +46,7 @@
         </select>
       </label>
 
-      <label>
+      <label hidden>
         <span>Isolation</span>
         <select data-acid-isolation>
           <option value="read-committed" selected>Read committed</option>

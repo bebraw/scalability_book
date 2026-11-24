@@ -11,17 +11,19 @@
       <h3 id="latency-demo-heading">Count distance and database waits</h3>
     </div>
     <div class="scaling-demo-summary demo-summary" aria-live="polite">
-      <span data-latency-demo-verdict>Build the request path</span>
+      <span data-latency-demo-verdict
+        ><b data-latency-demo-metric="total">75 ms</b> sequential</span
+      >
       <small
-        >An illustrative model of distance, network overhead, and sequential
-        database waits.</small
+        ><b data-latency-demo-metric="batchedTotal">75 ms</b> with at most two
+        database trips (modeled)</small
       >
     </div>
   </div>
 
   <form class="scaling-demo-form" data-latency-demo-form>
     <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      class="latency-demo-pair"
       data-latency-demo-step="0"
       aria-labelledby="latency-distance-title"
     >
@@ -59,13 +61,13 @@
         </label>
       </div>
       <div class="scaling-demo-panel">
-        <h4>Physical floor</h4>
+        <h4>Round-trip time in fiber</h4>
         <div
           class="latency-demo-map"
-          role="img"
-          aria-label="Schematic map of user, application, and database latency"
+          role="group"
+          aria-label="User, application and database route"
         >
-          <svg viewBox="0 0 640 260" focusable="false" aria-hidden="true">
+          <svg viewBox="100 30 465 145" focusable="false" aria-hidden="true">
             <image
               class="latency-demo-world-map"
               href="/assets/blank-map-world.svg"
@@ -90,64 +92,49 @@
               data-latency-demo-node="user"
               transform="translate(340 78)"
             >
-              <circle r="15" />
-              <text y="34">User</text>
+              <circle r="7" />
             </g>
             <g
               class="latency-demo-node latency-demo-node-app"
               data-latency-demo-node="app"
               transform="translate(390 82)"
             >
-              <circle r="15" />
-              <text y="34">App</text>
+              <rect x="-6" y="-6" width="12" height="12" />
             </g>
             <g
               class="latency-demo-node latency-demo-node-db"
               data-latency-demo-node="db"
               transform="translate(407 91)"
             >
-              <circle r="15" />
-              <text y="34">DB</text>
+              <path d="M0 -9 8 0 0 9 -8 0Z" />
             </g>
           </svg>
-          <div class="latency-demo-map-label latency-demo-map-label-user">
+          <ul class="latency-demo-key" aria-label="Map markers">
+            <li><i class="latency-marker-user" aria-hidden="true"></i>User</li>
+            <li><i aria-hidden="true"></i>App</li>
+            <li><i class="latency-marker-db" aria-hidden="true"></i>DB</li>
+          </ul>
+          <div class="latency-demo-map-label">
             <span>User to app</span>
             <strong data-latency-demo-map="userDistance">500 km</strong>
-            <small data-latency-demo-map="userLatency">5.0 ms RTT floor</small>
+            <small
+              ><b data-latency-demo-metric="userFloor">5.0 ms</b> RTT
+              floor</small
+            >
           </div>
-          <div class="latency-demo-map-label latency-demo-map-label-db">
+          <div class="latency-demo-map-label">
             <span>App to DB</span>
             <strong data-latency-demo-map="dbDistance">1 km</strong>
-            <small data-latency-demo-map="dbLatency">0.0 ms RTT floor</small>
+            <small
+              ><b data-latency-demo-metric="dbFloor">0.0 ms</b> RTT floor</small
+            >
           </div>
         </div>
-        <p class="latency-demo-source">
-          Map derived from
-          <a href="https://commons.wikimedia.org/wiki/File:BlankMap-World.svg"
-            >BlankMap-World.svg</a
-          >
-          by Canuckguy and contributors, public domain, via Wikimedia Commons.
-        </p>
-        <p class="latency-demo-note">
-          In fiber, light travels at roughly 200,000 km/s. That is about 200 km
-          per millisecond one way, before routing, queues, TLS, server work, or
-          database execution.
-        </p>
-        <dl class="scaling-demo-metrics">
-          <div>
-            <dt>User RTT floor</dt>
-            <dd data-latency-demo-metric="userFloor">0 ms</dd>
-          </div>
-          <div>
-            <dt>App-DB RTT floor</dt>
-            <dd data-latency-demo-metric="dbFloor">0 ms</dd>
-          </div>
-        </dl>
       </div>
     </section>
 
     <section
-      class="scaling-demo-step scaling-demo-pressure-step is-active"
+      class="latency-demo-pair"
       data-latency-demo-step="1"
       aria-labelledby="latency-database-title"
     >
@@ -188,74 +175,56 @@
         </label>
       </div>
       <div class="scaling-demo-panel">
-        <h4>Compare access shapes</h4>
-        <dl class="scaling-demo-metrics">
+        <h4>What batching changes</h4>
+        <dl class="scaling-demo-metrics demo-metrics-compact">
           <div>
             <dt>Sequential DB wait</dt>
             <dd data-latency-demo-metric="sequentialDb">0 ms</dd>
           </div>
           <div>
-            <dt>DB wait in at most 2 trips</dt>
+            <dt>DB wait in at most two trips</dt>
             <dd data-latency-demo-metric="batchedDb">0 ms</dd>
           </div>
           <div>
-            <dt>Round-trip penalty</dt>
-            <dd data-latency-demo-metric="roundtripPenalty">0 ms</dd>
-          </div>
-          <div>
-            <dt>Network per DB trip</dt>
-            <dd data-latency-demo-metric="dbTripNetwork">0 ms</dd>
-          </div>
-          <div>
-            <dt>Server execution</dt>
-            <dd data-latency-demo-metric="serverExecution">0 ms</dd>
+            <dt>Repeated network wait saved</dt>
+            <dd data-latency-demo-metric="avoidable">0 ms</dd>
           </div>
         </dl>
         <p class="demo-note">
-          Hypothetical timings: these values describe no hardware class.
-          Batching keeps the same queries and execution cost; it is possible
-          only if their dependencies permit at most two trips with identical
-          results.
+          These hypothetical queries can run in at most two dependency rounds
+          with identical results and unchanged execution time.
         </p>
       </div>
     </section>
-
-    <section
-      class="scaling-demo-step scaling-demo-tradeoff-step is-active"
-      data-latency-demo-step="2"
-      aria-labelledby="latency-budget-title"
-    >
-      <div>
-        <h4 id="latency-budget-title">Latency budget</h4>
-        <ol data-latency-demo-breakdown></ol>
-      </div>
-      <div>
-        <h4>Totals</h4>
-        <dl class="scaling-demo-metrics">
-          <div>
-            <dt>Sequential response</dt>
-            <dd data-latency-demo-metric="total">0 ms</dd>
-          </div>
-          <div>
-            <dt>Physical network floor</dt>
-            <dd data-latency-demo-metric="physical">0 ms</dd>
-          </div>
-          <div>
-            <dt>Avoidable DB wait</dt>
-            <dd data-latency-demo-metric="avoidable">0 ms</dd>
-          </div>
-          <div>
-            <dt>Response with at most 2 DB trips</dt>
-            <dd data-latency-demo-metric="batchedTotal">0 ms</dd>
-          </div>
-        </dl>
-      </div>
-      <div class="scaling-demo-impact">
-        <h4>Interpretation</h4>
-        <p data-latency-demo-interpretation>
-          Adjust distance and database access to see what dominates.
-        </p>
-      </div>
-    </section>
+    <details class="latency-demo-details">
+      <summary>Inspect the latency budget and assumptions</summary>
+      <p data-latency-demo-interpretation></p>
+      <dl class="scaling-demo-metrics demo-metrics-compact">
+        <div>
+          <dt>Physical network floor</dt>
+          <dd data-latency-demo-metric="physical">0 ms</dd>
+        </div>
+        <div>
+          <dt>Network per DB trip</dt>
+          <dd data-latency-demo-metric="dbTripNetwork">0 ms</dd>
+        </div>
+        <div>
+          <dt>Server execution</dt>
+          <dd data-latency-demo-metric="serverExecution">0 ms</dd>
+        </div>
+      </dl>
+      <ol data-latency-demo-breakdown></ol>
+      <p class="demo-note">
+        The floor assumes light travels 200 km per millisecond one way in fiber,
+        before routing, queues, TLS or server work.
+      </p>
+      <p class="latency-demo-source">
+        Map derived from
+        <a href="https://commons.wikimedia.org/wiki/File:BlankMap-World.svg"
+          >BlankMap-World.svg</a
+        >
+        by Canuckguy and contributors, public domain, via Wikimedia Commons.
+      </p>
+    </details>
   </form>
 </section>

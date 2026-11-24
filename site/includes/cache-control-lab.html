@@ -19,11 +19,7 @@
   </div>
 
   <p class="cache-control-lab-intro">
-    Every case begins after one successful response. Change its policy and age,
-    then trace the next request without changing the URL. For an executed
-    browser observation, try the optional
-    <a href="/downloads/labs/course-workspace.zip">local practice workspace</a>
-    and choose <code>http-cache/README.md</code>.
+    Choose a stored response and its age, then trace a request for the same URL.
   </p>
 
   <form data-cache-control-form>
@@ -96,6 +92,14 @@
       </label>
     </div>
 
+    <div class="cache-control-lab-decision">
+      <div class="cache-control-lab-panel-heading">
+        <button type="button" data-cache-run>Request again</button>
+        <strong data-cache-decision-code>cache → response</strong>
+      </div>
+      <ol data-cache-steps aria-label="Decision trace"></ol>
+    </div>
+
     <div class="cache-control-lab-stage">
       <div class="cache-control-lab-response">
         <div class="cache-control-lab-panel-heading">
@@ -130,15 +134,6 @@
           ><small data-cache-origin-state></small>
         </div>
       </div>
-    </div>
-
-    <div class="cache-control-lab-decision">
-      <div class="cache-control-lab-panel-heading">
-        <span>Decision trace</span>
-        <strong data-cache-decision-code>cache → response</strong>
-      </div>
-      <ol data-cache-steps></ol>
-      <button type="button" data-cache-run>Request again</button>
     </div>
 
     <dl class="cache-control-lab-facts">
@@ -180,7 +175,10 @@
       stale browser entry is forwarded; only the shared cache uses the stale
       window here. Reloads and request overrides are not modeled. Real cache
       keys, platform overrides, authorization, request directives, and
-      invalidation rules must be verified in the deployed path.
+      invalidation rules must be verified in the deployed path. To observe a
+      browser's HTTP cache, open <code>http-cache/README.md</code> in the
+      <a href="/downloads/labs/course-workspace.zip">local practice workspace</a
+      >.
     </p>
   </form>
 </section>

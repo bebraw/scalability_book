@@ -9,12 +9,22 @@ test.describe("web architecture update flows", () => {
   }) => {
     const demo = page.locator("[data-architecture-lens]");
     const draft = demo.locator("[data-architecture-lens-draft]");
+    await expect(demo.locator("[data-architecture-lens-trace]")).toBeHidden();
+    await demo
+      .getByText("Follow the modeled exchange", { exact: true })
+      .click();
+    await expect(demo.locator("[data-architecture-lens-trace]")).toContainText(
+      "Browser follows GET /activities",
+    );
     await draft.fill("My unsaved note");
     await expect(
       demo.locator("[data-architecture-lens-response]"),
     ).toContainText("303 redirect");
     await demo.locator("[data-architecture-lens-run]").click();
     await expect(draft).toHaveValue("");
+    await expect(demo.locator("[data-architecture-lens-verdict]")).toHaveText(
+      "Draft reset",
+    );
     await draft.fill("Explicitly preserved");
     await demo.locator("[data-architecture-lens-restore]").check();
     await demo.locator("[data-architecture-lens-run]").click();

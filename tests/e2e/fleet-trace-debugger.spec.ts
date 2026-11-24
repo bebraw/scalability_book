@@ -32,8 +32,8 @@ test.describe("fleet trace debugger", () => {
     await lab
       .locator("[data-fleet-trace-map='A-X901']")
       .selectOption("unmatched");
-    await expect(lab.locator("[data-fleet-trace-progress]")).toHaveText(
-      "5 / 5 mapped",
+    await expect(lab.locator("[data-fleet-trace-verdict]")).toHaveText(
+      "5 of 5 ledger rows assigned",
     );
     await expect(reconcile).toBeEnabled();
 
@@ -141,8 +141,8 @@ test.describe("fleet trace debugger", () => {
     await lab.locator("[data-fleet-trace-reset]").click();
     await expect(lab).toHaveAttribute("data-fleet-trace-state", "mapping");
     await expect(lab.locator("[data-fleet-trace-results]")).toBeHidden();
-    await expect(lab.locator("[data-fleet-trace-progress]")).toHaveText(
-      "0 / 5 mapped",
+    await expect(lab.locator("[data-fleet-trace-verdict]")).toHaveText(
+      "0 of 5 ledger rows assigned",
     );
     await expect(lab.locator("[data-fleet-trace-reconcile]")).toBeDisabled();
     const resetValues = await lab
@@ -153,30 +153,66 @@ test.describe("fleet trace debugger", () => {
     expect(resetValues).toEqual(["", "", "", "", ""]);
   });
 
-  test("contains wide evidence tables on a mobile viewport", async ({
+  test("keeps linking evidence and its mapping control together on a phone", async ({
     page,
   }) => {
     const lab = page.locator("[data-fleet-trace]");
-
     await page.setViewportSize({ width: 390, height: 844 });
+    const logs = lab.getByText("Inspect orchestration and gateway logs");
+    await logs.click();
+    await expect(lab.locator("[data-fleet-trace-gateway]")).toContainText(
+      "GW-501",
+    );
+    await expect(lab.locator("[data-fleet-trace-orchestration]")).toContainText(
+      "RunCancelled",
+    );
+    for (const source of await lab.locator(".fleet-trace-source").all()) {
+      expect(
+        await source
+          .locator("table")
+          .evaluate(
+            (table) =>
+              table.getBoundingClientRect().width <=
+              table.parentElement!.clientWidth + 1,
+          ),
+      ).toBe(true);
+    }
+    await logs.click();
+
+    const records = lab.locator("[data-fleet-trace-row]");
+    await expect(records).toHaveCount(5);
+    const firstMap = records.first().getByRole("combobox");
+    const firstIsWithinOneScreen = await firstMap.evaluate(
+      (control) =>
+        control.getBoundingClientRect().bottom -
+          control.closest("[data-demo-anchor]")!.getBoundingClientRect().top <=
+        innerHeight,
+    );
+    expect(firstIsWithinOneScreen).toBe(true);
+    for (const record of await records.all()) {
+      const fits = await record.evaluate((item) => {
+        const bounds = item.getBoundingClientRect();
+        const evidence = item.querySelector("code")!.getBoundingClientRect();
+        const control = item.querySelector("select")!.getBoundingClientRect();
+        return [evidence, control].every(
+          (part) =>
+            part.left >= bounds.left &&
+            part.right <= bounds.right &&
+            part.left >= 0 &&
+            part.right <= innerWidth,
+        );
+      });
+      expect(fits).toBe(true);
+    }
+
     await mapRows(lab, correctMappings);
     await lab.locator("[data-fleet-trace-reconcile]").click();
     await expect(lab.locator("[data-fleet-trace-results]")).toBeVisible();
-
-    const pageOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - window.innerWidth,
-    );
-    expect(pageOverflow).toBeLessThanOrEqual(1);
-
-    const physicalOverflow = await lab
-      .locator(".fleet-trace-physical-wrap")
-      .evaluate((element) => ({
-        client: element.clientWidth,
-        scroll: element.scrollWidth,
-        overflow: getComputedStyle(element).overflowX,
-      }));
-    expect(physicalOverflow.scroll).toBeGreaterThan(physicalOverflow.client);
-    expect(physicalOverflow.overflow).toBe("auto");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
   });
 });
 

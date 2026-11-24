@@ -94,6 +94,11 @@ test.describe("orchestration control-loop demo", () => {
     await expect(
       demo.locator("[data-orchestration-metric='failed']"),
     ).toHaveText("6");
+    await demo
+      .locator("summary")
+      .filter({ hasText: "Application request log" })
+      .click();
+    await expect(demo.locator("[data-orchestration-requests]")).toBeVisible();
     await expect(
       demo.locator("[data-orchestration-requests] li").last(),
     ).toContainText("HTTP 200 · v1");

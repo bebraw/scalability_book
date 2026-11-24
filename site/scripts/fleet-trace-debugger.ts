@@ -205,11 +205,8 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
   const gatewayBody = root.querySelector<HTMLTableSectionElement>(
     "[data-fleet-trace-gateway]",
   );
-  const physicalBody = root.querySelector<HTMLTableSectionElement>(
+  const physicalBody = root.querySelector<HTMLUListElement>(
     "[data-fleet-trace-physical]",
-  );
-  const progress = root.querySelector<HTMLOutputElement>(
-    "[data-fleet-trace-progress]",
   );
   const verdict = root.querySelector<HTMLElement>("[data-fleet-trace-verdict]");
   const summary = root.querySelector<HTMLElement>("[data-fleet-trace-summary]");
@@ -246,7 +243,6 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
     !orchestrationBody ||
     !gatewayBody ||
     !physicalBody ||
-    !progress ||
     !verdict ||
     !summary ||
     !guidance ||
@@ -270,10 +266,8 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
   orchestrationBody.innerHTML = fleetTraceOrchestration
     .map(
       (entry) => `<tr>
-        <td><time>${entry.time}</time></td>
-        <td><code>${entry.run}</code></td>
-        <td>${escapeFleetTraceHtml(entry.event)}</td>
-        <td><code>${escapeFleetTraceHtml(entry.evidence)}</code></td>
+        <td><time>${entry.time}</time><small>${entry.run}</small></td>
+        <td>${escapeFleetTraceHtml(entry.event)}<small>${escapeFleetTraceHtml(entry.evidence)}</small></td>
       </tr>`,
     )
     .join("");
@@ -281,9 +275,7 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
     .map(
       (entry) => `<tr>
         <td><code>${entry.attempt}</code><small>${entry.request}</small></td>
-        <td><code>${entry.run}</code><small>${entry.trace}</small></td>
-        <td>${escapeFleetTraceHtml(entry.resource)}</td>
-        <td>${escapeFleetTraceHtml(entry.policy)}</td>
+        <td>${escapeFleetTraceHtml(entry.resource)}<small>${entry.run} · ${entry.trace}</small><small>${escapeFleetTraceHtml(entry.policy)}</small></td>
       </tr>`,
     )
     .join("");
@@ -299,8 +291,6 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
     const assigned = [...selections.values()].filter(Boolean).length;
     const remaining = fleetTracePhysicalRows.length - assigned;
 
-    progress.value = `${assigned} / ${fleetTracePhysicalRows.length} mapped`;
-    progress.textContent = progress.value;
     reconcileButton.disabled = remaining > 0 || reconciliationComplete;
 
     if (reconciliationComplete) {
@@ -325,7 +315,7 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
 
     verdict.textContent = `${assigned} of ${fleetTracePhysicalRows.length} ledger rows assigned`;
     summary.textContent =
-      "Intent, mediation, and physical use are separate evidence streams.";
+      "Match the attempt, trace and gateway IDs in the source logs.";
     guidance.textContent = remaining
       ? `Assign ${remaining} remaining row${remaining === 1 ? "" : "s"} before reconciling the packet.`
       : "Every row is assigned. Reconcile the joins against the source logs.";
@@ -372,11 +362,13 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
       select.value = "";
       select.disabled = false;
     });
-    for (const row of physicalBody.querySelectorAll<HTMLElement>("tr")) {
+    for (const row of physicalBody.querySelectorAll<HTMLElement>(
+      "[data-fleet-trace-row]",
+    )) {
       row.removeAttribute("data-fleet-trace-status");
       const cell = row.querySelector<HTMLElement>("[data-fleet-trace-check]");
       if (cell) {
-        cell.textContent = "Awaiting mapping";
+        cell.textContent = "";
       }
     }
     reconcileButton.textContent = "Reconcile packet";
@@ -423,45 +415,46 @@ function initializeFleetTraceDebugger(root: HTMLElement) {
 function renderFleetTracePhysicalRow(row: FleetTracePhysicalRow) {
   const cost = row.cost === null ? "Unpriced" : formatFleetTraceCost(row.cost);
 
-  return `<tr data-fleet-trace-row="${row.attempt}">
-    <td><code>${row.attempt}</code><small>${row.ledger} ledger</small></td>
-    <td><time>${row.time}</time></td>
-    <td>${escapeFleetTraceHtml(row.operation)}</td>
-    <td><code>${escapeFleetTraceHtml(row.linkingEvidence)}</code></td>
-    <td>${escapeFleetTraceHtml(row.result)}</td>
-    <td class="${row.cost === null ? "is-unpriced" : ""}">${cost}</td>
-    <td>
-      <select aria-label="Map physical attempt ${row.attempt}" data-fleet-trace-map="${row.attempt}">
-        <option value="">Choose…</option>
-        <option value="R41">R41</option>
-        <option value="R42">R42</option>
-        <option value="unmatched">Unmatched</option>
-      </select>
-    </td>
-    <td data-fleet-trace-check>Awaiting mapping</td>
-  </tr>`;
+  return `<li data-fleet-trace-row="${row.attempt}">
+    <div class="fleet-trace-record-id">
+      <strong>${row.attempt}</strong>
+      <small>${row.ledger} ledger · <time>${row.time}</time></small>
+    </div>
+    <div class="fleet-trace-evidence">
+      <span>${escapeFleetTraceHtml(row.operation)} · ${cost}</span>
+      <code>${escapeFleetTraceHtml(row.linkingEvidence)}</code>
+      <small>${escapeFleetTraceHtml(row.result)}</small>
+    </div>
+    <select aria-label="Map physical attempt ${row.attempt}" data-fleet-trace-map="${row.attempt}">
+      <option value="">Map to run…</option>
+      <option value="R41">R41</option>
+      <option value="R42">R42</option>
+      <option value="unmatched">Unmatched</option>
+    </select>
+    <small data-fleet-trace-check></small>
+  </li>`;
 }
 
 function evaluateFleetTraceMappings(
-  physicalBody: HTMLTableSectionElement,
+  physicalBody: HTMLUListElement,
   selections: Map<string, FleetTraceSelection>,
 ) {
   let conflicts = 0;
 
   for (const row of fleetTracePhysicalRows) {
-    const tableRow = physicalBody.querySelector<HTMLElement>(
+    const record = physicalBody.querySelector<HTMLElement>(
       `[data-fleet-trace-row="${row.attempt}"]`,
     );
-    const check = tableRow?.querySelector<HTMLElement>(
+    const check = record?.querySelector<HTMLElement>(
       "[data-fleet-trace-check]",
     );
     const correct = selections.get(row.attempt) === row.correctAssignment;
 
-    if (!tableRow || !check) {
+    if (!record || !check) {
       continue;
     }
 
-    tableRow.dataset.fleetTraceStatus = correct ? "correct" : "conflict";
+    record.dataset.fleetTraceStatus = correct ? "correct" : "conflict";
     check.textContent = correct
       ? row.correctReason
       : buildFleetTraceConflictReason(row, selections.get(row.attempt));

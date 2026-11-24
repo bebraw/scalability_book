@@ -26,7 +26,7 @@ try {
   await page.evaluate(() => document.fonts.ready);
   await page.addStyleTag({
     content: `
-    .site-header, .demo-gallery-item-header { position: static !important; }
+    .site-header { position: static !important; }
     [data-demo-permalink] { visibility: hidden; }
     :target { outline: none !important; }
     * { caret-color: transparent !important; }

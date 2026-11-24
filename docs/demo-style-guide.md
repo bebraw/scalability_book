@@ -25,7 +25,9 @@ Keep each demo's existing ID and `data-demo-anchor` attribute, then add these cl
 
 The common rules at the end of `site/styles/demos.css` own this structure.
 Change those rules when adjusting the shared treatment; avoid adding another set of header overrides for individual demos.
-The gallery provides its own outer frame, while demos embedded in chapters use the shared grid surface and border.
+The gallery gives each demo the full width of its frame.
+Its “Find a demo” index links directly to each investigation, and “Read in context” opens the same demo in its published chapter or appendix.
+Demos embedded in chapters use the shared grid surface and border.
 
 ## Visual rules
 
@@ -37,6 +39,9 @@ The gallery provides its own outer frame, while demos embedded in chapters use t
 - Use square frames for panels and controls; rounded diagram nodes, status dots, and badges may communicate their own meaning.
 - Stack the shared header at narrow widths, and contain wide diagrams or logs inside their own scroll regions.
 - Inspect SVG text at its rendered size because its coordinate system can scale text independently of CSS labels.
+- On a phone, check how far readers must scroll between the first action, the evidence they need and the result.
+  Keep each choice and its feedback within reach.
+  Put supporting records, reference diagrams and custom settings behind descriptive disclosures when the opening task can stand on its own.
 
 ## Wording rules
 
@@ -61,8 +66,12 @@ Model evaluation uses the learner’s actual preserved attempts, a frozen rubric
 
 The tail population exposes all 60 ordered records, nearest-rank p95 at rank 57 and the count missing the objective; it models no concurrency or queue.
 The saturation model separates offered, admitted and completed rates, queue growth and rejection, with before/after capacity changes and separately revealed measurement hints.
+Readers can add capacity and compare the outcome before opening the individual stage settings.
 The latency map uses neutral distances and direct hypothetical service timings; batching assumes unchanged results and query execution with at most two dependency rounds.
+Its marker key stays readable as the map scales, and the header compares sequential and batched totals.
 The web architecture lens models three exchanges—document, HTML fragment and JSON—with explicit draft restoration and no invented payload sizes.
+It shows the draft, update and outcome together, with the HTTP exchange available on demand.
+The cache lab pairs the next request with its decision, and the ACID lab shows the inputs that apply to the selected disturbance.
 The statechart opens with a RELEASE proposal.
 Its outcome appears beside the button, and the header names the current state in each active region.
 Its optional patch B checkpoint replays the events through review approval, then pauses with B's checks still running.
@@ -74,6 +83,8 @@ Cancellation applies to the active workflow as a whole.
 The build renders these routes from the same machine configuration that runs the lab.
 The event history and executable model open on demand.
 Replica convergence in orchestration is separate from simulated HTTP success; running-but-broken v2 returns 500, and rollback restores v1 responses without erasing the failures.
+Request counts sit next to the burst control; readers can open the request log or controller feed for details.
+The fleet trace lets readers map each physical attempt alongside its ownership evidence and feedback, with the underlying logs available for inspection.
 The contention and reliability models retain their explicit assumptions and corrected boundary interpretations.
 
 ACID, retry and telemetry are short orientations.

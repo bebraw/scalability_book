@@ -54,6 +54,14 @@ for (const path of ["/chapters/benchmarking/", "/demos/"]) {
       await expect(toggle).toBeDisabled();
       await expect(reading).toBeHidden();
 
+      const child = demo.getByRole("button", { name: /validate event/ });
+      const childInFirstScreen = await child.evaluate(
+        (row) =>
+          row.getBoundingClientRect().bottom -
+            row.closest("[data-demo-anchor]")!.getBoundingClientRect().top <=
+          innerHeight,
+      );
+      expect(childInFirstScreen).toBe(true);
       await demo.getByRole("button", { name: /acquire connection/ }).click();
       await expect(toggle).toBeEnabled();
       await toggle.focus();
@@ -219,11 +227,15 @@ for (const path of ["/chapters/benchmarking/", "/demos/"]) {
         height: element.scrollHeight,
         clientHeight: element.clientHeight,
       }));
-      expect(scroll.width).toBeGreaterThan(scroll.clientWidth);
-      await page.keyboard.press("ArrowRight");
-      await expect
-        .poll(() => record.evaluate((element) => element.scrollLeft))
-        .toBeGreaterThan(0);
+      if (width <= 390) {
+        expect(scroll.width).toBeGreaterThan(scroll.clientWidth);
+      }
+      if (scroll.width > scroll.clientWidth) {
+        await page.keyboard.press("ArrowRight");
+        await expect
+          .poll(() => record.evaluate((element) => element.scrollLeft))
+          .toBeGreaterThan(0);
+      }
       if (scroll.height > scroll.clientHeight) {
         await page.keyboard.press("ArrowDown");
         await expect

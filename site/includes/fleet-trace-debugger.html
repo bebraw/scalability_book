@@ -9,47 +9,25 @@
     <div>
       <p class="fleet-trace-kicker demo-kicker">Fleet trace debugger</p>
       <h3 id="fleet-trace-heading">Match fleet activity to resource costs</h3>
-      <p>
-        Fixed synthetic teaching packet. No models or tools execute in this
-        demo.
-      </p>
+      <small>Synthetic packet FLT-17A. No models or tools execute.</small>
     </div>
     <div class="fleet-trace-summary demo-summary" aria-live="polite">
       <span data-fleet-trace-verdict>0 of 5 ledger rows assigned</span>
       <small data-fleet-trace-summary>
-        Compare planned work, gateway decisions, and the supplied resource
-        ledger.
+        Match the attempt, trace and gateway IDs in the source logs.
       </small>
     </div>
   </header>
 
   <form class="fleet-trace-form" data-fleet-trace-form>
-    <section
-      class="fleet-trace-packet"
-      aria-labelledby="fleet-trace-packet-heading"
-    >
-      <div class="fleet-trace-section-heading">
-        <span aria-hidden="true">01</span>
-        <div>
-          <h4 id="fleet-trace-packet-heading">Inspect the supplied logs</h4>
-          <p>
-            Compare orchestration intent with gateway decisions before touching
-            the physical ledger.
-          </p>
-        </div>
-        <div class="fleet-trace-packet-stamp">
-          <span>Packet</span>
-          <code>FLT-17A</code>
-          <small>Gateway export complete</small>
-        </div>
-      </div>
-
+    <details class="fleet-trace-packet">
+      <summary>Inspect orchestration and gateway logs</summary>
       <div class="fleet-trace-run-strip" aria-label="Delegated run outcomes">
         <article>
           <span>R41</span>
           <div>
             <strong>Patch event filter</strong>
-            <small><code>tr-41</code> · outcome accepted</small>
+            <small><code>tr-41</code></small>
           </div>
           <em class="is-accepted">Accepted</em>
         </article>
@@ -57,7 +35,7 @@
           <span>R42</span>
           <div>
             <strong>Publish audit notice</strong>
-            <small><code>tr-42</code> · outcome cancelled</small>
+            <small><code>tr-42</code></small>
           </div>
           <em class="is-cancelled">Cancelled</em>
         </article>
@@ -71,18 +49,16 @@
           <header>
             <span>ORCH</span>
             <div>
-              <h5 id="fleet-trace-orchestration-heading">Orchestration log</h5>
+              <h4 id="fleet-trace-orchestration-heading">Orchestration log</h4>
               <small>Run intent and outcomes</small>
             </div>
           </header>
-          <div class="fleet-trace-table-wrap" tabindex="0">
+          <div class="fleet-trace-table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">Time</th>
-                  <th scope="col">Run</th>
-                  <th scope="col">Event</th>
-                  <th scope="col">Evidence</th>
+                  <th scope="col">Time / run</th>
+                  <th scope="col">Event and evidence</th>
                 </tr>
               </thead>
               <tbody data-fleet-trace-orchestration></tbody>
@@ -97,18 +73,16 @@
           <header>
             <span>GATE</span>
             <div>
-              <h5 id="fleet-trace-gateway-heading">Gateway log</h5>
+              <h4 id="fleet-trace-gateway-heading">Gateway log</h4>
               <small>Selected route and policy result · complete export</small>
             </div>
           </header>
-          <div class="fleet-trace-table-wrap" tabindex="0">
+          <div class="fleet-trace-table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">Request</th>
-                  <th scope="col">Run / trace</th>
-                  <th scope="col">Selected resource</th>
-                  <th scope="col">Policy</th>
+                  <th scope="col">Attempt / request</th>
+                  <th scope="col">Run, route and policy</th>
                 </tr>
               </thead>
               <tbody data-fleet-trace-gateway></tbody>
@@ -116,55 +90,26 @@
           </div>
         </section>
       </div>
-    </section>
+    </details>
 
     <section
       class="fleet-trace-mapping"
       aria-labelledby="fleet-trace-mapping-heading"
     >
       <div class="fleet-trace-section-heading">
-        <span aria-hidden="true">02</span>
         <div>
           <h4 id="fleet-trace-mapping-heading">
             Match each resource record to a run
           </h4>
-          <p>
-            Map each provider or resource record to <code>R41</code>,
-            <code>R42</code>, or <code>unmatched</code>. Do not infer a run
-            where the linking evidence is absent.
-          </p>
-        </div>
-        <output data-fleet-trace-progress>0 / 5 mapped</output>
-      </div>
-
-      <div class="fleet-trace-physical-label">
-        <span>PHY</span>
-        <div>
-          <strong>Provider and resource ledger</strong>
-          <small>Authoritative provider spend and tool-effect records</small>
+          <p>Choose Unmatched when the linking evidence identifies no run.</p>
         </div>
       </div>
 
-      <div
-        class="fleet-trace-table-wrap fleet-trace-physical-wrap"
-        tabindex="0"
-      >
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Row</th>
-              <th scope="col">Time</th>
-              <th scope="col">Physical operation</th>
-              <th scope="col">Linking evidence</th>
-              <th scope="col">Result</th>
-              <th scope="col">Cost</th>
-              <th scope="col">Map to</th>
-              <th scope="col">Reconciliation</th>
-            </tr>
-          </thead>
-          <tbody data-fleet-trace-physical></tbody>
-        </table>
-      </div>
+      <ul
+        class="fleet-trace-ledger"
+        aria-label="Provider and resource ledger"
+        data-fleet-trace-physical
+      ></ul>
 
       <div class="fleet-trace-actions">
         <p data-fleet-trace-guidance>
@@ -186,7 +131,6 @@
       hidden
     >
       <div class="fleet-trace-section-heading">
-        <span aria-hidden="true">03</span>
         <div>
           <h4 id="fleet-trace-results-heading">Reconciled control record</h4>
           <p>
@@ -222,7 +166,7 @@
           aria-labelledby="fleet-trace-rollup-heading"
         >
           <h5 id="fleet-trace-rollup-heading">Run and route rollup</h5>
-          <div class="fleet-trace-table-wrap" tabindex="0">
+          <div class="fleet-trace-table-wrap">
             <table>
               <thead>
                 <tr>

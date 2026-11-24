@@ -67,6 +67,9 @@
     const events = root.querySelector<HTMLElement>(
       "[data-architecture-lens-events]",
     )!;
+    const verdict = root.querySelector<HTMLElement>(
+      "[data-architecture-lens-verdict]",
+    )!;
     const status = root.querySelector<HTMLElement>(
       ".architecture-lens-browser-status",
     )!;
@@ -98,8 +101,8 @@
       )!.textContent = selected.scope;
       restore.disabled = flow !== "mpa";
       events.replaceChildren();
-      status.textContent =
-        "Predict whether this update will preserve the draft, then reveal the modeled result.";
+      verdict.textContent = "Choose an update flow";
+      status.textContent = "";
     };
     choices.forEach((choice) => choice.addEventListener("change", render));
     restore.addEventListener("change", render);
@@ -112,13 +115,20 @@
         event.dataset.addedEvent = "";
         event.textContent = "E43 · Architecture study";
         events.append(event);
-        if (flow === "mpa" && !restore.checked) draft.value = "";
-        status.textContent =
-          flow === "mpa"
-            ? restore.checked
-              ? "Modeled document replacement with explicit draft restoration."
-              : "Modeled document replacement: the unpreserved DOM draft reset."
-            : "Modeled targeted update: the draft outside #activity-list stayed unchanged.";
+        if (flow !== "mpa") {
+          verdict.textContent = "Draft kept outside the update";
+          status.textContent =
+            "Modeled targeted update: the draft outside #activity-list stayed unchanged.";
+        } else if (restore.checked) {
+          verdict.textContent = "Draft restored";
+          status.textContent =
+            "Modeled document replacement with explicit draft restoration.";
+        } else {
+          draft.value = "";
+          verdict.textContent = "Draft reset";
+          status.textContent =
+            "Modeled document replacement: the unpreserved DOM draft reset.";
+        }
       });
     render();
   }

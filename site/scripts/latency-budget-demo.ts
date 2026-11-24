@@ -55,9 +55,6 @@ function initializeLatencyDemo(root: HTMLElement) {
   const mapLabels = Array.from(
     root.querySelectorAll<HTMLElement>("[data-latency-demo-map]"),
   );
-  const verdict = root.querySelector<HTMLElement>(
-    "[data-latency-demo-verdict]",
-  );
   const breakdown = root.querySelector<HTMLElement>(
     "[data-latency-demo-breakdown]",
   );
@@ -74,7 +71,6 @@ function initializeLatencyDemo(root: HTMLElement) {
     !dbExecOutput ||
     !appWork ||
     !appWorkOutput ||
-    !verdict ||
     !breakdown ||
     !interpretation
   ) {
@@ -104,8 +100,7 @@ function initializeLatencyDemo(root: HTMLElement) {
     appWorkOutput.value = `${applicationWork} ms`;
     appWorkOutput.textContent = `${applicationWork} ms`;
     updateLatencyMetrics(metrics, result);
-    updateLatencyMap(root, mapLabels, distances, result);
-    verdict.textContent = `${Math.round(result.total)} ms modeled response`;
+    updateLatencyMap(root, mapLabels, distances);
     breakdown.innerHTML = buildLatencyBreakdown(result)
       .map((item) => `<li>${escapeLatencyHtml(item)}</li>`)
       .join("");
@@ -122,7 +117,6 @@ function updateLatencyMap(
   root: HTMLElement,
   labels: HTMLElement[],
   distances: Record<LatencyDistanceKey, number>,
-  result: ReturnType<typeof calculateLatencyBudget>,
 ) {
   const fallbackUserPoint: LatencyPoint = { x: 340, y: 78 };
   const fallbackDbPoint: LatencyPoint = { x: 407, y: 91 };
@@ -165,10 +159,6 @@ function updateLatencyMap(
       label.textContent = `${distances.userApp.toLocaleString()} km`;
     } else if (key === "dbDistance") {
       label.textContent = `${distances.appDb.toLocaleString()} km`;
-    } else if (key === "userLatency") {
-      label.textContent = `${formatLatency(result.userRttFloor)} ms RTT floor`;
-    } else if (key === "dbLatency") {
-      label.textContent = `${formatLatency(result.dbRttFloor)} ms RTT floor`;
     }
   });
 }
@@ -266,8 +256,6 @@ function updateLatencyMetrics(
       node.textContent = `${formatLatency(result.sequentialDb)} ms`;
     } else if (key === "batchedDb") {
       node.textContent = `${formatLatency(result.batchedDb)} ms`;
-    } else if (key === "roundtripPenalty") {
-      node.textContent = `${formatLatency(result.avoidable)} ms`;
     } else if (key === "dbTripNetwork") {
       node.textContent = `${formatLatency(result.dbNetworkPerTrip)} ms`;
     } else if (key === "serverExecution") {
