@@ -29,7 +29,7 @@ These records contain planning context, research rationale or follow-up work; cu
 - [Student feedback follow-ups](student-feedback-followups-2026-11-16.md): remaining assistant, notebook, feedback-audience and Chapters 1–3 usability/editorial tasks from the November pilot review.
 - [First-run improvements](first-run-course-improvements.md) and [text-tightening review](text-tightening-review-2026-09-15.md): operational and editorial proposals to revisit against current material.
 - [Project scope review](project-specification-scope-review-2026-10-22.md): the agreed simplifications and remaining preparation for the pilot.
-- [Latest Obsidian intake](obsidian-content-review-2026-10-19.md): the 19 October source-review checkpoint for the next intake.
+- [Latest Obsidian intake](obsidian-content-review-2026-11-24.md) records the 24 November source review and its three book changes.
 - [Feedback hardening](feedback-bot-hardening.md) and [ScholarMark integration](scholarmark-integration-report.md): capability proposals and their recorded implementation boundaries.
 - [Three-build direction](three-build-project-direction.md) and [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md): historical planning and research context; the linked ADRs and current rubric own the decisions.
 

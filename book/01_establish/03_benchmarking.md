@@ -451,6 +451,21 @@ Generated lines and transcript length can hide work shifted into review or maint
 > A short project may have too few deployments or failures for stable rates.
 > Use this timeline to interpret the measurement boundaries; individual rankings and an uncontrolled before/after chart cannot establish an AI effect.
 
+### What did nearly 2,500 merges deliver?
+
+GitHits co-founder Juha Litola reports merging nearly 2,500 agent-written pull requests from his account in the GitHits organization in October 2026 :citep[litola2026githits].
+About one in five contributed to a single effort to speed up indexing when a repository changes.
+Most of that work landed behind feature flags.
+The production rollout began on November 12, and Litola reported 30–46% faster incremental indexing in the first runs.
+In a random sample of 500 October pull requests, Litola judged that about one in nine made a change users could clearly notice.
+
+Suppose you need to decide whether to assign more agents to the next indexing change.
+Splitting the same work into smaller pull requests could raise the merge count while leaving the rollout date unchanged.
+For comparable changes, measure elapsed time from assignment until a production rollout meets a target.
+For example, how soon after a repository update do the changed files appear correctly in the index?
+Track the wait for human decisions, the effort spent on review and rework, and the cost of the agent runs.
+The October account leaves open whether a smaller team of agents could have delivered the same improvement sooner or at lower total cost.
+
 ### Field note — Preserve accepted context, not every interaction
 
 I have not established a practice of preserving complete agent transcripts or detailed workflow telemetry.

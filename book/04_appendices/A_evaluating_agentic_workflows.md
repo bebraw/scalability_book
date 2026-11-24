@@ -197,6 +197,11 @@ Ambiguous instructions, incomplete graders, leaked state, shared caches, resourc
 Record the suite version and environment with every result, validate a reference solution, start trials from clean state, and read selected traces before trusting an aggregate score.
 When a task or grader changes materially, do not silently compare the new score with results from the previous instrument.
 
+Danish Foundation Models found that its Munin 2.0 training grader rejected 18–42% of exact reference fixes on SWE-smith tasks in Rust, C++ and Java :citep[dfm2026munin].
+The team traced most of those failures to running tests in the sandbox where the agent had built the code.
+SWE-smith supplied training rewards only.
+To check whether build state changes a verdict, grade the same reference patch twice, once in the workspace left by the build and once in a clean copy with the same dependencies.
+
 For this course, inspecting one packaged benchmark task is more useful than running the entire public suite.
 Identify its claimed capability, starting state, visible instructions, hidden or external assumptions, graders, reference solution, resource boundary, and plausible gaming paths.
 Then state what a passing result would and would not establish.
@@ -354,7 +359,8 @@ Confidence still depends on the theorem statements, platform models, and proof c
 
 The workflow allowed agents to patch code and regenerate specifications.
 Removing intended work could make crash freedom easier to prove; the authors report patch penalties and audits to discourage that shortcut.
-The result demonstrates progress in proof construction without establishing which part of delivery consumes the most effort.
+Where does a team spend its time once it can automate proof construction?
+Follow comparable changes through release and record the time spent agreeing on the property, producing the proof, reviewing patches, and checking the deployed artifact.
 
 For an invented CSV example, an exporter that always returns only the header could satisfy a claim that it never exports a forbidden event.
 It would still violate a requirement to include every permitted event matching the filter.

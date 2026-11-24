@@ -62,6 +62,22 @@ The interface and data branches may run together because both depend on the same
 The contract itself, integration, and end-to-end [acceptance](/concepts/#acceptance-criteria) remain sequential.
 If both branches need to reinterpret the lifecycle, edit the same schema, or wait for the same person, their apparent parallelism merely moves waiting and conflict downstream.
 
+What can one worker tell another that changes where it looks next?
+In the s³ study, four agents searched copies of the same network of rooms for an exit.
+Teams trained with messaging found the exit 19 percentage points more often than teams trained with the same shared reward and messaging disabled.
+With messages, agents overlapped in their searches about half as much :citep[jha2026s3].
+
+In a separate study, a team of specialists reporting to a coordinator and a single-agent Claude Code baseline each made eight agent calls on an e-commerce build.
+Both earned a functional completion score of 87.1%.
+The team took 171.8 seconds and the baseline took 161.2 seconds :citep[wu2026structured].
+Those timings cover the whole build, including model execution and code generation.
+
+Suppose two agents investigate a stale activity feed.
+The first confirms that the API already returns the new event.
+Telling the second agent lets it skip a database check and go straight to the browser's handling of the response.
+To test whether sharing findings helps on this task, compare runs with messaging enabled and disabled, holding the agent count, total token budget, and acceptance check fixed.
+Record which checks both agents repeated, how long either waited for a finding, and when the corrected feed passed the browser check.
+
 ### Separate agent concurrency from human work in progress
 
 **Agent concurrency** counts agents executing at the same time.
