@@ -36,7 +36,7 @@ interface Options {
   source: LearningSource;
   entries: NotebookEntry[];
   initial: (source: LearningSource, saved?: () => void) => void;
-  reflect: (source: LearningSource, body: string, relatedIds: string[]) => void;
+  reflect: (source: LearningSource, body: string) => void;
   status: (text: string) => void;
   save: GuideSave;
   help: (source: LearningSource, text: string) => void;
@@ -519,7 +519,6 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
           options.reflect(
             thread.source,
             `Discussion reference: ${threadLink(thread)}\nThis link does not copy replies or grant access after membership changes.\n\n${selected.size ? `Selected contributions for my review (not group consensus):\n${selectedInquiryText(chosen(), 12000)}\n\n` : ""}My initial view:\n\nWhat I can now justify myself:\n\nWhat remains uncertain or needs more help:\n\nMy next independent check:\n`,
-            related(thread.source),
           ),
         ),
       );
@@ -542,7 +541,6 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
                   0,
                   4000,
                 ),
-              noteIds: [],
             },
           }),
         ),

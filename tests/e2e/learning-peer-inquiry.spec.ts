@@ -1,9 +1,9 @@
 import {
-  activeLearningPanel,
+  assistantPanel,
   downloadedMarkdown,
   selectReading,
-  chooseNotebookTool,
-} from "./learning-notebook.helpers.ts";
+  chooseAssistantTool,
+} from "./learning-workspace.helpers.ts";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
@@ -113,7 +113,7 @@ test("students save private initial work before group replies, reflect individua
       .locator(".site-header")
       .getByRole("button", { name: "Teaching assistant", exact: true })
       .click();
-    const panel = activeLearningPanel(page);
+    const panel = assistantPanel(page);
     await panel
       .getByLabel("Companion address")
       .fill(`http://127.0.0.1:${port}`);
@@ -123,8 +123,8 @@ test("students save private initial work before group replies, reflect individua
     return { page, panel };
   }
   async function peers(page: Page) {
-    const panel = activeLearningPanel(page);
-    await chooseNotebookTool(panel, "Peer discussion");
+    const panel = assistantPanel(page);
+    await chooseAssistantTool(panel, "Peer discussion");
     await panel.getByLabel("Course for this inquiry").selectOption(course.id);
     return panel;
   }

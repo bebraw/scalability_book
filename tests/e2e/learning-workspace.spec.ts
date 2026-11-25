@@ -1,11 +1,11 @@
 import {
-  activeLearningPanel,
+  assistantPanel,
   openAssistantSettings,
   selectReading,
   downloadedMarkdown,
-  chooseNotebookTool,
-} from "./learning-notebook.helpers.ts";
-import { test, expect, type Locator } from "@playwright/test";
+  chooseAssistantTool,
+} from "./learning-workspace.helpers.ts";
+import { test, expect, type Locator, type Route } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
@@ -136,7 +136,7 @@ for (const width of [1440, 390]) {
       .locator(".site-header")
       .getByRole("button", { name: "Teaching assistant", exact: true })
       .click();
-    const panel = activeLearningPanel(page);
+    const panel = assistantPanel(page);
     await panel.getByLabel("Companion address").fill(companionAddress);
     await panel
       .getByRole("button", { name: "Connect companion", exact: true })
@@ -263,7 +263,7 @@ async function connectSyntheticDiscussion(
     .locator(".site-header")
     .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const panel = activeLearningPanel(page);
+  const panel = assistantPanel(page);
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel
     .getByRole("button", { name: "Connect companion", exact: true })
@@ -524,7 +524,7 @@ test("the conversation picker immediately follows new discussions and retains a 
     .locator(".site-header")
     .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const panel = activeLearningPanel(page);
+  const panel = assistantPanel(page);
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel.getByRole("button", { name: "Connect companion" }).click();
   await openAssistantSettings(panel);
@@ -547,9 +547,21 @@ test("the conversation picker immediately follows new discussions and retains a 
   const second = await start();
   await expect(picker).toHaveValue(second.id);
   await expect(picker.getByRole("option")).toHaveCount(3);
+  // The user's selection must survive navigation even while its messages are in flight.
+  let holdRequest!: (route: Route) => void;
+  const held = new Promise<Route>((resolve) => {
+    holdRequest = resolve;
+  });
+  await page.route(
+    `${companionAddress}/agent/conversations/${first.id}`,
+    holdRequest,
+    { times: 1 },
+  );
   await picker.selectOption(first.id);
+  const pending = await held;
   await expect(picker).toHaveValue(first.id);
   await page.reload();
+  await pending.abort().catch(() => {}); // The previous document may already have cancelled the request.
   await openAssistantSettings(panel);
   await expect(picker).toHaveValue(first.id);
   await expect(picker.getByRole("option")).toHaveCount(3);
@@ -582,7 +594,7 @@ test("first connection offers guided provider setup without sending a model requ
     .locator(".site-header")
     .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const panel = activeLearningPanel(page);
+  const panel = assistantPanel(page);
   await expect(
     panel.getByRole("heading", { name: "1. Choose your setup" }),
   ).toBeVisible();
@@ -678,12 +690,12 @@ test("notebook-only connections explain setup before sending and retain the ques
     .locator(".site-header")
     .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const panel = activeLearningPanel(page);
+  const panel = assistantPanel(page);
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel
     .getByRole("button", { name: "Connect companion", exact: true })
     .click();
-  await chooseNotebookTool(panel, "Discuss");
+  await chooseAssistantTool(panel, "Discuss");
   await panel
     .getByLabel("Message to the teaching assistant")
     .fill("Keep my question while I enable a provider.");
@@ -714,7 +726,7 @@ test("notebook-only connections explain setup before sending and retain the ques
   await panel
     .getByRole("button", { name: "Check connection", exact: true })
     .click();
-  await chooseNotebookTool(panel, "Discuss");
+  await chooseAssistantTool(panel, "Discuss");
   await expect(
     panel.getByLabel("Message to the teaching assistant"),
   ).toHaveValue("Keep my question while I enable a provider.");
@@ -777,13 +789,13 @@ test("students choose task support and direct explanations without a saved initi
     .locator(".site-header")
     .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const panel = activeLearningPanel(page);
+  const panel = assistantPanel(page);
   await panel.getByLabel("Companion address").fill(companionAddress);
   await panel
     .getByRole("button", { name: "Connect companion", exact: true })
     .click();
   await expect(panel.getByRole("status")).toContainText("Connected");
-  await chooseNotebookTool(panel, "Discuss");
+  await chooseAssistantTool(panel, "Discuss");
   await panel.getByLabel("How I want help").selectOption("explanation");
   await panel.getByLabel("Where I want support").selectOption("prerequisite");
   await panel
@@ -873,40 +885,34 @@ test("book highlights copy and download a source-linked passage without opening 
   );
 });
 
-test("old notebook data is recoverable only through the explicit recovery route", async ({
+test("only the explicit recovery route exposes notebook exports", async ({
   page,
 }) => {
+  const recovery = page.getByRole("region", { name: "Notebook recovery" });
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (["8788", "18888"].includes(new URL(request.url()).port))
+      requests.push(request.url());
+  });
+  await page.goto("/notebook/setup/");
+  await expect(recovery).toHaveCount(0);
   await page.goto("/notebook/setup/?legacy=1");
-  const notebook = page.locator("#learning-notebook");
-  await expect(notebook).toBeVisible();
-  await notebook.getByLabel("Companion address").fill(companionAddress);
-  await notebook
-    .getByRole("button", { name: "Connect companion", exact: true })
-    .click();
-  await chooseNotebookTool(notebook, "Write");
-  await notebook
-    .getByLabel("Your thinking")
-    .fill("A previous student's synthetic note.");
-  await notebook
-    .getByRole("button", { name: "Save note", exact: true })
-    .click();
-  await expect(notebook.getByRole("status")).toContainText(
-    "Saved in your private notebook",
+  await expect(recovery).toBeVisible();
+  await expect(recovery.getByLabel("Companion address")).toBeVisible();
+  await expect(page.locator(".learning-workspace")).toHaveCount(0);
+  await expect(page.getByLabel("Your thinking", { exact: true })).toHaveCount(
+    0,
   );
-  await chooseNotebookTool(notebook, "Connect");
-  const [archive] = await Promise.all([
-    page.waitForEvent("download"),
-    notebook.getByRole("button", { name: "Export notebook backup" }).click(),
-  ]);
-  expect(archive.suggestedFilename()).toBe("learning-notebook.json");
-  await page.goto("/chapters/introduction/");
-  await expect(notebook).toHaveCount(0);
+  expect(requests).toEqual([]);
+
+  await page.goto("/chapters/introduction/?legacy=1");
+  await expect(recovery).toHaveCount(0);
   await expect(
     page.getByRole("link", { name: "Learning diary", exact: true }),
   ).toHaveAttribute("href", "/diary/");
   await page.goto("/chapters/introduction/?assistant=1");
-  await expect(page.locator("#learning-assistant")).toBeVisible();
-  await expect(notebook).toHaveCount(0);
+  await expect(assistantPanel(page)).toBeVisible();
+  await expect(recovery).toHaveCount(0);
 });
 
 test("the diary assistant link opens the requested passage and preserves an unfinished question on cancellation", async ({
@@ -969,15 +975,15 @@ test("a reviewed assistant exchange downloads only the chosen writing with prove
   await panel.getByRole("button", { name: "Review for diary" }).click();
   const review = panel.getByRole("region", { name: "Diary exchange preview" });
   await review.getByLabel("Include your thinking").uncheck();
-  await review
-    .getByLabel("Assistant suggestion to review")
-    .fill("Check the observation interval before comparing results.");
+  const reviewed =
+    "Check the observation interval before comparing results.\n".repeat(320) +
+    "The last reviewed line compares the entire interval.";
+  expect(reviewed.length).toBeGreaterThan(16_000);
+  await review.getByLabel("Assistant suggestion to review").fill(reviewed);
   const markdown = await downloadedMarkdown(
     review.getByRole("button", { name: "Download Markdown" }),
   );
-  expect(markdown).toContain(
-    "Check the observation interval before comparing results.",
-  );
+  expect(markdown).toContain(reviewed);
   expect(markdown).toContain(
     "[Book source](https://scalableweb.dev/chapters/benchmarking/)",
   );

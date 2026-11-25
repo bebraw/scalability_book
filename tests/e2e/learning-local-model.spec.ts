@@ -10,9 +10,9 @@ import {
   localCall,
 } from "../fixtures/learning-local-server.ts";
 import {
-  chooseNotebookTool,
+  chooseAssistantTool,
   openAssistantSettings,
-} from "./learning-notebook.helpers.ts";
+} from "./learning-workspace.helpers.ts";
 
 for (const native of [false, true])
   test(`packed local model ${native ? "observes the real demo and respects declined/approved changes" : "shows discussion-only capabilities and reply provenance"}`, async ({
@@ -102,7 +102,7 @@ for (const native of [false, true])
         .click();
       await expect(assistant.getByRole("status")).toContainText("Connected");
       if (native) {
-        await chooseNotebookTool(assistant, "Discuss");
+        await chooseAssistantTool(assistant, "Discuss");
         await assistant
           .getByLabel("Investigation source")
           .selectOption("demo-cache-decision-lab");
@@ -120,7 +120,7 @@ for (const native of [false, true])
         await assistant
           .getByRole("checkbox", { name: /Include my attempt/ })
           .check();
-      } else await chooseNotebookTool(assistant, "Discuss");
+      } else await chooseAssistantTool(assistant, "Discuss");
       await openAssistantSettings(assistant);
       if (!native)
         await expect(

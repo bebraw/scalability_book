@@ -6,7 +6,7 @@ import {
 } from "../../shared/learning-workspace.ts";
 import type {
   AssistantDraft,
-  NotebookDraftPreview,
+  DiaryExchangePreview,
 } from "./learning-session.ts";
 import { mountLearningNotePreview } from "./learning-note-preview.ts";
 import { renderLearningReply } from "./learning-reply.ts";
@@ -67,20 +67,15 @@ interface Options {
   connect: () => void;
   toolMode?: "none" | "native";
   draft: AssistantDraft;
-  preview: () => NotebookDraftPreview | null;
-  previewChanged: (preview: NotebookDraftPreview) => void;
+  preview: () => DiaryExchangePreview | null;
+  previewChanged: (preview: DiaryExchangePreview) => void;
   source: () => LearningSource;
   entries: NotebookEntry[];
   loadAttempts: () => Promise<void>;
   currentReading: () => void;
   changed: () => void;
   active: () => boolean;
-  accept: (
-    text: string,
-    provenance: string,
-    source: LearningSource,
-    relatedIds: string[],
-  ) => void;
+  accept: (text: string, provenance: string, source: LearningSource) => void;
   initial: (source: LearningSource) => void;
   status: (text: string) => void;
 }
@@ -249,35 +244,35 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     choose.value = "";
     draw();
   });
+  async function loadConversation(id: string) {
+    const saved = await client.request<LearningConversation>(
+      `/agent/conversations/${id}`,
+    );
+    if (!choose.isConnected || !options.active() || draft.conversationId !== id)
+      return;
+    remember(saved);
+    draw();
+    void poll();
+  }
+  const restoredId = draft.conversationId;
   void act(async () => {
     const saved = await client.request<
       Pick<LearningConversation, "id" | "title" | "updatedAt">[]
     >("/agent/conversations");
+    if (!choose.isConnected) return;
     for (const item of saved) updateChoice(item);
-    if (draft.conversationId && options.active()) {
-      remember(
-        await client.request<LearningConversation>(
-          `/agent/conversations/${draft.conversationId}`,
-        ),
-      );
-      draw();
-      poll();
-    }
+    if (restoredId && draft.conversationId === restoredId && options.active())
+      await loadConversation(restoredId);
   });
-  choose.addEventListener(
-    "change",
-    () =>
-      void act(async () => {
-        if (!choose.value) return;
-        remember(
-          await client.request<LearningConversation>(
-            `/agent/conversations/${choose.value}`,
-          ),
-        );
-        draw();
-        poll();
-      }),
-  );
+  choose.addEventListener("change", () => {
+    // Persist the user's selection even if navigation interrupts the detail request.
+    const id = choose.value;
+    draft.conversationId = id || null;
+    options.changed();
+    conversation = null;
+    draw();
+    if (id) void act(() => loadConversation(id));
+  });
   toolbar.append(
     field("Saved conversations", choose),
     button("New conversation", async () => {
@@ -416,7 +411,6 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
     poll();
   });
   send.className = "learning-primary";
-  send.disabled = !options.provider;
   send.setAttribute("aria-describedby", "learning-provider-readiness");
   readiness.id = "learning-provider-readiness";
   actions.append(
@@ -435,6 +429,8 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
   });
   let renderedMessages = "";
   function draw() {
+    send.disabled =
+      !options.provider || Boolean(draft.conversationId && !conversation);
     drawContext();
     const current = conversation?.source ?? draft.source;
     pageOption.textContent = `${current.kind === "passage" ? "Selected passage" : current.kind === "demo" ? "Investigation" : "Current reading"} · ${current.title}`;
@@ -517,7 +513,6 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
           .slice(0, selectedConversation.messages.indexOf(message))
           .reverse()
           .find((item) => item.role === "student");
-        const relatedIds = student?.noteIds ?? [];
         const teaching = message.teaching
           ? `; policy ${message.teaching.policy.id} v${message.teaching.policy.version}; ${message.teaching.provider.name} ${message.teaching.provider.version ?? "version not reported"}${message.teaching.provider.model ? `; model ${message.teaching.provider.model}` : ""}`
           : "; teaching policy not recorded";
@@ -527,7 +522,6 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
             replyId: message.id,
             studentId: student?.id ?? null,
             source: selectedConversation.source,
-            relatedIds,
             teaching,
             studentText: student?.text ?? "",
             replyText: message.text,
@@ -536,14 +530,13 @@ export function mountLearningAgent(container: HTMLElement, options: Options) {
             open: true,
           }),
         );
-        prepare.dataset.learningNotebookReply = message.id;
+        prepare.dataset.learningDiaryReply = message.id;
         card.append(
           button("Download a takeaway prompt", () =>
             options.accept(
               "",
               `Student-written takeaway after discussion; conversation ${selectedConversation.id}; message ${message.id}${teaching}`,
               selectedConversation.source,
-              relatedIds,
             ),
           ),
           prepare,

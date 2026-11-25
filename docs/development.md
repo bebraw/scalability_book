@@ -421,7 +421,7 @@ Focused API/authentication checks are `node --test tests/learning-api.test.ts te
 The CLI suite includes a synthetic terminal setup journey using Python 3's standard `pty` module on macOS/Linux; automatic checks use synthetic provider responses and injected credential stores, never personal keychain entries.
 Native keychain smoke checks, when run, must use a fresh isolated service/account and synthetic value, verify readback/removal and retain their platform-specific limits; they do not verify provider inference.
 Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
-Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
+Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for read-only Notebook exports, packed-release onboarding, declared demo controls and course-backed peer inquiry in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
 
 ### Course project launcher
@@ -456,7 +456,7 @@ The [student guide](learning-companion-setup.md#start-a-course-coding-project) s
 ### Learning cockpit and reading investigations
 
 For shared learning loops, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts tests/e2e/learning-cockpit.spec.ts --project=chromium --project=webkit`.
-The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, selected-note and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
+The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, reviewed diary downloads and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
 Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and a local Markdown download.
 The tutorial's example reply is authored; these checks assert no model calls and distinguish preparing a draft from saving a note.
 Use a fresh `E2E_LOCAL_DATA_DIR` for synthetic browser records.

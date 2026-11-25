@@ -96,8 +96,8 @@ Students paste and send any question themselves.
 The book owns exercise checking, interactive demos and TA presentation.
 The local companion owns agent conversations, connection settings and prior Notebook records.
 The course workspace owns submissions.
-The historical Notebook and its exports are reachable through the [recovery instructions](docs/course-diary.md#bring-over-an-existing-notebook).
-[Learning panes](site/scripts/learning-pane.ts) and [navigation](site/scripts/learning-navigation.ts) coordinate the assistant and the recovery interface. [Reply rendering](site/scripts/learning-reply.ts) restricts assistant Markdown, and [browser evidence](site/scripts/learning-evidence.ts) keeps observations with the associated turn.
+The [recovery page](docs/course-diary.md#bring-over-an-existing-notebook) reads the local companion to download a complete JSON archive or all current entries in Markdown.
+[The assistant panel](site/scripts/learning-pane.ts) owns discussion, peer inquiry and connection settings. [Reply rendering](site/scripts/learning-reply.ts) restricts assistant Markdown, and [browser evidence](site/scripts/learning-evidence.ts) keeps observations with the associated turn.
 [The selected exchange preview](site/scripts/learning-note-preview.ts) retains one editable question and reply in the tab.
 Normal reading flows export selected material to Markdown.
 [learning-conversations.ts](scripts/lib/learning-conversations.ts) owns private conversation persistence and selected-context requests, while [learning-provider.ts](scripts/lib/learning-provider.ts) owns the provider port and three bounded tool schemas.
@@ -122,15 +122,15 @@ Earlier turns remain unversioned or keep their original metadata when resumed; n
 The browser presents an automated study role and reply metadata, while runtime access and demo approvals remain enforced outside the prompt.
 [learning-demos.ts](site/scripts/learning-demos.ts) exposes actual rendered controls and observations; proposed agent changes require student review in [learning-agent-ui.ts](site/scripts/learning-agent-ui.ts).
 [learning-context.ts](site/scripts/learning-context.ts) derives chapter/page links, authored concept membership and explicitly selected passage context, with selection captured by the lightweight [learning-selection.ts](site/scripts/learning-selection.ts).
-[learning-session.ts](site/scripts/learning-session.ts) owns tab-scoped independent open states, foreground experience, remembered sections, separate notebook/assistant note selections and unfinished writing/context/message/conversation continuity across book navigation; it does not create durable companion records.
-[learning-guide.ts](site/scripts/learning-guide.ts) uses the current reading's authored prompt and rendered demos for optional prediction, actual demo observation and private reflection after connecting.
+[learning-session.ts](site/scripts/learning-session.ts) retains the assistant panel, current section, unfinished question, source and conversation across navigation in the same tab.
 [reading-investigation.ts](shared/reading-investigation.ts) owns the versioned general learning loop, derived authored demo activities and validated reported-evidence/browser-snapshot contracts, published through the concept graph and public MCP lookups.
-[learning-cockpit.ts](site/scripts/learning-cockpit.ts) owns the one contextual cockpit, focus switching, recent-loop navigation and explicit entry from reading, exercises, practice, selected Notebook notes and peer context.
+[learning-cockpit.ts](site/scripts/learning-cockpit.ts) owns the one contextual cockpit, focus switching, recent-loop navigation and explicit entry from reading, exercises, practice and peer inquiry.
 [learning-tutorial.ts](site/scripts/learning-tutorial.ts) owns a replayable authored rehearsal, with independent tab-scoped writing/progress and a browser-local invitation preference; it offers a Markdown takeaway at the end.
 [learning-investigation.ts](site/scripts/learning-investigation.ts) renders one source-scoped predict/check/reflect loop using the coordinator's existing companion client, restricted reply renderer and reviewed Markdown download.
 [learning-investigation-session.ts](site/scripts/learning-investigation-session.ts) owns bounded tab drafts/history and actual generic demo observations; stored snapshots do not replay demo controls or actions.
 The browser owns unsent writing and selected context; submitted turns and snapshots remain with the companion's existing conversation owner.
-Explicit sends select no notebook entries by default, and an active reply can observe only the chosen demo through the existing broker.
+Cockpit sends include the student’s writing and current source.
+An active reply can observe the chosen demo through the existing broker.
 The student operates controls, diary takeaways download as Markdown, and public MCP remains stateless.
 The student course workspace exposes a private loop without capturing or submitting course records; administrative pages remain outside the learning interface.
 [learning-practice.ts](site/scripts/learning-practice.ts) presents optional independent cases from [learning-activities.ts](shared/learning-activities.ts), snapshots their versions into portable sources and links separately saved attempts/reflections.

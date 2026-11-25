@@ -1,4 +1,4 @@
-import { downloadedMarkdown } from "./learning-notebook.helpers.ts";
+import { downloadedMarkdown } from "./learning-workspace.helpers.ts";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 const tutorial = (page: Page) =>
@@ -236,6 +236,11 @@ test("the linked tutorial works when browser storage is unavailable and never re
 });
 
 test("a tutorial takeaway downloads without a companion", async ({ page }) => {
+  const companionRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).origin === "http://127.0.0.1:8788")
+      companionRequests.push(request.url());
+  });
   await open(page);
   await tutorial(page)
     .getByRole("button", { name: "Try the tutorial" })
@@ -252,5 +257,5 @@ test("a tutorial takeaway downloads without a companion", async ({ page }) => {
   expect(markdown).toContain(
     "Next independent check: Find one waiting boundary",
   );
-  await expect(page.locator("#learning-notebook")).toHaveCount(0);
+  expect(companionRequests).toEqual([]);
 });

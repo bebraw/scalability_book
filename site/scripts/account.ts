@@ -306,7 +306,6 @@ function initialize(toggle: HTMLButtonElement) {
           close();
           requestLearning({
             kind: "navigate",
-            experience: "assistant",
             view: "connect",
           });
         }),

@@ -1,23 +1,18 @@
 import { legacyRecovery } from "./learning-diary.ts";
 import { mountHighlightCapture } from "./learning-highlight.ts";
 import { readingSelection } from "./learning-selection.ts";
-import { readNotebookSession } from "./learning-session.ts";
-import type { LearningExperience } from "../../shared/learning-workspace.ts";
+import { readLearningSession } from "./learning-session.ts";
 import type { LearningAction } from "./learning-actions.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
-async function openLearning(
-  experience: LearningExperience,
-  resume = false,
-  currentReading = false,
-) {
-  // Capture before loading or focusing the notebook can alter the selection.
+async function openAssistant(resume = false, currentReading = false) {
+  // Capture before focusing the assistant can alter the selection.
   const selection = resume ? null : readingSelection();
   if (!(await loadLearning())) return;
   document.dispatchEvent(
     new CustomEvent("book-learning-open", {
-      detail: { selection, resume, experience, currentReading },
+      detail: { selection, resume, currentReading },
     }),
   );
 }
@@ -53,37 +48,19 @@ document.addEventListener("book-learning-request", (event) => {
   });
 });
 mountHighlightCapture();
-if (legacyRecovery) {
-  const recover = document.createElement("button");
-  recover.type = "button";
-  recover.className = "learning-toggle";
-  recover.textContent = "Recover notes";
-  recover.dataset.learningToggle = "notebook";
-  document.querySelector(".learning-launchers")?.append(recover);
-}
-const buttons = document.querySelectorAll<HTMLButtonElement>(
-  "[data-learning-toggle]",
+const assistant = document.querySelector<HTMLButtonElement>(
+  '[data-learning-toggle="assistant"]',
 );
-for (const button of buttons) {
-  button.hidden = false;
-  button.closest<HTMLElement>(".learning-launchers")!.hidden = false;
-  button.addEventListener(
-    "click",
-    () =>
-      void openLearning(
-        button.dataset.learningToggle === "assistant"
-          ? "assistant"
-          : "notebook",
-      ),
-  );
-}
-const session = readNotebookSession();
 const assistantRequested =
   new URLSearchParams(location.search).get("assistant") === "1";
-if (buttons.length) {
-  if (legacyRecovery) void openLearning("notebook");
-  else if (assistantRequested) void openLearning("assistant", false, true);
-  else if (session.assistantOpen) void openLearning("assistant", true);
+if (assistant) {
+  assistant.hidden = false;
+  assistant.closest<HTMLElement>(".learning-launchers")!.hidden = false;
+  assistant.addEventListener("click", () => void openAssistant());
+  if (!legacyRecovery) {
+    if (assistantRequested) void openAssistant(false, true);
+    else if (readLearningSession().assistantOpen) void openAssistant(true);
+  }
 }
 
 const cockpit = document.querySelector<HTMLButtonElement>(

@@ -1,7 +1,4 @@
-import {
-  downloadedMarkdown,
-  chooseNotebookTool,
-} from "./learning-notebook.helpers.ts";
+import { downloadedMarkdown } from "./learning-workspace.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
@@ -12,7 +9,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { openLearningNotebook } from "../../scripts/lib/learning-notebook.ts";
 import { companionRelease } from "../../shared/learning-connection.ts";
 
-test("an existing packed companion recovers selected diary Markdown and a full backup across restart", async ({
+test("export-only recovery downloads all Markdown and a complete notebook archive across a packed companion restart", async ({
   page,
   baseURL,
 }) => {
@@ -114,90 +111,100 @@ test("an existing packed companion recovers selected diary Markdown and a full b
     title: "Keep private",
     body: "An unrelated private reflection.",
   });
+  const judgment = notebook.saveJudgment({
+    conceptId: "cache",
+    studied: true,
+    understanding: "unsure",
+    evidenceIds: [initial.id],
+    intention: "Check a different cache lifetime.",
+  });
+  const revisedJudgment = notebook.saveJudgment({
+    ...judgment,
+    expected: judgment.revision,
+    understanding: "can-explain",
+  });
   notebook.close();
   try {
     await start();
+    const companion = "http://127.0.0.1:18974";
+    const requests: string[] = [];
+    page.on("request", (request) => {
+      const url = new URL(request.url());
+      if (url.origin === companion)
+        requests.push(`${request.method()} ${url.pathname}`);
+    });
     await page.goto("/diary/");
     await page
       .getByRole("link", { name: "Notebook recovery", exact: true })
       .click();
-    const panel = page.locator("#learning-notebook");
-    await panel.getByLabel("Companion address").fill("http://127.0.0.1:18974");
-    await expect(panel.getByLabel("Pairing code")).toHaveCount(0);
-    const connect = () =>
-      panel
+    const panel = page.getByRole("region", { name: "Notebook recovery" });
+    const connect = async () => {
+      await panel.getByLabel("Companion address").fill(companion);
+      await panel
         .getByRole("button", { name: "Connect companion", exact: true })
         .click();
+      await expect(panel.getByRole("status")).toContainText("Connected");
+    };
     await connect();
-    await expect(panel.getByRole("status")).toContainText("Connected");
-    await chooseNotebookTool(panel, "Connect");
     await expect(
-      panel.getByText(
-        `Companion ${companionRelease.version}; protocol ${companionRelease.protocol}; no assistant provider.`,
-      ),
-    ).toBeVisible();
+      panel.getByRole("button", { name: /Save note|Prepare selected notes/ }),
+    ).toHaveCount(0);
+    await expect(panel.locator('textarea, input[type="file"]')).toHaveCount(0);
+    expect(
+      requests.filter((request) => /\/(export|notebook)$/.test(request)),
+    ).toEqual([]);
+    const backup = panel.getByRole("button", {
+      name: "Export notebook backup",
+    });
+    const markdown = panel.getByRole("button", {
+      name: "Download previous notes as Markdown",
+    });
     const transfer = page.waitForEvent("download");
-    await panel.getByRole("button", { name: "Export notebook backup" }).click();
-    const file = await (await transfer).path();
-    const archive = JSON.parse(await readFile(file!, "utf8"));
+    await backup.click();
+    const archiveDownload = await transfer;
+    expect(archiveDownload.suggestedFilename()).toBe("learning-notebook.json");
+    const archive = JSON.parse(
+      await readFile((await archiveDownload.path())!, "utf8"),
+    );
+    expect(archive.entries).toHaveLength(2);
     expect(archive.entries).toEqual(
       expect.arrayContaining([latest, privateEntry]),
     );
-    expect(latest.history.map((item) => item.body)).toEqual([
-      initial.body,
-      latest.body,
-    ]);
-    const bulk = await downloadedMarkdown(
-      panel.getByRole("button", {
-        name: "Download previous notes as Markdown",
-      }),
-    );
-    expect(bulk).toContain(latest.body);
-    expect(bulk).toContain(privateEntry.body);
+    expect(archive.judgments).toEqual([revisedJudgment]);
+    expect(archive.judgmentHistory).toEqual([judgment, revisedJudgment]);
+    expect(requests).toContain("GET /export");
 
     await page.setViewportSize({ width: 390, height: 844 });
     const bounds = await panel.boundingBox();
     expect(bounds!.width).toBeLessThanOrEqual(390);
     expect(
-      (await new AxeBuilder({ page }).include(".learning-workspace").analyze())
+      (await new AxeBuilder({ page }).include("#notebook-recovery").analyze())
         .violations,
     ).toEqual([]);
+
     await stop();
-    await panel.getByRole("button", { name: "Check connection" }).click();
+    await markdown.click();
     await expect(panel.getByRole("status")).toContainText(
-      "cannot tell us which",
+      /could not reach|cannot tell us which/i,
     );
     await start();
+    const previous = requests.length;
+    await page.reload();
     await connect();
-    await expect(panel.getByRole("status")).toContainText("Connected");
-    await chooseNotebookTool(panel, "Notes");
-    await panel.getByLabel("Notes to show").selectOption("all");
-    const saved = panel
-      .locator("article")
-      .filter({
-        has: page.getByRole("heading", { name: initial.title, exact: true }),
-      });
-    await saved.getByRole("button", { name: "Edit", exact: true }).click();
-    const edited = "The stale response validated my prediction at 400 days.";
-    await panel.getByLabel("Your thinking").fill(edited);
-    await panel.getByRole("button", { name: "Save note", exact: true }).click();
-    await expect(panel.getByRole("status")).toContainText("Saved");
-    await chooseNotebookTool(panel, "Notes");
-    await panel.getByLabel("Notes to show").selectOption("all");
-    await panel
-      .getByLabel("Select My cache prediction", { exact: true })
-      .check();
-    await panel.getByRole("button", { name: "Prepare selected notes" }).click();
-    await panel.getByRole("button", { name: "Build submission draft" }).click();
-    await expect(
-      panel.getByLabel("Review and revise your submission material"),
-    ).toHaveValue(/400 days/);
-    const markdown = await downloadedMarkdown(
-      panel.getByRole("button", { name: "Download Markdown" }),
-    );
-    expect(markdown).toContain(edited);
-    expect(markdown).toContain(initial.source.url);
-    expect(markdown).not.toContain(privateEntry.body);
+    expect(
+      requests
+        .slice(previous)
+        .filter((request) => /\/(export|notebook)$/.test(request)),
+    ).toEqual([]);
+    const bulk = await downloadedMarkdown(markdown);
+    expect(bulk).toContain(latest.body);
+    expect(bulk).toContain(initial.source.url);
+    expect(bulk).toContain(privateEntry.body);
+    expect(bulk).not.toContain(initial.body);
+    expect(requests).toContain("GET /notebook");
+    expect(
+      requests.filter((request) => /^(POST|PUT|DELETE) /.test(request)),
+    ).toEqual(["POST /connect", "POST /connect"]);
   } finally {
     await stop();
     await rm(directory, { recursive: true, force: true });

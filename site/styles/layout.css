@@ -750,6 +750,34 @@
 .guide-main > .prose a {
   overflow-wrap: anywhere;
 }
+#notebook-recovery fieldset {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+#notebook-recovery fieldset > div:not([hidden]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+}
+#notebook-recovery input,
+#notebook-recovery button {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  padding: 0.4rem 0.65rem;
+}
+#notebook-recovery input {
+  display: block;
+  max-width: 100%;
+}
+#notebook-recovery button {
+  color: var(--accent-strong);
+  cursor: pointer;
+}
 :is(.guide-main, .book-shell) .prose :is(h1, h2, h3, h4, h5, h6)[id] {
   scroll-margin-block-start: var(--reading-heading-offset, 6rem);
 }

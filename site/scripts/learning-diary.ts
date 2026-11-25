@@ -1,4 +1,4 @@
-import type { NotebookHandoff } from "../../shared/learning-workspace.ts";
+import type { DiaryTakeaway } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 
 export const legacyRecovery =
@@ -26,25 +26,31 @@ export function highlightMarkdown(selection: ReadingSelection) {
   return `${quote(selection.text)}\n\n${sourceLink(location.href, selection.anchor)}\n`;
 }
 
-export function downloadMarkdown(title: string, markdown: string) {
-  const url = URL.createObjectURL(
-    new Blob([markdown], { type: "text/markdown;charset=utf-8" }),
-  );
+export function downloadFile(filename: string, body: string, type: string) {
+  const url = URL.createObjectURL(new Blob([body], { type }));
   const link = document.createElement("a");
   link.href = url;
-  link.download =
-    (title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 90) || "diary") + ".md";
+  link.download = filename;
   document.body.append(link);
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function downloadTakeaway(draft: NotebookHandoff) {
+export function downloadMarkdown(title: string, markdown: string) {
+  const name = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90);
+  downloadFile(
+    (name || "diary") + ".md",
+    markdown,
+    "text/markdown;charset=utf-8",
+  );
+}
+
+export function downloadTakeaway(draft: DiaryTakeaway) {
   const parts = [`# ${draft.title}`, draft.body];
   if (draft.source.excerpt) parts.push(quote(draft.source.excerpt));
   parts.push(sourceLink(draft.source.url, draft.source.anchor));

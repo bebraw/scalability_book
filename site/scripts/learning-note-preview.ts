@@ -2,17 +2,12 @@ import {
   sourceLink,
   type LearningSource,
 } from "../../shared/learning-workspace.ts";
-import type { NotebookDraftPreview } from "./learning-session.ts";
+import type { DiaryExchangePreview } from "./learning-session.ts";
 
 interface Options {
-  read: () => NotebookDraftPreview | null;
-  changed: (preview: NotebookDraftPreview) => void;
-  accept: (
-    body: string,
-    provenance: string,
-    source: LearningSource,
-    relatedIds: string[],
-  ) => void;
+  read: () => DiaryExchangePreview | null;
+  changed: (preview: DiaryExchangePreview) => void;
+  accept: (body: string, provenance: string, source: LearningSource) => void;
 }
 
 let identity = 0;
@@ -22,7 +17,7 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   return node;
 };
 
-export function buildNotebookDraft(preview: NotebookDraftPreview) {
+export function buildDiaryExcerpt(preview: DiaryExchangePreview) {
   const parts: string[] = [];
   const messages: string[] = [];
   if (
@@ -38,24 +33,14 @@ export function buildNotebookDraft(preview: NotebookDraftPreview) {
     messages.push(`assistant message ${preview.replyId}`);
   }
   const prefix = `Reviewed discussion draft; conversation ${preview.conversationId}; ${messages.join("; ")}; reply context ${preview.replyId}`;
-  const suffix = "; selected and reviewed by student before saving";
-  const complete = prefix + preview.teaching + suffix;
-  const metadataShortened = complete.length > 2000;
-  const marker =
-    "; teaching metadata shortened; see the original reply for full metadata";
-  const assistance = metadataShortened
-    ? prefix +
-      preview.teaching.slice(
-        0,
-        2000 - prefix.length - suffix.length - marker.length,
-      ) +
-      marker +
-      suffix
-    : complete;
-  return { body: parts.join("\n\n"), assistance, metadataShortened };
+  const assistance =
+    prefix +
+    preview.teaching +
+    "; selected and reviewed by student before saving";
+  return { body: parts.join("\n\n"), assistance };
 }
 
-/** One selected exchange is a tab draft; Notebook owns replacement and saving. */
+/** Keep one editable exchange in the tab until the reader chooses a download. */
 export function mountLearningNotePreview(
   container: HTMLElement,
   options: Options,
@@ -91,14 +76,12 @@ export function mountLearningNotePreview(
     prepare.type = "button";
     prepare.setAttribute("aria-describedby", count.id);
     const update = () => {
-      const draft = buildNotebookDraft(preview);
+      const draft = buildDiaryExcerpt(preview);
       const length = draft.body.length;
-      const over = length > 16_000;
-      count.textContent = `${length.toLocaleString("en-US")} of 16,000 characters, including speaker labels.${over ? " Shorten the text or omit a part before preparing the draft; nothing will be cut off automatically." : length ? " Ready to download." : " Include some writing to prepare a draft."}`;
-      if (draft.metadataShortened)
-        count.textContent +=
-          " Reply metadata is too long for the note history; it will be marked as shortened, with message identities retained. Full metadata stays with the original reply.";
-      prepare.disabled = over || !length;
+      count.textContent = length
+        ? `${length.toLocaleString("en-US")} characters, including speaker labels.`
+        : "Include some writing to download.";
+      prepare.disabled = !length;
       options.changed(preview);
     };
     function part(
@@ -143,12 +126,10 @@ export function mountLearningNotePreview(
       "Assistant suggestion to review",
     );
     prepare.addEventListener("click", () => {
-      const draft = buildNotebookDraft(preview);
+      const draft = buildDiaryExcerpt(preview);
       const text = draft.body;
-      if (!text || text.length > 16_000) return;
-      options.accept(text, draft.assistance, structuredClone(preview.source), [
-        ...preview.relatedIds,
-      ]);
+      if (!text) return;
+      options.accept(text, draft.assistance, preview.source);
     });
     const close = element("button", "Close draft preview");
     close.type = "button";
@@ -157,7 +138,7 @@ export function mountLearningNotePreview(
       options.changed(preview);
       render();
       const trigger = container.parentElement?.querySelector<HTMLButtonElement>(
-        `[data-learning-notebook-reply="${CSS.escape(preview.replyId)}"]`,
+        `[data-learning-diary-reply="${CSS.escape(preview.replyId)}"]`,
       );
       (trigger ?? container.parentElement?.querySelector("textarea"))?.focus();
     });
@@ -174,7 +155,7 @@ export function mountLearningNotePreview(
 
   render();
   return {
-    open(snapshot: NotebookDraftPreview) {
+    open(snapshot: DiaryExchangePreview) {
       const current = options.read();
       if (
         current &&

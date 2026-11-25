@@ -28,7 +28,8 @@ A student chooses whether to paste and send.
 The desktop Web viewer can display the reading beside the diary.
 Chrome on the companion's computer remains the supported browser for a connection.
 
-Retain a recovery entry point for earlier Notebook data, including complete JSON backup and selected Markdown export.
+Retire the browser Notebook editor.
+Readers can use the recovery page to download a complete JSON archive or one Markdown file with the latest text of every entry from their local companion.
 Retain assistant and peer activities that depend on a prior personal attempt.
 This decision supersedes the normal diary editor and its handoffs in ADRs 028, 034, 036, 043 and 044.
 

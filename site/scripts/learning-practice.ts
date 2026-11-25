@@ -3,11 +3,8 @@ import {
   followUpSource,
 } from "../../shared/learning-activities.ts";
 import {
-  reflectionExamples,
-  reflectionPrompts,
   type LearningSource,
   type NotebookEntry,
-  type NoteKind,
 } from "../../shared/learning-workspace.ts";
 import { requestLearning } from "./learning-actions.ts";
 
@@ -17,27 +14,12 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   return element;
 };
 export type GuideSave = (
-  kind: NoteKind,
+  kind: "attempt" | "revisit",
   title: string,
   body: string,
   source: LearningSource,
   relatedIds?: string[],
 ) => Promise<NotebookEntry>;
-
-export function reflectionSupport() {
-  const details = node("details");
-  details.append(node("summary", "Reflection starters and examples"));
-  details.append(
-    node(
-      "p",
-      "Use any of these or write freely. Short notes, uncertainty and failed checks are valid. There is no correct personal conclusion.",
-    ),
-  );
-  for (const prompt of reflectionPrompts) details.append(node("p", prompt));
-  for (const example of reflectionExamples)
-    details.append(node("h4", example.title), node("p", example.text));
-  return details;
-}
 
 export function mountLearningPractice(
   container: HTMLElement,
@@ -47,7 +29,7 @@ export function mountLearningPractice(
     save: GuideSave;
     help: (source: LearningSource, text: string) => void;
     notes: () => void;
-    draftScope?: string;
+    draftScope: string;
   },
 ) {
   const activity = followUpForSource(options.source);
@@ -64,7 +46,7 @@ export function mountLearningPractice(
       "Try your own explanation before opening the self-check. You can skip this, return later, choose your own case or ask for help at any time.",
     ),
   );
-  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}:${options.draftScope ?? "guide"}`;
+  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}:${options.draftScope}`;
   let draft = { question: "", answer: "" };
   try {
     const saved = JSON.parse(sessionStorage.getItem(key) ?? "null");
@@ -204,7 +186,6 @@ export function mountLearningPractice(
             0,
             4000,
           ),
-        noteIds: [],
       },
     }),
   );

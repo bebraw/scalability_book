@@ -173,6 +173,11 @@ await compileSiteBundle("scripts/course.ts", "course.js", "CourseWorkspace");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteBundle("scripts/account.ts", "account.js", "BookAccount");
 await compileSiteBundle(
+  "scripts/notebook-recovery.ts",
+  "notebook-recovery.js",
+  "NotebookRecovery",
+);
+await compileSiteBundle(
   "scripts/learning-workspace.ts",
   "learning-workspace.js",
   "BookLearningWorkspace",
@@ -380,6 +385,7 @@ for (const guide of [
   {
     route: "notebook/setup",
     file: "learning-companion-setup.md",
+    scripts: ["/notebook-recovery.js"],
     title: "Teaching assistant setup and Notebook recovery",
     description:
       "Connect the book’s teaching assistant, configure your provider or export an existing course Notebook.",
@@ -397,6 +403,7 @@ for (const guide of [
       title: `${guide.title} - ${config.title}`,
       description: guide.description,
       currentUrl: `/${guide.route}/`,
+      scripts: guide.scripts ?? [],
       children: `<main id="content" class="chapter-main guide-main"><article class="prose">${content}</article></main>`,
     }),
   );

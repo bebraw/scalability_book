@@ -1,9 +1,9 @@
 import {
-  activeLearningPanel,
-  chooseNotebookTool,
+  assistantPanel,
+  chooseAssistantTool,
   downloadedMarkdown,
   openAssistantSettings,
-} from "./learning-notebook.helpers.ts";
+} from "./learning-workspace.helpers.ts";
 import { test, expect } from "@playwright/test";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -64,19 +64,19 @@ test("real Codex observes and changes the browser demo, resumes and exports a st
       .locator(".site-header")
       .getByRole("button", { name: "Teaching assistant", exact: true })
       .click();
-    const panel = activeLearningPanel(page);
+    const panel = assistantPanel(page);
     await panel.getByLabel("Companion address").fill("http://127.0.0.1:18889");
     await panel
       .getByRole("button", { name: "Connect companion", exact: true })
       .click();
     await expect(panel.getByRole("status")).toContainText("Connected");
-    await chooseNotebookTool(panel, "Connect");
+    await chooseAssistantTool(panel, "Connect");
     await expect(
       panel.getByText(
         /Teaching policy scalableweb-study-assistant v1; Codex 0.154.0/,
       ),
     ).toBeVisible();
-    await chooseNotebookTool(panel, "Discuss");
+    await chooseAssistantTool(panel, "Discuss");
     await panel
       .getByLabel("Investigation source")
       .selectOption("demo-cache-decision-lab");

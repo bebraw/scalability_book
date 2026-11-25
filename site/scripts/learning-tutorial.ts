@@ -1,4 +1,4 @@
-import type { NotebookHandoff } from "../../shared/learning-workspace.ts";
+import type { DiaryTakeaway } from "../../shared/learning-workspace.ts";
 
 const draftKey = "book-learning-tutorial-draft-v1";
 const seenKey = "book-learning-tutorial-seen-v1";
@@ -29,7 +29,7 @@ export function createLearningTutorial(options: {
   active: (value: boolean) => void;
   returnFocus: () => void;
   settings: () => void | Promise<void>;
-  write: (draft: NotebookHandoff) => void | Promise<void>;
+  write: (draft: DiaryTakeaway) => void | Promise<void>;
 }) {
   let draft = fresh();
   let seen = false;
@@ -128,7 +128,7 @@ export function createLearningTutorial(options: {
     wrapper.append(node("span", label), input);
     return wrapper;
   }
-  function takeawayDraft(): NotebookHandoff {
+  function takeawayDraft(): DiaryTakeaway {
     return {
       source: {
         kind: "page",
@@ -140,7 +140,6 @@ export function createLearningTutorial(options: {
         revision: null,
         conceptIds: ["little-law"],
       },
-      kind: "reflection",
       title: "My first learning loop",
       body: [
         draft.takeaway,
@@ -150,7 +149,6 @@ export function createLearningTutorial(options: {
       ]
         .filter(Boolean)
         .join("\n\n"),
-      relatedIds: [],
       assistance:
         "Authored learning-tools tutorial; no model reply was requested. Student-written reflection, reviewed before saving.",
     };
@@ -291,7 +289,7 @@ export function createLearningTutorial(options: {
       element.append(
         node(
           "p",
-          "No model was called here. For a real reply, connect your local companion with Codex or a local model. Review Shared context, then explicitly send. Only selected notes are included; demo control changes require a separate review in Assistant.",
+          "No model was called here. For a real reply, connect your local companion with Codex or a local model. Review the source, your writing and any displayed demo result in Shared context before sending. Changing a demo control never sends a message.",
         ),
       );
     } else if (draft.step === 3) {

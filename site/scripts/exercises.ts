@@ -268,7 +268,6 @@ async function mount(root: HTMLElement, auth: Auth) {
           excerpt: exercises[id]!.prompt,
         },
         question: exerciseDiscussion(id, answer),
-        noteIds: [],
       },
     });
   });
@@ -292,7 +291,6 @@ async function mount(root: HTMLElement, auth: Auth) {
           excerpt: exercises[id]!.prompt,
         },
         question: exerciseDiscussion(id, answer).slice(0, 4000),
-        noteIds: [],
       },
     });
   });

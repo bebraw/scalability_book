@@ -111,21 +111,17 @@ Choose **Download takeaway as Markdown** to keep the observation in your diary.
 Use [the course diary guide](/diary/#bring-a-passage-into-your-diary) to keep a passage from the book and your response together.
 You can follow the source link when you revisit the entry.
 
-To recover existing companion records, start the original companion and [open Notebook recovery](/notebook/setup/?legacy=1).
-Connect to its existing directory.
-In **Notes**, choose **Whole notebook** to find entries across readings.
-Under **More learning tools → Connect**, **Export notebook backup** downloads the notebook as JSON, including saved revisions, source context and concept judgments.
-Keep this file privately in case you need to restore the records.
-For a readable copy of all entries, choose **Download previous notes as Markdown** and move the file into your vault.
+To recover earlier writing, start the companion with the directory that holds your notes and [open Notebook recovery](/notebook/setup/?legacy=1).
+Enter the address printed by the companion and choose **Connect companion**.
+Choose **Download previous notes as Markdown** and move the file into your vault.
+It contains the latest text of every entry, its dates and source link.
+Choose **Export notebook backup** for the complete private JSON archive, including earlier revisions and concept judgments.
 
 ### Prepare material for your portfolio
 
 The [course diary's portfolio walkthrough](/diary/#prepare-material-for-your-portfolio) explains how to choose evidence, attach written, audio or video files, and submit your individual phase portfolio.
 
-To export selected entries from the earlier Notebook, open [Notebook recovery](/notebook/setup/?legacy=1), select them under **Notes → Whole notebook** and choose **Prepare selected notes → Build submission draft**.
-Review them and choose **Copy draft** or **Download Markdown**.
-Paste the result into a lecture entry or move the file into your vault.
-These actions leave your course portfolio untouched.
+If you recovered earlier notes, open the downloaded Markdown file in your vault and copy the excerpts you want to use into your portfolio draft.
 
 ## Start a course coding project
 
@@ -448,18 +444,9 @@ Nothing sends the report automatically.
 These instructions cover records from the earlier Notebook.
 For your Obsidian diary, back up the vault folder and any separate media files.
 
-The packaged Notebook lives in the per-user directory printed by the CLI.
-Removing a package or clearing npm's cache does not remove it.
-You can read and edit it without a model connection while the companion is running.
-
-In [Notebook recovery](/notebook/setup/?legacy=1), use **More learning tools → Connect → Export notebook backup** to save a portable JSON archive.
-On another computer, start the companion and use **Import a portable notebook**.
-Identical records are retained once; imports with conflicting existing work are rejected without replacing your notes.
-Keep both copies and start a separate notebook if you need to inspect a conflict:
-
-```sh
-npx --yes @scalableweb/companion@0.4.0 start --directory /absolute/path/to/another-notebook
-```
+The earlier Notebook lives in the per-user directory printed by the CLI.
+The [recovery page](/notebook/setup/?legacy=1) connects to that companion and offers a complete JSON archive and a readable Markdown copy of all entries.
+To continue writing in Obsidian, move the Markdown file into your vault.
 
 Keep a backup outside the companion's directory.
 Your course membership does not give teachers or peers access to the private notebook.
@@ -483,7 +470,7 @@ The backup retains `credential-identity.json` and conversation data, while saved
 Keep the backup private because it contains your learning records.
 On another computer, restore your records and sign in again or supply your API key through the configured environment variable.
 Moving a Codex profile to another path requires sign-in again even on the same computer.
-After restoring the portable notebook, you can export selected entries as Markdown and use an excerpt to start a new discussion.
+You can use an excerpt from the Markdown copy to start a new discussion.
 
 ### Move an existing repository notebook
 

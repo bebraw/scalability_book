@@ -1,13 +1,17 @@
 import { test, expect, type Page } from "@playwright/test";
 import { demoResources } from "../../shared/learning-resources.ts";
 
-async function openDemoBridge(page: Page, id: string) {
-  await page.goto(`/demos/#${id}`);
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+async function openDemoBridge(page: Page, id?: string) {
+  await page.goto(id ? `/demos/#${id}` : "/demos/");
+  await page
+    .getByRole("button", { name: "Teaching assistant", exact: true })
+    .click();
   await expect(
-    page.getByRole("dialog", { name: "My learning notebook" }),
+    page.getByRole("dialog", { name: "Teaching assistant" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Teaching assistant", exact: true })
+    .click();
 }
 
 async function observeDemo(page: Page, id: string) {
@@ -161,11 +165,7 @@ test("every authored demo declares live observations and bounded controls", asyn
   page,
 }) => {
   test.setTimeout(60_000);
-  await page.goto("/demos/");
-  await page.getByRole("button", { name: "Notebook", exact: true }).click();
-  await expect(
-    page.getByRole("dialog", { name: "My learning notebook" }),
-  ).toBeVisible();
+  await openDemoBridge(page);
   await expect(page.locator("[data-orchestration-replicas]")).toBeEnabled({
     timeout: 15_000,
   });

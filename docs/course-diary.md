@@ -88,12 +88,9 @@ Identify any assistant wording you keep.
 ## Bring over an existing Notebook
 
 If you wrote in the book's earlier Notebook, open [Notebook recovery](/notebook/setup/?legacy=1) in Chrome with your original companion running.
-Under **More learning tools → Connect**, choose **Export notebook backup** and keep the JSON privately.
-It preserves notebook revisions, source context and concept judgments.
-Choose **Download previous notes as Markdown** in the same panel if you want all your entries together in a file you can open in Obsidian.
+Choose **Connect companion** and then **Download previous notes as Markdown**.
+Move the file into your vault.
+It contains the latest text of every entry and its source link.
+You can copy passages from that file into the matching lecture notes.
 
-To bring selected writing into Obsidian, open **Notes**, choose **Whole notebook** and select the entries you want.
-Then choose **Prepare selected notes → Build submission draft**.
-Review the text and choose **Download Markdown** or **Copy draft**.
-Place the file in your vault or paste the passages into the matching lecture entries.
-Keep the JSON for restoring the original Notebook. [Companion backup and transfer](/notebook/setup/#keep-your-work-portable)
+For a private backup with earlier revisions and concept judgments, choose **Export notebook backup** and keep the JSON file. [Companion backup and transfer](/notebook/setup/#keep-your-work-portable)

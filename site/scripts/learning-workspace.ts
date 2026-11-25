@@ -1,4 +1,4 @@
-import { downloadTakeaway, legacyRecovery } from "./learning-diary.ts";
+import { downloadTakeaway } from "./learning-diary.ts";
 import { LearningClient } from "./learning-client.ts";
 import {
   createLearningPane,
@@ -7,10 +7,9 @@ import {
 } from "./learning-pane.ts";
 import { syncLearningLaunchers } from "./learning-navigation.ts";
 import {
-  readNotebookSession,
-  saveNotebookSession,
+  readLearningSession,
+  saveLearningSession,
 } from "./learning-session.ts";
-import type { LearningExperience } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 import type { LearningAction } from "./learning-actions.ts";
 import type { SiteAccount } from "../../shared/site-account.ts";
@@ -21,107 +20,30 @@ export {
   availableLearningDemos,
 } from "./learning-demos.ts";
 
-// One connection and session owner serve independently rendered panels.
+// The assistant and cockpit share a connection to the local companion.
 const client = new LearningClient();
-const session = readNotebookSession();
-const compact = matchMedia("(max-width: 68rem), (max-height: 42rem)");
-const experiences: LearningExperience[] = legacyRecovery
-  ? ["notebook", "assistant"]
-  : ["assistant"];
-if (!legacyRecovery) {
-  session.notebookOpen = false;
-  session.experience = "assistant";
-  session.assistantSelected = [];
-}
+const session = readLearningSession();
 let snapshot: LearningSnapshot = {
   connected: false,
   companionStatus: null,
   entries: [],
-  judgments: [],
 };
 let refreshing: Promise<void> | null = null;
-let syncing = false;
-function pane(experience: LearningExperience) {
-  const owner = panes[experience];
-  if (!owner)
-    throw new Error(
-      "Open the recovery page to access previous notebook records.",
-    );
-  return owner;
-}
-function isOpen(experience: LearningExperience) {
-  return experience === "notebook"
-    ? session.notebookOpen
-    : session.assistantOpen;
-}
-function setOpen(experience: LearningExperience, value: boolean) {
-  if (experience === "notebook") session.notebookOpen = value;
-  else session.assistantOpen = value;
-}
-function persist() {
-  session.open = session.notebookOpen || session.assistantOpen;
-  session.view =
-    session.experience === "notebook"
-      ? session.notebookPaneView
-      : session.assistantPaneView;
-  saveNotebookSession(session);
-}
-function syncPanels() {
-  syncing = true;
-  try {
-    // Closing a panel must leave the other open panel as the foreground,
-    // including when the reader later resizes or navigates on a small screen.
-    if (!isOpen(session.experience)) {
-      const remaining = experiences.find(isOpen);
-      if (remaining) session.experience = remaining;
-    }
-    const active = session.experience;
-    for (const experience of experiences) {
-      const panel = pane(experience).panel;
-      const visible =
-        isOpen(experience) && (!compact.matches || experience === active);
-      panel.dataset.learningActive = String(experience === active);
-      if (!visible && panel.hasAttribute("open")) panel.close();
-      panel.hidden = !visible;
-      if (visible && !panel.hasAttribute("open")) panel.show();
-      syncLearningLaunchers(panel, experience);
-    }
-    document.body.dataset.learningOpen = String(
-      experiences.some((experience) => !pane(experience).panel.hidden),
-    );
-    document.body.dataset.learningNotebookOpen = String(
-      Boolean(panes.notebook && !panes.notebook.panel.hidden),
-    );
-    document.body.dataset.learningAssistantOpen = String(
-      !panes.assistant.panel.hidden,
-    );
-    panes.notebook?.syncSize();
-  } finally {
-    syncing = false;
-  }
-  persist();
-}
-function raise(experience: LearningExperience) {
-  if (syncing || session.experience === experience) return;
-  session.experience = experience;
-  syncPanels();
-}
-function show(experience: LearningExperience) {
-  setOpen(experience, true);
-  session.experience = experience;
-  syncPanels();
-}
-function close(experience: LearningExperience) {
-  const panel = pane(experience).panel;
-  const returnFocus = panel.contains(document.activeElement);
-  setOpen(experience, false);
-  syncPanels();
+
+function setOpen(open: boolean) {
+  session.assistantOpen = open;
+  const panel = assistant.panel;
+  const returnFocus = !open && panel.contains(document.activeElement);
+  if (!open && panel.open) panel.close();
+  panel.hidden = !open;
+  if (open && !panel.open) panel.show();
+  syncLearningLaunchers(panel);
+  document.body.dataset.learningAssistantOpen = String(open);
   if (returnFocus)
     document
-      .querySelector<HTMLButtonElement>(
-        `[data-learning-toggle="${experience}"]`,
-      )
+      .querySelector<HTMLButtonElement>('[data-learning-toggle="assistant"]')
       ?.focus({ preventScroll: true });
+  saveLearningSession(session);
 }
 async function refresh(readAttempts = false) {
   // A peer inquiry can request its saved attempts during an ordinary status check.
@@ -129,21 +51,13 @@ async function refresh(readAttempts = false) {
   if (!refreshing)
     refreshing = (async () => {
       const companionStatus = await client.status();
-      const data =
-        legacyRecovery || readAttempts
-          ? await client.request<
-              Pick<LearningSnapshot, "entries" | "judgments">
-            >("/notebook")
-          : snapshot;
-      snapshot = {
-        connected: true,
-        companionStatus,
-        entries: legacyRecovery
-          ? data.entries
-          : data.entries.filter((entry) => entry.kind === "attempt"),
-        judgments: legacyRecovery ? data.judgments : [],
-      };
-      experiences.forEach((experience) => pane(experience).update(snapshot));
+      const entries = readAttempts
+        ? (
+            await client.request<Pick<LearningSnapshot, "entries">>("/notebook")
+          ).entries.filter((entry) => entry.kind === "attempt")
+        : snapshot.entries;
+      snapshot = { connected: true, companionStatus, entries };
+      assistant.update(snapshot);
     })().finally(() => {
       refreshing = null;
     });
@@ -154,7 +68,7 @@ const services: LearningPaneServices = {
   session,
   save: (patch) => {
     Object.assign(session, patch);
-    persist();
+    saveLearningSession(session);
   },
   refresh,
   recordAttempt: (entry) => {
@@ -165,38 +79,22 @@ const services: LearningPaneServices = {
         entry,
       ],
     };
-    pane("assistant").update(snapshot);
+    assistant.update(snapshot);
   },
   connection: (connected) => {
     if (connected === snapshot.connected) return;
     snapshot = {
       ...snapshot,
       connected,
-      ...(!connected
-        ? { companionStatus: null, entries: [], judgments: [] }
-        : {}),
+      ...(!connected ? { companionStatus: null, entries: [] } : {}),
     };
-    experiences.forEach((experience) => pane(experience).update(snapshot));
+    assistant.update(snapshot);
   },
-  open: show,
-  close,
-  raise,
-  navigate: (experience, view) => {
-    if (experience === "notebook" && !legacyRecovery) {
-      location.assign("/diary/");
-      return;
-    }
-    pane(experience).navigate(view);
-  },
-  beginNote: (...args) => panes.notebook?.beginNote(...args) ?? false,
+  open: () => setOpen(true),
+  close: () => setOpen(false),
   write: downloadTakeaway,
-  discuss: (value) => panes.assistant.discuss(value),
 };
-const panes = {
-  notebook: legacyRecovery ? createLearningPane("notebook", services) : null,
-  assistant: createLearningPane("assistant", services),
-};
-compact.addEventListener("change", syncPanels);
+const assistant = createLearningPane(services);
 let accountIdentity: string | null = null;
 const cockpit = createLearningCockpit({
   client,
@@ -208,14 +106,14 @@ const cockpit = createLearningCockpit({
         services.connection(false);
       }
     }
-    services.navigate("assistant", "connect");
+    assistant.navigate("connect");
   },
   write: downloadTakeaway,
   disconnected: () => services.connection(false),
   diary: () => location.assign("/diary/"),
   assistant: () => {
-    show("assistant");
-    void panes.assistant.open(null, false);
+    setOpen(true);
+    void assistant.open(null, false);
   },
 });
 document.addEventListener("book-account-changed", (event) => {
@@ -227,13 +125,13 @@ document.addEventListener("book-account-changed", (event) => {
   ]);
   if (identity !== accountIdentity) {
     accountIdentity = identity;
-    panes.assistant.accountChanged();
+    assistant.accountChanged();
   }
 });
 document.addEventListener("book-learning-action", (event) => {
   const action = (event as CustomEvent<LearningAction>).detail;
   if (action.kind === "investigate") {
-    if (!action.resume) experiences.forEach(close);
+    if (!action.resume) setOpen(false);
     cockpit.open(action);
     return;
   }
@@ -245,43 +143,36 @@ document.addEventListener("book-learning-action", (event) => {
         /* Keep the requested draft available through connection recovery. */
       }
     }
-    if (action.kind === "discuss") panes.assistant.discuss(action.draft);
-    else services.navigate(action.experience, action.view);
+    if (action.kind === "discuss") assistant.discuss(action.draft);
+    else assistant.navigate(action.view);
   })();
 });
 document.addEventListener("book-learning-open", (event) => {
-  const { experience, selection, resume, currentReading } = (
+  const { selection, resume, currentReading } = (
     event as CustomEvent<{
-      experience: LearningExperience;
       selection: ReadingSelection | null;
       resume: boolean;
       currentReading?: boolean;
     }>
   ).detail;
-  if (experience === "notebook" && !legacyRecovery) return;
-  if (resume) {
-    syncPanels();
-    void (async () => {
-      let recovery = "";
-      if (client.token) {
-        try {
-          await refresh();
-        } catch (error) {
-          recovery =
-            error instanceof Error ? error.message : "Reconnect the companion.";
-        }
-      }
-      for (const owner of experiences)
-        if (isOpen(owner)) {
-          await pane(owner).open(null, true);
-          if (recovery) pane(owner).recover(recovery);
-        }
-    })();
-  } else if (!pane(experience).panel.hidden) close(experience);
-  else {
-    show(experience);
-    void pane(experience).open(selection, false, currentReading);
+  if (!resume && !assistant.panel.hidden) {
+    setOpen(false);
+    return;
   }
+  setOpen(true);
+  void (async () => {
+    let recovery = "";
+    if (resume && client.token) {
+      try {
+        await refresh();
+      } catch (error) {
+        recovery =
+          error instanceof Error ? error.message : "Reconnect the companion.";
+      }
+    }
+    await assistant.open(selection, resume, currentReading);
+    if (recovery) assistant.recover(recovery);
+  })();
 });
 
 let followingBookLink = false;
@@ -312,14 +203,10 @@ document.addEventListener("click", (event) => {
 window.addEventListener("pageshow", () => {
   followingBookLink = false;
 });
-window.addEventListener("pagehide", persist);
+window.addEventListener("pagehide", () => saveLearningSession(session));
 window.addEventListener("beforeunload", (event) => {
-  persist();
-  if (
-    (experiences.some((experience) => pane(experience).hasDraft()) ||
-      cockpit.hasDraft()) &&
-    !followingBookLink
-  ) {
+  saveLearningSession(session);
+  if ((assistant.hasDraft() || cockpit.hasDraft()) && !followingBookLink) {
     event.preventDefault();
     event.returnValue = "";
   }

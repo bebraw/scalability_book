@@ -114,10 +114,10 @@ Compare the time and clarity with ordinary copy and paste. [Portfolio walkthroug
 ### Existing Notebook users
 
 With two synthetic entries in a disposable companion, use the [recovery route](course-diary.md#bring-over-an-existing-notebook).
-Keep a JSON backup, then export one revised note as Markdown.
-Check that the other entry stays out of the Markdown.
-Find the selected note’s current text and source link in Obsidian, and its earlier revision in the JSON.
-Ask the learner which copy they would edit next.
+Revise one entry in the fixture before connecting.
+Download the JSON backup and the Markdown file.
+Find both entries and their source links in Obsidian.
+Check that the revised entry shows its current text and that its earlier text is present in the JSON history.
 
 ## Evidence to collect deliberately
 
@@ -184,7 +184,7 @@ Do not enable routine transcript collection or evaluate success by message, note
 Record the date, book/activity revision, companion release/source revision, provider/version, recorded teaching policy ID/version, chosen help mode, individual/group setting and which excerpts the learner chose to share.
 Record unknown versions honestly; never assign the current policy to an older reply.
 Use **Connect** and **About this reply** for available metadata without collecting complete histories.
-Ask whether the reflection examples made expectations clearer and whether the 400-character suggestion encouraged useful material or unnecessary writing.
+Ask which diary prompt helped the learner connect a claim to evidence in their own work.
 Ask whether they skipped or resumed the changed case, whether its assumptions/self-check were useful, and whether linked notes reduced diary/portfolio preparation effort.
 Include failed checks and short free writing in the chosen evidence; a polished reflection is not a substitute for explaining a new case.
 There is no hard reflection minimum in this release.
@@ -201,7 +201,7 @@ Use the learner-selected evidence above and report facilitation effort alongside
 Separate technical success, usability observations, instructional behavior, manner/trust feedback, independent learning evidence, workload and actual course progress.
 A small trial can identify problems and suggest changes; it cannot prove that the workspace caused a completion improvement.
 Preserve disagreements and negative results.
-Calibrate prompts, examples, the optional length cue and setup friction from the evidence before adding obligations.
+Revise prompts, examples and setup guidance using the trial evidence.
 Prioritize authored examples and misconception support from recurring difficulties, retaining source assumptions and meaningful self-check criteria.
 Choose feasible delayed recall within existing work; do not add a parallel assessment obligation or engagement quota.
 Assessment changes require the existing student-facing contract and requirement-edition workflow.

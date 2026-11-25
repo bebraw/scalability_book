@@ -35,7 +35,6 @@ export interface InvestigationDraft {
   takeaway: string;
   evidence: string;
   nextCheck: string;
-  noteIds: string[];
   conversationId: string | null;
   browserId: string;
   companionBase: string;
@@ -59,7 +58,6 @@ export function readInvestigationDraft(
     takeaway: "",
     evidence: "",
     nextCheck: "",
-    noteIds: [],
     conversationId: null,
     browserId: crypto.randomUUID(),
     companionBase: "",
@@ -92,11 +90,6 @@ export function readInvestigationDraft(
       takeaway: text("takeaway", 4000),
       evidence: turn.evidence ?? "",
       nextCheck: turn.nextCheck ?? "",
-      noteIds: Array.isArray(saved.noteIds)
-        ? saved.noteIds
-            .filter((id: unknown) => typeof id === "string" && uuid.test(id))
-            .slice(0, 100)
-        : [],
       conversationId:
         typeof saved.conversationId === "string" &&
         uuid.test(saved.conversationId)

@@ -49,7 +49,7 @@ The plugin can open this page in Obsidian's desktop Web viewer or in the default
 Chrome on the companion's computer is the supported route when the embedded connection is unavailable.
 The assistant retains the chosen reading and unsent draft across navigation in the same tab.
 Reviewing a selected exchange keeps attribution and lets the student edit the excerpt for the diary.
-The [legacy recovery link](course-diary.md#bring-over-an-existing-notebook) opens the old Notebook with its existing storage, full JSON backup and selected Markdown export.
+The [recovery page](course-diary.md#bring-over-an-existing-notebook) downloads earlier work from the local companion as JSON or Markdown.
 
 Assistant replies display a supported Markdown subset with readable links, lists, tables, code and equations.
 Long code lines scroll within their code block; each block is a named keyboard focus target with a visible focus indicator, so arrow keys can reveal the complete text and Tab can leave the block.
@@ -63,8 +63,8 @@ These records cover successful browser observations and approved demo changes, n
 [learning-evidence.ts](../site/scripts/learning-evidence.ts) owns this grouping and disclosure presentation; conversation storage and tool execution remain unchanged.
 [learning-reply.ts](../site/scripts/learning-reply.ts) builds permitted DOM elements from parsed tokens and renders TeX as bounded, untrusted KaTeX MathML; raw HTML remains text, images do not load and links allow only HTTP(S).
 Unsupported equations retain their original notation.
-Conversation storage retains the original reply text, and notebook previews start from that literal text before the learner's edits and selection; [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records the reply presentation boundary.
-Optional Codex, API and local-model adapters provide persisted conversations and student-reviewed notebook drafts.
+Conversation storage retains the original reply text, and diary previews start from that text before the learner’s edits and selection. [ADR-041](adrs/implemented/ADR-041-render-assistant-replies-through-a-restricted-dom.md) records the reply presentation boundary.
+Optional Codex, API and local-model adapters provide persisted conversations.
 Codex and explicitly selected native API/local tools use the same bounded browser broker; discussion-only providers have no live tools.
 Course-backed group/cohort inquiry uses the existing course identity and record store, with an initial-work reveal step and opt-in public editorial offers.
 Peer sign-in opens the shared account view in place and carries the source anchor/activity through email confirmation.
@@ -119,23 +119,21 @@ A check can mean revisiting a passage, comparing a hypothetical case, applying a
 The latest generated explanation stays beside the work, with source links, provider/policy metadata and conversation history.
 The authored passage and simulator remain the reference.
 
-Connect the same local companion used by Notebook and Teaching assistant; existing connections are reused.
+The cockpit uses the teaching assistant’s local companion connection.
 Authenticated status advertises the supported ID/version of the general `learning-loop` and every demo activity in `readingActivities`.
 An older running companion displays a restart instruction and retains writing; restart from the updated checkout, reconnect and check again.
-A notebook-only connection supports reflection drafts and reviewed notebook saving while offering provider setup through **Connection settings**.
+Students can write reflections and download Markdown before connecting. **Connection settings** offers provider setup for students who want replies.
 An actual response, rather than configuration status, establishes provider availability.
 
 Activation, connection, focus changes and demo controls never start a model reply or load notebook entries.
-An explicit send shares the previewed source, current writing, selected-note IDs and the current demo snapshot when available.
-No notebook entries are selected by default.
-**Shared context** shows the exact source excerpt, selected-note count and a way to clear those selections before sending.
+An explicit cockpit send shares the previewed source, current writing and current demo snapshot when available.
+**Shared context** shows the source excerpt before sending.
 Checked exercises offer **Explore and reflect on this attempt**, using the existing editable attempt/checker handoff without worked answers.
 Independent practice offers **Explore this case in the learning cockpit** with a reviewed copy of the current thinking (up to 4,000 characters).
-Notebook notes offer **Explore and reflect**, deliberately selecting only that note.
-The existing panels offer **Open learning cockpit**; the assistant supplies its current source/question and deliberately selected note set.
+The teaching assistant offers **Open learning cockpit** with the current source and question.
 Peer inquiry offers **Reflect in the learning cockpit**, copying only explicitly selected contributions into a private draft and retaining the discussion reference; this does not post or change the inquiry's audience.
 These entry points prepare context, never save or send automatically.
-Opening the cockpit from a learning panel closes the overlay while retaining its unfinished writing; Notebook and Assistant actions reopen the existing panels.
+Opening the cockpit closes the assistant panel and retains its unfinished writing.
 
 Demo sends read actual visible controls and text from the existing observation bridge, not an independently simulated result.
 All demos use a dated `browser-demo-snapshot` with at most 60 named values (text values shortened to 1,024 characters) and 8,000 characters of displayed text.
@@ -149,7 +147,7 @@ Browser reports are not independently attested measurements and never grant acti
 Submitted activity turns remain additive JSON in the companion's existing conversation store; notebook and protocol schemas are unchanged.
 The public graph/MCP exposes the same authored loop and all demo contracts without learner state, execution or private access.
 
-The browser owns source-scoped unsent writing, phase, last sent snapshot, selected-note IDs and conversation/browser identity.
+The browser owns source-scoped unsent writing, phase, last sent snapshot and conversation/browser identity.
 Up to 30 loops are kept in tab storage; the ten most recent appear in **Recent learning loops in this tab** and can be resumed across book navigation.
 Each tab record is bounded to 256,000 serialized characters; oversized demo snapshots are omitted before the student's writing and conversation identity.
 The next explicit send takes a fresh browser observation.
@@ -278,57 +276,17 @@ The student guide owns the concrete recovery steps and limits.
 
 ## Notebook and portability
 
-This section covers existing records accessed through [Notebook recovery](course-diary.md#bring-over-an-existing-notebook).
-For new writing, use the [diary guide](course-diary.md).
+The [recovery page](course-diary.md#bring-over-an-existing-notebook) connects to the original local companion.
+Students can download all entries as a single Markdown file or keep the complete version 1 JSON archive.
+Markdown includes each entry’s current text, source link and dates.
+The archive also preserves earlier revisions, assistance provenance and the history of concept judgments.
+Students choose excerpts in their own editor when preparing a portfolio. [Diary and portfolio walkthrough](course-diary.md#prepare-material-for-your-portfolio)
 
-Notes retain their original source URL, anchor, excerpt and available revision.
-On the current page, passage notes compare the captured excerpt with the live source text.
-Demo notes check that their anchored demo exists, because authored captions and saved observations need not match its changing controls/output.
-The saved demo inputs/result remain historical evidence; presence does not establish that the demo is unchanged.
-Editing appends a dated revision and preserves accepted assistance provenance.
-Concurrent/stale edits are rejected rather than overwriting the latest note.
-Concept judgments separate Studied from Unsure, Can explain and Can apply, with dated history, evidence references and a next intention.
-These judgments do not affect exercise completion or grades.
-
-Portable JSON uses schema version 1 and retains notes, their revision histories, source context and concept judgments.
-Import adds nonconflicting records atomically and is idempotent for identical records.
-If a record differs from existing work, import rejects the entire archive and preserves the notebook; keep both files and use a separate notebook directory to inspect conflicting copies.
-Unknown schemas and inconsistent histories are rejected.
-HTTP imports are limited to 16 MB; other JSON requests are limited to 96 KB.
-
-Selected-note preparation produces readable Markdown for review and use in the existing diary/portfolio workflow.
-It sends no notebook record to the course application and includes no unselected notes.
-Students remain responsible for selecting the material and submitting it under the existing course requirements.
-The [course introduction](../specifications/00_introduction.md#personal-notes-and-learning-diaries) recommends Obsidian and accepts written, audio and video entries.
-**Prepare** supplies current selected writing and source links, not a complete portfolio or a rubric assessment; **Copy draft** and **Download Markdown** are manual export steps, while **Open course workspace** only navigates to `/course/`.
-The [student walkthrough](learning-companion-setup.md#prepare-material-for-your-portfolio) distinguishes local writing from course drafts/files visible to the student and staff, and names the course's explicit **Submit portfolio** action.
-The whole-notebook JSON backup retains private revision/source/concept history and is separate from this selected-material export.
-
-Developed written reflections show a suggested target of 400 characters and representative examples.
-This is guidance, not a minimum or a quality score; short scratch notes and the existing audio/video diary options remain valid.
-Evaluation may change this reversible cue without changing the assessment rubric.
-
-The Write, Notes, Concepts and Prepare sections support capture, revision, recall before rereading, evidence-linked judgments and selected submission material.
-The Connect section handles connection and portable archives; connection tokens remain in the browser tab's session storage, while notebook records remain local.
-Students review drafts and use the ordinary course submission form.
-The published [student setup guide](learning-companion-setup.md) is available at `/notebook/setup/`.
-The optional Chapter guide uses the current reading's authored prompt and demos actually present on that page.
-Pages without a demo offer reflection without an observation action; the guide does not redirect every chapter to the queue lab.
-Demo activities use existing authored prediction, operation, observation and reflection instructions and preserve their assumptions.
-Save demo result stays disabled until private initial thinking is saved, explains that it captures current browser inputs/text, and shows the saved observation beside the action.
-Errors and save confirmations appear at the relevant step; unavailable demos provide a visible fallback.
-The guide offers **Apply it in a different situation** before reflection, including the existing benchmark/scaling transfer exercises.
-Other readings use a claim applied to a different system with a changed condition, including pages without demos.
-Students can choose their own related question; the self-check is a closed disclosure and help remains available before or after an attempt.
-Explicitly saving creates a separate `revisit` entry related to the original thinking and evidence; reflection relates to those entries without replacing them.
-Activity ID/version, question, assumptions, self-check and any student-chosen case are captured in the source excerpt alongside its book revision.
-This uses the existing version 1 portable source and `relatedIds`, with no schema/protocol change; saved context is never re-resolved from a later activity definition.
-Reviewed agent suggestions retain the existing assistance provenance when accepted; saving in the guide records the student's own text, not an assertion that external help was absent.
-Reflection starters/examples are optional, and saving a reflection does not require completing the preceding steps.
-Guided prediction/reflection drafts remain in tab storage for returning to the same page; changing demo asks before clearing unfinished writing.
-Changed-case drafts are isolated by source and activity version and survive switching activities/pages within the tab.
-For delayed recall, use **Notes → Revisit** on an earlier entry before opening its closed earlier-explanation disclosure; the student chooses the timing.
-Leaving/skipping has no assessment consequence, and no mastery mark or new submission is generated.
+The companion continues to store private attempts used in peer inquiry and teaching activities.
+Its API validates revisions and rejects stale updates.
+The companion API also accepts version 1 archives.
+Imports are atomic, skip identical records and reject conflicts, unknown schemas and inconsistent histories.
+HTTP imports are limited to 16 MB.
 
 ## Verification
 
@@ -367,15 +325,17 @@ Extend those resources from actual learner difficulties rather than generating a
 Under [ADR-031](adrs/implemented/ADR-031-adapt-learning-support-to-the-students-current-task.md), students can optionally identify getting started, a prerequisite, an unexpected result, demo operation or readiness for less help.
 The agent uses the actual response, selected context and authored concept references for tentative task-specific guidance; it asks a focused question when evidence is insufficient and explains directly when requested.
 Support increases or fades with the student's work, with no ability profile, turn quota, automatic concept judgment or explanation gate.
-Chapter guide can prepare an editable help request with its reading/demo source; students choose whether to send it, and unfinished guide writing stays in the tab.
+The learning cockpit retains the reading or demo source with a draft.
+Students choose whether to send their question.
 Student messages retain optional goal/help-mode/support-need metadata and the supplied note identities in existing conversation JSON; older requests default to unspecified and older turns remain valid.
 The chosen support need also appears in the sent message so earlier companions receive the student's request even without structured support metadata.
-Supplied note identities allow a reviewed takeaway to link the notes used on its actual turn, rather than the current selection; old turns omit them and are not assigned inferred relationships.
+The companion records which private attempts a student selected for each assistant turn.
+The diary download includes the chosen exchange and its attribution.
 The prepared 0.3.0 companion retains the provider changes introduced in 0.2.0; a website update alone does not update an installed companion.
 The Codex adapter applies the current shared instructions on both thread start and resume and reports the actual CLI version (or null if it cannot be read).
 Each new student and assistant message stores optional `teaching: { policy: { id, version, name }, provider: { name, version } }` in existing conversation JSON.
 The metadata identifies applied instructions, not proof that a reply complies; later policies never rewrite earlier turns.
-**About this reply** shows recorded versions, with an explicit unknown-history message for legacy replies; reviewed notebook handoffs retain that provenance.
+**About this reply** shows recorded versions, with an explicit unknown-history message for legacy replies; the diary preview identifies the selected exchange.
 Policy changes update the policy version alongside the instructions and their evaluation evidence.
 Teaching metadata is additive in the version 1 conversation database and portable notebook/archive schemas.
 The published companion uses HTTP protocol 2 for code-free connection; existing record histories remain valid.
@@ -484,8 +444,8 @@ Per-contribution selection starts unchecked.
 **Prepare summary from selected contributions** copies only selected visible posts into an editable reply, retaining contributor identities/IDs, disagreement, links, dates and tool provenance without inferring consensus.
 Oversized selections are rejected rather than silently shortening consequential material.
 The student reviews and uses the existing share action; there is no automatic summary generation, posting or participation score.
-**Reflect privately on this inquiry** starts with a thread reference and optional personal starters; selected contributions are copied only when deliberately checked.
-The draft relates to the student's existing records for that source and must be reviewed and explicitly saved.
+**Download a diary reflection prompt** produces a Markdown file with the thread reference and optional personal prompts.
+Students can include contributions they have explicitly selected.
 The link does not grant later thread access and does not retrieve peers for an agent.
 **Try a related case privately** offers the same authored independent application in a thread-specific tab draft, without copying peer replies or requiring a group decision.
 It saves a separate linked notebook entry; students can request help, keep different conclusions, or continue the Chapter guide and existing independent human review route when working solo.

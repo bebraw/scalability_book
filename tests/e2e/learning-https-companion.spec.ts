@@ -4,7 +4,11 @@ import { once } from "node:events";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { chooseNotebookTool } from "./learning-notebook.helpers.ts";
+import {
+  assistantPanel,
+  chooseAssistantTool,
+  openAssistantSettings,
+} from "./learning-workspace.helpers.ts";
 
 test("an HTTPS reading connects to the HTTP companion with local-network permission", async ({
   page,
@@ -71,14 +75,14 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
           method: request.method(),
         });
     });
-    await page.goto(`${website}/notebook/setup/?legacy=1`);
+    await page.goto(`${website}/chapters/benchmarking/?assistant=1`);
     expect(
       await page.evaluate(() => ({
         origin: location.origin,
         secure: window.isSecureContext,
       })),
     ).toEqual({ origin: website, secure: true });
-    const panel = page.locator("#learning-notebook");
+    const panel = assistantPanel(page);
     await panel.getByLabel("Companion address").fill(companion);
     const connected = page.waitForResponse(`${companion}/connect`);
     await panel
@@ -94,16 +98,15 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
       "Connected to your local companion.",
     );
 
-    await chooseNotebookTool(panel, "Write");
-    const title = "Synthetic HTTPS notebook note";
+    await openAssistantSettings(panel);
+    await panel.getByRole("button", { name: "Save initial thinking" }).click();
     const body = "My private observation survives a new browser session token.";
-    await panel.getByLabel("Title", { exact: true }).fill(title);
-    await panel.getByLabel("Your thinking").fill(body);
-    await panel.getByRole("button", { name: "Save note", exact: true }).click();
+    await panel.getByLabel("My initial thinking").fill(body);
+    await panel.getByRole("button", { name: "Save private attempt" }).click();
     await expect(panel.getByRole("status")).toContainText(
-      "Saved in your private notebook",
+      "Initial thinking saved in your local companion.",
     );
-    await chooseNotebookTool(panel, "Connect");
+    await chooseAssistantTool(panel, "Connect");
     await panel
       .getByRole("button", { name: "Disconnect", exact: true })
       .click();
@@ -116,13 +119,13 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
     await expect(panel.getByRole("status")).toHaveText(
       "Connected to your local companion.",
     );
-    await chooseNotebookTool(panel, "Notes");
-    const saved = panel.locator("article").filter({
-      has: page.getByRole("heading", { name: title, exact: true }),
-    });
-    await expect(saved).toContainText(body);
-    await saved.getByRole("button", { name: "Edit", exact: true }).click();
-    await expect(panel.getByLabel("Your thinking")).toHaveValue(body);
+    await openAssistantSettings(panel);
+    await panel
+      .getByRole("button", { name: "Load my saved attempts for this reading" })
+      .click();
+    await expect(
+      panel.getByRole("checkbox", { name: `Include my attempt: ${body}` }),
+    ).not.toBeChecked();
     expect(
       requests.filter(
         ({ path, method }) => path === "/connect" && method === "POST",
@@ -135,9 +138,12 @@ test("an HTTPS reading connects to the HTTP companion with local-network permiss
         { path: "/disconnect", method: "POST" },
       ]),
     );
-    expect(requests.filter(({ path }) => path.startsWith("/agent/"))).toEqual(
-      [],
-    );
+    expect(
+      requests.filter(
+        ({ path, method }) =>
+          method === "POST" && path.startsWith("/agent/conversations"),
+      ),
+    ).toEqual([]);
   } finally {
     if (child.exitCode === null) {
       const stopped = once(child, "exit");

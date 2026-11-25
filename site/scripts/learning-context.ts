@@ -4,7 +4,7 @@ import { explorations } from "../../shared/explorations.ts";
 import type { LearningSource } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 
-export function textOf(element: Element): string {
+function textOf(element: Element): string {
   const clone = element.cloneNode(true) as Element;
   for (const control of clone.querySelectorAll(
     "button, input, select, textarea, script, style, .reading-investigation, .paragraph-feedback-actions, [data-paragraph-feedback-panel], a[aria-label^='Link to']",
@@ -19,7 +19,6 @@ export function currentReading() {
     prompt:
       page?.prompt ??
       "What is one idea from this reading you can explain in your own words? What remains uncertain, and what could you check?",
-    isChapter: location.pathname.startsWith("/chapters/"),
   };
 }
 export function pageSource(

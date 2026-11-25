@@ -1,6 +1,6 @@
 import type {
   AssistantHandoff,
-  NotebookHandoff,
+  DiaryTakeaway,
   NotebookEntry,
   LearningSource,
 } from "../../shared/learning-workspace.ts";
@@ -8,10 +8,9 @@ import type { LearningClient } from "./learning-client.ts";
 import type {
   AssistantDraft,
   AssistantSection,
-  NotebookDraftPreview,
+  DiaryExchangePreview,
 } from "./learning-session.ts";
-import { currentReading, pageSource } from "./learning-context.ts";
-import { mountLearningGuide } from "./learning-guide.ts";
+import { pageSource } from "./learning-context.ts";
 import { mountLearningAgent } from "./learning-agent-ui.ts";
 import { mountLearningPeers } from "./learning-peers.ts";
 import type { GuideSave } from "./learning-practice.ts";
@@ -24,18 +23,15 @@ interface Options {
   entries: NotebookEntry[];
   loadAttempts: () => Promise<void>;
   draft: AssistantDraft;
-  preview: () => NotebookDraftPreview | null;
-  previewChanged: (preview: NotebookDraftPreview) => void;
+  preview: () => DiaryExchangePreview | null;
+  previewChanged: (preview: DiaryExchangePreview) => void;
   source: () => LearningSource;
-  selected: () => string[];
   active: () => boolean;
   changed: () => void;
-  write: (draft: NotebookHandoff) => void;
+  write: (draft: DiaryTakeaway) => void;
   help: (context: AssistantHandoff) => void;
-  discuss: () => void;
   notes: () => void;
   save: GuideSave;
-  close: () => void;
   status: (text: string) => void;
 }
 
@@ -93,27 +89,7 @@ export function mountLearningAssistant(
     body.focus();
   };
   const help = (source: LearningSource, question: string) =>
-    options.help({ source, question, noteIds: options.selected() });
-  if (section === "guide")
-    return mountLearningGuide(container, {
-      entries: options.entries,
-      save: options.save,
-      notes: options.notes,
-      close: options.close,
-      status: options.status,
-      initial,
-      help,
-      leave: options.discuss,
-      reflect: (source, relatedIds) =>
-        options.write({
-          source,
-          relatedIds,
-          kind: "reflection",
-          title: `Reflection: ${currentReading().title}`.slice(0, 300),
-          body: "",
-          assistance: null,
-        }),
-    });
+    options.help({ source, question });
   if (section === "peers")
     mountLearningPeers(container, {
       source: options.source(),
@@ -123,12 +99,10 @@ export function mountLearningAssistant(
       status: options.status,
       initial,
       help,
-      reflect: (source, body, relatedIds) =>
+      reflect: (source, body) =>
         options.write({
           source,
           body,
-          relatedIds,
-          kind: "reflection",
           title: `Peer inquiry: ${source.title}`.slice(0, 300),
           assistance: null,
         }),
@@ -153,19 +127,10 @@ export function mountLearningAssistant(
         options.help({
           source: pageSource(),
           question: "",
-          noteIds: options.selected(),
         }),
-      accept: (body, assistance, source, relatedIds) => {
-        if (body.length > 16_000) {
-          options.status(
-            "Shorten the exchange to 16,000 characters before downloading it.",
-          );
-          return;
-        }
+      accept: (body, assistance, source) => {
         options.write({
           source,
-          relatedIds,
-          kind: "reflection",
           title: `Takeaway: ${source.title}`.slice(0, 300),
           body,
           assistance,

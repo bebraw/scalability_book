@@ -1,4 +1,4 @@
-import { downloadedMarkdown } from "./learning-notebook.helpers.ts";
+import { downloadedMarkdown } from "./learning-workspace.helpers.ts";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
