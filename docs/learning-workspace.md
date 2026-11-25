@@ -40,7 +40,8 @@ The source and prepared message survive companion connection recovery and book n
 
 The local companion stores private conversations and earlier Notebook records.
 The reading header's **Diary** link opens the getting-started guide.
-Selecting a passage on a reading offers **Copy highlight** and **Download Markdown** with a public source link.
+Selecting a passage on a reading offers **Add book highlight**, which copies the quote and public source link, then opens the desktop course plugin so the reader can choose a lecture and confirm.
+**Copy highlight** copies the same Markdown for manual paste in any editor.
 The book's tutorial and learning loop can also download a takeaway.
 The **Teaching assistant** launcher opens discussion in the book.
 A public reading URL with `?assistant=1` opens the same panel without sending a question or reading the vault.
@@ -434,7 +435,10 @@ Migration `0004_learning_inquiry.sql` indexes course/kind/source identity in the
 Discovery filters by source/activity in storage and pages at most 40 records with an opaque course-scoped cursor.
 Ordinary course loads exclude inquiry records, leaving disclosure to the dedicated authorized API.
 
-Entry is **Teaching assistant → Peer discussion** at a passage, activity or demo.
+To discuss a reading, open the paragraph’s comment control and choose **Discuss with classmates**.
+The link carries the passage into Peer discussion in the default browser from Obsidian, or in a separate browser tab on the web.
+The private feedback draft stays in its original tab. **Teaching assistant → Peer discussion** also opens inquiry at a passage, activity or demo.
+If the account has no available course runs, **Course sign-in** lets a student use their instructor’s course ID and enrolled email address and return to the passage.
 [learning-inquiry.ts](../shared/learning-inquiry.ts) owns optional reasoning outlines and operator/challenger/validator prompts; the browser uses the existing contribution body, identity, provenance and revision contract.
 After reveal, questions/replies can use question, competing explanations, evidence/check, current decision and remaining uncertainty, or free writing without filling every part.
 Responsibility cues invite someone other than the operator to explain acceptance and rotate roles for the next check; the common project specification still owns required session practice.

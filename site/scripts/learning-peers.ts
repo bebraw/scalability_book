@@ -209,32 +209,36 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     }
     reset();
   });
+  function showCourseSignIn(message: string) {
+    courseSelect.disabled = true;
+    question.disabled = true;
+    const link = node("a", "Course sign-in");
+    const destination = new URL(source.url);
+    if (destination.pathname === location.pathname)
+      destination.search = location.search;
+    destination.hash = source.anchor;
+    if (!destination.searchParams.has("inquiry"))
+      destination.searchParams.set("inquiry", "1");
+    destination.searchParams.set("inquiryActivity", state.question);
+    if (state.course) destination.searchParams.set("course", state.course);
+    const returnTo =
+      destination.pathname + destination.search + destination.hash;
+    link.href = signInDestination(returnTo, state.course);
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      openAccount(state.course, returnTo);
+    });
+    gate.replaceChildren(node("p", message), link);
+  }
   void act(async () => {
     const response = await fetch("/api/courses", {
       credentials: "same-origin",
       cache: "no-store",
     });
     if (!response.ok) {
-      gate.append(
-        node(
-          "p",
-          "Sign in with your course account to discuss this passage with your group.",
-        ),
+      showCourseSignIn(
+        "Sign in with your course account to discuss this passage with your group.",
       );
-      const link = node("a", "Course sign-in");
-      const destination = new URL(location.href);
-      destination.hash = source.anchor;
-      destination.searchParams.set("inquiry", "1");
-      destination.searchParams.set("inquiryActivity", state.question);
-      if (state.course) destination.searchParams.set("course", state.course);
-      const returnTo =
-        destination.pathname + destination.search + destination.hash;
-      link.href = signInDestination(returnTo, state.course);
-      link.addEventListener("click", (event) => {
-        event.preventDefault();
-        openAccount(state.course, returnTo);
-      });
-      gate.append(link);
       return;
     }
     const data = (await response.json()) as {
@@ -242,6 +246,12 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
       user: { login: string };
     };
     state.sharingName = data.user.login;
+    if (!data.courses.length) {
+      showCourseSignIn(
+        "No courses are available to this account. Use your instructor’s course ID and the email address you enrolled with.",
+      );
+      return;
+    }
     for (const course of data.courses) {
       const option = node("option", course.name);
       option.value = course.id;

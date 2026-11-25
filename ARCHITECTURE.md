@@ -88,7 +88,12 @@ The site build packages those notes and the optional [desktop Obsidian plugin](p
 The student's files own diary entries and private portfolio drafts.
 The plugin operates on the named phase files and explicitly chosen excerpts.
 Its commands call Obsidian's editor, vault and workspace APIs.
-The dependency on the book runs through public reading links and source-linked Markdown. [Highlight capture](site/scripts/learning-highlight.ts) uses the page selection and offers copy or download without a companion.
+The book’s [highlight toolbar](site/scripts/learning-highlight.ts) copies a Markdown quote and its public source link to the clipboard.
+In a browser, **Add book highlight** opens the plugin through `obsidian://scalableweb-course-diary-add-highlight`.
+In Obsidian’s Web viewer, the plugin recognizes the reading’s `#scalableweb-course-diary-add-highlight` fragment through Electron’s `did-navigate-in-page` event.
+Both routes carry the action name in the URL and the passage on the clipboard.
+The plugin reads the clipboard, offers the lecture picker and writes the quote when the reader confirms.
+**Copy highlight** leaves the quote on the clipboard for manual paste.
 The book's [learning loader](site/scripts/learning-loader.ts) opens the existing teaching assistant on request.
 The plugin can display that page beside the diary or open the default browser.
 Only the public reading address enters the URL.

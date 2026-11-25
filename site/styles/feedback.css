@@ -84,6 +84,7 @@
 [data-comment-target] {
   padding-inline-end: 3rem;
   position: relative;
+  scroll-margin-block-start: var(--reading-heading-offset, 6rem);
 }
 .paragraph-feedback-actions {
   display: none;
@@ -116,8 +117,7 @@
     opacity 140ms ease,
     transform 140ms ease;
 }
-[data-comments-ready="true"] .paragraph-comment-button,
-[data-comments-admin="true"] .paragraph-comment-button,
+[data-paragraph-feedback] .paragraph-comment-button,
 .paragraph-comment-button.has-comments {
   display: inline-flex;
 }
@@ -130,23 +130,13 @@
   stroke-width: 1.8;
 }
 [data-comment-target]:hover .paragraph-comment-button,
+[data-comment-target].is-feedback-selected .paragraph-comment-button,
 .paragraph-comment-button:focus-visible,
 .paragraph-comment-button.has-comments {
   border-color: var(--border);
   opacity: 1;
 }
-[data-comments-ready="true"]
-  [data-comment-target]:hover
-  .paragraph-feedback-actions,
-[data-comments-admin="true"]
-  [data-comment-target]:hover
-  .paragraph-feedback-actions,
-[data-comments-ready="true"]
-  [data-comment-target].is-feedback-selected
-  .paragraph-feedback-actions,
-[data-comments-admin="true"]
-  [data-comment-target].is-feedback-selected
-  .paragraph-feedback-actions,
+[data-paragraph-feedback] .paragraph-feedback-actions,
 .paragraph-feedback-actions:focus-within,
 [data-comment-target]:has(.has-comments) .paragraph-feedback-actions {
   display: flex;
@@ -205,13 +195,7 @@
   }
 }
 @media (hover: none) {
-  [data-comments-ready="true"] .paragraph-feedback-actions,
-  [data-comments-admin="true"] .paragraph-feedback-actions {
-    display: flex;
-    transform: translateX(0);
-  }
-  [data-comments-ready="true"] .paragraph-comment-button,
-  [data-comments-admin="true"] .paragraph-comment-button {
+  [data-paragraph-feedback] .paragraph-comment-button {
     border-color: color-mix(in srgb, var(--border) 65%, transparent);
     opacity: 0.5;
   }
@@ -248,6 +232,9 @@
   margin: 0.75rem 0 1rem;
   max-width: 68ch;
   padding: 0.75rem;
+}
+.paragraph-feedback-panel :is(a, button, summary) {
+  scroll-margin-block: 2px;
 }
 .paragraph-feedback-panel-header {
   align-items: center;

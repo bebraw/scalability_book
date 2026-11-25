@@ -1,7 +1,6 @@
 import {
   assistantPanel,
   downloadedMarkdown,
-  selectReading,
   chooseAssistantTool,
 } from "./learning-workspace.helpers.ts";
 import { test, expect, type Page } from "@playwright/test";
@@ -52,9 +51,26 @@ test("students save private initial work before group replies, reflect individua
   });
   expect(configured.ok(), await configured.text()).toBe(true);
   const cleanups: (() => Promise<void>)[] = [];
+  const feedbackDraft = "This draft is only for the book editors.";
+  const passage = "Define the protocol before selecting a runner:";
+  const feedbackWrites: string[] = [];
+  const privateCoursePayloads: string[] = [];
   async function reader(id: number, port: number) {
     const context = await browser.newContext();
     cleanups.push(() => context.close());
+    context.on("request", (request) => {
+      const path = new URL(request.url()).pathname;
+      if (path === "/api/comments" && request.method() === "POST")
+        feedbackWrites.push(request.url());
+      if (path.startsWith("/api/courses/")) {
+        const payload = `${request.url()} ${request.postData() ?? ""}`;
+        if (
+          payload.includes(feedbackDraft) ||
+          /Private (Alice|Bob) initial thinking/.test(payload)
+        )
+          privateCoursePayloads.push(payload);
+      }
+    });
     await context.route("**/api/courses**", (route) =>
       route.continue({
         headers: {
@@ -106,13 +122,21 @@ test("students save private initial work before group replies, reflect individua
         }
       });
     });
-    const page = await context.newPage();
-    await page.goto(`${baseURL}/chapters/benchmarking/`);
-    await selectReading(page);
-    await page
-      .locator(".site-header")
-      .getByRole("button", { name: "Teaching assistant", exact: true })
-      .click();
+    const reading = await context.newPage();
+    await reading.goto(`${baseURL}/chapters/benchmarking/`);
+    const paragraph = reading.locator("[data-comment-target]").filter({
+      hasText: passage,
+    });
+    const paragraphId = await paragraph.getAttribute("id");
+    expect(paragraphId).toBeTruthy();
+    await paragraph.locator("[data-comment-button]").click();
+    const form = reading.locator("[data-comment-form]");
+    await form.getByLabel("Comment text").fill(feedbackDraft);
+    const opened = context.waitForEvent("page");
+    await form.getByRole("link", { name: "Discuss with classmates" }).click();
+    const page = await opened;
+    await expect(page).toHaveURL(`${reading.url()}?inquiry=1#${paragraphId}`);
+    await expect(form.getByLabel("Comment text")).toHaveValue(feedbackDraft);
     const panel = assistantPanel(page);
     await panel
       .getByLabel("Companion address")
@@ -120,6 +144,10 @@ test("students save private initial work before group replies, reflect individua
     await panel
       .getByRole("button", { name: "Connect companion", exact: true })
       .click();
+    await expect(panel.getByLabel("Course for this inquiry")).toBeVisible();
+    await expect(
+      panel.locator(`a[href="${reading.url()}#${paragraphId}"]`),
+    ).toBeVisible();
     return { page, panel };
   }
   async function peers(page: Page) {
@@ -131,7 +159,9 @@ test("students save private initial work before group replies, reflect individua
   try {
     const alice = await reader(2, 18971),
       bob = await reader(3, 18972);
-    await peers(alice.page);
+    await alice.panel
+      .getByLabel("Course for this inquiry")
+      .selectOption(course.id);
     await expect(
       alice.panel.getByText("Save initial thinking for this source first.", {
         exact: false,
@@ -158,6 +188,7 @@ test("students save private initial work before group replies, reflect individua
     await alice.panel
       .getByRole("button", { name: "Write my initial thinking" })
       .click();
+    await expect(alice.panel.getByLabel("My initial thinking")).toHaveValue("");
     await alice.panel
       .getByLabel("My initial thinking")
       .fill(
@@ -216,7 +247,38 @@ test("students save private initial work before group replies, reflect individua
         { exact: true },
       ),
     ).toBeVisible();
-    await peers(bob.page);
+    const outsider = await reader(8, 18974);
+    await expect(outsider.panel).toContainText(
+      "No courses are available to this account.",
+    );
+    await expect(outsider.panel).toContainText(
+      "the email address you enrolled with",
+    );
+    await expect(
+      outsider.panel.getByLabel("Course for this inquiry"),
+    ).toBeDisabled();
+    await expect(
+      outsider.panel.getByRole("option", { name: course.name }),
+    ).toHaveCount(0);
+    await expect(
+      outsider.panel.getByRole("button", { name: "Reveal peer inquiry" }),
+    ).toHaveCount(0);
+    const signIn = outsider.panel.getByRole("link", {
+      name: "Course sign-in",
+      exact: true,
+    });
+    const inquiryURL = new URL(outsider.page.url());
+    const returnTo = `${inquiryURL.pathname}?inquiry=1&inquiryActivity=reading${inquiryURL.hash}`;
+    const signInURL = new URL("/course/", baseURL);
+    signInURL.searchParams.set("returnTo", returnTo);
+    await expect(signIn).toHaveJSProperty("href", signInURL.href);
+    await signIn.click();
+    await expect(
+      outsider.page.getByRole("dialog", { name: "Account & connections" }),
+    ).toBeVisible();
+    await bob.panel
+      .getByLabel("Course for this inquiry")
+      .selectOption(course.id);
     await expect(
       bob.panel.getByText(
         "Which interval and population are common to both averages?",
@@ -247,6 +309,8 @@ test("students save private initial work before group replies, reflect individua
         { exact: true },
       ),
     ).toBeVisible();
+    await bob.panel.getByText("Captured source", { exact: true }).click();
+    await expect(bob.panel.locator("blockquote")).toHaveText(passage);
     await expect(
       bob.panel.getByText(/Private Alice initial thinking/),
     ).toHaveCount(0);
@@ -472,6 +536,8 @@ test("students save private initial work before group replies, reflect individua
           .analyze()
       ).violations,
     ).toEqual([]);
+    expect(feedbackWrites).toEqual([]);
+    expect(privateCoursePayloads).toEqual([]);
   } finally {
     for (const cleanup of cleanups.reverse()) await cleanup();
   }

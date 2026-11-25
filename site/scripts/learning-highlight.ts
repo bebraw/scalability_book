@@ -1,8 +1,23 @@
-import { downloadMarkdown, highlightMarkdown } from "./learning-diary.ts";
+import { highlightMarkdown } from "./learning-diary.ts";
 import {
   readingSelection,
   type ReadingSelection,
 } from "./learning-selection.ts";
+
+function openLecturePicker() {
+  const action = "scalableweb-course-diary-add-highlight";
+  // The desktop Web viewer observes same-document navigation. Restore the
+  // reading URL without scrolling or adding a Back entry.
+  const reading = location.href;
+  const state = history.state;
+  history.replaceState(state, "", "#" + action);
+  history.replaceState(state, "", reading);
+
+  // Standalone browsers hand the same action to the desktop app.
+  const link = document.createElement("a");
+  link.href = "obsidian://" + action;
+  link.click();
+}
 
 /** Only a selection in published reading material can become a diary highlight. */
 export function mountHighlightCapture() {
@@ -15,15 +30,19 @@ export function mountHighlightCapture() {
   bar.setAttribute("role", "group");
   bar.setAttribute("aria-label", "Selected book passage");
   bar.hidden = true;
+  const add = document.createElement("button");
+  add.type = "button";
+  add.textContent = "Add book highlight";
   const copy = document.createElement("button");
   copy.type = "button";
   copy.textContent = "Copy highlight";
-  const download = document.createElement("button");
-  download.type = "button";
-  download.textContent = "Download Markdown";
+  const manualCopy = document.createElement("textarea");
+  manualCopy.setAttribute("aria-label", "Highlight with book source");
+  manualCopy.readOnly = true;
+  manualCopy.hidden = true;
   const status = document.createElement("span");
   status.setAttribute("role", "status");
-  bar.append(copy, download, status);
+  bar.append(add, copy, status, manualCopy);
   document.body.append(bar);
   let selected: ReadingSelection | null = null;
   function update() {
@@ -45,6 +64,7 @@ export function mountHighlightCapture() {
         : null;
     bar.hidden = !selected;
     status.textContent = "";
+    manualCopy.hidden = true;
   }
   document.addEventListener("selectionchange", update);
   document.addEventListener("keydown", (event) => {
@@ -55,7 +75,7 @@ export function mountHighlightCapture() {
       !bar.contains(document.activeElement)
     ) {
       event.preventDefault();
-      copy.focus();
+      add.focus();
     }
     if (!bar.hidden && event.key === "Escape") {
       window.getSelection()?.removeAllRanges();
@@ -64,20 +84,41 @@ export function mountHighlightCapture() {
     }
   });
   // Pointer interaction must not clear the original selection before click.
-  bar.addEventListener("mousedown", (event) => event.preventDefault());
+  bar.addEventListener("mousedown", (event) => {
+    if (event.target instanceof HTMLButtonElement) event.preventDefault();
+  });
   bar.addEventListener("focusout", () => setTimeout(update, 0));
-  copy.addEventListener("click", async () => {
-    if (!selected) return;
+  let copying = false;
+  async function copySelection(openDiary: boolean) {
+    if (!selected || copying) return;
+    copying = true;
+    const markdown = highlightMarkdown(selected);
     try {
-      await navigator.clipboard.writeText(highlightMarkdown(selected));
-      status.textContent = "Copied for your diary.";
+      await navigator.clipboard.writeText(markdown);
     } catch {
       status.textContent =
-        "Clipboard unavailable. Download the Markdown instead.";
+        "Copy the selected Markdown below and paste it into your lecture note.";
+      manualCopy.value = markdown;
+      manualCopy.hidden = false;
+      manualCopy.focus();
+      manualCopy.select();
+      return;
+    } finally {
+      copying = false;
     }
-  });
-  download.addEventListener("click", () => {
-    if (selected)
-      downloadMarkdown("Book highlight", highlightMarkdown(selected));
-  });
+    manualCopy.hidden = true;
+    if (openDiary) {
+      status.textContent =
+        "Choose a lecture in Obsidian, or paste the copied highlight into your note. ";
+      const setup = document.createElement("a");
+      setup.href = "/diary/#use-the-optional-course-plugin";
+      setup.textContent = "Set up Course diary";
+      status.append(setup);
+      openLecturePicker();
+    } else {
+      status.textContent = "Copied for your diary.";
+    }
+  }
+  add.addEventListener("click", () => copySelection(true));
+  copy.addEventListener("click", () => copySelection(false));
 }

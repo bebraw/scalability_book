@@ -5,7 +5,13 @@ import {
   downloadedMarkdown,
   chooseAssistantTool,
 } from "./learning-workspace.helpers.ts";
-import { test, expect, type Locator, type Route } from "@playwright/test";
+import {
+  test,
+  expect,
+  type Locator,
+  type Page,
+  type Route,
+} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
@@ -270,6 +276,50 @@ async function connectSyntheticDiscussion(
     .click();
   return panel;
 }
+
+test("opening a class discussion preserves an unsent assistant question and its passage", async ({
+  page,
+}) => {
+  const panel = await connectSyntheticDiscussion(page);
+  await chooseAssistantTool(panel, "Discuss");
+  const chapter = page.url();
+  const paragraphs = page.locator("[data-comment-target]");
+  const originalId = await paragraphs.first().getAttribute("id");
+  const classId = await paragraphs.nth(1).getAttribute("id");
+  const originalText = await selectReading(page);
+  await panel.getByRole("button", { name: "Discuss selected text" }).click();
+  const question = "Which wait does this passage say the benchmark measures?";
+  const message = panel.getByLabel("Message to the teaching assistant");
+  await message.fill(question);
+
+  // A saved link or sign-in return can open in a tab with an existing draft.
+  await page.goto(`${chapter}?inquiry=1#${classId}`);
+  await expect(panel.getByLabel("Course for this inquiry")).toBeVisible();
+  await expect(panel.locator(`a[href="${chapter}#${classId}"]`)).toBeVisible();
+  await chooseAssistantTool(panel, "Discuss");
+  await expect(message).toHaveValue(question);
+  const source = panel.getByRole("region", { name: "Assistant context" });
+  await expect(source.getByRole("link")).toHaveJSProperty(
+    "href",
+    `${chapter}#${originalId}`,
+  );
+  await source
+    .getByText("Preview the selected source", { exact: true })
+    .click();
+  await expect(source.locator("blockquote")).toHaveText(originalText);
+
+  await panel.getByRole("button", { name: "Close teaching assistant" }).click();
+  await page
+    .getByRole("link", {
+      name: "Link to Benchmark to test a claim",
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(
+    `${chapter}?inquiry=1#benchmark-to-test-a-claim`,
+  );
+  await expect(panel).toBeHidden();
+});
 
 for (const width of [1440, 390]) {
   test(`browser evidence belongs to its reply and retains literal observations at ${width}px`, async ({
@@ -826,41 +876,71 @@ test("students choose task support and direct explanations without a saved initi
   await expect(panel.getByLabel("How I want help")).toHaveValue("explanation");
 });
 
-test("book highlights copy and download a source-linked passage without opening a workspace", async ({
+async function simulateHighlightHandoff(page: Page, allowClipboard = true) {
+  await page.addInitScript((allowed) => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => {
+          if (!allowed)
+            throw new DOMException("Clipboard blocked", "NotAllowedError");
+          await Promise.resolve();
+          document.body.dataset.copiedHighlight = value;
+        },
+      },
+    });
+    // Observe the attempted handoff and its clipboard contents without opening a real vault.
+    const originalClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (this.protocol === "obsidian:") {
+        document.body.dataset.diaryOpened = this.href;
+        document.body.dataset.highlightAtOpen =
+          document.body.dataset.copiedHighlight ?? "";
+        return;
+      }
+      originalClick.call(this);
+    };
+    const replace = history.replaceState;
+    history.replaceState = function (state, title, url) {
+      replace.call(this, state, title, url);
+      if (location.hash === "#scalableweb-course-diary-add-highlight") {
+        document.body.dataset.viewerSignal = location.href;
+        document.body.dataset.highlightAtSignal =
+          document.body.dataset.copiedHighlight ?? "";
+      }
+    };
+  }, allowClipboard);
+}
+
+test("book highlights copy a source-linked passage and hand the selected code to Obsidian", async ({
   page,
 }) => {
+  await simulateHighlightHandoff(page);
   await page.goto("/chapters/introduction/");
   const paragraph = page.locator("[data-comment-target]").first();
   const anchor = await paragraph.getAttribute("id");
   const text = await selectReading(page);
   const group = page.getByRole("group", { name: "Selected book passage" });
-  const markdown = await downloadedMarkdown(
-    group.getByRole("button", { name: "Download Markdown" }),
-  );
+  await expect(group.getByText("Download Markdown")).toHaveCount(0);
+  await group.getByRole("button", { name: "Copy highlight" }).click();
+  await expect(group.getByRole("status")).toContainText(/copied/i);
+  const body = page.locator("body");
+  const markdown = (await body.getAttribute("data-copied-highlight"))!;
   expect(markdown).toContain("> ");
   expect(markdown.replace(/\\(.)/g, "$1")).toContain(text);
   expect(markdown.trimEnd()).toMatch(
     /\[Book source\]\(https:\/\/scalableweb\.dev\/chapters\/introduction\/#.+\)$/,
   );
   expect(markdown).toContain("#" + anchor + ")");
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async (value: string) => {
-          document.body.dataset.copiedHighlight = value;
-        },
-      },
-    }),
-  );
-  await group.getByRole("button", { name: "Copy highlight" }).click();
-  await expect(group.getByRole("status")).toContainText("Copied");
-  await expect(page.locator("body")).toHaveAttribute(
-    "data-copied-highlight",
-    markdown,
-  );
+  await expect(body).not.toHaveAttribute("data-diary-opened", /.*/);
+  await expect(body).not.toHaveAttribute("data-viewer-signal", /.*/);
   await expect(page.locator(".learning-workspace")).toHaveCount(0);
-  await page.goto("/chapters/architecture/");
+  await page.goto("/chapters/architecture/?entry=lecture#saved-passage");
+  const originalUrl = page.url();
+  const originalLength = await page.evaluate(() => {
+    history.replaceState({ testReading: "saved-passage" }, "");
+    return history.length;
+  });
   const example = page.locator("article.prose pre code").first();
   const code = await example.evaluate((element) => {
     const range = document.createRange();
@@ -871,9 +951,31 @@ test("book highlights copy and download a source-linked passage without opening 
     return element.textContent!;
   });
   expect(code.trim().split("\n").length).toBeGreaterThan(1);
-  const codeMarkdown = await downloadedMarkdown(
-    group.getByRole("button", { name: "Download Markdown" }),
+  const add = group.getByRole("button", { name: "Add book highlight" });
+  await expect(add).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(add).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(body).toHaveAttribute(
+    "data-diary-opened",
+    "obsidian://scalableweb-course-diary-add-highlight",
   );
+  await expect(group.getByRole("status")).toContainText(/paste/i);
+  const codeMarkdown = (await body.getAttribute("data-highlight-at-open"))!;
+  const viewerUrl = new URL(originalUrl);
+  viewerUrl.hash = "scalableweb-course-diary-add-highlight";
+  await expect(body).toHaveAttribute("data-viewer-signal", viewerUrl.href);
+  await expect(body).toHaveAttribute("data-highlight-at-signal", codeMarkdown);
+  expect(page.url()).toBe(originalUrl);
+  expect(
+    await page.evaluate(() => ({
+      state: history.state,
+      length: history.length,
+    })),
+  ).toEqual({
+    state: { testReading: "saved-passage" },
+    length: originalLength,
+  });
   const raw = codeMarkdown
     .split("\n\n[Book source]")[0]!
     .split("\n")
@@ -882,6 +984,39 @@ test("book highlights copy and download a source-linked passage without opening 
   expect(raw).toBe(code);
   expect(codeMarkdown).toMatch(
     /\[Book source\]\(https:\/\/scalableweb\.dev\/chapters\/architecture\/#(?!content\))[^)]+\)/,
+  );
+});
+
+test("a blocked highlight copy leaves the reader on the passage with a manual fallback", async ({
+  page,
+}) => {
+  await simulateHighlightHandoff(page, false);
+  await page.goto("/chapters/introduction/");
+  const text = await selectReading(page);
+  const group = page.getByRole("group", { name: "Selected book passage" });
+  await group.getByRole("button", { name: "Add book highlight" }).click();
+  await expect(group.getByRole("status")).toContainText(/copy/i);
+  await expect(group.getByRole("status")).toContainText(/paste/i);
+  await expect(page.locator("body")).not.toHaveAttribute(
+    "data-diary-opened",
+    /.*/,
+  );
+  await expect(page.locator("body")).not.toHaveAttribute(
+    "data-viewer-signal",
+    /.*/,
+  );
+  const fallback = group.getByRole("textbox", {
+    name: "Highlight with book source",
+  });
+  await expect(fallback).toBeFocused();
+  const markdown = await fallback.inputValue();
+  const selected = await fallback.evaluate((field: HTMLTextAreaElement) =>
+    field.value.slice(field.selectionStart, field.selectionEnd),
+  );
+  expect(selected).toBe(markdown);
+  expect(markdown.replace(/\\(.)/g, "$1")).toContain(text);
+  expect(markdown).toMatch(
+    /\[Book source\]\(https:\/\/scalableweb\.dev\/chapters\/introduction\/#.+\)/,
   );
 });
 

@@ -16,7 +16,9 @@ At the end of each phase, you choose what goes into your individual portfolio.
 3. Open **00-Start here**, follow **Establish** and find **Lecture 1**.
    A team says its cached summary loads twice as fast.
    What would you measure before deciding to keep the cache?
-   Write your prediction under the prompt and follow the reading link.
+   Write your prediction under the prompt.
+   To open the reading inside desktop Obsidian, enable **Web viewer** under **Settings → Core plugins**, then turn on **Settings → Web viewer → Open external links**.
+   Follow **Reading** under **Lecture 1** to open the chapter. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
 4. After the lecture, return to the same entry.
    Add the date, what you observed and how it affected your prediction.
    For an audio or video diary, keep the recording or a link beside the prompt with a short description.
@@ -27,10 +29,23 @@ Choose the tools and diary format that suit you. [Course diary and participation
 
 ## Bring a passage into your diary
 
-On a book page, select the sentences you want and choose **Copy highlight**.
-Paste into your lecture entry.
-The quote carries a link back to the reading.
-Under it, add why you kept it or what you plan to check. **Download Markdown** gives you a file you can move into the vault if you prefer.
+With the **Course diary** plugin enabled in your desktop vault, select the sentences you want on a book page and choose **Add book highlight** at the bottom of the page.
+If your browser asks to open Obsidian, allow it.
+Choose the lecture, review the quotation and source link, then choose **Save highlight**. [Enable the course plugin](#use-the-optional-course-plugin)
+
+For manual paste, including in Restricted Mode, choose **Copy highlight** and paste the quote into your lecture entry.
+Both actions keep a link back to the passage.
+You can save private highlights while signed out.
+Under the quote, add why you kept it or what you plan to check.
+
+To read classmates’ comments on a passage, open the comment control beside the paragraph and choose **Discuss with classmates**.
+Obsidian opens the discussion in your default browser.
+Sign in to your course, save your own initial thinking for the passage in the learning companion, then choose **Reveal peer inquiry** to see shared threads.
+You can reply or start a thread for your group or the course cohort.
+
+To send feedback privately to the book team, use the same paragraph control.
+When sign-in is needed, Obsidian’s desktop Web viewer opens the same paragraph in your default browser.
+Sign in with GitHub there, write your feedback and choose **Post comment**.
 
 To see your highlights again when you return to the original web page, you can turn on the Highlighter in Obsidian's optional Web Clipper browser extension.
 The extension remembers highlighted passages in your browser and lets you save them to a note. [Web Clipper Highlighter](https://obsidian.md/help/web-clipper/highlight)
@@ -39,7 +54,8 @@ The extension remembers highlighted passages in your browser and lets you save t
 
 The starter includes the **Course diary** plugin for desktop Obsidian.
 To use it, open **Settings → Community plugins**, choose **Exit Restricted mode** (called **Turn on community plugins** in earlier versions), then enable **Course diary** under **Installed plugins**.
-Open the command palette with **Ctrl+P** or **Cmd+P** and search for **Course diary**. [Obsidian's community plugin settings](https://obsidian.md/help/community-plugins)
+You can add highlights directly from the book.
+To find the commands inside Obsidian, open the command palette with **Ctrl+P** or **Cmd+P** and search for **Course diary**. [Obsidian's community plugin settings](https://obsidian.md/help/community-plugins)
 
 | Command                    | When to use it                                                                                                                     |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |

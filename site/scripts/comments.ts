@@ -123,6 +123,7 @@ if (commentsRoot) {
     wireParagraphSelection();
     wireParagraphButtons();
     wireReflectionButtons();
+    document.documentElement.setAttribute("data-paragraph-feedback", "");
   }
 
   async function refreshAuth() {
@@ -147,6 +148,7 @@ if (commentsRoot) {
       updateViewControl();
       syncPreviewMode();
       await loadComments();
+      if (own === authRevision) resumeParagraphComment();
     } catch {
       if (own !== authRevision) return;
       if (commentsControls) {
@@ -369,10 +371,50 @@ if (commentsRoot) {
     paragraph.classList.add("is-feedback-selected");
   }
 
+  function canSignInToComment() {
+    return auth.available !== false && Boolean(auth.loginUrl);
+  }
+
+  function commentDestination(paragraphId: string) {
+    return (
+      location.pathname + "?feedback=comment#" + encodeURIComponent(paragraphId)
+    );
+  }
+
+  function externalPassageLink(label: string, href: string) {
+    const link = document.createElement("a");
+    link.textContent = label;
+    link.href = href;
+    // Obsidian uses this target for its native “Open in default browser” action.
+    link.target = "_external";
+    link.rel = "noopener noreferrer";
+    return link;
+  }
+
+  function classDiscussionLink(paragraphId: string) {
+    return externalPassageLink(
+      "Discuss with classmates",
+      location.pathname + "?inquiry=1#" + encodeURIComponent(paragraphId),
+    );
+  }
+
+  function resumeParagraphComment() {
+    const url = new URL(location.href);
+    if (url.searchParams.get("feedback") !== "comment") return;
+    const paragraph = document.getElementById(url.hash.slice(1));
+    url.searchParams.delete("feedback");
+    history.replaceState(history.state, "", url);
+    if (!paragraph || paragraph.dataset.commentTarget !== paragraph.id) return;
+
+    if (auth.authenticated) openForm(paragraph.id);
+    else if (canSignInToComment())
+      openAccount(undefined, commentDestination(paragraph.id));
+    else showParagraphFeedbackPanel(paragraph.id);
+  }
+
   function openForm(paragraphId: string): void {
     if (!auth.authenticated && !auth.admin) {
-      setStatus("Sign in with GitHub before commenting.");
-      openAccount();
+      showParagraphFeedbackPanel(paragraphId);
       return;
     }
 
@@ -391,7 +433,7 @@ if (commentsRoot) {
     form.dataset.commentForm = paragraphId;
     form.innerHTML = `
       <p id="paragraph-feedback-audience" class="comment-form-help" tabindex="-1"><strong>Who can read this?</strong> Your comment and replies are visible to you and the book’s feedback team. The team may publish a curated Reader note without your name or private replies.</p>
-      <p class="comment-form-help">Keep personal reflections in your <a href="/diary/">learning diary</a>. Use Peer discussion to share with classmates.</p>
+      <p class="comment-form-help" data-comment-alternatives>Keep personal reflections in your <a href="/diary/">learning diary</a>. </p>
       <label>
         <span>Category</span>
         <select name="category" required>
@@ -410,6 +452,13 @@ if (commentsRoot) {
       </div>
     `;
     form.prepend(renderParagraphContext(paragraph, paragraphId));
+    requireElement(
+      form.querySelector<HTMLElement>("[data-comment-alternatives]"),
+      "comment alternatives",
+    ).append(
+      classDiscussionLink(paragraphId),
+      " in your group or course cohort.",
+    );
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -511,17 +560,27 @@ if (commentsRoot) {
     header.className = "paragraph-feedback-panel-header";
     const title = document.createElement("h3");
     title.textContent = "Related feedback";
-    const add = document.createElement("button");
-    add.type = "button";
-    add.textContent =
-      auth.authenticated || auth.admin ? "Add comment" : "Sign in to comment";
-    add.addEventListener("click", () => openForm(paragraphId));
+    header.append(title);
+    if (auth.authenticated || auth.admin) {
+      const add = document.createElement("button");
+      add.type = "button";
+      add.textContent = "Add comment";
+      add.addEventListener("click", () => openForm(paragraphId));
+      header.append(add);
+    } else if (canSignInToComment()) {
+      header.append(
+        externalPassageLink(
+          "Sign in to comment",
+          commentDestination(paragraphId),
+        ),
+      );
+    }
     const close = document.createElement("button");
     close.type = "button";
     close.setAttribute("aria-label", "Close related feedback");
     close.textContent = "Close";
     close.addEventListener("click", () => closeParagraphFeedbackPanel());
-    header.append(title, add, close);
+    header.append(close);
     panel.append(header);
     if (confirmation) {
       const message = document.createElement("p");
@@ -530,6 +589,17 @@ if (commentsRoot) {
       panel.append(message);
     }
     panel.append(renderParagraphContext(paragraph, paragraphId));
+    const discussion = document.createElement("p");
+    discussion.append(
+      classDiscussionLink(paragraphId),
+      " in your group or course cohort.",
+    );
+    panel.append(discussion);
+    if (!auth.authenticated && !auth.admin && !canSignInToComment()) {
+      const unavailable = document.createElement("p");
+      unavailable.textContent = "Feedback sign-in is unavailable here.";
+      panel.append(unavailable);
+    }
 
     if (!relatedComments.length) {
       const empty = document.createElement("p");

@@ -1,18 +1,21 @@
 import { legacyRecovery } from "./learning-diary.ts";
 import { mountHighlightCapture } from "./learning-highlight.ts";
 import { readingSelection } from "./learning-selection.ts";
-import { readLearningSession } from "./learning-session.ts";
+import {
+  readLearningSession,
+  type AssistantSection,
+} from "./learning-session.ts";
 import type { LearningAction } from "./learning-actions.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
-async function openAssistant(resume = false, currentReading = false) {
+async function openAssistant(resume = false, section?: AssistantSection) {
   // Capture before focusing the assistant can alter the selection.
-  const selection = resume ? null : readingSelection();
+  const selection = resume || section === "peers" ? null : readingSelection();
   if (!(await loadLearning())) return;
   document.dispatchEvent(
     new CustomEvent("book-learning-open", {
-      detail: { selection, resume, currentReading },
+      detail: { selection, resume, section },
     }),
   );
 }
@@ -51,14 +54,18 @@ mountHighlightCapture();
 const assistant = document.querySelector<HTMLButtonElement>(
   '[data-learning-toggle="assistant"]',
 );
-const assistantRequested =
-  new URLSearchParams(location.search).get("assistant") === "1";
+const search = new URLSearchParams(location.search);
+const requestedSection = search.has("inquiry")
+  ? "peers"
+  : search.get("assistant") === "1"
+    ? "agent"
+    : undefined;
 if (assistant) {
   assistant.hidden = false;
   assistant.closest<HTMLElement>(".learning-launchers")!.hidden = false;
   assistant.addEventListener("click", () => void openAssistant());
   if (!legacyRecovery) {
-    if (assistantRequested) void openAssistant(false, true);
+    if (requestedSection) void openAssistant(false, requestedSection);
     else if (readLearningSession().assistantOpen) void openAssistant(true);
   }
 }
@@ -124,7 +131,7 @@ window.addEventListener("hashchange", () => {
   if (tutorialLink(new URL(location.href))) openTutorial();
 });
 if (tutorialLink(new URL(location.href))) openTutorial();
-else if (!assistantRequested && !legacyRecovery)
+else if (!requestedSection && !legacyRecovery)
   try {
     const saved = JSON.parse(
       sessionStorage.getItem("book-learning-cockpit-active") ?? "null",

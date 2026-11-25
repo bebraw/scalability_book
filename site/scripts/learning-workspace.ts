@@ -9,6 +9,7 @@ import { syncLearningLaunchers } from "./learning-navigation.ts";
 import {
   readLearningSession,
   saveLearningSession,
+  type AssistantSection,
 } from "./learning-session.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 import type { LearningAction } from "./learning-actions.ts";
@@ -148,14 +149,14 @@ document.addEventListener("book-learning-action", (event) => {
   })();
 });
 document.addEventListener("book-learning-open", (event) => {
-  const { selection, resume, currentReading } = (
+  const { selection, resume, section } = (
     event as CustomEvent<{
       selection: ReadingSelection | null;
       resume: boolean;
-      currentReading?: boolean;
+      section?: AssistantSection;
     }>
   ).detail;
-  if (!resume && !assistant.panel.hidden) {
+  if (!resume && !section && !assistant.panel.hidden) {
     setOpen(false);
     return;
   }
@@ -170,7 +171,7 @@ document.addEventListener("book-learning-open", (event) => {
           error instanceof Error ? error.message : "Reconnect the companion.";
       }
     }
-    await assistant.open(selection, resume, currentReading);
+    await assistant.open(selection, resume, section);
     if (recovery) assistant.recover(recovery);
   })();
 });

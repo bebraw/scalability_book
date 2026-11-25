@@ -32,6 +32,13 @@ const lectures = Array.from({ length: 9 }, (_, index) => {
   };
 });
 
+function readingPath(pathname) {
+  return (
+    pathname === "/" ||
+    readingPaths.some((prefix) => pathname.startsWith(prefix))
+  );
+}
+
 function publicSource(value) {
   try {
     const url = new URL(value);
@@ -40,8 +47,7 @@ function publicSource(value) {
       !url.username &&
       !url.password &&
       !url.search &&
-      (url.pathname === "/" ||
-        readingPaths.some((prefix) => url.pathname.startsWith(prefix)))
+      readingPath(url.pathname)
     )
       return url;
   } catch {
@@ -50,11 +56,52 @@ function publicSource(value) {
   return null;
 }
 
+function isWebViewerHighlight(event) {
+  if (
+    !event.isMainFrame ||
+    event.target.tagName !== "WEBVIEW" ||
+    !event.url?.endsWith("#scalableweb-course-diary-add-highlight")
+  )
+    return false;
+  try {
+    const url = new URL(event.url);
+    const current = new URL(event.target.getURL());
+    const local =
+      url.protocol === "http:" &&
+      (url.hostname === "127.0.0.1" || url.hostname === "localhost");
+    return (
+      (url.origin === "https://scalableweb.dev" || local) &&
+      !url.username &&
+      !url.password &&
+      readingPath(url.pathname) &&
+      url.hash === "#scalableweb-course-diary-add-highlight" &&
+      url.origin === current.origin &&
+      url.pathname === current.pathname &&
+      url.search === current.search
+    );
+  } catch {
+    // A Web viewer can be detached or navigated while the event is in flight.
+    return false;
+  }
+}
+
 function markdownUrl(url) {
   return url.href.replaceAll("(", "%28").replaceAll(")", "%29");
 }
 
+async function clipboardText() {
+  try {
+    return await navigator.clipboard.readText();
+  } catch {
+    return null;
+  }
+}
+
 function readHighlight(clipboard) {
+  if (clipboard === null)
+    throw new Error(
+      "Clipboard access is unavailable. Paste the copied Markdown into your lecture note.",
+    );
   const lines = clipboard.trim().split(/\r?\n/);
   const footer = lines.pop()?.match(/^\[Book source\]\(([^\s)]+)\)$/);
   const source = footer && publicSource(footer[1]);
@@ -64,7 +111,9 @@ function readHighlight(clipboard) {
     !lines.length ||
     !lines.every((line) => /^>(?: |$)/.test(line))
   )
-    throw new Error("Use Copy highlight in the course book, then try again.");
+    throw new Error(
+      "Select a passage in the course book and choose Add book highlight or Copy highlight.",
+    );
   // The book escapes Markdown punctuation before putting text on the clipboard.
   const quote = lines
     .map((line) =>
@@ -229,10 +278,16 @@ class CourseDiary extends Plugin {
       name: "Open lecture diary",
       callback: () => this.choose((lecture) => this.openLecture(lecture)),
     });
+    const addHighlight = () => this.run(() => this.addHighlight());
+    this.registerObsidianProtocolHandler(
+      "scalableweb-course-diary-add-highlight",
+      addHighlight,
+    );
+    this.watchWebViewerHighlights(addHighlight);
     this.addCommand({
       id: "add-highlight",
       name: "Add book highlight",
-      callback: () => this.run(() => this.addHighlight()),
+      callback: addHighlight,
     });
     this.addCommand({
       id: "discuss",
@@ -246,6 +301,34 @@ class CourseDiary extends Plugin {
       editorCallback: (editor, view) =>
         this.run(() => this.prepare(editor, view)),
     });
+  }
+  watchWebViewerHighlights(addHighlight) {
+    const workspace = this.app.workspace;
+    const onNavigation = (event) => {
+      if (isWebViewerHighlight(event)) return addHighlight();
+    };
+    // Capturing on each Web viewer catches its guest's navigation event even
+    // when the view replaces the guest element, including in pop-out windows.
+    const eventName = "did-navigate-in-page";
+    let containers = [];
+    const watch = (next) => {
+      for (const container of containers)
+        if (!next.includes(container))
+          container.removeEventListener(eventName, onNavigation, true);
+      for (const container of next)
+        if (!containers.includes(container))
+          container.addEventListener(eventName, onNavigation, true);
+      containers = next;
+    };
+    const refresh = () =>
+      watch(
+        workspace
+          .getLeavesOfType("webviewer")
+          .map((leaf) => leaf.view.containerEl),
+      );
+    this.registerEvent(workspace.on("layout-change", refresh));
+    this.register(() => watch([]));
+    refresh();
   }
   async run(action) {
     try {
@@ -317,16 +400,12 @@ class CourseDiary extends Plugin {
     return inserted;
   }
   async addHighlight() {
-    let clipboard;
-    try {
-      clipboard = await navigator.clipboard.readText();
-    } catch {
-      throw new Error(
-        "Clipboard access is unavailable. Paste the copied Markdown into your lecture note.",
-      );
-    }
-    const highlight = readHighlight(clipboard);
+    const clipboard = await clipboardText();
+    const copied = clipboard === null ? null : readHighlight(clipboard);
     this.choose(async (lecture) => {
+      // The protocol can arrive before Obsidian has focus. Choosing a lecture
+      // gives its window focus so it can retry a denied clipboard read.
+      const highlight = copied ?? readHighlight(await clipboardText());
       const { file } = await this.lectureData(lecture);
       const marker = await markerFor("highlight", [
         highlight.source.href,

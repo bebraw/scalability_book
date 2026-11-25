@@ -95,7 +95,8 @@ Record where each needed help and how long they spent setting up before reasonin
 
 Enable the bundled **Course diary** plugin in the disposable desktop vault.
 Try **Open lecture diary** after writing under a lecture.
-Try **Add book highlight** twice for the same lecture and passage.
+Select a passage on the book page and see whether the learner can find **Add book highlight** there.
+Choose a lecture, review the quote and save it, then repeat with the same passage and lecture.
 Check where it lands, what the source link opens and whether the second attempt adds unwanted text.
 
 Select a question beside an unrelated private remark and choose **Discuss with the course TA**.

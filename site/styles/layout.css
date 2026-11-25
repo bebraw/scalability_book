@@ -5,16 +5,21 @@
   border-bottom: 1px solid var(--border);
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   padding: 0.85rem clamp(1rem, 3vw, 2.5rem);
   position: sticky;
   top: 0;
   z-index: 5;
 }
 .brand {
-  color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.brand img {
+  display: block;
+}
+.brand:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 .header-actions {
   align-items: center;
@@ -1039,7 +1044,7 @@
   bottom: max(1rem, env(safe-area-inset-bottom));
   margin-inline: auto;
   width: fit-content;
-  max-width: calc(100% - 2rem);
+  max-width: min(32rem, calc(100% - 2rem));
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -1065,6 +1070,15 @@
 .diary-highlight-actions button:hover,
 .diary-highlight-actions button:focus-visible {
   border-color: var(--accent-strong);
+}
+.diary-highlight-actions button:first-child {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--panel);
+}
+.diary-highlight-actions textarea {
+  flex-basis: 100%;
+  min-inline-size: 0;
 }
 .diary-highlight-actions [role="status"] {
   font: 0.85rem/1.4 var(--font-ui);

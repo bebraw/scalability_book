@@ -1,12 +1,20 @@
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import { mountLearningAssistant } from "./learning-assistant.ts";
 import { mountLearningNavigation } from "./learning-navigation.ts";
-import { currentReading, pageSource } from "./learning-context.ts";
+import {
+  currentReading,
+  linkedInquirySource,
+  pageSource,
+} from "./learning-context.ts";
 import {
   readingSelection,
   type ReadingSelection,
 } from "./learning-selection.ts";
-import type { SessionState, AssistantView } from "./learning-session.ts";
+import type {
+  SessionState,
+  AssistantSection,
+  AssistantView,
+} from "./learning-session.ts";
 import type { CompanionStatus } from "../../shared/learning-connection.ts";
 import { prepareLearningHelp } from "./learning-agent-ui.ts";
 import { requestLearning } from "./learning-actions.ts";
@@ -14,6 +22,7 @@ import type {
   NotebookEntry,
   AssistantHandoff,
   DiaryTakeaway,
+  LearningSource,
 } from "../../shared/learning-workspace.ts";
 
 export interface LearningSnapshot {
@@ -50,6 +59,7 @@ export function createLearningPane(services: LearningPaneServices) {
   let view = restored.assistantPaneView;
   let assistantView = restored.assistantView;
   let assistant = restored.assistant;
+  let inquirySource: LearningSource | null = null;
   let notePreview = restored.notePreview;
   let companionStatus: CompanionStatus | null = null;
   let connected = false;
@@ -64,7 +74,7 @@ export function createLearningPane(services: LearningPaneServices) {
     });
   }
   function readingSource() {
-    return assistant?.source ?? pageSource();
+    return inquirySource ?? assistant?.source ?? pageSource();
   }
   function discussHandoff(value: AssistantHandoff) {
     if (
@@ -75,6 +85,7 @@ export function createLearningPane(services: LearningPaneServices) {
     )
       return;
     status.textContent = "";
+    inquirySource = null;
     assistant = prepareLearningHelp(
       value.source,
       value.question,
@@ -203,14 +214,16 @@ export function createLearningPane(services: LearningPaneServices) {
         requestLearning({
           kind: "investigate",
           activityId: "learning-loop",
-          ...(assistant
-            ? {
-                draft: {
-                  source: assistant.source,
-                  question: assistant.question,
-                },
-              }
-            : {}),
+          ...(assistantView === "peers" && inquirySource
+            ? { source: inquirySource }
+            : assistant
+              ? {
+                  draft: {
+                    source: assistant.source,
+                    question: assistant.question,
+                  },
+                }
+              : {}),
         }),
       ),
     );
@@ -311,13 +324,16 @@ export function createLearningPane(services: LearningPaneServices) {
     );
   }
   function renderConnection() {
-    const needsSetup = !connected || !companionStatus?.provider;
+    const forPeers = assistantView === "peers";
+    const needsSetup = !connected || (!forPeers && !companionStatus?.provider);
     container.append(
       node(
         "p",
         connected
           ? "Your teaching assistant companion is connected."
-          : "Connect your local companion to use the teaching assistant. Choose a provider during setup.",
+          : forPeers
+            ? "Connect your local companion to save your private initial thinking for this passage."
+            : "Connect your local companion to use the teaching assistant. Choose a provider during setup.",
       ),
     );
     if (!connected && location.protocol === "https:") {
@@ -344,39 +360,43 @@ export function createLearningPane(services: LearningPaneServices) {
           "p",
           connected
             ? "Stop the current companion, then run setup in its terminal. Your message draft stays here."
-            : "Run setup in your terminal and choose how you want to work. Already set up? Go to step 2.",
+            : forPeers
+              ? "Run setup in your terminal and choose Notebook only for peer discussion. Already set up? Go to step 2."
+              : "Run setup in your terminal and choose how you want to work. Already set up? Go to step 2.",
         ),
       );
-      const choices = node("ul", "", "learning-setup-choices");
-      for (const [label, href, detail] of [
-        [
-          "Codex",
-          "/notebook/setup/#connect-your-agent",
-          " — use ChatGPT sign-in or an OpenAI API key.",
-        ],
-        [
-          "API key",
-          "/notebook/setup/#use-an-api-key",
-          " — OpenAI, Claude, Gemini, OpenRouter or a compatible service; no Codex needed.",
-        ],
-        [
-          "Local model",
-          "/notebook/setup/#use-a-local-model",
-          " — use a model loaded on your computer.",
-        ],
-      ] as const) {
-        const choice = node("li");
-        choice.append(link(label, href), document.createTextNode(detail));
-        choices.append(choice);
+      if (!forPeers) {
+        const choices = node("ul", "", "learning-setup-choices");
+        for (const [label, href, detail] of [
+          [
+            "Codex",
+            "/notebook/setup/#connect-your-agent",
+            " — use ChatGPT sign-in or an OpenAI API key.",
+          ],
+          [
+            "API key",
+            "/notebook/setup/#use-an-api-key",
+            " — OpenAI, Claude, Gemini, OpenRouter or a compatible service; no Codex needed.",
+          ],
+          [
+            "Local model",
+            "/notebook/setup/#use-a-local-model",
+            " — use a model loaded on your computer.",
+          ],
+        ] as const) {
+          const choice = node("li");
+          choice.append(link(label, href), document.createTextNode(detail));
+          choices.append(choice);
+        }
+        container.append(
+          choices,
+          node(
+            "p",
+            "Enter API keys only in the terminal. API usage is billed by your provider.",
+            "learning-hint",
+          ),
+        );
       }
-      container.append(
-        choices,
-        node(
-          "p",
-          "Enter API keys only in the terminal. API usage is billed by your provider.",
-          "learning-hint",
-        ),
-      );
       renderCompanionCommand("setup");
       container.append(
         node(
@@ -404,9 +424,8 @@ export function createLearningPane(services: LearningPaneServices) {
           "Connect companion",
           async () => {
             await client.connect(address.value);
-            await services.refresh();
+            await services.refresh(assistantView === "peers");
             status.textContent = "Connected to your local companion.";
-            navigate(assistantView);
           },
           "learning-primary",
         ),
@@ -476,12 +495,16 @@ export function createLearningPane(services: LearningPaneServices) {
   async function open(
     selection: ReadingSelection | null,
     resume: boolean,
-    currentReading = false,
+    section?: AssistantSection,
   ) {
     await run(async () => {
-      // The coordinator already checked the shared connection during restore.
-      if (!resume && client.token && !connected) await services.refresh();
-      if (currentReading) {
+      if (section === "peers") {
+        // The class discussion follows its link even with an unsent assistant
+        // question about another reading. Keep that question and source together.
+        inquirySource = linkedInquirySource();
+        assistantView = "peers";
+        view = "peers";
+      } else if (section === "agent") {
         const reading = pageSource(selection);
         if (
           assistant?.source.url !== reading.url ||
@@ -495,14 +518,12 @@ export function createLearningPane(services: LearningPaneServices) {
           source: pageSource(selection),
           question: "",
         });
-      if (!connected) view = "connect";
-      else {
-        if (!resume && new URL(location.href).searchParams.has("inquiry")) {
-          view = "peers";
-          assistantView = "peers";
-        } else if (view === "connect") view = assistantView;
-        if (view === "peers") await services.refresh(true);
-      }
+      // The coordinator already checked the shared connection during restore.
+      if (!resume && client.token && !connected)
+        await services.refresh(assistantView === "peers");
+      else if (connected && assistantView === "peers")
+        await services.refresh(true);
+      view = connected ? assistantView : "connect";
       render();
       updateSelection();
     });

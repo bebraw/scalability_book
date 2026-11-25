@@ -18,7 +18,9 @@ Each phase note connects its three lectures to public readings and an optional o
 Students can also use the files with an editor of their choice or link selected audio and video evidence.
 
 Keep passage selection in the book.
-Copy or download the chosen words with a public link back to the source.
+Copy the chosen words with a public link back to the source.
+Let the reader open the lecture picker from the passage itself.
+Use the clipboard for the quote and its source, with an Obsidian URI in the browser or an in-page fragment in the desktop Web viewer to identify the action.
 Offer a bundled desktop plugin for choosing a lecture, appending a reviewed highlight, opening the existing TA beside a note and preparing a local portfolio excerpt.
 The course site receives only what the student transfers there.
 

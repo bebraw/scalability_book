@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const bookTitle = "Elements of Scalable Web Development";
+
 for (const width of [390, 320]) {
   test(`compact homepage header keeps navigation, learning actions, Account and Theme usable at ${width}px`, async ({
     page,
@@ -16,7 +18,8 @@ for (const width of [390, 320]) {
     const header = page.locator(".site-header");
     const nav = header.getByRole("navigation", { name: "Primary" });
     const brand = header.getByRole("link", {
-      name: "Elements of Scalable Web Development",
+      name: bookTitle,
+      exact: true,
     });
     const links = ["Contents", "Project", "Cases", "Demos", "Concepts"].map(
       (name) => nav.getByRole("link", { name, exact: true }),
@@ -37,19 +40,13 @@ for (const width of [390, 320]) {
     await page.evaluate(() => document.fonts.ready);
     const headerBox = (await header.boundingBox())!;
     if (width === 390) expect(headerBox.height).toBeLessThan(96);
-    const brandText = await brand.evaluate((link) => {
-      const style = getComputedStyle(link);
-      const context = document.createElement("canvas").getContext("2d")!;
-      context.font = style.font;
-      return {
-        available:
-          link.clientWidth -
-          parseFloat(style.paddingLeft) -
-          parseFloat(style.paddingRight),
-        firstWord: context.measureText("Elements").width,
-      };
-    });
-    expect(brandText.available).toBeGreaterThanOrEqual(brandText.firstWord);
+    const logo = brand.getByRole("img", { name: bookTitle, exact: true });
+    await expect(logo).toBeVisible();
+    await expect
+      .poll(() =>
+        logo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+      )
+      .toBeGreaterThan(0);
 
     // On macOS, Option-Tab includes links in Safari’s keyboard navigation.
     const tab =
@@ -90,6 +87,38 @@ for (const width of [390, 320]) {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 }
+
+test("the home logo and chapter tools fit on one row at 1104px", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1104, height: 800 });
+  await page.goto("/chapters/what-is-scalability/");
+  const header = page.getByRole("banner");
+  const home = header.getByRole("link", { name: bookTitle, exact: true });
+  await expect(home).toHaveAttribute("href", "/");
+  const controls = [
+    home,
+    header.getByRole("navigation", { name: "Primary" }),
+    header.getByRole("button", { name: "Learning cockpit" }),
+    header.getByRole("link", { name: "Learning diary" }),
+    header.getByRole("button", { name: "Teaching assistant" }),
+    header.getByRole("button", { name: "Account" }),
+    header.getByRole("combobox", { name: "Theme" }),
+    header.getByRole("button", { name: "Tools", exact: true }),
+  ];
+  for (const control of controls) {
+    await expect(control).toBeInViewport({ ratio: 1 });
+  }
+  await page.evaluate(() => document.fonts.ready);
+  const boxes = await Promise.all(
+    controls.map(async (control) => (await control.boundingBox())!),
+  );
+  // Controls of different heights should share a horizontal band.
+  expect(Math.max(...boxes.map((box) => box.y))).toBeLessThan(
+    Math.min(...boxes.map((box) => box.y + box.height)),
+  );
+  expect((await header.boundingBox())!.height).toBeLessThan(96);
+});
 
 type ThemeFrame = { theme?: string; scheme: string; background: string };
 type ThemeWindow = Window & { themeFrames: ThemeFrame[] };

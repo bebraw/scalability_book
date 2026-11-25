@@ -1,6 +1,29 @@
-import { expect, test, type Page } from "@playwright/test";
+import {
+  expect,
+  test,
+  type Locator,
+  type Page,
+  type Route,
+} from "@playwright/test";
 
 const chapterPath = "/chapters/introduction/";
+
+async function expectDiscussionLink(container: Locator, paragraphId: string) {
+  const link = container.getByRole("link", {
+    name: "Discuss with classmates",
+    exact: true,
+  });
+  await expect(link).toBeVisible();
+  await expect(link).toHaveJSProperty(
+    "href",
+    new URL(`${chapterPath}?inquiry=1#${paragraphId}`, container.page().url())
+      .href,
+  );
+  await expect(link).toHaveAttribute("target", "_external");
+  await expect(link).toHaveAttribute("rel", /\bnoopener\b/);
+  await expect(link).toHaveAttribute("rel", /\bnoreferrer\b/);
+  return link;
+}
 
 test.describe("paragraph feedback", () => {
   test.beforeEach(async ({ page }) => {
@@ -53,6 +76,16 @@ test.describe("paragraph feedback", () => {
     const audience = form.locator("#paragraph-feedback-audience");
     await expect(audience).toBeFocused();
     await expect(audience).toBeInViewport({ ratio: 1 });
+    await page.keyboard.press("Tab");
+    await expect(
+      form.getByRole("link", { name: "learning diary", exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press("Tab");
+    const discussion = await expectDiscussionLink(
+      form,
+      (await target.getAttribute("id"))!,
+    );
+    await expect(discussion).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(
       form.getByRole("combobox", { name: "Category" }),
@@ -115,6 +148,7 @@ test.describe("paragraph feedback", () => {
     const panel = page.locator("[data-paragraph-feedback-panel]");
     await expect(panel).toBeVisible();
     await expect(panel).toContainText("Seeded feedback for this paragraph.");
+    await expectDiscussionLink(panel, paragraphId);
     await expect(page.locator("[data-comment-form]")).toHaveCount(0);
     await expect(reloadedTarget).toHaveClass(/is-feedback-source/);
 
@@ -310,16 +344,18 @@ test.describe("paragraph feedback", () => {
   }
 });
 
-test("hides reflection prompts for logged-out readers", async ({ page }) => {
+test("offers class discussion when feedback sign-in is unavailable", async ({
+  page,
+}) => {
   await page.route("/api/auth/status", async (route) => {
     await route.fulfill({
       contentType: "application/json",
       body: JSON.stringify({
-        available: true,
+        available: false,
         authenticated: false,
         admin: false,
         user: null,
-        loginUrl: "/api/auth/login",
+        loginUrl: null,
       }),
     });
   });
@@ -332,30 +368,43 @@ test("hides reflection prompts for logged-out readers", async ({ page }) => {
   );
   await expect(page.locator("[data-reflection-prompts]")).toBeHidden();
   await expect(page.locator("[data-feedback-admin-link]")).toBeHidden();
+  const paragraph = page.locator("[data-comment-target]").nth(3);
+  await paragraph.click({ position: { x: 12, y: 12 } });
+  await paragraph.locator("[data-comment-button]").click();
+  const panel = page.locator("[data-paragraph-feedback-panel]");
+  await expect(panel).toContainText("Feedback sign-in is unavailable");
+  await expectDiscussionLink(panel, (await paragraph.getAttribute("id"))!);
 });
 
 for (const width of [1440, 390]) {
   test(`logged-out readers open public Reader notes before signing in at ${width}px`, async ({
     page,
+    context,
   }) => {
     await page.setViewportSize({ width, height: 900 });
     const loginUrl = "/api/auth/github/start";
-    await page.route("**/api/auth/status", (route) =>
+    // Model the Web viewer and regular browser with independent sign-in state.
+    let browserSignedIn = false;
+    const userFor = (route: Route) =>
+      browserSignedIn && route.request().frame().page() !== page
+        ? { id: 7, login: "synthetic-reader" }
+        : null;
+    await context.route("**/api/auth/status", (route) =>
       route.fulfill({
         json: {
           available: true,
-          authenticated: false,
+          authenticated: Boolean(userFor(route)),
           admin: false,
-          user: null,
+          user: userFor(route),
           loginUrl,
         },
       }),
     );
-    await page.route("**/api/account/status", (route) =>
+    await context.route("**/api/account/status", (route) =>
       route.fulfill({
         json: {
           local: false,
-          github: { available: true, user: null, loginUrl },
+          github: { available: true, user: userFor(route), loginUrl },
           course: { available: false, emailAvailable: false, user: null },
           answers: null,
         },
@@ -363,7 +412,7 @@ for (const width of [1440, 390]) {
     );
     const writes: string[] = [];
     let notes: object[] = [];
-    await page.route("**/api/comments**", (route) => {
+    await context.route("**/api/comments**", (route) => {
       if (route.request().method() === "GET")
         return route.fulfill({ json: notes });
       writes.push(route.request().method());
@@ -372,7 +421,7 @@ for (const width of [1440, 390]) {
         json: { message: "Sign in before commenting." },
       });
     });
-    await page.goto(chapterPath);
+    await page.goto(chapterPath + "?reader=local#previous-section");
     await expect(page.locator("html")).toHaveAttribute(
       "data-comments-ready",
       "false",
@@ -415,40 +464,85 @@ for (const width of [1440, 390]) {
     );
     await expect(panel.locator(".comment-replies")).toHaveCount(0);
     await expect(panel.locator(".comment-card-actions")).toHaveCount(0);
+    await expectDiscussionLink(panel, paragraphId!);
     await expect(page.locator("[data-comment-form]")).toHaveCount(0);
-    const account = page.getByRole("dialog", {
-      name: "Account & connections",
-      exact: true,
-    });
-    await expect(account).not.toBeVisible();
+    const account = (reader: Page) =>
+      reader.getByRole("dialog", {
+        name: "Account & connections",
+        exact: true,
+      });
+    await expect(account(page)).not.toBeVisible();
     await panel.getByRole("button", { name: "Close related feedback" }).click();
     await expect(panel).toHaveCount(0);
     await badge.click();
-    await panel
-      .getByRole("button", { name: "Sign in to comment", exact: true })
-      .click();
-    await expect(account).toBeVisible();
-    await expect(
-      account.getByRole("link", { name: "Sign in with GitHub", exact: true }),
-    ).toHaveAttribute(
-      "href",
-      `${loginUrl}?returnTo=${encodeURIComponent(chapterPath)}`,
+    const signIn = panel.getByRole("link", {
+      name: "Sign in to comment",
+      exact: true,
+    });
+    const target = chapterPath + "?feedback=comment#" + paragraphId;
+    await expect(signIn).toBeVisible();
+    expect(await signIn.evaluate((el: HTMLAnchorElement) => el.href)).toBe(
+      new URL(target, page.url()).href,
     );
-    await expect(page.locator("[data-comment-form]")).toHaveCount(0);
-    await account
-      .getByRole("button", { name: "Close account and connections" })
-      .click();
+    // Obsidian's Web viewer opens this named target in the operating system browser.
+    await expect(signIn).toHaveAttribute("target", "_external");
+    const opened = context.waitForEvent("page");
+    await signIn.click();
+    const browser = await opened;
+    const github = account(browser).getByRole("link", {
+      name: "Sign in with GitHub",
+      exact: true,
+    });
+    await expect(github).toHaveAttribute(
+      "href",
+      `${loginUrl}?returnTo=${encodeURIComponent(target)}`,
+    );
+    expect(await browser.evaluate(() => window.opener === null)).toBe(true);
+    await expect(browser.locator("[data-comment-form]")).toHaveCount(0);
     await expect(panel).toContainText(body);
-
-    notes = [];
-    await page.reload();
-    await expect(badge).toHaveAttribute("data-comment-count", "");
-    await expect(badge).toBeHidden();
-    // Exercise the empty-paragraph handler even though the logged-out UI hides it.
-    await badge.evaluate((button) => button.click());
-    await expect(account).toBeVisible();
+    await expect(account(page)).not.toBeVisible();
     await expect(page.locator("[data-comment-form]")).toHaveCount(0);
-    await expect(panel).toHaveCount(0);
+    // The Worker tests own the OAuth exchange; follow its return destination here.
+    await context.route("**/api/auth/github/start?*", (route) => {
+      browserSignedIn = true;
+      return route.fulfill({
+        contentType: "text/html",
+        body: '<script>location.replace(new URL(location.href).searchParams.get("returnTo"))</script>',
+      });
+    });
+    await github.click();
+    await expect(browser.locator("[data-comment-form]")).toHaveAttribute(
+      "data-comment-form",
+      paragraphId!,
+    );
+    await expect(account(browser)).not.toBeVisible();
+    await browser.close();
+
+    await panel.getByRole("button", { name: "Close related feedback" }).click();
+    const other = page.locator("[data-comment-target]").nth(1);
+    const otherId = await other.getAttribute("id");
+    await other.click({ position: { x: 12, y: 12 } });
+    const otherBadge = other.locator("[data-comment-button]");
+    await expect(otherBadge).toHaveAttribute("data-comment-count", "");
+    await otherBadge.click();
+    const next = context.waitForEvent("page");
+    await signIn.click();
+    const returningBrowser = await next;
+    await expect(
+      returningBrowser.locator("[data-comment-form]"),
+    ).toHaveAttribute("data-comment-form", otherId!);
+    await expect(account(returningBrowser)).not.toBeVisible();
+    await expect(account(page)).not.toBeVisible();
+    const reading = await context.newPage();
+    for (const url of [
+      chapterPath + "#" + otherId,
+      chapterPath + "?feedback=comment#no-such-paragraph",
+    ]) {
+      await reading.goto(url);
+      await waitForFeedback(reading);
+      await expect(reading.locator("[data-comment-form]")).toHaveCount(0);
+      await expect(account(reading)).not.toBeVisible();
+    }
     expect(writes).toEqual([]);
   });
 }

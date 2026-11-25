@@ -6,13 +6,19 @@ import { webcrypto } from "node:crypto";
 
 // Obsidian supplies its CommonJS API at runtime. Run its shipping entry point
 // against an in-memory vault so these tests cannot touch someone's notes.
-function diary() {
+function diary({ deniedClipboardReads = 0 } = {}) {
   const notices: string[] = [];
   const links: string[] = [];
   const external: string[] = [];
   const splits: string[] = [];
   const files = new Map<string, TFile>();
   const commands = new Map();
+  const layoutChanges = new Set<() => void>();
+  const cleanups: (() => void)[] = [];
+  const protocols = new Map<
+    string,
+    (params: Record<string, string>) => Promise<void>
+  >();
   const ui = new Map();
   let modal: Modal;
   let active: MarkdownView;
@@ -56,8 +62,20 @@ function diary() {
     }
   }
   class Plugin {
+    register(cleanup: () => void) {
+      cleanups.push(cleanup);
+    }
+    registerEvent(unsubscribe: () => void) {
+      this.register(unsubscribe);
+    }
     addCommand(command: { id: string }) {
       commands.set(command.id, command);
+    }
+    registerObsidianProtocolHandler(
+      action: string,
+      handler: (params: Record<string, string>) => Promise<void>,
+    ) {
+      protocols.set(action, handler);
     }
   }
   class TFile {
@@ -106,6 +124,11 @@ function diary() {
       },
     },
     workspace: {
+      on: (event: string, handle: () => void) => {
+        assert.equal(event, "layout-change");
+        layoutChanges.add(handle);
+        return () => layoutChanges.delete(handle);
+      },
       getActiveViewOfType: () => active,
       openLinkText: async (link: string) => {
         links.push(link);
@@ -164,7 +187,13 @@ function diary() {
     },
     navigator: {
       clipboard: {
-        readText: async () => clipboard,
+        readText: async () => {
+          if (deniedClipboardReads > 0) {
+            deniedClipboardReads--;
+            throw new Error("Document is not focused");
+          }
+          return clipboard;
+        },
         writeText: async (text: string) => {
           clipboard = text;
         },
@@ -196,6 +225,53 @@ function diary() {
     },
     disableReader() {
       readerEnabled = false;
+    },
+    openHighlight(params: Record<string, string> = {}) {
+      const handler = protocols.get("scalableweb-course-diary-add-highlight");
+      assert.ok(handler);
+      return handler(params);
+    },
+    unload() {
+      cleanups.forEach((cleanup) => cleanup());
+    },
+    webViewer(current: string) {
+      type Navigation = {
+        url: string;
+        isMainFrame: boolean;
+        target: { tagName: string; getURL: () => string };
+      };
+      let listener: ((event: Navigation) => Promise<void> | void) | undefined;
+      const containerEl = {
+        addEventListener(
+          name: string,
+          handle: typeof listener,
+          capture: boolean,
+        ) {
+          assert.equal(name, "did-navigate-in-page");
+          assert.ok(capture);
+          listener = handle;
+        },
+        removeEventListener(_name: string, handle: typeof listener) {
+          assert.equal(handle, listener);
+          listener = undefined;
+        },
+      };
+      const leaf = { view: { containerEl } };
+      leaves.push(leaf);
+      layoutChanges.forEach((handler) => handler());
+      return {
+        navigate(url: string, isMainFrame = true, tagName = "WEBVIEW") {
+          return listener?.({
+            url,
+            isMainFrame,
+            target: { tagName, getURL: () => current },
+          });
+        },
+        close() {
+          leaves.splice(leaves.indexOf(leaf), 1);
+          layoutChanges.forEach((handler) => handler());
+        },
+      };
     },
     run: (id: string) => {
       const command = commands.get(id);
@@ -245,7 +321,12 @@ test("choose a lecture from the starter, preview a highlight and save it once in
   assert.equal(h.links[0], file.path + "#" + section.slice(3));
   h.clipboard =
     "> A \\*literal\\*\n> second line\\.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)\n";
-  await h.run("add-highlight");
+  await h.openHighlight({
+    content: "Other text from a URI",
+    lecture: "9",
+  });
+  const quoted = h.clipboard;
+  h.clipboard = "Clipboard changed while the lecture picker was open.";
   await h.selectLecture(2);
   assert.equal(h.ui.get("blockquote").text, "A *literal*\nsecond line.");
   assert.ok(!file.text.includes("second line"));
@@ -262,11 +343,81 @@ test("choose a lecture from the starter, preview a highlight and save it once in
   assert.ok(saved.indexOf("[Book source]") < saved.indexOf("## Lecture 3"));
   assert.match(saved, /> A \\\*literal\\\*\n> second line\\\./);
   assert.ok(!file.text.includes("[Book source]"));
+  h.clipboard = quoted;
   await h.run("add-highlight");
   await h.selectLecture(2);
   await h.click("Save highlight");
   assert.equal(editor.getValue(), saved);
   assert.match(h.notices.at(-1) ?? "", /already in that lecture/);
+});
+
+test("the book handoff can read the highlight after the lecture picker receives focus", async () => {
+  const h = diary({ deniedClipboardReads: 1 });
+  const file = h.files.get("02-Challenge.md")!;
+  const original = file.text;
+  h.clipboard =
+    "> The cache missed.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)";
+  await h.openHighlight();
+  await h.selectLecture(5);
+  assert.equal(h.ui.get("blockquote").text, "The cache missed.");
+  assert.equal(file.text, original);
+  await h.click("Save highlight");
+  assert.match(file.text, /## Lecture 5.*The cache missed.*## Lecture 6/s);
+
+  const denied = diary({ deniedClipboardReads: 2 });
+  await denied.openHighlight();
+  await denied.selectLecture(5);
+  assert.match(denied.notices.at(-1) ?? "", /Paste the copied Markdown/);
+  assert.equal(denied.files.get(file.path)!.text, original);
+});
+
+test("a book page in a Web viewer can request a reviewed highlight in its own vault", async () => {
+  const path = "/chapters/benchmarking/";
+  const marker = "#scalableweb-course-diary-add-highlight";
+  for (const origin of ["https://scalableweb.dev", "http://127.0.0.1:3000"]) {
+    const h = diary();
+    const viewer = h.webViewer(origin + path + "#requests");
+    const file = h.files.get("02-Challenge.md")!;
+    const original = file.text;
+    h.clipboard =
+      "> Measure cold reads.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)";
+    await viewer.navigate(origin + path + marker);
+    await h.selectLecture(4);
+    assert.equal(h.ui.get("blockquote").text, "Measure cold reads.");
+    assert.equal(file.text, original);
+    await h.click("Save highlight");
+    assert.match(file.text, /## Lecture 4.*Measure cold reads.*## Lecture 5/s);
+  }
+});
+
+test("only a current course reading in the Web viewer main frame can start a handoff", async () => {
+  const h = diary();
+  // A clipboard read would surface a validation notice.
+  h.clipboard = "Unrelated clipboard";
+  const reading = "https://scalableweb.dev/chapters/benchmarking/";
+  const marker = "#scalableweb-course-diary-add-highlight";
+  const view = h.webViewer(reading);
+  await view.navigate(reading + "#requests");
+  await view.navigate(reading + marker, false);
+  await view.navigate(reading + marker, true, "IFRAME");
+  await view.navigate("https://scalableweb.dev/chapters/other/" + marker);
+  await view.navigate("http://localhost:3000/chapters/benchmarking/" + marker);
+  for (const url of [
+    "https://scalableweb.dev.example/chapters/benchmarking/",
+    "http://example.test/chapters/benchmarking/",
+    "https://scalableweb.dev/course/",
+    "http://localhost:3000/admin/",
+  ]) {
+    const other = h.webViewer(url);
+    await other.navigate(url + marker);
+    other.close();
+  }
+  view.close();
+  await view.navigate(reading + marker);
+  const last = h.webViewer(reading);
+  h.unload();
+  await last.navigate(reading + marker);
+  assert.deepEqual(h.notices, []);
 });
 
 test("malformed source links and ambiguous destinations leave student writing alone", async () => {
@@ -280,7 +431,7 @@ test("malformed source links and ambiguous destinations leave student writing al
     "https://scalableweb.dev/course/private-assessment/",
   ]) {
     h.clipboard = "> text\n\n[Book source](" + url + ")";
-    await h.run("add-highlight");
+    await h.openHighlight();
     assert.match(h.notices.at(-1) ?? "", /Copy highlight/);
   }
   h.clipboard =
