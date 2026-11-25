@@ -596,3 +596,9 @@ npm run deploy
 ```
 
 `worker:build` generates the static site and a small asset manifest for the Worker. `preview:worker` runs that production-style Worker locally through Wrangler; unlike `dev`, it does not provide the local Markdown editor. `deploy` publishes [worker/index.ts](../worker/index.ts) using [wrangler.jsonc](../wrangler.jsonc).
+
+To review a pull request online, open its successful **Workers Builds** check and find the Worker Version ID.
+The first eight characters identify the build at `https://<first-eight>-scalability-book.survivejs.workers.dev`.
+Append the page path you want to test.
+Opening that URL serves the uploaded version with its configured bindings, including shared feedback storage.
+Use the local test server for checks that write synthetic records. [Cloudflare Version URLs](https://developers.cloudflare.com/workers/versions-and-deployments/version-urls/)
