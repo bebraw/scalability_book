@@ -48,6 +48,7 @@ Keeping the earlier prediction gives you something concrete to compare.
 
 At the end of a phase, [prepare your private portfolio](04-Portfolio.md) from passages you choose.
 Keep this folder outside the group's project repository.
+For shared specifications, decisions and test results, open your team's project repository as a second vault. [Group work in Obsidian](https://scalableweb.dev/diary/#work-with-your-project-group-in-obsidian)
 The course accepts written, audio and video diaries. [Diary and participation criteria](https://scalableweb.dev/project/grading/#participation-and-learning-diary-3-points-per-lecture)
 
 ## Ask the course TA

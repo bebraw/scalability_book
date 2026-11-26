@@ -125,6 +125,16 @@ Identify any assistant wording you keep.
    Course staff can access saved drafts and uploaded files.
    Keep private entries and confidential peer feedback out of the group's shared technical submission.
 
+## Work with your project group in Obsidian
+
+Each teammate can open their own copy of the group's private Git repository as a second vault.
+In Obsidian choose **Open folder as vault**, select the project root containing `projects/` and open **README → Work together in Obsidian**. [Download the three-project starter](/downloads/project/project-starter.zip)
+
+The group can use the same vault for Establish, Challenge and Compare while building each implementation in its own directory.
+During an engineering session, record what the team tested and decided in its decision record or AI-use log.
+Link that record from the current phase’s evidence index so a teammate can pull the changes and repeat the check.
+Keep your individual reflections and peer assessments in your personal diary. [Shared engineering sessions](/project/#shared-engineering-sessions)
+
 ## Bring over an existing Notebook
 
 If you wrote in the book's earlier Notebook, open [Notebook recovery](/notebook/setup/?legacy=1) in Chrome with your original companion running.
