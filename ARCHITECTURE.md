@@ -85,6 +85,8 @@ The CLI trusts only `https://scalableweb.dev` by default; local development requ
 [ADR-037](docs/adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records that website trust boundary and the removal of manual pairing.
 The [course diary guide](docs/course-diary.md) and [starter vault](docs/diary-pilot/) are the entry point for student writing.
 Each phase folder has an overview and a Markdown note for each of its three lectures.
+Each lecture note links to the corresponding [draft slide deck](slides/README.md) and [self-study module](study/README.md).
+The site builds the student slide pages from the versioned lecture decks at stable numbered URLs, so revising a deck requires no changes to a student's vault.
 The site build [packages the vault and a plugin-only update](scripts/lib/course-diary-download.ts) with the same bundled [desktop Obsidian plugin](packages/obsidian-course-diary/).
 The student's files own diary entries and private portfolio drafts.
 The plugin opens the named lecture files and works with explicitly chosen excerpts.

@@ -4,3 +4,5 @@
 
 Which check made you trust or question one claim from the coding agent?
 Link the test or describe the observation that mattered. [Reading](https://scalableweb.dev/chapters/scalable-development/)
+
+[Lecture slides (draft)](https://scalableweb.dev/slides/lecture-2/) · [Optional self-study](https://scalableweb.dev/learn/pilot/agent-development/)

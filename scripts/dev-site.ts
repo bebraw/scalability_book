@@ -843,6 +843,7 @@ async function startSourceWatchers() {
       recursive: true,
     },
     { target: path.join(root, "site"), recursive: true },
+    { target: path.join(root, "slides"), recursive: true },
     { target: path.join(root, "study"), recursive: true },
     { target: path.join(root, "shared"), recursive: true },
     { target: path.join(root, "specifications"), recursive: true },

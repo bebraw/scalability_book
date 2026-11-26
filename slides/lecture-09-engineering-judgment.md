@@ -134,6 +134,8 @@ After the independent audit, add the report and your response to the same group 
 
 ---
 
+<!-- in-class-only -->
+
 # Would you keep the cache?
 
 A team added a cache to its workspace summary.
@@ -147,6 +149,8 @@ In your private lecture diary, record your provisional recommendation, what you 
 <!-- [Sources] lecture_plan.md -->
 
 ---
+
+<!-- in-class-only -->
 
 # What changes at handover?
 

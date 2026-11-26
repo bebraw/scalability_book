@@ -17,6 +17,14 @@ A few sentences in your own words, or a reference to an audio or video entry, ca
 | [Challenge](Challenge/02-Challenge.md) | [Lecture 4](Challenge/Lecture%204.md) · [Lecture 5](Challenge/Lecture%205.md) · [Lecture 6](Challenge/Lecture%206.md) | Build B and examine an assumption |
 | [Compare](Compare/03-Compare.md)       | [Lecture 7](Compare/Lecture%207.md) · [Lecture 8](Compare/Lecture%208.md) · [Lecture 9](Compare/Lecture%209.md)       | Build C and defend a decision     |
 
+## Before and after class
+
+Each lecture note links to its draft slides and an optional self-study activity.
+Before class, skim the slides and jot down one question you want to bring.
+For Lecture 1, write your own cache prediction first.
+After class, revisit your question and add one observation from a demonstration, a team presentation or your project that helped you answer it.
+Reopen the same slide link to see revisions as the course progresses. [All lecture slides](https://scalableweb.dev/slides/)
+
 ## An example diary entry
 
 > I expect a second worker to drain our queue faster.

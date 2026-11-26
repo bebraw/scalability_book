@@ -8,7 +8,20 @@ Their decks supply preparation, brief framing, and selective discussion prompts;
 Each file uses Marp-compatible frontmatter and `---` slide separators.
 The source comments at the end of each slide are intended to become speaker-note source blocks when the decks are converted to PowerPoint or another presentation format.
 
-Run `npm run slides:pdf` to render one 16:9 PDF per lecture under `output/pdf/lectures/`.
+## Publish a revision
+
+Edit the numbered Markdown deck below and run the normal site build.
+The [student slide index](https://scalableweb.dev/slides/) groups the decks by phase.
+Each Obsidian lecture note links to its own numbered page, such as `/slides/lecture-3/`, so students can reopen it after class to see the latest published revision.
+Students can also save the link beside a slide heading in their notes.
+Keep a heading's wording when revising its body if students should be able to return to the same passage.
+The [self-study modules](../study/README.md) provide separate exercises for the same topics.
+
+The student pages show the slide text in teaching order and omit speaker comments.
+Put `<!-- in-class-only -->` on its own line at the top of a slide to reserve it for the session.
+Lecture 9 uses this marker for the two-stage cache activity so students can record their first answer before the instructor gives the second prompt.
+To release a reserved slide for review after class, remove its marker and publish the revision.
+Run `npm run slides:pdf` to render the complete instructor decks as 16:9 PDFs under `output/pdf/lectures/`.
 
 | Lecture | Deck                                        |
 | ------- | ------------------------------------------- |

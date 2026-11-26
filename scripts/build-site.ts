@@ -34,6 +34,7 @@ import {
   renderConceptGraphMarkdown,
 } from "./lib/concept-export.ts";
 import { buildStudy } from "./lib/study-build.ts";
+import { readLectureSlidePages } from "./lib/lecture-slides.ts";
 import { writeConceptVisuals } from "./lib/concept-visuals.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -408,6 +409,19 @@ for (const guide of [
       currentUrl: `/${guide.route}/`,
       scripts: guide.scripts ?? [],
       children: `<main id="content" class="chapter-main guide-main"><article class="prose">${content}</article></main>`,
+    }),
+  );
+}
+
+for (const page of await readLectureSlidePages(path.join(root, "slides"))) {
+  await writePage(
+    `${page.url.slice(1)}index.html`,
+    renderer.renderLayout({
+      title: `${page.title} - ${config.title}`,
+      description: "Draft lecture slides for preparation and review.",
+      currentUrl: page.url,
+      scripts: developmentScripts,
+      children: `<main id="content" class="chapter-main guide-main"><article class="prose lecture-slides">${page.content}</article></main>`,
     }),
   );
 }

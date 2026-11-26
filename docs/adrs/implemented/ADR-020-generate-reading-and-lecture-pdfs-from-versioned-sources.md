@@ -23,6 +23,11 @@ Render one 16:9 PDF per lecture through the lecture export command.
 Lecture decks adapt chapter content; they are separate versioned teaching sources, not automatically identical copies of the book.
 Presentation-led sessions use their decks for framing and discussion rather than add another full lecture.
 
+The student diary links to stable numbered pages built from the same lecture Markdown.
+Publishing a revision updates the material in existing vaults when students reopen the link.
+The web edition omits speaker comments and slides the instructor reserves for a staged activity.
+The instructor PDF retains those slides in sequence.
+
 Keep book selection, export order, links, and layout aligned when material moves.
 The current PDF generator maintains its own entry/order list, so agreement with site configuration still requires review.
 

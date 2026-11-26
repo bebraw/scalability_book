@@ -6,24 +6,26 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { marked } from "marked";
+import { lectures } from "../packages/obsidian-course-diary/lecture-layout.ts";
 import { writeCourseDiaryDownloads } from "../scripts/lib/course-diary-download.ts";
 
-test("setup and Lecture 1 open the book that supplied the vault", async (t) => {
+test("setup, slides and self-study links open the matching lecture on the book that supplied the vault", async (t) => {
   const tmp = await mkdtemp(path.join(tmpdir(), "course-diary-origin-"));
   t.after(() => rm(tmp, { recursive: true, force: true }));
+  const study = JSON.parse(await readFile("study/pilot/course.json", "utf8"));
   for (const origin of [
     "https://feat-obsidian-course-diary-scalability-book.survivejs.workers.dev",
     "http://127.0.0.1:3910",
     "https://scalableweb.dev",
   ]) {
     await writeCourseDiaryDownloads(process.cwd(), tmp, origin);
-    const note = (name: string) =>
+    const note = (file: string) =>
       execFileSync(
         "unzip",
-        ["-p", path.join(tmp, "course-diary.zip"), `Course diary/${name}.md`],
+        ["-p", path.join(tmp, "course-diary.zip"), `Course diary/${file}`],
         { encoding: "utf8" },
       );
-    const start = note("00-Start here");
+    const start = note("00-Start here.md");
     assert.ok(
       start.includes(
         `[First-time setup with screenshots](${origin}/diary/#start-with-the-first-lecture)`,
@@ -31,11 +33,30 @@ test("setup and Lecture 1 open the book that supplied the vault", async (t) => {
     );
     assert.ok(start.includes("[Lecture 1](Establish/Lecture%201.md)"));
     assert.ok(start.includes("(https://obsidian.md/help/plugins/web-viewer)"));
+    assert.ok(start.includes(`[All lecture slides](${origin}/slides/)`));
     assert.ok(
-      note("Establish/Lecture 1").includes(
+      note("Establish/Lecture 1.md").includes(
         `[Reading](${origin}/chapters/what-is-scalability/)`,
       ),
     );
+    for (const lecture of lectures) {
+      const links = new Set<string>();
+      marked.walkTokens(marked.lexer(note(lecture.path)), (token) => {
+        if (
+          token.type === "link" &&
+          /\/(slides|learn\/pilot)\//.test(token.href)
+        )
+          links.add(token.href);
+      });
+      assert.deepEqual(
+        links,
+        new Set([
+          `${origin}/slides/lecture-${lecture.number}/`,
+          `${origin}/learn/pilot/${study.modules[lecture.number - 1].id}/`,
+        ]),
+        `${lecture.path} opens its own slides and self-study activity`,
+      );
+    }
   }
 });
 

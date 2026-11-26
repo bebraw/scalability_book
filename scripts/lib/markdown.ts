@@ -93,7 +93,21 @@ export function renderMarkdown(
   chapter: MarkdownChapter,
   bibliographySource = "",
 ): RenderedMarkdown {
-  source = getPublicMarkdownSource(source);
+  return renderPublicMarkdown(
+    getPublicMarkdownSource(source),
+    chapter,
+    bibliographySource,
+    { paragraphFeedback: true },
+  );
+}
+
+/** Render an already selected public document, including literal Markdown separators in code. */
+export function renderPublicMarkdown(
+  source: string,
+  chapter: MarkdownChapter,
+  bibliographySource = "",
+  { paragraphFeedback = false } = {},
+): RenderedMarkdown {
   let prepared = prepareMarkdownImports(source);
   let headingNumbers = prefixHeadingNumbers(
     headingNumbersByOffset(prepared.source),
@@ -148,6 +162,7 @@ export function renderMarkdown(
     rendered.captionedBlocks,
     Boolean(chapter.number),
     bibliographySource,
+    paragraphFeedback,
   );
 
   return {
@@ -297,10 +312,11 @@ function decorateRenderedTree(
   captionedBlocks: readonly RenderedCaptionedBlock[],
   numbered: boolean,
   bibliographySource: string,
+  paragraphFeedback: boolean,
 ): TableOfContentsItem[] {
   const importsByToken = new Map(imports.map((item) => [item.token, item]));
   const headingById = new Map(headings.map((heading) => [heading.id, heading]));
-  const paragraphCounts = new Map<string, number>();
+  const paragraphCounts = paragraphFeedback ? new Map<string, number>() : null;
   linkCitationsToBibliography(tree, bibliographySource);
   decorateCaptionedBlockPermalinks(tree, captionedBlocks);
 
@@ -373,7 +389,7 @@ function decorateChildren(
   parent: HastParent,
   source: string,
   importsByToken: ReadonlyMap<string, MarkdownImport>,
-  paragraphCounts: Map<string, number>,
+  paragraphCounts: Map<string, number> | null,
   numbered: boolean,
 ): void {
   for (let index = 0; index < parent.children.length; index++) {
@@ -403,10 +419,10 @@ function decorateElement(
   element: HastElement,
   parent: HastParent,
   source: string,
-  paragraphCounts: Map<string, number>,
+  paragraphCounts: Map<string, number> | null,
   numbered: boolean,
 ): void {
-  if (element.tagName === "p") {
+  if (element.tagName === "p" && paragraphCounts) {
     decorateParagraph(element, source, paragraphCounts);
   }
 

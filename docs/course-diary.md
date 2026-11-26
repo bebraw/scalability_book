@@ -66,6 +66,21 @@ You can also edit these files in a plain text editor.
 For an audio or video diary, add the recording or a link beside the prompt.
 Keep a backup of your folder and recordings. [Diary and participation criteria](/project/grading/#participation-and-learning-diary-3-points-per-lecture)
 
+### Use the slides before and after class
+
+In your lecture note, choose **Lecture slides (draft)** to open the current deck.
+Before class, skim it and write down one question you want to bring.
+For Lecture 1, save your own cache prediction first.
+After class, return to that question and add one observation that helped you answer it.
+For a presentation session, that might be a measurement another team showed.
+Choose **Optional self-study** if you want to try an exercise on your own.
+
+The slides are drafts.
+Reopening the same link brings up the latest published version.
+To save a particular slide on desktop, point at its heading, right-click the **#** that appears and copy the link.
+Paste it beside your question in the diary.
+If your vault predates these links, choose your lecture from the index and paste its address into your existing note. [All lecture slides](/slides/)
+
 ### Read the chapter beside your note (optional)
 
 The **Reading** link in Lecture 1 opens the book.
@@ -85,6 +100,7 @@ Turn on **Open external links** and close Settings.
 Right-click the **Lecture 1** tab and choose **Split right**.
 In the right-hand copy, click **Reading**.
 You should see the chapter on the right and your prediction on the left. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
+You can open **Lecture slides (draft)** beside your note the same way.
 
 ## Bring a passage into your diary
 

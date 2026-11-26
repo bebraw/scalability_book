@@ -41,7 +41,7 @@ async function main() {
                 <span>Elements of Scalable Web Development</span>
                 <span>Lecture ${Number(lectureNumber)}</span>
               </div>
-              <div class="slide-body">${renderMarkdown(stripSourceComments(slideSource), { number: "" }).content}</div>
+              <div class="slide-body">${renderMarkdown(stripSlideMetadata(slideSource), { number: "" }).content}</div>
               <div class="slide-footer">${index + 1} / ${slideSources.length}</div>
             </section>`,
         );
@@ -85,8 +85,11 @@ async function main() {
   }
 }
 
-function stripSourceComments(source) {
-  return source.replace(/<!--\s*\[Sources\][\s\S]*?-->/g, "").trim();
+function stripSlideMetadata(source) {
+  return source
+    .replaceAll("<!-- in-class-only -->", "")
+    .replace(/<!--\s*\[Sources\][\s\S]*?-->/g, "")
+    .trim();
 }
 
 function parseFrontmatter(source) {
