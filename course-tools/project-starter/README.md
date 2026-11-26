@@ -56,6 +56,7 @@ As behavior grows, adapt or replace the supplied smoke checks for the chosen rou
 
 Each teammate can clone the group's private project repository and choose **Open folder as vault** in Obsidian.
 Select the starter root containing `projects/`.
+If this is your first time using Obsidian, the diary tutorial shows how to open a folder and edit a note. [First-time setup with screenshots](https://scalableweb.dev/diary/#start-with-the-first-lecture)
 Keep your personal diary and peer assessments in a separate vault.
 This works with ordinary Markdown and Git, including a graphical Git client.
 

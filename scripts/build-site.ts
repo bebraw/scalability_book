@@ -1339,6 +1339,16 @@ async function copyStaticAssets() {
     path.join(siteDir, "assets", "blank-map-world.svg"),
     path.join(assetsDir, "blank-map-world.svg"),
   );
+  const screenshots = path.join(siteDir, "assets", "obsidian-setup");
+  const destination = path.join(assetsDir, "obsidian-setup");
+  await mkdir(destination, { recursive: true });
+  for (const file of await readdir(screenshots, { withFileTypes: true })) {
+    if (file.isFile() && file.name.endsWith(".png"))
+      await copyFile(
+        path.join(screenshots, file.name),
+        path.join(destination, file.name),
+      );
+  }
 }
 
 async function writeLabDownloads() {

@@ -258,6 +258,9 @@ Check that Obsidian offers a lecture, previews the quote and saves it to the cho
 Use synthetic writing.
 Check that the selected passage reopens its book section and that the portfolio draft contains only the chosen excerpt.
 The [student guide](course-diary.md) describes each action.
+Its first-use screenshots live in `site/assets/obsidian-setup/`.
+Capture updates in an isolated desktop profile using the downloaded starter and synthetic writing.
+Use a new filename for a changed image, then check that the guide’s linked thumbnail opens the full-size capture.
 The build packages the start and portfolio guides plus an overview and three lecture notes per phase from `docs/diary-pilot/`.
 It bundles `packages/obsidian-course-diary/main.js` and its local dependencies as one CommonJS entry point.
 It puts identical plugin files into the starter and the versioned plugin-only ZIP linked from the diary guide.

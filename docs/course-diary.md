@@ -1,34 +1,90 @@
 # Keep a course diary in Obsidian
 
-Keep a question, a passage from the book and the observation that helped you answer it together.
-One vault holds three folders, **Establish**, **Challenge** and **Compare**.
-Each contains three lecture notes and a phase overview.
-Return to the same lecture note to keep your prediction, saved passages and later reflections together.
-At the end of each phase, use its overview to look back across the three lectures and choose what goes into your individual portfolio.
-
-[Download the course diary (.zip)](/downloads/course-diary.zip)
+Your course diary gives you one note per lecture.
+Keep a prediction, a passage from the book and what you later found out together.
+At the end of each phase, choose the entries you want to share in your individual portfolio.
 
 ## Start with the first lecture
 
-1. Install [Obsidian](https://obsidian.md/download) and unzip the course diary somewhere private, outside your group's project repository.
-2. In Obsidian, choose **Open folder as vault**.
-   Select the extracted **Course diary** folder that contains **00-Start here.md**.
-   A vault is simply a folder of notes.
-   If Obsidian asks whether you trust the vault, choose **Browse vault in Restricted Mode** to start with the notes. [Open an existing folder in Obsidian](https://obsidian.md/help/vault)
-3. Open **00-Start here** and follow the link to **Lecture 1**.
-   You can also open **Establish → Lecture 1** from the file list.
-   A team says its cached summary loads twice as fast.
-   What would you measure before deciding to keep the cache?
-   Write your prediction under the prompt.
-   To open the reading inside desktop Obsidian, enable **Web viewer** under **Settings → Core plugins**, then turn on **Settings → Web viewer → Open external links**.
-   Follow **Reading** under **Lecture 1** to open the chapter. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
-4. After the lecture, reopen **Lecture 1** by name.
-   Add the date, what you observed and how it affected your prediction.
-   For an audio or video diary, keep the recording or a link beside the prompt with a short description.
+Obsidian is a note-taking app.
+It saves your writing in text files and calls the folder that holds them a **vault**.
+You can open your diary and write your first prediction without signing in.
 
-Keep a backup of your diary folder and any recordings it refers to.
-The notes also work in a plain text editor.
-Choose the tools and diary format that suit you. [Course diary and participation criteria](/project/grading/#participation-and-learning-diary-3-points-per-lecture)
+The screenshots show Obsidian 1.15.1 on macOS.
+Select a screenshot to enlarge it.
+
+### 1. Install Obsidian and unpack the course diary
+
+Download Obsidian for your computer.
+On Windows, run the installer.
+On macOS, open the downloaded file and drag Obsidian into **Applications**.
+On Linux, choose the package for your distribution. [Download Obsidian](https://obsidian.md/download) · [Installation instructions](https://obsidian.md/help/install)
+
+Download the starter files as well.
+In your Downloads folder, double-click the ZIP on macOS or right-click it and choose **Extract All** on Windows.
+On Linux, use your file manager’s extract action. [Download the course diary (.zip)](/downloads/course-diary.zip)
+
+Move the extracted **Course diary** folder somewhere you can find again, such as **Documents**.
+Open it in your file manager and look for **00-Start here** and the **Establish**, **Challenge** and **Compare** folders.
+This is the folder you’ll select in Obsidian.
+Keep it outside your group’s project repository.
+
+### 2. Open the course diary as a vault
+
+Launch Obsidian.
+On the welcome screen, find **Open folder as vault** and click **Open** on that row.
+Select the **Course diary** folder you just checked and confirm.
+
+[![Obsidian’s welcome screen with the Open button beside Open folder as vault.](/assets/obsidian-setup/open-vault-1-15-1.png)](/assets/obsidian-setup/open-vault-1-15-1.png)
+
+If Obsidian asks **Do you trust the author of this vault?**, choose **Browse vault in Restricted Mode**.
+You can write, follow links and save your first entry in this mode.
+
+[![The first-open trust dialog with Browse vault in Restricted Mode at the lower left.](/assets/obsidian-setup/restricted-mode-1-15-1.png)](/assets/obsidian-setup/restricted-mode-1-15-1.png)
+
+You should see **00-Start here** in the left sidebar.
+If Obsidian opened an empty vault or a different folder, click the vault name at the bottom left, choose **Manage vaults**, then repeat **Open folder as vault**. [Manage vaults](https://obsidian.md/help/manage-vaults)
+
+### 3. Write a prediction and find it again
+
+Click **00-Start here**, then follow **Lecture 1**.
+You can also expand **Establish** in the left sidebar and click **Lecture 1**.
+
+A team says its cached summary loads twice as fast.
+What would you measure before deciding to keep the cache?
+If you see a pencil at the top right of the note, click it to edit.
+Place your cursor on a new line below the **Reading** link and write one sentence in your own words.
+
+[![The file list shows Establish expanded and Lecture 1 selected. The editor shows where to write a prediction below the Reading link.](/assets/obsidian-setup/first-prediction-1-15-1.png)](/assets/obsidian-setup/first-prediction-1-15-1.png)
+
+Obsidian saves as you type.
+Click **00-Start here**, then reopen **Establish → Lecture 1**.
+When you see your sentence again, your diary is ready.
+
+After the lecture, add the date, what you observed and whether it changed your prediction.
+You can also edit these files in a plain text editor.
+For an audio or video diary, add the recording or a link beside the prompt.
+Keep a backup of your folder and recordings. [Diary and participation criteria](/project/grading/#participation-and-learning-diary-3-points-per-lecture)
+
+### Read the chapter beside your note (optional)
+
+The **Reading** link in Lecture 1 opens the book.
+If it opens in Chrome or another browser, you can keep reading there.
+To keep the book and your diary side by side in desktop Obsidian, use its built-in **Web viewer**.
+
+Click the **Settings** gear at the bottom left.
+Under **Core plugins**, turn on **Web viewer**.
+Then click the small gear on the **Web viewer** row to open its settings.
+
+[![The Web viewer row in Core plugins, showing the settings gear and the enabled switch.](/assets/obsidian-setup/web-viewer-1-15-1.png)](/assets/obsidian-setup/web-viewer-1-15-1.png)
+
+Turn on **Open external links** and close Settings.
+
+[![The Open external links switch turned on in Web viewer settings.](/assets/obsidian-setup/external-links-1-15-1.png)](/assets/obsidian-setup/external-links-1-15-1.png)
+
+Right-click the **Lecture 1** tab and choose **Split right**.
+In the right-hand copy, click **Reading**.
+You should see the chapter on the right and your prediction on the left. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
 
 ## Bring a passage into your diary
 
@@ -59,6 +115,9 @@ The extension remembers highlighted passages in your browser and lets you save t
 
 The starter includes the **Course diary** plugin for desktop Obsidian.
 To use it, open **Settings → Community plugins**, choose **Exit Restricted mode** (called **Turn on community plugins** in earlier versions), then enable **Course diary** under **Installed plugins**.
+
+[![The Course diary plugin in Installed plugins, with its switch on at the right.](/assets/obsidian-setup/course-plugin-1-15-1.png)](/assets/obsidian-setup/course-plugin-1-15-1.png)
+
 You can add highlights directly from the book.
 To find the commands inside Obsidian, open the command palette with **Ctrl+P** or **Cmd+P** and search for **Course diary**. [Obsidian's community plugin settings](https://obsidian.md/help/community-plugins)
 
@@ -129,6 +188,8 @@ Identify any assistant wording you keep.
 
 Each teammate can open their own copy of the group's private Git repository as a second vault.
 In Obsidian choose **Open folder as vault**, select the project root containing `projects/` and open **README → Work together in Obsidian**. [Download the three-project starter](/downloads/project/project-starter.zip)
+
+[![The group project vault, with the Work together in Obsidian guide open and the Challenge evidence index visible in the file list.](/assets/obsidian-setup/group-project-1-15-1.png)](/assets/obsidian-setup/group-project-1-15-1.png)
 
 The group can use the same vault for Establish, Challenge and Compare while building each implementation in its own directory.
 During an engineering session, record what the team tested and decided in its decision record or AI-use log.

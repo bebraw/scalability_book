@@ -1,8 +1,12 @@
 # My learning diary
 
-Open [Lecture 1](Establish/Lecture%201.md) to make your first prediction.
-Each phase has a folder, and each lecture has its own note.
-You can find a note by its lecture number when you return to it.
+Obsidian calls this **Course diary** folder a _vault_.
+Each lecture note is a text file you can edit. [First-time setup with screenshots](https://scalableweb.dev/diary/#start-with-the-first-lecture)
+
+Open [Lecture 1](Establish/Lecture%201.md) and write your prediction on a new line below the prompt.
+Obsidian saves as you type.
+Next time, open **Establish → Lecture 1** in the file list to find your prediction again.
+
 Start with something you noticed, questioned or tried.
 Each lecture has a question you can use if the page feels blank.
 A few sentences in your own words, or a reference to an audio or video entry, can capture the idea.
