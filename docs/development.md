@@ -266,7 +266,9 @@ It bundles `packages/obsidian-course-diary/main.js` and its local dependencies a
 It puts identical plugin files into the starter and the versioned plugin-only ZIP linked from the diary guide.
 To rehearse an update, install the two files from the plugin ZIP into the existing plugin folder of a synthetic vault.
 Check that the lecture notes, plugin settings and TA history are available after reload.
-The plugin in a branch build can recognize that branch’s own Cloudflare alias when the matching reading is open in Web viewer.
+Book links in the downloadable diary and project starter use the branch’s Cloudflare alias for a PR preview, the local book address for an editable build and the published book address on `main`.
+When testing a preview, follow the illustrated tutorial link from the extracted starter and open the **Reading** link in **Establish → Lecture 1**.
+Both should open the preview.
 The book review URL appears in the plugin before the local TA starts.
 Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records diary ownership and recovery, and [ADR-067](adrs/implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md) covers the optional plugin runtime and peer handoff.
 

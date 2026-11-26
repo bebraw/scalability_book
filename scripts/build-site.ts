@@ -55,6 +55,7 @@ import { writeDirectoryZip } from "./lib/zip.ts";
 import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
 import { writeCourseDiaryDownloads } from "./lib/course-diary-download.ts";
 import { writeProjectStarterDownload } from "./lib/project-starter-download.ts";
+import { branchPreviewOrigin } from "./lib/starter-book-links.ts";
 import { getBrowserBuildTargets } from "./lib/browser-targets.ts";
 import {
   readRequirementEditions,
@@ -90,6 +91,8 @@ const config = parseJsonc(
 const siteUrl = includeEditor
   ? `http://127.0.0.1:${Number(process.env.PORT || 3000)}/`
   : `https://${config.domain}/`;
+const starterBookOrigin =
+  (!includeEditor && branchPreviewOrigin(root)) || new URL(siteUrl).origin;
 const templates = await loadTemplates({
   baseLayout: "layouts/BaseLayout.html",
   bookNavigation: "components/BookNavigation.html",
@@ -724,7 +727,11 @@ await writePage(
   JSON.stringify(exportBookPassages(publicPassages)) + "\n",
 );
 await writeLabDownloads();
-await writeCourseDiaryDownloads(root, path.join(buildDir, "downloads"));
+await writeCourseDiaryDownloads(
+  root,
+  path.join(buildDir, "downloads"),
+  starterBookOrigin,
+);
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 await buildStudy(root, path.join(buildDir, "learn/pilot"));
@@ -1364,6 +1371,7 @@ async function writeProjectDownloads() {
   await writeProjectStarterDownload(
     root,
     path.join(downloadsDirectory, "project-starter.zip"),
+    starterBookOrigin,
   );
   await writeDirectoryZip(
     path.join(root, "specifications", "examples", "fleet-trace"),

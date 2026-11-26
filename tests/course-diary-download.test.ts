@@ -8,6 +8,37 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { marked } from "marked";
 import { writeCourseDiaryDownloads } from "../scripts/lib/course-diary-download.ts";
 
+test("setup and Lecture 1 open the book that supplied the vault", async (t) => {
+  const tmp = await mkdtemp(path.join(tmpdir(), "course-diary-origin-"));
+  t.after(() => rm(tmp, { recursive: true, force: true }));
+  for (const origin of [
+    "https://feat-obsidian-course-diary-scalability-book.survivejs.workers.dev",
+    "http://127.0.0.1:3910",
+    "https://scalableweb.dev",
+  ]) {
+    await writeCourseDiaryDownloads(process.cwd(), tmp, origin);
+    const note = (name: string) =>
+      execFileSync(
+        "unzip",
+        ["-p", path.join(tmp, "course-diary.zip"), `Course diary/${name}.md`],
+        { encoding: "utf8" },
+      );
+    const start = note("00-Start here");
+    assert.ok(
+      start.includes(
+        `[First-time setup with screenshots](${origin}/diary/#start-with-the-first-lecture)`,
+      ),
+    );
+    assert.ok(start.includes("[Lecture 1](Establish/Lecture%201.md)"));
+    assert.ok(start.includes("(https://obsidian.md/help/plugins/web-viewer)"));
+    assert.ok(
+      note("Establish/Lecture 1").includes(
+        `[Reading](${origin}/chapters/what-is-scalability/)`,
+      ),
+    );
+  }
+});
+
 test("the starter opens as one portable vault with all nine lectures and the course plugin disabled", async (t) => {
   const tmp = await mkdtemp(path.join(tmpdir(), "course-diary-"));
   t.after(() => rm(tmp, { recursive: true, force: true }));

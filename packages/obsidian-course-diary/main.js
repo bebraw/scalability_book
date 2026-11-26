@@ -8,7 +8,11 @@ const {
   TFile,
 } = require("obsidian");
 const { isInquiryReadingPath } = require("../../shared/concept-pages.ts");
-const { isBookOrigin, matchingBookSource } = require("./book-origin.js");
+const {
+  isBookOrigin,
+  matchingBookSource,
+  onBookOrigin,
+} = require("./book-origin.js");
 const { lectures } = require("./lecture-layout.ts");
 
 const readingPaths = [
@@ -35,13 +39,7 @@ function readingPath(pathname) {
 function publicSource(value) {
   try {
     const url = new URL(value);
-    if (
-      url.origin === "https://scalableweb.dev" &&
-      !url.username &&
-      !url.password &&
-      !url.search &&
-      readingPath(url.pathname)
-    )
+    if (isBookOrigin(url) && !url.search && readingPath(url.pathname))
       return url;
   } catch {
     // Clipboard contents can be arbitrary prose.
@@ -95,7 +93,7 @@ function readHighlight(clipboard) {
   const source = footer && publicSource(footer[1]);
   while (lines.at(-1) === "") lines.pop();
   if (
-    !source ||
+    source?.origin !== "https://scalableweb.dev" ||
     !lines.length ||
     !lines.every((line) => /^>(?: |$)/.test(line))
   )
@@ -152,6 +150,13 @@ function readingIn(text, validate = publicSource) {
     if (url) return url;
   }
   return null;
+}
+
+// Saved highlights cite the public site; open them on the lecture's own book.
+function lectureSource(selected, reading) {
+  if (selected?.origin === "https://scalableweb.dev" && reading)
+    return onBookOrigin(selected, reading.origin);
+  return selected ?? reading;
 }
 
 function selectedReading(editor, validate = publicSource) {
@@ -460,11 +465,12 @@ class CourseDiary extends Plugin {
     const reading = lecture ? selectedReading(editor) : readingIn(selected);
     const launch = async (lecture) => {
       const file = this.lectureFile(lecture);
-      const url =
-        reading ??
+      const url = lectureSource(
+        reading,
         readingIn(
           this.editorFor(file)?.getValue() ?? (await this.app.vault.read(file)),
-        );
+        ),
+      );
       if (!url)
         throw new Error(
           "Add a public course reading link to the lecture to open its TA.",
@@ -564,16 +570,17 @@ class CourseDiary extends Plugin {
       const candidate = peerSource(match[1]);
       if (candidate) precedingSource = candidate;
     }
-    const source =
+    const source = lectureSource(
       selectedReading(editor, peerSource) ??
-      precedingSource ??
-      readingIn(
-        text.slice(section?.start ?? 0, section?.end ?? text.length),
-        peerSource,
-      ) ??
-      (lectures.some((lecture) => lecture.path === file.path)
+        precedingSource ??
+        readingIn(
+          text.slice(section?.start ?? 0, section?.end ?? text.length),
+          peerSource,
+        ),
+      lectures.some((lecture) => lecture.path === file.path)
         ? readingIn(text, peerSource)
-        : null);
+        : null,
+    );
 
     new Review(this.app, "Use as my initial thinking", (el, modal) => {
       el.createEl("blockquote", { text: selected });
@@ -620,7 +627,11 @@ class CourseDiary extends Plugin {
     const marker = await markerFor("excerpt", [lecture.number, selected]);
     const markdown =
       `## Course lecture ${lecture.number} · Portfolio lecture ${lecture.slot}\n\n${selected}` +
-      (source ? "\n\n[Lecture reading](" + markdownUrl(source) + ")" : "");
+      (source
+        ? "\n\n[Lecture reading](" +
+          markdownUrl(onBookOrigin(source, "https://scalableweb.dev")) +
+          ")"
+        : "");
     new Review(this.app, "Prepare portfolio excerpt", (el, modal) => {
       el.createEl("p", {
         text: `Add to the private draft ${destination}. Review and submit chosen material in My portfolio on the course website.`,

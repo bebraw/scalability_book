@@ -3,6 +3,10 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  canonicalBookOrigin,
+  localizeBookLinks,
+} from "./starter-book-links.ts";
 import { createStoredZip } from "./zip.ts";
 
 const execFileAsync = promisify(execFile);
@@ -46,6 +50,7 @@ const contractFiles = [
 export async function writeProjectStarterDownload(
   repositoryRoot: string,
   outputFile: string,
+  bookOrigin = canonicalBookOrigin,
 ): Promise<void> {
   const starterRoot = path.join(await realpath(repositoryRoot), sourcePath);
   if ((await realpath(starterRoot)) !== starterRoot) {
@@ -58,7 +63,11 @@ export async function writeProjectStarterDownload(
       if ((await realpath(filename)) !== filename) {
         throw new Error(`Starter source must not contain symlinks: ${name}`);
       }
-      return { name, data: await readFile(filename) };
+      const data = await readFile(filename);
+      return {
+        name,
+        data: name.endsWith(".md") ? localizeBookLinks(data, bookOrigin) : data,
+      };
     }),
   );
   const contracts = await Promise.all(
@@ -71,6 +80,7 @@ export async function writeProjectStarterDownload(
   const manifest = {
     schemaVersion: 1,
     sourceRepository: "https://github.com/bebraw/scalability_book",
+    bookOrigin,
     ...provenance,
     revisionMeaning:
       "Revisions identify the checkout base. Dirty exports include changes beyond that revision; null means Git provenance is unavailable. SHA-256 hashes identify the exported source and referenced contract contents.",

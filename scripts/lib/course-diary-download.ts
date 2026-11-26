@@ -1,5 +1,3 @@
-import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { build } from "vite";
@@ -7,31 +5,12 @@ import {
   lectures,
   phases,
 } from "../../packages/obsidian-course-diary/lecture-layout.ts";
+import {
+  branchPreviewOrigin,
+  canonicalBookOrigin,
+  localizeBookLinks,
+} from "./starter-book-links.ts";
 import { createStoredZip } from "./zip.ts";
-
-function branchPreviewOrigin(root: string) {
-  const branch =
-    process.env.WORKERS_CI_BRANCH ||
-    process.env.GITHUB_HEAD_REF ||
-    spawnSync("git", ["branch", "--show-current"], {
-      cwd: root,
-      encoding: "utf8",
-    }).stdout?.trim();
-  if (!branch || branch === "main") return "";
-  // Match the alias assigned by Wrangler's versions upload on this project.
-  const worker = "scalability-book";
-  let alias = branch
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  if (!/^[a-z]/.test(alias)) return "";
-  const limit = 63 - worker.length - 1;
-  if (alias.length > limit) {
-    const hash = createHash("sha256").update(branch).digest("hex").slice(0, 4);
-    alias = alias.slice(0, limit - 5) + "-" + hash;
-  }
-  return `https://${alias}-${worker}.survivejs.workers.dev`;
-}
 
 export async function buildCourseDiaryPlugin(
   root: string,
@@ -69,6 +48,7 @@ export async function buildCourseDiaryPlugin(
 export async function writeCourseDiaryDownloads(
   root: string,
   directory: string,
+  bookOrigin = canonicalBookOrigin,
 ) {
   const notes = [
     "00-Start here.md",
@@ -91,7 +71,10 @@ export async function writeCourseDiaryDownloads(
     Promise.all(
       notes.map(async (note) => ({
         name: `Course diary/${note}`,
-        data: await readSource(`docs/diary-pilot/${note}`),
+        data: localizeBookLinks(
+          await readSource(`docs/diary-pilot/${note}`),
+          bookOrigin,
+        ),
       })),
     ),
   ]);

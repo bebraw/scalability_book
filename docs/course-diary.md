@@ -141,7 +141,7 @@ If you already use the plugin, [update it](#update-the-course-plugin-in-an-exist
 
 ### Update the course plugin in an existing vault
 
-[Download Course diary plugin 0.4.0 (.zip)](/downloads/course-diary-plugin-0.4.0.zip) and unzip it outside your vault.
+[Download Course diary plugin 0.4.1 (.zip)](/downloads/course-diary-plugin-0.4.1.zip) and unzip it outside your vault.
 Close Obsidian.
 In your vault’s `.obsidian/plugins/scalableweb-course-diary/` folder, replace just `main.js` and `manifest.json` with the two files from the download.
 Reopen the vault and check the version of **Course diary** under **Settings → Community plugins**.

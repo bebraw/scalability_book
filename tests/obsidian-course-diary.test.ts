@@ -905,6 +905,64 @@ test("a phase portfolio draft receives only the approved selection and survives 
   assert.equal(draft.text, original);
 });
 
+test("a fresh preview or local lecture keeps discussions on its book and portfolio links shareable", async () => {
+  const reading = "/chapters/what-is-scalability/";
+  const highlighted = "/chapters/benchmarking/#which-requests-counted";
+  for (const origin of [previewOrigin, "http://127.0.0.1:3000"]) {
+    const h = diary();
+    const file = h.files.get("Establish/Lecture 1.md")!;
+    file.text = file.text.replace("https://scalableweb.dev", origin);
+    const reflection = "I would measure the first request.";
+    file.text += "\n\n" + reflection;
+    h.select(file.path, reflection);
+    await h.run("discuss");
+    await h.click("Copy and open beside diary");
+    assert.deepEqual(h.splits, [origin + reading + "?assistant=1"]);
+    await h.run("portfolio");
+    await h.click("Add to private draft");
+    assert.ok(
+      h.files
+        .get("Portfolio - Establish.md")!
+        .text.includes(
+          "[Lecture reading](https://scalableweb.dev" + reading + ")",
+        ),
+    );
+    const quote = "Count the offered requests.";
+    file.text +=
+      "\n\n> " +
+      quote +
+      "\n\n[Book source](https://scalableweb.dev" +
+      highlighted +
+      ")";
+    h.select(file.path, quote);
+    await h.run("discuss");
+    await h.click("Copy and open in default browser");
+    assert.deepEqual(h.external, [
+      origin + highlighted.replace("#", "?assistant=1#"),
+    ]);
+    await h.run("initial-thinking");
+    assert.equal(h.ui.get("input").value, origin + highlighted);
+  }
+});
+
+test("another branch's reading cannot start the TA or become portfolio attribution", async () => {
+  const h = diary();
+  const file = h.files.get("Establish/Lecture 1.md")!;
+  file.text = file.text.replace(
+    "https://scalableweb.dev",
+    "https://other-scalability-book.survivejs.workers.dev",
+  );
+  h.select(file.path, "Would you keep the cache?");
+  await h.run("discuss");
+  assert.match(h.notices.at(-1) ?? "", /public course reading link/);
+  await h.run("portfolio");
+  await h.click("Add to private draft");
+  assert.doesNotMatch(
+    h.files.get("Portfolio - Establish.md")!.text,
+    /Lecture reading/,
+  );
+});
+
 test("discussing words inside a pasted book quote opens that passage's source", async () => {
   const h = diary();
   const selection = "Measure requests";

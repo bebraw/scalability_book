@@ -133,6 +133,43 @@ test("starter archive includes the declared source only and hashes the exact exp
   );
 });
 
+test("project Markdown links follow the book while hashes describe the exported files and original contracts", async (t) => {
+  const { root, source, archive } = await fixture();
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const markdown = (book: string) =>
+    [
+      `[Setup](${book}/diary/#start-with-the-first-lecture)`,
+      `<${book}/project/>`,
+      "[Local](projects/01-establish/README.md)",
+      "[External](https://scalableweb.dev.example.org/)",
+      "[External query](https://example.org/?source=https://scalableweb.dev/)",
+    ].join("\n");
+  const canonical = "https://scalableweb.dev";
+  await put(path.join(source, "README.md"), markdown(canonical));
+  await put(
+    path.join(root, "specifications/00_introduction.md"),
+    markdown(canonical),
+  );
+  for (const origin of [
+    "https://feat-obsidian-course-diary-scalability-book.survivejs.workers.dev",
+    "http://127.0.0.1:3910",
+    canonical,
+  ]) {
+    await writeProjectStarterDownload(root, archive, origin);
+    const entries = storedEntries(await readFile(archive));
+    assert.equal(entries["project-starter/README.md"], markdown(origin));
+    const manifest = JSON.parse(
+      entries["project-starter/starter-manifest.json"],
+    );
+    assert.equal(manifest.bookOrigin, origin);
+    assert.equal(manifest.files["README.md"], digest(markdown(origin)));
+    assert.equal(
+      manifest.contractFiles["specifications/00_introduction.md"],
+      digest(markdown(canonical)),
+    );
+  }
+});
+
 test("missing required source or symlinks fail before publishing an incomplete or redirected starter", async (t) => {
   for (const kind of ["missing", "file-link", "directory-link", "root-link"]) {
     await t.test(kind, async (t) => {

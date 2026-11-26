@@ -12,6 +12,14 @@ function isBookOrigin(url) {
   );
 }
 
+function onBookOrigin(source, origin) {
+  const destination = new URL(origin);
+  destination.pathname = source.pathname;
+  destination.search = source.search;
+  destination.hash = source.hash;
+  return destination;
+}
+
 function matchingBookSource(app, source) {
   if (!source || source.origin !== "https://scalableweb.dev") return source;
   const origins = new Set();
@@ -28,11 +36,7 @@ function matchingBookSource(app, source) {
     }
   }
   if (origins.size !== 1) return source;
-  const destination = new URL([...origins][0]);
-  destination.pathname = source.pathname;
-  destination.search = source.search;
-  destination.hash = source.hash;
-  return destination;
+  return onBookOrigin(source, [...origins][0]);
 }
 
-export { isBookOrigin, matchingBookSource };
+export { isBookOrigin, matchingBookSource, onBookOrigin };
