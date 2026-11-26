@@ -11,6 +11,14 @@ A few sentences in your own words, or a reference to an audio or video entry, ca
 | [Challenge](02-Challenge.md) | 4–6             | Build B and examine an assumption |
 | [Compare](03-Compare.md)     | 7–9             | Build C and defend a decision     |
 
+## An example diary entry
+
+> I expect a second worker to drain our queue faster.
+> I’ll time how long one worker and then two take to finish the same 600 jobs.
+>
+> One worker took 61 seconds and two took 60. The trace showed both workers waiting for a database connection.
+> Before trying a third worker, I’d measure how much time each job spent waiting for a connection.
+
 ## Open readings inside Obsidian
 
 On desktop, you can read the book beside your notes with the built-in Web viewer.
