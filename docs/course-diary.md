@@ -1,8 +1,10 @@
 # Keep a course diary in Obsidian
 
 Keep a question, a passage from the book and the observation that helped you answer it together.
-The starter has one Markdown note per phase, with a prompt and reading link for each of the nine lectures.
-At the end of each phase, you choose what goes into your individual portfolio.
+One vault holds three folders, **Establish**, **Challenge** and **Compare**.
+Each contains three lecture notes and a phase overview.
+Return to the same lecture note to keep your prediction, saved passages and later reflections together.
+At the end of each phase, use its overview to look back across the three lectures and choose what goes into your individual portfolio.
 
 [Download the course diary (.zip)](/downloads/course-diary.zip)
 
@@ -13,13 +15,14 @@ At the end of each phase, you choose what goes into your individual portfolio.
    Select the extracted **Course diary** folder that contains **00-Start here.md**.
    A vault is simply a folder of notes.
    If Obsidian asks whether you trust the vault, choose **Browse vault in Restricted Mode** to start with the notes. [Open an existing folder in Obsidian](https://obsidian.md/help/vault)
-3. Open **00-Start here**, follow **Establish** and find **Lecture 1**.
+3. Open **00-Start here** and follow the link to **Lecture 1**.
+   You can also open **Establish → Lecture 1** from the file list.
    A team says its cached summary loads twice as fast.
    What would you measure before deciding to keep the cache?
    Write your prediction under the prompt.
    To open the reading inside desktop Obsidian, enable **Web viewer** under **Settings → Core plugins**, then turn on **Settings → Web viewer → Open external links**.
    Follow **Reading** under **Lecture 1** to open the chapter. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
-4. After the lecture, return to the same entry.
+4. After the lecture, reopen **Lecture 1** by name.
    Add the date, what you observed and how it affected your prediction.
    For an audio or video diary, keep the recording or a link beside the prompt with a short description.
 
@@ -59,26 +62,30 @@ To use it, open **Settings → Community plugins**, choose **Exit Restricted mod
 You can add highlights directly from the book.
 To find the commands inside Obsidian, open the command palette with **Ctrl+P** or **Cmd+P** and search for **Course diary**. [Obsidian's community plugin settings](https://obsidian.md/help/community-plugins)
 
-| Command                    | When to use it                                                                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Open lecture diary         | Jump to the lecture you are studying.                                                                                              |
-| Add book highlight         | After copying a highlight in the book, choose its lecture, review the quote and confirm.                                           |
-| Discuss with the course TA | Review the excerpt or question you want to bring to the reading's assistant.                                                       |
-| Use as my initial thinking | Use a saved selection for the initial step in a class discussion.                                                                  |
-| Prepare portfolio excerpt  | Select text under a lecture heading and review what will go into that phase’s private draft, such as **Portfolio - Establish.md**. |
+| Command                    | When to use it                                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Open lecture diary         | Jump to the lecture you are studying.                                                                                        |
+| Add book highlight         | After copying a highlight in the book, choose its lecture, review the quote and confirm.                                     |
+| Discuss with the course TA | Review the excerpt or question you want to bring to the reading's assistant.                                                 |
+| Use as my initial thinking | Use a saved selection for the initial step in a class discussion.                                                            |
+| Prepare portfolio excerpt  | Select text in a lecture note and review what will go into that phase’s private draft, such as **Portfolio - Establish.md**. |
 
-If you already have a vault, you can use just the numbered Markdown files.
-To use its course commands as well, place the five files at the vault root and copy the starter's `.obsidian/plugins/scalableweb-course-diary/` folder there under the same path.
-It contains `manifest.json` and `main.js`.
-Show hidden files if needed, keep existing notes when names overlap, then reopen the vault and enable **Course diary**.
+### Use the lecture folders in an existing vault
+
+Unzip the course diary outside your vault.
+Copy **Establish**, **Challenge** and **Compare** into your vault root, keeping any files you already have with the same name.
+Copy **00-Start here** and **04-Portfolio** to the vault root for direct links to all nine lectures.
+
+To enable the course commands for the first time, copy the starter’s `.obsidian/plugins/scalableweb-course-diary/` folder into the same location in your vault.
+Show hidden files if needed, reopen the vault and enable **Course diary**.
+If you already use the plugin, [update it](#update-the-course-plugin-in-an-existing-vault) to use its commands with the new lecture folders.
 
 ### Update the course plugin in an existing vault
 
-[Download Course diary plugin 0.3.0 (.zip)](/downloads/course-diary-plugin-0.3.0.zip) and unzip it outside your vault.
+[Download Course diary plugin 0.4.0 (.zip)](/downloads/course-diary-plugin-0.4.0.zip) and unzip it outside your vault.
 Close Obsidian.
 In your vault’s `.obsidian/plugins/scalableweb-course-diary/` folder, replace just `main.js` and `manifest.json` with the two files from the download.
 Reopen the vault and check the version of **Course diary** under **Settings → Community plugins**.
-This lets you keep the lecture notes you have written and any saved plugin settings.
 
 ## Discuss a question with the TA
 

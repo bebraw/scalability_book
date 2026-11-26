@@ -12,7 +12,7 @@ Implemented status identifies verified software behavior; production rollout and
 ## Diary, assistant and existing Notebook records
 
 [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) moves the recommended diary into a local Obsidian vault.
-The [student guide](course-diary.md) covers the numbered starter, linked highlights, optional desktop commands, discussion beside the note, portfolio preparation and Notebook recovery.
+The [student guide](course-diary.md) covers the phase folders and lecture notes, linked highlights, optional desktop commands, discussion beside the note, portfolio preparation and Notebook recovery.
 The book and plugin exchange public reading links and Markdown.
 Students control which writing enters a question or course portfolio.
 The book continues to own exercises, interactive demos, peer inquiry and the teaching assistant.

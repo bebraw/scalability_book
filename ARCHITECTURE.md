@@ -83,10 +83,11 @@ The pinned `@napi-rs/keyring` runtime dependency provides native OS credential s
 The HTTP boundary binds to loopback, accepts session bootstrap only from an exact configured website origin and issues an origin-bound token for private API routes.
 The CLI trusts only `https://scalableweb.dev` by default; local development requires explicit `--origin`.
 [ADR-037](docs/adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records that website trust boundary and the removal of manual pairing.
-The [course diary guide](docs/course-diary.md) and [five numbered notes](docs/diary-pilot/) are the entry point for student writing.
+The [course diary guide](docs/course-diary.md) and [starter vault](docs/diary-pilot/) are the entry point for student writing.
+Each phase folder has an overview and a Markdown note for each of its three lectures.
 The site build [packages the vault and a plugin-only update](scripts/lib/course-diary-download.ts) with the same bundled [desktop Obsidian plugin](packages/obsidian-course-diary/).
 The student's files own diary entries and private portfolio drafts.
-The plugin operates on the named phase files and explicitly chosen excerpts.
+The plugin opens the named lecture files and works with explicitly chosen excerpts.
 Its commands call Obsidian's editor, vault and workspace APIs.
 The book’s [highlight toolbar](site/scripts/learning-highlight.ts) copies a Markdown quote and its public source link to the clipboard.
 In a browser, **Add book highlight** opens the plugin through `obsidian://scalableweb-course-diary-add-highlight`.

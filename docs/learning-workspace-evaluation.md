@@ -71,7 +71,7 @@ Listen for whether the learner includes the timeouts among the 20 offered reques
 
 ## Try Obsidian as the diary editor
 
-The [student guide](course-diary.md) now recommends the [numbered Markdown starter](diary-pilot/00-Start%20here.md).
+The [student guide](course-diary.md) recommends a [single vault with a note for each lecture](diary-pilot/00-Start%20here.md).
 Use a fresh vault and synthetic writing for the rehearsal.
 Compare a newcomer with a student who already keeps notes.
 Record where each needed help and how long they spent setting up before reasoning about the course.
@@ -86,7 +86,7 @@ Record where each needed help and how long they spent setting up before reasonin
    Ask the learner to close the reading and reopen the same section from the note.
    If they expect the passage to stay marked on the website, try the optional Web Clipper Highlighter and ask which behavior they want. [Web Clipper Highlighter](https://obsidian.md/help/web-clipper/highlight)
 3. On the return visit, present the [benchmarking prompts](#return-visit-for-a-learner-who-chose-benchmarking) before the learner rereads their answer.
-   Can they then find their earlier explanation, add a dated revision and name the condition that changed their judgment?
+   Can they reopen the lecture by name, find their prediction and saved passage together, and add a dated revision naming what changed their judgment?
 4. In Lecture 5, ask learners to revisit an expectation from Establish and compare it with an audit or demonstration.
    Does the prompt elicit a concrete observation?
    Can they preserve their earlier wording while revising their conclusion?

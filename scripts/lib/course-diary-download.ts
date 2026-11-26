@@ -3,6 +3,10 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { build } from "vite";
+import {
+  lectures,
+  phases,
+} from "../../packages/obsidian-course-diary/lecture-layout.ts";
 import { createStoredZip } from "./zip.ts";
 
 function branchPreviewOrigin(root: string) {
@@ -68,10 +72,9 @@ export async function writeCourseDiaryDownloads(
 ) {
   const notes = [
     "00-Start here.md",
-    "01-Establish.md",
-    "02-Challenge.md",
-    "03-Compare.md",
     "04-Portfolio.md",
+    ...phases.map((phase, index) => `${phase}/0${index + 1}-${phase}.md`),
+    ...lectures.map((lecture) => lecture.path),
   ];
   const repository = await realpath(root);
   async function readSource(source: string) {

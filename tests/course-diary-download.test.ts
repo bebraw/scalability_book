@@ -4,6 +4,8 @@ import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { marked } from "marked";
 import { writeCourseDiaryDownloads } from "../scripts/lib/course-diary-download.ts";
 
 test("the starter opens as one portable vault with all nine lectures and the course plugin disabled", async (t) => {
@@ -22,23 +24,62 @@ test("the starter opens as one portable vault with all nine lectures and the cou
   assert.deepEqual((await readdir(vault)).sort(), [
     ".obsidian",
     "00-Start here.md",
-    "01-Establish.md",
-    "02-Challenge.md",
-    "03-Compare.md",
     "04-Portfolio.md",
+    "Challenge",
+    "Compare",
+    "Establish",
   ]);
-  const start = await readFile(path.join(vault, "00-Start here.md"), "utf8");
-  const lectures = [];
-  for (const phase of ["01-Establish.md", "02-Challenge.md", "03-Compare.md"]) {
-    assert.ok(start.includes(`(${phase})`));
-    const note = await readFile(path.join(vault, phase), "utf8");
-    lectures.push(
-      ...[...note.matchAll(/^## Lecture (\d+) /gm)].map((match) =>
-        Number(match[1]),
-      ),
-    );
+  const notes = new Set(
+    (await readdir(vault, { recursive: true })).filter((file) =>
+      file.endsWith(".md"),
+    ),
+  );
+  const links = new Map<string, Set<string>>();
+  for (const file of notes) {
+    const source = pathToFileURL(path.join(vault, file));
+    const tokens = marked.lexer(await readFile(source, "utf8"));
+    const targets = new Set<string>();
+    marked.walkTokens(tokens, (token) => {
+      if (token.type !== "link") return;
+      const url = new URL(token.href, source);
+      if (url.protocol !== "file:") return;
+      const target = path.relative(vault, fileURLToPath(url));
+      assert.ok(notes.has(target), `${file} links to missing note ${target}`);
+      targets.add(target);
+    });
+    links.set(file, targets);
   }
-  assert.deepEqual(lectures, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  for (const [phase, overview, numbers] of [
+    ["Establish", "01-Establish.md", [1, 2, 3]],
+    ["Challenge", "02-Challenge.md", [4, 5, 6]],
+    ["Compare", "03-Compare.md", [7, 8, 9]],
+  ] as const) {
+    const index = path.join(phase, overview);
+    assert.ok(
+      links.get("00-Start here.md")?.has(index),
+      `Start here opens ${phase}`,
+    );
+    const lectures = numbers.map((number) => `Lecture ${number}.md`);
+    assert.deepEqual((await readdir(path.join(vault, phase))).sort(), [
+      overview,
+      ...lectures,
+    ]);
+    for (const number of numbers) {
+      const lecture = path.join(phase, `Lecture ${number}.md`);
+      assert.ok(
+        links.get(index)?.has(lecture),
+        `${phase} opens Lecture ${number}`,
+      );
+      const contents = await readFile(path.join(vault, lecture), "utf8");
+      assert.deepEqual(
+        [...contents.matchAll(/^#+ Lecture (\d+)\b/gm)].map((match) =>
+          Number(match[1]),
+        ),
+        [number],
+        `One lecture per note in ${lecture}`,
+      );
+    }
+  }
   assert.deepEqual(await readdir(path.join(vault, ".obsidian")), ["plugins"]);
   const plugins = path.join(vault, ".obsidian/plugins");
   assert.deepEqual(await readdir(plugins), ["scalableweb-course-diary"]);

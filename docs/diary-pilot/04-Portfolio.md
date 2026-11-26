@@ -4,11 +4,11 @@ Open **My portfolio** in the course workspace and select your phase.
 Use this page to pick material, or copy it to make a private working draft.
 Take only the passages and attachments you want course staff to see. [Course workspace](https://scalableweb.dev/course/)
 
-| Selected phase               | Portfolio Lecture 1 | Portfolio Lecture 2 | Portfolio Lecture 3 |
-| ---------------------------- | ------------------- | ------------------- | ------------------- |
-| [Establish](01-Establish.md) | Course lecture 1    | Course lecture 2    | Course lecture 3    |
-| [Challenge](02-Challenge.md) | Course lecture 4    | Course lecture 5    | Course lecture 6    |
-| [Compare](03-Compare.md)     | Course lecture 7    | Course lecture 8    | Course lecture 9    |
+| Selected phase                         | Portfolio Lecture 1                          | Portfolio Lecture 2                          | Portfolio Lecture 3                          |
+| -------------------------------------- | -------------------------------------------- | -------------------------------------------- | -------------------------------------------- |
+| [Establish](Establish/01-Establish.md) | [Course lecture 1](Establish/Lecture%201.md) | [Course lecture 2](Establish/Lecture%202.md) | [Course lecture 3](Establish/Lecture%203.md) |
+| [Challenge](Challenge/02-Challenge.md) | [Course lecture 4](Challenge/Lecture%204.md) | [Course lecture 5](Challenge/Lecture%205.md) | [Course lecture 6](Challenge/Lecture%206.md) |
+| [Compare](Compare/03-Compare.md)       | [Course lecture 7](Compare/Lecture%207.md)   | [Course lecture 8](Compare/Lecture%208.md)   | [Course lecture 9](Compare/Lecture%209.md)   |
 
 ## Select a lecture entry
 

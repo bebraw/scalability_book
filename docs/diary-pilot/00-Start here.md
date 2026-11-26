@@ -1,15 +1,17 @@
 # My learning diary
 
-Open the phase you are studying and write under the current lecture.
+Open [Lecture 1](Establish/Lecture%201.md) to make your first prediction.
+Each phase has a folder, and each lecture has its own note.
+You can find a note by its lecture number when you return to it.
 Start with something you noticed, questioned or tried.
 Each lecture has a question you can use if the page feels blank.
 A few sentences in your own words, or a reference to an audio or video entry, can capture the idea.
 
-| Phase                        | Course lectures | Project                           |
-| ---------------------------- | --------------- | --------------------------------- |
-| [Establish](01-Establish.md) | 1–3             | Build and measure A               |
-| [Challenge](02-Challenge.md) | 4–6             | Build B and examine an assumption |
-| [Compare](03-Compare.md)     | 7–9             | Build C and defend a decision     |
+| Phase                                  | Lecture notes                                                                                                         | Project                           |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| [Establish](Establish/01-Establish.md) | [Lecture 1](Establish/Lecture%201.md) · [Lecture 2](Establish/Lecture%202.md) · [Lecture 3](Establish/Lecture%203.md) | Build and measure A               |
+| [Challenge](Challenge/02-Challenge.md) | [Lecture 4](Challenge/Lecture%204.md) · [Lecture 5](Challenge/Lecture%205.md) · [Lecture 6](Challenge/Lecture%206.md) | Build B and examine an assumption |
+| [Compare](Compare/03-Compare.md)       | [Lecture 7](Compare/Lecture%207.md) · [Lecture 8](Compare/Lecture%208.md) · [Lecture 9](Compare/Lecture%209.md)       | Build C and defend a decision     |
 
 ## An example diary entry
 
@@ -26,9 +28,9 @@ It works in Restricted Mode.
 
 1. Open **Settings → Core plugins** and turn on **Web viewer**.
 2. In the Settings sidebar, choose **Web viewer** and turn on **Open external links**.
-3. Open **Establish** from the table above.
+3. Open [Lecture 1](Establish/Lecture%201.md).
    Right-click the note’s tab and choose **Split right** to keep your diary visible on the left.
-4. In the right pane, follow **Reading** under **Lecture 1**.
+4. In the right pane, follow **Reading** in the lecture note.
    The chapter should open beside your note. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
 
 ## Keep a passage
@@ -37,7 +39,7 @@ To send a passage straight to a lecture, open **Settings → Community plugins**
 Select a sentence in the book and choose **Add book highlight** at the bottom of the page.
 In Obsidian, choose the lecture, check the quote and its source, then choose **Save highlight**.
 
-In Restricted Mode, choose **Copy highlight** in the book and paste it under the lecture heading yourself.
+In Restricted Mode, choose **Copy highlight** in the book and paste it into your lecture note.
 Below the quote, add what made you pause. [Course diary guide](https://scalableweb.dev/diary/)
 
 When a result or someone’s feedback changes your thinking, return to the original entry.

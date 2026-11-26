@@ -13,8 +13,9 @@ Neither task requires a separate web editor or model provider.
 ## Decision
 
 Recommend a private Obsidian vault.
-Publish a guide and a downloadable folder containing five numbered Markdown notes.
-Each phase note connects its three lectures to public readings and an optional opening question.
+Publish a guide and a downloadable vault with **Establish**, **Challenge** and **Compare** folders.
+Give each lecture its own named note with a public reading and an optional opening question, so students can reopen a prediction alongside their saved passages and later reflections.
+Keep the reflection that spans all three lectures in the phase overview.
 Students can also use the files with an editor of their choice or link selected audio and video evidence.
 
 Keep passage selection in the book.
@@ -44,7 +45,8 @@ The web handoff keeps one place to configure a provider, inspect the chosen cont
 
 The student owns backup and synchronization of the vault.
 The starter works in restricted mode.
-The optional plugin uses the numbered phase paths and lecture headings to place excerpts, so students who reorganize the files can still use ordinary copy and paste.
+The optional plugin uses the phase folder and lecture filename to place highlights and attribute selected portfolio excerpts.
+Updating the plugin leaves student files in place.
 The class's existing portfolio criteria and staff access boundaries still apply.
 
 The [student guide](../../course-diary.md) covers setup, transfer and recovery.

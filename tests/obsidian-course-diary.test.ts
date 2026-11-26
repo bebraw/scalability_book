@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { createRequire, isBuiltin } from "node:module";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
@@ -89,7 +89,7 @@ test("the distributed desktop plugin connects a reviewed reading and retains a f
   const reading = "/chapters/benchmarking/";
   h.webViewer(previewOrigin + reading);
   h.select(
-    "02-Challenge.md",
+    "Challenge/Lecture 6.md",
     question,
     "> " +
       question +
@@ -343,9 +343,6 @@ function diary({
       this.path = path;
       this.text = text;
     }
-    get basename() {
-      return this.path.slice(0, -3);
-    }
   }
   type Editor = {
     getValue(): string;
@@ -536,14 +533,22 @@ function diary({
   const plugin = new module.exports();
   plugin.app = app;
   plugin.onload();
-  for (const path of ["01-Establish.md", "02-Challenge.md", "03-Compare.md"]) {
-    files.set(
-      path,
-      new TFile(path, readFileSync("docs/diary-pilot/" + path, "utf8")),
-    );
+  function addNote(filePath: string, text: string) {
+    const file = new TFile(filePath, text);
+    files.set(filePath, file);
+    return file;
+  }
+  const starter = "docs/diary-pilot";
+  for (const filename of readdirSync(starter, { recursive: true })) {
+    if (filename.endsWith(".md"))
+      addNote(
+        filename.split(path.sep).join("/"),
+        readFileSync(path.join(starter, filename), "utf8"),
+      );
   }
   return {
     files,
+    addNote,
     get port() {
       return port;
     },
@@ -656,10 +661,7 @@ function diary({
     click: (label: string) => ui.get(label)(),
     select(path: string, selection: string, extra = "") {
       const file = files.get(path)!;
-      let text = file.text.replace(
-        "## At phase end",
-        extra + "\n## At phase end",
-      );
+      let text = extra ? file.text + "\n" + extra : file.text;
       const from = text.indexOf(selection);
       assert.ok(from !== -1);
       active = new MarkdownView(file, {
@@ -680,11 +682,11 @@ function diary({
 
 test("choose a lecture from the starter, preview a highlight and save it once into the latest editor text", async () => {
   const h = diary();
-  const file = h.files.get("01-Establish.md")!;
-  const section = "## Lecture 2 · Checking an agent’s work";
+  const file = h.files.get("Establish/Lecture 2.md")!;
+  const section = "# Lecture 2 · Checking an agent’s work";
   h.run("open-lecture");
   await h.selectLecture(2);
-  assert.equal(h.links[0], file.path + "#" + section.slice(3));
+  assert.equal(h.links[0], file.path);
   h.clipboard =
     "> A \\*literal\\*\n> second line\\.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)\n";
   await h.openHighlight({
@@ -706,7 +708,9 @@ test("choose a lecture from the starter, preview a highlight and save it once in
   const saved = editor.getValue();
   assert.ok(saved.includes("My unsaved thought."));
   assert.ok(saved.indexOf("second line") > saved.indexOf(section));
-  assert.ok(saved.indexOf("[Book source]") < saved.indexOf("## Lecture 3"));
+  assert.ok(
+    !h.files.get("Establish/Lecture 3.md")!.text.includes("[Book source]"),
+  );
   assert.match(saved, /> A \\\*literal\\\*\n> second line\\\./);
   assert.ok(!file.text.includes("[Book source]"));
   h.clipboard = quoted;
@@ -719,7 +723,7 @@ test("choose a lecture from the starter, preview a highlight and save it once in
 
 test("the book handoff can read the highlight after the lecture picker receives focus", async () => {
   const h = diary({ deniedClipboardReads: 1 });
-  const file = h.files.get("02-Challenge.md")!;
+  const file = h.files.get("Challenge/Lecture 5.md")!;
   const original = file.text;
   h.clipboard =
     "> The cache missed.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)";
@@ -728,7 +732,8 @@ test("the book handoff can read the highlight after the lecture picker receives 
   assert.equal(h.ui.get("blockquote").text, "The cache missed.");
   assert.equal(file.text, original);
   await h.click("Save highlight");
-  assert.match(file.text, /## Lecture 5.*The cache missed.*## Lecture 6/s);
+  assert.ok(file.text.startsWith(original));
+  assert.match(file.text, /> The cache missed/);
 
   const denied = diary({ deniedClipboardReads: 2 });
   await denied.openHighlight();
@@ -737,13 +742,54 @@ test("the book handoff can read the highlight after the lecture picker receives 
   assert.equal(denied.files.get(file.path)!.text, original);
 });
 
+test("a reviewed highlight stays with the displayed lecture when switching notes and rechecks a replaced file", async () => {
+  const h = diary();
+  const file = h.files.get("Establish/Lecture 2.md")!;
+  const other = h.files.get("Establish/Lecture 3.md")!;
+  const initial = other.text;
+  h.clipboard =
+    "> Check timeouts.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/)";
+  await h.openHighlight();
+  await h.selectLecture(2);
+  assert.equal(h.ui.get("p").text, "Save in Establish/Lecture 2.md");
+  const editor = h.select(other.path, "Lecture 3");
+  await h.click("Save highlight");
+  assert.match(file.text, /> Check timeouts/);
+  assert.equal(editor.getValue(), initial);
+  assert.equal(other.text, initial);
+
+  h.clipboard =
+    "> A second observation.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/)";
+  await h.openHighlight();
+  await h.selectLecture(2);
+  const previous = file.text;
+  const replacement = h.addNote(file.path, "A new lecture note.");
+  await h.click("Save highlight");
+  assert.match(h.notices.at(-1)!, /Choose the lecture again/);
+  assert.equal(replacement.text, "A new lecture note.");
+  assert.equal(file.text, previous);
+});
+
+test("a phase overview is never used as the missing lecture's destination", async () => {
+  const h = diary();
+  h.files.delete("Establish/Lecture 1.md");
+  const overview = h.files.get("Establish/01-Establish.md")!;
+  const initial = overview.text;
+  h.clipboard =
+    "> A second worker.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/)";
+  await h.openHighlight();
+  await h.selectLecture(1);
+  assert.match(h.notices.at(-1)!, /Establish\/Lecture 1\.md/);
+  assert.equal(overview.text, initial);
+});
+
 test("a book page in a Web viewer can request a reviewed highlight in its own vault", async () => {
   const path = "/chapters/benchmarking/";
   const marker = "#scalableweb-course-diary-add-highlight";
   for (const origin of ["https://scalableweb.dev", "http://127.0.0.1:3000"]) {
     const h = diary();
     const viewer = h.webViewer(origin + path + "#requests");
-    const file = h.files.get("02-Challenge.md")!;
+    const file = h.files.get("Challenge/Lecture 4.md")!;
     const original = file.text;
     h.clipboard =
       "> Measure cold reads.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#requests)";
@@ -752,7 +798,8 @@ test("a book page in a Web viewer can request a reviewed highlight in its own va
     assert.equal(h.ui.get("blockquote").text, "Measure cold reads.");
     assert.equal(file.text, original);
     await h.click("Save highlight");
-    assert.match(file.text, /## Lecture 4.*Measure cold reads.*## Lecture 5/s);
+    assert.ok(file.text.startsWith(original));
+    assert.match(file.text, /> Measure cold reads/);
   }
 });
 
@@ -786,10 +833,9 @@ test("only a current course reading in the Web viewer main frame can start a han
   assert.deepEqual(h.notices, []);
 });
 
-test("malformed source links and ambiguous destinations leave student writing alone", async () => {
+test("malformed source links leave student writing alone", async () => {
   const h = diary();
-  const file = h.files.get("01-Establish.md")!;
-  file.text += "\n## Lecture 2\nAn unrelated heading with the same number.\n";
+  const file = h.files.get("Establish/Lecture 2.md")!;
   const original = file.text;
   for (const url of [
     "https://scalableweb.dev.other.test/chapters/",
@@ -800,11 +846,6 @@ test("malformed source links and ambiguous destinations leave student writing al
     await h.openHighlight();
     assert.match(h.notices.at(-1) ?? "", /Copy highlight/);
   }
-  h.clipboard =
-    "> text\n\n[Book source](https://scalableweb.dev/chapters/architecture/)";
-  await h.run("add-highlight");
-  await h.selectLecture(2);
-  assert.match(h.notices.at(-1) ?? "", /Keep one Lecture 2 heading/);
   assert.equal(file.text, original);
 });
 
@@ -812,9 +853,9 @@ test("TA handoff copies only the reviewed selection and opens a public reading i
   const h = diary();
   const selection = "The cache missed on cold requests.";
   h.select(
-    "02-Challenge.md",
+    "Challenge/Lecture 6.md",
     selection,
-    "Confidential peer feedback.\n" + selection,
+    "Confidential peer feedback.\n\n## Later reflection\n" + selection,
   );
   h.clipboard = "existing clipboard";
   const discuss = h.editorMenu().get("Discuss with the course TA");
@@ -831,7 +872,7 @@ test("TA handoff copies only the reviewed selection and opens a public reading i
   assert.deepEqual(h.external, []);
 
   const other = diary();
-  other.select("02-Challenge.md", selection, selection);
+  other.select("Challenge/Lecture 6.md", selection, selection);
   other.disableReader();
   await other.run("discuss");
   await other.click("Copy and open beside diary");
@@ -844,7 +885,11 @@ test("TA handoff copies only the reviewed selection and opens a public reading i
 test("a phase portfolio draft receives only the approved selection and survives a repeated export", async () => {
   const h = diary();
   const selection = "We measured cold reads before setting the TTL.";
-  h.select("03-Compare.md", selection, "Private meeting notes.\n" + selection);
+  h.select(
+    "Compare/Lecture 9.md",
+    selection,
+    "Private meeting notes.\n\n## Later reflection\n" + selection,
+  );
   const path = "Portfolio - Compare.md";
   await h.run("portfolio");
   assert.ok(!h.files.has(path));
@@ -864,7 +909,7 @@ test("discussing words inside a pasted book quote opens that passage's source", 
   const h = diary();
   const selection = "Measure requests";
   h.select(
-    "03-Compare.md",
+    "Compare/Lecture 7.md",
     selection,
     "> Measure requests at the edge.\n\n[Book source](https://scalableweb.dev/chapters/benchmarking/#which-requests-counted)\n",
   );
@@ -878,7 +923,7 @@ test("discussing words inside a pasted book quote opens that passage's source", 
 
 test("a saved diary selection opens the reviewed paragraph with only opaque attempt references", async () => {
   const h = diary();
-  const file = h.files.get("02-Challenge.md")!;
+  const file = h.files.get("Challenge/Lecture 5.md")!;
   const thought = "I expect the queue to drain more slowly.";
   const paragraph =
     "https://scalableweb.dev/chapters/benchmarking/#p-count-all-requests";
@@ -921,9 +966,26 @@ test("a saved diary selection opens the reviewed paragraph with only opaque atte
     );
 });
 
+test("a student's own reflection heading can start peer discussion for that lecture's reading", async () => {
+  const h = diary();
+  const file = h.files.get("Establish/Lecture 1.md")!;
+  const thought = "The cached case took longer on the first request.";
+  const editor = h.select(
+    file.path,
+    thought,
+    "## A later reflection\n\n" + thought,
+  );
+  file.text = editor.getValue();
+  await h.run("initial-thinking");
+  assert.equal(
+    h.ui.get("input").value,
+    "https://scalableweb.dev/chapters/what-is-scalability/",
+  );
+});
+
 test("peer handoff validates the edited source and rechecks the saved passage at confirmation", async () => {
   const h = diary();
-  const file = h.files.get("01-Establish.md")!;
+  const file = h.files.get("Establish/Lecture 1.md")!;
   const thought = "I counted requests that timed out.";
   const editor = h.select(file.path, thought, thought);
   file.text = editor.getValue();
@@ -953,7 +1015,7 @@ test("peer handoff validates the edited source and rechecks the saved passage at
 
 test("the peer handoff accepts reviewed page links and paragraph links on course previews", async () => {
   const h = diary();
-  const file = h.files.get("03-Compare.md")!;
+  const file = h.files.get("Compare/Lecture 8.md")!;
   const thought = "Cold starts might change this result.";
   for (const source of [
     "http://localhost:3000/chapters/scaling/",
@@ -979,7 +1041,7 @@ test("the peer handoff accepts reviewed page links and paragraph links on course
 
 test("the diary suggests the open book's origin only for an unambiguous matching reading", async () => {
   const h = diary();
-  const file = h.files.get("01-Establish.md")!;
+  const file = h.files.get("Establish/Lecture 1.md")!;
   const thought = "An offered request can time out.";
   const reading = "/chapters/benchmarking/";
   const anchor = "#p-requests";

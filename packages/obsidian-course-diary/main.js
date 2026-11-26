@@ -9,8 +9,8 @@ const {
 } = require("obsidian");
 const { isInquiryReadingPath } = require("../../shared/concept-pages.ts");
 const { isBookOrigin, matchingBookSource } = require("./book-origin.js");
+const { lectures } = require("./lecture-layout.ts");
 
-const phases = ["Establish", "Challenge", "Compare"];
 const readingPaths = [
   "/chapters/",
   "/appendices/",
@@ -24,15 +24,6 @@ const readingPaths = [
   "/agents/",
   "/notebook/setup/",
 ];
-const lectures = Array.from({ length: 9 }, (_, index) => {
-  const phase = Math.floor(index / 3);
-  return {
-    number: index + 1,
-    phase: phases[phase],
-    slot: (index % 3) + 1,
-    path: `0${phase + 1}-${phases[phase]}.md`,
-  };
-});
 
 function readingPath(pathname) {
   return (
@@ -148,24 +139,11 @@ function sections(text) {
       else if (boundary[1].startsWith(fence) && !boundary[2].trim()) fence = "";
     } else if (!fence && /^ {0,3}#{1,2}(?:\s|$)/.test(line)) {
       if (sections.length) sections.at(-1).end = offset;
-      const title = line.replace(/^ {0,3}#{1,2}\s*/, "").replace(/\s+#+$/, "");
-      const number = Number(title.match(/^Lecture ([1-9])\b/)?.[1]);
-      sections.push({ title, number, start: offset, end: text.length });
+      sections.push({ start: offset, end: text.length });
     }
     offset += raw.length + 1;
   }
   return sections;
-}
-
-function lectureSection(text, lecture) {
-  const matches = sections(text).filter(
-    (section) => section.number === lecture.number,
-  );
-  if (matches.length !== 1)
-    throw new Error(
-      `Keep one Lecture ${lecture.number} heading in ${lecture.path}, or paste your material where you want it.`,
-    );
-  return matches[0];
 }
 
 function readingIn(text, validate = publicSource) {
@@ -217,23 +195,19 @@ async function markerFor(kind, parts) {
   return `<!-- scalableweb-${kind}:${hash} -->`;
 }
 
-function insertion(text, start, end, marker, markdown) {
-  if (text.slice(start, end).includes(marker)) return null;
+function appendText(text, marker, markdown) {
+  if (text.includes(marker)) return "";
   const lineEnd = text.includes("\r\n") ? "\r\n" : "\n";
-  const preceding = text.slice(start, end);
-  const gap = /\r?\n\r?\n$/.test(preceding)
-    ? ""
-    : preceding.endsWith("\n")
-      ? "\n"
-      : "\n\n";
-  const following = end === text.length ? "\n" : "\n\n";
-  return {
-    at: end,
-    body: (gap + markdown.trim() + "\n\n" + marker + following).replace(
-      /\r?\n/g,
-      lineEnd,
-    ),
-  };
+  const gap =
+    !text || /\r?\n\r?\n$/.test(text)
+      ? ""
+      : text.endsWith("\n")
+        ? "\n"
+        : "\n\n";
+  return (gap + markdown.trim() + "\n\n" + marker + "\n").replace(
+    /\r?\n/g,
+    lineEnd,
+  );
 }
 
 class LecturePicker extends FuzzySuggestModal {
@@ -398,11 +372,11 @@ class CourseDiary extends Plugin {
       this.run(() => action(lecture)),
     ).open();
   }
-  phaseFile(lecture) {
+  lectureFile(lecture) {
     const file = this.app.vault.getAbstractFileByPath(lecture.path);
     if (!(file instanceof TFile))
       throw new Error(
-        `Open the extracted course diary as a vault. Its ${lecture.path} belongs at the top level.`,
+        `Open the course diary vault and check for ${lecture.path}.`,
       );
     return file;
   }
@@ -418,40 +392,26 @@ class CourseDiary extends Plugin {
       .getLeavesOfType("markdown")
       .find((leaf) => editable(leaf.view))?.view.editor;
   }
-  async lectureData(lecture) {
-    const file = this.phaseFile(lecture);
-    const text =
-      this.editorFor(file)?.getValue() ?? (await this.app.vault.read(file));
-    const section = lectureSection(text, lecture);
-    return {
-      file,
-      section,
-      source: readingIn(text.slice(section.start, section.end)),
-    };
-  }
   async openLecture(lecture) {
-    const { file, section } = await this.lectureData(lecture);
-    await this.app.workspace.openLinkText(
-      file.path + "#" + section.title,
-      file.path,
-    );
+    const file = this.lectureFile(lecture);
+    await this.app.workspace.openLinkText(file.path, file.path);
   }
-  async update(file, plan) {
+  async append(file, marker, markdown) {
     // Preserve unsaved editor text and undo history. For inactive notes
-    // Vault.process applies the insertion against the latest on-disk contents.
+    // Vault.process appends to the latest on-disk contents.
     const editor = this.editorFor(file);
     if (editor) {
-      const change = plan(editor.getValue());
-      if (!change) return false;
-      editor.replaceRange(change.body, editor.offsetToPos(change.at));
+      const text = editor.getValue();
+      const addition = appendText(text, marker, markdown);
+      if (!addition) return false;
+      editor.replaceRange(addition, editor.offsetToPos(text.length));
       return true;
     }
     let inserted = false;
     await this.app.vault.process(file, (text) => {
-      const change = plan(text);
-      if (!change) return text;
-      inserted = true;
-      return text.slice(0, change.at) + change.body + text.slice(change.at);
+      const addition = appendText(text, marker, markdown);
+      inserted = Boolean(addition);
+      return text + addition;
     });
     return inserted;
   }
@@ -462,7 +422,7 @@ class CourseDiary extends Plugin {
       // The protocol can arrive before Obsidian has focus. Choosing a lecture
       // gives its window focus so it can retry a denied clipboard read.
       const highlight = copied ?? readHighlight(await clipboardText());
-      const { file } = await this.lectureData(lecture);
+      const file = this.lectureFile(lecture);
       const marker = await markerFor("highlight", [
         highlight.source.href,
         highlight.quote,
@@ -473,14 +433,20 @@ class CourseDiary extends Plugin {
         (el, modal) => {
           el.createEl("blockquote", { text: highlight.quote });
           el.createEl("p", { text: highlight.source.href });
+          el.createEl("p", { text: `Save in ${file.path}` });
           modal.action("Save highlight", async () => {
-            const inserted = await this.update(file, (text) => {
-              const { start, end } = lectureSection(text, lecture);
-              return insertion(text, start, end, marker, highlight.markdown);
-            });
+            if (this.lectureFile(lecture) !== file)
+              throw new Error(
+                "The lecture note changed. Choose the lecture again.",
+              );
+            const inserted = await this.append(
+              file,
+              marker,
+              highlight.markdown,
+            );
             new Notice(
               inserted
-                ? `Saved to ${file.basename}.`
+                ? `Saved to ${file.path}.`
                 : "This highlight is already in that lecture.",
             );
           });
@@ -488,29 +454,17 @@ class CourseDiary extends Plugin {
       ).open();
     });
   }
-  currentLecture(editor, view) {
-    if (!lectures.some((lecture) => view.file?.path === lecture.path))
-      return null;
-    const offset = editor.posToOffset(editor.getCursor("from"));
-    const text = editor.getValue();
-    const section = sections(text).find(
-      (section) =>
-        section.start <= offset &&
-        (offset < section.end ||
-          (offset === text.length && section.end === offset)),
-    );
-    return lectures.find(
-      (lecture) =>
-        lecture.path === view.file.path && lecture.number === section?.number,
-    );
-  }
   async discuss(editor, view) {
     const selected = editor.getSelection();
-    const lecture = this.currentLecture(editor, view);
+    const lecture = lectures.find((item) => item.path === view.file?.path);
     const reading = lecture ? selectedReading(editor) : readingIn(selected);
     const launch = async (lecture) => {
-      const data = await this.lectureData(lecture);
-      const url = reading ?? data.source;
+      const file = this.lectureFile(lecture);
+      const url =
+        reading ??
+        readingIn(
+          this.editorFor(file)?.getValue() ?? (await this.app.vault.read(file)),
+        );
       if (!url)
         throw new Error(
           "Add a public course reading link to the lecture to open its TA.",
@@ -616,7 +570,10 @@ class CourseDiary extends Plugin {
       readingIn(
         text.slice(section?.start ?? 0, section?.end ?? text.length),
         peerSource,
-      );
+      ) ??
+      (lectures.some((lecture) => lecture.path === file.path)
+        ? readingIn(text, peerSource)
+        : null);
 
     new Review(this.app, "Use as my initial thinking", (el, modal) => {
       el.createEl("blockquote", { text: selected });
@@ -655,18 +612,10 @@ class CourseDiary extends Plugin {
   }
   async prepare(editor, view) {
     const selected = editor.getSelection();
-    const lecture = this.currentLecture(editor, view);
+    const lecture = lectures.find((item) => item.path === view.file?.path);
     if (!selected.trim() || !lecture)
-      throw new Error(
-        "Select a passage from one lecture in a numbered phase note.",
-      );
-    const text = editor.getValue();
-    const section = lectureSection(text, lecture);
-    if (editor.posToOffset(editor.getCursor("to")) > section.end)
-      throw new Error("Choose an excerpt from one lecture at a time.");
-    const source =
-      selectedReading(editor) ??
-      readingIn(text.slice(section.start, section.end));
+      throw new Error("Select a passage in a course lecture note.");
+    const source = selectedReading(editor) ?? readingIn(editor.getValue());
     const destination = `Portfolio - ${lecture.phase}.md`;
     const marker = await markerFor("excerpt", [lecture.number, selected]);
     const markdown =
@@ -693,9 +642,7 @@ class CourseDiary extends Plugin {
         }
         if (!(file instanceof TFile))
           throw new Error(`A folder already uses the name ${destination}.`);
-        const inserted = await this.update(file, (body) =>
-          insertion(body, 0, body.length, marker, markdown),
-        );
+        const inserted = await this.append(file, marker, markdown);
         new Notice(
           inserted
             ? `Added to ${destination}.`
