@@ -6,6 +6,11 @@ For lecture notes, start with the [course diary in Obsidian](/diary/).
 You can keep a diary and save linked highlights using the book and the starter files alone.
 Use this page to connect the optional book teaching assistant, launch a course coding project or [recover notes from the earlier Notebook](/notebook/setup/?legacy=1).
 
+With the desktop **Course diary** plugin and an OpenAI API key, you can also [start the TA from your diary](/diary/#discuss-a-question-with-the-ta).
+This option runs inside a current Obsidian desktop installation with built-in SQLite and secret storage.
+Keep Obsidian open while using the TA.
+Its conversations are separate from an existing standalone companion’s history.
+
 ## Start on your computer
 
 The standalone package is [@scalableweb/companion@0.4.0](https://www.npmjs.com/package/@scalableweb/companion/v/0.4.0), maintained by bebraw.

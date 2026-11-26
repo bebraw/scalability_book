@@ -1,4 +1,5 @@
 import { legacyRecovery } from "./learning-diary.ts";
+import { diaryAttemptMarker } from "./learning-diary-attempt.ts";
 import { mountHighlightCapture } from "./learning-highlight.ts";
 import { readingSelection } from "./learning-selection.ts";
 import {
@@ -128,7 +129,14 @@ document.addEventListener("click", (event) => {
   }
 });
 window.addEventListener("hashchange", () => {
-  if (tutorialLink(new URL(location.href))) openTutorial();
+  const url = new URL(location.href);
+  if (tutorialLink(url)) openTutorial();
+  else if (
+    assistant &&
+    url.searchParams.get("inquiry") === "1" &&
+    url.hash.includes(diaryAttemptMarker)
+  )
+    void openAssistant(false, "peers");
 });
 if (tutorialLink(new URL(location.href))) openTutorial();
 else if (!requestedSection && !legacyRecovery)

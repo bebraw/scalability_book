@@ -16,6 +16,7 @@
   },
   "include": [
     "labs/**/*.ts",
+    "packages/obsidian-course-diary/**/*.ts",
     "scripts/**/*.ts",
     "site/scripts/**/*.ts",
     "worker/**/*.ts"

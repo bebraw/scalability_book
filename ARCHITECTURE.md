@@ -84,7 +84,7 @@ The HTTP boundary binds to loopback, accepts session bootstrap only from an exac
 The CLI trusts only `https://scalableweb.dev` by default; local development requires explicit `--origin`.
 [ADR-037](docs/adrs/implemented/ADR-037-connect-to-the-local-companion-without-pairing-codes.md) records that website trust boundary and the removal of manual pairing.
 The [course diary guide](docs/course-diary.md) and [five numbered notes](docs/diary-pilot/) are the entry point for student writing.
-The site build packages those notes and the optional [desktop Obsidian plugin](packages/obsidian-course-diary/) in a [downloadable vault](scripts/lib/course-diary-download.ts).
+The site build [packages the vault and a plugin-only update](scripts/lib/course-diary-download.ts) with the same bundled [desktop Obsidian plugin](packages/obsidian-course-diary/).
 The student's files own diary entries and private portfolio drafts.
 The plugin operates on the named phase files and explicitly chosen excerpts.
 Its commands call Obsidian's editor, vault and workspace APIs.
@@ -96,10 +96,15 @@ The plugin reads the clipboard, offers the lecture picker and writes the quote w
 **Copy highlight** leaves the quote on the clipboard for manual paste.
 The book's [learning loader](site/scripts/learning-loader.ts) opens the existing teaching assistant on request.
 The plugin can display that page beside the diary or open the default browser.
-Only the public reading address enters the URL.
-Students paste and send any question themselves.
+For the TA, the URL identifies the public reading and the requested connection mode.
+Students review, paste and send their question themselves.
+For class discussion, the plugin can supply two opaque identifiers for a saved selection in the URL fragment.
+The book consumes them in the tab and waits for the student to reveal the discussion.
+Existing course enrollment and audience checks still apply.
 The book owns exercise checking, interactive demos and TA presentation.
 The local companion owns agent conversations, connection settings and prior Notebook records.
+The desktop plugin can host the same conversation and HTTP handlers for a discussion-only OpenAI session, using Obsidian’s secret storage and a separate history directory for each vault and book origin. [ADR-067](docs/adrs/implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md)
+Those histories live under `scalableweb-obsidian` beside the standalone companion's data directory, so migrating a standalone installation only copies its own records.
 The course workspace owns submissions.
 The [recovery page](docs/course-diary.md#bring-over-an-existing-notebook) reads the local companion to download a complete JSON archive or all current entries in Markdown.
 [The assistant panel](site/scripts/learning-pane.ts) owns discussion, peer inquiry and connection settings. [Reply rendering](site/scripts/learning-reply.ts) restricts assistant Markdown, and [browser evidence](site/scripts/learning-evidence.ts) keeps observations with the associated turn.

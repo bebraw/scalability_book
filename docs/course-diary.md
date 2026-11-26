@@ -38,9 +38,11 @@ Both actions keep a link back to the passage.
 You can save private highlights while signed out.
 Under the quote, add why you kept it or what you plan to check.
 
-To read classmates’ comments on a passage, open the comment control beside the paragraph and choose **Discuss with classmates**.
-Obsidian opens the discussion in your default browser.
-Sign in to your course, save your own initial thinking for the passage in the learning companion, then choose **Reveal peer inquiry** to see shared threads.
+If you already wrote your initial thinking in Obsidian, select those words in your saved note, right-click and choose **Use as my initial thinking**.
+Review the book passage and choose **Open class discussion**.
+Only the reference to your saved attempt travels with you.
+If you start from the book, open the comment control beside the paragraph, choose **Discuss with classmates** and save your initial thinking with the standalone companion.
+In either case, sign in to your course and choose **Reveal peer inquiry** to see threads for that reading.
 You can reply or start a thread for your group or the course cohort.
 
 To send feedback privately to the book team, use the same paragraph control.
@@ -62,6 +64,7 @@ To find the commands inside Obsidian, open the command palette with **Ctrl+P** o
 | Open lecture diary         | Jump to the lecture you are studying.                                                                                              |
 | Add book highlight         | After copying a highlight in the book, choose its lecture, review the quote and confirm.                                           |
 | Discuss with the course TA | Review the excerpt or question you want to bring to the reading's assistant.                                                       |
+| Use as my initial thinking | Use a saved selection for the initial step in a class discussion.                                                                  |
 | Prepare portfolio excerpt  | Select text under a lecture heading and review what will go into that phase’s private draft, such as **Portfolio - Establish.md**. |
 
 If you already have a vault, you can use just the numbered Markdown files.
@@ -69,19 +72,33 @@ To use its course commands as well, place the five files at the vault root and c
 It contains `manifest.json` and `main.js`.
 Show hidden files if needed, keep existing notes when names overlap, then reopen the vault and enable **Course diary**.
 
+### Update the course plugin in an existing vault
+
+[Download Course diary plugin 0.3.0 (.zip)](/downloads/course-diary-plugin-0.3.0.zip) and unzip it outside your vault.
+Close Obsidian.
+In your vault’s `.obsidian/plugins/scalableweb-course-diary/` folder, replace just `main.js` and `manifest.json` with the two files from the download.
+Reopen the vault and check the version of **Course diary** under **Settings → Community plugins**.
+This lets you keep the lecture notes you have written and any saved plugin settings.
+
 ## Discuss a question with the TA
 
-Open your lecture's reading in Chrome on the computer running your configured companion.
-Choose **Teaching assistant**, open **Discuss**, paste the part of your entry you want to discuss and add a question.
-For example, “Would my measurement catch slow cache misses?” Check the source and text, then choose **Send message**.
-If this is your first conversation, [set up the teaching assistant](/notebook/setup/#start-on-your-computer).
+With the desktop plugin, select a few lines of your diary, right-click and choose **Discuss with the course TA**.
+Review the excerpt and add your question, for example, “Would my measurement catch slow cache misses?”
+Choose **Use Obsidian TA** to run the assistant on this computer while the vault is open.
+The first time, enter the ID of a Chat Completions model available to your account and your OpenAI API key.
+The plugin uses Obsidian’s secret storage for the key.
+Review the reading address and choose **Start TA and open reading**.
+Use that reading in Chrome on the same computer.
+Choose **Connect to Obsidian** and allow local network access if asked.
+Paste the reviewed text and choose **Send message** when ready.
+Your provider bills API usage.
+You can choose **Stop Obsidian TA** in the command palette when finished.
+The same vault and book website reopen their previous TA conversations on this computer.
+Moving the vault or switching between a preview and the published site opens a separate conversation history.
 
-With the course plugin, select a few lines in your diary and run **Discuss with the course TA**.
-Review the excerpt and add your question.
-Choose **Copy and open beside diary** to use Obsidian’s desktop Web viewer, or **Copy and open in default browser**.
-Paste the text into **Discuss** and send it when ready.
-The split pane requires **Settings → Core plugins → Web viewer**.
-If the companion connection fails there, open the reading in Chrome on the same computer. [Obsidian Web viewer](https://obsidian.md/help/plugins/web-viewer)
+If you use another editor, prefer another provider or want to reopen conversations saved with the standalone companion, use [the standalone setup](/notebook/setup/#start-on-your-computer).
+Open the reading in Chrome on the companion’s computer and choose **Teaching assistant → Discuss**.
+The plugin’s **Copy and open beside diary** and **Copy and open in default browser** actions also work with your existing companion.
 
 Back in your lecture entry, record which part of your explanation changed and what you will try next.
 Identify any assistant wording you keep.

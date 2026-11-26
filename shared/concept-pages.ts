@@ -482,3 +482,11 @@ export const conceptPages: ConceptPage[] = [
     ],
   },
 ];
+
+/** Book readings and catalogues that can host a course discussion. */
+export function isInquiryReadingPath(pathname: string): boolean {
+  return (
+    conceptPages.some((page) => page.url === pathname) ||
+    ["/concepts/", "/explore/", "/demos/"].includes(pathname)
+  );
+}

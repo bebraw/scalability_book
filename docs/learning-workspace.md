@@ -439,6 +439,14 @@ To discuss a reading, open the paragraph’s comment control and choose **Discus
 The link carries the passage into Peer discussion in the default browser from Obsidian, or in a separate browser tab on the web.
 The private feedback draft stays in its original tab. **Teaching assistant → Peer discussion** also opens inquiry at a passage, activity or demo.
 If the account has no available course runs, **Course sign-in** lets a student use their instructor’s course ID and enrolled email address and return to the passage.
+The desktop diary plugin can open the same reading from a saved selection.
+Its fragment carries two random UUIDs.
+The book removes them from the address and keeps them in the tab for the matching reading.
+After course sign-in and **Reveal peer inquiry**, the existing course endpoint accepts that declaration.
+A student can then start a thread or reply without connecting a companion.
+The selection, vault name and file path stay in Obsidian.
+If email sign-in finishes in another tab, return to the original tab and choose **Check sign-in again**.
+If it was closed, repeat the handoff in Obsidian.
 [learning-inquiry.ts](../shared/learning-inquiry.ts) owns optional reasoning outlines and operator/challenger/validator prompts; the browser uses the existing contribution body, identity, provenance and revision contract.
 After reveal, questions/replies can use question, competing explanations, evidence/check, current decision and remaining uncertainty, or free writing without filling every part.
 Responsibility cues invite someone other than the operator to explain acceptance and rotate roles for the next check; the common project specification still owns required session practice.
@@ -456,7 +464,7 @@ It saves a separate linked notebook entry; students can request help, keep diffe
 No shared outcome updates a member's concept judgment, private reflection, course credit or submission.
 
 The scope combines the course run, source URL path/anchor and one activity key: reading, prediction, evidence or session.
-Initial-work declarations store only a timestamp and a fingerprint of the student's local note revision.
+Initial-work declarations store a timestamp and a fingerprint derived from the companion note and revision IDs or from the diary plugin's two random IDs.
 This is a student declaration for pedagogical pacing, not proof of correctness or an anti-cheating mechanism.
 The initial text remains local.
 Both thread discovery and direct reads require that declaration before returning peer content; course staff may review without it.

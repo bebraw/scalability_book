@@ -1,4 +1,3 @@
-import { DatabaseSync } from "node:sqlite";
 import { existsSync, lstatSync, chmodSync, rmSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { learningAssert } from "../../shared/learning-workspace.ts";
@@ -17,12 +16,23 @@ const schemas = {
   "local-provider": { local_sessions: ["id", "body"] },
   "api-provider": { api_sessions: ["id", "body"] },
 };
+// A desktop vault can load the diary plugin on an older Obsidian installer.
+// Resolve SQLite only when a student actually starts a companion.
+function databaseConstructor() {
+  const sqlite = process.getBuiltinModule?.("node:sqlite");
+  if (!sqlite?.DatabaseSync)
+    throw new Error(
+      "This companion needs a desktop runtime with built-in SQLite.",
+    );
+  return sqlite.DatabaseSync;
+}
 export function inspectLearningDatabase(filename: string, kind: DatabaseKind) {
   const state = lstatSync(filename);
   learningAssert(
     state.isFile() && !state.isSymbolicLink(),
     "Use a regular learning database file.",
   );
+  const DatabaseSync = databaseConstructor();
   const db = new DatabaseSync(filename, { readOnly: true });
   try {
     const version = Number(
@@ -55,6 +65,7 @@ export function openLearningDatabase(
   kind: DatabaseKind,
   initialSql: string,
 ) {
+  const DatabaseSync = databaseConstructor();
   const existing = existsSync(filename);
   const version = existing ? inspectLearningDatabase(filename, kind) : 1;
   let backup: string | null = null;

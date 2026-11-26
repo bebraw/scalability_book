@@ -19,6 +19,10 @@ import {
 } from "../../shared/learning-inquiry.ts";
 import { mountLearningPractice, type GuideSave } from "./learning-practice.ts";
 import {
+  bindDiaryAttempt,
+  type DiaryAttempt,
+} from "./learning-diary-attempt.ts";
+import {
   currentCourse,
   rememberCourse,
   openAccount,
@@ -35,6 +39,7 @@ type Membership = {
 interface Options {
   source: LearningSource;
   entries: NotebookEntry[];
+  diaryAttempt: DiaryAttempt | null;
   initial: (source: LearningSource, saved?: () => void) => void;
   reflect: (source: LearningSource, body: string) => void;
   status: (text: string) => void;
@@ -88,7 +93,8 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
   const state = {
     course: currentCourse(),
     sharingName: "",
-    question: (inquiryQuestions.includes(selectedActivity as InquiryQuestion)
+    question: (!options.diaryAttempt &&
+    inquiryQuestions.includes(selectedActivity as InquiryQuestion)
       ? selectedActivity
       : "reading") as InquiryQuestion,
     membership: null as Membership | null,
@@ -137,7 +143,9 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
   container.append(
     node(
       "p",
-      "Peer inquiry follows your own thinking. Save an explanation, prediction or where you are stuck, then compare and reflect. Your initial text stays in your local companion.",
+      options.diaryAttempt
+        ? "Your selected initial thinking stays in your Obsidian diary. Choose your course to read or share contributions about this passage."
+        : "Peer inquiry follows your own thinking. Save an explanation, prediction or where you are stuck, then compare and reflect. Your initial text stays in your local companion.",
     ),
   );
   container.append(
@@ -172,6 +180,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     compose = node("div"),
     offers = node("div");
   question.value = state.question;
+  question.disabled = Boolean(options.diaryAttempt);
   container.append(
     field("Course for this inquiry", courseSelect),
     field("Inquiry activity", question),
@@ -220,6 +229,7 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     if (!destination.searchParams.has("inquiry"))
       destination.searchParams.set("inquiry", "1");
     destination.searchParams.set("inquiryActivity", state.question);
+    if (options.diaryAttempt) destination.searchParams.set("diaryReturn", "1");
     if (state.course) destination.searchParams.set("course", state.course);
     const returnTo =
       destination.pathname + destination.search + destination.hash;
@@ -287,6 +297,67 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
         `Course account: ${state.sharingName}. Shared text is attributed to this account in ${state.course}.`,
       ),
     );
+    const diary = options.diaryAttempt;
+    const course = state.course;
+    const revealWith = (
+      identity: () => { noteId: string; noteRevision: string },
+    ) => {
+      const action = button("Reveal peer inquiry", async () => {
+        action.disabled = true;
+        try {
+          await api("/attempts", "POST", {
+            source,
+            question: state.question,
+            ...identity(),
+          });
+          if (diary) bindDiaryAttempt(diary, course, membership.user);
+          if (revision === selectionRevision && gate.isConnected)
+            await reveal();
+        } finally {
+          action.disabled = false;
+        }
+      });
+      return action;
+    };
+    if (diary) {
+      if (membership.staff) {
+        gate.append(button("Open inquiry as course staff", reveal));
+        return;
+      }
+      if (!membership.active) {
+        gate.append(
+          node(
+            "p",
+            "An active course enrollment is required to use your saved initial thinking.",
+          ),
+        );
+        return;
+      }
+      if (
+        diary.owner &&
+        (diary.owner.course !== course ||
+          diary.owner.member !== membership.user)
+      ) {
+        gate.append(
+          node(
+            "p",
+            "Open your selected writing from your own diary to use it with this course account.",
+          ),
+        );
+        return;
+      }
+      gate.append(
+        node(
+          "p",
+          "The course will record that you saved initial thinking for this reading. Your diary text and filename stay on your device.",
+        ),
+        revealWith(() => ({
+          noteId: diary.noteId,
+          noteRevision: diary.noteRevision,
+        })),
+      );
+      return;
+    }
     const own = options.entries.filter(
       (entry) =>
         entry.kind === "attempt" &&
@@ -323,15 +394,9 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
     }
     gate.append(
       field("My saved initial work", initial),
-      button("Reveal peer inquiry", async () => {
+      revealWith(() => {
         const entry = own.find((entry) => entry.id === initial.value)!;
-        await api("/attempts", "POST", {
-          source,
-          question: state.question,
-          noteId: entry.id,
-          noteRevision: entry.revision,
-        });
-        await reveal();
+        return { noteId: entry.id, noteRevision: entry.revision };
       }),
     );
   }
@@ -555,24 +620,26 @@ export function mountLearningPeers(container: HTMLElement, options: Options) {
           }),
         ),
       );
-      const practice = node("details");
-      practice.append(node("summary", "Try a related case privately"));
-      mountLearningPractice(practice, {
-        source: {
-          ...thread.source,
-          excerpt: `Discussion reference: ${threadLink(thread)}\n\n${thread.source.excerpt}`,
-        },
-        related: () => related(thread.source),
-        save: async (...args) => {
-          const entry = await options.save(...args);
-          privateEntries.push(entry);
-          return entry;
-        },
-        help: options.help,
-        notes: options.notes,
-        draftScope: thread.id,
-      });
-      card.append(practice);
+      if (!options.diaryAttempt) {
+        const practice = node("details");
+        practice.append(node("summary", "Try a related case privately"));
+        mountLearningPractice(practice, {
+          source: {
+            ...thread.source,
+            excerpt: `Discussion reference: ${threadLink(thread)}\n\n${thread.source.excerpt}`,
+          },
+          related: () => related(thread.source),
+          save: async (...args) => {
+            const entry = await options.save(...args);
+            privateEntries.push(entry);
+            return entry;
+          },
+          help: options.help,
+          notes: options.notes,
+          draftScope: thread.id,
+        });
+        card.append(practice);
+      }
       if (!record.readOnly && !thread.closedAt) {
         const reply = node("textarea");
         reply.rows = 3;

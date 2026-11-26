@@ -7,6 +7,8 @@ const {
   Plugin,
   TFile,
 } = require("obsidian");
+const { isInquiryReadingPath } = require("../../shared/concept-pages.ts");
+const { isBookOrigin, matchingBookSource } = require("./book-origin.js");
 
 const phases = ["Establish", "Challenge", "Compare"];
 const readingPaths = [
@@ -66,13 +68,8 @@ function isWebViewerHighlight(event) {
   try {
     const url = new URL(event.url);
     const current = new URL(event.target.getURL());
-    const local =
-      url.protocol === "http:" &&
-      (url.hostname === "127.0.0.1" || url.hostname === "localhost");
     return (
-      (url.origin === "https://scalableweb.dev" || local) &&
-      !url.username &&
-      !url.password &&
+      isBookOrigin(url) &&
       readingPath(url.pathname) &&
       url.hash === "#scalableweb-course-diary-add-highlight" &&
       url.origin === current.origin &&
@@ -171,27 +168,44 @@ function lectureSection(text, lecture) {
   return matches[0];
 }
 
-function readingIn(text) {
-  for (const match of text.matchAll(/\[[^\n\]]+\]\((https:\/\/[^\s)]+)\)/g)) {
-    const url = publicSource(match[1]);
+function readingIn(text, validate = publicSource) {
+  for (const match of text.matchAll(/\[[^\n\]]+\]\((https?:\/\/[^\s)]+)\)/g)) {
+    const url = validate(match[1]);
     if (url) return url;
   }
   return null;
 }
 
-function selectedReading(editor) {
-  const selected = readingIn(editor.getSelection());
+function selectedReading(editor, validate = publicSource) {
+  const selected = readingIn(editor.getSelection(), validate);
   if (selected) return selected;
   // A selection inside a saved quotation usually omits the source line.
   const start = editor.posToOffset(editor.getCursor("from"));
   const end = editor.posToOffset(editor.getCursor("to"));
   const highlights =
-    /^(?:>[^\r\n]*\r?\n)+\r?\n\[Book source\]\((https:\/\/[^\s)]+)\)/gm;
+    /^(?:>[^\r\n]*\r?\n)+\r?\n\[Book source\]\((https?:\/\/[^\s)]+)\)/gm;
   for (const match of editor.getValue().matchAll(highlights)) {
     if (start >= match.index && end <= match.index + match[0].length)
-      return publicSource(match[1]);
+      return validate(match[1]);
   }
   return null;
+}
+
+function peerSource(value) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    return null;
+  }
+  if (
+    !isBookOrigin(url) ||
+    (url.search && url.search !== "?inquiry=1") ||
+    (url.hash && !/^#[a-z0-9_-]{1,200}$/i.test(url.hash)) ||
+    !isInquiryReadingPath(url.pathname)
+  )
+    return null;
+  return url;
 }
 
 async function markerFor(kind, parts) {
@@ -273,6 +287,24 @@ class Review extends Modal {
 
 class CourseDiary extends Plugin {
   onload() {
+    this.taUnloaded = false;
+    this.register(() => {
+      this.taUnloaded = true;
+      void this.diaryAssistant?.stop();
+    });
+    this.addCommand({
+      id: "stop-obsidian-ta",
+      name: "Stop Obsidian TA",
+      checkCallback: (checking) => {
+        if (!this.diaryAssistant?.running) return false;
+        if (!checking)
+          void this.run(async () => {
+            await this.diaryAssistant.stop();
+            new Notice("Obsidian TA stopped.");
+          });
+        return true;
+      },
+    });
     this.addCommand({
       id: "open-lecture",
       name: "Open lecture diary",
@@ -295,6 +327,30 @@ class CourseDiary extends Plugin {
       editorCallback: (editor, view) =>
         this.run(() => this.discuss(editor, view)),
     });
+    this.addCommand({
+      id: "initial-thinking",
+      name: "Use as my initial thinking",
+      editorCallback: (editor, view) =>
+        this.run(() => this.peerAttempt(editor, view)),
+    });
+    this.registerEvent(
+      this.app.workspace.on("editor-menu", (menu, editor, view) => {
+        if (!view.file?.path.endsWith(".md") || !editor.getSelection().trim())
+          return;
+        menu.addItem((item) =>
+          item
+            .setTitle("Use as my initial thinking")
+            .setIcon("messages-square")
+            .onClick(() => this.run(() => this.peerAttempt(editor, view))),
+        );
+        menu.addItem((item) =>
+          item
+            .setTitle("Discuss with the course TA")
+            .setIcon("message-circle-question")
+            .onClick(() => this.run(() => this.discuss(editor, view))),
+        );
+      }),
+    );
     this.addCommand({
       id: "portfolio",
       name: "Prepare portfolio excerpt",
@@ -468,7 +524,16 @@ class CourseDiary extends Plugin {
         const writing = label.createEl("textarea", { attr: { rows: "6" } });
         writing.value = selected ? selected + "\n\n" : "";
         el.createEl("p", {
-          text: "Copy the text you want to discuss, then paste it in the TA and choose Send message. Chrome on the computer running your companion is the supported browser.",
+          text: "Use Obsidian TA to run the assistant with your OpenAI API account, or open the reading with a separately configured companion. Paste your reviewed text into the book and choose Send message.",
+        });
+        modal.action("Use Obsidian TA", async () => {
+          const { DiaryAssistant } = require("./assistant-ui.js");
+          this.diaryAssistant ??= new DiaryAssistant(this, Review);
+          await this.diaryAssistant.review(url, async (destination) => {
+            await this.copyDraft(writing);
+            if (!this.taUnloaded && this.diaryAssistant.running)
+              await require("electron").shell.openExternal(destination.href);
+          });
         });
         modal.action("Copy and open beside diary", async () => {
           await this.copyDraft(writing);
@@ -521,6 +586,72 @@ class CourseDiary extends Plugin {
         "Enable Web viewer under Core plugins or choose the default browser.",
       );
     }
+  }
+  peerAttempt(editor, view) {
+    const selected = editor.getSelection();
+    const file = view.file;
+    if (
+      !selected.trim() ||
+      !(file instanceof TFile) ||
+      !file.path.endsWith(".md")
+    )
+      throw new Error("Select your own initial thinking in a Markdown note.");
+    const text = editor.getValue();
+    const start = editor.posToOffset(editor.getCursor("from"));
+    const section = sections(text).find(
+      (part) => part.start <= start && start < part.end,
+    );
+    // A student often writes their response immediately below a saved highlight.
+    const preceding = text.slice(section?.start ?? 0, start);
+    let precedingSource = null;
+    for (const match of preceding.matchAll(
+      /^\[Book source\]\((https?:\/\/[^\s)]+)\)\s*$/gm,
+    )) {
+      const candidate = peerSource(match[1]);
+      if (candidate) precedingSource = candidate;
+    }
+    const source =
+      selectedReading(editor, peerSource) ??
+      precedingSource ??
+      readingIn(
+        text.slice(section?.start ?? 0, section?.end ?? text.length),
+        peerSource,
+      );
+
+    new Review(this.app, "Use as my initial thinking", (el, modal) => {
+      el.createEl("blockquote", { text: selected });
+      const field = el.createEl("label", {
+        text: "Book passage for this discussion",
+      });
+      const address = field.createEl("input", {
+        attr: { type: "url", placeholder: "Paste the book passage URL" },
+      });
+      address.value = matchingBookSource(this.app, source)?.href ?? "";
+      el.createEl("p", {
+        text: "Your words stay in this diary. At the book, choose Reveal peer inquiry to tell the course you saved your initial thinking.",
+      });
+      modal.action("Open class discussion", async () => {
+        const url = peerSource(address.value);
+        if (!url)
+          throw new Error(
+            "Use a published course reading URL, optionally with its paragraph or heading.",
+          );
+        const saved = await this.app.vault.read(file);
+        if (view.file !== file || editor.getValue() !== text)
+          throw new Error(
+            "The note changed. Close this review and select your passage again.",
+          );
+        if (saved.replace(/\r\n/g, "\n") !== text.replace(/\r\n/g, "\n"))
+          throw new Error(
+            "Save this note in Obsidian, then choose Open class discussion again.",
+          );
+        // These one-handoff references are independent of the note's name and contents.
+        url.search = "?inquiry=1";
+        url.hash +=
+          "&diaryAttempt=" + crypto.randomUUID() + "." + crypto.randomUUID();
+        await require("electron").shell.openExternal(url.href);
+      });
+    }).open();
   }
   async prepare(editor, view) {
     const selected = editor.getSelection();

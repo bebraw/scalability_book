@@ -1,5 +1,10 @@
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import { mountLearningAssistant } from "./learning-assistant.ts";
+import {
+  readDiaryAttempt,
+  diaryAttemptMarker,
+  type DiaryAttempt,
+} from "./learning-diary-attempt.ts";
 import { mountLearningNavigation } from "./learning-navigation.ts";
 import {
   currentReading,
@@ -15,7 +20,10 @@ import type {
   AssistantSection,
   AssistantView,
 } from "./learning-session.ts";
-import type { CompanionStatus } from "../../shared/learning-connection.ts";
+import {
+  obsidianCompanionAddress,
+  type CompanionStatus,
+} from "../../shared/learning-connection.ts";
 import { prepareLearningHelp } from "./learning-agent-ui.ts";
 import { requestLearning } from "./learning-actions.ts";
 import type {
@@ -60,6 +68,7 @@ export function createLearningPane(services: LearningPaneServices) {
   let assistantView = restored.assistantView;
   let assistant = restored.assistant;
   let inquirySource: LearningSource | null = null;
+  let diaryAttempt: DiaryAttempt | null = null;
   let notePreview = restored.notePreview;
   let companionStatus: CompanionStatus | null = null;
   let connected = false;
@@ -75,6 +84,14 @@ export function createLearningPane(services: LearningPaneServices) {
   }
   function readingSource() {
     return inquirySource ?? assistant?.source ?? pageSource();
+  }
+  function hasDiaryAttempt() {
+    return Boolean(
+      diaryAttempt &&
+      inquirySource &&
+      new URL(inquirySource.url).pathname === diaryAttempt.path &&
+      inquirySource.anchor === diaryAttempt.anchor,
+    );
   }
   function discussHandoff(value: AssistantHandoff) {
     if (
@@ -194,7 +211,7 @@ export function createLearningPane(services: LearningPaneServices) {
     }
     if (next !== "connect") assistantView = next;
     view = next;
-    if (next === "peers" && connected)
+    if (next === "peers" && connected && !hasDiaryAttempt())
       void run(async () => {
         await services.refresh(true);
         if (view === "peers") render();
@@ -228,7 +245,24 @@ export function createLearningPane(services: LearningPaneServices) {
       ),
     );
     updateAssistantRecords = undefined;
-    if (!connected && view !== "connect") {
+    if (
+      (view === "peers" || (view === "connect" && assistantView === "peers")) &&
+      !hasDiaryAttempt() &&
+      new URLSearchParams(location.search).get("diaryReturn") === "1"
+    ) {
+      container.append(
+        node(
+          "p",
+          "Return to the tab you opened from Obsidian and choose Check sign-in again in Account. Your selected writing stays in your diary. If you closed the original tab, select it again in Obsidian and run Use as my initial thinking.",
+        ),
+      );
+      return;
+    }
+    if (
+      !connected &&
+      view !== "connect" &&
+      !(view === "peers" && hasDiaryAttempt())
+    ) {
       container.append(
         node(
           "p",
@@ -253,6 +287,7 @@ export function createLearningPane(services: LearningPaneServices) {
           ? { toolMode: companionStatus.capabilities.tools }
           : {}),
         entries,
+        diaryAttempt: hasDiaryAttempt() ? diaryAttempt : null,
         loadAttempts: async () => {
           await services.refresh(true);
           status.textContent =
@@ -324,6 +359,23 @@ export function createLearningPane(services: LearningPaneServices) {
     );
   }
   function renderConnection() {
+    const viaObsidian =
+      assistantView === "agent" &&
+      new URLSearchParams(location.search).get("diaryTA") === "1";
+    if (viaObsidian && !connected) {
+      container.append(
+        node(
+          "p",
+          "Keep your vault open and use this reading in Chrome on the same computer. Connect to Obsidian and allow local network access if asked. Then paste your reviewed question and choose Send message.",
+        ),
+        button(
+          "Connect to Obsidian",
+          () => connect(obsidianCompanionAddress),
+          "learning-primary",
+        ),
+      );
+      return;
+    }
     const forPeers = assistantView === "peers";
     const needsSetup = !connected || (!forPeers && !companionStatus?.provider);
     container.append(
@@ -365,6 +417,13 @@ export function createLearningPane(services: LearningPaneServices) {
               : "Run setup in your terminal and choose how you want to work. Already set up? Go to step 2.",
         ),
       );
+      if (forPeers && !connected)
+        container.append(
+          node(
+            "p",
+            "Already wrote about this reading in Obsidian? Select your saved words in your diary and run Use as my initial thinking to open peer discussion.",
+          ),
+        );
       if (!forPeers) {
         const choices = node("ul", "", "learning-setup-choices");
         for (const [label, href, detail] of [
@@ -422,11 +481,7 @@ export function createLearningPane(services: LearningPaneServices) {
         field("Companion address", address),
         button(
           "Connect companion",
-          async () => {
-            await client.connect(address.value);
-            await services.refresh(assistantView === "peers");
-            status.textContent = "Connected to your local companion.";
-          },
+          () => connect(address.value),
           "learning-primary",
         ),
       );
@@ -480,6 +535,11 @@ export function createLearningPane(services: LearningPaneServices) {
       );
     }
   }
+  async function connect(address: string) {
+    await client.connect(address);
+    await services.refresh(assistantView === "peers");
+    status.textContent = "Connected to your local companion.";
+  }
   function close() {
     services.close();
   }
@@ -501,10 +561,23 @@ export function createLearningPane(services: LearningPaneServices) {
       if (section === "peers") {
         // The class discussion follows its link even with an unsent assistant
         // question about another reading. Keep that question and source together.
-        inquirySource = linkedInquirySource();
+        const offered = location.hash.includes(diaryAttemptMarker);
+        diaryAttempt = readDiaryAttempt();
+        if (offered)
+          status.textContent = diaryAttempt
+            ? ""
+            : "This diary handoff could not be matched to the reading. Reopen your selected writing in Obsidian and check its book link.";
+        inquirySource = linkedInquirySource(diaryAttempt?.anchor);
         assistantView = "peers";
         view = "peers";
       } else if (section === "agent") {
+        if (
+          new URLSearchParams(location.search).get("diaryTA") === "1" &&
+          client.base !== obsidianCompanionAddress
+        ) {
+          client.setBase(obsidianCompanionAddress);
+          setConnected(false);
+        }
         const reading = pageSource(selection);
         if (
           assistant?.source.url !== reading.url ||
@@ -519,11 +592,15 @@ export function createLearningPane(services: LearningPaneServices) {
           question: "",
         });
       // The coordinator already checked the shared connection during restore.
-      if (!resume && client.token && !connected)
-        await services.refresh(assistantView === "peers");
-      else if (connected && assistantView === "peers")
-        await services.refresh(true);
-      view = connected ? assistantView : "connect";
+      if (assistantView === "peers" && hasDiaryAttempt()) {
+        view = "peers";
+      } else {
+        if (!resume && client.token && !connected)
+          await services.refresh(assistantView === "peers");
+        else if (connected && assistantView === "peers")
+          await services.refresh(true);
+        view = connected ? assistantView : "connect";
+      }
       render();
       updateSelection();
     });
@@ -533,7 +610,11 @@ export function createLearningPane(services: LearningPaneServices) {
     connected = snapshot.connected;
     companionStatus = snapshot.companionStatus;
     entries.splice(0, entries.length, ...snapshot.entries);
-    if (connectionChanged) view = connected ? assistantView : "connect";
+    if (connectionChanged)
+      view =
+        connected || (assistantView === "peers" && hasDiaryAttempt())
+          ? assistantView
+          : "connect";
     updateSelection();
     if (!panel.hidden && (connectionChanged || view === "connect")) render();
     else updateAssistantRecords?.();

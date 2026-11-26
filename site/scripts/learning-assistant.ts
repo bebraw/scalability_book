@@ -14,6 +14,7 @@ import { pageSource } from "./learning-context.ts";
 import { mountLearningAgent } from "./learning-agent-ui.ts";
 import { mountLearningPeers } from "./learning-peers.ts";
 import type { GuideSave } from "./learning-practice.ts";
+import type { DiaryAttempt } from "./learning-diary-attempt.ts";
 
 interface Options {
   client: LearningClient;
@@ -21,6 +22,7 @@ interface Options {
   connect: () => void;
   toolMode?: "none" | "native";
   entries: NotebookEntry[];
+  diaryAttempt: DiaryAttempt | null;
   loadAttempts: () => Promise<void>;
   draft: AssistantDraft;
   preview: () => DiaryExchangePreview | null;
@@ -94,6 +96,7 @@ export function mountLearningAssistant(
     mountLearningPeers(container, {
       source: options.source(),
       entries: options.entries,
+      diaryAttempt: options.diaryAttempt,
       save: options.save,
       notes: options.notes,
       status: options.status,

@@ -1,12 +1,248 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createRequire, isBuiltin } from "node:module";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 import { webcrypto } from "node:crypto";
+import * as http from "node:http";
+import { once } from "node:events";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
+import { buildCourseDiaryPlugin } from "../scripts/lib/course-diary-download.ts";
+import {
+  obsidianCompanionAddress,
+  obsidianCompanionPort,
+} from "../shared/learning-connection.ts";
+import { teachingPolicyIdentity } from "../shared/learning-agent.ts";
+
+const previewOrigin =
+  "https://class-pilot-scalability-book.survivejs.workers.dev";
+const source = await buildCourseDiaryPlugin(process.cwd(), previewOrigin);
+const loadBuiltin = createRequire(import.meta.url);
+
+test("the distributed desktop plugin connects a reviewed reading and retains a first TA reply in private storage", async (t) => {
+  const home = await mkdtemp(path.join(tmpdir(), "obsidian-ta-"));
+  const model = "synthetic-course-model";
+  const key = "synthetic-course-key";
+  const reply = "Which offered requests were still waiting at the end?";
+  const calls: { url: string; auth?: string; body: string }[] = [];
+  let delayDiscovery: (() => void) | undefined;
+  const provider = http.createServer(async (req, res) => {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    calls.push({
+      url: req.url!,
+      auth: req.headers.authorization,
+      body: Buffer.concat(chunks).toString(),
+    });
+    if (delayDiscovery && req.url === "/v1/models") {
+      delayDiscovery();
+      return;
+    }
+    res.setHeader("Content-Type", "application/json");
+    res.end(
+      JSON.stringify(
+        req.url === "/v1/models"
+          ? { data: [{ id: model }] }
+          : {
+              model,
+              choices: [
+                {
+                  finish_reason: "stop",
+                  message: { role: "assistant", content: reply },
+                },
+              ],
+            },
+      ),
+    );
+  });
+  provider.listen(0, "127.0.0.1");
+  await once(provider, "listening");
+  const address = provider.address();
+  assert.ok(address && typeof address === "object");
+  const h = diary({
+    desktop: { home, provider: new URL("http://127.0.0.1:" + address.port) },
+  });
+  async function stop() {
+    const before = h.notices.length;
+    if (h.run("stop-obsidian-ta")) {
+      const deadline = Date.now() + 2000;
+      while (!h.notices.slice(before).includes("Obsidian TA stopped.")) {
+        assert.ok(
+          Date.now() < deadline,
+          "Timed out stopping the plugin's companion",
+        );
+        await delay(10);
+      }
+    }
+  }
+  t.after(async () => {
+    await stop();
+    h.unload();
+    await new Promise<void>((resolve) => provider.close(() => resolve()));
+    await rm(home, { recursive: true, force: true });
+  });
+  const question = "Which requests should I count?";
+  const privateText = "Unselected private details about the team.";
+  const reading = "/chapters/benchmarking/";
+  h.webViewer(previewOrigin + reading);
+  h.select(
+    "02-Challenge.md",
+    question,
+    "> " +
+      question +
+      "\n\n[Book source](https://scalableweb.dev" +
+      reading +
+      "#which-requests-counted)\n\n" +
+      privateText,
+  );
+  await h.run("discuss");
+  h.ui.get("textarea").value = question;
+  await h.click("Use Obsidian TA");
+  h.inputs.get("OpenAI model")!.value = model;
+  h.inputs.get("OpenAI API key")!.value = key;
+  await h.click("Start TA and open reading");
+  assert.deepEqual(
+    h.external,
+    [previewOrigin + reading + "?assistant=1&diaryTA=1#which-requests-counted"],
+    h.notices.join("\n"),
+  );
+  assert.equal(h.clipboard, question);
+  assert.deepEqual(Object.entries(h.settings), [["taModel", model]]);
+  assert.deepEqual([...h.secrets.values()], [key]);
+  assert.deepEqual(
+    calls.map((call) => call.url),
+    ["/v1/models"],
+  );
+  let token = "";
+  async function call(endpoint: string, body?: object, origin = previewOrigin) {
+    return new Promise<Response>((resolve, reject) => {
+      const req = http.request(
+        obsidianCompanionAddress + endpoint,
+        {
+          port: h.port,
+          method: body ? "POST" : "GET",
+          headers: {
+            Host: new URL(obsidianCompanionAddress).host,
+            Origin: origin,
+            ...(body ? { "Content-Type": "application/json" } : {}),
+            ...(token ? { Authorization: "Bearer " + token } : {}),
+          },
+        },
+        async (res) => {
+          const chunks = [];
+          for await (const chunk of res) chunks.push(chunk);
+          resolve(
+            new Response(Buffer.concat(chunks).toString(), {
+              status: res.statusCode,
+            }),
+          );
+        },
+      );
+      req.once("error", reject);
+      req.end(body ? JSON.stringify(body) : undefined);
+    });
+  }
+  assert.equal(
+    (await call("/connect", {}, "https://scalableweb.dev")).status,
+    403,
+  );
+  token = (await (await call("/connect", {})).json()).token;
+  assert.ok(token);
+  const status = await (await call("/status")).json();
+  assert.equal(status.provider, "OpenAI API");
+  assert.deepEqual(status.teaching.policy, teachingPolicyIdentity);
+  assert.ok(status.storage.startsWith(home + path.sep));
+  const start = await call("/agent/conversations", {
+    source: {
+      url: previewOrigin + reading,
+      kind: "page",
+      title: "Synthetic reading",
+      anchor: "",
+      excerpt: "",
+      revision: null,
+      conceptIds: [],
+    },
+  });
+  const conversation = await start.json();
+  assert.equal(start.status, 201, JSON.stringify(conversation));
+  const endpoint = "/agent/conversations/" + conversation.id;
+  const sent = await call(endpoint, {
+    text: h.clipboard,
+    mode: "explanation",
+    noteIds: [],
+    browserId: webcrypto.randomUUID(),
+  });
+  assert.equal(sent.status, 202, await sent.text());
+  const deadline = Date.now() + 3000;
+  for (;;) {
+    const updated = await (await call(endpoint)).json();
+    if (updated.state === "idle") {
+      assert.equal(
+        updated.messages.at(-1).text,
+        reply,
+        JSON.stringify(updated),
+      );
+      break;
+    }
+    assert.ok(Date.now() < deadline, JSON.stringify(updated));
+    await delay(20);
+  }
+  assert.deepEqual(
+    calls.map((call) => call.url),
+    ["/v1/models", "/v1/chat/completions"],
+  );
+  for (const call of calls) assert.equal(call.auth, "Bearer " + key);
+  const payload = JSON.parse(calls[1]!.body);
+  assert.equal(payload.model, model);
+  assert.ok(calls[1]!.body.includes(question));
+  assert.ok(calls[1]!.body.includes("Distinguish authored claims"));
+  for (const text of [key, privateText])
+    assert.ok(!calls[1]!.body.includes(text));
+  await stop();
+  assert.equal(h.run("stop-obsidian-ta"), false);
+  await h.run("discuss");
+  await h.click("Use Obsidian TA");
+  assert.equal(h.inputs.get("OpenAI model")!.value, model);
+  h.inputs.get("OpenAI API key")!.value = "";
+  await h.click("Start TA and open reading");
+  token = (await (await call("/connect", {})).json()).token;
+  assert.equal(
+    (await (await call(endpoint)).json()).messages.at(-1).text,
+    reply,
+  );
+  await stop();
+
+  // Unloading while the provider is still checking this account must release
+  // the lock, discard pending settings and leave the reading closed.
+  await h.run("discuss");
+  await h.click("Use Obsidian TA");
+  h.inputs.get("OpenAI model")!.value = "pending-model";
+  h.inputs.get("OpenAI API key")!.value = "pending-key";
+  const discovering = new Promise<void>((resolve) => {
+    delayDiscovery = resolve;
+  });
+  const opening = h.click("Start TA and open reading");
+  await discovering;
+  h.unload();
+  await opening;
+  assert.equal(h.external.length, 2);
+  assert.deepEqual(Object.entries(h.settings), [["taModel", model]]);
+  assert.deepEqual([...h.secrets.values()], [key]);
+  assert.equal(h.run("stop-obsidian-ta"), false);
+});
 
 // Obsidian supplies its CommonJS API at runtime. Run its shipping entry point
 // against an in-memory vault so these tests cannot touch someone's notes.
-function diary({ deniedClipboardReads = 0 } = {}) {
+function diary({
+  deniedClipboardReads = 0,
+  desktop = undefined,
+}: {
+  deniedClipboardReads?: number;
+  desktop?: { home: string; provider: URL };
+} = {}) {
   const notices: string[] = [];
   const links: string[] = [];
   const external: string[] = [];
@@ -14,12 +250,19 @@ function diary({ deniedClipboardReads = 0 } = {}) {
   const files = new Map<string, TFile>();
   const commands = new Map();
   const layoutChanges = new Set<() => void>();
+  const editorMenus = new Set<
+    (menu: unknown, editor: Editor, view: MarkdownView) => void
+  >();
   const cleanups: (() => void)[] = [];
   const protocols = new Map<
     string,
     (params: Record<string, string>) => Promise<void>
   >();
   const ui = new Map();
+  const inputs = new Map<string, { value?: string }>();
+  const secrets = new Map<string, string>();
+  let settings = {};
+  let port = 0;
   let modal: Modal;
   let active: MarkdownView;
   let clipboard = "";
@@ -33,14 +276,21 @@ function diary({ deniedClipboardReads = 0 } = {}) {
       createEl: (tag: string, options: { text?: string } = {}) => {
         const node = {
           ...options,
-          createEl: this.contentEl.createEl,
+          createEl: (child: string, attributes?: { text?: string }) => {
+            const result = this.contentEl.createEl(child, attributes);
+            if (tag === "label" && child === "input" && options.text)
+              inputs.set(options.text, result);
+            return result;
+          },
           addEventListener: (_name: string, action: () => void) =>
             ui.set(options.text, action),
         };
         ui.set(tag, node);
         return node;
       },
-      empty: () => ui.clear(),
+      empty: () => {
+        if (modal === this) ui.clear();
+      },
     };
     open() {
       modal = this;
@@ -62,6 +312,14 @@ function diary({ deniedClipboardReads = 0 } = {}) {
     }
   }
   class Plugin {
+    manifest = { version: "test" };
+    loadData() {
+      return Promise.resolve(settings);
+    }
+    saveData(value: object) {
+      settings = value;
+      return Promise.resolve();
+    }
     register(cleanup: () => void) {
       cleanups.push(cleanup);
     }
@@ -110,7 +368,17 @@ function diary({ deniedClipboardReads = 0 } = {}) {
   }
   const leaves: object[] = [];
   const app = {
+    secretStorage: {
+      getSecret: (key: string) => secrets.get(key),
+      setSecret: (key: string, value: string) => secrets.set(key, value),
+    },
     vault: {
+      adapter: {
+        getBasePath: () => {
+          assert.ok(desktop);
+          return desktop.home;
+        },
+      },
       getAbstractFileByPath: (path: string) => files.get(path),
       read: async (file: TFile) => file.text,
       process: async (file: TFile, edit: (text: string) => string) => {
@@ -125,6 +393,10 @@ function diary({ deniedClipboardReads = 0 } = {}) {
     },
     workspace: {
       on: (event: string, handle: () => void) => {
+        if (event === "editor-menu") {
+          editorMenus.add(handle);
+          return () => editorMenus.delete(handle);
+        }
         assert.equal(event, "layout-change");
         layoutChanges.add(handle);
         return () => layoutChanges.delete(handle);
@@ -168,14 +440,74 @@ function diary({ deniedClipboardReads = 0 } = {}) {
   };
   const module: { exports?: new () => { app: typeof app; onload(): void } } =
     {};
-  const source = readFileSync("packages/obsidian-course-diary/main.js", "utf8");
   runInNewContext(source, {
     module,
     URL,
     TextEncoder,
+    process: Object.assign(Object.create(process), {
+      env: {
+        ...process.env,
+        XDG_DATA_HOME: desktop?.home,
+        LOCALAPPDATA: desktop?.home,
+      },
+    }),
+    Headers,
+    Response,
+    Request,
+    ReadableStream,
+    AbortController,
+    AbortSignal,
+    Buffer,
+    Uint8Array,
+    setTimeout,
+    clearTimeout,
+    structuredClone,
     crypto: webcrypto,
     require: (name: string) => {
       if (name === "obsidian") return obsidian;
+      if (name === "node:os" && desktop)
+        return { ...loadBuiltin(name), homedir: () => desktop.home };
+      if (name === "node:http" && desktop)
+        return {
+          ...http,
+          // Run the shipped host on an ephemeral socket during tests so a real
+          // Obsidian vault can keep its own listener and data directory.
+          createServer: (handler: http.RequestListener) => {
+            const server = http.createServer(handler);
+            const listen = server.listen.bind(server);
+            server.listen = ((requested: number, host: string) => {
+              assert.equal(requested, obsidianCompanionPort);
+              assert.equal(host, "127.0.0.1");
+              server.once("listening", () => {
+                const address = server.address();
+                assert.ok(address && typeof address === "object");
+                port = address.port;
+              });
+              return listen(0, host);
+            }) as typeof server.listen;
+            return server;
+          },
+        };
+      if (name === "node:https")
+        return {
+          request: (
+            url: URL,
+            options: http.RequestOptions,
+            callback: (res: http.IncomingMessage) => void,
+          ) => {
+            assert.ok(desktop);
+            assert.equal(url.origin, "https://api.openai.com");
+            assert.ok(
+              ["/v1/models", "/v1/chat/completions"].includes(url.pathname),
+            );
+            return http.request(
+              new URL(url.pathname, desktop.provider),
+              options,
+              callback,
+            );
+          },
+        };
+      if (isBuiltin(name)) return loadBuiltin(name);
       assert.equal(name, "electron");
       return {
         shell: {
@@ -212,6 +544,14 @@ function diary({ deniedClipboardReads = 0 } = {}) {
   }
   return {
     files,
+    get port() {
+      return port;
+    },
+    inputs,
+    secrets,
+    get settings() {
+      return settings;
+    },
     notices,
     links,
     external,
@@ -242,6 +582,8 @@ function diary({ deniedClipboardReads = 0 } = {}) {
       };
       let listener: ((event: Navigation) => Promise<void> | void) | undefined;
       const containerEl = {
+        querySelector: (tag: string) =>
+          tag === "webview" ? { getURL: () => current } : null,
         addEventListener(
           name: string,
           handle: typeof listener,
@@ -275,9 +617,33 @@ function diary({ deniedClipboardReads = 0 } = {}) {
     },
     run: (id: string) => {
       const command = commands.get(id);
+      if (command.checkCallback) return command.checkCallback(false);
       return command.callback
         ? command.callback()
         : command.editorCallback(active.editor, active);
+    },
+    editorMenu() {
+      const actions = new Map<string, () => Promise<void>>();
+      const menu = {
+        addItem(build: (item: typeof menuItem) => void) {
+          build(menuItem);
+        },
+      };
+      const menuItem = {
+        title: "",
+        setTitle(title: string) {
+          this.title = title;
+          return this;
+        },
+        setIcon() {
+          return this;
+        },
+        onClick(action: () => Promise<void>) {
+          actions.set(this.title, action);
+        },
+      };
+      editorMenus.forEach((handler) => handler(menu, active.editor, active));
+      return actions;
     },
     selectLecture: (number: number) => {
       assert.ok(modal instanceof FuzzySuggestModal);
@@ -451,7 +817,9 @@ test("TA handoff copies only the reviewed selection and opens a public reading i
     "Confidential peer feedback.\n" + selection,
   );
   h.clipboard = "existing clipboard";
-  await h.run("discuss");
+  const discuss = h.editorMenu().get("Discuss with the course TA");
+  assert.ok(discuss);
+  await discuss();
   assert.equal(h.clipboard, "existing clipboard");
   assert.equal(h.ui.get("textarea").value.trim(), selection);
   h.ui.get("textarea").value = "Which measurements cover cold requests?";
@@ -506,4 +874,135 @@ test("discussing words inside a pasted book quote opens that passage's source", 
   assert.deepEqual(h.splits, [
     "https://scalableweb.dev/chapters/benchmarking/?assistant=1#which-requests-counted",
   ]);
+});
+
+test("a saved diary selection opens the reviewed paragraph with only opaque attempt references", async () => {
+  const h = diary();
+  const file = h.files.get("02-Challenge.md")!;
+  const thought = "I expect the queue to drain more slowly.";
+  const paragraph =
+    "https://scalableweb.dev/chapters/benchmarking/#p-count-all-requests";
+  const editor = h.select(
+    file.path,
+    thought,
+    "> Count all offered requests.\n\n[Book source](" +
+      paragraph +
+      ")\n\n" +
+      thought +
+      "\n\nA confidential observation about my team.",
+  );
+  h.clipboard = "existing clipboard";
+  const action = h.editorMenu().get("Use as my initial thinking");
+  assert.ok(action);
+  await action();
+  assert.equal(h.ui.get("blockquote").text, thought);
+  assert.equal(h.ui.get("input").value, paragraph);
+  assert.deepEqual(h.external, []);
+  await h.click("Open class discussion");
+  assert.match(h.notices.at(-1)!, /Save this note/);
+  assert.deepEqual(h.external, []);
+
+  // The editor normalizes newlines; the original file can have CRLF.
+  file.text = editor.getValue().replaceAll("\n", "\r\n");
+  await h.click("Open class discussion");
+  assert.equal(h.clipboard, "existing clipboard");
+  assert.equal(h.external.length, 1);
+  const destination = new URL(h.external[0]!);
+  const [anchor, references] = destination.hash.split("&diaryAttempt=");
+  assert.equal(destination.search, "?inquiry=1");
+  assert.equal(destination.origin + destination.pathname + anchor, paragraph);
+  const ids = references!.split(".");
+  assert.equal(ids.length, 2);
+  assert.notEqual(ids[0], ids[1]);
+  for (const id of ids)
+    assert.match(
+      id,
+      /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,
+    );
+});
+
+test("peer handoff validates the edited source and rechecks the saved passage at confirmation", async () => {
+  const h = diary();
+  const file = h.files.get("01-Establish.md")!;
+  const thought = "I counted requests that timed out.";
+  const editor = h.select(file.path, thought, thought);
+  file.text = editor.getValue();
+  await h.run("initial-thinking");
+  const address = h.ui.get("input");
+  for (const invalid of [
+    "https://scalableweb.dev/course/private-assessment/",
+    "https://scalableweb.dev/chapters/unknown/",
+    "https://scalableweb.dev/chapters/benchmarking/?private=info",
+    "https://scalableweb.dev/chapters/benchmarking/#p-a&diaryAttempt=x.y",
+    "https://student:secret@scalableweb.dev/chapters/benchmarking/",
+    "https://some-other-worker.survivejs.workers.dev/chapters/benchmarking/",
+    "https://another-branch-scalability-book.survivejs.workers.dev/chapters/benchmarking/",
+    "https://scalableweb.dev.example/chapters/benchmarking/",
+  ]) {
+    address.value = invalid;
+    await h.click("Open class discussion");
+    assert.match(h.notices.at(-1)!, /published course reading URL/);
+    assert.deepEqual(h.external, []);
+  }
+  address.value = "http://127.0.0.1:3000/chapters/benchmarking/";
+  editor.replaceRange("I revised this before confirming.\n", 0);
+  await h.click("Open class discussion");
+  assert.match(h.notices.at(-1)!, /note changed/);
+  assert.deepEqual(h.external, []);
+});
+
+test("the peer handoff accepts reviewed page links and paragraph links on course previews", async () => {
+  const h = diary();
+  const file = h.files.get("03-Compare.md")!;
+  const thought = "Cold starts might change this result.";
+  for (const source of [
+    "http://localhost:3000/chapters/scaling/",
+    previewOrigin + "/chapters/scaling/?inquiry=1#p-compare",
+  ]) {
+    const editor = h.select(file.path, thought, thought);
+    file.text = editor.getValue();
+    await h.run("initial-thinking");
+    h.ui.get("input").value = source;
+    await h.click("Open class discussion");
+    const opened = new URL(h.external.at(-1)!);
+    const chosen = new URL(source);
+    assert.equal(
+      opened.origin + opened.pathname,
+      chosen.origin + chosen.pathname,
+    );
+    assert.equal(
+      opened.hash.slice(1).split("&diaryAttempt=")[0],
+      chosen.hash.slice(1),
+    );
+  }
+});
+
+test("the diary suggests the open book's origin only for an unambiguous matching reading", async () => {
+  const h = diary();
+  const file = h.files.get("01-Establish.md")!;
+  const thought = "An offered request can time out.";
+  const reading = "/chapters/benchmarking/";
+  const anchor = "#p-requests";
+  const canonical = "https://scalableweb.dev" + reading + anchor;
+  h.select(
+    file.path,
+    thought,
+    "[Book source](" + canonical + ")\n\n" + thought,
+  );
+  h.webViewer("https://elsewhere.test" + reading);
+  h.webViewer(previewOrigin + "/chapters/scaling/");
+  await h.run("initial-thinking");
+  assert.equal(h.ui.get("input").value, canonical);
+  const preview = h.webViewer(
+    previewOrigin + reading + "?private=skip#unrelated",
+  );
+  await h.run("initial-thinking");
+  assert.equal(h.ui.get("input").value, previewOrigin + reading + anchor);
+  const local = "http://localhost:3000";
+  h.webViewer(local + reading);
+  await h.run("initial-thinking");
+  assert.equal(h.ui.get("input").value, canonical);
+  preview.close();
+  await h.run("initial-thinking");
+  assert.equal(h.ui.get("input").value, local + reading + anchor);
 });

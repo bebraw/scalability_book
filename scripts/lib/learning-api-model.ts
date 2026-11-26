@@ -11,6 +11,10 @@ export interface ApiModelOptions {
   contextWindow: number;
   outputTokens?: number;
 }
+export type ApiTransport = (
+  url: string,
+  init: RequestInit,
+) => Promise<Response>;
 export const presetUrls = {
   openai: "https://api.openai.com/v1",
   anthropic: "https://api.anthropic.com/v1",
@@ -139,7 +143,11 @@ export async function apiModelJson(
   signal: AbortSignal,
   body?: unknown,
   maximum = 512_000,
-  request: { anthropic?: boolean; afterId?: string } = {},
+  request: {
+    anthropic?: boolean;
+    afterId?: string;
+    transport?: ApiTransport;
+  } = {},
 ): Promise<Record<string, unknown>> {
   apiModelUrl(url);
   validateApiKey(apiKey);
@@ -147,7 +155,7 @@ export async function apiModelJson(
   if (request.afterId) endpoint.searchParams.set("after_id", request.afterId);
   let response: Response;
   try {
-    response = await fetch(endpoint.href, {
+    response = await (request.transport ?? fetch)(endpoint.href, {
       redirect: "error",
       signal,
       headers: {
@@ -221,6 +229,7 @@ export async function apiModelJson(
 export async function listApiModels(
   options: Pick<ApiModelOptions, "provider" | "url">,
   apiKey: string,
+  transport?: ApiTransport,
 ): Promise<string[]> {
   const url = validateApiEndpoint(options);
   const signal = AbortSignal.timeout(15_000);
@@ -237,6 +246,7 @@ export async function listApiModels(
       8_000_000,
       {
         anthropic: options.provider === "anthropic",
+        ...(transport ? { transport } : {}),
         ...(afterId ? { afterId } : {}),
       },
     );
@@ -282,9 +292,10 @@ export async function listApiModels(
 export async function inspectApiModel(
   options: ApiModelOptions,
   apiKey: string,
+  transport?: ApiTransport,
 ) {
   validateApiModelOptions(options);
-  const models = await listApiModels(options, apiKey);
+  const models = await listApiModels(options, apiKey, transport);
   learningAssert(
     models.includes(options.model),
     "The selected API model is not listed. Check its exact identifier and account access; no model was selected for you.",

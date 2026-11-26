@@ -109,7 +109,8 @@ Open the comment control beside a chapter paragraph.
 You can read any featured Reader note there before signing in.
 
 - To read and reply to classmates, choose **Discuss with classmates**.
-  Sign in to your course, save your initial thinking for the passage in the companion, then choose **Reveal peer inquiry** to see threads shared with your group or cohort.
+  Sign in to your course and choose **Reveal peer inquiry** after saving your initial thinking for the passage.
+  You can use a saved diary selection from Obsidian or an attempt in the companion. [Course diary guide](course-diary.md#bring-a-passage-into-your-diary)
 - To send private feedback to the book team, choose **Sign in to comment** if signed out.
   Obsidian’s Web viewer opens the same paragraph in your default browser.
   Choose **Sign in with GitHub** to return to its comment form.

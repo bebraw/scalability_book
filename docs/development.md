@@ -258,8 +258,13 @@ Check that Obsidian offers a lecture, previews the quote and saves it only after
 Use synthetic writing.
 Check that the selected passage reopens its book section and that the portfolio draft contains only the chosen excerpt.
 The [student guide](course-diary.md) describes each action.
-The build reads the five numbered notes from `docs/diary-pilot/` and the plugin from `packages/obsidian-course-diary/`.
-Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records ownership and recovery.
+The build reads the five numbered notes from `docs/diary-pilot/` and bundles `packages/obsidian-course-diary/main.js` and its local dependencies as one CommonJS entry point.
+It puts identical plugin files into the starter and the versioned plugin-only ZIP linked from the diary guide.
+To rehearse an update, install the two files from the plugin ZIP into the existing plugin folder of a synthetic vault.
+Check that the earlier notes, plugin settings and TA history are available after reload.
+The plugin in a branch build can recognize that branch’s own Cloudflare alias when the matching reading is open in Web viewer.
+The book review URL appears in the plugin before the local TA starts.
+Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records diary ownership and recovery, and [ADR-067](adrs/implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md) covers the optional plugin runtime and peer handoff.
 
 ### Setup guide layout
 

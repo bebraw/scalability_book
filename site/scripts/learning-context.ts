@@ -12,9 +12,12 @@ function textOf(element: Element): string {
     control.remove();
   return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
 }
-export function linkedInquirySource(): LearningSource {
-  const target = document.getElementById(location.hash.slice(1));
-  if (target && target.dataset.commentTarget === target.id)
+export function linkedInquirySource(diaryAnchor?: string): LearningSource {
+  const target = document.getElementById(diaryAnchor ?? location.hash.slice(1));
+  if (
+    target &&
+    (target.dataset.commentTarget === target.id || diaryAnchor !== undefined)
+  )
     return pageSource({
       anchor: target.id,
       text: textOf(target).slice(0, 12_000),

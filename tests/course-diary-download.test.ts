@@ -4,15 +4,15 @@ import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { writeCourseDiaryDownload } from "../scripts/lib/course-diary-download.ts";
+import { writeCourseDiaryDownloads } from "../scripts/lib/course-diary-download.ts";
 
 test("the starter opens as one portable vault with all nine lectures and the course plugin disabled", async (t) => {
   const tmp = await mkdtemp(path.join(tmpdir(), "course-diary-"));
   t.after(() => rm(tmp, { recursive: true, force: true }));
   const archive = path.join(tmp, "downloads/course-diary.zip");
-  await writeCourseDiaryDownload(process.cwd(), archive);
+  await writeCourseDiaryDownloads(process.cwd(), path.dirname(archive));
   const bytes = await readFile(archive);
-  await writeCourseDiaryDownload(process.cwd(), archive);
+  await writeCourseDiaryDownloads(process.cwd(), path.dirname(archive));
   assert.deepEqual(await readFile(archive), bytes);
 
   const unpacked = path.join(tmp, "unpacked");
@@ -47,8 +47,30 @@ test("the starter opens as one portable vault with all nine lectures and the cou
     "main.js",
     "manifest.json",
   ]);
-  assert.equal(
-    JSON.parse(await readFile(path.join(plugin, "manifest.json"), "utf8")).id,
-    path.basename(plugin),
+  const manifest = JSON.parse(
+    await readFile(path.join(plugin, "manifest.json"), "utf8"),
+  );
+  assert.equal(manifest.id, path.basename(plugin));
+  const update = path.join(tmp, "update");
+  execFileSync("unzip", [
+    "-q",
+    path.join(tmp, "downloads", `course-diary-plugin-${manifest.version}.zip`),
+    "-d",
+    update,
+  ]);
+  assert.deepEqual((await readdir(update)).sort(), [
+    "main.js",
+    "manifest.json",
+  ]);
+  for (const file of ["main.js", "manifest.json"])
+    assert.deepEqual(
+      await readFile(path.join(update, file)),
+      await readFile(path.join(plugin, file)),
+    );
+  assert.ok(
+    (await readFile("docs/course-diary.md", "utf8")).includes(
+      `(/downloads/course-diary-plugin-${manifest.version}.zip)`,
+    ),
+    "Existing vault users can download the matching update from the guide.",
   );
 });

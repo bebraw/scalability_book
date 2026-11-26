@@ -702,7 +702,9 @@ Stop that Worker afterwards.
 Students enter book inquiry through **Discuss with classmates** at a book paragraph or through **Teaching assistant → Peer discussion**.
 Access uses this workspace's course identity and published phase allocations.
 [The learning-workspace guide](learning-workspace.md#peer-inquiry-contract) owns attempt-first disclosure, group/cohort scope, membership corrections, moderation and consented editorial offers.
-Private initial notes stay in the student's companion; shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
+Private initial notes stay in the student's vault or companion.
+The course records the student’s declaration for that reading or activity.
+Shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
 Optional reasoning outlines, role-rotation cues and reviewed summaries reuse the existing inquiry contribution and provenance contract.
 Students select which visible contributions enter a draft; summaries preserve named contributors, disagreement and evidence limitations and require the ordinary sharing action.
 Each learner can return to a separately saved private takeaway or changed case without waiting for absent members.

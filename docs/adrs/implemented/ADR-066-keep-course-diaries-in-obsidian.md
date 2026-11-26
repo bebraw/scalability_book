@@ -24,7 +24,8 @@ Use the clipboard for the quote and its source, with an Obsidian URI in the brow
 Offer a bundled desktop plugin for choosing a lecture, appending a reviewed highlight, opening the existing TA beside a note and preparing a local portfolio excerpt.
 The course site receives only what the student transfers there.
 
-Keep provider setup, model requests and conversation history in the existing companion.
+Originally, provider setup, model requests and conversation history required the standalone companion.
+[ADR-067](ADR-067-use-the-diary-plugin-for-course-discussion.md) supersedes that installation choice for the optional desktop plugin.
 The plugin opens a public reading and puts the student's reviewed draft on the clipboard.
 A student chooses whether to paste and send.
 The desktop Web viewer can display the reading beside the diary.

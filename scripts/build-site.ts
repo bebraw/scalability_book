@@ -53,7 +53,7 @@ import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
-import { writeCourseDiaryDownload } from "./lib/course-diary-download.ts";
+import { writeCourseDiaryDownloads } from "./lib/course-diary-download.ts";
 import { writeProjectStarterDownload } from "./lib/project-starter-download.ts";
 import { getBrowserBuildTargets } from "./lib/browser-targets.ts";
 import {
@@ -724,10 +724,7 @@ await writePage(
   JSON.stringify(exportBookPassages(publicPassages)) + "\n",
 );
 await writeLabDownloads();
-await writeCourseDiaryDownload(
-  root,
-  path.join(buildDir, "downloads/course-diary.zip"),
-);
+await writeCourseDiaryDownloads(root, path.join(buildDir, "downloads"));
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 await buildStudy(root, path.join(buildDir, "learn/pilot"));

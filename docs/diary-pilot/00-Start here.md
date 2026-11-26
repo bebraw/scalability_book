@@ -50,10 +50,16 @@ The course accepts written, audio and video diaries. [Diary and participation cr
 
 ## Ask the course TA
 
-When you want a hint or a check on your reasoning, copy the part of your entry you want to discuss.
-For a TA conversation, copy the lecture’s reading URL into Chrome on the computer running your configured companion.
-Choose **Teaching assistant → Discuss**, check the reading, then paste the excerpt and add your question.
-For example, “What observation would challenge my explanation?” Choose **Send message** when you are ready. [Discuss a question with the TA](https://scalableweb.dev/diary/#discuss-a-question-with-the-ta)
+When you want a hint or a check on your reasoning, select the part of your entry you want to discuss.
+With the course plugin, right-click the selection, choose **Discuss with the course TA** and review your question.
+For example, “What observation would challenge my explanation?”
+Choose **Use Obsidian TA** if you want to use your OpenAI API account from this computer.
+You can also open the book with an existing companion.
+In the book, review the excerpt and choose **Send message** when you are ready. [TA setup and other providers](https://scalableweb.dev/diary/#discuss-a-question-with-the-ta)
 
 Back in your diary, add what you now think or what you still want to check.
 If you keep wording from the assistant, identify it as such.
+
+To talk with classmates, select your saved initial thinking and choose **Use as my initial thinking** from the right-click menu.
+Review the book passage before opening the class discussion.
+You can write a separate question or reply for your group once you are there.
