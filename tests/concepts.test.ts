@@ -9,8 +9,11 @@ import {
   layoutNeighborhood,
   layoutEdgeLabels,
   layoutLabeledOverview,
+  labeledOverviewScale,
+  scaleOverviewRoute,
   neighborhood,
   layoutConnection,
+  type RoutePoint,
 } from "../shared/concept-graph.ts";
 import { layoutOverview } from "../scripts/lib/concept-layout.ts";
 import {
@@ -393,6 +396,133 @@ test("focused connection captions fit without covering concept nodes", () => {
           `${caption.label} covers ${point.id}`,
         );
       }
+    }
+  }
+});
+
+test("each focused relationship has a separate path through its label to its authored endpoints", () => {
+  const bounds = (a: RoutePoint, b: RoutePoint) => ({
+    left: Math.min(a.x, b.x),
+    right: Math.max(a.x, b.x),
+    top: Math.min(a.y, b.y),
+    bottom: Math.max(a.y, b.y),
+  });
+  const box = (center: RoutePoint, width: number, height: number) =>
+    bounds(
+      { x: center.x - width / 2, y: center.y - height / 2 },
+      { x: center.x + width / 2, y: center.y + height / 2 },
+    );
+  const touches = (
+    a: ReturnType<typeof bounds>,
+    b: ReturnType<typeof bounds>,
+  ) =>
+    a.left <= b.right &&
+    b.left <= a.right &&
+    a.top <= b.bottom &&
+    b.top <= a.bottom;
+
+  const views = concepts.map(({ id: focus }) => ({
+    focus,
+    edges: conceptRelationships.filter(
+      ({ source, target }) => source === focus || target === focus,
+    ),
+  }));
+  const dense = {
+    focus: "dense",
+    edges: Array.from({ length: 24 }, (_, i) => ({
+      source: "dense",
+      target: `neighbor-${i}`,
+      label: "connects to",
+    })),
+  };
+  for (const { focus, edges } of [...views, dense]) {
+    const layout = layoutNeighborhood(
+      [...neighborhood(focus, edges)],
+      focus,
+      true,
+    );
+    const captions = layoutEdgeLabels(layout.points, edges, layout, focus);
+    const earlierSegments: ReturnType<typeof bounds>[] = [];
+    for (const caption of captions) {
+      const route = layout.routeFor!(caption)!;
+      const name = `${focus}: ${caption.source} → ${caption.target}`;
+      for (const [tip, id] of [
+        [route[0]!, caption.source],
+        [route.at(-1)!, caption.target],
+      ] as const) {
+        const node = layout.points.find((point) => point.id === id)!;
+        const dx = Math.abs(tip.x - node.x),
+          dy = Math.abs(tip.y - node.y);
+        assert.ok(
+          (dx === 95 && dy <= 30) || (dy === 30 && dx <= 95),
+          `${name} misses ${id}`,
+        );
+      }
+      const segments = route.slice(1).map((b, index) => {
+        const a = route[index]!;
+        assert.ok(a.x === b.x || a.y === b.y, name);
+        return bounds(a, b);
+      });
+      assert.ok(
+        segments.some((segment) => touches(segment, bounds(caption, caption))),
+        `${name} misses label`,
+      );
+      const obstacles = [
+        ...layout.points
+          .filter(({ id }) => id !== caption.source && id !== caption.target)
+          .map((node) => box(node, 190, 60)),
+        ...captions
+          .filter((other) => other !== caption)
+          .map((other) => box(other, other.width, 22)),
+        ...earlierSegments,
+      ];
+      assert.ok(
+        !segments.some((segment) =>
+          obstacles.some((obstacle) => touches(segment, obstacle)),
+        ),
+        `${name} touches another card, label or path`,
+      );
+      earlierSegments.push(...segments);
+    }
+  }
+});
+
+test("labelled overview routes meet their fixed-size cards and keep orthogonal segments", async () => {
+  const overview = await layoutOverview(
+    concepts,
+    conceptRelationships,
+    conceptGroups,
+  );
+  const layout = layoutLabeledOverview(
+    overview.points,
+    overview.width,
+    overview.height,
+  );
+  const nodes = new Map(layout.points.map((point) => [point.id, point]));
+  for (const { source, target, points } of overview.routes) {
+    const start = nodes.get(source)!,
+      end = nodes.get(target)!;
+    const route = scaleOverviewRoute(points, labeledOverviewScale, start, end);
+    for (const [pin, node] of [
+      [route[0]!, start],
+      [route.at(-1)!, end],
+    ] as const) {
+      const x = Math.abs(pin.x - node.x),
+        y = Math.abs(pin.y - node.y);
+      assert.ok(
+        (Math.abs(x - 95) < 0.001 && y <= 30.001) ||
+          (Math.abs(y - 30) < 0.001 && x <= 95.001),
+        `${source} → ${target} is detached from ${node.id}`,
+      );
+    }
+    for (let i = 1; i < route.length; i++) {
+      const a = route[i - 1]!,
+        b = route[i]!;
+      assert.notDeepEqual(a, b, "A zero-length segment has no arrow direction");
+      assert.ok(
+        a.x === b.x || a.y === b.y,
+        `${source} → ${target} has a diagonal segment`,
+      );
     }
   }
 });

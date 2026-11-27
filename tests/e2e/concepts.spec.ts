@@ -655,6 +655,24 @@ test("arrows express qualified relationships and focus reveals labels without ch
   await page.mouse.move(0, 0);
   await expect(map.locator(".concept-edge-label:visible")).toHaveCount(0);
   await map.getByLabel("Focus on").selectOption("latency");
+  const shafts = await map.evaluate(async (element) => {
+    const svg = await (
+      await fetch("/concepts/visuals/graph-latency.svg")
+    ).text();
+    const asset = new DOMParser().parseFromString(svg, "image/svg+xml");
+    const paths = (root: ParentNode) =>
+      Object.fromEntries(
+        [...root.querySelectorAll("[data-concept-edge]:not(.is-hidden)")].map(
+          (edge) => [
+            edge.getAttribute("data-concept-edge"),
+            edge.querySelector("[data-concept-line]")!.getAttribute("d"),
+          ],
+        ),
+      );
+    return { explorer: paths(element), exported: paths(asset) };
+  });
+  expect(Object.keys(shafts.exported)).toHaveLength(7);
+  expect(shafts.explorer).toEqual(shafts.exported);
   await map.getByRole("link", { name: "Explore Latency", exact: true }).click();
   const pane = page.getByRole("dialog", { name: "Latency", exact: true });
   await expect(
@@ -663,15 +681,18 @@ test("arrows express qualified relationships and focus reveals labels without ch
   const edge = pane.locator('[data-concept-edge="queue latency"]');
   expect(
     await edge.evaluate((element) => {
-      const line = element.querySelector("line")!;
+      const line = element.querySelector<SVGGeometryElement>(
+        "[data-concept-line]",
+      )!;
       const destination = element
         .closest("svg")!
         .querySelector(
           '[data-concept-node="latency"] g',
         )! as SVGGraphicsElement;
       const matrix = destination.transform.baseVal.consolidate()!.matrix;
-      const dx = Number(line.getAttribute("x2")) - matrix.e;
-      const dy = Number(line.getAttribute("y2")) - matrix.f;
+      const tip = line.getPointAtLength(line.getTotalLength());
+      const dx = tip.x - matrix.e;
+      const dy = tip.y - matrix.f;
       return Math.abs(dx) > 95 || Math.abs(dy) > 30;
     }),
   ).toBe(true);

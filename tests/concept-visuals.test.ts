@@ -1,16 +1,54 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import sharp from "sharp";
 import { renderConceptGraph } from "../scripts/lib/concept-html.ts";
 import {
   extractConceptMapSvg,
   frameVisual,
   resolveVisualStyles,
+  writeConceptVisuals,
 } from "../scripts/lib/concept-visuals.ts";
 import { graphResources } from "../shared/learning-resources.ts";
 import { concepts } from "../shared/concepts.ts";
 import { conceptRelationships } from "../shared/concept-relationships.ts";
+
+test("published PNGs visibly paint the relationship shafts", async (t) => {
+  const dir = await mkdtemp(path.join(tmpdir(), "book-concept-visuals-"));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  await writeConceptVisuals(process.cwd(), dir);
+
+  for (const id of ["graph-cache", "graph-complete"]) {
+    const base = path.join(dir, "concepts/visuals", id);
+    const svg = await readFile(`${base}.svg`, "utf8");
+    const png = await sharp(`${base}.png`)
+      .removeAlpha()
+      .greyscale()
+      .raw()
+      .toBuffer();
+    // Hide only the shafts. Arrowheads, labels, leaders and boxes still paint,
+    // so none of them can accidentally satisfy the check.
+    for (const direction of ["directed", "undirected"]) {
+      const hidden = svg.replace(
+        "</style>",
+        `[data-direction="${direction}"] [data-concept-line] { stroke: none !important; }</style>`,
+      );
+      const reference = await sharp(Buffer.from(hidden))
+        .removeAlpha()
+        .greyscale()
+        .raw()
+        .toBuffer();
+      let darkPixels = 0;
+      for (let i = 0; i < png.length && darkPixels < 25; i++) {
+        if (reference[i]! - png[i]! > 48) darkPixels++;
+      }
+      assert.ok(darkPixels >= 25, `${id} has no distinct ${direction} shaft`);
+    }
+  }
+});
 
 test("standalone styles freeze theme tokens and mixed colors without an external stylesheet", () => {
   const theme = readFileSync("site/styles/theme.css", "utf8");

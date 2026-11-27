@@ -12,8 +12,11 @@ import {
   layoutNeighborhood,
   layoutEdgeLabels,
   layoutLabeledOverview,
+  labeledOverviewScale,
   layoutConnection,
   routeConnection,
+  scaleOverviewRoute,
+  type GraphLayout,
   neighborhood,
 } from "../../shared/concept-graph.ts";
 import { escapeAttribute, escapeHtml } from "./text.ts";
@@ -180,29 +183,27 @@ export function renderConceptGraph(
       ids.includes(relation.target) &&
       (!focus || relation.source === focus || relation.target === focus),
   );
-  const layout = complete
+  const layout: GraphLayout = complete
     ? labelledOverview
       ? layoutLabeledOverview(overview.points, overview.width, overview.height)
       : overview
     : layoutNeighborhood(ids, focus, true);
   const points = new Map(layout.points.map((point) => [point.id, point]));
-  const factor = labelledOverview ? 1.7 : 1;
+  const factor = labelledOverview ? labeledOverviewScale : 1;
   const routedRelations = relations.map((relation) => ({
     ...relation,
-    ...(complete
-      ? {
-          route: overview.routes
-            .find(
-              (route) =>
-                route.source === relation.source &&
-                route.target === relation.target,
-            )!
-            .points.map((point) => ({
-              x: point.x * factor,
-              y: point.y * factor,
-            })),
-        }
-      : {}),
+    route: complete
+      ? scaleOverviewRoute(
+          overview.routes.find(
+            (route) =>
+              route.source === relation.source &&
+              route.target === relation.target,
+          )!.points,
+          factor,
+          points.get(relation.source)!,
+          points.get(relation.target)!,
+        )
+      : layout.routeFor?.(relation),
   }));
   const clusters = complete
     ? overview.clusters
@@ -225,19 +226,18 @@ export function renderConceptGraph(
         })
         .join("")
     : "";
-  const edges = relations
-    .map((relation, index) => {
+  const edges = routedRelations
+    .map((relation) => {
       const a = points.get(relation.source)!,
         b = points.get(relation.target)!;
-      const line = layoutConnection(a, b);
-      const route = complete
-        ? routeConnection(routedRelations[index]!.route!)
-        : null;
+      const line = relation.route
+        ? routeConnection(relation.route)
+        : layoutConnection(a, b);
       const proposition =
         relation.direction === "directed"
           ? `${byId.get(relation.source)!.title} ${relation.label} ${byId.get(relation.target)!.title}`
           : `${byId.get(relation.source)!.title} — ${byId.get(relation.target)!.title}: ${relation.label}`;
-      return `<g class="${byId.get(relation.source)!.group !== byId.get(relation.target)!.group ? "is-cross-group" : "is-within-group"}" data-concept-edge="${relation.source} ${relation.target}" data-direction="${relation.direction}"${complete ? ` data-route='${JSON.stringify(overview.routes.find((edge) => edge.source === relation.source && edge.target === relation.target)!.points)}'` : ""}><title>${escapeHtml(`${proposition}. ${relation.explanation}`)}</title>${route ? `<path data-concept-line d="${route.path}"/>` : `<line data-concept-line x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}"/>`}${relation.direction === "directed" ? `<path data-concept-arrow d="M -8 -4 L 0 0 L -8 4 Z" transform="translate(${route?.x2 ?? line.x2} ${route?.y2 ?? line.y2}) rotate(${route?.angle ?? line.angle})" aria-hidden="true"/>` : ""}</g>`;
+      return `<g class="${byId.get(relation.source)!.group !== byId.get(relation.target)!.group ? "is-cross-group" : "is-within-group"}" data-concept-edge="${relation.source} ${relation.target}" data-direction="${relation.direction}"${complete ? ` data-route='${JSON.stringify(overview.routes.find((edge) => edge.source === relation.source && edge.target === relation.target)!.points)}'` : ""}><title>${escapeHtml(`${proposition}. ${relation.explanation}`)}</title><path data-concept-line d="${line.path}"/>${relation.direction === "directed" ? `<path data-concept-arrow d="M -8 -4 L 0 0 L -8 4 Z" transform="translate(${line.x2} ${line.y2}) rotate(${line.angle})" aria-hidden="true"/>` : ""}</g>`;
     })
     .join("");
   const captions = layoutEdgeLabels(
@@ -264,7 +264,7 @@ export function renderConceptGraph(
         if (current && candidate.length > 17) lines.push(word);
         else lines[lines.length - 1] = candidate;
       }
-      return `<a href="/concepts/#${concept.id}" class="concept-role-${role}${concept.id === focus ? " is-current" : ""}" data-concept-role="${role}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}" aria-label="Explore ${escapeAttribute(concept.title)}"><title>${escapeHtml(concept.title)} · ${conceptRoles[role].label}</title><g transform="translate(${point.x} ${point.y})"><rect class="concept-node-card" x="-95" y="-30" width="190" height="60" rx="12"/><rect class="concept-node-role-mark" x="-93" y="-20" width="4" height="40" rx="2"/><circle class="concept-node-dot" r="10"/><text class="concept-node-title" text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${-2 + (index - (lines.length - 1) / 2) * 16}">${escapeHtml(line)}</tspan>`).join("")}</text><text class="concept-node-role" text-anchor="middle" y="25">${conceptRoles[role].short}</text></g></a>`;
+      return `<a href="/concepts/#${concept.id}" class="concept-role-${role}${concept.id === focus ? " is-current" : ""}" data-concept-role="${role}" data-concept-node="${concept.id}" data-title="${escapeAttribute(concept.title)}" data-group="${concept.group}" data-search="${escapeAttribute(`${concept.title} ${concept.definition} ${concept.usage?.note ?? ""}`.toLowerCase())}" data-x="${point.x}" data-y="${point.y}" aria-label="Explore ${escapeAttribute(concept.title)}"><title>${escapeHtml(concept.title)} · ${conceptRoles[role].label}</title><g transform="translate(${point.x} ${point.y})"><rect class="concept-node-card" x="-95" y="-30" width="190" height="60" rx="12"/><rect class="concept-node-role-mark" x="-93" y="-20" width="4" height="40" rx="2"/><circle class="concept-node-dot" r="10"/><text class="concept-node-title" text-anchor="middle" dominant-baseline="middle">${lines.map((line, index) => `<tspan x="0" y="${-1.5 + (index - (lines.length - 1) / 2) * 15}">${escapeHtml(line)}</tspan>`).join("")}</text><text class="concept-node-role" text-anchor="middle" y="25">${conceptRoles[role].short}</text></g></a>`;
     })
     .join("");
   return `<div class="concept-map${complete ? " concept-map-complete" : " has-connection-labels"}" data-concept-map data-focus="${focus}" data-complete="${complete}">

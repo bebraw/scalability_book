@@ -4,6 +4,8 @@ import {
   layoutLabeledOverview,
   layoutConnection,
   routeConnection,
+  scaleOverviewRoute,
+  type GraphLayout,
   labeledOverviewScale,
   type RoutePoint,
   neighborhood,
@@ -146,9 +148,9 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         target: target!,
         direction: edge.dataset.direction!,
         label: captions[index]!.dataset.label!,
-        ...(edge.dataset.route
-          ? { route: JSON.parse(edge.dataset.route) as RoutePoint[] }
-          : {}),
+        route: edge.dataset.route
+          ? (JSON.parse(edge.dataset.route) as RoutePoint[])
+          : undefined,
       };
     });
     const status = map.querySelector<HTMLElement>("[data-concept-map-status]")!;
@@ -212,7 +214,14 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
         incident.map((relation) => `${relation.source} ${relation.target}`),
       );
       if (incident.length)
-        placeCaptions(layoutEdgeLabels(graphPoints, incident, bounds));
+        placeCaptions(
+          layoutEdgeLabels(
+            graphPoints,
+            incident,
+            bounds,
+            select?.value || fixedFocus,
+          ),
+        );
       for (const [index, edge] of edges.entries()) {
         const previewed = shown.has(edge.dataset.conceptEdge!);
         edge.classList.toggle("is-previewed", previewed);
@@ -445,7 +454,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       practiceLabels.textContent = labels.checked
         ? "Hide labels to try"
         : "Compare with the labels";
-      const layout = overviewVisible
+      const layout: GraphLayout | null = overviewVisible
         ? labeledOverview
           ? layoutLabeledOverview(
               nodes.map((node) => ({
@@ -457,7 +466,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
               Number(svg.dataset.height),
             )
           : null
-        : layoutNeighborhood([...visible], focus, labels.checked);
+        : layoutNeighborhood([...(focused ?? visible)], focus, labels.checked);
       const points = new Map(
         layout?.points.map((point) => [point.id, point]) || [],
       );
@@ -522,32 +531,24 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
             x: Number(b.dataset.x),
             y: Number(b.dataset.y),
           };
-        const connection = layoutConnection(start, end);
-        let arrow = connection;
-        if (complete) {
-          if (overviewVisible) {
-            const factor = labeledOverview ? labeledOverviewScale : 1;
-            relation.route = (
-              JSON.parse(edge.dataset.route!) as RoutePoint[]
-            ).map((point) => ({ x: point.x * factor, y: point.y * factor }));
-            const route = routeConnection(relation.route);
-            line.setAttribute("d", route.path);
-            arrow = { ...connection, ...route };
-          } else {
-            delete relation.route;
-            line.setAttribute(
-              "d",
-              `M ${connection.x1} ${connection.y1} L ${connection.x2} ${connection.y2}`,
-            );
-          }
-        } else
-          for (const key of ["x1", "y1", "x2", "y2"] as const)
-            line.setAttribute(key, String(connection[key]));
+        if (overviewVisible) {
+          const factor = labeledOverview ? labeledOverviewScale : 1;
+          relation.route = scaleOverviewRoute(
+            JSON.parse(edge.dataset.route!) as RoutePoint[],
+            factor,
+            start,
+            end,
+          );
+        } else relation.route = layout?.routeFor?.(relation);
+        const connection = relation.route
+          ? routeConnection(relation.route)
+          : layoutConnection(start, end);
+        line.setAttribute("d", connection.path);
         edge
           .querySelector("[data-concept-arrow]")
           ?.setAttribute(
             "transform",
-            `translate(${arrow.x2} ${arrow.y2}) rotate(${arrow.angle})`,
+            `translate(${connection.x2} ${connection.y2}) rotate(${connection.angle})`,
           );
       }
       graphPoints = visibleNodes.map(

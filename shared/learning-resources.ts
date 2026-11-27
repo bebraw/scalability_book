@@ -58,7 +58,7 @@ export const graphResources: LearningResource[] = [
       // Membership refers to the focal idea; neighboring IDs are in the graph data.
       conceptIds: [concept.id],
       url: `/concepts/?topic=${concept.id}`,
-      caption: `${concept.title} and its ${neighborhood(concept.id, conceptRelationships).size - 1} neighboring concepts. Labels state the authored relationships.`,
+      caption: `${concept.title} and its ${neighborhood(concept.id, conceptRelationships).size - 1} neighboring concepts. Read from the source through the label to the arrowhead. Plain lines mark comparisons or associations.`,
       assumptions: graphAssumptions,
       images: imagePaths(
         `graph-${concept.id}`,

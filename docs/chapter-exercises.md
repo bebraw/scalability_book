@@ -178,6 +178,8 @@ Every connection has a short authored label alongside its explanation.
 **Show connection labels** affects only the current map.
 The option starts off on the whole-book map and on in chapters and reading panes.
 Labeled views make additional room for captions without covering concept nodes.
+In a focused map, each line between the selected concept and a neighbor carries its own label.
+Read a directed connection toward the arrowhead, including when it points back to the selected concept.
 In each reading’s “Follow an idea” map, “Enlarge map” increases the drawing size within a scrollable region and preserves the reader's concept selection.
 Readers can reach the region with Tab, pan with the arrow keys, and uncheck the box to fit the whole map again.
 Shared explorer links can also carry search and filter selections through the query parameters `q`, `reading`, `theme`, `topic`, `subtopic`, and `group-view`.

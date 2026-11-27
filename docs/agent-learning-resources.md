@@ -134,6 +134,8 @@ These instructions guide the student's external agent; the site does not run or 
 Graphics are generated under `/concepts/visuals/` as standalone SVG and PNG files during the site build.
 They use the existing diagram and graph renderers, with the light theme embedded so the image does not depend on host-page CSS or JavaScript.
 The PNG alternative supports agents and clients that cannot display SVG.
+When changing graph styles, inspect a generated PNG at chat width.
+Sharp rasterizes the standalone SVG during the build, and a stroke selector that works in the browser can leave only the arrowheads visible in the PNG.
 The agent guide describes how to return an image, cite its context, and prompt a prediction before operating a demo.
 
 Demo previews in `site/assets/demo-previews/` are captured static PNGs of the default gallery views, not simulation results or the learner's saved state.

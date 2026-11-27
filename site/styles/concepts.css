@@ -426,9 +426,12 @@
     max-width: none;
   }
 }
-.concept-map-graphic :is(line, [data-concept-line]) {
+/* The standalone PNG renderer needs simple selectors for SVG strokes. */
+.concept-map-graphic [data-concept-line] {
+  fill: none;
   stroke: var(--muted);
-  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 .concept-map-graphic [data-concept-arrow] {
   fill: var(--muted);
@@ -575,9 +578,9 @@
 }
 .concept-map-graphic .concept-edge-label text {
   fill: var(--text);
-  font: 600 12px var(--font-ui);
+  font: 600 13px var(--font-ui);
 }
-.concept-map-graphic .concept-edge-label :is(line, [data-concept-line]) {
+.concept-map-graphic .concept-edge-label line {
   stroke: var(--muted);
   stroke-width: 1;
 }
@@ -1192,10 +1195,6 @@
 }
 .concept-semantic-status:empty {
   display: none;
-}
-.concept-map-graphic [data-concept-line] {
-  fill: none;
-  stroke-linejoin: round;
 }
 .concept-map-graphic .concept-node-card {
   stroke: currentColor;

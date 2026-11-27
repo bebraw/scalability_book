@@ -2,6 +2,12 @@ export type GraphPoint = { id: string; x: number; y: number };
 export type GraphEdge = { source: string; target: string };
 
 export type RoutePoint = { x: number; y: number };
+export type GraphLayout = {
+  width: number;
+  height: number;
+  points: GraphPoint[];
+  routeFor?(edge: GraphEdge): RoutePoint[] | undefined;
+};
 
 export function routePath(points: readonly RoutePoint[]) {
   return points
@@ -67,16 +73,53 @@ export function layoutConnection(
   const inset = length ? Math.min(95 / Math.abs(dx), 30 / Math.abs(dy)) : 0;
   const start = inset + (length ? 3 / length : 0);
   const end = inset + (length ? 6 / length : 0);
+  const x1 = a.x + dx * start,
+    y1 = a.y + dy * start;
+  const x2 = b.x - dx * end,
+    y2 = b.y - dy * end;
   return {
-    x1: a.x + dx * start,
-    y1: a.y + dy * start,
-    x2: b.x - dx * end,
-    y2: b.y - dy * end,
+    x1,
+    y1,
+    x2,
+    y2,
+    path: `M ${x1} ${y1} L ${x2} ${y2}`,
     angle: (Math.atan2(dy, dx) * 180) / Math.PI,
   };
 }
 
 export const labeledOverviewScale = 1.7;
+
+export function scaleOverviewRoute(
+  points: readonly RoutePoint[],
+  factor: number,
+  sourceCenter: RoutePoint,
+  targetCenter: RoutePoint,
+) {
+  const route = points.map(({ x, y }) => ({ x: x * factor, y: y * factor }));
+  if (factor === 1) return route;
+  // The labelled layout spreads card centers and routing lanes apart, but
+  // keeps each card 190 by 60. Extend each terminal segment back to its card.
+  const attach = (tip: RoutePoint, next: RoutePoint, center: RoutePoint) => {
+    const vertical = tip.x === next.x;
+    const along = vertical ? "y" : "x";
+    const across = vertical ? "x" : "y";
+    const pin = {
+      ...tip,
+      [along]: center[along] + (tip[along] - center[along]) / factor,
+    };
+    const offset = tip[across] - center[across];
+    if (Math.abs(offset) <= (vertical ? 95 : 30) - 12) return [pin];
+    // A nudged lane can pass outside the flat side of the smaller card.
+    // Turn at the old boundary to reach the original pin without a diagonal.
+    pin[across] = center[across] + offset / factor;
+    return [pin, { ...tip, [across]: pin[across] }, tip];
+  };
+  return [
+    ...attach(route[0]!, route[1]!, sourceCenter),
+    ...route.slice(1, -1),
+    ...attach(route.at(-1)!, route.at(-2)!, targetCenter).reverse(),
+  ];
+}
 
 export function layoutLabeledOverview(
   points: GraphPoint[],
@@ -108,31 +151,65 @@ export function neighborhood(
   return ids;
 }
 
-// A compact, deterministic reading layout. It places the focal idea first,
-// followed by its neighbors, and grows vertically rather than shrinking text.
-export function layoutNeighborhood(ids: string[], focus = "", labels = false) {
-  const ordered =
-    focus && ids.includes(focus)
-      ? [focus, ...ids.filter((id) => id !== focus)]
-      : ids;
-  const points = ordered.map((id, index) => {
-    if (focus && index === 0) return { id, x: 220, y: 42 };
-    const position = focus ? index - 1 : index;
-    return {
-      id,
-      x: position % 2 ? 325 : 115,
-      y:
-        (focus ? (labels ? 166 : 142) : labels ? 66 : 42) +
-        Math.floor(position / 2) * (labels ? (focus ? 116 : 200) : 90),
-    };
+const focusCaptionOffset = 62;
+
+// Each neighbor has a separate path from the bottom of the focal card.
+// The outermost lanes turn first, leaving the inner lanes clear for later rows.
+function layoutFocusedNeighborhood(focus: string, neighbors: string[]) {
+  const rows = Math.ceil(neighbors.length / 2);
+  // Keep every port on the straight bottom edge even as more neighbors are authored.
+  const laneSpacing = Math.min(12, 80 / Math.max(rows, 1));
+  const center = 220 + rows * laneSpacing;
+  const focusY = 42;
+  const points: GraphPoint[] = [{ id: focus, x: center, y: focusY }];
+  const routes = new Map<string, RoutePoint[]>();
+  neighbors.forEach((id, index) => {
+    const row = Math.floor(index / 2);
+    const left = index % 2 === 0;
+    const x = left ? 110 : center * 2 - 110;
+    const y = 166 + row * 116;
+    const laneX = center + (left ? -1 : 1) * (rows - row) * laneSpacing;
+    const captionY = y - focusCaptionOffset;
+    points.push({ id, x, y });
+    routes.set(id, [
+      { x: laneX, y: focusY + 30 },
+      { x: laneX, y: captionY },
+      { x, y: captionY },
+      { x, y: y - 30 },
+    ]);
   });
+  return {
+    points,
+    width: center * 2,
+    height: Math.max(100, points.at(-1)!.y + 40),
+    routeFor({ source, target }: GraphEdge) {
+      if (source === focus) return routes.get(target);
+      if (target === focus) return routes.get(source)?.slice().reverse();
+    },
+  };
+}
+
+export function layoutNeighborhood(
+  ids: string[],
+  focus = "",
+  labels = false,
+): GraphLayout {
+  if (focus && ids.includes(focus))
+    return layoutFocusedNeighborhood(
+      focus,
+      ids.filter((id) => id !== focus),
+    );
+  const points = ids.map((id, index) => ({
+    id,
+    x: index % 2 ? 325 : 115,
+    y: (labels ? 66 : 42) + Math.floor(index / 2) * (labels ? 200 : 90),
+  }));
   return {
     points,
     width: 440,
     height: Math.max(
       100,
-      (labels && !focus ? 64 : 40) +
-        Math.max(...points.map((point) => point.y), 0),
+      (labels ? 64 : 40) + Math.max(...points.map((point) => point.y), 0),
     ),
   };
 }
@@ -141,7 +218,7 @@ export function layoutNeighborhood(ids: string[], focus = "", labels = false) {
 // their edge, avoiding node boxes and earlier captions where space permits.
 export function layoutEdgeLabels(
   points: GraphPoint[],
-  edges: (GraphEdge & { label: string; route?: RoutePoint[] })[],
+  edges: (GraphEdge & { label: string; route?: RoutePoint[] | undefined })[],
   bounds: { width: number; height: number },
   focus = "",
 ) {
@@ -153,13 +230,14 @@ export function layoutEdgeLabels(
     const width = Math.max(50, edge.label.length * 7 + 14);
     if (focus && (edge.source === focus || edge.target === focus)) {
       const neighbor = edge.source === focus ? b : a;
+      const y = neighbor.y - focusCaptionOffset;
       return {
         ...edge,
         x: neighbor.x,
-        y: neighbor.y - 62,
+        y,
         width,
         anchorX: neighbor.x,
-        anchorY: neighbor.y - 30,
+        anchorY: y,
       };
     }
     const dx = b.x - a.x,
