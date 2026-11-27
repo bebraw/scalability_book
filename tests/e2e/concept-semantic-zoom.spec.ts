@@ -2,10 +2,10 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { concepts } from "../../shared/concepts.ts";
 
-test("compact overview counts are separated and sit on their topic connections", async ({
+test("overview counts sit on distinct visible paths between their named topics", async ({
   page,
 }) => {
-  for (const width of [320, 390]) {
+  for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("/concepts/?view=all");
     const badges = page.locator(".concept-cluster-connection:visible");
@@ -17,12 +17,62 @@ test("compact overview counts are separated and sit on their topic connections",
           .getBoundingClientRect();
         const path = group.querySelector("path")!;
         const center = new DOMPoint(x + width / 2, y + height / 2);
+        const matrix = path.getScreenCTM()!;
+        const length = path.getTotalLength();
+        const topicAt = (position: number) => {
+          const point = path.getPointAtLength(position).matrixTransform(matrix);
+          return [
+            ...group
+              .closest("svg")!
+              .querySelectorAll<SVGGElement>("[data-concept-cluster]"),
+          ].find((region) => {
+            const r = region.querySelector("rect")!.getBoundingClientRect();
+            return (
+              point.x >= r.left - 1 &&
+              point.x <= r.right + 1 &&
+              point.y >= r.top - 1 &&
+              point.y <= r.bottom + 1
+            );
+          })?.dataset.conceptCluster;
+        };
+        const endpoints = [topicAt(0), topicAt(length)].sort();
+        const topicPair = group.querySelector<SVGGElement>(
+          "[data-topic-connection]",
+        )!.dataset.topicConnection!;
+        // Each end needs a visible stretch of shaft before it reaches the badge.
+        const clearOfCount = (position: number) => {
+          const point = path.getPointAtLength(position).matrixTransform(matrix);
+          return (
+            point.x < x ||
+            point.x > x + width ||
+            point.y < y ||
+            point.y > y + height
+          );
+        };
+        const inset = 5 / matrix.a;
+        const otherRoutes = groups
+          .filter((other) => other !== group)
+          .map((other) => other.querySelector("path")!);
+        let crosses = false;
+        for (let d = 0; d < length; d += 1 / matrix.a) {
+          const point = path.getPointAtLength(d);
+          if (otherRoutes.some((other) => other.isPointInStroke(point))) {
+            crosses = true;
+            break;
+          }
+        }
         return {
           x,
           y,
           width,
           height,
-          topicPair: group.querySelector("title")!.textContent,
+          topicPair,
+          endpoints,
+          crosses,
+          visibleShafts:
+            length > inset * 2 &&
+            clearOfCount(inset) &&
+            clearOfCount(length - inset),
           onRoute: path.isPointInStroke(
             center.matrixTransform(path.getScreenCTM()!.inverse()),
           ),
@@ -30,6 +80,9 @@ test("compact overview counts are separated and sit on their topic connections",
       }),
     );
     for (const [index, a] of boxes.entries()) {
+      expect(a.endpoints).toEqual(a.topicPair.split(" "));
+      expect(a.crosses, `${width}px: ${a.topicPair}`).toBe(false);
+      expect(a.visibleShafts, `${width}px: ${a.topicPair}`).toBe(true);
       expect(a.onRoute, `${width}px: ${a.topicPair}`).toBe(true);
       for (const b of boxes.slice(index + 1)) {
         const gap = Math.max(
@@ -44,6 +97,34 @@ test("compact overview counts are separated and sit on their topic connections",
         ).toBeGreaterThan(1);
       }
     }
+    const outerPair = page.getByRole("button", {
+      name: "Read 7 connections between Development and Operations",
+    });
+    const traced = page.locator("[data-concept-cluster].is-traced-topic");
+    await outerPair.focus();
+    await expect(traced).toHaveCount(2);
+    await expect(
+      page.locator(".concept-cluster-connection.is-traced"),
+    ).toContainText("Development and Operations");
+    expect(
+      await traced.evaluateAll((items) =>
+        items.map((item) => item.getAttribute("data-concept-cluster")).sort(),
+      ),
+    ).toEqual(["Development", "Operations"]);
+    await page.getByRole("button", { name: "Fit", exact: true }).focus();
+    await expect(traced).toHaveCount(0);
+    await page
+      .getByRole("button", {
+        name: "Read 3 connections between Architecture and Evidence",
+      })
+      .hover();
+    expect(
+      await traced.evaluateAll((items) =>
+        items.map((item) => item.getAttribute("data-concept-cluster")).sort(),
+      ),
+    ).toEqual(["Architecture", "Evidence"]);
+    await page.mouse.move(0, 0);
+    await expect(traced).toHaveCount(0);
   }
 });
 

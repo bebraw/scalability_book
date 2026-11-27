@@ -16,6 +16,7 @@ import {
   type RoutePoint,
 } from "../shared/concept-graph.ts";
 import { layoutOverview } from "../scripts/lib/concept-layout.ts";
+import { overviewHeadingBounds } from "../shared/concept-route-labels.ts";
 import {
   conceptRoleById,
   conceptRoles,
@@ -527,7 +528,7 @@ test("labelled overview routes meet their fixed-size cards and keep orthogonal s
   }
 });
 
-test("the labeled overview keeps captions clear of nodes and other captions", async () => {
+test("the labelled overview links each caption to its routed shaft without masking another connection", async () => {
   const overview = await layoutOverview(
     concepts,
     conceptRelationships,
@@ -538,12 +539,62 @@ test("the labeled overview keeps captions clear of nodes and other captions", as
     overview.width,
     overview.height,
   );
-  const captions = layoutEdgeLabels(
-    layout.points,
-    conceptRelationships,
-    layout,
-  );
+  const nodes = new Map(layout.points.map((p) => [p.id, p]));
+  const edges = overview.routes.map(({ source, target, points }, i) => ({
+    ...conceptRelationships[i]!,
+    route: scaleOverviewRoute(
+      points,
+      labeledOverviewScale,
+      nodes.get(source)!,
+      nodes.get(target)!,
+    ),
+  }));
+  const captions = layoutEdgeLabels(layout.points, edges, layout, "", {
+    headings: overviewHeadingBounds(
+      overview.clusters,
+      overview.subgroups,
+      labeledOverviewScale,
+    ),
+  });
   for (const [index, caption] of captions.entries()) {
+    const left = caption.x - caption.width / 2,
+      right = caption.x + caption.width / 2;
+    const top = caption.y - 11,
+      bottom = caption.y + 11;
+    let attached = false;
+    for (const [edgeIndex, edge] of edges.entries()) {
+      for (let i = 1; i < edge.route.length; i++) {
+        const a = edge.route[i - 1]!,
+          b = edge.route[i]!;
+        const xMin = Math.min(a.x, b.x),
+          xMax = Math.max(a.x, b.x);
+        const yMin = Math.min(a.y, b.y),
+          yMax = Math.max(a.y, b.y);
+        if (edgeIndex === index) {
+          if (
+            caption.anchorX >= xMin &&
+            caption.anchorX <= xMax &&
+            caption.anchorY >= yMin &&
+            caption.anchorY <= yMax
+          )
+            attached = true;
+        } else {
+          assert.ok(
+            right <= xMin || left >= xMax || bottom <= yMin || top >= yMax,
+            `${caption.label} masks ${edge.source} → ${edge.target}`,
+          );
+        }
+      }
+    }
+    assert.ok(attached, `${caption.label} has a leader to empty space`);
+    const gap = Math.hypot(
+      Math.max(0, left - caption.anchorX, caption.anchorX - right),
+      Math.max(0, top - caption.anchorY, caption.anchorY - bottom),
+    );
+    assert.ok(
+      gap < 95,
+      `${caption.label} sits more than half a card away from its shaft`,
+    );
     for (const point of layout.points) {
       assert.ok(
         Math.abs(caption.x - point.x) >= caption.width / 2 + 95 ||
@@ -558,6 +609,37 @@ test("the labeled overview keeps captions clear of nodes and other captions", as
         `${caption.label} covers ${other.label}`,
       );
     }
+  }
+});
+
+test("previewing either end of a long connection puts its label on the visible approach to that concept", () => {
+  const nodes = [
+    { id: "from", x: 200, y: 180 },
+    { id: "to", x: 1800, y: 180 },
+  ];
+  const edges = [
+    {
+      source: "from",
+      target: "to",
+      label: "leads to",
+      route: [
+        { x: 200, y: 210 },
+        { x: 200, y: 740 },
+        { x: 1800, y: 740 },
+        { x: 1800, y: 210 },
+      ],
+    },
+  ];
+  for (const node of nodes) {
+    const [caption] = layoutEdgeLabels(
+      nodes,
+      edges,
+      { width: 2000, height: 900 },
+      "",
+      { preview: node.id },
+    );
+    assert.ok(Math.abs(caption!.x - node.x) < 1, node.id);
+    assert.ok(caption!.y > 210 && caption!.y < 360, node.id);
   }
 });
 

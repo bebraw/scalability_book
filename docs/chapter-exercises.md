@@ -220,8 +220,14 @@ Compact overviews keep the main topic headings and counts.
 A highlighted group or subcategory marks its parent topic here.
 Subcategory names and role markers appear when there is room to separate them clearly.
 Connection counts summarize the actual cross-group relationships without asserting a single proposition or direction between whole groups.
+Hover over a count or focus it with the keyboard to highlight the line and both topic borders.
+Select a count to open **Read the relationships** with the connections between those two topics.
+Each entry keeps its authored direction, qualification and links to the concepts.
+Close the list to return to its count, or choose **Show all relationships** to read the full list.
 The view switch, filters, expand button, and zoom controls share a toolbar above the drawing.
 Zooming closer reveals concept cards and their roles, then emphasizes the full connection network; hovering or focusing a concept reveals its authored labels.
+With all labels visible, hovering or focusing a concept emphasizes its lines, labels and neighboring cards while the other labels stay in place.
+Most labels sit directly on their connection, with short leader lines where the surrounding routes leave too little room.
 Selecting a region zooms to it; when the region cannot expose readable cards on a compact canvas, the same action opens the existing group-only view.
 Selecting a subcategory opens its concepts in the filtered graph and list; the parent topic's Subcategory control provides the same selection on compact screens.
 This selection clears the current search, reading and concept focus, sets its parent topic and Show only mode, and can be shared through `subtopic`.

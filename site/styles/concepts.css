@@ -553,6 +553,9 @@
 .concept-map-relationships ul {
   padding-left: 1.2rem;
 }
+.concept-map-complete .concept-map-relationships {
+  scroll-margin-top: 7rem;
+}
 .concept-map .concept-map-status {
   color: var(--muted);
   font-size: 0.75rem;
@@ -990,6 +993,7 @@
   font: 400 0.8rem/1.6 var(--font-ui);
 }
 .concept-map-actions button,
+.concept-map-relationships button,
 .concept-map-navigation button,
 .concept-map-heading-actions button,
 .concept-connection-practice button {
@@ -1062,13 +1066,15 @@
 .concept-map-complete .concept-map-graphic a {
   cursor: pointer;
 }
-.concept-map-complete .concept-map-graphic :is(line, [data-concept-line]) {
-  opacity: 0.35;
+.concept-map-complete
+  .concept-map-graphic
+  :where(line, [data-concept-line], [data-concept-arrow]) {
+  opacity: 0.72;
 }
 .concept-map-complete
   .concept-map-graphic
   .is-related
-  :is(line, [data-concept-line]) {
+  :is(line, [data-concept-line], [data-concept-arrow]) {
   opacity: 0.8;
 }
 .concept-map
@@ -1081,6 +1087,24 @@
 }
 .concept-map .concept-map-graphic .is-previewed [data-concept-arrow] {
   opacity: 1;
+}
+@media screen {
+  .concept-map-graphic.is-tracing-connections
+    [data-concept-edge]:not(.is-previewed) {
+    opacity: 0.18;
+  }
+  .concept-map-graphic .is-trace-neighbor .concept-node-card {
+    stroke-width: 3.5;
+  }
+  .concept-map-graphic .concept-edge-label.is-previewed rect {
+    stroke: var(--accent-strong);
+    stroke-width: 1.5;
+  }
+  .concept-map-graphic.is-tracing-connections
+    .concept-edge-label:not(.is-previewed)
+    text {
+    fill: var(--muted);
+  }
 }
 .concept-map .concept-map-help {
   font-size: 0.75rem;
@@ -1284,13 +1308,36 @@
 .concept-map-graphic [data-concept-summary-line] {
   fill: none;
   stroke: var(--muted);
-  stroke-width: 1.2;
+  stroke-width: 1.75;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
-  opacity: 0.6;
 }
-.concept-map-graphic .concept-cluster-connection rect {
+.concept-map-graphic .concept-cluster-connection :is(rect, circle) {
   fill: var(--panel);
-  stroke: var(--border);
+  stroke: var(--muted);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.concept-map-graphic [data-topic-connection] {
+  cursor: pointer;
+}
+.concept-map-graphic [data-topic-connection]:focus-visible {
+  outline: none;
+}
+.concept-map-graphic
+  .concept-cluster-connection.is-traced
+  :is(path, rect, circle),
+.concept-map-graphic[data-detail="overview"]
+  .concept-cluster.is-traced-topic
+  > rect {
+  stroke: var(--accent-strong);
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+@media screen {
+  .concept-map-graphic[data-compact-overview="true"] .concept-cluster {
+    transform: var(--compact-topic-position, none);
+  }
 }
 .concept-map-graphic[data-detail="overview"] .concept-cluster-connection {
   display: block;

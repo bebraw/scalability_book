@@ -731,6 +731,66 @@ test("arrows express qualified relationships and focus reveals labels without ch
   ).toEqual([]);
 });
 
+test("a reader can trace Queue while all relationship labels are visible", async ({
+  page,
+}) => {
+  await page.goto("/concepts/?view=all");
+  const map = page.locator("#concept-graph");
+  await map.getByText("Filters", { exact: true }).click();
+  await map.getByLabel("Show connection labels").check();
+
+  const queue = map.getByRole("link", { name: "Explore Queue", exact: true });
+  const incident = map.locator('[data-concept-edge="queue latency"]');
+  const unrelated = map.locator('[data-concept-edge="cache trade-off"]');
+  const neutralShaftOpacity = await unrelated
+    .locator("[data-concept-line]")
+    .evaluate((line) => getComputedStyle(line).opacity);
+  await expect(unrelated.locator("[data-concept-arrow]")).toHaveCSS(
+    "opacity",
+    neutralShaftOpacity,
+  );
+  const neighbor = map.locator(
+    '[data-concept-node="latency"] .concept-node-card',
+  );
+  const cardWidth = () =>
+    neighbor.evaluate((card) => parseFloat(getComputedStyle(card).strokeWidth));
+  const originalWidth = await cardWidth();
+  const labels = map.locator(".concept-edge-label:visible");
+  const placement = await labels.evaluateAll((items) =>
+    items.map((item) => item.getAttribute("transform")),
+  );
+  expect(placement).toHaveLength(conceptRelationships.length);
+  const exportedPlacement = await page.evaluate(async () => {
+    const svg = await (
+      await fetch("/concepts/visuals/graph-complete.svg")
+    ).text();
+    const image = new DOMParser().parseFromString(svg, "image/svg+xml");
+    return [...image.querySelectorAll("[data-concept-edge-label]")].map(
+      (label) => label.getAttribute("transform"),
+    );
+  });
+  expect(placement).toEqual(exportedPlacement);
+
+  await queue.focus();
+  await expect(incident.locator("[data-concept-line]")).toHaveCSS(
+    "opacity",
+    "1",
+  );
+  expect(await cardWidth()).toBeGreaterThan(originalWidth);
+  const contextOpacity = () =>
+    unrelated.evaluate((edge) => parseFloat(getComputedStyle(edge).opacity));
+  expect(await contextOpacity()).toBeLessThan(1);
+  expect(
+    await labels.evaluateAll((items) =>
+      items.map((item) => item.getAttribute("transform")),
+    ),
+  ).toEqual(placement);
+
+  await queue.press("Escape");
+  expect(await contextOpacity()).toBe(1);
+  expect(await cardWidth()).toBe(originalWidth);
+});
+
 test("connection labels stay local while following concepts across graph views", async ({
   page,
 }) => {
@@ -1624,4 +1684,45 @@ test("cumulative questions reject unstable flow and a swapped model", async ({
   await expect(choice.locator("[data-result]")).toContainText(
     "Exercise complete",
   );
+});
+
+test("the complete map's caption boxes leave the rendered arrowheads and section headings visible", async ({
+  page,
+}) => {
+  await page.goto("/concepts/visuals/graph-complete.svg");
+  const arrows = page.locator("[data-concept-arrow]");
+  await expect(arrows).toHaveCount(
+    conceptRelationships.filter((edge) => edge.direction === "directed").length,
+  );
+  const collisions = await page.evaluate(() => {
+    const obstacles = [
+      ...document.querySelectorAll(
+        "[data-concept-arrow], [data-concept-cluster-heading] text, [data-concept-subgroup-heading] text",
+      ),
+    ].map((element) => ({
+      box: element.getBoundingClientRect(),
+      name:
+        element
+          .closest("[data-concept-edge]")
+          ?.getAttribute("data-concept-edge") ?? element.textContent,
+    }));
+    return [
+      ...document.querySelectorAll("[data-concept-edge-label] rect"),
+    ].flatMap((element) => {
+      const box = element.getBoundingClientRect();
+      return obstacles
+        .filter(
+          (other) =>
+            box.left < other.box.right &&
+            box.right > other.box.left &&
+            box.top < other.box.bottom &&
+            box.bottom > other.box.top,
+        )
+        .map((other) => [
+          element.parentElement!.getAttribute("data-concept-edge-label"),
+          other.name,
+        ]);
+    });
+  });
+  expect(collisions).toEqual([]);
 });

@@ -1,4 +1,6 @@
 import { devices, expect, test, type Locator } from "@playwright/test";
+import { concepts } from "../../shared/concepts.ts";
+import { conceptRelationships } from "../../shared/concept-relationships.ts";
 
 const camera = (graphic: Locator) =>
   graphic.evaluate(
@@ -15,6 +17,54 @@ const camera = (graphic: Locator) =>
 // Native pointer coordinates are rounded to screen pixels by the browser.
 const sameScreenPosition = (actual: number, expected: number, scale: number) =>
   expect(Math.abs(actual - expected) * scale).toBeLessThan(1);
+
+test("a topic connection count opens exactly the relationships it counts", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    ...devices["iPhone 13"],
+    baseURL,
+  });
+  const page = await context.newPage();
+  await page.goto("/concepts/?view=all");
+  const map = page.locator("#concept-graph");
+  const groupOf = new Map(
+    concepts.map((concept) => [concept.id, concept.group]),
+  );
+  const expected = conceptRelationships
+    .filter(
+      ({ source, target }) =>
+        [groupOf.get(source), groupOf.get(target)].sort().join(" ") ===
+        "Development Evidence",
+    )
+    .map(({ source, target }) => `${source} ${target}`);
+  const description = `${expected.length} connections between Development and Evidence`;
+  const count = map.getByRole("button", {
+    name: `Read ${description}`,
+    exact: true,
+  });
+  const list = map.locator(".concept-map-relationships");
+  const summary = list.locator("summary");
+  const rows = list.locator("[data-concept-relation]:visible");
+  await count.tap();
+  await expect(summary).toBeFocused();
+  await expect(summary).toHaveText(description);
+  expect(
+    await rows.evaluateAll((elements) =>
+      elements.map((li) => li.getAttribute("data-concept-relation")),
+    ),
+  ).toEqual(expected);
+  await summary.press("Enter");
+  await expect(count).toBeFocused();
+  await count.press("Space");
+  await expect(rows).toHaveCount(expected.length);
+  await list.getByRole("button", { name: "Show all relationships" }).click();
+  await expect(summary).toHaveText("Read the relationships");
+  await expect(summary).toBeFocused();
+  await expect(rows).toHaveCount(conceptRelationships.length);
+  await context.close();
+});
 
 test("students can enlarge and scroll the chapter map on a narrow screen", async ({
   page,

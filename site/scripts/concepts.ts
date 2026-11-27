@@ -12,6 +12,7 @@ import {
 } from "../../shared/concept-graph.ts";
 import { ConceptViewport, type ViewportState } from "./concept-viewport.ts";
 import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
+import { bindTopicConnections } from "./concept-topic-connections.ts";
 
 (() => {
   const agentUrl = document.querySelector<HTMLInputElement>(
@@ -137,6 +138,12 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
     );
     if (expand) expand.hidden = false;
     const nodes = [...map.querySelectorAll<SVGAElement>("[data-concept-node]")];
+    const relationRows = [
+      ...map.querySelectorAll<HTMLElement>("[data-concept-relation]"),
+    ];
+    const resetTopicConnections = complete
+      ? bindTopicConnections(map, relationRows)
+      : null;
     const edges = [...map.querySelectorAll<SVGGElement>("[data-concept-edge]")];
     const captions = [
       ...map.querySelectorAll<SVGGElement>("[data-concept-edge-label]"),
@@ -198,28 +205,37 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
 
     function previewConnections() {
       if (!complete) return;
-      for (const node of nodes)
-        node.classList.toggle(
-          "is-selected",
-          node.dataset.conceptNode === selectedNode,
-        );
       const id = focusedNode || hoveredNode || selectedNode;
-      const incident =
-        labels.checked || practice.open
-          ? []
-          : activeRelationships.filter(
-              (relation) => relation.source === id || relation.target === id,
-            );
+      const incident = practice.open
+        ? []
+        : activeRelationships.filter(
+            (relation) => relation.source === id || relation.target === id,
+          );
       const shown = new Set(
         incident.map((relation) => `${relation.source} ${relation.target}`),
       );
-      if (incident.length)
+      const neighbors = new Set(
+        incident.map(({ source, target }) => (source === id ? target : source)),
+      );
+      graphic.classList.toggle("is-tracing-connections", incident.length > 0);
+      for (const node of nodes) {
+        const nodeId = node.dataset.conceptNode!;
+        node.classList.toggle("is-selected", nodeId === selectedNode);
+        node.classList.toggle("is-trace-neighbor", neighbors.has(nodeId));
+      }
+      if (incident.length && !labels.checked)
         placeCaptions(
           layoutEdgeLabels(
             graphPoints,
             incident,
             bounds,
             select?.value || fixedFocus,
+            {
+              headings: overviewVisible
+                ? semantic?.headingBounds(1)
+                : undefined,
+              preview: id,
+            },
           ),
         );
       for (const [index, edge] of edges.entries()) {
@@ -350,6 +366,7 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
       viewport?.render();
     });
     function update(preserveViewport = false) {
+      resetTopicConnections?.();
       if (complete) {
         for (const tab of viewTabs) {
           const active = tab.dataset.conceptView === presentation;
@@ -569,12 +586,15 @@ import { ConceptSemanticZoom } from "./concept-semantic-zoom.ts";
               height: Number(svg.dataset.height),
             },
             focus,
+            {
+              headings: overviewVisible
+                ? semantic?.headingBounds(labeledOverviewScale)
+                : undefined,
+            },
           ),
         );
       }
-      for (const row of map.querySelectorAll<HTMLElement>(
-        "[data-concept-relation]",
-      )) {
+      for (const row of relationRows) {
         const ids = row.dataset.conceptRelation!.split(" ");
         row.hidden =
           !ids.every((id) => visible.has(id)) ||

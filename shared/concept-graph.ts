@@ -1,3 +1,10 @@
+import {
+  connectionLabelWidth,
+  layoutRouteLabels,
+  segmentBounds,
+  type LabelBounds,
+  type RoutedLabel,
+} from "./concept-route-labels.ts";
 export type GraphPoint = { id: string; x: number; y: number };
 export type GraphEdge = { source: string; target: string };
 
@@ -218,16 +225,44 @@ export function layoutNeighborhood(
 // their edge, avoiding node boxes and earlier captions where space permits.
 export function layoutEdgeLabels(
   points: GraphPoint[],
-  edges: (GraphEdge & { label: string; route?: RoutePoint[] | undefined })[],
+  edges: (GraphEdge & {
+    label: string;
+    direction?: string;
+    route?: RoutePoint[] | undefined;
+  })[],
   bounds: { width: number; height: number },
   focus = "",
+  {
+    headings = [],
+    preview = "",
+  }: { headings?: LabelBounds[] | undefined; preview?: string } = {},
 ) {
   const byId = new Map(points.map((point) => [point.id, point]));
-  const placed: { x: number; y: number; width: number }[] = [];
+  const protectedAreas = [...headings];
+  if (!focus)
+    for (const edge of edges) {
+      if (!edge.route || edge.direction !== "directed") continue;
+      const { x2, y2, angle } = routeConnection(edge.route);
+      // The arrow's 8 × 8 triangle extends back from its tip. Orthogonal routes
+      // keep that bounding square axis-aligned at either end of the map.
+      const radians = (angle * Math.PI) / 180;
+      const x = x2 - 4 * Math.cos(radians),
+        y = y2 - 4 * Math.sin(radians);
+      protectedAreas.push({
+        left: x - 5,
+        right: x + 5,
+        top: y - 5,
+        bottom: y + 5,
+      });
+    }
+  const routed = focus
+    ? new Map<GraphEdge, RoutedLabel>()
+    : layoutRouteLabels(points, edges, bounds, protectedAreas, preview);
+  const placed = [...routed.values()];
   return edges.map((edge) => {
     const a = byId.get(edge.source)!,
       b = byId.get(edge.target)!;
-    const width = Math.max(50, edge.label.length * 7 + 14);
+    const width = connectionLabelWidth(edge.label);
     if (focus && (edge.source === focus || edge.target === focus)) {
       const neighbor = edge.source === focus ? b : a;
       const y = neighbor.y - focusCaptionOffset;
@@ -240,6 +275,8 @@ export function layoutEdgeLabels(
         anchorY: y,
       };
     }
+    const onRoute = routed.get(edge);
+    if (onRoute) return { ...edge, ...onRoute };
     const dx = b.x - a.x,
       dy = b.y - a.y;
     const length = Math.max(1, Math.hypot(dx, dy));
@@ -283,10 +320,30 @@ export function layoutEdgeLabels(
         if (score < best.score) best = { x, y, anchorX, anchorY, score };
       }
     }
+    const reserved = edge.route
+      ? [
+          ...protectedAreas,
+          ...edges
+            .filter((other) => other !== edge)
+            .flatMap((other) =>
+              (other.route ?? []).slice(1).map((end, i) => {
+                const start = other.route![i]!;
+                return segmentBounds(start, end);
+              }),
+            ),
+        ]
+      : protectedAreas;
     const blocked = (x: number, y: number) =>
       points.some(
         (point) =>
           Math.abs(x - point.x) < width / 2 + 111 && Math.abs(y - point.y) < 58,
+      ) ||
+      reserved.some(
+        (h) =>
+          x + width / 2 > h.left &&
+          x - width / 2 < h.right &&
+          y + 11 > h.top &&
+          y - 11 < h.bottom,
       ) ||
       placed.some(
         (box) =>

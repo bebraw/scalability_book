@@ -23,6 +23,7 @@ import { escapeAttribute, escapeHtml } from "./text.ts";
 import { learningResources } from "../../shared/learning-resources.ts";
 import { explorations, explorationUrl } from "../../shared/explorations.ts";
 import { layoutOverview } from "./concept-layout.ts";
+import { overviewHeadingBounds } from "../../shared/concept-route-labels.ts";
 import {
   conceptRoleById,
   conceptRoles,
@@ -245,6 +246,11 @@ export function renderConceptGraph(
     routedRelations,
     layout,
     focus,
+    {
+      headings: complete
+        ? overviewHeadingBounds(overview.clusters, overview.subgroups, factor)
+        : [],
+    },
   )
     .map(
       (caption) =>
@@ -296,7 +302,7 @@ export function renderConceptGraph(
   <div class="concept-map-graphic"${complete || reading ? ` id="${prefix}-graphic" tabindex="0" role="region" aria-label="${reading ? "Concept map for this reading" : "Interactive concept graph"}"` : ""}${complete ? ` aria-describedby="${prefix}-help"` : ""}><svg viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-label="${complete ? "All concepts in the book" : "Connected concepts"}" data-width="${layout.width}" data-height="${layout.height}">${clusters}${subgroups}${edges}${captions}${nodes}</svg></div>
   ${
     complete
-      ? `</div><details class="concept-map-guide"><summary>Map guide</summary><p class="concept-map-help" id="${prefix}-help">Drag or scroll to pan. Pinch or use Ctrl/⌘ + scroll to zoom. With keyboard focus on the map, use the arrow keys to pan, +/− to zoom, and 0 to fit the map. Choose Readable to restore the text size.</p><p class="concept-map-help">Colors identify concept roles. Choose a topic or subcategory to explore its concepts. Numbers between topics count their authored connections.</p><ul class="concept-role-legend" aria-label="Concept roles">${Object.entries(
+      ? `</div><details class="concept-map-guide"><summary>Map guide</summary><p class="concept-map-help" id="${prefix}-help">Drag or scroll to pan. Pinch or use Ctrl/⌘ + scroll to zoom. With keyboard focus on the map, use the arrow keys to pan, +/− to zoom, and 0 to fit the map. Choose Readable to restore the text size.</p><p class="concept-map-help">Colors identify concept roles. Choose a topic or subcategory to explore its concepts. Select a number between two topics to read the connections it counts.</p><ul class="concept-role-legend" aria-label="Concept roles">${Object.entries(
           conceptRoles,
         )
           .map(
@@ -309,7 +315,7 @@ export function renderConceptGraph(
   <p class="concept-map-legend">Read arrows as topic → relationship → topic. Plain lines connect comparisons and associations.${complete ? " Hover or focus a concept to see its relationship labels. Select a concept to keep its labels visible, or press Escape to clear them." : ""}</p>
   ${complete ? "</details>" : ""}
   ${!complete ? `<p class="concept-map-status" data-concept-map-status role="status">${focus ? `${escapeHtml(byId.get(focus)!.title)} · ${relations.length} connections` : `${items.length} concepts · ${relations.length} connections`}</p>` : ""}
-  <details class="concept-map-relationships"><summary>Read the relationships</summary><ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${renderProposition(relation)}</strong><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
+  <details class="concept-map-relationships"><summary>Read the relationships</summary>${complete ? '<button type="button" data-concept-all-relations hidden>Show all relationships</button>' : ""}<ul>${relations.map((relation) => `<li data-concept-relation="${relation.source} ${relation.target}"><strong>${renderProposition(relation)}</strong><p>${escapeHtml(relation.explanation)}</p></li>`).join("")}</ul></details>
   <details class="concept-connection-practice"><summary>Try explaining a connection</summary><p>Hide the labels and choose two connected topics. Write a linking phrase and decide whether the statement needs a direction. Read it as a complete sentence, then compare it with the authored label and explanation. Which assumption makes it hold, and when might it fail?</p><button type="button" data-concept-practice-labels hidden>${complete ? "Compare with the labels" : "Hide labels to try"}</button></details>
   ${complete ? "</div>" : ""}
   </div>`;

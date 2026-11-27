@@ -1,5 +1,7 @@
 import { routePath, type RoutePoint } from "../../shared/concept-graph.ts";
 import type { ConceptViewport } from "./concept-viewport.ts";
+import type { TopicConnections } from "./concept-topic-connections.ts";
+import { overviewHeadingBounds } from "../../shared/concept-route-labels.ts";
 
 type Region = {
   group: string;
@@ -11,37 +13,69 @@ type Region = {
 };
 const ns = "http://www.w3.org/2000/svg";
 const badgeWidth = 24;
-const badgeHeight = 20;
+const badgeHeight = 24;
 
-// Return only the part of a routed connection outside its two topic regions.
-function betweenRegions(route: RoutePoint[], source: Region, target: Region) {
-  const trim = (points: RoutePoint[], box: Region) => {
-    const inside = (point: RoutePoint) =>
-      point.x >= box.x &&
-      point.x <= box.x + box.width &&
-      point.y >= box.y &&
-      point.y <= box.y + box.height;
-    const index = points.findIndex((point) => !inside(point));
-    if (index <= 0) return points;
-    const a = points[index - 1]!,
-      b = points[index]!;
-    const dx = b.x - a.x,
-      dy = b.y - a.y;
-    const t = Math.min(
-      dx > 0
-        ? (box.x + box.width - a.x) / dx
-        : dx < 0
-          ? (box.x - a.x) / dx
-          : Infinity,
-      dy > 0
-        ? (box.y + box.height - a.y) / dy
-        : dy < 0
-          ? (box.y - a.y) / dy
-          : Infinity,
-    );
-    return [{ x: a.x + dx * t, y: a.y + dy * t }, ...points.slice(index)];
+// Topic counts summarize pairs, so their paths attach to topic boundaries.
+function topicConnection(
+  a: Region,
+  b: Region,
+  outside: number,
+  firstColumn: number,
+) {
+  const right = (r: Region) => r.x + r.width;
+  const bottom = (r: Region) => r.y + r.height;
+  const top = a.y <= b.y ? a : b;
+  const lower = top === a ? b : a;
+  let points: RoutePoint[];
+  if (a.y === b.y) {
+    const left = a.x < b.x ? a : b;
+    const other = left === a ? b : a;
+    const x = (right(left) + other.x) / 2;
+    const y1 = left.y + left.height * 0.3;
+    const y2 = other.y + other.height * 0.7;
+    points = [
+      { x: right(left), y: y1 },
+      { x, y: y1 },
+      { x, y: y2 },
+      { x: other.x, y: y2 },
+    ];
+  } else if (top.x > lower.x) {
+    // Take one diagonal around the outside of the grid. Both diagonals can
+    // then be traced without a crossing in the middle of the four topics.
+    const x1 = top.x + top.width / 2;
+    const x2 = lower.x - outside;
+    const y1 = top.y - outside;
+    const y2 = lower.y + lower.height / 2;
+    points = [
+      { x: x1, y: top.y },
+      { x: x1, y: y1 },
+      { x: x2, y: y1 },
+      { x: x2, y: y2 },
+      { x: lower.x, y: y2 },
+    ];
+  } else {
+    // The left column, inner diagonal and right column occupy separate
+    // intervals of the same row gutter.
+    const sameColumn = top.x === lower.x;
+    const leftColumn = top.x === firstColumn;
+    const x1 =
+      top.x + top.width * (sameColumn ? (leftColumn ? 0.12 : 0.58) : 0.72);
+    const x2 =
+      lower.x + lower.width * (sameColumn ? (leftColumn ? 0.42 : 0.88) : 0.28);
+    const y = (bottom(top) + lower.y) / 2;
+    points = [
+      { x: x1, y: bottom(top) },
+      { x: x1, y },
+      { x: x2, y },
+      { x: x2, y: lower.y },
+    ];
+  }
+  const start = points[1]!,
+    end = points[2]!;
+  return {
+    points,
+    label: { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 },
   };
-  return trim(trim(route, source).reverse(), target).reverse();
 }
 
 export class ConceptSemanticZoom {
@@ -55,8 +89,9 @@ export class ConceptSemanticZoom {
   private status;
   private summaries: {
     element: SVGGElement;
-    points: RoutePoint[];
-    labelPositions: RoutePoint[];
+    badge: SVGGElement;
+    source: string;
+    target: string;
   }[] = [];
 
   constructor(
@@ -160,90 +195,81 @@ export class ConceptSemanticZoom {
         (node) => [node.dataset.conceptNode!, node.dataset.group!],
       ),
     );
-    const regionOf = new Map(
-      this.regions.map(({ bounds }) => [bounds.group, bounds]),
-    );
     const aggregates = new Map<
       string,
-      {
-        source: string;
-        target: string;
-        count: number;
-        points: RoutePoint[];
-        length: number;
-      }
+      { groups: string[]; relations: Set<string> }
     >();
     for (const edge of svg.querySelectorAll<SVGGElement>(
       "[data-concept-edge]",
     )) {
-      const [sourceId, targetId] = edge.dataset.conceptEdge!.split(" ");
-      const source = groupOf.get(sourceId!)!,
-        target = groupOf.get(targetId!)!;
-      if (source === target) continue;
-      const key = [source, target].sort().join(" ");
-      const points = betweenRegions(
-        JSON.parse(edge.dataset.route!),
-        regionOf.get(source)!,
-        regionOf.get(target)!,
-      );
-      const length = points
-        .slice(1)
-        .reduce(
-          (sum, p, i) =>
-            sum + Math.hypot(p.x - points[i]!.x, p.y - points[i]!.y),
-          0,
-        );
-      const earlier = aggregates.get(key);
-      aggregates.set(key, {
-        source,
-        target,
-        count: (earlier?.count || 0) + 1,
-        points: earlier && earlier.length < length ? earlier.points : points,
-        length: Math.min(earlier?.length ?? Infinity, length),
-      });
+      const relation = edge.dataset.conceptEdge!;
+      const [sourceId, targetId] = relation.split(" ");
+      const groups = [groupOf.get(sourceId!)!, groupOf.get(targetId!)!].sort();
+      if (groups[0] === groups[1]) continue;
+      const key = groups.join(" ");
+      const aggregate = aggregates.get(key) ?? {
+        groups,
+        relations: new Set<string>(),
+      };
+      aggregate.relations.add(relation);
+      aggregates.set(key, aggregate);
     }
-    for (const aggregate of aggregates.values()) {
+    for (const { groups, relations } of aggregates.values()) {
+      const count = relations.size;
+      const [source, target] = groups as [string, string];
       const element = document.createElementNS(ns, "g");
       element.classList.add("concept-cluster-connection");
-      element.setAttribute("aria-hidden", "true");
-      element.dataset.connectionCount = String(aggregate.count);
+      element.dataset.connectionCount = String(count);
+      const description = `${count} ${count === 1 ? "connection" : "connections"} between ${source} and ${target}`;
       const title = document.createElementNS(ns, "title");
-      title.textContent = `${aggregate.source} ↔ ${aggregate.target}: ${aggregate.count} authored connections. Expand the topics to inspect their directions and explanations.`;
+      title.textContent = description;
       element.append(title);
       const path = document.createElementNS(ns, "path");
       path.setAttribute("data-concept-summary-line", "");
-      element.append(path);
+      element.append(
+        path,
+        document.createElementNS(ns, "circle"),
+        document.createElementNS(ns, "circle"),
+      );
       const label = document.createElementNS(ns, "g");
       const text = document.createElementNS(ns, "text");
-      text.textContent = String(aggregate.count);
+      text.textContent = String(count);
       text.setAttribute("text-anchor", "middle");
       text.setAttribute("dominant-baseline", "middle");
       const rect = document.createElementNS(ns, "rect");
       label.append(rect, text);
       element.append(label);
-      // Prefer the longest segment's center. Other points on the route let
-      // fixed-size badges move apart as the map shrinks.
-      const segments = aggregate.points
-        .slice(1)
-        .map((b, i) => ({ a: aggregate.points[i]!, b }));
-      segments.sort(
-        (a, b) =>
-          Math.hypot(b.b.x - b.a.x, b.b.y - b.a.y) -
-          Math.hypot(a.b.x - a.a.x, a.b.y - a.a.y),
-      );
-      this.summaries.push({
-        element,
-        points: aggregate.points,
-        labelPositions: segments.flatMap(({ a, b }) =>
-          [0.5, 0.25, 0.75, 0.125, 0.875].map((fraction) => ({
-            x: a.x + (b.x - a.x) * fraction,
-            y: a.y + (b.y - a.y) * fraction,
-          })),
-        ),
+      label.setAttribute("role", "button");
+      label.setAttribute("aria-label", `Read ${description}`);
+      label.dataset.topicConnection = groups.join(" ");
+      const read = () =>
+        label.dispatchEvent(
+          new CustomEvent<TopicConnections>("concept-topic-connections", {
+            bubbles: true,
+            detail: { description, relations },
+          }),
+        );
+      label.addEventListener("click", read);
+      for (const event of ["pointerenter", "pointerleave", "focus", "blur"])
+        label.addEventListener(event, () => this.highlightTopicPair());
+      label.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          read();
+        }
       });
+      this.summaries.push({ element, badge: label, source, target });
       // Summary connections sit in front of region backgrounds and behind nodes.
       this.regions.at(-1)!.element.after(element);
     }
+  }
+
+  headingBounds(factor: number) {
+    return overviewHeadingBounds(
+      this.regions.map((region) => region.bounds),
+      this.subgroups.map((subgroup) => subgroup.bounds),
+      factor,
+    );
   }
 
   setContext(enabled: boolean, showLabels: boolean, factor: number) {
@@ -255,6 +281,20 @@ export class ConceptSemanticZoom {
 
   get overview() {
     return this.graphic.dataset.detail === "overview";
+  }
+
+  private highlightTopicPair() {
+    const active = this.overview
+      ? (this.summaries.find(({ badge }) => badge.matches(":focus-visible")) ??
+        this.summaries.find(({ badge }) => badge.matches(":hover")))
+      : undefined;
+    for (const summary of this.summaries)
+      summary.element.classList.toggle("is-traced", summary === active);
+    for (const { element, bounds } of this.regions)
+      element.classList.toggle(
+        "is-traced-topic",
+        bounds.group === active?.source || bounds.group === active?.target,
+      );
   }
 
   private render() {
@@ -282,13 +322,42 @@ export class ConceptSemanticZoom {
         : detail === "concepts"
           ? "Zoom in or focus a concept to follow its connections."
           : "Hover or focus a concept to read the connection labels.";
-    for (const { element, bounds } of this.regions) {
+    const firstColumn = Math.min(...this.regions.map(({ bounds }) => bounds.x));
+    const lastColumn = Math.max(...this.regions.map(({ bounds }) => bounds.x));
+    const firstRow = Math.min(...this.regions.map(({ bounds }) => bounds.y));
+    const lastRow = Math.max(...this.regions.map(({ bounds }) => bounds.y));
+    const cell = this.regions[0]!.bounds;
+    // Compact views show only the four topic cards. Give the count buttons a
+    // clear gutter at phone widths without shrinking those cards or their type.
+    const minGap = compactOverview ? 42 / (scale * this.factor) : 0;
+    const dx = Math.max(
+      0,
+      (minGap - (lastColumn - firstColumn - cell.width)) / 2,
+    );
+    const dy = Math.max(0, (minGap - (lastRow - firstRow - cell.height)) / 2);
+    const displayed = new Map(
+      this.regions.map(({ bounds }) => [
+        bounds.group,
+        {
+          ...bounds,
+          x: bounds.x + (bounds.x === firstColumn ? -dx : dx),
+          y: bounds.y + (bounds.y === firstRow ? -dy : dy),
+        },
+      ]),
+    );
+    for (const { element, bounds: authoredBounds } of this.regions) {
+      const bounds = displayed.get(authoredBounds.group)!;
       element.classList.toggle("is-hidden", !this.enabled);
       element.setAttribute("tabindex", this.enabled ? "0" : "-1");
       element.setAttribute(
         "transform",
-        `translate(${bounds.x * this.factor} ${bounds.y * this.factor})`,
+        `translate(${authoredBounds.x * this.factor} ${authoredBounds.y * this.factor})`,
       );
+      if (compactOverview)
+        element.style.setProperty(
+          "--compact-topic-position",
+          `translate(${bounds.x}px, ${bounds.y}px)`,
+        );
       element
         .querySelector("rect")!
         .setAttribute("width", String(bounds.width * this.factor));
@@ -376,32 +445,30 @@ export class ConceptSemanticZoom {
         ),
       );
     }
-    const placed: RoutePoint[] = [];
-    const pixelsPerUnit = scale * this.factor;
     for (const summary of this.summaries) {
-      summary.element.classList.toggle("is-hidden", detail !== "overview");
-      summary.element.querySelector("path")!.setAttribute(
-        "d",
-        routePath(
-          summary.points.map((point) => ({
-            x: point.x * this.factor,
-            y: point.y * this.factor,
-          })),
-        ),
+      const visible = detail === "overview";
+      summary.element.classList.toggle("is-hidden", !visible);
+      const label = summary.badge;
+      label.setAttribute("tabindex", visible ? "0" : "-1");
+      if (!visible) continue;
+      const route = topicConnection(
+        displayed.get(summary.source)!,
+        displayed.get(summary.target)!,
+        12 / (scale * this.factor),
+        firstColumn - dx,
       );
-      const label = summary.element.querySelector("g")!;
-      const position =
-        summary.labelPositions.find((p) =>
-          placed.every(
-            (other) =>
-              Math.abs(p.x - other.x) * pixelsPerUnit >= badgeWidth + 3 ||
-              Math.abs(p.y - other.y) * pixelsPerUnit >= badgeHeight + 3,
-          ),
-        ) ?? summary.labelPositions[0]!;
-      placed.push(position);
+      summary.element
+        .querySelector("path")!
+        .setAttribute("d", routePath(route.points));
+      const pins = [route.points[0]!, route.points.at(-1)!];
+      summary.element.querySelectorAll("circle").forEach((circle, index) => {
+        circle.setAttribute("cx", String(pins[index]!.x));
+        circle.setAttribute("cy", String(pins[index]!.y));
+        circle.setAttribute("r", String(2 / scale));
+      });
       label.setAttribute(
         "transform",
-        `translate(${position.x * this.factor} ${position.y * this.factor})`,
+        `translate(${route.label.x} ${route.label.y})`,
       );
       const size = 1 / scale;
       label.querySelector<SVGTextElement>("text")!.style.fontSize =
@@ -416,5 +483,6 @@ export class ConceptSemanticZoom {
       }))
         rect.setAttribute(name, String(value * size));
     }
+    this.highlightTopicPair();
   }
 }

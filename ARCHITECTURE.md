@@ -50,6 +50,8 @@ The concept graph's authored registries remain separate from [editorial subcateg
 [The build-only layout adapter](scripts/lib/concept-layout.ts) places equally sized topic regions in an aligned grid, with regular concept rows inside named subcategories and dimensions derived from their membership.
 [The routing adapter](scripts/lib/concept-routing.ts) uses pinned libavoid WebAssembly only during the build to route authored connections around concept boxes and topic/subcategory headings, preserving proposition endpoints and direction.
 [The camera](site/scripts/concept-viewport.ts) owns pan/zoom state; [semantic zoom](site/scripts/concept-semantic-zoom.ts) owns counted group summaries, subcategory entry and detail presentation, while [concepts.ts](site/scripts/concepts.ts) retains filters, shareable subcategory selection, reading navigation and reference panes.
+[Topic connection counts](site/scripts/concept-topic-connections.ts) open the matching entries in the map’s existing relationship list.
+[Whole-book label placement](shared/concept-route-labels.ts) uses the routed line segments and reserves space for cards and headings in both the explorer and the static export.
 These presentation owners do not change the public graph schema or require a browser layout engine.
 [The explicit browser floors](package.json) drive every site-owned JavaScript transform through [browser-targets.ts](scripts/lib/browser-targets.ts), including lazy vendor bundles.
 CSS is inlined without compatibility transformation; the browser baseline covers its required features as well as JavaScript and DOM APIs.
