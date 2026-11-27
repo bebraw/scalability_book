@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 import {
   phases,
   rubricVersion,
+  individualWorkMinimums,
+  adjustmentFor,
+  availableIndividualPoints,
+  hasDiaryEntry,
+  hasAssessmentEvidence,
   projectCriteria,
   calculateResult,
   csvCell,
@@ -15,6 +20,7 @@ import {
   type Grade,
   type CourseFile,
   type Adjustment,
+  type CourseAdjustment,
 } from "../shared/course.ts";
 import {
   Problem,
@@ -111,14 +117,45 @@ function inTeam(course: Course, phase: Phase, group: string, user: CourseUser) {
     team(course, phase, group).members.includes(user.id)
   );
 }
-function parseAdjustment(value: unknown, course: Course): Adjustment {
+function parseAdjustment(
+  value: unknown,
+  course: Course,
+): Adjustment | CourseAdjustment {
   const a = obj(value);
-  requireThat(phases.includes(a.phase as Phase), "Unknown phase.");
   const student = studentId(a.student);
   requireThat(
     course.students.some((s) => s.id === student),
     "Unknown student.",
   );
+  const reason = text(
+    a.reason,
+    "Approved arrangement and replacement activity",
+    2000,
+    true,
+  );
+  if (course.rubric === rubricVersion) {
+    requireThat(
+      a.phase === "course",
+      "Set a course-wide diary requirement for this rubric.",
+    );
+    const caps = obj(a.availablePointsByPhase);
+    return {
+      student,
+      phase: "course",
+      lectureMinimum: integer(
+        a.lectureMinimum,
+        0,
+        individualWorkMinimums.lectures,
+      ),
+      availablePointsByPhase: {
+        establish: integer(caps.establish, 1, 21),
+        challenge: integer(caps.challenge, 1, 21),
+        compare: integer(caps.compare, 1, 21),
+      },
+      reason,
+    };
+  }
+  requireThat(phases.includes(a.phase as Phase), "Unknown phase.");
   const adjustment: Adjustment = {
     student,
     phase: a.phase as Phase,
@@ -126,12 +163,7 @@ function parseAdjustment(value: unknown, course: Course): Adjustment {
     assessmentMinimum: integer(a.assessmentMinimum, 0, 12),
     contributionMinimum: integer(a.contributionMinimum, 0, 3),
     availablePoints: integer(a.availablePoints, 1, 21),
-    reason: text(
-      a.reason,
-      "Approved arrangement and replacement activity",
-      2000,
-      true,
-    ),
+    reason,
   };
   requireThat(
     adjustment.availablePoints >=
@@ -725,12 +757,17 @@ export async function handleCourses(
           !(a.student === adjustment.student && a.phase === adjustment.phase),
       );
       next.adjustments.push(adjustment);
-      const grade = values<Grade>("individual-grade").find(
-        (g) => g.phase === adjustment.phase && g.subject === adjustment.student,
+      const grades = values<Grade>("individual-grade").filter(
+        (g) =>
+          g.subject === adjustment.student &&
+          (adjustment.phase === "course" || g.phase === adjustment.phase),
       );
       requireThat(
-        !grade ||
-          grade.scores.reduce((a, b) => a + b, 0) <= adjustment.availablePoints,
+        grades.every(
+          (grade) =>
+            grade.scores.reduce((a, b) => a + b, 0) <=
+            availableIndividualPoints(adjustment, grade.phase),
+        ),
         "Available points cannot be lower than earned individual points.",
       );
       return reply(
@@ -1239,36 +1276,47 @@ export async function handleCourses(
         body.stage === "draft" || body.stage === "submit",
         "Choose save draft or submit portfolio.",
       );
+      const partialAssessment = course.rubric === rubricVersion;
+      const assessmentText = (key: string, label: string) =>
+        text(
+          partialAssessment ? (data[key] ?? "") : data[key],
+          label,
+          2500,
+          !partialAssessment && body.stage === "submit",
+        );
       const value: Portfolio = {
         phase,
         student: subject,
         lectures,
         files: fileIds,
-        self: text(data.self, "Self-assessment", 2500, body.stage === "submit"),
-        peers: text(
-          data.peers,
+        self: assessmentText("self", "Self-assessment"),
+        peers: assessmentText(
+          "peers",
           soloStudent(course, phase, subject)
             ? "Private independent implementation review"
             : "Private peer feedback",
-          2500,
-          body.stage === "submit",
         ),
-        reflection: text(
-          data.reflection,
+        reflection: assessmentText(
+          "reflection",
           soloStudent(course, phase, subject)
             ? "Response to feedback and solo reflection"
             : "Response and group reflection",
-          2500,
-          body.stage === "submit",
         ),
-        contribution: text(
-          data.contribution,
+        contribution: assessmentText(
+          "contribution",
           "Decision challenged, tested or reviewed",
-          2500,
-          body.stage === "submit",
         ),
         submittedAt: body.stage === "submit" ? now : null,
       };
+      if (partialAssessment && value.submittedAt)
+        requireThat(
+          value.lectures.some(
+            (entry) =>
+              hasDiaryEntry(entry) ||
+              (entry.mode !== "missing" && entry.participation),
+          ) || hasAssessmentEvidence(value),
+          "Include a diary entry, participation evidence or individual assessment before submitting.",
+        );
       const old = find<Portfolio>("portfolio");
       requireThat(
         !old?.value.submittedAt || body.stage === "submit",
@@ -1486,15 +1534,26 @@ export async function handleCourses(
               (entry.mode !== "missing" && entry.participation),
             "Participation points require recorded live or equivalent remote evidence.",
           );
+          if (course.rubric === rubricVersion)
+            requireThat(
+              hasDiaryEntry(entry) ||
+                (pointScores[i * 3 + 1] === 0 && pointScores[i * 3 + 2] === 0),
+              "Diary points require a written entry or reference for that lecture.",
+            );
         }
+        // Contribution is judged against the project record and corroborating sources.
+        if (course.rubric === rubricVersion)
+          requireThat(
+            hasAssessmentEvidence(portfolio) ||
+              pointScores.slice(9, 12).every((score) => score === 0),
+            "Self-assessment, peer feedback and reflection points require submitted assessment evidence.",
+          );
       }
-      const adjustment = course.adjustments.find(
-        (a) => a.student === subject && a.phase === phase,
-      );
+      const adjustment = adjustmentFor(course, subject, phase);
       if (!project)
         requireThat(
           pointScores.reduce((a, b) => a + b, 0) <=
-            (adjustment?.availablePoints ?? 21),
+            availableIndividualPoints(adjustment, phase),
           "Scores exceed the approved available individual points.",
         );
       const value: Grade = {

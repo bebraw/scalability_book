@@ -268,7 +268,8 @@ To rehearse an update, install the two files from the plugin ZIP into the existi
 Check that the lecture notes, plugin settings and TA history are available after reload.
 Book links in the downloadable diary and project starter use the branch’s Cloudflare alias for a PR preview, the local book address for an editable build and the published book address on `main`.
 When testing a preview, follow the illustrated tutorial link from the extracted starter, then open the reading, slide deck and self-study module from **Establish → Lecture 1**.
-All four should open on the same preview.
+Open the separate welcome presentation in that note as well.
+All five links should open on the same preview.
 To check slide revisions locally, open a lecture from `/slides/`, edit its [Markdown deck](../slides/README.md) and reload the numbered page after the development build completes.
 The book review URL appears in the plugin before the local TA starts.
 Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records diary ownership and recovery, and [ADR-067](adrs/implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md) covers the optional plugin runtime and peer handoff.

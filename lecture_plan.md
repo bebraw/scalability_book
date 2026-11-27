@@ -1,7 +1,9 @@
 # Lecture plan
 
 This is an intentionally loose plan for the first run of the course.
-Each lecture is approximately 90 minutes, with about 15 additional minutes left uncommitted for questions, technical delays, extended discussion, or an activity that proves more useful than expected.
+Each lecture has 105 minutes.
+The first meeting reserves time for questions at the midpoint and the end.
+Later sessions can use up to 15 minutes flexibly for questions, technical delays or extended discussion.
 
 The learning outcomes in `course_plan.md` remain the overall design frame.
 They do not need to be presented explicitly during each lecture.
@@ -42,29 +44,61 @@ Schedule the bounded cross-team audit after each submission within the existing 
 
 ### 1. Course introduction and a common view of scalability
 
-Use five minutes of the opening reflection for an individual case, before the word cloud or group discussion.
-Use the same prompt for the announced remote equivalent.
+Use the [welcome deck](slides/lecture-01-orientation.md) for the first 55 minutes and the [scalability deck](slides/lecture-01-what-scalability-means.md) for the remaining 50.
+Protect ten minutes at the end of each for written questions on any topic.
 
-> A team added a cache to its workspace summary.
-> It now reuses a saved copy and the team reports that the page loads twice as fast.
-> What would you need to know before recommending that they keep the cache?
+| Minutes | In the room                                                                                                       |
+| ------- | ----------------------------------------------------------------------------------------------------------------- |
+| 0–10    | Introduce Juho and the TAs, then briefly show Moodle, the course workspace and a prepared diary note.             |
+| 10–18   | Introduce the Work Activity Tracker and the three builds.                                                         |
+| 18–32   | Show how 153 points map to grades and explain how students assess their own work and give each teammate feedback. |
+| 32–45   | Start group formation and show how a student can propose a group or ask staff to assign one.                      |
+| 45–55   | Take general written questions in Lecture Studio.                                                                 |
+| 55–62   | Collect the class word cloud, invite two students to explain a word and save the result.                          |
+| 62–68   | Introduce the book’s definition, then apply it to the running tracker and the team developing it.                 |
+| 68–76   | Use one tracker example each for demand, data, contributor and change pressure.                                   |
+| 76–89   | Run the pipeline demo and ask for a prediction before each change.                                                |
+| 89–95   | Discuss what a team could test in Implementation A and what to bring to its first session.                        |
+| 95–105  | Take general written questions in Lecture Studio.                                                                 |
 
-Ask students to record their provisional recommendation, the first thing they would measure and why in their private lecture diary, using their usual written, audio or video format.
-Let them answer on their own before consulting an agent or comparing ideas.
-Keep this first response for Lecture 9.
+For each deck, turn **Live** on and show the audience link so students can use **Ask a question** as questions occur to them.
+At each Q&A, open **Responses → Questions**, choose **Discuss** to show a question and answer it.
+Copy questions you want to revisit into a private staff note before choosing **Done** or switching decks.
+The second deck starts a fresh queue.
 
-Possible elements:
+Open the chapter with **What is scalability to you?**
+Ask for one word or short phrase before offering examples.
+Approve responses, choose **Show approved cloud** and invite students to explain what they had in mind.
+Save a screenshot of the approved cloud, or its terms and counts, in a private instructor folder labeled with the course run and date.
+In Lecture 9, ask the same question before showing the saved cloud.
+If the live activity is unavailable, collect the class’s own words on the board and photograph them.
 
-- introduce the course, related work, practical arrangements, and the three-project structure;
-- form teams, unless already formed: groups must have three students wherever possible, with instructor-arranged exceptions for cohort remainders, support needs, or membership changes;
-- explain how group projects, lectures, learning diaries, reflection, and assessment fit together;
-- collect students' initial associations with scalability through a word cloud or similar activity;
-- discuss the different views of scalability developed in the first chapter;
-- distinguish pressures, maintained goals, responses, constraints, and neighboring properties without trying to exhaust the topic;
-- briefly introduce agent-driven development so teams can begin Establish.
+**Pipeline demonstration.** Open **Can the tracker keep up?** in the live deck.
+The same [pipeline model](https://scalableweb.dev/learn/pilot/responses/#slide-capacity) is linked in the student slides.
+Ask the class to keep the event queue from growing.
+Start at 100 new events per second with retries at zero and admission control off.
+The database has room for 10 more events per second.
 
-The lecture should leave teams ready to choose a project direction and state their first bounded scalability claims.
-Preserve the initial word cloud so it can be compared with the final lecture.
+1. Ask for a prediction, then raise **New work /s** to **150**.
+   Read the result together.
+   The model's database can handle 110 per second, so the queue grows by 40 per second.
+2. Ask whether adding 40 per second of database capacity will close the gap.
+   Choose **Add 40/s at limit**.
+   The downstream stage can handle 130 per second, leaving 20 per second to accumulate.
+3. Ask which two counts students would compare to check the same claim in a real tracker over one minute.
+   The displayed rates come from the model.
+   A team would need observations of arrivals, completions and anything rejected in its own system.
+
+If the controls are unavailable, draw the two stages with capacities of 110 and 130 on the board.
+Offer 150 events in one second and let students work out the excess before and after increasing the database capacity.
+
+After the demo, ask what the team could check about its running tracker and what it could check about changing the code.
+Teams take those two claims to their first session, build A with the approved large model and one coding agent at a time, and submit before Lecture 4.
+Students follow the [diary setup guide](docs/course-diary.md) independently after class and keep their private cache prediction for Lecture 9.
+
+Before class, rehearse the [systems tour and Q&A controls](docs/course-system.md#prepare-the-first-lecture).
+Confirm the TAs’ names and contact route, the course link and group-formation dates.
+If time runs short, show the prepared diary note briefly and take one prediction per change in the demo.
 
 ### 2. Coding agents and first experiences
 
@@ -214,7 +248,9 @@ Give the same two prompts in order in the remote equivalent.
 During the discussion, invite students to compare with their opening entry if they have it, or identify an uncertainty the handover observation raised.
 When reviewing the diaries, look for a connection between a user's decision, an observable effect and evidence that could change the student's recommendation.
 
-Repeat the opening scalability word cloud or another equivalent activity.
+Ask **“What is scalability to you?”** again.
+Collect the new words before showing the class its first answers.
+Then show the approved final cloud alongside the opening screenshot or transcription saved for this course run.
 Compare the two views and discuss:
 
 - which ideas persisted;

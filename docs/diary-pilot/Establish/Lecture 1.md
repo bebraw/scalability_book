@@ -2,11 +2,13 @@
 
 [Establish overview](01-Establish.md)
 
+After class, use this prompt for your first diary entry.
+
 A team says its cached workspace summary loads twice as fast.
 Would you keep the cache?
-Record what you would measure first and why.
-Keep this initial answer for the closing lecture. [Reading](https://scalableweb.dev/chapters/what-is-scalability/)
+On your own, record what you would measure first and why.
+Keep your answer for Lecture 9. [Reading](https://scalableweb.dev/chapters/what-is-scalability/)
 
-Write your prediction on your own before opening the slides or trying the activity.
+If a word from the class cloud helped shape your answer, add it beside your example.
 
-[Lecture slides (draft)](https://scalableweb.dev/slides/lecture-1/) · [Optional self-study](https://scalableweb.dev/learn/pilot/scalability/)
+[Course welcome and project launch](https://scalableweb.dev/slides/lecture-1/orientation/) · [Lecture slides (draft)](https://scalableweb.dev/slides/lecture-1/) · [Optional self-study](https://scalableweb.dev/learn/pilot/scalability/)

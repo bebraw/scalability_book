@@ -117,6 +117,7 @@ No accepted decisions await implementation.
 | [ADR-065](implemented/ADR-065-back-up-book-data-to-private-r2.md) | Verify book snapshots locally and keep dated copies in private EU R2. |
 | [ADR-066](implemented/ADR-066-keep-course-diaries-in-obsidian.md) | Keep diaries in student-owned Markdown, link book highlights and discussion, and retain recovery for existing Notebook records. |
 | [ADR-067](implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md) | Let the desktop diary plugin supply a private attempt or run the book’s local assistant, and distribute plugin updates independently of student notes. |
+| [ADR-068](implemented/ADR-068-count-lecture-diary-entries-across-the-course.md) | Require an entry for seven lectures across the course and award individual assessment points toward the total. |
 
 [The learning workspace guide](../learning-workspace.md) records current companion and peer behavior, rollout requirements and learner-evaluation limits.
 

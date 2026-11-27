@@ -106,7 +106,7 @@ Each phase includes one approximately 30-minute [shared engineering session](spe
 Each student predicts first, the group investigates with the agent, and a student other than the operator explains the acceptance decision.
 The record belongs in the existing decision record or AI-use log.
 
-Each student must submit self- and peer-assessment after every phase so useful feedback can be shared with the group and the student can reflect on their collaboration.
+Each phase offers up to 12 points for giving teammates useful feedback and reflecting on individual contributions and collaboration.
 Collect this assessment and the phase's lecture diary entries in one private individual portfolio, following the [course submission workflow](specifications/00_introduction.md#groups-submissions-and-access).
 
 ## Course learning diary
@@ -114,10 +114,10 @@ Collect this assessment and the phase's lecture diary entries in one private ind
 During the course, the students are expected to maintain a learning diary that should contain an entry per lecture about what they learned.
 There will also be additional reading available related to each lecture besides the course book.
 Note that the entries don't have to be written but can also be provided in an audio or video format.
-In Lectures 1 and 9, students use five minutes of reflection time to decide what they would need to know before recommending a workspace cache.
-They record their own reasoning before consulting an agent or discussing it with others.
+After Lecture 1, students set up their diary independently and consider what they would need to know before recommending a workspace cache.
+They record their own recommendation, first measurement and reason before consulting an agent or discussing the case with others.
 Midway through the course, [Lecture 5](lecture_plan.md#5-development-friction) gives students a chance to reopen one of their own Establish predictions and use what they have since observed to decide what to try in Challenge.
-The [closing lecture](lecture_plan.md#9-compare-presentations-and-course-reflection) returns to the cache case and adds a new observation so students can explain which evidence changes or supports their recommendation.
+The [closing lecture](lecture_plan.md#9-compare-presentations-and-course-reflection) gives students five minutes in class to answer the original question independently and then consider a new observation before revisiting their earlier entry.
 
 ## Grading
 
@@ -130,10 +130,9 @@ It is derived from the following factors:
 
 There's slight bias towards project work in the point system so you cannot complete the course by participation alone.
 
-Passing requires at least half the available total points, at least 10 points from every project, and the [mandatory individual work](specifications/grading.md#mandatory-individual-work):
-
-- two of three lecture activities in each phase, each earning its participation point and both diary points; and
-- at least 6 of 12 self- and peer-assessment points in each phase, including at least 1 point for reliable contribution and shared ownership.
+Passing requires at least half the available total points, at least 10 points from each project, and [diary entries for seven of the nine lectures](specifications/grading.md#mandatory-individual-work).
+The seven entries may be spread across the phases in any combination.
+Self- and peer-assessment points contribute to the total.
 
 Approved absence and support arrangements specify any replacement activity or adjusted requirement alongside any points adjustment.
 Once all passing requirements are met, the grades are scaled from the percentage of available points as follows:

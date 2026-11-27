@@ -18,7 +18,7 @@ test("run checklists link every entry to its pinned owner and reject unsupported
   const editions = await readRequirementEditions(process.cwd());
   assert.deepEqual(
     editions.map((edition) => edition.version),
-    ["2026-10-v2", requirementVersion],
+    ["2026-10-v2", "2026-11-v1", requirementVersion],
   );
   const bibliography = await readFile("bibliography.bib", "utf8");
   for (const edition of editions) {
@@ -45,7 +45,15 @@ test("run checklists link every entry to its pinned owner and reject unsupported
         );
     }
   }
-  assert.equal(requirementsFor({}).version, "2026-11-v1");
+  assert.equal(requirementsFor({}).rubric, "2026-11-individual-evidence-v3");
+  assert.equal(
+    requirementsFor({ rubric: "2026-10-solo-equivalence-v2" }).version,
+    "2026-11-v1",
+  );
+  assert.equal(
+    requirementsFor({ requirements: "2026-11-v1" }).rubric,
+    "2026-10-solo-equivalence-v2",
+  );
   assert.throws(
     () => requirementsFor({ requirements: "unavailable-edition" }),
     /Unsupported/,

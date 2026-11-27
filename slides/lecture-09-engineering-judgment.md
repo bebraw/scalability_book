@@ -120,15 +120,15 @@ Keep those results separate from your team's B–C comparison.
 
 # Complete the Compare record
 
-C's implementation was due before this lecture.
-After the independent audit, add the report and your response to the same group record.
+C was due before class.
+Add the independent audit report and your response to the group record.
 
-| In the group's evidence index | What to link                                                                                                                |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Implementation                | Frozen C revision, common checks, engineering session, audit and response, earlier A and B records                          |
-| Fleet evidence                | Plan and run record, two debugging findings, coordination measures, B–C comparison, supplied trace analysis, workflow model |
-| Scaling and deployment        | Application model, scaling change and before-and-after results, new failure or recovery check, deployed workload rerun      |
-| Final decision                | A–B–C matrix, target architecture, trade-offs, owner and revisit condition                                                  |
+| Evidence index         | What to link                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Implementation         | Frozen C revision, common checks, engineering session, audit and response, A and B records                               |
+| Fleet                  | Plan, run record, two debugging findings, coordination measures, B–C comparison, supplied trace analysis, workflow model |
+| Scaling and deployment | Application model, scaling change, before/after results, new failure or recovery check, deployed workload rerun          |
+| Decision               | A–B–C matrix, target architecture, trade-offs, owner, when to revisit                                                    |
 
 <!-- [Sources] specifications/00_introduction.md#submit-each-phase-in-stages; specifications/03_compare.md#what-to-do-and-submit -->
 
@@ -174,9 +174,7 @@ Which word would you keep, replace or add after the three builds?
 Submit your **private Compare portfolio** by the published deadline.
 Label each diary entry by lecture.
 In your self- and peer-assessment, link the evidence for a decision you challenged, tested or reviewed and explain the outcome.
-Each phase assessment needs at least 6/12 points, including 1/3 for reliable contribution and shared ownership.
-
-Two of the three lecture activities must count in each phase.
-For each, take part live or through the announced remote equivalent and connect one concrete idea in your diary to evidence, an assumption or a decision.
+Check that your submitted portfolios include diary entries for at least **seven different lectures**.
+An idea from today’s discussion or a connection to your project can be your Lecture 9 entry.
 
 <!-- [Sources] lecture_plan.md#9-compare-presentations-and-course-reflection; specifications/grading.md#mandatory-individual-work; specifications/grading.md -->

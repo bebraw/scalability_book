@@ -278,12 +278,18 @@ test("grading presets exercise frozen evidence, late arrival, withdrawal, stale 
         .result;
     assert.equal(result(0).status, "pass");
     assert.equal(result(0).grade, 5);
-    assert.equal(result(1).status, "fail");
-    assert.ok(result(1).percentage > 90);
-    assert.match(result(1).unmet.join(" "), /1\/3 completed lecture/);
+    assert.equal(result(1).status, "pass");
+    assert.equal(result(1).grade, 5);
+    assert.equal(result(1).earned, 147);
+    assert.deepEqual(
+      result(1).breakdown.map((r: { completed: number }) => r.completed),
+      [3, 1, 3],
+    );
     assert.equal(result(2).status, "fail");
-    assert.ok(result(2).percentage > 80);
-    assert.match(result(2).unmet.join(" "), /self\/peer assessment/);
+    assert.equal(result(2).earned, 132);
+    assert.deepEqual(result(2).unmet, [
+      "Diary entries: 6/9; needs 7 across the course",
+    ]);
     assert.equal(result(4).status, "pass");
     assert.equal(result(5).status, "withdrawn");
     assert.equal(result(5).grade, null);
@@ -311,7 +317,7 @@ test("grading presets exercise frozen evidence, late arrival, withdrawal, stale 
     assert.ok(view.audits.length >= 9);
     const csv = await f.api(`${base}/export`);
     const exported = await csv.text();
-    assert.match(exported, /"SIM002","Ben Example".*"0","fail"/);
+    assert.match(exported, /"SIM002","Ben Example".*"5","pass"/);
     assert.deepEqual(
       exported
         .split("\r\n")
@@ -380,7 +386,7 @@ test("grading presets exercise frozen evidence, late arrival, withdrawal, stale 
     ).state;
     const studentView = await json(await f.api(base));
     assert.equal(studentView.results.length, 1);
-    assert.equal(studentView.results[0].result.status, "fail");
+    assert.deepEqual(studentView.results[0].result, result(1));
     assert.ok(
       studentView.portfolios.every(
         (p: any) => p.value.student === course.students[1]!.id,

@@ -70,7 +70,7 @@ Individual contribution is assessed through the self- and peer-assessment criter
 Submit one private individual portfolio per phase containing the relevant lecture diary entries and self- and peer-assessment.
 Label entries by lecture so the instructor can apply the existing three-point lecture criteria.
 The [assessment rubric](grading.md) defines the criteria, passing requirements, and grade thresholds.
-To pass, each student must also complete the [mandatory lecture activities and individual assessments](grading.md#mandatory-individual-work) in every phase.
+For the [individual passing requirement](grading.md#mandatory-individual-work), include diary entries for at least seven of the nine lectures across your submitted portfolios.
 
 ### Approved solo route
 
@@ -121,7 +121,7 @@ Looking at another submission does not authorize copying its implementation; fol
 
 Keep learning diaries, self- and peer-assessment reports, personal support information, and scoring records in the private course submission channel.
 Share useful feedback with teammates, while confidential assessment reports go to the teaching staff.
-Each group can see its project score and feedback; each student can see their individual score breakdown, completed lecture activities, phase assessment results, total, and any unmet passing requirement.
+Each group can see its project score and feedback; each student can see their individual score breakdown, diary entry count, phase assessment results, total, and any unmet passing requirement.
 
 ## Guidelines for course work
 

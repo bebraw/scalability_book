@@ -16,6 +16,7 @@ import {
 } from "../worker/courses.ts";
 import {
   phases,
+  legacyRubricVersion,
   rubricVersion,
   calculateResult,
   csvCell,
@@ -926,11 +927,11 @@ test("group allocation generates identifiers and retains established IDs across 
   });
   assert.equal(arbitrary.status, 400);
 });
-test("scores cannot bypass phase hurdles; pending differs from explicitly assessed zero", () => {
+test("older pinned rubrics keep their phase minima, arrangements and pending results", () => {
   const course: Course = {
     id: "x",
     name: "x",
-    rubric: rubricVersion,
+    rubric: legacyRubricVersion,
     staff: [],
     students: [],
     adjustments: [],
@@ -1049,6 +1050,160 @@ test("scores cannot bypass phase hurdles; pending differs from explicitly assess
   assert.equal(adjusted.available, 150);
   assert.equal(adjusted.status, "pass");
 });
+test("seven distinct submitted diary entries count across phases independently of assessment and attendance points", async (t) => {
+  const f = fixture(t);
+  const course = (await f.create()).value;
+  const portfolios = phases.map((phase, phaseIndex) => {
+    const portfolio = emptyPortfolio(phase, alice.id);
+    portfolio.submittedAt = before;
+    for (let i = 0; i < (phaseIndex === 1 ? 1 : 3); i++) {
+      if (i === 2)
+        portfolio.lectures[i]!.connection =
+          "My recorded explanation at minute 2 of the attached audio.";
+      else
+        portfolio.lectures[i]!.idea =
+          "Adding workers moved the queue downstream.";
+    }
+    return portfolio;
+  });
+  const individuals = phases.map((phase) => ({
+    phase,
+    subject: alice.id,
+    scores: Array<number>(13).fill(0),
+    missing: false,
+    evidenceRevision: null,
+    feedback: "Assessed without points.",
+  }));
+  const projects = phases.map((phase) => ({
+    phase,
+    subject: "red",
+    scores: projectScores,
+    missing: false,
+    evidenceRevision: null,
+    feedback: "Checked.",
+  }));
+  const result = () =>
+    calculateResult(
+      course,
+      alice.id,
+      [],
+      portfolios,
+      projects,
+      individuals,
+      true,
+    );
+  assert.deepEqual(
+    result().breakdown.map((p) => p.completed),
+    [3, 1, 3],
+  );
+  assert.equal(result().earned, 90);
+  assert.equal(result().grade, 1);
+  const seventh = portfolios[1]!.lectures[0]!;
+  seventh.idea = "  ";
+  seventh.participation = "Attended the lecture.";
+  seventh.mode = "live";
+  // A second field in an existing entry and participation elsewhere cannot replace the seventh entry.
+  portfolios[0]!.lectures[0]!.connection =
+    "We compared arrival and completion counts.";
+  individuals[1]!.scores[0] = 1;
+  assert.equal(result().grade, 0);
+  assert.deepEqual(result().unmet, [
+    "Diary entries: 6/9; needs 7 across the course",
+  ]);
+  seventh.connection = "After class I checked the number of readers.";
+  portfolios[1]!.submittedAt = null;
+  assert.equal(result().grade, 0);
+  course.adjustments.push({
+    student: alice.id,
+    phase: "course",
+    lectureMinimum: 6,
+    availablePointsByPhase: { establish: 21, challenge: 15, compare: 21 },
+    reason: "Approved reduced course diary requirement",
+  });
+  assert.equal(result().available, 147);
+  assert.equal(result().grade, 2);
+  for (const phase of phases) course.phases[phase].published = true;
+  course.phases.challenge.published = false;
+  const unreleased = calculateResult(
+    course,
+    alice.id,
+    [],
+    portfolios,
+    projects,
+    individuals,
+  );
+  assert.equal(unreleased.status, "pending");
+  assert.equal(unreleased.breakdown[1]!.completed, null);
+  assert.deepEqual(unreleased.unmet, []);
+});
+
+test("a diary-only submission can earn diary and corroborated contribution points independently", async (t) => {
+  const f = fixture(t);
+  const config = await f.create();
+  const base = `/${config.value.id}`;
+  const route = `${base}/portfolio/establish/${alice.id}`;
+  const work = emptyPortfolio("establish", alice.id);
+  const submit = () =>
+    f.request(
+      route,
+      "PUT",
+      { expected: null, stage: "submit", value: work },
+      alice,
+    );
+  assert.equal((await submit()).status, 400);
+  work.lectures[0]!.idea =
+    "I compared the demo with the project log: raising database capacity moved the queue downstream.";
+  assert.equal((await submit()).status, 200);
+  const gradeRoute = `${base}/individual-grade/establish/${alice.id}`;
+  const scores = Array<number>(13).fill(0);
+  const grade = () =>
+    f.request(
+      gradeRoute,
+      "PUT",
+      {
+        expected: null,
+        missing: false,
+        scores,
+        reason: "Assess diary only",
+        feedback:
+          "The diary connects the model to observed queue growth. The team's review thread and revised capacity check corroborate Alice’s contribution.",
+      },
+      admin,
+      after,
+    );
+  for (const absent of [0, 4, 5, 9, 10, 11]) {
+    scores[absent] = 1;
+    assert.equal(
+      (await grade()).status,
+      400,
+      `No evidence for criterion ${absent}`,
+    );
+    scores[absent] = 0;
+  }
+  scores[1] = scores[2] = 1;
+  scores[12] = 2;
+  assert.equal((await grade()).status, 200);
+  const view = await f.good<{
+    results: { student: Student; result: Result }[];
+  }>(base);
+  const assessed = view.results.find((r) => r.student.id === alice.id)!.result;
+  assert.equal(assessed.breakdown[0]!.completed, 1);
+  assert.equal(assessed.breakdown[0]!.assessment, 2);
+  assert.equal(assessed.breakdown[0]!.contribution, 2);
+  const capBelowEarned = await f.request(`${base}/adjustment`, "PUT", {
+    expected: config.revision,
+    adjustment: {
+      phase: "course",
+      student: alice.id,
+      lectureMinimum: 6,
+      availablePointsByPhase: { establish: 3, challenge: 21, compare: 21 },
+      reason: "Reduced availability",
+    },
+  });
+  assert.equal(capBelowEarned.status, 400);
+  assert.match(await capBelowEarned.text(), /lower than earned/);
+});
+
 test("course and portfolio identity isolation, delayed cohort access, and private attachments", async (t) => {
   const f = fixture(t),
     config = await f.create(),
@@ -1464,11 +1619,9 @@ test("writes check origin, bounded bodies and upload size; CAS also checks cours
     expected: config.revision,
     adjustment: {
       student: alice.id,
-      phase: "establish",
-      lectureMinimum: 1,
-      assessmentMinimum: 6,
-      contributionMinimum: 1,
-      availablePoints: 18,
+      phase: "course",
+      lectureMinimum: 6,
+      availablePointsByPhase: { establish: 18, challenge: 21, compare: 21 },
       reason: "Approved absence; replacement diary activity",
     },
   });
@@ -1527,11 +1680,9 @@ test("writes check origin, bounded bodies and upload size; CAS also checks cours
         expected: config.revision,
         adjustment: {
           student: alice.id,
-          phase: "establish",
-          lectureMinimum: 3,
-          assessmentMinimum: 12,
-          contributionMinimum: 1,
-          availablePoints: 1,
+          phase: "course",
+          lectureMinimum: 10,
+          availablePointsByPhase: { establish: 18, challenge: 21, compare: 21 },
           reason: "Impossible arrangement",
         },
       })

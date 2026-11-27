@@ -12,7 +12,10 @@ Take only the passages and attachments you want course staff to see. [Course wor
 
 ## Select a lecture entry
 
-For each activity you include, identify your live participation or announced remote equivalent and its evidence.
+The workspace labels entries by course lecture number, from 1 to 9.
+The Obsidian draft also gives each lecture’s position within its phase.
+Submit an idea or a connection for seven different lectures across your three portfolios.
+For participation points, identify your live participation or announced remote equivalent and its evidence.
 Choose one concrete idea, failure, model or trade-off from the entry.
 Which observation, earlier assumption or decision gives that idea meaning in your project?
 

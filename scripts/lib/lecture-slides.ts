@@ -11,6 +11,53 @@ import { escapeHtml } from "./text.ts";
 
 type SlidePage = { title: string; url: string; content: string };
 
+const chapterDecks = [
+  "what-scalability-means",
+  "agent-supported-development",
+  "measurement-and-evidence",
+  "web-architecture",
+  "development-friction",
+  "assumptions-under-pressure",
+  "agent-fleets",
+  "scaling-responses",
+  "engineering-judgment",
+];
+
+export async function readLectureDeckSources(directory: string) {
+  const decks = lectures.flatMap(({ number, phase }) => {
+    const prefix = `lecture-${String(number).padStart(2, "0")}-`;
+    const url = `/slides/lecture-${number}/`;
+    const chapter = {
+      number,
+      phase,
+      filename: `${prefix}${chapterDecks[number - 1]}.md`,
+      url,
+    };
+    if (number !== 1) return [chapter];
+    return [
+      {
+        number,
+        phase,
+        filename: `${prefix}orientation.md`,
+        url: `${url}orientation/`,
+      },
+      chapter,
+    ];
+  });
+  const files = new Set(
+    (await readdir(directory)).filter((name) =>
+      /^lecture-\d{2}-.+\.md$/.test(name),
+    ),
+  );
+  for (const { filename } of decks) {
+    if (!files.delete(filename))
+      throw new Error(`Missing lecture deck: ${filename}`);
+  }
+  if (files.size)
+    throw new Error(`Unmapped lecture decks: ${[...files].join(", ")}`);
+  return decks;
+}
+
 export function renderStudentDeck(source: string, lecture: number) {
   const deck = source
     .replaceAll("\r\n", "\n")
@@ -65,29 +112,19 @@ export function renderStudentDeck(source: string, lecture: number) {
 export async function readLectureSlidePages(
   directory: string,
 ): Promise<SlidePage[]> {
-  const files = (await readdir(directory))
-    .filter((name) => /^lecture-\d{2}-.+\.md$/.test(name))
-    .sort();
-  if (files.length !== lectures.length)
-    throw new Error("Expected one slide deck per course lecture");
+  const sources = await readLectureDeckSources(directory);
   const decks = await Promise.all(
-    lectures.map(async ({ number, phase }, index) => {
-      const filename = files[index]!;
-      if (!filename.startsWith(`lecture-${String(number).padStart(2, "0")}-`))
-        throw new Error(
-          `Expected a slide deck for Lecture ${number}, found ${filename}`,
-        );
+    sources.map(async ({ filename, number, phase, url }) => {
       const { title, content } = renderStudentDeck(
         await readFile(path.join(directory, filename), "utf8"),
         number,
       );
       return {
+        number,
         phase,
         title,
-        url: `/slides/lecture-${number}/`,
-        content:
-          '<p class="chapter-kicker"><a href="/slides/">All lecture slides</a> · Draft</p>' +
-          content,
+        url,
+        content,
       };
     }),
   );
@@ -109,6 +146,18 @@ export async function readLectureSlidePages(
         "<h1>Lecture slides</h1><p>Use these draft slides to prepare for class or revisit a lecture. Reopen the same link for the latest version.</p>" +
         groups.join(""),
     },
-    ...decks,
+    ...decks.map(({ number, title, url, content }) => {
+      const companionLinks = decks
+        .filter((other) => other.number === number && other.url !== url)
+        .map(
+          (other) => `<a href="${other.url}">${escapeHtml(other.title)}</a> · `,
+        )
+        .join("");
+      return {
+        title,
+        url,
+        content: `<p class="chapter-kicker"><a href="/slides/">All lecture slides</a> · ${companionLinks}Draft</p>${content}`,
+      };
+    }),
   ];
 }

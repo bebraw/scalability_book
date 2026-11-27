@@ -51,6 +51,9 @@ test("setup, slides and self-study links open the matching lecture on the book t
       assert.deepEqual(
         links,
         new Set([
+          ...(lecture.number === 1
+            ? [`${origin}/slides/lecture-1/orientation/`]
+            : []),
           `${origin}/slides/lecture-${lecture.number}/`,
           `${origin}/learn/pilot/${study.modules[lecture.number - 1].id}/`,
         ]),

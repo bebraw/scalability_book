@@ -151,7 +151,7 @@ test("student indexes incomplete evidence, appends technical files and links ear
           name: "Run's published rubric ↗",
           exact: true,
         }),
-      ).toHaveAttribute("href", "/project/requirements/2026-11-v1/grading/");
+      ).toHaveAttribute("href", "/project/requirements/2026-11-v2/grading/");
       await form.getByText(/Common requirements ·/).click();
     }
     if (phase === "compare") {

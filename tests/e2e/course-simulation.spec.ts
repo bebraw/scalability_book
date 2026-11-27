@@ -296,6 +296,9 @@ test("teachers can load both presets, review withdrawal, refresh a stale assessm
   const rows = page.locator("table").first();
   await expect(
     rows.getByRole("row").filter({ hasText: "Ben Example" }),
+  ).toContainText("Grade 5");
+  await expect(
+    rows.getByRole("row").filter({ hasText: "Cora Example" }),
   ).toContainText("Fail");
   await expect(
     rows.getByRole("row").filter({ hasText: "Eli Example" }),
@@ -348,10 +351,10 @@ test("teachers can load both presets, review withdrawal, refresh a stale assessm
   await expect(release).toContainText("Compare results: released");
   await expect(
     rows.getByRole("row").filter({ hasText: "Ben Example" }),
-  ).toContainText("1/3 completed lecture");
+  ).toContainText("All met");
   await expect(
     rows.getByRole("row").filter({ hasText: "Cora Example" }),
-  ).toContainText("self/peer assessment");
+  ).toContainText("Diary entries: 6/9; needs 7 across the course");
   const status = await (await request.get(`${control}/status`)).json();
   const exportUrl = `/api/simulation/${discovery.environment}/${status.state.value.generation}/courses/${status.courses[0].id}/export`;
   const exported = await (await request.get(exportUrl)).text();
@@ -401,7 +404,7 @@ test("teachers can load both presets, review withdrawal, refresh a stale assessm
   await banner.getByText("Teacher controls", { exact: true }).click();
   await banner
     .getByRole("combobox", { name: "Rehearsal role", exact: true })
-    .selectOption({ label: "Ben Example" });
+    .selectOption({ label: "Cora Example" });
   await banner
     .getByRole("button", { name: "Switch role", exact: true })
     .click();
@@ -409,7 +412,7 @@ test("teachers can load both presets, review withdrawal, refresh a stale assessm
     page.getByRole("heading", { name: "My course progress", exact: true }),
   ).toBeVisible();
   await expect(page.locator("[data-course-content]")).toContainText(
-    "1/3 completed lecture",
+    "Diary entries: 6/9; needs 7 across the course",
   );
   await expect(
     page.getByRole("button", { name: "Gradebook", exact: true }),

@@ -13,6 +13,9 @@ Earlier unused requirement and rubric contracts have been removed.
 Edition `2026-11-v1` updates the introduction to recommend a private Obsidian diary.
 It retains the October deliverables, checklist and rubric.
 Runs pinned to October keep their original introduction and setup link.
+Edition `2026-11-v2` uses rubric `2026-11-individual-evidence-v3`.
+It keeps the same project checklist and counts entries for seven distinct lectures across the course for the individual passing requirement.
+Earlier editions retain their published rubric and scoring rules.
 Once a real run begins, its snapshots and checklist are immutable and later changes require a new edition.
 The site builds readable archived briefs and Markdown downloads under `/project/requirements/<edition>/<document>/`.
 Links among the briefs stay within their edition; links to supporting book concepts may follow the current book.

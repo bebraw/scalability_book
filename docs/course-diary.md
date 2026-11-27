@@ -3,12 +3,15 @@
 Your course diary gives you one note per lecture.
 Keep a prediction, a passage from the book and what you later found out together.
 At the end of each phase, choose the entries you want to share in your individual portfolio.
+For the diary requirement, submit an idea or a connection from at least seven different lectures across the course.
 
 ## Start with the first lecture
 
 Obsidian is a note-taking app.
 It saves your writing in text files and calls the folder that holds them a **vault**.
-You can open your diary and write your first prediction without signing in.
+The instructor will show a sample diary in Lecture 1.
+After class, use this guide to set up your own diary and write your first prediction.
+You can do both without signing in.
 
 The screenshots show Obsidian 1.15.1 on macOS.
 Select a screenshot to enlarge it.
@@ -61,7 +64,7 @@ Obsidian saves as you type.
 Click **00-Start here**, then reopen **Establish → Lecture 1**.
 When you see your sentence again, your diary is ready.
 
-After the lecture, add the date, what you observed and whether it changed your prediction.
+Keep this first answer for Lecture 9. If a later observation changes your advice, add a dated note below it.
 You can also edit these files in a plain text editor.
 For an audio or video diary, add the recording or a link beside the prompt.
 Keep a backup of your folder and recordings. [Diary and participation criteria](/project/grading/#participation-and-learning-diary-3-points-per-lecture)
@@ -69,8 +72,8 @@ Keep a backup of your folder and recordings. [Diary and participation criteria](
 ### Use the slides before and after class
 
 In your lecture note, choose **Lecture slides (draft)** to open the current deck.
-Before class, skim it and write down one question you want to bring.
-For Lecture 1, save your own cache prediction first.
+The Lecture 1 note also links to the **Course welcome and project launch** presentation for grading, group formation and course links.
+For later lectures, skim the slides before class and write down one question you want to bring.
 After class, return to that question and add one observation that helped you answer it.
 For a presentation session, that might be a measurement another team showed.
 Choose **Optional self-study** if you want to try an exercise on your own.
@@ -188,7 +191,7 @@ Identify any assistant wording you keep.
 ## Prepare material for your portfolio
 
 1. Open **04-Portfolio** and choose a phase.
-   Its table maps the course lectures to the phase's three portfolio entries.
+   Its table maps each phase’s three portfolio entries to the course lecture numbers shown in the workspace.
    Select a passage or recording from each entry you want to include.
    Check what the phase requires for participation, self-assessment, feedback and a decision you influenced. [Assessment rubric](/project/grading/)
 2. Sign in to the [course workspace](/course/), select your course and phase, then open **My portfolio**.

@@ -551,7 +551,7 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
         const completed = index === 1 && phase === "challenge" ? 1 : 2;
         for (let i = 1; i <= completed; i++) {
           const lecture = form.getByRole("group", {
-            name: `Lecture ${i}`,
+            name: `Lecture ${3 * phases.indexOf(phase) + i}`,
             exact: true,
           });
           await lecture
@@ -574,6 +574,20 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
             .fill(
               "Compared advance() with summary() and proposed shared state definitions; no throughput claim follows.",
             );
+        }
+        if (phase === "establish") {
+          const diaryOnly = form.getByRole("group", {
+            name: "Lecture 3",
+            exact: true,
+          });
+          await diaryOnly
+            .getByLabel("One concrete idea, failure, model or trade-off")
+            .fill(
+              "A cache can change what a reader sees after a work item is closed.",
+            );
+          await expect(
+            diaryOnly.getByLabel("Participation", { exact: true }),
+          ).toHaveValue("missing");
         }
         await form
           .getByLabel("Self-assessment:", { exact: false })
@@ -703,7 +717,7 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
           .getByLabel("Criterion reasons, feedback and missing evidence")
           .fill(
             index === 1 && phase === "challenge"
-              ? "Only one completed lecture activity; full project work cannot replace mandatory participation."
+              ? "One submitted diary entry in this phase, with live activity evidence."
               : "Two complete live/remote activities and specific self, peer, reflection and contribution evidence.",
           );
         await form
@@ -764,7 +778,7 @@ test("a teacher rehearses creation, consent, all three submission/audit/portfoli
   ).toHaveLength(5);
   await role("Ben Example");
   await expect(page.locator("[data-course-content]")).toContainText(
-    "1/3 completed lecture activities; needs 2",
+    "Diary entries: 6/9; needs 7 across the course",
   );
   const privateView = await snapshot();
   expect(privateView.results).toHaveLength(1);

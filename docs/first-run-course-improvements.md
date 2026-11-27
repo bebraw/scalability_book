@@ -54,9 +54,11 @@ Provide one supported deployment recipe and check that the guidance makes actual
 For students choosing the optional trace-import extension, start from the existing [portable fleet-trace example](../specifications/03_compare.md#optional-import-the-trace-into-c); consider a loader skeleton only if their experience shows it would help.
 Prioritize interpreting coordination evidence, applying formal models, testing a justified scaling response, and defending a decision within the required path.
 
-## 4. Pilot the paired first- and last-lecture diagnostic
+## 4. Revisit the first diary entry in the closing lecture
 
-The [opening lecture](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability) and [closing lecture](../lecture_plan.md#9-compare-presentations-and-course-reflection) now include five minutes for an individual cache decision before discussion.
+After the [opening lecture](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability), students set up their own diary and independently record their advice on the cache case.
+Their first entry reflects what they have already heard in class.
+The [closing lecture](../lecture_plan.md#9-compare-presentations-and-course-reflection) reserves five minutes for a fresh response to the case and an additional observation before discussion.
 The word clouds capture the group's vocabulary, and the diary entries show how each student reasons about the same decision over time.
 
 When reviewing the diaries, compare the two answers to the original prompt first.
@@ -88,7 +90,7 @@ What would the first author need to check before claiming an improvement?
 For a learner who chose benchmarking, the [return-visit prompts](learning-workspace-evaluation.md#return-visit-for-a-learner-who-chose-benchmarking) use the same assistant claim twice and change the outcomes of two requests.
 
 The [individual-assessment comparison](individual-assessment-requirements-2026-10-05.md) examines how published courses require individual work alongside shared project marks.
-The revised rubric requires two completed lecture activities and at least six self- and peer-assessment points per phase, including contribution credit, using already-assessed evidence.
+The current rubric checks for diary entries for seven of nine lectures across the course, with participation and self- and peer-assessment scored toward the overall grade.
 This closes the earlier case in which 90 shared project points alone could earn grade 1.
 Publish any completion or approved absence arrangements before the affected work begins and record them through the existing individual-arrangement workflow.
 

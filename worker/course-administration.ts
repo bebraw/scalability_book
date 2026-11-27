@@ -4,6 +4,7 @@ import { activeStudent } from "../shared/course-enrollment.ts";
 import {
   phases,
   rubricVersion,
+  legacyRubricVersion,
   type Course,
   type Phase,
   type Student,
@@ -198,7 +199,9 @@ function settings(
     "Keep yourself as course staff.",
   );
   requireThat(
-    body.rubric === course.rubric && course.rubric === rubricVersion,
+    body.rubric === course.rubric &&
+      (course.rubric === rubricVersion ||
+        course.rubric === legacyRubricVersion),
     "Keep the published rubric version for this run.",
   );
   course.staff = staff;

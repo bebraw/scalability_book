@@ -1,6 +1,11 @@
-import type { Course, Phase } from "./course.ts";
+import {
+  legacyRubricVersion,
+  rubricVersion,
+  type Course,
+  type Phase,
+} from "./course.ts";
 
-export const requirementVersion = "2026-11-v1";
+export const requirementVersion = "2026-11-v2";
 export type RequirementDocument = "introduction" | "common" | Phase | "grading";
 export interface RequirementEntry {
   id: string;
@@ -291,29 +296,33 @@ const octoberChecklist = {
       ],
     ]),
   ) as Record<Phase, RequirementEntry[]>,
-  rubric: "2026-10-solo-equivalence-v2",
+  rubric: legacyRubricVersion,
 } as const;
 
 export const requirementEditions = {
   "2026-10-v2": octoberChecklist,
-  [requirementVersion]: structuredClone(octoberChecklist),
+  "2026-11-v1": octoberChecklist,
+  [requirementVersion]: {
+    ...octoberChecklist,
+    rubric: rubricVersion,
+  },
 } as const;
-export function requirementsFor(course: Pick<Course, "requirements">) {
-  const version = course.requirements ?? requirementVersion;
+type RunEdition = Partial<Pick<Course, "requirements" | "rubric">>;
+export function requirementsFor(course: RunEdition) {
+  const version =
+    course.requirements ??
+    (course.rubric === legacyRubricVersion ? "2026-11-v1" : requirementVersion);
   const edition =
     requirementEditions[version as keyof typeof requirementEditions];
   if (!edition) throw new Error(`Unsupported requirement edition: ${version}`);
   return { version, ...edition };
 }
-export function checklistEntries(
-  course: Pick<Course, "requirements">,
-  phase: Phase,
-) {
+export function checklistEntries(course: RunEdition, phase: Phase) {
   const edition = requirementsFor(course);
   return [...edition.common, ...edition.phases[phase]];
 }
 export const emptyChecklist = (
-  course: Pick<Course, "requirements">,
+  course: RunEdition,
   phase: Phase,
 ): EvidenceCheckpoint[] =>
   checklistEntries(course, phase).map((r) => ({

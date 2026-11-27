@@ -3,7 +3,7 @@
 Obsidian calls this **Course diary** folder a _vault_.
 Each lecture note is a text file you can edit. [First-time setup with screenshots](https://scalableweb.dev/diary/#start-with-the-first-lecture)
 
-Open [Lecture 1](Establish/Lecture%201.md) and write your prediction on a new line below the prompt.
+After the first lecture, open [Lecture 1](Establish/Lecture%201.md) and write your own response to the cache question on a new line below the prompt.
 Obsidian saves as you type.
 Next time, open **Establish → Lecture 1** in the file list to find your prediction again.
 
@@ -20,8 +20,7 @@ A few sentences in your own words, or a reference to an audio or video entry, ca
 ## Before and after class
 
 Each lecture note links to its draft slides and an optional self-study activity.
-Before class, skim the slides and jot down one question you want to bring.
-For Lecture 1, write your own cache prediction first.
+For later lectures, skim the slides before class and jot down one question you want to bring.
 After class, revisit your question and add one observation from a demonstration, a team presentation or your project that helped you answer it.
 Reopen the same slide link to see revisions as the course progresses. [All lecture slides](https://scalableweb.dev/slides/)
 
@@ -59,6 +58,7 @@ Add the date and what you would say now.
 Keeping the earlier prediction gives you something concrete to compare.
 
 At the end of a phase, [prepare your private portfolio](04-Portfolio.md) from passages you choose.
+Across the course, submit an entry for at least seven of the nine lectures.
 Keep this folder outside the group's project repository.
 For shared specifications, decisions and test results, open your team's project repository as a second vault. [Group work in Obsidian](https://scalableweb.dev/diary/#work-with-your-project-group-in-obsidian)
 The course accepts written, audio and video diaries. [Diary and participation criteria](https://scalableweb.dev/project/grading/#participation-and-learning-diary-3-points-per-lecture)

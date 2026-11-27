@@ -1,6 +1,7 @@
 # Lecture slide drafts
 
-These nine Markdown decks provide a content-first starting point for the course lectures.
+These Markdown decks are the student reading editions for nine lectures.
+Lecture 1 has two presentations.
 They follow the topic sequence in `course_plan.md`, use the matching book chapter as their primary source, and end with the project evidence students should produce.
 Use `lecture_plan.md` for the actual session format: Lectures 4, 7, and 9 are primarily project presentations.
 Their decks supply preparation, brief framing, and selective discussion prompts; they are not additional full lectures to deliver alongside the presentations.
@@ -21,19 +22,30 @@ The student pages show the slide text in teaching order and omit speaker comment
 Put `<!-- in-class-only -->` on its own line at the top of a slide to reserve it for the session.
 Lecture 9 uses this marker for the two-stage cache activity so students can record their first answer before the instructor gives the second prompt.
 To release a reserved slide for review after class, remove its marker and publish the revision.
-Run `npm run slides:pdf` to render the complete instructor decks as 16:9 PDFs under `output/pdf/lectures/`.
+Run `npm run slides:pdf` to render one 16:9 PDF per deck under `output/pdf/lectures/`.
+For Lecture 1, the instructor's Obsidian teaching vault also has separate Lecture Studio presentations for the welcome and the chapter.
+Both decks finish with written questions through Lecture Studio’s **Ask a question** control.
+Open the chapter with the moderated word cloud, then use the embedded pipeline demo to vary demand and capacity before discussing Implementation A.
+The web pages and PDFs are reading copies.
+The [teaching plan](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability) covers timing, keeping questions for follow-up and saving the cloud for Lecture 9.
 
-| Lecture | Deck                                        |
-| ------- | ------------------------------------------- |
-| 1       | `lecture-01-what-scalability-means.md`      |
-| 2       | `lecture-02-agent-supported-development.md` |
-| 3       | `lecture-03-measurement-and-evidence.md`    |
-| 4       | `lecture-04-web-architecture.md`            |
-| 5       | `lecture-05-development-friction.md`        |
-| 6       | `lecture-06-assumptions-under-pressure.md`  |
-| 7       | `lecture-07-agent-fleets.md`                |
-| 8       | `lecture-08-scaling-responses.md`           |
-| 9       | `lecture-09-engineering-judgment.md`        |
+| Lecture | Deck                                                           |
+| ------- | -------------------------------------------------------------- |
+| 1       | [Course welcome and project launch](lecture-01-orientation.md) |
+| 1       | [What scalability means](lecture-01-what-scalability-means.md) |
+| 2       | `lecture-02-agent-supported-development.md`                    |
+| 3       | `lecture-03-measurement-and-evidence.md`                       |
+| 4       | `lecture-04-web-architecture.md`                               |
+| 5       | `lecture-05-development-friction.md`                           |
+| 6       | `lecture-06-assumptions-under-pressure.md`                     |
+| 7       | `lecture-07-agent-fleets.md`                                   |
+| 8       | `lecture-08-scaling-responses.md`                              |
+| 9       | `lecture-09-engineering-judgment.md`                           |
 
-The drafts deliberately keep slides concise.
-Worked demonstrations, screenshots, live labs, and lecturer-specific examples can be added during the voice-editing pass.
+Keep projected slides short enough to read at a glance.
+A useful classroom starting point is 24 pt for body text and table cells, and 36 pt for slide headings.
+Check from the back of the room and move detail into presenter notes or the linked reading when a slide gets crowded. [Aalto’s checklist for accessible learning materials](https://www.aalto.fi/en/services/checklist-for-the-accessibility-of-learning-material-and-digital-content)
+A question, a picture or a few figures often gives the lecturer enough to work with.
+When a demo can show the idea, pause for a prediction, change one input and discuss what the class observes.
+Put operating steps, expected results and a fallback in the private presenter notes.
+Link the student-facing demo so students can try it again after class.

@@ -78,13 +78,13 @@ The [diary criteria](00_introduction.md#personal-notes-and-learning-diaries) app
 The book's Teaching assistant is optional.
 State the actual submission route separately from note-taking tools and the assigned coding-agent setup.
 
-| Detail         | Required course-run decision                                                                                                                                                                                            |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Groups         | Registration location, group identifiers and membership, formation deadline, and route for membership changes.                                                                                                          |
-| Submissions    | Locations and deadlines for the frozen implementation, audit report, completed evidence bundle, and private individual portfolio; late-work and correction rules.                                                       |
-| Class browsing | Assigned-auditor access after the implementation deadline, course-only submission index opening after the audit window, source and evidence access, and handling of approved exceptions.                                |
-| Audits         | Assigned auditing groups, setup and probe time boxes, common tool policy, report destination, and fallback for missing reports or access.                                                                               |
-| Assessment     | Published rubric version, feedback timing, group and individual score breakdowns, completed lecture activities, phase assessment and contribution minima, total and passing-status calculation, and correction history. |
+| Detail         | Required course-run decision                                                                                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Groups         | Registration location, group identifiers and membership, formation deadline, and route for membership changes.                                                                                |
+| Submissions    | Locations and deadlines for the frozen implementation, audit report, completed evidence bundle, and private individual portfolio; late-work and correction rules.                             |
+| Class browsing | Assigned-auditor access after the implementation deadline, course-only submission index opening after the audit window, source and evidence access, and handling of approved exceptions.      |
+| Audits         | Assigned auditing groups, setup and probe time boxes, common tool policy, report destination, and fallback for missing reports or access.                                                     |
+| Assessment     | Published rubric version, feedback timing, group and individual score breakdowns, lectures with diary entries, project minimum, total and passing-status calculation, and correction history. |
 
 Keep the class browsing index focused on technical submissions.
 Give teaching staff access to the private records needed for assessment and each student access to their own results.

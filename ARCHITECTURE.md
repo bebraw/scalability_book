@@ -205,6 +205,11 @@ Submission checklists enter through the shared course submission API and `site/s
 `worker/course-submission.ts` validates indexed/missing evidence, technical attachments and earlier A/B references.
 Final evidence lives on new submission revisions; frozen source/setup/initial evidence/checklist/membership remain unchanged.
 Private draft redaction and file authorization stay in `worker/courses.ts`; submitted final evidence changes assessment freshness using the existing revision boundary.
+
+Each run’s pinned rubric determines how `shared/course.ts` counts individual evidence for results and exports.
+For new runs the count comes from distinct lecture entries in the submitted phase portfolios; the point scores continue to determine the numerical grade.
+The gradebook stores approved course-wide diary arrangements in the course snapshot.
+Earlier rubrics retain their per-phase adjustments. [ADR-068](docs/adrs/implemented/ADR-068-count-lecture-diary-entries-across-the-course.md)
 The [submission decision](docs/adrs/implemented/ADR-005-submit-reproducible-source-with-phase-checklists.md) records this extension and its verification.
 
 Teacher rehearsal enters through instructor-only `/api/simulation/` and the shared course interface's simulation context.
