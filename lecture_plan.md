@@ -102,21 +102,82 @@ If time runs short, show the prepared diary note briefly and take one prediction
 
 ### 2. Coding agents and first experiences
 
-Possible elements:
+Follow the same CSV export from a colleague’s request to a file they can open.
+First have the class describe how a team would deliver it.
+Then put an agent in charge of writing the patch and ask what the team is now waiting for. [Student slides](slides/lecture-02-agent-supported-development.md)
 
-- collect teams' first impressions, surprises, problems, and questions from working with coding agents;
-- use these experiences to open the chapter's discussion of intent, constraints, validation, correction, ownership, and development throughput;
-- compare places where agents accelerated work with places where they moved effort into review or debugging;
-- demonstrate a bounded agent-supported task live, such as [clarifying a handover request](https://scalableweb.dev/chapters/scalable-development/#clarify-a-handover-request) before briefing the agent;
-- open the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/) for live review and let students predict the stored count after the first call, a retry on the same worker and a retry after restart;
-- ask the agent for a test of its restart claim.
-  Have students decide which state the test needs to preserve and which it needs to recreate before running it.
-  Use the sample test in the exercise if an agent is unavailable;
-- connect the demonstration to the required reproducible harness, validation commands, and decision and AI-use records;
-- introduce the shared engineering-session protocol for use during Establish project work.
+| Minutes | In the room                                                                                                      |
+| ------- | ---------------------------------------------------------------------------------------------------------------- |
+| 0–12    | Poll the class about their own agent experience and ask two people what they would check themselves.             |
+| 12–24   | Walk through a developer-led CSV change from a user example to release and a bug report.                         |
+| 24–35   | Use the comparison table to decide who supplies the export rules, who makes edits and who can accept the result. |
+| 35–44   | Trace the book’s CSV diagram together, using a title containing commas to explain the failing check.             |
+| 44–57   | Predict the review queue with a second poll, then work out the flow for both columns.                            |
+| 57–67   | Compare the classroom model with the reported contribution and review experience at epilot.                      |
+| 67–84   | Predict, test and discuss the tracker’s retry behavior across a worker restart.                                  |
+| 84–96   | Drive the release demo through a requested change and ask which checks the new patch still needs.                |
+| 96–105  | Apply one check to Implementation A, revisit the opening answers and take written questions.                     |
 
-The exact live demonstration can follow current student concerns.
-It is more useful to expose observation, failure, correction, and validation than to present a perfectly scripted successful run.
+**Read the room.** Start Lecture Studio’s live session and show the audience link before offering examples.
+Give students who have never used a coding agent time to answer.
+If many are new, explain how a coding agent reads files, chooses a tool, edits the code and sees the result of a command.
+If many have run agents, ask for a recent change that took longer to check than to write.
+For either group, ask what would make them give the tool more or less responsibility.
+Students can use **Ask a question** throughout; review their written questions at the end.
+If polling is unavailable, take a show of hands, then invite someone from two different groups to explain their choices.
+
+**Before and after.** Ask who decides the exported columns and who will notice if they change.
+Show how a human developer could use a library, tests and continuous integration before delegating edits to an agent.
+Point at the same acceptance step in both columns.
+In the book figure, the title `Build, measure, learn` is one field and location is the second.
+The unquoted commas produce four parsed fields.
+Ask what input the team should keep in its test suite and who would decide whether adding an event ID is acceptable.
+
+**Queue poll.** Count a patch when it is ready for review, then again when review finishes.
+Assume steady arrivals to an initially empty queue, equal-size patches, no rework and capacity for three reviews per hour.
+At two patches per hour, both can clear review and none accumulate.
+At six per hour, three clear review and three accumulate each hour.
+Ask what students would measure if reviewers instead spent most of their time waiting for the requester to clarify the task.
+
+**epilot.** Viljami Kuosmanen reported that non-engineers initiated 807 agent pull requests from February through September 2026, of which 543 were merged.
+In one customer-success case, an engineer declined a proposed duplicate-detection fix and addressed the underlying cause.
+Ask which part of that judgment a preview supplied and which part required knowledge of the system.
+To estimate review waiting time, pair the time a patch became ready with the time its first review began.
+The two counts alone give neither that interval nor the reasons other patches had yet to merge. [Kuosmanen’s SDLCAI slides, pp. 21–22, 41, 45](https://www.sdlcai.org/media/talks/non-engineers-vibe-code-production/404574e7-178f-48ea-bca5-02245c74ab6a.pdf#page=22)
+
+**Recorder demo.** Open the [event-recorder exercise](https://scalableweb.dev/explore/challenge-an-explanation/) and show the code before the proposed test.
+Ask everyone to write down the three counts for request `C7`.
+Have the agent propose a check, or use the exercise’s same-recorder test.
+Ask whether that test would still pass if a restarted worker wrote a duplicate.
+To run the comparison, paste the exercise’s `makeRecorder` function into a browser console, then run:
+
+```js
+const events = [];
+const append = (id) => events.push(id);
+let record = makeRecorder(append);
+await record("C7");
+console.log(events.length);
+await record("C7");
+console.log(events.length);
+record = makeRecorder(append);
+await record("C7");
+console.log(events.length);
+```
+
+The counts are 1, 1 and 2.
+Constructing a new recorder clears its in-memory set while the same event list survives.
+On the board, keep one column for that set and another for the stored events.
+Ask a student to redraw only the state that a restart replaces.
+
+**Release demo.** In the [release model](https://scalableweb.dev/learn/pilot/agent-development/#slide-gates), choose **Plan approved**, **Patch ready**, **Tests pass**, **Review start** and **Request changes**.
+Have someone predict what will be available after the next **Patch ready**.
+Choose **Review start** and **Approve** on the revised patch, then ask why **Release** is still unavailable.
+Choose **Tests pass** to enable release.
+If projection fails, draw two boxes labeled “checks” and “review” and clear both when the patch changes.
+
+Close by asking which step in the team’s first build they would delegate now and what observation would make them reconsider.
+Direct teams to the existing 30-minute [engineering session](specifications/00_common_project.md#shared-engineering-sessions) to try their chosen check.
+Someone other than the operator explains the result and the team records its decision in the existing project log.
 
 ### 3. Measurement and observability
 

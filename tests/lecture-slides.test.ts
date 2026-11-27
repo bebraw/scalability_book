@@ -106,6 +106,22 @@ test("the Lecture 1 orientation leads to the chapter while existing lecture link
   assert.doesNotMatch(orientation.content, /keep the cache|two starts/i);
 });
 
+test("a reused book figure reaches the student deck with its drawing and accessible description", () => {
+  const source = [
+    "---",
+    "title: Candidate review",
+    "---",
+    "# How was the export checked?",
+    "",
+    '{{ import "site/includes/coding-loop-figure.html" }}',
+  ].join("\n");
+  const { content } = renderStudentDeck(source, 2);
+  assert.match(content, /<svg[^>]+role="img"[^>]+aria-labelledby=/);
+  assert.match(content, /<desc[^>]*>[^<]*CSV reader finds four fields/);
+  assert.match(content, /data-diagram-node="Validate"/);
+  assert.doesNotMatch(content, /data-book-diagram-placeholder/);
+});
+
 test("title links survive slide reordering and count only visible headings", () => {
   const first = "# Reordering";
   const measure =

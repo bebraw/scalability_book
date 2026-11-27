@@ -23,11 +23,16 @@ Put `<!-- in-class-only -->` on its own line at the top of a slide to reserve it
 Lecture 9 uses this marker for the two-stage cache activity so students can record their first answer before the instructor gives the second prompt.
 To release a reserved slide for review after class, remove its marker and publish the revision.
 Run `npm run slides:pdf` to render one 16:9 PDF per deck under `output/pdf/lectures/`.
+To reuse a book diagram, copy its `{{ import "site/includes/…-figure.html" }}` line from the chapter into the slide.
+Both the student page and the offline PDF render the diagram from the book source.
 For Lecture 1, the instructor's Obsidian teaching vault also has separate Lecture Studio presentations for the welcome and the chapter.
 Both decks finish with written questions through Lecture Studio’s **Ask a question** control.
 Open the chapter with the moderated word cloud, then use the embedded pipeline demo to vary demand and capacity before discussing Implementation A.
 The web pages and PDFs are reading copies.
 The [teaching plan](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability) covers timing, keeping questions for follow-up and saving the cloud for Lecture 9.
+
+For Lecture 2, open **02 Coding agents and first experiences** in the teaching vault to run the experience poll and the review-queue poll.
+The [Lecture 2 teaching plan](../lecture_plan.md#2-coding-agents-and-first-experiences) includes the recorder example, the sequence for the release demo and a board exercise for each.
 
 | Lecture | Deck                                                           |
 | ------- | -------------------------------------------------------------- |

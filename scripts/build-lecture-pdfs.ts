@@ -3,8 +3,10 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
-import { renderMarkdown } from "./lib/markdown.ts";
-import { readLectureDeckSources } from "./lib/lecture-slides.ts";
+import {
+  readLectureDeckSources,
+  renderLectureMarkdown,
+} from "./lib/lecture-slides.ts";
 
 const root = process.cwd();
 const sourceDir = path.join(root, "slides");
@@ -35,7 +37,7 @@ async function main() {
                 <span>Elements of Scalable Web Development</span>
                 <span>Lecture ${number}</span>
               </div>
-              <div class="slide-body">${renderMarkdown(stripSlideMetadata(slideSource), { number: "" }).content}</div>
+              <div class="slide-body">${renderLectureMarkdown(stripSlideMetadata(slideSource))}</div>
               <div class="slide-footer">${index + 1} / ${slideSources.length}</div>
             </section>`,
         );
@@ -126,6 +128,8 @@ function renderDeckHtml(title, slides) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${escapeHtml(title)}</title>
+    <link rel="stylesheet" href="${pathToFileURL(path.join(root, "site/styles/theme.css")).href}">
+    <link rel="stylesheet" href="${pathToFileURL(path.join(root, "site/styles/figures.css")).href}">
     <style>${slideCss}</style>
   </head>
   <body>${slides}</body>
@@ -187,6 +191,17 @@ const slideCss = String.raw`
     right: 50px;
   }
   .slide-body { height: 100%; padding-top: 22px; }
+  .slide-body .book-diagram-figure {
+    margin: 0 0 12px;
+    max-width: 100%;
+  }
+  .slide-body .book-diagram-canvas {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .slide-body .coding-loop-figure { margin-inline: auto; width: 840px; }
+  .slide-body .coding-loop-figure figcaption { display: none; }
 
   h1, h2, h3 { margin: 0; }
   h1 {

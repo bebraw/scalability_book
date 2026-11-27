@@ -6,10 +6,21 @@ import {
   phases,
 } from "../../packages/obsidian-course-diary/lecture-layout.ts";
 import { renderPublicMarkdown } from "./markdown.ts";
+import {
+  injectBookDiagrams,
+  renderBookDiagrams,
+} from "./render-book-diagrams.ts";
 import { localizeBookLinks } from "./starter-book-links.ts";
 import { escapeHtml } from "./text.ts";
 
 type SlidePage = { title: string; url: string; content: string };
+
+const bookDiagrams = renderBookDiagrams();
+
+export function renderLectureMarkdown(source: string) {
+  const { content } = renderPublicMarkdown(source, { number: "" });
+  return injectBookDiagrams(content, bookDiagrams);
+}
 
 const chapterDecks = [
   "what-scalability-means",
@@ -105,7 +116,7 @@ export function renderStudentDeck(source: string, lecture: number) {
   );
   return {
     title,
-    content: renderPublicMarkdown(publicSource, { number: "" }).content,
+    content: renderLectureMarkdown(publicSource),
   };
 }
 
