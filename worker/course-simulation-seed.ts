@@ -535,7 +535,7 @@ export async function buildSimulationPlan(
         feedback: missing
           ? "Portfolio missing: explicit zero scores. The project total cannot waive individual requirements."
           : index === 1 && phase === "challenge"
-            ? "Only one lecture activity has complete evidence. The phase requires two even with full project scores."
+            ? "One Challenge entry is present. The course-wide diary count includes the other phases."
             : "Synthetic criterion scores match the authored participation, reflection, peer-review and contribution evidence.",
         reason,
       });

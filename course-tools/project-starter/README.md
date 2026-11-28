@@ -52,6 +52,28 @@ You may choose another language or framework under the common contract.
 Record why you adopt or replace the default in [the initial stack decision](docs/adrs/ADR-001-stack.md), and give the replacement an equally clear setup and validation path.
 As behavior grows, adapt or replace the supplied smoke checks for the chosen routes and stack, and add the application acceptance checks.
 
+## Work together in Obsidian
+
+Each teammate can clone the group's private project repository and choose **Open folder as vault** in Obsidian.
+Select the starter root containing `projects/`.
+If this is your first time using Obsidian, the diary tutorial shows how to open a folder and edit a note. [First-time setup with screenshots](https://scalableweb.dev/diary/#start-with-the-first-lecture)
+Keep your personal diary and peer assessments in a separate vault.
+This works with ordinary Markdown and Git, including a graphical Git client.
+
+1. Pull the latest changes and open the evidence index for [Establish](projects/01-establish/evidence/index.md), [Challenge](projects/02-challenge/evidence/index.md) or [Compare](projects/03-compare/evidence/index.md).
+2. Pick a question for the session.
+   In Challenge, for example, what will happen if two clients try the same work-item transition at once?
+   Each person predicts the outcome before the operator consults the agent.
+   The challenger proposes a competing explanation.
+   The validator runs the agreed check and explains whether the result supports the group's decision.
+   Rotate roles as you work. [Shared engineering sessions](https://scalableweb.dev/project/#shared-engineering-sessions)
+3. Have one teammate record the responsibilities, prediction, check, result and decision in the [decision log](docs/adrs/README.md) or AI-use log.
+   Link that record from the phase evidence index. The recorder commits and pushes the changes so teammates can pull them and follow the evidence.
+
+If the team changes between phases, give the new group its own private repository from the starter and bring over the permitted specifications and written reasoning.
+Keep the previous group's repository with its original members.
+Submit the frozen technical work through **Group submission** in the [course workspace](https://scalableweb.dev/course/).
+
 ## Your first working session
 
 Aim for one checked result before attempting the whole application.

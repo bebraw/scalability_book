@@ -6,7 +6,9 @@ import type {
 // Runs pin the published rubric and requirement edition.
 export const phases = ["establish", "challenge", "compare"] as const;
 export type Phase = (typeof phases)[number];
-export const rubricVersion = "2026-10-solo-equivalence-v2";
+export const legacyRubricVersion = "2026-10-solo-equivalence-v2";
+export const rubricVersion = "2026-11-individual-evidence-v3";
+export const individualWorkMinimums = { lectures: 7 } as const;
 export const commonCriteria = [
   ["Required behavior and correctness", 6],
   ["Reproducible setup and operation", 4],
@@ -93,16 +95,23 @@ export interface Adjustment {
   availablePoints: number;
   reason: string;
 }
+export interface CourseAdjustment {
+  student: string;
+  phase: "course";
+  lectureMinimum: number;
+  availablePointsByPhase: Record<Phase, number>;
+  reason: string;
+}
 export interface Course {
   requirements?: string;
   nextGroupNumber?: number;
   id: string;
   name: string;
-  rubric: typeof rubricVersion;
+  rubric: typeof rubricVersion | typeof legacyRubricVersion;
   staff: string[];
   students: Student[];
   phases: Record<Phase, PhaseSetup>;
-  adjustments: Adjustment[];
+  adjustments: (Adjustment | CourseAdjustment)[];
 }
 export interface Envelope<T = unknown> {
   key: string;
@@ -155,6 +164,15 @@ export interface Portfolio {
   files: string[];
   submittedAt: string | null;
 }
+export const hasDiaryEntry = (entry: Portfolio["lectures"][number]) =>
+  Boolean(entry.idea.trim() || entry.connection.trim());
+export const hasAssessmentEvidence = (portfolio: Portfolio) =>
+  Boolean(
+    portfolio.self ||
+    portfolio.peers ||
+    portfolio.reflection ||
+    portfolio.contribution,
+  );
 export interface Audit {
   phase: Phase;
   from: string;
@@ -245,6 +263,34 @@ export function groupFor(
   );
 }
 const sum = (scores: number[]) => scores.reduce((a, b) => a + b, 0);
+function countedLectures(
+  rubric: Course["rubric"],
+  grade?: Grade,
+  portfolio?: Portfolio,
+) {
+  if (!grade) return null;
+  if (rubric === rubricVersion)
+    return portfolio?.submittedAt
+      ? portfolio.lectures.filter(hasDiaryEntry).length
+      : 0;
+  return [0, 3, 6].filter((i) => sum(grade.scores.slice(i, i + 3)) === 3)
+    .length;
+}
+export function adjustmentFor(course: Course, student: string, phase: Phase) {
+  return course.adjustments.find(
+    (a) =>
+      a.student === student &&
+      a.phase === (course.rubric === rubricVersion ? "course" : phase),
+  );
+}
+export function availableIndividualPoints(
+  adjustment: Adjustment | CourseAdjustment | undefined,
+  phase: Phase,
+) {
+  return adjustment?.phase === "course"
+    ? adjustment.availablePointsByPhase[phase]
+    : (adjustment?.availablePoints ?? 21);
+}
 export function calculateResult(
   course: Course,
   student: string,
@@ -258,6 +304,7 @@ export function calculateResult(
     unmet: string[] = [];
   let earned = 0,
     available = 153;
+  const pooled = course.rubric === rubricVersion;
   const breakdown = phases.map((phase) => {
     const published = course.phases[phase].published;
     const group = groupFor(course, phase, student, submissions);
@@ -272,16 +319,11 @@ export function calculateResult(
     const portfolio = portfolios.find(
       (p) => p.phase === phase && p.student === student,
     );
-    const adjustment = course.adjustments.find(
-      (a) => a.student === student && a.phase === phase,
-    );
-    available += (adjustment?.availablePoints ?? 21) - 21;
+    const adjustment = adjustmentFor(course, student, phase);
+    available += availableIndividualPoints(adjustment, phase) - 21;
     const projectPoints = project ? sum(project.scores) : null;
     const lecture = individual ? sum(individual.scores.slice(0, 9)) : null;
-    const completed = individual
-      ? [0, 3, 6].filter((i) => sum(individual.scores.slice(i, i + 3)) === 3)
-          .length
-      : null;
+    const completed = countedLectures(course.rubric, individual, portfolio);
     const assessment = individual ? sum(individual.scores.slice(9)) : null;
     const contribution = individual?.scores[12] ?? null;
     earned += (projectPoints ?? 0) + (lecture ?? 0) + (assessment ?? 0);
@@ -291,7 +333,7 @@ export function calculateResult(
       unmet.push(`${title(phase)} project: ${projectPoints}/30; needs 10`);
     if (individual === undefined)
       pending.push(`${title(phase)} individual assessment`);
-    else {
+    else if (!pooled && adjustment?.phase !== "course") {
       if ((completed ?? 0) < (adjustment?.lectureMinimum ?? 2))
         unmet.push(
           `${title(phase)}: ${completed}/3 completed lecture activities; needs ${adjustment?.lectureMinimum ?? 2}`,
@@ -330,6 +372,21 @@ export function calculateResult(
       status: "withdrawn",
       breakdown,
     };
+  if (pooled && breakdown.every((row) => row.completed !== null)) {
+    const adjustment = course.adjustments.find(
+      (a) => a.student === student && a.phase === "course",
+    );
+    const lectures = breakdown.reduce(
+      (total, row) => total + (row.completed ?? 0),
+      0,
+    );
+    const lecturesRequired =
+      adjustment?.lectureMinimum ?? individualWorkMinimums.lectures;
+    if (lectures < lecturesRequired)
+      unmet.push(
+        `Diary entries: ${lectures}/9; needs ${lecturesRequired} across the course`,
+      );
+  }
   if (!pending.length && percentage < 50)
     unmet.push("Total below 50% of available points");
   const status = pending.length ? "pending" : unmet.length ? "fail" : "pass";

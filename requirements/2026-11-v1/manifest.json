@@ -1,0 +1,37 @@
+{
+  "version": "2026-11-v1",
+  "rubric": "2026-10-solo-equivalence-v2",
+  "checklistSha256": "3bc7eb701eac0b6ef00f9ac8e59b181ef15868e0399cdd9109644e1efa52c391",
+  "documents": [
+    {
+      "document": "introduction",
+      "file": "specifications/00_introduction.md",
+      "sha256": "c4e9d15b3acaa07db37c1a1388de1ca5ea4dc932c15b84852de6f2ab959b39fe"
+    },
+    {
+      "document": "common",
+      "file": "specifications/00_common_project.md",
+      "sha256": "6a6ece87051a410cfc8b57d3e88459b6f544af2bbeea72f65556cc70c6773c35"
+    },
+    {
+      "document": "establish",
+      "file": "specifications/01_establish.md",
+      "sha256": "6815c24cc9939251ef736f2b5dd1d15a5569e177153439a8596667c5364afe93"
+    },
+    {
+      "document": "challenge",
+      "file": "specifications/02_challenge.md",
+      "sha256": "bb2b599d71fd21c6a04b442b72dd4382a0af87baed485280bd526b81a63bbb81"
+    },
+    {
+      "document": "compare",
+      "file": "specifications/03_compare.md",
+      "sha256": "f5a6f06397c7ea0720f99178a60c2854034b4851d039d121f1a6e4431d1396b2"
+    },
+    {
+      "document": "grading",
+      "file": "specifications/grading.md",
+      "sha256": "b9cf55bf74b20f8aa1870b4cc033d15a67ad27fae098e3f768407daefc9d9ab6"
+    }
+  ]
+}

@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-09
 
+**Superseded in part:** [ADR-066](ADR-066-keep-course-diaries-in-obsidian.md) moves everyday diary writing and the book’s takeaway handoff to student-owned Markdown.
+
 ## Context
 
 Public retrieval gives an agent authored material and affordances, but does not connect its explanation to the learner's current reading, prediction or actual demo result.

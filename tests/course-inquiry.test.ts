@@ -175,6 +175,43 @@ test("peer discovery and direct reads require own saved-work declaration, with n
     (await f.request(f.list(), "GET", undefined, outsider)).status,
     403,
   );
+  assert.equal(
+    (
+      await f.request(
+        "/attempts",
+        "POST",
+        {
+          source,
+          question: "reading",
+          noteId: randomUUID(),
+          noteRevision: randomUUID(),
+        },
+        outsider,
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (await f.request(`/${thread.value.id}`, "GET", undefined, outsider)).status,
+    403,
+  );
+  assert.equal(
+    (
+      await f.request(
+        "",
+        "POST",
+        {
+          source,
+          question: "reading",
+          audience: { kind: "cohort" },
+          kind: "question",
+          body: "A question from outside the course",
+        },
+        outsider,
+      )
+    ).status,
+    403,
+  );
   assert.equal((await f.request(f.list(), "GET", undefined, null)).status, 401);
   assert.equal(
     (
@@ -313,6 +350,80 @@ test("group and phase isolation survives corrected allocation and withdrawal; wi
       })
     ).status,
     200,
+  );
+});
+test("staff can remove a peer's contribution and close a cohort thread to further replies", async (t) => {
+  const f = await fixture(t);
+  await f.attempt(alice);
+  await f.attempt(bob);
+  const thread = await f.share("Which measurement would you repeat?", {
+    kind: "cohort",
+  });
+  const route = `/${thread.value.id}`;
+  const reply = {
+    kind: "observation",
+    body: "This comment is outside the discussion.",
+  };
+  const answered = await f.good<Envelope<InquiryThread>>(
+    route + "/replies",
+    "POST",
+    { ...reply, expected: thread.revision },
+    bob,
+  );
+  assert.equal(answered.value.posts[1]!.body, reply.body);
+  const removal = {
+    postId: answered.value.posts[1]!.id,
+    expected: answered.revision,
+    remove: true,
+    reason: "Off-topic contribution",
+  };
+  const close = { close: true, reason: "Discussion concluded" };
+  assert.equal((await f.request(route, "PUT", removal, alice)).status, 403);
+  assert.equal(
+    (
+      await f.request(
+        route,
+        "PUT",
+        { ...close, expected: answered.revision },
+        alice,
+      )
+    ).status,
+    403,
+  );
+  const moderated = await f.good<Envelope<InquiryThread>>(
+    route,
+    "PUT",
+    removal,
+    admin,
+  );
+  const closed = await f.good<Envelope<InquiryThread>>(
+    route,
+    "PUT",
+    { ...close, expected: moderated.revision },
+    admin,
+  );
+  const visible = await f.good<Envelope<InquiryThread>>(
+    route,
+    "GET",
+    undefined,
+    alice,
+  );
+  assert.ok(visible.value.closedAt);
+  assert.equal(visible.value.posts[0]!.body, thread.value.posts[0]!.body);
+  assert.doesNotMatch(
+    JSON.stringify(visible),
+    /This comment is outside the discussion/,
+  );
+  assert.equal(
+    (
+      await f.request(
+        route + "/replies",
+        "POST",
+        { ...reply, expected: closed.revision },
+        bob,
+      )
+    ).status,
+    409,
   );
 });
 test("concurrent replies and edits reject stale writes and source snapshots retain original text", async (t) => {

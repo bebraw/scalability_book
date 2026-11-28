@@ -70,7 +70,7 @@ export class LearningClient {
       if (response.status === 401) {
         this.clearSession();
         throw new LearningConnectionError(
-          `${data.message ?? "The companion session is unavailable."} Choose Connect companion again. Your stored notebook and this draft are retained.`,
+          `${data.message ?? "The companion session is unavailable."} Choose Connect companion again. Your local records and this draft are retained.`,
           "session",
         );
       }

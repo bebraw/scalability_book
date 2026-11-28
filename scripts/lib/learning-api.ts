@@ -6,12 +6,21 @@ import {
   apiModelUrl,
   inspectApiModel,
   type ApiModelOptions,
+  type ApiTransport,
 } from "./learning-api-model.ts";
 
 export async function createApiProvider(
-  options: ApiModelOptions & { directory: string; apiKey: string },
+  options: ApiModelOptions & {
+    directory: string;
+    apiKey: string;
+    transport?: ApiTransport;
+  },
 ) {
-  const info = await inspectApiModel(options, options.apiKey);
+  const info = await inspectApiModel(
+    options,
+    options.apiKey,
+    options.transport,
+  );
   const url = apiModelUrl(options.url);
   const outputTokens = options.outputTokens ?? 4096;
   const backend = createHash("sha256")
@@ -56,7 +65,10 @@ export async function createApiProvider(
         signal,
         body,
         512_000,
-        { anthropic: options.provider === "anthropic" },
+        {
+          anthropic: options.provider === "anthropic",
+          ...(options.transport ? { transport: options.transport } : {}),
+        },
       ),
   });
 }

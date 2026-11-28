@@ -12,6 +12,8 @@ The public website is generated from those chapters and deployed at [scalableweb
 The interactive site targets Chrome/Edge 111+, Firefox 121+, and Safari/iOS Safari 16.4+; use an up-to-date browser.
 See [browser support and verification](docs/development.md#browser-support) for the build contract and test limits.
 
+The [student diary guide](docs/course-diary.md) walks through the Obsidian starter, book highlights and individual portfolios.
+
 Development, preview, feedback, and deployment notes are in [docs/development.md](docs/development.md).
 The [documentation index](docs/README.md) points to course operations, learning tools, pilot preparation and remaining reviews.
 The [architecture map](ARCHITECTURE.md) describes the current system, and [Architecture Decision Records](docs/adrs/README.md) distinguish implemented decisions from the agreed course administration revision.

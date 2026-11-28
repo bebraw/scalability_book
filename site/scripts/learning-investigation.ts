@@ -13,7 +13,7 @@ import {
   sourceLink,
   type LearningSource,
   type AssistantHandoff,
-  type NotebookHandoff,
+  type DiaryTakeaway,
 } from "../../shared/learning-workspace.ts";
 import { LearningClient, LearningConnectionError } from "./learning-client.ts";
 import {
@@ -40,7 +40,7 @@ export function mountReadingInvestigation(
     handoff?: AssistantHandoff;
     phase?: InvestigationPhase;
     settings: () => void | Promise<void>;
-    write: (draft: NotebookHandoff) => void | Promise<void>;
+    write: (draft: DiaryTakeaway) => void | Promise<void>;
     disconnected: () => void;
     next: (source: LearningSource, takeaway: string, nextCheck: string) => void;
   },
@@ -56,7 +56,6 @@ export function mountReadingInvestigation(
       ))
   ) {
     draft.question = options.handoff.question.slice(0, 4000);
-    draft.noteIds = options.handoff.noteIds.slice(0, 100);
     draft.phase = "experiment";
   }
   if (options.phase) draft.phase = options.phase;
@@ -211,10 +210,10 @@ export function mountReadingInvestigation(
   );
   const privacy = node("details");
   privacy.append(
-    node("summary", "Shared context: this activity and my selections"),
+    node("summary", "Shared context: this activity and my writing"),
     node(
       "p",
-      "Sending shares the source shown here, your writing and any displayed demo snapshot with your companion’s provider. During a reply, only this activity’s demo can be inspected. Control changes never start a reply. Notebook entries are included only when explicitly handed off below.",
+      "Sending shares the source shown here, your writing and any displayed demo snapshot with your companion’s provider. During a reply, only this activity’s demo can be inspected. Control changes never start a reply.",
     ),
   );
   privacy.className = "reading-investigation-hint";
@@ -224,20 +223,6 @@ export function mountReadingInvestigation(
       "This page’s title, source link and authored concepts; no page-wide capture.",
   );
   privacy.append(node("h3", "Selected source context"), excerpt);
-  const selections = node("p");
-  const clearSelections = button("Clear selected notes", () => {
-    draft.noteIds = [];
-    save();
-    drawSelections();
-  });
-  privacy.append(selections, clearSelections);
-  function drawSelections() {
-    selections.textContent = draft.noteIds.length
-      ? `${draft.noteIds.length} deliberately selected notebook entries will be supplied on send.`
-      : "No notebook entries are selected.";
-    clearSelections.hidden = !draft.noteIds.length;
-  }
-  drawSelections();
   const actions = node("div");
   actions.className = "reading-investigation-actions";
   const send = button("Discuss my prediction", () => sendTurn(false));
@@ -254,14 +239,13 @@ export function mountReadingInvestigation(
     save();
     drawMessages();
   });
-  const write = button("Prepare notebook takeaway", async () => {
+  const write = button("Download takeaway as Markdown", async () => {
     if (!draft.takeaway.trim()) {
       notice.textContent = "Write your takeaway first.";
       return;
     }
     await options.write({
       source: source(),
-      kind: "reflection",
       title: `Learning takeaway: ${draft.system || source().title}`.slice(
         0,
         300,
@@ -276,9 +260,7 @@ export function mountReadingInvestigation(
           : "",
       ]
         .filter(Boolean)
-        .join("\n\n")
-        .slice(0, 16_000),
-      relatedIds: [...draft.noteIds],
+        .join("\n\n"),
       assistance: draft.conversationId
         ? `Student-written takeaway after learning activity ${activity.id} v${activity.version}; conversation ${draft.conversationId}; reviewed before saving`
         : null,
@@ -365,7 +347,7 @@ export function mountReadingInvestigation(
         ? "Restart the companion from the updated checkout to enable the learning cockpit. Your writing is retained."
         : status.provider
           ? `${status.provider} connected · Your learning loop stays beside the work.`
-          : "Notebook-only connection. Enable Codex or a local model in Connection settings, then check the connection again.";
+          : "No assistant provider is connected. Enable Codex or a local model in Connection settings, then check the connection again.";
   }
   function drawPhase() {
     const phase = activity.phases.find(({ id }) => id === draft.phase)!;
@@ -467,9 +449,7 @@ export function mountReadingInvestigation(
     status = await client.status();
     if (draft.companionBase && draft.companionBase !== client.base) {
       draft.conversationId = null;
-      draft.noteIds = [];
       conversation = null;
-      drawSelections();
     }
     draft.companionBase = client.base;
     address.value = client.base;
@@ -546,7 +526,7 @@ export function mountReadingInvestigation(
         supportNeed: "unspecified",
         goal: draft.system,
         browserId: draft.browserId,
-        noteIds: [...draft.noteIds],
+        noteIds: [],
         investigation: turn,
       },
     );

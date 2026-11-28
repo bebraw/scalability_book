@@ -1,6 +1,11 @@
-import type { Course, Phase } from "./course.ts";
+import {
+  legacyRubricVersion,
+  rubricVersion,
+  type Course,
+  type Phase,
+} from "./course.ts";
 
-export const requirementVersion = "2026-10-v2";
+export const requirementVersion = "2026-11-v2";
 export type RequirementDocument = "introduction" | "common" | Phase | "grading";
 export interface RequirementEntry {
   id: string;
@@ -274,43 +279,50 @@ const phaseEntries: Record<Phase, RequirementEntry[]> = {
     ),
   ],
 };
+const octoberChecklist = {
+  common,
+  phases: Object.fromEntries(
+    Object.entries(phaseEntries).map(([phase, entries]) => [
+      phase,
+      [
+        ...entries,
+        entry(
+          `${phase}-solo`,
+          "Approved solo route (when allocated)",
+          "If the instructor allocated the solo route, index the phase-specific solo work, instructor check-in, incoming independent audit, outgoing reference audit and portfolio under the published solo equivalents. Group-route students mark this entry as not applicable with their allocation reference.",
+          phase as Phase,
+          "solo-route",
+        ),
+      ],
+    ]),
+  ) as Record<Phase, RequirementEntry[]>,
+  rubric: legacyRubricVersion,
+} as const;
+
 export const requirementEditions = {
-  "2026-10-v2": {
-    common,
-    phases: Object.fromEntries(
-      Object.entries(phaseEntries).map(([phase, entries]) => [
-        phase,
-        [
-          ...entries,
-          entry(
-            `${phase}-solo`,
-            "Approved solo route (when allocated)",
-            "If the instructor allocated the solo route, index the phase-specific solo work, instructor check-in, incoming independent audit, outgoing reference audit and portfolio under the published solo equivalents. Group-route students mark this entry as not applicable with their allocation reference.",
-            phase as Phase,
-            "solo-route",
-          ),
-        ],
-      ]),
-    ) as Record<Phase, RequirementEntry[]>,
-    rubric: "2026-10-solo-equivalence-v2",
+  "2026-10-v2": octoberChecklist,
+  "2026-11-v1": octoberChecklist,
+  [requirementVersion]: {
+    ...octoberChecklist,
+    rubric: rubricVersion,
   },
 } as const;
-export function requirementsFor(course: Pick<Course, "requirements">) {
-  const version = course.requirements ?? requirementVersion;
+type RunEdition = Partial<Pick<Course, "requirements" | "rubric">>;
+export function requirementsFor(course: RunEdition) {
+  const version =
+    course.requirements ??
+    (course.rubric === legacyRubricVersion ? "2026-11-v1" : requirementVersion);
   const edition =
     requirementEditions[version as keyof typeof requirementEditions];
   if (!edition) throw new Error(`Unsupported requirement edition: ${version}`);
   return { version, ...edition };
 }
-export function checklistEntries(
-  course: Pick<Course, "requirements">,
-  phase: Phase,
-) {
+export function checklistEntries(course: RunEdition, phase: Phase) {
   const edition = requirementsFor(course);
   return [...edition.common, ...edition.phases[phase]];
 }
 export const emptyChecklist = (
-  course: Pick<Course, "requirements">,
+  course: RunEdition,
   phase: Phase,
 ): EvidenceCheckpoint[] =>
   checklistEntries(course, phase).map((r) => ({

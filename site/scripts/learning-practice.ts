@@ -3,11 +3,8 @@ import {
   followUpSource,
 } from "../../shared/learning-activities.ts";
 import {
-  reflectionExamples,
-  reflectionPrompts,
   type LearningSource,
   type NotebookEntry,
-  type NoteKind,
 } from "../../shared/learning-workspace.ts";
 import { requestLearning } from "./learning-actions.ts";
 
@@ -17,27 +14,12 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, text = "") => {
   return element;
 };
 export type GuideSave = (
-  kind: NoteKind,
+  kind: "attempt" | "revisit",
   title: string,
   body: string,
   source: LearningSource,
   relatedIds?: string[],
 ) => Promise<NotebookEntry>;
-
-export function reflectionSupport() {
-  const details = node("details");
-  details.append(node("summary", "Reflection starters and examples"));
-  details.append(
-    node(
-      "p",
-      "Use any of these or write freely. Short notes, uncertainty and failed checks are valid. There is no correct personal conclusion.",
-    ),
-  );
-  for (const prompt of reflectionPrompts) details.append(node("p", prompt));
-  for (const example of reflectionExamples)
-    details.append(node("h4", example.title), node("p", example.text));
-  return details;
-}
 
 export function mountLearningPractice(
   container: HTMLElement,
@@ -47,7 +29,7 @@ export function mountLearningPractice(
     save: GuideSave;
     help: (source: LearningSource, text: string) => void;
     notes: () => void;
-    draftScope?: string;
+    draftScope: string;
   },
 ) {
   const activity = followUpForSource(options.source);
@@ -64,7 +46,7 @@ export function mountLearningPractice(
       "Try your own explanation before opening the self-check. You can skip this, return later, choose your own case or ask for help at any time.",
     ),
   );
-  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}:${options.draftScope ?? "guide"}`;
+  const key = `book-learning-practice:${options.source.url}:${options.source.anchor}:${activity.id}:${activity.version}:${options.draftScope}`;
   let draft = { question: "", answer: "" };
   try {
     const saved = JSON.parse(sessionStorage.getItem(key) ?? "null");
@@ -167,7 +149,7 @@ export function mountLearningPractice(
           answer.textarea.value = "";
           persist();
           feedback.textContent =
-            "Independent attempt saved separately in Notes. Keep your own conclusion; this does not mark a concept understood.";
+            "Your independent attempt was saved in the local companion.";
         } catch (error) {
           feedback.textContent =
             error instanceof Error
@@ -186,7 +168,7 @@ export function mountLearningPractice(
       `I want help with this related case: ${question.textarea.value.trim() || activity.question}\n\nMy thinking so far: ${answer.textarea.value.trim() || "I am unsure how to begin."}`,
     ),
   );
-  const revisit = node("button", "Revisit later in Notes");
+  const revisit = node("button", "Open diary guide");
   const loop = node("button", "Explore this case in the learning cockpit");
   loop.type = "button";
   loop.addEventListener("click", () =>
@@ -204,7 +186,6 @@ export function mountLearningPractice(
             0,
             4000,
           ),
-        noteIds: [],
       },
     }),
   );
@@ -220,7 +201,7 @@ export function mountLearningPractice(
     check,
     node(
       "p",
-      "For a later revisit, use Revisit on a saved note and recall the idea before rereading. You choose when.",
+      "For a later revisit, write a question in your diary and try answering it before rereading.",
     ),
     revisit,
   );

@@ -137,6 +137,68 @@ function sessionCookie(env: { SESSION_SECRET: string }, login: string) {
   return `scalableweb_session=${payload}.${signature}`;
 }
 
+test("private comments and confusion markers share submission limits by login and IP", async (t) => {
+  const now = Date.parse(timestamp);
+  t.mock.timers.enable({ apis: ["Date"], now });
+  const window = Math.floor(now / 600_000);
+  const campusIp = "192.0.2.1";
+  const reader = "fixture-reader";
+  const entries = new Map<string, string>([
+    [`rate:${window}:login:${reader}`, "9"],
+    [`rate:${window}:ip:${campusIp}`, "28"],
+  ]);
+  const env = {
+    ...workerFixture().env,
+    COMMENTS_KV: {
+      async get(key: string, type?: "json") {
+        const value = entries.get(key) ?? null;
+        return type === "json" && value ? JSON.parse(value) : value;
+      },
+      async put(key: string, value: string) {
+        entries.set(key, value);
+      },
+      async list() {
+        return { keys: [], list_complete: true as const };
+      },
+    },
+  };
+  const submit = (path: string, login: string, ip: string) =>
+    worker.fetch(
+      new Request(new URL(path, "https://book.test"), {
+        method: "POST",
+        headers: {
+          Cookie: sessionCookie(env, login),
+          "CF-Connecting-IP": ip,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chapter: knownChapter,
+          paragraphId: "p-example",
+          category: "missing-example",
+          body: "Could we see an example?",
+        }),
+      }),
+      env,
+    );
+
+  assert.equal((await submit("/api/stuck", reader, campusIp)).status, 201);
+  const loginLimited = await submit("/api/comments", reader, "192.0.2.2");
+  assert.equal(loginLimited.status, 429);
+  assert.equal(loginLimited.headers.get("Retry-After"), "600");
+  assert.equal(
+    (await submit("/api/comments", "fixture-classmate", campusIp)).status,
+    201,
+  );
+  const ipLimited = await submit(
+    "/api/stuck",
+    "fixture-third-reader",
+    campusIp,
+  );
+  assert.equal(ipLimited.status, 429);
+  assert.equal(ipLimited.headers.get("Retry-After"), "600");
+  assert.equal(JSON.parse(entries.get(`comments:${knownChapter}`)!).length, 2);
+});
+
 test("feedback MCP denies all requests before reading KV unless the owner credential is valid", async () => {
   const { env, storageCalls } = workerFixture();
   const cookie = sessionCookie(env, "fixture-owner");

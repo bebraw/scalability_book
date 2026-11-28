@@ -1,26 +1,8 @@
-import type { LearningExperience } from "../../shared/learning-workspace.ts";
-import type { NotebookView } from "./learning-session.ts";
+import type { AssistantView } from "./learning-session.ts";
 
-const sections = {
-  notebook: [
-    ["write", "Write"],
-    ["notes", "Notes"],
-    ["concepts", "Concepts"],
-    ["prepare", "Prepare"],
-  ],
-  assistant: [
-    ["agent", "Discuss"],
-    ["guide", "Chapter guide"],
-    ["peers", "Peer discussion"],
-  ],
-} as const;
-
-export function syncLearningLaunchers(
-  panel: HTMLDialogElement,
-  experience: LearningExperience,
-) {
+export function syncLearningLaunchers(panel: HTMLDialogElement) {
   const button = document.querySelector<HTMLButtonElement>(
-    `[data-learning-toggle="${experience}"]`,
+    '[data-learning-toggle="assistant"]',
   );
   button?.setAttribute("aria-expanded", String(!panel.hidden));
   button?.setAttribute("aria-controls", panel.id);
@@ -29,27 +11,10 @@ export function syncLearningLaunchers(
 /** Experience navigation owns presentation only, independently of providers/stores. */
 export function mountLearningNavigation(
   panel: HTMLDialogElement,
-  experience: LearningExperience,
-  view: NotebookView,
-  navigate: (view: NotebookView) => void,
+  view: AssistantView,
+  navigate: (view: AssistantView | "guide") => void,
 ) {
-  syncLearningLaunchers(panel, experience);
-  const name =
-    experience === "notebook" ? "My learning notebook" : "Teaching assistant";
-  panel.setAttribute("aria-label", name);
-  panel.querySelector<HTMLElement>(".learning-eyebrow")!.textContent = name;
-  panel.querySelector<HTMLElement>(".learning-purpose")!.textContent =
-    experience === "notebook"
-      ? "Keep and organize your thinking."
-      : "Explore a question and choose the support you need.";
-  panel
-    .querySelector("[data-learning-close]")!
-    .setAttribute(
-      "aria-label",
-      experience === "notebook" ? "Close notebook" : "Close teaching assistant",
-    );
   const tabs = panel.querySelector<HTMLElement>(".learning-tabs")!;
-  tabs.setAttribute("aria-label", `${name} sections`);
   tabs.replaceChildren();
   const primary = document.createElement("div");
   primary.className = "learning-tab-primary";
@@ -60,9 +25,11 @@ export function mountLearningNavigation(
   const menu = document.createElement("div");
   menu.className = "learning-tools-menu";
   tools.append(summary, menu);
-  tools.open = view === "connect" || view === "prepare";
+  tools.open = view === "connect";
   for (const [id, label] of [
-    ...sections[experience],
+    ["agent", "Discuss"],
+    ["guide", "Chapter guide"],
+    ["peers", "Peer discussion"],
     ["connect", "Connect"],
   ] as const) {
     const button = document.createElement("button");
@@ -70,7 +37,7 @@ export function mountLearningNavigation(
     button.textContent = label;
     button.setAttribute("aria-current", String(view === id));
     button.addEventListener("click", () => navigate(id));
-    (id === "prepare" || id === "connect" ? menu : primary).append(button);
+    (id === "connect" ? menu : primary).append(button);
   }
   tabs.append(primary, tools);
 }

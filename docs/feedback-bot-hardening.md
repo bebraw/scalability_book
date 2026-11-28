@@ -1,65 +1,41 @@
-# Feedback Bot Hardening
+# Feedback bot hardening
 
-The GitHub login flow is suitable for student identity, but it is not a complete spam defense by itself.
-Any authenticated GitHub account can currently post feedback.
-Keep the OAuth flow as the identity layer and add abuse controls around the write endpoints.
+## Who sees a contribution
 
-## Phase 1: Rate Limit Authenticated Writes
+Any reader with a GitHub feedback session can send a paragraph comment to the book team.
+Initially, the author and feedback moderators can see it.
+To share an explanation with other readers, a moderator reviews the wording and features a **Reader note** at the passage.
+The public note contains the curated text and omits the original author's identity and private replies.
+Moderators can hide individual comments and unfeature public notes. [Feedback workflow](feedback-setup.md#5-student-feedback-flow)
 
-Add per-login and per-IP rate limits for `POST /api/comments` and any legacy feedback write endpoints.
+For discussion among classmates, students can share a contribution with their group or cohort through **Peer discussion** in a configured course run.
+The course checks enrollment, the chosen audience and the student's initial attempt before returning peer content.
+Course staff can moderate contributions and close threads.
+Creating a GitHub account alone grants no class membership. [Peer inquiry contract](learning-workspace.md#peer-inquiry-contract)
 
-- Store counters in KV with keys such as `rate:<window>:login:<github-login>` and `rate:<window>:ip:<client-ip>`.
-- Use short windows for burst control, for example 10 comments per 10 minutes per login and 30 writes per 10 minutes per IP.
-- Return `429 Too Many Requests` with a clear JSON message when a limit is exceeded.
-- Keep admin users exempt or give them a higher moderation limit.
+## Limits in the feedback Worker
 
-Acceptance criteria:
+The Worker checks each non-admin comment or legacy confusion submission against two counters in the same ten-minute window.
+The limit is 10 submissions per GitHub login and 30 per client IP.
+An exceeded limit returns HTTP 429 with a `Retry-After` header.
+The counters expire in KV. [Worker implementation](../worker/index.ts)
 
-- A normal student can post several comments without friction.
-- Repeated scripted POSTs from one login or IP receive `429`.
-- Rate limit keys expire automatically and do not require manual cleanup.
+These limits reduce bursts in the moderation inbox.
+The counters use separate KV reads and writes, so simultaneous submissions can be undercounted.
+A campus network can also share a single IP across many legitimate readers.
+Moderators can see the stored GitHub identity even when an author chooses anonymous display. [Feedback audiences](feedback-setup.md#5-student-feedback-flow)
 
-## Phase 2: Add Cloudflare Turnstile To Feedback Submission
+## Options if abuse persists
 
-Use Turnstile as a challenge only when the user submits feedback, not during normal reading.
+If one account repeatedly fills the inbox, a useful next control would be a moderator action to suspend its feedback writes temporarily.
+Key the suspension to the verified numeric GitHub account ID, which stays the same when the login name changes.
+Record the reason, moderator and expiry privately, and let a moderator lift the suspension.
+Keep its scope to reader feedback so students retain access to readings, private highlights and course work.
 
-- Add a Turnstile widget to comment forms.
-- Send the Turnstile token with each feedback POST.
-- Verify the token in the Worker before writing to KV.
-- Keep the feature configurable with `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` so local development can run without it.
+For a backlog, moderators could preview one account's recent submissions across chapters and select which to hide together.
+Preserve the original records and moderation reasons for review, with a way to undo the batch.
+Avoid attributing old records to an account solely through a matching display name, or grouping different students as one author because they share an IP.
 
-Acceptance criteria:
-
-- Missing or invalid Turnstile tokens cannot create comments.
-- Valid GitHub login plus valid Turnstile token can create comments.
-- Local development remains usable without production Turnstile secrets.
-
-## Phase 3: Restrict Who Can Post During Course Runs
-
-For stricter course deployments, add an optional allowlist before accepting feedback writes.
-
-- Support a `FEEDBACK_GITHUB_LOGINS` Worker var containing comma-separated GitHub usernames.
-- If the var is empty, preserve the current behavior: any GitHub user may post.
-- If the var is set, allow only listed users and admins to post comments.
-- Document how to update the allowlist before each course run.
-
-Acceptance criteria:
-
-- Unlisted authenticated users can sign in but receive `403` when posting.
-- Listed users and admins can post normally.
-- Public featured notes remain visible to anonymous readers.
-
-## Phase 4: Improve Moderation And Recovery
-
-Add tools that make abuse easy to inspect and reverse.
-
-- Add `hiddenReason` and `hiddenBy` details to hidden comments.
-- Add a local export report grouped by author login and chapter.
-- Add a bulk hide command for one login if an account posts spam.
-- Keep original GitHub identity in KV even when a comment is displayed anonymously.
-
-Acceptance criteria:
-
-- Admins can identify the source login behind abusive anonymous comments.
-- Admins can hide all feedback from one login without editing KV manually.
-- Exported reports include enough context for course staff to audit moderation decisions.
+If many accounts generate automated submissions, a challenge such as Turnstile on the submission step is another option.
+Evaluate its effect on legitimate students as well as the moderator workload.
+Account suspension, bulk hiding and submission challenges are proposals.

@@ -2,6 +2,8 @@
 
 **Draft for discussion — 22 October 2026.**
 
+This pilot uses the [October grading rubric](../../requirements/2026-10-v2/grading.md).
+
 Complete the full 5 ECTS course through the approved solo route, with student work submitted by **16 December 2026** and grading targeted for **18 December**.
 The expected student workload is **135 hours**, including approximately **6–8 hours of orientation before an early-November kickoff**.
 The remaining work needs approximately **20–21 hours per week after kickoff**, with the final phase approaching **22–25 hours per week**.

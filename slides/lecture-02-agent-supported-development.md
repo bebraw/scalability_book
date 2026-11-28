@@ -4,122 +4,123 @@ paginate: true
 title: "Lecture 2: Agent-supported development"
 ---
 
-# How can coding agents support scalable development?
+# What have you let a coding agent do?
 
 ## Lecture 2 · Establish
 
-More implementation capacity makes the feedback system more important.
+Choose the closest match in Lecture Studio.
 
-<!-- [Sources] course_plan.md; book/01_establish/02_scalable_development.md -->
+Haven’t tried one · Explained code · Proposed a patch · Edited and ran checks
 
----
+What would you want to check yourself?
 
-# The development system scales too
-
-A web project is changed by a connected system of:
-
-- people and agents;
-- instructions and context;
-- tools and environments;
-- tests and review;
-- ownership and correction paths.
-
-Faster code production does not guarantee faster accepted change.
-
-<!-- [Sources] book/00_introduction.md; book/01_establish/02_scalable_development.md -->
+<!-- [Sources] lecture_plan.md#2-coding-agents-and-first-experiences -->
 
 ---
 
-# Constrain → generate → validate
+# How did we ship changes before coding agents?
 
-**Constrain**
+A colleague asks for a CSV export from the tracker.
 
-State the behavior, boundaries, commands, and prohibited effects.
+**Agree on an example → Write the exporter → Run tests in CI → Review and release**
 
-**Generate**
+The colleague opens the CSV. “Build, measure, learn” fills three columns.
+What happens next?
 
-Let the agent propose and implement a bounded change.
-
-**Validate**
-
-Check the artifact independently and feed concrete failures back into the loop.
-
-The loop ends with accepted evidence—not generated output.
-
-<!-- [Sources] book/01_establish/02_scalable_development.md -->
+<!-- [Sources] book/01_establish/02_scalable_development.md#what-changes-when-agents-implement-code; book/01_establish/02_scalable_development.md#constraint-feedback-through-an-actual-export -->
 
 ---
 
-# A project harness makes work inspectable
+# Who does what when an agent writes the patch?
 
-Could another team run A and explain why a transition produces one event?
+| Work      | Developer-led                       | Agent-assisted                            |
+| --------- | ----------------------------------- | ----------------------------------------- |
+| Specify   | Agree on a sample row with the user | Give the agent the row and allowed fields |
+| Implement | Write the exporter and tests        | Agent edits, runs checks and revises      |
+| Accept    | A teammate inspects the download    | A teammate inspects the download          |
 
-- Give them setup instructions, run commands and repeatable acceptance checks.
-- Link the maintained specification and architecture notes from the **ownership card** for the core event workflow.
-- Record the stack choice, its risks and what would make you revisit it.
-- Keep one representative agent task, including its configuration, checks, human corrections and acceptance decision.
+Who decides whether to add an event ID?
 
-<!-- [Sources] book/01_establish/02_scalable_development.md; specifications/00_common_project.md -->
+<!-- [Sources] book/01_establish/02_scalable_development.md#what-changes-when-agents-implement-code -->
+
+---
+
+# What did the CSV test catch?
+
+{{ import "site/includes/coding-loop-figure.html" }}
+
+<!-- [Sources] book/01_establish/02_scalable_development.md#constrain-generate-validate-revise; site/includes/coding-loop-figure.html -->
+
+---
+
+# Where will the patches wait?
+
+| Patches per hour       | Developer drafts | Agent drafts |
+| ---------------------- | ---------------: | -----------: |
+| Ready for review       |                2 |            6 |
+| One reviewer can check |                3 |            3 |
+
+In this example, every patch passes.
+Starting empty, how many await review after one hour of agent drafting?
+
+<!-- [Sources] book/01_establish/02_scalable_development.md#when-generation-outruns-comprehension; lecture_plan.md -->
+
+---
+
+# Who reviewed the change at epilot?
+
+Product, design and support staff requested patches in Slack.
+They tried the previews.
+Engineers reviewed the code.
+
+| Agent pull requests initiated by non-engineers |  Merged |
+| ---------------------------------------------: | ------: |
+|                                        **807** | **543** |
+
+What two timestamps would tell you how long a patch waited for review? [Viljami Kuosmanen at SDLCAI · epilot, Feb–Sep 2026](https://www.sdlcai.org/media/talks/non-engineers-vibe-code-production/404574e7-178f-48ea-bca5-02245c74ab6a.pdf#page=22)
+
+<!-- [Sources] book/01_establish/02_scalable_development.md#what-changes-when-agents-implement-code; SDLCAI 2026, Kuosmanen, slides 21–22, 41 and 45 -->
 
 ---
 
 # Can a retry record the event twice?
 
-For this class discussion, read the [event recorder](https://scalableweb.dev/explore/challenge-an-explanation/).
-An agent says it prevents duplicates even after a worker restart.
+An agent says a restarted worker still remembers request `C7`.
+Predict the stored event count.
 
-1. On your own, predict the event count after the first call, a retry on the same worker and a retry after restart.
-   Which state survives?
-2. Ask the agent for a test of its claim, or inspect the sample test.
-   Does the test restart the recorder, keep the event store and inspect the stored events?
-3. Correct the test if needed and run it.
-   What guarantee would you now state?
+| First call | Retry on the same worker | Restart, then retry |
+| ---------- | ------------------------ | ------------------- |
+| ?          | ?                        | ?                   |
 
-<!-- [Sources] book/01_establish/02_scalable_development.md; explorations/challenge-an-explanation.md -->
+[Inspect the recorder and test the claim](https://scalableweb.dev/explore/challenge-an-explanation/)
 
----
-
-# Authority should shrink as consequences grow
-
-An agent may:
-
-- **propose** when intent is ambiguous;
-- **prepare** when a human must approve a consequential action;
-- **execute** when scope, evidence, reversibility, and limits are clear.
-
-Provenance records who or what produced an artifact.
-It does not prove correctness or transfer accountability.
-
-<!-- [Sources] book/01_establish/02_scalable_development.md -->
+<!-- [Sources] explorations/challenge-an-explanation.md; book/01_establish/02_scalable_development.md#test-an-explanation-against-behavior -->
 
 ---
 
-# Improve the feedback loop, not just the prompt
+# Would you release this patch?
 
-When an agent struggles, ask which system property is weak:
+The checks pass.
+The reviewer asks for a change.
 
-- the requirement is ambiguous;
-- the relevant context is hard to find;
-- the change boundary is unclear;
-- checks are slow or incomplete;
-- failure output does not explain what to correct.
+After the agent revises the patch, which evidence from the first version can you still use to release it?
 
-Prompt changes help only when the prompt is the actual bottleneck.
+[Try the book’s release demo](https://scalableweb.dev/learn/pilot/agent-development/#slide-gates)
 
-<!-- [Sources] book/01_establish/02_scalable_development.md -->
+<!-- [Sources] study/pilot/agent-development.md; book/01_establish/02_scalable_development.md#bound-probabilistic-generation-with-deterministic-controls -->
 
 ---
 
-# Establish checkpoint
+# What will your team check in Implementation A?
 
-Use one engineering session of **about 30 minutes** to check a work-item transition and its activity event.
-Each person predicts the result before the group uses the agent.
+Pick a tracker transition.
+Each teammate predicts what will be stored.
 
-- The **operator** guides the approved large-model agent.
-- The **challenger** tries a case that could break the claim.
-- The **validator** checks the visible result and stored state.
-  Someone other than the operator explains the acceptance decision.
+**Operator** guides the agent · **Challenger** tries to break its claim · **Validator** checks the stored result
 
-Record the roles, predictions, check and decision in your existing decision log or AI-use log. [Session protocol and approved solo equivalent](https://scalableweb.dev/project/#shared-engineering-sessions)
+Which step would you delegate now?
+What convinced you?
 
-<!-- [Sources] lecture_plan.md; specifications/01_establish.md; specifications/00_common_project.md#shared-engineering-sessions -->
+[Shared engineering session and solo equivalent](https://scalableweb.dev/project/#shared-engineering-sessions)
+
+<!-- [Sources] specifications/00_common_project.md#shared-engineering-sessions; lecture_plan.md -->

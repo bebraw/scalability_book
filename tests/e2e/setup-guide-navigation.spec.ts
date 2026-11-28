@@ -2,9 +2,13 @@ import { expect, test } from "@playwright/test";
 
 test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-for (const [edition, introduction] of [
-  ["current", "/project/introduction/"],
-  ["archived", "/project/requirements/2026-10-v2/introduction/"],
+for (const [edition, introduction, guide] of [
+  ["current", "/project/introduction/", "/diary/"],
+  [
+    "archived",
+    "/project/requirements/2026-10-v2/introduction/",
+    "/notebook/setup/",
+  ],
 ]) {
   for (const width of [1440, 960, 390]) {
     test(`the ${edition} introduction reveals the setup walkthrough at ${width}px`, async ({
@@ -28,12 +32,12 @@ for (const [edition, introduction] of [
         })
         .click();
       await expect(page).toHaveURL(
-        /\/notebook\/setup\/#prepare-material-for-your-portfolio$/,
+        `${guide}#prepare-material-for-your-portfolio`,
       );
       await page.waitForLoadState("load");
       await page.evaluate(() => document.fonts.ready);
 
-      const heading = page.locator("h3:target");
+      const heading = page.getByRole("heading").and(page.locator(":target"));
       await expect(heading).toContainText(
         "Prepare material for your portfolio",
       );

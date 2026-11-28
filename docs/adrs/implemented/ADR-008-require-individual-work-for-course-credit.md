@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-05
 
+[ADR-068](ADR-068-count-lecture-diary-entries-across-the-course.md) supersedes the per-phase individual passing rules for new runs.
+
 **Later revisions:** [ADR-026](ADR-026-support-an-approved-solo-course-route.md) adds approved solo assessment equivalents; [ADR-039](ADR-039-sequence-model-sizes-and-permit-mixed-fleets.md) makes that rubric the sole pre-course version and removes unused legacy compatibility.
 
 ## Context

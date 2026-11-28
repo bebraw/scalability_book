@@ -10,9 +10,9 @@ import {
   localCall,
 } from "../fixtures/learning-local-server.ts";
 import {
-  chooseNotebookTool,
+  chooseAssistantTool,
   openAssistantSettings,
-} from "./learning-notebook.helpers.ts";
+} from "./learning-workspace.helpers.ts";
 
 for (const native of [false, true])
   test(`packed local model ${native ? "observes the real demo and respects declined/approved changes" : "shows discussion-only capabilities and reply provenance"}`, async ({
@@ -91,39 +91,36 @@ for (const native of [false, true])
       });
       await page.goto("/demos/#demo-cache-decision-lab");
       await page
-        .locator('.site-header [data-learning-toggle="notebook"]')
+        .locator('.site-header [data-learning-toggle="assistant"]')
         .click();
-      const notebook = page.locator("#learning-notebook"),
-        assistant = page.locator("#learning-assistant");
-      await notebook
+      const assistant = page.locator("#learning-assistant");
+      await assistant
         .getByLabel("Companion address")
         .fill("http://127.0.0.1:18886");
-      await notebook
+      await assistant
         .getByRole("button", { name: "Connect companion", exact: true })
         .click();
-      await expect(notebook.getByRole("status")).toContainText("Connected");
+      await expect(assistant.getByRole("status")).toContainText("Connected");
       if (native) {
-        await chooseNotebookTool(notebook, "Discuss");
+        await chooseAssistantTool(assistant, "Discuss");
         await assistant
           .getByLabel("Investigation source")
           .selectOption("demo-cache-decision-lab");
         await assistant
           .getByRole("button", { name: "Save initial thinking" })
           .click();
-        await notebook
-          .getByLabel("Your thinking")
+        await assistant
+          .getByLabel("My initial thinking")
           .fill(
             "I predict that a stored asset aged 400 days is stale under its 365-day policy. I want to inspect the actual response path.",
           );
-        await notebook
-          .getByRole("button", { name: "Save note", exact: true })
+        await assistant
+          .getByRole("button", { name: "Save private attempt", exact: true })
           .click();
-        await chooseNotebookTool(notebook, "Notes");
-        await notebook.getByRole("checkbox").first().check();
-        await notebook
-          .getByRole("button", { name: "Discuss selected notes" })
-          .click();
-      } else await chooseNotebookTool(notebook, "Discuss");
+        await assistant
+          .getByRole("checkbox", { name: /Include my attempt/ })
+          .check();
+      } else await chooseAssistantTool(assistant, "Discuss");
       await openAssistantSettings(assistant);
       if (!native)
         await expect(

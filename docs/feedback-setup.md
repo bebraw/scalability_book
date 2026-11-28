@@ -10,7 +10,7 @@ This site has two feedback modes:
 Resolved local comments are synced back to Cloudflare KV with an explicit command.
 Local editing does not silently write to production.
 
-Course-backed peer inquiry is a separate opt-in surface at **Teaching assistant → Peer discussion**.
+Students can open course-backed peer inquiry from a paragraph’s comment control with **Discuss with classmates**, or through **Teaching assistant → Peer discussion**.
 [Its contract](learning-workspace.md#peer-inquiry-contract) uses course membership and explicit group/cohort audiences, without migrating private feedback.
 Public inquiry offers require author consent and course-staff review; reviewed Markdown is handed to the existing book-editor workflow.
 This does not change the visibility or featuring rules for existing feedback.
@@ -105,12 +105,17 @@ If `available` is `false`, the OAuth values or `SESSION_SECRET` are missing.
 
 ## 5. Student Feedback Flow
 
-Students use the deployed site:
+Open the comment control beside a chapter paragraph.
+You can read any featured Reader note there before signing in.
 
-1. Open a chapter.
-2. Select `Sign in` in the navigation header feedback controls.
-3. Use the comment control next to a paragraph.
-4. Choose a feedback category and post feedback.
+- To read and reply to classmates, choose **Discuss with classmates**.
+  Sign in to your course and choose **Reveal peer inquiry** after saving your initial thinking for the passage.
+  You can use a saved diary selection from Obsidian or an attempt in the companion. [Course diary guide](course-diary.md#bring-a-passage-into-your-diary)
+- To send private feedback to the book team, choose **Sign in to comment** if signed out.
+  Obsidian’s Web viewer opens the same paragraph in your default browser.
+  Choose **Sign in with GitHub** to return to its comment form.
+  With an existing feedback session you can go straight to the form.
+  Choose a category, write your feedback and select **Post comment**.
 
 Comments are stored under KV keys named `comments:<chapter-slug>`.
 New resolutions are stored under `feedback-resolution:<chapter-slug>:<comment-id>` in the same namespace.
@@ -124,12 +129,11 @@ It also shows the acknowledgement alongside the original feedback category.
 Other readers can see only curated Reader notes that feedback admins explicitly feature for public display.
 Public Reader notes omit the author's identity and private replies.
 Readers can open a public note through its paragraph badge without signing in.
-The related-feedback panel offers **Sign in to comment** to logged-out readers; it opens Account before any comment form appears.
-Closing Account leaves the public note available to read.
 Admin users can see all feedback records, including the stored author identity when a comment is displayed as anonymous.
 
 Before posting, the form explains this audience and the possibility of a public Reader note, and distinguishes feedback from private Notebook writing and course Peer discussion.
-Opening the form focuses the audience explanation so it stays in view; Tab then moves to Category and the remaining fields.
+Opening the form focuses the audience explanation.
+Tab reaches the learning diary link, **Discuss with classmates**, then Category and the remaining fields.
 The anonymous checkbox changes the displayed name to **Anonymous student**; its description states that the GitHub identity remains stored in KV and accessible to feedback administrators.
 It does not remove identity from the stored record or its admin API response.
 After posting, a visible confirmation in the related-feedback panel says the feedback was sent to the book's feedback team and that replies can be read there.

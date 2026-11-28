@@ -1,12 +1,9 @@
-import type {
-  AssistantHandoff,
-  LearningExperience,
-} from "../../shared/learning-workspace.ts";
+import type { AssistantHandoff } from "../../shared/learning-workspace.ts";
 import type { CockpitRequest } from "./learning-cockpit.ts";
-import type { NotebookView } from "./learning-session.ts";
+import type { AssistantView } from "./learning-session.ts";
 
 export type LearningAction =
-  | { kind: "navigate"; experience: LearningExperience; view: NotebookView }
+  | { kind: "navigate"; view: AssistantView }
   | ({ kind: "investigate" } & CockpitRequest)
   | { kind: "discuss"; draft: AssistantHandoff };
 

@@ -1,3 +1,4 @@
+import { downloadedMarkdown } from "./learning-workspace.helpers.ts";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
@@ -238,23 +239,11 @@ for (const native of [false, true])
       await page.screenshot({
         path: test.info().outputPath("inline-mobile-dark.png"),
       });
-      await activity
-        .getByRole("button", { name: "Prepare notebook takeaway" })
-        .click();
-      const notebook = page.locator("#learning-notebook");
-      await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-        /The stored policy and actual age/,
+      const markdown = await downloadedMarkdown(
+        activity.getByRole("button", { name: "Download takeaway as Markdown" }),
       );
-      expect(
-        privateRequests.filter((url) => /\/notebook\/entries/.test(url)),
-      ).toHaveLength(0);
-      await notebook
-        .getByRole("button", { name: "Save note", exact: true })
-        .click();
-      await expect(notebook.getByRole("status")).toContainText(
-        "Saved in your private notebook",
-      );
-      await notebook.getByRole("button", { name: "Close notebook" }).click();
+      expect(markdown).toContain("The stored policy and actual age");
+      expect(markdown).toContain("#demo-cache-decision-lab)");
       await activity
         .getByRole("button", { name: "Pause this exploration" })
         .click();

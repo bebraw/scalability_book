@@ -4,148 +4,127 @@ paginate: true
 title: "Lecture 1: What scalability means"
 ---
 
-# What does scalability mean for web development?
+# What is scalability to you?
 
 ## Lecture 1 · Establish
 
-Pressure changes.
-What must the system continue to do?
+Send one word or short phrase to the Lecture Studio word cloud.
 
-<!-- [Sources] course_plan.md; book/01_establish/01_what_is_scalability.md -->
+Pick a word from the screen.
+What experience does it bring to mind?
 
----
-
-# Would you keep the cache?
-
-A team added a cache to its workspace summary.
-It now reuses a saved copy and the team reports that the page loads twice as fast.
-
-> What would you need to know before recommending that they keep the cache?
-
-Take five minutes on your own, before using an agent or discussing the case.
-In your private lecture diary, record your provisional recommendation, what you would measure first and why.
-Save this entry for Lecture 9.
-
-<!-- [Sources] lecture_plan.md -->
+<!-- [Sources] lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability -->
 
 ---
 
-# Scalability is a relationship, not a size
+# How the book defines scalability
 
-**Pressure changes**
+**Scalability** is a system’s ability to keep meeting a stated goal as a named pressure grows or changes.
 
-Users, data, contributors, or requirements grow or vary.
-
-**Expected behavior remains bounded**
-
-The system preserves an explicit quality, cost, reliability, or change goal.
-
-> “Scales well” is incomplete until both sides of the relationship are named.
-
-<!-- [Sources] book/00_introduction.md; book/01_establish/01_what_is_scalability.md -->
-
----
-
-# Four pressures organize the course
-
-| Pressure    | What changes?                                | Example question                                          |
-| ----------- | -------------------------------------------- | --------------------------------------------------------- |
-| Demand      | Requests and useful work                     | Can the application sustain a tenfold traffic burst?      |
-| Data        | Volume, velocity, shape, or retention        | Can queries remain useful as history grows?               |
-| Contributor | People and agents changing the system        | Can more contributors work without integration collapse?  |
-| Change      | Requirements, dependencies, and environments | Can the system evolve without making every release risky? |
-
-<!-- [Sources] course_plan.md; book/01_establish/01_what_is_scalability.md -->
-
----
-
-# Related qualities answer different questions
-
-**Performance** asks how the system behaves under stated conditions.
-
-**Elasticity** asks how capacity adapts to changing demand.
-
-**Resilience** asks how behavior changes when parts fail.
-
-**Efficiency** asks what resources an accepted outcome consumes.
-
-Scalability connects changing pressure to the behavior that must be maintained.
+What changes?
+What needs to keep working?
 
 <!-- [Sources] book/01_establish/01_what_is_scalability.md -->
 
 ---
 
-# Mechanisms are responses—not dimensions
+# Application scalability
 
-Architecture and infrastructure give us response surfaces:
+Someone finishes a work item.
+Its state changes and exactly one completion appears in the activity feed.
 
-- move or duplicate computation;
-- cache, replicate, partition, archive, or delete data;
-- isolate failure and ownership boundaries;
-- automate validation and deployment;
-- change contracts, workflows, or responsibility.
+Can the running tracker keep that promise as more people use it?
 
-Every response introduces a cost, constraint, or new failure mode.
-
-<!-- [Sources] course_plan.md; book/01_establish/01_what_is_scalability.md -->
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#begin-with-the-goal-that-must-continue-to-hold -->
 
 ---
 
-# Turn an ambition into a bounded claim
+# Development scalability
 
-> Under **[declared pressure and conditions]**, the system maintains **[observable behavior]** within **[threshold or comparison]**, except for **[known limit]**.
+A teammate changes how the tracker records a completion.
 
-Weak: “The application is scalable.”
+As more people work on it, can the team still review, test and ship that change safely?
 
-An example to test: “As we increase concurrency from four clients to twenty, at least 95% of valid work-item creations finish within 500 ms.
-Each creates one activity event.”
-
-<!-- [Sources] book/01_establish/01_what_is_scalability.md; specifications/01_establish.md -->
+<!-- [Sources] book/00_introduction.md; book/01_establish/02_scalable_development.md -->
 
 ---
 
-# One product, three development systems
+# Demand pressure
 
-Make three fresh implementations of the same Work Activity Tracker.
+One person finishes a work item.
+Now twenty people finish different items at once.
 
-1. **Establish (A).** Use the approved large model, one coding agent at a time.
-2. **Challenge (B).** Use the approved small model, one coding agent at a time.
-3. **Compare (C).** Declare the fleet and its approved model assignments.
+How long does the last person wait for confirmation?
 
-In A and B, teammates can plan, test and correct the work together.
-Record consequential manual corrections.
-Use only the approved inference route for each build.
-
-<!-- [Sources] book/00_introduction.md; specifications/00_common_project.md -->
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#demand-changes-the-distribution-of-web-behavior -->
 
 ---
 
-# How course credit works
+# Data pressure
 
-| Work in each phase                   | Points | Minimum to pass each phase                                             |
-| ------------------------------------ | -----: | ---------------------------------------------------------------------- |
-| Shared group project                 |     30 | 10 points                                                              |
-| Individual participation and diaries |      9 | Two of three lecture activities at 3/3 each                            |
-| Private self- and peer-assessment    |     12 | 6 points, including 1/3 for reliable contribution and shared ownership |
+Keep the same four readers.
+Grow the history from 1,000 events to 10,000.
 
-A 3-point lecture activity combines live participation or the announced remote equivalent, one concrete idea, and a connection to evidence, an assumption, or a decision.
+How long does it take to return the latest 20 events in order?
 
-Meet these minima in **every phase** and earn at least **50% overall**. [Assessment rubric](https://scalableweb.dev/project/grading/)
-
-<!-- [Sources] specifications/grading.md; specifications/00_introduction.md -->
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#data-changes-paths-as-well-as-volume -->
 
 ---
 
-# Establish checkpoint
+# Contributor pressure
 
-Start two claims in your group's evidence index for implementation A:
+Three agents open patches.
+One person reviews them.
 
-- one about runtime demand or data;
-- one about contributors or change.
+Which queue would you watch to learn whether the team can accept changes any faster?
 
-Use the [pressure record](https://scalableweb.dev/project/#pressure-record-template) to say where each claim applies and what evidence could challenge it.
-Use the runtime claim to choose one pressure you can repeat on B and C.
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#contributors-increase-coordination-pressure -->
 
-**Question to carry forward:** What evidence would make your claim credible?
+---
 
-<!-- [Sources] course_plan.md; specifications/01_establish.md -->
+# Change pressure
+
+A new tracker client adds a category to events.
+Some teams still use last month’s client.
+
+Which read and write would you try before rolling out the change?
+
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#change-makes-old-commitments-visible -->
+
+---
+
+# Can the tracker keep up?
+
+Raise incoming work from **100 to 150 events per second**.
+Where will work pile up?
+
+Add capacity for **40 more events per second** at that stage.
+Will the queue stop growing?
+
+[Run the pipeline demo](https://scalableweb.dev/learn/pilot/responses/#slide-capacity)
+
+<!-- [Sources] study/pilot/responses.md; lecture_plan.md -->
+
+---
+
+# Implementation A
+
+After class, build your team’s first tracker with the approved large model and one coding agent at a time.
+
+What will you check as demand or data grows?
+What will you check as contributors or requirements change?
+
+Bring those two claims to your first team session.
+Submit A before Lecture 4. [Establish brief](https://scalableweb.dev/project/establish/)
+
+<!-- [Sources] book/01_establish/01_what_is_scalability.md#project-artifact; specifications/01_establish.md -->
+
+---
+
+# Questions
+
+On the Lecture Studio audience page, choose **Ask a question**.
+
+What would you like us to go through together?
+
+<!-- [Sources] lecture_plan.md -->

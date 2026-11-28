@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-06
 
+**Superseded in part:** [ADR-066](ADR-066-keep-course-diaries-in-obsidian.md) moves everyday diary writing and the book’s takeaway handoff to student-owned Markdown.
+
 ## Context
 
 The course already requires learning diaries and private individual portfolios.

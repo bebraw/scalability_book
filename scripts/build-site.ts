@@ -34,6 +34,7 @@ import {
   renderConceptGraphMarkdown,
 } from "./lib/concept-export.ts";
 import { buildStudy } from "./lib/study-build.ts";
+import { readLectureSlidePages } from "./lib/lecture-slides.ts";
 import { writeConceptVisuals } from "./lib/concept-visuals.ts";
 import { build as viteBuild, transformWithOxc } from "vite";
 import {
@@ -53,7 +54,9 @@ import { createSiteAssets } from "./lib/site-assets.ts";
 import { writeOpenGraphImages, type OpenGraphCard } from "./lib/open-graph.ts";
 import { writeDirectoryZip } from "./lib/zip.ts";
 import { writeLabSourceDownloads } from "./lib/lab-downloads.ts";
+import { writeCourseDiaryDownloads } from "./lib/course-diary-download.ts";
 import { writeProjectStarterDownload } from "./lib/project-starter-download.ts";
+import { branchPreviewOrigin } from "./lib/starter-book-links.ts";
 import { getBrowserBuildTargets } from "./lib/browser-targets.ts";
 import {
   readRequirementEditions,
@@ -89,6 +92,8 @@ const config = parseJsonc(
 const siteUrl = includeEditor
   ? `http://127.0.0.1:${Number(process.env.PORT || 3000)}/`
   : `https://${config.domain}/`;
+const starterBookOrigin =
+  (!includeEditor && branchPreviewOrigin(root)) || new URL(siteUrl).origin;
 const templates = await loadTemplates({
   baseLayout: "layouts/BaseLayout.html",
   bookNavigation: "components/BookNavigation.html",
@@ -171,6 +176,11 @@ await compileSiteStylesheet("styles/course.css");
 await compileSiteBundle("scripts/course.ts", "course.js", "CourseWorkspace");
 await compileSiteScript("scripts/theme.ts", "theme.js");
 await compileSiteBundle("scripts/account.ts", "account.js", "BookAccount");
+await compileSiteBundle(
+  "scripts/notebook-recovery.ts",
+  "notebook-recovery.js",
+  "NotebookRecovery",
+);
 await compileSiteBundle(
   "scripts/learning-workspace.ts",
   "learning-workspace.js",
@@ -361,34 +371,60 @@ const renderer = createSiteRenderer({
   onOpenGraphCard: (card) => openGraphCards.push(card),
 });
 
-const notebookSetup = await readFile(
-  path.join(root, "docs/learning-companion-setup.md"),
-  "utf8",
-);
-const externalAgentSetup = await readFile(
-  path.join(root, "docs/external-agent-setup.md"),
-  "utf8",
-);
-await writePage(
-  "agents/index.html",
-  renderer.renderLayout({
-    title: `Explore with your own agent - ${config.title}`,
+for (const guide of [
+  {
+    route: "agents",
+    file: "external-agent-setup.md",
+    title: "Explore with your own agent",
     description:
       "Connect your agent to the public book MCP server, or start with the Markdown guide.",
-    currentUrl: "/agents/",
-    children: `<main id="content" class="chapter-main guide-main"><article class="prose">${renderMarkdown(externalAgentSetup, { number: "" }, bibliographySource).content}</article></main>`,
-  }),
-);
-await writePage(
-  "notebook/setup/index.html",
-  renderer.renderLayout({
-    title: `Set up your learning notebook - ${config.title}`,
+  },
+  {
+    route: "diary",
+    file: "course-diary.md",
+    title: "Keep a course diary in Obsidian",
     description:
-      "Connect a private local notebook, capture your thinking, revisit ideas and prepare existing course submissions.",
-    currentUrl: "/notebook/setup/",
-    children: `<main id="content" class="chapter-main guide-main"><article class="prose">${renderMarkdown(notebookSetup, { number: "", title: "Set up your learning notebook" }, bibliographySource).content}</article></main>`,
-  }),
-);
+      "Open the starter vault, keep passages beside your lecture notes and choose evidence for your phase portfolio.",
+  },
+  {
+    route: "notebook/setup",
+    file: "learning-companion-setup.md",
+    scripts: ["/notebook-recovery.js"],
+    title: "Teaching assistant setup and Notebook recovery",
+    description:
+      "Connect the book’s teaching assistant, configure your provider or export an existing course Notebook.",
+  },
+]) {
+  const source = await readFile(path.join(root, "docs", guide.file), "utf8");
+  const { content } = renderMarkdown(
+    source,
+    { number: "" },
+    bibliographySource,
+  );
+  await writePage(
+    `${guide.route}/index.html`,
+    renderer.renderLayout({
+      title: `${guide.title} - ${config.title}`,
+      description: guide.description,
+      currentUrl: `/${guide.route}/`,
+      scripts: guide.scripts ?? [],
+      children: `<main id="content" class="chapter-main guide-main"><article class="prose">${content}</article></main>`,
+    }),
+  );
+}
+
+for (const page of await readLectureSlidePages(path.join(root, "slides"))) {
+  await writePage(
+    `${page.url.slice(1)}index.html`,
+    renderer.renderLayout({
+      title: `${page.title} - ${config.title}`,
+      description: "Draft lecture slides for preparation and review.",
+      currentUrl: page.url,
+      scripts: developmentScripts,
+      children: `<main id="content" class="chapter-main guide-main"><article class="prose lecture-slides">${page.content}</article></main>`,
+    }),
+  );
+}
 
 for (let index = 0; index < bookPages.length; index++) {
   const page = bookPages[index];
@@ -705,6 +741,11 @@ await writePage(
   JSON.stringify(exportBookPassages(publicPassages)) + "\n",
 );
 await writeLabDownloads();
+await writeCourseDiaryDownloads(
+  root,
+  path.join(buildDir, "downloads"),
+  starterBookOrigin,
+);
 await writeProjectDownloads();
 await copyProjectSpecificationSources(projectSpecifications);
 await buildStudy(root, path.join(buildDir, "learn/pilot"));
@@ -1319,6 +1360,16 @@ async function copyStaticAssets() {
     path.join(siteDir, "assets", "blank-map-world.svg"),
     path.join(assetsDir, "blank-map-world.svg"),
   );
+  const screenshots = path.join(siteDir, "assets", "obsidian-setup");
+  const destination = path.join(assetsDir, "obsidian-setup");
+  await mkdir(destination, { recursive: true });
+  for (const file of await readdir(screenshots, { withFileTypes: true })) {
+    if (file.isFile() && file.name.endsWith(".png"))
+      await copyFile(
+        path.join(screenshots, file.name),
+        path.join(destination, file.name),
+      );
+  }
 }
 
 async function writeLabDownloads() {
@@ -1334,6 +1385,7 @@ async function writeProjectDownloads() {
   await writeProjectStarterDownload(
     root,
     path.join(downloadsDirectory, "project-starter.zip"),
+    starterBookOrigin,
   );
   await writeDirectoryZip(
     path.join(root, "specifications", "examples", "fleet-trace"),

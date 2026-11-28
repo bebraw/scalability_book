@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-07
 
+**Superseded in part:** [ADR-066](ADR-066-keep-course-diaries-in-obsidian.md) moves everyday diary writing and the book’s takeaway handoff to student-owned Markdown.
+
 ## Context
 
 The current whole-book Notebook combines writing, note review, concept judgments, chapter guidance, agent conversation, independent practice and peer inquiry.

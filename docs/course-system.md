@@ -20,6 +20,39 @@ Incoming email uses server-only forwarding configuration.
 Use the ADRs for the intended design and this guide for commands and workflows that work today.
 Update this guide as each decision is implemented.
 
+## Prepare the first lecture
+
+Start the demonstration on the actual course Moodle page.
+Show the contact route for Juho and the TAs and where students can find the links for this run.
+Before announcing a destination, confirm it with the teaching team.
+The following map describes the systems available for the walkthrough.
+
+| Student action                   | Where it happens and who sees the result                                                                                                          |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Read the brief, rubric or slides | Students reach the public book from a browser or their Obsidian lecture note.                                                                     |
+| Record a prediction              | Students write in their personal diary or start on paper while getting set up.                                                                    |
+| Find a team                      | The course workspace collects proposals, confirmations and requests for assignment so staff can publish groups and resolve corrections.           |
+| Record technical work            | The team links runnable checks and observations in its private project repository.                                                                |
+| Hand in work                     | The course workspace holds the group submission and the excerpts each student chooses for their own portfolio, including drafts visible to staff. |
+| Answer the word cloud            | Students respond through the Lecture Studio audience link and the presenter chooses which responses to project.                                   |
+| Ask a question                   | Students send written questions from the Lecture Studio audience page and the presenter chooses which ones to discuss.                            |
+
+Prepare a fictional student in the [teacher simulation](#teacher-simulation) and a sample lecture note in a demo vault.
+For the welcome tour, open Moodle, point out the workspace’s group controls and show the sample diary.
+Give students the [illustrated setup guide](course-diary.md) to follow after class.
+Check the approved agent access route for Establish and where students can ask for help.
+
+Rehearse **Ask a question** from the audience page and **Responses → Questions → Discuss** from the presenter view.
+Keep the welcome and chapter Q&As open to any topic.
+Copy questions that need follow-up into a private staff note before choosing **Done** or changing decks.
+The [lecture plan](../lecture_plan.md#1-course-introduction-and-a-common-view-of-scalability) covers when to open the second deck and how to retain the word cloud for Lecture 9.
+
+**Decisions for this course run.** Agree which announcements and links belong in Moodle, where the authorized enrollment list comes from, who resolves unassigned students, and whether the university requires an official submission or grade entry there.
+The current workspace imports a roster and manages groups and assessment itself.
+A Moodle link can take students to it.
+Automatic transfer of enrollment, groups, submissions or grades would require separate integration work.
+Record the chosen destinations, responsible staff, formation dates and access fallback in the [course environment sheet](../specifications/course_environment.md#publish-the-course-workflow) so students hear one set of instructions.
+
 ## First run locally
 
 ```bash
@@ -89,7 +122,7 @@ An instructor's course link supplies the run ID; students can also enter it expl
 A remembered course is a tab navigation preference, not proof of enrollment.
 Email requests from a reading/peer activity retain a validated internal return location; confirmation returns there instead of the course overview.
 Requests from the ordinary course workspace retain its existing overview behavior.
-When email opens another tab, unfinished notebook, assistant and exercise writing remains in the original tab; return there and choose **Check sign-in again** if necessary.
+When email opens another tab, unfinished assistant and exercise writing remains in the original tab; return there and choose **Check sign-in again** if necessary.
 GitHub and course sessions can be signed out independently through Account.
 
 Verified email students can also save private chapter exercise answers under their course run and stable student identity.
@@ -224,7 +257,7 @@ The public grading page publishes the standard group criteria; staff agree any e
 The [October to December 2026 pilot review pack](solo-pilot-2026/README.md) provides a draft study agreement, dated milestones, independent lecture activities and an instructor preparation checklist for a pre-course solo run.
 Complete its operational choices and retain the agreed arrangement privately before using it with a student.
 
-New runs use requirements `2026-10-v2` and rubric `2026-10-solo-equivalence-v2`.
+New runs use requirements `2026-11-v2` and rubric `2026-11-individual-evidence-v3`.
 Historical runs keep their pinned requirements and rubric; do not rewrite them to enable this route.
 The [project introduction](../specifications/00_introduction.md#approved-solo-route) and all three phase briefs describe the work for an allocated exception; the [assessment equivalents below](#solo-assessment-equivalents) guide the individual agreement.
 The common application, three fresh implementations, workload, points and passing minima remain required.
@@ -244,7 +277,7 @@ The common application, three fresh implementations, workload, points and passin
    The report is bound to the student's frozen revision.
    The student submits their outgoing audit in **Assigned audit**, whether it targets another group or the supplied reference, and answers the incoming findings in final technical evidence.
 5. **My portfolio** uses independent implementation review and solo reflection prompts.
-   The private individual assessment uses the four solo equivalents, retaining the twelve-point assessment maximum, contribution minimum and lecture requirements.
+   The private assessment uses the four solo equivalents, with the twelve-point assessment maximum and the same diary rule as the group route.
    Ordinary solo assessment requires the completed discussion and incoming/outgoing audits; incomplete work can be explicitly recorded as missing with zero scores and a reason.
 6. Assess, release and export through the existing gradebook.
    A changed solo review or outgoing audit makes both project and individual assessments stale until reassessed, in addition to the ordinary submission/portfolio revision checks.
@@ -272,9 +305,9 @@ The instructor records a completed discussion and incoming independent audit, an
 Incomplete work may be explicitly assessed as missing with zero scores and a reason; it does not waive passing requirements.
 A reviewer or agent recommendation is evidence, not an automatic grade.
 
-Keep the three 30-point projects, nine lecture activities, 153-point maximum, grade thresholds and per-phase minima.
-The six-point assessment minimum and one-point contribution minimum apply to these equivalent criteria.
-The individual portfolio itself remains required, and instructor check-ins do not automatically satisfy lecture participation.
+Keep the three 30-point projects, nine lecture activities, 153-point maximum, grade thresholds and the minimum of 10 points per project.
+For the current rubric, count entries for seven different lectures across the submitted portfolios.
+Solo assessment points contribute to the total in the same way as self- and peer-assessment on the group route.
 An approved exception changes the evidence for human collaboration criteria; it does not claim that the student practiced team collaboration.
 Historical runs retain their published rubric and requirements.
 
@@ -317,9 +350,9 @@ Staff must manage storage cleanup outside the UI; no destructive removal of orig
 
 ## Run requirements and evidence checklists
 
-New runs retain the current requirement edition, `2026-10-v2`.
-The course has not run yet; this is the sole pre-course contract and there are no earlier run contracts to maintain.
-It assigns a large model to Establish, a small model to Challenge, and a declared small/large or mixed-model fleet to Compare.
+New runs retain requirement edition `2026-11-v2` with its course-wide diary rule.
+Runs pinned to `2026-11-v1` or `2026-10-v2` retain the earlier individual passing rules.
+All three editions assign a large model to Establish, a small model to Challenge, and a declared small/large or mixed-model fleet to Compare.
 The pre-course scope review retains three fresh builds, maintained specifications and an evolving ADR-style log, with a standard six-field ownership card in each phase's evidence index.
 Required pressure work follows one primary procedure across A–B–C, a bounded correctness or recovery case in B, and one measured scaling response with its new obligation checked in Compare.
 Keep both bounded audits and one evidenced friction finding with a checked improvement or justified follow-up per phase.
@@ -350,6 +383,8 @@ Changing final evidence creates another revision and makes prior project assessm
 Assess one project bundle per group and phase.
 Record its group identifier, frozen membership, assessed implementation revision, criterion scores, brief reasons, and missing evidence.
 Link that result to each member’s individual record rather than assessing duplicate project submissions.
+Students can prepare selected excerpts in their [local diary](course-diary.md#prepare-material-for-your-portfolio).
+Saving a course draft or uploading a file makes it accessible to staff.
 Keep private individual portfolios together by phase, scoring diary entries by lecture and self/peer assessment by criterion.
 
 Release the group project breakdown and feedback to the group, and each student’s individual breakdown, total, and status against every passing requirement to that student.
@@ -366,7 +401,11 @@ One project score applies to every frozen phase member.
 Lecture participation, diaries and self/peer assessments remain individual.
 
 The rubric is versioned per run.
-The sole supported rubric, `2026-10-solo-equivalence-v2`, retains 153 points, at least 10/30 per project, two fully completed lecture activities in each phase, a submitted individual assessment earning at least 6/12 with at least 1/3 contribution per phase, and at least 50% overall.
+Rubric `2026-11-individual-evidence-v3` requires at least 10/30 on each project, entries for seven of the nine lectures and at least 50% of the available 153 points.
+Count each submitted lecture once when its idea or connection field contains the entry or a reference to a recording.
+The entry can earn partial or zero points and still count.
+Participation, diary quality and self- and peer-assessment contribute points to the total.
+Runs pinned to `2026-10-solo-equivalence-v2` use their original per-phase lecture, assessment and contribution minimums.
 Individually approved solo exceptions use the [agreed assessment equivalents](#solo-assessment-equivalents) in the same score positions.
 Grades use the published 50/60/70/80/90% thresholds.
 
@@ -376,10 +415,10 @@ Before releasing a phase, staff must assess every registered group and student a
 The instructor gradebook shows provisional totals; students and CSV exports use released assessments.
 A high total cannot produce a passing grade while a mandatory requirement is unmet, and pending assessments leave the final grade blank.
 
-Use **Approved individual arrangement** in the gradebook to record a private replacement activity/reason, lecture minimum, assessment minimum, contribution minimum and available individual points for a phase.
+Use **Approved individual arrangement** in the gradebook to record the reason and agreed replacement, the required diary entry count across the course, and the available individual points for each phase.
 The available points cannot fall below earned individual points.
 Restoring the standard requirements uses the same form and records another reason.
-The self/peer submission itself remains required, including when a replacement activity is used.
+On the earlier rubric, the same control edits the phase arrangement using that edition’s published requirements.
 
 Every saved revision records its actor, timestamp and reason.
 Concurrent saves use revision checks; a stale browser tab cannot overwrite another submission.
@@ -608,18 +647,18 @@ The evidence index names actual fixture files and explicitly marks missing perfo
    Downloads contain valid small source/evidence files; audit targets and Compare's A/B references retain frozen revisions.
 3. Open **Compare → Gradebook**.
    Ada Example has a passing provisional result.
-   Ben Example has only one completed Challenge lecture activity, despite 90 project points.
-   Cora Example has no Compare portfolio and explicit zeros.
+   Ben Example has one Challenge entry and seven across the course.
+   Cora Example has six diary entries and an explicitly assessed missing Compare portfolio.
    Eli Example is pending because a portfolio correction made its assessment stale.
    Finn Example shows **Withdrawn** with no final grade or numeric total.
 4. Try **Release phase results** with a reason: release fails while Eli's assessment is stale.
    Open **Private portfolios**, select Eli, inspect the correction and stale record, then record the reviewed assessment with a reason.
 5. Release Compare again.
-   Ada receives grade 5; Ben fails the lecture minimum and Cora fails mandatory portfolio/individual requirements despite a high total.
+   Ada and Ben receive grade 5; Cora is one diary entry short of a pass despite her high total.
    Eli's result now passes.
    Jules retains the missing A outcome until any approved course response is documented and assessed through the ordinary workflow.
-6. Switch to Ben and confirm the released failing requirement is visible in **My course progress**; other students' individual evidence remains private.
-   Return to instructor and export: every row is marked `Simulation`, Ben/Cora have grade 0, and the filename starts with `SIMULATION`.
+6. Switch to Cora and confirm that **My course progress** shows six of nine entries and the required seven.
+   Return to instructor and export the results to verify that the rows are marked `Simulation`, Ben has grade 5, Cora has grade 0, and the filename starts with `SIMULATION`.
    Finn's row has status `withdrawn` and blank numeric grade fields, preserving the distinction from a failure.
 7. Switch to Finn and inspect retained work.
    His private departure reason and group-review notes are hidden, and submission/portfolio controls are read-only.
@@ -643,7 +682,7 @@ The [browser walkthrough](../tests/e2e/course-simulation-walkthrough.spec.ts) fo
    Class access remains closed during the audit window.
 5. Advance the clock past implementation freeze but before the audit deadline.
    As each group's representative, download the assigned team's frozen source and submit an audit.
-   As every student, submit a private portfolio with two complete live or equivalent remote lecture activities; leave Ben with only one in Challenge to inspect the mandatory minimum.
+   As each student, submit a private portfolio with two full lecture activities plus an additional diary entry in Establish; give Ben just one activity in Challenge to exercise the six-entry boundary.
 6. Advance past the audit deadline but before final evidence closes.
    Inspect **Class submissions** and the incoming audit, then attach final technical evidence and submit the response.
    Compare should reference each group's earlier A/B frozen submissions.
@@ -653,7 +692,7 @@ The [browser walkthrough](../tests/e2e/course-simulation-walkthrough.spec.ts) fo
    Repeat steps 4–7 for all three phases, advancing the clock to each phase's windows.
 8. Export released grades and switch to Ben to inspect his failing requirement.
    The automated walkthrough uses 12/30 project points and 18/21 individual points per phase, with 15/21 for Ben's Challenge portfolio.
-   Five students receive grade 1; Ben receives grade 0 despite exceeding the overall points threshold because Challenge has only one completed lecture activity.
+   Five students meet the seven-entry requirement; Ben receives grade 0 despite exceeding the overall points threshold because his submitted entries cover six lectures.
    Exports are marked `Simulation`; frozen archives, membership and audit target revisions remain intact.
 
 The browser flow also checks delayed-save/refresh behavior, mobile layout, accessibility and the absence of escaped live course/auth requests.
@@ -696,9 +735,12 @@ Stop that Worker afterwards.
 
 ## Optional peer inquiry
 
-Optional book inquiry enters through **Teaching assistant → Peer discussion**, using this workspace's course identity and published phase allocations.
+Students enter book inquiry through **Discuss with classmates** at a book paragraph or through **Teaching assistant → Peer discussion**.
+Access uses this workspace's course identity and published phase allocations.
 [The learning-workspace guide](learning-workspace.md#peer-inquiry-contract) owns attempt-first disclosure, group/cohort scope, membership corrections, moderation and consented editorial offers.
-Private initial notes stay in the student's companion; shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
+Private initial notes stay in the student's vault or companion.
+The course records the student’s declaration for that reading or activity.
+Shared threads are separate ungraded course records and do not appear in ordinary course snapshots.
 Optional reasoning outlines, role-rotation cues and reviewed summaries reuse the existing inquiry contribution and provenance contract.
 Students select which visible contributions enter a draft; summaries preserve named contributors, disagreement and evidence limitations and require the ordinary sharing action.
 Each learner can return to a separately saved private takeaway or changed case without waiting for absent members.
@@ -730,7 +772,7 @@ Simulation checks cover teacher/student permissions, live sentinels, teacher and
 Worker adapter tests reject missing/wrong markers, distinct binding objects aliasing the same resources, live-file/database aliases and forged test identities, and prove simulation selects no live mail even when delivery is enabled.
 The simulation browser checks cover synthetic roster import, mock login, role switching, clock, export, reset, both presets, private withdrawal review and read-only student access with a blank exported grade, stale-release rejection/reassessment, failing individual outcomes, mobile/accessibility and the absence of escaped live course/auth requests.
 The complete teaching flow creates two consented/allocated trios, retains their phase identifiers, and submits all three phases through the interface: source freezing, assigned audits, private portfolios, final evidence, current assessments, release and a marked final export.
-It verifies that missing mandatory participation fails despite sufficient overall points, and that delayed saves/refreshes cannot accept edits that would be discarded.
+It verifies that six diary entries fall short despite sufficient overall points, and that delayed saves/refreshes cannot accept edits that would be discarded.
 Preset API checks exercise both cohort sizes, real frozen history/A–B references, late enrollment, withdrawal with retained assessments/private review/no grade, explicit zeros, mandatory minima, interrupted/concurrent preparation, isolation and reproducible source download.
 
 To check real local D1/R2 bindings, use the separate local configuration:

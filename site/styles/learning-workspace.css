@@ -1,9 +1,9 @@
 .learning-workspace {
   position: fixed;
-  inset: 5rem 1rem 1rem auto;
+  inset: auto 1rem 1rem auto;
   margin: 0;
-  width: min(31rem, calc(100vw - 2rem));
-  height: calc(100dvh - 6rem);
+  width: min(29rem, calc(100vw - 2rem));
+  height: min(38rem, calc(100dvh - 6rem));
   max-height: calc(100vh - 6rem);
   max-height: calc(100dvh - 6rem);
   box-sizing: border-box;
@@ -12,6 +12,7 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-top: 4px solid var(--accent);
+  border-radius: 0.6rem 0.6rem 0 0;
   box-shadow: var(--shadow);
   z-index: 80;
   display: flex;
@@ -20,46 +21,6 @@
 }
 .learning-workspace[hidden] {
   display: none;
-}
-.learning-workspace[data-learning-experience="notebook"] {
-  --learning-notebook-max-height: calc(100dvh - 6rem);
-  /* Keep slider geometry immediate even when reduced-motion rules set a duration. */
-  transition-property: none;
-  width: min(
-    clamp(20rem, var(--learning-notebook-width, 31rem), 48rem),
-    calc(100vw - 2rem)
-  );
-  height: clamp(
-    min(20rem, var(--learning-notebook-max-height)),
-    var(--learning-notebook-height, var(--learning-notebook-max-height)),
-    var(--learning-notebook-max-height)
-  );
-  max-height: var(--learning-notebook-max-height);
-}
-.learning-workspace[data-learning-experience="assistant"] {
-  inset: auto 1rem 1rem auto;
-  width: min(29rem, calc(100vw - 2rem));
-  height: min(38rem, calc(100dvh - 6rem));
-  border-radius: 0.6rem 0.6rem 0 0;
-}
-body[data-learning-notebook-open="true"][data-learning-assistant-open="true"] {
-  --learning-assistant-height: min(32rem, 48dvh);
-}
-body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
-  .learning-workspace[data-learning-experience="notebook"] {
-  --learning-notebook-max-height: calc(
-    100dvh - var(--learning-assistant-height) - 7rem
-  );
-  inset-block-end: calc(var(--learning-assistant-height) + 2rem);
-}
-body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
-  .learning-workspace[data-learning-experience="assistant"] {
-  height: var(--learning-assistant-height);
-  max-height: var(--learning-assistant-height);
-}
-body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
-  .learning-note-input {
-  height: 7rem;
 }
 .learning-heading {
   display: flex;
@@ -97,53 +58,6 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
 .learning-heading button {
   font-size: 1.4rem;
   padding: 0.2rem 0.6rem;
-}
-.learning-heading-actions {
-  display: flex;
-  align-items: start;
-  gap: 0.4rem;
-  flex: none;
-}
-.learning-notebook-size > summary {
-  padding: 0.25rem 0.4rem;
-  border: 1px solid var(--border);
-  color: var(--accent-strong);
-  font-size: 0.75rem;
-}
-.learning-notebook-size-options {
-  position: absolute;
-  inset: 3.5rem 0.75rem auto auto;
-  z-index: 2;
-  width: min(18rem, calc(100% - 1.5rem));
-  max-height: calc(100% - 4.5rem);
-  box-sizing: border-box;
-  overflow: auto;
-  padding: 0.65rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  box-shadow: var(--shadow);
-  font-size: 0.8rem;
-}
-.learning-workspace .learning-notebook-size-options label {
-  margin: 0 0 0.6rem;
-}
-.learning-notebook-size-options label > span {
-  display: flex;
-  justify-content: space-between;
-}
-.learning-notebook-size-options p {
-  margin: 0.4rem 0;
-  color: var(--muted);
-}
-.learning-workspace .learning-notebook-size-options input[type="range"] {
-  padding: 0;
-  min-height: 1.5rem;
-  border: 0;
-  accent-color: var(--accent-strong);
-}
-.learning-workspace .learning-notebook-size-options button {
-  padding: 0.35rem 0.55rem;
-  font-size: 0.8rem;
 }
 .learning-tabs {
   padding: 0 1rem;
@@ -254,8 +168,6 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
 }
 .learning-workspace button:focus-visible,
 .learning-workspace a:focus-visible,
-.learning-notebook-size > summary:focus-visible,
-.learning-notebook-size input:focus-visible,
 .learning-evidence > summary:focus-visible,
 .learning-reply pre:focus-visible {
   outline: 2px solid var(--accent);
@@ -315,14 +227,6 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   margin-top: 1.25rem;
   padding-top: 0.8rem;
   border-top: 1px solid var(--border);
-}
-.learning-guide-feedback {
-  color: var(--accent-strong);
-  font-size: 0.85rem;
-  scroll-margin-top: 12rem;
-}
-.learning-guide-feedback:empty {
-  display: none;
 }
 .learning-workspace h3 {
   font-family: var(--font-serif);
@@ -412,21 +316,6 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   border-left: 2px solid var(--accent-strong);
   font-size: 0.85rem;
 }
-.learning-storage-location,
-.learning-observation {
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-.learning-observation {
-  max-height: 14rem;
-  overflow-y: auto;
-  padding: 0.7rem;
-  background: var(--panel);
-  font-size: 0.75rem;
-}
-.learning-observation:empty {
-  display: none;
-}
 .learning-note details {
   margin: 0.5rem 0;
 }
@@ -434,31 +323,18 @@ body[data-learning-notebook-open="true"][data-learning-assistant-open="true"]
   body {
     --learning-sheet-height: 80dvh;
   }
-  body:is(
-      [data-learning-notebook-open="true"],
-      [data-learning-assistant-open="true"]
-    )
-    .book-navigation {
+  body[data-learning-assistant-open="true"] .book-navigation {
     inset-block-end: calc(var(--learning-sheet-height) + 0.4rem);
   }
-  body:is(
-      [data-learning-notebook-open="true"],
-      [data-learning-assistant-open="true"]
-    )
-    .book-navigation-lists {
+  body[data-learning-assistant-open="true"] .book-navigation-lists {
     inset-block: calc(100% + 0.4rem) auto;
   }
-  .learning-workspace,
-  .learning-workspace[data-learning-experience="notebook"],
-  .learning-workspace[data-learning-experience="assistant"] {
+  .learning-workspace {
     inset: auto 0 0 auto;
     width: 100%;
     height: var(--learning-sheet-height);
     max-height: var(--learning-sheet-height);
     border-radius: 0.6rem 0.6rem 0 0;
-  }
-  .learning-notebook-size {
-    display: none;
   }
   .learning-heading {
     padding-top: 1rem;

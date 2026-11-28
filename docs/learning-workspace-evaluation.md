@@ -22,7 +22,7 @@ Its tutoring and outsourcing groups were self-selected, so use help modes as que
    Keep a learner's own case distinguishable from an agent suggestion.
 3. **Check immediate application.** Ask the learner to explain the first changed case before returning to the agent or worked reasoning.
    Look for the relevant condition, predicted behavior and justification, including uncertainty; a correct choice alone is insufficient.
-4. **Return before rereading.** Use Notes → Revisit to recall the explanation before opening it, then try the second changed case without the agent or transcript.
+4. **Return before rereading.** Keep the diary note closed while recalling the explanation, then try the second changed case without the agent or transcript.
    Record the actual delay and any intervening practice or help the learner chooses to report.
    Compare recall, application and support needed; a saved attempt does not itself prove that no help was used.
 
@@ -69,13 +69,64 @@ Run B’s completed-response p95 is 40 ms in both versions.
 Ask which two outcomes account for the difference.
 Listen for whether the learner includes the timeouts among the 20 offered requests when judging the first case.
 
+## Try Obsidian as the diary editor
+
+The [student guide](course-diary.md) recommends a [single vault with a note for each lecture](diary-pilot/00-Start%20here.md).
+Use a fresh vault and synthetic writing for the rehearsal.
+Compare a newcomer with a student who already keeps notes.
+Record where each needed help and how long they spent setting up before reasoning about the course.
+
+### First visit and return
+
+1. Begin on a chapter and find **Diary**.
+   Download the starter, unzip it, open its folder as a vault and follow the first lecture link with community plugins disabled.
+   Ask the learner what they would measure before accepting the cache claim.
+   Can they find where to write?
+2. Select a passage in the book, copy the highlight and paste it below the prediction.
+   Ask the learner to close the reading and reopen the same section from the note.
+   If they expect the passage to stay marked on the website, try the optional Web Clipper Highlighter and ask which behavior they want. [Web Clipper Highlighter](https://obsidian.md/help/web-clipper/highlight)
+3. On the return visit, present the [benchmarking prompts](#return-visit-for-a-learner-who-chose-benchmarking) before the learner rereads their answer.
+   Can they reopen the lecture by name, find their prediction and saved passage together, and add a dated revision naming what changed their judgment?
+4. In Lecture 5, ask learners to revisit an expectation from Establish and compare it with an audit or demonstration.
+   Does the prompt elicit a concrete observation?
+   Can they preserve their earlier wording while revising their conclusion?
+
+### Test the optional commands
+
+Enable the bundled **Course diary** plugin in the disposable desktop vault.
+Try **Open lecture diary** after writing under a lecture.
+Select a passage on the book page and see whether the learner can find **Add book highlight** there.
+Choose a lecture, review the quote and save it, then repeat with the same passage and lecture.
+Check where it lands, what the source link opens and whether the second attempt adds unwanted text.
+
+Select a question beside an unrelated private remark and choose **Discuss with the course TA**.
+Review the draft, open the reading beside the diary and paste the question in the book's assistant.
+Does the learner know which words will reach the configured provider when they send?
+Can they return to the same note and keep their own conclusion distinct from the reply?
+Try Chrome on the companion's computer if its connection is unavailable inside the desktop Web viewer. [TA setup and browser support](learning-companion-setup.md#browser-connection-support)
+
+Select one passage from Lecture 6 for **Prepare portfolio excerpt** and leave the adjacent passage behind.
+Check the Challenge draft contains the selection and identifies it as the third lecture of that phase.
+Ask the learner to find its destination in **My portfolio** and explain when staff can see the material.
+Use a synthetic course for any upload.
+Observe repeated copying, unfamiliar commands and information lost on transfer.
+Compare the time and clarity with ordinary copy and paste. [Portfolio walkthrough](course-diary.md#prepare-material-for-your-portfolio)
+
+### Existing Notebook users
+
+With two synthetic entries in a disposable companion, use the [recovery route](course-diary.md#bring-over-an-existing-notebook).
+Revise one entry in the fixture before connecting.
+Download the JSON backup and the Markdown file.
+Find both entries and their source links in Obsidian.
+Check that the revised entry shows its current text and that its earlier text is present in the JSON history.
+
 ## Evidence to collect deliberately
 
 ### Finding and using the tools
 
-Observe whether a learner can find Notebook and Teaching assistant, distinguish their purposes, connect once and continue chapter work without losing a draft.
+Observe whether a learner can find the diary and teaching assistant, choose a useful point to connect the assistant and return to a note after discussion.
 Ask them to discuss a selected passage or chosen note, identify what will reach the provider, then write and save their own takeaway.
-Include notebook-only use, returning to a conversation from another chapter and declining an unwanted demo change.
+Include writing with community plugins disabled, returning to a conversation from another chapter and declining an unwanted demo change.
 Record missed entry points, confusing labels, context mistakes, setup failures and unnecessary reconstruction work.
 Successful clicks establish usability for that participant, not understanding of the subject.
 
@@ -134,7 +185,7 @@ Do not enable routine transcript collection or evaluate success by message, note
 Record the date, book/activity revision, companion release/source revision, provider/version, recorded teaching policy ID/version, chosen help mode, individual/group setting and which excerpts the learner chose to share.
 Record unknown versions honestly; never assign the current policy to an older reply.
 Use **Connect** and **About this reply** for available metadata without collecting complete histories.
-Ask whether the reflection examples made expectations clearer and whether the 400-character suggestion encouraged useful material or unnecessary writing.
+Ask which diary prompt helped the learner connect a claim to evidence in their own work.
 Ask whether they skipped or resumed the changed case, whether its assumptions/self-check were useful, and whether linked notes reduced diary/portfolio preparation effort.
 Include failed checks and short free writing in the chosen evidence; a polished reflection is not a substitute for explaining a new case.
 There is no hard reflection minimum in this release.
@@ -151,7 +202,7 @@ Use the learner-selected evidence above and report facilitation effort alongside
 Separate technical success, usability observations, instructional behavior, manner/trust feedback, independent learning evidence, workload and actual course progress.
 A small trial can identify problems and suggest changes; it cannot prove that the workspace caused a completion improvement.
 Preserve disagreements and negative results.
-Calibrate prompts, examples, the optional length cue and setup friction from the evidence before adding obligations.
+Revise prompts, examples and setup guidance using the trial evidence.
 Prioritize authored examples and misconception support from recurring difficulties, retaining source assumptions and meaningful self-check criteria.
 Choose feasible delayed recall within existing work; do not add a parallel assessment obligation or engagement quota.
 Assessment changes require the existing student-facing contract and requirement-edition workflow.

@@ -22,8 +22,19 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --test tests/link-check.test.ts
+      - run: node --test tests/course-diary-download.test.ts tests/obsidian-course-diary.test.ts
       - run: npm run test:benchmark
       - run: npm run worker:build
+      - name: Extract the student vault for pull request review
+        if: github.event_name == 'pull_request'
+        run: unzip -q build/downloads/course-diary.zip -d .local/diary-review
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: course-diary
+          path: .local/diary-review/
+          include-hidden-files: true
+          if-no-files-found: error
       - run: npm run validate
       - run: npm run check:links
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -13,6 +13,12 @@ test("student indexes incomplete evidence, appends technical files and links ear
   page.on("dialog", (dialog) => dialog.accept());
   await page.goto("/admin/courses/");
   const create = page.locator('form[data-form="create"]');
+  const allCourses = page.getByRole("button", {
+    name: "All courses",
+    exact: true,
+  });
+  await expect(create.or(allCourses)).toBeVisible();
+  if (await allCourses.isVisible()) await allCourses.click();
   await create
     .getByLabel("Course name", { exact: true })
     .fill(`Evidence ${Date.now()}`);
@@ -145,14 +151,16 @@ test("student indexes incomplete evidence, appends technical files and links ear
           name: "Run's published rubric ↗",
           exact: true,
         }),
-      ).toHaveAttribute("href", "/project/requirements/2026-10-v2/grading/");
+      ).toHaveAttribute("href", "/project/requirements/2026-11-v2/grading/");
       await form.getByText(/Common requirements ·/).click();
     }
     if (phase === "compare") {
       await form.getByText(/Compare requirements ·/).click();
       await expect(form).toContainText("Separate application model");
       await expect(form).toContainText("Workflow model");
-      await expect(form).toContainText("Bounded single-agent/fleet contrast");
+      await expect(form).toContainText(
+        "Supplied matched single-agent/fleet analysis",
+      );
       await form.getByText(/Compare requirements ·/).click();
     }
     await form

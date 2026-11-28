@@ -1,0 +1,53 @@
+# ADR-066: Keep course diaries in student-owned Markdown
+
+**Status:** Implemented
+
+**Date:** 2026-11-24
+
+## Context
+
+The book's Notebook required students to start a local service before writing and to export their work to use another editor.
+The course needs nine lecture reflections and a deliberate transfer of selected evidence into the phase portfolio.
+Neither task requires a separate web editor or model provider.
+
+## Decision
+
+Recommend a private Obsidian vault.
+Publish a guide and a downloadable vault with **Establish**, **Challenge** and **Compare** folders.
+Give each lecture its own named note with a public reading and an optional opening question, so students can reopen a prediction alongside their saved passages and later reflections.
+Keep the reflection that spans all three lectures in the phase overview.
+Students can also use the files with an editor of their choice or link selected audio and video evidence.
+
+Keep passage selection in the book.
+Copy the chosen words with a public link back to the source.
+Let the reader open the lecture picker from the passage itself.
+Use the clipboard for the quote and its source, with an Obsidian URI in the browser or an in-page fragment in the desktop Web viewer to identify the action.
+Offer a bundled desktop plugin for choosing a lecture, appending a reviewed highlight, opening the existing TA beside a note and preparing a local portfolio excerpt.
+The course site receives only what the student transfers there.
+
+Originally, provider setup, model requests and conversation history required the standalone companion.
+[ADR-067](ADR-067-use-the-diary-plugin-for-course-discussion.md) supersedes that installation choice for the optional desktop plugin.
+The plugin opens a public reading and puts the student's reviewed draft on the clipboard.
+A student chooses whether to paste and send.
+The desktop Web viewer can display the reading beside the diary.
+Chrome on the companion's computer remains the supported browser for a connection.
+
+Retire the browser Notebook editor.
+Readers can use the recovery page to download a complete JSON archive or one Markdown file with the latest text of every entry from their local companion.
+Retain assistant and peer activities that depend on a prior personal attempt.
+This decision supersedes the normal diary editor and its handoffs in ADRs 028, 034, 036, 043 and 044.
+
+## Alternatives and consequences
+
+Keeping both editors in the reading header would leave students to decide where to start writing and which copy to resume.
+A native chat client would require a second integration with the companion and the book's live demo tools.
+The web handoff keeps one place to configure a provider, inspect the chosen context and send a message.
+
+The student owns backup and synchronization of the vault.
+The starter works in restricted mode.
+The optional plugin uses the phase folder and lecture filename to place highlights and attribute selected portfolio excerpts.
+Updating the plugin leaves student files in place.
+The class's existing portfolio criteria and staff access boundaries still apply.
+
+The [student guide](../../course-diary.md) covers setup, transfer and recovery.
+The [evaluation](../../learning-workspace-evaluation.md#try-obsidian-as-the-diary-editor) covers first use, a return visit and a selective portfolio rehearsal.

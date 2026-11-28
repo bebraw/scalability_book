@@ -1,6 +1,5 @@
 /** Provider-independent contracts for the private learning workspace. */
 export const notebookVersion = 1;
-export const suggestedReflectionCharacters = 400;
 export const noteKinds = [
   "scratch",
   "reflection",
@@ -23,19 +22,15 @@ export interface LearningSource {
   revision: string | null;
   conceptIds: string[];
 }
-export type LearningExperience = "notebook" | "assistant";
 /** Deliberately prepared browser handoffs; preparing one does not send or save. */
 export interface AssistantHandoff {
   source: LearningSource;
   question: string;
-  noteIds: string[];
 }
-export interface NotebookHandoff {
+export interface DiaryTakeaway {
   source: LearningSource;
-  kind: NoteKind;
   title: string;
   body: string;
-  relatedIds: string[];
   assistance: string | null;
 }
 export interface NoteRevision {
@@ -307,27 +302,3 @@ export function notebookMarkdown(entries: NotebookEntry[]): string {
     )
     .join("\n---\n\n");
 }
-export const reflectionPrompts = [
-  "What did I initially expect or want to understand?",
-  "What did I observe, and what evidence can I link?",
-  "What changed or became better supported in my explanation?",
-  "What is still uncertain, and what would I investigate next?",
-];
-export const reflectionExamples = [
-  {
-    title: "An initial attempt",
-    text: "I expect a higher arrival rate to mean more work in progress if time in the system stays unchanged. I want to test which averages must be measured over the same window.",
-  },
-  {
-    title: "A developed reflection",
-    text: "In the Little’s Law demo, I set arrival rate to 20 events/s and time in the system to 0.5 s. The expected work in progress was 10 events. Changing the observed work in progress to 15 produced a gap. I now check whether the three averages describe the same stable observation window before applying L = λW. This illustration does not measure my project: I still need observations from its runtime.",
-  },
-  {
-    title: "Honest uncertainty",
-    text: "I can calculate L = λW, but I am unsure how to choose an observation window when the queue is growing. I will compare a stable interval with an overloaded interval and record what changes.",
-  },
-  {
-    title: "An unchanged view",
-    text: "My prediction still seems plausible after this run, but a single demo result is limited evidence. I kept the original explanation and wrote down a different input that might challenge it.",
-  },
-];

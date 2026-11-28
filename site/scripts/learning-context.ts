@@ -4,13 +4,25 @@ import { explorations } from "../../shared/explorations.ts";
 import type { LearningSource } from "../../shared/learning-workspace.ts";
 import type { ReadingSelection } from "./learning-selection.ts";
 
-export function textOf(element: Element): string {
+function textOf(element: Element): string {
   const clone = element.cloneNode(true) as Element;
   for (const control of clone.querySelectorAll(
-    "button, input, select, textarea, script, style, .reading-investigation, .paragraph-feedback-actions, [data-paragraph-feedback-panel], a[aria-label^='Link to']",
+    "button, input, select, textarea, form, script, style, .reading-investigation, .paragraph-feedback-actions, [data-paragraph-feedback-panel], a[aria-label^='Link to']",
   ))
     control.remove();
   return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+}
+export function linkedInquirySource(diaryAnchor?: string): LearningSource {
+  const target = document.getElementById(diaryAnchor ?? location.hash.slice(1));
+  if (
+    target &&
+    (target.dataset.commentTarget === target.id || diaryAnchor !== undefined)
+  )
+    return pageSource({
+      anchor: target.id,
+      text: textOf(target).slice(0, 12_000),
+    });
+  return pageSource();
 }
 export function currentReading() {
   const page = conceptPages.find((page) => page.url === location.pathname);
@@ -19,7 +31,6 @@ export function currentReading() {
     prompt:
       page?.prompt ??
       "What is one idea from this reading you can explain in your own words? What remains uncertain, and what could you check?",
-    isChapter: location.pathname.startsWith("/chapters/"),
   };
 }
 export function pageSource(

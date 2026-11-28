@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { recordKey, type Course, type Envelope } from "../shared/course.ts";
 import { activeStudent } from "../shared/course-enrollment.ts";
-import { conceptPages } from "../shared/concept-pages.ts";
+import { isInquiryReadingPath } from "../shared/concept-pages.ts";
 import {
   inquiryAudience,
   inquiryMember,
@@ -62,8 +62,7 @@ export async function handleCourseInquiry(
     learningAssert(
       sourceUrl.origin === url.origin &&
         !sourceUrl.search &&
-        (conceptPages.some((page) => page.url === sourceUrl.pathname) ||
-          ["/concepts/", "/explore/", "/demos/"].includes(sourceUrl.pathname)),
+        isInquiryReadingPath(sourceUrl.pathname),
       "Use a published book source on this website.",
     );
     return source;

@@ -23,6 +23,9 @@ export interface CompanionOptions {
   conversations?: LearningConversations;
   metadata?: Pick<CompanionStatus, "release" | "storage" | "schemas">;
 }
+type CompanionRequest = Pick<Request, "url" | "method" | "headers"> & {
+  body: ReadableStream<Uint8Array> | null;
+};
 export function createCompanionHandler(options: CompanionOptions) {
   const now = options.now ?? Date.now;
   const origins = new Set(
@@ -48,7 +51,7 @@ export function createCompanionHandler(options: CompanionOptions) {
     sessions.set(token, { origin, expires: now() + 12 * 60 * 60_000 });
     return { token, version: companionRelease.protocol };
   }
-  async function body(request: Request, maximum = 96_000) {
+  async function body(request: CompanionRequest, maximum = 96_000) {
     learningAssert(
       request.headers.get("content-type")?.split(";")[0] === "application/json",
       "Send JSON.",
@@ -80,7 +83,7 @@ export function createCompanionHandler(options: CompanionOptions) {
     }
   }
   return {
-    async handle(request: Request): Promise<Response> {
+    async handle(request: CompanionRequest): Promise<Response> {
       const origin = request.headers.get("origin") ?? "";
       const headers = new Headers({
         "Cache-Control": "private, no-store",

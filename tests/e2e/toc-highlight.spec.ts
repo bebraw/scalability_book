@@ -5,12 +5,12 @@ const nextChapter = "/chapters/benchmarking/";
 
 test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-test("tracks the current section while reading and keeps both lists in reach beside Notebook", async ({
+test("tracks the current section while reading and keeps both lists in reach beside the assistant", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(chapter);
-  await openNotebook(page);
+  await openAssistant(page);
   const navigation = page.locator("#book-navigation");
   const activeLink = navigation.locator(
     '.local-toc a[aria-current="location"]',
@@ -80,12 +80,12 @@ for (const [width, height] of [
   [320, 568],
   [844, 390],
 ]) {
-  test(`Notebook leaves navigation links clickable at ${width}×${height}`, async ({
+  test(`The assistant leaves navigation links clickable at ${width}×${height}`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height });
     await page.goto(chapter);
-    const notebook = await openNotebook(page);
+    const notebook = await openAssistant(page);
     await page
       .locator(".prose #summary")
       .evaluate((element) => element.scrollIntoView({ block: "center" }));
@@ -143,12 +143,12 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
   });
 }
 
-async function openNotebook(page: Page) {
+async function openAssistant(page: Page) {
   await page
     .getByRole("group", { name: "Learning tools" })
-    .getByRole("button", { name: "Notebook", exact: true })
+    .getByRole("button", { name: "Teaching assistant", exact: true })
     .click();
-  const notebook = page.locator("#learning-notebook");
+  const notebook = page.locator("#learning-assistant");
   await expect(notebook).toBeVisible();
   return notebook;
 }

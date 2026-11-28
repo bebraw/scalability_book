@@ -1,17 +1,22 @@
+import { legacyRecovery } from "./learning-diary.ts";
+import { diaryAttemptMarker } from "./learning-diary-attempt.ts";
+import { mountHighlightCapture } from "./learning-highlight.ts";
 import { readingSelection } from "./learning-selection.ts";
-import { readNotebookSession } from "./learning-session.ts";
-import type { LearningExperience } from "../../shared/learning-workspace.ts";
+import {
+  readLearningSession,
+  type AssistantSection,
+} from "./learning-session.ts";
 import type { LearningAction } from "./learning-actions.ts";
 
 declare const __LEARNING_WORKSPACE_URL__: string;
 let loaded: Promise<void> | null = null;
-async function openLearning(experience: LearningExperience, resume = false) {
-  // Capture before loading or focusing the notebook can alter the selection.
-  const selection = resume ? null : readingSelection();
+async function openAssistant(resume = false, section?: AssistantSection) {
+  // Capture before focusing the assistant can alter the selection.
+  const selection = resume || section === "peers" ? null : readingSelection();
   if (!(await loadLearning())) return;
   document.dispatchEvent(
     new CustomEvent("book-learning-open", {
-      detail: { selection, resume, experience },
+      detail: { selection, resume, section },
     }),
   );
 }
@@ -46,26 +51,25 @@ document.addEventListener("book-learning-request", (event) => {
       );
   });
 });
-const buttons = document.querySelectorAll<HTMLButtonElement>(
-  "[data-learning-toggle]",
+mountHighlightCapture();
+const assistant = document.querySelector<HTMLButtonElement>(
+  '[data-learning-toggle="assistant"]',
 );
-for (const button of buttons) {
-  button.hidden = false;
-  button.closest<HTMLElement>(".learning-launchers")!.hidden = false;
-  button.addEventListener(
-    "click",
-    () =>
-      void openLearning(
-        button.dataset.learningToggle === "assistant"
-          ? "assistant"
-          : "notebook",
-      ),
-  );
+const search = new URLSearchParams(location.search);
+const requestedSection = search.has("inquiry")
+  ? "peers"
+  : search.get("assistant") === "1"
+    ? "agent"
+    : undefined;
+if (assistant) {
+  assistant.hidden = false;
+  assistant.closest<HTMLElement>(".learning-launchers")!.hidden = false;
+  assistant.addEventListener("click", () => void openAssistant());
+  if (!legacyRecovery) {
+    if (requestedSection) void openAssistant(false, requestedSection);
+    else if (readLearningSession().assistantOpen) void openAssistant(true);
+  }
 }
-// An explicitly opened notebook follows book navigation; other readers keep
-// the workspace unloaded and make no companion requests.
-const session = readNotebookSession();
-if (buttons.length && session.open) void openLearning(session.experience, true);
 
 const cockpit = document.querySelector<HTMLButtonElement>(
   "[data-learning-cockpit]",
@@ -125,10 +129,17 @@ document.addEventListener("click", (event) => {
   }
 });
 window.addEventListener("hashchange", () => {
-  if (tutorialLink(new URL(location.href))) openTutorial();
+  const url = new URL(location.href);
+  if (tutorialLink(url)) openTutorial();
+  else if (
+    assistant &&
+    url.searchParams.get("inquiry") === "1" &&
+    url.hash.includes(diaryAttemptMarker)
+  )
+    void openAssistant(false, "peers");
 });
 if (tutorialLink(new URL(location.href))) openTutorial();
-else
+else if (!requestedSection && !legacyRecovery)
   try {
     const saved = JSON.parse(
       sessionStorage.getItem("book-learning-cockpit-active") ?? "null",

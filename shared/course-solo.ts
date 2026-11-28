@@ -1,5 +1,6 @@
 import type { Course, Envelope, Grade, Phase } from "./course.ts";
-import { groupFor, individualCriteria, rubricVersion } from "./course.ts";
+import { groupFor, individualCriteria } from "./course.ts";
+import { requirementEditions } from "./course-requirements.ts";
 
 export interface SoloReview {
   phase: Phase;
@@ -17,7 +18,10 @@ export interface SoloReview {
   reviewedAt: string | null;
 }
 export const soloSupported = (course: Course) =>
-  course.rubric === rubricVersion && course.requirements === "2026-10-v2";
+  Object.entries(requirementEditions).some(
+    ([version, edition]) =>
+      version === course.requirements && edition.rubric === course.rubric,
+  );
 export const soloGroup = (course: Course, phase: Phase, group: string) =>
   course.phases[phase].groups.some(
     (g) => g.id === group && g.route === "solo" && g.members.length === 1,

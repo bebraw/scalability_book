@@ -1,5 +1,8 @@
 import type { TeachingContext } from "./learning-agent.ts";
 
+export const obsidianCompanionPort = 17888;
+export const obsidianCompanionAddress = `http://127.0.0.1:${obsidianCompanionPort}`;
+
 /** Release and connection metadata, independent of a provider or rendering. */
 export const companionRelease = {
   name: "@scalableweb/companion",

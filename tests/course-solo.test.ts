@@ -7,6 +7,7 @@ import { localCourseStores } from "../scripts/lib/local-courses.ts";
 import { handleCourses } from "../worker/courses.ts";
 import {
   phases,
+  legacyRubricVersion,
   projectCriteria,
   emptyPortfolio,
   type Course,
@@ -14,7 +15,7 @@ import {
   type Submission,
   type Grade,
 } from "../shared/course.ts";
-import type { SoloReview } from "../shared/course-solo.ts";
+import { soloSupported, type SoloReview } from "../shared/course-solo.ts";
 import {
   updateAdministration,
   administrationRevisions,
@@ -417,6 +418,13 @@ test("a solo student completes all three phases with independent review, portfol
 test("solo allocation requires explicit approval and a supported edition; frozen routes cannot be rewritten", async (t) => {
   const f = await fixture(t),
     course = f.config.value;
+  for (const requirements of ["2026-10-v2", "2026-11-v1"]) {
+    assert.equal(
+      soloSupported({ ...course, requirements, rubric: legacyRubricVersion }),
+      true,
+    );
+    assert.equal(soloSupported({ ...course, requirements }), false);
+  }
   const unsupported = {
     ...course,
     requirements: "unsupported-edition",

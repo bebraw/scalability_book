@@ -4,6 +4,8 @@
 
 **Date:** 2026-10-09
 
+**Superseded in part:** [ADR-066](ADR-066-keep-course-diaries-in-obsidian.md) moves everyday diary writing and the book’s takeaway handoff to student-owned Markdown.
+
 ## Context
 
 The queue slice in ADR-043 connects initial thinking, an actual browser result, adapted explanation and reflection in the reading flow.

@@ -205,14 +205,6 @@ test("instructor manages a run; student submits privately; rubric grading and re
     .getByLabel("Private peer feedback:", { exact: false })
     .fill("CONFIDENTIAL PORTFOLIO: specific feedback for Bob.");
   await portfolio
-    .getByLabel("Response to feedback,")
-    .fill("We agreed on a smaller integration step.");
-  await portfolio
-    .getByLabel("One consequential decision you challenged,")
-    .fill(
-      "I tested a proposed caching decision; evidence is in the submitted archive.",
-    );
-  await portfolio
     .getByRole("button", { name: "Submit portfolio", exact: true })
     .click();
   await expect(student.locator("[data-course-notice]")).toContainText("Saved.");
@@ -262,7 +254,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
     "CONFIDENTIAL PORTFOLIO",
   );
   const individualGrade = page.locator('form[data-form="individual-grade"]');
-  const individualScores = [1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 1, 2, 1];
+  const individualScores = [1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 1, 0, 0];
   for (let i = 0; i < individualScores.length; i++)
     await individualGrade
       .locator(`[name="score-${i}"]`)
@@ -270,7 +262,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
   await individualGrade
     .getByLabel("Criterion reasons, feedback and missing evidence")
     .fill(
-      "Two complete lecture activities; corroborated contribution and specific reflection.",
+      "Two complete lecture activities, a self-assessment and peer feedback. No evidence for the remaining criteria.",
     );
   await individualGrade
     .getByLabel("Assessment record reason")
@@ -280,7 +272,7 @@ test("instructor manages a run; student submits privately; rubric grading and re
     .click();
   await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
   await page.getByRole("button", { name: "Gradebook", exact: true }).click();
-  await expect(page.getByRole("table").first()).toContainText("42/153");
+  await expect(page.getByRole("table").first()).toContainText("39/153");
   const release = page.locator('form[data-form="publish"]');
   await release
     .getByLabel("Reason for releasing or withdrawing results")
@@ -338,12 +330,46 @@ test("instructor manages a run; student submits privately; rubric grading and re
   await expect(
     page.getByRole("heading", { name: "Establish results: released" }),
   ).toBeVisible();
+  await page.locator("[data-student-select]").selectOption("github:2");
+  const arrangement = page.locator('form[data-form="adjustment"]');
+  await page
+    .locator('details:has(form[data-form="adjustment"]) > summary')
+    .click();
+  const diaryMinimum = arrangement.getByLabel(
+    "Diary entries required across the course (0–7)",
+  );
+  await expect(diaryMinimum).toHaveValue("7");
+  await diaryMinimum.fill("6");
+  await arrangement
+    .getByLabel("Challenge available individual points (1–21)")
+    .fill("20");
+  await arrangement
+    .getByLabel("Approved arrangement, replacement activity and reason")
+    .fill("Private attendance adjustment for the synthetic student.");
+  await arrangement
+    .getByRole("button", { name: "Save private arrangement" })
+    .click();
+  await expect(page.locator("[data-course-notice]")).toContainText("Saved.");
   await student.reload();
   await expect(
     student.getByRole("heading", { name: "My course progress" }),
   ).toBeVisible();
-  await expect(student.getByRole("table")).toContainText("30");
-  await expect(student.getByRole("table")).toContainText("12");
+  const releasedPhase = student
+    .getByRole("row")
+    .filter({
+      has: student.getByRole("rowheader", { name: "Establish", exact: true }),
+    });
+  await expect(releasedPhase.getByRole("cell")).toHaveText([
+    "30",
+    "6",
+    "2",
+    "3",
+    "0",
+  ]);
+  await expect(student.locator(".course-score")).toContainText("/ 152");
+  await expect(student.locator("[data-course-content]")).toContainText(
+    "Private attendance adjustment",
+  );
   await student
     .getByText("Establish private assessment", { exact: true })
     .click();

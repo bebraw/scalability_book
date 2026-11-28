@@ -249,13 +249,38 @@ Any scrolling needed to reveal the active link belongs to its own list.
 Run `npx playwright test tests/e2e/toc-highlight.spec.ts` for the chapter and section journeys, including keyboard and native disclosure use.
 The native keyboard check opens the chapter at **Summary**, selects **Four pressures organize the course** and checks that the heading is on screen with both default and reduced motion.
 
+### Course diary starter
+
+To evaluate a change, run `npm run dev` and open `/diary/`.
+Download the ZIP and open its extracted **Course diary** folder as a fresh Obsidian vault.
+Test **Copy highlight** and manual paste first, then enable the bundled community plugin and choose **Add book highlight** on a reading in both Chrome and Obsidian’s Web viewer.
+Check that Obsidian offers a lecture, previews the quote and saves it to the chosen lecture file only after confirmation.
+Use synthetic writing.
+Check that the selected passage reopens its book section and that the portfolio draft contains only the chosen excerpt.
+The [student guide](course-diary.md) describes each action.
+Its first-use screenshots live in `site/assets/obsidian-setup/`.
+Capture updates in an isolated desktop profile using the downloaded starter and synthetic writing.
+Use a new filename for a changed image, then check that the guide’s linked thumbnail opens the full-size capture.
+The build packages the start and portfolio guides plus an overview and three lecture notes per phase from `docs/diary-pilot/`.
+It bundles `packages/obsidian-course-diary/main.js` and its local dependencies as one CommonJS entry point.
+It puts identical plugin files into the starter and the versioned plugin-only ZIP linked from the diary guide.
+To rehearse an update, install the two files from the plugin ZIP into the existing plugin folder of a synthetic vault.
+Check that the lecture notes, plugin settings and TA history are available after reload.
+Book links in the downloadable diary and project starter use the branch’s Cloudflare alias for a PR preview, the local book address for an editable build and the published book address on `main`.
+When testing a preview, follow the illustrated tutorial link from the extracted starter, then open the reading, slide deck and self-study module from **Establish → Lecture 1**.
+Open the separate welcome presentation in that note as well.
+All five links should open on the same preview.
+To check slide revisions locally, open a lecture from `/slides/`, edit its [Markdown deck](../slides/README.md) and reload the numbered page after the development build completes.
+The book review URL appears in the plugin before the local TA starts.
+Download contents and plugin behavior have focused tests in the unit suite. [ADR-066](adrs/implemented/ADR-066-keep-course-diaries-in-obsidian.md) records diary ownership and recovery, and [ADR-067](adrs/implemented/ADR-067-use-the-diary-plugin-for-course-discussion.md) covers the optional plugin runtime and peer handoff.
+
 ### Setup guide layout
 
-The standalone `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
+The standalone `/diary/`, `/agents/` and `/notebook/setup/` pages use the centered `.guide-main` container and shared `.prose` typography.
 Keep code blocks and tables within that reading column at wide and narrow widths.
 The guide's minimum inline gutter reserves room for hanging heading links and their keyboard focus outlines.
 Long prose links can wrap within the guide's reading column.
-Neither guide should create document-level horizontal scrolling; long code remains scrollable inside its own block.
+The guides should avoid document-level horizontal scrolling; long code remains scrollable inside its own block.
 Run `npx playwright test tests/e2e/book-layout.spec.ts --project=chromium --grep 'setup guides'` for the focused layout regression.
 
 Links to guide headings should land with the whole heading visible.
@@ -267,11 +292,11 @@ Run `npx playwright test tests/e2e/setup-guide-navigation.spec.ts` to follow the
 
 ### Compact site header
 
-At 48rem and below, the book title and primary navigation share a row when there is room.
-On a narrower phone the title gets its own line.
-The next row groups Cockpit, Notebook, Teaching assistant, Account, Theme and any available Tools in keyboard order.
+The header uses the book’s favicon as its home link, with the full book title as the image’s accessible name and the link’s tooltip.
+At 48rem and below, the smaller logo and primary navigation share a row when there is room.
+The next row groups Cockpit, Diary, Teaching assistant, Account, Theme and any available Tools in keyboard order.
 The controls can wrap and their labels stay visible.
-The compact homepage checks in [the theme browser suite](../tests/e2e/theme-initialization.spec.ts) cover the 390-pixel height budget, keyboard access and theme selection.
+The [theme browser suite](../tests/e2e/theme-initialization.spec.ts) checks the single-row chapter header at 1104 pixels, the 390-pixel homepage height budget, keyboard access and theme selection.
 
 ### Homepage project cards
 
@@ -385,10 +410,10 @@ The website's Account dialog uses `/api/account/status`, with the same verified-
 `shared/site-account.ts` owns exercise identity selection; keep existing GitHub/local keys and email course namespaces consistent between adapters.
 Development honors explicit test identity overrides for both account status and exercise routes; those headers remain unavailable in the Worker.
 Run `node --test tests/site-account.test.ts tests/learning-auth.test.ts tests/course-auth.test.ts tests/course-mail.test.ts` for account/return-context boundaries, and `npx playwright test tests/e2e/account-learning.spec.ts tests/e2e/chapter-exercises.spec.ts tests/e2e/course-email-signin.spec.ts` for the connected browser journeys.
-The new account journey runs in Chromium and WebKit, including an actual notebook-only companion, cross-tab email confirmation, reviewed exercise context and retained private writing.
+The new account journey runs in Chromium and WebKit, including an actual companion, cross-tab email confirmation and reviewed exercise context.
 Use a fresh `E2E_LOCAL_DATA_DIR` when testing synthetic enrollments; retained simulation directories must not be relabeled or deleted to bypass isolation checks.
 
-Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional local private notebook service beside the development website.
+Run `npm run companion -- --origin http://127.0.0.1:3000` for the optional teaching assistant or Notebook recovery service beside the development website.
 Only `https://scalableweb.dev` is trusted by default; specify exact development origins explicitly.
 It stores records under `.local/learning-companion/`, independently of the development server's course and feedback data.
 See [the learning-workspace guide](learning-workspace.md) for code-free connection, exact origins, portability and the current implementation boundary.
@@ -410,7 +435,7 @@ Focused API/authentication checks are `node --test tests/learning-api.test.ts te
 The CLI suite includes a synthetic terminal setup journey using Python 3's standard `pty` module on macOS/Linux; automatic checks use synthetic provider responses and injected credential stores, never personal keychain entries.
 Native keychain smoke checks, when run, must use a fresh isolated service/account and synthetic value, verify readback/removal and retain their platform-specific limits; they do not verify provider inference.
 Focused checks are `node --test tests/learning-notebook.test.ts tests/learning-companion.test.ts tests/learning-agent.test.ts tests/learning-storage.test.ts tests/learning-client.test.ts tests/course-inquiry.test.ts`.
-Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for the notebook, packed-release onboarding, all declared demo controls and course-backed peer flow in Chromium/WebKit.
+Run `npx playwright test tests/e2e/learning-workspace.spec.ts tests/e2e/learning-onboarding.spec.ts tests/e2e/learning-demo-bridge.spec.ts tests/e2e/learning-peer-inquiry.spec.ts` for read-only Notebook exports, packed-release onboarding, declared demo controls and course-backed peer inquiry in Chromium/WebKit.
 The opt-in real-provider check and voluntary learner evaluation are documented in [the workspace guide](learning-workspace.md#verification).
 
 ### Course project launcher
@@ -445,8 +470,8 @@ The [student guide](learning-companion-setup.md#start-a-course-coding-project) s
 ### Learning cockpit and reading investigations
 
 For shared learning loops, run `node --test tests/reading-investigation.test.ts` and `npx playwright test tests/e2e/reading-investigation.spec.ts tests/e2e/learning-cockpit.spec.ts --project=chromium --project=webkit`.
-The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, selected-note and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
-Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and an actual notebook-only companion's reviewed save path.
+The cockpit checks exercise every authored demo snapshot, source-scoped reading/reflect/revisit continuity, reviewed diary downloads and checked-exercise handoffs, lazy entry points, accessibility and compact dark presentation.
+Run `npx playwright test tests/e2e/learning-tutorial.spec.ts --project=chromium --project=webkit` for skippable/replayable first-use guidance, independent drafts, unavailable storage, compact dark accessibility and a local Markdown download.
 The tutorial's example reply is authored; these checks assert no model calls and distinguish preparing a draft from saving a note.
 Use a fresh `E2E_LOCAL_DATA_DIR` for synthetic browser records.
 The browser check runs an actual companion and synthetic local model, checking submitted activity context rather than model teaching quality.
@@ -543,8 +568,9 @@ Staged publishing is a separate optional npm feature; this release command uses 
 The [book backup and recovery runbook](backups.md) covers production feedback, exercise answers, and local-only project data.
 
 The deployed Worker supports private paragraph-level feedback when `COMMENTS_KV` and GitHub OAuth are configured.
-Students sign in with GitHub, use the paragraph comment control, and post comments.
-The feedback sign-in button opens the shared Account view; reader feedback continues to use its GitHub identity, independently of a course email session.
+The paragraph comment control carries a signed-out reader to the same passage in a browser tab for GitHub sign-in.
+The browser uses its own session and reopens the paragraph’s feedback form after sign-in.
+Reader feedback uses its GitHub identity independently of a course email session. [Student feedback flow](feedback-setup.md#5-student-feedback-flow)
 Signing out through Account clears feedback controls and refreshes their GitHub status in place.
 Students see only their own comments and admin replies to those comments.
 Admin users listed in `ADMIN_GITHUB_LOGINS` can see all comments, reply to comments, resolve comments, hide comments that should not be shown back to students, and feature curated reader notes publicly.
@@ -553,7 +579,7 @@ Admins can open `/admin/feedback/` (or choose `Review all` from a chapter's feed
 The [private feedback MCP](feedback-setup.md#private-feedback-mcp) gives the configured book owner access from Codex, with issue resolution enabled explicitly on the credential.
 Run `node --test tests/feedback-mcp.test.ts tests/public-mcp.test.ts` to check private authorization, issue retrieval and resolution, and the independent public endpoint with synthetic records.
 
-Local editing stores feedback data in `.local/comments.json`.
+Local editing uses the `local-editor` identity and stores feedback data in `.local/comments.json`.
 To review production feedback locally, pull from Cloudflare KV first:
 
 ```bash
@@ -583,3 +609,9 @@ npm run deploy
 ```
 
 `worker:build` generates the static site and a small asset manifest for the Worker. `preview:worker` runs that production-style Worker locally through Wrangler; unlike `dev`, it does not provide the local Markdown editor. `deploy` publishes [worker/index.ts](../worker/index.ts) using [wrangler.jsonc](../wrangler.jsonc).
+
+To review a pull request online, open its successful **Workers Builds** check and find the Worker Version ID.
+The first eight characters identify the build at `https://<first-eight>-scalability-book.survivejs.workers.dev`.
+Append the page path you want to test.
+Opening that URL serves the uploaded version with its configured bindings, including shared feedback storage.
+Use the local test server for checks that write synthetic records. [Cloudflare Version URLs](https://developers.cloudflare.com/workers/versions-and-deployments/version-urls/)

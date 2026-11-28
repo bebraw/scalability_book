@@ -1,3 +1,4 @@
+import { downloadedMarkdown } from "./learning-workspace.helpers.ts";
 import { test as base, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawn } from "node:child_process";
@@ -155,7 +156,7 @@ test("every demo enters the same cockpit and supplies its own actual snapshot on
   expect(model.requests).toHaveLength(demoResources.length);
 });
 
-test("reading loops retain independent thinking, reflection and a next check across sources and reviewed notebook handoffs", async ({
+test("reading loops retain independent thinking, reflection and a next check across sources and download a diary takeaway", async ({
   page,
   model,
 }) => {
@@ -167,9 +168,29 @@ test("reading loops retain independent thinking, reflection and a next check acr
   await cockpit(page)
     .getByLabel("My prediction or uncertainty")
     .fill("A successful release might leave older deployments running.");
+  // A retained cockpit draft may still refer to a note chosen in the retired editor.
+  await page.evaluate(() => {
+    const key = Object.keys(sessionStorage).find((key) =>
+      key.startsWith("book-learning-loop:"),
+    );
+    if (!key) throw new Error("The cockpit did not save its draft.");
+    const draft = JSON.parse(sessionStorage.getItem(key)!);
+    draft.noteIds = ["c0000000-0000-4000-8000-000000000001"];
+    sessionStorage.setItem(key, JSON.stringify(draft));
+  });
+  await page.reload();
+  await expect(
+    cockpit(page).getByLabel("My prediction or uncertainty"),
+  ).toHaveValue("A successful release might leave older deployments running.");
+  const send = page.waitForRequest(
+    (request) =>
+      request.method() === "POST" &&
+      request.url().startsWith(address + "/agent/conversations/"),
+  );
   await cockpit(page)
     .getByRole("button", { name: "Discuss my prediction", exact: true })
     .click();
+  expect((await send).postDataJSON().noteIds).toEqual([]);
   await expect(
     cockpit(page).getByRole("button", {
       name: "Discuss this result",
@@ -243,38 +264,18 @@ test("reading loops retain independent thinking, reflection and a next check acr
     (await new AxeBuilder({ page }).include("#learning-cockpit").analyze())
       .violations,
   ).toEqual([]);
-  await cockpit(page)
-    .getByRole("button", { name: "Prepare notebook takeaway" })
-    .click();
-  const notebook = page.locator("#learning-notebook");
-  await expect(notebook.getByLabel("Your thinking")).toHaveValue(
-    /Next independent check: Inspect one runtime inventory/,
+  const markdown = await downloadedMarkdown(
+    cockpit(page).getByRole("button", {
+      name: "Download takeaway as Markdown",
+    }),
   );
-  await notebook
-    .getByRole("button", { name: "Save note", exact: true })
-    .click();
-  await expect(notebook.getByRole("status")).toContainText(
-    "Saved in your private notebook",
+  expect(markdown).toContain(
+    "Next independent check: Inspect one runtime inventory",
   );
-  await notebook.getByRole("button", { name: "Notes", exact: true }).click();
-  await notebook
-    .getByRole("button", { name: "Explore and reflect", exact: true })
-    .click();
-  await expect(cockpit(page).getByLabel("What I noticed")).toHaveValue(
-    /Help me revisit this selected note/,
+  expect(markdown).toContain(
+    "[Book source](https://scalableweb.dev/chapters/reality/",
   );
   expect(model.requests).toHaveLength(sent);
-  await cockpit(page)
-    .getByRole("button", { name: "Explain directly", exact: true })
-    .click();
-  await expect(
-    cockpit(page).locator(".reading-investigation-messages strong"),
-  ).toBeVisible();
-  await expect.poll(() => model.requests.length).toBe(sent + 1);
-  expect(lastContext(model).selectedNotes).toHaveLength(1);
-  expect(lastContext(model).selectedNotes[0].body).toContain(
-    "Release success does not establish",
-  );
   await cockpit(page).getByRole("button", { name: "03 / Reflect" }).click();
   await cockpit(page)
     .getByRole("button", { name: "Start my next check" })
@@ -285,7 +286,53 @@ test("reading loops retain independent thinking, reflection and a next check acr
   await expect(
     cockpit(page).getByLabel("My prediction or uncertainty"),
   ).toHaveValue("");
-  expect(model.requests).toHaveLength(sent + 1);
+  expect(model.requests).toHaveLength(sent);
+});
+
+test("a long cockpit takeaway exports the complete writing and browser snapshot", async ({
+  page,
+  model,
+}) => {
+  const demoId = "demo-cache-decision-lab";
+  await page.goto("/chapters/architecture/");
+  const observed =
+    "Visible response age from the synthetic cache trial. ".repeat(128) +
+    "End of the recorded cache trial.";
+  await page.locator(`#${demoId}`).evaluate((demo, text) => {
+    const output = document.createElement("p");
+    output.textContent = text;
+    demo.prepend(output);
+  }, observed);
+  await page.locator(`[data-investigate-demo="${demoId}"]`).click();
+  await connect(page);
+  const panel = cockpit(page);
+  const prediction = "My prediction about the stored age. ".repeat(50);
+  await panel.getByLabel("My prediction or uncertainty").fill(prediction);
+  await panel.getByRole("button", { name: "Discuss my prediction" }).click();
+  await expect(
+    panel.getByRole("button", { name: "Discuss this result" }),
+  ).toBeEnabled();
+  expect(
+    lastContext(model).readingActivity.turn.observation.visibleText,
+  ).toContain(observed);
+  await panel.getByRole("button", { name: "03 / Reflect" }).click();
+  const takeaway = "The response lifetime changes the outcome. ".repeat(90);
+  const evidence = "I compared the saved age to the response lifetime. ".repeat(
+    75,
+  );
+  const next =
+    "I will repeat the same check with two responses. ".repeat(35) +
+    "Final independent check.";
+  await panel.getByLabel("My takeaway", { exact: true }).fill(takeaway);
+  await panel.getByLabel("My check and evidence").fill(evidence);
+  await panel.getByLabel("My next independent check").fill(next);
+  const markdown = await downloadedMarkdown(
+    panel.getByRole("button", { name: "Download takeaway as Markdown" }),
+  );
+  expect(markdown).toContain(next);
+  expect(markdown.indexOf("End of the recorded cache trial.")).toBeGreaterThan(
+    16_000,
+  );
 });
 
 test("a checked exercise enters a reviewed loop without worked answers or automatic messages", async ({
@@ -328,19 +375,9 @@ test("a checked exercise enters a reviewed loop without worked answers or automa
   await assistant
     .getByRole("button", { name: "Chapter guide", exact: true })
     .click();
-  await assistant
-    .getByLabel("My explanation of the changed case")
-    .fill("I need to compare one changed boundary before generalizing.");
-  await assistant
-    .getByRole("button", {
-      name: "Explore this case in the learning cockpit",
-      exact: true,
-    })
-    .click();
-  await expect(cockpit(page).getByLabel("What I noticed")).toHaveValue(
-    /compare one changed boundary/,
-  );
-  await expect(assistant).toBeHidden();
+  await expect(
+    cockpit(page).getByLabel("My prediction or uncertainty"),
+  ).toBeVisible();
   expect(model.requests).toHaveLength(1);
 });
 

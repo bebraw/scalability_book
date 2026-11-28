@@ -832,7 +832,18 @@ async function runBuild() {
 async function startSourceWatchers() {
   const sources = [
     { target: path.join(root, "book"), recursive: true },
+    { target: path.join(root, "docs", "course-diary.md"), recursive: false },
+    {
+      target: path.join(root, "docs", "learning-companion-setup.md"),
+      recursive: false,
+    },
+    { target: path.join(root, "docs", "diary-pilot"), recursive: true },
+    {
+      target: path.join(root, "packages", "obsidian-course-diary"),
+      recursive: true,
+    },
     { target: path.join(root, "site"), recursive: true },
+    { target: path.join(root, "slides"), recursive: true },
     { target: path.join(root, "study"), recursive: true },
     { target: path.join(root, "shared"), recursive: true },
     { target: path.join(root, "specifications"), recursive: true },

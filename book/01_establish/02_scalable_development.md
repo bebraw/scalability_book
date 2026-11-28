@@ -58,6 +58,16 @@ The change is that a probabilistic tool-using system can perform more of the imp
 The event tracker could use BDD scenarios to define acceptance, generate an API client from a schema, and delegate implementation to an agent.
 Across these patterns, a requested outcome still has to become a checked change someone can maintain.
 
+Consider a support report about a duplicate record.
+One route is for a support specialist to reproduce the problem, a developer to write a fix, and a teammate to review it.
+At epilot, support staff could ask a coding agent for a patch in Slack and try the change through a preview link.
+At SDLCAI 2026, Viljami Kuosmanen described a case where a reviewer turned down a proposed fix for duplicate detection and an engineer traced the underlying cause.
+He identified the workload of a few senior reviewers as a bottleneck at epilot :citep[kuosmanen2026epilot].
+
+How could you tell whether a change like this helped your team deliver a fix sooner?
+Compare the time from the report to a patch ready for review with the time from that patch to a verified fix.
+The first interval can shrink while a patch waits longer for someone who understands the affected code.
+
 ## Loop engineering
 
 When the CSV check reports an extra field, should the agent repair the serializer, ask the owner to clarify the format, or stop because it has spent its retry budget?
